@@ -1,0 +1,7 @@
+# Values for Devlopment Environment cdm.
+
+env: 
+  azureCR:
+      imageTag: latest
+  d4lNexus:
+      imageTag: latest

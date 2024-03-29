@@ -1,0 +1,49 @@
+# Default values for cdm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+isD4LEnv: true
+
+replicaCount: 1
+
+alpReleaseName: "v23.1-kita-dake"
+
+nameOverride: ""
+fullnameOverride: ""
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+
+env: 
+  azureCR:
+      repository: alpcr.azurecr.io/clinical-research
+      imageCredentials: alpcrregistrykeys
+      imageTag: develop
+  d4lNexus:
+      repository: alp-snapshots.alp-dev.org/clinical-research
+      imageCredentials: alp-regsecret
+      imageTag: develop
+  image:
+    repository: "{{- ternary .Values.env.d4lNexus.repository .Values.env.azureCR.repository .Values.isD4LEnv -}}"
+    tag: "{{- ternary .Values.env.d4lNexus.imageTag .Values.env.azureCR.imageTag .Values.isD4LEnv -}}"
+    imageCredentials: "{{- ternary .Values.env.d4lNexus.imageCredentials .Values.env.azureCR.imageCredentials .Values.isD4LEnv -}}"
+    pullPolicy: Always
+
+secrets:
+  POSTGRES_PORT: "5432"
+  POSTGRES_HOST: localhost
+  POSTGRES_DB: query_engine
+  POSTGRES_SCHEMA: qe_config_new
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: Toor1234
+

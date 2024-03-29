@@ -1,0 +1,38 @@
+PROCEDURE "hc.hph.plugins.vcf.db.procedures::UpdateDocumentStatus" ( IN audit_id INTEGER, OUT status VARCHAr(16), OUT message VARCHAR(5000) )
+LANGUAGE SQLSCRIPT SQL SECURITY INVOKER AS
+BEGIN
+    DECLARE CURSOR document_status FOR
+        SELECT
+            "AuditLogID",
+            "DocumentURI",
+            "Status",
+            "Notes"
+        FROM
+            "hc.hph.di.model::DataIntegration.AuditLog"
+        WHERE
+            "ParentAuditLogID" = :audit_id
+        ORDER BY
+            "AuditLogID";
+    DECLARE numeric_status INTEGER := 0;
+    
+    message := NULL;
+    FOR document AS document_status DO
+        IF :document."Status" <> 'Completed' THEN    
+            IF :document."Status" = 'Failed' THEN
+                IF :numeric_status < 3 THEN
+                   numeric_status = 3;
+                   message := 'Document ' || :document."DocumentURI" || ' failed with error ' || ': ' || :document."Notes";
+                END IF;
+            ELSEIF :document."Status" = 'Running' THEN
+                IF :numeric_status <= 2 THEN
+                   numeric_status = 2;
+                END IF;
+            ELSE
+                IF :numeric_status <=1 THEN
+                   numeric_status = 1; 
+                END IF;
+            END IF;
+        END IF;
+    END FOR;
+    status := CASE WHEN :numeric_status = 0 THEN 'Completed' WHEN :numeric_status = 1 THEN 'Queued' WHEN :numeric_status = 2 THEN 'Running' ELSE 'Failed' END;
+END

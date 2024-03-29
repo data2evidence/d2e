@@ -1,0 +1,29 @@
+PROCEDURE "hc.hph.plugins.textProcessing.pathology.db.procedures::DeletePostProcessing" 
+(
+in iv_auditLogID bigint,
+in iv_pipelineID nvarchar(256)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+ --get the post processing table for the pluginID
+ declare lv_ppTable nvarchar(256);
+ declare lt_dwid table("DWID" varbinary(32));
+ 
+ --select "ConfigurationValue" into lv_ppTable from "hc.hph.di.documents.staging.db.models::DocumentProcessing.PipelineConfiguration" where "PipelineID" = :iv_pipelineID and "Action" = 'PostProcessing';
+
+ --get the DWID from the status table
+ lt_dwid = select distinct "DWID" from "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status"
+ where "DWAuditID" = :iv_auditLogID;
+ 
+ --exec 'delete from '||:lv_ppTable||' where "DWID" in(select "DWID" from it_data)';
+ 
+ delete from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_FILTERED"
+ where "DWID" in(select "DWID" from :lt_dwid);
+ 
+END;

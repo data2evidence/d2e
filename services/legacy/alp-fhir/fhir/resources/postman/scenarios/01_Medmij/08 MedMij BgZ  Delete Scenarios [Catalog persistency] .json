@@ -1,0 +1,145 @@
+{
+	"info": {
+		"_postman_id": "cc9cadee-3b8a-457f-8bcb-3d8e43e8f76b",
+		"name": "08 MedMij BgZ  Delete Scenarios Tokens.postman_collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Delete Deployed Scenario ( EndPoint )",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bc078b27-0f57-47cc-9314-8e0c1a07ee4b",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{bearerToken}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/content/fhir/Scenario/hcim_demo/$deleteEndpoint",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"content",
+						"fhir",
+						"Scenario",
+						"hcim_demo",
+						"$deleteEndpoint"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Deployed Scenarios",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "adfaa9d3-2f0b-4b79-9a21-4a2272679f57",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Multiple checks on bundle\", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(0)",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{bearerToken}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/content/fhir/Scenario",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"content",
+						"fhir",
+						"Scenario"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

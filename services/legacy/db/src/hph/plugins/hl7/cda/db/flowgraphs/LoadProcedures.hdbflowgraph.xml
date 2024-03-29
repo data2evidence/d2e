@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<flowgraph:ContainerNode xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowgraph="http://www.com/ndb/flowgraph/1.0" xmi:id="_KvX1wD0nEeaHzp_P5kzDGQ" name="LOADENTRIESPROCEDURES" generateProcedure="false" generateTask="true">
+  <annotations xmi:id="_KvX1wT0nEeaHzp_P5kzDGQ" key="afm.layout">
+    <annotations xmi:id="_KvX1wj0nEeaHzp_P5kzDGQ" key="x" value="10"/>
+    <annotations xmi:id="_KvX1wz0nEeaHzp_P5kzDGQ" key="y" value="10"/>
+  </annotations>
+  <annotations xmi:id="_SZ_ioD0oEeaHzp_P5kzDGQ" key="afm.nodeType" value="ContainerNode"/>
+  <annotations xmi:id="_SahuID0oEeaHzp_P5kzDGQ" key="afm.nodeInputs">
+    <annotations xmi:id="_SastQD0oEeaHzp_P5kzDGQ" key="VIRTUAL_TABLE" value=""/>
+  </annotations>
+  <annotations xmi:id="_SbCEcD0oEeaHzp_P5kzDGQ" key="afm.nodeOutputs"/>
+  <inputs xmi:id="_O0jicD0nEeaHzp_P5kzDGQ" name="VIRTUAL_TABLE" kind="TABLE">
+    <attributes xmi:id="_QROUwD0nEeaHzp_P5kzDGQ" name="DocumentID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_Ryn2ED0nEeaHzp_P5kzDGQ" name="SectionID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_R0MjYD0nEeaHzp_P5kzDGQ" name="EntryID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_TmQ98D0nEeaHzp_P5kzDGQ" name="EntryName" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_WBMvUD0nEeaHzp_P5kzDGQ" name="TemplateID.Root" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_eis2UD0nEeaHzp_P5kzDGQ" name="TemplateID.Ext" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_gKJ8UD0nEeaHzp_P5kzDGQ" name="Code.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_g3Zc0D0nEeaHzp_P5kzDGQ" name="Code.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_g47G0D0nEeaHzp_P5kzDGQ" name="Code.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_g6sBYD0nEeaHzp_P5kzDGQ" name="Code.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_hAMzgD0nEeaHzp_P5kzDGQ" name="Code.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_hRuBUD0nEeaHzp_P5kzDGQ" name="Status.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_iDsQ0D0nEeaHzp_P5kzDGQ" name="Status.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_iFN60D0nEeaHzp_P5kzDGQ" name="Status.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_iGrTYD0nEeaHzp_P5kzDGQ" name="Status.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_iH9s0D0nEeaHzp_P5kzDGQ" name="Status.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_ien5UD0nEeaHzp_P5kzDGQ" name="StartTime" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+    <attributes xmi:id="_jtb10D0nEeaHzp_P5kzDGQ" name="EndTime" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+    <attributes xmi:id="_ZLutcD0uEeaHzp_P5kzDGQ" name="Priority.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_dVO5cD0uEeaHzp_P5kzDGQ" name="Priority.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_dW1b8D0uEeaHzp_P5kzDGQ" name="Priority.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_dYS0gD0uEeaHzp_P5kzDGQ" name="Priority.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_dZqGcD0uEeaHzp_P5kzDGQ" name="Priority.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_dofMoD0uEeaHzp_P5kzDGQ" name="Language.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_fZrdcD0uEeaHzp_P5kzDGQ" name="Language.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_fbNugD0uEeaHzp_P5kzDGQ" name="Language.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_fc_3MD0uEeaHzp_P5kzDGQ" name="Language.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_fe3fcD0uEeaHzp_P5kzDGQ" name="Language.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_fnkIcD0uEeaHzp_P5kzDGQ" name="Method.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_gasOgD0uEeaHzp_P5kzDGQ" name="Method.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_gcN4gD0uEeaHzp_P5kzDGQ" name="Method.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_gdlKcD0uEeaHzp_P5kzDGQ" name="Method.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_gfDKED0uEeaHzp_P5kzDGQ" name="Method.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_ggt-AD0uEeaHzp_P5kzDGQ" name="ApproachSite.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_ht6w8D0uEeaHzp_P5kzDGQ" name="ApproachSite.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_hvYJgD0uEeaHzp_P5kzDGQ" name="ApproachSite.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_hw1iED0uEeaHzp_P5kzDGQ" name="ApproachSite.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_h0BY8D0uEeaHzp_P5kzDGQ" name="ApproachSite.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_h4EygD0uEeaHzp_P5kzDGQ" name="TargetSite.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_jHa6gD0uEeaHzp_P5kzDGQ" name="TargetSite.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_jI9yoD0uEeaHzp_P5kzDGQ" name="TargetSite.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_jKT2cD0uEeaHzp_P5kzDGQ" name="TargetSite.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_jNE2kD0uEeaHzp_P5kzDGQ" name="TargetSite.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+  </inputs>
+  <tableMappings xmi:id="_FlFFsD0oEeaHzp_P5kzDGQ" source="_O0jicD0nEeaHzp_P5kzDGQ" target="_6HhdRz0nEeaHzp_P5kzDGQ">
+    <attributeMappings xmi:id="_FlFFsT0oEeaHzp_P5kzDGQ" source="_QROUwD0nEeaHzp_P5kzDGQ" target="_FeZ18D0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFsj0oEeaHzp_P5kzDGQ" source="_Ryn2ED0nEeaHzp_P5kzDGQ" target="_FeiY0D0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFsz0oEeaHzp_P5kzDGQ" source="_R0MjYD0nEeaHzp_P5kzDGQ" target="_FeqUoD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFtD0oEeaHzp_P5kzDGQ" source="_TmQ98D0nEeaHzp_P5kzDGQ" target="_FexCUD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFtT0oEeaHzp_P5kzDGQ" source="_WBMvUD0nEeaHzp_P5kzDGQ" target="_Fe4XED0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFtj0oEeaHzp_P5kzDGQ" source="_eis2UD0nEeaHzp_P5kzDGQ" target="_Fe-dsD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFtz0oEeaHzp_P5kzDGQ" source="_gKJ8UD0nEeaHzp_P5kzDGQ" target="_FfFLYD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFuD0oEeaHzp_P5kzDGQ" source="_g3Zc0D0nEeaHzp_P5kzDGQ" target="_FfNHMD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFuT0oEeaHzp_P5kzDGQ" source="_g47G0D0nEeaHzp_P5kzDGQ" target="_FfT04D0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFuj0oEeaHzp_P5kzDGQ" source="_g6sBYD0nEeaHzp_P5kzDGQ" target="_FfZUcD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFuz0oEeaHzp_P5kzDGQ" source="_hAMzgD0nEeaHzp_P5kzDGQ" target="_FfhQQD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFvD0oEeaHzp_P5kzDGQ" source="_hRuBUD0nEeaHzp_P5kzDGQ" target="_Ffn98D0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFvT0oEeaHzp_P5kzDGQ" source="_iDsQ0D0nEeaHzp_P5kzDGQ" target="_FfuroD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFvj0oEeaHzp_P5kzDGQ" source="_iFN60D0nEeaHzp_P5kzDGQ" target="_Ff1ZUD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFvz0oEeaHzp_P5kzDGQ" source="_iGrTYD0nEeaHzp_P5kzDGQ" target="_Ff8HAD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFwD0oEeaHzp_P5kzDGQ" source="_iH9s0D0nEeaHzp_P5kzDGQ" target="_FgDbwD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFwT0oEeaHzp_P5kzDGQ" source="_ien5UD0nEeaHzp_P5kzDGQ" target="_FgKwgD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FlFFwj0oEeaHzp_P5kzDGQ" source="_jtb10D0nEeaHzp_P5kzDGQ" target="_FgTTYD0oEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_ZLy-4T0uEeaHzp_P5kzDGQ" source="_ZLutcD0uEeaHzp_P5kzDGQ" target="_ZLy-4D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_dVUZAD0uEeaHzp_P5kzDGQ" source="_dVO5cD0uEeaHzp_P5kzDGQ" target="_dVTx8D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_dW34MT0uEeaHzp_P5kzDGQ" source="_dW1b8D0uEeaHzp_P5kzDGQ" target="_dW34MD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_dYVQwT0uEeaHzp_P5kzDGQ" source="_dYS0gD0uEeaHzp_P5kzDGQ" target="_dYVQwD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_dZtJwT0uEeaHzp_P5kzDGQ" source="_dZqGcD0uEeaHzp_P5kzDGQ" target="_dZtJwD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_doho4T0uEeaHzp_P5kzDGQ" source="_dofMoD0uEeaHzp_P5kzDGQ" target="_doho4D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_fZugwT0uEeaHzp_P5kzDGQ" source="_fZrdcD0uEeaHzp_P5kzDGQ" target="_fZugwD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_fbQKwT0uEeaHzp_P5kzDGQ" source="_fbNugD0uEeaHzp_P5kzDGQ" target="_fbQKwD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_fdCTcT0uEeaHzp_P5kzDGQ" source="_fc_3MD0uEeaHzp_P5kzDGQ" target="_fdCTcD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_fe7J0T0uEeaHzp_P5kzDGQ" source="_fe3fcD0uEeaHzp_P5kzDGQ" target="_fe7J0D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_fnny0T0uEeaHzp_P5kzDGQ" source="_fnkIcD0uEeaHzp_P5kzDGQ" target="_fnny0D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_gauqwT0uEeaHzp_P5kzDGQ" source="_gasOgD0uEeaHzp_P5kzDGQ" target="_gauqwD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_gcQ70T0uEeaHzp_P5kzDGQ" source="_gcN4gD0uEeaHzp_P5kzDGQ" target="_gcQ70D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_gdo00T0uEeaHzp_P5kzDGQ" source="_gdlKcD0uEeaHzp_P5kzDGQ" target="_gdo00D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_gfFmUT0uEeaHzp_P5kzDGQ" source="_gfDKED0uEeaHzp_P5kzDGQ" target="_gfFmUD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_ggxBUT0uEeaHzp_P5kzDGQ" source="_ggt-AD0uEeaHzp_P5kzDGQ" target="_ggxBUD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_ht9NMT0uEeaHzp_P5kzDGQ" source="_ht6w8D0uEeaHzp_P5kzDGQ" target="_ht9NMD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_hvbM0T0uEeaHzp_P5kzDGQ" source="_hvYJgD0uEeaHzp_P5kzDGQ" target="_hvbM0D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_hw4lYT0uEeaHzp_P5kzDGQ" source="_hw1iED0uEeaHzp_P5kzDGQ" target="_hw4lYD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_h0EcQT0uEeaHzp_P5kzDGQ" source="_h0BY8D0uEeaHzp_P5kzDGQ" target="_h0EcQD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_h4H10T0uEeaHzp_P5kzDGQ" source="_h4EygD0uEeaHzp_P5kzDGQ" target="_h4H10D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_jHdWwT0uEeaHzp_P5kzDGQ" source="_jHa6gD0uEeaHzp_P5kzDGQ" target="_jHdWwD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_jJBdAD0uEeaHzp_P5kzDGQ" source="_jI9yoD0uEeaHzp_P5kzDGQ" target="_jJA18D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_jKW5wT0uEeaHzp_P5kzDGQ" source="_jKT2cD0uEeaHzp_P5kzDGQ" target="_jKW5wD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_jNHS0T0uEeaHzp_P5kzDGQ" source="_jNE2kD0uEeaHzp_P5kzDGQ" target="_jNHS0D0uEeaHzp_P5kzDGQ"/>
+  </tableMappings>
+  <tableMappings xmi:id="_AUB-oD0vEeaHzp_P5kzDGQ" source="_6HhdSD0nEeaHzp_P5kzDGQ" target="_PuYQ-D0oEeaHzp_P5kzDGQ">
+    <attributeMappings xmi:id="_AUB-oT0vEeaHzp_P5kzDGQ" source="_8Wd84D0uEeaHzp_P5kzDGQ" target="__VyNsD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-oj0vEeaHzp_P5kzDGQ" source="_8Wd84T0uEeaHzp_P5kzDGQ" target="__VyNsT0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-oz0vEeaHzp_P5kzDGQ" source="_8Wd84j0uEeaHzp_P5kzDGQ" target="__Vy0wD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-pD0vEeaHzp_P5kzDGQ" source="_8Wd84z0uEeaHzp_P5kzDGQ" target="__Vy0wT0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-pT0vEeaHzp_P5kzDGQ" source="_8Wej8D0uEeaHzp_P5kzDGQ" target="__Vy0wj0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-pj0vEeaHzp_P5kzDGQ" source="_8Wej8T0uEeaHzp_P5kzDGQ" target="__Vy0wz0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-pz0vEeaHzp_P5kzDGQ" source="_8Wej8z0uEeaHzp_P5kzDGQ" target="__Vy0xD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-qD0vEeaHzp_P5kzDGQ" source="_8Wej9T0uEeaHzp_P5kzDGQ" target="__Vy0xT0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-qT0vEeaHzp_P5kzDGQ" source="_8Wej9z0uEeaHzp_P5kzDGQ" target="__Vy0xj0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-qj0vEeaHzp_P5kzDGQ" source="_8Wej-T0uEeaHzp_P5kzDGQ" target="__Vy0xz0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-qz0vEeaHzp_P5kzDGQ" source="_8WfLAD0uEeaHzp_P5kzDGQ" target="__Vy0yD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-rD0vEeaHzp_P5kzDGQ" source="_8WfLAj0uEeaHzp_P5kzDGQ" target="__Vy0yT0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-rT0vEeaHzp_P5kzDGQ" source="_8WfLBD0uEeaHzp_P5kzDGQ" target="__Vy0yj0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-rj0vEeaHzp_P5kzDGQ" source="_8WfLBj0uEeaHzp_P5kzDGQ" target="__Vy0yz0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-rz0vEeaHzp_P5kzDGQ" source="_8WfLCD0uEeaHzp_P5kzDGQ" target="__Vy0zD0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-sD0vEeaHzp_P5kzDGQ" source="_8WfLCT0uEeaHzp_P5kzDGQ" target="__Vy0zT0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-sT0vEeaHzp_P5kzDGQ" source="_8WfLCj0uEeaHzp_P5kzDGQ" target="__Vy0zj0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-sj0vEeaHzp_P5kzDGQ" source="_8WfLCz0uEeaHzp_P5kzDGQ" target="__Vy0zz0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-sz0vEeaHzp_P5kzDGQ" source="_8WfyED0uEeaHzp_P5kzDGQ" target="__Vzb0D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-tD0vEeaHzp_P5kzDGQ" source="_8WfyET0uEeaHzp_P5kzDGQ" target="__Vzb0T0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-tT0vEeaHzp_P5kzDGQ" source="_8WfyEj0uEeaHzp_P5kzDGQ" target="__Vzb0j0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-tj0vEeaHzp_P5kzDGQ" source="_8WfyEz0uEeaHzp_P5kzDGQ" target="__Vzb0z0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-tz0vEeaHzp_P5kzDGQ" source="_8WfyFD0uEeaHzp_P5kzDGQ" target="__Vzb1D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-uD0vEeaHzp_P5kzDGQ" source="_8WfyFT0uEeaHzp_P5kzDGQ" target="__Vzb1T0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-uT0vEeaHzp_P5kzDGQ" source="_8WfyFj0uEeaHzp_P5kzDGQ" target="__Vzb1j0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-uj0vEeaHzp_P5kzDGQ" source="_8WfyFz0uEeaHzp_P5kzDGQ" target="__Vzb1z0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-uz0vEeaHzp_P5kzDGQ" source="_8WfyGD0uEeaHzp_P5kzDGQ" target="__Vzb2D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-vD0vEeaHzp_P5kzDGQ" source="_8WfyGT0uEeaHzp_P5kzDGQ" target="__Vzb2T0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-vT0vEeaHzp_P5kzDGQ" source="_8WfyGj0uEeaHzp_P5kzDGQ" target="__Vzb2j0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-vj0vEeaHzp_P5kzDGQ" source="_8WfyGz0uEeaHzp_P5kzDGQ" target="__Vzb2z0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-vz0vEeaHzp_P5kzDGQ" source="_8WfyHT0uEeaHzp_P5kzDGQ" target="__Vzb3D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-wD0vEeaHzp_P5kzDGQ" source="_8WgZIT0uEeaHzp_P5kzDGQ" target="__Vzb3T0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-wT0vEeaHzp_P5kzDGQ" source="_8WgZIz0uEeaHzp_P5kzDGQ" target="__Vzb3j0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-wj0vEeaHzp_P5kzDGQ" source="_8WgZJT0uEeaHzp_P5kzDGQ" target="__Vzb3z0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-wz0vEeaHzp_P5kzDGQ" source="_8WgZJz0uEeaHzp_P5kzDGQ" target="__Vzb4D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-xD0vEeaHzp_P5kzDGQ" source="_8WhAMD0uEeaHzp_P5kzDGQ" target="__Vzb4T0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-xT0vEeaHzp_P5kzDGQ" source="_8WhAMj0uEeaHzp_P5kzDGQ" target="__Vzb4j0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-xj0vEeaHzp_P5kzDGQ" source="_8WhAMz0uEeaHzp_P5kzDGQ" target="__Vzb4z0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-xz0vEeaHzp_P5kzDGQ" source="_8WhAND0uEeaHzp_P5kzDGQ" target="__V0C4D0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-yD0vEeaHzp_P5kzDGQ" source="_8WhANT0uEeaHzp_P5kzDGQ" target="__V0C4T0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-yT0vEeaHzp_P5kzDGQ" source="_8WhANj0uEeaHzp_P5kzDGQ" target="__V0C4j0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-yj0vEeaHzp_P5kzDGQ" source="_8WhnQD0uEeaHzp_P5kzDGQ" target="__V0C4z0uEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_AUB-yz0vEeaHzp_P5kzDGQ" source="_8WhnQj0uEeaHzp_P5kzDGQ" target="__V0C5D0uEeaHzp_P5kzDGQ"/>
+  </tableMappings>
+  <nodes xsi:type="flowgraph:TableComparisonNode" xmi:id="_6HhdQD0nEeaHzp_P5kzDGQ" name="TABLECOMP" detectDeletedRows="false" compareTableName="hc.hph.plugins.hl7.cda.db.models::CDA.Staging.Entries.Procedures" compareTableType="DATABASE_TABLE" compareTableLayout="COLUMN" compareAttributes="_FeZ18D0oEeaHzp_P5kzDGQ _FeiY0D0oEeaHzp_P5kzDGQ _Fe4XED0oEeaHzp_P5kzDGQ">
+    <annotations xmi:id="_6HhdQT0nEeaHzp_P5kzDGQ" key="afm.displayName" value="Table Comparison"/>
+    <annotations xmi:id="_6HhdQj0nEeaHzp_P5kzDGQ" key="im.tableComparisonGenDelKey" value="allRows"/>
+    <annotations xmi:id="_6HhdQz0nEeaHzp_P5kzDGQ" key="afm.description" value="Compares two data sets and produces the difference between them as a data set with rows flagged as INSERT, UPDATE, or DELETE."/>
+    <annotations xmi:id="_6HhdRD0nEeaHzp_P5kzDGQ" key="afm.layout">
+      <annotations xmi:id="_6HhdRT0nEeaHzp_P5kzDGQ" key="x" value="62"/>
+      <annotations xmi:id="_6HhdRj0nEeaHzp_P5kzDGQ" key="y" value="124"/>
+    </annotations>
+    <annotations xmi:id="_SbILED0oEeaHzp_P5kzDGQ" key="afm.nodeType" value="TableComparisonNode"/>
+    <annotations xmi:id="_SbTKMD0oEeaHzp_P5kzDGQ" key="afm.nodeInputs">
+      <annotations xmi:id="_SbYCsD0oEeaHzp_P5kzDGQ" key="INPUT" value="VIRTUAL_TABLE"/>
+    </annotations>
+    <annotations xmi:id="_Sbq9oD0oEeaHzp_P5kzDGQ" key="afm.nodeOutputs">
+      <annotations xmi:id="_SbwdMD0oEeaHzp_P5kzDGQ" key="OUTPUT" value="DATA"/>
+    </annotations>
+    <inputs xmi:id="_6HhdRz0nEeaHzp_P5kzDGQ" name="INPUT" kind="TABLE">
+      <attributes xmi:id="_FeZ18D0oEeaHzp_P5kzDGQ" name="DocumentID" type="NVARCHAR" nullable="false" length="100" scale="0">
+        <annotations xmi:id="_h83EgD0xEeaHzp_P5kzDGQ" key="im.primaryKey" value="true"/>
+      </attributes>
+      <attributes xmi:id="_FeiY0D0oEeaHzp_P5kzDGQ" name="SectionID" type="NVARCHAR" nullable="false" length="100" scale="0">
+        <annotations xmi:id="_ip80AD0xEeaHzp_P5kzDGQ" key="im.primaryKey" value="true"/>
+      </attributes>
+      <attributes xmi:id="_FeqUoD0oEeaHzp_P5kzDGQ" name="EntryID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_FexCUD0oEeaHzp_P5kzDGQ" name="EntryName" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_Fe4XED0oEeaHzp_P5kzDGQ" name="TemplateID.Root" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_Fe-dsD0oEeaHzp_P5kzDGQ" name="TemplateID.Ext" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_FfFLYD0oEeaHzp_P5kzDGQ" name="Code.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_FfNHMD0oEeaHzp_P5kzDGQ" name="Code.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_FfT04D0oEeaHzp_P5kzDGQ" name="Code.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_FfZUcD0oEeaHzp_P5kzDGQ" name="Code.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_FfhQQD0oEeaHzp_P5kzDGQ" name="Code.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_Ffn98D0oEeaHzp_P5kzDGQ" name="Status.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_FfuroD0oEeaHzp_P5kzDGQ" name="Status.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_Ff1ZUD0oEeaHzp_P5kzDGQ" name="Status.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_Ff8HAD0oEeaHzp_P5kzDGQ" name="Status.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_FgDbwD0oEeaHzp_P5kzDGQ" name="Status.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_FgKwgD0oEeaHzp_P5kzDGQ" name="StartTime" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_FgTTYD0oEeaHzp_P5kzDGQ" name="EndTime" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_ZLy-4D0uEeaHzp_P5kzDGQ" name="Priority.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_dVTx8D0uEeaHzp_P5kzDGQ" name="Priority.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_dW34MD0uEeaHzp_P5kzDGQ" name="Priority.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_dYVQwD0uEeaHzp_P5kzDGQ" name="Priority.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_dZtJwD0uEeaHzp_P5kzDGQ" name="Priority.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_doho4D0uEeaHzp_P5kzDGQ" name="Language.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_fZugwD0uEeaHzp_P5kzDGQ" name="Language.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_fbQKwD0uEeaHzp_P5kzDGQ" name="Language.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_fdCTcD0uEeaHzp_P5kzDGQ" name="Language.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_fe7J0D0uEeaHzp_P5kzDGQ" name="Language.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_fnny0D0uEeaHzp_P5kzDGQ" name="Method.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_gauqwD0uEeaHzp_P5kzDGQ" name="Method.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_gcQ70D0uEeaHzp_P5kzDGQ" name="Method.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_gdo00D0uEeaHzp_P5kzDGQ" name="Method.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_gfFmUD0uEeaHzp_P5kzDGQ" name="Method.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_ggxBUD0uEeaHzp_P5kzDGQ" name="ApproachSite.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_ht9NMD0uEeaHzp_P5kzDGQ" name="ApproachSite.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_hvbM0D0uEeaHzp_P5kzDGQ" name="ApproachSite.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_hw4lYD0uEeaHzp_P5kzDGQ" name="ApproachSite.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_h0EcQD0uEeaHzp_P5kzDGQ" name="ApproachSite.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_h4H10D0uEeaHzp_P5kzDGQ" name="TargetSite.OriginalValue" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_jHdWwD0uEeaHzp_P5kzDGQ" name="TargetSite.OID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_jJA18D0uEeaHzp_P5kzDGQ" name="TargetSite.Code" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_jKW5wD0uEeaHzp_P5kzDGQ" name="TargetSite.CodeSystem" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_jNHS0D0uEeaHzp_P5kzDGQ" name="TargetSite.CodeSystemVersion" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    </inputs>
+    <outputs xmi:id="_6HhdSD0nEeaHzp_P5kzDGQ" name="OUTPUT" kind="TABLE">
+      <attributes xmi:id="_8Wd84D0uEeaHzp_P5kzDGQ" name="ApproachSite.Code" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="ApproachSite.Code"/>
+      <attributes xmi:id="_8Wd84T0uEeaHzp_P5kzDGQ" name="ApproachSite.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="ApproachSite.CodeSystem"/>
+      <attributes xmi:id="_8Wd84j0uEeaHzp_P5kzDGQ" name="ApproachSite.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="ApproachSite.CodeSystemVersion"/>
+      <attributes xmi:id="_8Wd84z0uEeaHzp_P5kzDGQ" name="ApproachSite.OID" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="ApproachSite.OID"/>
+      <attributes xmi:id="_8Wej8D0uEeaHzp_P5kzDGQ" name="ApproachSite.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="ApproachSite.OriginalValue"/>
+      <attributes xmi:id="_8Wej8T0uEeaHzp_P5kzDGQ" name="Code.Code" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Code.Code"/>
+      <attributes xmi:id="_8Wej8z0uEeaHzp_P5kzDGQ" name="Code.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Code.CodeSystem"/>
+      <attributes xmi:id="_8Wej9T0uEeaHzp_P5kzDGQ" name="Code.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Code.CodeSystemVersion"/>
+      <attributes xmi:id="_8Wej9z0uEeaHzp_P5kzDGQ" name="Code.OID" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Code.OID"/>
+      <attributes xmi:id="_8Wej-T0uEeaHzp_P5kzDGQ" name="Code.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Code.OriginalValue"/>
+      <attributes xmi:id="_8WfLAD0uEeaHzp_P5kzDGQ" name="DocumentID" type="NVARCHAR" nullable="false" length="100" scale="0" mappedName="DocumentID"/>
+      <attributes xmi:id="_8WfLAj0uEeaHzp_P5kzDGQ" name="EndTime" type="TIMESTAMP" nullable="true" length="0" scale="0" mappedName="EndTime"/>
+      <attributes xmi:id="_8WfLBD0uEeaHzp_P5kzDGQ" name="EntryID" type="NVARCHAR" nullable="false" length="100" scale="0" mappedName="EntryID"/>
+      <attributes xmi:id="_8WfLBj0uEeaHzp_P5kzDGQ" name="EntryName" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="EntryName"/>
+      <attributes xmi:id="_8WfLCD0uEeaHzp_P5kzDGQ" name="Language.Code" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Language.Code"/>
+      <attributes xmi:id="_8WfLCT0uEeaHzp_P5kzDGQ" name="Language.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Language.CodeSystem"/>
+      <attributes xmi:id="_8WfLCj0uEeaHzp_P5kzDGQ" name="Language.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Language.CodeSystemVersion"/>
+      <attributes xmi:id="_8WfLCz0uEeaHzp_P5kzDGQ" name="Language.OID" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Language.OID"/>
+      <attributes xmi:id="_8WfyED0uEeaHzp_P5kzDGQ" name="Language.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Language.OriginalValue"/>
+      <attributes xmi:id="_8WfyET0uEeaHzp_P5kzDGQ" name="Method.Code" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Method.Code"/>
+      <attributes xmi:id="_8WfyEj0uEeaHzp_P5kzDGQ" name="Method.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Method.CodeSystem"/>
+      <attributes xmi:id="_8WfyEz0uEeaHzp_P5kzDGQ" name="Method.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Method.CodeSystemVersion"/>
+      <attributes xmi:id="_8WfyFD0uEeaHzp_P5kzDGQ" name="Method.OID" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Method.OID"/>
+      <attributes xmi:id="_8WfyFT0uEeaHzp_P5kzDGQ" name="Method.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Method.OriginalValue"/>
+      <attributes xmi:id="_8WfyFj0uEeaHzp_P5kzDGQ" name="Priority.Code" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Priority.Code"/>
+      <attributes xmi:id="_8WfyFz0uEeaHzp_P5kzDGQ" name="Priority.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Priority.CodeSystem"/>
+      <attributes xmi:id="_8WfyGD0uEeaHzp_P5kzDGQ" name="Priority.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Priority.CodeSystemVersion"/>
+      <attributes xmi:id="_8WfyGT0uEeaHzp_P5kzDGQ" name="Priority.OID" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Priority.OID"/>
+      <attributes xmi:id="_8WfyGj0uEeaHzp_P5kzDGQ" name="Priority.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Priority.OriginalValue"/>
+      <attributes xmi:id="_8WfyGz0uEeaHzp_P5kzDGQ" name="SectionID" type="NVARCHAR" nullable="false" length="100" scale="0" mappedName="SectionID"/>
+      <attributes xmi:id="_8WfyHT0uEeaHzp_P5kzDGQ" name="StartTime" type="TIMESTAMP" nullable="true" length="0" scale="0" mappedName="StartTime"/>
+      <attributes xmi:id="_8WgZIT0uEeaHzp_P5kzDGQ" name="Status.Code" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Status.Code"/>
+      <attributes xmi:id="_8WgZIz0uEeaHzp_P5kzDGQ" name="Status.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Status.CodeSystem"/>
+      <attributes xmi:id="_8WgZJT0uEeaHzp_P5kzDGQ" name="Status.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Status.CodeSystemVersion"/>
+      <attributes xmi:id="_8WgZJz0uEeaHzp_P5kzDGQ" name="Status.OID" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Status.OID"/>
+      <attributes xmi:id="_8WhAMD0uEeaHzp_P5kzDGQ" name="Status.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="Status.OriginalValue"/>
+      <attributes xmi:id="_8WhAMj0uEeaHzp_P5kzDGQ" name="TargetSite.Code" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="TargetSite.Code"/>
+      <attributes xmi:id="_8WhAMz0uEeaHzp_P5kzDGQ" name="TargetSite.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="TargetSite.CodeSystem"/>
+      <attributes xmi:id="_8WhAND0uEeaHzp_P5kzDGQ" name="TargetSite.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="TargetSite.CodeSystemVersion"/>
+      <attributes xmi:id="_8WhANT0uEeaHzp_P5kzDGQ" name="TargetSite.OID" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="TargetSite.OID"/>
+      <attributes xmi:id="_8WhANj0uEeaHzp_P5kzDGQ" name="TargetSite.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="TargetSite.OriginalValue"/>
+      <attributes xmi:id="_8WhnQD0uEeaHzp_P5kzDGQ" name="TemplateID.Ext" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="TemplateID.Ext"/>
+      <attributes xmi:id="_8WhnQj0uEeaHzp_P5kzDGQ" name="TemplateID.Root" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="TemplateID.Root"/>
+    </outputs>
+  </nodes>
+  <nodes xsi:type="flowgraph:DataNode" xmi:id="_PuYQ8D0oEeaHzp_P5kzDGQ" name="CDMDEFAULT_HC_HPH_PLUGINS_HL7_CDA_DB_MODELS__CDA_STAGING_ENTRIES_PROCEDURES" type="DATABASE_TABLE" catalogObjectName="hc.hph.plugins.hl7.cda.db.models::CDA.Staging.Entries.Procedures" dataLayout="COLUMN" truncateTable="false">
+    <annotations xmi:id="_PuYQ8T0oEeaHzp_P5kzDGQ" key="afm.description" value="Write data to a catalog object"/>
+    <annotations xmi:id="_PuYQ8j0oEeaHzp_P5kzDGQ" key="afm.displayName" value="Data Sink"/>
+    <annotations xmi:id="_PuYQ8z0oEeaHzp_P5kzDGQ" key="afm.layout">
+      <annotations xmi:id="_PuYQ9D0oEeaHzp_P5kzDGQ" key="x" value="247"/>
+      <annotations xmi:id="_PuYQ9T0oEeaHzp_P5kzDGQ" key="y" value="129"/>
+      <annotations xmi:id="_PuYQ9j0oEeaHzp_P5kzDGQ" key="width" value="100"/>
+      <annotations xmi:id="_PuYQ9z0oEeaHzp_P5kzDGQ" key="height" value="64"/>
+    </annotations>
+    <annotations xmi:id="_ScBi8D0oEeaHzp_P5kzDGQ" key="afm.nodeType" value="DataNode"/>
+    <annotations xmi:id="_ScO-UD0oEeaHzp_P5kzDGQ" key="afm.nodeInputs">
+      <annotations xmi:id="_ScVsAD0oEeaHzp_P5kzDGQ" key="DATA" value="OUTPUT"/>
+    </annotations>
+    <annotations xmi:id="_ScnY0D0oEeaHzp_P5kzDGQ" key="afm.nodeOutputs"/>
+    <inputs xmi:id="_PuYQ-D0oEeaHzp_P5kzDGQ" name="DATA" kind="TABLE">
+      <attributes xmi:id="__VyNsD0uEeaHzp_P5kzDGQ" name="ApproachSite.Code" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__VyNsT0uEeaHzp_P5kzDGQ" name="ApproachSite.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0wD0uEeaHzp_P5kzDGQ" name="ApproachSite.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0wT0uEeaHzp_P5kzDGQ" name="ApproachSite.OID" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0wj0uEeaHzp_P5kzDGQ" name="ApproachSite.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0wz0uEeaHzp_P5kzDGQ" name="Code.Code" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0xD0uEeaHzp_P5kzDGQ" name="Code.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0xT0uEeaHzp_P5kzDGQ" name="Code.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0xj0uEeaHzp_P5kzDGQ" name="Code.OID" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0xz0uEeaHzp_P5kzDGQ" name="Code.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0yD0uEeaHzp_P5kzDGQ" name="DocumentID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0yT0uEeaHzp_P5kzDGQ" name="EndTime" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="__Vy0yj0uEeaHzp_P5kzDGQ" name="EntryID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0yz0uEeaHzp_P5kzDGQ" name="EntryName" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0zD0uEeaHzp_P5kzDGQ" name="Language.Code" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0zT0uEeaHzp_P5kzDGQ" name="Language.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0zj0uEeaHzp_P5kzDGQ" name="Language.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vy0zz0uEeaHzp_P5kzDGQ" name="Language.OID" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb0D0uEeaHzp_P5kzDGQ" name="Language.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb0T0uEeaHzp_P5kzDGQ" name="Method.Code" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb0j0uEeaHzp_P5kzDGQ" name="Method.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb0z0uEeaHzp_P5kzDGQ" name="Method.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb1D0uEeaHzp_P5kzDGQ" name="Method.OID" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb1T0uEeaHzp_P5kzDGQ" name="Method.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb1j0uEeaHzp_P5kzDGQ" name="Priority.Code" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb1z0uEeaHzp_P5kzDGQ" name="Priority.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb2D0uEeaHzp_P5kzDGQ" name="Priority.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb2T0uEeaHzp_P5kzDGQ" name="Priority.OID" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb2j0uEeaHzp_P5kzDGQ" name="Priority.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb2z0uEeaHzp_P5kzDGQ" name="SectionID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb3D0uEeaHzp_P5kzDGQ" name="StartTime" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="__Vzb3T0uEeaHzp_P5kzDGQ" name="Status.Code" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb3j0uEeaHzp_P5kzDGQ" name="Status.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb3z0uEeaHzp_P5kzDGQ" name="Status.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb4D0uEeaHzp_P5kzDGQ" name="Status.OID" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb4T0uEeaHzp_P5kzDGQ" name="Status.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb4j0uEeaHzp_P5kzDGQ" name="TargetSite.Code" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__Vzb4z0uEeaHzp_P5kzDGQ" name="TargetSite.CodeSystem" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__V0C4D0uEeaHzp_P5kzDGQ" name="TargetSite.CodeSystemVersion" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__V0C4T0uEeaHzp_P5kzDGQ" name="TargetSite.OID" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__V0C4j0uEeaHzp_P5kzDGQ" name="TargetSite.OriginalValue" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__V0C4z0uEeaHzp_P5kzDGQ" name="TemplateID.Ext" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="__V0C5D0uEeaHzp_P5kzDGQ" name="TemplateID.Root" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+    </inputs>
+  </nodes>
+</flowgraph:ContainerNode>

@@ -1,0 +1,32 @@
+FUNCTION "hc.hph.genomics.db.procedures.annotation::GetReverseComplement" (codon String) 
+       RETURNS modifiedCodon String
+       LANGUAGE SQLSCRIPT
+       SQL SECURITY INVOKER AS
+BEGIN
+
+declare count int default 0;
+declare base String default '';
+modifiedCodon = '';
+codon:=UPPER(codon);
+
+ while count < length(codon) do
+count = count +1;
+base = substr(codon,count,1);
+  if base = 'A'
+  THEN 
+  modifiedCodon = 'T' || modifiedCodon;
+  end if; 
+  if base = 'G'
+  THEN
+  modifiedCodon = 'C' || modifiedCodon;
+  end if;
+  if base = 'C'
+  THEN
+  modifiedCodon = 'G' || modifiedCodon;
+  end if;
+  if base = 'T'
+  THEN
+  modifiedCodon = 'A' || modifiedCodon;
+  end if;
+end while;
+END;

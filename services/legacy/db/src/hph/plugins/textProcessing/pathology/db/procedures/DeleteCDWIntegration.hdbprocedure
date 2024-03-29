@@ -1,0 +1,42 @@
+PROCEDURE "hc.hph.plugins.textProcessing.pathology.db.procedures::DeleteCDWIntegration"
+(
+in iv_auditLogID bigint,
+in iv_pipelineID nvarchar(256)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+ 
+ declare lt_linkID table ("DWLinkID" varbinary(32));
+ declare lt_DWID table ("DWID_Interaction" varbinary(32));
+ --get the LinkID
+ 
+ lt_linkID = select "DWLinkID" from  "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link_Attr"
+ where "DWAuditID" = :iv_auditLogID
+ and "LinkType" = :iv_pipelineID;
+ 
+ --get the Interaction DWID
+ 
+ lt_DWID = select "DWID_Interaction" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" int_link
+ inner join :lt_linkID link
+ on int_link."DWLinkID" = link."DWLinkID";
+ 
+ delete from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" 
+ where "DWID" in(select "DWID_Interaction" from :lt_DWID);
+ 
+ delete from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" 
+ where "DWID" in(select "DWID_Interaction" from :lt_DWID);
+ 
+ delete from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" 
+ where "DWLinkID" in(select "DWLinkID" from :lt_linkID);
+ 
+ delete from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link_Attr" 
+ where "DWAuditID" = :iv_auditLogID
+ and "LinkType" = :iv_pipelineID;
+ 
+END;

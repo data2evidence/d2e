@@ -1,0 +1,29 @@
+PROCEDURE "hc.hph.search.db.procedures::CreateUsersWithoutTracking" (
+
+	IN  it_new "hc.hph.search.db.models::TT_SV_USERSWITHOUTTRACKING2",
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"
+
+)
+	LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count INTEGER;
+	lv_newid NVARCHAR(32);
+BEGIN
+
+	select count(*) into lv_count from :it_new where length(trim(' ' from "USER_ID")) = 0;
+
+	if :lv_count > 0 then
+		ot_error =
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating UsersWithoutTracking: USER_ID must not be empty.' detail from "hc::DUMMY";
+		return;
+	end if;
+
+	insert into "hc.hph.search.db.models::Search.UsersWithoutTracking" (
+			"USER_ID",
+			"CREATED_AT"
+			)
+		( select
+			SESSION_CONTEXT( 'APPLICATIONUSER' ),
+			CURRENT_TIMESTAMP as CREATED_AT
+		 from :it_new )
+	;
+END

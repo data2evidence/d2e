@@ -1,0 +1,28 @@
+PROCEDURE "hc.hph.di.procedures::update_job_schedule_config" ( 
+	in _ScheduleConfigID BIGINT,	
+	in _Name nvarchar(512),
+	in _Description  nvarchar(1024),
+	in _ScheduleConfigJSON NCLOB,	
+	
+	out ot_error INTEGER
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+	declare lv_count integer;
+	SELECT count(*) into lv_count from "hc.hph.di.model::DataIntegration.DIJobScheduleConfig"  where "ScheduleConfigID" = :_ScheduleConfigID;
+	
+	IF(lv_count=0) THEN
+	 	SELECT lv_count into ot_error from "hc::DUMMY";
+	ELSE 
+	update "hc.hph.di.model::DataIntegration.DIJobScheduleConfig" config set
+	"Name" = :_Name,
+	"Description" = :_Description,
+	"ScheduleConfigJSON" = :_ScheduleConfigJSON,
+	"ModifiedAt" = CURRENT_UTCTIMESTAMP,
+	"ModifiedBy" = (Select SESSION_CONTEXT('XS_APPLICATIONUSER') From "hc::DUMMY")
+	FROM "hc.hph.di.model::DataIntegration.DIJobScheduleConfig" config
+	where config."ScheduleConfigID" = :_ScheduleConfigID ;
+	SELECT lv_count into ot_error from "hc::DUMMY";
+    END IF;	
+END;

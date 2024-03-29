@@ -1,0 +1,13 @@
+procedure "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec.lib::TearDown"
+	language sqlscript
+	sql security definer as
+begin
+	
+	-- remove newly inserted post-processing entries
+	-- delete from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_FILTERED" where "CONFIG_ID" = 'hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec';
+
+	-- create post-processing configuration
+	-- delete "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_CONFIG" where "CONFIG_ID" = 'hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec';
+	
+end
+;

@@ -1,0 +1,64 @@
+PROCEDURE "hc.hph.um.config.db::CustomAttrib" 
+		(
+			IN I_ATTR_DETAILS "hc.hph.cdw.db.models::Config.OrgAttribs",
+			OUT O_MESSAGE TABLE ("Status" NVARCHAR(1), "Code" NVARCHAR(100), "Message" NVARCHAR(100))
+		) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+	
+	declare v_current_timestamp TIMESTAMP;
+    declare v_creator NVARCHAR(256); 
+	declare status NVARCHAR(1);
+	declare message NVARCHAR(100);
+
+	declare cursor attr_dets for select * from :I_ATTR_DETAILS;
+
+	declare exit handler for sqlexception
+	begin
+		O_MESSAGE = select 	'E' as "Status",
+							::SQL_ERROR_CODE as "Code",
+		       				::SQL_ERROR_MESSAGE as "Message"
+		   			from "hc::DUMMY";    
+	end;
+	
+    select current_utctimestamp into v_current_timestamp from "hc::DUMMY";
+    select session_context('XS_APPLICATIONUSER') into v_creator from "hc::DUMMY";
+    
+    -- For each user 
+	for attr_det AS attr_dets do
+
+		upsert "hc.hph.cdw.db.models::Config.OrgAttribs"
+         values(
+			:attr_det."AttribID",
+			:attr_det."Label",
+            :attr_det."Description",
+			:attr_det."Datatype",
+            :attr_det."InputType",
+			:attr_det."Visible",
+            :attr_det."Required",
+			:attr_det."Enabled",
+            :attr_det."IsConfigurable",
+			:attr_det."Length",
+            :attr_det."DefaultVal",
+			:attr_det."Placeholder",
+            :attr_det."Tooltip",
+			:attr_det."AttrOrder",
+            :attr_det."IsCustom",
+			:attr_det."CustomUrl",
+            v_creator,
+			v_current_timestamp,
+            v_creator,
+			v_current_timestamp
+		)
+		where "AttribID" = :attr_det."AttribID";
+		
+	end for;
+
+	O_MESSAGE = select 'S' as "Status",
+					   null as "Code",
+	       			   'Successfully inserted new attribute details' as "Message"
+	   			from "hc::DUMMY";    
+				
+END;

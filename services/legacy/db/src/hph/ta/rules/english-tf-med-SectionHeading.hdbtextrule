@@ -1,0 +1,1724 @@
+!======================================================================
+! File Name: english-tf-med-SectionHeading.rul 
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of PROBLEM type section headings, 
+!          that are not listed in the hdbtextdict file.
+!======================================================================
+
+!======================================================================
+! OUTPUT FIELDS
+!======================================================================
+
+!! Main entities:
+!! Composition_Section_Problem
+
+!======================================================================
+!!Character class definitions
+!======================================================================
+
+#define PREP_CONJ_DET: (in|on|into|onto|of|off|upon|upto|inside|out|outside|for|with|within|without|between|among|amongst|beneath|under|underneath|below|during|from|to|towards|outward|inward|through|throughout|by|across|over|at|and|or|but|yet|that|which|while|when|whenever|where|wherever|how|however|meanwhile|a|an|the|A|An|The)
+
+#define PREP_CONJ_DET_UCASE: (IN|ON|INTO|ONTO|OF|OFF|UPON|UPTO|INSIDE|OUT|OUTSIDE|FOR|WITH|WITHIN|WITHOUT|BETWEEN|AMONG|AMONGST|BENEATH|UNDER|UNDERNEATH|BELOW|DURING|FROM|TO|TOWARDS|OUTWARD|INWARD|THROUGH|THROUGHOUT|BY|ACROSS|OVER|AT|AND|OR|BUT|YET|THAT|WHICH|WHILE|WHEN|WHENEVER|WHERE|WHEREVER|HOW|HOWEVER|MEANWHILE|A|AN|THE)
+
+#define DET_TCASE: (A|An|The)
+
+#define DET_UCASE: (A|AN|THE)
+
+#define COMMON_MED_HEADING_MODIFIER_UCASE: {
+	(
+	  ABD\.?
+	| ABDOMIN(AL)?
+	| ABNORMAL
+	| ACROMIAL
+	| ACUTE
+	| ADDITION(AL)?
+	| ANOTHER
+	| ANTEBRACHIAL
+	| ANTECUBITAL
+	| ASSOCIATED
+	| ASYMPTOMATIC
+	| AUDITORY
+	| AXILLARY
+	| BACK
+	| BACTERI(UM|A|AL)
+	| BAD
+	| BASELINE
+	| BASIC
+	| BESIDE
+	| BIG
+	| BILATERAL
+	| BILIARY
+	| BLOOD\-?LOSS
+	| BRACHIAL
+	| BREATH(E|ING)?
+	| BRIEF
+	| BUCCAL
+	| CARDIAC
+	| CARDIO(\-|/)?PULM(ONARY)?
+	| CARDIO(\-|/)?VASCULAR
+	| CARPAL
+	| CERVICAL
+	| CHIEF
+	| CHRONIC
+	| CLOSE(D|R|ST)?
+	| CONCLUDING
+	| CONCLUSIVE
+	| CONSTITUTIONAL
+	| COXAL
+	| CRANIAL
+	| CRURAL
+	| CURRENT
+	| DEEP
+	| DEGRAD(ED|ING)
+	| DERMATOLOGIC(AL|ALLY)?
+	| DIGITAL
+	| DIGESTI(ON|VE)
+	| PHALANGEAL
+	| DISTANT
+	| DORSAL
+	| DOWN
+	| DOWNWARD
+	| EARLY
+	| EATING
+	| EIGHTH
+	| ELEMENTARY
+	| ELEVATED
+	| ENDO\.?
+	| ENDOCRINOLOGIC(AL|ALLY)
+	| ENT\.?
+	| ESSENTIAL
+	| EST\.
+	| ESTIMATED
+	| FACIAL
+	| FAST
+	| FEMORAL
+	| FEW
+	| FIFTH
+	| FINAL
+	| FIRST
+	| FOURTH
+	| FREQUENT
+	| FRONTAL
+	| FULL
+	| FUNDAMENTAL
+	| G\.?I\.?
+	| GASTRO(\-|/)?ENTEROLOG(Y|IC|ICAL|ICALLY)
+	| GASTRO(\-|/)?INTESTINAL
+	| GEN\.?
+	| GENERAL
+	| GENERALIZED
+	| GENITAL(IA)?
+	| GENITO
+	| GENITO(\-|/)?URINARY
+	| GERD\.?
+	| GLUTEAL
+	| GROIN
+	| GYN\.?
+	| GYNECOLOGIC(AL|ALLY)?
+	| HARD
+	| HEARING
+	| HEMATOLOG(Y|IC|ICAL|ICALLY)
+	| HIGH(ER|EST)?
+	| HUGE
+	| HYP(ER)?OXIC
+	| HYP(ER|O)(\-|/)?CARBIC
+	| IMPORTANT
+	| IN(TER|TRA)(\-|/)?OP\.?
+	| IN(TER|TRA)(\-|/)?OPER\.?
+	| IN(TER|TRA)(\-|/)?OPERATIVE
+	| IN(TER|TRA)(\-|/)?PARTUM
+	| IN(TER|TRA)(\-|/)?PROC\.?
+	| IN(TER|TRA)(\-|/)?PROCEDUR(AL|E)S?
+	| INFECTIOUS
+	| INFLAMMATORY
+	| INT\.?
+	| INTEGUMENT(ARY)?
+	| INTERIM
+	| INTERNAL
+	| INTRODUCTORY
+	| ISCHEMIC
+	| LARGE
+	| LAST
+	| LEFT
+	| LIKELY
+	| LITTLE
+	| LOW(ER|EST)?
+	| LUMBAR
+	| M(I|A)CRO(\-|/)?SCOPIC
+	| M(I|A)CRO(\-|/)?VASCULAR
+	| MAIN
+	| MAJOR
+	| MALIGNANT
+	| MAMMARY
+	| MANUAL
+	| MANY
+	| MASSIVE
+	| MENTAL
+	| METABOLIC
+	| METASTATIC
+	| MIDDLE
+	| MILD
+	| MIXED
+	| MORE
+	| MOST
+	| MULTI(\-|/)?FOCAL
+	| MULTI(\-|/)?LOBAR
+	| MULTI(\-|/)?ORGAN
+	| MYOCARDIAL
+	| MYOCLONIC
+	| NASAL
+	| NEAR(ER|EST)?
+	| NERV\.?
+	| NERVOUS
+	| NEURO(\-|/)?MUSCULAR
+	| NEURO(\-|/)?PSYCH(IATRIC)?
+	| NEURO\.?
+	| NEURO\.?
+	| NEUROLOGIC(AL|ALLY)?
+	| NEXT
+	| NON\-?SUSTAINED
+	| NOTABLE
+	| OB(\-|/)GYN
+	| OB\.?
+	| OBSTETRIC(AL)?
+	| OCCASSION(AL|ALLY)
+	| OCULAR
+	| OLECRANAL
+	| OLIGURIC
+	| ONCOLOGIC
+	| ORAL
+	| ORTHO(PEDIC)?
+	| OTHER
+	| OTIC
+	| OVERRID(E|DEN)
+	| P(RE|OST)(\-|/)?OP\.?
+	| P(RE|OST)(\-|/)?OPER\.?
+	| P(RE|OST)(\-|/)?OPERATIVE
+	| P(RE|OST)(\-|/)?PARTUM
+	| P(RE|OST)(\-|/)?PROC\.?
+	| P(RE|OST)(\-|/)?PROCEDUR(AL|E)S?
+	| PAINLESS
+	| PALMAR
+	| PANCREATIC
+	| PAST
+	| PATELLAR
+	| PEDAL
+	| PELVI(S|C)
+	| PENILE
+	| PEPTIC
+	| PERIODIC(AL)?
+	| PERIPHERAL
+	| PERIRECTAL
+	| PERSISTENT
+	| PERTINENT
+	| PHALANGEAL
+	| PHYSIC(AL|ALLY)
+	| PLANTAR
+	| POOR(ER|EST)
+	| POPLITEUS
+	| POSSIBLE
+	| POST
+	| POSTERIOR
+	| POTENTIAL
+	| PRESENT
+	| PRESUMED
+	| PREVIOUS
+	| PRIMARY
+	| PRIME
+	| PRINCIPAL
+	| PRIOR
+	| PROBABLE
+	| PROC\.?
+	| PROCEDUR(AL|E)S?
+	| PROCESS(ES|ING)?
+	| PROFOUND
+	| PSYCHO?(\-|/)?SOC(\.|IAL)
+	| PSYCHO?\.?
+	| PSYCHOLOGIC(AL)?
+	| PUBIC
+	| PULM\.?
+	| PULMONARY
+	| QUESTIONABLE
+	| QUICK
+	| RADIOLOGIC(AL)?
+	| RAPID
+	| RECENT
+	| RECTAL
+	| RECURRENT
+	| RECURRING
+	| REFRACTORY
+	| RELATIVE
+	| RELEVANT
+	| RENAL
+	| RESP(IRATORY)?
+	| RETINAL
+	| RIGHT
+	| ROOT
+	| SECOND
+	| SECONDARY
+	| SENSORY?S?
+	| SEPTIC
+	| SEVENTH
+	| SEVERE
+	| SEVERAL
+	| SIGNIFICANT
+	| SINUS
+	| SIXTH
+	| SLEEP(ING)?
+	| SLOW
+	| SMALL
+	| SOCIAL
+	| SOFT
+	| SOLID
+	| SPECIAL
+	| SPINAL
+	| STEADY
+	| SURAL
+	| SURGICAL(LY)?
+	| SWALLOW(ING)?
+	| SYSTEM
+	| SYSTEMIC
+	| TACHY(\-|/)BRADY
+	| TARSAL
+	| THIRD
+	| THORACIC
+	| TOP
+	| TOXIC
+	| UNDERLYING
+	| UNKNOWN
+	| UP
+	| UPPER
+	| UPWARD
+	| URIN(ARY)?
+	| VASCULAR
+	| VENTRICULAR
+	| VIR(US|USES|AL)
+	| VISION
+	| WORS(E|T|ENING)
+	)
+}
+
+#define COMMON_MED_HEADING_MODIFIER_LCASE: {
+	(
+	  abd\.?
+	| abdomin(al)?
+	| abnormal
+	| acromial
+	| acute
+	| addition(al)?
+	| another
+	| antebrachial
+	| antecubital
+	| associated
+	| asymptomatic
+	| axillary
+	| auditory
+	| back
+	| bacteri(um|a|al)
+	| bad
+	| baseline
+	| basic
+	| beside
+	| big
+	| bilateral
+	| biliary
+	| blood\-?loss
+	| brachial
+	| breath(e|ing)?
+	| brief
+	| buccal
+	| cardiac
+	| cardio(\-|/)?pulm(onary)?
+	| cardio(\-|/)?vascular
+	| carpal
+	| cervical
+	| chief
+	| chronic
+	| close(d|r|st)?
+	| concluding
+	| conclusive
+	| constitutional
+	| coxal
+	| cranial
+	| crural
+	| current
+	| deep
+	| degrad(ed|ing)
+	| dermatologic(al|ally)?
+	| digital
+	| digesti(on|ve)
+	| distant
+	| dorsal
+	| down
+	| downward
+	| early
+	| eating
+	| eighth
+	| elementary
+	| elevated
+	| endo\.?
+	| endocrinologic(al|ally)
+	| ent\.?
+	| essential
+	| est\.
+	| estimated
+	| facial
+	| fast
+	| femoral
+	| few
+	| fifth
+	| final
+	| first
+	| fourth
+	| frequent
+	| frontal
+	| full
+	| fundamental
+	| g\.?i\.?
+	| gastro(\-|/)?enterolog(y|ic|ical|ically)
+	| gastro(\-|/)?intestinal
+	| gen\.?
+	| general
+	| generalized
+	| genital(ia)?
+	| genito
+	| genito(\-|/)?urinary
+	| gerd\.?
+	| gluteal
+	| groin
+	| gyn\.?
+	| gynecologic(al|ally)?
+	| hard
+	| hearing
+	| hematolog(y|ic|ical|ically)
+	| high(er|est)
+	| huge
+	| hyp(er)?oxic
+	| hyp(er|o)(\-|/)?carbic
+	| important
+	| in(ter|tra)(\-|/)?op\.?
+	| in(ter|tra)(\-|/)?oper\.?
+	| in(ter|tra)(\-|/)?operative
+	| in(ter|tra)(\-|/)?partum
+	| in(ter|tra)(\-|/)?proc\.?
+	| in(ter|tra)(\-|/)?procedur(al|e)s?
+	| infectious
+	| inflammatory
+	| int\.?
+	| integument(ary)?
+	| interim
+	| internal
+	| introductory
+	| ischemic
+	| large
+	| last
+	| left
+	| likely
+	| little
+	| low(er|est)
+	| lumbar
+	| m(i|a)cro(\-|/)?scopic
+	| m(i|a)cro(\-|/)?vascular
+	| main
+	| major
+	| malignant
+	| mammary
+	| manual
+	| many
+	| massive
+	| mental
+	| metabolic
+	| metastatic
+	| middle
+	| mild
+	| mixed
+	| more
+	| most
+	| multi(\-|/)?focal
+	| multi(\-|/)?lobar
+	| multi(\-|/)?organ
+	| myocardial
+	| myoclonic
+	| nasal
+	| near(er|est)?
+	| nerv\.?
+	| nervous
+	| neuro(\-|/)?muscular
+	| neuro(\-|/)?psych(iatric)?
+	| neuro\.?
+	| neuro\.?
+	| neurologic(al|ally)?
+	| next
+	| non\-?sustained
+	| notable
+	| ob(\-|/)gyn
+	| ob\.?
+	| obstetric(al)?
+	| occassion(al|ally)
+	| ocular
+	| olecranal
+	| oliguric
+	| oncologic
+	| oral
+	| ortho(pedic)?
+	| other
+	| otic
+	| overrid(e|den)
+	| p(re|ost)(\-|/)?op\.?
+	| p(re|ost)(\-|/)?oper\.?
+	| p(re|ost)(\-|/)?operative
+	| p(re|ost)(\-|/)?partum
+	| p(re|ost)(\-|/)?proc\.?
+	| p(re|ost)(\-|/)?procedur(al|e)s?
+	| painless
+	| palmar
+	| pancreatic
+	| past
+	| patellar
+	| pedal
+	| pelvi(s|c)
+	| penile
+	| peptic
+	| periodic(al)?
+	| peripheral
+	| perirectal
+	| persistent
+	| pertinent
+	| phalangeal
+	| physic(al|ally)
+	| plantar
+	| poor(er|est)
+	| popliteus
+	| possible
+	| post
+	| posterior
+	| potential
+	| present
+	| presumed
+	| previous
+	| primary
+	| prime
+	| principal
+	| prior
+	| probable
+	| proc\.?
+	| procedur(al|e)s?
+	| process(es|ing)?
+	| profound
+	| psycho?(\-|/)?soc(\.|ial)
+	| psycho?\.?
+	| psychologic(al)?
+	| pubic
+	| pulm\.?
+	| pulmonary
+	| questionable
+	| quick
+	| radiologic(al)?
+	| rapid
+	| recent
+	| rectal
+	| recurrent
+	| recurring
+	| refractory
+	| relative
+	| relevant
+	| renal
+	| resp(iratory)?
+	| retinal
+	| right
+	| root
+	| second
+	| secondary
+	| sensory?s?
+	| septic
+	| seventh
+	| severe
+	| several
+	| significant
+	| sinus
+	| sixth
+	| sleep(ing)?
+	| slow
+	| small
+	| social
+	| soft
+	| solid
+	| special
+	| spinal
+	| steady
+	| sural
+	| surgical(ly)?
+	| swallow(ing)?
+	| system
+	| systemic
+	| tachy(\-|/)brady
+	| tarsal
+	| third
+	| thoracic
+	| top
+	| toxic
+	| underlying
+	| unknown
+	| up
+	| upper
+	| upward
+	| urin(ary)?
+	| vascular
+	| ventricular
+	| vir(us|uses|al)
+	| vision
+	| wors(e|t|ening)
+	)
+}
+
+#define COMMON_MED_HEADING_MODIFIER_TCASE: {
+	(
+	  Abd\.?
+	| Abdomin(al)?
+	| Abnormal
+	| Acromial
+	| Acute
+	| Addition(al)?
+	| Another
+	| Antebrachial
+	| Antecubital
+	| Associated
+	| Asymptomatic
+	| Auditory
+	| Axillary
+	| Back
+	| Bacteri(um|a|al)
+	| Bad
+	| Baseline
+	| Basic
+	| Beside
+	| Big
+	| Bilateral
+	| Biliary
+	| Blood\-?(l|L)oss
+	| Brachial
+	| Breath(e|ing)?
+	| Brief
+	| Buccal
+	| Cardiac
+	| Cardio(\-|/)?(p|P)ulm(onary)?
+	| Cardio(\-|/)?(v|V)ascular
+	| Carpal
+	| Cervical
+	| Chief
+	| Chronic
+	| Close(d|r|st)?
+	| Concluding
+	| Conclusive
+	| Constitutional
+	| Coxal
+	| Cranial
+	| Crural
+	| Current
+	| Deep
+	| Degrad(ed|ing)
+	| Dermatologic(al|ally)?
+	| Digital
+	| Digesti(on|ve)
+	| Distant
+	| Dorsal
+	| Down
+	| Downward
+	| Early
+	| Eighth
+	| Eating
+	| Elementary
+	| Elevated
+	| Endo\.?
+	| Endocrinologic(al|ally)
+	| Ent\.?
+	| Essential
+	| Est\.
+	| Estimated
+	| Facial
+	| Fast
+	| Femoral
+	| Few
+	| Fifth
+	| Final
+	| First
+	| Fourth
+	| Frequent
+	| Frontal
+	| Full
+	| Fundamental
+	| G\.?I\.?
+	| Gastro(\-|/)?(e|E)nterolog(y|ic|ical|ically)
+	| Gastro(\-|/)?(i|I)ntestinal
+	| Gen\.?
+	| General
+	| Generalized
+	| Genital(ia)?
+	| Genito
+	| Genito(\-|/)?(u|U)rinary
+	| Gerd\.?
+	| Gluteal
+	| Groin
+	| Gyn\.?
+	| Gynecologic(al|ally)?
+	| Hard
+	| Hearing
+	| Hematolog(y|ic|ical|ically)
+	| High(er|est)
+	| Huge
+	| Hyp(er)?oxic
+	| Hyp(er|o)(\-|/)?(c|C)arbic
+	| Important
+	| In(ter|tra)(\-|/)?(o|O)p\.?
+	| In(ter|tra)(\-|/)?(o|O)per\.?
+	| In(ter|tra)(\-|/)?(o|O)perative
+	| In(ter|tra)(\-|/)?(p|P)artum
+	| In(ter|tra)(\-|/)?(p|P)roc\.?
+	| In(ter|tra)(\-|/)?(p|P)rocedur(al|e)s?
+	| Infectious
+	| Inflammatory
+	| Int\.?
+	| Integument(ary)?
+	| Interim
+	| Internal
+	| Introductory
+	| Ischemic
+	| Large
+	| Last
+	| Left
+	| Likely
+	| Little
+	| Low(er|est)
+	| Lumbar
+	| M(i|a)cro(\-|/)?(s|S)copic
+	| M(i|a)cro(\-|/)?(v|V)ascular
+	| Main
+	| Major
+	| Malignant
+	| Mammary
+	| Manual
+	| Many
+	| Massive
+	| Mental
+	| Metabolic
+	| Metastatic
+	| Middle
+	| Mild
+	| Mixed
+	| More
+	| Most
+	| Multi(\-|/)?(f|F)ocal
+	| Multi(\-|/)?(l|L)obar
+	| Multi(\-|/)?(o|O)rgan
+	| Myocardial
+	| Myoclonic
+	| Nasal
+	| Near(er|est)?
+	| Nerv\.?
+	| Nervous
+	| Neuro(\-|/)?(m|M)uscular
+	| Neuro(\-|/)?(p|P)sych(iatric)?
+	| Neuro\.?
+	| Neuro\.?
+	| Neurologic(al|ally)?
+	| Next
+	| Non\-?(s|S)ustained
+	| Notable
+	| Ob(\-|/)(g|G)yn
+	| Ob\.?
+	| Obstetric(al)?
+	| Occassion(al|ally)
+	| Ocular
+	| Olecranal
+	| Oliguric
+	| Oncologic
+	| Oral
+	| Ortho(pedic)?
+	| Other
+	| Otic
+	| Overrid(e|den)
+	| P(re|ost)(\-|/)?(o|O)p\.?
+	| P(re|ost)(\-|/)?(o|O)per\.?
+	| P(re|ost)(\-|/)?(o|O)perative
+	| P(re|ost)(\-|/)?(p|P)artum
+	| P(re|ost)(\-|/)?(p|P)roc\.?
+	| P(re|ost)(\-|/)?(p|P)rocedur(al|e)s?
+	| Painless
+	| Palmar
+	| Pancreatic
+	| Past
+	| Patellar
+	| Pedal
+	| Pelvi(s|c)
+	| Penile
+	| Peptic
+	| Periodic(al)?
+	| Peripheral
+	| Perirectal
+	| Persistent
+	| Pertinent
+	| Phalangeal
+	| Physic(al|ally)
+	| Plantar
+	| Poor(er|est)
+	| Popliteus
+	| Possible
+	| Post
+	| Posterior
+	| Potential
+	| Present
+	| Presumed
+	| Previous
+	| Primary
+	| Prime
+	| Principal
+	| Prior
+	| Probable
+	| Proc\.?
+	| Procedur(al|e)s?
+	| Process(es|ing)?
+	| Profound
+	| Psycho?(\-|/)?(s|S)oc(\.|ial)
+	| Psycho?\.?
+	| Psychologic(al)?
+	| Pubic
+	| Pulm\.?
+	| Pulmonary
+	| Questionable
+	| Quick
+	| Radiologic(al)?
+	| Rapid
+	| Recent
+	| Rectal
+	| Recurrent
+	| Recurring
+	| Refractory
+	| Relative
+	| Relevant
+	| Renal
+	| Resp(iratory)?
+	| Retinal?
+	| Right
+	| Root
+	| Second
+	| Secondary
+	| Sensory?s?
+	| Septic
+	| Seventh
+	| Severe
+	| Significant
+	| Sinus
+	| Sixth
+	| Slow
+	| Small
+	| Sleep(ing)?
+	| Social
+	| Soft
+	| Solid
+	| Special
+	| Spinal
+	| Steady
+	| Sural
+	| Surgical(ly)?
+	| Swallow(ing)?
+	| System
+	| Systemic
+	| Tachy(\-|/)(b|B)rady
+	| Tarsal
+	| Third
+	| Thoracic
+	| Top
+	| Toxic
+	| Underlying
+	| Unknown
+	| Up
+	| Upper
+	| Upward
+	| Urin(ary)?
+	| Vascular
+	| Ventricular
+	| Vir(us|uses|al)
+	| Vision
+	| Wors(e|t|ening)
+	)
+}
+
+#define ANAT_WORDS_UCASE: {
+	(
+	  ABDOMENS?
+	| ANKLES?
+	| AORTAS
+	| ARCH(ES)?
+	| ARMS?
+	| ARMPIT
+	| ARTER(Y|IES)
+	| BACKS?
+	| BACK(\-|/)?BONES?
+	| BACKSIDES?
+	| BACKWARDS?
+	| BALLS?
+	| BEARDS?
+	| BITES?
+	| BOD(Y|IES)
+	| BONES?
+	| BRAINS?
+	| BREASTS?
+	| BREAST(\-|/)?BONES?
+	| BRIDGES?
+	| BUTTS?
+	| BUTTOCKS?
+	| CALF
+	| CALVES
+	| CEREBELL(UM|UMS|A)
+	| CHEEKS?
+	| CHESTS?
+	| CHINS?
+	| CORNEAS?
+	| CUTICLES?
+	| DIMPLES?
+	| EARS?
+	| EAR(\-|/)?LOBES?
+	| ELBOWS?
+	| EYES?
+	| EYE(\-|/)?BROWS?
+	| EYE(\-|/)?LASH(ES)?
+	| EYE(\-|/)?LIDS?
+	| FACES?
+	| FEET
+	| FINGERS?
+	| FINGER(\-|/)?NAILS?
+	| FISTS?
+	| FOOT
+	| FOREARMS?
+	| FOREHEADS?
+	| GLANDS?
+	| GROINS?
+	| HAIRS?
+	| HANDS?
+	| HEADS?
+	| HEARTS?
+	| HEELS?
+	| HIPS?
+	| HIP(\-|/)?BONES?
+	| INDEX(\-|/)?FINGERS?
+	| INFERIOR(\-|/)VENA(\-|/)CAVA
+	| IN(\-|/)?STEPS?
+	| INTESTINES?
+	| IRIS(ES)?
+	| JAWS?
+	| KIDNEYS?
+	| KNEES?
+	| KNEE(\-|/)?CAPS?
+	| KNUCKLES?
+	| LEGS?
+	| LIPS?
+	| LIVERS?
+	| LOBES?
+	| LOINS?
+	| LUNGS?
+	| LUNULAE?
+	| MOLES?
+	| MOUTHS?
+	| MUSCLES?
+	| MUSTACHES?
+	| NAILS?
+	| NAPES?
+	| NAVELS?
+	| NECKS?
+	| NIPPLES?
+	| NOSES?
+	| NOSTRILS?
+	| PALMS?
+	| PARTS?
+	| PELV(I|E)S
+	| PITUITARY(\-|/)GLANDS?
+	| PUB(I|E)S
+	| PULMONARY(\-|/)ARTER(Y|IES)
+	| PUPILS?
+	| RIBS?
+	| SHINS?
+	| SHOULDERS?
+	| SHOULDER(\-|/)BLADES?
+	| SIDEBURNS?
+	| SKELETONS?
+	| SKINS?
+	| SKULLS?
+	| SOLES?
+	| SPINES?
+	| STERN(UM|UMS|A)
+	| STOMACHS?
+	| SUPERIOR(\-|/)VENA(\-|/)?CAVA
+	| TEETH
+	| TEMPLES?
+	| THIGHS?
+	| THORA(X|XES|CES)
+	| THUMBS?
+	| TOES?
+	| TOE(\-|/)?NAILS?
+	| TONGUES?
+	| TONSILS?
+	| TOOTH
+	| TRUNKS?
+	| TUMM(Y|IES)
+	| VEINS?
+	| WAISTS?
+	| WRISTS?
+	)
+}
+
+#define ANAT_WORDS_LCASE: {
+	(
+	  abdomens?
+	| ankles?
+	| aortas
+	| arch(es)?
+	| arms?
+	| armpit
+	| arter(y|ies)
+	| backs?
+	| back(\-|/)?bones?
+	| backsides?
+	| backwards?
+	| balls?
+	| beards?
+	| bites?
+	| bod(y|ies)
+	| bones?
+	| brains?
+	| breasts?
+	| breast(\-|/)?bones?
+	| bridges?
+	| butts?
+	| buttocks?
+	| calf
+	| calves
+	| cerebell(um|ums|a)
+	| cheeks?
+	| chests?
+	| chins?
+	| corneas?
+	| cuticles?
+	| dimples?
+	| ears?
+	| ear(\-|/)?lobes?
+	| elbows?
+	| eyes?
+	| eye(\-|/)?brows?
+	| eye(\-|/)?lash(es)?
+	| eye(\-|/)?lids?
+	| faces?
+	| feet
+	| fingers?
+	| finger(\-|/)?nails?
+	| fists?
+	| foot
+	| forearms?
+	| foreheads?
+	| glands?
+	| groins?
+	| hairs?
+	| hands?
+	| heads?
+	| hearts?
+	| heels?
+	| hips?
+	| hip(\-|/)?bones?
+	| index(\-|/)?fingers?
+	| inferior(\-|/)vena(\-|/)cava
+	| in(\-|/)?steps?
+	| intestines?
+	| iris(es)?
+	| jaws?
+	| kidneys?
+	| knees?
+	| knee(\-|/)?caps?
+	| knuckles?
+	| legs?
+	| lips?
+	| livers?
+	| lobes?
+	| loins?
+	| lungs?
+	| lunulae?
+	| moles?
+	| mouths?
+	| muscles?
+	| mustaches?
+	| nails?
+	| napes?
+	| navels?
+	| necks?
+	| nipples?
+	| noses?
+	| nostrils?
+	| palms?
+	| parts?
+	| pelv(i|e)s
+	| pituitary(\-|/)glands?
+	| pub(i|e)s
+	| pulmonary(\-|/)arter(y|ies)
+	| pupils?
+	| ribs?
+	| shins?
+	| shoulders?
+	| shoulder(\-|/)blades?
+	| sideburns?
+	| skeletons?
+	| skins?
+	| skulls?
+	| soles?
+	| spines?
+	| stern(um|ums|a)
+	| stomachs?
+	| superior(\-|/)vena(\-|/)?cava
+	| teeth
+	| temples?
+	| thighs?
+	| thora(x|xes|ces)
+	| thumbs?
+	| toes?
+	| toe(\-|/)?nails?
+	| tongues?
+	| tonsils?
+	| tooth
+	| trunks?
+	| tumm(y|ies)
+	| veins?
+	| waists?
+	| wrists?
+	)
+}
+
+#define ANAT_WORDS_TCASE: {
+	(
+	  Abdomens?
+	| Ankles?
+	| Aortas?
+	| Arch(es)?
+	| Arms?
+	| Armpits?
+	| Arter(y|ies)
+	| Backs?
+	| Back(\-|/)?(b|B)ones?
+	| Backsides?
+	| Backwards?
+	| Balls?
+	| Beards?
+	| Bites?
+	| Bod(y|ies)
+	| Bones?
+	| Brains?
+	| Breasts?
+	| Breast(\-|/)?(b|B)ones?
+	| Bridges?
+	| Butts?
+	| Buttocks?
+	| Calf
+	| Calves
+	| Cerebell(um|ums|a)
+	| Cheeks?
+	| Chests?
+	| Chins?
+	| Corneas?
+	| Cuticles?
+	| Dimples?
+	| Ears?
+	| Ear(\-|/)?(l|L)obes?
+	| Elbows?
+	| Eyes?
+	| Eye(\-|/)?(b|B)rows?
+	| Eye(\-|/)?(l|L)ash(es)?
+	| Eye(\-|/)?(l|L)ids?
+	| Faces?
+	| Feet
+	| Fingers?
+	| Finger(\-|/)?(n|N)ails?
+	| Fists?
+	| Foot
+	| Forearms?
+	| Foreheads?
+	| Groins?
+	| Hairs?
+	| Hands?
+	| Heads?
+	| Hearts?
+	| Heels?
+	| Hips?
+	| Hip(\-|/)?(b|B)ones?
+	| Index(\-|/)?(f|F)ingers?
+	| Inferior(\-|/)(v|V)ena(\-|/)?(c|C)ava
+	| In(\-|/)?steps?
+	| Intestines?
+	| Iris(es)?
+	| Jaws?
+	| Kidneys?
+	| Knees?
+	| Knee(\-|/)?(c|C)aps?
+	| Knuckles?
+	| Legs?
+	| Lips?
+	| Livers?
+	| Lobes?
+	| Loins?
+	| Lungs?
+	| Lunulae?
+	| Moles?
+	| Mouths?
+	| Muscles?
+	| Mustaches?
+	| Nails?
+	| Napes?
+	| Navels?
+	| Necks?
+	| Nipples?
+	| Noses?
+	| Nostrils?
+	| Palms?
+	| Parts?
+	| Pelv(i|e)s
+	| Pituitary(\-|/)(g|G)lands?
+	| Pub(i|e)s
+	| Pulmonary(\-|/)(a|A)rter(y|ies)
+	| Pupils?
+	| Ribs?
+	| Shins?
+	| Shoulders?
+	| Shoulder(\-|/)(b|B)lades?
+	| Sideburns?
+	| Skeletons?
+	| Skins?
+	| Skulls?
+	| Soles?
+	| Spines?
+	| Stern(um|ums|a)
+	| Stomachs?
+	| Superior(\-|/)(v|V)ena(\-|/)(c|C)ava
+	| Teeth
+	| Temples?
+	| Thighs?
+	| Thora(x|xes|ces)
+	| Thumbs?
+	| Toes?
+	| Toe(\-|/)?(n|N)ails?
+	| Tongues?
+	| Tonsils?
+	| Tooth
+	| Trunks?
+	| Tumm(y|ies)
+	| Veins?
+	| Waists?
+	| Wrists?
+	)
+}
+
+#define PROBLEM_WORDS_UCASE: {
+	(
+	  BLEEDINGS?
+	| BREAKDOWNS?
+	| CHANGES?
+	| CONDITIONS?
+	| COMPLICATIONS?
+	| DEFICIENC(Y|IES)
+	| DELIRI(UM|UMS|A)
+	| DIFFICULT(Y|IES)
+	| DISCHARGES?
+	| DISEASES?
+	| DISORDERS?
+	| DISTRESS(ES)?
+	| DYSFUNCTIONS?
+	| EAR(\-|/)?ACHES?
+	| EVIDENCES?
+	| EXACERBATIONS?
+	| FACTORS?
+	| FAILURES?
+	| FEVERS?
+	| GROWTHS?
+	| HEADACHES?
+	| ILLNESS(ES)?
+	| INDICATIONS?
+	| INFECTIONS?
+	| INJUR(Y|IES)
+	| INFLAMMATIONS?
+	| INFO(RMATION|\.)?
+	| INSUFFICIENC(Y|IES)
+	| ISCHEMIAS?
+	| ISSUES?
+	| KLEBSIELLA
+	| LOSS(ES)?
+	| LISTS?
+	| MARKS?
+	| OCCURRENCES?
+	| OVERDOSES?
+	| PAINS?
+	| PNEUMONIAS?
+	| PROBLEMS?
+	| RATES?
+	| REDNESS(ES)?
+	| RISKS?
+	| SEPS(I|E)S
+	| SHOCKS?
+	| SYMPTOMS?
+	| SYNDROMES?
+	| SICKNESS(ES)?
+	| SIGNS?
+	| STAGES?
+	| STATUS
+	| STRAINS?
+	| STRESS(ES)?
+	| STRUGGLES?
+	| SWELLINGS?
+	| TROUBLES?
+	| TYPES?
+	| WOUNDS?
+	)
+}
+
+#define PROBLEM_WORDS_LCASE: {
+	(
+	  bleedings?
+	| breakdowns?
+	| changes?
+	| conditions?
+	| complications?
+	| deficienc(y|ies)
+	| deliri(um|ums|a)
+	| difficult(y|ies)
+	| discharges?
+	| diseases?
+	| disorders?
+	| distress(es)?
+	| dysfunctions?
+	| ear(\-|/)?aches?
+	| evidences?
+	| exacerbations?
+	| factors?
+	| failures?
+	| fevers?
+	| growths?
+	| headaches?
+	| illness(es)?
+	| indications?
+	| infections?
+	| injur(y|ies)
+	| inflammations?
+	| info(rmation|\.)?
+	| insufficienc(y|ies)
+	| ischemias?
+	| issues?
+	| klebsiella
+	| loss(es)?
+	| lists?
+	| marks?
+	| occurrences?
+	| overdoses?
+	| pains?
+	| pneumonias?
+	| problems?
+	| rates?
+	| redness(es)?
+	| risks?
+	| seps(i|e)s
+	| shocks?
+	| symptoms?
+	| syndromes?
+	| sickness(es)?
+	| signs?
+	| stages?
+	| status
+	| strains?
+	| stress(es)?
+	| struggles?
+	| swellings?
+	| troubles?
+	| types?
+	| wounds?
+	)
+}
+
+#define PROBLEM_WORDS_TCASE: {
+	(
+	  Bleedings?
+	| Breakdowns?
+	| Changes?
+	| Conditions?
+	| Complications?
+	| Deficienc(y|ies)
+	| Deliri(um|ums|a)
+	| Difficult(y|ies)
+	| Discharges?
+	| Diseases?
+	| Disorders?
+	| Distress(es)?
+	| Dysfunctions?
+	| Ear(\-|/)?(a|A)ches?
+	| Evidences?
+	| Exacerbations?
+	| Factors?
+	| Failures?
+	| Fevers?
+	| Growths?
+	| Headaches?
+	| Illness(es)?
+	| Indications?
+	| Infections?
+	| Injur(y|ies)
+	| Inflammations?
+	| Info(rmation|\.)?
+	| Insufficienc(y|ies)
+	| Ischemias?
+	| Issues?
+	| Klebsiella
+	| Loss(es)?
+	| Lists?
+	| Marks?
+	| Occurrences?
+	| Overdoses?
+	| Pains?
+	| Pneumonias?
+	| Problems?
+	| Rates?
+	| Redness(es)?
+	| Risks?
+	| Seps(i|e)s
+	| Shocks?
+	| Symptoms?
+	| Syndromes?
+	| Sickness(es)?
+	| Signs?
+	| Stages?
+	| Status
+	| Strains?
+	| Stress(es)?
+	| Struggles?
+	| Swellings?
+	| Troubles?
+	| Types?
+	| Wounds?
+	)
+}
+
+
+!! Rule to match various patterns of plain-text bullet points
+!! Possible cases include:
+!! 1.  1.2.  #1  #1.  ##1. 1#  #1.2  #1.2.  1.2#  (1)  (1.)  (#1)  (#1.)
+!! (#1.2)  (#1.2.)  1)  1.)  1.2)  1.2.)  #1)  #1.2)  #1.2.)  #a  #a.
+!! (#a)  a.  (a)   a)   a.)   A.  A)  (A)  A.1   A.1.  A.1.2.  a.1.2.
+!! a.1   a.1.2   a.1.2.  1.a.   1.2.a.   1.2.a   iii  iv  vii viv  ix xii
+!! xxi  xiv  III   IV  VII  VIV   IX   XII  XXI  XIV  1-2)  1-2.  1-1
+!! 1-2. -  --  #   ##
+
+#subgroup PLAIN_BULLET_POINTS: {
+	(
+		(
+			<#{0,3}(([0-9]{1,2})|([ivxIVX]{1,5})|[a-oA-O])([\.\-](([0-9]{1,2})|([ivxIVX]{1,5})|[a-oA-O])){0,3}>
+			<\.>?
+			<\)>?
+		)
+		|
+		(
+			<(([0-9]{1,2})|([ivxIVX]{1,5})|[a-oA-O])([\.\-](([0-9]{1,2})|([ivxIVX]{1,5})|[a-oA-O])){0,3}#?>
+			<\.>?
+			<\)>?
+		)
+		|
+		(
+			<\(>
+			<#{0,3}(([0-9]{1,2})|([ivxIVX]{1,5})|[a-oA-O])([\.\-](([0-9]{1,2})|([ivxIVX]{1,5})|[a-oA-O])){0,3}>
+			<\.>?
+			<\)>
+		)
+		|
+		(
+			<\(>
+			<(([0-9]{1,2})|([ivxIVX]{1,5})|[a-oA-O])([\.\-](([0-9]{1,2})|([ivxIVX]{1,5})|[a-oA-O])){0,3}#?>
+			<\.>?
+			<\)>
+		)
+		|
+		<([\-]{1,3}|[#]{1,3})>
+	)
+}
+
+
+#subgroup DIS_SYMP: {
+	(
+		(
+			[TE CONDITION]
+				<>+
+			[/TE]
+		)
+		|
+		(
+			[TE OBSERVATION_SYMPTOM]
+				<>+
+			[/TE]
+		)
+	)
+}
+
+#subgroup DIS_SYMP_UCASE: {
+	(
+		(
+			[TE CONDITION]
+				<[A-Z]+([/\-][A-Z]+)?>+
+			[/TE]
+		)
+		|
+		(
+			[TE OBSERVATION_SYMPTOM]
+				<[A-Z]+([/\-][A-Z]+)?>+
+			[/TE]
+		)
+	)
+}
+
+#subgroup DIS_SYMP_TCASE: {
+	(
+		(
+			[TE CONDITION]
+				<[A-Z][a-z]+([/\-][A-Z][a-z]+)?>+
+			[/TE]
+		)
+		|
+		(
+			[TE OBSERVATION_SYMPTOM]
+				<[A-Z][a-z]+([/\-][A-Z][a-z]+)?>+
+			[/TE]
+		)
+	)
+}
+
+#subgroup DIS_SYMP_ICASE: {
+	(
+		(
+			[TE CONDITION]
+				<#?[0-9\-\.]{0,5}[A-Z][a-z]+([/\-][A-Z][a-z]+)?>
+				<>*
+			[/TE]
+		)
+		|
+		(
+			[TE OBSERVATION_SYMPTOM]
+				<#?[0-9\-\.]{0,5}[A-Z][a-z]+([/\-][A-Z][a-z]+)?>
+				<>*
+			[/TE]
+		)
+	)
+}
+
+
+#subgroup ANAT: {
+!!	TE-BASED EXTRACTION (Deprecated for conflict with Assertion Rules)
+!!	[TE BODYSITE] <\p{ci} ([a-z]{1,20}([/\-][a-z]{1,20})?)>{1,3} [/TE]
+
+!!  LINIENT POS-BASED EXTRACTION (Deprecated)
+!!	<[A-Za-z]+([/\-][A-Za-z]+)?, POS:Adj|Nn|Prop>{1,3}
+
+!!  STRICT LEXICON-BASED EXTRACTION
+	<\p{ci}(%(ANAT_WORDS_LCASE))>{1,3}
+}
+
+#subgroup ANAT_UCASE: {
+!!	TE-BASED EXTRACTION (Deprecated for conflict with Assertion Rules)
+!!	[TE BODYSITE] <[A-Z]{1,20}([/\-][A-Z]{1,20})?>{1,3} [/TE]
+
+!!  LINIENT POS-BASED EXTRACTION (Deprecated)
+!!	<[A-Z]+([/\-][A-Z]+)?, POS:Adj|Nn|Prop>{1,3}
+
+!!  STRICT LEXICON-BASED EXTRACTION
+	<%(ANAT_WORDS_UCASE)>{1,3}
+}
+
+#subgroup ANAT_TCASE: {
+!!	TE-BASED EXTRACTION (Deprecated for conflict with Assertion Rules)
+!!	[TE BODYSITE] <[A-Z][a-z]{1,20}([/\-][A-Z][a-z]{1,20})?>{1,3} [/TE]
+
+!!  LINIENT POS-BASED EXTRACTION (Deprecated)
+!!	<[A-Z][a-z]+([/\-][A-Z][a-z]+)?, POS:Adj|Nn|Prop>{1,3}
+
+!!  STRICT LEXICON-BASED EXTRACTION
+	<%(ANAT_WORDS_TCASE)>{1,3}
+}
+
+#subgroup ANAT_ICASE: {
+!!	TE-BASED EXTRACTION (Deprecated for conflict with Assertion Rules)
+!!	[TE BODYSITE] <#?[0-9\-\.]{0,5}[A-Z][a-z]{1,20}([/\-][A-Z][a-z]{1,20})?> <\p{ci} ([a-z]{1,20}([/\-][a-z]{1,20})?)>{0,2} [/TE]
+
+!!  GENERAL POS-BASED EXTRACTION (Deprecated)
+!!	<#?[0-9\-\.]{0,5}[A-Z][a-z]+([/\-][A-Z][a-z]+)?, POS:Adj|Nn|Prop>
+!!	<[A-Za-z]+([/\-][A-Za-z]+)?, POS:Adj|Nn|Prop>{0,2}
+
+!!  STRICT LEXICON-BASED EXTRACTION
+	<#?[0-9\-\.]{0,5}(%(ANAT_WORDS_TCASE))>
+	<\p{ci}(%(ANAT_WORDS_LCASE))>{0,2}
+}
+
+
+#subgroup MED: {
+	[TE MEDICATIONSTATEMENT_MEDICATION]
+		<>+
+	[/TE]
+}
+
+#subgroup MED_UCASE: {
+	[TE MEDICATIONSTATEMENT_MEDICATION]
+		<[A-Z]+([/\-][A-Z]+)?>+
+	[/TE]
+}
+
+#subgroup MED_TCASE: {
+	[TE MEDICATIONSTATEMENT_MEDICATION]
+		<[A-Z][a-z]+([/\-][A-Z][a-z]+)?>+
+	[/TE]
+}
+
+#subgroup MED_ICASE: {
+	[TE MEDICATIONSTATEMENT_MEDICATION]
+		<#?[0-9\-\.]{0,5}[A-Z][a-z]+([/\-][A-Z][a-z]+)?>
+		<>*
+	[/TE]
+}
+
+#group COMPOSITION_SECTION_PROBLEM: {
+
+	%(PLAIN_BULLET_POINTS)?
+
+	(
+		(
+			(
+				<#?[0-9\-\.]{0,5}(%(COMMON_MED_HEADING_MODIFIER_UCASE)|%(DET_UCASE))>
+				<%(PROBLEM_WORDS_UCASE)>?
+				<%(PREP_CONJ_DET_UCASE)>?
+			){0,1}
+			(
+				<%(COMMON_MED_HEADING_MODIFIER_UCASE)>
+				<%(PROBLEM_WORDS_UCASE)>?
+				<%(PREP_CONJ_DET_UCASE)>?
+			){0,2}
+			(
+
+				%(ANAT_UCASE)
+				|
+
+				%(MED_UCASE)
+			)?
+			%(DIS_SYMP_UCASE)
+			<%(PROBLEM_WORDS_UCASE)>{0,1}
+			(
+				</>?
+				<%(PREP_CONJ_DET_UCASE)>{0,3}
+				<%(COMMON_MED_HEADING_MODIFIER_UCASE)>{0,3}
+
+				%(ANAT_UCASE)?
+
+				%(DIS_SYMP_UCASE)?
+				<%(COMMON_MED_HEADING_MODIFIER_UCASE)>{0,1}
+
+				%(ANAT_UCASE)?
+
+				( %(DIS_SYMP_UCASE) | %(MED_UCASE) | <%(PROBLEM_WORDS_UCASE)> )
+				<%(PROBLEM_WORDS_UCASE)>?
+			){0,2}
+		)
+		|
+		(
+			(
+				<#?[0-9\-\.]{0,5}(%(COMMON_MED_HEADING_MODIFIER_TCASE)|%(DET_TCASE))>
+				<%(PROBLEM_WORDS_TCASE)>?
+				<%(PREP_CONJ_DET)>?
+			){0,1}
+			(
+				<%(COMMON_MED_HEADING_MODIFIER_TCASE)>
+				<%(PROBLEM_WORDS_TCASE)>?
+				<\p{ci} (%(PREP_CONJ_DET))>?
+			){0,2}
+			(
+
+				%(ANAT_TCASE)
+				|
+
+				%(MED_TCASE)
+			)?
+			%(DIS_SYMP_TCASE)
+			<%(PROBLEM_WORDS_TCASE)>{0,1}
+			(
+				</>?
+				<\p{ci} (%(PREP_CONJ_DET))>{0,3}
+				<%(COMMON_MED_HEADING_MODIFIER_TCASE)>{0,3}
+
+				%(ANAT_TCASE)?
+
+				%(DIS_SYMP_TCASE)?
+				<%(COMMON_MED_HEADING_MODIFIER_TCASE)>{0,1}
+
+				%(ANAT_TCASE)?
+
+				( %(DIS_SYMP_TCASE) | %(MED_TCASE) | <%(PROBLEM_WORDS_TCASE)> )
+				<%(PROBLEM_WORDS_TCASE)>?
+			){0,2}
+		)
+		|
+		(
+			(
+				(
+					<#?[0-9\-\.]{0,5}%(COMMON_MED_HEADING_MODIFIER_TCASE)>
+					<\p{ci} (%(COMMON_MED_HEADING_MODIFIER_LCASE)|%(PREP_CONJ_DET)|%(PROBLEM_WORDS_LCASE))>{0,3}
+				)
+				|
+
+				%(ANAT_ICASE)
+				|
+
+				%(MED_ICASE)
+			)
+			<\p{ci} (%(COMMON_MED_HEADING_MODIFIER_LCASE)|%(PREP_CONJ_DET))>{0,2}
+			%(DIS_SYMP)
+			<\p{ci} (%(PROBLEM_WORDS_LCASE))>{0,1}
+			(
+				</>?
+				<\p{ci} (%(PREP_CONJ_DET))>{0,3}
+				<\p{ci} (%(COMMON_MED_HEADING_MODIFIER_LCASE))>{0,3}
+
+				%(ANAT)?
+
+				%(DIS_SYMP)?
+				<\p{ci} (%(COMMON_MED_HEADING_MODIFIER_LCASE))>{0,1}
+
+				%(ANAT)?
+
+				( %(DIS_SYMP) | %(MED) | <\p{ci} (%(PROBLEM_WORDS_LCASE))> )
+				<\p{ci} (%(PROBLEM_WORDS_LCASE))>?
+			){0,2}
+		)
+		|
+		(
+			%(DIS_SYMP_ICASE)
+			<\p{ci} (%(COMMON_MED_HEADING_MODIFIER_LCASE)|%(PREP_CONJ_DET)|%(PROBLEM_WORDS_LCASE))>{0,3}
+			(
+				%(ANAT)
+				|
+
+				%(MED)
+			)?
+			( %(DIS_SYMP) | <\p{ci} (%(PROBLEM_WORDS_LCASE))> ){0,1}
+			(
+				</>?
+				<\p{ci} (%(PREP_CONJ_DET))>{0,3}
+				<\p{ci} (%(COMMON_MED_HEADING_MODIFIER_LCASE))>{0,3}
+
+				%(ANAT)?
+
+				%(DIS_SYMP)?
+				<\p{ci} (%(COMMON_MED_HEADING_MODIFIER_LCASE))>{0,1}
+
+				%(ANAT)?
+
+				( %(DIS_SYMP) | %(MED) | <\p{ci} (%(PROBLEM_WORDS_LCASE))> )
+				<\p{ci} (%(PROBLEM_WORDS_LCASE))>?
+			){0,2}
+		)
+	)
+
+	<\:>
+}

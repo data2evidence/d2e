@@ -1,0 +1,5 @@
+*tgz
+pkg
+.*
+src/
+node_modules/

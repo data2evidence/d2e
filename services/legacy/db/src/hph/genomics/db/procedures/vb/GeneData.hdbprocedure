@@ -1,0 +1,42 @@
+PROCEDURE "hc.hph.genomics.db.procedures.vb::GeneData"(
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN position INTEGER,
+        OUT geneAttributes "hc.hph.genomics.db.models::VariantBrowser.GeneDefinition"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+	geneAttributes = SELECT
+        genes."FeatureName" as "GeneName",
+        MAX( "hc.hph.genomics.db.functions::StripNullBytes"( genes."Description" ) ) as "Description" ,
+        synonyms."TermText" as "Synonym"
+	FROM
+	   "hc.hph.genomics.db.models::Reference.Features" AS genes
+	LEFT OUTER JOIN
+	    "hc.hph.ots::Views.ConceptTerms" as symbols
+	ON
+	    genes."FeatureName" = symbols."TermText" AND
+        symbols."ConceptVocabularyID" = 'ots.NCBI.GENE' AND
+        symbols."TermType" = 'symbol'
+    LEFT OUTER JOIN
+	    "hc.hph.ots::Views.ConceptTerms" as synonyms
+	ON
+	    symbols."ConceptCode" = synonyms."ConceptCode" AND
+        symbols."ConceptVocabularyID" = 'ots.NCBI.GENE' AND
+        synonyms."TermType" = 'synonym'
+	WHERE
+	    :reference_id = genes."ReferenceID" AND
+	    :position between genes."Region.Begin" AND genes."Region.End"-1 AND
+	    :chromosome_index = genes."ChromosomeIndex" AND
+	    genes."Class" = 'gene'
+	GROUP BY
+	    genes."FeatureName",
+	    synonyms."TermText"
+	ORDER BY
+	   genes."FeatureName",
+	   synonyms."TermText";
+END;
+

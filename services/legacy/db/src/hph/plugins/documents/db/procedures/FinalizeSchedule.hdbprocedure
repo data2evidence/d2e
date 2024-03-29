@@ -1,0 +1,20 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::FinalizeSchedule" 
+(
+in in_scheduleID bigint
+)
+LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+delete from "hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage" 
+where ("DWID","DWDateFrom") in 
+(select "DWID", "DWDateFrom" from "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status"
+where "ScheduleID" = :in_scheduleID
+and "ActionName" = 'Finalize'
+and "Status" = 'Finalized');
+	 
+END;

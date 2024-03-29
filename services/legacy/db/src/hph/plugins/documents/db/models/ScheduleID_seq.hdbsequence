@@ -1,0 +1,1 @@
+SEQUENCE "hc.hph.plugins.documents.db.models::ScheduleID_seq" RESET BY SELECT IFNULL(MAX("ScheduleID")+1,1) FROM "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status"

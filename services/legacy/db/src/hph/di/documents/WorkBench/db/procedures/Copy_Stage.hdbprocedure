@@ -1,0 +1,38 @@
+PROCEDURE "hc.hph.di.documents.WorkBench.db.procedures::Copy_Stage" (IN Documents NVARCHAR(1024),IN batchid BIGINT ,IN state NVARCHAR(1024)) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	--DEFAULT SCHEMA <default_schema_name>
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+declare curtime timestamp;
+declare lv_sessionuser NVARCHAR(256);
+SELECT SESSION_CONTEXT('XS_APPLICATIONUSER') into lv_sessionuser FROM "hc::DUMMY";
+curtime := now();
+if(:state ='Reprocess')
+then
+update "hc.hph.di.documents.WorkBench.db.models::DWBViews.ProcessingStage_WB" set "BatchID"=:batchid ,"DWDateFrom"=curtime,"Title"='Inprocess',"Status"=null
+where "DocumentID"=:Documents and "Status" is not null and "ChangedBy"=lv_sessionuser;
+
+
+insert into "hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage" 
+("DWID","DWDateFrom","DWSource","DocumentID","DWAuditID","BatchID","ProcessingMode","DWParentEntitySource","ParentEntityID","ParentEntityType","FileName","MIMEType","Content","Title","Author","Type","LanguageCode","CreatedAt","CreatedBy","ChangedAt","ChangedBy")
+(select "DWID","DWDateFrom","DWSource","DocumentID","DWAuditID","BatchID","ProcessingMode","DWParentEntitySource","ParentEntityID","ParentEntityType","FileName","MIMEType","Content","FileName","Author","Type","LanguageCode","CreatedAt","CreatedBy","ChangedAt","ChangedBy" 
+from "hc.hph.di.documents.WorkBench.db.models::DWBViews.ProcessingStage_WB"
+where "DocumentID" in (:Documents) and "Status" is  null and "ChangedBy"=lv_sessionuser and "BatchID"=:batchid);
+
+else
+update "hc.hph.di.documents.WorkBench.db.models::DWBViews.ProcessingStage_WB" set "BatchID"=:batchid ,"Title"='Inprocess' where "DocumentID"=:Documents and "Status" is null and "ChangedBy"=lv_sessionuser;
+
+
+insert into "hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage" 
+("DWID","DWDateFrom","DWSource","DocumentID","DWAuditID","BatchID","ProcessingMode","DWParentEntitySource","ParentEntityID","ParentEntityType","FileName","MIMEType","Content","Title","Author","Type","LanguageCode","CreatedAt","CreatedBy","ChangedAt","ChangedBy")
+(select "DWID",:curtime as "DWDateFrom","DWSource","DocumentID","DWAuditID","BatchID","ProcessingMode","DWParentEntitySource","ParentEntityID","ParentEntityType","FileName","MIMEType","Content","FileName","Author","Type","LanguageCode","CreatedAt","CreatedBy","ChangedAt","ChangedBy" 
+from "hc.hph.di.documents.WorkBench.db.models::DWBViews.ProcessingStage_WB"
+where "DocumentID" in (:Documents) and "Status" is  null and  "ChangedBy"=lv_sessionuser);
+
+
+end if; 
+END;

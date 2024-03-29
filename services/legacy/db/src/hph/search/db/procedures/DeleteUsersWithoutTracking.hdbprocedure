@@ -1,0 +1,36 @@
+PROCEDURE "hc.hph.search.db.procedures::DeleteUsersWithoutTracking"(
+
+	IN  it_delete "hc.hph.search.db.models::TT_SV_USERSWITHOUTTRACKING2",
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"
+	)
+
+LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count BIGINT;
+	lv_check BIGINT;
+BEGIN
+
+
+	select "USER_ID" from "hc.hph.search.db.models::Search.UsersWithoutTracking"
+		where "USER_ID" in (select "USER_ID" from :it_delete) for update
+	;
+
+	select count(*) into lv_count from :it_delete;
+	if :lv_count = 0 then
+		ot_error =
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating UsersWithoutTracking: USER_ID not found.' detail from "hc::DUMMY";
+		return;
+	end if;
+
+	select count(*) into lv_count from :it_delete where length(trim(' ' from "USER_ID")) = 0;
+	if :lv_count > 0 then
+		ot_error =
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating UsersWithoutTracking: USER_ID field cannot be empty.' detail from "hc::DUMMY";
+		return;
+	end if;
+
+
+	delete from "hc.hph.search.db.models::Search.UsersWithoutTracking"
+		where "USER_ID" = SESSION_CONTEXT( 'APPLICATIONUSER' );
+
+
+END;

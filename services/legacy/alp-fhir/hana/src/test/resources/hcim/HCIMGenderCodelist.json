@@ -1,0 +1,131 @@
+{
+	"resourceType": "StructureDefinition",
+	"id": "HCIMGenderCodelist",
+	"url": "http://data4life.care/health/fhir/StructureDefinition/HCIMGenderCodelist",
+	"kind": "resource",
+	"type": "HCIMGenderCodelist",
+	"meta": {
+		"profile": [
+			"http://data4life.care/health/fhir/profile/Viewdefinition"
+		]
+	},
+	"extension": [
+		{
+			"uri": "http://data4life.care/health/fhir/extension/schema",
+			"valueString": "FHIRGZ"
+		},
+		{
+			"uri": "http://data4life.care/health/fhir/extension/table",
+			"valueString": "GenderCodelist"
+		},
+		{
+			"uri": "http://data4life.care/health/fhir/extension/definition",
+			"valueString": "select \"Conceptname\", \"Conceptcode\", \"CodesystemName\",\"CodesystemOID\" ,\"Description\" from %%SCHEMA%%.\"Codelist\"\r\n where \"Valueset\" ='2.16.840.1.113883.2.4.3.11.60.40.2.0.1.1'"
+		}
+	],
+	"snapshot": {
+		"element": [
+			{
+				"id": "HCIMGenderCodelist",
+				"path": "HCIMGenderCodelist",
+				"min": 0,
+				"max": "*"
+			},
+			{
+				"id": "CodesystemName",
+				"min": 0,
+				"extension": [
+					{
+						"uri": "http://data4life.care/health/fhir/extension/column",
+						"valueString": "CodesystemName"
+					},
+					{
+						"uri": "http://data4life.care/health/fhir/extension/column-type",
+						"valueString": "NVARCHAR"
+					},
+					{
+						"uri": "http://data4life.care/health/fhir/extension/columnsize",
+						"valuePositiveInt": 100
+					}
+				],
+				"max": "*"
+			},
+			{
+				"id": "CodesystemOID",
+				"min": 0,
+				"extension": [
+					{
+						"uri": "http://data4life.care/health/fhir/extension/column",
+						"valueString": "CodesystemOID"
+					},
+					{
+						"uri": "http://data4life.care/health/fhir/extension/column-type",
+						"valueString": "NVARCHAR"
+					},
+					{
+						"uri": "http://data4life.care/health/fhir/extension/columnsize",
+						"valuePositiveInt": 100
+					}
+				],
+				"max": "*"
+			},
+			{
+				"id": "Description",
+				"min": 0,
+				"extension": [
+					{
+						"uri": "http://data4life.care/health/fhir/extension/column",
+						"valueString": "Description"
+					},
+					{
+						"uri": "http://data4life.care/health/fhir/extension/column-type",
+						"valueString": "NVARCHAR"
+					},
+					{
+						"uri": "http://data4life.care/health/fhir/extension/columnsize",
+						"valuePositiveInt": 1000
+					}
+				],
+				"max": "*"
+			},
+			{
+				"id": "Conceptname",
+				"min": 0,
+				"extension": [
+					{
+						"uri": "http://data4life.care/health/fhir/extension/column",
+						"valueString": "Conceptname"
+					},
+					{
+						"uri": "http://data4life.care/health/fhir/extension/column-type",
+						"valueString": "NVARCHAR"
+					},
+					{
+						"uri": "http://data4life.care/health/fhir/extension/columnsize",
+						"valuePositiveInt": 100
+					}
+				],
+				"max": "*"
+			},
+			{
+				"id": "Conceptcode",
+				"min": 0,
+				"extension": [
+					{
+						"uri": "http://data4life.care/health/fhir/extension/column",
+						"valueString": "Conceptcode"
+					},
+					{
+						"uri": "http://data4life.care/health/fhir/extension/column-type",
+						"valueString": "NVARCHAR"
+					},
+					{
+						"uri": "http://data4life.care/health/fhir/extension/columnsize",
+						"valuePositiveInt": 100
+					}
+				],
+				"max": "*"
+			}
+		]
+	}
+}

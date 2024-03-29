@@ -1,0 +1,2512 @@
+{
+	"info": {
+		"_postman_id": "8f2490bd-0f13-45a1-8724-c6117336b400",
+		"name": "06 MedMij BgZ  [ Catalog  persistency] Tokens.postman_collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Initialize Platform",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4af5ac76-35ab-4ea1-aced-6acbd1431481",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"CapabilityStatement\")",
+							"    pm.expect(jsonData.id).to.equal(\"fhir-capabilitystatement\")",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/init",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"init"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upload HCIM Content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b30d11a-3fdc-493e-a336-35bbc65474d7",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "../../../testdata/hcim_content.zip"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/content/upload",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"content",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Scenario Definitions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0cb3bc2f-f599-4105-b159-5f01f0ba09de",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(1)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"hcimscenario\")",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/content/fhir/ScenarioDefinition",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"content",
+						"fhir",
+						"ScenarioDefinition"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Endpoint - Scenario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c172edc2-13df-430d-b090-95929c26b9db",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"id\":\"hcim4fhirgz\",\r\n\t\"resourceType\":\"Scenario\",\r\n\t\"definition\":{\r\n\t\t\"reference\":\"hcimscenario\"\r\n\t},\r\n\t\"scope\":[\"base\",\"test\"],\r\n\t\"parameter\":[\r\n\t\t{\r\n\t\t\t\"name\":\"endpoint\",\r\n\t\t\t\"valueString\":\"hcim_demo\"\r\n\t\t},\r\n\t\t{\r\n\t\t\t\"name\":\"schema\",\r\n\t\t\t\"valueString\":\"HCIM_TEST\"\r\n\t\t},\r\n\t\t{\r\n\t\t\t\"name\":\"HCIMPatientGroupPermission.groupId\",\r\n\t\t\t\"valueString\":\"HCIMPatientGroup\"\r\n\t\t}\r\n\t]\r\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/content/fhir/Scenario/$enableEndpoint",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"content",
+						"fhir",
+						"Scenario",
+						"$enableEndpoint"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Deployed Scenarios",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5daabb61-b01e-4247-bace-e15ea4d0507e",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(1)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"hcim_demo\")",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/content/fhir/Scenario",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"content",
+						"fhir",
+						"Scenario"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Patient with identifier( key)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e7f368ae-5866-4412-a99c-e59e76487c4a",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(1)",
+							"    pm.expect(jsonData.entry[0].resource.address[0].use).to.equal(\"home\")",
+							"    pm.expect(jsonData.entry[0].resource.gender).to.equal(\"female\")",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?identifier=12332332",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "12332332"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Patient with id value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "88c043e7-16a2-43f0-a849-6e62fed3b4e4",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on resource  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Patient\")",
+							"    pm.expect(jsonData.id).to.equal(\"999911338\")",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient/999911338",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient",
+						"999911338"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Patient with id value (Accept: XML)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "88c043e7-16a2-43f0-a849-6e62fed3b4e4",
+						"exec": [
+							"var resXML = \"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><Patient xmlns=\\\"http://hl7.org/fhir\\\"><address><use value=\\\"home\\\"/><type value=\\\"HP\\\"/><line value=\\\"MyStreet Street1 122b\\\"/><city value=\\\"Amsterdam\\\"/><postalCode value=\\\"123345\\\"/><country value=\\\"NLD\\\"/></address><id value=\\\"999911338\\\"/><meta><profile value=\\\"http://nictiz.nl/fhir/StructureDefinition/nl-core-patient\\\"/></meta><active value=\\\"true\\\"/><birthDate value=\\\"2000-03-20 05:30:00.0\\\"/><gender value=\\\"female\\\"/><identifier><value value=\\\"12332332\\\"/><system value=\\\"2.16.840.1.113883.2.4.6.3\\\"/></identifier></Patient>\";",
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/xml\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on resource  \", function () {",
+							"    console.log(responseBody)",
+							"    var jsonData = xml2Json(responseBody)",
+							"    var resJson = xml2Json(resXML)",
+							"    pm.expect(jsonData.Patient.id).to.eql(resJson.Patient.id)",
+							"    pm.expect(jsonData.Patient.gender).to.eql(resJson.Patient.gender)",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient/999911338",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient",
+						"999911338"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Patient with identifier (system + key)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(1)",
+							"    pm.expect(jsonData.entry[0].resource.address[0].use).to.equal(\"home\")",
+							"    pm.expect(jsonData.entry[0].resource.gender).to.equal(\"female\")",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?identifier=2.16.840.1.113883.2.4.6.3|12332332",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "2.16.840.1.113883.2.4.6.3|12332332"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Patient with identifier (system + key) - false positive",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(0)",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?identifier=2.16.840.1.113883.2.4.6.3|12332331",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "2.16.840.1.113883.2.4.6.3|12332331"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation : Reference on subject attribute",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Code value '15074-8' check \", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"15074-8\");",
+							"});",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(2)",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?subject=999911338",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "subject",
+							"value": "999911338"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation : Reference on subject attribute (Accept: XML)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "451d6806-0607-4e0f-a015-8185c67fa2f4",
+						"exec": [
+							"var res='<?xml version=\"1.0\" encoding=\"UTF-8\"?><Bundle xmlns=\"http://hl7.org/fhir\"><id value=\"e6190a84-6c2e-456a-ad4e-8bb1404444c1\"/><link><relation value=\"self\"/><url value=\"http://localhost:8080/fhir/hcim_demo/fhir/Observation?subject=999911338\"/></link><type value=\"searchset\"/><total value=\"2\"/><entry><fullUrl value=\"999111\"/><Observation><id value=\"999111\"/><meta><profile value=\"http://nictiz.nl/fhir/StructureDefinition/nl-core-observation\"/></meta><subject><reference value=\"999911338\"/></subject><performer><reference value=\"100\"/></performer><valueQuantity><value value=\"72.0\"/><unit value=\"kg\"/></valueQuantity><code><coding><system value=\"http://loinc.org\"/><code value=\"15074-8\"/></coding></code><category><coding><system value=\"http://hl7.org/fhir/observation-category\"/><code value=\"vital-signs\"/></coding></category></Observation></entry><entry><fullUrl value=\"999112\"/><Observation><id value=\"999112\"/><meta><profile value=\"http://nictiz.nl/fhir/StructureDefinition/nl-core-observation\"/></meta><subject><reference value=\"999911338\"/></subject><performer><reference value=\"100\"/></performer><valueQuantity><value value=\"70.0\"/><unit value=\"kg\"/></valueQuantity><code><coding><system value=\"http://loinc.org\"/><code value=\"15074-9\"/></coding></code><category><coding><system value=\"http://hl7.org/fhir/observation-category\"/><code value=\"vital-signs\"/></coding></category></Observation></entry></Bundle>'",
+							"",
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/xml\");",
+							"});",
+							"",
+							"pm.test(\"Code value '15074-8' check \", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"15074-8\");",
+							"});",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = xml2Json(responseBody)",
+							"    var resData = xml2Json(res)",
+							"    pm.expect(jsonData.total).to.eql(resData.total)",
+							"    pm.expect(jsonData.entry).to.eql(resData.entry)",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?subject=999911338",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "subject",
+							"value": "999911338"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation : Reference on subject attribute - false positive",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(0)",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?subject=9999113",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "subject",
+							"value": "9999113"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get any observation with system and code values",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Code value '15074-8' check \", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"15074-8\");",
+							"});",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(2)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999113\")",
+							"    pm.expect(jsonData.entry[1].resource.id).to.equal(\"999111\")",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?code=http://loinc.org|15074-8",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "http://loinc.org|15074-8"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get any observation with system and code values - false positive",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(0)",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?code=http://loinc.org|1507",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "http://loinc.org|1507"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Observation with patient identifier & code",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Code value '15074-8' check \", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"15074-8\");",
+							"});",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(1)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999111\")",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?patient.identifier=12332332&code=15074-8",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "12332332"
+						},
+						{
+							"key": "code",
+							"value": "15074-8"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Observation with ID value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a1f951e4-39b6-494b-9d15-b25680a5ebc9",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Multiple checks on resource  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Observation\")",
+							"    pm.expect(jsonData.id).to.equal(\"999111\")",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation/999111",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation",
+						"999111"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get any observation with code value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Code value '15074-8' check \", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"15074-8\");",
+							"});",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(2)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999113\")",
+							"    pm.expect(jsonData.entry[1].resource.id).to.equal(\"999111\")",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?code=15074-8",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "15074-8"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get observations with multiple code values",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Code value '15074-8' check \", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"15074-8\");",
+							"});",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(2)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999111\")",
+							"    pm.expect(jsonData.entry[1].resource.id).to.equal(\"999112\")",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?patient.identifier=12332332&code=http://loinc.org|15074-8,http://loinc.org|15074-9",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "12332332"
+						},
+						{
+							"key": "code",
+							"value": "http://loinc.org|15074-8,http://loinc.org|15074-9"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation : Single include",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(5)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999113\")",
+							"   ",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?_include=Observation:subject",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "_include",
+							"value": "Observation:subject"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation : patient id &  Single include",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(3)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999111\")",
+							"    pm.expect(jsonData.entry[1].resource.id).to.equal(\"999112\")",
+							"    ",
+							"   ",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?patient.identifier=12332332&_include=Observation:subject",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "12332332"
+						},
+						{
+							"key": "_include",
+							"value": "Observation:subject"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation : patient id &  Single include - false positive",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(0)",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?patient.identifier=12332&_include=Observation:subject",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "12332"
+						},
+						{
+							"key": "_include",
+							"value": "Observation:subject"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation : patient id &  multiple include",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "294a4b9b-5602-4033-8269-0ce7329d2412",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(4)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999111\")",
+							"    pm.expect(jsonData.entry[1].resource.id).to.equal(\"999112\")",
+							"    ",
+							"   ",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?patient.identifier=12332332&_include=Observation:subject&_include=Observation:performer",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "12332332"
+						},
+						{
+							"key": "_include",
+							"value": "Observation:subject"
+						},
+						{
+							"key": "_include",
+							"value": "Observation:performer"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Patient : patient id &  Single revinclude",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5fe45f9f-fa9d-4cbd-b02d-f77db0b59306",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(3)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999911338\")",
+							"    pm.expect(jsonData.entry[1].resource.id).to.equal(\"999111\")",
+							"    ",
+							"   ",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?identifier=2.16.840.1.113883.2.4.6.3|12332332&_revinclude=Observation:subject",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "2.16.840.1.113883.2.4.6.3|12332332"
+						},
+						{
+							"key": "_revinclude",
+							"value": "Observation:subject"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Patient : patient id &  multiple revinclude",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5fe45f9f-fa9d-4cbd-b02d-f77db0b59306",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(4)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999911338\")",
+							"    pm.expect(jsonData.entry[1].resource.id).to.equal(\"999111\")",
+							"    ",
+							"   ",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?identifier=2.16.840.1.113883.2.4.6.3|12332332&_revinclude=Observation:subject&_revinclude=Encounter:subject",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "2.16.840.1.113883.2.4.6.3|12332332"
+						},
+						{
+							"key": "_revinclude",
+							"value": "Observation:subject"
+						},
+						{
+							"key": "_revinclude",
+							"value": "Encounter:subject"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation with category( system + code)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(3)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999113\")",
+							"   ",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?category=http://hl7.org/fhir/observation-category|vital-signs",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "category",
+							"value": "http://hl7.org/fhir/observation-category|vital-signs"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation with ID & category( system + code)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(2)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999111\")",
+							"    pm.expect(jsonData.entry[1].resource.id).to.equal(\"999112\")",
+							"   ",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?patient.identifier=12332332&category=http://hl7.org/fhir/observation-category|vital-signs",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "12332332"
+						},
+						{
+							"key": "category",
+							"value": "http://hl7.org/fhir/observation-category|vital-signs"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation with ID & category( system + code) - false positive",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(0)",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?patient.identifier=12332&category=http://hl7.org/fhir/observation-category|vital-signs",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "12332"
+						},
+						{
+							"key": "category",
+							"value": "http://hl7.org/fhir/observation-category|vital-signs"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation with category( system )",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(3)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"999113\")",
+							"   ",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?category=vital-signs",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "category",
+							"value": "vital-signs"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation with category( system ) - false positive",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle  \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(0)",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Observation?category=vital-signs111",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "category",
+							"value": "vital-signs111"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check for Patient by identfier & birthDate using (eq)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "35c3eeca-a1ba-47cc-87cb-273648e71330",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Resource tye should be 'Bundle' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(1)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"1\")",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?identifier=123&birthdate=eq1970-03-04",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "identifier",
+							"value": "123"
+						},
+						{
+							"key": "birthdate",
+							"value": "eq1970-03-04"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check for Patient by birthDate using (eq)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "35c3eeca-a1ba-47cc-87cb-273648e71330",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Resource tye should be 'Bundle' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(1)",
+							"    pm.expect(jsonData.entry[0].resource.id).to.equal(\"1\")",
+							"    ",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?birthdate=eq1970-03-04",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "birthdate",
+							"value": "eq1970-03-04"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check for Patient by birthDate using not equal(ne)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b8fd667c-9c92-479e-b53d-d36ff4576fff",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Resource tye should be 'Bundle' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(3)",
+							"    pm.expect(jsonData.entry[0].resource.birthDate).not.equal(\"1942-11-16 05:30:00.0\")",
+							"    pm.expect(jsonData.entry[1].resource.birthDate).not.equal(\"1942-11-16 05:30:00.0\")",
+							"    pm.expect(jsonData.entry[2].resource.birthDate).not.equal(\"1942-11-16 05:30:00.0\")",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?birthdate=ne1942-11-16",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "birthdate",
+							"value": "ne1942-11-16"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check for Patient by birthDate using less then equal(le)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6069b09a-70be-4245-8389-24354fd80eec",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Resource tye should be 'Bundle' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?birthdate=le2000-03-20",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "birthdate",
+							"value": "le2000-03-20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check for Patient by birthDate using greater then (gt)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ad1bfc4d-331b-4d5a-b9bb-f6febf03e3c2",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"",
+							"pm.test(\"Resource tye should be 'Bundle' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(1)",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?birthdate=gt2000-03-20",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "birthdate",
+							"value": "gt2000-03-20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check for Patient by birthDate using less then (lt)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dc2c9f0-3975-41e4-89dc-c7fc010dd802",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Resource tye should be 'Bundle' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(1)",
+							"",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?birthdate=lt2000-03-20",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "birthdate",
+							"value": "lt2000-03-20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check for Patient by birthDate using greater then equal(ge)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a2f7f3b-46ae-4c5f-94a3-0351c154fa63",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Resource tye should be 'Bundle' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.total).to.equal(2)",
+							"",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient?birthdate=ge2000-03-20",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "birthdate",
+							"value": "ge2000-03-20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Batch Query BgZ Patient Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a3957a3-aa07-419d-9cf7-68d427f5ee8e",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.type).to.equal(\"batch-response\")",
+							"    pm.expect(jsonData.total).to.equal(6)",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/fhir+json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"resourceType\": \"Bundle\",\r\n  \"id\": \"bundle-BGZ-request\",\r\n  \"type\": \"batch\",\r\n  \"entry\": [\r\n    {\r\n      \"request\": {\r\n        \"method\": \"GET\",\r\n        \"url\": \"/Observation?code=15074-8\"\r\n      }\r\n    },\r\n    {\r\n      \"request\": {\r\n        \"method\": \"GET\",\r\n        \"url\": \"/Observation?code=http://loinc.org|15074-8\"\r\n      }\r\n    },\r\n    {\r\n      \"request\": {\r\n        \"method\": \"GET\",\r\n        \"url\": \"/Observation?patient.identifier=12332332&code=15074-8\"\r\n      }\r\n    },\r\n    {\r\n      \"request\": {\r\n        \"method\": \"GET\",\r\n        \"url\": \"/Observation?category=vital-signs\"\r\n      }\r\n    },\r\n    {\r\n      \"request\": {\r\n        \"method\": \"GET\",\r\n        \"url\": \"/Observation?patient.identifier=12332332&_include=Encounter:subject\"\r\n      }\r\n    },\r\n    {\r\n      \"request\": {\r\n        \"method\": \"GET\",\r\n        \"url\": \"/Patient?birthdate=gt2000-03-20\"\r\n      }\r\n    }\r\n  ]\r\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Batch Query BgZ Patient Summary - Content type - XML",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a3957a3-aa07-419d-9cf7-68d427f5ee8e",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Multiple checks on bundle \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.type).to.equal(\"batch-response\")",
+							"    pm.expect(jsonData.total).to.equal(6)",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/xml"
+					},
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<Bundle xmlns='http://hl7.org/fhir'>\n  <id value='bundle-BGZ-request'/>\n  <type value='batch'/>\n  <entry>\n    <request>\n      <method value='GET'/>\n      <url value='/Observation?code=15074-8'/>\n    </request>\n  </entry>\n  <entry>\n    <request>\n      <method value='GET'/>\n      <url value='/Observation?code=http://loinc.org|15074-8'/>\n    </request>\n  </entry>\n  <entry>\n    <request>\n      <method value='GET'/>\n      <url value='/Observation?patient.identifier=12332332&amp;code=15074-8'/>\n    </request>\n  </entry>\n  <entry>\n    <request>\n      <method value='GET'/>\n      <url value='/Observation?category=vital-signs'/>\n    </request>\n  </entry>\n  <entry>\n    <request>\n      <method value='GET'/>\n      <url value='/Observation?patient.identifier=12332332&amp;_include=Encounter:subject'/>\n    </request>\n  </entry>\n  <entry>\n    <request>\n      <method value='GET'/>\n      <url value='/Patient?birthdate=gt2000-03-20'/>\n    </request>\n  </entry>\n</Bundle>"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

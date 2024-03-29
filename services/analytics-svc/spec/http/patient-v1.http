@@ -1,0 +1,121 @@
+POST http://localhost:3000/analytics-svc/pa/services/analytics.xsjs?action=patientdetail
+Content-Type: application/json;charset=utf-8
+X-CSRF-Token: null
+
+
+{
+	"cards": {
+		"content": [{
+				"content": [{
+						"_configPath": "patient",
+						"_instanceNumber": 0,
+						"_instanceID": "patient",
+						"_name": "Basic Data",
+						"_attributes": {
+							"content": [{
+									"_configPath": "patient.attributes.smoker",
+									"_instanceID": "patient.attributes.smoker",
+									"_constraints": {
+										"content": []
+									}
+								}, {
+									"_configPath": "patient.attributes.gender",
+									"_instanceID": "patient.attributes.gender",
+									"_constraints": {
+										"content": []
+									}
+								}, {
+									"_configPath": "patient.attributes.biomarker",
+									"_instanceID": "patient.attributes.biomarker",
+									"_constraints": {
+										"content": []
+									}
+								}
+							]
+						}
+					}, {
+						"_configPath": "patient.conditions.acme.interactions.priDiag",
+						"_instanceNumber": 1,
+						"_instanceID": "patient.conditions.acme.interactions.priDiag.1",
+						"_name": "Primary Tumor Diagnosis A",
+						"_attributes": {
+							"content": [{
+									"_configPath": "patient.conditions.acme.interactions.priDiag.attributes.icd_10",
+									"_instanceID": "patient.conditions.acme.interactions.priDiag.1.attributes.icd_10",
+									"_constraints": {
+										"content": []
+									}
+								}, {
+									"_configPath": "patient.conditions.acme.interactions.priDiag.attributes.age",
+									"_instanceID": "patient.conditions.acme.interactions.priDiag.1.attributes.age",
+									"_constraints": {
+										"content": []
+									}
+								}
+							]
+						}
+					}
+				]
+			}, {
+				"content": []
+			}
+		]
+	},
+	"guarded": true,
+	"limit": 10000,
+	"offset": 0,
+	"axes": [{
+			"id": "patient.attributes.lastName",
+			"axis": "y",
+			"aggregation": "string_agg",
+			"seq": 1,
+			"isFiltercard": true,
+			"instanceID": "patient",
+			"configPath": "patient"
+		}, {
+			"id": "patient.attributes.firstName",
+			"axis": "y",
+			"aggregation": "string_agg",
+			"seq": 2,
+			"isFiltercard": true,
+			"instanceID": "patient",
+			"configPath": "patient"
+		}, {
+			"id": "patient.attributes.dateOfBirth",
+			"axis": "y",
+			"aggregation": "string_agg",
+			"seq": 3,
+			"isFiltercard": true,
+			"instanceID": "patient",
+			"configPath": "patient"
+		}, {
+			"id": "patient.attributes.gender",
+			"axis": "y",
+			"aggregation": "string_agg",
+			"seq": 4,
+			"isFiltercard": true,
+			"instanceID": "patient",
+			"configPath": "patient"
+		}, {
+			"id": "patient.conditions.acme.interactions.priDiag.1.attributes.age",
+			"axis": "y",
+			"aggregation": "string_agg",
+			"seq": 5,
+			"isFiltercard": true,
+			"instanceID": "patient.conditions.acme.interactions.priDiag.1",
+			"configPath": "patient.conditions.acme.interactions.priDiag"
+		}, {
+			"id": "patient.conditions.acme.interactions.priDiag.1.attributes.icd_10",
+			"axis": "y",
+			"aggregation": "string_agg",
+			"seq": 6,
+			"isFiltercard": true,
+			"instanceID": "patient.conditions.acme.interactions.priDiag.1",
+			"configPath": "patient.conditions.acme.interactions.priDiag"
+		}
+	],
+	"configData": {
+		"configId": "b71d1c67-2c8f-43d3-9f32-c26088a8d1b3",
+		"configVersion": "A"
+	}
+}

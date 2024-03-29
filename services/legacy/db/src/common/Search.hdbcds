@@ -1,0 +1,23 @@
+/* Domain-specific annotations: Search */
+
+namespace common;
+
+annotation Search
+{
+  /* annotation at view level */
+  searchable:            Boolean;
+
+  /* annotations at element level */
+  defaultSearchElement:  Boolean;
+
+  ranking:               String(6) enum {
+                           HIGH='HIGH';
+                           MEDIUM='MEDIUM';
+                           LOW='LOW';
+  };
+
+  fuzzinessThreshold:    Decimal(3,2);
+
+  termMappingDictionary: String(128);
+  termMappingListID:     array of String(32);
+};

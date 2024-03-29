@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" schemaVersion="3.0" id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.views::collapsing" applyPrivilegeType="NONE" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" dataCategory="CUBE" enforceSqlExecution="false" executionSemantic="UNDEFINED" outputViewType="Aggregation" xscCompatibilityMode="true">
+  <descriptions defaultDescription="collapsing"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="47"/>
+  <dataSources>
+    <DataSource id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp</resourceUri>
+    </DataSource>
+    <DataSource id="hc.hph.plugins.textProcessing.medical.postProcessing::Entities.TA_COLLAPSING_MED_CONFIG">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing::Entities.TA_COLLAPSING_MED_CONFIG</resourceUri>
+    </DataSource>
+  </dataSources>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:ProjectionView" id="TA_TEMP">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="TA_NORMALIZED"/>
+        <viewAttribute id="DWID"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Collapsing_Relations">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="SOURCE"/>
+        <viewAttribute id="TARGET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="hc.hph.plugins.textProcessing.medical.postProcessing::Entities.TA_COLLAPSING_MED_CONFIG">
+        <mapping xsi:type="Calculation:AttributeMapping" target="SOURCE" source="SOURCE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TARGET" source="TARGET"/>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="Target_Subentities" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="TA_TEMP">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <input node="Collapsing_Relations">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TARGET"/>
+      </input>
+      <joinAttribute name="TA_TYPE"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="Source_Subentities" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="TARGET"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="TA_NORMALIZED"/>
+        <viewAttribute id="DWID"/>
+        <viewAttribute hidden="true" id="JOIN$TA_TYPE$SOURCE"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="TA_TEMP">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TYPE$SOURCE" source="TA_TYPE"/>
+      </input>
+      <input node="Collapsing_Relations">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TARGET" source="TARGET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TYPE$SOURCE" source="SOURCE"/>
+      </input>
+      <joinAttribute name="JOIN$TA_TYPE$SOURCE"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="Collapsed_Entities" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_NORMALIZED"/>
+        <viewAttribute hidden="true" id="JOIN$TA_TOKEN$TA_TOKEN"/>
+        <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Target_Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <input node="Source_Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TARGET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      </input>
+      <joinAttribute name="JOIN$TA_TOKEN$TA_TOKEN"/>
+      <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+      <joinAttribute name="TA_TYPE"/>
+      <joinAttribute name="DWID"/>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Collapsed_Entities">
+    <descriptions/>
+    <attributes>
+      <attribute id="DWID" order="1" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="DWID"/>
+        <keyMapping columnObjectName="Collapsed_Entities" columnName="DWID"/>
+      </attribute>
+      <attribute id="TA_PARENT" order="2" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_PARENT"/>
+        <keyMapping columnObjectName="Collapsed_Entities" columnName="TA_PARENT"/>
+      </attribute>
+      <attribute id="TA_TYPE" order="3" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_TYPE"/>
+        <keyMapping columnObjectName="Collapsed_Entities" columnName="TA_TYPE"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures>
+      <measure id="TA_NORMALIZED" order="4" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+        <measureMapping columnObjectName="Collapsed_Entities" columnName="TA_NORMALIZED"/>
+      </measure>
+    </baseMeasures>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+        <upperLeftCorner x="180" y="100"/>
+        <rectangleSize height="0" width="0"/>
+      </shape>
+      <shape expanded="true" modelObjectName="TA_TEMP" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="70" y="509"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Collapsing_Relations" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="336" y="529"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Target_Subentities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="91" y="330"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape modelObjectName="TA_TEMP" modelObjectNameSpace="Target_Subentities" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="Collapsing_Relations" modelObjectNameSpace="Target_Subentities" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Source_Subentities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="280" y="330"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape modelObjectName="TA_TEMP" modelObjectNameSpace="Source_Subentities" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="Collapsing_Relations" modelObjectNameSpace="Source_Subentities" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Collapsed_Entities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="180" y="230"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+    
+      <shape modelObjectName="Target_Subentities" modelObjectNameSpace="Collapsed_Entities" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="Source_Subentities" modelObjectNameSpace="Collapsed_Entities" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario>

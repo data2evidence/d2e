@@ -1,0 +1,782 @@
+/* This procedure can used to execute
+ Feature Annotations independent of DI */ 
+ PROCEDURE "hc.hph.genomics.internal.db.procedures.annotation::AnnotateFeatures" (
+		IN iProfileAuditID BIGINT,
+		IN dwAuditID BIGINT
+	)
+	LANGUAGE SQLSCRIPT 
+	SQL SECURITY INVOKER
+	AS 
+BEGIN
+
+
+ featWithGene = select
+	 feat."DWAuditID",
+	 feat."ReferenceID",
+	 feat."FeatureID",
+	 feat."ChromosomeIndex",
+	 feat."Class",
+	 feat."FeatureName",
+	 feat."Region.Begin",
+	 feat."Region.End",
+	 feat."Strand",
+	 feat."Frame",
+	 feat."Score",
+	 feat."ParentID",
+	 gene."FeatureID" as GENE 
+from "hc.hph.genomics.db.models::Reference.Features" as feat 
+inner join (select
+	 "FeatureID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End" 
+	from "hc.hph.genomics.db.models::Reference.Features" 
+	where "Class" = 'mRNA' 
+	and "DWAuditID" = dwAuditID) as gene on (feat."ChromosomeIndex" = gene."ChromosomeIndex" 
+	and feat."ParentID"=gene."FeatureID") 
+where feat."DWAuditID" = dwAuditID 
+;
+exons = select
+	 featExon."DWAuditID",
+	 featExon."ReferenceID",
+	 featExon."FeatureID",
+	 featExon."ChromosomeIndex",
+	 featExon."Class",
+	 featExon."FeatureName",
+	 featExon."Region.Begin",
+	 featExon."Region.End",
+	 featExon."Strand",
+	 featExon."Frame",
+	 featExon."Score",
+	 featExon."ParentID",
+	 featExon."GENE",
+	 ROW_NUMBER() over (partition by featExon."ChromosomeIndex",
+	 featExon."GENE" 
+	Order by featExon."Region.Begin") as "Rank" 
+from :featWithGene as featExon 
+where featExon."Class" = 'exon' 
+order by featExon."ChromosomeIndex",
+	 featExon."GENE",
+	 "Rank" asc 
+;
+cds = select
+	 featCDS."DWAuditID",
+	 featCDS."ReferenceID",
+	 featCDS."FeatureID",
+	 featCDS."ChromosomeIndex",
+	 featCDS."Class",
+	 featCDS."FeatureName",
+	 featCDS."Region.Begin",
+	 featCDS."Region.End",
+	 featCDS."Strand",
+	 featCDS."Frame",
+	 featCDS."Score",
+	 featCDS."ParentID",
+	 featCDS."GENE",
+	 ROW_NUMBER() over (partition by featCDS."ChromosomeIndex",
+	 featCDS."GENE" 
+	Order by featCDS."Region.Begin") as "Rank" 
+from :featWithGene as featCDS 
+where featCDS."Class" = 'CDS' 
+order by featCDS."ChromosomeIndex",
+	 featCDS."GENE",
+	 "Rank" asc 
+;
+
+--Annotate 5'Prime and 3'Prime UTR
+ -- 5'Prime UTR when the first CDS is within first exon
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+	-- "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost")(select
+	 exon."DWAuditID",
+	 exon."ReferenceID",
+	 exon."ChromosomeIndex",
+	  exon."Region.Begin" as "Region.Begin",
+	 (cds."Region.Begin"-1) as "Region.End",
+	case when exon."Strand"='+'  then ('five_prime_UTR' || exon."FeatureID")
+	else ('three_prime_UTR' || exon."FeatureID") end as "FeatureID",
+	case when exon."Strand"='+'  then 'five_prime_UTR' else 'three_prime_UTR' end,
+	 null,
+	 exon."Strand",
+--	 exon."Frame",
+	 exon."Score",
+	 exon."FeatureID",
+	case when exon."Strand"='+'  then 'five_prime_UTR' else 'three_prime_UTR' end,
+	null, null, null
+	from :exons as exon 
+	INNER JOIN :cds as cds on (exon."GENE" = cds."GENE" 
+		and exon."ChromosomeIndex" = cds."ChromosomeIndex" 
+		and cds."Rank" =1 
+		--and cds."Region.Begin" != exon."Region.Begin" 
+		and cds."Region.Begin" between exon."Region.Begin" 
+		and exon."Region.End" )) 
+;
+
+-- 5'Prime UTR when the first CDS is not within first exon this excludes the 5'Prime which is contained in the first cds
+-- All exons that appear before first cds are marked as 5'Prime UTRs
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost")(select
+	 exon."DWAuditID",
+	 exon."ReferenceID",
+	 exon."ChromosomeIndex",
+	 exon."Region.Begin",
+	 exon."Region.End",
+	case when exon."Strand"='+' then ('five_prime_UTR' || exon."FeatureID")
+	else ('three_prime_UTR' || exon."FeatureID") end ,
+case when exon."Strand"='+' then 'five_prime_UTR'
+else 'three_prime_UTR' end,
+	 null,
+	 exon."Strand",
+	 --exon."Frame",
+	 exon."Score",
+	 exon."FeatureID",
+case when exon."Strand"='+' then 'five_prime_UTR'
+else 'three_prime_UTR' end,
+NULL, NULL, NULL
+	from :exons as exon 
+	INNER JOIN :cds as cds on (exon."GENE" = cds."GENE" 
+		and exon."ChromosomeIndex"=cds."ChromosomeIndex" 
+		and (select
+	 "Region.Begin" 
+			from :cds as innerCDS 
+			where innerCDS."GENE"=exon."GENE" 
+			and innerCDS."ChromosomeIndex"=exon."ChromosomeIndex" 
+			and innerCDS."Rank"=1 
+			and cds."Rank"=1)> exon."Region.End" -- and cds."Region.Begin" > exon."Region.End" 
+ 
+		and cds."Region.Begin" != exon."Region.Begin") ) 
+;
+-- 3'Prime UTR when the last CDS is  within exon
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+	-- "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost") (select
+	 exon."DWAuditID",
+	 exon."ReferenceID",
+	 exon."ChromosomeIndex",
+	 cds."Region.End"+1,
+	 (exon."Region.End"),
+case when exon."Strand"='+' then ('three_prime_UTR' || exon."FeatureID")
+else ('five_prime_UTR' || exon."FeatureID") end ,
+	case when exon."Strand"='+' then 'three_prime_UTR'
+	else 'five_prime_UTR' end,
+	 null,
+	 exon."Strand",
+--	 exon."Frame",
+	 exon."Score",
+	 exon."ParentID",
+case when exon."Strand"='+' then 'three_prime_UTR' 
+else 'five_prime_UTR' end,
+NULL, NULL, NULL 
+	from :exons as exon 
+	INNER JOIN :cds as cds on (cds."Region.End" != exon."Region.End" 
+		and exon."GENE" = cds."GENE" 
+		and exon."ChromosomeIndex" = cds."ChromosomeIndex" 
+		and (select
+	 max(cdsSecondInner."Region.Begin") 
+			from :cds as cdsSecondInner 
+			where cdsSecondInner."GENE" = exon."GENE" 
+			and cdsSecondInner."ChromosomeIndex" = exon."ChromosomeIndex" 
+			and cds."Rank" = (select
+	 max ("Rank") 
+				from :cds as innerCDS 
+				where innerCDS."GENE" = exon."GENE" 
+				and innerCDS."ChromosomeIndex" = exon."ChromosomeIndex")) between exon."Region.Begin" 
+		and exon."Region.End" ) ) 
+;
+ -- 3'Prime UTR after the last CDS. All exons after last CDS are marked as 3'Prime
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost")(select
+	 distinct exon."DWAuditID",
+	 exon."ReferenceID",
+	 exon."ChromosomeIndex",
+	 exon."Region.Begin",
+	 exon."Region.End",
+	 case when exon."Strand"='+' then ('three_prime_UTR' || exon."FeatureID")
+	 else ('five_prime_UTR' || exon."FeatureID") end,
+	 case when exon."Strand"='+' then 'three_prime_UTR'
+	 else 'five_prime_UTR' end ,
+	 null,
+	 exon."Strand",
+--	 exon."Frame",
+	 exon."Score",
+	 exon."FeatureID",
+	 case when exon."Strand"='+' then 'three_prime_UTR' 
+	 else 'five_prime_UTR' end,
+NULL, NULL, NULL
+	from :exons as exon 
+	INNER JOIN :cds as cds on (exon."GENE" = cds."GENE" 
+		and exon."Region.Begin" > (select
+	 max(innerCDS."Region.End" ) 
+			from :cds as innerCDS 
+			where innerCDS."GENE" = exon."GENE" 
+			and innerCDS."ChromosomeIndex" = exon."ChromosomeIndex") ) ) 
+;
+
+
+ --Annotate introns
+introns = select
+	 T1."DWAuditID",
+	 T1."ReferenceID",
+	 T1."ChromosomeIndex",
+	 T1."Region.End"+4 as "Region.Begin",
+	 T2."Region.Begin"-4 as "Region.End",
+	 T1."GENE"||'intron'||T1."Rank" as "FeatureID",
+	 'intron' as "Class",
+	 T1."GENE"||'intron'||T1."Rank" as "Name",
+	 T1."Strand",
+--	 T1."Frame",
+	 T1."Score",
+	 T1."ParentID" as "ParentID",
+	 'intron' as "Description" 
+from :exons as T1 
+INNER JOIN :exons as T2 on (T1."Region.End" < T2."Region.End" 
+	and T1."Rank" =T2."Rank"-1 
+	and T1."ChromosomeIndex"=T2."ChromosomeIndex" 
+	and T1."GENE"=T2."GENE" 
+	and T1."Rank" <T2."Rank") 
+order by T1."GENE" 
+;
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost") (select
+	 introns."DWAuditID",
+	 introns."ReferenceID",
+	 introns."ChromosomeIndex",
+	 introns."Region.Begin",
+	 introns."Region.End",
+	 introns."FeatureID",
+	 introns."Class",
+	 null,
+	 introns."Strand",
+	-- introns."Frame",
+	 introns."Score",
+	 introns."ParentID",
+	 introns."Description",
+NULL, NULL, NULL 
+	from :introns as introns 
+	where introns."Region.Begin" < introns."Region.End") 
+;
+
+
+ --Annotate trans_splice_donor_site
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+	 --"Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost") (select
+	 introns."DWAuditID",
+	 introns."ReferenceID",
+	 introns."ChromosomeIndex",
+	 introns."Region.Begin"-3,
+	 introns."Region.Begin"-1,
+	 introns."FeatureID" ||'trans_splice_donor_site',
+	 'trans_splice_donor_site',
+	 null,
+	 introns."Strand",
+	-- introns."Frame",
+	 introns."Score",
+	 introns."ParentID",
+	 'trans_splice_donor_site',
+NULL, NULL, NULL 
+	from :introns as introns) 
+;
+
+
+ --Annotate trans_splice_acceptor_site
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+	-- "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost") (select
+	 introns."DWAuditID",
+	 introns."ReferenceID",
+	 introns."ChromosomeIndex",
+	 introns."Region.End"+1,
+	 introns."Region.End"+3,
+	 introns."FeatureID" ||'trans_splice_acceptor_site',
+	 'trans_splice_acceptor_site',
+	 null,
+	 introns."Strand",
+--	 introns."Frame",
+	 introns."Score",
+	 introns."ParentID",
+	 'trans_splice_acceptor_site',
+NULL, NULL, NULL 
+	from :introns as introns) 
+;
+
+ --Annotate intergenic regions
+intergenic_region = select
+	 feat."DWAuditID",
+	 feat."ReferenceID",
+	 feat."FeatureID",
+	 feat."ChromosomeIndex",
+	 feat."Class",
+	 feat."FeatureName",
+	 feat."Region.Begin",
+	 feat."Region.End",
+	 feat."Strand",
+	-- feat."Frame",
+	 feat."Score",
+	 feat."ParentID",
+	 ROW_NUMBER() over (partition by feat."ChromosomeIndex" 
+	Order by feat."Region.Begin") as "Rank" 
+from "hc.hph.genomics.db.models::Reference.Features" as feat 
+where feat."Class"='gene' 
+and feat."DWAuditID" = dwAuditID 
+;
+ insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+	-- "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost") (select
+	 T1."DWAuditID",
+	 T1."ReferenceID",
+	 T1."ChromosomeIndex",
+	 T1."Region.End"+1,
+	 T2."Region.Begin"-1,
+	 T1."FeatureID"||'intergenic_region'||T1."Rank",
+	 'intergenic_region',
+	 null,
+	 T1."Strand",
+--	 T1."Frame",
+	 T1."Score",
+	 T1."ParentID",
+	 'intergenic_region',
+NULL, NULL, NULL 
+	from :intergenic_region as T1 
+	INNER JOIN :intergenic_region as T2 on (T1."Rank" =T2."Rank"-1 
+		and T1."ChromosomeIndex"=T2."ChromosomeIndex") 
+	and T2."Region.Begin" > T1."Region.End"+1 
+	order by T1."ChromosomeIndex") 
+;
+
+
+ --Annotate start and stop codons
+cdsGroup = select
+	 feat."DWAuditID",
+	 feat."ReferenceID",
+	 feat."FeatureID",
+	 feat."ChromosomeIndex",
+	 feat."Class",
+	 feat."FeatureName",
+	 feat."Region.Begin",
+	 feat."Region.End",
+	 feat."Strand",
+	-- feat."Frame",
+	 feat."Score",
+	 feat."ParentID",
+	case when feat."Strand" = '+' then
+	  ROW_NUMBER() over (partition by feat."ChromosomeIndex",
+	 feat."FeatureName" 
+	Order by feat."Region.Begin") 
+else
+ ROW_NUMBER() over (partition by feat."ChromosomeIndex",
+feat."FeatureName" 
+Order by feat."Region.Begin" desc) end
+	as "Rank",	
+	 feat."Description" 
+from "hc.hph.genomics.db.models::Reference.Features" as feat 
+where "Class"='CDS' 
+and feat."FeatureName" is not null 
+and TRIM(COALESCE(feat."FeatureName",'')) != '' 
+and feat."DWAuditID" = :dwAuditID order by feat."FeatureName",feat."Region.Begin"
+;
+
+
+
+insert into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID","ChromosomeIndex","Region.Begin","Region.End","FeatureID","Class","FeatureName",
+	  "Strand",
+	  --"Frame",
+	  "Score", "ParentID", "Description","Sequence","Rank","PrePost") (
+	 select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+	 case when cdsGroup."Strand" = '+' then
+	 cdsGroup."Region.Begin" else 
+	 cdsGroup."Region.End"-2 end as "Region.Begin" ,
+	 case when cdsGroup."Strand" = '+' then
+	 cdsGroup."Region.Begin" +2
+	 else 
+	 	 cdsGroup."Region.End" end
+	  as "Region.End",
+	'start_codon_' ||cdsGroup."FeatureID" ,
+     'start_codon' ,
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+	-- cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."FeatureName",
+	 'start_codon' ,
+	'' as "Sequence",
+	0 as "Rank",
+	NULL AS "PrePost"
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' 
+	and cdsGroup."Rank" = 1) 
+;
+
+
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence","Rank","PrePost") (select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+	 case when cdsGroup."Strand" = '+'  then
+	 cdsGroup."Region.End"-2
+	 else 	 cdsGroup."Region.Begin" end as "Region.Begin",
+	 case when cdsGroup."Strand" = '+'  then
+	 cdsGroup."Region.End"
+	 else cdsGroup."Region.Begin"+2 end as "Region.End",
+	 'stop_codon_' ||cdsGroup."FeatureID" ,
+	'stop_codon' ,
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+--	 cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."FeatureName",
+	 'stop_codon' ,
+	'' as "Sequence",
+	(cdsGroup."Rank"+1) as "Rank",
+	NULL AS "PrePost"
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' 
+	and cdsGroup."Rank" =(select
+	 max(cdsGroupInner."Rank") 
+		from :cdsGroup as cdsGroupInner 
+		where cdsGroup."FeatureName" = cdsGroupInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupInner."ChromosomeIndex" 
+		group by cdsGroupInner."FeatureName")) 
+;
+
+ --Annotate CDS
+ insert --for in-between cds eg cds 2, cds3 and cds4 in a cds1-cds5 range of CDS's
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	  "Sequence","Rank","PrePost") (select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+	 cdsGroup."Region.Begin",
+	 cdsGroup."Region.End",
+	 cdsGroup."FeatureID",
+	 'CDS_region',
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+--	 cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."ParentID",
+	 cdsGroup."Description",
+	 '' as "Sequence",
+	  cdsGroup."Rank" as "Rank",
+	  NULL AS "PrePost"
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' -- and cdsGroup."Region.End"-cdsGroup."Region.Begin" >3 
+ 
+	and cdsGroup."Rank" >(select
+	 min(cdsGroupMinInner."Rank") 
+		from :cdsGroup as cdsGroupMinInner 
+		where cdsGroup."FeatureName" = cdsGroupMinInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupMinInner."ChromosomeIndex" 
+		group by cdsGroupMinInner."FeatureName") 
+	and cdsGroup."Rank" < (select
+	 max(cdsGroupInner."Rank") 
+		from :cdsGroup as cdsGroupInner 
+		where cdsGroup."FeatureName" = cdsGroupInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupInner."ChromosomeIndex" 
+		group by cdsGroupInner."FeatureName") ) 
+;
+
+
+insert -- for cds1 in a cds-range  whose length > 1 and cds1 is not the start codon i.e length =3 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+ "Sequence","Rank","PrePost") (select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+case when cdsGroup."Strand"='+' then
+	 cdsGroup."Region.Begin"+3 
+	 else cdsGroup."Region.Begin"
+	 end as "Region.Begin",
+	 case when cdsGroup."Strand"='+' then
+	 cdsGroup."Region.End"
+	 else cdsGroup."Region.End" -3  end
+	 as "Region.End",
+	 cdsGroup."FeatureID",
+	 'CDS_region',
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+--	 cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."ParentID",
+	 cdsGroup."Description",
+	 '' as "Sequence",
+	 cdsGroup."Rank" as "Rank",
+	 NULL AS "PrePost" 
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' 
+	and cdsGroup."Rank" = 1 
+	and ( cdsGroup."Region.End"-cdsGroup."Region.Begin" +1 ) >3 
+	and (select
+	 max(cdsGroupInner."Rank") 
+		from :cdsGroup as cdsGroupInner 
+		where cdsGroup."FeatureName" = cdsGroupInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupInner."ChromosomeIndex" 
+		group by cdsGroupInner."FeatureName") >1) 
+;
+
+ insert -- for cds1 in a cds-range  whose length = 1 and cds1 is not the start codon i.e length =3 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+ "Sequence","Rank","PrePost") (select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+	 cdsGroup."Region.Begin"+3,
+	 cdsGroup."Region.End"-3,
+	 cdsGroup."FeatureID",
+	 'CDS_region',
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+--	 cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."ParentID",
+	 cdsGroup."Description", 
+	  '' as "Sequence",
+	 	 cdsGroup."Rank" as "Rank",
+	 	 NULL AS "PrePost"
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' 
+	and cdsGroup."Rank" = 1 
+	and ( cdsGroup."Region.End"-cdsGroup."Region.Begin" +1 )>3 
+	and (select
+	 max(cdsGroupInner."Rank") 
+		from :cdsGroup as cdsGroupInner 
+		where cdsGroup."FeatureName" = cdsGroupInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupInner."ChromosomeIndex" 
+		group by cdsGroupInner."FeatureName") =1) 
+;
+
+-- for last cds eg cds 5 in a cds1-cds5 range of CDS's
+ insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "Region.Begin",
+	 "Region.End",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description","Sequence","Rank","PrePost") (select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+case when cdsGroup."Strand"='+' then
+	 cdsGroup."Region.Begin" 
+	 else cdsGroup."Region.Begin"+3 end  as "Region.Begin",
+case when cdsGroup."Strand"='+' then
+	 cdsGroup."Region.End"-3
+	 else cdsGroup."Region.End" end as "Region.End",
+	 cdsGroup."FeatureID",
+	 'CDS_region',
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+--	 cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."ParentID",
+	 cdsGroup."Description", 
+	 '' as "Sequence",
+     cdsGroup."Rank" as "Rank",
+     NULL AS "PrePost"
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' 
+	and ( cdsGroup."Region.End"-cdsGroup."Region.Begin" +1 ) >3 
+	and cdsGroup."Rank" >1 
+	and cdsGroup."Rank" =(select
+	 max(cdsGroupInner."Rank") 
+		from :cdsGroup as cdsGroupInner 
+		where cdsGroup."FeatureName" = cdsGroupInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupInner."ChromosomeIndex" 
+		group by cdsGroupInner."FeatureName")) 
+;
+
+
+--Rank correction for cds rank and stop codon
+update "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  s1 set s1."Rank"=(select s1."Rank" -(s2.minRank-1) from  
+(select "FeatureName",min("Rank") as minRank from "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  where "ChromosomeIndex"=s1."ChromosomeIndex" 
+and "Class" ='CDS_region' group by "FeatureName" ) as s2
+where s1."FeatureName"=s2."FeatureName" )
+where s1."Class" in ('CDS_region','stop_codon') and "DWAuditID"=:dwAuditID;
+
+
+--update cds_pos column
+update "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  t1 set t1."CDSPosition"=
+( select sum(ABS("Region.End"-"Region.Begin")+1) from  "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  t2 where t2."Rank" < t1."Rank"
+and t2."FeatureName"=t1."FeatureName" and  t2."ChromosomeIndex"= t1."ChromosomeIndex" and t2."DWAuditID"=t1."DWAuditID" ) where --t1."Strand"='+' and  
+t1."DWAuditID"=:dwAuditID ;
+
+--update where ever start codon cds_pos =0
+update "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  set "CDSPosition"=0 where "Rank"=0 and 
+"DWAuditID"=:dwAuditID ;
+
+
+
+END 
+;

@@ -1,0 +1,21 @@
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::noteScheduleId" (
+		in auditLogId	BIGINT,
+		in scheduleId	BIGINT
+   ) 
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+
+   --READS SQL DATA AS
+   AS   
+BEGIN    
+
+INSERT INTO "hc.hph.plugins.ccdi.db.models::Tasks.NotedScheduleId" (
+ "auditLogId",
+ "scheduleId"
+)
+VALUES (
+ auditLogId,
+ scheduleId
+);
+
+END;

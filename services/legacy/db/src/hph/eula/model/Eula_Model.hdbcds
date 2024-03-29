@@ -1,0 +1,64 @@
+Namespace hc.hph.eula.model;
+context Eula_Model {
+	type arKey:            String(1024);
+	type arName:           String(100);
+	type arNamespace:      String(127);
+	type arComponentName:  String(127);
+    type arLocalName:      String(256);		
+    type arLabel:          String(100);
+    type arText:           String(5000);
+    type arLongText:       String(5000);
+    type arHANAUserName:   String(256); 
+
+	//  Eula
+    entity Eula {
+        key ID:                     arKey;
+        key VersionNo:              Integer default 1;
+        IdName: 					arLocalName;
+        AgencyId:					String(3);
+        ValidFromPointInTime:       LocalDate default date'0001-01-01' not null;                               
+        ValidToPointInTime:         LocalDate default date'9999-12-31' not null;
+        Active:                     String(1) default 'X';
+    };
+
+    entity EulaDescription {
+        key ID:                     arKey;
+        key LanguageISOCode:        String(2) not null;               
+        DescribedInstance {
+            ID : arKey;
+            VersionNo : Integer;
+        };
+        Name:                       arName;
+        Label:                      arLabel;
+        Description:                arLongText;
+        Text:						LargeString;
+        CreatedAt:                  UTCTimestamp;
+        CreatedBy:                  String(256);                     
+    } technical configuration {
+        unique index BusinessKey on (LanguageISOCode, DescribedInstance);
+    };
+
+    entity EulaTimeDependency {
+        key ID:                     arKey;
+        TimeIndependentInstance:    association to Eula_Model.Eula {ID} not null;      
+        ValidFromPointInTime:       UTCTimestamp default timestamp'0001-01-01 00:00:00' not null;                               
+        ValidToPointInTime:         UTCTimestamp default timestamp'9999-12-31 23:59:59' not null;
+
+    } technical configuration {
+        //unique index BusinessKey on (TimeIndependentInstance, ValidFromPointInTime); 
+    };
+
+
+    entity EulaAgreement {
+        key ID:                     arKey;
+        AgreedEula {
+            ID : arKey;
+            VersionNo : Integer;
+        };
+        SignDate:					UTCTimestamp not null;     
+        Signee:               		arHANAUserName not null;
+    } technical configuration {
+        unique index BusinessKey on (AgreedEula, Signee, SignDate);
+    };
+
+};

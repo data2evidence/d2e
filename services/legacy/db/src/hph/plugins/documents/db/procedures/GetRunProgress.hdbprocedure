@@ -1,0 +1,176 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::GetRunProgress" 
+(
+in iv_auditLogID bigint,
+in iv_batchID bigint,
+in iv_showTrace nvarchar(10),
+out ov_notes nvarchar(1024),
+out ot_progress table("AuditLogID" bigint,
+					  "FinalStatus" nvarchar(128), 
+					  "TotalDocuments" bigint,
+					  "Failed" bigint,
+					  "Successful" bigint,
+					  "InProcess" bigint),
+out ot_trace table("DocumentID" nvarchar(1024), 
+				     "FileName" nvarchar(256),
+				     "Action" nvarchar(256),
+				     "Status" nvarchar(128), 
+				     "Trace" nvarchar(1024)),
+out ot_documentStatus table("DocumentID" nvarchar(1024),
+							"Status" nvarchar(128)),
+out ot_unProcessedDocuments table("DocumentID" nvarchar(1024))
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+ --check the status
+ declare lv_getRunStatus nvarchar(128);
+ declare lv_failedDocs bigint;
+ declare lv_successfulDocs bigint;
+ declare lv_inProcessDocs bigint;
+ declare lt_runProgress table("DWID" varbinary(32), "NumberOfPipeline" bigint, "PipelineCompleted" bigint, "PipelineErrored" bigint);
+ declare lt_docStatus table("DWID" varbinary, "Status" nvarchar(128));
+ 
+ select "Status" into lv_getRunStatus 
+ from "hc.hph.di.model::DataIntegration.AuditLog" 
+ where "AuditLogID" = :iv_auditLogID;
+ 
+ select "Notes" into ov_notes 
+ from "hc.hph.di.model::DataIntegration.AuditLog" 
+ where "AuditLogID" = :iv_auditLogID;
+ 
+  if (ov_notes = 'Run Failed. Please check the Audit Log trace for detailed information') then
+ 
+ 	ov_notes := 'Profile Run Failed';	
+ 	
+ end if;
+
+ if (iv_showTrace = 'true') and (lv_getRunStatus = 'Failed') then
+ 	
+ 	 ot_trace = select auditLog."DocumentID", auditLog."DocumentName" "FileName", 
+	 				   trace."Location" "Action", trace."Status", trace."Text" "Trace" 
+	 		 	from "hc.hph.di.model::DataIntegration.AuditLog" auditLog 
+		 	    inner join "hc.hph.di.model::DataIntegration.AuditLogTrace" trace 
+	 		 	 	   on trace."AuditLogID" = auditLog."AuditLogID" 
+		 	    where auditLog."ParentAuditLogID" = :iv_auditLogID
+		 	    and trace."Status" = 'Error';
+		 	    	
+ end if;
+ 
+ if (lv_getRunStatus = 'Failed') or (lv_getRunStatus = 'Completed') then
+ 
+ 	select count("AuditLogID") into lv_failedDocs 
+ 	from "hc.hph.di.model::DataIntegration.AuditLog" 
+	where "ParentAuditLogID" = :iv_auditLogID 
+	and "Status" = 'Failed';
+	
+ 	select count("AuditLogID") into lv_successfulDocs 
+ 	from "hc.hph.di.model::DataIntegration.AuditLog" 
+	where "ParentAuditLogID" = :iv_auditLogID 
+	and "Status" = 'Completed';
+ 
+ 	ot_progress = select iv_auditLogID "AuditLogID",
+ 						 lv_getRunStatus "FinalStatus",
+ 						 count("AuditLogID") "TotalDocuments",
+ 						 lv_failedDocs "Failed",
+ 						 lv_successfulDocs "Successful",
+ 						 0 "InProcess" from "hc.hph.di.model::DataIntegration.AuditLog"
+ 						 where "ParentAuditLogID" = :iv_auditLogID;
+ 						 
+ elseif lv_getRunStatus = 'Queued' then
+ 	
+ 	ot_progress = select iv_auditLogID "AuditLogID",
+ 						 lv_getRunStatus "FinalStatus",
+ 						 0 "TotalDocuments",
+ 						 0 "Failed",
+ 						 0 "Successful",
+ 						 0 "InProcess" from "hc::DUMMY";
+ 						 
+ else
+ 
+ 	--the profile is in running state.
+ 	lt_runProgress = select docTypePipelines."DWID", docTypePipelines."NumberOfPipeline", 
+ 				 case
+ 				 	when  pipelineStatus."PipelineCompleted" is null then 0
+ 				 	when pipelineStatus."PipelineCompleted" is not null then pipelineStatus."PipelineCompleted" 
+ 				 	END as "PipelineCompleted", 
+ 				 case 
+ 				 	when pipelineStatus."PipelineErrored" is null then 0
+ 				 	when pipelineStatus."PipelineErrored" is not null then pipelineStatus."PipelineErrored" 
+ 				 	END as "PipelineErrored"
+ 				 from
+						(select distinct stage."DWID", count(pipeline."PipelineID") as "NumberOfPipeline" 
+						from "hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage" stage
+						inner join "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" status
+						on stage."DWID" = status."DWID" and stage."DWDateFrom" = status."DWDateFrom"
+						inner join "hc.hph.di.documents.staging.db.models::DocumentProcessing.DocumentTypePipelineMapping" pipeline
+						on stage."Type" = pipeline."DWDocumentType"
+						where status."DWAuditID" = :iv_auditLogID and status."PipelineID" = 'PROFILE RUN' and status."ActionName" = 'Initialize Profile Run'
+						group by stage."DWID") docTypePipelines
+				  left outer join
+					    (select distinct pipelineCompleted."DWID", pipelineCompleted."PipelineCompleted", pipelineErrored."PipelineErrored" from
+							  (select distinct "DWID", count("ActionName") as "PipelineCompleted" from "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" 
+							  where "DWAuditID" = :iv_auditLogID and "ActionName" = 'Finalize'
+							  group by "DWID") pipelineCompleted
+						left outer join
+							  (select distinct "DWID", count("Status") as "PipelineErrored"
+							  from "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" 
+							  where "DWAuditID" = :iv_auditLogID and "Status" = 'FinalizedWithError'
+							  group by "DWID") pipelineErrored
+						on pipelineCompleted."DWID" = pipelineErrored."DWID") pipelineStatus
+			  on docTypePipelines."DWID" = pipelineStatus."DWID"
+			  group by docTypePipelines."DWID", docTypePipelines."NumberOfPipeline",pipelineStatus."PipelineCompleted", pipelineStatus."PipelineErrored";
+					 
+ 	lt_docStatus = select "DWID", 
+ 				   case 
+ 				   	  when "PipelineErrored" > 0 then 'Failed'
+ 				   	  when (("NumberOfPipeline" > "PipelineCompleted") and ("PipelineErrored" = 0)) then 'Running'
+ 				   	  else 'Completed' end as "Status" from :lt_runProgress; 
+ 				   	  
+ 	ot_documentStatus = select distinct stage."DocumentID" as "DocumentID", loc_status."Status" 
+ 						from "hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage" stage
+ 						inner join :lt_docStatus loc_status
+ 						on stage."DWID" = loc_status."DWID"
+ 						inner join "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" status
+ 						on stage."DWID" = status."DWID"
+ 						and stage."DWDateFrom" = status."DWDateFrom" 
+ 						where status."DWAuditID" = :iv_auditLogID;
+ 				   	  
+ 	select count("DWID") into lv_failedDocs 
+ 	from :lt_docStatus
+	where "Status" = 'Failed';
+	
+ 	select count("DWID") into lv_successfulDocs 
+ 	from :lt_docStatus
+	where "Status" = 'Completed';
+	
+	select count("DWID") into lv_inProcessDocs 
+ 	from :lt_docStatus 
+	where "Status" = 'Running';
+	
+	ot_progress = select iv_auditLogID "AuditLogID",
+ 						 lv_getRunStatus "FinalStatus",
+ 						 count("AuditLogID") "TotalDocuments",
+ 						 lv_failedDocs "Failed",
+ 						 lv_successfulDocs "Successful",
+ 						 lv_inProcessDocs "InProcess" from "hc.hph.di.model::DataIntegration.AuditLog"
+ 						 where "ParentAuditLogID" = :iv_auditLogID;
+ 						 
+ 	if :iv_batchID != 0 then
+ 	
+	 	ot_unProcessedDocuments = select stage."DocumentID" from "hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage" stage
+	    						  left outer join "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" status
+	    						  on status."DWID" = stage."DWID"
+	    						  and status."DWDateFrom" = stage."DWDateFrom"
+	   							  where stage."BatchID" = :iv_batchID
+	  							  and status."ScheduleID" is null; 
+	  							
+	end if;
+ 				   	  
+ end if;
+ 
+END;

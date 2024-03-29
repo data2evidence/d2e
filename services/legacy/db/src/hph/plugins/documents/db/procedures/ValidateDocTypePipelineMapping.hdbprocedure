@@ -1,0 +1,36 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::ValidateDocTypePipelineMapping" 
+(
+in iv_auditLogID bigint,
+out ov_res nvarchar(32)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+ declare lv_docCount_stage bigint;
+ declare lv_docCount bigint;
+ declare lt_docType table("Type" nvarchar(128));
+ 
+ lt_valid_docType = select distinct "Type" from "hc.hph.di.documents.staging.db.models::DocumentsForRun" where "DWAuditID" = :iv_auditLogID;
+ 
+ select count(distinct "Type") into lv_docCount_stage from :lt_valid_docType;
+ 
+ select count(distinct dtpm."DWDocumentType") into lv_docCount from "hc.hph.di.documents.staging.db.models::DocumentProcessing.DocumentTypePipelineMapping" dtpm
+ inner join :lt_valid_docType valid
+ on dtpm."DWDocumentType" = valid."Type";
+ 
+ if lv_docCount != lv_docCount_stage then
+ 
+ 	ov_res:= 'Unassinged Type Present';
+ 
+ else
+ 
+ 	ov_res:= 'All types are assigned';
+ 	
+ end if;
+ 
+END;

@@ -1,0 +1,19 @@
+{
+    "spec_dir": "spec",
+    "spec_files": [
+        "**/*_test.ts"
+    ],
+    "reporters": [
+        {
+          "name": "jasmine-spec-reporter#SpecReporter",
+          "options": {
+            "displayStacktrace": "all"
+          }
+        },
+        {
+            "name": "jasmine-reporters#JUnitXmlReporter"
+          }
+      ],
+    "stopSpecOnExpectationFailure": false,
+    "random": false
+}

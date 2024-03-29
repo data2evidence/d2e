@@ -1,0 +1,43 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::GetProcessingStatus" 
+(
+in in_scheduleID bigint,
+in in_pipelineID nvarchar(256),
+out o_ActionName nvarchar(128),
+out o_Status nvarchar(128)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+ declare lt_status table
+	(
+		"DWID" varbinary(32),
+		"ActionName" nvarchar(128), 
+		"DWAuditID" bigint, 
+		"Status" nvarchar(128),
+		"ScheduleID" bigint,
+		"ActionFinishedON" timestamp
+	);
+
+ declare EXIT HANDLER FOR sqlexception
+ begin
+ 	--no actions required. Just to catch the no data found exception
+ end;
+ 
+ lt_status = select "DWID", "ActionName", "DWAuditID", "Status", "ScheduleID","ActionFinishedON"
+ from "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" 
+ where "ScheduleID" = :in_scheduleID
+ and "PipelineID" = :in_pipelineID
+ and "ActionFinishedON" is not null;
+ 
+ select distinct("ActionName") into o_ActionName
+ from :lt_status where "ActionFinishedON" = (select max("ActionFinishedON") from :lt_status);
+ 
+ select distinct("Status") into o_Status
+ from :lt_status where "ActionFinishedON" = (select max("ActionFinishedON") from :lt_status);
+ 
+END;

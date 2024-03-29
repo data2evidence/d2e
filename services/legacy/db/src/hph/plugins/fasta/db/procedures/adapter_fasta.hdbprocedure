@@ -1,0 +1,27 @@
+PROCEDURE "hc.hph.plugins.fasta.db.procedures::adapter_fasta" (
+IN referenceID VARCHAR(200),
+IN schemaname VARCHAR(100),
+IN seqTable VARCHAR(100),
+IN chromTable VARCHAR(100),
+IN auditID BIGINT,
+IN prefixTrim VARCHAR(255)
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+
+declare i int;
+
+
+
+EXEC 'Insert into "hc.hph.genomics.db.models::Reference.Sequences"
+select ''' || ESCAPE_SINGLE_QUOTES(:referenceID) || ''', * from  "' || ESCAPE_DOUBLE_QUOTES(:schemaname) || '"."' || ESCAPE_DOUBLE_QUOTES(:seqTable) || '"';
+
+
+EXEC 'Insert into "hc.hph.genomics.db.models::Reference.Chromosomes" ("ReferenceID",  
+"ChromosomeIndex", "DWAuditID", "ChromosomeName", "Size", "Topology", "Visible", "MD5Hash", "Description") 
+select ''' || ESCAPE_SINGLE_QUOTES(:referenceID) || ''', "ChromosomeIndex", '|| :auditID || ', "ChromosomeName", "Size", "Topology", "Visible", "MD5Hash", "Description" from "' || ESCAPE_DOUBLE_QUOTES(:schemaname) || '"."' || ESCAPE_DOUBLE_QUOTES(:chromTable) ||'"';
+
+UPDATE "hc.hph.genomics.db.models::Reference.Chromosomes" SET "ChromosomeName" = SUBSTRING( "ChromosomeName", LENGTH( ESCAPE_SINGLE_QUOTES(:prefixTrim) )+1 ) WHERE "ChromosomeName" LIKE CONCAT(ESCAPE_SINGLE_QUOTES(:prefixTrim),'%') AND "ReferenceID" = ESCAPE_SINGLE_QUOTES(:referenceID);
+
+END;

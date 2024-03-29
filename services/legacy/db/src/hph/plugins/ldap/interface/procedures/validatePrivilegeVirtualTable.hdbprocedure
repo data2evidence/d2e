@@ -1,0 +1,104 @@
+PROCEDURE "hc.hph.plugins.ldap.interface.procedures::validatePrivilegeVirtualTable" ( IN remoteSourceName NVARCHAR (256) , IN entity NVARCHAR(256),
+OUT STATUS INTEGER,
+OUT OT_ERROR TABLE ("ERROR_TABLE" NVARCHAR(256)))
+LANGUAGE SQLSCRIPT 
+SQL SECURITY INVOKER 
+ AS
+BEGIN
+
+	DECLARE orgTableCount INTEGER :=0;
+    DECLARE userTableCount INTEGER := 0;
+    DECLARE userOrgTableCount INTEGER := 0;
+    DECLARE logTableCount INTEGER := 0;
+    DECLARE traceTableCount INTEGER := 0;
+    declare orgVT nvarchar(512);
+	declare userVT nvarchar(512);
+	declare orgUserVT nvarchar(512);
+	declare logVT nvarchar(512);
+	declare traceVT nvarchar(512);
+    DECLARE STRINGARRAY  NVARCHAR(50) ARRAY;
+    declare i INTEGER;
+    i := 1;
+    status := 0;
+     
+  
+	CALL "hc.hph.plugins.ldap.interface.procedures::getVirtualTableDetails"(:remoteSourceName,:VirtualTableOut);
+  
+	Select "VIRTUAL_TABLE_NAME" into orgVT from :VirtualTableOut where "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_UM_ORG';
+	Select "VIRTUAL_TABLE_NAME" into logVT from :VirtualTableOut where "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_LOG_DETAIL';
+	Select "VIRTUAL_TABLE_NAME" into traceVT from :VirtualTableOut where "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_LOG_TRACE';
+  
+  
+  
+  	SELECT COUNT(*) INTO orgTableCount FROM (
+        SELECT TOP 1 USER_NAME
+        FROM "hc::EFFECTIVE_PRIVILEGES"
+        WHERE USER_NAME = '_SYS_REPO' AND OBJECT_NAME = :orgVT AND PRIVILEGE = 'SELECT' AND IS_VALID = 'TRUE' );
+        
+    SELECT COUNT(*) INTO logTableCount FROM (
+        SELECT TOP 1 "USER_NAME"
+        FROM "hc::EFFECTIVE_PRIVILEGES"
+        WHERE "USER_NAME" = '_SYS_REPO'  AND "OBJECT_NAME" = :logVT AND "PRIVILEGE" = 'SELECT' AND "IS_VALID" = 'TRUE'
+    );
+    SELECT COUNT(*) INTO traceTableCount FROM (
+        SELECT TOP 1 USER_NAME
+        FROM "hc::EFFECTIVE_PRIVILEGES"
+        WHERE "USER_NAME" = '_SYS_REPO'  AND "OBJECT_NAME" = :traceVT AND "PRIVILEGE" = 'SELECT' AND "IS_VALID" = 'TRUE'
+    );
+    
+    IF(:orgTableCount <> 1)THEN
+     STRINGARRAY[:i] := :orgVT;
+     i := :i+1;
+    END IF;
+    IF(:logTableCount <> 1)THEN
+     STRINGARRAY[:i] := :logVT;
+     i := :i+1;
+    END IF;
+    IF(:traceTableCount <> 1)THEN
+    STRINGARRAY[:i] := :traceVT;
+     i := :i+1;
+    END IF;
+    
+    
+    
+    IF (:entity = 'U')THEN
+    Select"VIRTUAL_TABLE_NAME" into userVT from :VirtualTableOut where "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_UM_USER';
+	Select "VIRTUAL_TABLE_NAME" into orgUserVT from :VirtualTableOut where "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_UM_ORG_USER';
+	SELECT COUNT(*) INTO userTableCount FROM (
+        SELECT TOP 1 USER_NAME
+        FROM "hc::EFFECTIVE_PRIVILEGES"
+        WHERE "USER_NAME" = '_SYS_REPO'  AND "OBJECT_NAME" = :userVT AND "PRIVILEGE" = 'SELECT' AND "IS_VALID" = 'TRUE'
+    );
+    SELECT COUNT(*) INTO userOrgTableCount FROM (
+        SELECT TOP 1 USER_NAME
+        FROM "hc::EFFECTIVE_PRIVILEGES"
+        WHERE "USER_NAME" = '_SYS_REPO'  AND "OBJECT_NAME" = :orgUserVT AND "PRIVILEGE" = 'SELECT' AND "IS_VALID" = 'TRUE'
+    );
+    
+    IF(:userTableCount <> 1)THEN
+     STRINGARRAY[:i] := :userVT;
+     i := :i+1;
+    END IF;
+    IF(:userOrgTableCount <> 1)THEN
+    STRINGARRAY[:i] := :orgUserVT;
+     i := :i+1;
+    END IF;
+    
+    IF (:orgTableCount = 1 AND logTableCount = 1  AND traceTableCount = 1 AND userTableCount = 1 AND traceTableCount = 1)THEN
+        status := 1;
+       
+    END IF;
+   
+    ELSE IF(:orgTableCount = 1 AND logTableCount = 1  AND traceTableCount = 1)THEN
+        status := 1;
+        END IF;
+
+
+
+	END IF;
+
+	OT_ERROR = UNNEST (:STRINGARRAY) AS ("ERROR_TABLE");
+    
+    
+    
+END

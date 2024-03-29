@@ -1,0 +1,202 @@
+PROCEDURE "hc.hph.um.org.db.procs::create_org" 
+		(
+			IN i_org_details "hc.hph.um.org.db.models::ConfigTypes.Org_Details",
+			IN i_org_details_eav "hc.hph.um.org.db.models::ConfigTypes.OrgAttrEAVForProc",--TABLE ("OrgID" NVARCHAR(100), "Attribute" NVARCHAR(100), "Value" NVARCHAR(100)), 
+			OUT o_message TABLE ("Status" NVARCHAR(1), "Code" NVARCHAR(100), "Message" NVARCHAR(100))
+		) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+	declare no_org_data condition for SQL_ERROR_CODE 10001;
+	declare org_already_exists condition for SQL_ERROR_CODE 10002;
+	declare error_in_manage_ancestors_for_orgs condition for SQL_ERROR_CODE 10003;
+	
+	declare v_creator NVARCHAR(256); 
+	declare v_current_timestamp TIMESTAMP;
+	declare v_end_timestamp TIMESTAMP; 
+	declare v_org_id NVARCHAR(100);
+	--declare v_parent_org_id NVARCHAR(100);
+	declare v_org_id_eav_count INTEGER;
+	declare v_org_id_found integer;
+	declare count integer;
+	declare status NVARCHAR(1);
+	declare message NVARCHAR(100);
+	
+	declare org_ids "hc.hph.um.org.db.models::ConfigTypes.OrgIdStructForProc";
+	declare cursor organizations for select * from :i_org_details;
+	declare error_inactive_parent_found condition for SQL_ERROR_CODE 10001;
+    	
+	declare exit handler for error_inactive_parent_found
+    begin
+       o_message = select 'E' as "Status",
+                            ::SQL_ERROR_CODE as "Code",
+                            ::SQL_ERROR_MESSAGE as "Message"
+                    from "hc::DUMMY";    
+    end;
+    	
+	declare exit handler for no_org_data
+	begin
+		o_message = select 	'E' as "Status",
+							::SQL_ERROR_CODE as "Code",
+		       				::SQL_ERROR_MESSAGE as "Message"
+		   			from "hc::DUMMY";    
+	end;
+	
+	declare exit handler for org_already_exists
+	begin
+		o_message = select 	'E' as "Status",
+							::SQL_ERROR_CODE as "Code",
+		       				::SQL_ERROR_MESSAGE as "Message"
+		   			from "hc::DUMMY";    
+	end;
+	
+	declare exit handler for error_in_manage_ancestors_for_orgs
+	begin
+		o_message = select 	'E' as "Status",
+							::SQL_ERROR_CODE as "Code",
+		       				::SQL_ERROR_MESSAGE as "Message"
+		   			from "hc::DUMMY";    
+	end;
+	
+	declare exit handler for sqlexception
+	begin
+		o_message = select 	'E' as "Status",
+							::SQL_ERROR_CODE as "Code",
+		       				::SQL_ERROR_MESSAGE as "Message"
+		   			from "hc::DUMMY";    
+	end;
+	
+	
+	select session_context('XS_APPLICATIONUSER') into v_creator from "hc::DUMMY";
+	select current_utctimestamp into v_current_timestamp from "hc::DUMMY";
+	select to_timestamp('9999-12-31') into v_end_timestamp from "hc::DUMMY";
+	
+	-- For each org 
+	for organization AS organizations do
+	
+		-- OrgID present in input data.
+		v_org_id := organization."OrgID";
+		if :v_org_id is null then	
+			signal no_org_data set MESSAGE_TEXT = 'No data to create org';					
+		end if;
+		
+		-- OrgID cannot be duplicate.
+		select count("OrgID") into v_org_id_found from "hc.hph.cdw.db.models::Config.Org" where "OrgID" = :v_org_id;
+		if :v_org_id_found > 0 then
+			signal org_already_exists set MESSAGE_TEXT = 'Org already exists';
+		end if;
+		
+		-- Check : parent org must not Inactive 
+		if organization."ParentOrgID" = '' or organization."ParentOrgID" = null then
+			-- Do nothing, as this org is root org
+		else
+			select count("OrgID") into count from "hc.hph.cdw.db.models::Config.Org"
+				where "OrgID" = organization."ParentOrgID" and "ValidTo" > current_utctimestamp and "Status" = 'Inactive';
+			
+			if count = 1 then
+				signal error_inactive_parent_found set MESSAGE_TEXT = 'Error! Inactive parent found';
+			end if;
+		end if;
+		
+		-- handle Parent Org ID
+		-- select "ParentOrgID" into v_parent_org_id from :organization;
+		--v_parent_org_id := organization."ParentOrgID";
+		--if :v_parent_org_id = '' then
+		--	v_parent_org_id := null;
+		--end if;
+		
+		-- TODO : Enhance this with better exception handling.
+		insert into "hc.hph.cdw.db.models::Config.Org" (
+			"OrgID",
+			"ValidFrom",
+			"ValidTo",
+			"ParentOrgID",
+			"OrgName",
+			"Type",
+			"Status",
+			"Address.StreetName",
+			"Address.StreetNumber",
+			"Address.PostOfficeBox",
+			"Address.City",
+			"Address.PostalCode",
+			"Address.State",
+			"Address.Country.OriginalValue",
+			"Address.Region",
+			"Telecom.Phone",
+			"URL",
+			"ChangeDetails.CreatedBy",
+			"ChangeDetails.CreatedAt",
+			"ChangeDetails.ChangedBy",
+			"ChangeDetails.ChangedAt"
+		)     
+		VALUES (
+			organization."OrgID",
+			:v_current_timestamp,
+			:v_end_timestamp,
+			
+			organization."ParentOrgID",
+			organization."Name",
+			'Research',
+			'Active',
+			organization."Address.StreetName",
+			organization."Address.StreetNumber",
+			organization."Address.PostOfficeBox",
+			organization."Address.City",
+			organization."Address.PostalCode",
+			organization."Address.State",
+			organization."Address.Country.OriginalValue",
+			organization."Address.Region",
+			organization."Telecom.Phone",
+			organization."URL",
+			:v_creator,
+			:v_current_timestamp,
+			:v_creator,
+			:v_current_timestamp
+			
+		);
+		
+		select count(*) into v_org_id_eav_count from :i_org_details_eav;
+		
+		if :v_org_id_eav_count > 0 then
+			insert into "hc.hph.cdw.db.models::Config.OrgAttrEAV" (
+				select
+					"OrgID",
+					:v_current_timestamp as "ValidFrom",
+					:v_end_timestamp as "ValidTo",
+					"Attribute",
+					"Value",
+					:v_creator,
+					:v_current_timestamp,
+					:v_creator,
+					:v_current_timestamp from :i_org_details_eav
+			);
+		end if;
+	
+    --insert into    "hc.hph.cdw.db.models::Config.OrgTexts"
+    --( select "OrgID", 'EN' as "lang", :v_current_timestamp as "ValidFrom", :v_end_timestamp as "ValidTo",
+        --    "Name", "Description", :v_creator, :v_current_timestamp, :v_creator, :v_current_timestamp
+            --from :i_org_details);
+
+	
+	end for;
+	
+	org_ids = SELECT "OrgID" FROM :i_org_details;
+	CALL "hc.hph.um.org.db.procs::manage_ancestors_for_orgs"(:org_ids, 'I', :o_message);
+ 
+	count := 0;
+	select count(*) into count from :o_message;
+	if count > 0 then
+	    select "Status" into status from :o_message;
+	    if status = 'E' then 
+			select "Message" into message from :o_message;
+			signal error_in_manage_ancestors_for_orgs set MESSAGE_TEXT = message;
+		end if;
+	end if;
+
+	o_message = select 'S' as "Status",
+					   null as "Code",
+	       			   'Successfully created the Organization' as "Message"
+	   			from "hc::DUMMY";    
+				
+END;

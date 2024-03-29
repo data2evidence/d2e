@@ -1,0 +1,8 @@
+PROCEDURE "hc.hph.fhir.api::GrantAccess" ( IN USER NVARCHAR(255) )
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER AS
+BEGIN
+    declare schema varchar(255);
+    select current_schema into schema from "hc::DUMMY";
+    CALL "hc.hph.fhir.impl::GrantAccessInternal"(USER, schema);
+END

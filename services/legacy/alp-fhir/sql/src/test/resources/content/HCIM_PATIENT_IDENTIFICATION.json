@@ -1,0 +1,89 @@
+{
+	"resourceType": "StructureDefinition",
+	"id": "HCIM_PATIENT_IDENTIFICATION",
+	"url": "http://data4life-asia.care/health/fhir/StructureDefinition/HCIM_PATIENT_IDENTIFICATION",
+	"kind": "resource",
+	"type": "HCIM_PATIENT_IDENTIFICATION",
+	"meta": {
+		"profile": [
+			"http://data4life-asia.care/health/fhir/profile/Tabledefinition"
+		]
+	},
+	"extension": [
+		{
+			"uri": "http://data4life-asia.care/health/fhir/extension/schema",
+			"valueString": "HCIM"
+		},
+		{
+			"uri": "http://data4life-asia.care/health/fhir/extension/table",
+			"valueString": "HCIM_PATIENT_IDENTIFICATION"
+		}
+	],
+	"snapshot": {
+		"element": [
+			{
+				"id": "HCIM_PATIENT_IDENTIFICATION",
+				"path": "HCIM_PATIENT_IDENTIFICATION",
+				"min": 0,
+				"max": "*"
+			},
+			{
+				"id": "identification_number",
+				"extension": [
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/column",
+						"valueString": "identification_number"
+					},
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+						"valueString": "NVARCHAR"
+					},
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+						"valuePositiveInt": 64
+					}
+				],
+				"min": 0,
+				"max": "*"
+			},
+			{
+				"id": "PatientIdentification",
+				"extension": [
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/column",
+						"valueString": "PatientIdentification"
+					},
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+						"valueString": "NVARCHAR"
+					},
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+						"valuePositiveInt": 100
+					}
+				],
+				"min": 0,
+				"max": "*"
+			},
+			{
+				"id": "System",
+				"extension": [
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/column",
+						"valueString": "System"
+					},
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+						"valueString": "NVARCHAR"
+					},
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+						"valuePositiveInt": 255
+					}
+				],
+				"min": 0,
+				"max": "*"
+			}
+		]
+	}
+}

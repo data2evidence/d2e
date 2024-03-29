@@ -1,0 +1,27 @@
+{  
+   "type":"query",
+   "from":{  
+      "type":"from",
+      "definition":"Patient"
+   },
+   "name":"Search",
+   "limit":{  
+      "type":"limit",
+      "limit":25
+   },
+   "filter":{  
+      "type":"tokenexpression",
+      "context":{  
+         "type":"resultelement",
+         "definition":"Patient",
+         "path":"Patient.identifier"
+      },
+      "code":"999911338"
+   },
+   "out":[  
+      {  
+         "type":"resultelement",
+         "definition":"Patient"
+      }
+   ]
+}

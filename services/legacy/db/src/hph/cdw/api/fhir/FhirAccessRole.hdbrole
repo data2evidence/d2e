@@ -1,0 +1,12 @@
+{ 
+  "role":{ 
+    "name":"hc.hph.cdw.api.fhir::FhirAccessRole#", 
+    "object_privileges":[ 
+      { 
+        "name":"hc.hph.cdw.db.models::DWViews.AllowedOrgIDs", 
+        "type":"VIEW", 
+        "privileges_with_grant_option":[ "SELECT" ]
+      } 
+    ] 
+  } 
+}

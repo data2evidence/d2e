@@ -1,0 +1,10 @@
+{
+	"1.8.0":
+		{ 
+			"MedicationRequest.patient":{"source":"MedicationRequest.patient","target":"MedicationRequest.subject","name":"subject"},
+			"MedicationRequest.stage":	{"source":"MedicationRequest.stage","target":"MedicationRequest.intent","name":"subject"},
+			"MedicationRequest.dateWritten":{"source":"MedicationRequest.dateWritten","target":"MedicationRequest.authoredOn","name":"authoredOn"},
+			"Immunization.wasNotGiven":{"source":"Immunization.wasNotGiven","target":"Immunization.notGiven","name":"notGiven"}
+		}
+	
+}

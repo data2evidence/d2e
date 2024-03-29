@@ -1,0 +1,8 @@
+extends: ../../.eslint/strict_services.eslintrc.yml
+globals:
+  it: false
+  describe: false
+  __dirname: false
+rules:
+  quotes: [2, single]
+  linebreak-style: 0

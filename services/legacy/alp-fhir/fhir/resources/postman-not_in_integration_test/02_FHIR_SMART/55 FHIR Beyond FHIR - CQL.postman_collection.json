@@ -1,0 +1,697 @@
+{
+	"info": {
+		"_postman_id": "108337fd-13f7-42bb-b0ce-95e61e7d1705",
+		"name": "55 FHIR Beyond FHIR - CQL",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Upload Female Administrative Sex ValueSet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e0be5372-d599-4dd3-8d84-720569ce9a40",
+						"type": "text/javascript",
+						"exec": [
+							"var res = {",
+							"  \"resourceType\": \"ValueSet\",",
+							"  \"id\": \"female-administrative-sex\",",
+							"  \"url\": \"http://health.email.com/valueset/female-administrative-sex\",",
+							"  \"version\": \"20150622\",",
+							"  \"name\": \"Female Administrative Sex\",",
+							"  \"status\": \"draft\",",
+							"  \"experimental\": true,",
+							"  \"date\": \"2015-06-22\",",
+							"  \"publisher\": \"HL7 International\",",
+							"  \"description\": \"This is an example value set that includes all the LOINC codes for serum/plasma cholesterol from v2.36.\",",
+							"  \"compose\": {",
+							"    \"inactive\": false,",
+							"    \"include\": [",
+							"      {",
+							"        \"system\": \"http://some-system.org\",",
+							"        \"version\": \"0.1\",",
+							"        \"concept\": [",
+							"          {",
+							"            \"code\": \"Female\",",
+							"            \"display\": \"Female\"",
+							"          },",
+							"          {",
+							"            \"code\": \"female\",",
+							"            \"display\": \"Female\"",
+							"          },",
+							"          {",
+							"            \"code\": \"f\",",
+							"            \"display\": \"Female\"",
+							"          }",
+							"        ]",
+							"      }",
+							"    ]",
+							"  }",
+							"};",
+							"",
+							"pm.test(\"Status code is 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    pm.response.to.have.status(\"Created\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response).to.eql(res);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"resourceType\": \"ValueSet\",\r\n  \"id\": \"female-administrative-sex\",\r\n  \"url\": \"http://health.email.com/valueset/female-administrative-sex\",\r\n  \"version\": \"20150622\",\r\n  \"name\": \"Female Administrative Sex\",\r\n  \"status\": \"draft\",\r\n  \"experimental\": true,\r\n  \"date\": \"2015-06-22\",\r\n  \"publisher\": \"HL7 International\",\r\n  \"description\": \"This is an example value set that includes all the LOINC codes for serum/plasma cholesterol from v2.36.\",\r\n  \"compose\": {\r\n    \"inactive\": false,\r\n    \"include\": [\r\n      {\r\n        \"system\": \"http://some-system.org\",\r\n        \"version\": \"0.1\",\r\n        \"concept\": [\r\n          {\r\n            \"code\": \"Female\",\r\n            \"display\": \"Female\"\r\n          },\r\n          {\r\n            \"code\": \"female\",\r\n            \"display\": \"Female\"\r\n          },\r\n          {\r\n            \"code\": \"f\",\r\n            \"display\": \"Female\"\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/ValueSet",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"ValueSet"
+					]
+				},
+				"description": "Required for execution of CQL Examples"
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Abnormal Weight Loss ValueSet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b91350f-b4d5-435b-aea8-5c86544ae739",
+						"type": "text/javascript",
+						"exec": [
+							"var res = {",
+							"  \"resourceType\": \"ValueSet\",",
+							"  \"id\": \"abnormal-weight-loss\",",
+							"  \"url\": \"http://health.email.com/valueset/abnormal-weight-loss\",",
+							"  \"version\": \"20150622\",",
+							"  \"name\": \"Abnormal Weight Loss\",",
+							"  \"status\": \"draft\",",
+							"  \"experimental\": true,",
+							"  \"date\": \"2015-06-22\",",
+							"  \"publisher\": \"HL7 International\",",
+							"  \"description\": \"This is an example value set that includes all the LOINC codes for serum/plasma cholesterol from v2.36.\",",
+							"  \"compose\": {",
+							"    \"inactive\": false,",
+							"    \"include\": [",
+							"      {",
+							"        \"system\": \"http://snomed.info/sct\",",
+							"        \"version\": \"0.1\",",
+							"        \"concept\": [",
+							"          {",
+							"            \"code\": \"267024001\",",
+							"            \"display\": \"Abnormal weight loss\"",
+							"          }",
+							"        ]",
+							"      }",
+							"    ]",
+							"  }",
+							"};",
+							"",
+							"pm.test(\"Status code is 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    pm.response.to.have.status(\"Created\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response).to.eql(res);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"resourceType\": \"ValueSet\",\r\n  \"id\": \"abnormal-weight-loss\",\r\n  \"url\": \"http://health.email.com/valueset/abnormal-weight-loss\",\r\n  \"version\": \"20150622\",\r\n  \"name\": \"Abnormal Weight Loss\",\r\n  \"status\": \"draft\",\r\n  \"experimental\": true,\r\n  \"date\": \"2015-06-22\",\r\n  \"publisher\": \"HL7 International\",\r\n  \"description\": \"This is an example value set that includes all the LOINC codes for serum/plasma cholesterol from v2.36.\",\r\n  \"compose\": {\r\n    \"inactive\": false,\r\n    \"include\": [\r\n      {\r\n        \"system\": \"http://snomed.info/sct\",\r\n        \"version\": \"0.1\",\r\n        \"concept\": [\r\n          {\r\n            \"code\": \"267024001\",\r\n            \"display\": \"Abnormal weight loss\"\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/ValueSet",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"ValueSet"
+					]
+				},
+				"description": "Required for execution of CQL Examples"
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Vitamin D deficiency ValueSet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "32735430-0c26-46d4-bd5c-33b66cda5a29",
+						"type": "text/javascript",
+						"exec": [
+							"var res = {",
+							"  \"resourceType\": \"ValueSet\",",
+							"  \"id\": \"vitamin-d-deficiency\",",
+							"  \"url\": \"http://health.email.com/valueset/vitamin-d-deficiency\",",
+							"  \"version\": \"20150622\",",
+							"  \"name\": \"Vitamin D deficiency\",",
+							"  \"status\": \"draft\",",
+							"  \"experimental\": true,",
+							"  \"date\": \"2015-06-22\",",
+							"  \"publisher\": \"HL7 International\",",
+							"  \"description\": \"This is an example value set that includes all the LOINC codes for serum/plasma cholesterol from v2.36.\",",
+							"  \"compose\": {",
+							"    \"inactive\": false,",
+							"    \"include\": [",
+							"      {",
+							"        \"system\": \"http://snomed.info/sct\",",
+							"        \"version\": \"0.1\",",
+							"        \"concept\": [",
+							"          {",
+							"            \"code\": \"34713006\",",
+							"            \"display\": \"Vitamin D deficiency\"",
+							"          }",
+							"        ]",
+							"      }",
+							"    ]",
+							"  }",
+							"};",
+							"",
+							"pm.test(\"Status code is 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    pm.response.to.have.status(\"Created\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response).to.eql(res);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"resourceType\": \"ValueSet\",\r\n  \"id\": \"vitamin-d-deficiency\",\r\n  \"url\": \"http://health.email.com/valueset/vitamin-d-deficiency\",\r\n  \"version\": \"20150622\",\r\n  \"name\": \"Vitamin D deficiency\",\r\n  \"status\": \"draft\",\r\n  \"experimental\": true,\r\n  \"date\": \"2015-06-22\",\r\n  \"publisher\": \"HL7 International\",\r\n  \"description\": \"This is an example value set that includes all the LOINC codes for serum/plasma cholesterol from v2.36.\",\r\n  \"compose\": {\r\n    \"inactive\": false,\r\n    \"include\": [\r\n      {\r\n        \"system\": \"http://snomed.info/sct\",\r\n        \"version\": \"0.1\",\r\n        \"concept\": [\r\n          {\r\n            \"code\": \"34713006\",\r\n            \"display\": \"Vitamin D deficiency\"\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/ValueSet",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"ValueSet"
+					]
+				},
+				"description": "Required for execution of CQL Examples"
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Height ValueSet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "27d22a52-a426-43bc-95af-387b86440219",
+						"type": "text/javascript",
+						"exec": [
+							"var res = {",
+							"  \"resourceType\": \"ValueSet\",",
+							"  \"id\": \"height\",",
+							"  \"url\": \"http://health.email.com/valueset/height\",",
+							"  \"version\": \"20150622\",",
+							"  \"name\": \"Height\",",
+							"  \"status\": \"draft\",",
+							"  \"experimental\": true,",
+							"  \"date\": \"2015-06-22\",",
+							"  \"publisher\": \"HL7 International\",",
+							"  \"description\": \"This is an example value set that includes all the LOINC codes for serum/plasma cholesterol from v2.36.\",",
+							"  \"compose\": {",
+							"    \"inactive\": false,",
+							"    \"include\": [",
+							"      {",
+							"        \"system\": \"http://loin.org\",",
+							"        \"version\": \"0.1\",",
+							"        \"concept\": [",
+							"          {",
+							"            \"code\": \"8302-2\",",
+							"            \"display\": \"height\"",
+							"          }",
+							"        ]",
+							"      }",
+							"    ]",
+							"  }",
+							"};",
+							"",
+							"pm.test(\"Status code is 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    pm.response.to.have.status(\"Created\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response).to.eql(res);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"resourceType\": \"ValueSet\",\r\n  \"id\": \"height\",\r\n  \"url\": \"http://health.email.com/valueset/height\",\r\n  \"version\": \"20150622\",\r\n  \"name\": \"Height\",\r\n  \"status\": \"draft\",\r\n  \"experimental\": true,\r\n  \"date\": \"2015-06-22\",\r\n  \"publisher\": \"HL7 International\",\r\n  \"description\": \"This is an example value set that includes all the LOINC codes for serum/plasma cholesterol from v2.36.\",\r\n  \"compose\": {\r\n    \"inactive\": false,\r\n    \"include\": [\r\n      {\r\n        \"system\": \"http://loin.org\",\r\n        \"version\": \"0.1\",\r\n        \"concept\": [\r\n          {\r\n            \"code\": \"8302-2\",\r\n            \"display\": \"height\"\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/ValueSet",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"ValueSet"
+					]
+				},
+				"description": "Required for execution of CQL Examples"
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Weight ValueSet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fda8c720-6ee5-4e87-a7bc-84bcb63ce845",
+						"type": "text/javascript",
+						"exec": [
+							"var res = {",
+							"  \"resourceType\": \"ValueSet\",",
+							"  \"id\": \"height\",",
+							"  \"url\": \"http://health.email.com/valueset/height\",",
+							"  \"version\": \"20150622\",",
+							"  \"name\": \"Height\",",
+							"  \"status\": \"draft\",",
+							"  \"experimental\": true,",
+							"  \"date\": \"2015-06-22\",",
+							"  \"publisher\": \"HL7 International\",",
+							"  \"description\": \"This is an example value set that includes all the LOINC codes for serum/plasma cholesterol from v2.36.\",",
+							"  \"compose\": {",
+							"    \"inactive\": false,",
+							"    \"include\": [",
+							"      {",
+							"        \"system\": \"http://loin.org\",",
+							"        \"version\": \"0.1\",",
+							"        \"concept\": [",
+							"          {",
+							"            \"code\": \"8302-2\",",
+							"            \"display\": \"height\"",
+							"          }",
+							"        ]",
+							"      }",
+							"    ]",
+							"  }",
+							"};",
+							"",
+							"pm.test(\"Status code is 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    pm.response.to.have.status(\"Created\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response).to.eql(res);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"resourceType\": \"ValueSet\",\r\n  \"id\": \"height\",\r\n  \"url\": \"http://health.email.com/valueset/height\",\r\n  \"version\": \"20150622\",\r\n  \"name\": \"Height\",\r\n  \"status\": \"draft\",\r\n  \"experimental\": true,\r\n  \"date\": \"2015-06-22\",\r\n  \"publisher\": \"HL7 International\",\r\n  \"description\": \"This is an example value set that includes all the LOINC codes for serum/plasma cholesterol from v2.36.\",\r\n  \"compose\": {\r\n    \"inactive\": false,\r\n    \"include\": [\r\n      {\r\n        \"system\": \"http://loin.org\",\r\n        \"version\": \"0.1\",\r\n        \"concept\": [\r\n          {\r\n            \"code\": \"8302-2\",\r\n            \"display\": \"height\"\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/ValueSet",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"ValueSet"
+					]
+				},
+				"description": "Required for execution of CQL Examples"
+			},
+			"response": []
+		},
+		{
+			"name": "Hello World CQL",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "90c3ced1-a64e-40a3-92c2-0faa9290f945",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    var startTime = new Date(\"2013-01-01\").getTime();",
+							"    for(var result of response.result) {",
+							"        var ageDiff = Math.abs(new Date(startTime - new Date(result.birthDate).getTime()).getUTCFullYear() - 1970);",
+							"        pm.expect(ageDiff).to.be.above(1).to.be.below(18);",
+							"    }",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/plain"
+					},
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "library HelloWorld version '1'\r\n\r\nusing QUICK\r\n\r\nparameter MeasurementPeriod default Interval[DateTime(2013, 1, 1, 0, 0, 0, 0), DateTime(2014, 1, 1, 0, 0, 0, 0))\r\n\r\ncontext Patient\r\n\r\ndefine InDemographic:\r\n    AgeInYearsAt(start of MeasurementPeriod) >= 2 and AgeInYearsAt(start of MeasurementPeriod) < 18"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/cql/InDemographic",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"cql",
+						"InDemographic"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Hello World CQL with Gender",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "30fda107-b7f4-441a-986e-8f28fa259609",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    var startTime = new Date(\"2013-01-01\").getTime();",
+							"    for(var result of response.result) {",
+							"        var ageDiff = Math.abs(new Date(startTime - new Date(result.birthDate).getTime()).getUTCFullYear() - 1970);",
+							"        pm.expect(ageDiff).to.be.above(1).to.be.below(18);",
+							"        pm.expect(result.gender).to.eql(\"female\");",
+							"    }",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "library HelloWorld version '1'\r\n\r\nusing QUICK\r\n\r\nvalueset \"Female Administrative Sex\": 'http://health.email.com/valueset/female-administrative-sex'\r\n\r\nparameter MeasurementPeriod default Interval[DateTime(2013, 1, 1, 0, 0, 0, 0), \r\n\t\t\t\t\t\t\t\t\t\t\t DateTime(2014, 1, 1, 0, 0, 0, 0))\r\n\r\n\r\ncontext Patient\r\n\r\ndefine InDemographic:\r\n    \tAgeInYearsAt(start of MeasurementPeriod) >= 2 \r\n    and AgeInYearsAt(start of MeasurementPeriod) < 18\r\n    and Patient.gender in \"Female Administrative Sex\""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/cql/InDemographic",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"cql",
+						"InDemographic"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Vitamin D Deficiency in measurement Period ",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "library VitaminDDeficiency version '1'\r\n\r\nusing QUICK\r\n\r\nvalueset \"Female Administrative Sex\": 'http://health.email.com/valueset/female-administrative-sex'\r\nvalueset \"Vitamin D Deficiency\" : 'http://health.email.com/valueset/vitamin-d-deficiency'\r\n\r\nparameter MeasurementPeriod default Interval[DateTime(2008, 1, 1, 0, 0, 0, 0), \r\n\t\t\t\t\t\t\t\t\t\t\t DateTime(2013, 1, 1, 0, 0, 0, 0))\r\n\r\ncontext Patient\r\n\r\ndefine InDemographic:\r\n    \tAgeInYearsAt(start of MeasurementPeriod) >= 2 \r\n    and AgeInYearsAt(start of MeasurementPeriod) < 80\r\n    and Patient.gender in \"Female Administrative Sex\"\r\n    \r\ndefine VitaminDDeficiency:\r\n    [Condition: \"Vitamin D Deficiency\"] C\r\n    \twhere Interval[C.onsetDateTime, C.abatementDate] overlaps MeasurementPeriod"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/cql/VitaminDDeficiency",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"cql",
+						"VitaminDDeficiency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Has Vitamin D Deficiency in measurement Period ",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+xml"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "library VitaminDDeficiency version '1'\r\n\r\nusing QUICK\r\n\r\nvalueset \"Female Administrative Sex\": 'http://health.email.com/valueset/female-administrative-sex'\r\nvalueset \"Vitamin D Deficiency\" : 'http://health.email.com/valueset/vitamin-d-deficiency'\r\n\r\nparameter MeasurementPeriod default Interval[DateTime(2008, 1, 1, 0, 0, 0, 0), \r\n\t\t\t\t\t\t\t\t\t\t\t DateTime(2013, 1, 1, 0, 0, 0, 0))\r\n\r\ncontext Patient\r\n\r\ndefine InDemographic:\r\n    \tAgeInYearsAt(start of MeasurementPeriod) >= 2 \r\n    and AgeInYearsAt(start of MeasurementPeriod) < 80\r\n    and Patient.gender in \"Female Administrative Sex\"\r\n    \r\ndefine VitaminDDeficiency:\r\n    [Condition: \"Vitamin D Deficiency\"] C\r\n    \twhere Interval[C.onsetDateTime, C.abatementDate] overlaps MeasurementPeriod\r\n    \t\r\ndefine hasVitaminDDeficiency:\r\n\texists(VitaminDDeficiency)"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/cql/hasVitaminDDeficiency",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"cql",
+						"hasVitaminDDeficiency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Has Vitamin D Deficiency with Quantity in measurement Period ",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "library VitaminDDeficiency version '1'\r\n\r\nusing QUICK\r\n\r\nvalueset \"Female Administrative Sex\": 'http://health.email.com/valueset/female-administrative-sex'\r\nvalueset \"Vitamin D Deficiency\" : 'http://health.email.com/valueset/vitamin-d-deficiency'\r\n\r\nparameter MeasurementPeriod default Interval[DateTime(2008, 1, 1, 0, 0, 0, 0), \r\n\t\t\t\t\t\t\t\t\t\t\t DateTime(2013, 1, 1, 0, 0, 0, 0))\r\n\r\ncontext Patient\r\n\r\ndefine InDemographic:\r\n    \tAgeInYearsAt(start of MeasurementPeriod) >= 2 \r\n    and AgeInYearsAt(start of MeasurementPeriod) < 80\r\n    and Patient.gender in \"Female Administrative Sex\"\r\n    \r\ndefine VitaminDDeficiency:\r\n    [Condition: \"Vitamin D Deficiency\"] C\r\n    \twhere Interval[C.onsetDateTime, C.abatementDate] overlaps MeasurementPeriod\r\n    \t\r\ndefine hasVitaminDDeficiency:\r\n\texists(VitaminDDeficiency) and InDemographic"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/cql/hasVitaminDDeficiency",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"cql",
+						"hasVitaminDDeficiency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Female Patients between 2 and 80 which are small and heavy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8e060406-f346-4351-b0ef-51be27ccd32e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present, if response is present\", function () {",
+							"    if(responseBody) {",
+							"        pm.response.to.have.header(\"Content-Type\");",
+							"        pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    // Some Validation goes here...",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "library VitaminDDeficiency version '1'\r\n\r\nusing QUICK\r\n\r\nvalueset \"Female Administrative Sex\": 'http://health.email.com/valueset/female-administrative-sex'\r\nvalueset \"Vitamin D Deficiency\" : 'http://health.email.com/valueset/vitamin-d-deficiency'\r\nvalueset \"height\" : 'http://health.email.com/valueset/height'\r\nvalueset \"weight\" : 'http://health.email.com/valueset/weight'\r\n\r\nparameter MeasurementPeriod default Interval[@2013-01-01,@2014-01-01 )\r\n\r\ncontext Patient\r\n\r\ndefine InDemographic:\r\n    \tAgeInYearsAt(start of MeasurementPeriod) >= 2 \r\n    and AgeInYearsAt(start of MeasurementPeriod) < 80\r\n    and Patient.gender in \"Female Administrative Sex\"\r\n    \r\ndefine VitaminDDeficiency:\r\n    [Condition: \"Vitamin D Deficiency\"] C\r\n    \twhere Interval[C.onsetDateTime, C.abatementDate] overlaps MeasurementPeriod\r\n    \t\r\ndefine isSmallAndHeavy:\r\n\t\texists([Observation: \"height\"] H where H.valueQuantity <= 165 'cm')\r\n\tand exists([Observation: \"weight\"] W where  W.valueQuantity >= 80 'kg')\r\n    \t\r\ndefine hasVitaminDDeficiency:\r\n\texists(VitaminDDeficiency) and InDemographic"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/cql/isSmallAndHeavy",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"cql",
+						"isSmallAndHeavy"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

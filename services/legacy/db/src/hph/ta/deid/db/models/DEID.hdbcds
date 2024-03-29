@@ -1,0 +1,218 @@
+namespace hc.hph.ta.deid.db.models;
+
+context DEID {
+	entity DOCUMENT_COLLECTIONS {
+	 key DOCUMENT_COLLECTION_ID : Integer not null;
+	 DOCUMENT_COLLECTION_NAME : hana.VARCHAR(50);
+	 USER_NAME : hana.VARCHAR(50);
+	 CREATED : UTCTimestamp;
+	} technical configuration {
+  column store;
+ };
+
+	entity DOCUMENTS {
+	 key DOCUMENT_COLLECTION_ID : Integer not null;
+     key DOCUMENT_ID    : Binary(32) not null;
+     FILENAME : String(200);
+     LANGUAGE : String(2);
+	 MIMETYPE : hana.VARCHAR(20);
+	 USER_NAME : hana.VARCHAR(50);
+     PATIENT_ID    : Binary(32);
+	 CREATED : UTCTimestamp;
+	} technical configuration {
+  column store;
+ };
+
+	temporary entity DEID_DOCUMENTS {
+	 key DOCUMENT_COLLECTION_ID : Integer not null;
+     key DOCUMENT_ID    : Binary(32) not null;
+	 key PROJECT_ID : Integer not null;
+     CONTENT : LargeString;
+	 USER_NAME : hana.VARCHAR(50);
+     PATIENT_ID    : Binary(32);
+	 CREATED : UTCTimestamp;
+	} technical configuration {
+  row store;
+ };
+
+	entity DOCUMENTS_STATUS {
+	 key PROJECT_ID : Integer not null;
+     key DOCUMENT_ID : Binary(32);
+	 CONTENT_CACHE : LargeString;
+	 DEID_CONTENT : LargeString;
+	 ANON_STATUS : hana.TINYINT;
+	 ANON_ENTITIES : hana.VARCHAR(2000);
+	 DATE_DELTA : Integer;
+	 CREATED : UTCTimestamp;
+	} technical configuration {
+  column store;
+ };
+
+	entity PROJECT_TEXT_INDEX {
+     key PROJECT_ID     : Integer;
+     key DOCUMENT_ID    : Binary(32);
+     key TA_RULE        : String(200);
+     key TA_COUNTER     : Integer64;
+     TA_TOKEN           : String(5000);
+     TA_LANGUAGE        : String(2);
+     TA_TYPE            : String(100);
+     TA_NORMALIZED      : String(5000);
+     TA_STEM            : String(5000);
+     TA_PARAGRAPH       : Integer;
+     TA_SENTENCE        : Integer;
+     TA_CREATED_AT      : UTCDateTime;
+     TA_OFFSET          : Integer64;
+     TA_PARENT          : Integer64;
+	} technical configuration {
+     column store;
+ };
+
+
+	entity SYNONYMS {
+     PROJECT_ID  : Integer;
+     NAME        : String(5000);
+     SYNONYM     : String(5000);
+	} technical configuration {
+     column store;
+ };
+
+	entity PROJECTS {
+	 key PROJECT_ID : Integer not null;
+	 PROJECT_NAME : hana.VARCHAR(50);
+	 USER_NAME : hana.VARCHAR(50);
+	 SCHEMA_NAME : hana.VARCHAR(50);
+	 TABLE_NAME : hana.VARCHAR(400);
+	 DEID_TYPE : hana.TINYINT;
+	 DEID_STATUS : hana.TINYINT;
+	 TA_TABLE_NAME : hana.VARCHAR(100);
+	 DOC_ID_COLUMN : hana.VARCHAR(50);
+	 DOC_CONTENT_COLUMN : hana.VARCHAR(50);
+	 LANGUAGE : hana.VARCHAR(3);
+	 TOTAL_DOCS : Integer;
+	 ANON_ENTITIES : hana.VARCHAR(2000);
+	 DATE_DELTA : Integer;
+	 CREATED : UTCTimestamp;
+	} technical configuration {
+  column store;
+ };
+
+	entity DEID_PROJECTS {
+	 key PROJECT_ID : Integer not null;
+	 key DOCUMENT_COLLECTION_ID : Integer not null;
+	 PROJECT_NAME : hana.VARCHAR(50);
+	 USER_NAME : hana.VARCHAR(50);
+	 DEID_TYPE : hana.TINYINT;
+	 DEID_STATUS : hana.TINYINT;
+	 ANON_ENTITIES : hana.VARCHAR(2000);
+	 DATE_DELTA : Integer;
+	 TA_CONFIG : hana.VARCHAR(200);
+	 CREATED : UTCTimestamp;
+	 UPDATED_INDEX : hana.TINYINT;
+	} technical configuration {
+  column store;
+ };
+
+	entity VARS {
+	 key VARNAME : hana.VARCHAR(10) not null;
+	 VALUE : hana.TINYINT;
+	 USERNAME : hana.VARCHAR(50);
+	 CREATED : UTCTimestamp;
+	} technical configuration {
+  column store;
+ };
+
+
+	entity DOCS {
+		SCHEMA_NAME : hana.VARCHAR(50);
+		TABLE_NAME : hana.VARCHAR(400);
+		TA_TABLE_NAME : hana.VARCHAR(100);
+		DOC_ID_COLUMN : hana.VARCHAR(50);
+		DOC_ID : String(1024);
+		DOC_CONTENT_COLUMN : hana.VARCHAR(50);
+		DOC_CONTENT : LargeString;
+		ANON_STATUS : hana.TINYINT;
+		ANON_ENTITIES : hana.VARCHAR(2000);
+		DATE_DELTA : Integer;
+		CREATED : UTCTimestamp;
+		USER_NAME : hana.VARCHAR(50);
+		PROJECT_NAME : hana.VARCHAR(50);
+		DEID_TYPE : hana.TINYINT;
+	} technical configuration {
+  column store;
+ };
+
+
+	entity EXC_DICT {
+		VARIANT : String(400);
+		PROJECT_ID : Integer;
+		CREATED : UTCTimestamp;
+		USER_NAME : hana.VARCHAR(50);
+		TEMPORARY : Boolean;
+	} technical configuration {
+  column store;
+ };
+
+
+	entity INC_DICT {
+		VARIANT : String(400);
+		PROJECT_ID : Integer;
+		CREATED : UTCTimestamp;
+		USER_NAME : hana.VARCHAR(50);
+		SAVED : Boolean;
+	} technical configuration {
+  column store;
+ };
+
+	
+	entity TERMLISTS {
+		TERM_TEXT : String(5000);
+		TERM_TYPE : hana.VARCHAR(200);
+		CREATED : UTCTimestamp;
+		USER_NAME : hana.VARCHAR(50);
+		PATIENT_ID : Binary(32);
+	} technical configuration {
+  column store;
+ };
+
+	table type TERM_DATA {
+     TERM_TEXT : String(5000);
+	 TERM_TYPE : hana.VARCHAR(200);
+     PATIENT_ID : Binary(32);
+	};
+
+	table type NAME_PARTS_OUTPUT {
+     PROJECT_ID     : Integer;
+     DOCUMENT_ID    : Binary(32);
+     TA_RULE        : String(200);
+     TA_COUNTER     : Integer64;
+     TA_TOKEN       : String(5000);
+     T1             : String(5000);
+     L1             : Integer;
+     T2             : String(5000);
+     L2             : Integer;
+     T3             : String(5000);
+     L3             : Integer;
+     T4             : String(5000);
+     L4             : Integer;
+     T5             : String(5000);
+     L5             : Integer;
+	};
+
+	table type SYNONYMIZED_OUTPUT {
+	 PROJECT_ID     : Integer;
+     DOCUMENT_ID    : Binary(32);
+     TA_RULE        : String(200);
+     TA_COUNTER     : Integer64;
+     TA_TOKEN           : String(5000);
+     TA_TOKEN_SYNONYM   : String(5000);
+     TA_LANGUAGE        : String(2);
+     TA_TYPE            : String(100);
+     TA_NORMALIZED      : String(5000);
+     TA_STEM            : String(5000);
+     TA_PARAGRAPH       : Integer;
+     TA_SENTENCE        : Integer;
+     TA_CREATED_AT      : UTCDateTime;
+     TA_OFFSET          : Integer64;
+     TA_PARENT          : Integer64;
+	};
+};

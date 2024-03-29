@@ -1,0 +1,50 @@
+PROCEDURE "hc.hph.di.procedures::activate_diextension" ( 
+      IN ExtensionId NVARCHAR(256) ,
+      IN PluginId NVARCHAR(256) ,
+      IN XSJSLibrary NVARCHAR(512),
+      IN JsonMetadata NCLOB,
+      IN Provider NVARCHAR(512) ,
+      IN Status NVARCHAR(16) ,
+      IN TextBundle NVARCHAR(512),
+      IN ExtensionName NVARCHAR(512),
+      IN ExtensionDescription NVARCHAR(1024),
+      IN Alias NVARCHAR(64)
+) 
+       LANGUAGE SQLSCRIPT
+       SQL SECURITY INVOKER AS
+BEGIN
+       DECLARE lv_count integer;
+       SELECT COUNT(*) INTO lv_count FROM "hc.hph.di.model::DataIntegration.DIExtension"  WHERE "ExtensionID" = :ExtensionId;
+              IF lv_count = 0 THEN
+                     UPSERT "hc.hph.di.model::DataIntegration.DIExtension"  
+						SELECT :ExtensionID as "ExtensionID",
+					    :PluginId as "PluginID",
+					    :XSJSLibrary as "XSJSLibrary",
+					    TO_CHAR(:JsonMetadata) as "JSONMetadata",
+					    :Provider as "Provider",
+					    :Status as "Status",
+					    (SELECT CURRENT_TIMESTAMP FROM "hc::DUMMY") as "CreatedAt",
+					    (SELECT SESSION_CONTEXT('XS_APPLICATIONUSER') FROM "hc::DUMMY") as "CreatedBy",
+					    '' as "ModifiedAt",
+					    ''  as "ModifiedBy",
+					    :TextBundle as "TextBundle",
+					    :ExtensionName as "Name",
+					    :ExtensionDescription as "Description",
+					    :Alias as "ExtensionAlias"
+				        FROM "hc::DUMMY";	
+        	  ELSE 
+              	UPDATE "hc.hph.di.model::DataIntegration.DIExtension" DIExtension SET 
+                DIExtension."ModifiedBy" = (SELECT SESSION_CONTEXT('XS_APPLICATIONUSER') FROM "hc::DUMMY"),
+			    DIExtension."ModifiedAt" = (SELECT CURRENT_TIMESTAMP FROM "hc::DUMMY"),
+			    DIExtension."XSJSLibrary" = :XSJSLibrary,
+				DIExtension."JSONMetadata" = TO_CHAR(:JsonMetadata),
+				DIExtension."Status" = :Status,
+				DIExtension."Provider" = :Provider,
+				DIExtension."Name" =:ExtensionName,
+				DIExtension."Description" =:ExtensionDescription,
+				DIExtension."ExtensionAlias" =:Alias,
+				DIExtension."TextBundle" =:TextBundle
+				FROM "hc.hph.di.model::DataIntegration.DIExtension" DIExtension
+			    WHERE DIExtension."ExtensionID" = :ExtensionId;
+        	  END IF;
+END;

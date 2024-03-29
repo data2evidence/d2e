@@ -1,0 +1,6 @@
+"MAPPING_ID","LIST_ID","LANGUAGE_CODE","TERM_1","TERM_2","WEIGHT"
+"1","hc.hph.custom","en","cancer","tumor","0.8"
+"2","hc.hph","en","cancer","neoplasm","0.8"
+"3","hc.hph","en","cancer","carcinoma","0.8"
+"4","hc.hph","en","lung","bronchial","0.8"
+"5","hc.hph","en","house","building","0.8"

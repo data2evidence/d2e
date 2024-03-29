@@ -1,0 +1,653 @@
+{
+    "resourceType": "StructureDefinition",
+    "id": "HCIMBloodPressure",
+    "url": "http://data4life-asia.care/health/fhir/StructureDefinition/HCIMBloodPressure",
+    "kind": "resource",
+    "type": "HCIMBloodPressure",
+    "meta": {
+        "profile": [
+            "http://data4life-asia.care/health/fhir/profile/Tabledefinition"
+        ]
+    },
+    "extension": [
+        {
+            "uri": "http://data4life.care/health/fhir/extension/schema",
+            "valueString": "FHIR"
+        },
+        {
+            "uri": "http://data4life-asia.care/health/fhir/extension/table",
+            "valueString": "BloodPressure"
+        }
+    ],
+    "snapshot": {
+        "element": [
+            {
+                "id": "HCIMBloodPressure",
+                "path": "HCIMBloodPressure",
+                "min": 0,
+                "max": "*"
+            },
+            {
+                "id": "_RecordKey",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_RecordKey"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/primaryKey",
+                        "valueBoolean": true
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_MeasuringMethod",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_MeasuringMethod"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "MeasuringMethod_CD",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "MeasuringMethod_CD"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 100
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_CuffType",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_CuffType"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "CuffType_CD",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "CuffType_CD"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 100
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_MeasuringLocation",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_MeasuringLocation"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "MeasuringLocation_CD",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "MeasuringLocation_CD"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 100
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_DiastolicEndpoint",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_DiastolicEndpoint"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "DiastolicEndpoint_CD",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "DiastolicEndpoint_CD"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 100
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "SystolicBloodPressure_mm_Hg",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "SystolicBloodPressure_mm_Hg"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "DECIMAL"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 38
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnprecission",
+                        "valuePositiveInt": 10
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "DiastolicBloodPressure_mm_Hg",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "DiastolicBloodPressure_mm_Hg"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "DECIMAL"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 38
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnprecission",
+                        "valuePositiveInt": 10
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "AverageBloodPressure_mm_Hg",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "AverageBloodPressure_mm_Hg"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "INTEGER"
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_BloodPressureDateTime",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_BloodPressureDateTime"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 14
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_BloodPressureDateTime_Timezone",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_BloodPressureDateTime_Timezone"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 64
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "BloodPressureDateTime",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "BloodPressureDateTime"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "TIMESTAMP"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Comment",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "Comment"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_Position",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_Position"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Position_CD",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "Position_CD"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 100
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "InformationSource_PatientAsInformationSource::Patient",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "InformationSource_PatientAsInformationSource::Patient"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "InformationSource_HealthProfessional",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "InformationSource_HealthProfessional"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "InformationSource_RelatedPersonAsInformationSource::ContactPerson",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "InformationSource_RelatedPersonAsInformationSource::ContactPerson"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Author_PatientAsAuthor::Patient",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "Author_PatientAsAuthor::Patient"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Author_HealthProfessionalAsAuthor::HealthProfessional",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "Author_HealthProfessionalAsAuthor::HealthProfessional"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Author_RelatedPersonAsAuthor::ContactPerson",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "Author_RelatedPersonAsAuthor::ContactPerson"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Subject_Patient",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "Subject_Patient"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Subject_RelatedPersonAsSubject::ContactPerson",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "Subject_RelatedPersonAsSubject::ContactPerson"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_DateTime",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_DateTime"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 14
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_DateTime_Timezone",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_DateTime_Timezone"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 64
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "DateTime",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "DateTime"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "TIMESTAMP"
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_validFrom",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_validFrom"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "TIMESTAMP"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnPostfix",
+                        "valueString": " GENERATED ALWAYS AS ROW START"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/readOnly",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_validTo",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_validTo"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "TIMESTAMP"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/columnPostfix",
+                        "valueString": " GENERATED ALWAYS AS ROW END"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/readOnly",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            }
+        ]
+    }
+}

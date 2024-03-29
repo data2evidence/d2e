@@ -1,0 +1,94 @@
+PROCEDURE "hc.hph.plugins.gff3.db.procedures.annotation::AnnotateFeaturesPrePost" (IN RunAuditID int,
+      IN chromosomeIndex int,
+      in explicitRun int --0-normal run 1- explict run 
+) LANGUAGE SQLSCRIPT SQL SECURITY INVOKER
+AS 
+BEGIN 
+DECLARE referenceID varchar(255) 
+;
+
+if :explicitRun = 0 then
+update "hc.hph.plugins.gff3.db.models::Staging.FeaturesAnnotation" s1
+ set s1."PrePost" = ( select case when s1."Strand"='+' then SUBSTRING(s2."Sequence",COALESCE(1,LENGTH(s2."Sequence")-1),2)
+ else SUBSTRING(s2."Sequence",1,2) end 
+  from "hc.hph.plugins.gff3.db.models::Staging.FeaturesAnnotation" s2 
+ where s2."Class"='CDS_region' and s1."RunAuditID"=s2."RunAuditID" and s1."DWAuditID"=s2."DWAuditID" and s1."FeatureName"=s2."FeatureName" and s2."Rank"=s1."Rank"-1 
+ and s1."ParentID"=s2."ParentID" and s1."Strand"=s2."Strand" and s1."FeatureID"=s2."FeatureID"
+  and  s1."ChromosomeIndex"=s2."ChromosomeIndex" and s1."Class"=s2."Class" )
+  where
+ s1."Class" ='CDS_region' and s1."ChromosomeIndex"=:chromosomeIndex and s1."RunAuditID"=:RunAuditID ;
+
+
+update "hc.hph.plugins.gff3.db.models::Staging.FeaturesAnnotation" s1
+ set s1."PrePost"= ( 
+case when s1."PrePost" is null then 
+case when s2."Strand"='+' then
+(SUBSTRING(s2."Sequence",1,2)) 
+else  case when LENGTH(s2."Sequence") > 1 then 
+SUBSTRING(s2."Sequence",LENGTH(s2."Sequence")-1,2)
+else
+SUBSTRING(s2."Sequence",1,2)
+end
+end
+else case when s2."Sequence" is null then s1."PrePost"
+else case when s2."Strand"='+' then concat(s1."PrePost",SUBSTRING(s2."Sequence",1,2))
+else case when LENGTH(s2."Sequence") > 1 then 
+ concat(SUBSTRING(s2."Sequence",LENGTH(s2."Sequence")-1,2),s1."PrePost")
+else 
+ concat(SUBSTRING(s2."Sequence",1,2),s1."PrePost")
+end 
+end
+end
+end)
+from "hc.hph.plugins.gff3.db.models::Staging.FeaturesAnnotation" s1
+left outer join
+"hc.hph.plugins.gff3.db.models::Staging.FeaturesAnnotation" s2 
+on (s1."DWAuditID"=s2."DWAuditID" and s1."RunAuditID"=s2."RunAuditID" and s1."FeatureName"=s2."FeatureName" 
+and s2."Rank"=s1."Rank"+1 and s1."ChromosomeIndex"=s2."ChromosomeIndex" and s1."Class"=s2."Class" and s1."FeatureID"=s2."FeatureID"
+    and s1."ParentID"=s2."ParentID" and s1."Strand"=s2."Strand")
+where s1."Class" ='CDS_region' and s1."ChromosomeIndex"=:chromosomeIndex and s1."RunAuditID"=:RunAuditID ;
+
+else
+
+update "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" s1
+ set s1."PrePost" = ( select case when s1."Strand"='+' then SUBSTRING(s2."Sequence",COALESCE(1,LENGTH(s2."Sequence")-1),2)
+ else SUBSTRING(s2."Sequence",1,2) end 
+  from "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" s2 
+ where s2."Class"='CDS_region' and s1."DWAuditID"=s2."DWAuditID" and s1."RunAuditID"=s2."RunAuditID" and s1."FeatureName"=s2."FeatureName" and s2."Rank"=s1."Rank"-1 
+ and s1."ParentID"=s2."ParentID" and s1."Strand"=s2."Strand" and s1."FeatureID"=s2."FeatureID"
+  and  s1."ChromosomeIndex"=s2."ChromosomeIndex" and s1."Class"=s2."Class" )
+  where
+ s1."Class" ='CDS_region' and s1."ChromosomeIndex"=:chromosomeIndex and s1."RunAuditID"=:RunAuditID ;
+
+
+update "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" s1
+ set s1."PrePost"= ( 
+case when s1."PrePost" is null then 
+case when s2."Strand"='+' then
+(SUBSTRING(s2."Sequence",1,2)) 
+else  case when LENGTH(s2."Sequence") > 1 then 
+SUBSTRING(s2."Sequence",LENGTH(s2."Sequence")-1,2)
+else
+SUBSTRING(s2."Sequence",1,2)
+end
+end
+else case when s2."Sequence" is null then s1."PrePost"
+else case when s2."Strand"='+' then concat(s1."PrePost",SUBSTRING(s2."Sequence",1,2))
+else case when LENGTH(s2."Sequence") > 1 then 
+ concat(SUBSTRING(s2."Sequence",LENGTH(s2."Sequence")-1,2),s1."PrePost")
+else 
+ concat(SUBSTRING(s2."Sequence",1,2),s1."PrePost")
+end 
+end
+end
+end)
+from "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" s1
+left outer join
+"hc.hph.genomics.db.models::Reference.FeaturesAnnotation" s2 
+on (s1."DWAuditID"=s2."DWAuditID" and s1."RunAuditID"=s2."RunAuditID" and s1."FeatureName"=s2."FeatureName" 
+and s2."Rank"=s1."Rank"+1 and s1."ChromosomeIndex"=s2."ChromosomeIndex" and s1."Class"=s2."Class"
+and s1."ParentID"=s2."ParentID" and s1."Strand"=s2."Strand" and s1."FeatureID"=s2."FeatureID"
+) 
+where s1."Class" ='CDS_region' and s1."ChromosomeIndex"=:chromosomeIndex and s1."RunAuditID"=:RunAuditID ;
+end if;
+END;

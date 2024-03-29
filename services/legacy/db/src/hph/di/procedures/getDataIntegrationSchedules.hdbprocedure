@@ -1,0 +1,64 @@
+PROCEDURE "hc.hph.di.procedures::getDataIntegrationSchedules" ( 
+	IN starttime TIMESTAMP,
+	IN endtime TIMESTAMP,
+	IN lang NVARCHAR(5),
+	IN Extensions "hc.hph.di.model::DataIntegration.Extensions",
+	OUT Schedules "hc.hph.di.model::DataIntegration.Schedules"
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	 AS
+BEGIN
+	DECLARE ExntesionFilters INTEGER := 0;
+	SELECT COUNT(*) INTO ExntesionFilters FROM :Extensions;
+	
+	IF :ExntesionFilters=0 THEN
+		Schedules = SELECT monitor."MonitorID",
+		monitor."StartedAt",
+		monitor."EndedAt",
+		monitor."XSScheduleID",
+		monitor."XSScheduleRunStatus",
+		CASE WHEN textbundle."CONTENT" is null THEN extension."ExtensionAlias" ELSE textbundle."CONTENT" END as "ExtensionAlias",
+		extension."PluginID",
+		extension."Provider",
+		extension."TextBundle",
+		profile."Name" as "ProfileName",
+		profile."ProfileID" as "ProfileID",
+		profile."Status" as "ProfileStatus", 
+		source."Name" as "SourceName", 
+		source."SourceID" as "SourceID", 
+		config."Name" as "ScheduleName", 
+		config."ScheduleConfigID" as "ScheduleConfigID"
+		FROM "hc.hph.di.model::DataIntegration.DIJobScheduleMonitor" as monitor 
+		LEFT OUTER JOIN "hc.hph.di.model::DataIntegration.JobProfile" as profile ON monitor."ProfileID"=profile."ProfileID" 
+		LEFT OUTER JOIN "hc.hph.di.model::DataIntegration.DIJobScheduleConfig" as config ON config."ScheduleConfigID"=profile."ScheduleConfigID" 
+		LEFT OUTER JOIN  "hc.hph.di.model::DataIntegration.DISource" as source ON profile."SourceID"=source."SourceID" 
+		LEFT OUTER JOIN "hc.hph.di.model::DataIntegration.DIExtension" as extension ON profile."ExtensionID"=extension."ExtensionID" 
+		LEFT OUTER JOIN "hc::ACTIVE_CONTENT_TEXT_CONTENT" as textbundle on extension."ExtensionAlias" = textbundle."TEXT_ID" and textbundle."LANG" = LCASE(:lang)
+		WHERE monitor."StartedAt">= :starttime AND monitor."StartedAt"<= :endtime order by monitor."StartedAt" desc;
+	ELSE
+		Schedules = SELECT monitor."MonitorID",
+		monitor."StartedAt",
+		monitor."EndedAt",
+		monitor."XSScheduleID",
+		monitor."XSScheduleRunStatus",
+		CASE WHEN textbundle."CONTENT" is null THEN extension."ExtensionAlias" ELSE textbundle."CONTENT" END as "ExtensionAlias",
+		extension."PluginID",
+		extension."Provider",
+		extension."TextBundle",
+		profile."Name" as "ProfileName",
+		profile."ProfileID" as "ProfileID",
+		profile."Status" as "ProfileStatus", 
+		source."Name" as "SourceName", 
+		source."SourceID" as "SourceID", 
+		config."Name" as "ScheduleName", 
+		config."ScheduleConfigID" as "ScheduleConfigID"
+		FROM "hc.hph.di.model::DataIntegration.DIJobScheduleMonitor" as monitor 
+		LEFT OUTER JOIN "hc.hph.di.model::DataIntegration.JobProfile" as profile ON monitor."ProfileID"=profile."ProfileID" 
+		LEFT OUTER JOIN "hc.hph.di.model::DataIntegration.DIJobScheduleConfig" as config ON config."ScheduleConfigID"=profile."ScheduleConfigID" 
+		LEFT OUTER JOIN  "hc.hph.di.model::DataIntegration.DISource" as source ON profile."SourceID"=source."SourceID" 
+		LEFT OUTER JOIN "hc.hph.di.model::DataIntegration.DIExtension" as extension ON profile."ExtensionID"=extension."ExtensionID" 
+		LEFT OUTER JOIN "hc::ACTIVE_CONTENT_TEXT_CONTENT" as textbundle on extension."ExtensionAlias" = textbundle."TEXT_ID" and textbundle."LANG" = LCASE(:lang) and textbundle."PACKAGE_ID" || '.' || textbundle."OBJECT_NAME" || '.' || textbundle."OBJECT_SUFFIX" = extension."PluginID" || '.' || REPLACE(extension."TextBundle", '/' , '.')
+		WHERE monitor."StartedAt">= :starttime AND monitor."StartedAt"<= :endtime and profile."ExtensionID" IN (SELECT "EXTENSIONID" FROM :Extensions) order by monitor."StartedAt" desc;
+	END IF;
+END;

@@ -1,0 +1,9 @@
+FUNCTION "hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::ta" ()
+	RETURNS "hc.hph.plugins.textProcessing.pathology.postProcessing::Types.TA_EXT"
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+
+RETURN SELECT * FROM "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_EXT";
+	
+END;

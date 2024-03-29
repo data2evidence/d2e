@@ -1,0 +1,19 @@
+namespace hc.hph.plugins.bed.db.models;
+
+
+context profileParameters
+{
+
+entity bedParameters
+{
+schemaName : String(256);
+regionVT : String(256);
+chromVT : String(256);
+logDetailVT : String(256);
+logTraceVT : String(256);
+};
+
+
+
+};
+

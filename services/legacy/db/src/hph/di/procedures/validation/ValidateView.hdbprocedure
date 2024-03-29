@@ -1,0 +1,10 @@
+PROCEDURE "hc.hph.di.procedures.validation::ValidateView" ( IN schema_name NVARCHAR(255), IN view_name NVARCHAR(255), OUT status TINYINT )
+LANGUAGE SQLSCRIPT SQL SECURITY INVOKER READS SQL DATA AS
+BEGIN
+    DECLARE count INTEGER := 0;
+    SELECT COUNT(*) INTO count FROM "hc::VIEWS" WHERE "SCHEMA_NAME" = :schema_name AND "VIEW_NAME" = :view_name;
+    status := 0;
+    IF :count = 1 THEN
+        status := 1;
+    END IF;
+END

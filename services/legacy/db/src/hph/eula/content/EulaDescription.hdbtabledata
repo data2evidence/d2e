@@ -1,0 +1,41 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.eula.model::Eula_Model.EulaDescription",
+            "import_settings": {
+                "include_filter": [
+                    {
+                        "ID": "1"
+                    },
+                    {
+                        "ID": "2"
+                    },
+                    {
+                        "ID": "3"
+                    }
+                ],
+                "import_columns": [
+                    "ID",
+                    "LanguageISOCode",
+                    "DescribedInstance.ID",
+                    "DescribedInstance.VersionNo",
+                    "Name",
+                    "Label",
+                    "Description",
+                    "Text",
+                    "CreatedAt",
+                    "CreatedBy"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.eula.content::EulaDescription.csv",
+                "has_header": true,
+                "type_config": {
+                    "delimiter": ";"
+                }
+            }
+        }
+    ]
+}

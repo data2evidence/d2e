@@ -1,0 +1,70 @@
+PROCEDURE "hc.hph.genomics.internal.db.procedures.vb::MutationData"(
+		IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+		IN reference_id NVARCHAR(255), 
+		IN chromosome_index INTEGER, 
+		IN begin_position INTEGER, 
+		IN end_position INTEGER, 
+		OUT mutation_data "hc.hph.genomics.db.models::VariantBrowser.MutationData",
+		OUT affected_gene "hc.hph.genomics.db.models::VariantBrowser.AffectedGene"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+	DECLARE sample_count INTEGER;
+
+	SELECT COUNT( * )	INTO sample_count FROM :sample_list;
+  
+	all_mutation = SELECT 
+            "VariantAnnotations"."MutationType" as "MutationType",
+            COUNT( DISTINCT "Samples"."SampleIndex" ) as "SampleCount",
+            "VariantAnnotations"."GeneName" as "GeneName"
+	    FROM :sample_list as "Samples"
+            JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+                ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+            JOIN  "hc.hph.genomics.db.models::SNV.VariantAnnotations" AS "VariantAnnotations"
+                ON "Genotypes"."DWAuditID" = "VariantAnnotations"."DWAuditID"
+                AND "Genotypes"."VariantIndex" = "VariantAnnotations"."VariantIndex"
+		WHERE "VariantAnnotations"."ChromosomeIndex" = :chromosome_index
+		    AND "VariantAnnotations"."Position" < :end_position
+            AND "VariantAnnotations"."Position" >= :begin_position
+		GROUP BY "VariantAnnotations"."GeneName",
+		    "VariantAnnotations"."Position",
+		    "VariantAnnotations"."MutationType"
+		ORDER BY "GeneName" NULLS LAST;
+		
+    affected_gene_list = SELECT CASE WHEN "GeneName" IS NULL THEN 'intergenic' ELSE "GeneName" END AS "GeneName", 
+	        AVG( "SampleCount" ) / :sample_count * 100 as "Percent"
+		FROM :all_mutation
+		GROUP BY "GeneName"
+		ORDER BY "GeneName" ASC;
+		
+	affected_gene = SELECT "affected_gene_list"."GeneName", "features"."Description", "affected_gene_list"."Percent"
+	    FROM :affected_gene_list AS "affected_gene_list"
+	    LEFT OUTER JOIN "hc.hph.genomics.db.models::Reference.Features" AS "features"
+	    ON "affected_gene_list"."GeneName" = "features"."FeatureName";
+	 
+ 	mutation_per_gene = SELECT CASE WHEN "GeneName" IS NULL THEN 'intergenic' ELSE "GeneName" END AS "GeneName", "MutationType", COUNT ( * ) as "Count"
+    	FROM :all_mutation 
+    	GROUP BY "GeneName", 
+    	    "MutationType"
+    	ORDER BY "GeneName";
+	
+    totalMutationPerGene = SELECT "GeneName", SUM( "Count" ) as "Count"
+    	FROM :mutation_per_gene
+    	GROUP BY "GeneName"
+    	ORDER BY "GeneName";
+	    
+	mutation_data = SELECT "mutation_per_gene"."GeneName", "mutation_per_gene"."MutationType", "mutation_per_gene"."Count" / "total_mutation_per_gene"."Count" as "Percent"
+            FROM :mutation_per_gene AS "mutation_per_gene"
+        	     JOIN :totalMutationPerGene AS "total_mutation_per_gene"
+        	      ON "mutation_per_gene"."GeneName" = "total_mutation_per_gene"."GeneName"
+        	GROUP BY "mutation_per_gene"."GeneName",
+        		"mutation_per_gene"."MutationType",
+        		"mutation_per_gene"."Count",
+        		"total_mutation_per_gene"."Count"
+        	ORDER BY "mutation_per_gene"."GeneName",
+        	    "mutation_per_gene"."MutationType";
+        	    
+END;

@@ -1,0 +1,85 @@
+VIEW "hc.hph.plugins.ccdi.internal.projects.hix.db.models::HIXPatient" ( "OrgID", "Source", "DocumentID", "LastUpdated", "PatientID", "IsVoided", "PatientDetailItem", "KeyText", "KeyCodeValue", "KeyCodeSystem", "KeyCodeSystemVersion", "ValueText", "ValueType", "SourceID" ) AS select  
+ 		ORG."Value04" AS "OrgID",
+    	ifnull(SYSTYPE."Value05",'<??>') || '-' || ifnull(PRODNAME."Value05",'<??>')  AS "Source",		
+	    P_PID."DocumentID", 
+		P_PID."LastUpdated",
+		P_PID."Value02" AS "PatientID" ,
+		P_IV."Value02" AS "IsVoided",	
+		KEYTXT."Item03" AS "PatientDetailItem", 
+		KEYTXT."Value05" AS "KeyText", 
+		KEYCV."Value05" AS "KeyCodeValue",
+		KEYCS."Value05" AS "KeyCodeSystem",
+		KEYCSV."Value05" AS "KeyCodeSystemVersion",
+		VALTXT."Value05" AS "ValueText",
+		VALTYPE."Value05" AS "ValueType",
+        DWSRC."SourceID" as "SourceID"
+
+    	FROM  (select * from "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML04" 
+    			    	WHERE "Value00" = 'hix_clinical_document' 
+				    	AND "Value01" = 'message_header' 
+				    	AND "Value02" = 'sender' 
+				    	AND "Value03" = 'sender_location_code' ) AS ORG
+
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS SYSTYPE
+		on SYSTYPE."DocumentID" = ORG."DocumentID" 
+    	AND SYSTYPE."Item02" = ORG."Item02" 
+    	AND SYSTYPE."Value03" = 'system' 
+    	AND SYSTYPE."Value04" = 'system_type'
+
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS PRODNAME
+		on SYSTYPE."DocumentID" = PRODNAME."DocumentID" 
+    	AND SYSTYPE."Item03" = PRODNAME."Item03" 	
+     	AND PRODNAME."Value04" = 'product_name'
+        
+		-- get patient id
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML02" AS P_PID
+		on ORG."DocumentID" = P_PID."DocumentID"          
+		and P_PID."Key02" = 'pid'              
+        
+		-- get the isvoided flag for the patient
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML03" AS P_IV
+		on P_PID."DocumentID" = P_IV."DocumentID"          
+		and P_PID."Item01" = P_IV."Item01" 
+		and P_IV."Key02" = 'isvoided'              
+        
+		-- get patient_details
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML02" AS P_DET
+		on P_PID."DocumentID" = P_DET."DocumentID"          
+		and P_PID."Item01" = P_DET."Item01"  -- same PID
+		and P_DET."Value02" = 'patient_details'              
+
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS KEYTXT
+		on P_DET."DocumentID" = KEYTXT."DocumentID"    
+		and P_DET."Item02" = KEYTXT."Item02"  -- same patient_details 
+		and KEYTXT."Value03" = 'patient_detail'
+		and KEYTXT."Value04" = 'key'
+		and KEYTXT."Key05" = 'text'
+
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS KEYCV
+		on KEYTXT."DocumentID" = KEYCV."DocumentID"    
+		and KEYTXT."Item04" = KEYCV."Item04"  -- same key
+		and KEYCV."Key05" = 'code_value'
+
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS KEYCS
+		on KEYTXT."DocumentID" = KEYCS."DocumentID"    
+		and KEYTXT."Item04" = KEYCS."Item04"  -- same key
+		and KEYCS."Key05" = 'code_system'
+		
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS KEYCSV
+		on KEYTXT."DocumentID" = KEYCSV."DocumentID"    
+		and KEYTXT."Item04" = KEYCSV."Item04"  -- same key
+		and KEYCSV."Key05" = 'code_system_version'
+        
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS VALTXT
+		on KEYTXT."DocumentID" = VALTXT."DocumentID"    
+		and KEYTXT."Item03" = VALTXT."Item03"  -- same patient_detail
+		and VALTXT."Value04" = 'value'
+		and VALTXT."Key05" = 'text'
+
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS VALTYPE
+		on VALTXT."DocumentID" = VALTYPE."DocumentID"    
+		and VALTXT."Item04" = VALTYPE."Item04"  -- same value
+		and VALTYPE."Key05" = 'type'
+
+        LEFT JOIN "hc.hph.di.model::DataIntegration.DISource" DWSRC
+        ON DWSRC."Name" = ORG."Value04" || '::' || SYSTYPE."Value05" || '-' || PRODNAME."Value05" order by ORG."LastUpdated", ORG."DocumentID" WITH READ ONLY

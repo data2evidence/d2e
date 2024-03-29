@@ -1,0 +1,10 @@
+PROCEDURE "hc.hph.plugins.vcf.db.procedures.annotation::ClearStagingTables" (
+		IN iAuditID BIGINT
+	) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+	CALL "hc.hph.di.procedures::clean_logs"( :iAuditID );
+	DELETE FROM "hc.hph.plugins.vcf.db.models::Staging.VariantAnnotations" WHERE "RunAuditID" = :iAuditID;
+END;

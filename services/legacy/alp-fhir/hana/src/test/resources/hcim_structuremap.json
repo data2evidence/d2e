@@ -1,0 +1,100 @@
+{
+  "resourceType": "StructureMap",
+  "id": "mimic-transform",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Map for DB to logical FHIR </div>"
+  },
+  "url": "http://data4life.care/health/fhir/StructureMap/mimic",
+  "name": "Map from Mimic Tables to Mimic Resources",
+  "status": "draft",
+  "structure": [
+    {
+      "url": "http://data4life.care/health/fhir/StructureDefinition/HCIM_PATIENT",
+      "alias": "HCIM_PATIENT",
+      "mode": "source"
+    },
+    {
+      "url": "http://data4life.care/health/fhir/StructureDefinition/HCIM_PATIENT_ADDRESS_INFORMATION",
+      "alias": "HCIM_PATIENT_ADDRESS_INFORMATION",
+      "mode": "source"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/Patient",
+      "alias": "Patient",
+      "mode": "target"
+    }
+  ],
+  "group": [
+    {
+      "name": "HcimPatient",
+      "typeMode": "none",
+      "input": [
+        {
+          "name": "HCIM_PATIENT",
+          "type": "HCIM_PATIENT",
+          "mode": "source"
+        },
+        {
+          "name": "HCIM_PATIENT_ADDRESS_INFORMATION",
+          "type": "HCIM_PATIENT_ADDRESS_INFORMATION",
+          "filter": {
+            "source": "HCIM_PATIENT",
+            "source_element": "identification_number",
+            "target_element": "identification_number"
+          },
+          "mode": "source"
+        },
+        {
+          "name": "Patient",
+          "type": "Patient",
+          "mode": "target"
+        }
+      ],
+      "rule": [
+        {
+          "name": "id",
+          "source": [
+            {
+              "context": "PATIENTS",
+              "element": "SUBJECT_ID"
+            }
+          ],
+          "target": [
+            {
+              "context": "Patient",
+              "contextType": "variable",
+              "element": "id",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "gender",
+          "source": [
+            {
+              "context": "PATIENTS",
+              "element": "GENDER"
+            }
+          ],
+          "target": [
+            {
+              "context": "Patient",
+              "contextType": "variable",
+              "element": "gender",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "address",
+          "source": [
+            {
+              "context": "HCIM_PATIENT_ADDRESS_INFORMATION"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

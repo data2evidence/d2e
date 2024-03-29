@@ -1,0 +1,70 @@
+[
+    {
+        "username": "FHIR_PATIENT1",
+        "email": "FHIRTestUser1@email.com",
+        "givenName": "PatientOnFhir",
+        "familyName": "Patient1",
+        "password": "Initial1",
+        "roleCollections": [
+            "FHIR_END_USER_PATIENT_1"
+        ]
+    },
+    {
+        "username": "FHIR_PATIENT2",
+        "email": "FHIRTestUser2@email.com",
+        "givenName": "PatientStillOnFhir",
+        "familyName": "Patient2",
+        "password": "Initial1",
+        "roleCollections": [
+            "FHIR_END_USER_PATIENT_2"
+        ]
+    },
+    {
+        "username": "FHIR_USER",
+        "email": "FHIRTestUserAdmin@email.com",
+        "givenName": "AdminStillOnFhir",
+        "familyName": "USER",
+        "password": "Initial1",
+        "roleCollections": []
+    },
+    {
+        "username": "FHIR_INIT_ADMIN",
+        "email": "FHIRTestUserAdmin1@email.com",
+        "givenName": "AdminStillOnFhir",
+        "familyName": "Patient2",
+        "password": "Initial1",
+        "roleCollections": [
+            "FHIR_INIT_ADMIN_AUTHORIZATION"
+        ]
+    },
+    {
+        "username": "FHIR_CONTENT_ADMIN",
+        "email": "FHIRTestUserAdmin2@email.com",
+        "givenName": "AdmintillOnFhir",
+        "familyName": "Patient2",
+        "password": "Initial1",
+        "roleCollections": [
+            "FHIR_CONTENT_ADMIN"
+        ]
+    },
+    {
+        "username": "FHIR_HCIM_DEMO_ADMIN",
+        "email": "FHIRTestUser4@email.com",
+        "givenName": "PatientStillOnFhir",
+        "familyName": "Patient2",
+        "password": "Initial1",
+        "roleCollections": [
+            "FHIR_ADMIN_AUTHORIZATION_HCIM_DEMO"
+        ]
+    },
+    {
+        "username": "FHIR_HCIM_SCENARIO_ADMIN",
+        "email": "FHIRTestUser5@email.com",
+        "givenName": "PatientStillOnFhir",
+        "familyName": "Patient2",
+        "password": "Initial1",
+        "roleCollections": [
+            "FHIR_ADMIN_AUTHORIZATION_HCIM_SCENARIO"
+        ]
+    }
+]

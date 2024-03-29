@@ -1,0 +1,31 @@
+{
+  "name": "http-performance-specs",
+  "version": "0.0.1",
+  "description": "HTTP based performance tests for the analytics backend",
+  "bin": "./run_specs.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alp-os/alp"
+  },
+  "keywords": [
+    "tests",
+    "HTTP",
+    "performance"
+  ],
+  "author": "",
+  "devDependencies": {},
+  "dependencies": {
+    "hdb": "^0.5.3",
+    "mysql": "^2.11.1",
+    "underscore": "^1.8.3",
+    "request": "^2.69.0",
+    "performance-now": "^0.2.0",
+    "simple-xml-writer": "^0.0.2",
+    "express": "^4.14.0",
+    "console.table": "^0.7.0"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=5.11.x"
+  }
+}

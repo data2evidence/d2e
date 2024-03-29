@@ -1,0 +1,10 @@
+PROCEDURE "hc.hph.di.procedures.validation::ValidateScheduleConfiguration" ( IN scheduleConfig NVARCHAR(255), OUT status TINYINT )
+LANGUAGE SQLSCRIPT SQL SECURITY INVOKER READS SQL DATA AS
+BEGIN
+    DECLARE count INTEGER := 0;
+    SELECT COUNT(*) INTO count FROM "hc.hph.di.model::DataIntegration.DIJobScheduleConfig" WHERE "ScheduleConfigID" = :scheduleConfig;
+    status := 0;
+    IF :count = 1 THEN
+        status := 1;
+    END IF;
+END

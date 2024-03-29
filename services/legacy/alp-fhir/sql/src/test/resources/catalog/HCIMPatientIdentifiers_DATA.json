@@ -1,0 +1,65 @@
+{
+    "resourceType": "TableContent",
+    "id": "HCIMPatientIdentifiers_DATA",
+    "definition": {
+        "reference": "HCIMPatientIdentifiers"
+    },
+    "row": [
+        {
+            "column": [
+                {
+                    "name": "_RecordKey",
+                    "valueString": "\u0002"
+                },
+                {
+                    "name": "_PatientRecordKey",
+                    "valueString": "\u0001"
+                },
+                {
+                    "name": "_IsPrimaryID",
+                    "valueString": "1"
+                },
+                {
+                    "name": "PatientIdentificationNumber",
+                    "valueString": "47110815"
+                },
+                {
+                    "name": "ID_System_name",
+                    "valueString": "Burgerservicenummer"
+                },
+                {
+                    "name": "ID_System_OID",
+                    "valueString": "2.16.840.1.113883.2.4.6.3"
+                }
+            ]
+        },
+        {
+            "column": [
+                {
+                    "name": "_RecordKey",
+                    "valueString": "\u0003"
+                },
+                {
+                    "name": "_PatientRecordKey",
+                    "valueString": "\u0001"
+                },
+                {
+                    "name": "_IsPrimaryID",
+                    "valueString": "0"
+                },
+                {
+                    "name": "PatientIdentificationNumber",
+                    "valueString": "SOME OTHER NUMBER"
+                },
+                {
+                    "name": "ID_System_name",
+                    "valueString": "Ministry of Magic"
+                },
+                {
+                    "name": "ID_System_OID",
+                    "valueString": "13-9-7-5-3-1"
+                }
+            ]
+        }
+    ]
+}

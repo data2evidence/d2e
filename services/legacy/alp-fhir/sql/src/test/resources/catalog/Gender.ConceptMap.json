@@ -1,0 +1,75 @@
+{
+  "resourceType": "ConceptMap",
+  "id": "bgzgender",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Mapping from the HCIM Gender Codes to FHIR Gender</div>"
+  },
+  "url": "http://data4life-asia.care/health/fhir/ConceptMap/bgzgender",
+  "version": "20180925",
+  "name": "HCIM/FHIR Gender Mapping",
+  "title": "FHIR/v3 Address Use Mapping",
+  "status": "draft",
+  "experimental": false,
+  "date": "2019-09-25",
+  "publisher": "D4L",
+  "contact": [],
+  "description": "A mapping between HCIM Gender Codes and FHIR gender",
+  "useContext": [],
+  "purpose": "To help  map from HCIM Gender to FHIR",
+  "sourceUri": "https://zibs.nl/wiki/Patient-v3.1(2017EN)#GenderCodelist",
+  "targetUri": "http://hl7.org/fhir/ValueSet/administrative-gender",
+  "group": [
+    {
+      "source": "https://zibs.nl/wiki/Patient-v3.1(2017EN)#GenderCodelist",
+      "target": "http://hl7.org/fhir/ValueSet/administrative-gender",
+      "element": [
+        {
+          "code": "UN",
+          "display": "Undifferentiated",
+          "target": [
+            {
+              "code": "other",
+              "display": "Other"
+            }
+          ]
+        },
+        {
+          "code": "M",
+          "display": "Male",
+          "target": [
+            {
+              "code": "male",
+              "display": "Male"
+            }
+          ]
+        },
+        {
+          "code": "F",
+          "display": "Female",
+          "target": [
+            {
+              "code": "female",
+              "display": "Female"
+            }
+          ]
+        },
+        {
+          "code": "UNK",
+          "display": "Unkown",
+          "target": [
+            {
+              "code": "unknown",
+              "display": "Unkown"
+            }
+          ]
+        }
+      ],
+      "unmapped": {
+        "mode": "fixed",
+        "code": "UNK",
+        "display": "UNK"
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "search.exclude": {
+    "tests/performance": true,
+    "services/alp-approuter/portal-ui/build": true,
+    "services/alp-portal/app/server/dist": true,
+    "services/alp-approuter/portal-sa-ui/build": true,
+  },
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4
+  },
+  "python.formatting.provider": "autopep8",
+  "python.formatting.autopep8Args": ["--max-line-length=99"],
+
+  "python.pythonPath": "${env:HOME}/.pyenv/versions/venv-3.7.4/bin/python",
+  "python.testing.unittestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+  "python.testing.pytestEnabled": true
+}

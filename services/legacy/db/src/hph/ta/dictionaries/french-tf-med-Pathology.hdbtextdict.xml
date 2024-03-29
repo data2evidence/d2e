@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dictionary xmlns="http://www.com/ta/4.0">
+    <entity_category name="OBSERVATION_CANCERHISTOLOGY_COMPONENT_BEHAVIOR">
+        <entity_name standard_form="N/A">
+            <variant name="localement avancé" />
+            <variant name="localement avancée" />
+            <variant name="localement avancées" />
+            <variant name="localement avancés" />
+            <variant name="évolutif" />
+            <variant name="très évolutif" />
+            <variant name="évolution" />
+            <variant name="progression" />
+        </entity_name>
+        <entity_name standard_form="cancer_behavior0">
+            <variant name="bénigne" />
+            <variant name="bénignes" />
+            <variant name="bénin" />
+            <variant name="bénins" />
+        </entity_name>
+        <entity_name standard_form="cancer_behavior1">
+            <variant name="de bénignité ou de malignité incertaine" />
+            <variant name="de bénignité ou de malignité non assurée" />
+            <variant name="faible potentiel de malignité" />
+            <variant name="à la limite de la malignité" />
+            <variant name="à potentiel malin incertain" />
+            <variant name="à évolution imprévisible ou inconnue" />
+        </entity_name>
+        <entity_name standard_form="cancer_behavior2">
+            <variant name="in situ" />
+            <variant name="in-situ" />
+            <variant name="intra-épithélial" />
+            <variant name="intraépithélial" />
+            <variant name="non inflitrant" />
+            <variant name="non invasif" />
+            <variant name="non-infiltrant" />
+            <variant name="non-invasif" />
+        </entity_name>
+        <entity_name standard_form="cancer_behavior3">
+            <variant name="infiltration" />
+            <variant name="infiltrant" />
+            <variant name="infiltrat" />
+            <variant name="infiltre" />
+            <variant name="infiltre en profondeur" />
+            <variant name="maligne" />
+            <variant name="malignes" />
+            <variant name="malignité" />
+            <variant name="malin" />
+            <variant name="malins" />
+            <variant name="micro-invasif" />
+            <variant name="micro-invasifs" />
+            <variant name="microinvasif" />
+            <variant name="microinvasifs" />
+            <variant name="invasifs" />
+            <variant name="invasif" />
+            <!-- <variant name="primaire" />
+            <variant name="primitif" /> -->
+        </entity_name>
+        <entity_name standard_form="cancer_behavior6">
+            <variant name="envahissement" />
+            <variant name="envahissements" />
+            <variant name="atteinte" />
+            <variant name="atteintes" />
+            <variant name="localisation secondaire" />
+            <variant name="localisation secondaires" />
+            <variant name="localisations secondaire" />
+            <variant name="localisations secondaires" />
+            <variant name="multimétastatique" />
+            <variant name="multimétastatiques" />
+            <variant name="métastase" />
+            <variant name="métastase" />
+            <variant name="métastases" />
+            <variant name="métastases" />
+            <variant name="métastasé" />
+            <variant name="métastasés" />
+            <variant name="métastatique" />
+            <variant name="évolution métastatique" />
+            <variant name="métastatiques" />
+            <variant name="lésions métastatiques" />
+            <variant name="lésions secondaires" />
+            <variant name="lésion métastatique" />
+            <variant name="secondaire" />
+            <variant name="site métastatique" />
+            <variant name="sites métastatiques" />
+            <variant name="évolutivité métastatique" />
+            <variant name="évolutivité polymétastatique" />
+            <variant name="évolutivité" />
+            <variant name="reprise évolutive" />
+            <variant name="extension" />
+            <variant name="extensions" />
+        </entity_name>
+        <entity_name standard_form="cancer_behavior9">
+            <variant name="carcinomateuse" />
+            <variant name="carcinose" />
+            <variant name="carcinoses" />
+            <variant name="de nature primaire ou secondaire incertaine" />
+            <variant name="de nature primaire ou secondaire non assurée" />
+        </entity_name>
+    </entity_category>
+
+
+    <entity_category name="CANCER__SIZE@KEYWORD">
+        <entity_name standard_form="masse tumorale"></entity_name>
+        <entity_name standard_form="masse carcinomateuse"></entity_name>
+        <entity_name standard_form="masse tissulaire à centre nécrotique"></entity_name>
+    </entity_category>
+
+
+    <entity_category name="OBSERVATION_CANCERGRADE_NORMALIZED">
+        <entity_name standard_form="Gleason">
+            <variant name="score de gleason" />
+        </entity_name>
+        <entity_name standard_form="Scarff-Bloom-Richardson (SBR) grading">
+            <variant name="SBR" />
+            <variant name="EE" />
+            <variant name="SBR EE" />
+        </entity_name>
+    </entity_category>
+
+
+    <entity_category name="OBSERVATION_CANCERGRADE_VALUE">
+        <entity_name standard_form="GX">
+            <variant name="grade GX" />
+            <variant name="différencié" />
+            <variant name="différenciée" />
+        </entity_name>
+        <entity_name standard_form="G1">
+            <variant name="grade 1" />
+            <variant name="grade I" />
+            <variant name="grade G1" />
+            <variant name="bien différencié" />
+            <variant name="bien differencie" />
+            <variant name="bien différenciée" />
+            <variant name="bien differenciee" />
+        </entity_name>
+        <entity_name standard_form="G2">
+            <variant name="grade 2" />
+            <variant name="grade II" />
+            <variant name="grade G2" />
+            <variant name="modérément différencié" />
+            <variant name="modérément différenciée" />
+            <variant name="moyennement différencié" />
+            <variant name="moyennement différenciée" />
+            <variant name="moderement differencie" />
+            <variant name="moderement differenciee" />
+            <variant name="moyennement differencie" />
+            <variant name="moyennement differenciee" />
+        </entity_name>
+        <entity_name standard_form="G3">
+            <variant name="grade 3" />
+            <variant name="grade III" />
+            <variant name="grade G3" />
+            <variant name="peu différencié" />
+            <variant name="peu différenciée" />
+            <variant name="peu differencie" />
+            <variant name="peu differenciee" />
+        </entity_name>
+        <entity_name standard_form="G4">
+            <variant name="grade 4" />
+            <variant name="grade IV" />
+            <variant name="grade G4" />
+            <variant name="indifférencié" />
+            <variant name="indifferencie" />
+            <variant name="indifférenciée" />
+            <variant name="indifferenciee" />
+        </entity_name>
+    </entity_category> 
+</dictionary>

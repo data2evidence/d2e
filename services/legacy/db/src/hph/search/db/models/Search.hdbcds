@@ -1,0 +1,68 @@
+namespace hc.hph.search.db.models;
+
+using hc.hph.cdw.db.models::DWTypes as DT;
+using hc.hph.cdw.db.models::Config as Config; 
+using hc.hph.cdw.db.models::DWViews as DWViews;
+using "hc.hph.collections.db.models::CollectionModel" as "CollectionModel";
+
+context Search {
+
+    entity Result {
+        ID : DT.DWID;
+        USER: String(32) null;  
+    } technical configuration {
+        column store;
+    };
+
+    entity TermMappings {    
+        key MAPPING_ID  : String(32);
+        LIST_ID         : String(32);
+        LANGUAGE_CODE   : String(2);
+        TERM_1          : String(200);
+        TERM_2          : String(200);
+        WEIGHT          : Decimal(3,2);
+        CREATED_AT      : UTCTimestamp null;
+        CREATED_BY      : String(32) null;        
+    } technical configuration {
+        column store;
+
+    FULLTEXT INDEX ftiOnTERM_1 ON ( TERM_1 )
+        SEARCH ONLY ON
+        PHRASE INDEX RATIO 0.0
+        SYNCHRONOUS
+        FAST PREPROCESS ON;
+    };
+
+    entity TermMappingItems {    
+        key MAPPING_ID  : String(32);
+        key USER_ID      : String(32);
+        INACTIVE        : String(1);
+        WEIGHT          : Decimal(3,2);
+        LANGUAGE_CODE   : String(2);
+    } technical configuration {
+        column store;
+    };   
+
+    entity TermMappingSource {    
+        key MAPPING_ID      : String(32);
+        key VOCABULARY_ID   : String(100);
+        CREATED_AT          : UTCTimestamp null;
+        CREATED_BY          : String(32) null;
+    } technical configuration {
+        column store;
+    };    
+
+    entity TermMappingUiClosed {    
+        key USER_ID          : String(32);
+    } technical configuration {
+        column store;
+    };        
+
+    entity UsersWithoutTracking {    
+        key USER_ID      : String(32);
+        CREATED_AT        : UTCTimestamp not null;
+    } technical configuration {
+        column store;
+    };       
+
+};

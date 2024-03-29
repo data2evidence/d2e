@@ -1,0 +1,10 @@
+PROCEDURE "hc.hph.di.procedures.validation::ValidateVirtualTable" ( IN schema_name NVARCHAR(255), IN table_name NVARCHAR(255), IN remote_name NVARCHAR(255), OUT status TINYINT )
+LANGUAGE SQLSCRIPT SQL SECURITY INVOKER READS SQL DATA AS
+BEGIN
+    DECLARE count INTEGER := 0;
+    SELECT COUNT(*) INTO count FROM "hc::VIRTUAL_TABLES" WHERE "SCHEMA_NAME" = :schema_name AND "TABLE_NAME" = :table_name AND ( :remote_name IS NULL OR "REMOTE_OBJECT_NAME" = :remote_name );
+    status := 0;
+    IF :count = 1 THEN
+        status := 1;
+    END IF;
+END

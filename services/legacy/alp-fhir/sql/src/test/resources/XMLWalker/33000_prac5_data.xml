@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hix_clinical_document hix_version="1">
+	<message_header>
+		<creation_timestamp>2015-10-06 21:48:06</creation_timestamp>
+		<test_data_indicator>1</test_data_indicator>
+		<phi_data_indicator>0</phi_data_indicator>
+		<sender>
+			<sender_ref_id/>
+			<sender_code>prac5</sender_code>
+			<sender_location_code>prac5</sender_location_code>
+			<system>
+				<system_type>EHR</system_type>
+				<vendor>CLQ Informatics</vendor>
+				<product_name>CLQ_TEST_DATA</product_name>
+				<version>1.0</version>
+				<system_instance>1</system_instance>
+			</system>
+		</sender>
+		<creator_agent>
+			<creator_org_name>ASCO</creator_org_name>
+			<software>
+				<vendor>Jitterbit</vendor>
+				<product_name>Jitterbit</product_name>
+				<product_version>8.3.0.15</product_version>
+				<configuration_version>1.0</configuration_version>
+				<canonical_data_model_version>1.0</canonical_data_model_version>
+			</software>
+		</creator_agent>
+		<receiver>
+			<receiver_code>CLQ</receiver_code>
+			<receiver_location_code/>
+			<system>
+				<system_type>CLQ</system_type>
+				<vendor>CLQ</vendor>
+				<product_name>CLQ</product_name>
+				<version>1.0</version>
+				<system_instance>1</system_instance>
+			</system>
+		</receiver>
+	</message_header>
+	<patient isvoided="0" pid="33000">
+		<patient_details code_system="SNOMED" code_system_version="2015" code_value="443709011" isvoided="0" src_pkid="33000" timestamp="2015-10-06 21:48:06" type="Patient Demographics">
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="184096005">Patient surname</key>
+				<value type="NVarchar">Wallace</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="2770657016">City of residence</key>
+				<value type="NVarchar">Chandler</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="398070004">State</key>
+				<value type="NVarchar">AZ</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="2766668013">Patient country</key>
+				<value type="NVarchar">United States</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="184102003">Patient postal code</key>
+				<value type="NVarchar">85246</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="429697006">Patient home telephone number</key>
+				<value type="NVarchar">(087)982-1764</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="2164240014">Patient first name</key>
+				<value type="NVarchar">Jean</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="184099003">Date of birth</key>
+				<value type="NVarchar">1948-06-10</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="391746016">Gender</key>
+				<value type="NVarchar">F</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="286004017">Ethnicity</key>
+				<value type="NVarchar">Non Hispanic</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="265558016">Race</key>
+				<value type="NVarchar">Native Hawaiian or Other Pacific Islander</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="729536019">Patient marital status</key>
+				<value type="NVarchar">W</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="284402010">Patient address</key>
+				<value type="NVarchar">7091 Messerschmidt Parkway</value>
+			</patient_detail>
+		</patient_details>
+		<interaction code_system="CLQ" code_value="Risk Category Assessment" isvoided="0" src_pkid="83000" type="Risk Category Assessment">
+			<providers>
+				<provider isvoided="0" provider_ID="10000">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Hanne</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Arud</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Hanne.Arud@prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Honolulu</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1934-02-27</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">M</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">664928092</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">96825</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">HI</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">2 Mesta Terrace</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">harud</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key>Assessment Name</key>
+				<value code_system="LNC" code_system_version="250" code_value="68535-4" type="NVarchar">Tobacco Use Screening</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Assessment Value</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="266919005" type="NVarchar">Tobacco Non-User</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Assessment Date</key>
+				<value type="NVarchar">2014-05-02</value>
+			</interaction_detail>
+		</interaction>
+		<interaction code_system="CLQ" code_value="Encounter, Performed" isvoided="0" src_pkid="73000" type="Encounter, Performed">
+			<providers>
+				<provider isvoided="0" provider_ID="10000">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Hanne</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Arud</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Hanne.Arud@prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Honolulu</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1934-02-27</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">M</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">664928092</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">96825</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">HI</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">2 Mesta Terrace</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">harud</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key>Encounter Type</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="19681004" type="NVarchar">Face-to-Face Interaction</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Encounter Date</key>
+				<value type="NVarchar">2013-05-12</value>
+			</interaction_detail>
+		</interaction>
+		<interaction code_system="CLQ" code_value="Encounter, Performed" isvoided="0" src_pkid="63000" type="Encounter, Performed">
+			<providers>
+				<provider isvoided="0" provider_ID="10000">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Hanne</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Arud</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Hanne.Arud@prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Honolulu</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1934-02-27</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">M</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">664928092</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">96825</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">HI</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">2 Mesta Terrace</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">harud</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key>Encounter Type</key>
+				<value code_system="CPT" code_system_version="2015" code_value="99202" type="NVarchar">Office Visit</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Encounter Date</key>
+				<value type="NVarchar">2013-05-08</value>
+			</interaction_detail>
+		</interaction>
+		<interaction code_system="CLQ" code_value="Encounter, Performed" isvoided="0" src_pkid="53000" type="Encounter, Performed">
+			<providers>
+				<provider isvoided="0" provider_ID="10000">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Hanne</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Arud</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Hanne.Arud@prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Honolulu</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1934-02-27</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">M</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">664928092</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">96825</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">HI</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">2 Mesta Terrace</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">harud</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key>Encounter Type</key>
+				<value code_system="CPT" code_system_version="2015" code_value="99202" type="NVarchar">Office Visit</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Encounter Date</key>
+				<value type="NVarchar">2013-05-01</value>
+			</interaction_detail>
+		</interaction>
+		<interaction code_system="CLQ" code_value="Diagnosis, Active" isvoided="0" src_pkid="43000" type="Diagnosis, Active">
+			<providers>
+				<provider isvoided="0" provider_ID="10000">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Hanne</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Arud</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Hanne.Arud@prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Honolulu</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1934-02-27</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">M</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">664928092</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">96825</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">HI</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">2 Mesta Terrace</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">harud</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="413458017">Diagnosis Type</key>
+				<value type="NVarchar">P_Dx</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="LNC" code_system_version="250" code_value="33999-4">Diagnosis Status</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="55561003" type="NVarchar">Active</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Diagnosis Date</key>
+				<value type="NVarchar">2013-05-02</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="8319008">Diagnosis Code</key>
+				<value code_system="ICD9CM" code_system_version="2013" code_value="162.5" type="NVarchar">162.5</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="14725018">Diagnosis</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="282291009" type="NVarchar">Present</value>
+			</interaction_detail>
+		</interaction>
+	</patient>
+</hix_clinical_document>

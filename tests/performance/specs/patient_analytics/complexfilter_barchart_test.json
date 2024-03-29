@@ -1,0 +1,19 @@
+{
+        "host": "",
+        "instance": "",
+        "user_http": "Alice",
+        "password_http": "Initial1",
+        "user_hdb": "",
+        "password_hdb":"",
+        "host_2": "",
+        "user_hdb_2": "",
+        "password_hdb_2":"",
+        "instance_2": "",
+        "filter_tag":"(analytics).xsjs",
+        "fold":5,
+        "max_cached_time":0,
+        "max_noncached_time":4,
+        "max_cached_deviation":0,
+        "max_noncached_deviation":0,
+        "file":"specs/patient_analytics/complexfilter_barchart.har"
+}

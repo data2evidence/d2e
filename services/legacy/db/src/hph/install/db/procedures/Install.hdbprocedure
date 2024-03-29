@@ -1,0 +1,8 @@
+PROCEDURE "hc.hph.install.db.procedures::Install" ( )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY DEFINER
+   AS
+BEGIN
+    CALL "hc.hph.install.db.procedures::WriteSearchDefaultConfig" ();
+	  CALL "hc.hph.install.db.procedures::WriteAuditLogDefaultConfig" ();
+END

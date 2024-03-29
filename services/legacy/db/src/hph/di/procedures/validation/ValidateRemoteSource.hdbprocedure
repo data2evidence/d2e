@@ -1,0 +1,10 @@
+PROCEDURE "hc.hph.di.procedures.validation::ValidateRemoteSource" ( IN source_name NVARCHAR(255), IN adapter_name NVARCHAR(255), OUT status TINYINT )
+LANGUAGE SQLSCRIPT SQL SECURITY INVOKER READS SQL DATA AS
+BEGIN
+    DECLARE count INTEGER := 0;
+    SELECT COUNT(*) INTO count FROM "hc::REMOTE_SOURCES" WHERE "REMOTE_SOURCE_NAME" = :source_name AND ( :adapter_name IS NULL OR "ADAPTER_NAME" = :adapter_name );
+    status := 0;
+    IF :count = 1 THEN
+        status := 1;
+    END IF;
+END

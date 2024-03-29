@@ -1,0 +1,30 @@
+PROCEDURE "hc.hph.config.db.procedures::GetOrganizations" (IN USERNAME NVARCHAR(256), OUT ORGS table ("ORG_ID" NVARCHAR(1024))) 
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    READS SQL DATA AS
+
+BEGIN
+ 
+    ORGS = 
+        SELECT DISTINCT
+            CAST(RESULT_NODE AS NVARCHAR(100)) AS "ORG_ID" 
+        FROM 
+            "hc.hph.cdw.db.models::CVOrg/hier/ORG_PC_HIER" ('expression' = 'ascendants(nodes())') 
+        WHERE 
+            QUERY_NODE IN ( 
+                SELECT
+                    "OrgID" AS ORG_ID 
+                FROM 
+                    "hc.hph.cdw.db.models::Config.UserOrgMapping"
+                WHERE 
+                    UPPER("UserName") = UPPER(:USERNAME)
+            ) UNION (
+       SELECT "OrgID" AS ORG_ID 
+                FROM 
+                    "hc.hph.cdw.db.models::Config.UserOrgMapping"
+                WHERE 
+                    UPPER("UserName") = UPPER(:USERNAME)
+        )
+    ;
+            
+END;

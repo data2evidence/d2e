@@ -1,0 +1,15 @@
+PROCEDURE "hc.hph.config.db.procedures::DeleteAssignment" (
+        IN ASSIGNMENT_ID NVARCHAR(256)
+    ) 
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    AS
+
+BEGIN 
+ 
+    DELETE FROM "hc.hph.config.db.models::Configuration.AssignmentHeader"
+    WHERE "Id" = :ASSIGNMENT_ID;
+    DELETE FROM "hc.hph.config.db.models::Configuration.AssignmentDetail"
+    WHERE "Header.Id" = :ASSIGNMENT_ID;
+
+END;

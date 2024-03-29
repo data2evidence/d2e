@@ -1,0 +1,55 @@
+namespace hc.hph.ta.tagenerator.db.models;
+
+context tagenerator {
+    entity TAJob {
+        key jobId          : String(200) not null;
+            objectType      : String(20) not null;
+            domain          : String(20);
+            dictionaries    : String(2048);
+            event           : String(32) not null;
+            user            : String(50) not null;
+            status          : String(16);
+            error           : LargeString;
+            started_at      : UTCTimestamp;
+            completed_at    : UTCTimestamp;
+    }
+    technical configuration {
+        column store;
+    };
+
+	entity TADomain {
+			key domain      : String(20);
+        	description		: String(200);
+            provider        : String(20);
+    }
+    technical configuration {
+        column store;
+    };
+    
+	entity TADomainStatus {
+			key domain      : String(20);
+            status          : String(16);
+    }
+    technical configuration {
+        column store;
+    };
+	
+    view TADomainRuntime as select from TADomain as _d 
+    full outer join TADomainStatus as runtime on _d.domain = runtime.domain{
+        	_d.domain,
+        	_d.description,
+        	_d.provider,
+            ifnull(runtime.status, 'INACTIVE') status
+    };
+    
+    entity TADictionary {
+        key domain         : String(20)  not null;
+        key dictionaryName : String(100) not null;
+            conceptType    : String(20);
+            language       : String(2);
+            taType         : String(256);
+    }
+    technical configuration {
+        column store;
+    };
+};

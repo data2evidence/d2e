@@ -1,0 +1,46 @@
+PROCEDURE "hc.hph.eula.procedures::SIGN_AGREEMENT" ( 
+
+	IN  it_new "hc.hph.eula.model::SV_EULA_IDS",
+	OUT ot_error "hc.hph.eula.model::TT_ODATA_ERROR" 
+
+	) 
+	
+	LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count INTEGER;
+	lv_newid NVARCHAR(32);
+	lv_eulaid NVARCHAR(1024);
+	lv_eulaversion INTEGER;
+BEGIN
+	select count(*) into lv_count from :it_new where length(trim(' ' from ID)) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error signing agreement' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	select top 1 "ID" into lv_eulaid from :it_new;
+	select top 1 "VersionNo" into lv_eulaversion from :it_new;
+	select count(*) into lv_count from "hc.hph.eula.model::Eula_Model.EulaAgreement" where "AgreedEula.ID" = lv_eulaid and "AgreedEula.VersionNo" = 1 and "Signee" = SESSION_CONTEXT('XS_APPLICATIONUSER'); 
+	
+	if :lv_count < 1 then
+		select cast(SYSUUID as NVARCHAR(32)) into lv_newid from "hc::DUMMY";
+		insert into "hc.hph.eula.model::Eula_Model.EulaAgreement" (
+				"ID",
+				"AgreedEula.ID",
+				"AgreedEula.VersionNo",
+				"SignDate",
+				"Signee")
+			VALUES (:lv_newid, :lv_eulaid, :lv_eulaversion, CURRENT_TIMESTAMP, SESSION_CONTEXT('XS_APPLICATIONUSER')) 
+		;
+	else 
+		select cast(SYSUUID as NVARCHAR(32)) into lv_newid from "hc::DUMMY";
+		insert into "hc.hph.eula.model::Eula_Model.EulaAgreement" (
+				"ID",
+				"AgreedEula.ID",
+				"AgreedEula.VersionNo",
+				"SignDate",
+				"Signee")
+			VALUES (:lv_newid, :lv_eulaid, :lv_eulaversion, CURRENT_TIMESTAMP, SESSION_CONTEXT('XS_APPLICATIONUSER')) 
+		;
+	end if;	 
+END;  

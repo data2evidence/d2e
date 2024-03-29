@@ -1,0 +1,125 @@
+PROCEDURE "hc.hph.plugins.ldap.interface.procedures::getExternalOrgs" ( 
+IN remoteSourceName nvarchar(256), IN auditLogID BIGINT , IN dwSource NVARCHAR(100), IN profileID NVARCHAR(100),
+OUT EXTRNL_ORGDETAILS TABLE ("Org_ID" NVARCHAR (100), "Parent_OrgID" nvarchar(100),"Org_Name" nvarchar(5000),"Street_Name" nvarchar(5000),
+"Street_Number" nvarchar(5000),"City" nvarchar (200),"State" nvarchar (100),"Country" nvarchar (100),"Postal_Code" nvarchar (60),
+"Phone_Num" nvarchar (100)),
+OUT os_message  "hc.hph.um.user.db::userTable.message" 
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	 AS
+BEGIN
+ 
+	declare parent_org_count int;
+	declare count_all int;
+	declare count_distinct int;
+	declare userOrgCount int;
+	declare extensionId nvarchar(512);
+	declare VirtualTableOut TABLE("SCHEMA_NAME" NVARCHAR(256) ,"VIRTUAL_TABLE_NAME" NVARCHAR(256), "REMOTE_OBJECT_NAME" NVARCHAR(256));
+	declare schemaName nvarchar(512);
+	declare orgVT nvarchar(512);
+	declare logVT nvarchar(512);
+	declare traceVT nvarchar(512);
+	declare logTest int;
+	declare ProcessId BIGINT;
+	declare flagFlowgraph INTEGER := 0;
+
+
+	declare parent_org_not_exist condition for SQL_ERROR_CODE 10001; 
+	declare org_already_exists condition for SQL_ERROR_CODE 10002; 
+	declare user_org_not_exist condition for SQL_ERROR_CODE 10003;
+ 	declare exit handler for parent_org_not_exist
+      begin
+            os_message = select      'E' as "STATUS",
+                                          ::SQL_ERROR_CODE as "ERROR_CODE",
+                                          ::SQL_ERROR_MESSAGE as "ERROR_MESSAGE"
+                              from "hc::DUMMY";    
+      end;
+      
+      
+       declare exit handler for org_already_exists
+      begin
+            os_message = select      'E' as "STATUS",
+                                          ::SQL_ERROR_CODE as "ERROR_CODE",
+                                          ::SQL_ERROR_MESSAGE as "ERROR_MESSAGE"
+                              from "hc::DUMMY";    
+      end;
+      
+	
+	
+	CALL "hc.hph.plugins.ldap.interface.procedures::getVirtualTableDetails"(:remoteSourceName,:VirtualTableOut);
+
+	Select "SCHEMA_NAME" ,"VIRTUAL_TABLE_NAME" into schemaName ,orgVT from :VirtualTableOut where "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_UM_ORG';
+	Select "VIRTUAL_TABLE_NAME" into logVT from :VirtualTableOut where "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_LOG_DETAIL';
+	Select "VIRTUAL_TABLE_NAME" into traceVT from :VirtualTableOut where "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_LOG_TRACE';
+
+
+
+
+
+--EXTRNL_ORGDETAILS = select * from "LDAP_CDMDEFAULT_VT_UM_ORG";
+
+
+	EXEC 'INSERT INTO "hc.hph.plugins.ldap.interface.db.model::Staging.Organizations"  
+	SELECT  "Org_ID" , "Parent_OrgID" ,"Org_Name" ,
+	"Street_Name" ,"Street_Number" ,
+	"City" ,"State" ,"Country","Postal_Code" ,
+	"Phone_Num",'||:auditLogID||' AS "AuditLogID"  FROM "' || :schemaName || '"."' || :orgVT || '"';
+
+
+	EXTRNL_ORGDETAILS = select "Org_ID" , "Parent_OrgID" ,"Org_Name" ,
+	"Street_Name" ,"Street_Number" ,
+	"City" ,"State" ,"Country","Postal_Code" ,
+	"Phone_Num" from "hc.hph.plugins.ldap.interface.db.model::Staging.Organizations" where  "AuditLogID" = auditLogID ;
+	SELECT "ExtensionID" into extensionId FROM "hc.hph.di.model::DataIntegration.JobProfile" WHERE "ProfileID" = :profileID ;
+
+
+ 	SELECT count("Org_ID") INTO count_all FROM :EXTRNL_ORGDETAILS;
+    SELECT DISTINCT COUNT("Org_ID")  INTO count_distinct FROM :EXTRNL_ORGDETAILS;
+      
+      
+      --checking for duplicate orgids in csv
+      IF count_all <> count_distinct THEN
+      signal org_already_exists set MESSAGE_TEXT = 'Duplicate org ids present';
+            
+      END IF;
+
+
+	select count(a."Parent_OrgID") into parent_org_count from
+	(select "Parent_OrgID" from :EXTRNL_ORGDETAILS where "Parent_OrgID" <> '' and "Parent_OrgID"  is not null) a  LEFT OUTER JOIN
+	(select "Org_ID" from :EXTRNL_ORGDETAILS) b 
+	ON a."Parent_OrgID" = b."Org_ID" WHERE b."Org_ID" IS NULL;
+
+	 IF (:parent_org_count>0) THEN
+      
+      
+      signal parent_org_not_exist set MESSAGE_TEXT = 'Parent Org not found';
+      
+      END IF;
+      
+
+      
+	 EXEC 'START TASK "hc.hph.plugins.ldap.interface.flowgraphs::LoadAuditLog_LDAP"("AuditLogID" => '''''''||:auditLogID||''''''', "DWSource" => '''''''||:dwSource||''''''', "ProfileID" => '''''''||:profileID||''''''',"ExtensionID" => '''''''||:extensionId||''''''') PROCEDURE PARAMETERS ("'||:schemaName||'"."'||:logVT||'")';
+	 
+     EXEC 'INSERT INTO "hc.hph.plugins.ldap.interface.db.model::Staging.Trace"  
+	SELECT  "LOGDETAILID" , "LOGTRACEID" ,"LOGSTATUS" ,
+	"LOGTIMESTAMP" ,"LOGLOCATION" ,
+	"LOGMESSAGE",'||:auditLogID||' AS "AuditLogID" FROM "' || :schemaName || '"."' || :traceVT || '"';
+      
+
+ 	insert into "hc.hph.di.model::DataIntegration.AuditLogTrace"
+ 	SELECT a."AuditLogID" , b."LOGTRACEID",b."LOGSTATUS", b."LOGTIMESTAMP",b."LOGLOCATION" ,b."LOGMESSAGE" from 
+	"hc.hph.di.model::DataIntegration.AuditLog" AS a inner join "hc.hph.plugins.ldap.interface.db.model::Staging.Trace"  AS b on a."DocumentURI"= b."LOGDETAILID";
+ 	
+	      
+    -- EXEC 'START TASK "hc.hph.plugins.ldap.interface.flowgraphs::LoadAuditTrace_LDAP" PROCEDURE PARAMETERS ("'||:schemaName||'"."'||:traceVT||'")';
+
+
+
+os_message = SELECT 
+					'S' as STATUS,
+					0 as ERROR_CODE,       -- SQL Error Code
+					'Success' as ERROR_MESSAGE  -- Error Message
+					from "hc::DUMMY";
+
+END;

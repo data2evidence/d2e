@@ -1,0 +1,117 @@
+name: DockerCompose AzureTest CD
+run-name: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
+
+on:
+  push:
+    branches:
+    - develop
+
+  workflow_dispatch:
+    inputs:
+      env:
+        type: environment
+        description: Select the environment
+        required: true
+        default: alp-dev-sg-2
+
+env:
+  DOCKER_TAG_NAME: develop
+  ENV_NAME: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
+  ENV_TYPE: remote
+
+concurrency: 
+  group: az-dc-cd-${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
+    name: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
+    runs-on: [ "${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}", self-hosted, Linux, X64 ]
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        clean: false
+        submodules: recursive
+
+    - uses: actions/checkout@v4
+      with:
+        repository:  ${{ vars.OVERRIDE_REPO }}
+        token: ${{ secrets.CI_PAT }}
+        path: 'tmp'
+        sparse-checkout: 'alp-data-node-override'
+        sparse-checkout-cone-mode: false
+        ref: develop
+
+    - shell: bash
+      id: link_files_from_override
+      run: |
+        ln -s tmp/alp-data-node-override alp-data-node-override
+        chmod 755 -R alp-data-node-override
+
+    - name: Login to ACR
+      uses: docker/login-action@v3.1.0
+      with:
+        registry: alpcr.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Install 1Password CLI
+      uses: 1Password/install-cli-action@v1.0.0
+
+    - name: Generate dotenv
+      env:
+        DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+        DOTENV_YML: .env.${{ env.ENV_NAME }}.yml 
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      run: |
+        dn_dir=$PWD
+        cd alp-data-node-override
+        ACTIONS_STEP_DEBUG=false
+      
+        # get env yml from 1password
+        overwrite=true env_name=$ENV_NAME yarn op:get:$ENV_TYPE
+
+        # mask sensitive values
+        scripts/gha-mask.sh
+
+        # generate dotenv
+        dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
+
+        cd $dn_dir
+        env_type=$ENV_TYPE yarn gen:tls
+        cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
+
+        echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
+        echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
+        echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
+
+
+    - shell: bash
+      if: github.event_name == 'push'
+      id: enable_delay_for_docker_build_to_complete
+      run: |
+        sleep 500 # Temporary solution
+
+    - name: docker compose up
+      env:
+        GATEWAY_NAME: alp-minerva-gateway-1
+      run: |
+        yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
+
+        # Run ALP services
+        yarn remote:minerva up --remove-orphans --force-recreate --wait --pull always
+        EXIT_CODE=$?
+
+        yarn base:minerva ps --format "{{.Names}} {{.Status}}" 2> /dev/null | grep ^alp | tee -a $GITHUB_STEP_SUMMARY
+        echo | tee -a $GITHUB_STEP_SUMMARY
+
+        if [ $EXIT_CODE != 0 ]; then
+          echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
+          exit $EXIT_CODE
+        fi
+
+    - name: Logs minerva
+      if: success() || failure()
+      run: |  
+        yarn logs:minerva

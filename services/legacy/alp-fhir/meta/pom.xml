@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+    
+  <parent>
+    <groupId>com.legacy.health.fhir</groupId>
+    <artifactId>parent</artifactId>
+    <version>0.1.13</version>
+  </parent>
+
+  <artifactId>meta</artifactId>
+  <name>meta</name>  
+  <version>${meta.version}</version>
+  <description>FHIR Metamodel</description>  
+
+  <dependencies>
+        <dependency>
+           <groupId>com.google.guava</groupId>
+           <artifactId>guava</artifactId>
+           <version>23.6.1-jre</version>
+        </dependency>
+      <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+      </dependency>
+
+  	<dependency>
+    		<groupId>commons-logging</groupId>
+    		<artifactId>commons-logging</artifactId>
+    		<version>1.1.1</version>
+		</dependency>
+  	<dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.6</version>
+    </dependency>
+      <dependency>
+          <groupId>org.reflections</groupId>
+          <artifactId>reflections</artifactId>
+          <version>0.9.9</version>
+      </dependency>
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>1.7.25</version>
+      </dependency>
+    <dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<scope>test</scope>
+  	</dependency>
+  	 <dependency>
+	<groupId>javax.servlet</groupId>
+	<artifactId>servlet-api</artifactId>
+	<version>2.5</version>
+	<scope>provided</scope>
+  </dependency>
+  <dependency>
+      <groupId>org.togglz</groupId>
+      <artifactId>togglz-core</artifactId>
+      <version>2.6.1.Final</version>
+  </dependency>
+  </dependencies>
+    
+</project>

@@ -1,0 +1,264 @@
+﻿!======================================================================
+! File Name: german-tf-med-Relation.rul
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+!======================================================================
+
+#subgroup genitiveArticle:{(
+(<de(s|r)>)
+|(<eine(s|r)>)
+)}
+
+#subgroup coord: (<\p{ci}(und|&|oder)>|(<\,> <\p{ci}(und|&|oder)>?)|</>|<\|>)
+
+!=============================
+!Disease and Symptom Entities
+!=============================
+
+#subgroup Dis_Entity:{
+[OD Condition] [TE CONDITION] <>+ [/TE] [/OD]
+}
+
+#subgroup Dis_Entities:{
+%(Dis_Entity) (%(coord) %(Dis_Entity))*
+}
+
+#subgroup Symp_Entity:{
+[OD Observation_Symptom] [TE OBSERVATION_SYMPTOM] <>+ [/TE] [/OD]
+}
+
+#subgroup Symp_Entities:{
+%(Symp_Entity) (%(coord) %(Symp_Entity))*
+}
+
+!====================================================
+!DISEASE STATUS
+!====================================================
+
+!=================
+!Progression nouns
+!=================
+
+!How should phrases like 'Tumorprogression' and 'Tumorrezidiv' be handled?
+#subgroup progressionNouns:{(
+[OD Progression](
+(<(Größen)?(p|P)rogress>)
+|(<(Größen)?(p|P)rogredienz>)
+)[/OD]
+)}
+
+#subgroup progressionNounPhrasesDis:{
+(%(progressionNouns) (%(genitiveArticle)|<POS:Prep>) <>{0,3} %(Dis_Entities))
+}
+
+#subgroup progressionNounPhrasesSymp:{
+(%(progressionNouns) (%(genitiveArticle)|<POS:Prep>) <>{0,3} %(Symp_Entities))
+}
+
+!======================
+!Progression adjectives
+!======================
+
+#subgroup progressionAdjs:{(
+[OD Progression](
+<((rezidivierend)|(((G|g)rößen)?(P|p)rogredient)|((P|p)rogressiv)).*>
+)[/OD]
+)}
+
+#subgroup progressionAdjFirstDis:{
+(%(progressionAdjs) <>{0,3} %(Dis_Entities))
+}
+
+#subgroup progressionAdjLastDis:{
+(%(Dis_Entities) <POS:~(Conj-Coord)>{0,3} %(progressionAdjs))
+}
+
+#subgroup progressionAdjPhrasesDis:{(
+%(progressionAdjFirstDis)
+|%(progressionAdjLastDis)
+)}
+
+#subgroup progressionAdjFirstSymp:{
+(%(progressionAdjs) <>{0,3} %(Symp_Entities))
+}
+
+#subgroup progressionAdjLastSymp:{
+(%(Symp_Entities) <POS:~(Conj-Coord)>{0,3} %(progressionAdjs))
+}
+
+#subgroup progressionAdjPhrasesSymp:{(
+%(progressionAdjFirstSymp)
+|%(progressionAdjLastSymp)
+)}
+
+!===========================
+!Progression subgroup 
+!===========================
+
+#subgroup progressionDis:{(
+%(progressionNounPhrasesDis)
+|%(progressionAdjPhrasesDis)
+)}
+
+#subgroup progressionSymp:{(
+%(progressionNounPhrasesSymp)
+|%(progressionAdjPhrasesSymp)
+)}
+
+!===============
+!Remission nouns
+!===============
+
+#subgroup remissionNouns:{(
+[OD Remission](
+<Remission>
+)[/OD]
+)}
+
+#subgroup remissionNounPhrasesDis:{(
+%(remissionNouns) (%(genitiveArticle)|<POS:Prep>) <>{0,3} %(Dis_Entities)
+)}
+
+#subgroup remissionNounPhrasesSymp:{(
+%(remissionNouns) (%(genitiveArticle)|<POS:Prep>) <>{0,3} %(Symp_Entities)
+)}
+
+!=========================
+!Remission subgroup 
+!=========================
+
+#subgroup remissionDis:{(
+%(remissionNounPhrasesDis)
+)}
+
+#subgroup remissionSymp:{(
+%(remissionNounPhrasesSymp)
+)}
+
+!==================
+!Regression nouns
+!==================
+
+#subgroup regressionNouns:{(
+[OD Regression](
+<(Regression)|(Verkleinerung)|(Besserung)|(((g|G)rößen)?(R|r)egredienz)>
+)[/OD]
+)}
+
+#subgroup regressionNounPhrasesDis:{(
+%(regressionNouns) (%(genitiveArticle)|<POS:Prep>) <>{0,3} %(Dis_Entities)
+)}
+
+#subgroup regressionNounPhrasesSymp:{(
+%(regressionNouns) (%(genitiveArticle)|<POS:Prep>) <>{0,3} %(Symp_Entities)
+)}
+
+!======================
+!Regression adjectives
+!======================
+
+#subgroup regressionAdjs:{(
+[OD Regression](
+<((((G|g)rößen)?(R|r)egredient)|(verbessert)).*>
+)[/OD]
+)}
+
+#subgroup regressionAdjFirstDis:{(
+%(regressionAdjs) <>{0,3} %(Dis_Entities)
+)}
+
+#subgroup regressionAdjLastDis:{(
+%(Dis_Entities) (<\,> <teils>)? <~(\:)>{0,3} %(regressionAdjs)
+)}
+
+#subgroup regressionAdjPhrasesDis:{(
+%(regressionAdjFirstDis)
+|%(regressionAdjLastDis)
+)}
+
+#subgroup regressionAdjFirstSymp:{(
+%(regressionAdjs) <>{0,3} %(Symp_Entities)
+)}
+
+#subgroup regressionAdjLastSymp:{(
+%(Symp_Entities) (<\,> <teils>)? <~(\:)>{0,3} %(regressionAdjs)
+)}
+
+#subgroup regressionAdjPhrasesSymp:{(
+%(regressionAdjFirstSymp)
+|%(regressionAdjLastSymp)
+)}
+
+!====================
+!Regression subgroup
+!====================
+
+#subgroup regressionDis:{(
+%(regressionNounPhrasesDis)
+|%(regressionAdjPhrasesDis)
+)}
+
+#subgroup regressionSymp:{(
+%(regressionNounPhrasesSymp)
+|%(regressionAdjPhrasesSymp)
+)}
+
+!=====================
+!Stable adjectives
+!=====================
+
+#subgroup stableAdjs:{(
+[OD Stable](
+ <(stabil).*>
+)[/OD]
+)}
+
+#subgroup stableAdjsFirstDis:{(
+%(stableAdjs) <>{0,3} %(Dis_Entities)
+)}
+
+#subgroup stableAdjsFirstSymp:{(
+%(stableAdjs) <>{0,3} %(Symp_Entities)
+)}
+
+#subgroup stableAdjPhrasesDis:{(
+%(stableAdjsFirstDis)
+)}
+
+#subgroup stableAdjPhrasesSymp:{(
+%(stableAdjsFirstSymp)
+)}
+
+!================
+!Stable subgroup
+!================
+
+#subgroup stableDis:{(
+%(stableAdjPhrasesDis)
+)}
+
+#subgroup stableSymp:{(
+%(stableAdjPhrasesSymp)
+)}
+
+!=======================
+!Condition_ClinicalStatus
+!========================
+
+#group Condition_ClinicalStatus:{(
+ %(progressionDis)
+|%(regressionDis)
+|%(remissionDis)
+|%(stableDis)
+)}
+
+!===========================================
+!Observation_Symptom_Component_ClinicalStatus
+!============================================
+
+#group Observation_Symptom_Component_ClinicalStatus:{(
+ %(progressionSymp)
+|%(regressionSymp)
+|%(remissionSymp)
+|%(stableSymp)
+)}

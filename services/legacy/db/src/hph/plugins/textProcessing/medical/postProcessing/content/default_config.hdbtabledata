@@ -1,0 +1,37 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.plugins.textProcessing.medical.postProcessing::Entities.TA_CONFIG",
+            "import_settings": {
+                "include_filter": [
+                    {
+                        "CONFIG_ID": "hc.hph.ta.config::EXTRACTION_CORE_MEDICAL"
+                    }
+                ],
+                "import_columns": [
+                    "CONFIG_ID",
+                    "EXTRACTION_TYPE",
+                    "EXTRACTION_ID",
+                    "SELECTED"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.plugins.textProcessing.medical.postProcessing.content::default_config.csv",
+                "has_header": false,
+                "type_config": {
+                    "delimiter": ";",
+                    "do_quote": true,
+                    "quote_character": "\""
+                }
+            },
+            "column_mappings": {
+                "CONFIG_ID": 1,
+                "EXTRACTION_TYPE": 2,
+                "EXTRACTION_ID": 3,
+                "SELECTED": 4
+            }
+        }
+    ]
+}

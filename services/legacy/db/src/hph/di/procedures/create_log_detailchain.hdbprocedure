@@ -1,0 +1,37 @@
+PROCEDURE "hc.hph.di.procedures::create_log_detailchain" ( 
+	in AuditLogID BIGINT,
+	in ParentAuditLogID BIGINT,
+	in ProcessID nvarchar(512),
+	in ProcessType nvarchar(512),
+	in Status nvarchar(16)
+) 
+
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+	ExtensionID nvarchar(256);
+	ProfileID BIGINT;
+	ProfileName nvarchar(512);
+	SourceID nvarchar(5);
+	
+BEGIN
+	select "ExtensionID" into ExtensionID from "hc.hph.di.model::DataIntegration.AuditLog" where "AuditLogID" = :AuditLogID and "ParentAuditLogID"=:ParentAuditLogID;
+	select "ProfileID" into ProfileID from "hc.hph.di.model::DataIntegration.AuditLog"  where "AuditLogID" = :AuditLogID and "ParentAuditLogID"=:ParentAuditLogID;
+	select "SourceID" into SourceID from "hc.hph.di.model::DataIntegration.AuditLog" where "AuditLogID" = :AuditLogID and "ParentAuditLogID"=:ParentAuditLogID;
+	select "Name" into ProfileName from "hc.hph.di.model::DataIntegration.JobProfile" where "ProfileID" = :ProfileID;
+	upsert  "hc.hph.di.model::DataIntegration.AuditLog" ("AuditLogID", "ParentAuditLogID", "ExtensionID", "ProfileID", "Status", "SourceID", "ProcessID","DocumentID","DocumentURI","DocumentName","DocumentSize","DocumentType","Notes")
+	 values (:AuditLogID,
+	 		 :ParentAuditLogID,
+	 		 :ExtensionID,
+	 		 :ProfileID,
+	 		 :Status,
+	 		 :SourceID,
+	 		 :ProcessID,
+	 		 :ProfileID,
+	 		 :ProfileName,
+	 		 :ProfileName,
+	 		 '1',
+	 		 'Profile',
+	 		 'Profile' || :ProfileID || ' Run Completed'
+	 		 ) WITH PRIMARY KEY;
+	 		 
+END;	 		 

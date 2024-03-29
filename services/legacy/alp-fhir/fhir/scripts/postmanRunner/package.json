@@ -1,0 +1,10 @@
+{
+"name": "postmanRunner",
+"version": "0.0.1",
+"dependencies": {
+"newman": "^3.9.3",
+"uuid": "^3.2.1",
+"colors": "^1.2.3",
+"hdb": "^0.15.4"
+}
+}

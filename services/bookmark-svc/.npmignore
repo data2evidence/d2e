@@ -1,0 +1,14 @@
+spec/
+src/
+src_ui/*
+!src_ui/mri/
+!src_ui/mri_config/
+target/*
+!target/src
+typings/
+default-env.json
+Gruntfile.js
+tsconfig.json
+tslint.json
+.yarnrc
+yarn.lock

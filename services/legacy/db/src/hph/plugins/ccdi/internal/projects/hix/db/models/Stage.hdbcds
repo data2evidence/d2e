@@ -1,0 +1,42 @@
+namespace hc.hph.plugins.ccdi.internal.projects.hix.db.models;
+
+context Stage {
+
+    entity Xml {
+
+        DocumentID		: String(1024);       
+        LastUpdated 	: UTCTimestamp;      
+        Item 	        : Integer;    
+        Level	        : Integer;
+        Parent 		    : Integer;      
+        Type 	        : hana.VARCHAR(100);       
+        Key         	: hana.VARCHAR(100);
+        Value 	        : hana.VARCHAR(5000);
+        ValueExt 		: LargeString;       
+        BinValue 		: LargeBinary;       
+
+        
+    } technical configuration {
+        column store;
+    };
+
+    
+    entity LogDetail {
+
+        LogDetailID		    : String(256);       
+        DocumentID 	        : String(1024);      
+        Status 	            : String(16);    
+        Notes	            : String(1024);
+        StartTime 		    : UTCTimestamp;      
+        EndTime 	        : UTCTimestamp;       
+        DocumentType        : String(512);
+        DocumentSize 	    : String(512);
+        DocumentLastUpdated : UTCTimestamp;       
+
+        
+    } technical configuration {
+        column store;
+    };
+
+    
+}

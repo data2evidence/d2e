@@ -1,0 +1,22 @@
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::getQueueEntry" (
+		in taskId BIGINT,
+		out auditLogId	BIGINT,
+		out profileId BIGINT,
+		out auditLogDetailId BIGINT,
+		out taskType NVARCHAR(100),
+		out oJsonString NCLOB,
+		out ERROR NCLOB,
+		OUT STATUS NVARCHAR(16)
+   ) 
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+
+   READS SQL DATA
+   AS   
+BEGIN  
+
+SELECT "auditLogId", "profileId", "auditLogDetailId", "taskType", "oJsonString", "ERROR", "STATUS" INTO auditLogId, profileId, auditLogDetailId, taskType, oJsonString, ERROR, STATUS
+FROM "hc.hph.plugins.ccdi.db.models::Tasks.Queue" WHERE 
+ "taskId" = :taskId;
+
+END;

@@ -1,0 +1,25 @@
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::isParentAuditLogId" (
+	IN auditLogId	BIGINT,
+	out isParentAuditLogId	TINYINT 
+	) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+
+	READS SQL DATA 
+	AS
+BEGIN
+
+DECLARE ParentAuditLogID BIGINT := 0;
+SELECT "ParentAuditLogID" INTO ParentAuditLogID FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "AuditLogID"=:auditLogId;
+
+IF (ParentAuditLogID = 0) THEN
+	isParentAuditLogId := 1;
+ELSE
+	isParentAuditLogId := 0;
+END IF;
+
+--SELECT (CASE WHEN (COUNT(*) > 0) THEN 1 ELSE 0 END) INTO isParentAuditLogId 
+--FROM "hc.hph.plugins.ccdi.db.models::Tasks.Queue" WHERE 
+-- "auditLogId" = :auditLogId;
+
+END;

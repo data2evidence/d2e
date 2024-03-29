@@ -1,0 +1,30 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::BLOBWrite" 
+(
+in batchID nvarchar(100),
+in vt_name nvarchar(137),
+in auditLogId bigint,
+in scheduleId bigint,
+in dwSource nvarchar(7),
+in columnId nvarchar(100)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+
+if batchID = '0' then
+
+	if columnId = 'DWID' then
+	exec'insert into "'||:vt_name||'" select "DWID",null,null,null,null,"Content" from "hc.hph.plugins.documents.db.models::Interface.ProcessingStageView" where "ParentAuditLogID" = '||:auditLogId||' and "ScheduleID" = '||:scheduleId||' and "DWSource" in('||:dwSource||')';
+	else
+	exec'insert into "'||:vt_name||'" select "DocumentID",null,null,null,null,"Content" from "hc.hph.plugins.documents.db.models::Interface.ProcessingStageView" where "ParentAuditLogID" = '||:auditLogId||' and "ScheduleID" = '||:scheduleId||' and "DWSource" in('||:dwSource||')';
+	end if;
+else
+	if columnId='DWID' then
+	exec'insert into "'||:vt_name||'" select "DWID",null,null,null,null,"Content" from "hc.hph.plugins.documents.db.models::Interface.ProcessingStageView" where "ParentAuditLogID" = '||:auditLogId||' and "ScheduleID" = '||:scheduleId||' and "DWSource" in('||:dwSource||') and "BatchID" = '||:batchID||'';
+	else
+	exec'insert into "'||:vt_name||'" select "DocumentID",null,null,null,null,"Content" from "hc.hph.plugins.documents.db.models::Interface.ProcessingStageView" where "ParentAuditLogID" = '||:auditLogId||' and "ScheduleID" = '||:scheduleId||' and "DWSource" in('||:dwSource||') and "BatchID" = '||:batchID||'';
+	end if;
+end if;
+
+END;

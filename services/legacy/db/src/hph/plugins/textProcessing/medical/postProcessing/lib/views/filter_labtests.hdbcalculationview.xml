@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.views::filter_labtests" applyPrivilegeType="NONE" dataCategory="DEFAULT" schemaVersion="3.0" outputViewType="Aggregation" cacheInvalidationPeriod="NONE" enforceSqlExecution="false">
+<descriptions defaultDescription="filter_labtests"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp" type="TABLE_FUNCTION">
+    <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp</resourceUri>
+  </DataSource>
+  <DataSource id="Observation_Laboratory_NormalizedSubentities$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp$$" type="TABLE_FUNCTION">
+    <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp</resourceUri>
+  </DataSource>
+</dataSources>
+<calculationViews>
+  <calculationView xsi:type="Calculation:ProjectionView" id="OBSERVATION_LABORATORY" filterExpressionLanguage="COLUMN_ENGINE">
+    <viewAttributes>
+      <viewAttribute id="TA_RULE">
+        <descriptions defaultDescription="TA_RULE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TOKEN">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp">
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_RULE" source="TA_RULE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+    </input>
+    <filter>(in(&quot;TA_TYPE&quot;,'OBSERVATION_LABORATORY'))</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:ProjectionView" id="Observation_Laboratory_NormalizedSubentities" filterExpressionLanguage="COLUMN_ENGINE">
+    <viewAttributes>
+      <viewAttribute id="TA_RULE">
+        <descriptions defaultDescription="TA_RULE"/>
+      </viewAttribute>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TOKEN">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="Observation_Laboratory_NormalizedSubentities$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp$$">
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_RULE" source="TA_RULE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+    </input>
+    <filter>(&quot;TA_TYPE&quot; = 'Observation_Laboratory_Normalized')</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="IdentifyRemovalCandidates" cardinality="CN_N" joinType="leftOuter">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER" aggregationType="sum">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+      <viewAttribute id="TA_RULE">
+        <descriptions defaultDescription="TA_RULE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET" aggregationType="sum">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TOKEN">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes>
+      <calculatedViewAttribute id="TA_NEW_TYPE" datatype="VARCHAR" length="100" expressionLanguage="COLUMN_ENGINE">
+        <formula>if(isnull(&quot;TA_TYPE&quot;),'OBSERVATION_LABORATORY','Removal_Candidate')</formula>
+      </calculatedViewAttribute>
+    </calculatedViewAttributes>
+    <restrictedViewAttributes/>
+    <input node="OBSERVATION_LABORATORY">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_RULE" source="TA_RULE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+    </input>
+    <input node="Observation_Laboratory_NormalizedSubentities">
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+    </input>
+    <joinAttribute name="DWID"/>
+    <joinAttribute name="TA_OFFSET"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:ProjectionView" id="RemovalCandidates" filterExpressionLanguage="COLUMN_ENGINE">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+      <viewAttribute id="TA_RULE">
+        <descriptions defaultDescription="TA_RULE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_NEW_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TOKEN">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="IdentifyRemovalCandidates">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_RULE" source="TA_RULE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_NEW_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+    </input>
+    <filter>(&quot;TA_TYPE&quot; = 'Removal_Candidate')</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:AggregationView" id="FindObservationObservation_Laboratory_Normalized">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED" aggregationType="max">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TOKEN">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="RemovalCandidates">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+    </input>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="GetAllAttributes" cardinality="CN_N" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET" aggregationType="sum">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED" aggregationType="max">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TOKEN">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER" aggregationType="sum">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+      <viewAttribute id="TA_RULE">
+        <descriptions defaultDescription="TA_RULE"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes>
+      <calculatedViewAttribute id="TA_TYPE" datatype="VARCHAR" length="100" expressionLanguage="COLUMN_ENGINE">
+        <formula>'TO_REMOVE'</formula>
+      </calculatedViewAttribute>
+    </calculatedViewAttributes>
+    <restrictedViewAttributes/>
+    <input node="FindObservationObservation_Laboratory_Normalized">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+    </input>
+    <input node="RemovalCandidates">
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_RULE" source="TA_RULE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+    </input>
+    <joinAttribute name="DWID"/>
+    <joinAttribute name="TA_OFFSET"/>
+    <joinAttribute name="TA_NORMALIZED"/>
+    <joinAttribute name="TA_TOKEN"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="KeepUnnormalizedObservation_Laboratory_Normalizeds" cardinality="CN_N" joinType="leftOuter">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER" aggregationType="sum">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET" aggregationType="sum">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_RULE">
+        <descriptions defaultDescription="TA_RULE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TOKEN">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes>
+      <calculatedViewAttribute id="TA_NEW_TYPE" datatype="VARCHAR" length="100" expressionLanguage="COLUMN_ENGINE">
+        <formula>if(isNull(&quot;TA_TYPE&quot;),'OBSERVATION_LABORATORY',&quot;TA_TYPE&quot;)</formula>
+      </calculatedViewAttribute>
+    </calculatedViewAttributes>
+    <restrictedViewAttributes/>
+    <input node="RemovalCandidates">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_RULE" source="TA_RULE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+    </input>
+    <input node="GetAllAttributes">
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+    </input>
+    <joinAttribute name="TA_COUNTER"/>
+    <joinAttribute name="DWID"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:ProjectionView" id="medObservation_Laboratory_NormalizedsToKeep" filterExpressionLanguage="COLUMN_ENGINE">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_RULE">
+        <descriptions defaultDescription="TA_RULE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_NEW_TYPE"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="KeepUnnormalizedObservation_Laboratory_Normalizeds">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_RULE" source="TA_RULE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_NEW_TYPE"/>
+    </input>
+  
+    <filter>(&quot;TA_TYPE&quot; = 'OBSERVATION_LABORATORY')</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:ProjectionView" id="Definite_OBSERVATION_LABORATORYs" filterExpressionLanguage="COLUMN_ENGINE">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+      <viewAttribute id="TA_RULE">
+        <descriptions defaultDescription="TA_RULE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_NEW_TYPE"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="IdentifyRemovalCandidates">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_RULE" source="TA_RULE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_NEW_TYPE"/>
+    </input>
+    <filter>(&quot;TA_TYPE&quot; = 'OBSERVATION_LABORATORY')</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:UnionView" id="GetAllObservation_Laboratory_NormalizedsToKeep">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER" aggregationType="sum">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET" aggregationType="sum">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_RULE">
+        <descriptions defaultDescription="TA_RULE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_NEW_TYPE"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="medObservation_Laboratory_NormalizedsToKeep">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_RULE" source="TA_RULE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+    </input>
+    <input node="Definite_OBSERVATION_LABORATORYs">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_RULE" source="TA_RULE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+    </input>
+  </calculationView>
+</calculationViews>
+<logicalModel id="GetAllObservation_Laboratory_NormalizedsToKeep">
+  <attributes>
+    <attribute id="DWID" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="DWID"/>
+      <keyMapping columnObjectName="GetAllObservation_Laboratory_NormalizedsToKeep" columnName="DWID"/>
+    </attribute>
+    <attribute id="TA_COUNTER" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="TA_COUNTER"/>
+      <keyMapping columnObjectName="GetAllObservation_Laboratory_NormalizedsToKeep" columnName="TA_COUNTER"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="TA_OFFSET" order="3" aggregationType="max" measureType="simple">
+      <descriptions defaultDescription="TA_OFFSET"/>
+      <measureMapping columnObjectName="GetAllObservation_Laboratory_NormalizedsToKeep" columnName="TA_OFFSET"/>
+    </measure>
+    <measure id="TA_NORMALIZED" order="4" aggregationType="max" measureType="simple">
+      <descriptions defaultDescription="TA_NORMALIZED"/>
+      <measureMapping columnObjectName="GetAllObservation_Laboratory_NormalizedsToKeep" columnName="TA_NORMALIZED"/>
+    </measure>
+    <measure id="TA_RULE" order="5" aggregationType="max" measureType="simple">
+      <descriptions defaultDescription="TA_RULE"/>
+      <measureMapping columnObjectName="GetAllObservation_Laboratory_NormalizedsToKeep" columnName="TA_RULE"/>
+    </measure>
+    <measure id="TA_TYPE" order="6" aggregationType="max" measureType="simple">
+      <descriptions defaultDescription="TA_NEW_TYPE"/>
+      <measureMapping columnObjectName="GetAllObservation_Laboratory_NormalizedsToKeep" columnName="TA_TYPE"/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  
+    <shape expanded="true" modelObjectName="OBSERVATION_LABORATORY" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-411" y="1091"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="Observation_Laboratory_NormalizedSubentities" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-174" y="1097"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="IdentifyRemovalCandidates" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-261" y="906"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="OBSERVATION_LABORATORY" modelObjectNameSpace="IdentifyRemovalCandidates" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape modelObjectName="Observation_Laboratory_NormalizedSubentities" modelObjectNameSpace="IdentifyRemovalCandidates" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape expanded="true" modelObjectName="RemovalCandidates" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-303" y="788"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="FindObservationObservation_Laboratory_Normalized" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-533" y="702"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="GetAllAttributes" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-431" y="545"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="FindObservationObservation_Laboratory_Normalized" modelObjectNameSpace="GetAllAttributes" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape modelObjectName="RemovalCandidates" modelObjectNameSpace="GetAllAttributes" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape expanded="true" modelObjectName="KeepUnnormalizedObservation_Laboratory_Normalizeds" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-331" y="423"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="RemovalCandidates" modelObjectNameSpace="KeepUnnormalizedObservation_Laboratory_Normalizeds" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape modelObjectName="GetAllAttributes" modelObjectNameSpace="KeepUnnormalizedObservation_Laboratory_Normalizeds" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape expanded="true" modelObjectName="medObservation_Laboratory_NormalizedsToKeep" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-341" y="302"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+  
+    <shape expanded="true" modelObjectName="Definite_OBSERVATION_LABORATORYs" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-79" y="326"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="GetAllObservation_Laboratory_NormalizedsToKeep" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-159" y="168"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

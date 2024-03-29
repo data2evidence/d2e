@@ -1,0 +1,20 @@
+PROCEDURE "hc.hph.genomics.db.procedures.model::SampleNames" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        OUT sample_names "hc.hph.genomics.db.models::General.SampleNames"
+    )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER
+    READS SQL DATA AS
+BEGIN
+    sample_names = SELECT
+            "QuerySamples"."SampleIndex",
+            "KnownSamples"."SampleID" as "SampleName"
+        FROM
+            :sample_list AS "QuerySamples"
+        LEFT OUTER JOIN
+            "hc.hph.genomics.db.models::General.Samples" AS "KnownSamples"
+        ON
+            "QuerySamples"."SampleIndex" = "KnownSamples"."SampleIndex"
+        ORDER BY
+            "SampleID";
+END

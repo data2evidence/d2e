@@ -1,0 +1,108 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::GenerateTAArtefact" 
+(
+in iv_auditLogID bigint,
+in iv_scheduleID bigint,
+in iv_pluginID nvarchar(256),
+in iv_validationConfig nvarchar(256),
+in iv_schemaName nvarchar(256),
+out ov_res nvarchar(10)
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY DEFINER
+   AS
+BEGIN
+
+	declare lv_languageCode nvarchar(2) default '';
+	declare lv_TAPlainText NCLOB;
+	declare lv_startTime timestamp;
+	declare lv_endTime timestamp;
+	declare lv_timeTaken bigint;
+	declare lv_curDWID varbinary(32);
+	declare lv_TANormalized nvarchar(5000);
+	declare lv_MIMEType nvarchar(256) default 'text/plain';
+
+	declare lt_TAResult table(RULE NVARCHAR(200), COUNTER BIGINT, TOKEN NVARCHAR(5000), TYPE NVARCHAR(100), NORMALIZED NVARCHAR(5000), STEM NVARCHAR(5000), PARAGRAPH INTEGER, SENTENCE INTEGER, OFFSET BIGINT, PARENT BIGINT, EXPANDED_TYPE NVARCHAR(200));
+	declare lt_TA "hc.hph.plugins.documents.db.models::TA.Results";
+		
+	declare cursor ta_cursor for
+		select "DWID","DWDateFrom","TAConfiguration","MIMEType","Content" from "hc.hph.plugins.documents.db.models::TA.Document" where "DWAuditID" =:iv_auditLogID and "ScheduleID" =:iv_scheduleID and "PipelineID"=iv_pluginID;
+
+	declare cursor ta_entities for
+		select * from :lt_TAResult;
+
+	declare exit handler for sqlexception
+		begin
+
+			if iv_validationConfig  = '' then
+
+				lv_endTime := now();
+				lv_timeTaken := 0;
+				select seconds_between(lv_startTime, lv_endTime) into lv_timeTaken from "hc::DUMMY";
+
+				--update the log table in case of failure
+				UPSERT "hc.hph.plugins.documents.db.models::TA.PreProcessingLog"("DWAuditID","ScheduleID","DWID","PipelineID","TA_Entities","TA_Time","Status") 
+				values (iv_auditLogID,iv_scheduleID,lv_curDWID,iv_pluginID,0,lv_timeTaken,'failed') WITH PRIMARY KEY;
+
+			end if;
+			ov_res := 'Error';
+		end; 
+
+	if iv_validationConfig <> '' then
+
+		CALL "hc.hph.plugins.documents.db.procedures::PerformTA"(
+					IV_DOCBIN => ''/*<BLOB>*/,
+					IV_DOCTEXT => 'This is a vaidation String'/*<NCLOB>*/,
+					IV_CONFIGNAME => :iv_validationConfig,
+					IV_LANGUAGECODE => lv_languageCode,
+					IV_MIMETYPE => lv_MIMEType,
+					IV_SCHEMANAME => :iv_schemaName,
+					OT_TARES => lt_TAResult,
+					OV_TAPLAINTEXT => lv_TAPlainText
+				);
+
+	else
+			
+		CREATE LOCAL TEMPORARY TABLE #my_local_temp_table like "hc.hph.plugins.documents.db.models::TA.Results";
+
+		for cur_row as ta_cursor do
+			lv_startTime := now();
+			lv_curDWID := cur_row.DWID;
+			lv_MIMEType := cur_row."MIMEType";
+
+			CALL "hc.hph.plugins.documents.db.procedures::PerformTA"(
+					IV_DOCBIN => cur_row."Content"/*<BLOB>*/,
+					IV_DOCTEXT => ''/*<NCLOB>*/,
+					IV_CONFIGNAME => cur_row."TAConfiguration",
+					IV_LANGUAGECODE => lv_languageCode,
+					IV_MIMETYPE => lv_MIMEType,
+					IV_SCHEMANAME => :iv_schemaName,
+					OT_TARES => lt_TAResult,
+					OV_TAPLAINTEXT => lv_TAPlainText
+				);
+
+			for cur_ent as ta_entities do
+
+				if cur_ent.NORMALIZED = '' then
+					lv_TANormalized := null;
+				else 
+					lv_TANormalized := cur_ent.NORMALIZED;
+				end if;
+				
+				insert into #my_local_temp_table("DWID","DWDateFrom","PluginID","TA_RULE", "TA_COUNTER","DWAuditID","TA_Configuration","TA_TOKEN","TA_LANGUAGE",
+				"TA_TYPE","TA_NORMALIZED","TA_STEM","TA_PARAGRAPH","TA_SENTENCE","TA_CREATED_AT","TA_OFFSET","TA_PARENT")
+				(select cur_row.DWID, cur_row."DWDateFrom", :iv_pluginID "PluginID", cur_ent.RULE "TA_RULE", cur_ent.COUNTER "TA_COUNTER", :iv_auditLogID "DWAuditID", cur_row."TAConfiguration" "TA_Configuration", cur_ent.TOKEN "TA_TOKEN", 'en' "TA_LANGUAGE", 
+				cur_ent.TYPE "TA_TYPE", lv_TANormalized "TA_NORMALIZED", null "TA_STEM", cur_ent.PARAGRAPH "TA_PARAGRAPH", cur_ent.SENTENCE "TA_SENTENCE", null "TA_CREATED_AT", cur_ent.OFFSET "TA_OFFSET", cur_ent.PARENT "TA_PARENT" 
+				from "hc::DUMMY" where cur_ent.RULE = 'Entity Extraction');
+
+			end for;
+
+		end for;
+
+		lt_TA = select * from #my_local_temp_table;
+
+		call "hc.hph.plugins.documents.db.procedures::LoadTAResults"(:lt_TA);
+
+	end if;
+	ov_res := 'Success';
+
+END

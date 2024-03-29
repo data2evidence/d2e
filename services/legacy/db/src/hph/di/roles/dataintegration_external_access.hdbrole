@@ -1,0 +1,22 @@
+{
+  "role":{
+    "name": "hc.hph.di.roles::dataintegration_external_access",
+    "object_privileges":[
+      {
+        "name":"hc.hph.di.model::DataIntegration.JobProfiles",
+        "type":"VIEW",
+        "privileges":[ "SELECT"]
+      },
+      {
+        "name":"hc.hph.di.model::DataIntegration.DWSources",
+        "type":"VIEW",
+        "privileges":[ "SELECT"]
+      },
+      {
+        "name":"hc.hph.di.model::DataIntegration.AuditLogRuns",
+        "type":"VIEW",
+        "privileges":[ "SELECT"]
+      }
+    ]
+  }
+}

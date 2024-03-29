@@ -1,0 +1,24 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::GetNextAction" 
+(
+in in_old_action nvarchar(128),
+in in_staus nvarchar(128),
+in in_pipelineID nvarchar(256),
+out o_new_action nvarchar(128)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ declare action nvarchar(128);
+ select "SucceedingAction" into action 
+ from "hc.hph.di.documents.staging.db.models::DocumentProcessing.ActionStateMapping"
+ where "ActionName" = :in_old_action
+ and "State" = :in_staus
+ and "PipelineID" = :in_pipelineID;
+ 
+ o_new_action := action;
+ 
+END;

@@ -1,0 +1,11 @@
+version: "3"
+services:
+  alp-db-svc:
+    build:
+      context: .
+    container_name: alp-db-svc
+    env_file:
+      - .env.example
+      - .env
+    ports:
+      - 3333:3333

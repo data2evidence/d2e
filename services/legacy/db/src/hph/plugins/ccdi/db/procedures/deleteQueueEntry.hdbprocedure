@@ -1,0 +1,13 @@
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::deleteQueueEntry" (
+		in taskId	BIGINT
+   ) 
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+
+   --READS SQL DATA AS
+   AS   
+BEGIN    
+
+DELETE FROM "hc.hph.plugins.ccdi.db.models::Tasks.Queue" WHERE "taskId"=:taskId;
+
+END;

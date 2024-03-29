@@ -1,0 +1,16 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.TAFacts",
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.plugins.textProcessing.common.db.data::ta_facts.csv",
+                "has_header": true,
+                "type_config": {
+                    "delimiter": "|"
+                }
+            }
+        }
+    ]
+}

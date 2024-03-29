@@ -1,0 +1,135 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "MimicPatient",
+  "meta": {
+    "lastUpdated": "2018-06-30T07:44:43.294+10:00"
+  },
+  "text": {
+    "status": "generated",
+    "div": ""
+  },
+  "extension": [],
+  "url": "http://data4life.care/StructureDefinition/MimicPatient",
+  "name": "MimicPatient",
+  "status": "draft",
+  "date": "2017-04-19T07:44:43+10:00",
+  "publisher": "D4L",
+  "contact": [],
+  "description": "Mimic Patient",
+  "purpose": "Contains all charted data for all patients.",
+  "fhirVersion": "3.0.1",
+  "mapping": [],
+  "kind": "resource",
+  "abstract": false,
+  "type": "MimicPatient",
+  "snapshot": {
+    "element": [
+      {
+        "id": "MimicPatient",
+        "path": "MimicPatient",
+        "short": "Resource for MIMIC III Patients",
+        "definition": "Contains all charted data for all patients.",
+        "alias": [],
+        "min": 0,
+        "max": "*",
+        "constraint": [],
+        "mapping": []
+      },
+      {
+        "id": "MimicPatient.id",
+        "path": "MimicPatient.id",
+        "short": "a unique identifier which specifies an individual patient",
+        "definition": "a unique identifier which specifies an individual patient",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "id"
+          }
+        ],
+        "isSummary": true
+      },
+      {
+        "id": "MimicPatient.gender",
+        "path": "MimicPatient.gender",
+        "short": "Gender is the genotypical sex of the patient",
+        "definition": "Gender is the genotypical sex of the patient.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ],
+        "isSummary": true
+      },
+      {
+        "id": "MimicPatient.dob",
+        "path": "MimicPatient.dob",
+        "short": "DOB is the date of birth of the given patient.",
+        "definition": "DOB is the date of birth of the given patient. Patients who are older than 89 years old at any time in the database have had their date of birth shifted to obscure their age and comply with HIPAA. The shift process was as follows: the patient’s age at their first admission was determined. The date of birth was then set to exactly 300 years before their first admission.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ],
+        "isSummary": true
+      },
+      {
+        "id": "MimicPatient.dod",
+        "path": "MimicPatient.dod",
+        "short": "DOD is the date of death for the given patient.",
+        "definition": "DOD is the date of death for the given patient. Note that DOD merged together DOD_HOSP and DOD_SSN, giving priority to DOD_HOSP if both were recorded.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ],
+        "isSummary": true
+      },
+      {
+        "id": "MimicPatient.dod_hosp",
+        "path": "MimicPatient.dod_hosp",
+        "short": "DOD_HOSP is the date of death as recorded in the hospital database.",
+        "definition": "DOD_HOSP is the date of death as recorded in the hospital database.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "MimicPatient.dod_ssn",
+        "path": "MimicPatient.dod_ssn",
+        "short": "DOD_SSN is the date of death from the social security database.",
+        "definition": "DOD_SSN is the date of death from the social security database.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "MimicPatient.expire_flag",
+        "path": "MimicPatient.expire_flag",
+        "short": "EXPIRE_FLAG is a binary flag which indicates whether the patient died,",
+        "definition": "EXPIRE_FLAG is a binary flag which indicates whether the patient died,",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      }
+    ]
+  }
+}

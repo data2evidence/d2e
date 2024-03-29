@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--(c) Copyright 2017 ALP. All rights reserved.
+
+ALP and the ALP logo are registered trademarks of ALP in Germany and other countries. Business Objects and the Business Objects logo are registered trademarks of Business Objects S.A., which is an ALP company.
+-->
+<!--(c) Copyright 2017 ALP. All rights reserved.
+
+ALP and the ALP logo are registered trademarks of ALP in Germany and other countries. Business Objects and the Business Objects logo are registered trademarks of Business Objects S.A., which is an ALP company.
+-->
+<dictionary xmlns="http://www.com/ta/4.0">
+  <entity_category name="SEVERITY">
+    <entity_name standard_form="SEVERE_24484000">
+      <variant name="stark"/>
+      <variant name="starker"/>
+      <variant name="starkes"/>
+      <variant name="starken"/>
+      <variant name="starke"/>
+      <variant name="starkem"/>
+      <variant name="hochgradig"/>
+      <variant name="hochgradiger"/>
+      <variant name="hochgradiges"/>
+      <variant name="hochgradigen"/>
+      <variant name="hochgradige"/>
+      <variant name="hochgradigem"/>
+      <variant name="akut"/>
+      <variant name="akuter"/>
+      <variant name="akutes"/>
+      <variant name="akuten"/>
+      <variant name="akute"/>
+      <variant name="akutem"/>
+      <variant name="signifikant"/>
+      <variant name="signifkanter"/>
+      <variant name="signifikantes"/>
+      <variant name="signifikanten"/>
+      <variant name="signifikante"/>
+      <variant name="signifikantem"/>
+      <variant name="schwer"/>
+      <variant name="schwerer"/>
+      <variant name="schweres"/>
+      <variant name="schweren"/>
+      <variant name="schwere"/>
+      <variant name="schwerem"/>
+      <variant name="gering differenziert"/>
+      <variant name="gering differenzierter"/>
+      <variant name="gering differenziertes"/>
+      <variant name="gering differenzierten"/>
+      <variant name="gering differenzierte"/>
+      <variant name="gering differenziertem"/>
+      <variant name="geringgradig differenziert"/>
+      <variant name="geringgradig differenzierter"/>
+      <variant name="geringgradig differenziertes"/>
+      <variant name="geringgradig differenzierten"/>
+      <variant name="geringgradig differenzierte"/>
+      <variant name="geringgradig differenziertem"/>
+    </entity_name>
+
+    <entity_name standard_form="MODERATE_6736007">
+      <variant name="mittelgradig"/>
+      <variant name="mittelgradiger"/>
+      <variant name="mittelgradiges"/>
+      <variant name="mittelgradigen"/>
+      <variant name="mittelgradige"/>
+      <variant name="mittelgradigem"/>
+      <variant name="mittelgradig differenziert"/>
+      <variant name="mittelgradig differenzierter"/>
+      <variant name="mittelgradig differenziertes"/>
+      <variant name="mittelgradig differenzierten"/>
+      <variant name="mittelgradig differenzierte"/>
+      <variant name="mittelgradig differenziertem"/>   
+      <variant name="mäßiggradig"/>
+      <variant name="mäßiggradiger"/>
+      <variant name="mäßiggradiges"/>
+      <variant name="mäßiggradigen"/>
+      <variant name="mäßiggradige"/>
+      <variant name="mäßiggradigem"/>
+      <variant name="mäßiggradig differenziert"/>
+      <variant name="mäßiggradig differenzierter"/>
+      <variant name="mäßiggradig differenziertes"/>
+      <variant name="mäßiggradig differenzierten"/>
+      <variant name="mäßiggradig differenzierte"/>
+      <variant name="mäßiggradig differenziertem"/>
+    </entity_name>
+
+    <entity_name standard_form="MILD_255604002">
+      <variant name="gering"/>
+      <variant name="geringer"/>
+      <variant name="geringes"/>
+      <variant name="geringen"/>
+      <variant name="geringe"/>
+      <variant name="geringem"/>
+      <variant name="geringgradig"/>
+      <variant name="geringgradiger"/>
+      <variant name="geringgradiges"/>
+      <variant name="geringgradigen"/>
+      <variant name="geringgradige"/>
+      <variant name="geringgradigem"/>
+      <variant name="hochgradig differenziert"/>
+      <variant name="hochgradig differenzierter"/>
+      <variant name="hochgradig differenziertes"/>
+      <variant name="hochgradig differenzierten"/>
+      <variant name="hochgradig differenzierte"/>
+      <variant name="hochgradig differenziertem"/>
+      <variant name="klein"/>
+      <variant name="kleiner"/>
+      <variant name="kleines"/>
+      <variant name="kleinen"/>
+      <variant name="kleine"/>
+      <variant name="kleinem"/>
+      <variant name="leicht"/>
+      <variant name="leichter"/>
+      <variant name="leicthes"/>
+      <variant name="leichten"/>
+      <variant name="leichte"/>
+      <variant name="leichtem"/>
+      <variant name="minimal"/>
+      <variant name="minimaler"/>
+      <variant name="minimales"/>
+      <variant name="minimalen"/>
+      <variant name="minimale"/>
+      <variant name="minimalem"/>
+    </entity_name>
+  </entity_category>
+  </dictionary>
+

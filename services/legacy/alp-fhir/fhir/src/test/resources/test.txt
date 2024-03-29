@@ -1,0 +1,20 @@
+spring.datasource.url=jdbc:sap://<hostname>:33315/
+spring.datasource.username=SYSTEM
+spring.datasource.password=manager
+spring.datasource.driver-class-name=com.sap.db.jdbc.Driver
+server.compression.enabled=true
+server.compression.mime-types=application/json,application/json+fhir
+
+sap.sql.driver=com.sap.db.jdbc.Driver
+sap.sql.url=jdbc:sap://<hostname>:33315/
+sap.sql.username=system
+sap.sql.password=manager
+sap.sql.schema=fhir2
+sap.sql.factory=com.legacy.health.fhir.meta.hana.HanaSQLProviderFactory
+sap.sql.path=c:/tmp/spec.zip
+
+server.port= 8443
+server.ssl.key-store= keystore.p12
+server.ssl.key-store-password= Abcd1234
+server.ssl.key-store-type= PKCS12
+server.ssl.key-alias= tomcat

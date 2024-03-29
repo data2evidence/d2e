@@ -1,0 +1,14 @@
+PROCEDURE "hc.hph.di.procedures.validation::ValidateObjectPrivilege" ( IN SchemaName NVARCHAR(255), IN ObjectName NVARCHAR(255), IN UserName NVARCHAR(255), IN Privilege NVARCHAR(255), OUT isAuthorized TINYINT )
+LANGUAGE SQLSCRIPT SQL SECURITY INVOKER READS SQL DATA AS
+BEGIN
+    isAuthorized := 0;
+    SELECT COUNT(*) INTO IsAuthorized FROM (
+        SELECT TOP 1 USER_NAME
+        FROM "hc::EFFECTIVE_PRIVILEGES"
+        WHERE USER_NAME = :UserName AND SCHEMA_NAME = :SchemaName AND (OBJECT_NAME = :ObjectName OR OBJECT_NAME IS NULL) AND PRIVILEGE = :Privilege AND IS_VALID = 'TRUE'
+        UNION ALL
+        SELECT TOP 1 OWNER_NAME
+        FROM "hc::OWNERSHIP"
+        WHERE OWNER_NAME = :UserName AND SCHEMA_NAME = :SchemaName AND (OBJECT_NAME = :ObjectName OR OBJECT_NAME IS NULL)  
+    );
+END

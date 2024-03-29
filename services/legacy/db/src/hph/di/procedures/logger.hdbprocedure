@@ -1,0 +1,21 @@
+PROCEDURE "hc.hph.di.procedures::logger" ( IN AuditLogID BIGINT, IN Status NVARCHAR(32), IN Notes NVARCHAR(1024) ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+	if :Status = 'Completed' or :Status = 'Failed' or :Status = 'Cancelled' then
+		update "hc.hph.di.model::DataIntegration.AuditLog" logger set 
+		        logger."EndTime" = current_utctimestamp,
+		        logger."Status" = :Status,
+		        logger."Notes" = :Notes
+		        FROM "hc.hph.di.model::DataIntegration.AuditLog" logger
+		        where logger."AuditLogID" = :AuditLogID;
+	else
+		update "hc.hph.di.model::DataIntegration.AuditLog" logger set 
+		        logger."Status" = :Status,
+		        logger."Notes" = :Notes
+		        FROM "hc.hph.di.model::DataIntegration.AuditLog" logger
+		        where logger."AuditLogID" = :AuditLogID;
+	end if;
+	commit;
+END;
+

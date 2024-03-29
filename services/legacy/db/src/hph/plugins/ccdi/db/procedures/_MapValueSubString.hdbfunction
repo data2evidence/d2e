@@ -1,0 +1,14 @@
+FUNCTION "hc.hph.plugins.ccdi.db.procedures::_MapValueSubString" ( 
+		IN _RuleSet NVARCHAR(100),
+		IN _XVal NVARCHAR(1000) ) 
+	RETURNS _YVal NVARCHAR(1000)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+	
+	select ifnull(min(REPLACE_REGEXPR('(.*)' || "XVal" || '(.*)' IN :_XVal WITH '\1' || "YVal" || '\2' OCCURRENCE  ALL)), :_XVal) 
+	into _YVal from "hc.hph.plugins.ccdi.db.models::Ref.ValueMap"	
+	where "RuleSet" = :_RuleSet;
+	
+	--select REPLACE_REGEXPR('(.*)' || "XVal" || '(.*)' IN _XVal WITH '\1' || "YVal" || '\2' OCCURRENCE  ALL) from "hc::DUMMY";
+END;

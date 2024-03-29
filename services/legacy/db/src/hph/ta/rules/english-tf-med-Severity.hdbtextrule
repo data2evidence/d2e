@@ -1,0 +1,106 @@
+!======================================================================
+! File Name: english-tf-med-Severity.rul 
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of levels of severity 
+!          of diseases and symptoms
+!======================================================================
+
+!======================================================================
+! OUTPUT FIELDS
+!======================================================================
+
+!======================================================================
+!!coordination
+!======================================================================
+
+#subgroup coord: (<\p{ci}(and|&|or)>|(<\,> <\p{ci}(and|&|or)>?)|</>|<\|>)
+
+!======================================================================
+!!Entities for clinical reports
+!======================================================================
+
+#subgroup Dis_Entity_Added: {(
+	<STEM: left|right>? <STEM: main> <STEM: distal> <STEM: disease>
+)}
+
+#subgroup Dis_Entity: {(
+([TE CONDITION] <~(tension)>+ [/TE] )
+|	(%(Dis_Entity_Added))
+)}
+
+#subgroup Symp_Entity: {(
+([TE OBSERVATION_SYMPTOM] <~(counseling|coagulation|tension)>+ [/TE] )
+)}
+
+
+#subgroup mildKeyWords: {(
+[OD Mild](
+  <\p{ci}(mild|slight|lowgrade|low\-grade|minimal)>
+| (\p{ci}<mildly>)
+| (\p{ci}<low> \p{ci}<grade>)
+)[/OD]
+)}
+
+#subgroup moderateKeyWords: {(
+[OD Moderate](
+  <\p{ci}(moderate|midgrade|mid\-grade)>
+| (\p{ci}<mild> <\/> \p{ci}<moderate>)
+| (\p{ci}<mild> \p{ci}<to> \p{ci}<moderate>)
+| (\p{ci}<mild\-to\-moderate>)
+)[/OD]
+)}
+
+#subgroup severeKeyWords: {(
+[OD Severe](
+  <\p{ci}(severe|highgrade|high\-grade|gravis|acute|extensive|massive|widespread|fatal|intense|significant|moderate\-to\-severe)>
+| (\p{ci}<moderate> <\/> \p{ci}<severe>)
+| (\p{ci}<moderate> \p{ci}<to> \p{ci}<severe>)
+| (\p{ci}<acutely>)
+)[/OD]
+)}
+
+
+
+#subgroup Severity: {(
+  %(mildKeyWords)
+| %(moderateKeyWords)
+| %(severeKeyWords)
+)}
+
+
+!============================================================
+! Captures a disease along with the severity that describes
+! it. 
+! EXAMPLES:
+! Myocardial infarction, severe.
+! Metastatic carcinoma: mild
+!============================================================
+#group Condition_Severity: {
+  ( %(Severity) (<[A-Za-z]+>|<POS: Adj|Nn>|<.+\-induced>)? [OD Condition] %(Dis_Entity) [/OD])
+ |([OD Condition] %(Dis_Entity) [/OD] <\:>  %(Severity) )
+ |([OD Condition] %(Dis_Entity) [/OD] <\(>  %(Severity) <\)>)
+ |([OD Condition] %(Dis_Entity) [/OD] <\,>  %(Severity) <\.>)
+}
+
+#group Observation_Symptom_Value: {
+  ( %(Severity) (<[A-Za-z]+>|<POS: Adj|Nn>)? [OD Observation_Symptom] %(Symp_Entity) [/OD])
+ |([OD Observation_Symptom] %(Symp_Entity) [/OD] ((<\:>)|(<STEM: be> <STEM: consider>)) %(Severity) )
+ |([OD Observation_Symptom] %(Symp_Entity) [/OD] <\(> %(Severity)  <\)> )
+ |([OD Observation_Symptom] %(Symp_Entity) [/OD] <POS: Pron> <STEM: be> %(Severity) )
+ |([OD Observation_Symptom] %(Symp_Entity) [/OD] <\,>  %(Severity)  <\.>)
+ !|([TE OBSERVATION_SYMPTOM] [OD Severity] <STEM: mild|moderate|severe> [/OD] [OD Observation_Symptom] <>+ [/OD] [/TE])
+}
+
+
+#group DROP_Condition_Severity: {(
+  (\p{ci}<significant> \p{ci}<for> %(Dis_Entity))
+)}
+
+#group DROP_Observation_Symptom_Value: {(
+  (%(Severity) <>? \p{ci}<staining>)
+ |(\p{ci}(<staining>) <\:> %(Severity) )
+ |(\p{ci}<significant> \p{ci}<for> %(Symp_Entity))
+ |%(Severity) <.+\-induced> 
+)}
+

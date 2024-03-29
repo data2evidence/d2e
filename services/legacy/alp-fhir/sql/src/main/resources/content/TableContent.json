@@ -1,0 +1,142 @@
+{
+	"resourceType": "StructureDefinition",
+	"id": "TableContent",
+	"url": "http://data4life.care/health/fhir/StructureDefinition/TableContent",
+	"kind": "resource",
+	"name": "TableContent",
+	"test": {
+		"div": "<div>Allows to deliver data for scenarios</div>"
+	},
+	"type": "TableContent",
+	"meta": {
+		"profile": [
+			"http://data4life.care/health/fhir/profile/StructureDefinition"
+		]
+	},
+	"extension": [
+		{
+			"uri": "http://data4life.care/health/fhir/extension/shortname",
+			"valueString": "TableContent"
+		}
+	],
+	"snapshot": {
+		"element": [
+			{
+				"id": "TableContent",
+				"path": "TableContent",
+				"min": 0,
+				"max": "*"
+			},
+			{
+				"id": "TableContent.id",
+				"short": "Logical id of this artifact",
+				"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+				"comment": "The only time that a resource does not have an id is when it is being submitted to the server using a create operation.",
+				"min": 0,
+				"max": "1",
+				"base": {
+					"path": "Resource.id",
+					"min": 0,
+					"max": "1"
+				},
+				"type": [
+					{
+						"code": "id"
+					}
+				],
+				"isSummary": true
+			},
+			{
+				"id": "TableContent.url",
+				"short": "Canonical URL of this table content",
+				"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "uri"
+					}
+				],
+				"isSummary": true
+			},
+			{
+				"id": "TableContent.version",
+				"short": "Canonical Version of this Table Content",
+				"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				],
+				"isSummary": true
+			},
+			{
+				"id": "TableContent.definition",
+				"path": "TableContent.definition",
+				"short": "The TableDefinition this content will be stored",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://data4life.care/health/fhir/profile/Tabledefinition"
+					}
+				]
+			},
+			{
+				"id": "TableContent.row",
+				"path": "TableContent.row",
+				"short": "Parameters used to bind the scenario",
+				"definition": "Parameters used to bind the scenario",
+				"min": 0,
+				"max": "*",
+				"type": [
+					{
+						"code": "BackboneElement"
+					}
+				]
+			},
+			{
+				"id": "TableContent.row.column",
+				"path": "TableContent.row.column",
+				"short": "Parameters used to bind the scenario",
+				"definition": "Parameters used to bind the scenario",
+				"min": 0,
+				"max": "*",
+				"type": [
+					{
+						"code": "BackboneElement"
+					}
+				]
+			},
+			{
+				"id": "TableContent.row.column.name",
+				"path": "TableContent.row.column.name",
+				"short": "Name of the parameter",
+				"definition": "Name of the parameter",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "TableContent.row.column.valueString",
+				"path": "TableContent.row.column.valueString",
+				"short": "String value of the Parameter",
+				"definition": "String value of the Parameter",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			}
+		]
+	}
+}

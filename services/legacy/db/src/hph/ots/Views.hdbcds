@@ -1,0 +1,67 @@
+namespace hc.hph.ots;
+
+using hc.hph.ots.internals::Entities as Entities;
+
+
+context Views {
+
+	view Classification as
+	select from Entities.Classification {
+		VocabularyID,
+		Code,
+		ClassVocabularyID,
+		ClassCode,
+		ClassHierarchyLevel,
+		Context
+	};
+
+	view ConceptTerms as
+	select from Entities.ConceptTerms {
+		ConceptVocabularyID,
+		ConceptCode,
+		TermContext,
+		TermLanguage,
+		TermText,
+		TermType,
+		TermIsPreferred
+	};
+
+	view ConceptPreferredTerms as
+	select from Entities.ConceptTerms {
+		ConceptVocabularyID,
+		ConceptCode,
+		TermContext,
+		TermLanguage,
+		TermText,
+		TermType
+	} where TermIsPreferred = true;	
+
+    view ConceptTermsByConceptTypes as select from Entities.ConceptTerms as _ct 
+        left outer join Entities.ConceptTypes as _ctt on _ct.ConceptVocabularyID = _ctt.ConceptVocabularyID and _ct.ConceptCode = _ctt.ConceptCode
+    {
+		_ct.ConceptVocabularyID,
+		_ct.ConceptCode,
+		_ctt.ConceptTypeVocabularyID,
+		_ctt.ConceptTypeCode,		
+		_ct.TermContext,
+		_ct.TermLanguage,
+		_ct.TermText,
+		_ct.TermType
+    } WHERE _ct.TermContext = 'default';
+
+	view ConceptTranslation as
+	select from Entities.ConceptTranslation {
+		TypeVocabularyID,
+		TypeCode,
+		FromVocabularyID,
+		FromCode,
+		ToVocabularyID,
+		ToCode
+	};
+
+	view Vocabularies as
+	select from Entities.Vocabularies {
+		ID,
+		ExternalID
+	};
+};

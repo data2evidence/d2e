@@ -1,0 +1,31 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::UpdateProcessingStatus" 
+(
+in in_status table
+	(
+		"DWID" varbinary(32),
+		"DWDateFrom" timestamp,
+		"ActionName" nvarchar(128),
+		"PipelineID" nvarchar(256), 
+		"DWAuditID" bigint, 
+		"Status" nvarchar(128),
+		"ScheduleID" bigint,
+		"ActionStartedON" timestamp
+	) 
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ declare lv_status nvarchar(128);
+ declare EXIT HANDLER FOR sqlexception
+ begin
+ end;
+  select distinct("Status") into lv_status from :in_status;
+  update  "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status"
+  set "ActionFinishedON" = now(),
+  "Status" = lv_status
+  where ("DWID","DWDateFrom","ActionName","ScheduleID") in (select "DWID","DWDateFrom","ActionName","ScheduleID" from :in_status);
+END;

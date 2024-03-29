@@ -1,0 +1,162 @@
+	{
+		"resourceType": "StructureDefinition",
+		"id": "Role",
+		"url": "http://data4life.care/health/fhir/StructureDefinition/Role",
+		"kind": "resource",
+		"name": "Role",
+		"test": {
+			"div": "<div>Defines the permissions for a group</div>"
+		},
+		"type": "Role",
+		"meta": {
+			"profile": [
+				"http://data4life.care/health/fhir/profile/StructureDefinition"
+			]
+		},
+		"snapshot": {
+			"element": [
+				{
+					"id": "Role",
+					"path": "Role",
+					"min": 0,
+					"max": "*"
+				},
+				{
+					"id": "Role.id",
+					"short": "Logical id of this artifact",
+					"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes. It will be used to construct the final role name",
+					"comment": "The only time that a resource does not have an id is when it is being submitted to the server using a create operation.",
+					"min": 0,
+					"max": "1",
+					"base": {
+						"path": "Resource.id",
+						"min": 0,
+						"max": "1"
+					},
+					"type": [
+						{
+							"code": "id"
+						}
+					],
+					"isSummary": true
+				},
+				{
+					"id": "Role.url",
+					"short": "Canonical URL of this permission",
+					"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+					"min": 0,
+					"max": "1",
+					"type": [
+						{
+							"code": "uri"
+						}
+					],
+					"isSummary": true
+				},
+				{
+					"id": "Role.version",
+					"short": "Canonical Version of this permission",
+					"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+					"min": 0,
+					"max": "1",
+					"type": [
+						{
+							"code": "string"
+						}
+					],
+					"isSummary": true
+				},
+				{
+					"id": "Role.objectPrivileges",
+					"path": "Role.objectPrivileges",
+					"short": "All object privileges which should be assigned to the created role",
+					"definition": "All object privileges which should be assigned to the created role",
+					"min": 0,
+					"max": "*",
+					"type": [
+						{
+							"code": "BackboneElement"
+						}
+					]
+				},
+				{
+					"id": "Role.objectPrivileges.type",
+					"path": "Role.objectPrivileges.type",
+					"short": "Type of the object to be granted",
+					"definition": "Type of the object to be granted",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				},
+				{
+					"id": "Role.objectPrivileges.objectName",
+					"path": "Role.objectPrivileges.objectName",
+					"short": "Name of the object to be granted",
+					"definition": "Name of the object to be granted",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				},
+				{
+					"id": "Role.objectPrivileges.grants",
+					"path": "Role.objectPrivileges.grants",
+					"short": "Grant type of the object to be granted",
+					"definition": "Grant ype of the object to be granted",
+					"min": 1,
+					"max": "*",
+					"type": [
+						{
+							"code": "BackboneElement"
+						}
+					]
+				},
+				{
+					"id": "Role.objectPrivileges.grants.type",
+					"path": "Role.objectPrivileges.grants.type",
+					"short": "Privilege to be granted on the object",
+					"definition": "Privilege to be granted on the object",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				},
+				{
+					"id": "Role.objectPrivileges.grants.grant",
+					"path": "Role.objectPrivileges.grants.grant",
+					"short": "With Grant Option",
+					"definition": "With Grant Option",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "boolean"
+						}
+					]
+				},
+				{
+					"id": "Role.schemaPrivileges",
+					"path": "Role.schemaPrivileges",
+					"short": "All schema privileges which should be assigned to the created role",
+					"definition": "All schema privileges which should be assigned to the created role",
+					"min": 0,
+					"max": "*",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				}
+			]
+		}
+	}

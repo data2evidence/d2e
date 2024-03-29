@@ -1,0 +1,51 @@
+{
+    "resourceType": "Permission",
+    "id": "HCIMPatientGroupPermission",
+    "group": "HCIMPatientGroup",
+    "restPermission": [
+        {
+            "type": "resource",
+            "definition": {
+                "reference": "http://hl7.org/fhir/StructureDefinition/Patient"
+            },
+            "grant": [
+                "read"
+            ]
+        },
+        {
+            "type": "resource",
+            "definition": {
+                "reference": "http://hl7.org/fhir/StructureDefinition/Observation"
+            },
+            "grant": [
+                "read"
+            ]
+        }
+    ],
+    "instancePermission": [
+        {
+            "type": "resource",
+            "definition": {
+                "reference": "http://hl7.org/fhir/StructureDefinition/Patient"
+            },
+            "grant": [
+                "read"
+            ],
+            "constraintType": "elementMap",
+            "element": "identifier",
+            "value": "*"
+        },
+        {
+            "type": "resource",
+            "definition": {
+                "reference": "http://hl7.org/fhir/StructureDefinition/Observation"
+            },
+            "grant": [
+                "read"
+            ],
+            "constraintType": "elementMap",
+            "element": "patient.identifier",
+            "value": "*"
+        }
+    ]
+}

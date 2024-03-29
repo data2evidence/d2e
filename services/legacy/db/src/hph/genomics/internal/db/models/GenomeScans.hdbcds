@@ -1,0 +1,31 @@
+namespace hc.hph.genomics.internal.db.models;
+
+using hc.hph.genomics.db.models::Type as Type;
+
+
+context GenomeScans
+{
+
+	entity Quantities
+	{
+		key Quantity : Type.StringValue;
+		key ChromosomeIndex : Type.ChromosomeIndex;
+		key Position : Type.Position;
+		Value : Type.FloatValue;
+	} technical configuration {
+  column store;
+ };
+
+	entity Connections
+	{
+		key Quantity : Type.StringValue;
+		key SourceChromosomeIndex : Type.ChromosomeIndex;
+		key SourcePosition : Type.Position;
+		key TargetChromosomeIndex : Type.ChromosomeIndex;
+		key TargetPosition : Type.Position;
+		Value : Type.FloatValue;
+	} technical configuration {
+  column store;
+ };
+
+}

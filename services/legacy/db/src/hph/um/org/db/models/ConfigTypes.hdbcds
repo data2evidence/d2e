@@ -1,0 +1,61 @@
+namespace hc.hph.um.org.db.models;
+
+using hc.hph.cdw.db.models::DWTypes as Types;
+using hc.hph.cdw.db.models::Config as Config;
+
+context ConfigTypes {
+
+	 
+	 table type Org_Details { 
+	 	 OrgID 			: String(100);
+	 	 Level			: Integer;
+	 	 Leaf 			: Integer;
+		 ExternalOrgID 	: String(255);      // External org id, 
+         ExternalSource	: String(5);
+	 	 ValidFrom 		: UTCTimestamp; 	// FROM Validity of this user entered record 
+         ValidTo 		: UTCTimestamp; 	// TO Validity of this user entered record
+         ParentOrgID 	: String(100); 		// Parent Org ID.
+         Type			: String(100);		// Type of the ORG.
+         Status 		: String(100); 		// Activation, Deactivation. Replace with Annotations.
+         Address 		: Types.Address; 	// Address of the ORG.
+         Telecom        : Types.Contact;    // Contact of the ORG.
+         URL			: String(256); 		// URL of the ORG.
+         ChangeDetails	: Config.ChangeLog;	// Change Log.
+         //lang 			: String(2); 		// Language key 
+         Name			: String(5000);		// Legal Entity Name. Primarily used as short text.
+         Description	: String(256); 		// Long Text.
+   		 Attribute		: String(100);
+ 		 Value			: String(100);	
+     };
+
+     table type OrgAttrEAVForProc {
+        OrgID       : String(100);
+        Attribute   : String(100);
+        Value       : String(100);
+     };
+
+     table type OrgIdStructForProc {
+        OrgID           : String(100);
+     };
+
+     table type OrgInfo{
+     OrgID :String(100);
+     Persona:String(100);
+     }; 
+
+     table type UserInfo{
+     Username :String(256);
+     Persona:String(100);
+     }; 
+
+      entity UserPreferences {
+     	userID				: String(256);
+     	componentID			: String(256);
+     	subComponentID		: String(256);
+     	Content				: LargeString;
+     	CreatedOn			: UTCTimestamp;
+     	ModifiedOn			: UTCTimestamp;
+     } technical configuration {
+      column store;
+     }; 
+};

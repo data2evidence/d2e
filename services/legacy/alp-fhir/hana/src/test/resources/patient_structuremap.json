@@ -1,0 +1,115 @@
+{
+  "resourceType": "StructureMap",
+  "id": "mimic-transform",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Map for DB to logical FHIR </div>"
+  },
+  "url": "http://data4life.care/health/fhir/StructureMap/mimic",
+  "name": "Map from Mimic Tables to Mimic Resources",
+  "status": "draft",
+  "structure": [
+    {
+      "url": "http://data4life.care/health/fhir/StructureDefinition/ISH_PATIENTS",
+      "alias": "PATIENTS",
+      "mode": "source"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/Patient",
+      "alias": "Patient",
+      "mode": "target"
+    }
+  ],
+  "group": [
+    {
+      "name": "Patient",
+      "typeMode": "none",
+      "input": [
+        {
+          "name": "PATIENTS",
+          "type": "PATIENTS",
+          "mode": "source"
+        },
+        {
+          "name": "Patient",
+          "type": "Patient",
+          "mode": "target"
+        }
+      ],
+      "rule": [
+        {
+          "name": "id",
+          "source": [
+            {
+              "context": "PATIENTS"
+            }
+          ],
+          "target": [
+            {
+              "context": "Patient",
+              "contextType": "variable",
+              "element": "id",
+              "transform": "evaluate",
+              "parameter": [
+                {
+                  "valueString": "PATNR"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "gender",
+          "source": [
+            {
+              "context": "PATIENTS",
+              "element": "GENDER"
+            }
+          ],
+          "target": [
+            {
+              "context": "Patient",
+              "contextType": "variable",
+              "element": "gender",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "dob",
+          "source": [
+            {
+              "context": "PATIENTS",
+              "element": "DOB"
+            }
+          ],
+          "target": [
+            {
+              "context": "Patient",
+              "contextType": "variable",
+              "element": "dob",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "dod",
+          "source": [
+            {
+              "context": "PATIENTS",
+              "element": "DOD"
+            }
+          ],
+          "target": [
+            {
+              "context": "Patient",
+              "contextType": "variable",
+              "element": "dod",
+              "transform": "copy"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

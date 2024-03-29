@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" schemaVersion="3.0" defaultLanguage="$$language$$" defaultClient="$$client$$" hierarchiesSQLEnabled="false" executionSemantic="UNDEFINED" dataCategory="DEFAULT" id="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::pivoting" xscCompatibilityMode="true" applyPrivilegeType="NONE" outputViewType="Projection" enforceSqlExecution="false">
+  <descriptions defaultDescription="pivoting"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="25"/>
+  <dataSources>
+    <DataSource id="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerStage">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerStage</resourceUri>
+    </DataSource>
+    <DataSource id="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerHistology">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerHistology</resourceUri>
+    </DataSource>
+    <DataSource id="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_Biomarker">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_Biomarker</resourceUri>
+    </DataSource>
+    <DataSource id="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerGrade">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerGrade</resourceUri>
+    </DataSource>
+    <DataSource id="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerSize">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerSize</resourceUri>
+    </DataSource>
+    <DataSource id="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::obs_QuantitativeConcept">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::obs_QuantitativeConcept</resourceUri>
+    </DataSource>
+  </dataSources>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:UnionView" id="Union">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_COUNTER">
+          <descriptions defaultDescription="TA_COUNTER"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_GRADE_NORMALIZED">
+          <descriptions defaultDescription="TA_CA_GRADE_NORMALIZED"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_GRADE_VALUE">
+          <descriptions defaultDescription="TA_CA_GRADE_VALUE"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_T">
+          <descriptions defaultDescription="TA_CA_STAGE_T"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N">
+          <descriptions defaultDescription="TA_CA_STAGE_N"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_INTERPRETATION">
+          <descriptions defaultDescription="TA_CA_STAGE_N_INTERPRETATION"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_BODYSITE">
+          <descriptions defaultDescription="TA_CA_STAGE_N_BODYSITE"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_LATERALITY">
+          <descriptions defaultDescription="TA_CA_STAGE_N_LATERALITY"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_DENOMINATOR">
+          <descriptions defaultDescription="TA_CA_STAGE_N_DENOMINATOR"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_M">
+          <descriptions defaultDescription="TA_CA_STAGE_M"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_NUMERATOR">
+          <descriptions defaultDescription="TA_CA_STAGE_N_NUMERATOR"/>
+        </viewAttribute>
+        <viewAttribute id="TA_NORMALIZED">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute>
+        <viewAttribute id="TA_BIOM_INTERPRETATION">
+          <descriptions defaultDescription="TA_BIOM_INTERPRETATION"/>
+        </viewAttribute>
+        <viewAttribute id="TA_BIOM_METHOD">
+          <descriptions defaultDescription="TA_BIOM_METHOD"/>
+        </viewAttribute>
+        <viewAttribute id="TA_BIOM_ALTERATION">
+          <descriptions defaultDescription="TA_BIOM_ALTERATION"/>
+        </viewAttribute>
+        <viewAttribute id="TA_BIOM_DNAREGION">
+          <descriptions defaultDescription="TA_BIOM_DNAREGION"/>
+        </viewAttribute>
+        <viewAttribute id="TA_BIOM_VALUE">
+          <descriptions defaultDescription="TA_BIOM_VALUE"/>
+        </viewAttribute>
+        <viewAttribute id="TA_OBS_VALUE">
+          <descriptions defaultDescription="TA_OBS_VALUE"/>
+        </viewAttribute>
+        <viewAttribute id="TA_OBS_UNIT">
+          <descriptions defaultDescription="TA_OBS_UNIT"/>
+        </viewAttribute>
+      
+        <viewAttribute id="TA_CA_BODYSITE">
+          <descriptions defaultDescription="TA_CA_BODYSITE"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_SIZE">
+          <descriptions defaultDescription="TA_CA_SIZE"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_BEHAVIOR">
+          <descriptions defaultDescription="TA_CA_BEHAVIOR"/>
+        </viewAttribute>
+      
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerStage" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_GRADE_NORMALIZED"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_GRADE_VALUE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_STAGE_T" target="TA_CA_STAGE_T"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_STAGE_N" target="TA_CA_STAGE_N"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_STAGE_N_INTERPRETATION" target="TA_CA_STAGE_N_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_STAGE_N_BODYSITE" target="TA_CA_STAGE_N_BODYSITE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_STAGE_N_LATERALITY" target="TA_CA_STAGE_N_LATERALITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_STAGE_N_DENOMINATOR" target="TA_CA_STAGE_N_DENOMINATOR"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_STAGE_M" target="TA_CA_STAGE_M"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_STAGE_N_NUMERATOR" target="TA_CA_STAGE_N_NUMERATOR"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_METHOD"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_ALTERATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_DNAREGION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_OBS_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_OBS_UNIT"/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_BODYSITE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_SIZE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_BEHAVIOR"/>
+      
+      </input>
+      <input node="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerHistology" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_GRADE_NORMALIZED" target="TA_CA_GRADE_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_GRADE_VALUE" target="TA_CA_GRADE_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_T"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_BODYSITE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_LATERALITY"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_DENOMINATOR"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_M"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_NUMERATOR"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_NORMALIZED" target="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_METHOD"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_ALTERATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_DNAREGION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_OBS_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_OBS_UNIT"/>
+      
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_BODYSITE" target="TA_CA_BODYSITE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_SIZE" target="TA_CA_SIZE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_BEHAVIOR" target="TA_CA_BEHAVIOR"/>
+      
+      </input>
+      <input node="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_Biomarker" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_GRADE_NORMALIZED"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_GRADE_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_T"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N_BODYSITE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N_LATERALITY"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N_DENOMINATOR"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_M"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N_NUMERATOR"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_NORMALIZED" target="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_BIOM_INTERPRETATION" target="TA_BIOM_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_BIOM_METHOD" target="TA_BIOM_METHOD"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_BIOM_ALTERATION" target="TA_BIOM_ALTERATION"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_BIOM_DNAREGION" target="TA_BIOM_DNAREGION"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_BIOM_VALUE" target="TA_BIOM_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_OBS_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_OBS_UNIT"/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_BODYSITE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_SIZE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_BEHAVIOR"/>
+      
+      </input>
+      <input node="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerGrade" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_GRADE_NORMALIZED" target="TA_CA_GRADE_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_GRADE_VALUE" target="TA_CA_GRADE_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_T"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_BODYSITE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_LATERALITY"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_DENOMINATOR"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_M"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_NUMERATOR"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_METHOD"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_ALTERATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_DNAREGION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_OBS_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_OBS_UNIT"/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_BODYSITE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_SIZE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_BEHAVIOR"/>
+      
+      </input>
+      <input node="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerSize" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_GRADE_NORMALIZED"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_GRADE_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_T"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_BODYSITE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_LATERALITY"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_DENOMINATOR"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_M"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_STAGE_N_NUMERATOR"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_METHOD"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_ALTERATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_DNAREGION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_BIOM_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_OBS_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_OBS_UNIT"/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_BODYSITE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CA_SIZE" target="TA_CA_SIZE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_CA_BEHAVIOR"/>
+
+      </input>
+      <input node="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::obs_QuantitativeConcept" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_GRADE_NORMALIZED"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_GRADE_VALUE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_T"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N_BODYSITE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N_LATERALITY"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N_DENOMINATOR"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_M"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_STAGE_N_NUMERATOR"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_NORMALIZED" target="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_BIOM_INTERPRETATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_BIOM_METHOD"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_BIOM_ALTERATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_BIOM_DNAREGION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_BIOM_VALUE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_OBS_VALUE" target="TA_OBS_VALUE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_OBS_UNIT" target="TA_OBS_UNIT"/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_BODYSITE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_SIZE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" target="TA_CA_BEHAVIOR"/>
+      
+      </input>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Union">
+    <descriptions/>
+    <attributes>
+      <attribute id="DWID" displayAttribute="false" order="1" attributeHierarchyActive="false">
+        <descriptions defaultDescription="DWID"/>
+        <keyMapping columnObjectName="Union" columnName="DWID"/>
+      </attribute>
+      <attribute id="TA_COUNTER" displayAttribute="false" order="2" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_COUNTER"/>
+        <keyMapping columnObjectName="Union" columnName="TA_COUNTER"/>
+      </attribute>
+      <attribute id="TA_CA_GRADE_NORMALIZED" displayAttribute="false" order="3" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_GRADE_NORMALIZED"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_GRADE_NORMALIZED"/>
+      </attribute>
+      <attribute id="TA_CA_GRADE_VALUE" displayAttribute="false" order="4" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_GRADE_VALUE"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_GRADE_VALUE"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_T" displayAttribute="false" order="5" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_T"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_STAGE_T"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N" displayAttribute="false" order="6" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_N"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_STAGE_N"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N_INTERPRETATION" displayAttribute="false" order="7" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_N_INTERPRETATION"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_STAGE_N_INTERPRETATION"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N_BODYSITE" displayAttribute="false" order="8" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_N_BODYSITE"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_STAGE_N_BODYSITE"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N_LATERALITY" displayAttribute="false" order="9" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_N_LATERALITY"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_STAGE_N_LATERALITY"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N_DENOMINATOR" displayAttribute="false" order="10" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_N_DENOMINATOR"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_STAGE_N_DENOMINATOR"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_M" displayAttribute="false" order="11" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_M"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_STAGE_M"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N_NUMERATOR" displayAttribute="false" order="12" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_N_NUMERATOR"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_STAGE_N_NUMERATOR"/>
+      </attribute>
+      <attribute id="TA_NORMALIZED" displayAttribute="false" order="13" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+        <keyMapping columnObjectName="Union" columnName="TA_NORMALIZED"/>
+      </attribute>
+      <attribute id="TA_BIOM_INTERPRETATION" displayAttribute="false" order="14" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_BIOM_INTERPRETATION"/>
+        <keyMapping columnObjectName="Union" columnName="TA_BIOM_INTERPRETATION"/>
+      </attribute>
+      <attribute id="TA_BIOM_METHOD" displayAttribute="false" order="15" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_BIOM_METHOD"/>
+        <keyMapping columnObjectName="Union" columnName="TA_BIOM_METHOD"/>
+      </attribute>
+      <attribute id="TA_BIOM_ALTERATION" displayAttribute="false" order="16" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_BIOM_ALTERATION"/>
+        <keyMapping columnObjectName="Union" columnName="TA_BIOM_ALTERATION"/>
+      </attribute>
+      <attribute id="TA_BIOM_DNAREGION" displayAttribute="false" order="17" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_BIOM_DNAREGION"/>
+        <keyMapping columnObjectName="Union" columnName="TA_BIOM_DNAREGION"/>
+      </attribute>
+      <attribute id="TA_BIOM_VALUE" displayAttribute="false" order="18" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_BIOM_VALUE"/>
+        <keyMapping columnObjectName="Union" columnName="TA_BIOM_VALUE"/>
+      </attribute>
+      <attribute id="TA_OBS_VALUE" displayAttribute="false" order="19" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_OBS_VALUE"/>
+        <keyMapping columnObjectName="Union" columnName="TA_OBS_VALUE"/>
+      </attribute>
+      <attribute id="TA_OBS_UNIT" displayAttribute="false" order="20" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_OBS_UNIT"/>
+        <keyMapping columnObjectName="Union" columnName="TA_OBS_UNIT"/>
+      </attribute>
+    
+      <attribute id="TA_CA_BODYSITE" displayAttribute="false" order="21" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_BODYSITE"/>
+    
+        <keyMapping columnObjectName="Union" columnName="TA_CA_BODYSITE"/>
+    
+      </attribute>
+      <attribute id="TA_CA_SIZE" displayAttribute="false" order="22" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_SIZE"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_SIZE"/>
+      </attribute>
+      <attribute id="TA_CA_BEHAVIOR" displayAttribute="false" order="23" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_BEHAVIOR"/>
+        <keyMapping columnObjectName="Union" columnName="TA_CA_BEHAVIOR"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures/>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectNameSpace="MeasureGroup" modelObjectName="Output">
+        <upperLeftCorner x="40" y="85"/>
+        <rectangleSize width="0" height="0"/>
+      </shape>
+      <shape expanded="true" modelObjectNameSpace="CalculationView" modelObjectName="Union">
+        <upperLeftCorner x="-21" y="188"/>
+        <rectangleSize width="795" height="30"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario>

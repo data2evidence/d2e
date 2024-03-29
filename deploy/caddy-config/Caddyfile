@@ -1,0 +1,104 @@
+{
+	debug
+	pki {
+		ca local {
+			name "ALP Local CA"
+			root_cn "ALP Local CA - 2024 ECC Root"
+			intermediate_cn "ALP Local CA - ECC Intermediate"
+		}
+		ca alp-internal {
+			name "ALP Internal CA"
+			root_cn "ALP Internal CA - 2024 ECC Root"
+			intermediate_cn "ALP Internal CA - ECC Intermediate"
+		}
+	}
+}
+
+https://*.alp.local:55555 {
+	tls {
+		issuer internal {
+			ca alp-internal
+			lifetime 360d
+			sign_with_root
+		}
+	}
+	respond alp-internal
+}
+
+(portal) {
+	log {
+		format console {
+			level_format color
+		}
+	}
+
+	handle /alp-prefect/* {
+		uri strip_prefix /alp-prefect
+		reverse_proxy http://alp-dataflow-gen-1:41120 {
+			transport http {
+				read_buffer 8192
+			}
+		}
+	}
+
+	redir / /portal
+	handle /* {
+		reverse_proxy https://alp-minerva-gateway-1:41100 {
+			transport http {
+				tls
+				tls_insecure_skip_verify
+				read_buffer 8192
+			}
+		}
+	}
+}
+
+https://${CADDY__ALP__INTERNAL_FQDN:localhost}:41101 https://host.docker.internal:41101 {
+	tls internal
+	import portal
+}
+
+https://{$CADDY__ALP__PUBLIC_FQDN} {
+	{$TLS__CADDY_DIRECTIVE}
+	import portal
+}
+
+https://{$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3001 {
+	log {
+		format console {
+			level_format color
+		}
+	}
+
+	{$TLS__CADDY_DIRECTIVE}
+
+	handle /* {
+		reverse_proxy http://alp-logto-1:3001 {
+			header_up Host {$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3001
+			transport http {
+				read_buffer 8192
+			}
+		}
+	}
+}
+
+https://{$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3002 {
+	log {
+		format console {
+			level_format color
+		}
+	}
+
+	{$TLS__CADDY_DIRECTIVE}
+
+	handle /* {
+		{$CADDY__BLOCK_LOGTO_ADMIN_CONSOLE}
+		reverse_proxy http://alp-logto-1:3002 {
+			header_up Host {$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3002
+
+			transport http {
+				read_buffer 8192
+			}
+		}
+	}
+}

@@ -1,0 +1,348 @@
+{
+    "resourceType": "StructureDefinition",
+    "id": "HCIMAddressInformation",
+    "url": "http://data4life.care/health/fhir/StructureDefinition/HCIMAddressInformation",
+    "kind": "resource",
+    "type": "HCIMAddressInformation",
+    "meta": {
+        "profile": [
+            "http://data4life.care/health/fhir/profile/Tabledefinition"
+        ]
+    },
+    "extension": [
+        {
+            "uri": "http://data4life.care/health/fhir/extension/schema",
+            "valueString": "FHIRGZ"
+        },
+        {
+            "uri": "http://data4life.care/health/fhir/extension/table",
+            "valueString": "AddressInformation"
+        }
+    ],
+    "snapshot": {
+        "element": [
+            {
+                "id": "HCIMAddressInformation",
+                "path": "HCIMAddressInformation",
+                "min": 0,
+                "max": "*"
+            },
+            {
+                "id": "_RecordKey",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "_RecordKey"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/primaryKey",
+                        "valueBoolean": true
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_BelongsTo",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "_BelongsTo"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Street",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "Street"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "HouseNumber",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "HouseNumber"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "HouseNumberLetter",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "HouseNumberLetter"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "HouseNumberAddition",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "HouseNumberAddition"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_HouseNumberIndication",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "_HouseNumberIndication"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "HouseNumberIndication_CD",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "HouseNumberIndication_CD"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 100
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Postcode",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "Postcode"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "PlaceOfResidence",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "PlaceOfResidence"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Municipality",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "Municipality"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_Country",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "_Country"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "Country_CD",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "Country_CD"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 100
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "AdditionalInformation",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "AdditionalInformation"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_AddressType",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "_AddressType"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "AddressType_CD",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "AddressType_CD"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 100
+                    }
+                ],
+                "max": "*"
+            }
+        ]
+    }
+}

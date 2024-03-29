@@ -1,0 +1,5 @@
+<mvc:View controllerName="legacy.config.global.ui.views.App" xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" class="sapUiSizeCompact" displayBlock="true">
+	<App id="appControl">
+		<mvc:XMLView viewName="legacy.config.global.ui.views.GlobalSettings" />		
+	</App>
+</mvc:View>

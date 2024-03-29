@@ -1,0 +1,7 @@
+PROCEDURE "hc.hph.di.procedures::clean_logs" ( IN auditID BIGINT )
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+    DELETE FROM "hc.hph.di.model::DataIntegration.AuditLogTrace" WHERE "AuditLogID" IN ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID"= :auditID );
+    DELETE FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :auditID;
+END;

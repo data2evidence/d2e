@@ -1,0 +1,11 @@
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::getQueueEntries" (
+		in auditLogIdFilter NVARCHAR(255),
+		OUT output_table "hc.hph.plugins.ccdi.db.models::Tasks.TaskInfoType"
+   ) 
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+
+   READS SQL DATA AS
+BEGIN
+   output_table = APPLY_FILTER("hc.hph.plugins.ccdi.db.models::Tasks.Queue", :auditLogIdFilter) ;
+END;

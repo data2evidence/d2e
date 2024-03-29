@@ -1,0 +1,105 @@
+
+elementNode = node.get("$name");
+	if(elementNode!=null){
+#if ($cardinality=="1")
+#if ($type=="String")
+		String value = elementNode.asText();
+		set$firstUpperName(value);
+#end
+#if ($type=="Boolean")
+		Boolean value = elementNode.asBoolean();
+		set$firstUpperName(value);
+#end
+#if ($type=="Structure")
+		JsonNode reference = elementNode.get("reference");
+		if(reference!=null){
+			String value = reference.asText();
+			set$firstUpperName(getStructureById(value,"$rawtype.targetProfile"));
+		}
+#end
+#if ($type=="StructureDefinition")
+		JsonNode reference = elementNode.get("reference");
+		if(reference!=null){
+			String value = reference.asText();
+			set$firstUpperName(getStructureDefinitionByUrl(value));
+		}
+#end
+#if ($types.isBackbone($rawtype)==true)
+		$name = new $firstUpperName();
+		$name .setContentRepository(this.repo);
+		$name .fromJson(elementNode);
+#end
+#if ($types.isContentReference($parent)==true)
+		$name = new $type();
+		$name .setContentRepository(this.repo);
+		$name .fromJson(elementNode);
+#end
+#if ($types.isStructureDefinition($parent)==true)
+		JsonNode reference = elementNode.get("reference");
+		if(reference!=null){
+			String value = reference.asText();
+			$name = new $type();
+			$name .setContentRepository(this.repo);
+			if(value.startsWith("http") && value.split("\\|").length==2){
+				String[]segments = value.split("\\|");
+				$name .setUrl(segments[0]);
+				$name .setVersion(segments[1]);
+			}else{
+				$name .setId(value);
+			}
+		}
+#end	
+#else	
+		$name .clear();
+		for(int i =0; i<elementNode.size();i++){
+#if ($types.isBackbone($rawtype)==true)	
+			$firstUpperName listElement = new $firstUpperName();
+			listElement .setContentRepository(this.repo);
+			listElement .fromJson(elementNode.get(i));
+				
+			$name .add(listElement);
+#end
+
+#if ($types.isStructureDefinition($parent)==true)
+			JsonNode reference = elementNode.get(i).get("reference");
+			if(reference!=null){
+				String value = reference.asText();
+				$type listElement = new $type();
+				listElement .setContentRepository(this.repo);
+				if(value.startsWith("http") && value.split("\\|").length==2){
+					String[]segments = value.split("\\|");
+					listElement.setUrl(segments[0]);
+					listElement.setVersion(segments[1]);
+				}else{
+					listElement.setId(value);
+				}
+				$name .add(listElement);
+			}
+#end
+#if ($type=="StructureDefinition")
+			JsonNode reference = elementNode.get(0).get("reference");
+			if(reference!=null){
+				String value = reference.asText();
+				StructureDefinition helper = getStructureDefinitionByUrl(value);
+				$name .add(helper);
+			}
+#end
+#if ($type=="Structure")
+			JsonNode reference = elementNode.get(0).get("reference");
+			if(reference!=null){
+				String value = reference.asText();
+				Structure helper = getStructureById(value,$rawtype.targetProfile);
+				$name .add(helper);
+			}
+#end
+#if ($type=="String")
+			String value = elementNode.get(i).asText();
+			$name .add(value);
+#end
+#if ($type=="Boolean")
+			Boolean value = elementNode.get(i).asBoolean();
+			$name .add(value);
+#end
+	}
+#end
+	}

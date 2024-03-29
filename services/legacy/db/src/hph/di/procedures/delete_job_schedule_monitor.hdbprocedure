@@ -1,0 +1,19 @@
+PROCEDURE "hc.hph.di.procedures::delete_job_schedule_monitor" ( 
+	in _MonitorID BIGINT,	
+	out ot_error "hc.hph.di.model::tt_error"
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+	if :_MonitorID is null  then
+	         ot_error = select 400 as http_status_code, 'Bad Request' error_message, 'PROCEDURE:delete_job_schedule_monitor()' detail from "hc::DUMMY";
+	         return;
+	end if;
+	
+	update "hc.hph.di.model::DataIntegration.DIJobScheduleMonitor" monitor set
+	"XSScheduleRunStatus" = 'Failed',
+	"EndedAt" = (SELECT CURRENT_TIMESTAMP FROM "hc::DUMMY")
+	FROM "hc.hph.di.model::DataIntegration.DIJobScheduleMonitor" monitor
+	where monitor."MonitorID" = :_MonitorID ;
+	
+END;

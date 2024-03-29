@@ -1,0 +1,72 @@
+PROCEDURE "hc.hph.di.documents.WorkBench.db.procedures::Create_Interactions" (IN iv_row1 nvarchar(5), IN iv_row2 nvarchar(512),IN iv_row3 nvarchar(256),IN iv_row4 VARBINARY(32),IN iv_type nvarchar(512),IN iv_start nvarchar(100),IN iv_end nvarchar(100)) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	--DEFAULT SCHEMA <default_schema_name>
+	 AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+declare lv_dwid varbinary(32);
+declare lv_prevdwid varbinary(32);
+declare lv_newdwid varbinary(32);
+declare lv_sid nvarchar(100);
+declare lv_dwidproc varbinary(32);
+declare lv_dwiddoc varbinary(32);
+declare count_dwid INTEGER;
+declare count_interactiondwid INTEGER;
+declare curtime timestamp;
+declare lv_interactiondwid varbinary(32); 
+declare lv_peid nvarchar(100);
+curtime := now();
+select "DWID","SourceInteractionID" into lv_dwiddoc,lv_sid from "hc.hph.di.documents.WorkBench.db.models::DWBViews.UnprocessedDocuments" where "FileName"=:iv_row3;
+select "hc.hph.cdw.db.etl::HashDWID"(iv_row1,iv_row2) into lv_dwid from "hc::DUMMY";
+select "hc.hph.cdw.db.etl::HashDWID"(iv_row1,:lv_dwid) into lv_newdwid from "hc::DUMMY";
+
+-- Update the document type for the document if selected
+if iv_type is not null
+then
+update "hc.hph.di.documents.WorkBench.db.models::DWBViews.ProcessingStage_WB" set "Type"=:iv_type where "FileName"=:iv_row3 and "DWDateFrom" in (Select "DWDateFrom" from "hc.hph.di.documents.WorkBench.db.models::DWBViews.UnprocessedDocuments" where "FileName"=:iv_row3);
+end if;
+
+--check if document is assigned to same patient or not
+if :lv_sid != :lv_dwid and :iv_row4 !=''
+then
+select "DWID" into lv_prevdwid from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "InteractionID"= :lv_sid;
+delete from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "InteractionID"= :lv_sid;
+delete from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID"=:lv_prevdwid;
+end if;
+
+
+--check if interaction is already present or not.If not add the interaction
+select count(*) into count_dwid from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID"= :lv_newdwid;
+
+if :count_dwid= 0 and :iv_row4 !=''
+then
+insert into "hc.hph.cdw.db.models::DWEntities.Interactions_Key" ("DWID","DWSource","DWAuditID","InteractionID") values(:lv_newdwid,:iv_row1,0,:lv_dwid);
+insert into "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" ("DWDateFrom","DWID","DWDateTo","DWAuditID","DWID_Patient","DWID_ParentInteraction","DWID_Condition","InteractionType.OriginalValue","InteractionType.Code","InteractionType.CodeSystem","InteractionType.CodeSystemVersion","InteractionStatus","PeriodStart","PeriodEnd","OrgID") values(:curtime,:lv_newdwid,null,0,:iv_row4,null,null,'WB_Attachment',null,null,null,null,:curtime,:curtime,null);
+update "hc.hph.di.documents.WorkBench.db.models::DWBViews.ProcessingStage_WB" set "DWParentEntitySource"=:iv_row1,"ParentEntityID"=:lv_dwid where "FileName"=:iv_row3 and "Status" is null;
+end if;
+
+
+select count(*) into count_interactiondwid from "hc.hph.di.documents.WorkBench.db.models::DWBViews.ProcessingStage_WB" where "FileName"=:iv_row3 and "Status" is null and "ParentEntityID" is not null;
+
+
+-- Update the period start for the interaction in the interaction attr table
+if :iv_start is not null and count_interactiondwid != 0
+then
+select "SourceInteractionID" into lv_peid from "hc.hph.di.documents.WorkBench.db.models::DWBViews.UnprocessedDocuments" where "FileName"=:iv_row3; 
+select "DWID" into lv_interactiondwid from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "InteractionID"=:lv_peid;
+update "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" set "PeriodStart"=:iv_start where "DWID"=:lv_interactiondwid;
+end if;
+
+-- Update the period end for the interaction in the interaction attr table
+if :iv_end is not null and count_interactiondwid !=0
+then
+select "SourceInteractionID" into lv_peid from "hc.hph.di.documents.WorkBench.db.models::DWBViews.UnprocessedDocuments" where "FileName"=:iv_row3; 
+select "DWID" into lv_interactiondwid from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "InteractionID"=:lv_peid;
+update "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" set "PeriodEnd"=:iv_end where "DWID"=:lv_interactiondwid;
+end if;
+
+END;

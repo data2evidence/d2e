@@ -1,0 +1,52 @@
+PROCEDURE "hc.hph.search.db.procedures::CreateTermMappingItem" (
+    
+	IN  it_new "hc.hph.search.db.models::TT_SV_TERMMAPPINGITEMS",
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"    
+    
+)
+	LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count INTEGER;
+	lv_newid NVARCHAR(32);
+BEGIN
+
+	select count(*) into lv_count from :it_new where length(trim(' ' from "USER_ID")) = 0;
+	
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating termmappings: USER_ID must not be empty.' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	select count(*) into lv_count from :it_new where length(trim(' ' from "MAPPING_ID")) = 0;
+	
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating termmappings: USER_ID must not be empty.' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	select count(*) into lv_count from :it_new where MAPPING_ID not in ( SELECT MAPPING_ID FROM "hc.hph.search.db.models::Search.TermMappings" );
+	
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating termmappings: parent must exist.' detail from "hc::DUMMY";
+		return;	
+	end if;	
+
+	insert into "hc.hph.search.db.models::Search.TermMappingItems" (
+			"MAPPING_ID",
+			"USER_ID",
+			"INACTIVE",
+			"WEIGHT", 
+			"LANGUAGE_CODE"
+			)
+		( select 
+			"MAPPING_ID",
+			"USER_ID",
+			"INACTIVE",
+			"WEIGHT", 
+			"LANGUAGE_CODE"
+		 from :it_new )
+	;
+	
+END

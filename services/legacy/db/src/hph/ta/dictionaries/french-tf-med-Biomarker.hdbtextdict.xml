@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dictionary xmlns="http://www.com/ta/4.0">
+
+    <entity_category name="OBSERVATION_CANCERBIOMARKER_METHOD">
+
+        <entity_name standard_form="FISH">
+        </entity_name>
+        <entity_name standard_form="phospho">
+        </entity_name>
+        <entity_name standard_form="Biopsie">
+	</entity_name>
+        <entity_name standard_form="Séquençage direct">
+	</entity_name>
+        <entity_name standard_form="Immunohistochimie">
+            <variant name="IHC" />
+            <variant name="profil immunohistochimique" />
+	</entity_name>
+
+    </entity_category>
+
+    <entity_category name="OBSERVATION_CANCERBIOMARKER_COMPONENT_ALTERATION">
+    
+	<entity_name standard_form="Alteration">
+            <variant name="mut" />
+            <variant name="mutation" />
+            <variant name="mutations" />
+            <variant name="muté" />
+            <variant name="mutée" />
+            <variant name="mutés" />
+            <variant name="statut mutationnel" />
+            <variant name="altération" />
+        </entity_name>
+        <entity_name standard_form="Amplification">
+            <variant name="amplifié" />
+            <variant name="amplifiée" />
+        </entity_name>
+        <entity_name standard_form="Deletion">
+            <variant name="Extinction" />
+            <variant name="délétion" />
+	</entity_name>
+        <entity_name standard_form="Expression">
+            <variant name="Détection" />
+            <variant name="surexpression" />
+	</entity_name>
+        <entity_name standard_form="Fusion">
+	</entity_name>
+        <entity_name standard_form="Insertion">
+	</entity_name>
+        <entity_name standard_form="Translocation">
+            <variant name="translocations" />
+	</entity_name>
+        <entity_name standard_form="Conversion">
+	</entity_name>
+        <entity_name standard_form="Substitution">
+	</entity_name>
+        <entity_name standard_form="Extension">
+	</entity_name>
+        <entity_name standard_form="Inversion">
+	</entity_name>
+        <entity_name standard_form="Polymorphism">
+            <variant name="Polymorphisme" />
+	</entity_name>
+        <entity_name standard_form="Deletion/Insertion">
+	</entity_name>
+        <entity_name standard_form="Other">
+            <variant name="gain" />
+            <variant name="anomalie" />
+            <variant name="hyperméthylation" />
+            <variant name="marquage des cellules tumorales" />
+	</entity_name>
+
+    </entity_category>
+
+</dictionary>

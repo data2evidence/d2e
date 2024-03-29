@@ -1,0 +1,139 @@
+PROCEDURE "hc.hph.cdw.db.models.patientdeletion.procedures::CDWDeletePatient" (IN DWSource NVARCHAR(5), IN PatientID NVARCHAR(100)) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+	dwID VARBINARY(32);
+	
+BEGIN
+
+    DECLARE err_Code NUMBER(5):=0;
+    DECLARE result_text NVARCHAR(100);
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            err_Code:= ::SQL_ERROR_CODE; 
+         
+            IF :err_Code= 1299 
+            THEN
+                result_text:= 'The DWSource and PatientID combination provided does not exist';
+            ELSE
+                result_text:= 'Please check log for error';
+            END IF;
+--        Result:='FAILURE:'||result_text;
+        SELECT :result_text AS ERROR from "hc::DUMMY";
+    END; 
+    --SELECT ::SQL_ERROR_CODE AS ERROR_CODE, ::SQL_ERROR_MESSAGE AS ERROR_MESSAGE FROM "hc::DUMMY";
+   
+    select "DWID" into dwID from "hc.hph.cdw.db.models::DWEntities.Patient_Key" where "DWSource" = :DWSource and "PatientID" = :PatientID;
+    
+    ------------Collection-----------------------
+    
+    delete from "hc.hph.collections.db.models::CollectionModel.Item" where "ItemType" = 'hhp.tax.Patient' and "Id" = :dwID;
+    
+	
+	-----------------DWDocuments-----------	
+	
+	-- call deletion procedure from plugins
+	exec 'call "hc.hph.plugins.textProcessing.common.db.procedures::DeletePatientData"(''' ||:dwID ||''');';
+	--Delete row from Interaction_Document_Link_Attr table
+    delete from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link_Attr" where "DWLinkID" in (select "DWLinkID" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link"
+     where "DWID_Interaction" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+      where "DWID_Patient" = :dwID)));
+      
+    
+    --Delete row from Document_Attr table
+    delete from "hc.hph.cdw.db.models::DWDocuments.Document_Attr" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWDocuments.Document_Key"
+     where "DWID" in (select "DWID_Document" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Interaction" in (select "DWID" from
+      "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+       where "DWID_Patient" = :dwID))));
+    
+    --Delete from PostProcessing.TA_FILTERED
+    delete from "hc.hph.ta.models::PostProcessing.TA_FILTERED" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWDocuments.Document_Key"
+     where "DWID" in (select "DWID_Document" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Interaction" in (select "DWID" from
+      "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+       where "DWID_Patient" = :dwID))));
+    
+    --Delete from Document_SearchIndex
+    delete from "hc.hph.cdw.db.models::Document_SearchIndex" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWDocuments.Document_Key"
+     where "DWID" in (select "DWID_Document" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Interaction" in (select "DWID" from
+      "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+       where "DWID_Patient" = :dwID))));
+    
+    ---Delete grom Document Key table
+    delete from "hc.hph.cdw.db.models::DWDocuments.Document_Key" where "DWID" in (select "DWID_Document" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link"
+     where "DWID_Interaction" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+      where "DWID_Patient" = :dwID)));    
+    
+    --Delete from Interactions_Documents_Link
+    delete from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Interaction" in (select "DWID"
+     from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+      where "DWID_Patient" = :dwID));
+      
+    -- Delete row from TA_Interaction_Document_Link table  
+    delete from "hc.hph.cdw.db.models::DWDocuments.TA_Document_Interactions_Link" where "DWID_Interaction" in (select "DWID"
+     from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+      where "DWID_Patient" = :dwID));
+	
+	------------DWEntitiesEAV---------------
+	
+	--Delete from Interaction_Details table
+	delete from "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Key"
+	 where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID));
+	
+	--Delete from Interaction_Measures table
+	delete from "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Measures" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Key"
+	 where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID));
+	
+	--Delete from Interaction_Text table
+	delete from "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Text" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Key"
+	 where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID));
+	  
+	
+	------------DWEntities-----------------------
+	--Delete from Ref.PatientBestRecord table
+	delete from "hc.hph.cdw.db.models::Ref.PatientBestRecord" where "PatientBestRecordID" in 
+    (select "PatientBestRecordID" from "hc.hph.cdw.db.models::DWEntities.Patient_BestRecord_Attr" where "DWID" = :dwID);
+    
+    --Delete from Patient_BestRecord_Attr table
+    delete from "hc.hph.cdw.db.models::DWEntities.Patient_BestRecord_Attr" where "DWID" = :dwID;
+	
+	--Delete from Interactions_Key table
+	delete from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from
+	 "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID);
+	 
+	 
+	--Delete from Condition_Attr table
+	delete from "hc.hph.cdw.db.models::DWEntities.Condition_Attr" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Condition_Key" where "DWID"
+	 in (select "DWID_Condition" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID));
+	
+	
+	--Delete from Condition_Key table
+	delete from "hc.hph.cdw.db.models::DWEntities.Condition_Key" where "DWID" in (select "DWID_Condition" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+	 where "DWID_Patient" = :dwID);
+	
+	
+	--Delete from Interactions_Attr table
+	delete from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID;
+	 
+	 
+	--Delete from Observations_Key table
+	delete from "hc.hph.cdw.db.models::DWEntities.Observations_Key" where "DWID" in (select DWID from "hc.hph.cdw.db.models::DWEntities.Observations_Attr"
+	 where "DWID_Patient" = :dwID);
+	
+	
+	--Delete from Observations_Attr table
+	delete from "hc.hph.cdw.db.models::DWEntities.Observations_Attr" where "DWID_Patient" = :dwID;
+	 
+	 
+	--Delete from Patient_Attr table
+	delete from "hc.hph.cdw.db.models::DWEntities.Patient_Attr" where "DWID" = :dwID;
+	
+	
+	--Delete from Patient_Key table
+	delete from "hc.hph.cdw.db.models::DWEntities.Patient_Key" where "DWID" = :dwID;
+	
+    
+    result_text:= 'Patient data with PatientID:' || '"' ||:PatientID || '"' || ' deleted successfully.';
+--    Result:='SUCCESS:'||result_text;
+    SELECT :result_text AS RESULT from "hc::DUMMY";
+
+END;

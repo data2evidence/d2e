@@ -1,0 +1,35 @@
+{
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "prefer-const": false,
+    "ban-types": false,
+    "interface-over-type-literal": false,
+    "no-angle-bracket-type-assertion": false,
+    "jsdoc-format": false,
+    "no-trailing-whitespace": false,
+    "no-console": [true, "log"],
+    "no-empty": false,
+    "semicolon": [false],
+    "align": [false],
+    "no-unused-expression": false,
+    "interface-name": [false],
+    "curly": true,
+    "ordered-imports": [false],
+    "object-literal-shorthand": true,
+    "no-string-literal": true,
+    "no-bitwise": false,
+    "member-ordering": [false],
+    "comment-format": [true],
+    "variable-name": [true, "ban-keywords"],
+    "object-literal-sort-keys": false,
+    "no-shadowed-variable": false,
+    "member-access": [false],
+    "prefer-for-of": false,
+    "forin": false,
+    "max-classes-per-file": false,
+    "no-var-requires": false
+  }
+}

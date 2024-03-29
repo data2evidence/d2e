@@ -1,0 +1,91 @@
+###
+### A complete description of a Prefect Deployment for flow 'execute-dqd'
+###
+name: alp_dqd
+description: null
+version: adfbde02351df863028176694e9ee57e
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: default-agent-pool
+tags: ["data_quality_dashboard"]
+parameters:
+  {
+    options: 
+      {
+        "schemaName": "CDMSYNPUF1K",
+        "databaseCode": "ALPDEV",
+        "cdmVersionNumber": "5.4",
+        "vocabSchemaName": "CDMVOCAB",
+        "releaseDate": "2023-10-23",
+      }
+}
+schedule: null
+is_schedule_active: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: .
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: execute-dqd
+manifest_path: null
+storage: null
+path: "."
+entrypoint: /app/pysrc/main.py:execute_dqd_flow
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    options:
+      title: options
+      position: 0
+      allOf:
+      - $ref: '#/definitions/dqdOptionsType'
+  required:
+  - options
+  definitions:
+    dqdOptionsType:
+      title: dqdOptionsType
+      type: object
+      properties:
+        schemaName:
+          title: Schemaname
+          type: string
+        databaseCode:
+          title: Databasecode
+          type: string
+        cdmVersionNumber:
+          title: Cdmversionnumber
+          type: string
+        vocabSchemaName:
+          title: Vocabschemaname
+          type: string
+        releaseDate:
+          title: Releasedate
+          type: string
+        cohortDefinitionId:
+          title: Cohortdefinitionid
+          type: string
+        checkNames:
+          title: Checknames
+          type: array
+          items:
+            type: string
+      required:
+      - schemaName
+      - databaseCode
+      - cdmVersionNumber
+      - vocabSchemaName
+      - releaseDate
+timestamp: "2023-07-20T10:34:39.562603+00:00"
+triggers: []
+enforce_parameter_schema: null

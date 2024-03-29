@@ -1,0 +1,99 @@
+!======================================================================
+! File Name: french-tf-med-Pathology.hdbtextrul
+! Author: Pierre Marchal (PI IC HC Platform FR)
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of pathology report specific entities
+!======================================================================
+
+
+!======================================================================
+! OUTPUT FIELDS:
+!======================================================================
+
+! Main cancer group: med_CancerHistology
+
+!The following subentity must be present to trigger the rule:
+!!CancerHistology
+
+!Optional subentities:
+!!CancerBehavior
+!!GradeType
+!!GradeValue
+!!CancerSite
+
+
+! Peripheral entities:
+!       1) med_CancerGrade;
+!       2) med_CancerSize;
+!       3) med_CancerStage;
+
+
+
+!======================================================================
+! SUB-RULES
+!======================================================================
+
+#include "hc.hph.ta.rules::common.hdbtextinclude"
+
+
+!======================================================================
+! FINAL RULE
+!======================================================================
+
+
+!!!!!!!!!!!!!!!!!!!!!!
+!! CANCER HISTOLOGY
+#group Observation_CancerHistology: {
+    %(OD_CancerHistology)
+    | %(OD_CancerBehavior) %(OD_CancerSite) %(behavior__histology) %(OD_CancerHistology) %(OD_CancerSite)
+    | %(OD_CancerBehavior) %(behavior__histology) %(OD_CancerHistology)
+    | %(OD_CancerBehavior) %(behavior__histology) %(OD_CancerHistology) (
+    		  %(OD_CancerGradeValue)
+    		| %(OD_CancerSite) 
+    		| %(OD_CancerSite) %(behavior__site) %(OD_CancerSite)
+    		| %(OD_CancerSite) %(histology__behavior) %(OD_CancerBehavior)
+    		| %(OD_CancerSite) %(histology__behavior) %(OD_CancerBehavior) %(OD_CancerSite)
+    		| %(histology__behavior) %(OD_CancerBehavior) %(OD_CancerSite)
+		)
+    | %(OD_CancerHistology) (
+      		  %(OD_CancerBehavior)
+    		| %(OD_CancerBehavior) %(OD_CancerGradeValue)
+     		| %(OD_CancerBehavior) %(OD_CancerSite)
+    		| %(OD_CancerBehavior) %(histology__grade) %(OD_CancerGradeValue)
+    		| %(OD_CancerBehavior) %(histology__grade) %(OD_CancerGradeValue) %(histology_modifier)
+    		| %(OD_CancerBehavior) %(histology_modifier)
+    		| %(OD_CancerBehavior) %(histology_modifier) %(OD_CancerGradeValue)
+    		| %(OD_CancerBehavior) %(histology_modifier) %(OD_CancerGradeValue) %(histology_modifier) 
+    		| %(OD_CancerBehavior) <\(> %(OD_CancerSite) <\)>
+    		| %(OD_CancerGradeValue)
+    		| %(OD_CancerGradeValue) %(OD_CancerBehavior)
+    		| %(OD_CancerGradeValue) %(histology_modifier) %(histology__site) %(OD_CancerSite)
+    		| %(OD_CancerSite)
+    		| %(OD_CancerSite) %(OD_CancerBehavior)
+    		| %(OD_CancerSite) %(OD_CancerBehavior) %(OD_CancerGradeValue)
+    		| %(OD_CancerSite) %(OD_CancerBehavior) %(OD_CancerSite)
+    		| %(OD_CancerSite) %(OD_CancerGradeValue)
+    		| %(OD_CancerSite) %(OD_CancerStage_ambiguous) %(OD_CancerBehavior) %(OD_CancerSite)
+    		| %(OD_CancerSite) %(OD_CancerStage_ambiguous) %(histology__behavior) %(OD_CancerBehavior)
+    		| %(OD_CancerSite) %(OD_CancerStage_ambiguous) %(histology__behavior) %(OD_CancerBehavior) %(OD_CancerSite)
+    		| %(OD_CancerSite) %(histology__behavior) %(OD_CancerBehavior) %(OD_CancerSite)
+		| %(OD_CancerSite) %(histology__behavior) %(OD_CancerBehavior) %(OD_CancerSite) %(histology__behavior) %(OD_CancerBehavior) %(OD_CancerSite)
+    		| %(OD_CancerSite) %(histology__behavior) %(OD_CancerBehavior) %(histology__site) %(OD_CancerSite)
+    		| %(OD_CancerSite) %(histology__histology) %(OD_CancerHistology) %(OD_CancerGradeValue) %(OD_CancerSite)
+    		| %(OD_CancerSite) %(histology__site) %(OD_CancerSite)
+    		| %(OD_CancerSite) %(histology_modifier)
+    		| %(OD_CancerSite) %(histology_modifier) %(OD_CancerBehavior)
+    		| %(OD_CancerSite) %(histology_modifier) %(OD_CancerBehavior) %(OD_CancerSite)
+    		| %(OD_CancerSite) %(histology_modifier) %(histology__behavior) %(OD_CancerBehavior)
+    		| %(OD_CancerSite) %(histology_modifier) %(histology__behavior) %(OD_CancerBehavior) %(OD_CancerSite)
+		| %(OD_CancerSite) %(histology_modifier) %(histology__behavior) ( <\,>? <et>? %(OD_CancerBehavior) %(OD_CancerSite) %(behavior_modifier_right)?  )+
+    		| %(OD_CancerStage_ambiguous)
+    		| %(histology__behavior) %(OD_CancerBehavior) %(OD_CancerSite)
+    		| %(histology__site) %(OD_CancerSite)
+    		| %(histology__stage) %(OD_CancerStage_ambiguous)
+    		| %(histology__stage) %(OD_CancerStage_ambiguous) %(OD_CancerSite)
+		)
+    | %(OD_CancerSite) %(behavior__histology) %(OD_CancerHistology) %(OD_CancerSite)
+}
+
+

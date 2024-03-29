@@ -1,0 +1,421 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.legacy.health.fhir</groupId>
+	<artifactId>parent</artifactId>
+	<version>0.1.13</version>
+	<packaging>pom</packaging>
+	<name>parent</name>
+	<description>Parent POM for all fhir repos</description>
+
+	<properties>
+
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<fhir-assembly.version>0.1.13</fhir-assembly.version>
+
+		<meta.version>${fhir-assembly.version}</meta.version>
+		<json.version>${fhir-assembly.version}</json.version>
+		<queryengine.version>${fhir-assembly.version}</queryengine.version>
+		<catalog.version>${fhir-assembly.version}</catalog.version>
+		<xml.version>${fhir-assembly.version}</xml.version>
+		<sql.version>${fhir-assembly.version}</sql.version>
+		<terminology.version>${fhir-assembly.version}</terminology.version>
+		<postgresql.version>${fhir-assembly.version}</postgresql.version>
+		<hana.version>${fhir-assembly.version}</hana.version>
+		<logicaldatamodel.version>${fhir-assembly.version}</logicaldatamodel.version>
+		<fluentpath.version>${fhir-assembly.version}</fluentpath.version>
+		<calculationview.version>${fhir-assembly.version}</calculationview.version>
+		<elm.version>${fhir-assembly.version}</elm.version>
+		<validator.version>${fhir-assembly.version}</validator.version>
+
+		<fhir-standard-resource-validator.version>${fhir-assembly.version}</fhir-standard-resource-validator.version>
+		<fhir-nonstandard-resource-validator.version>${fhir-assembly.version}</fhir-nonstandard-resource-validator.version>
+		<fhir-resource-capability-validator.version>${fhir-assembly.version}</fhir-resource-capability-validator.version>
+		<fhir.version>${fhir-assembly.version}</fhir.version>
+		
+		<findbugs.version>3.0.1</findbugs.version>
+
+		<spotbugs-maven-plugin.version>3.1.6</spotbugs-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
+		<org.eclipse.m2e.lifecycle-mapping.version>1.0.0</org.eclipse.m2e.lifecycle-mapping.version>
+		<junit.version>4.12</junit.version>
+		<maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+		<maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
+		<spring-boot-dependencies.version>1.5.7.RELEASE</spring-boot-dependencies.version>
+		<jackson.version>2.9.8</jackson.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+		
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+		
+			<dependency>
+				<groupId>com.google.code.findbugs</groupId>
+				<artifactId>annotations</artifactId>
+				<version>${findbugs.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson</groupId>
+				<artifactId>jackson-bom</artifactId>
+				<version>${jackson.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+		
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>2.2.4</version>
+				<executions>
+					<execution>
+						<id>get-the-git-infos</id>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+					<prefix>git</prefix>
+					<verbose>false</verbose>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<generateGitPropertiesFilename>${project.build.outputDirectory}/${project.artifactId}_git.properties</generateGitPropertiesFilename>
+					<format>properties</format>
+					<includeOnlyProperties>
+						<includeOnlyProperty>git.commit.id$</includeOnlyProperty>
+						<includeOnlyProperty>git.build.version$</includeOnlyProperty>
+						<includeOnlyProperty>git.build.time</includeOnlyProperty>
+					</includeOnlyProperties>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<!-- <version>${findbugs-maven-plugin.version}</version> -->
+			</plugin>
+			<!-- Configure Jacoco -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco-maven-plugin.version}</version>
+				<configuration>
+					<excludes>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>default-prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-prepare-agent-integration</id>
+						<goals>
+							<goal>prepare-agent-integration</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-report-integration</id>
+						<goals>
+							<goal>report-integration</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-check</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+							</rules>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-check-integration</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<dataFile>${project.build.directory}/jacoco-it.exec</dataFile>
+							<rules>
+							</rules>
+						</configuration>
+					</execution>
+					<execution>
+						<id>merge-results</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>merge</goal>
+						</goals>
+						<configuration>
+							<fileSets>
+								<fileSet>
+									<directory>${project.build.directory}</directory>
+									<includes>
+										<include>*.exec</include>
+									</includes>
+									<excludes>
+										<exclude>aggregate.exec</exclude>
+									</excludes>
+								</fileSet>
+							</fileSets>
+							<destFile>${project.build.directory}/aggregate.exec</destFile>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>${project.build.directory}/aggregate.exec</dataFile>
+							<outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.whitesource</groupId>
+					<artifactId>whitesource-maven-plugin</artifactId>
+					<version>18.4.1</version>
+					<configuration>
+						<orgToken>6971b2eec2d3420bad0caf173ec629f6a3c7d3ba63f3445ab99ffdbf1acfb1d0</orgToken>
+						<product>SHC - XSAC_CHP_FHIR 1.0</product>
+						<checkPolicies>false</checkPolicies>
+						<failOnError>true</failOnError>
+						<ignorePomModules>false</ignorePomModules>
+						<autoDetectProxySettings>true</autoDetectProxySettings>
+						<forceCheckAllDependencies>true</forceCheckAllDependencies>
+						<forceUpdate>false</forceUpdate>
+						<reportAsJson>true</reportAsJson>
+						<productVersion>latest</productVersion>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.github.spotbugs</groupId>
+					<artifactId>spotbugs-maven-plugin</artifactId>
+					<version>${spotbugs-maven-plugin.version}</version>
+					<configuration>
+						<plugins>
+							<plugin>
+								<groupId>com.h3xstream.findsecbugs</groupId>
+								<artifactId>findsecbugs-plugin</artifactId>
+								<version>LATEST</version>
+							</plugin>
+						</plugins>
+					</configuration>
+					<executions>
+						<execution>
+							<id>analyze-compile</id>
+							<phase>compile</phase>
+							<goals>
+								<goal>spotbugs</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven-compiler-plugin.version}</version>
+					<configuration>
+						<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>${org.eclipse.m2e.lifecycle-mapping.version}</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>findbugs-maven-plugin</artifactId>
+										<versionRange>[${findbugs-maven-plugin.version}]</versionRange>
+										<goals>
+											<goal>findbugs</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.github.spotbugs</groupId>
+										<artifactId>spotbugs-maven-plugin</artifactId>
+										<versionRange>[${spotbugs-maven-plugin.version}]</versionRange>
+										<goals>
+											<goal>spotbugs</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-antrun-plugin</artifactId>
+										<versionRange>[${maven-antrun-plugin.version}]</versionRange>
+										<goals>
+											<goal>run</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>								
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+
+	<profiles>
+
+
+		<profile>
+			<id>vulas</id>
+			<activation>
+				<property>
+					<name>vulas</name>
+				</property>
+			</activation>
+			<!-- Several properties for Vulas, used in the plugins maven-dependency-plugin, 
+				maven-surefire-plugin, and vulas-maven-plugin -->
+			<properties>
+				<vulas.version>2.3.8</vulas.version>
+				<vulas.shared.backend.serviceUrl>http://vulas:8080/backend</vulas.shared.backend.serviceUrl>
+				<vulas.shared.cia.serviceUrl>http://vulas:8080/cia</vulas.shared.cia.serviceUrl>
+				<vulas.report.exceptionScopeBlacklist>test</vulas.report.exceptionScopeBlacklist>
+			</properties>
+			<build>
+				<plugins>
+					<!-- Copies Vulas JARs to ${project.build.directory}/vulas/lib and incl, 
+						which is needed for the instrumentation of JUnit tests. -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.10</version>
+						<executions>
+							<execution>
+								<id>copy-vulas</id>
+								<phase>generate-test-resources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>com.legacy.research.security.vulas</groupId>
+											<artifactId>vulas-core</artifactId>
+											<version>${vulas.version}</version>
+											<type>jar</type>
+											<classifier>jar-with-dependencies</classifier>
+											<outputDirectory>${project.build.directory}/vulas/lib</outputDirectory>
+											<destFileName>vulas-core-latest-jar-with-dependencies.jar</destFileName>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- Registers the Vulas agent at JVM startup (and specifies a couple 
+						of configuration settings) -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.19.1</version>
+						<configuration>
+							<argLine>
+								-javaagent:target/vulas/lib/vulas-core-latest-jar-with-dependencies.jar
+								-Dvulas.shared.backend.serviceUrl=${vulas.shared.backend.serviceUrl}
+								-Dvulas.shared.cia.serviceUrl=${vulas.shared.cia.serviceUrl}
+								-Dvulas.core.appContext.group=${project.groupId}
+								-Dvulas.core.appContext.artifact=${project.artifactId}
+								-Dvulas.core.appContext.version=${project.version}
+								-noverify
+							</argLine>
+						</configuration>
+					</plugin>
+
+					<!-- The Vulas plugin itself -->
+					<plugin>
+						<groupId>com.legacy.research.security.vulas</groupId>
+						<artifactId>vulas-maven-plugin</artifactId>
+						<version>${vulas.version}</version>
+						<configuration>
+							<layeredConfiguration>
+								<vulas.shared.backend.serviceUrl>${vulas.shared.backend.serviceUrl}</vulas.shared.backend.serviceUrl>
+								<vulas.shared.cia.serviceUrl>${vulas.shared.cia.serviceUrl}</vulas.shared.cia.serviceUrl>
+								<vulas.report.legacy.scv>dummy</vulas.report.legacy.scv>
+							</layeredConfiguration>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- this profile executes Integration Tests marked with an IT Suffix in 
+			the Test classes names -->
+		<profile>
+			<id>it</id>
+			<activation>
+				<property>
+					<name>it</name>
+				</property>
+			</activation>
+			<properties>
+				<maven-failsafe-plugin.version>2.21.0</maven-failsafe-plugin.version>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>${maven-failsafe-plugin.version}</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
+</project>

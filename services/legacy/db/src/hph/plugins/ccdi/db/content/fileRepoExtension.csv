@@ -1,0 +1,4 @@
+ExtensionProviderType,ExtensionProviderURI,ExtensionProviderConfig
+JS,hc.hph.plugins.ccdi.services.lib:FileRepositoryExtension,{}
+JS,hc.hph.plugins.ccdi.services.lib:FileRepositoryExtensionSQL,{}
+JS,hc.hph.plugins.ccdi.services.lib:FileRepositoryExtensionHDBCDS,{}

@@ -1,0 +1,7 @@
+version: "3"
+services:
+  portal-server:
+    ports:
+      - 3001:3000
+    volumes:
+      - /usr/src/app/node_modules

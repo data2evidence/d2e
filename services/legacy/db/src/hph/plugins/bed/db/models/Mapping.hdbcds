@@ -1,0 +1,14 @@
+namespace hc.hph.plugins.bed.db.models;
+using hc.hph.genomics.db.models::Type as Type;
+
+context Mapping
+{
+    entity Chromosomes
+    {
+        key DWAuditID : Type.DWDocID;
+        key ChromosomeName : String(255);
+        ChromosomeIndex : Type.ChromosomeIndex;
+    } technical configuration {
+        column store;
+    };
+}

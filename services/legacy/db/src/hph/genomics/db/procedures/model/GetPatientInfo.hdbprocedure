@@ -1,0 +1,54 @@
+PROCEDURE "hc.hph.genomics.db.procedures.model::GetPatientInfo" ( IN PatientId VARBINARY(32),
+    OUT  Genotypes "hc.hph.genomics.db.models::SNV.Genotypes",
+    OUT GenotypeMultiValueAttributes "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes",
+    OUT Haplotypes "hc.hph.genomics.db.models::SNV.Haplotypes",
+    OUT GenotypeAlleles "hc.hph.genomics.db.models::SNV.GenotypeAlleles",
+    OUT Samples "hc.hph.genomics.db.models::General.Samples",
+    OUT Variants "hc.hph.genomics.db.models::SNV.Variants",
+    OUT VariantMultiValueAttributes "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes",
+    OUT VariantAlleles "hc.hph.genomics.db.models::SNV.VariantAlleles",
+    OUT VariantStructuredAttributes "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes",
+    OUT Headers "hc.hph.genomics.db.models::SNV.Headers",
+    OUT VariantAnnotations "hc.hph.genomics.db.models::SNV.VariantAnnotations")
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    AS
+BEGIN 
+  -- get all SampleIdx that match this PatientId
+  DECLARE CURSOR sample_idx_cursor
+    FOR SELECT "SampleIndex"
+        FROM "hc.hph.genomics.db.models::General.Samples"
+        WHERE "PatientDWID" = :PatientId;
+            
+    FOR sample_idx AS sample_idx_cursor DO
+        relevantAuditIds = SELECT "DWAuditID"
+            FROM "hc.hph.genomics.db.models::SNV.Genotypes"
+            WHERE "SampleIndex" = :sample_idx."SampleIndex";
+            
+        -- Delete data corresponding directly to the patientid
+        Genotypes = SELECT * FROM "hc.hph.genomics.db.models::SNV.Genotypes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+        GenotypeMultiValueAttributes = SELECT * FROM "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+        Haplotypes = SELECT * FROM "hc.hph.genomics.db.models::SNV.Haplotypes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+        GenotypeAlleles = SELECT * FROM "hc.hph.genomics.db.models::SNV.GenotypeAlleles" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+        Samples = SELECT * FROM "hc.hph.genomics.db.models::General.Samples" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+        
+        --Look for empty analysis
+        BEGIN
+            DECLARE CURSOR audit_id_cursor
+                FOR SELECT "DWAuditID"
+                    FROM :relevantAuditIds;
+            DECLARE sample_count INTEGER;
+            FOR audit_id AS audit_id_cursor DO
+                SELECT COUNT("SampleIndex") INTO sample_count FROM "hc.hph.genomics.db.models::SNV.Genotypes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+                IF sample_count = 0 THEN
+                    Variants = SELECT * FROM "hc.hph.genomics.db.models::SNV.Variants" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                    VariantMultiValueAttributes = SELECT * FROM "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                    VariantAlleles = SELECT * FROM "hc.hph.genomics.db.models::SNV.VariantAlleles" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                    VariantStructuredAttributes = SELECT * FROM "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                    Headers = SELECT * FROM "hc.hph.genomics.db.models::SNV.Headers" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                    VariantAnnotations = SELECT * FROM "hc.hph.genomics.db.models::SNV.VariantAnnotations" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                END IF;
+            END FOR;
+        END;
+    END FOR;
+END

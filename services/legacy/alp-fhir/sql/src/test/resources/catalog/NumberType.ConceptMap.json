@@ -1,0 +1,64 @@
+{
+  "resourceType": "ConceptMap",
+  "id": "bgznumbertype",
+  "text": {
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">A mapping between HCIM Number Type Codes and FHIR contanct point use</div>"
+  },
+  "url": "http://data4life-asia.care/health/fhir/ConceptMap/bgznumbertype",
+  "version": "20180925",
+  "name": "HCIM/FHIR Number Type Mapping",
+  "title": "FHIR/v3 Contact Point Use Mapping",
+  "status": "draft",
+  "experimental": false,
+  "date": "2019-09-25",
+  "publisher": "D4L",
+  "contact": [],
+  "description": "A mapping between HCIM Address Type Codes and FHIR address use",
+  "useContext": [],
+  "purpose": "To help  map from HCIM Addresses to FHIR",
+  "sourceUri": "https://zibs.nl/wiki/ContactInformation-v1.0(2017EN)#NumberTypeCodelist",
+  "targetUri": "http://hl7.org/fhir/ValueSet/contact-point-use",
+  "group": [
+    {
+      "source": "https://zibs.nl/wiki/ContactInformation-v1.0(2017EN)#NumberTypeCodelist",
+      "target": "http://hl7.org/fhir/ValueSet/contact-point-use",
+      "element": [
+        {
+          "code": "HP",
+          "display": "Primary Home",
+          "target": [
+            {
+              "code": "home",
+              "display": "Home"
+            }
+          ]
+        },
+        {
+          "code": "WP",
+          "display": "Work Place",
+          "target": [
+            {
+              "code": "work",
+              "display": "Work"
+            }
+          ]
+        },
+        {
+          "code": "TMP",
+          "display": "Temporary Address",
+          "target": [
+            {
+              "code": "temp",
+              "display": "Temporary"
+            }
+          ]
+        }
+      ],
+      "unmapped": {
+        "mode": "fixed",
+        "code": "old",
+        "display": "Old/Unknown/Incorrect"
+      }
+    }
+  ]
+}

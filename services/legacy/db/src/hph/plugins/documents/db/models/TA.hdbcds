@@ -1,0 +1,78 @@
+namespace hc.hph.plugins.documents.db.models;
+
+using hc.hph.di.documents.staging.db.models::DocumentStage as DS;
+using hc.hph.cdw.db.models::DWTypes as DT;
+using hc.hph.cdw.db.models::DWDocuments as Doc;
+using hc.hph.di.documents.staging.db.models::DocumentProcessing as DP;
+
+
+context TA {
+  entity "Results" {
+     key DWID       : DT.DWID;
+     key DWDateFrom : DT.DWTimestamp;
+     key PluginID 	: String(256) ;
+     key TA_RULE    : String(200);
+     key TA_COUNTER : Integer64;
+     DWAuditID		: DT.DWAuditID;
+     TA_Configuration : String(200);
+     TA_TOKEN       : String(5000);
+     TA_LANGUAGE    : String(2);
+     TA_TYPE        : String(100);
+     TA_NORMALIZED  : String(5000);
+     TA_STEM        : String(5000);
+     TA_PARAGRAPH   : Integer;
+     TA_SENTENCE    : Integer;
+     TA_CREATED_AT  : UTCTimestamp;
+     TA_OFFSET      : Integer64;
+     TA_PARENT      : Integer64;   
+  } technical configuration {
+     column store;
+  };   
+
+  entity "PreProcessingLog"{
+  	 key DWAuditID  : Integer64; 
+	 key ScheduleID : Integer64;  
+  	 key DWID : DT.DWID;
+	 key PipelineID	: String(256) default '';
+  	 TA_Entities : Integer;
+  	 TA_Time  : Integer;
+  	 Status   : String(32) default 'Success';
+  } technical configuration {
+    column store;
+  };
+
+  view RelevantDocument as select from DS.DocumentProcessingStatus{
+     DWID,
+     max(DWDateFrom) as DWDateFrom
+  }GROUP BY DWID;
+
+  view Document as select from DS.DocumentProcessingStatus mixin {
+  		_TA_Config : association [*,1] to DP.PipelineConfiguration on PipelineID = _TA_Config.PipelineID;
+  		_Relevant_Docs : association [*,1] to RelevantDocument on DWID = _Relevant_Docs.DWID and DWDateFrom = _Relevant_Docs.DWDateFrom;
+    }into{
+    	DWID,
+    	DWSource,
+    	DocumentID,
+    	DWDateFrom,
+    	ProcessingMode,
+    	ScheduleID,
+    	DWAuditID,
+    	MIMEType,    	
+    	Content,
+    	PipelineID,
+    	Type,
+    	_TA_Config.ConfigurationValue as TAConfiguration  	
+    }where _TA_Config.Action = 'TextAnalysis' and _TA_Config.ConfigurationKey = 'Configuration'
+    and _Relevant_Docs.DWID is not null;
+
+	view PipelineTAConfiguration as select from DS.DocumentProcessingStatus as DPS 
+	inner join DP.DocumentTypeTextProcessingMapping as DT_TP on DPS.Type = DT_TP.DWDocumentType
+	{
+		DWAuditID,
+    	Type,   	
+    	DT_TP.PipelineID,
+    	DT_TP.TAConfiguration
+	}where "DWAuditID" is not null;
+
+
+};

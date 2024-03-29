@@ -1,0 +1,97 @@
+{
+	"resourceType": "CatalogDefinition",
+	"id": "bodyweight_catalog",
+	"target": {
+		"reference": "http://hl7.org/fhir/StructureDefinition/Observation"
+	},
+	"table": [
+		{
+			"id": "bodyweight",
+			"definition": {
+				"reference": "HCIM_BODYWEIGHT"
+			},
+			"cardinality": "*",
+			"referenceColumn": {
+				"type": "column",
+				"name": "identification_number"
+			}
+		}
+	],
+	"mapping": [
+		{
+			"dataelement": "Observation.id",
+			"tableid": "bodyweight",
+			"type": "column",
+			"column": "identification_number",
+			"searchable": true
+		},
+		{
+			"dataelement": "Observation.meta.profile",
+			"tableid": "bodyweight",
+			"type": "value",
+			"value": "http://nictiz.nl/fhir/StructureDefinition/nl-core-observation",
+			"searchable": false
+		},
+		{
+			"dataelement": "Observation.subject.reference",
+			"tableid": "bodyweight",
+			"type": "column",
+			"column": "subject",
+			"searchable": true
+		},
+		{
+			"dataelement": "Observation.issued",
+			"tableid": "bodyweight",
+			"type": "column",
+			"column": "datetime",
+			"searchable": true
+		},
+		{
+			"dataelement": "Observation.valueQuantity.value",
+			"tableid": "bodyweight",
+			"type": "column",
+			"column": "weightValue",
+			"searchable": false
+		},
+		{
+			"dataelement": "Observation.valueQuantity.unit",
+			"tableid": "bodyweight",
+			"type": "column",
+			"column": "weightUnit",
+			"searchable": false
+		},
+		{
+			"dataelement": "Observation.code.coding.system",
+			"tableid": "bodyweight",
+			"type": "column",
+			"column": "clothingCodesystemName",
+			"searchable": false
+		},
+		{
+			"dataelement": "Observation.code.coding.code",
+			"tableid": "bodyweight",
+			"type": "column",
+			"column": "clothingCodesystemOid",
+			"searchable": false
+		},
+		{
+			"dataelement": "Observation.category.coding",
+			"tableid": "bodyweight",
+			"type": "complex",
+			"children": [
+				{
+					"dataelement": "Observation.category.coding.system",
+					"type": "value",
+					"value": "http://fhir.nl/fhir/StructureDefinition/nl-core-address-official",
+					"tableid": "bodyweight"
+				},
+				{
+					"dataelement": "Observation.category.coding.code",
+					"type": "value",
+					"value": "vital-signs",
+					"tableid": "bodyweight"
+				}
+			]
+		}
+	]
+}

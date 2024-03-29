@@ -1,0 +1,126 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.core.tableP13n.db.models::P13nModel.TableP13nConfiguration",
+            "import_settings": {
+                "include_filter": [
+                    {
+                        "Id": "TDTitle",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDPreview",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDAuthor",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDPatientID",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDSourcePatientID",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDPatientName",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDFamilyName",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDGivenName",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDLanguageCode",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDFileName",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDMIMEType",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDCreatedBy",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDCreatedAt",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDChangedBy",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDChangedAt",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    },
+                    {
+                        "Id": "TDAction",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "TemplateDocumentsList"
+                    }
+                ],
+                "import_columns": [
+                    "Id",
+                    "HANAUserName",
+                    "TableId",
+                    "ColumnOrder",
+                    "Text",
+                    "ColumnId",
+                    "Visible",
+                    "Personalizable",
+                    "Sortable",
+                    "Filterable",
+                    "Type"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.search.db.dataload::p13nTemplateDocuments.csv",
+                "has_header": false,
+                "type_config": {
+                    "delimiter": ";"
+                }
+            },
+            "column_mappings": {
+                "Id": 1,
+                "HANAUserName": 2,
+                "TableId": 3,
+                "ColumnOrder": 4,
+                "Text": 5,
+                "ColumnId": 6,
+                "Visible": 7,
+                "Personalizable": 8,
+                "Sortable": 9,
+                "Filterable": 10,
+                "Type": 11
+            }
+        }
+    ]
+}

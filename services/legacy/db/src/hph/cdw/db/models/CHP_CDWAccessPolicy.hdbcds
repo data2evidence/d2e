@@ -1,0 +1,11 @@
+namespace hc.hph.cdw.db.models;
+
+using hc.hph.cdw.db.models::DWViews as ddl;
+define AccessPolicy CHP_CDWAccessPolicy {
+ 
+  define role guardedOrgs {
+    grant select on ddl.AllowedOrgIDs
+      where AncestorOrgID in $env.user.Organization;
+  };
+
+};

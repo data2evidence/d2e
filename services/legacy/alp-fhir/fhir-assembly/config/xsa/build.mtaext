@@ -1,0 +1,7 @@
+_schema-version: "3.1.0"
+ID: com.legacy.health.fhir.xsa.build
+extends: com.legacy.health.fhir
+modules:
+  - name: fhirserver
+    parameters:
+      buildpack: java_buildpack

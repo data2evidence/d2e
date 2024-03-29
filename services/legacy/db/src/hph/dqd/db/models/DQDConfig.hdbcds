@@ -1,0 +1,33 @@
+namespace hc.hph.dqd.db.models;
+context DQDConfig{
+	entity DQDConfiguration {
+ 		Key MeasureID : Integer64;
+ 		Key Category : String(60);
+ 		SchemaName : String(10);
+ 		CatObject : String(100);
+ 		TitleKey : String(60);
+	 	DescriptionKey : String(200);
+	 	Function : String(60);
+		Expression : String(200);	
+		GroupName : String(100);
+		Status : String(15);
+	 	Delivery : String(10);
+ 	}; 
+ 	entity DQDPreferredText {
+ 		 key MeasureID : Integer64;
+ 		 key Category : String(60);
+ 		 key LanguageCode : String(2);
+ 		 Title : String(60);
+ 		 Description : String(200);
+ 	};
+ 	entity DQDTemp {
+ 		MeasureID : Integer64;
+ 		TitleKey : String(60);
+	 	DescriptionKey : String(200);
+ 		Measure : Integer64;
+ 		Status : String(15);
+ 		Delivery : String(10);
+ 	} technical configuration {
+   row store;
+  }
+}

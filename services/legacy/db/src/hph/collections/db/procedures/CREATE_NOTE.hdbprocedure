@@ -1,0 +1,42 @@
+PROCEDURE "hc.hph.collections.db.procedures::CREATE_NOTE" ( 
+	IN  it_new "hc.hph.collections.db.models::TT_NOTE", 
+    OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"
+	) 
+	
+LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count BIGINT;
+	lv_check BIGINT;
+	lv_newid NVARCHAR(32);
+	
+BEGIN
+	select count(*) into lv_count from :it_new where length(trim(' ' from "CollectionId")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error creating Note: CollectionId must not be empty.' detail from "hc::DUMMY";
+		
+		return;	
+	end if;
+	
+	--select cast(SYSUUID as NVARCHAR(32)) into lv_newid from dummy;
+	
+	insert into "hc.hph.collections.db.models::CollectionModel.Comment" (
+			"Id",
+			"Collection.Id",
+			"Item.Id",
+			"Type", 
+			"Text", 
+			"CreatedBy",
+			"CreatedAt",
+			"Content")
+		(select 
+			(select cast(SYSUUID as NVARCHAR(32)) from "hc::DUMMY"),
+			"CollectionId",
+			"ItemId",
+			"Type",
+			"Text",
+			SESSION_CONTEXT('XS_APPLICATIONUSER') as "CreatedBy",
+			CURRENT_UTCTIMESTAMP as "CreatedAt",
+			"Content"
+		 from :it_new)
+	;	
+END;

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<flowgraph:ContainerNode xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowgraph="http://www.com/ndb/flowgraph/1.0" xmi:id="_pFxzIClVEea6gp11D-4p9A" name="LOADAUDITTRACE_LDAP" generateProcedure="false" generateTask="true">
+  <annotations xmi:id="_pFxzISlVEea6gp11D-4p9A" key="afm.layout">
+    <annotations xmi:id="_pFxzIilVEea6gp11D-4p9A" key="x" value="10"/>
+    <annotations xmi:id="_pFxzIylVEea6gp11D-4p9A" key="y" value="10"/>
+  </annotations>
+  <annotations xmi:id="_pFxzJClVEea6gp11D-4p9A" key="afm.palette" value="">
+    <annotations xmi:id="_pFxzJSlVEea6gp11D-4p9A" key="additions" value=""/>
+  </annotations>
+  <annotations xmi:id="_cd1kwClhEea6gp11D-4p9A" key="afm.nodeType" value="ContainerNode"/>
+  <annotations xmi:id="_cfJzYClhEea6gp11D-4p9A" key="afm.nodeInputs">
+    <annotations xmi:id="_cf-SwClhEea6gp11D-4p9A" key="INPUT" value=""/>
+  </annotations>
+  <annotations xmi:id="_cimwAClhEea6gp11D-4p9A" key="afm.nodeOutputs"/>
+  <inputs xmi:id="_vd0TQClVEea6gp11D-4p9A" name="INPUT" kind="TABLE">
+    <attributes xmi:id="_G77uEClXEea6gp11D-4p9A" name="LOGDETAILID" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+    <attributes xmi:id="_VgXn4ClXEea6gp11D-4p9A" name="LOGTRACEID" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+    <attributes xmi:id="_XoPTUClXEea6gp11D-4p9A" name="LOGSTATUS" type="NVARCHAR" nullable="true" length="16" scale="0"/>
+    <attributes xmi:id="_Z14PkClXEea6gp11D-4p9A" name="LOGTIMESTAMP" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+    <attributes xmi:id="_i9rhkClXEea6gp11D-4p9A" name="LOGLOCATION" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+    <attributes xmi:id="_p96DEClXEea6gp11D-4p9A" name="LOGMESSAGE" type="NVARCHAR" nullable="true" length="5000" scale="0"/>
+  </inputs>
+  <tableMappings xmi:id="_ip3eoClgEea6gp11D-4p9A" source="_fh6POClgEea6gp11D-4p9A" target="_g-VJ6ClgEea6gp11D-4p9A">
+    <attributeMappings xmi:id="_ip3eoSlgEea6gp11D-4p9A" source="_fh6POSlgEea6gp11D-4p9A" target="_hY8CQClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3eoilgEea6gp11D-4p9A" source="_fh6POilgEea6gp11D-4p9A" target="_hZol0ClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3eoylgEea6gp11D-4p9A" source="_fh6POylgEea6gp11D-4p9A" target="_hadFMClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3epClgEea6gp11D-4p9A" source="_fh6PPClgEea6gp11D-4p9A" target="_hbPvYClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3epSlgEea6gp11D-4p9A" source="_fh6PPSlgEea6gp11D-4p9A" target="_hb_WQClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3epilgEea6gp11D-4p9A" source="_fh6PPilgEea6gp11D-4p9A" target="_hcyAcClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3epylgEea6gp11D-4p9A" source="_fh6PPylgEea6gp11D-4p9A" target="_hdr_YClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3eqClgEea6gp11D-4p9A" source="_fh6PQClgEea6gp11D-4p9A" target="_henzgClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3eqSlgEea6gp11D-4p9A" source="_fh6PQSlgEea6gp11D-4p9A" target="_hfevIClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3eqilgEea6gp11D-4p9A" source="_fh6PQilgEea6gp11D-4p9A" target="_hgbKUClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3eqylgEea6gp11D-4p9A" source="_fh6PQylgEea6gp11D-4p9A" target="_hhZasClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3erClgEea6gp11D-4p9A" source="_fh6PRClgEea6gp11D-4p9A" target="_hiUAsClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3erSlgEea6gp11D-4p9A" source="_fh6PRSlgEea6gp11D-4p9A" target="_hjN_oClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3erilgEea6gp11D-4p9A" source="_fh6PRilgEea6gp11D-4p9A" target="_hkEUMClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3erylgEea6gp11D-4p9A" source="_fh6PRylgEea6gp11D-4p9A" target="_hk6owClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3esClgEea6gp11D-4p9A" source="_fh6PSClgEea6gp11D-4p9A" target="_hl110ClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3esSlgEea6gp11D-4p9A" source="_fh6PSSlgEea6gp11D-4p9A" target="_hmxp8ClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_ip3esilgEea6gp11D-4p9A" source="_fh6PSilgEea6gp11D-4p9A" target="_hnzksClgEea6gp11D-4p9A"/>
+  </tableMappings>
+  <tableMappings xmi:id="_j7mMTSlgEea6gp11D-4p9A" source="_vd0TQClVEea6gp11D-4p9A" target="_g-VJ6SlgEea6gp11D-4p9A">
+    <attributeMappings xmi:id="_j7mMTilgEea6gp11D-4p9A" source="_G77uEClXEea6gp11D-4p9A" target="_j7llMClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_j7mMTylgEea6gp11D-4p9A" source="_VgXn4ClXEea6gp11D-4p9A" target="_j7llMSlgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_j7mMUClgEea6gp11D-4p9A" source="_XoPTUClXEea6gp11D-4p9A" target="_j7llMilgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_j7mMUSlgEea6gp11D-4p9A" source="_Z14PkClXEea6gp11D-4p9A" target="_j7llMylgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_j7mMUilgEea6gp11D-4p9A" source="_i9rhkClXEea6gp11D-4p9A" target="_j7llNClgEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_j7mMUylgEea6gp11D-4p9A" source="_p96DEClXEea6gp11D-4p9A" target="_j7llNSlgEea6gp11D-4p9A"/>
+  </tableMappings>
+  <tableMappings xmi:id="_U57ucClhEea6gp11D-4p9A" source="_g-VJ6ilgEea6gp11D-4p9A" target="_ULmByClhEea6gp11D-4p9A">
+    <attributeMappings xmi:id="_U57ucSlhEea6gp11D-4p9A" source="_h7yQoClgEea6gp11D-4p9A" target="_ULmBySlhEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_U57ucilhEea6gp11D-4p9A" source="_iLVIgClgEea6gp11D-4p9A" target="_ULmBzClhEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_U57ucylhEea6gp11D-4p9A" source="_j7mMQSlgEea6gp11D-4p9A" target="_ULmByylhEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_aMUOEClhEea6gp11D-4p9A" source="_j7mMRClgEea6gp11D-4p9A" target="_ULmByilhEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_bh5g8ClhEea6gp11D-4p9A" source="_j7mMRSlgEea6gp11D-4p9A" target="_ULmBzSlhEea6gp11D-4p9A"/>
+    <attributeMappings xmi:id="_b8fyQClhEea6gp11D-4p9A" source="_j7mMQylgEea6gp11D-4p9A" target="_ULmBzilhEea6gp11D-4p9A"/>
+  </tableMappings>
+  <nodes xsi:type="flowgraph:DataNode" xmi:id="_fh6PMClgEea6gp11D-4p9A" name="CDMDEFAULT_HC_HPH_DI_MODEL__DATAINTEGRATION_AUDITLOG" type="DATABASE_TABLE" catalogObjectName="hc.hph.di.model::DataIntegration.AuditLog" dataLayout="COLUMN" truncateTable="false">
+    <annotations xmi:id="_fh6PMSlgEea6gp11D-4p9A" key="afm.description" value="Read data from a catalog or repository object"/>
+    <annotations xmi:id="_fh6PMilgEea6gp11D-4p9A" key="afm.displayName" value="Data Source"/>
+    <annotations xmi:id="_fh6PMylgEea6gp11D-4p9A" key="afm.layout">
+      <annotations xmi:id="_fh6PNClgEea6gp11D-4p9A" key="x" value="74"/>
+      <annotations xmi:id="_fh6PNSlgEea6gp11D-4p9A" key="y" value="30"/>
+      <annotations xmi:id="_fh6PNilgEea6gp11D-4p9A" key="width" value="100"/>
+      <annotations xmi:id="_fh6PNylgEea6gp11D-4p9A" key="height" value="64"/>
+    </annotations>
+    <annotations xmi:id="_cjYMEClhEea6gp11D-4p9A" key="afm.nodeType" value="DataNode"/>
+    <annotations xmi:id="_ck2ywClhEea6gp11D-4p9A" key="afm.nodeInputs"/>
+    <annotations xmi:id="_cllLgClhEea6gp11D-4p9A" key="afm.nodeOutputs">
+      <annotations xmi:id="_cmw3QClhEea6gp11D-4p9A" key="DATA_2" value="INPUT1"/>
+    </annotations>
+    <outputs xmi:id="_fh6POClgEea6gp11D-4p9A" name="DATA_2" kind="TABLE">
+      <attributes xmi:id="_fh6POSlgEea6gp11D-4p9A" name="AdditionalParams" type="NCLOB" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_fh6POilgEea6gp11D-4p9A" name="AuditLogID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_fh6POylgEea6gp11D-4p9A" name="DocumentID" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_fh6PPClgEea6gp11D-4p9A" name="DocumentName" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_fh6PPSlgEea6gp11D-4p9A" name="DocumentSize" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_fh6PPilgEea6gp11D-4p9A" name="DocumentType" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_fh6PPylgEea6gp11D-4p9A" name="DocumentURI" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_fh6PQClgEea6gp11D-4p9A" name="EndTime" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_fh6PQSlgEea6gp11D-4p9A" name="ExtensionID" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_fh6PQilgEea6gp11D-4p9A" name="Notes" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_fh6PQylgEea6gp11D-4p9A" name="ParentAuditLogID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_fh6PRClgEea6gp11D-4p9A" name="ProcessID" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_fh6PRSlgEea6gp11D-4p9A" name="ProcessType" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_fh6PRilgEea6gp11D-4p9A" name="ProfileID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_fh6PRylgEea6gp11D-4p9A" name="ProfileJSONParams" type="NCLOB" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_fh6PSClgEea6gp11D-4p9A" name="SourceID" type="NVARCHAR" nullable="true" length="5" scale="0"/>
+      <attributes xmi:id="_fh6PSSlgEea6gp11D-4p9A" name="StartTime" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_fh6PSilgEea6gp11D-4p9A" name="Status" type="NVARCHAR" nullable="true" length="16" scale="0"/>
+    </outputs>
+  </nodes>
+  <nodes xsi:type="flowgraph:JoinNode" xmi:id="_g-VJ4ClgEea6gp11D-4p9A" name="JOIN">
+    <annotations xmi:id="_g-VJ4SlgEea6gp11D-4p9A" key="afm.description" value="Join two input sources"/>
+    <annotations xmi:id="_g-VJ4ilgEea6gp11D-4p9A" key="afm.displayName" value="Join"/>
+    <annotations xmi:id="_g-VJ4ylgEea6gp11D-4p9A" key="afm.layout">
+      <annotations xmi:id="_g-VJ5ClgEea6gp11D-4p9A" key="x" value="205"/>
+      <annotations xmi:id="_g-VJ5SlgEea6gp11D-4p9A" key="y" value="163"/>
+      <annotations xmi:id="_g-VJ5ilgEea6gp11D-4p9A" key="width" value="100"/>
+      <annotations xmi:id="_g-VJ5ylgEea6gp11D-4p9A" key="height" value="104"/>
+    </annotations>
+    <annotations xmi:id="_csPNIClhEea6gp11D-4p9A" key="afm.nodeType" value="JoinNode"/>
+    <annotations xmi:id="_cvQE4ClhEea6gp11D-4p9A" key="afm.nodeInputs">
+      <annotations xmi:id="_cw6RwClhEea6gp11D-4p9A" key="INPUT1" value="DATA_2"/>
+      <annotations xmi:id="_cyrMUClhEea6gp11D-4p9A" key="INPUT2" value="INPUT"/>
+    </annotations>
+    <annotations xmi:id="_c7zTIClhEea6gp11D-4p9A" key="afm.nodeOutputs">
+      <annotations xmi:id="_c9vM0ClhEea6gp11D-4p9A" key="OUTPUT_2" value="DATA"/>
+    </annotations>
+    <inputs xmi:id="_g-VJ6ClgEea6gp11D-4p9A" name="INPUT1" kind="TABLE">
+      <attributes xmi:id="_hY8CQClgEea6gp11D-4p9A" name="AdditionalParams" type="NCLOB" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_hZol0ClgEea6gp11D-4p9A" name="AuditLogID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_hadFMClgEea6gp11D-4p9A" name="DocumentID" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_hbPvYClgEea6gp11D-4p9A" name="DocumentName" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_hb_WQClgEea6gp11D-4p9A" name="DocumentSize" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_hcyAcClgEea6gp11D-4p9A" name="DocumentType" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_hdr_YClgEea6gp11D-4p9A" name="DocumentURI" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_henzgClgEea6gp11D-4p9A" name="EndTime" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_hfevIClgEea6gp11D-4p9A" name="ExtensionID" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_hgbKUClgEea6gp11D-4p9A" name="Notes" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_hhZasClgEea6gp11D-4p9A" name="ParentAuditLogID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_hiUAsClgEea6gp11D-4p9A" name="ProcessID" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_hjN_oClgEea6gp11D-4p9A" name="ProcessType" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_hkEUMClgEea6gp11D-4p9A" name="ProfileID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_hk6owClgEea6gp11D-4p9A" name="ProfileJSONParams" type="NCLOB" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_hl110ClgEea6gp11D-4p9A" name="SourceID" type="NVARCHAR" nullable="true" length="5" scale="0"/>
+      <attributes xmi:id="_hmxp8ClgEea6gp11D-4p9A" name="StartTime" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_hnzksClgEea6gp11D-4p9A" name="Status" type="NVARCHAR" nullable="true" length="16" scale="0"/>
+    </inputs>
+    <inputs xmi:id="_g-VJ6SlgEea6gp11D-4p9A" name="INPUT2" kind="TABLE">
+      <attributes xmi:id="_j7llMClgEea6gp11D-4p9A" name="LOGDETAILID" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_j7llMSlgEea6gp11D-4p9A" name="LOGTRACEID" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_j7llMilgEea6gp11D-4p9A" name="LOGSTATUS" type="NVARCHAR" nullable="true" length="16" scale="0"/>
+      <attributes xmi:id="_j7llMylgEea6gp11D-4p9A" name="LOGTIMESTAMP" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_j7llNClgEea6gp11D-4p9A" name="LOGLOCATION" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_j7llNSlgEea6gp11D-4p9A" name="LOGMESSAGE" type="NVARCHAR" nullable="true" length="5000" scale="0"/>
+    </inputs>
+    <outputs xmi:id="_g-VJ6ilgEea6gp11D-4p9A" name="OUTPUT_2" kind="TABLE">
+      <attributes xmi:id="_h7yQoClgEea6gp11D-4p9A" name="AuditLogID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_iA1vwClgEea6gp11D-4p9A" name="DocumentURI" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_iKCIAClgEea6gp11D-4p9A" name="SourceID" type="NVARCHAR" nullable="true" length="5" scale="0"/>
+      <attributes xmi:id="_iKsPUClgEea6gp11D-4p9A" name="StartTime" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_iLVIgClgEea6gp11D-4p9A" name="Status" type="NVARCHAR" nullable="true" length="16" scale="0"/>
+      <attributes xmi:id="_j7mMQClgEea6gp11D-4p9A" name="LOGDETAILID" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_j7mMQSlgEea6gp11D-4p9A" name="LOGTRACEID" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_j7mMQilgEea6gp11D-4p9A" name="LOGSTATUS" type="NVARCHAR" nullable="true" length="16" scale="0"/>
+      <attributes xmi:id="_j7mMQylgEea6gp11D-4p9A" name="LOGTIMESTAMP" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_j7mMRClgEea6gp11D-4p9A" name="LOGLOCATION" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_j7mMRSlgEea6gp11D-4p9A" name="LOGMESSAGE" type="NVARCHAR" nullable="true" length="5000" scale="0"/>
+    </outputs>
+    <tableMappings xmi:id="_iL_P0ClgEea6gp11D-4p9A" source="_g-VJ6ClgEea6gp11D-4p9A" target="_g-VJ6ilgEea6gp11D-4p9A">
+      <attributeMappings xmi:id="_iOwP8ClgEea6gp11D-4p9A" source="_hZol0ClgEea6gp11D-4p9A" target="_h7yQoClgEea6gp11D-4p9A"/>
+      <attributeMappings xmi:id="_iWsrAClgEea6gp11D-4p9A" source="_hdr_YClgEea6gp11D-4p9A" target="_iA1vwClgEea6gp11D-4p9A"/>
+      <attributeMappings xmi:id="_imfagClgEea6gp11D-4p9A" source="_hl110ClgEea6gp11D-4p9A" target="_iKCIAClgEea6gp11D-4p9A"/>
+      <attributeMappings xmi:id="_in1eUClgEea6gp11D-4p9A" source="_hmxp8ClgEea6gp11D-4p9A" target="_iKsPUClgEea6gp11D-4p9A"/>
+      <attributeMappings xmi:id="_ipLiIClgEea6gp11D-4p9A" source="_hnzksClgEea6gp11D-4p9A" target="_iLVIgClgEea6gp11D-4p9A"/>
+    </tableMappings>
+    <tableMappings xmi:id="_j7mMRilgEea6gp11D-4p9A" source="_g-VJ6SlgEea6gp11D-4p9A" target="_g-VJ6ilgEea6gp11D-4p9A">
+      <attributeMappings xmi:id="_j7mMRylgEea6gp11D-4p9A" source="_j7llMClgEea6gp11D-4p9A" target="_j7mMQClgEea6gp11D-4p9A"/>
+      <attributeMappings xmi:id="_j7mMSClgEea6gp11D-4p9A" source="_j7llMSlgEea6gp11D-4p9A" target="_j7mMQSlgEea6gp11D-4p9A"/>
+      <attributeMappings xmi:id="_j7mMSSlgEea6gp11D-4p9A" source="_j7llMilgEea6gp11D-4p9A" target="_j7mMQilgEea6gp11D-4p9A"/>
+      <attributeMappings xmi:id="_j7mMSilgEea6gp11D-4p9A" source="_j7llMylgEea6gp11D-4p9A" target="_j7mMQylgEea6gp11D-4p9A"/>
+      <attributeMappings xmi:id="_j7mMSylgEea6gp11D-4p9A" source="_j7llNClgEea6gp11D-4p9A" target="_j7mMRClgEea6gp11D-4p9A"/>
+      <attributeMappings xmi:id="_j7mMTClgEea6gp11D-4p9A" source="_j7llNSlgEea6gp11D-4p9A" target="_j7mMRSlgEea6gp11D-4p9A"/>
+    </tableMappings>
+    <joinDefinitions xmi:id="_lSV8wClgEea6gp11D-4p9A" left="_g-VJ6ClgEea6gp11D-4p9A" right="_g-VJ6SlgEea6gp11D-4p9A" type="INNER" condition="&quot;INPUT1&quot;.&quot;DocumentURI&quot;=&quot;INPUT2&quot;.&quot;LOGDETAILID&quot;"/>
+  </nodes>
+  <nodes xsi:type="flowgraph:DataNode" xmi:id="_ULmBwClhEea6gp11D-4p9A" name="CDMDEFAULT_HC_HPH_DI_MODEL__DATAINTEGRATION_AUDITLOGTRACE" type="DATABASE_TABLE" catalogObjectName="hc.hph.di.model::DataIntegration.AuditLogTrace" dataLayout="COLUMN" truncateTable="false">
+    <annotations xmi:id="_ULmBwSlhEea6gp11D-4p9A" key="afm.description" value="Write data to a catalog object"/>
+    <annotations xmi:id="_ULmBwilhEea6gp11D-4p9A" key="afm.displayName" value="Data Sink"/>
+    <annotations xmi:id="_ULmBwylhEea6gp11D-4p9A" key="afm.layout">
+      <annotations xmi:id="_ULmBxClhEea6gp11D-4p9A" key="x" value="404"/>
+      <annotations xmi:id="_ULmBxSlhEea6gp11D-4p9A" key="y" value="179"/>
+      <annotations xmi:id="_ULmBxilhEea6gp11D-4p9A" key="width" value="100"/>
+      <annotations xmi:id="_ULmBxylhEea6gp11D-4p9A" key="height" value="64"/>
+    </annotations>
+    <annotations xmi:id="_dDIDIClhEea6gp11D-4p9A" key="afm.nodeType" value="DataNode"/>
+    <annotations xmi:id="_dHlFUClhEea6gp11D-4p9A" key="afm.nodeInputs">
+      <annotations xmi:id="_dJoTwClhEea6gp11D-4p9A" key="DATA" value="OUTPUT_2"/>
+    </annotations>
+    <annotations xmi:id="_dOwEUClhEea6gp11D-4p9A" key="afm.nodeOutputs"/>
+    <inputs xmi:id="_ULmByClhEea6gp11D-4p9A" name="DATA" kind="TABLE">
+      <attributes xmi:id="_ULmBySlhEea6gp11D-4p9A" name="AuditLogID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_ULmByilhEea6gp11D-4p9A" name="Location" type="NVARCHAR" nullable="true" length="512" scale="0"/>
+      <attributes xmi:id="_ULmByylhEea6gp11D-4p9A" name="LogTraceID" type="NVARCHAR" nullable="false" length="256" scale="0"/>
+      <attributes xmi:id="_ULmBzClhEea6gp11D-4p9A" name="Status" type="NVARCHAR" nullable="true" length="16" scale="0"/>
+      <attributes xmi:id="_ULmBzSlhEea6gp11D-4p9A" name="Text" type="NVARCHAR" nullable="true" length="5000" scale="0"/>
+      <attributes xmi:id="_ULmBzilhEea6gp11D-4p9A" name="Timestamp" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+    </inputs>
+  </nodes>
+</flowgraph:ContainerNode>

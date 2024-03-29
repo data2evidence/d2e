@@ -1,0 +1,55 @@
+PROCEDURE "hc.hph.genomics.db.procedures.vb::GeneVariantCounts" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        OUT gene_variant_counts "hc.hph.genomics.db.models::VariantBrowser.RegionCounts",
+        OUT sample_count INTEGER
+    )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER
+    READS SQL DATA AS
+BEGIN
+    SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+
+    -- return a list of genes with the number of affected patients
+    gene_variant_counts =        
+        SELECT
+            "Features"."FeatureName" AS "GeneName" ,
+            "Variants"."ChromosomeIndex" AS "ChromosomeIndex",
+            MIN ( "Features"."Region.Begin" ) AS "Begin",
+            MAX ( "Features"."Region.End" ) AS "End",
+            COUNT( DISTINCT "AllSamples"."PatientDWID" ) as "Count"
+        FROM
+            :sample_list as "Samples"
+            INNER JOIN "hc.hph.genomics.db.models::General.Samples" as "AllSamples"
+                ON "Samples"."SampleIndex" = "AllSamples"."SampleIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+                ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+                ON "Genotypes"."DWAuditID" = "Variants"."DWAuditID"
+                AND "Genotypes"."VariantIndex" = "Variants"."VariantIndex"
+            JOIN "hc.hph.genomics.db.models::Reference.Features" AS "Features"
+                ON "Variants"."ChromosomeIndex" = "Features"."ChromosomeIndex"
+                AND "Variants"."Position" BETWEEN "Features"."Region.Begin" AND "Features"."Region.End" - 1
+                AND "Features"."Class" = 'gene'
+        WHERE
+            "Genotypes"."ReferenceAlleleCount" != "Genotypes"."CopyNumber" 
+            AND "Features"."ReferenceID" = :reference_id
+            AND (
+                :end_position IS NULL
+                OR (
+                    "Features"."Region.Begin" < :end_position
+                    AND "Features"."Region.End" > :begin_position
+                )
+            )
+        GROUP BY
+            "Variants"."ChromosomeIndex",
+            "Features"."FeatureName"
+        ORDER BY
+             "Variants"."ChromosomeIndex";
+    IF :chromosome_index IS NOT NULL THEN
+        gene_variant_counts = SELECT * FROM :gene_variant_counts WHERE "ChromosomeIndex" = :chromosome_index;
+    END IF;
+END

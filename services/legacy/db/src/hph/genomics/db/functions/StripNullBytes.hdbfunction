@@ -1,0 +1,18 @@
+FUNCTION "hc.hph.genomics.db.functions::StripNullBytes" ( input NVARCHAR(5000) )
+RETURNS output NVARCHAR(5000)
+LANGUAGE SQLScript AS
+BEGIN
+      DECLARE buffer NVARCHAR(5000) := BINTOHEX( TO_BINARY( input ) );
+      IF :input IS NULL THEN
+        output := NULL;
+      ELSE
+          output := '';
+          WHILE LENGTH( :buffer ) > 1 DO
+                IF SUBSTRING( :buffer, 1, 2 ) <> '00' THEN
+                      output := :output || SUBSTRING( :buffer, 1, 2 );
+                END IF;
+                buffer := SUBSTRING( :buffer, 3 );
+          END WHILE;
+          output := BINTOSTR( HEXTOBIN( :output ) );
+    END IF;
+END;

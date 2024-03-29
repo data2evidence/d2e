@@ -1,0 +1,44 @@
+PROCEDURE "hc.hph.di.procedures::getProfileScheduleRunInfo" ( 
+	IN MonitorID BIGINT,
+	IN lang NVARCHAR(5),
+	OUT monitorrun "hc.hph.di.model::DataIntegration.MonitorRun"
+	) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	 AS 
+BEGIN
+	monitorrun=SELECT
+		 profile."Name" as "ProfileName",
+		 profile."Status" as "ProfileStatus",
+		 audit_log."ProfileID" as "ProfileID",
+		 audit_log."AuditLogID" as "AuditLogID",
+		 audit_log."ParentAuditLogID" as "ParentAuditLogID",
+		 extension."Name" as "ExtensionName",
+		 CASE WHEN textbundle."CONTENT" is null THEN extension."ExtensionAlias" ELSE textbundle."CONTENT" END as "ExtensionAlias",
+		 extension."PluginID" as "PluginID",
+		 extension."Provider" as "Provider",
+		 extension."TextBundle" as "TextBundle",
+		 audit_log."ExtensionID" as "ExtensionID",
+		 audit_log."SourceID" as "SourceID",
+		 audit_log."StartTime" as "StartTime",
+		 audit_log."EndTime" as "EndTime",
+		 source."Name" as "SourceName",
+		 audit_log."Status" as "Status",
+		 audit_log."Notes" as "Notes",
+		 (SELECT count(*) from "hc.hph.di.model::DataIntegration.AuditLog" sub_audit_log 
+          where sub_audit_log."ParentAuditLogID" = audit_log."AuditLogID" and sub_audit_log."Status" = 'Completed' ) as "Success",
+         (SELECT count(*) from "hc.hph.di.model::DataIntegration.AuditLog" sub_audit_log 
+	     where sub_audit_log."ParentAuditLogID" = audit_log."AuditLogID" and sub_audit_log."Status" = 'Cancelled' ) as "Warning",
+	     (SELECT count(*) from "hc.hph.di.model::DataIntegration.AuditLog" sub_audit_log 
+         where sub_audit_log."ParentAuditLogID" = audit_log."AuditLogID" and sub_audit_log."Status" = 'Failed' ) as "Error",         
+		 audit_log."RunBy" as "RunBy",
+		 profile."ProfileType" as "ProfileType"
+	FROM "hc.hph.di.model::DataIntegration.AuditLog" as audit_log 
+	LEFT OUTER JOIN "hc.hph.di.model::DataIntegration.JobProfile" as profile on profile."ProfileID"=audit_log."ProfileID" 
+	LEFT OUTER JOIN "hc.hph.di.model::DataIntegration.DIExtension" as extension on extension."ExtensionID"=audit_log."ExtensionID" 
+	LEFT OUTER JOIN "hc.hph.di.model::DataIntegration.DISource"as source on audit_log."SourceID"=source."SourceID"
+	LEFT OUTER JOIN "hc::ACTIVE_CONTENT_TEXT_CONTENT" as textbundle on extension."ExtensionAlias" = textbundle."TEXT_ID" and textbundle."LANG" = LCASE(:lang) and textbundle."PACKAGE_ID" || '.' || textbundle."OBJECT_NAME" || '.' || textbundle."OBJECT_SUFFIX" = extension."PluginID" || '.' || REPLACE(extension."TextBundle", '/' , '.')
+	WHERE audit_log."ParentAuditLogID" = 0 and
+	audit_log."MonitorID"=:MonitorID ORDER BY audit_log."StartTime" desc;
+
+END;

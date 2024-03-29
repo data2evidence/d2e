@@ -1,0 +1,44 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::SetLogStatus" 
+(
+in auditId bigint
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN 
+ declare lt_valid_entries table("DWID" varbinary(32), "DocumentID" nvarchar(1024));
+declare lt_failed_documents table("DWID" varbinary(32), "DocumentID" nvarchar(1024));
+declare lt_succeeded_documents table("DWID" varbinary(32), "DocumentID" nvarchar(1024));
+
+--get all valid records.
+
+lt_valid_entries = select distinct "DWID", "DocumentID" from "hc.hph.plugins.documents.db.models::Interface.ProcessingStageView"
+				   where "ParentAuditLogID" = :auditId
+				   and "ScheduleID" is not null;
+				   
+--get all failed records.
+
+lt_failed_documents = select valid."DWID",valid."DocumentID" from :lt_valid_entries valid
+					  inner join "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" status
+					  on valid."DWID" = status."DWID" where status."DWAuditID" = :auditId
+					  and status."Status" = 'FinalizedWithError'
+					  and status."ScheduleID" != 0;		 
+					  
+--set the log
+
+update "hc.hph.di.model::DataIntegration.AuditLog"
+set "Status" = 'Failed',
+"Notes" = 'Run Failed. Please check Audit Log Trace.'
+where "ParentAuditLogID" = :auditId
+and "DocumentID" in(select "DocumentID" from :lt_failed_documents);
+				      
+--get the succeded documents.
+
+lt_succeeded_documents = select "DWID", "DocumentID" from :lt_valid_entries minus select "DWID", "DocumentID" from :lt_failed_documents;
+
+update "hc.hph.di.model::DataIntegration.AuditLog"
+set "Status" = 'Completed',
+"Notes" = 'Completed'
+where "ParentAuditLogID" = :auditId
+and "DocumentID" in(select "DocumentID" from :lt_succeeded_documents);
+END;

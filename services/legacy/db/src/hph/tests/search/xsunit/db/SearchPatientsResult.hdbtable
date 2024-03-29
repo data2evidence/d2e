@@ -1,0 +1,1 @@
+COLUMN TABLE "hc.hph.tests.search.xsunit.db::SearchPatientsResult" ("RunID" NVARCHAR(32), "TS" INTEGER CS_INT, "Name" NVARCHAR(100), "SearchTerm" NVARCHAR(1000), "Description" NVARCHAR(1024), "Position" INTEGER CS_INT, "GivenName" NVARCHAR(100), "FamilyName" NVARCHAR(100), "PatientID" NVARCHAR(100), "Preview" NVARCHAR(3000)) UNLOAD PRIORITY 5  AUTO MERGE 

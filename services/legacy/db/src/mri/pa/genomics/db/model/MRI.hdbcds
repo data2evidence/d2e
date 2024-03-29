@@ -1,0 +1,42 @@
+namespace hc.mri.pa.genomics.db.model;
+
+using hc.hph.genomics.db.models::Type as Type;
+using hc.hph.genomics.db.models::SNV as SNV;
+using hc.hph.genomics.db.models::General as General;
+
+
+
+context MRI
+{
+    entity SessionHeaders {
+        key Id : String(255);
+        ValidUntil : UTCTimestamp not null;
+        Username : String(256) not null;
+    };
+
+    entity SampleCohortSessions {
+        key SampleIndex : Type.SampleIndex; // ToDo: Association to General.Samples; (Currently not possible due to data issues)
+        key SampleGroup : String(255);
+        key Session : Association to SessionHeaders;
+    };
+
+    view Sessions as select from SampleCohortSessions {
+        SampleIndex,
+        SampleGroup,
+        Session.Id as SessionId
+    }
+    where
+        Session.Username = SESSION_CONTEXT('APPLICATIONUSER')
+        AND Session.ValidUntil >= CURRENT_UTCTIMESTAMP;
+
+        
+    view Interaction as select from General.Samples {
+        PatientDWID as PATIENT_ID,
+        InteractionDWID as INTERACTION_ID,
+        SampleIndex as SAMPLE_ID,
+        ReferenceID as REFERENCE_ID,
+        SampleClass as SAMPLE_CLASS,
+        AnalysisDate as "START",
+        AnalysisDate as "END"
+    };
+};

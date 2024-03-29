@@ -1,0 +1,43 @@
+PROCEDURE "hc.hph.genomics.db.procedures.genetables::GeneCorrelation" (
+	IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+	IN variant_grouping "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping",
+	IN reference NVARCHAR(255),
+	OUT output_table table("GeneName" NVARCHAR(255),
+						   "PatientDWID" NVARCHAR(255),
+						   "TotalPatients" INTEGER)
+	)
+   	LANGUAGE SQLSCRIPT
+   	SQL SECURITY INVOKER
+  	 --DEFAULT SCHEMA <default_schema_name>
+  	 READS SQL DATA AS
+BEGIN
+	DECLARE totalPatients INTEGER;
+   
+   	SELECT COUNT(DISTINCT S."PatientDWID") INTO totalPatients 
+   	FROM 
+   	:sample_list TT
+    	INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS S
+	    	ON TT."SampleIndex" = S."SampleIndex";
+
+	output_table = SELECT DISTINCT
+		F."GeneName" AS "GeneName",
+	 	BINTOHEX(S."PatientDWID") AS "PatientDWID",
+	 	:totalPatients AS "TotalPatients"
+	FROM 
+	:sample_list TT
+    	INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS S
+	    	ON TT."SampleIndex" = S."SampleIndex"
+	    INNER JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS G
+	        ON TT."SampleIndex" = G."SampleIndex" AND G."ReferenceAlleleCount" <> G."CopyNumber"
+	    INNER JOIN "hc.hph.genomics.db.models::SNV.Variants" AS UV
+           	ON G."DWAuditID" = UV."DWAuditID" AND G."VariantIndex" = UV."VariantIndex"
+        INNER JOIN :variant_grouping
+        	ON :variant_grouping."DWAuditID" = UV."DWAuditID" AND :variant_grouping."VariantIndex" = UV."VariantIndex"
+        INNER JOIN (SELECT DISTINCT CASE WHEN "FeatureName" IS NULL OR "FeatureName" = '' THEN "FeatureID" ELSE "FeatureName" END AS "GeneName",
+			  "ChromosomeIndex","Region.Begin","Region.End" 
+    	      FROM "hc.hph.genomics.db.models::Reference.Features" WHERE "ReferenceID"=:reference AND "Class"='gene') AS F
+    	      ON UV."ChromosomeIndex" = F."ChromosomeIndex" AND UV."Position" BETWEEN F."Region.Begin" AND F."Region.End"-1
+    ORDER BY "GeneName";
+      
+END;
+ 

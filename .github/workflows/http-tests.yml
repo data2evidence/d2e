@@ -1,0 +1,240 @@
+name: Run HTTP tests
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened, synchronize]
+  push:
+      branches:
+        - develop
+
+env:
+  ENV_NAME: local
+  ENV_TYPE: local
+
+# Run only one job per branch
+concurrency: 
+  group: ${{  github.head_ref || github.ref_name }}-http-tests # Run the latest push 
+  cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
+jobs:
+
+  check_file_changes:
+      runs-on: ubuntu-latest
+      if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+      outputs:
+        changes: ${{ steps.file_changes.outputs.src }}
+      steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dorny/paths-filter@v2
+        id: file_changes
+        with:
+          initial-fetch-depth: 1
+          filters: |
+            src:
+              - "alp-libs/nodejs/**"
+              - "services/analytics-svc/**"
+              - "services/bookmark-svc/**"
+              - "services/cdw-svc/**"
+              - "services/mri-pa-config/**"
+              - "services/mri-pg-config/**"
+              - "services/ps-config/**"
+              - "alp-data-node/query-gen-svc/**"
+              - "services/mri-db/**"
+              - "internal/build/initdb.js"
+              - ".github/workflows/http-tests.yml"
+
+  run-http-tests:
+    needs: [check_file_changes]
+    if: (github.ref_name == 'develop' || contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    runs-on: ubuntu-latest
+    env:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      TESTSCHEMA: HTTP_${{github.run_id}}
+      isTestEnv: "true"
+      isHttpTestRun: "true"
+      DOCKER_TAG_NAME: "local"
+      SKIP_AUTH: "TRUE"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.14.0'
+      
+      - name: Load dotenv from 1password
+        uses: 1password/load-secrets-action@v1
+        id: op-load-secret
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          DOCKER_COMPOSE_DN_BASE_ALL_ENV: op://${{ vars.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain
+          DOCKER_COMPOSE_DN_BASE_LOCAL_ENV: op://${{ vars.OP_VAULT_NAME }}/.env.base-local.yml/notesPlain
+          DOCKER_COMPOSE_DN_LOCAL_ENV: op://${{ vars.OP_VAULT_NAME }}/.env.http.tests.yml/notesPlain
+          HANASERVER: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DE_FQDN"
+          HANASERVER_REPLACE: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/SG_FQDN"
+          HDIUSER: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin user"
+          HDIPORT: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DB Port"
+          HDIPW: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin password"
+          TESTSYSTEMPW: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin password"
+          TESTPORT: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DB Port"
+
+      - name: Print env vars
+        run: |
+          echo "DOCKER_TAG_NAME: ${DOCKER_TAG_NAME}"
+          echo "HDIPORT: ${HDIPORT}"
+          echo "HDIPW: ${HDIPW}"
+          echo "HDIUSER: ${HDIUSER}"
+          echo "HANASERVER: ${HANASERVER}"
+          echo "HANASERVER_REPLACE: ${HANASERVER_REPLACE}"
+          echo "isHttpTestRun: ${isHttpTestRun}"
+          echo "isTestEnv: ${isTestEnv:-false}"
+          echo "SKIP_AUTH: ${SKIP_AUTH}"
+          echo "TESTSCHEMA: ${TESTSCHEMA}"
+
+      - name: Install 1Password CLI
+        uses: 1password/install-cli-action@v1
+
+      - name: Get alp-dbcli from 1password
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        run: |
+          pwd
+          mkdir -p alp-data-node-override/build
+          op read --out-file alp-data-node-override/build/alp-dbcli-v1.0.0.tgz "op://Singapore/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
+          ls -l internal/build
+
+      - name: create .env.local for docker-compose in system services
+        run: |
+          # cd alp-data-node
+          dn_dir=$PWD
+          # cd alp-data-node-override
+          echo "${DOCKER_COMPOSE_DN_BASE_ALL_ENV}" > .env.base-all.yml
+          echo "${DOCKER_COMPOSE_DN_BASE_LOCAL_ENV}" > .env.base-local.yml
+          echo "${DOCKER_COMPOSE_DN_LOCAL_ENV}" > .env.local.yml
+          # overwrite=true env_name=local yarn op:get:local
+          wc -l .env.base-all.yml .env.base-local.yml .env.local.yml
+          dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
+          cd $dn_dir
+          env_type=$ENV_TYPE yarn gen:tls
+
+          sed -i "s/${HANASERVER_REPLACE}/${HANASERVER}/g" .env.local
+          sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
+          # sed -i "s/HTTPTEST_ADMIN_USER/${HDIUSER}/g" .env.local
+          # sed -i "s/HTTPTEST_ADMIN_PWD/${HDIPW}/g" .env.local
+          # cat .env.local
+          # cd ..
+
+      - name: Setup Test DB
+        run: |
+            yarn --prefer-offline
+            yarn inittestdb
+      - name: build system services
+        run: |
+          yarn build:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc
+
+      - name: Manipulate configuration
+        run : |
+            yq -i '.networks.alp.external=true' docker-compose.yml
+            yq -i '.services.alp-minerva-portal-server.environment.APP__DEPLOY_MODE="proxy"' docker-compose.yml
+            yq -i '.services.alp-minerva-gateway.environment.APP__DEPLOY_MODE="proxy"' docker-compose.yml
+            yq -i '.services.alp-caddy.environment.CS_PUBLIC_FQDN="localhost:41000"' docker-compose.yml
+            yq -i '.services.alp-caddy.ports |= ["41100:41100", "41000:41000"]' docker-compose.yml
+
+      - name: start system services
+        run : |
+            yarn start:minerva-test alp-minerva-postgres alp-minerva-gateway alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-analytics-svc alp-minerva-pa-config-svc alp-minerva-cdw-svc
+            sleep 120
+            # yarn start:minerva-test alp-minerva-analytics-svc
+            # cd -
+      - name: check status of docker containers
+        run : |
+            docker ps -a
+      # - name: Install dependencies in backend integration tests
+      #   working-directory: ./tests/backend_integration_tests
+      #   run: |
+      #     yarn
+      # - name: sleep for 20 seconds until all services starts up
+      #   run: sleep 20s
+      # - name: Run HTTP tests
+      #   working-directory: ./tests/backend_integration_tests
+      #   run: yarn test-specs --test_schema_name=$TESTSCHEMA
+      # # print docker logs for debugging
+      # - name: print logs for caddy
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-caddy -t
+      # - name: print logs for alp-minerva-portal-server-nest-prod-1
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-portal-server-nest-prod-1 -t
+      # - name: print logs for user-mgmt
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-user-mgmt-1 -t
+      # - name: print logs for alp-minerva-postgres-1
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-postgres-1 -t
+      # - name: print logs for user-mgmt
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-user-mgmt-1 -t
+      # - name: print logs for query-gen-svc
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-query-gen-svc-1  -t
+      # - name: print logs for bookmark-svc
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-bookmark-svc-1 -t
+      # - name: print logs for gateway
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-gateway-1 -t
+      # - name: print logs for alp-minerva-db-credentials-mgr-1
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-db-credentials-mgr-1 -t
+      # - name: print logs for analytics-svc
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-analytics-1 -t
+      # - name: print logs for gateway
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-gateway-1 -t
+      # - name: print logs for analytics
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-analytics-1 -t
+      # - name: print logs for query-gen
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-query-gen-svc-1 -t
+      # - name: print logs for bookmarks
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-bookmark-svc-1 -t
+      # - name: print logs for pa-config
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-pa-config-svc -t
+      # - name: print logs for cdw
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: |
+      #     docker logs alp-minerva-cdw-svc -t
+      # - name: Remove Test DB
+      #   if: ${{ always() || cancelled() || failure() }}
+      #   run: yarn removetestdb
+
+      # - name: Clean Docker compose
+      #   if: always()
+      #   run: |  
+      #     # Clean DataNode services
+      #     # cd alp-data-node
+      #     yarn clean:minerva
+      #     docker network rm combined_network -f

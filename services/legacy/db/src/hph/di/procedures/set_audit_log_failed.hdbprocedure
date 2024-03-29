@@ -1,0 +1,17 @@
+PROCEDURE "hc.hph.di.procedures::set_audit_log_failed" (in audit_log_id BIGINT,IN Notes NVARCHAR(1024)) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+	-- What happens if auditLogId is invalid.
+	-- There are no sanity checks in place here. Status can be set to any user provided value
+	-- TODO: 
+	--     Refactor this procedure to provide proper error handling
+	--     Refactor to have just one procedure to update the status.Pass status as parameter
+	UPDATE "hc.hph.di.model::DataIntegration.AuditLog" audit_log 
+		SET audit_log."Status" = 'Failed',
+			audit_log."EndTime" = CURRENT_UTCTIMESTAMP,
+			audit_log."Notes" = CAST(:Notes AS NVARCHAR(1024))
+		FROM 
+			"hc.hph.di.model::DataIntegration.AuditLog" audit_log
+		WHERE "AuditLogID" = :audit_log_id;
+END;

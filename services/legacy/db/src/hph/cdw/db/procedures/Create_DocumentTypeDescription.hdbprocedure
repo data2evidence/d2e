@@ -1,0 +1,18 @@
+PROCEDURE "hc.hph.cdw.db.procedures::Create_DocumentTypeDescription" (
+	IN it_row table("DWDocumentType" nvarchar(256), "LanguageCode" nvarchar(2), "LanguageName" nvarchar(256), "ShortText" nvarchar(256)),
+	OUT ot_error "hc.hph.cdw.db.procedures::tt_error"
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+  
+	INSERT INTO "hc.hph.cdw.db.models::DWDocuments.Document_Type_Description" 
+		("DWDocumentType","LanguageCode","ShortText")
+		(SELECT "DWDocumentType","LanguageCode","ShortText" from :it_row);
+	ot_error = SELECT top 0 400 AS http_status_code, 'Bad 
+		Request' error_message, 'Error signing agreement' 
+		detail FROM "hc::DUMMY";
+  
+		
+END;
+

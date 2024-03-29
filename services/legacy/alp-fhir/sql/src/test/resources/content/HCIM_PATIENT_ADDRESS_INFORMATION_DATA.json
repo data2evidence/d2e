@@ -1,0 +1,117 @@
+{
+	"resourceType": "TableContent",
+	"id": "HCIM_PATIENT_ADDRESS_INFORMATION_DATA",
+	"definition": {
+		"reference": "HCIM_PATIENT_ADDRESS_INFORMATION"
+	},
+	"row": [
+		{
+			"column": [
+				{
+					"name": "identification_number",
+					"valueString": "1"
+				},
+				{
+					"name": "Street",
+					"valueString": "MyStreet"
+				},
+				{
+					"name": "HouseNumber",
+					"valueString": "12"
+				},
+				{
+					"name": "HouseNumberLetter",
+					"valueString": "b"
+				},
+				{
+					"name": "Postcode",
+					"valueString": "12345"
+				},
+				{
+					"name": "PlaceOfResidence",
+					"valueString": "Amsterdam"
+				},
+				{
+					"name": "Country",
+					"valueString": "NLD"
+				},
+				{
+					"name": "AddressType",
+					"valueString": "HP"
+				}
+			]
+		},
+		{
+			"column": [
+				{
+					"name": "identification_number",
+					"valueString": "999911338"
+				},
+				{
+					"name": "Street",
+					"valueString": "MyStreet Street1"
+				},
+				{
+					"name": "HouseNumber",
+					"valueString": "122"
+				},
+				{
+					"name": "HouseNumberLetter",
+					"valueString": "b"
+				},
+				{
+					"name": "Postcode",
+					"valueString": "123345"
+				},
+				{
+					"name": "PlaceOfResidence",
+					"valueString": "Amsterdam"
+				},
+				{
+					"name": "Country",
+					"valueString": "NLD"
+				},
+				{
+					"name": "AddressType",
+					"valueString": "HP"
+				}
+			]
+		},
+		{
+			"column": [
+				{
+					"name": "identification_number",
+					"valueString": "999911339"
+				},
+				{
+					"name": "Street",
+					"valueString": "MyStreet Street2"
+				},
+				{
+					"name": "HouseNumber",
+					"valueString": "123"
+				},
+				{
+					"name": "HouseNumberLetter",
+					"valueString": "b"
+				},
+				{
+					"name": "Postcode",
+					"valueString": "12333"
+				},
+				{
+					"name": "PlaceOfResidence",
+					"valueString": "Germany"
+				},
+				{
+					"name": "Country",
+					"valueString": "NLD"
+				},
+				{
+					"name": "AddressType",
+					"valueString": "HP"
+				}
+			]
+		}
+	]
+}

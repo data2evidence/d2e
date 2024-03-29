@@ -1,0 +1,21 @@
+PROCEDURE "hc.hph.cdw.db.procedures::Create_DocumentType" (
+	IN it_row table("DWDocumentType" nvarchar(256), "DocTypeCount" bigint),
+	OUT ot_error "hc.hph.cdw.db.procedures::tt_error"
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+
+  DECLARE document INTEGER;
+  DECLARE duplicate INTEGER;
+  
+	select count("DWDocumentType") into duplicate from "hc.hph.cdw.db.models::DWDocuments.Document_Type" where "DWDocumentType" in (SELECT "DWDocumentType" FROM :it_row);
+	IF :duplicate = 0 then
+	  INSERT INTO "hc.hph.cdw.db.models::DWDocuments.Document_Type"("DWDocumentType")
+		(SELECT "DWDocumentType" FROM :it_row);	
+	ELSE
+		ot_error = SELECT 301 AS http_status_code, 'Document Type already exists' error_message, 'Service Exception[301] - unique constraint violated' 
+		detail FROM "hc::DUMMY";
+	END IF;	
+END;
+ 

@@ -1,0 +1,42 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::DeleteArchive" 
+(
+in iv_schemaName nvarchar(256),
+in iv_tableName  nvarchar(256),
+in iv_DWID nvarchar(512),
+in iv_targetColumn nvarchar(256)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+ 
+ /*
+ declare lv_tableType nvarchar(16);
+
+ 
+ --Check if the table is a physical/Virtual Table
+   
+ select "TABLE_TYPE" into lv_tableType from "SYS"."TABLES"
+ where "SCHEMA_NAME" = :iv_schemaName 
+ AND "TABLE_NAME" = :iv_tableName;
+ 
+ if lv_tableType = 'VIRTUAL' then
+ 
+ 	exec 'delete from'||:iv_schemaName||':'||:iv_tableName||' where "DOCUMENTID" in(select "DWID" from '||:it_data||')';
+ 	
+ else if lv_tableType = 'PHYSICAL' then
+ 	
+ 	--Archiving Table is a physical Table
+ 	
+ 	exec 'delete from'||:iv_schemaName||':'||:iv_tableName||' where "DWID" in(select "DWID" from '||:it_data||')';
+ 	
+ end if;
+ end if;*/
+ 
+ exec 'delete from "'||:iv_schemaName||'"."'||:iv_tableName||'" where "'||:iv_targetColumn||'" = '''||:iv_DWID||'''';
+ 
+END;

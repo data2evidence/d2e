@@ -1,0 +1,233 @@
+{
+	"info": {
+		"_postman_id": "f064c9b2-05c8-47d1-98d6-9fdbab9b1baa",
+		"name": "07 MedMij BgZ  Data Protection  APIs [ Catalog  persistency ]  Tokens.postman_collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Patient $fullget operation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a2f7f3b-46ae-4c5f-94a3-0351c154fa63",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Resource type should be 'Bundle' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"Bundle\")",
+							"    pm.expect(jsonData.type).to.equal(\"search-set\")",
+							"    pm.expect(jsonData.total).to.equal(7)",
+							"    pm.expect(jsonData.entry[0].resourceType).to.equal(\"TableContent\")",
+							"    pm.expect(jsonData.entry[0].row[0].column[0].name).to.equal(\"identification_number\")",
+							"    pm.expect(jsonData.entry[1].row[0].column[0].name).to.equal(\"identification_number\")",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient/999911338/$fullget",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient",
+						"999911338",
+						"$fullget"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patient $fulldelete operation - false positive",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a2f7f3b-46ae-4c5f-94a3-0351c154fa63",
+						"exec": [
+							"pm.test(\"Status code is 400 Bad Request\", function () {",
+							"    pm.response.to.have.status(400);",
+							"    pm.response.to.have.status(\"Bad Request\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Resource type should be 'OperationOutcome' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"OperationOutcome\")",
+							"    pm.expect(jsonData.issue[0].severity).to.equal(\"error\")",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient/999911338/$fulldelete",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient",
+						"999911338",
+						"$fulldelete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patient $fulldelete operation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a2f7f3b-46ae-4c5f-94a3-0351c154fa63",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Resource type should be 'OperationOutcome' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"OperationOutcome\")",
+							"    pm.expect(jsonData.issue[0].severity).to.equal(\"information\")",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient/999911338/$fulldelete",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient",
+						"999911338",
+						"$fulldelete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Patient after delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a2f7f3b-46ae-4c5f-94a3-0351c154fa63",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(404);",
+							"    pm.response.to.have.status(\"Not Found\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Resource type should be 'OperationOutcome' \", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.resourceType).to.be.a('string')",
+							"    pm.expect(jsonData.resourceType).to.equal(\"OperationOutcome\")",
+							"    pm.expect(jsonData.issue[0].severity).to.equal(\"error\")",
+							"    pm.expect(jsonData.issue[0].code).to.equal(\"not-found\")",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/hcim_demo/fhir/Patient/999911338",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"hcim_demo",
+						"fhir",
+						"Patient",
+						"999911338"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

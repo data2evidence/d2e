@@ -1,0 +1,245 @@
+
+/**
+ * Delete all records from CDW for given Audit Log ID.
+ 
+ * @param[in]  {BIGINT}         _AuditLogID - Audit Log ID
+ */
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::Rollback"( IN _AuditLogID BIGINT ) 
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+ 
+    AS
+BEGIN
+    ---------------
+    -- Documents --
+    ---------------
+
+    -- Recover previous version --
+    
+    UPDATE "hc.hph.cdw.db.models::DWDocuments.Document_Attr" A SET "DWDateTo" = (
+        SELECT CASE WHEN "DWDateTo" = "DWDateFrom" THEN NULL ELSE "DWDateTo" END FROM "hc.hph.cdw.db.models::DWDocuments.Document_Attr" B where 
+            ("DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+                SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+            AND B."DWID"=A."DWID" AND B."DWDateFrom"=A."DWDateTo") 
+    WHERE "DWID" in (
+        SELECT "DWID" FROM "hc.hph.cdw.db.models::DWDocuments.Document_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+    AND "DWDateTo" in ( 
+        SELECT "DWDateFrom" FROM "hc.hph.cdw.db.models::DWDocuments.Document_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID));
+
+    
+    -- Delete new version --
+    
+    DELETE FROM "hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);    
+
+    --------------
+    -- Patients --
+    --------------
+    
+    -- Recover previous version --
+    
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Patient_Attr" A SET "DWDateTo" = (
+        SELECT CASE WHEN "DWDateTo" = "DWDateFrom" THEN NULL ELSE "DWDateTo" END FROM "hc.hph.cdw.db.models::DWEntities.Patient_Attr" B where 
+            ("DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+                SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+            AND B."DWID"=A."DWID" AND B."DWDateFrom"=A."DWDateTo") 
+    WHERE "DWID" in (
+        SELECT "DWID" FROM "hc.hph.cdw.db.models::DWEntities.Patient_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+    AND "DWDateTo" in ( 
+        SELECT "DWDateFrom" FROM "hc.hph.cdw.db.models::DWEntities.Patient_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID));
+ 
+ 
+    -- Delete new version --
+    
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Patient_Key" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Patient_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+
+    -------------------
+    -- Practitioners --
+    -------------------
+    
+    -- Recover previous version --
+    
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Practitioner_Attr" A SET "DWDateTo" = (
+        SELECT CASE WHEN "DWDateTo" = "DWDateFrom" THEN NULL ELSE "DWDateTo" END FROM "hc.hph.cdw.db.models::DWEntities.Practitioner_Attr" B where 
+            ("DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+                SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+            AND B."DWID"=A."DWID" AND B."DWDateFrom"=A."DWDateTo") 
+    WHERE "DWID" in (
+        SELECT "DWID" FROM "hc.hph.cdw.db.models::DWEntities.Practitioner_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+    AND "DWDateTo" in ( 
+        SELECT "DWDateFrom" FROM "hc.hph.cdw.db.models::DWEntities.Practitioner_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID));
+        
+    -- Delete new version --
+    
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Practitioner_Key" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Practitioner_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+    
+    -----------------------------------
+    -- Patient Practitioner Mappings --
+    -----------------------------------
+    
+    -- Recover previous version
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link_Attr" A SET "DWDateTo" = (
+        SELECT CASE WHEN "DWDateTo" = "DWDateFrom" THEN NULL ELSE "DWDateTo" END FROM "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link_Attr" B where 
+            ("DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+                SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+            AND B."DWLinkID"=A."DWLinkID" AND B."DWDateFrom"=A."DWDateTo") 
+    WHERE "DWLinkID" in (
+        SELECT "DWLinkID" FROM "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+    AND "DWDateTo" in ( 
+        SELECT "DWDateFrom" FROM "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID));  
+
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link" WHERE "DWDateTo" IS NULL AND ( "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID) );         
+        
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link" A SET "DWDateTo" = NULL
+    WHERE  "DWDateTo" IS NOT NULL AND ( "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID) );              
+    
+    -- Delete new version
+    
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+
+    ------------------
+    -- Interactions --
+    ------------------
+
+    -- Recover previous version --
+    
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" A SET "DWDateTo" = (
+        SELECT CASE WHEN "DWDateTo" = "DWDateFrom" THEN NULL ELSE "DWDateTo" END FROM "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" B where (
+            "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+                SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+            AND B."DWID"=A."DWID" AND B."DWDateFrom"=A."DWDateTo") 
+    WHERE "DWID" in (
+        SELECT "DWID" FROM "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+    AND "DWDateTo" in ( 
+        SELECT "DWDateFrom" FROM "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID));
+    
+    UPDATE "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" A SET "DWDateTo" = (
+        SELECT CASE WHEN "DWDateTo" = "DWDateFrom" THEN NULL ELSE "DWDateTo" END FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" B where (
+            "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+                SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+            AND B."DWID"=A."DWID" AND B."DWDateFrom"=A."DWDateTo" AND B."Attribute.OriginalValue" = A."Attribute.OriginalValue" AND B."Value.OriginalValue" = A."Value.OriginalValue") 
+    WHERE "DWID" in (
+        SELECT "DWID" FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+    AND "DWDateTo" in ( 
+        SELECT "DWDateFrom" FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID));
+    
+    UPDATE "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Measures" A SET "DWDateTo" = (
+        SELECT CASE WHEN "DWDateTo" = "DWDateFrom" THEN NULL ELSE "DWDateTo" END FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Measures" B where (
+            "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+                SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+            AND B."DWID"=A."DWID" AND B."DWDateFrom"=A."DWDateTo" AND B."Attribute.OriginalValue" = A."Attribute.OriginalValue") 
+    WHERE "DWID" in (
+        SELECT "DWID" FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Measures" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+    AND "DWDateTo" in ( 
+        SELECT "DWDateFrom" FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Measures" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID));
+    
+    UPDATE "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Text" A SET "DWDateTo" = (
+        SELECT CASE WHEN "DWDateTo" = "DWDateFrom" THEN NULL ELSE "DWDateTo" END FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Text" B where ( 
+            "DWAuditID" = :_AuditLogID OR "DWAuditID" IN (
+                SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+            AND B."DWID"=A."DWID" AND B."DWDateFrom"=A."DWDateTo" AND "B"."Attribute" = "A"."Attribute" AND "B"."Lang" = "A"."Lang") 
+    WHERE "DWID" in (
+        SELECT "DWID" FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Text" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN (
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+    AND "DWDateTo" in (
+        SELECT "DWDateFrom" FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Text" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN (
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID
+            )
+        );
+    
+    -- Delete new version --
+    
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Interactions_Key" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+    
+    DELETE FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+
+    DELETE FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Measures" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+    
+    DELETE FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Text" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+
+
+    ------------------
+    -- Observations --
+    ------------------
+    
+    -- Recover previous version --
+    
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Observations_Attr" A SET "DWDateTo" = (
+        SELECT CASE WHEN "DWDateTo" = "DWDateFrom" THEN NULL ELSE "DWDateTo" END FROM "hc.hph.cdw.db.models::DWEntities.Observations_Attr" B where (
+            "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+                SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+            AND B."DWID"=A."DWID" AND B."DWDateFrom"=A."DWDateTo") 
+    WHERE "DWID" in (
+        SELECT "DWID" FROM "hc.hph.cdw.db.models::DWEntities.Observations_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) AND
+     "DWDateTo" in ( 
+        SELECT "DWDateFrom" FROM "hc.hph.cdw.db.models::DWEntities.Observations_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID));
+    
+    -- Delete new version --
+    
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Observations_Key" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Observations_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+    
+    ----------------
+    -- Conditions --
+    ----------------
+    
+    -- Recover previous version --
+    
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Condition_Attr" A SET "DWDateTo" = (
+        SELECT CASE WHEN "DWDateTo" = "DWDateFrom" THEN NULL ELSE "DWDateTo" END FROM "hc.hph.cdw.db.models::DWEntities.Condition_Attr" B where (
+            "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+                SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+            AND B."DWID"=A."DWID" AND B."DWDateFrom"=A."DWDateTo") 
+    WHERE "DWID" in (
+        SELECT "DWID" FROM "hc.hph.cdw.db.models::DWEntities.Condition_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID)) 
+    AND "DWDateTo" in ( 
+        SELECT "DWDateFrom" FROM "hc.hph.cdw.db.models::DWEntities.Condition_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN ( 
+            SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID));
+    
+    -- Delete new version --
+    
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Condition_Key" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+
+    DELETE FROM "hc.hph.cdw.db.models::DWEntities.Condition_Attr" WHERE "DWAuditID" = :_AuditLogID OR "DWAuditID" IN
+    ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :_AuditLogID);
+    
+END;

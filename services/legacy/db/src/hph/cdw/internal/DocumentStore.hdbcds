@@ -1,0 +1,34 @@
+namespace hc.hph.cdw.internal;
+
+using hc.hph.cdw.db.models::DWTypes as DT;
+
+
+
+/**
+	Persistence of documents for test purposes. Only used in internal test environment
+*/
+context DocumentStore {
+
+  entity TempStore{
+	key DWID : DT.DWID;
+	DWSource : DT.DWSource;    
+    DocumentID : String(1024);
+
+	Title: String(1024);
+	Author: String(1024);
+	FileName: String(256);
+	Type: String(128);
+	MIMEType: String(256);
+	LanguageCode: String(2);
+	Content : LargeBinary;
+
+	CreatedAt: UTCTimestamp;
+	CreatedBy: String(256);
+	ChangedAt: UTCTimestamp;
+	ChangedBy: String(256);
+
+	DWID_Interaction : DT.DWID;	 
+  } technical configuration {
+ column store;
+  };	
+};

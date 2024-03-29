@@ -1,0 +1,12 @@
+FUNCTION "hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::pathology_entities" ( ) 
+	RETURNS "hc.hph.plugins.textProcessing.pathology.postProcessing::Types.TA_EXT"
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+
+RETURN SELECT
+	*
+FROM "hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::ta"()
+WHERE "TA_TYPE" IN ('Observation_CancerHistology', 'Observation_CancerStage', 'Observation_CancerGrade', 'Observation_CancerBiomarker','Observation_CancerSize', 'Observation');
+
+END;

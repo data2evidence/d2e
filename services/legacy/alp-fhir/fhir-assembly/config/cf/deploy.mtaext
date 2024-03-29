@@ -1,0 +1,7 @@
+_schema-version: "3.1.0"
+ID: com.legacy.health.fhir.cf.deploy
+extends: com.legacy.health.fhir    
+resources:
+  - name: fhirdb
+    parameters:
+      service-plan: v9.6-dev

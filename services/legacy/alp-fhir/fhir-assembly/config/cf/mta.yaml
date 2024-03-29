@@ -1,0 +1,15 @@
+_schema-version: "2.0"
+ID: com.legacy.health.fhir
+version: 1.0.0
+modules:
+  - name: fhirserver
+    type: custom
+    path: .
+    build-parameters:
+      builder: maven
+      build-result: com.legacy.health.fhir/target/*.jar
+    requires:
+      - name: fhirdb
+resources:
+  - name: fhirdb
+    type: postgresql

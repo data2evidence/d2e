@@ -1,0 +1,108 @@
+PROCEDURE "hc.hph.genomics.db.procedures.vb::SampleList"(
+	IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+	IN reference_id NVARCHAR(255),
+	IN chromosome_index INTEGER,
+	IN position INTEGER,
+	IN guarded_patients "hc.hph.cdw.db.models::DWViews.V_GuardedPatient",
+	OUT samples "hc.hph.genomics.db.models::General.SampleDetails",
+	OUT visible_patient_count INTEGER,
+	OUT total_patient_count INTEGER
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+READS SQL DATA
+AS
+BEGIN
+	allSamples = SELECT
+		p."FamilyName",
+		p."GivenName",
+		p."BirthDate",
+		s."PatientDWID",
+		p."Gender.OriginalValue" AS "Gender",
+		s."AnalysisDate",
+		s."SampleClass",
+		s."InteractionDWID",
+		ga."SampleIndex",
+		v."DWAuditID",
+		ik."DWSource",
+		ik."InteractionID",
+		va."AlleleIndex",
+		va."Allele",
+		ga."AlleleCount"
+	FROM
+		"hc.hph.genomics.db.models::SNV.GenotypeAlleles" AS ga
+	INNER JOIN
+		:sample_list AS sl
+	ON
+		ga."SampleIndex" = sl."SampleIndex"
+	INNER JOIN
+		"hc.hph.genomics.db.models::General.Samples" AS s
+	ON
+		ga."SampleIndex" = s."SampleIndex"
+	INNER JOIN
+		"hc.hph.cdw.db.models::DWEntities.Patient_Attr" AS p
+	ON
+		s."PatientDWID" = p."DWID"
+	INNER JOIN
+		"hc.hph.cdw.db.models::DWEntities.Interactions_Key" AS ik
+	ON
+		s."InteractionDWID" = ik."DWID"
+	INNER JOIN
+		"hc.hph.genomics.db.models::SNV.Variants" AS v
+	ON
+		ga."DWAuditID" = v."DWAuditID" AND
+		ga."VariantIndex" = v."VariantIndex"
+	INNER JOIN
+		"hc.hph.genomics.db.models::SNV.Genotypes" AS g
+	ON
+		ga."DWAuditID" = g."DWAuditID" AND
+		ga."VariantIndex" = g."VariantIndex" AND
+		ga."SampleIndex" = g."SampleIndex"
+	INNER JOIN
+		"hc.hph.genomics.db.models::SNV.VariantAlleles" AS va
+	ON
+		ga."DWAuditID" = va."DWAuditID" AND
+		ga."VariantIndex" = va."VariantIndex" AND
+		ga."AlleleIndex" = va."AlleleIndex"
+	WHERE
+		:reference_id = s."ReferenceID" AND
+		:chromosome_index = v."ChromosomeIndex" AND
+		:position = v."Position";
+	
+	samples = SELECT
+		s."FamilyName",
+		s."GivenName",
+		s."BirthDate",
+		BINTOHEX( s."PatientDWID" ) AS "PatientDWID",
+		s."Gender",
+		s."AnalysisDate",
+		s."SampleClass",
+		BINTOHEX( s."InteractionDWID" ) AS "InteractionDWID",
+		s."SampleIndex",
+		s."DWAuditID",
+		s."DWSource",
+		s."InteractionID",
+		s."AlleleIndex",
+		s."Allele",
+		s."AlleleCount"
+	FROM
+		:allSamples AS s
+	INNER JOIN
+		:guarded_patients AS gp
+	ON
+		s."PatientDWID" = gp."PatientID"
+	ORDER BY
+		s."FamilyName",
+		s."GivenName",
+		s."BirthDate",
+		s."PatientDWID",
+		s."Gender",
+		s."AnalysisDate",
+		s."SampleClass",
+		s."SampleIndex",
+		s."AlleleIndex";
+	
+	SELECT COUNT( DISTINCT "PatientDWID" ) INTO visible_patient_count FROM :samples;
+	SELECT COUNT( DISTINCT "PatientDWID" ) INTO total_patient_count FROM :allSamples;
+END;
+

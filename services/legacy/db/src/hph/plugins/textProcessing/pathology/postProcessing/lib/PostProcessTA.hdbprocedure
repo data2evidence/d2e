@@ -1,0 +1,167 @@
+procedure "hc.hph.plugins.textProcessing.pathology.postProcessing.lib::PostProcessTA"(
+		in iv_config_id   nvarchar(1024),
+		in iv_ta_batch_id nvarchar(1024),
+		in it_ta_batch    "hc.hph.plugins.textProcessing.pathology.postProcessing::Types.TA_BATCH_INPUT"
+	)
+	language sqlscript
+	sql security definer as
+begin
+
+  declare lv_proc nvarchar(1000) := 'hc.hph.plugins.textProcessing.pathology.postProcessing.lib::PostProcessTA';
+
+
+  -- Store the TA results in a persistent TA_EXT
+  delete from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_EXT";
+  
+  conv_table = select distinct "DWID" as "BIN_DWID", TO_VARCHAR(DWID) as "STR_DWID" from :it_ta_batch;
+  	
+  select
+	:iv_config_id "CONFIG_ID",
+	:iv_ta_batch_id "BATCH_ID",
+  	"STR_DWID" as "DWID",
+	"TA_RULE",
+	"TA_COUNTER",
+	"TA_TOKEN",
+	"TA_LANGUAGE",
+	"TA_TYPE",
+	"TA_NORMALIZED",
+	"TA_STEM",
+	"TA_PARAGRAPH",
+	"TA_SENTENCE",
+	"TA_CREATED_AT",
+	"TA_OFFSET",
+	"TA_PARENT",
+	NULL "TA_AMBIGUITY"
+	from :it_ta_batch b
+	inner join :conv_table c
+	on b."DWID" = c."BIN_DWID" 
+	into "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_EXT";
+
+  -- will process TA_EXT with AM call
+ --  call "hc.hph.plugins.textProcessing.pathology.postProcessing.lib::SetHistologyCode"(
+  --	:iv_config_id,
+  --	:iv_ta_batch_id
+ -- )
+ -- ; 
+  
+	lt_config_type_ids =
+		select
+			"EXTRACTION_TYPE",
+			"EXTRACTION_ID"
+		from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_CONFIG"
+		where "CONFIG_ID" = :iv_config_id
+		  and "SELECTED"  = 'X'
+	;
+	
+	-- Clear TA_FILTERED
+	delete from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_FILTERED"
+	where "CONFIG_ID" = :iv_config_id
+	  and "DWID" in (select distinct "DWID" from :it_ta_batch)
+	;
+	
+ --DEBUG 
+ --SELECT * FROM "hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::pathology_" ORDER BY DWID, TA_COUNTER;
+ 
+  --Copy data from view directly into TA_FILTERED 
+ insert into "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_FILTERED"
+	SELECT :iv_config_id "CONFIG_ID",
+		"DWID",
+		"TA_RULE",
+		"TA_COUNTER",
+		"TA_TOKEN",
+		"TA_LANGUAGE",
+		"TA_TYPE",
+		"TA_NORMALIZED",
+		"TA_STEM",
+		"TA_PARAGRAPH",
+		"TA_SENTENCE",
+		"TA_CREATED_AT",
+		"TA_OFFSET",
+		"TA_PARENT",
+		"TA_SECTION",
+		"TA_STATUS",
+		"TA_POLARITY",
+		"TA_SUBJECT",
+		NULL "TA_TIME_START",
+		NULL "TA_TIME_END",
+		NULL "TA_TIME_LINK",
+		COALESCE ("TA_AMBIGUITY", 'Unambiguous') "TA_AMBIGUITY",
+		"TA_CA_BEHAVIOR",
+		"TA_CA_SIZE",
+		"TA_CA_BODYSITE",
+		"TA_CA_STAGE_T",
+		"TA_CA_STAGE_N",
+		"TA_CA_STAGE_M",
+		"TA_CA_GRADE_NORMALIZED",
+		"TA_CA_GRADE_VALUE",
+		"TA_BIOM_INTERPRETATION",
+		"TA_BIOM_METHOD",
+		"TA_BIOM_ALTERATION",
+		"TA_BIOM_DNAREGION",
+		"TA_BIOM_VALUE",
+		"TA_OBS_VALUE",
+		"TA_OBS_UNIT",
+		"TA_CA_STAGE_N_DENOMINATOR",
+		"TA_CA_STAGE_N_NUMERATOR",
+		"TA_CA_STAGE_N_INTERPRETATION",
+		"TA_CA_STAGE_N_BODYSITE",
+		"TA_CA_STAGE_N_LATERALITY"
+		FROM "hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::pathology_" p
+		inner join :conv_table c
+		on p."DWID" = c."BIN_DWID"
+		-- the new calculation view will use TA_EXT as input
+		/*
+		where ("TA_TYPE" is null or
+				("TA_TYPE" is not null
+					and "TA_TYPE" in (select "EXTRACTION_ID"
+											from :lt_config_type_ids
+											where "EXTRACTION_TYPE" = 'TA_TYPE')
+		  ))
+		  and "TA_SECTION" is not null
+		  and ("TA_STATUS" is not null
+				or ("TA_STATUS" is null
+					and 'Confirmed' in (select "EXTRACTION_ID"
+											from :lt_config_type_ids
+											where "EXTRACTION_TYPE" = 'TA_STATUS')
+		  ))
+		  and ("TA_POLARITY" is not null
+				or ("TA_POLARITY" is null
+					and 'Positive' in (select "EXTRACTION_ID"
+											from :lt_config_type_ids
+											where "EXTRACTION_TYPE" = 'TA_POLARITY')
+		  ))
+		  and ("TA_SUBJECT" is not null
+			or ("TA_SUBJECT" is null
+				and 'Patient' in (select "EXTRACTION_ID"
+											from :lt_config_type_ids
+											where "EXTRACTION_TYPE" = 'TA_SUBJECT')
+		  ))
+		  
+		  and "TA_STATUS" not in (select "EXTRACTION_ID" as "TA_STATUS"
+										from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_CONFIG"
+										where "CONFIG_ID"       = :iv_config_id
+										  and "EXTRACTION_TYPE" =  'TA_STATUS'
+										  and (   "SELECTED" <> 'X' or "SELECTED" is null )
+							       )
+
+		  and "TA_POLARITY" not in (select "EXTRACTION_ID" as "TA_POLARITY"
+										from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_CONFIG"
+										where "CONFIG_ID"       = :iv_config_id
+										  and "EXTRACTION_TYPE" =  'TA_POLARITY'
+										  and (   "SELECTED" <> 'X' or "SELECTED" is null )
+							       )
+
+		  and "TA_SUBJECT" not in (select "EXTRACTION_ID" as "TA_SUBJECT"
+										from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_CONFIG"
+										where "CONFIG_ID"       = :iv_config_id
+										  and "EXTRACTION_TYPE" =  'TA_SUBJECT'
+										  and (   "SELECTED" <> 'X' or "SELECTED" is null )
+							       )
+		*/
+							       ;
+
+
+
+
+end
+;

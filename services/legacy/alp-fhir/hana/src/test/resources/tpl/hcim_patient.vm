@@ -1,0 +1,31 @@
+#set( $gender = {"M" : "male", "F" : "female","UN":"other","UNK":"unknown"}) 
+{ 
+    "resourceType":"Patient",
+    "id":"$Patient.identification_number",
+    "meta":{
+        "profile": [
+            "http://fhir.nl/fhir/StructureDefinition/nl-core-patient"
+        ]
+    },
+    "identifier": [
+    #set($isep="")
+	#foreach( $identifier in $PatientIdentifier )
+        $isep
+        {
+            "use":"official",
+            "system":"$identifier.System",
+            "value":"$identifier.PatientIdentification"
+        }
+         #set($isep=",")
+	#end        
+    ],
+    "name": [
+		#parse("tpl/HCIM_name.vm")    
+    ],
+    #parse("tpl/HCIM_address.vm")
+    #if($Patient.gender)"gender":"$gender.get("$Patient.gender")",#end
+    #if($Patient.dateOfBirth)"birthDate":"$Patient.dateOfBirth",#end
+    #if($Patient.deathIndicator)"deceasedBoolean":$Patient.deathIndicator,#end
+    #if($Patient.multipleBirthIndicator)"multipleBirthBoolean":"$Patient.multipleBirthIndicator",#end
+	"active":true
+}

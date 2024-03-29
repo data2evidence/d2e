@@ -1,0 +1,105 @@
+{
+	"resourceType": "TableContent",
+	"id": "HCIM_BODYWEIGHT_DATA",
+	"definition": {
+		"reference": "HCIM_BODYWEIGHT"
+	},
+	"row": [
+		{
+			"column": [
+				{
+					"name": "identification_number",
+					"valueString": "999111"
+				},
+				{
+					"name": "information_source_patient",
+					"valueString": "patient1"
+				},
+				{
+					"name": "subject",
+					"valueString": "999911338"
+				},
+				{
+					"name": "weightValue",
+					"valueString": "72.00"
+				},
+				{
+					"name": "weightUnit",
+					"valueString": "kg"
+				},
+				{
+					"name": "clothingCodesystemName",
+					"valueString": "http://loinc.org"
+				},
+				{
+					"name": "clothingCodesystemOid",
+					"valueString": "15074-8"
+				}
+			]
+		},
+		{
+			"column": [
+				{
+					"name": "identification_number",
+					"valueString": "999112"
+				},
+				{
+					"name": "information_source_patient",
+					"valueString": "patient1"
+				},
+				{
+					"name": "subject",
+					"valueString": "999911338"
+				},
+				{
+					"name": "weightValue",
+					"valueString": "70.00"
+				},
+				{
+					"name": "weightUnit",
+					"valueString": "kg"
+				},
+				{
+					"name": "clothingCodesystemName",
+					"valueString": "http://loinc.org"
+				},
+				{
+					"name": "clothingCodesystemOid",
+					"valueString": "15074-9"
+				}
+			]
+		},
+		{
+			"column": [
+				{
+					"name": "identification_number",
+					"valueString": "999113"
+				},
+				{
+					"name": "information_source_patient",
+					"valueString": "patient2"
+				},
+				{
+					"name": "subject",
+					"valueString": "999911339"
+				},
+				{
+					"name": "weightValue",
+					"valueString": "70.00"
+				},
+				{
+					"name": "weightUnit",
+					"valueString": "kg"
+				},
+				{
+					"name": "clothingCodesystemName",
+					"valueString": "http://loinc.org"
+				},
+				{
+					"name": "clothingCodesystemOid",
+					"valueString": "15074-8"
+				}
+			]
+		}
+	]
+}

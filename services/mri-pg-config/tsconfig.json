@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+      "moduleResolution": "node",
+      "module": "commonjs",
+      "noImplicitAny": false,
+      "removeComments": false,
+      "preserveConstEnums": false,
+      "sourceMap": true,
+      "declaration": true,
+      "outDir": "target",
+      "rootDir": ".",
+      "target": "ES2017"
+  },
+  "include": [
+      "src"
+  ]
+}

@@ -1,0 +1,24 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::LoadAuditLog_Processing" 
+(
+in profileId bigint,
+in auditId bigint,
+in BatchID bigint,
+in PipelineID nvarchar(256)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+ declare Curtime timestamp;
+ declare extensionID nvarchar(256);
+ CurTime := now();
+	
+	--get extension id	
+	SELECT "ExtensionID" into extensionID FROM "hc.hph.di.model::DataIntegration.JobProfile" WHERE "ProfileID" = :profileId;
+	
+	exec 'START TASK "hc.hph.plugins.documents.db.flowgraphs::LoadAuditLog_Processing"("BatchID" => '''''''||:BatchID||''''''', "DWAuditID" => '''''''||:auditId||''''''', "ExtensionID" => '''''''||extensionID||''''''', "ProfileID" => '''''''||:profileId||''''''', "CurTime" => '''''''||CurTime||''''''', "PipelineID" => '''''''||:PipelineID||''''''')';
+END;

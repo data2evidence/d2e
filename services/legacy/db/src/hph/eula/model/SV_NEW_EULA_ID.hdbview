@@ -1,0 +1,1 @@
+VIEW "hc.hph.eula.model::SV_NEW_EULA_ID" ( "NEW_EULA_ID" ) AS select cast(SYSUUID as NVARCHAR(32)) as NEW_EULA_ID from "hc::DUMMY"

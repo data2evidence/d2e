@@ -1,0 +1,4 @@
+.hdi
+node_modules
+*lock.json
+*-services.json

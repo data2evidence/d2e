@@ -1,0 +1,124 @@
+namespace hc.hph.tests.cdw.db.models;
+
+using hc.hph.cdw.db.models::DWTypes as DT;
+using hc.hph.cdw.db.models::DWAnnotations as DWAnnotation;
+using hc.hph.di.model::DataIntegration as DI;
+using hc.hph.cdw.db.models::Ref as Ref;
+
+context MetadataTest{
+
+    @DWAnnotation.Entity.Name : 'TestEntity1'
+    @DWAnnotation.Entity."Group" : 'ClinicalDataWarehouse'
+    @DWAnnotation.Entity.WriteEnabled : True
+    @DWAnnotation.Table.Type : #Key
+    entity TestEntity1_Key {
+
+        key DWID : DT.DWID;
+        //TODO: key DWPartition : String(10);
+
+        DWSource : DT.DWSource not null;
+        DWAuditID : DT.DWAuditID not null;
+
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;     
+        TestEntity1_Attr_Assoc : association to TestEntity1_Attr on TestEntity1_Attr_Assoc.DWID = DWID;     
+    } technical configuration {
+        column store;
+    };
+
+    @DWAnnotation.Entity.Name : 'TestEntity1'
+    @DWAnnotation.Table.Type : #Attribute
+    @DWAnnotation.Table.Label : 'TestEntity1 Attributes'
+    entity TestEntity1_Attr {
+
+        key DWDateFrom: DT.DWTimestamp; 
+        key DWID : DT.DWID;
+        DWDateTo : DT.DWTimestamp;
+        DWAuditID : DT.DWAuditID not null;
+
+        
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        TestEntity1_Key_Assoc : association to TestEntity1_Key on TestEntity1_Key_Assoc.DWID = DWID;    
+    } technical configuration {
+        column store;
+    };
+
+    
+    @DWAnnotation.Link.Name : 'TestLink1'
+    @DWAnnotation.Link."Group" : 'ClinicalDataWarehouse'
+    @DWAnnotation.Table.Type : #Link
+    entity TestLink1 {
+
+        key DWLinkID        : DT.DWID;
+
+        @DWAnnotation.Column : { Type: #ForeignKey, Entity : { Name : 'TestEntity1' } }
+        DWID_TestEntity1       : DT.DWID not null;
+
+        DWDateTo            : DT.DWTimestamp;
+        DWAuditID           : DT.DWAuditID not null;       
+
+        TestLink1_LinkAttr_Assoc : association to TestLink1_Attr on TestLink1_LinkAttr_Assoc.DWLinkID = DWLinkID;
+        TestEntity1_Key_Assoc : association to TestEntity1_Key on TestEntity1_Key_Assoc.DWID = DWID_TestEntity1;
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID; 
+    } technical configuration {
+        column store;
+    };     
+
+    @DWAnnotation.Link.Name : 'TestLink1'
+    @DWAnnotation.Table.Type : #LinkAttribute
+    @DWAnnotation.Table.Label : 'TestLink1 Attribute table'
+    entity TestLink1_Attr {
+
+        key DWDateFrom      : DT.DWTimestamp;
+        key DWLinkID        : DT.DWID;
+        DWDateTo            : DT.DWTimestamp;
+        DWAuditID           : DT.DWAuditID not null;
+
+        TestLink1_Link_Assoc : association to TestLink1 on TestLink1_Link_Assoc.DWLinkID = DWLinkID;
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+    } technical configuration {
+        column store;
+    };
+
+    @DWAnnotation.Entity.Name : 'TestEntity1'
+    @DWAnnotation.Table.Type : #EAV
+    @DWAnnotation.Table.Label : 'EAV table of TestEntity1'
+    entity TestEntity1EAV {
+
+        DWDateFrom : DT.DWTimestamp;        
+        DWID : DT.DWID;
+        DWAuditID : DT.DWAuditID not null;
+        DWDateTo: DT.DWTimestamp;
+
+        @DWAnnotation.Column : { Type: #EntityAttribute, Element : 'OriginalValue' }   
+        Attribute : DT.CodeableValue100;
+
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        TestEntity1_Key_Assoc : association to TestEntity1_Key on TestEntity1_Key_Assoc.DWID = DWID;   
+    } technical configuration {
+        column store;
+    };
+
+    @DWAnnotation.Entity."Group" : 'ClinicalDataWarehouse'
+    @DWAnnotation.Entity.Name : 'TestEntityTableUndefined'
+    entity TestEntity1_Undefined {
+
+        key DWDateFrom              : DT.DWTimestamp;
+        @DWAnnotation.Column : { Type: #BusinessKey }
+        key BestRecordID     : DT.GeneratedID;              
+        DWDateTo                    : DT.DWTimestamp;       
+        DWAuditID                   : DT.DWAuditID not null; 
+
+        FamilyName : String(100);
+        GivenName : String(100);        
+
+        Title               : DT.CodeableValue100; 
+        Gender              : DT.CodeableValue100;
+
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        TestEntity1_Key_Assoc : association to TestEntity1_Key on TestEntity1_Key_Assoc.DWID = BestRecordID;    
+    } technical configuration {
+        column store;
+
+        index DWDateTo on (DWDateTo) asc;
+    };
+}

@@ -1,0 +1,42 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::InitializeSchedule" 
+(
+in in_schedule_id bigint,
+in in_pipeline_id nvarchar(256),
+in in_parentAudit_id bigint,
+in in_batch_size bigint,
+out o_cnt bigint
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+ declare lt_status table("DWID" varbinary(32),
+						 "DWDateFrom" timestamp);
+	
+
+ lt_status = select top :in_batch_size "DWID","DWDateFrom"
+ from "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status"
+ where "DWAuditID" = :in_parentAudit_id 
+ and "ActionName" = 'Initialize'
+ and "Status" = 'Initialized'
+ and "ScheduleID" = 0
+ and "PipelineID" = :in_pipeline_id; 
+ 
+ select count("DWID") into o_cnt from :lt_status;
+ 
+ if o_cnt != 0 then
+ 
+	 update	"hc.hph.di.documents.staging.db.models::DocumentProcessing.Status"
+	 set "ScheduleID" = :in_schedule_id,
+	 "PipelineID" = :in_pipeline_id
+	 where ("DWID","DWDateFrom")
+	 in (select * from :lt_status)
+	 and "PipelineID" = :in_pipeline_id;
+ 
+ end if; 
+
+END;

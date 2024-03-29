@@ -1,0 +1,736 @@
+!!(c) Copyright 2017 ALP. All rights reserved.
+!!
+!!ALP and the ALP logo are registered trademarks of ALP in Germany and other countries. Business Objects and the Business Objects logo are registered trademarks of Business Objects S.A., which is an ALP company.
+!!
+!======================================================================
+! File Name: english-tf-med-Pathology.rul 
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of pathology report specific entities
+! Encoding: cp-1252
+!======================================================================
+!======================================================================
+!! PATHOLOGY REPORTS:
+!======================================================================
+   
+!======================================================================
+! OUTPUT FIELDS:
+!======================================================================
+! Main Cancer group: Observation_CancerHistology
+
+! Obligatory subentity:
+!!	Observation_CancerHistology_Value
+
+
+!Optional subentities:
+!!	Observation_CancerHistology_Component_Behavior
+!!	Observation_CancerGrade_Normalized
+!!	Observation_CancerGrade_Value
+!!	Observation_CancerHistology_BodySite
+!!	CancerCellType
+!!	CancerHistologicGrade
+!!	CancerHistologicType
+
+
+!======================================================================
+! Metastasis group (TNM): !!med_Metastasis
+
+! Obligatory subentity:
+!!	CancerMetastasis
+
+!======================================================================
+! Lymph Nodes group (TNM): !!med_Lymph_nodes
+
+! Obligatory subentity:
+!!	CancerNodes
+
+!======================================================================
+! Stage group (TNM): !!med_Stage
+
+!! Cancer stage refers to the extent or severity of the cancer, based on factors such as the location of the primary tumor, tumor size, number of tumors, and lymph node involvement (spread of cancer into lymph nodes)
+
+! Obligatory subentity:
+!!	CancerStage
+
+!======================================================================
+! Tumor group (TNM): !!med_Tumor
+
+! Obligatory subentity:
+!!	CancerTumor
+
+!======================================================================
+! Tumor Size group: Observation_CancerSize
+
+! Obligatory subentity:
+!!	Observation_CancerSize_Value
+
+
+!======================================================================
+! Procedure group: med_Procedure (not being exposed yet)
+
+! Obligatory subentity:
+!!	CancerProcedure
+
+
+!======================================================================
+! Tumor Grade group: med_TumorGrade
+
+!! Tumor grade is a system used to classify cancer cells in terms of how abnormal they look under a microscope and how quickly the tumor is likely to grow and spread. 
+!! Histologic grade, also called differentiation, refers to how much the tumor cells resemble normal cells of the same tissue type. 
+!! Nuclear grade refers to the size and shape of the nucleus in tumor cells and the percentage of tumor cells that are dividing.
+
+! Obligatory subentity:
+!!	Observation_CancerGrade_Value
+
+!Optional subentities:
+!!	Observation_CancerGrade_Normalized
+
+!======================================================================
+!! Common defines:
+!======================================================================
+
+#subgroup skipParens: <\(><~(\()>+<\)>
+#subgroup coord: (<\p{ci}(and|&|or)>|(<STEM:\,> <\p{ci}(and|&|or)>?)|</>|<\|>)
+
+!======================================================================
+!!Entities coming from dictionaries
+!======================================================================
+!! APPEARANCE
+!! Observation_CancerHistology_Component_Behavior
+!! GRADE
+!! HISTOLOGY
+!! LYMPH_NODES
+!! ANATOMY (Observation_CancerHistology_BodySite_Value)
+!! PRECANCER - "pre-cancer"   In the TNM classification, carcinoma in situ is reported as TisN0M0 (Stage 0)
+!! PROCEDURE
+
+!#subgroup DictAppearance: ([OD CancerCellType] ( [TE APPEARANCE] <>+ [/TE] <\p{ci}(Type|TYPE|type|Variant|VARIANT|variant)>?) [/OD])
+#subgroup DictBehavior: ( [OD Observation_CancerHistology_Component_Behavior] ( [TE OBSERVATION_CANCERHISTOLOGY_COMPONENT_BEHAVIOR] <>+ [/TE] ) [/OD] (%(coord)[OD Observation_CancerHistology_Component_Behavior] ( [TE OBSERVATION_CANCERHISTOLOGY_COMPONENT_BEHAVIOR] <>+ [/TE] ) [/OD])?)
+#subgroup DictGradeValue: [TE OBSERVATION_CANCERGRADE_VALUE] <>+ [/TE] 
+#subgroup DictGradeType: [TE OBSERVATION_CANCERGRADE_NORMALIZED] <>+ [/TE] 
+#subgroup DictHistology: ( [OD Observation_CancerHistology_Value] ([TE OBSERVATION_CANCERHISTOLOGY_VALUE] <>+ [/TE] ) [/OD])
+#subgroup DictLymph_nodes: [TE LYMPH_NODES] <>+ [/TE] 
+#subgroup Laterality: ( [OD Laterality] <\p{ci}(lateral|LATERAL|Lateral|bilateral|BILATERAL|Bilateral|ipsilateral|IPSILATERAL|Ipsilateral|contralateral|Contralateral|CONTRALATERAL|left|right|RT|Rt|LEFT|RIGHT|Right|Left)> [/OD] )
+#subgroup DictAnatomy: ( [TE OBSERVATION_CANCERHISTOLOGY_BODYSITE] <>+ [/TE] )
+#subgroup GeneralProcedure: ( <\p{ci}(needle|NEEDLE|Needle|core|CORE|Core)>?  <\p{ci}(BX|bx|bxs|BXs|Biopsies|biopsies|BIOPSIES|Biopsy|biopsy|BIOPSY|Resection|RESECTION|resection|EXCISION|Excision|excision|Dissection|DISSECTION|dissection|ASPIRATION|aspiration|Aspiration)> )
+!#subgroup DictProcedure: ( [TE PROCEDURE] <>+ [/TE] )
+!#subgroup DictType: ([OD CancerHistologicType] ([TE HISTOTYPE] <>+ [/TE] )+ [/OD])
+#subgroup DictOtherMod: ( [OD CancerModifier] ([TE MODIFIER] <>+ [/TE] <\p{ci}(Type|TYPE|type|Variant|VARIANT|variant)>? ) [/OD] )
+#subgroup DictICDO: ([OD Observation_CancerHistology_Value_ICDO] ([TE OBSERVATION_CANCERHISTOLOGY_VALUE_ICDO] <>* <[a-zA-Z]{2}[a-zA-Z]+> <>* [/TE] )+ [/OD])
+#subgroup DictICDO3Literal: ([OD Observation_CancerHistology_Value_ICDO][TE OBSERVATION_CANCERHISTOLOGY_VALUE_ICDO] <M?[0-9]+(\/[0-9])?>[/TE][/OD])
+
+
+
+!======================================================================
+!These are key words that can trigger a rule, but are too generic to get a "histology" label
+#subgroup CancerGeneric: {(
+[OD CancerHistology_Generic](
+   (<\p{ci}(Cancer|Tumor|cancer|tumor|CANCER|TUMOR|CA\.?|ca\.?|Ca\.?)>  <\p{ci}(cells?|masses|mass|Cells?|Masses|Mass|CELLS?|MASSES|MASS)> )
+|  (<\p{ci}(Cancers?|Tumors?|cancers?|tumors?|CANCERS?|TUMORS?|CA\.?|ca\.?|Ca\.?|(I|i)nvasion|(M|m)alignancy)> )
+)[/OD]
+)}
+
+
+!======================================================================
+#subgroup CancerType: {(
+   %(DictHistology)
+|  %(DictICDO)
+|  %(CancerGeneric)
+)}
+
+!======================================================================
+!! EXAMPLE:  "0.04 cm"            						
+!! EXAMPLE:  "0.2 mm"            						
+!! EXAMPLE:  "0.4 cm."            						
+!! EXAMPLE:  "1 CM"            						    
+!! EXAMPLE:  "1.0 mm"            						
+!! EXAMPLE:  "1.1 cm."            						
+!! EXAMPLE:  "30 cm."            						
+!! EXAMPLE:  "6.0 mm"            						
+!! EXAMPLE:  "7.0 cm."            						
+#subgroup Measure: { [OD Observation_CancerSize_Value] (
+  ( <POS:Num> ( <\.> | <\->| <x|X> ) <POS:Num>+ <(C|c|M|m)(M|m)\.?> ) 
+| ( <POS:Num> <(C|c|M|m)(M|m)\.?> ) 
+| ( <[0-9]+(\.|\-)[0-9](C|c|M|m)(M|m)\.?> ) 
+| ( <[0-9]+(C|c|M|m)(M|m)\.?> )
+)[/OD] }
+
+
+!======================================================================
+!! med_Lymph_nodes, med_Metastasis and med_Tumor are all being output as part of med_Stage (as per Style Guide)
+!======================================================================
+!! EXAMPLE:  "pT1a"
+!! EXAMPLE:  "pT1b"
+!! EXAMPLE:  "pT2"
+!! EXAMPLE:  "pTis"
+!! EXAMPLE:  "Tis"
+!! EXAMPLE:  "ypT0"
+#subgroup Tumor: { [OD Observation_CancerStage_Component_T] (
+  (<(y?p)T(0|1|2|3|4|X|x|i)[a-z]{0,2}(\(m\))?>)
+| (<T(0|1|2|3|4)[a-z]{0,2}(\(m\))?>)
+| (<(y?p)?T\(m\)([0-9]|X|x|i)[a-z]{0,2}>)
+| (<PT(0|1|2|3|4)[a-z](\(m\))?>)
+| (<(y?p)?T(0|1|2|3|4)[A-Z]{1,2}>)
+| (<(y?p)?Tis>)
+)[/OD] }
+
+
+!======================================================================
+!! EXAMPLE:   "N0(i-)(sn)"
+!! EXAMPLE:   "pN0"
+!! EXAMPLE:   "pN0(i-)"
+!! EXAMPLE:   "pN0(i+)"
+!! EXAMPLE:   "pN1a(sn)"
+!! EXAMPLE:   "pN0 (sn)"
+!! EXAMPLE:   "pNX"
+!! EXAMPLE:   "ypN0"
+#subgroup Lymph_nodes_stage: { [OD Observation_CancerStage_Component_N] (
+  (<(y?p)?N(0|1|2|3|4|X|x)[a-z]{0,2}(\((sn|i\+|i\-)\))+>)   ! pT1b N0(i-)(sn)
+| (<(y?p)?N(0|1|2|3|4|X|x)[a-z]{0,2}(\((sn|i\+|i\-)\))*> (<\(> (<sn>|(<i><\+|\->)) <\)>)* )  ! pT1c, pN0 (sn)
+| ( <POS:Num> <N(0|1|2|3)> )
+|  ( <LN> <\p{ci}(positive|POSITIVE|Positive|NEGATIVE|negative|Negative)>  )
+)[/OD] }
+
+#subgroup Lymph_nodes_stage_no_OD: {(
+  (<(y?p)?N(0|1|2|3|4|X|x)[a-z]{0,2}(\((sn|i\+|i\-)\))+>)   ! pT1b N0(i-)(sn)
+| (<(y?p)?N(0|1|2|3|4|X|x)[a-z]{0,2}(\((sn|i\+|i\-)\))*> (<\(> (<sn>|(<i><\+|\->)) <\)>)* )  ! pT1c, pN0 (sn)
+| ( <POS:Num> <N(0|1|2|3)> )
+|  ( <LN> <\p{ci}(positive|POSITIVE|Positive|NEGATIVE|negative|Negative)>  )
+)}
+
+
+!======================================================================
+!! EXAMPLE:  "cM0"
+!! EXAMPLE:  "M0"
+!! EXAMPLE:  "M1b"
+!! EXAMPLE:  "Mx"
+!! EXAMPLE:  "pMX"
+#subgroup Metastasis: {[OD Observation_CancerStage_Component_M] (
+   (<(c|p)?M(0|1|X|x)[a-z]{0,2}>)
+|  (<(c|p)?M\+>)
+|  (<(c|p)?M\->)
+|  ( <M> <\p{ci}(present|PRESENT|Present|Absent|absent|ABSENT)>  )
+|  ( <\p{ci}(negative)> <\p{ci}(for)> (<\p{ci}(micrometastasis)>|<\p{ci}(macrometastasis)>|<\p{ci}(metastasis)>|<\p{ci}(micro\-metastasis)>|<\p{ci}(macro\-metastasis)>)   )
+|  ( <\p{ci}(no)> (<\p{ci}(evidence)> <\p{ci}(of)>)? (<\p{ci}(micrometastasis)>|<\p{ci}(macrometastasis)>|<\p{ci}(metastasis)>|<\p{ci}(micro\-metastasis)>|<\p{ci}(macro\-metastasis)>)   )
+)[/OD] }
+
+
+!======================================================================
+!! EXAMPLE:   "pT3bpN0"
+!! EXAMPLE:   "Stage 0"
+!! EXAMPLE:   "stage I"
+!! EXAMPLE:   "Stage IA"
+!! EXAMPLE:   "Stage IIIB"
+!! EXAMPLE:   "Stage IIIC1"
+!! EXAMPLE:   "ypTisN0"
+#subgroup Stage: {(
+  [OD Observation_CancerStage_Value_TNMComplete]( <(y?(p|c))?T(0|1|2|3|4|X|x|i)[a-z]{0,2}(\/|\,)?p?N(0|1|2|3|4|X|x)[a-z]{0,2}((\/|\,)?(c|p)?M(0|1|X|x)[a-z]{0,2})?> )[/OD]
+| [OD Observation_CancerStage_Value_Summarized]( <\p{ci}(STAGE|Stage|stage)>  <((0|1|2|3|4)[a-z]?|(I|X|V)+([a-z]|[A-Z])?)> ) [/OD]
+| [OD Observation_CancerStage_Value_Summarized]( <\p{ci}(STAGE|Stage|stage)>  <I(a|A)> )[/OD]
+| [OD Observation_CancerStage_Value_Summarized]( <\p{ci}(STAGE|Stage|stage)>  <(I|X|V)+[a-zA-Z][0-9]> )[/OD]
+)}
+
+!======================================================================
+#subgroup NumModifier: {(
+<(ABOUT|About|about|approximately|Approximately|APPROXIMATELY|\>|\<)> | <(at|AT)> <(LEAST|Least|least|Most|MOST|most)> | <(UP|up|Up)> <(TO|to|To)> | <\p{ci}(greater|smaller|less)> <\p{ci}(than)>
+)}
+
+#subgroup GradeNum: {(
+<\p{ci}(score)>? %(NumModifier)?
+(  ( <(1|2|3|4|(i|v|I|V|x|X)+) >)
+| (<[0-9][0-9]?\-[0-9][0-9]?>)
+| (<[0-9][0-9]?\/[0-9][0-9]?>)
+| (<[0-9][0-9]?> <\/> <[0-9][0-9]?>)
+| (<[0-9][0-9]?> <\p{ci}(per)> <[0-9][0-9]?>)
+| (<[0-9]\+[0-9]>)
+| (<[0-9]\+[0-9]=[0-9]>)
+| (<[0-9]\+[0-9]> <=> <[0-9]>)
+| (<[0-9]\+[0-9]> <\(> <\p{ci}(sum=[0-9][0-9]?)> <\)>)
+| (<[0-9]> <\+> <[0-9]> (<=> <[0-9]>)?)
+| (<[0-9][0-9]?> <\(>? <(of|OF|Of)> <[0-9][0-9]?> <\)>?)
+| (<[0-9]\+?> <(to|TO|To)> <[0-9]\+?>)
+| (<[0-9][0-9]?> <\(>? ( <(out|OUT|Out)>?  <(of|OF|Of|\+)> ) <[0-9]+> <\)>?)
+| ( <(I|V)+\/(I|V)+> )
+| ( <(I|V)+\-(I|V)+> )
+| (<(I|V)+> ( <(out|OUT|Out)>?  <(of|OF|Of|\+)> ) <(I|V)+>)
+| ( <(I|V){1,3}(A|B|C)(1|2)?> )
+| (<(sum|SUM|Sum)>  <=>? <[0-9]>)
+| (<[0-9]\([0-9]\+[0-9]\)>)
+| ( <[0-9][0-9]?>) 
+) <hpf|HPF>?
+)  }
+
+!======================================================================
+#subgroup GradeEquals: {(
+   <(=|\:|\-|is|of|IS|OF)> 
+)}
+
+
+!======================================================================
+!! EXAMPLE:  "(1-2)"            						
+!! EXAMPLE:  "(1 of 3)"            						
+!! EXAMPLE:  "1/3"            						    
+!! EXAMPLE:  "2-3"            						    
+!! EXAMPLE:  "2 + 3 (SUM 5)"            				
+!! EXAMPLE:  "2 + 3"            						
+!! EXAMPLE:  "2+3, SUM 5"            					
+!! EXAMPLE:  "3 + 2 (SUM 5)"            				
+!! EXAMPLE:  "3 + 4 (SUM = 7)"            				
+!! EXAMPLE:  "3 + 4 equals 7"            				
+!! EXAMPLE:  "3/3"            						    
+!! EXAMPLE:  "3/9"            						    
+!! EXAMPLE:  "3+3 (SUM 6)"            					
+!! EXAMPLE:  "3+3 = 6"            						
+!! EXAMPLE:  "6(3+3)"            						
+!! EXAMPLE:  "9 (4+5)"            						
+!! EXAMPLE:  "9 (5 + 4)"            					
+!! EXAMPLE:  "9 (5+4)"            						
+!! EXAMPLE:  "I OF III"            						
+!! EXAMPLE:  "I/III"            						
+!! EXAMPLE:  "II (7/9)"            						
+!! EXAMPLE:  "II/III"            						
+!! EXAMPLE:  "III of III"            					
+!! EXAMPLE:  "Intermediate (2 of 3)"            		
+
+#subgroup GradeValue: { (
+   <\(> %(GradeNum) <\)>
+|  %(GradeNum) 
+|  %(DictGradeValue) 
+|   ( <GS?(1|2|3|4|X)>)
+|   ( <G(1|2|3|4)> <(of|OF)> <[0-9]>)
+|   ( <G(1|2|3|4)\-[0-9]>)
+|   ( <GRADE(1|2|3|4)> )
+|   ( <grade(1|2|3|4)> )
+|   ( <Grade(1|2|3|4)> )
+)}
+
+!======================================================================
+#subgroup GradeModifier: { (
+   (<\(> [OD Observation_CancerGrade_Value] %(DictGradeValue) [/OD] <\)>)
+| [OD Observation_CancerGrade_Value] %(DictGradeValue) [/OD] 
+)}
+
+
+!======================================================================
+!! EXAMPLE:  "BLOOM-RICHARDSON"            				
+!! EXAMPLE:  "Gleason's score"            				
+!! EXAMPLE:  "Gleason Histologic Score"            		
+!! EXAMPLE:  "GLEASON PATTERN"            				
+!! EXAMPLE:  "GS"            						    
+!! EXAMPLE:  "Histologic grade (FIGO I-III)"            
+!! EXAMPLE:  "HISTOLOGIC GRADE (FIGO)"            		
+!! EXAMPLE:  "Modified Bloom-Richardson score"          
+!! EXAMPLE:  "NOTTINGHAM GRADE (GI-III)"            	
+!! EXAMPLE:  "Nuclear Grade"            				
+!! EXAMPLE:  "Primary Gleason Pattern"            		
+!! EXAMPLE:  "Secondary Gleason Pattern"            	
+!! EXAMPLE:  "Total Gleason Score"            			
+!! EXAMPLE:  "Tubular differentiation score"            
+!! EXAMPLE:  "tubule score"            					
+
+#subgroup GradeType: { ( %(DictGradeType))}
+!  ( <\p{ci}(total|TOTAL|Total|overall|OVERALL|Overall)>? <\p{ci}(gleason|GLEASON|Gleason)> <\p{ci}('s|'S)>? <\p{ci}(Histologic(al)?|histologic(al)?|HISTOLOGIC(AL)?)>?  <\p{ci}(pattern|PATTERN|Pattern|SCORE|score|Score|Grade|GRADE|grade)>)
+!| ( <\p{ci}(PRIMARY|primary|Primary|Primary|Secondary|SECONDARY|Secondary|secondary|tertiary|TERTIARY|Tertiary|Tertiary)> <\p{ci}(gleason|GLEASON|Gleason)>? <\p{ci}(pattern|PATTERN|Pattern)>)
+!| ( <\p{ci}(Highest|highest|HIGHEST)> <\p{ci}(gleason|GLEASON|Gleason)> <\p{ci}(SCORE|score|Score|Grade)> <\p{ci}(at|AT)> <\p{ci}(Single|single|SINGLE)>  <\p{ci}(site|SITE|Site)> )
+!| ( <\p{ci}(Histologic(al)?|histologic(al)?|HISTOLOGIC(AL)?)> <\(> <\p{ci}(gleason|GLEASON|Gleason|MBR|FIGO)> <\)> <\p{ci}(Grade|GRADE|grade)> )
+!| ( <\p{ci}(Histologic(al)?|histologic(al)?|HISTOLOGIC(AL)?)> <\p{ci}(Grade|GRADE|grade)> (<\(> <\p{ci}(gleason|GLEASON|Gleason|MBR|FIGO|FUHRMAN)> <\)>)? )
+!| ( <\p{ci}(Histologic(al)?|histologic(al)?|HISTOLOGIC(AL)?)> <\p{ci}(Grade|GRADE|grade|SCORE|score|Score)> (<\(> <FIGO> <I\-(I|V)+>? <\)> )? ) ! Histologic grade (FIGO I-III):  Grade III.
+!| ( <\p{ci}(nottingham|Nottingham|NOTTINGHAM)> <\p{ci}(Combined|COMBINED|combined)>? <\p{ci}(Histologic(al)?|histologic(al)?|HISTOLOGIC(AL)?)>? <\p{ci}(Grade|GRADE|grade|SCORE|score|Score)> (<\(> <G1\-3> <\)>)? )
+!| ( <\p{ci}(MITOTIC|Mitotic|mitotic|MITOSIS|Mitosis|mitosis|MITOSES|Mitoses|mitoses|Tubules|tubules|TUBULES)> <\p{ci}(RATE|Rate|rate|SCORE|score|Score|COUNT|Count|count|ACTIVITY|activity|Activity)> )
+!| ( <\p{ci}(MITOSIS|Mitosis|mitosis|MITOSES|Mitoses|mitoses|Tubules|tubules|TUBULES)> )
+!| ( <\p{ci}(modified|MODIFIED|Modified)>? <\p{ci}(bloom\-richardson|BLOOM\-RICHARDSON|Bloom\-richardson|Bloom\-Richardson|scarf\-bloom\-richardson|SCARF\-BLOOM\-RICHARDSON|Scarf\-Bloom\-richardson|Scarf\-Bloom\-Richardson)>  <\p{ci}(SCORE|score|Score)>? )
+!| ( <\p{ci}(modified|MODIFIED|Modified)> <>{0,2}  ( <\(> <\p{ci}(nottingham|Nottingham|NOTTINGHAM)> <\)> )  <\p{ci}(SCORE|score|Score)>? )
+!| ( <\p{ci}(glandular|acinar|GLANDULAR|ACINAR|Glandular|Acinar|Tubule|tubule|TUBULE|Tubular|tubular|TUBULAR)> <>? <\p{ci}(DIFFERENTIATION|differentiation|Differentiation|Formation|formation|FORMATION|SCORE|score|Score)> )
+!| ( <\p{ci}(nuclear|NUCLEAR|Nuclear)> <\p{ci}(pleomorphism|Pleomorphism|PLEOMORPHISM)>? <\p{ci}(SCORE|score|Score|Grade|GRADE|grade)>)
+!| ( <\p{ci}(nuclear|NUCLEAR|Nuclear)> <\p{ci}(pleomorphism|Pleomorphism|PLEOMORPHISM)> )
+!| ( <\p{ci}(total|TOTAL|Total|overall|OVERALL|Overall)> <\p{ci}(Grade|GRADE|grade|SCORE|score|Score)>)
+!| ( <\p{ci}(gleason|GLEASON|Gleason)> <\p{ci}('s|'S)>? )
+!| ( <\p{ci}(grade|GRADE|Grade)> )
+!| ( <\p{ci}(nottingham|Nottingham|NOTTINGHAM)> <\p{ci}(Grade|GRADE|grade)> (<\(> <G.+> <\)>) )
+!| ( <\p{ci}(nottingham|Nottingham|NOTTINGHAM)> )
+!| ( <GS> )
+!| ( <FIGO> )
+!| ( <MBR> )
+!) <\p{ci}(SCORE|score|Score|Grade|GRADE|grade)>? }
+
+
+!======================================================================
+
+#subgroup TumorGrade: {(
+  ( [OD Observation_CancerGrade_Normalized] %(GradeType) %(GradeValue) <\+> %(GradeType) %(GradeValue)[/OD] %(GradeEquals) [OD Observation_CancerGrade_Value] <\p{ci}(total)> <>? <\p{ci}(score)>  %(GradeValue)+ [/OD] )
+| ( [OD Observation_CancerGrade_Normalized] %(GradeType) <[0-9]\+> %(GradeType) %(GradeValue)[/OD] %(GradeEquals) [OD Observation_CancerGrade_Value] <\p{ci}(total)> <>? <\p{ci}(score)>  %(GradeValue)+ [/OD] )
+| ( [OD Observation_CancerGrade_Normalized] %(GradeType)[/OD]  %(GradeEquals)?  ( <\p{ci}(total|TOTAL|Total)>? <\p{ci}(SCORE|score|Score|Grade|GRADE|grade)> %(GradeEquals)? )? [OD Observation_CancerGrade_Value] %(GradeValue)+ (<\,|;>? <(sum|SUM|Sum|equals|EQUALS|Equals)>  <[0-9]>)? [/OD] )
+| ( [OD Observation_CancerGrade_Normalized] %(GradeType)[/OD]  %(GradeEquals)?  [OD Observation_CancerGrade_Value] %(GradeValue)  (<to>|<TO>) %(GradeValue)  ( <(sum|SUM|Sum|equals|EQUALS|Equals)>  <[0-9]>)? [/OD]  )
+| ( [OD Observation_CancerGrade_Value] %(GradeValue) [/OD] <for|For|FOR> [OD Observation_CancerGrade_Normalized] %(GradeType)[/OD] )
+| ( [OD Observation_CancerGrade_Normalized] %(GradeType)[/OD]  %(GradeEquals)  %(GradeModifier) )
+| ( [OD Observation_CancerGrade_Normalized] %(GradeType)[/OD]  %(GradeEquals)  [OD Observation_CancerGrade_Value] <(low|LOW|Low|HIGH|High|high|intermediate|INTERMEDIATE|Intermediate|poor|Poor|POOR)> %(skipParens)? [/OD] )
+| ( [OD Observation_CancerGrade_Normalized] %(GradeType)[/OD]  %(GradeEquals)  [OD Observation_CancerGrade_Value] <(low|LOW|Low|HIGH|High|high|intermediate|INTERMEDIATE|Intermediate|poor|Poor|POOR)> <\,> %(GradeValue) [/OD]  )
+| ( %(GradeValue) <\,> %(GradeModifier) )
+| ( [OD Observation_CancerGrade_Value] <G(1|2|3|4|X)> [/OD])
+| ( %(GradeModifier) )
+!) ( <\,|\:>? ( %(GradeModifier) |( <\(> <\p{ci}(high)>|<\p{ci}(low)> <\)> )) )? }
+) ( <\,|\:>? ( %(GradeModifier) | (  <\(> (<\p{ci}(high)>|<\p{ci}(low)>) <\)> )   ) )? }
+
+#subgroup GradeGValue: {(
+[OD Observation_CancerGrade_Value] (
+    ( <GS?(1|2|3|4|X)>)
+|   ( <G> <(1|2|3|4|X)>)
+|   ( <G(1|2|3|4)> <(of|OF)> <[0-9]>)
+|   ( <G(1|2|3|4)\-[0-9]>)
+|   ( <GRADE(1|2|3|4)> )
+|   ( <grade(1|2|3|4)> )
+|   ( <Grade(1|2|3|4)> )
+)[/OD]
+)}
+
+!======================================================================
+#subgroup DictCancerSite: {(
+( %(Laterality)? [OD Observation_CancerHistology_BodySite] %(DictAnatomy) [/OD] )
+)}
+
+#subgroup CancerMod: {(
+  %(DictCancerSite)
+!| (  %(DictAppearance))
+| (  %(DictBehavior))
+| (  %(DictOtherMod) ( <\(> %(DictOtherMod)  <\)> )? )
+!| (  %(DictType) ( <\(> %(DictType)  <\)> )? )
+| (  %(GradeModifier))
+)}
+
+!======================================================================
+!! EXAMPLE: large tubulovillous adenoma of the cecum
+
+#group Observation_CancerHistology: { (
+!  ( %(CancerMod)+ %(CancerType) ( <\p{ci}(of|OF|Of)> <\p{ci}(the|THE)>?)? (<\,>? %(CancerMod))+  )
+  ( %(CancerMod){1,3} %(CancerType) ( <\p{ci}(of|OF|Of)> <\p{ci}(the|THE)>?)? (<\,>? %(CancerMod))+  )
+| ( %(CancerType) ( <\p{ci}(of|OF|Of)> <\p{ci}(the|THE)>?)? (<\,>? %(CancerMod))+  )
+| ( %(CancerMod)+ (<\,>? %(CancerMod))* %(CancerType)  )
+| ( %(DictHistology))
+| ( %(DictICDO))
+|(<ICD\-O(\-([0-9]+|Nr\.))?> <M>? <\:>? %(DictICDO3Literal))
+!) ( <\,> (%(DictAppearance) | %(DictBehavior) | %(GradeModifier) ) )? }						 
+) ( <\,> ( %(DictBehavior) | %(GradeModifier) ) )? }						 
+
+!======================================================================
+
+!! EXAMPLE:  "Gleason Histologic Score 7 of 10"
+!! EXAMPLE:  "grade II"
+!! EXAMPLE:  "Histologic grade (MBR): Poorly-differentiated"
+!! EXAMPLE:  "Histologic Grade : G1, Well differentiated"
+!! EXAMPLE:  "Histologic Grade 3 out of 3"
+!! EXAMPLE:  "histologic grade 3"
+!! EXAMPLE:  "Nuclear Grade : Grade I"
+!! EXAMPLE:  "Nuclear Pleomorphism Score 2"
+!! EXAMPLE:  "Overall Grade Grade 2"
+!! EXAMPLE:  "score 1"
+#group Observation_CancerGrade: {(
+  ( %(TumorGrade) | %(GradeGValue) )
+)}						 
+
+!======================================================================
+
+!! EXAMPLE:   "Invasive tumor size: 0.6 cm"
+!! EXAMPLE:   "Size of invasive carcinoma: 3.0 x 2.5 x 1.6 cm"
+!! EXAMPLE:   "Size of invasive carcinoma: 3.0 x 2.5 x 1.6 cm"
+!! EXAMPLE:   "Splenic flexure Tumor size: 4.5 cm"
+!! EXAMPLE:   "Tumor Size : 5.3cm"
+#subgroup SizeKeyword: {(
+<\p{ci}(Size|size|SIZE|extent|EXTENT|Extent|length|LENGTH|Length|dimension|DIMENSION|Dimension|(Size\/Extent))>
+)}
+
+#subgroup SizeKeywords: {(
+%(SizeKeyword) ((<\/|\:> <POS:~(Punct)>? %(SizeKeyword)) | (<\(> <POS:~(Punct)>? %(SizeKeyword) <\)> ) )?
+)}
+
+#subgroup SizePredicate: {(
+ %(skipParens)? (<\p{ci}(WAS|was|IS|is|\:|\,)>|<\(><\p{ci}(measures?|measuring)>)? %(NumModifier)? %(Measure)
+)}
+
+#subgroup CancerSizeMod: {(
+!  (  %(DictAppearance))
+  (  %(DictBehavior))
+| (  %(DictOtherMod) ( <\(> %(DictOtherMod)  <\)> )? )
+!| (  %(DictType) ( <\(> %(DictType)  <\)> )? )
+)}
+
+
+#group Observation_CancerSize: {(
+  ( %(CancerMod)* %(CancerType) <\,>? %(SizeKeywords)? %(SizePredicate) )
+| ( %(CancerSizeMod)+ %(CancerType)? <\,>? %(SizeKeywords)? %(SizePredicate) )
+| ( %(SizeKeywords) <\p{ci}(Of|OF|of)> <POS:~(Punct)>{0,3} %(CancerType) %(SizePredicate) )
+)}						 
+
+!======================================================================
+!#group med_Lymph_nodes: {
+!  %(Lymph_nodes)
+! }
+!
+!!======================================================================
+!#group med_Metastasis: {
+! %(Metastasis)
+! }
+!
+!!======================================================================
+!#group med_Tumor: {
+!  %(Tumor)
+! }
+
+!======================================================================
+!#group med_CancerStage: {( !!Moved to end of rulefile and combined with med_LymphNodeInvolvement
+!    [OD Stage] %(Stage) [/OD]
+!| ( %(Metastasis) |  %(Lymph_nodes_stage) | %(Tumor) ) ( <\,>? ( %(Metastasis) |  %(Lymph_nodes_stage) | %(Tumor) )  )*
+
+!) }
+
+!======================================================================
+!#group med_Procedure: {(
+!  (   %(DictCancerSite) ( <\,|;> %(Laterality) )? <\,> [OD CancerProcedure] %(DictProcedure) [/OD]  )
+!  |   %(DictCancerSite)? %(Laterality)? [OD CancerProcedure] %(DictProcedure) [/OD]  ( <\p{ci}(of|OF|Of)> <\p{ci}(the|THE|A|a)>?  %(DictCancerSite) <\p{ci}(mass|Mass|MASS|lump|polyp|lesion|LUMP|POLYP|LESION|Lump|Polyp|Lesion)>? )?
+!  | ( %(Laterality)? [OD CancerProcedure] %(GeneralProcedure) [/OD]  <\p{ci}(of|OF|Of)> <\p{ci}(the|THE|a|A)>?  %(DictCancerSite) <\p{ci}(mass|Mass|MASS|lump|polyp|lesion|LUMP|POLYP|LESION|Lump|Polyp|Lesion)>? )
+!  | ( %(DictCancerSite) <\p{ci}(mass|Mass|MASS|lump|polyp|lesion|LUMP|POLYP|LESION|Lump|Polyp|Lesion)> <\,|;>?  ( <\,|;>?  %(Laterality) )? [OD CancerProcedure] (%(GeneralProcedure)|%(DictProcedure) ) [/OD] )
+!  | ( %(DictCancerSite) <\,|;>  %(Laterality) ( <\p{ci}(apex|base|mid|lobe|lat|APEX|BASE|MID|LOBE|LAT|Apex|Base|Mid|Lobe|Lat)> ( <\p{ci}(and|AND)>? <\p{ci}(apex|base|mid|lobe|lat|APEX|BASE|MID|LOBE|LAT|Apex|Base|Mid|Lobe|Lat)> )? )? <\,|;>? [OD CancerProcedure] (%(GeneralProcedure)|%(DictProcedure) ) [/OD] )
+!  | ( %(DictCancerSite) <\,|;>? ( <\p{ci}(mass|Mass|MASS|lump|polyp|lesion|LUMP|POLYP|LESION|Lump|Polyp|Lesion)> )?  [OD CancerProcedure] %(GeneralProcedure) [/OD] )
+!)}						 
+
+
+!======================================================================
+#subgroup MarginMod: {(
+  (<\p{ci}((A|a)pical)>)
+| (<\p{ci}((B|b)ronchial)>)
+| (<\p{ci}((C|c)ircumferential)>)
+| (<\p{ci}((C|c)olonic)>)
+| (<\p{ci}((D|d)eep)>)
+| (<\p{ci}((D|d)istal)>)
+| (<\p{ci}((F|f)irst)>)
+| (<\p{ci}((I|i)leal)>)
+| (<\p{ci}((I|i)nferior)>)
+| (<\p{ci}((L|l)ateral)>)
+| (<\p{ci}((L|l)ower)>)
+| (<\p{ci}((P|p)osterior)> <\p{ci}((D|d)eep)>)
+| (<\p{ci}((P|p)osterior)>)
+| (<\p{ci}((P|p)roximal)>)
+| (<\p{ci}((R|r)adial)>)
+| (<\p{ci}((R|r)ight)> <\p{ci}((D|d)eep)>)
+| (<\p{ci}((R|r)ight)> <\p{ci}((M|m)edial)>)
+| (<\p{ci}((S|s)uperior)>)
+| (<\p{ci}((T|t)rue)> <\p{ci}((P|p)osterior)>)
+| (<\p{ci}((U|u)pper)>)
+)}
+
+
+!======================================================================
+!#subgroup DictMargin: [TE MARGIN] <>+ [/TE] 
+
+
+!======================================================================
+#subgroup MarginResult: {(
+  <\p{ci}((P|p)ositive)>
+| <\p{ci}((N|n)egative)>
+| <\p{ci}((F|f)ree)>
+| <\p{ci}((C|c)lear)>
+| (<\p{ci}((N|n)ot)>? <\p{ci}(I|involved)>)
+)}
+
+
+!======================================================================
+!Margins Not being exposed yet
+
+!#group med_RelationCancerMargins: {(
+!  ( ( <\(>? %(MarginMod) <\)>? )* %(Laterality)? %(DictAnatomy)? %(DictMargin) %(GradeEquals)?  %(MarginResult)  )
+!| ( (%(MarginMod)| (%(Laterality)? %(DictAnatomy)))+ %(skipParens)? %(DictMargin) %(GradeEquals)?  %(MarginResult)  )
+!| ( %(MarginResult) %(DictMargin) )
+!)}
+
+!======================================================================
+#subgroup PrimaryKeyword: {(
+ (<\p{ci}((P|p)rimary)> <\p{ci}((S|s)ite)>? )
+|(<\p{ci}((P|p)rimaries)>)
+)}
+
+#subgroup DictPrimarySite: {(
+([OD PrimarySite][TE OBSERVATION_CANCERHISTOLOGY_BODYSITE] <>+ [/TE][/OD]) (%(coord) [OD PrimarySite][TE OBSERVATION_CANCERHISTOLOGY_BODYSITE] <>+ [/TE][/OD])*
+)}
+
+#group med_CancerPrimary: {(
+  ( %(PrimaryKeyword) <~(but|if|although|and|with|while|\,|;|\(|\))>{0,3} %(DictPrimarySite) ) 
+| ( %(DictPrimarySite) <~(but|if|although|and|with|while|\,|;|\(|\))>{0,2} %(PrimaryKeyword) )
+)}
+
+!======================================================================
+!======================================================================
+
+!======================================================================
+!! LYMPH NODE INVOLVEMENT:
+!======================================================================
+
+!======================================================================
+! OUTPUT FIELDS:
+! stageNExamined, stageNInvolved, stageNExtension, stageNLocation, stageNSize, stageNLaterality
+!======================================================================
+
+#subgroup numberPos: {(
+  ((<~((.*\%)|(.*\/.*)|(0)|((Z|z)ero)|(ZERO)),POS:Num>|<\p{ci}((multiple)|(single))>|(<\(>(<~((.*\%)|(.*\/.*)|(0)|((Z|z)ero)|(ZERO)),POS:Num>|<\p{ci}((multiple)|(single))>)<\)>))+)
+)}
+
+#subgroup numberZero: {(
+  ((<\p{ci}((zero)|(none)|0)>|(<\(><\p{ci}((zero)|(none)|0)><\)>))+)
+)}
+
+#subgroup proportion_no_parens: {(
+  (((([OD Observation_CancerLymphNodes_Value_Numerator_Pos] %(numberPos) [/OD])|([OD Observation_CancerLymphNodes_Value_Numerator_Neg] %(numberZero) [/OD])) <\p{ci}(out)>? <\p{ci}(of)>)? [OD Observation_CancerLymphNodes_Value_Denominator] (%(numberPos)) [/OD])
+| ((([OD Observation_CancerLymphNodes_Value_Numerator_Pos] %(numberPos) [/OD])|([OD Observation_CancerLymphNodes_Value_Numerator_Neg] %(numberZero) [/OD])) <\/> [OD Observation_CancerLymphNodes_Value_Denominator] (%(numberPos)) [/OD])
+| ([OD Observation_CancerLymphNodes_Value_Numerator_Neg] %(numberZero) [/OD])
+| ([OD Observation_CancerLymphNodes_Value_Denominator] <[0-9]+\/[0-9]+> [/OD])
+| (<POS:Det>)
+)}
+
+#subgroup proportion: {(
+  (%(proportion_no_parens))
+| (<\(> %(proportion_no_parens) <\)>)
+)}
+
+#subgroup malignancy: {(
+  (<\p{ci}(metastatic)>? ((<\p{ci}(deposits)> <\p{ci}(of)>)? (([TE OBSERVATION_CANCERHISTOLOGY_VALUE_ICDO] <>+ [/TE])|<\p{ci}(tumou?r)>) <\p{ci}(deposit(s)?)>?))
+| (<\p{ci}(metastatic)>? <\p{ci}(involvement)>)
+| (<\p{ci}(malignanc.*)>)
+| (<\p{ci}(isolated)>? <\p{ci}(tumou?r)> <\p{ci}(cells)>?)
+| (<\p{ci}(metasta((tic)|(sis)|(ses)))> (<\(>? (<\,>? [TE MEASURE] <>* [/TE])+ <\)>?)?)
+| ([OD Observation_CancerLymphNodes_Component_Size] <\p{ci}(m(a|i)crometastas((is)|(es)))> [/OD])
+)}
+
+#subgroup evidence: {(
+([OD Observation_CancerLymphNodes_Component_Size] <\p{ci}(m(a|i)croscopic)> [/OD])? <\p{ci}(evidence)>
+)}
+
+#subgroup extension: {(
+  (<\p{ci}(focal)>? [OD Observation_CancerLymphNodes_Component_Extension]<\p{ci}(((peri)|(extra))nodal)>[/OD] <\p{ci}((spread)|(extension))>)
+)}
+
+#subgroup result: {(
+  ( [OD Observation_CancerLymphNodes_Interpretation] <\p{ci}((positive)|(negative))> [/OD](<\p{ci}(with(out)?)>? %(evidence))? (<\p{ci}(for)> %(malignancy))?)
+| (<\p{ci}((((contain)|(show))(ing)?)|(with(out)?))> ([OD Observation_CancerLymphNodes_Value_Numerator_Neg] <\p{ci}(no)> [/OD])? (%(evidence) <\p{ci}((for)|(of))>)? %(malignancy) (<\p{ci}(with)> %(extension))?)
+!| (<\p{ci}((((contain)|(show))(ing)?)|(with(out)?))>? ([OD Observation_CancerLymphNodes_Value_Numerator_Neg] <\p{ci}(no)> [/OD])? (%(evidence) <\p{ci}((for)|(of))>)? %(malignancy) (<\p{ci}(with)> %(extension))?)
+| (%(malignancy) <>? [OD Observation_CancerLymphNodes_Interpretation] <\p{ci}((positive)|(negative))> [/OD])
+| ([OD Observation_CancerLymphNodes_Value_Numerator_Neg] <\p{ci}(free)> [/OD] <\p{ci}(of)> %(malignancy))
+| ([OD Observation_CancerLymphNodes_Value_Numerator_Neg] <\p{ci}(benign)> [/OD])
+| (%(extension))
+)}
+
+#subgroup dissection: {(
+  ((<\p{ci}(isolated)>? <\p{ci}(from)>)? ([OD Observation_CancerLymphNodes_Component_Laterality] <\p{ci}((right)|(left))> [/OD])?  <POS:Adj>* <\p{ci}((neck)|(compartment))>? <\p{ci}((dissection)|(sampling)|(biopsy))> <\p{ci}(specimen)>?)
+)}
+
+#subgroup lnAnatomy: {(
+  (<\p{ci}(subaortic)>)
+| (<\p{ci}(para)>? <\p{ci}(aortic)>)
+| (<\p{ci}(aortopulmonary)>)
+| (<\p{ci}(ascending)> <\p{ci}(aorta)>)
+| (<\p{ci}(axilla(ry)?)>)
+| (<\p{ci}(azygos)>)
+| (<\p{ci}(((contra)|(ipsi)|(bi)|(uni))lateral)>)
+| (<\p{ci}(hilar)>)
+| (<\p{ci}(mediastinal)>)
+| (<\p{ci}(scalene)>)
+| (<\p{ci}(((supra)|(infra))clavicular)>)
+| (<\p{ci}((peri\-?)?bronchial)>)
+| (<\p{ci}(high((est)|(er)))>)
+| (<\p{ci}(low((est)|(er)))>)
+| (<\p{ci}(upper)>)
+| (<\p{ci}(inferior)>)
+| (<\p{ci}(superior)>)
+| (<\p{ci}(interlobar)>)
+| (<\p{ci}(internal)>? <\p{ci}(mammary)>)
+| (<\p{ci}(intra((mammary)|(pulmonary)|(parenchymal)))>)
+| (<\p{ci}(low)>? <\p{ci}(cervical)>)
+| (<\p{ci}((lower)|(upper))> <\p{ci}(paratracheal)>)
+| (<\p{ci}(lobar)>)
+| (<\p{ci}((non)?sentinel)>)
+| (<\p{ci}(para\-?((aortic)|(esophageal)|(bronchial)))>)
+| (<\p{ci}(pelvic)>)
+| (<\p{ci}(peripheral)>)
+| (<\p{ci}(phrenic)>)
+| (<\p{ci}(pre\-?((vascular)|(vertebral)))>)
+| (<\p{ci}(pulmonary)> <\p{ci}(ligament)>)
+| (<\p{ci}(regional)>)
+| (<\p{ci}(retrotracheal)>)
+| (<\p{ci}(segmental)>)
+| (<\p{ci}(sternal)> <\p{ci}(notch)>)
+| (<\p{ci}(subcarinal)>)
+| (<\p{ci}(subsegmental)>)
+| (<\p{ci}(station)> <\p{ci}([0-9]+(r|l)?)> <\p{ci}(r|l)>?)
+| (<\p{ci}(perihepatic)>)
+| (<\p{ci}(mesenter((ic)|(y)))>)
+| (<\p{ci}(anthracotic)>)
+| (<\p{ci}(thyroid)>)
+| (<\p{ci}(level)> <POS:Num>)
+| (<\p{ci}(superficial)>)
+| (<\p{ci}(deep)>)
+| (<\p{ci}(chest)> <\p{ci}(wall)>)
+| (<\p{ci}(breast)>)
+| (<\p{ci}(colon)>)
+)}
+
+#subgroup lnLaterality: {(
+  ([OD Observation_CancerLymphNodes_Component_Laterality]<\p{ci}((right)|(left))>[/OD])
+)}
+
+#subgroup lnModifier: {(
+ (([OD Observation_CancerLymphNodes_BodySite]%(lnAnatomy)+[/OD])|%(lnLaterality))
+)}
+
+#subgroup involvementWord: {(
+  <\p{ci}((seen)|(identified)|(involved)|(noted)|(observed))>
+)}
+
+#subgroup lymphNode: {(
+  (( %(lnModifier)+ <\p{ci}((window)|(zone))>?)? <\p{ci}(lymph)>? <\p{ci}((lymph)?nodes?)> (<\(> [TE MODIFIER] <>* [/TE] <\p{ci}(type)>? <\)>)? %(dissection)? <\:>?)
+| (<\p{ci}(lymph)> <\p{ci}(nodes?)> <\,>  %(lnModifier)  (<\,> <\p{ci}(excision)>)? <\:>?)
+| (%(Lymph_nodes_stage_no_OD) <\:>?)
+)}
+
+#group Observation_CancerStage: {(
+    %(Stage)
+| ( %(Metastasis) |  %(Lymph_nodes_stage) | %(Tumor) ) ( <\,>? ( %(Metastasis) |  %(Lymph_nodes_stage) | %(Tumor) )  )*
+
+!! lymph node involvement
+
+| (%(proportion)? %(lymphNode) (<~(\.|;)>{0,5} %(proportion)? %(lymphNode))* <~(\.)>{0,5} %(result) (<\p{ci}(in)> %(proportion) %(lymphNode))? (<>{0,2} %(involvementWord))? (<\(> %(proportion) <\)>)? (<\,>? %(dissection))?)
+
+| ((%(proportion)? %(lymphNode) (<\,> %(proportion))? <;>)+ %(result) (<>{0,2} %(involvementWord))?)
+
+| (%(proportion) %(result) %(lymphNode) (<>{0,2} %(involvementWord))?)
+
+| (%(proportion) %(lymphNode) <>{0,2} %(involvementWord) <\,>? %(result) (<\(> %(proportion) <\)>)?)
+
+| ((<\p{ci}(total)>? <\p{ci}(number)> <\p{ci}(of)>?)? %(lymphNode)? <>{0,5} ((%(result) %(involvementWord))|(%(result))|(%(involvementWord))) (<\(> <>* <\)>)? <\:> (((([OD Observation_CancerLymphNodes_Value_Numerator_Pos] %(numberPos) [/OD])|([OD Observation_CancerLymphNodes_Value_Numerator_Neg] %(numberZero) [/OD])) %(lymphNode)? (<\(> %(proportion) <>*? <\)>)?)|(<\p{ci}(not)> <\p{ci}(applicable)>)))
+
+| ((%(lymphNode) <>{0,5} <\:>)? ([OD Observation_CancerLymphNodes_Value_Numerator_Neg] <\p{ci}(no)> [/OD])? (%(evidence) <\p{ci}((for)|(of))>)? %(malignancy) <>{0,2} <\p{ci}(identified)>? <\p{ci}((in(to)?)|(to))> <>{0,5} %(proportion) <>? %(lymphNode) (<\(>? %(proportion) <\)>?)?)
+
+| (%(malignancy) <\p{ci}(involving)> (%(numberPos)|%(numberZero)|%(proportion))? %(lymphNode))
+
+| (%(proportion) <\p{ci}(total)> %(lymphNode))
+
+| (<\p{ci}(reactive)>? <\p{ci}(hyperplasia)> <\,> %(lymphNode) <\(> %(proportion) <\)>)
+
+| (<\p{ci}(size)> <\p{ci}(of)> [OD Observation_CancerLymphNodes_Interpretation] <\p{ci}(positive)> [/OD] %(lymphNode) <>? [OD Observation_CancerLymphNodes_Component_Size] [TE MEASURE] <>+ [/TE] [/OD])
+
+| (%(lymphNode) <\p{ci}(metastasis)> <\:> <\p{ci}(total)> <\p{ci}(nodes)> <\:> %(proportion) %(lymphNode))
+
+| (<\p{ci}(final)>? %(lymphNode) <\p{ci}(count)> <>{0,5} <\:> %(proportion))
+
+| ([OD Observation_CancerLymphNodes_Interpretation] <\p{ci}((positive)|(negative))> [/OD] <\p{ci}(for)> %(lymphNode) %(malignancy))
+
+| (<\p{ci}(nodal)> <\p{ci}((involvement)|(metastasis))>)
+
+| ([OD Observation_CancerLymphNodes_Interpretation] <\p{ci}((absence)|(presence))> [/OD] <\p{ci}(of)> <>? %(lymphNode) %(malignancy))
+
+| (%(lymphNode) <>{0,5} ([OD Observation_CancerLymphNodes_Value_Numerator_Neg] <\p{ci}(no)> [/OD])? (<>{0,3} <\p{ci}(or)>)? %(malignancy) %(involvementWord))
+
+|(%(lnModifier)+ <\:> %(result) %(lymphNode))
+
+) }
+
+#group DROP_Observation_CancerStage: {(
+!  (<\(> %(Stage) <\,>? <\p{ci}(if)> (%(Metastasis)|%(Lymph_nodes_stage))+ <>*? <\)>)
+  (<\p{ci}(total)>? <\p{ci}(number)> <\p{ci}(of)>? <\p{ci}(blocks?)> <>*? <\:> (%(numberPos)|%(numberZero)))
+)}

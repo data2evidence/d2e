@@ -1,0 +1,38 @@
+PROCEDURE "hc.hph.collections.db.procedures::INSERT_ALL" (
+	IN old_collection_id NVARCHAR(32),
+	IN old_status NVARCHAR(256),
+	IN new_collection_id NVARCHAR(32),
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR")
+	 
+LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+
+BEGIN
+ 	declare msg nvarchar(1000);
+ 	declare res table("Id" NVARCHAR(100),
+	 			"ItemType" NVARCHAR(1024),
+	 			"CollectionId" NVARCHAR(32),
+	 			"CreatedBy" NVARCHAR(256),
+	 			"CreatedAt" TIMESTAMP,
+	 			"ChangedBy" NVARCHAR(256),
+	 			"ChangedAt" TIMESTAMP,
+	 			"StatusId" NVARCHAR(32));
+	declare ot_error_1 "hc.hph.core.db.models::TT_ODATA_ERROR";
+
+	
+ 	res = SELECT "Id", 
+ 					"ItemType", 
+ 					new_collection_id as "CollectionId", 
+ 					"CreatedBy", 
+ 					"CreatedAt", 
+ 					"ChangedBy", 
+ 					"ChangedAt", 
+ 					'1' as "StatusId"
+				FROM "hc.hph.collections.db.models::CollectionModel.Item"
+				WHERE 
+				"Status.Id" = :old_status 
+					AND 
+				"Collection.Id" = :old_collection_id;
+
+	CALL "hc.hph.collections.db.procedures::CREATE_ITEM"(:res, :ot_error_1);
+ 	ot_error = select * from :ot_error_1;
+END;

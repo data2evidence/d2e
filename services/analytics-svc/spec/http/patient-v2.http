@@ -1,0 +1,99 @@
+POST http://localhost:3000/patient
+Content-Type: application/json;charset=utf-8
+X-CSRF-Token: null
+
+{
+	"cohortDefinition": {
+		"axes": [],
+		"guarded": true,
+		"limit": 10000,
+		"offset": 0,
+		"cards": {
+			"content": [{
+					"content": [{
+							"_configPath": "patient",
+							"_instanceNumber": 0,
+							"_instanceID": "patient",
+							"_name": "Basic Data",
+							"_attributes": {
+								"content": [{
+										"_configPath": "patient.attributes.smoker",
+										"_instanceID": "patient.attributes.smoker",
+										"_constraints": {
+											"content": []
+										}
+									}, {
+										"_configPath": "patient.attributes.gender",
+										"_instanceID": "patient.attributes.gender",
+										"_constraints": {
+											"content": []
+										}
+									}, {
+										"_configPath": "patient.attributes.biomarker",
+										"_instanceID": "patient.attributes.biomarker",
+										"_constraints": {
+											"content": []
+										}
+									}
+								]
+							}
+						}, {
+							"_configPath": "patient.conditions.acme.interactions.priDiag",
+							"_instanceNumber": 1,
+							"_instanceID": "patient.conditions.acme.interactions.priDiag.1",
+							"_name": "Primary Tumor Diagnosis A",
+							"_attributes": {
+								"content": [{
+										"_configPath": "patient.conditions.acme.interactions.priDiag.attributes.icd_10",
+										"_instanceID": "patient.conditions.acme.interactions.priDiag.1.attributes.icd_10",
+										"_constraints": {
+											"content": []
+										}
+									}, {
+										"_configPath": "patient.conditions.acme.interactions.priDiag.attributes.age",
+										"_instanceID": "patient.conditions.acme.interactions.priDiag.1.attributes.age",
+										"_constraints": {
+											"content": []
+										}
+									}
+								]
+							}
+						}
+					]
+				}, {
+					"content": []
+				}
+			]
+		},
+		"columns": [{
+				"configPath": "patient.attributes.lastName",
+				"seq": 0,
+				"order": ""
+			}, {
+				"configPath": "patient.attributes.firstName",
+				"seq": 1,
+				"order": ""
+			}, {
+				"configPath": "patient.attributes.dateOfBirth",
+				"seq": 2,
+				"order": ""
+			}, {
+				"configPath": "patient.attributes.gender",
+				"seq": 3,
+				"order": ""
+			}, {
+				"configPath": "patient.conditions.acme.interactions.priDiag.attributes.age",
+				"seq": 4,
+				"order": ""
+			}, {
+				"configPath": "patient.conditions.acme.interactions.priDiag.attributes.icd_10",
+				"seq": 5,
+				"order": ""
+			}
+		],
+		"configData": {
+			"configId": "b71d1c67-2c8f-43d3-9f32-c26088a8d1b3",
+			"configVersion": "A"
+		}
+	}
+}

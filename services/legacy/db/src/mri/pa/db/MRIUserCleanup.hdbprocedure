@@ -1,0 +1,10 @@
+PROCEDURE "hc.mri.pa.db::MRIUserCleanup" ( 
+   in UserName NVARCHAR(40)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+
+    DELETE FROM "hc.mri.pa.db::MRIEntities.Bookmarks" WHERE "UserName" = UserName;
+  
+END;

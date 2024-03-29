@@ -1,0 +1,12 @@
+version: '3'
+
+services: 
+
+  pg-config:
+    build: . 
+    container_name: mri-pg-config
+    env_file: .env
+
+volumes:
+  database-data:
+

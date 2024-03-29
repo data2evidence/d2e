@@ -1,0 +1,16 @@
+PROCEDURE "hc.hph.plugins.vcf.db.procedures.annotation::MigrateAllVCFAnnotations" ( )
+  LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+DECLARE CURSOR c_calls FOR
+   select "ProfileAuditID","DocumentAuditID","FeatureAuditID" from "hc.hph.plugins.vcf.db.models::Staging.GenomicsMigration";
+    FOR cur_row as c_calls DO
+--clear logs of this in trace table 
+
+    "hc.hph.di.procedures::clean_logs" ( cur_row."ProfileAuditID");
+    call "hc.hph.plugins.vcf.db.procedures.annotation::AnnotateVCF"(cur_row."ProfileAuditID",cur_row."DocumentAuditID",cur_row."FeatureAuditID",1);
+     
+  END FOR;
+  Delete from "hc.hph.plugins.vcf.db.models::Staging.GenomicsMigration";
+END;
+

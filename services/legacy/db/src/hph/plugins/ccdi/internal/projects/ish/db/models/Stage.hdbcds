@@ -1,0 +1,185 @@
+
+namespace hc.hph.plugins.ccdi.internal.projects.ish.db.models;
+
+context Stage {
+
+    entity CaseIn {
+        "EINRI" : String(4) not null;
+    	"FALNR" : String(10) not null;
+    	"LFDNR" : hana.VARCHAR(5) not null;
+    	"FALAR" : String(1);
+    	"PATNR" : String(10);
+    	"STORN" : String(1);
+    	"ABRKZ" : String(1);
+    	"BEWTY" : String(1);
+    	"BWIDT" : hana.VARCHAR(8);
+    	"BWIZT" : hana.VARCHAR(6);
+    	"BWEDT" : hana.VARCHAR(8);
+    	"BWEZT" : hana.VARCHAR(6);
+    	"ORGFA" : String(8);
+    	"TIMESTAMP" : Decimal(15,0);
+    	"CLIENT" : String(3);
+    } technical configuration {
+     column store;
+    };
+
+    
+
+    entity CaseOut {
+    	"EINRI" : String(4) not null;
+    	"FALNR" : String(10) not null;
+    	"LFDNR" : hana.VARCHAR(5) not null;
+    	"FALAR" : String(1);
+    	"PATNR" : String(10);
+    	"STORN" : String(1);
+    	"BEGDT" : hana.VARCHAR(8);
+    	"ENDDT" : hana.VARCHAR(8);
+    	"ABRKZ" : String(1);
+    	"BEWTY" : String(1);
+    	"BWIDT" : hana.VARCHAR(8);
+    	"BWIZT" : hana.VARCHAR(6);
+    	"ORGPF" : String(8);
+    	"TIMESTAMP" : Decimal(15,0);
+    	"CLIENT" : String(3);
+    } technical configuration {
+     column store;
+    };
+
+    entity Diagnosis {
+    	"EINRI" : String(4) not null;
+    	"FALNR" : String(10) not null;
+    	"LFDNR" : hana.VARCHAR(3) not null;
+    	"DKAT1" : String(2);
+    	"DKEY1" : String(30);
+    	"DITXT" : String(50);
+    	"DIADT" : hana.VARCHAR(8);
+    	"DIAZT" : hana.VARCHAR(6);
+    	"EWDIA" : String(1);
+    	"BHDIA" : String(1);
+    	"AFDIA" : String(1);
+    	"ENDIA" : String(1);
+    	"FHDIA" : String(1);
+    	"KHDIA" : String(1);
+    	"STORN" : String(1);
+    	"DIAGW" : String(2);
+    	"PATNR" : String(10);
+    	"ORGFA" : String(8);
+    	"ORGPF" : String(8);
+    	"FALAR" : String(1);
+    	"TIMESTAMP" : Decimal(15,0);
+    	"CLIENT" : String(3);
+    } technical configuration {
+     column store;
+    };
+
+
+    entity DRG {
+    	"INSTITUTION" : String(4) not null;
+    	"PATCASEID" : String(10) not null;
+    	"DRG_SEQNO" : hana.VARCHAR(3) not null;
+    	"DRG_CODE" : String(10) not null;
+    	"MDC_CODE" : String(30) not null;
+    	"DRG_CAT" : String(2) not null;
+    	"SOI" : String(1) not null;
+    	"ROM" : String(1) not null;
+    	"DRG_CREAT_DATE" : hana.VARCHAR(8) not null;
+    	"DRG_CREAT_TIME" : hana.VARCHAR(6) not null;
+    	"CANCEL_FLAG" : String(1) not null;
+    	"MDC_CAT" : String(2) not null;
+    	"COST_WEIGHT" : Decimal(9,5)  not null;
+    	"PATNR" : String(10) not null;
+    	"TIMESTAMP" : Decimal(15,0);
+    	"LFDNR" : hana.VARCHAR(5) not null;
+    	"ORGFA" : String(8);
+    	"CLIENT" : String(3);
+    } technical configuration {
+     column store;
+    };
+
+    entity Patient {
+    	"PATNR" : String(10) not null;
+    	"EINRI" : String(4);
+    	"GSCHL" : String(1);
+    	"NNAME" : String(30);
+    	"VNAME" : String(30);
+    	"TITEL" : String(15);
+    	"NAMZU" : String(15);
+    	"VORSW" : String(15);
+    	"NAME2" : String(30);
+    	"GBDAT" : hana.VARCHAR(8);
+    	"TODDT" : hana.VARCHAR(8);
+    	"TODZT" : hana.VARCHAR(6);
+    	"TODUR" : String(3);
+    	"FAMST" : String(1);
+    	"NATIO" : String(3);
+    	"SPEND" : String(1);
+    	"SPENT" : String(50);
+    	"BEGDT" : hana.VARCHAR(8);
+    	"ENDDT" : hana.VARCHAR(8);
+    	"UPDAT" : hana.VARCHAR(8);
+    	"STORN" : String(1);
+    	"ADRNR" : String(10);
+    	"ADROB" : String(4);
+    	"VNAME_LONG" : String(70);
+    	"NNAME_LONG" : String(70);
+    	"PSTLZ" : String(10);
+    	"LAND" : String(3);
+    	"REGIO" : String(3);
+    	"ORT" : String(40);
+    	"ORT2" : String(40);
+    	"STRAS" : String(40);
+    	"STRAZ" : String(40);
+    	"PFACH" : String(10);
+    	"TELNR" : String(30);
+    	"TELXT" : String(10);
+    	"FAXNR" : String(30);
+    	"FAXXT" : String(10);
+    	"EMAIL" : String(241);
+    	"STRAS_LONG" : String(60);
+    	"HSNM1" : String(10);
+    	"MOB_NMBR" : String(30);
+    	"CLIENT" : String(3);   
+	} technical configuration {
+     column store;
+ };
+
+    entity Procedure {
+    	"LNRIC" : String(10) not null;
+    	"ICPMK" : String(2);
+    	"ICPML" : String(10);
+    	"ICPHC" : String(1);
+    	"BGDOP" : hana.VARCHAR(8);
+    	"BZTOP" : hana.VARCHAR(6);
+    	"EZTOP" : hana.VARCHAR(6);
+    	"STORN" : String(1);
+    	"FALNR" : String(10);
+    	"PATNR" : String(10);
+    	"ORGFA" : String(8);
+    	"ORGPF" : String(8);
+    	"FALAR" : String(1);
+    	"TIMESTAMP" : Decimal(15,0);
+    	"CLIENT" : String(3);   
+    } technical configuration {
+     column store;
+    };
+
+    entity Movement {
+    	"EINRI" : String(4) not null;
+    	"FALNR" : String(10) not null;
+    	"LFDNR" : hana.VARCHAR(5) not null;
+    	"BEWTY" : String(1);
+    	"BWART" : String(2);
+    	"BWIDT" : hana.VARCHAR(8);
+    	"BWIZT" : hana.VARCHAR(6);
+    	"BWEDT" : hana.VARCHAR(8);
+    	"BWEZT" : hana.VARCHAR(6);
+    	"ORGFA" : String(8);
+    	"ORGPF" : String(8);
+    	"STORN" : String(1);
+    	"PATNR" : String(10);
+    	"TIMESTAMP" : Decimal(15,0);
+    	"CLIENT" : String(3);
+    } technical configuration {
+     column store;
+    };
+}

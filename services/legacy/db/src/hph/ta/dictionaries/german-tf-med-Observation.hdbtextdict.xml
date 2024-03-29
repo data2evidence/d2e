@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dictionary xmlns="http://www.com/ta/4.0">
+
+<entity_category name="OBSERVATION_PERFORMANCESTATUS">
+
+	<entity_name standard_form="ECOG">
+		<variant name="ECOG:"/>
+		<variant name="ECOG Status"/>
+		<variant name="ECOG Status:"/>
+		<variant name="WHO-Status"/>
+		<variant name="WHO-Status:"/>
+	</entity_name>
+
+	<entity_name standard_form="KPS">
+		<variant name="KI"/>
+		<variant name="Karnofsky-Index"/>
+		<variant name="Karnofsky-Index:"/>
+	</entity_name>
+
+	<entity_name standard_form="LANSKY">
+		<variant name="Lansky-Index"/>
+	</entity_name>
+
+</entity_category>
+</dictionary>

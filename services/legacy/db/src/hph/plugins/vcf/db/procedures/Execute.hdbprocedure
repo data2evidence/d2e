@@ -1,0 +1,24 @@
+PROCEDURE "hc.hph.plugins.vcf.db.procedures::Execute" ( IN audit_id INTEGER, IN source_name VARCHAR(255), IN source_schema VARCHAR(255) )
+LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+BEGIN SEQUENTIAL EXECUTION
+    DECLARE is_running TINYINT := 0;
+    DECLARE document_count INTEGER;
+    
+    -- run background task and ensure there is only one task to be started
+    --LOCK TABLE "hc.hph.di.model::DataIntegration.AuditLog" IN EXCLUSIVE MODE;
+    SELECT COUNT(*) INTO is_running FROM "hc::TASK_EXECUTIONS" INNER JOIN "hc.hph.di.model::DataIntegration.AuditLog" ON "TASK_EXECUTION_ID" = "ProcessID" WHERE "AuditLogID" = :audit_id;
+    IF :is_running = 0 THEN
+        -- update data model if required
+        CALL "hc.hph.genomics.db.procedures.extensions::ActivateCustomAttributeCDS" ( 0, :audit_id );
+    
+        -- re-map data source
+        CALL "hc.hph.plugins.vcf.db.procedures.mapping::MainDataSource" ( :source_name, :source_schema );
+        
+        COMMIT;
+        -- start the import flow graph
+        EXEC 'START TASK "hc.hph.plugins.vcf.db.flowgraphs::Import" ASYNC ( "DWAuditID" => ''' || ESCAPE_SINGLE_QUOTES( :audit_id ) || ''' )';
+        
+        UPDATE "hc.hph.di.model::DataIntegration.AuditLog" SET "Status" = 'Running', "ProcessID" = SESSION_CONTEXT( 'TASK_EXECUTION_ID' ), "ProcessType" = 'Task' WHERE "AuditLogID" = :audit_id;
+        COMMIT;
+    END IF;
+END

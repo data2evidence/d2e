@@ -1,0 +1,29 @@
+/**
+ * Delete entries of specific package from given source table.
+ 
+ * @param[in]  {NVARCHAR(1000)} _Source    - FQN of source object (table, virtual table or view)
+ * @param[in]  {INTEGER}        _PackageID - Package ID
+ */
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::cleanupSource" (
+    IN _Source NVARCHAR(1000),
+    IN _PackageID INT )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER 
+ 
+    AS
+BEGIN
+    
+    DECLARE SQLInjection CONDITION FOR SQL_ERROR_CODE 10001; 
+    
+    IF is_sql_injection_safe( :_Source, 2 ) = 1 THEN 
+    
+        IF :_PackageID IS NULL THEN
+            EXEC 'DELETE FROM ' || escape_single_quotes( :_Source ) || ' WHERE "_PackageID" IS NULL';  
+        ELSE  
+            EXEC 'DELETE FROM ' || escape_single_quotes( :_Source ) || ' WHERE "_PackageID" = ' || escape_single_quotes( :_PackageID );              
+        END IF;
+    ELSE        
+        SIGNAL SQLInjection SET MESSAGE_TEXT = 'Invalid object source name ' || :_Source; 
+    END IF;
+    
+END;

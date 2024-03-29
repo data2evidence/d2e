@@ -1,0 +1,20 @@
+PROCEDURE "hc.hph.di.procedures::create_job_schedule_monitor" ( 
+	in _ScheduleConfigID BIGINT,
+	in _MonitorID BIGINT,
+	in _XSScheduleID NVARCHAR(100),
+	in _XSScheduleRunStatus NVARCHAR(16),
+	in _StartedAt timestamp,
+	in _EndedAt timestamp,
+	in _ProfileID BIGINT,
+	
+	OUT ot_error INTEGER
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+	declare lv_count Integer;
+	select count(*) into lv_count from "hc.hph.di.model::DataIntegration.DIJobScheduleMonitor" as monitor where monitor."ProfileID"= :_ProfileID;
+	insert into "hc.hph.di.model::DataIntegration.DIJobScheduleMonitor" ("ScheduleConfigID", "MonitorID", "XSScheduleID", "XSScheduleRunStatus", "StartedAt", "EndedAt","ProfileID")
+		values (:_ScheduleConfigID, :_MonitorID, :_XSScheduleID, _XSScheduleRunStatus, :_StartedAt, :_EndedAt,:_ProfileID);
+
+END;

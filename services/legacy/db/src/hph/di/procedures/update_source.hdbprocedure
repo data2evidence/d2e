@@ -1,0 +1,35 @@
+PROCEDURE "hc.hph.di.procedures::update_source" ( 
+    IN SourceID NVARCHAR(5),
+	IN SourceName NVARCHAR(512),
+	IN SourceDescription NVARCHAR(1024),
+	OUT ot_error "hc.hph.di.model::tt_error"
+) 
+
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER as
+BEGIN
+	declare lv_count Integer;
+	declare lv_count1 Integer;
+	declare sourceName1 NVARCHAR(512);
+	
+    
+   SELECT count(*) into lv_count from "hc.hph.di.model::DataIntegration.DISource"  where "SourceID" = :SourceID;
+   
+   IF lv_count = 0 THEN
+   	   ot_error = select 500 as http_status_code, 'MSG_DWSOURCE_DOES_NOT_EXIST' error_message, 'PROCEDURE:update_source()' detail from "hc::DUMMY";
+   ELSE 
+   SELECT "Name" into sourceName1 from "hc.hph.di.model::DataIntegration.DISource" where "SourceID"=:SourceID;
+   SELECT count(*) into lv_count1 from "hc.hph.di.model::DataIntegration.DISource"  where "Name" = :SourceName and "Name" <> sourceName1;
+   IF lv_count1 > 0 THEN
+	   ot_error = select 500 as http_status_code, 'MSG_DWSOURCE_NAME_EXISTS' error_message, 'PROCEDURE:update_source()' detail from "hc::DUMMY";
+   	ELSE 
+   update "hc.hph.di.model::DataIntegration.DISource" source set 
+   source."Name" = :SourceName,
+   source."Description" = :SourceDescription,
+   source."ModifiedAt" = CURRENT_UTCTIMESTAMP,
+   source."ModifiedBy" = (Select SESSION_CONTEXT('XS_APPLICATIONUSER') From "hc::DUMMY")
+   FROM "hc.hph.di.model::DataIntegration.DISource" source
+   where source."SourceID" = :SourceID;
+   END IF;
+   END IF;
+END;

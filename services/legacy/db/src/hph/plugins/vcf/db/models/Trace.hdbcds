@@ -1,0 +1,55 @@
+namespace hc.hph.plugins.vcf.db.models;
+
+using hc.hph.genomics.db.models::Type as Type;
+
+context Trace
+{
+
+	// Progress information
+
+	
+	entity Progress
+	{
+		DWAuditID : Type.DWDocID;
+		UpdateTime : UTCDateTime null;
+		RowsProcessed : Integer;
+		RowsSkipped : Integer null;
+		RowsFailed : Integer null;
+		Rows : Type.PositionInterval null;
+		InsertTime : Type.FloatValue null;
+		CommitTime : Type.FloatValue null;
+		MergeTime : Type.FloatValue null;
+		TotalMemoryConsumption : Type.FloatValue null;
+	} technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+  	   migration disabled;
+        };
+
+	table type ImportResultType
+	{
+		TaskID : Integer;
+		DWAuditID : Type.DWDocID;
+		ParentDWAuditID : Type.DWAuditID;
+		Status : String(20);
+		WarningCount : Integer;
+		ErrorCode : Integer;
+		ErrorMessage : String(5000);
+	};
+
+	entity ImportResult
+	{
+		key TaskID : Integer;
+		key DWAuditID : Type.DWDocID;
+		ParentDWAuditID : Type.DWAuditID;
+		Status : String(20);
+		WarningCount : Integer;
+		ErrorCode : Integer null;
+		ErrorMessage : String(5000) null;
+	} technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+           migration disabled;
+  	};
+
+};

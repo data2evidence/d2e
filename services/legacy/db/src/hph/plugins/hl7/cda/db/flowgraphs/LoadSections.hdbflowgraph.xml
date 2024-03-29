@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<flowgraph:ContainerNode xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowgraph="http://www.com/ndb/flowgraph/1.0" xmi:id="_JQYksD0mEeaHzp_P5kzDGQ" name="LOADSECTIONS" generateProcedure="false" generateTask="true">
+  <annotations xmi:id="_JQYksT0mEeaHzp_P5kzDGQ" key="afm.layout">
+    <annotations xmi:id="_JQYksj0mEeaHzp_P5kzDGQ" key="x" value="10"/>
+    <annotations xmi:id="_JQYksz0mEeaHzp_P5kzDGQ" key="y" value="10"/>
+  </annotations>
+  <annotations xmi:id="_F7da0D0nEeaHzp_P5kzDGQ" key="afm.nodeType" value="ContainerNode"/>
+  <annotations xmi:id="_F8LMgD0nEeaHzp_P5kzDGQ" key="afm.nodeInputs">
+    <annotations xmi:id="_F8cSQD0nEeaHzp_P5kzDGQ" key="VIRTUAL_TABLE" value=""/>
+  </annotations>
+  <annotations xmi:id="_F80FsD0nEeaHzp_P5kzDGQ" key="afm.nodeOutputs"/>
+  <inputs xmi:id="_Kg38MD0mEeaHzp_P5kzDGQ" name="VIRTUAL_TABLE" kind="TABLE">
+    <attributes xmi:id="_NIs6ED0mEeaHzp_P5kzDGQ" name="DocumentID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_PfRI0D0mEeaHzp_P5kzDGQ" name="SectionID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_QnWLMD0mEeaHzp_P5kzDGQ" name="SectionName" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_R2HEYD0mEeaHzp_P5kzDGQ" name="TemplateID.Root" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    <attributes xmi:id="_TMm9QD0mEeaHzp_P5kzDGQ" name="TemplateID.Ext" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+  </inputs>
+  <tableMappings xmi:id="_fYnAED0mEeaHzp_P5kzDGQ" source="_Kg38MD0mEeaHzp_P5kzDGQ" target="_bNaK9z0mEeaHzp_P5kzDGQ">
+    <attributeMappings xmi:id="_fYnAET0mEeaHzp_P5kzDGQ" source="_NIs6ED0mEeaHzp_P5kzDGQ" target="_fX7qoD0mEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_fYnAEj0mEeaHzp_P5kzDGQ" source="_PfRI0D0mEeaHzp_P5kzDGQ" target="_fX_8ED0mEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_fYnAEz0mEeaHzp_P5kzDGQ" source="_QnWLMD0mEeaHzp_P5kzDGQ" target="_fYENgD0mEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_fYnAFD0mEeaHzp_P5kzDGQ" source="_R2HEYD0mEeaHzp_P5kzDGQ" target="_fYH34D0mEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_fYnAFT0mEeaHzp_P5kzDGQ" source="_TMm9QD0mEeaHzp_P5kzDGQ" target="_fYMwYD0mEeaHzp_P5kzDGQ"/>
+  </tableMappings>
+  <tableMappings xmi:id="_FrdP8D0nEeaHzp_P5kzDGQ" source="_bNaK-D0mEeaHzp_P5kzDGQ" target="_E-4d2D0nEeaHzp_P5kzDGQ">
+    <attributeMappings xmi:id="_FrdP8T0nEeaHzp_P5kzDGQ" source="_fGIwAD0mEeaHzp_P5kzDGQ" target="_E-4d2T0nEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FrdP8j0nEeaHzp_P5kzDGQ" source="_fGIwAT0mEeaHzp_P5kzDGQ" target="_E-4d2j0nEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FrdP8z0nEeaHzp_P5kzDGQ" source="_fGJXED0mEeaHzp_P5kzDGQ" target="_E-4d2z0nEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FrdP9D0nEeaHzp_P5kzDGQ" source="_fGJXET0mEeaHzp_P5kzDGQ" target="_E-4d3D0nEeaHzp_P5kzDGQ"/>
+    <attributeMappings xmi:id="_FrdP9T0nEeaHzp_P5kzDGQ" source="_fGJXEj0mEeaHzp_P5kzDGQ" target="_E-4d3T0nEeaHzp_P5kzDGQ"/>
+  </tableMappings>
+  <nodes xsi:type="flowgraph:TableComparisonNode" xmi:id="_bNaK8D0mEeaHzp_P5kzDGQ" name="TABLECOMP" detectDeletedRows="false" compareTableName="hc.hph.plugins.hl7.cda.db.models::CDA.Staging.Sections" compareTableType="DATABASE_TABLE" compareTableLayout="COLUMN" compareAttributes="_fX7qoD0mEeaHzp_P5kzDGQ _fYH34D0mEeaHzp_P5kzDGQ">
+    <annotations xmi:id="_bNaK8T0mEeaHzp_P5kzDGQ" key="afm.displayName" value="Table Comparison"/>
+    <annotations xmi:id="_bNaK8j0mEeaHzp_P5kzDGQ" key="im.tableComparisonGenDelKey" value="allRows"/>
+    <annotations xmi:id="_bNaK8z0mEeaHzp_P5kzDGQ" key="afm.description" value="Compares two data sets and produces the difference between them as a data set with rows flagged as INSERT, UPDATE, or DELETE."/>
+    <annotations xmi:id="_bNaK9D0mEeaHzp_P5kzDGQ" key="afm.layout">
+      <annotations xmi:id="_bNaK9T0mEeaHzp_P5kzDGQ" key="x" value="68"/>
+      <annotations xmi:id="_bNaK9j0mEeaHzp_P5kzDGQ" key="y" value="132"/>
+    </annotations>
+    <annotations xmi:id="_F87acD0nEeaHzp_P5kzDGQ" key="afm.nodeType" value="TableComparisonNode"/>
+    <annotations xmi:id="_F9HnsD0nEeaHzp_P5kzDGQ" key="afm.nodeInputs">
+      <annotations xmi:id="_F9OVYD0nEeaHzp_P5kzDGQ" key="INPUT" value="VIRTUAL_TABLE"/>
+    </annotations>
+    <annotations xmi:id="_F9hQUD0nEeaHzp_P5kzDGQ" key="afm.nodeOutputs">
+      <annotations xmi:id="_F9n-AD0nEeaHzp_P5kzDGQ" key="OUTPUT" value="DATA"/>
+    </annotations>
+    <inputs xmi:id="_bNaK9z0mEeaHzp_P5kzDGQ" name="INPUT" kind="TABLE">
+      <attributes xmi:id="_fX7qoD0mEeaHzp_P5kzDGQ" name="DocumentID" type="NVARCHAR" nullable="false" length="100" scale="0">
+        <annotations xmi:id="_jyNckD0xEeaHzp_P5kzDGQ" key="im.primaryKey" value="true"/>
+      </attributes>
+      <attributes xmi:id="_fX_8ED0mEeaHzp_P5kzDGQ" name="SectionID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_fYENgD0mEeaHzp_P5kzDGQ" name="SectionName" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_fYH34D0mEeaHzp_P5kzDGQ" name="TemplateID.Root" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_fYMwYD0mEeaHzp_P5kzDGQ" name="TemplateID.Ext" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+    </inputs>
+    <outputs xmi:id="_bNaK-D0mEeaHzp_P5kzDGQ" name="OUTPUT" kind="TABLE">
+      <attributes xmi:id="_fGIwAD0mEeaHzp_P5kzDGQ" name="DocumentID" type="NVARCHAR" nullable="false" length="100" scale="0" mappedName="DocumentID"/>
+      <attributes xmi:id="_fGIwAT0mEeaHzp_P5kzDGQ" name="SectionID" type="NVARCHAR" nullable="false" length="100" scale="0" mappedName="SectionID"/>
+      <attributes xmi:id="_fGJXED0mEeaHzp_P5kzDGQ" name="SectionName" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="SectionName"/>
+      <attributes xmi:id="_fGJXET0mEeaHzp_P5kzDGQ" name="TemplateID.Ext" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="TemplateID.Ext"/>
+      <attributes xmi:id="_fGJXEj0mEeaHzp_P5kzDGQ" name="TemplateID.Root" type="NVARCHAR" nullable="true" length="100" scale="0" mappedName="TemplateID.Root"/>
+    </outputs>
+  </nodes>
+  <nodes xsi:type="flowgraph:DataNode" xmi:id="_E-4d0D0nEeaHzp_P5kzDGQ" name="CDMDEFAULT_HC_HPH_PLUGINS_HL7_CDA_DB_MODELS__CDA_STAGING_SECTIONS" type="DATABASE_TABLE" catalogObjectName="hc.hph.plugins.hl7.cda.db.models::CDA.Staging.Sections" dataLayout="COLUMN" truncateTable="false">
+    <annotations xmi:id="_E-4d0T0nEeaHzp_P5kzDGQ" key="afm.description" value="Write data to a catalog object"/>
+    <annotations xmi:id="_E-4d0j0nEeaHzp_P5kzDGQ" key="afm.displayName" value="Data Sink"/>
+    <annotations xmi:id="_E-4d0z0nEeaHzp_P5kzDGQ" key="afm.layout">
+      <annotations xmi:id="_E-4d1D0nEeaHzp_P5kzDGQ" key="x" value="269"/>
+      <annotations xmi:id="_E-4d1T0nEeaHzp_P5kzDGQ" key="y" value="136"/>
+      <annotations xmi:id="_E-4d1j0nEeaHzp_P5kzDGQ" key="width" value="100"/>
+      <annotations xmi:id="_E-4d1z0nEeaHzp_P5kzDGQ" key="height" value="64"/>
+    </annotations>
+    <annotations xmi:id="_F95DwD0nEeaHzp_P5kzDGQ" key="afm.nodeType" value="DataNode"/>
+    <annotations xmi:id="_F-FRAD0nEeaHzp_P5kzDGQ" key="afm.nodeInputs">
+      <annotations xmi:id="_F-LXoD0nEeaHzp_P5kzDGQ" key="DATA" value="OUTPUT"/>
+    </annotations>
+    <annotations xmi:id="_F-drgD0nEeaHzp_P5kzDGQ" key="afm.nodeOutputs"/>
+    <inputs xmi:id="_E-4d2D0nEeaHzp_P5kzDGQ" name="DATA" kind="TABLE">
+      <attributes xmi:id="_E-4d2T0nEeaHzp_P5kzDGQ" name="DocumentID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_E-4d2j0nEeaHzp_P5kzDGQ" name="SectionID" type="NVARCHAR" nullable="false" length="100" scale="0"/>
+      <attributes xmi:id="_E-4d2z0nEeaHzp_P5kzDGQ" name="SectionName" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="_E-4d3D0nEeaHzp_P5kzDGQ" name="TemplateID.Ext" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="_E-4d3T0nEeaHzp_P5kzDGQ" name="TemplateID.Root" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+    </inputs>
+  </nodes>
+</flowgraph:ContainerNode>

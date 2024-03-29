@@ -1,0 +1,134 @@
+name: Docker compose Build & Up
+
+on: 
+  pull_request:
+    types: [opened, ready_for_review, reopened, synchronize]
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+env:
+  DOCKER_TAG_NAME: ${{ github.sha }}
+  ENV_NAME: local
+  ENV_TYPE: local
+  GIT_COMMIT_ARG: ${{ github.sha }}
+
+# Run only one job per branch
+concurrency: 
+  group: ${{ github.head_ref || github.ref_name }}-docker-compose-up # Run the latest push 
+  cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
+
+jobs:
+  docker-compose-up:
+    runs-on: ubuntu-latest
+    if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: true
+      
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/checkout@v4
+        with:
+          repository:  ${{ vars.OVERRIDE_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout-cone-mode: false
+          ref: develop
+
+      - shell: bash
+        id: link_files_from_override
+        run: |
+          ln -s tmp/alp-data-node-override alp-data-node-override
+          chmod 755 -R alp-data-node-override
+
+      - name: Login to ACR
+        uses: docker/login-action@v3.1.0
+        with:
+          registry: alpcr.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Install 1Password CLI
+        uses: 1Password/install-cli-action@v1.0.0
+
+      - name: Generate dotenv
+        env:
+         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+         DOTENV_YML: .env.${{ env.ENV_NAME }}.yml 
+         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        run: |
+          dn_dir=$PWD
+          cd alp-data-node-override
+          ACTIONS_STEP_DEBUG=false
+        
+          # get env yml from 1password
+          overwrite=true env_name=$ENV_NAME yarn op:get:$ENV_TYPE
+
+          # mask sensitive values
+          scripts/gha-mask.sh
+
+          # generate dotenv
+          dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
+
+          cd $dn_dir
+          env_type=$ENV_TYPE yarn gen:tls
+
+          echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
+
+
+      - uses: docker/setup-buildx-action@v3
+        id: builder
+
+      - name: Docker compose build minerva dataflow-gen
+        run: |
+          # Build DataNode dataflow-gen
+          yarn build:minerva alp-dataflow-gen alp-dataflow-gen-init alp-dataflow-gen-agent --builder ${{ steps.builder.outputs.name }}
+
+      - name: Docker compose build minerva
+        run: |
+          # Build DataNode services and pull dataflow-gen from cache
+          yarn build:minerva --builder ${{ steps.builder.outputs.name }}
+
+      - name: Docker compose up Local Mode without UI Container
+        env:          
+          PORTAL_NAME: alp-minerva-gateway-1
+        run: |
+          # Run DataNode services
+          yarn start:minerva --force-recreate --wait
+          EXIT_CODE=$?
+
+          docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
+          echo | tee -a $GITHUB_STEP_SUMMARY
+  
+          if [ $EXIT_CODE != 0 ]; then
+            echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
+          fi  
+
+      - name: Logs minerva
+        if: success() || failure()
+        run: |  
+          yarn logs:minerva
+
+      - name: Clean Docker compose
+        if: always()
+        run: |  
+          # Clean DataNode services
+          yarn clean:minerva

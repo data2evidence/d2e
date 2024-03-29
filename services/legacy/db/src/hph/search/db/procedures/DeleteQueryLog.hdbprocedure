@@ -1,0 +1,45 @@
+PROCEDURE "hc.hph.search.db.procedures::DeleteQueryLog"(
+
+	IN  it_delete "hc.hph.search.db.models::TT_QUERY_LOG",
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"
+	)
+
+LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count BIGINT;
+	lv_count2 BIGINT;
+	lv_check BIGINT;
+BEGIN
+
+	select count(*) into lv_count from :it_delete;
+	if :lv_count = 0 then
+		ot_error =
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error deleting querylog: not data found.' detail from "hc::DUMMY";
+		return;
+	end if;
+
+	select count(*) into lv_count from :it_delete where length(trim(' ' from "EXEC_ID")) > 0;
+	select count(*) into lv_count2 from :it_delete where length(trim(' ' from "SEARCHTERM")) > 0;
+
+	if :lv_count > 0 OR lv_count2 > 0 then
+    	lt_delete_ids = select "EXEC_ID" from "hc.hph.search.db.models::QueryLog.HEADER"
+    		            where ("EXEC_ID" in (select "EXEC_ID" from :it_delete) OR "SEARCHTERM" in (select "SEARCHTERM" from :it_delete)  ) AND "EXEC_USER" = SESSION_CONTEXT( 'APPLICATIONUSER' ) for update;
+    end if;
+
+    if :lv_count = 0 AND :lv_count2 = 0 then
+        lt_delete_ids = select "EXEC_ID" from "hc.hph.search.db.models::QueryLog.HEADER"
+    		where "EXEC_USER" = SESSION_CONTEXT( 'APPLICATIONUSER' ) for update;
+
+	end if;
+
+	select "EXEC_ID" from "hc.hph.search.db.models::QueryLog.DETAILS"
+		where "EXEC_ID" in (select "EXEC_ID" from :lt_delete_ids) for update
+	;
+
+	delete from "hc.hph.search.db.models::QueryLog.DETAILS"
+		where "EXEC_ID" in (select "EXEC_ID" from :lt_delete_ids);
+
+	delete from "hc.hph.search.db.models::QueryLog.HEADER"
+		where "EXEC_ID" in (select "EXEC_ID" from :lt_delete_ids) ;
+
+
+END;

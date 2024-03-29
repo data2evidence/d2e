@@ -1,0 +1,32 @@
+PROCEDURE "hc.hph.core.tableP13n.db.procedures::UPDATE_P13N" ( 
+	IN  it_after "hc.hph.core.tableP13n.db.models::P13nModel.TableP13nConfiguration", 
+	IN  it_before "hc.hph.core.tableP13n.db.models::P13nModel.TableP13nConfiguration", 
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR" ) 
+LANGUAGE SQLSCRIPT 
+SQL SECURITY DEFINER AS
+	lv_count BIGINT;
+	lv_check BIGINT;
+	lv_mode STRING;
+	lv_table STRING;
+	
+BEGIN
+	select count(*) into lv_count from :it_after where length(trim(' ' from "Id")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating personalization: ID must not be empty.' detail from "hc::DUMMY";
+			
+		return;	
+	end if;
+
+	upsert "hc.hph.core.tableP13n.db.models::P13nModel.TableP13nPersonalization"("Id","HANAUserName","ColumnOrder","Visible","TableId")
+	select 
+		"Id",
+		SESSION_CONTEXT('XS_APPLICATIONUSER') as "HANAUserName",
+		"ColumnOrder",
+		"Visible",
+		"TableId"
+		from :it_after
+	;	
+
+
+END;

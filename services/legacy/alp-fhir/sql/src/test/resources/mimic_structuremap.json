@@ -1,0 +1,224 @@
+{
+  "resourceType": "StructureMap",
+  "id": "mimic-transform",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Map for DB to logical FHIR </div>"
+  },
+  "url": "http://data4life-asia.care/health/fhir/StructureMap/mimic",
+  "name": "Map from Mimic Tables to Mimic Resources",
+  "status": "draft",
+  "structure": [
+    {
+      "url": "http://data4life-asia.care/health/fhir/StructureDefinition/MIMIC_PATIENTS",
+      "alias": "PATIENTS",
+      "mode": "source"
+    },
+    {
+      "url": "http://data4life-asia.care/health/fhir/StructureDefinition/MIMIC_ADMISSIONS",
+      "alias": "ADMISSIONS",
+      "mode": "source"
+    },
+    {
+      "url": "http://data4life-asia.care/StructureDefinition/MimicPatient",
+      "alias": "Patient",
+      "mode": "target"
+    },
+    {
+      "url": "http://data4life-asia.care/StructureDefinition/MimicAdmission",
+      "alias": "Admission",
+      "mode": "target"
+    }
+  ],
+  "group": [
+    {
+      "name": "MimicPatient",
+      "typeMode": "none",
+      "input": [
+        {
+          "name": "PATIENTS",
+          "type": "PATIENTS",
+          "mode": "source"
+        },
+        {
+          "name": "Patient",
+          "type": "Patient",
+          "mode": "target"
+        }
+      ],
+      "rule": [
+        {
+          "name": "id",
+          "source": [
+            {
+              "context": "PATIENTS",
+              "element": "SUBJECT_ID"
+            }
+          ],
+          "target": [
+            {
+              "context": "Patient",
+              "contextType": "variable",
+              "element": "id",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "gender",
+          "source": [
+            {
+              "context": "PATIENTS",
+              "element": "GENDER"
+            }
+          ],
+          "target": [
+            {
+              "context": "Patient",
+              "contextType": "variable",
+              "element": "gender",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "dob",
+          "source": [
+            {
+              "context": "PATIENTS",
+              "element": "DOB"
+            }
+          ],
+          "target": [
+            {
+              "context": "Patient",
+              "contextType": "variable",
+              "element": "dob",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "dod",
+          "source": [
+            {
+              "context": "PATIENTS",
+              "element": "DOD"
+            }
+          ],
+          "target": [
+            {
+              "context": "Patient",
+              "contextType": "variable",
+              "element": "dod",
+              "transform": "copy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MimicAdmission",
+      "typeMode": "none",
+      "input": [
+        {
+          "name": "ADMISSIONS",
+          "type": "ADMISSIONS",
+          "mode": "source"
+        },
+        {
+          "name": "Admission",
+          "type": "Admission",
+          "mode": "target"
+        }
+      ],
+      "rule": [
+        {
+          "name": "id",
+          "source": [
+            {
+              "context": "ADMISSIONS",
+              "element": "HADM_ID"
+            }
+          ],
+          "target": [
+            {
+              "context": "Admission",
+              "contextType": "variable",
+              "element": "id",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "subject",
+          "source": [
+            {
+              "context": "ADMISSIONS",
+              "element": "SUBJECT_ID"
+            }
+          ],
+          "target": [
+            {
+              "context": "Admission",
+              "contextType": "variable",
+              "element": "subject.reference",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "admittime",
+          "source": [
+            {
+              "context": "ADMISSIONS",
+              "element": "ADMITTIME"
+            }
+          ],
+          "target": [
+            {
+              "context": "Admission",
+              "contextType": "variable",
+              "element": "admittime",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "dischtime",
+          "source": [
+            {
+              "context": "ADMISSIONS",
+              "element": "DISCHTIME"
+            }
+          ],
+          "target": [
+            {
+              "context": "Admission",
+              "contextType": "variable",
+              "element": "dischtime",
+              "transform": "copy"
+            }
+          ]
+        },
+        {
+          "name": "diagnosis",
+          "source": [
+            {
+              "context": "ADMISSIONS",
+              "element": "DIAGNOSIS"
+            }
+          ],
+          "target": [
+            {
+              "context": "Admission",
+              "contextType": "variable",
+              "element": "diagnosis",
+              "transform": "copy"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

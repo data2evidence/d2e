@@ -1,0 +1,146 @@
+{
+	"id": "FHIRGZ",
+	"resourceType": "ScenarioDefinition",
+	"category": "catalog",
+	"deployment": [
+		{
+			"scope": "base",
+			"persistency": [
+				{
+					"reference": "AddressInformation"
+				},
+				{
+					"reference": "BasicElements"
+				},
+				{
+					"reference": "BloodPressure"
+				},
+				{
+					"reference": "BodyHeight"
+				},
+				{
+					"reference": "BodyWeight"
+				},
+				{
+					"reference": "Codelist"
+				},
+				{
+					"reference": "ContactInformation"
+				},
+				{
+					"reference": "Encounter"
+				},
+				{
+					"reference": "EncounterContactHealthProfessional"
+				},
+				{
+					"reference": "MaritalStatus"
+				},
+				{
+					"reference": "Patient"
+				},
+				{
+					"reference": "PatientIdentifiers"
+				},
+				{
+					"reference": "AddressTypeCodelist"
+				},
+				{
+					"reference": "ClothingCodelist"
+				},
+				{
+					"reference": "ContactTypeCodelist"
+				},
+				{
+					"reference": "CountryGBACodelist"
+				},
+				{
+					"reference": "CountryISOCodelist"
+				},
+				{
+					"reference": "CuffTypeCodelist"
+				},
+				{
+					"reference": "DestinationCodelist"
+				},
+				{
+					"reference": "DiastolicEndpointCodelist"
+				},
+				{
+					"reference": "EmailAddressTypeCodelist"
+				},
+				{
+					"reference": "GenderCodelist"
+				},
+				{
+					"reference": "HouseNumberIndicationCodelist"
+				},
+				{
+					"reference": "MaritalStatusCodelist"
+				},
+				{
+					"reference": "MeasuringLocationCodelist"
+				},
+				{
+					"reference": "MeasuringMethodCodelist"
+				},
+				{
+					"reference": "NameUsageCodelist"
+				},
+				{
+					"reference": "NumberTypeCodelist"
+				},
+				{
+					"reference": "OriginCodelist"
+				},
+				{
+					"reference": "PositionCodelist"
+				},
+				{
+					"reference": "TelecomTypeCodelist"
+				}
+			]
+		},
+		{
+			"scope": "test",
+			"data": [
+				{
+					"reference": "HCIMAddressInformation_DATA"
+				},
+				{
+					"reference": "HCIMBasicElements_DATA"
+				},
+				{
+					"reference": "HCIMBloodPressure_DATA"
+				},
+				{
+					"reference": "HCIMBodyHeight_DATA"
+				},
+				{
+					"reference": "HCIMBodyWeight_DATA"
+				},
+				{
+					"reference": "HCIMCodelist_DATA"
+				},
+				{
+					"reference": "HCIMContactInformation_DATA"
+				},
+				{
+					"reference": "HCIMEncounter_DATA"
+				},
+				{
+					"reference": "HCIMEncounterContactHealthProfessional_DATA"
+				},
+				{
+					"reference": "HCIMMaritalStatus_DATA"
+				},
+				{
+					"reference": "HCIMPatient_DATA"
+				},
+				{
+					"reference": "HCIMPatientIdentifiers_DATA"
+				}
+			]
+		}
+	]
+}

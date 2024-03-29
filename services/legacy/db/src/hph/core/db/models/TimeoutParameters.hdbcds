@@ -1,0 +1,11 @@
+namespace hc.hph.core.db.models;
+
+context TimeoutParameters {
+
+    entity TimeoutEnabled{
+
+    Enabled : String(10) default 'True'; 
+
+    };
+
+};

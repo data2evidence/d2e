@@ -1,0 +1,13 @@
+PROCEDURE "hc.hph.plugins.helloworld.db.procedures::LoadSamplePatients" ( 
+	in profile_id bigint,
+    in in_audit_id bigint,
+	in vt_schema nvarchar(150),
+	in vt_tab nvarchar(256)		
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+
+exec 'START TASK "hc.hph.plugins.helloworld.db.flowgraphs::LoadSamplePatients" PROCEDURE PARAMETERS ('||vt_schema||'.'||vt_tab||')';
+
+END;

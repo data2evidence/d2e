@@ -1,0 +1,53 @@
+PROCEDURE "hc.hph.plugins.textProcessing.medical.postProcessing.lib::PostProcessWrapper" (in auditId bigint,in scheduleID bigint, in pluginId NVARCHAR(256), in clearStage VARCHAR(1) ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER 
+	--DEFAULT SCHEMA <default_schema_name>
+	AS	
+	
+    
+BEGIN	
+	declare taConfig NVARCHAR(256);
+	
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+  --1. Read the content from TA Results Table
+  --2. Group By TA_Config
+  --3. For every group, call the post processing
+  --4. Delete the TA Results Table
+  
+   -- Get all the valid DWIDs that are relevant for post processing
+   valid_docs = select "DWID", "DWDateFrom", "ProcessingMode" from "hc.hph.di.documents.staging.db.models::DocumentStage.DocumentProcessingStatus"
+   where "ScheduleID" = :scheduleID and "DWAuditID" = :auditId;
+   
+   valid_docs_for_processing = select * from :valid_docs where "ProcessingMode" is null;
+   valid_docs_for_deletion = select * from :valid_docs where "ProcessingMode" is not null;
+   
+   ta_results = select dollar_ta.* from "hc.hph.plugins.documents.db.models::TA.Results" dollar_ta   
+   inner join :valid_docs_for_processing
+   on dollar_ta."DWID" = :valid_docs_for_processing."DWID" and
+   dollar_ta."DWDateFrom" =  :valid_docs_for_processing."DWDateFrom"
+   and dollar_ta."PluginID" = :pluginId;
+   
+   -- Get TA Configuration
+   select top 1 IFNULL("ConfigurationValue",'hc.hph.ta.config::EXTRACTION_CORE_MEDICAL') into taConfig from "hc.hph.di.documents.staging.db.models::DocumentProcessing.PipelineConfiguration"
+   where "PipelineID" = :pluginId and "Action" = 'TextAnalysis' and "ConfigurationKey" = 'Configuration';
+   --Call the post processing for every unique configuration
+   
+   ta_results_config = select "DWID","TA_RULE", "TA_COUNTER", "TA_TOKEN", "TA_LANGUAGE", "TA_TYPE", "TA_NORMALIZED", "TA_STEM", "TA_PARAGRAPH",
+    "TA_SENTENCE", "TA_CREATED_AT", "TA_OFFSET", "TA_PARENT" from :ta_results;
+  
+   delete from "hc.hph.plugins.textProcessing.medical.postProcessing::Entities.TA_FILTERED"
+   where "DWID" in (select distinct "DWID" from :valid_docs_for_processing);
+   
+   call "hc.hph.plugins.textProcessing.medical.postProcessing.lib::PostProcessTA"(:taConfig,scheduleID,:ta_results_config);
+   
+   
+   --delete the content from TA_FILTERED for documents marked for deletion 
+   delete from "hc.hph.plugins.textProcessing.medical.postProcessing::Entities.TA_FILTERED"
+   where "DWID" in (select distinct "DWID" from :valid_docs_for_deletion);
+   --Delete the content from TA Results if clearStage flag is set
+   delete from "hc.hph.plugins.documents.db.models::TA.Results" 
+   where :clearStage='X' and "DWID" in (select distinct "DWID" from :valid_docs);
+   
+END;

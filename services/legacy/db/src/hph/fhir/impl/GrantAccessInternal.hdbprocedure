@@ -1,0 +1,8 @@
+--!HDI REQUIRES "hc.hph.fhir.api::FhirAccessRole#"
+PROCEDURE "hc.hph.fhir.impl::GrantAccessInternal" ( IN USER NVARCHAR(255), IN SCHEMA NVARCHAR(255) )
+LANGUAGE SQLSCRIPT
+SQL SECURITY DEFINER AS
+BEGIN
+   exec 'GRANT ' || SCHEMA || '."hc.hph.fhir.api::FhirAccessRole#" TO ' || USER;
+   exec 'GRANT STRUCTURED PRIVILEGE  ' || SCHEMA || '."hc.hph.cdw.db.models::CHP_CDWAccessPolicy.guardedOrgs.-Rule1-" to ' || USER;
+END

@@ -1,0 +1,190 @@
+{
+	"info": {
+		"_postman_id": "342c3049-7d74-4699-8dcf-149020e0f7ab",
+		"name": "50 FHIR Beyond FHIR",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Query for Parts of Observations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3c49cf9d-8ec1-4ce6-a4d6-ec9067dd2eb8",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    for(var resource of response.entry) {",
+							"        pm.expect(resource.resource.display).to.eql(\"Body Weight\");",
+							"    }",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"type\":\"query\",\n\t\"from\":{\n\t\t\"type\":\"from\",\"definition\":\"Observation\"},\n\t\t\"name\":\"TestObservationQuery\",\n\t\t\"filter\":{\"type\":\"binaryexpression\",\n\t\t\t\"left\":{\"type\":\"resultelement\",\"definition\":\"Observation\",\"path\":\"Observation.code.coding.code\"},\n\t\t\t\"right\":{\"type\":\"stringexpression\",\"value\":\"29463-7\"},\n\t\t\t\"operation\":\"=\"},\n\t\t\"out\":[\n\t\t\t{\"type\":\"resultelement\",\"definition\":\"Observation\",\"path\":\"Observation.valueQuantity.value\"},\n\t\t\t{\"type\":\"resultelement\",\"definition\":\"Observation\",\"path\":\"Observation.code.coding.display\"}\n\t\t]\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/query",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query for Getting a \"Full\" Patient",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c5a1edf5-3d8a-49a2-ab80-66cd78f52206",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    for(var resource of response.entry) {",
+							"        pm.expect(resource.resource.gender).to.eql(\"male\");",
+							"    }",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"type\":\"query\",\n\t\"from\":{\"type\":\"from\",\"definition\":\"Patient\"},\n\t\"name\":\"TestObservationQuery\",\n\t\"filter\":{\"type\":\"binaryexpression\",\n\t\t\t\"left\":{\"type\":\"resultelement\",\"definition\":\"Patient\",\"path\":\"Patient.gender\"},\n\t\t\t\"right\":{\"type\":\"stringexpression\",\"value\":\"male\"},\n\t\t\t\"operation\":\"=\"},\n\t\"out\":[{\"type\":\"resultelement\",\"definition\":\"Patient\"}]\n\t\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/query",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Per Gender and VitalSign Average and Max Value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6c9c6a5a-f712-4582-9f7e-7ed3033a8e6c",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response.entry.length).to.be.below(101);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"type\":\"query\",\r\n\t\"from\":{\"type\":\"from\",\"definition\":\"Patient\"},\r\n\t\"name\":\"TestObservationQuery\",\r\n\t\"out\":[\r\n\t\t\t{\"type\":\"resultelement\",\"definition\":\"Patient\",\"path\":\"Patient.gender\"},\r\n\t\t\t{\"type\":\"resultelement\",\"definition\":\"Observation\",\"path\":\"Observation.code.coding.display\"},\r\n\t\t\t{\"label\":\"average\",\"type\":\"unaryfunction\",\"function\":\"avg\",\"expression\":{\"type\":\"resultelement\",\"definition\":\"Observation\",\"path\":\"Observation.valueQuantity.value\"}},\r\n\t\t\t{\"label\":\"max\",\"type\":\"unaryfunction\",\"function\":\"max\",\"expression\":{\"type\":\"resultelement\",\"definition\":\"Observation\",\"path\":\"Observation.valueQuantity.value\"}}\r\n\t],\r\n\t\"joins\":[\r\n\t\t{\"type\":\"join\",\"definition\":\"Observation\",\"link\":{\"type\":\"resultelement\",\"definition\":\"Observation\",\"path\":\"Observation.subject.reference\"}}],\r\n\t\"groups\":[{\"type\":\"resultelement\",\"definition\":\"Patient\",\"path\":\"Patient.gender\"},\r\n\t\t\t{\"type\":\"resultelement\",\"definition\":\"Observation\",\"path\":\"Observation.code.coding.display\"}],\r\n\t\"limit\":{ \"type\":\"limit\",\"limit\":100}\r\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/query",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"query"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

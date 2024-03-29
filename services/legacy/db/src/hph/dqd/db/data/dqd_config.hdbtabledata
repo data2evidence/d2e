@@ -1,0 +1,130 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.dqd.db.models::DQDConfig.DQDConfiguration",
+            "import_settings": {
+                "include_filter": [
+                    {
+                        "MeasureID": "1",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "2",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "3",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "4",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "5",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "6",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "7",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "8",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "9",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "10",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "11",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "12",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "13",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "14",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "15",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "16",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "17",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "18",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "19",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "20",
+                        "Category": "CDW"
+                    },
+                    {
+                        "MeasureID": "21",
+                        "Category": "CDW"
+                    }
+                ],
+                "import_columns": [
+                    "MeasureID",
+                    "Category",
+                    "SchemaName",
+                    "CatObject",
+                    "TitleKey",
+                    "DescriptionKey",
+                    "Function",
+                    "Expression",
+                    "GroupName",
+                    "Status",
+                    "Delivery"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.dqd.db.data::dqd_config.csv",
+                "has_header": false,
+                "type_config": {
+                    "delimiter": "|"
+                }
+            },
+            "column_mappings": {
+                "MeasureID": 1,
+                "Category": 2,
+                "SchemaName": 3,
+                "CatObject": 4,
+                "TitleKey": 5,
+                "DescriptionKey": 6,
+                "Function": 7,
+                "Expression": 8,
+                "GroupName": 9,
+                "Status": 10,
+                "Delivery": 11
+            }
+        }
+    ]
+}

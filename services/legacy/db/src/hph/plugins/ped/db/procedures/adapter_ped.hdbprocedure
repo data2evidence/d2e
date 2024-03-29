@@ -1,0 +1,69 @@
+PROCEDURE "hc.hph.plugins.ped.db.procedures::adapter_ped" (
+IN auditID BIGINT, 
+IN schemaname NVARCHAR(100),
+IN sampleTable NVARCHAR(100),
+IN pedTable NVARCHAR(100),
+IN dwSource NVARCHAR(100)
+		)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+
+DECLARE reserveCount INT; 
+DECLARE count INT;
+DECLARE value1 INT;
+DECLARE endValue INT;
+
+--Delete other entries with duplicate audit ID before starting
+DELETE FROM "hc.hph.plugins.ped.db.models::Pedigree.Samples";
+
+--create local temp table for staging data before updating CDW
+CREATE LOCAL TEMPORARY TABLE "#sampleTemp"("DWAuditID" BIGINT,"DWSource" NVARCHAR(5),
+"ReferenceID" NVARCHAR(255),"SampleID" NVARCHAR(255),"SampleClass" NVARCHAR(255),"PatientDWID" VARBINARY(32),
+"InteractionDWID" VARBINARY(32),"AnalysisDate" TIMESTAMP,"OrgID" NVARCHAR(100),"Phenotype" VARCHAR2(5000),
+"Sex" VARCHAR2(10),"FamilyID" VARCHAR2(255),"DocumentID" NVARCHAR(255));
+
+--inserting samples virtual table data to temporary table
+EXEC 'INSERT INTO "#sampleTemp"
+SELECT '|| ESCAPE_SINGLE_QUOTES(:auditID) ||','''|| ESCAPE_SINGLE_QUOTES(:dwSource) ||''',null,"SampleID",null,null,null,TO_TIMESTAMP("AnalysisDate",''MM/DD/YYYY HH24:MI:SS''),null,"Phenotype","Sex","FamilyID","DocumentID"
+FROM "' || :schemaname || '"."' || :sampleTable || '"';
+
+SELECT COUNT(*) into reserveCount FROM "#sampleTemp";
+
+--Generating sequence for each Sample
+
+SELECT COUNT(*) into count FROM "hc.hph.genomics.db.models::General.Sequences" WHERE "SequenceID"='SampleIndex';
+
+IF :count=1 THEN
+   SELECT TOP 1 "Value" INTO value1 FROM "hc.hph.genomics.db.models::General.Sequences" WHERE "SequenceID"='SampleIndex';
+   SELECT TOP 1 "Value" INTO endValue FROM "hc.hph.genomics.db.models::General.Sequences" WHERE "SequenceID"='SampleIndex';	
+ELSE
+	value1 := -1;
+	endValue := -1;
+	INSERT INTO "hc.hph.genomics.db.models::General.Sequences" ("SequenceID","Value") VALUES ('SampleIndex',:value1);
+END IF;
+
+IF :reserveCount>0 THEN
+	SELECT TOP 1 "Value" INTO endValue FROM "hc.hph.genomics.db.models::General.Sequences" WHERE "SequenceID"='SampleIndex'; 
+	endValue := endValue + reserveCount;
+	UPDATE "hc.hph.genomics.db.models::General.Sequences" SET "Value" = :endValue WHERE "SequenceID"='SampleIndex';
+END IF;
+ 
+--inserting into intermediate staging Samples table
+INSERT INTO "hc.hph.plugins.ped.db.models::Pedigree.Samples"("SampleIndex","DWAuditID",
+	"DWSource","ReferenceID","SampleID","SampleClass","PatientDWID","InteractionDWID","AnalysisDate","OrgID","Phenotype",
+	"Sex","FamilyID","DocumentID")(SELECT ROW_NUMBER ( )OVER()+:value1,"DWAuditID","DWSource","ReferenceID","SampleID",'Pedigree',"PatientDWID",
+	"InteractionDWID","AnalysisDate","OrgID","Phenotype","Sex","FamilyID","DocumentID" FROM "#sampleTemp");  
+
+--inserting into Pedigree staging table
+EXEC 'INSERT INTO "hc.hph.plugins.ped.db.models::Pedigree.Ped" ("DWAuditID", "SourceSampleID", "TargetSampleID", "Relationship")
+(SELECT '||:auditID||',"SourceSampleID","TargetSampleID","Relationship"
+FROM "' || :schemaname || '"."' || :pedTable || '")';
+
+UPDATE "hc.hph.plugins.ped.db.models::Pedigree.Ped"
+SET "SourceSampleIndex" = (SELECT T1."SampleIndex" FROM "hc.hph.plugins.ped.db.models::Pedigree.Samples" as T1 WHERE T1."SampleID"="SourceSampleID" AND T1."DWAuditID"= :auditID),
+"TargetSampleIndex" = (SELECT T2."SampleIndex" FROM "hc.hph.plugins.ped.db.models::Pedigree.Samples" as T2 WHERE T2."SampleID"="TargetSampleID" AND T2."DWAuditID"=:auditID)
+WHERE "DWAuditID" = :auditID;
+
+DROP TABLE "#sampleTemp";
+END;

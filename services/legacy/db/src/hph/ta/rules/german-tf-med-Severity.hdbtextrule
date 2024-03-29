@@ -1,0 +1,74 @@
+!======================================================================
+! File Name: german-tf-med-Severity.rul 
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of levels of severity 
+!          of diseases and symptoms
+!======================================================================
+
+!======================================================================
+! OUTPUT FIELDS
+!======================================================================
+
+!======================================================================
+!!coordination
+!======================================================================
+
+#subgroup coord: (<\p{ci}(und|&|oder)>|(<\,> <\p{ci}(und|&|oder)>?)|</>|<\|>)
+
+!======================================================================
+!!Entities for clinical reports
+!======================================================================
+
+
+#subgroup Dis_Entity: {(
+([TE CONDITION] <>+ [/TE] )
+)}
+
+#subgroup Symp_Entity: {(
+([TE OBSERVATION_SYMPTOM] <>+ [/TE] )
+)}
+
+#subgroup Mild: {
+[OD Mild](
+(<(((gering.*)(gradig.*)?)|(klein)|(leicht)|(minimal)).*>)
+|(<hochgradig> <differenziert.*>)
+)[/OD]
+}
+
+#subgroup Moderate: {
+[OD Moderate](
+(<((mittel)|(mäßig))(gradig)?> <differenziert.*>)
+)[/OD]
+}
+
+#subgroup Severe: {
+[OD Severe](
+(<((stark)|(hochgradig)|(akut)|(signifikant)|(schwer)).*>)
+|(<(gering)(gradig)?> <differenziert.*>)
+)[/OD]
+}
+
+
+#subgroup Severity: {(
+%(Mild)
+|%(Moderate)
+|%(Severe)
+)}
+
+
+
+
+#group Condition_Severity: {
+  (%(Severity) <>{0,3} [OD Condition] %(Dis_Entity) [/OD])
+ |([OD Condition] %(Dis_Entity) [/OD] <\:> %(Severity) )
+ |([OD Condition] %(Dis_Entity) [/OD] <\(> %(Severity) <\)> )
+}
+
+
+#group Observation_Symptom_Value: {
+  ( %(Severity) <>{0,3} [OD Observation_Symptom] %(Symp_Entity) [/OD])
+ |([OD Observation_Symptom] %(Symp_Entity) [/OD] <\:>  %(Severity) )
+ |([OD Observation_Symptom] %(Symp_Entity) [/OD] <\(>  %(Severity) <\)> )
+}
+

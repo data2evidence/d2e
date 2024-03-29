@@ -1,0 +1,1 @@
+SEQUENCE "hc.hph.di.model::ScheduleMonitorID_Seq" RESET BY SELECT IFNULL(MAX("MonitorID")+1,1) FROM "hc.hph.di.model::DataIntegration.DIJobScheduleMonitor"

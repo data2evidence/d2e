@@ -1,0 +1,50 @@
+{
+    "resourceType":"Patient",
+    "id":"$patient.id",
+    "meta":{
+        "profile": [
+            "http://fhir.nl/fhir/StructureDefinition/nl-core-patient"
+        ]
+    },
+    "identifier": [
+#foreach( $identifier in $identifiers )
+        {
+            "use":"official",
+            "system":"$identifier.system",
+            "value":"$.identifier.value"
+        }
+#end        
+    ],
+    "active":true,
+    "name": [
+#parse("zib_name.vm")    
+    ],
+    "telecom": [
+        {
+            "system":"phone",
+            "value":"06-23456789",
+            "use":"mobile"
+        },
+        {
+            "system":"email",
+            "value":"XXX_Mesker@hotmail.com",
+            "use":"home"
+        }
+    ],
+    #if($patient.gender)gender":"$gender.get("$patient.gender")"#end,
+    #if($patient.dateOfBirth)"birthDate":"$patient.dateOfBirth"#end,
+    #if($patient.deathIndicator)"deceasedBoolean":$patient.deathIndicator#end,
+    "address": #parse("zib_address.vm"),
+    #if($maritialStatus)
+    "maritalStatus":{
+        "coding": [
+            {
+                "system":"http://hl7.org/fhir/v3/MaritalStatus",
+                "code":"$maritialStatus.code",
+                "display":"$maritialStatus.display"
+            }
+        ]
+    },
+    #end
+    #if($patient.multipleBirthIndicator)"multipleBirthBoolean":"$patient.multipleBirthIndicator"#end
+}

@@ -1,0 +1,10 @@
+PROCEDURE "hc.hph.plugins.gff3.db.procedures.annotation::CleanUp" (
+		IN ProfileAuditID BIGINT
+	) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+    CALL "hc.hph.di.procedures::clean_logs"(:ProfileAuditID);
+	DELETE FROM "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" WHERE "RunAuditID" = :ProfileAuditID;
+END;

@@ -1,0 +1,16 @@
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::logQueueEntryError" (
+		in taskId	BIGINT,
+		in ERROR    NCLOB
+   ) 
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+
+   --READS SQL DATA AS
+   AS   
+BEGIN  
+
+UPDATE "hc.hph.plugins.ccdi.db.models::Tasks.Queue" 
+ SET "ERROR" = :ERROR
+WHERE "taskId" = :taskId;
+
+END;

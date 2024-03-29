@@ -1,0 +1,28 @@
+VIEW "hc.hph.plugins.ccdi.internal.projects.ish.db.models::V_Procedure" ( 
+"_ProcessingMode",
+"OrgID", 
+"InteractionID", 
+"PatientID", 
+"InteractionType.OriginalValue", 
+"PeriodStart", 
+"PeriodEnd", 
+"MainSurgicalProcCode", 
+"IdSurgicalProcCodingCat",
+"SurgicalProcCode") AS SELECT 
+    case when STORN = 'X' then 'D' else null end as "_ProcessingMode",
+    'ISH_' || case when FALAR in ('1','3') THEN ORGFA ELSE ORGPF END as "OrgID",
+    LNRIC || 'PRO' as "InteractionID",
+    PATNR as "PatientID",
+    'ISH_PROCEDURE' as "InteractionType.OriginalValue",
+    CASE
+    WHEN BGDOP is not null AND LTRIM(RTRIM(BGDOP)) <> '' AND BGDOP <> '00000000'
+    THEN to_timestamp(to_date(BGDOP) || ' ' || to_time(BZTOP))
+    END as "PeriodStart",
+    CASE
+    WHEN BGDOP is not null AND LTRIM(RTRIM(BGDOP)) <> '' AND BGDOP <> '00000000'
+    THEN to_timestamp(to_date(BGDOP) || ' ' || to_time(EZTOP))
+    END as "PeriodEnd",   
+    ICPHC as "MainSurgicalProcCode",      -- Main Surgical Procedure Code
+    ICPMK as "IdSurgicalProcCodingCat",   -- Identification of Surgical Procedure Coding Catalog
+    ICPML as "SurgicalProcCode"           -- Surgical Procedure Code (Service)
+from "hc.hph.plugins.ccdi.internal.projects.ish.db.models::Procedure" WITH READ ONLY

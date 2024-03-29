@@ -1,0 +1,60 @@
+namespace hc.hph.plugins.ldap.interface.db.model;
+
+context Staging {
+
+	entity Organizations
+	{
+		Org_ID : String (100);
+		Parent_OrgID : String (100);
+		Org_Name : String (5000);
+		Street_Name : String (5000);
+		Street_Number : String (5000);
+		City : String(200);
+		State : String(100);
+		Country : String (100);
+		Postal_Code : String (60);
+		Phone_Num : String (100);
+		AuditLogID : Integer64;
+	};
+
+	
+	entity Users
+	{
+		User_Name : String (256);
+		First_Name : String (256);
+		Last_Name : String (256);
+		Email : String (256);
+		Locale : String (100);
+		Time_Zone : String(10);
+		Title : String(256);
+		Gender : String (100);
+		Middle_Name : String (256);
+		AuditLogID : Integer64;
+	};
+
+	
+	entity User_Org_Mapping
+	{
+		User_Name : String (100);
+		Org_ID : String (256);
+		AuditLogID : Integer64;
+
+	};
+
+	entity Trace
+
+	{
+	LOGDETAILID : String(256);
+	LOGTRACEID : String(256);
+	LOGSTATUS : String(16);
+	LOGTIMESTAMP : UTCTimestamp;
+	LOGLOCATION : String(512);
+	LOGMESSAGE : String(5000);
+	AuditLogID : Integer64;
+
+	}
+
+	
+
+
+};

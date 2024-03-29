@@ -1,0 +1,25 @@
+PROCEDURE "hc.hph.di.documents.WorkBench.db.procedures::DWSource_Creation" ( in iv_schemaName nvarchar(4000)) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	--DEFAULT SCHEMA <default_schema_name>
+	 AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ declare curtime timestamp;
+ declare lv_sessionuser NVARCHAR(256);
+ curtime := now();
+ 
+ SELECT SESSION_CONTEXT('XS_APPLICATIONUSER') into lv_sessionuser FROM "hc::DUMMY";
+ upsert  "hc.hph.di.model::DataIntegration.DISource"
+("SourceID","Name","Description","CreatedAt","CreatedBy","ModifiedAt","ModifiedBy")
+ values('DocWb','Document WorkBench','Document WorkBench',:curtime,lv_sessionuser,:curtime,lv_sessionuser) with primary key;
+
+
+ upsert "hc.hph.config.db.models::Configuration.Config"
+("Id","Version","Status","Name","Type","Data","Parent.Id","Parent.Version","Creator","Created","Modifier","Modified")
+values('hc.hph.plugins.documents:DocWb',1,null,'Document WorkBench','CDW/DOCUMENT/SERVICE',:iv_schemaName,null,null,'hph_admin',:curtime,'hph_admin',:curtime)with primary key;
+
+END;
+

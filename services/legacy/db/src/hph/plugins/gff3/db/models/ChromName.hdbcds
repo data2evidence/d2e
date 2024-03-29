@@ -1,0 +1,12 @@
+namespace hc.hph.plugins.gff3.db.models;
+using hc.hph.genomics.db.models::Type as Type;
+context ChromName
+{
+    entity ChromosomeName
+    {
+    	key AuditLogID : Type.DWDocID;
+        key ChromosomeName : String(255);       
+    } technical configuration {
+        column store;
+    };
+};

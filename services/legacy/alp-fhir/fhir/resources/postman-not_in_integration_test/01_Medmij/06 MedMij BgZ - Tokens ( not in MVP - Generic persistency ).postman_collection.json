@@ -1,0 +1,219 @@
+{
+	"info": {
+		"_postman_id": "da22940a-1be6-4d84-a666-e6229500de55",
+		"name": "Demo MedMij BgZ - Tokens ( not in MVP)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get any patient with gender not male",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "117792a5-f5df-42ba-823a-51e929eab556",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/json\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/Coverage/subscriber:Patient.identifier=999911338",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"Coverage",
+						"subscriber:Patient.identifier=999911338"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get any observation with :text",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "117792a5-f5df-42ba-823a-51e929eab556",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/json\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/Coverage/subscriber:Patient.identifier=999911338",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"Coverage",
+						"subscriber:Patient.identifier=999911338"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get any patient with code using above",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fb8a3060-e4ec-4732-900e-d6c1249f3723",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation?code:below=15074-8",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "code:below",
+							"value": "15074-8"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get any patient with code using below",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fb8a3060-e4ec-4732-900e-d6c1249f3723",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation?code:below=15074-8",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "code:below",
+							"value": "15074-8"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

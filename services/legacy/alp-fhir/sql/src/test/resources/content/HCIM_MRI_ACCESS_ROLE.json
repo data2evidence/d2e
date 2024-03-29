@@ -1,0 +1,20 @@
+{
+  "resourceType": "Role",
+  "id": "HCIM_MRI_ACCESS_ROLE",
+  "description": "Generates a schema local role <endpointName>_HCIM_MRI_ACCESS_ROLE",
+  "objectPrivileges": [
+    {
+      "type": "DatabaseObject",
+      "objectName": "HCIMPatient",
+      "grants": [
+        {
+          "type": "SELECT",
+          "grant": true
+        }
+      ]
+    }
+  ],
+  "schemaPrivileges": [
+    "select"
+  ]
+}

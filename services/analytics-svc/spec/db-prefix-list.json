@@ -1,0 +1,28 @@
+{
+    "tablePrefixes": [
+        "legacy.ots",
+        "legacy.di.model",
+        "legacy.config.db.models::",
+        "legacy.cdw.db.models::",
+        "legacy.cdw.db::",
+        "pa.db::",
+        "legacy.collections.db.models",
+        "legacy.config.db",
+        "legacy.cdw.db.models::Config",
+        "legacy.um.user.db::userTable"
+    ],
+    "viewPrefixes": [
+        "legacy.ots.core",
+        "legacy.ots.services",
+        "legacy.cdw.db.models::",
+        "legacy.cdw.db.models::InterfaceViews.",
+        "legacy.config.db",
+        "legacy.cdw.db.models::Config",
+        "legacy.collections.db.models::CollectionModel"
+    ],
+    "procedurePrefixes": [
+        "legacy.um.org.db.procs::reset_org_ancestors",
+        "legacy.config.db",
+        "legacy.cdw.db.models::Config"
+    ]
+}

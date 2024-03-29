@@ -1,0 +1,1 @@
+SEQUENCE "hc.hph.di.documents.staging.db.models::BatchID_Seq" START WITH 500 RESET BY SELECT IFNULL(MAX("BatchID")+1,1) FROM "hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage" where "BatchID" <= 99

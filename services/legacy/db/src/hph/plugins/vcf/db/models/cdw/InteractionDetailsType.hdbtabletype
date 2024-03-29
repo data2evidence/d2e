@@ -1,0 +1,14 @@
+TYPE "hc.hph.plugins.vcf.db.models.cdw::InteractionDetailsType" AS TABLE (
+	"DWID" VARBINARY(32),
+	"DWAuditID" BIGINT,
+	"DWDateFrom" TIMESTAMP,
+	"DWDateTo" TIMESTAMP,
+	"Attribute.OriginalValue" VARCHAR(11),
+	"Attribute.Code" VARCHAR(1),
+	"Attribute.CodeSystem" VARCHAR(1),
+	"Attribute.CodeSystemVersion" VARCHAR(1),
+	"Value.OriginalValue" NVARCHAR(5000),
+	"Value.Code" VARCHAR(1),
+	"Value.CodeSystem" VARCHAR(1),
+	"Value.CodeSystemVersion" VARCHAR(1)
+)

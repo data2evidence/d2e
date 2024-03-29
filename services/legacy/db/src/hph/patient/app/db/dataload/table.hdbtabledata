@@ -1,0 +1,146 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.core.tableP13n.db.models::P13nModel.TableP13n",
+            "import_settings": {
+                "include_filter": [
+                    {
+                        "Id": "NameAndBirthDate",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "PatientID",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "SourcePatientID",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "DocumentCount",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "DateOfBirth",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "DateOfDeath",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "Gender",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "VitalStatus",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "PersonTitle",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "Nationality",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "PostalCode",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "City",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "Street",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "Country",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "State",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "Phone",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "Mobile",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "Fax",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "Email",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    },
+                    {
+                        "Id": "TotalCohort",
+                        "HANAUserName": "HPH_ADMIN",
+                        "TableId": "searchAllList"
+                    }
+                ],
+                "import_columns": [
+                    "Id",
+                    "HANAUserName",
+                    "TableId",
+                    "ColumnOrder",
+                    "Text",
+                    "ColumnId",
+                    "Visible",
+                    "Personalizable",
+                    "Sortable",
+                    "Filterable",
+                    "Type"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.patient.app.db.dataload::table.csv",
+                "has_header": false,
+                "type_config": {
+                    "delimiter": ";"
+                }
+            },
+            "column_mappings": {
+                "Id": 1,
+                "HANAUserName": 2,
+                "TableId": 3,
+                "ColumnOrder": 4,
+                "Text": 5,
+                "ColumnId": 6,
+                "Visible": 7,
+                "Personalizable": 8,
+                "Sortable": 9,
+                "Filterable": 10,
+                "Type": 11
+            }
+        }
+    ]
+}

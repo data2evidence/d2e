@@ -1,0 +1,23 @@
+{
+    "spec_dir": "target/spec",
+    "spec_files": [
+        "**/*_integrationtest.js",
+        "**/*_integrationtest.js",
+        "**/*_integrationtest.js",
+        "**/*_test.js",
+        "**/*_test.js"
+    ],
+    "reporters": [
+        {
+            "name": "jasmine-spec-reporter#SpecReporter",
+            "options": {
+                "displayStacktrace": "all"
+            }
+        },
+        {
+            "name": "jasmine-reporters#JUnitXmlReporter"
+        }
+    ],
+    "stopSpecOnExpectationFailure": false,
+    "random": false
+}

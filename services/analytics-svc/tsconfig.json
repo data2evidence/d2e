@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "removeComments": false,
+        "preserveConstEnums": false,
+        "sourceMap": true,
+        "declaration": true,
+        "outDir": "target",
+        "rootDir": ".",
+        "target": "ES2017",
+        "esModuleInterop": true,
+        "types": ["jest", "node"],
+        "resolveJsonModule": true
+    },
+    "include": [
+        "src",
+        "spec",
+        "typings"
+    ],
+    "exclude": ["envConverter"]
+}

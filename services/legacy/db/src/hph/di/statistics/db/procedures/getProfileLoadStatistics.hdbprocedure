@@ -1,0 +1,23 @@
+PROCEDURE "hc.hph.di.statistics.db.procedures::getProfileLoadStatistics" (
+	IN START_DATE DATE,
+	IN END_DATE DATE,
+	IN Profiles "hc.hph.di.statistics.db.model::Statistics.Profiles",
+	OUT STATISTICS "hc.hph.di.statistics.db.model::Statistics.DataIngestionProfileLoads"
+	 ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA AS
+BEGIN
+	DECLARE ProfileValues INTEGER := 0;
+	SELECT COUNT(*) INTO ProfileValues FROM :Profiles;
+	
+	IF :ProfileValues=0 THEN
+		STATISTICS=SELECT * FROM
+		"hc.hph.di.statistics.db.model::Statistics.DataIngestionProfileLoads"
+		WHERE "LoadDate" BETWEEN :START_DATE AND :END_DATE;
+	ELSE
+		STATISTICS=SELECT * FROM
+		"hc.hph.di.statistics.db.model::Statistics.DataIngestionProfileLoads"
+		WHERE "ProfileName" IN(SELECT "ProfileName" FROM :Profiles) AND "LoadDate" BETWEEN :START_DATE AND :END_DATE;
+	END IF;
+END;

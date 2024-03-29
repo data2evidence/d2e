@@ -1,0 +1,10 @@
+PROCEDURE "hc.hph.plugins.ped.db.procedures::getCurrentTask" (
+		IN iAuditID BIGINT, 
+		OUT ORESULT TABLE( "TaskExecutionID" BIGINT, "TaskName" VARCHAR(255) ) 
+	) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA AS
+BEGIN
+	ORESULT = SELECT TOP 1 "TaskExecutionID","TaskName" FROM "hc.hph.plugins.ped.db.models::PedAdapterRunStatus.TaskExecution" WHERE "AuditLogID" = :iAuditID ORDER BY "TaskExecutionID" DESC;
+END;

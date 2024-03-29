@@ -1,0 +1,10 @@
+PROCEDURE "hc.hph.plugins.gff3.db.procedures::cleanUp" (	IN auditID BIGINT ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+	DELETE FROM "hc.hph.genomics.db.models::Reference.Features" WHERE "DWAuditID"=:auditID;
+	DELETE FROM "hc.hph.plugins.gff3.db.models::Mapping.Chromosomes" WHERE  "DWAuditID"=:auditID;
+	DELETE FROM "hc.hph.di.model::DataIntegration.AuditLogTrace" WHERE "AuditLogID" IN ( SELECT "AuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :auditID );
+	DELETE FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :auditID;
+END;

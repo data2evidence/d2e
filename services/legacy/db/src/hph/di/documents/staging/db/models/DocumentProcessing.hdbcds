@@ -1,0 +1,108 @@
+namespace hc.hph.di.documents.staging.db.models;
+
+using hc.hph.cdw.db.models::DWTypes as DT;
+
+
+context DocumentProcessing {
+ //Document Processing and Pipelining
+    //Action Design
+
+    entity Action
+    {
+    key PipelineID				: String(256) default '';
+    key ActionName				: String(256);
+    ImplementationLocation		: String(256);
+    IsActive					: String(1);
+    Description         			: String(256);
+    CreatedAt       				: UTCTimestamp;
+    CreatedBy       				: String(256);
+    ChangedAt   			    	: UTCTimestamp;
+    ChangedBy    	    			: String(256);	
+
+    } technical configuration {
+    column store;
+    };
+
+   //ActionState Mapping Design
+
+   entity ActionStateMapping
+   {
+   key PipelineID				: String(256) default '';
+   key ActionName		: String(128);
+   key State			: String(128);
+   SucceedingAction 	: String(128); 
+   CreatedAt       		: UTCTimestamp;
+   CreatedBy       		: String(256);
+   ChangedAt   			: UTCTimestamp;
+   ChangedBy    	    	: String(256);
+   };
+
+   //StatusTable
+
+   entity Status
+   {
+   key DWID        		: DT.DWID;
+   key DWDateFrom	   	: UTCTimestamp;
+   key ActionName 		: String(128);
+   key PipelineID		: String(256) default '';
+   DWAuditID  	 	        : DT.DWAuditID;  
+   ScheduleID			: Integer64 not null;
+   Status			: String(128);
+   ActionStartedON		: UTCTimestamp;
+   ActionFinishedON		: UTCTimestamp;
+   };
+
+   entity RunParameters
+   {
+     key DWAuditID : DT.DWAuditID; 
+     Parameters : String(1028);
+     key PipelineID : String(256);
+   };
+
+   entity LockForStatus
+   {
+   key DWID        		: DT.DWID;
+   key DWDateFrom	   	: UTCTimestamp;
+   key ActionName 		: String(128);
+   key PipelineID		: String(256) default '';
+   DWAuditID  	 	        : DT.DWAuditID;  
+   ScheduleID			: Integer64 not null;
+   Status			: String(128);
+   ActionStartedON		: UTCTimestamp;
+   ActionFinishedON		: UTCTimestamp;
+   };
+
+   view ProcessDocument as select from Status{
+   DWID,
+   DWDateFrom,  
+   DWAuditID,
+   ScheduleID,
+   PipelineID   
+   } where "ActionName" = 'Initialize Profile Run' or "ActionName" = 'Initialize'; 
+
+   entity DocumentTypePipelineMapping {
+    key DWDocumentType : String(128);
+   	key PipelineID : String(256);
+   	CreatedAt   : UTCTimestamp;
+    CreatedBy   : String(256);
+   };
+
+   view DocumentTypeTextProcessingMapping as select from DocumentTypePipelineMapping as DTPMap
+   inner join PipelineConfiguration as PipelineConfig on DTPMap.PipelineID = PipelineConfig.PipelineID{
+   	DTPMap.PipelineID,
+   	DTPMap.DWDocumentType,
+   	PipelineConfig.ConfigurationValue as TAConfiguration
+   } where DTPMap.PipelineID <> 'hc.hph.plugins.documents.DocumentProcessingPipeline' and 
+   PipelineConfig.Action = 'TextAnalysis' and PipelineConfig.ConfigurationKey = 'Configuration';
+
+    entity "PipelineConfiguration" {
+    	key PipelineID : String(256);
+  		key Action 		:  String(256);
+  		key ConfigurationKey  : String(256);  		
+  		ConfigurationValue  :  String(2048);
+  		ActivatedAt  : DT.DWTimestamp;
+  } technical configuration {
+    column store;
+  };
+
+};

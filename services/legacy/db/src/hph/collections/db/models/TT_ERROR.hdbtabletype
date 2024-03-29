@@ -1,0 +1,1 @@
+TYPE "hc.hph.collections.db.models::TT_ERROR" AS TABLE  ( "Status" NVARCHAR(50)  CS_STRING, "Code" NVARCHAR(100)  CS_STRING, "Message" NVARCHAR(100)  CS_STRING ) 

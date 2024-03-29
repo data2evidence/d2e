@@ -1,0 +1,532 @@
+!======================================================================
+! File Name: german-tf-med-Medication.rul 
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of Medications and their relations
+!======================================================================
+
+!======================================================================
+!! MEDICATIONS:
+!======================================================================
+
+!======================================================================
+! OUTPUT FIELDS:
+! Medication, Dosage, Route, Frequency, Duration, Reason
+!======================================================================
+
+! Medication group: med_Medication
+
+!======================================================================
+
+#subgroup skipParens: <\(><~(\()>+<\)>
+
+#subgroup NumRange: {(
+( <POS:Num> (<TO|To|to|\-|OR|Or|or> <POS:Num>)? (<\(> <POS:Num> <\)>)? )
+| <\p{ci}(single|double|triple|maximum|minimum|few|many|extra)>
+)}
+  
+!|(C|c)ombinations?|COMBINATIONS?
+#subgroup doseform: {(
+[OD MedicationStatement_Medication_Form](
+   <\p{ci}((A|a)mpo?ule?s?|(A|a)pplicators?|(A|a)uto\-?(I|i)njectors?|(B|b)alm|(B|b)alsam|(B|b)ars?|(B|b)ottles?|(C|c)artridges?|(C|c)leanser|(D|d)entifrice|(D|d)ouche|(I|i)mplants?|(E|e)lixirs?|(E|e)nema|(O|o)int|(T|t)roches?|(M|m)outhwash|(W|w)ashings?)>
+|  <\p{ci}(AMPO?ULE?S?|APPLICATORS?|AUTO\-?INJECTORS?|BALM|BALSAM|BARS?|BOTTLES?|CARTRIDGES?|CLEANSER|DENTIFRICE|DOUCHE|IMPLANTS?|ELIXIRS?|ENEMA|OINT|TROCHES?|MOUTHWASH|WASHINGS?)>
+| (<\p{ci}(((M|m)uco\-?)?(A|a)dhesives?|(A|a)erosols?|(B|b)ath|(B|b)ulk|(C|c)akes?|(C|c)apsules?|(C|c)ap(let)?s?|(C|c)reams?|(G|g)auze|(G|g)um|(C|c)oncentrations?|(C|c)oncentrates?|(C|c)loths?|(D|d)ropperettes?|(E|e)xtracts?|(E|e)mulsions?|(E|e)xpectorants?|(F|f)luids?|(F|f)ilms?|(F|f)ilm\-?(F|f)orming|(F|f)oam|(T|t)ablets?|(T|t)abs?|(G|g)els?|(G|g)el\-?forming|(J|j)els?|(G|g)ranules?|(I|i)nhalants?|(I|i)nhalers?|(J|j)elly|kits?|(L|l)iquids?|(L|l)otions?|(L|l)ozenges?|(O|o)ils?|(O|o)intments?|(P|p)owders?|(P|p)lasters?|(P|p)astes?|(P|p)atch(es)?|(P|p)acks?|(P|p)ens?|(P|p)ills?|(P|p)uffers?|(P|p)umps?|(P|p)ellets?|(S|s)crubs?|(S|s)hampoos?|(S|s)oaps?|(S|s)yringes?|(S|s)yrs?|(S|s)uspensions?|(S|s)usps?|(S|s)olutions?|(S|s)oln?|(S|s)yrups?|(S|s)prays?|(S|s)ponges?|(S|s)wabs?|(S|s)uppositor(y|ies)|(S|s)uppo?s?|(S|s)ticks?|(T|t)inctures?|(T|t)oothpastes?|(T|t)owelettes?|(V|v)ials?|(W|w)ipes?|(W|w)ax|(W|w)afers?)>)
+| (<\p{ci}((MUCO\-?)?ADHESIVES?|AEROSOLS?|BATH|BULK|CAKES?|CAPSULES?|CAP(LET)?S?|CREAMS?|GAUZE|GUM|CONCENTRATIONS?|CONCENTRATES?|CLOTHS?|DROPPERETTES?|EXTRACTS?|EMULSIONS?|EXPECTORANTS?|FLUIDS?|FILMS?|FILM\-?FORMING|FOAM|TABLETS?|TABS?|GELS?|GEL\-?FORMING|JELS?|GRANULES?|INHALANTS?|INHALERS?|JELLY|KITS?|LIQUIDS?|LOTIONS?|LOZENGES?|OILS?|OINTMENTS?|POWDERS?|PLASTERS?|PASTES?|PATCH(ES)?|PACKS?|PENS?|PILLS?|PUFFERS?|PUMPS?|PELLETS?|SCRUBS?|SHAMPOOS?|SOAPS?|SYRINGES?|SYRS?|SUSPENSIONS?|SUSPS?|SOLUTIONS?|SOLN?|SYRUPS?|SPRAYS?|SPONGES?|SWABS?|SUPPOSITOR(Y|IES)|SUPPO?S?|STICKS?|TINCTURES?|TOOTHPASTES?|TOWELETTES?|VIALS?|WIPES?|WAX|WAFERS?)>)
+| (<\p{ci}((A|a)ugmented)> <\p{ci}((T|t)opical)> <\p{ci}((G|g)el|(C|c)ream|(L|l)otion|(O|o)intment)>)
+| (<\p{ci}(AUGMENTED)> <\p{ci}(TOPICAL)> <\p{ci}(GEL|CREAM|LOTION|OINTMENT)>)
+| <((A|a)mps?|AMPS?)>
+| (<\p{ci}((D|d)isintegrating|(E|e)ffervescent)> <\p{ci}((O|o)ral)> <\p{ci}((T|t)ab(let)?s?)>)
+| (<\p{ci}(DISINTEGRATING|EFFERVESCENT)> <\p{ci}(ORAL)> <\p{ci}(TAB(LET)?S?)>)
+| (<\p{ci}((D|d)ry)> <\p{ci}((P|p)owder)> <\p{ci}((Ii|n)halers?)>)
+| (<\p{ci}(DRY)> <\p{ci}(POWDER)> <\p{ci}(INHALERS?)>)
+| (<\p{ci}((T|t)opical)> <\p{ci}((L|l)iquedified)> <\p{ci}((G|g)as)>)
+| (<\p{ci}(TOPICAL)> <\p{ci}(LIQUEDIFIED)> <\p{ci}(GAS)>)
+| (<\p{ci}((G|g)as)> <\p{ci}((F|f)or)> <\p{ci}((I|i)nhalation)>)
+| (<\p{ci}(GAS)> <\p{ci}(FOR)> <\p{ci}(INHALATION)>)
+| (<\p{ci}((M|m)etered)> <\p{ci}((D|d)ose)> <\p{ci}((I|i)nhalers?)>)
+| (<\p{ci}(METERED)> <\p{ci}(DOSE)> <\p{ci}(INHALERS?)>)
+| (<\p{ci}((M|m)edicated)> <\p{ci}((B|b)ar)> <\p{ci}((S|s)oap)>)
+| (<\p{ci}(MEDICATED)> <\p{ci}(BAR)> <\p{ci}(SOAP)>)
+| (<\p{ci}((M|m)edicated)> <\p{ci}((L|l)iquid)> <\p{ci}((S|s)oap)>)
+| (<\p{ci}(MEDICATED)> <\p{ci}(LIQUID)> <\p{ci}(SOAP)>)
+| (<\p{ci}((M|m)etered)> <\p{ci}((D|d)ose)> <\p{ci}((N|n)asal)> <\p{ci}((S|s)pray)>)
+| (<\p{ci}(METERED)> <\p{ci}(DOSE)> <\p{ci}(NASAL)> <\p{ci}(SPRAY)>)
+| (<\p{ci}((M|m)ucous)> <\p{ci}((M|m)embrane)> <\p{ci}((T|t)opical)> <\p{ci}((S|s)olution)>)
+| (<\p{ci}(MUCOUS)> <\p{ci}(MEMBRANE)> <\p{ci}(TOPICAL)> <\p{ci}(SOLUTION)>)
+| (<\p{ci}((G|g)ranules?)> <\p{ci}((F|f)or)> <\p{ci}((O|o)ral)> <\p{ci}((S|s)olution|(S|s)uspension)>)
+| (<\p{ci}(GRANULES?)> <\p{ci}(FOR)> <\p{ci}(ORAL)> <\p{ci}(SOLUTION|SUSPENSION)>)
+|  <\p{ci}((B|b)uccal)> <\p{ci}((F|f)ilm|(T|t)ablet)>
+|  <\p{ci}(BUCCAL)> <\p{ci}(FILM|TABLET)>
+|  <\p{ci}((C|c)hewable)> <\p{ci}((T|t)ablet)>
+|  <\p{ci}(CHEWABLE)> <\p{ci}(TABLET)>
+|  <\p{ci}((C|c)hewing)> <\p{ci}((G|g)um)>
+|  <\p{ci}(CHEWING)> <\p{ci}(GUM)>
+|  <\p{ci}((D|d)ental)> <\p{ci}((C|c)ream|(D|d)rops|(G|g)el|(P|p)aste|(S|s)olutions?)>
+|  <\p{ci}(DENTAL)> <\p{ci}(CREAM|DROPS|GEL|PASTE|SOLUTIONS?)>
+|  <\p{ci}((D|d)rug)> <\p{ci}((I|i)mplant)>
+|  <\p{ci}(DRUG)> <\p{ci}(IMPLANT)>
+|  <\p{ci}((E|e)pidural)> <\p{ci}((P|p)lastic|(P|p)refilled|(S|s)yringe|(V|v)ial)>
+|  <\p{ci}(EPIDURAL)> <\p{ci}(PLASTIC|PREFILLED|SYRINGE|VIAL)>
+|  <\p{ci}((I|i)mplant)> <\p{ci}((G|g)el|(W|w)afer)>
+|  <\p{ci}(IMPLANT)> <\p{ci}(GEL|WAFER)>
+|  <\p{ci}((I|i)nhalant)> <\p{ci}((P|p)owder|(S|s)olution)>
+|  <\p{ci}(INHALANT)> <\p{ci}(POWDER|SOLUTION)>
+|  <\p{ci}((I|i)nhalation)> <\p{ci}((A|a)erosol|(A|a)mpul|blisters?|capsules?|cartridges?|hfa|mist|(S|s)olutions?|vials)>
+|  <\p{ci}(INHALATION)> <\p{ci}(AEROSOL|AMPUL|BLISTERS?|CAPSULES?|CARTRIDGES?|HFA|MIST|SOLUTIONS?|VIALS)>
+|  <\p{ci}((I|i)njectable)> <\p{ci}(Foam|Solutions?|Suspensions?)>
+|  <\p{ci}(INJECTABLE)> <\p{ci}(FOAM|SOLUTIONS?|SUSPENSIONS?)>
+|  <\p{ci}((I|i)njection)> <\p{ci}((A|a)mpuls?|bulk|cartridges?|elastomeric|(I|i)nfusion|(I|i)ntravo?enous|kits?|plastic|prefilled|(S|s)yringes?|vials?)>
+|  <\p{ci}(INJECTION)> <\p{ci}(AMPULS?|BULK|CARTRIDGES?|ELASTOMERIC|INFUSION|INTRAVO?ENOUS|KITS?|PLASTIC|PREFILLED|SYRINGES?|VIALS?)>
+|  <\p{ci}((I|i)ntraartic)> <\p{ci}((S|s)yringe)>
+|  <\p{ci}(INTRAARTIC)> <\p{ci}(SYRINGE)>
+|  <\p{ci}((I|i)ntracaver)> <\p{ci}(kits?)>
+|  <\p{ci}(INTRACAVER)> <\p{ci}(KITS?)>
+|  <\p{ci}((I|i)ntraderm)> <\p{ci}((S|s)yringe|vials?)>
+|  <\p{ci}(INTRADERM)> <\p{ci}(SYRINGE|VIALS?)>
+|  <\p{ci}((I|i)ntramusc)> <\p{ci}(ampul|kits?|pens?|(S|s)uspensions?|(S|s)yringe|vials?)>
+|  <\p{ci}(INTRAMUSC)> <\p{ci}(AMPUL|KITS?|PENS?|SUSPENSIONS?|SYRINGE|VIALS?)>
+|  <\p{ci}((I|i)ntraoculr)> <\p{ci}(implants?|(S|s)yringe|vials?)>
+|  <\p{ci}(INTRAOCULR)> <\p{ci}(IMPLANTS?|SYRINGE|VIALS?)>
+|  <\p{ci}((I|i)ntraperitoneal)> <\p{ci}((S|s)olution)>
+|  <\p{ci}(INTRAPERITONEAL)> <\p{ci}(SOLUTION)>
+|  <\p{ci}((I|i)ntrathec)> <\p{ci}((A|a)mpul|(S|s)yringe|vials?)>
+|  <\p{ci}(INTRATHEC)> <\p{ci}(AMPUL|SYRINGE|VIALS?)>
+|  <\p{ci}((I|i)ntratracheal)> <\p{ci}((S|s)uspension)>
+|  <\p{ci}(INTRATRACHEAL)> <\p{ci}(SUSPENSION)>
+|  <\p{ci}((I|i)ntraven)> <\p{ci}((A|a)mpul|cartridges?|dehp\-?(free)?|emulsions?|foam|infusion|kits?|plastic|prefilled|(S|s)yringes?|vials?)>
+|  <\p{ci}(INTRAVEN)> <\p{ci}(AMPUL|CARTRIDGES?|DEHP\-?(FREE)?|EMULSIONS?|FOAM|INFUSION|KITS?|PLASTIC|PREFILLED|SYRINGES?|VIALS?)>
+|  <\p{ci}((I|i)ntravesic)> <\p{ci}((S|s)olutions?|vials?)>
+|  <\p{ci}(INTRAVESIC)> <\p{ci}(SOLUTIONS?|VIALS?)>
+|  <\p{ci}((I|i)rrigation)> <\p{ci}((A|a)mpul|(S|s)olutions?|vials)>
+|  <\p{ci}(IRRIGATION)> <\p{ci}(AMPUL|SOLUTIONS?|VIALS)>
+|  <\p{ci}((J|j)et)> <\p{ci}(Injector)>
+|  <\p{ci}(JET)> <\p{ci}(INJECTOR)>
+|  <\p{ci}((M|m)edicated)> <\p{ci}(Pad|patch|(S|s)hampoo|tape)>
+|  <\p{ci}(MEDICATED)> <\p{ci}(PAD|PATCH|SHAMPOO|TAPE)>
+|  <\p{ci}((M|m)iscell)> <\p{ci}((A|a)erosols?|kits?|liquid|oil|solutions?|tablets?|towelette|wax)>
+|  <\p{ci}(MISCELL)> <\p{ci}(AEROSOLS?|KITS?|LIQUID|OIL|SOLUTIONS?|TABLETS?|TOWELETTE|WAX)>
+|  <\p{ci}((M|m)ucosal)> <\p{ci}((S|s)pray)>
+|  <\p{ci}(MUCOSAL)> <\p{ci}(SPRAY)>
+|  <\p{ci}((N|n)asal)> <\p{ci}((A|a)erosols?|ampul|drops?|gels?|inhalant|jelly|ointment|powder|(S|s)olutions?|(S|s)prays?|(S|s)uspensions?)>
+|  <\p{ci}(NASAL)> <\p{ci}(AEROSOLS?|AMPUL|DROPS?|GELS?|INHALANT|JELLY|OINTMENT|POWDER|SOLUTIONS?|SPRAYS?|SUSPENSIONS?)>
+|  <\p{ci}((O|o)phthalmic)> <\p{ci}(Cream|dropperettes?|drops?|gel\-?(forming)?|ointment|(S|s)olutions?|(S|s)uspensions?)>
+|  <\p{ci}(OPHTHALMIC)> <\p{ci}(CREAM|DROPPERETTES?|DROPS?|GEL\-?(FORMING)?|OINTMENT|SOLUTIONS?|SUSPENSIONS?)>
+|  <\p{ci}((O|o)ral)> <\p{ci}(capsules?|combination|concentrates?|Cream|drops?|elixirs?|emulsions?|expectorants?|flakes?|foam|gel|granules?|gums?|kits?|liquids?|lozenges?|oil|ointment|packets?|pellets?|pills?|powders?|prefilled|(S|s)olutions?|(S|s)prays?|(S|s)trips?|(S|s)usp\.?|(S|s)uspensions?|(S|s)yringe|(S|s)yrups?|tablets?|tinctures?|wafers?)>
+|  <\p{ci}(ORAL)> <\p{ci}(CAPSULES?|COMBINATION|CONCENTRATES?|CREAM|DROPS?|ELIXIRS?|EMULSIONS?|EXPECTORANTS?|FLAKES?|FOAM|GEL|GRANULES?|GUMS?|KITS?|LIQUIDS?|LOZENGES?|OIL|OINTMENT|PACKETS?|PELLETS?|PILLS?|POWDERS?|PREFILLED|SOLUTIONS?|SPRAYS?|STRIPS?|SUSP|SUSPENSIONS?|SYRINGE|SYRUPS?|TABLETS?|TINCTURES?|WAFERS?)>
+|  <\p{ci}((O|o)tic)> <\p{ci}(combination|dropperettes?|drops?|ointment|solutions?|suspensions?)>
+|  <\p{ci}(OTIC)> <\p{ci}(COMBINATION|DROPPERETTES?|DROPS?|OINTMENT|SOLUTIONS?|SUSPENSIONS?)>
+|  <\p{ci}((P|p)en)> <\p{ci}((I|i)njector)>
+|  <\p{ci}(PEN)> <\p{ci}(INJECTOR)>
+|  <\p{ci}((P|p)erfusion)> <\p{ci}((V|v)ials?)>
+|  <\p{ci}(PERFUSION)> <\p{ci}(VIALS?)>
+|  <\p{ci}((P|p)refilled)> <\p{ci}((A|a)pplicator|syringe)>
+|  <\p{ci}(PREFILLED)> <\p{ci}(APPLICATOR|SYRINGE)>
+|  <\p{ci}((R|r)ectal)> <\p{ci}(cream|enema|foam|gel|kits?|lotion|ointment|solution|spray|suppositor(y|ies))>
+|  <\p{ci}(RECTAL)> <\p{ci}(CREAM|ENEMA|FOAM|GEL|KITS?|LOTION|OINTMENT|SOLUTION|SPRAY|SUPPOSITOR(Y|IES))>
+|  <\p{ci}((S|s)ublingual)> <\p{ci}(drops?|films?|lozenges?|sprays?|tablets?)>
+|  <\p{ci}(SUBLINGUAL)> <\p{ci}(DROPS?|FILMS?|LOZENGES?|SPRAYS?|TABLETS?)>
+|  <\p{ci}((T|t)opical)> <\p{ci}((A|a)dhesive|(A|a)erosols?|bars?|bath|cakes?|cleansers?|combination|creams?|drops?|emulsions?|film\-?(forming)?|foam|gels?|jelly|kits?)>
+|  <\p{ci}(TOPICAL)> <\p{ci}(ADHESIVE|AEROSOLS?|BARS?|BATH|CAKES?|CLEANSERS?|COMBINATION|CREAMS?|DROPS?|EMULSIONS?|FILM\-?(FORMING)?|FOAM|GELS?|JELLY|KITS?)>
+| (<\p{ci}((S|s)ub\-?q)> <\p{ci}((A|a)mpuls?|(A|a)uto\-?(I|i)njectors?|(C|c)artridges?|(I|i)nsulin|(K|k)its?|(P|p)ens?|(S|s)yringes?|(V|v)ials?)>)
+| (<\p{ci}(SUB\-?Q)> <\p{ci}(AMPULS?|AUTO\-?INJECTORS?|CARTRIDGES?|INSULIN|KITS?|PENS?|SYRINGES?|VIALS?)>)
+| (<\p{ci}((E|e)pidural)> <\p{ci}((P|p)lastic|(P|p)refilled|(S|s)yringes?|(V|v)ials?)>)
+| (<\p{ci}(EPIDURAL)> <\p{ci}(PLASTIC|PREFILLED|SYRINGES?|VIALS?)>)
+| (<\p{ci}((O|o)phthalmic)> <\p{ci}(i(I|i)rrigation)> <\p{ci}((S|s)olutions?)>)
+| (<\p{ci}(OPHTHALMIC)> <\p{ci}(IRRIGATION)> <\p{ci}(SOLUTIONS?)>)
+|  <I\.?N\.?(J|H)?\.?>
+|  <((i\.n\.(j|h)?)|in(j|h))\.?>
+|  <\p{ci}((n|n)asal|NASAL)>? <(I|i)nhale(rs?|d)?|INHALE(RS?|D)?|(I|i)nhalation|INHALATION>
+|  <\p{ci}((I|i)nj\.?|(I|i)njections?)>
+|  <\p{ci}(INJ\.?|INJECTIONS?)>
+|  <\p{ci}((S|s)wish)> <\p{ci}((A|a)nd|&)> <\p{ci}((S|s)wallow)>
+|  <\p{ci}(SWISH)> <\p{ci}(AND|&)> <\p{ci}(SWALLOW)>
+|  <\p{ci}((W|w)ash|(I|i)nfusion|(N|n)ebulizers?|(N|n)ebs?|(D|d)rips?|(S|s)hots?|(T|t)apers?|(D|d)ispensers?)>
+|  <\p{ci}(WASH|INFUSION|NEBULIZERS?|NEBS?|DRIPS?|SHOTS?|TAPERS?|DISPENSERS?)>
+| (<\p{ci}((S|s)ustained|(S|s)ust\.?|(E|e)xtended|(C|c)ontrolled|(T|t)ime|(R|r)apid|(D|d)elayed|(I|i)mmediate|(L|l)ong\-acting|(S|s)low)> <\p{ci}((R|r)elease|(R|r)el\.?)>)
+| (<\p{ci}(SUSTAINED|SUST\.?|EXTENDED|CONTROLLED|TIME|RAPID|DELAYED|IMMEDIATE|LONG\-ACTING)|SLOW> <\p{ci}(RELEASE|REL\.?)>)
+| <(S|s)ust\.?|SUST\.?|((S|E|I)\.?R\.?)>
+| (<POS:Adj|V-PaPart>? <\p{ci}(.+\-(R|r)el\.?|.+\-(R|r)elease)>)
+| (<POS:Adj|V-PaPart>? <\p{ci}(.+\-REL\.?|.+\-RELEASE)>)
+| (<DA>)
+| (<Dosieraerosol>)
+| (<Drg\.>)
+| (<retard>)
+| (<Penfil(l)?>)
+| (<Dis(k|c)us>)
+| (<Filmtabletten>)
+| (<magensaft.*>? <(Tbl\.)|(Tabletten)>) 
+| (<Pulv(\.)?> <\.>? (<z\.> <Herstellung> <einer> <Lösung> <zum> <Einnehmen>)?)
+| (<liquidum>)
+| (<Tropfen>)
+| (<Tropf(\.)?> <\.>?)
+| (<Susp\.>)
+| (<Pflaster>)
+| (<Supp(\.)?>)
+| (<MSL>)
+| (<Blt(\.)?>)
+| (<orale> <Substitution>)
+)[/OD]
+| (<(S|s)liding|SLIDING> <\p{ci}((S|s)cale|SCALE)>)
+| (<POS:Adj|V-PaPart> <\p{ci}((S|s)cale|(M|m)icronized|(C|c)oated)>)
+| (<POS:Adj|V-PaPart> <\p{ci}(SCALE|MICRONIZED|COATED)>)
+| (<POS:Adj|V-PaPart>? <\p{ci}(.+(M|m)icronized|.+(C|c)oated)>)
+| (<POS:Adj|V-PaPart>? <\p{ci}(.+MICRONIZED|.+COATED)>)
+)}
+
+#subgroup strengthUnit: {(
+ <((m|M)?\.?(g|G)\.?)>
+|<((M|m)cg)\.?|(MCG)\.?>
+|<(m|M)(e|E)(q|Q)\.?(/(M|m)?(L|l))?>
+|(<(m|M)(e|E)(q|Q)></><(M|m)?(L|l)>)
+|<((M|m)illiequivalents?|MILLIEQUIVALENTS?)>
+|<(((M|m)i(lli|cro))?(G|g)rams?|(MILLI)?GRAMS?|GM|gm)>
+|<((S|s)trength|STRENGTH)>
+|<((M|m)(G|g)/(M|m)?(L|l|2))>
+|(<(M|m)(G|g)></><(M|m)?(L|l|2)>)
+|<((U|u)ni?ts?/mls?|UNI?TS?/MLS?)>
+|(<(U|u)ni?ts?></><mls?>)
+|(<UNI?TS?></><MLS?>)
+!!|(<mg/qm>)
+|(<mg.*>)
+|(<ml>)
+|(<µg.*>)
+|(<mval>)
+|(<Tropfen>)
+)}
+
+#subgroup str_w_unit:{
+([OD MedicationStatement_Medication_Ingredient_Amount] (%(NumRange) %(strengthUnit) )[/OD])
+|([OD MedicationStatement_Medication_Ingredient_Amount] <[0-9]+mg.*> [/OD])
+|([OD MedicationStatement_Medication_Ingredient_Amount] <[0-9]+°> [/OD])
+}
+
+#subgroup strength: {(
+[OD MedicationStatement_Medication_Ingredient_Amount] (%(NumRange) %(strengthUnit) )[/OD]
+| %(strengthUnit)
+| ([OD MedicationStatement_Medication_Ingredient_Amount] (<[0-9]+ ((\,)[0-9]+)? / [0-9]+ ((\,) [0-9]+)? >) [/OD])
+| ([OD MedicationStatement_Medication_Ingredient_Amount] (<[0-9]+> </ [0-9]+>) [/OD])
+| ([OD MedicationStatement_Medication_Ingredient_Amount] <[0-9]+mg.*> [/OD])
+| ([OD MedicationStatement_Medication_Ingredient_Amount] <[0-9]+> [/OD])
+)}
+
+#subgroup otherUnit: {(
+ <(((t|T)b?sp\.?)|(TB?SP\.?))>
+|<(((t|T)easpoon(ful)?s?)|(TEASPOON(FUL)?S?))>
+|<(((t|T)ablespoons?)|(TABLESPOONS?))>
+|<(((M|m)illi)?(L|l)iters?|(MILLI)?LITERS?)>
+|<(((M|m)illi)?(L|l)itres?|(MILLI)?LITRE?)>
+| <((m|M)?\.?(l|L)\.?)>
+|<(L|l)\.>
+|<(Oz|OZ|oz|lbs?|LBS?)\.>
+|<((O|o)unces?|OUNCES?)>
+|<((P|p)ounds?|POUNDS?)>
+|<(C|c)\.?(C|c)\.?>
+|<(((r|R)ept?\.?)|(REPT?\.?))>
+|<((B|b)ags?|BAGS?)>
+|<((D|d)oses?|DOSES?)>
+|<((L|l)oads?|LOADS?)>
+|<((P|p)uffs?|PUFFS?)>
+|<((T|t|G|g)\-)?((T|t)ubes?|TUBES?)>
+|<((U|u)nits?|UNITS?)>
+|<((S|s)upplements?|SUPPLEMENTS?)>
+|<((S|s)upplementations?|SUPPLEMENTATIONS?)>
+|<((R|r)egimen|REGIMEN)>
+|<((R|r)equirements?|REQUIREMENTS?)>
+)}
+
+#subgroup doseUnit: {(
+ %(otherUnit)
+|%(doseform)
+)}
+
+#subgroup Suff: {(
+ %(strength)
+|%(doseUnit)
+)}
+
+#subgroup AddMedication: {(
+   <\p{ci}(ASA)>
+|  <\p{ci}(ECASA)>
+|  <\p{ci}(Celesone)>
+|  <\p{ci}(Lisinoprl|Lisinopril)>
+|  <\p{ci}(Kelfex)>
+|  <\p{ci}(CZI)>
+|  <\p{ci}(Alb|albuterol)>
+|  <\p{ci}(Avadia)>
+|  <\p{ci}(BB|beta-blockers?)>
+|  <\p{ci}(Fondaparinux)>
+|  <\p{ci}(Allopurinol)>
+|  <\p{ci}(Percocet)>
+|  <\p{ci}(PRBCs?)>
+|  (<\p{ci}(Enteric-coated)> <\p{ci}(aspirin)>  <325> <\p{ci}(mg)>)
+|  <\p{ci}(Sulfa)>
+|  <\p{ci}(Lasix)>
+|  <\p{ci}(Captopril)>
+|  <\p{ci}(Rhinocort)>
+|  <\p{ci}(Guaifenesin)>
+|  <\p{ci}(Oxycodone)>
+|  <\p{ci}(KCL)>
+|  <\p{ci}(Levoflox|Levo)>
+|  <\p{ci}(Nitropaste|nitro)>
+|  <\p{ci}(Paroxetine)>
+|  <\p{ci}(Statin)>
+|  <\p{ci}(Levaquin)>
+|  <\p{ci}(Phenothiazine)>
+|  <\p{ci}(Novalog)>
+|  <\p{ci}(Tomoxifen)>
+|  <\p{ci}(antibiotics?)>
+|  <\p{ci}(hydration)>
+|  (<\p{ci}(pain)>  <\p{ci}(control|medications?)>)
+|  (<\p{ci}((B|b)eta)>  <\p{ci}((B|b)lockers?)>)
+|  <\p{ci}(((M|m)ulti)?(V|v)itamins?)>
+|  <\p{ci}(Diuretics?)>
+|  <\p{ci}(Hypoglycemics?)>
+|  <\p{ci}(regular)> <\p{ci}(insulin)>
+|  <\p{ci}(insulin)> (<STEM:\,> <\p{ci}(regular)>)? 
+|  <\p{ci}(opiates?)>
+|  <\p{ci}(normal)> <\p{ci}(saline)>
+|  <\p{ci}Inhibace>)}
+
+#subgroup plain_Med:{
+ [OD MedicationStatement_Medication] ( [TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE] | %(AddMedication)) [/OD] %(str_w_unit)?
+}
+
+#subgroup DictMedication: {(
+[OD MedicationStatement_Medication](
+([TE MEDICATIONSTATEMENT_MEDICATION]<>+[/TE] | %(AddMedication))
+)[/OD]  %(Suff)?
+)}
+
+#subgroup Medication: {(
+ %(DictMedication) (<POS:Punct-Open> <>? %(DictMedication) (<([a-zA-Z])+,POS:Adj|V-PaPart|V-PrPart>? <([a-zA-Z])+,POS:Nn>)* <POS:Punct> )*
+(<([a-zA-Z])+,POS:Adj|V-PaPart|V-PrPart>? <([a-zA-Z])+,POS:Nn>)*
+)}
+
+!#subgroup Medication: {(
+! %(DictMedication) (<POS:Punct-Open> <>? %(DictMedication) %(doseUnit)* <POS:Punct> )* %(doseUnit)*
+!)}
+
+!<\p{ci}(per|/)>? %(Suff)?
+!|[OD MedicationStatement_Dosage_Dose]([TE MEASURE]<>+ <~((C|c|M|m)(M|m))>[/TE])[/OD]
+
+#subgroup Unit: {(
+( !!%(strength)
+([OD MedicationStatement_Dosage_Dose]%(NumRange)[/OD] %(doseUnit))
+|[OD MedicationStatement_Dosage_Dose](<[0-9]+(\.[0-9]+)?(L|l|U|u|Y|y|UNT|unt|Unt|mcg|MCG|Mcg|Meq|MEQ|(mg/m2)|(MG/M2))>)[/OD]
+|[OD MedicationStatement_Medication_Ingredient_Amount]([TE PERCENT]<>+[/TE])[/OD] 
+) 
+)}
+
+#subgroup Doseform: {(
+(<POS:Punct>|<\p{ci}(and|&|or)>)? %(doseform)
+)}
+
+!| (<POS:Adv>? <POS:Prep> [OD Dosage](%(NumRange) %(Suff)?)[/OD])
+!| ([OD Dosage]<[0-9]+\.[0-9]+> %(Suff)?[/OD])
+#subgroup Dosage: {(
+<POS:Punct>? <\p{ci}(and|&|or|then)>? (
+((<POS:Adv>?<POS:Prep>)*
+(
+  (%(Unit) (<\p{ci}(x|X|\-|/)>? %(Unit))*)
+| <((u|U)\.?(d|D)\.?)>
+| (<((ut|UT)\.?)> < (dict|DICT)\.?>)
+| <((s|S)\.?(a|A)\.?)>
+| [OD MedicationStatement_Dosage_Dose](<E> </> <BE>)[/OD]
+| [OD MedicationStatement_Dosage_Dose] <E> [/OD]
+))
+)
+)}
+
+#subgroup Route: {(
+<\p{ci}(and|&|or|then)>? (
+[OD MedicationStatement_Dosage_Route](
+   <(p|P)\.?(o|O)\.?>
+|  <(t|T)\.(o|O)\.>
+|  <POS:Prep> <\p{ci}(mouth|nose)>
+|  <\p{ci}(under)> <\p{ci}(the)> <\p{ci}(tongue)>
+|  <\p{ci}((oral|nasal)(ly|s)?)>
+|  <(p|P|s|S|u|U)\.?(r|R)\.?>
+|  <\p{ci}(per)> <\p{ci}(rectum)>
+|  <(i|I)\.?(m|M)\.?(i|I)?\.?>
+|  (<(i|I)\.?(v|V)\.?(p|P)?\.?(b|B)?\.?> <\p{ci}(inj\.?|injections?)>?)
+|  <\p{ci}(intravenous(ly)?)>
+|  <(i|I)\.?(d|D|p|P)\.?>
+|  <\p{ci}(intra\-?dermal(ly)?)>
+|  <\p{ci}(intra\-?nasal(ly)?)>
+|  <(t|T)\.?(o|O)?\.?(p|P)\.?>
+|  <\p{ci}(topical(ly)?)>
+|  <\p{ci}(vaginal(ly)?)>
+|  <(s|S)\.?(l|L|c|C)\.?>
+|  (<(s|S)\.?> <(c|C)\.?>)
+|  <\p{ci}(sublingual(ly)?)>
+|  <\p{ci}(BUCC|buccal(ly)?)>
+|  <\p{ci}(MDI)>
+|  <(i|I)\.?(p|P)\.?>
+|  <(o|O)\.?(s|S|u|U)\.?>
+|  <\p{ci}(intraperitoneal(ly)?)>
+|  <\p{ci}(sublingual(ly)?|subcutaneous(ly)?)>   
+|  <\p{ci}(subcu?|sub\-?q\.?|subcut)>
+|  <\p{ci}(auricular(ly)?)>
+|  <\p{ci}(cutaneous(ly)?)>
+|  <\p{ci}(injectabl(e|y))>
+|  <\p{ci}(intra\-?articular(ly)?)>
+|  <\p{ci}(intra\-?musc(ular)?(ly)?)>
+|  <\p{ci}(intra\-?ocular)>
+|  <\p{ci}(intra\-?perit(oneal)?)>
+|  <\p{ci}(intra\-?thecal)>
+|  <\p{ci}(intra\-?trac(heal)?)>
+|  <\p{ci}(intra\-?uteri(ne)?)>
+|  <\p{ci}(intravo?en(ous)?(ly)?)>
+|  <\p{ci}(non\-?oral(ly)?)>
+|  <\p{ci}(ophth(almic)?)>
+|  <\p{ci}(otic)>
+|  <\p{ci}(rectal(ly)?)>
+|  <\p{ci}(transderm(al)?(ly)?)>
+|  <\p{ci}(transmucosal(ly)?)>
+|  <\p{ci}(urethral(ly)?)>
+|  (<POS:Num> <min\-Inf\.>)
+)[/OD])
+)}
+
+#subgroup FreqKeywords: {(
+   (<\p{ci}(daily|nightly|weekly|biweekly|monthly|bimonthly|frequent(ly)?)>)
+|  (<\p{ci}((B\.?I\.?(D|W)\.?)|(b\.?i\.?(d|w)\.?))>)
+|  (<\p{ci}((T\.?I\.?(D|W)\.?)|(t\.?i\.?(d|w)\.?))>)
+|  (<\p{ci}((B\.?I\.?D\.?)|(b\.?i\.?d\.?))>)
+|  (<\p{ci}((T\.?D\.?S\.?)|(t\.?d\.?s\.?))>)
+|  (((<POS:Num> <\p{ci}((T|t)imes)>)|<\p{ci}(once|twice)>|<\p{ci}([0-9]+(x|X))>)((<\p{ci}(a|per|every|/)> <\p{ci}(hour|day|week|month|morning|afternoon|evening|night)>)|(<\p{ci}(in)> <\p{ci}(the)> <\p{ci}(morning|afternoon|evening|night)>))?)  
+|  (<\p{ci}((e|E)very|EVERY|(E|e)ach|EACH|q\.?|Q\.?|per|/|(T|t)his|THIS)> <\p{ci}(other)>? <\p{ci}(hour|day|bedtime|Week|Month|Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|morning|afternoon|evening|night)>)
+|  (<\p{ci}((e|E)very|EVERY|q|Q)> <POS:Num> (<\p{ci}(to|\-)> <POS:Num>)? <\p{ci}(minutes|hours|days|weeks|months|morning|afternoon|evening|night)>)
+|  (<\p{ci}((Q\.?(O|I|A)\.?D\.?)|(q\.?(o|i|a)\.?d\.?))>)
+|  (<\p{ci}(Q\.?H\.?S\.?|q\.?h\.?s\.?)>)
+|  (<(Q|q)(\.|\-)?(WK|wk|A\.?(M|C)\.?|a\.?(m|c)\.?|P\.?M\.?|p\.?m\.?|D|d|WEEK|(W|w)eek|DAY|(D|d)ay|NIGHT|(N|n)ight|(M|m)orning|(A|a)fternoon|(E|e)vening)\.?>)
+|  (<(Q|q)\.?|(e|E)very|EVERY> <\p{ci}(other)>? <(WK|wk|WEEK|(W|w)eek|DAY|(D|d)ay|NIGHT|(N|n)ight|A\.?M\.?|a\.?m\.?|P\.?M\.?|p\.?m\.?|D|d|(M|m)orning|(A|a)fternoon|(E|e)vening)\.?>)
+|  (<((Q|q)\.?[1-9]\-?[0-9]?(h|H|min|MIN|Min|(H|h)ours?|(M|m)inutes?|(D|d)ays?|(N|n)ights?)\.?)>)
+|  (<((Q|q)\.?(Q|q)\.?(h|H)\.?)>)
+|  (<(ALT|alt)\.?> <(h|H)\.?>)
+|  (<(ALT|alt)\.?(h|H)\.?>)
+|  (<\p{ci}((Q|q)\.?(Q|q)\.?(h|H)\.?)>)
+|  (<(Q|q)\.?[1-9]\-?[0-9]?> <(h|H|min|MIN|Min|(H|h)ours?|(M|m)inutes?|(D|d)ays?)\.?>?)
+|  (<(Q|q)\.?> <[1-9]\-?[0-9]?(h|H|min|MIN|Min|(H|h)ours?|(M|m)inutes?|(D|d)ays?)\.?>)
+|  (<(Q|q)\.?> <[1-9]\-?[0-9]?> <(h|H|min|MIN|Min|(H|h)ours?|(M|m)inutes?|(D|d)ays?|(W|w)eeks?)\.?>?)
+|  (<(Q|q)\.?> <\.>? (<\p{ci}(other)>|<POS:Num>)? <\p{ci}(hours?|minutes?|WEEKS?|(W|w)eeks?|DAYS?|(D|d)ays?|NIGHTS?|(N|n)ights?)>)
+|  (<(Q|q)\.?>? <((H|h)\.?(S|s)\.?)> )
+|  (<(Q|q)\.?>? <((P|p|A|a)\.?(C|c)\.?)> )
+|  (<(Q|q)\.?((H|h)\.?(S|s)\.?)> )
+| ( <\p{ci}(at)> <POS:Num> <(A|a|P|p)\.?(M|m)\.?> )
+| ( <q[0-9]+w> )
+)}
+
+
+#subgroup Temporal: {(
+<POS:Punct>? <\p{ci}(and|&|or|then)>? (
+  ( <\p{ci}(at|before|after|with|w\/|W\/)> <\p{ci}(each|every)>? <\p{ci}(meals?|dinner|lunch|breakfast|bed(time)?|noon)> )
+)
+)}
+
+!(<POS:Num><\.>)?
+
+#subgroup Frequency: {(
+  (<POS:Punct>? <\p{ci}(and|&|or|then)>? [OD MedicationStatement_Dosage_Rate] %(FreqKeywords) [/OD])
+| ([OD MedicationStatement_Dosage_Rate] <[0-9]+\-[0-9]+\-[0-9]+> [/OD])
+| ([OD MedicationStatement_Dosage_Rate] <[0-9]+\/[0-9]+\/[0-9]+> [/OD])
+| ([OD MedicationStatement_Dosage_Rate] <.{1,3}\-.{1,3}\-.{1,3}> [/OD])
+| ([OD MedicationStatement_Dosage_Rate] <POS:Num> <POS:Num> <POS:Num> <POS:Num> [/OD])
+| ([OD MedicationStatement_Dosage_Rate] <(a|A)lle> <POS:Num> <Tage> [/OD])
+| ([OD MedicationStatement_Dosage_Rate] <nach> <Schema> [/OD])
+| ([OD MedicationStatement_Dosage_Rate] <POS:Num> <(x|X)> <tgl(\.)?> [/OD])
+| ([OD MedicationStatement_Dosage_Rate] <[0-9]+(x|X)[0-9]+> [/OD])
+)}
+
+#subgroup Duration: {(
+<POS:Punct>? <\p{ci}(and|&|or|then)>? (
+[OD MedicationStatement_Dosage_Timing_Duration](
+   (((<\p{ci}(x|X|times)> (<POS:Num>|<\p{ci}([0-9]+)>))|<\p{ci}(x|X[0-9]+)>) <\p{ci}(doses?|minutes?|hours?|days?|nights?|weeks?|months?|years?)>?)
+|  (<\p{ci}(for|For|For)>? ((<\p{ci}(at)> <\p{ci}(least|most)>)|<\p{ci}(another)> )? (<POS:Num>|(<\p{ci}(a)><\p{ci}(few|couple)>?)|<\p{ci}(several)>) <\p{ci}(more)>? <\p{ci}(minutes?|hours?|days?|nights?|weeks?|months?|years?)>)
+|  (<POS:Prep>? <POS:Det>? ((<POS:Num> <\p{ci}(day|night|week|month)>)|<\p{ci}([0-9]+\-(day|night|week|month|year))>) <\p{ci}(course|period)>)
+|  (<POS:Prep>? <POS:Det> <\p{ci}(course|period)> <POS:Prep> <POS:Num> <\p{ci}(minutes?|hours?|days?|nights?|weeks?|months?|years?)> )
+|  (<\p{ci}(during)> <\p{ci}(spring|summer|fall|winter)> <\p{ci}(break)>)
+|  (<\p{ci}(until)> <\p{ci}(the)> <\p{ci}(symptoms?)> <\p{ci}(disappears?)>)
+|  (<\p{ci}(until)> <\p{ci}(it)> <\p{ci}(is)> <\p{ci}(finished)>)
+|  (<\p{ci}(until)> <POS:~(Punct)>+ )
+|  (<\p{ci}(until)> <\p{ci}(ready)> <\p{ci}(for)> <\p{ci}(d/c)> <\p{ci}(home)>)
+|  (<\p{ci}(for|For|For)>? <\p{ci}(as)> <\p{ci}(long)> <\p{ci}(as)> <\p{ci}(needed)>)
+|  <\p{ci}(temporarily|today|tonight)> 
+)[/OD]
+)
+)}
+
+#subgroup DurationPost: {(
+<POS:Punct>? (<\p{ci}((N|n)umber|NUMBER)> <\p{ci}(of)> <\p{ci}(doses)> <\p{ci}(required)>? %(skipParens)? <\:> [OD MedicationStatement_Dosage_Timing_Duration]<POS:Num> [/OD])
+)}
+
+#subgroup DurationAll: {(
+%(Duration) | %(DurationPost) |([OD MedicationStatement_Dosage_Timing_Duration] <POS:Prep> <POS:Num> <Tage(n)?> [/OD])
+)}
+
+
+#subgroup AsNeeded: {(
+<POS:Punct>? (
+   <\p{ci}((p\.?r\.?n\.?)|(P\.?R\.?N\.?))> ([OD MedicationStatement_Reason]<POS:Adj|V-PaPart|Det>? <POS:(Nn|Prop|V-PrPart)>[/OD])?
+| ( <\p{ci}((a|A)s|AS)> <\p{ci}(needed|necessary)>)
+| ( <\p{ci}(if)> <\p{ci}(there)><\p{ci}(is)><\p{ci}(a)> <\p{ci}(need)>)
+| ( <(S|s)\.?(O|o)\.?(S|s)\.?>)
+| ( <si|SI> <(op|OP)\.?> <sit|SIT>)
+| ( <bei> <Bedarf> )
+| ( <b\.Bed\.> )
+| ( <bei> <Bed(\.)?> )
+)
+(<\p{ci}((F|f)or|FOR)> [OD MedicationStatement_Reason](
+  (<POS:Prep|Pron>? <POS:(Adj|Nn|Prop)>)+
+)[/OD])*
+)}
+
+#subgroup Reason: {(
+<POS:Punct>? (
+<\p{ci}((F|f)or|FOR|(R|r)eason|REASON)> <\:>?
+[OD MedicationStatement_Reason](
+  (<POS:Prep|Pron>? <POS:(Adj|Nn|Prop)>)+
+)[/OD]
+)
+)| ([OD MedicationStatement_Reason] <nach> <BZ> [/OD]) | ([OD MedicationStatement_Reason] <bei> <~(Bed(arf)?),POS:Nn> [/OD])}
+
+#subgroup MedVerb: {(
+<POS:Punct>? <\p{ci}(and|&|or|then|is|was|are|were)>? (
+<STEM:(G|g)iven?|GIVE|(U|u)se|USE|(T|t)aken?|(T|t)aking|TAKE|(A|a)pply?|APPLY?>
+|(<STEM:(alternate|alternating)> <POS:Prep>)
+)
+)}
+
+#subgroup PreMedication: {(
+ (%(Doseform)|%(Route)|%(Dosage)|%(Duration))+ <POS:Prep>?
+)}
+
+!(%(Doseform)|<[a-zA-Z]+,POS:Nn>)? 
+!#group med_Medication: {(
+!  %(PreMedication)? %(Medication) %(doseUnit)? (%(Doseform) |  %(NumRange) | (<((S|s)ig|SIG|(R|r)oute|ROUTE)> <POS:Punct>?) | %(MedVerb) | %(Dosage) | %(Route) | %(Frequency) | %(DurationAll) | %(Temporal) | %(AsNeeded) | %(Reason) )* 
+!)}
+
+
+#subgroup Nonstandard_Dosage:{
+ !!([OD Dosage] <[0-9]+(x|X)[0-9]+> [/OD])
+ [OD MedicationStatement_Dosage_Dose] <[0-9]+x> [/OD]
+| [OD MedicationStatement_Dosage_Dose] <POS:Num> <Gabe(n)?> [/OD]
+}
+
+
+#subgroup Therapieempfehlung:{
+(%(Medication) %(str_w_unit) %(Nonstandard_Dosage) (%(Reason)|%(AsNeeded)))
+|(%(Medication) %(Doseform) %(Frequency))
+|(%(Medication) %(str_w_unit) (<\,>? %(Doseform))? %(Nonstandard_Dosage)? %(Frequency)?)
+}
+
+
+#group MedicationStatement:{
+(%(Route)? %(Medication) %(strength)? ((<>? %(DurationAll))|%(Frequency)|%(AsNeeded)))
+|((%(str_w_unit)|%(Doseform)) <POS:Prep>? %(Medication) %(Route)?)
+|(%(Medication) (%(strength)|%(Frequency)) %(Dosage))
+|(%(Medication) (%(AsNeeded)|%(Reason)|%(Nonstandard_Dosage)))
+|(%(Therapieempfehlung))
+|(%(Nonstandard_Dosage)? %(Medication) %(Route)? %(str_w_unit)?)
+}
+

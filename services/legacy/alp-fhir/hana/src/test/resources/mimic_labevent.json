@@ -1,0 +1,151 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "MimicLabevent",
+  "meta": {
+    "lastUpdated": "2018-06-30T07:44:43.294+10:00"
+  },
+  "text": {
+    "status": "generated",
+    "div": ""
+  },
+  "extension": [],
+  "url": "http://data4life.care/StructureDefinition/MimicLabevent",
+  "name": "MimicLabevent",
+  "status": "draft",
+  "date": "22018-06-30T07:44:43.294+10:00",
+  "publisher": "D4L",
+  "contact": [],
+  "description": "Contains all laboratory measurements for a given patient, including out patient data.",
+  "purpose": "Contains all laboratory measurements for a given patient, including out patient data.",
+  "fhirVersion": "3.0.1",
+  "mapping": [],
+  "kind": "resource",
+  "abstract": false,
+  "type": "MimicLabevent",
+  "snapshot": {
+    "element": [
+      {
+        "id": "MimicLabevent",
+        "path": "MimicLabevent",
+        "short": "Resource for MIMIC III Labevents",
+        "definition": "Laboratory Measurements",
+        "alias": [],
+        "min": 0,
+        "max": "*",
+        "constraint": [],
+        "mapping": []
+      },
+      {
+        "id": "MimicLabevent.id",
+        "path": "MimicLabevent.id",
+        "short": "row_id ",
+        "definition": "row_id.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "id"
+          }
+        ],
+        "isSummary": true
+      },
+      {
+        "id": "MimicLabevent.subject",
+        "path": "MimicLabevent.subject",
+        "short": "Link to the patients",
+        "definition": "Link to the patients.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": "http://data4life.care/StructureDefinition/MimicPatient"
+          }
+        ],
+        "isSummary": true
+      },
+      {
+        "id": "MimicLabevent.admission",
+        "path": "MimicLabevent.admission",
+        "short": "Link to the admission",
+        "definition": "Link to the admission.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": "http://data4life.care/StructureDefinition/MimicAdmission"
+          }
+        ],
+        "isSummary": true
+      },
+      {
+        "id": "MimicLabevent.item",
+        "path": "MimicLabevent.item",
+        "short": "Link to item (code)",
+        "definition": "Link to item (code).",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": "http://data4life.care/StructureDefinition/MimicItem"
+          }
+        ],
+        "isSummary": true
+      },
+      {
+        "id": "MimicLabevent.charttime",
+        "path": "MimicLabevent.charttime",
+        "short": "CHARTTIME records the time at which an observation was charted, and is usually the closest proxy to the time the data was actually measured. ",
+        "definition": "CHARTTIME records the time at which an observation was charted, and is usually the closest proxy to the time the data was actually measured. ",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "MimicLabevent.value",
+        "path": "MimicLabevent.value",
+        "short": "VALUE contains the value measured for the concept identified by the ITEMID.",
+        "definition": "DISCHTIME provides the date and time the patient was discharged from the hospital.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "MimicLabevent.valuenum",
+        "path": "MimicLabevent.valuenum",
+        "short": "VALUE contains the value measured for the concept identified by the ITEMID.",
+        "definition": "DISCHTIME provides the date and time the patient was discharged from the hospital.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "decimal"
+          }
+        ]
+      },
+      {
+        "id": "MimicLabevent.valueuom",
+        "path": "MimicLabevent.valueuom",
+        "short": "VALUEUOM is the unit of measurement for the VALUE, if appropriate.",
+        "definition": "VALUEUOM is the unit of measurement for the VALUE, if appropriate.",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,204 @@
+name: DockerCompose AzureDev Deploy
+run-name: ${{ github.event.inputs.env }} ${{ github.event.inputs.repo }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        type: choice
+        required: true
+        description: Select a repo
+        default: d2e
+        options:
+          - d2e
+          - dev-afreen-d2e
+          - dev-alicia-d2e
+          - dev-brandan-d2e
+          - dev-brian-d2e
+          - dev-hengxian-d2e
+          - dev-jerome-d2e
+          - dev-khairul-d2e
+          - dev-nadirah-d2e
+          - dev-nicholas-d2e
+          - dev-peter-d2e
+          - dev-qiya-d2e
+          - dev-ragavan-d2e
+          - dev-santan-d2e
+          - dev-satish-d2e
+          - dev-suwarno-d2e
+          - dev-zed-d2e
+      env:
+        type: environment
+        description: Select the environment
+        required: true
+        default: alp-dev-sg-1
+      docker-tag-develop:
+        description: tag:*:develop
+        type: boolean
+      docker-tag-textbox:
+        description: tag:fromTextbox (precedence)
+        type: string
+        required: false
+      ui-docker-tag-develop:
+        description: tag:ui:develop
+        type: boolean
+        default: true
+      ui-docker-tag-textbox:
+        description: tag:ui:fromTextbox (precedence)
+        type: string
+        required: false
+      override-branch-boolean:
+        description: override:branch:sameAsDn
+        type: boolean
+        default: false
+      override-repo-branch-textbox:
+        description: override:branch:fromTextbox (precedence)
+        type: string
+        required: false
+        default: develop
+
+env:
+  DOCKER_TAG_NAME: ${{ github.event.inputs.docker-tag-textbox || 'develop' }}
+  ENV_NAME: ${{ github.event.inputs.env }}
+  ENV_TYPE: remote
+
+concurrency: 
+  group: az-dc-deploy-${{ github.event.inputs.env }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment: ${{ github.event.inputs.env }}
+    name: ${{ github.event.inputs.env }}
+    runs-on: [ "${{ github.event.inputs.env }}", self-hosted, Linux, X64 ]
+    steps:
+    - run: |
+        echo REPO=${{ github.repository_owner }}/${{ github.event.inputs.repo }} | tee -a "$GITHUB_OUTPUT"
+
+    - uses: actions/checkout@v4.1.1
+      name: checkout d2e repo
+      with:
+        clean: false
+        repository: ${{ github.repository_owner }}/${{ github.event.inputs.repo }}
+        token: ${{ github.event.inputs.repo == 'd2e' && secrets.GITHUB_TOKEN || secrets.CI_PAT }}
+        ref: ${{ env.DOCKER_TAG_NAME }}
+
+    - shell: bash
+      id: override-repo
+      name: override-repo
+      run: |
+        OVERRIDE_REPO="${{ github.event.inputs.override-repo-branch-textbox }}"
+        [ ${{ github.event.inputs.override-branch-boolean }} = true ] && OVERRIDE_REPO=${{ github.ref_name }}
+        echo OVERRIDE_REPO=$OVERRIDE_REPO | tee -a "$GITHUB_OUTPUT"
+
+    - uses: actions/checkout@v4.1.1
+      name: checkout override repo
+      with:
+        repository:  ${{ vars.OVERRIDE_REPO }}
+        token: ${{ secrets.CI_PAT }}
+        path: 'tmp'
+        sparse-checkout: 'alp-data-node-override'
+        sparse-checkout-cone-mode: false
+        ref: ${{ steps.override-repo.outputs.OVERRIDE_REPO }} # branch name
+
+    - shell: bash
+      id: link_files_from_override
+      run: |
+        pwd
+        ln -s tmp/alp-data-node-override alp-data-node-override
+        chmod 755 -R alp-data-node-override
+
+    - name: Cleanup dangling images and remove created/exited containers
+      continue-on-error: true
+      run: |
+        if [[ $(docker ps -aq -f status=exited) ]]; then
+          docker rm $(docker ps -aq -f status=exited)
+          echo "Exited containers removed"
+          else
+          echo "No exited containers"
+        fi
+    
+        if [[ $(docker ps -aq -f status=created) ]]; then
+          docker rm $(docker ps -aq -f status=created)
+          echo "Created status containers removed"
+        else
+          echo "No created status containers"
+        fi
+    
+        sleep 5
+    
+        # docker image prune -af
+
+    - name: Login to ACR
+      uses: docker/login-action@v3.1.0
+      with:
+        registry: alpcr.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Generate dotenv
+      env:
+        DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+        DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      run: |
+        dn_dir=$PWD
+        cd alp-data-node-override
+        ACTIONS_STEP_DEBUG=false
+      
+        # get env yml from 1password
+        overwrite=true env_name=$ENV_NAME yarn op:get:$ENV_TYPE
+
+        # mask sensitive values
+        dn_dir=$dn_dir scripts/gha-mask.sh
+
+        # generate dotenv
+        dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
+        echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+
+        cd $dn_dir
+        env_type=$ENV_TYPE yarn gen:tls
+
+        cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
+
+        [ "${{ github.event.inputs.docker-tag-develop }}" = true ] && DOCKER_TAG_NAME=develop
+        UI_DOCKER_TAG_NAME=$DOCKER_TAG_NAME
+        [ "${{ github.event.inputs.ui-docker-tag-develop }}" = true ] && UI_DOCKER_TAG_NAME=develop
+        [ "${{ github.event.inputs.ui-docker-tag-textbox }}" != '' ] && UI_DOCKER_TAG_NAME=${{ github.event.inputs.ui-docker-tag-textbox }}
+
+        echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+        echo UI_DOCKER_TAG_NAME=$UI_DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+        echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
+        echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
+
+    - name: docker compose up
+      env:
+        GATEWAY_NAME: alp-minerva-gateway-1
+      run: |
+        echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
+
+        # customize dc.yml
+        yq -i '.services.alp-local-ui-file-server.image="alpcr.azurecr.io/alp-data-node/alp-local-ui-file-server:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
+        yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
+
+        # Run ALP services
+        yarn remote:minerva up --remove-orphans --force-recreate --wait --pull always
+        EXIT_CODE=$?
+          
+        if [ "$( docker container inspect -f '{{.State.Status}}' $GATEWAY_NAME )" = "running" ]; then
+          echo open https://$CADDY__ALP__PUBLIC_FQDN/portal/index.html | tee -a $GITHUB_STEP_SUMMARY
+          echo | tee -a $GITHUB_STEP_SUMMARY
+        fi
+
+        yarn base:minerva ps --format "{{.Names}} {{.Status}}" 2> /dev/null | grep ^alp | tee -a $GITHUB_STEP_SUMMARY
+        echo | tee -a $GITHUB_STEP_SUMMARY
+
+        if [ $EXIT_CODE != 0 ]; then
+          echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
+          exit $EXIT_CODE
+        fi
+
+    - name: Logs minerva
+      if: success() || failure()
+      run: |
+        yarn logs:minerva

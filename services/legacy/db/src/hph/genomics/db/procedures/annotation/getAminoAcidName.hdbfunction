@@ -1,0 +1,63 @@
+FUNCTION "hc.hph.genomics.db.procedures.annotation::getAminoAcidName" (
+	 aminoAcid String,
+	 format String ) RETURNS aminoAcidName String LANGUAGE SQLSCRIPT SQL SECURITY INVOKER AS 
+BEGIN 
+if UPPER(:format)= 'THREE' then
+  if UPPER(:aminoAcid) = 'A'
+    then aminoAcidName ='Ala' ;
+   elseif UPPER(:aminoAcid) = 'B'
+     then aminoAcidName ='Asx' ;    
+   elseif UPPER(:aminoAcid) = 'C'
+     then aminoAcidName ='Cys' ;
+   elseif UPPER(:aminoAcid) = 'D'
+    then aminoAcidName ='Asp' ;
+   elseif UPPER(:aminoAcid) = 'E'
+    then aminoAcidName ='Glu' ;
+   elseif UPPER(:aminoAcid) = 'F'
+    then aminoAcidName ='Phe' ;
+   elseif UPPER(:aminoAcid) = 'G'
+    then aminoAcidName ='Gly' ;
+   elseif UPPER(:aminoAcid) = 'H'
+    then aminoAcidName ='His' ;
+   elseif UPPER(:aminoAcid) = 'I'
+    then aminoAcidName ='Ile' ;
+   elseif UPPER(:aminoAcid) = 'K'
+    then aminoAcidName ='Lys' ;
+   elseif UPPER(:aminoAcid) = 'L'
+    then aminoAcidName ='Leu' ;
+   elseif UPPER(:aminoAcid) = 'M'
+    then aminoAcidName ='Met' ;
+   elseif UPPER(:aminoAcid) = 'N'
+    then aminoAcidName ='Asn' ;
+   elseif UPPER(:aminoAcid) = 'P'
+    then aminoAcidName ='Pro' ;
+   elseif UPPER(:aminoAcid) = 'Q'
+    then aminoAcidName ='Gln' ;
+   elseif UPPER(:aminoAcid) = 'R'
+    then aminoAcidName ='Arg' ;
+   elseif UPPER(:aminoAcid) = 'S'
+    then aminoAcidName ='Ser' ;
+   elseif UPPER(:aminoAcid) = 'T'
+    then aminoAcidName ='Thr' ;
+   elseif UPPER(:aminoAcid) = 'U'
+    then aminoAcidName ='Sec' ;
+   elseif UPPER(:aminoAcid) = 'V'
+    then aminoAcidName ='Val' ;
+   elseif UPPER(:aminoAcid) = 'W'
+    then aminoAcidName ='Trp' ;
+   elseif UPPER(:aminoAcid) = 'X'
+    then aminoAcidName ='Xaa' ;
+   elseif UPPER(:aminoAcid) = 'Y'
+    then aminoAcidName ='Tyr' ;
+   elseif UPPER(:aminoAcid) = 'Z'
+    then aminoAcidName ='Glx' ;
+   elseif UPPER(:aminoAcid) = '*'
+    then aminoAcidName ='*' ;   
+   elseif UPPER(:aminoAcid) = '.'
+    then aminoAcidName ='*' ;  
+   end if;    
+else 
+aminoAcidName =aminoAcid ;
+ end if ;
+ 
+END;

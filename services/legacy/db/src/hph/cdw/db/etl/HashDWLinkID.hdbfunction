@@ -1,0 +1,22 @@
+FUNCTION "hc.hph.cdw.db.etl::HashDWLinkID" ( Source1 NVARCHAR(5), BusinessKey1 NVARCHAR( 1024 ), Source2 NVARCHAR(5), BusinessKey2 NVARCHAR( 1024 ) ) 
+    RETURNS DWLinkID VARBINARY( 32 )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER AS    
+BEGIN
+    
+    DECLARE RawDWID NVARCHAR(212);
+    DECLARE UniqueSource NVARCHAR(10) := RPAD( :Source1, 5, ' ' );    
+        
+    IF :Source1 <> :Source2 THEN
+        UniqueSource := RPAD( :Source1, 5, ' ' ) || RPAD( :Source2, 5, ' ' );
+    END IF;        
+    
+    RawDWID := :UniqueSource || NCHAR( LENGTH( :BusinessKey1 ) + 1 ) || NCHAR( 0 ) || :BusinessKey1 || :BusinessKey2;    
+    
+    IF LENGTH( :RawDWID ) < 32 THEN
+        DWLinkID := TO_BINARY( :RawDWID );
+    ELSE        
+        DWLinkID := HASH_SHA256( TO_BINARY( :RawDWID ) );
+    END IF;
+    
+END;

@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+  postgres:
+    image: postgres:11
+    container_name: postgres-integration-test
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "Toor1234"
+      POSTGRES_DB: "alp"
+    ports:
+      - 35432:5432
+    volumes:
+      - ./test-migrations:/docker-entrypoint-initdb.d
+
+  pg-config:
+    build: ../mri-pg-config
+    container_name: mri-pg-config
+    environment:
+      PG_HOST: "host.docker.internal"
+      PG_PORT: 35432
+      PG_DATABASE: "alp"
+      PG_USER: "postgres"
+      PG_PASSWORD: "Toor1234"
+      PG_ADMIN_USER: "postgres"
+      PG_ADMIN_PASSWORD: "Toor1234"
+      PG_SCHEMA: "cdw_test_schema"
+      PG_MIN_POOL: 2
+      PG_MAX_POOL: 10
+      PG_DEBUG: 1
+      NODE_ENV: "development"
+    depends_on:
+      - "postgres"

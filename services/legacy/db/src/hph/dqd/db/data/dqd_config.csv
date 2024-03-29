@@ -1,0 +1,21 @@
+1|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Patient_Key|PatientsNotAssociatedtoInteractions|PatientsNotAssociatedtoInteractionsDescription|COUNT(*)|where "Int_PatientID" is null|Patients|DATAQUALITY|ALP
+2|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Patient_Key|PatientKeysWithoutAttributes|PatientKeysWithoutAttributesDescription|COUNT(*)|where "Pat_PatientID" is null|Patients|DATAQUALITY|ALP
+3|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Patients|PatientAttributesWithoutKeys|PatientAttributesWithoutKeysDescription|COUNT(*)|where "PatKey_PatientID" is null|Patients|DATAQUALITY|ALP
+4|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Patients|PatientCount|PatientCountDescription|COUNT(*)||Patients|INFO|ALP
+5|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.InteractionPatientLink|InteractionsNotAssociatedToPatients|InteractionsNotAssociatedToPatientsDescription|COUNT(*)|where "Pat_PatientID" IS NULL|Interactions|DATAQUALITY|ALP
+6|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interactions|InteractionsNotAssociatedToDetailsAndMeasures|InteractionsNotAssociatedToDetailsAndMeasuresDescription|COUNT(*)|where "IntDetails_DWID" IS NULL and "IntMeasures_DWID" IS NULL|Interactions|DATAQUALITY|ALP
+7|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interactions|InteractionsWithoutType|InteractionsWithoutTypeDescription|COUNT(*)|where "InteractionTypeValue" IS NULL|Interactions|DATAQUALITY|ALP
+8|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interactions|InteractionCount|InteractionCountDescription|COUNT(DISTINCT "InteractionID")||Interactions|INFO|ALP
+9|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interaction_Details|InteractionDetailsWithoutInteractions|InteractionDetailsWithoutInteractionsDescription|COUNT(*)|where "Int_InteractionID" is null|InteractionDetails|DATAQUALITY|ALP
+10|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interaction_Details|InteractionDetailsWithoutType|InteractionDetailsWithoutTypeDescription|COUNT(*)|where "AttributeValue" IS NULL|InteractionDetails|DATAQUALITY|ALP
+11|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interaction_Details|InteractionDetailsWithoutValue|InteractionDetailsWithoutValueDescription|COUNT(*)|where "Value" IS NULL|InteractionDetails|DATAQUALITY|ALP
+12|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interaction_Details|InteractionDetailsCount|InteractionDetailsCountDescription|COUNT(*)||InteractionDetails|INFO|ALP
+13|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interaction_Measures|InteractionMeasuresWithoutType|InteractionMeasuresWithoutTypeDescription|COUNT(*)|where "AttributeValue" IS NULL|InteractionMeasures|DATAQUALITY|ALP
+14|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interaction_Measures|InteractionMeasuresWithoutValue|InteractionMeasuresWithoutValueDescription|COUNT(*)|where "Value" IS NULL|InteractionMeasures|DATAQUALITY|ALP
+15|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interaction_Measures|InteractionMeasuresWithoutUnit|InteractionMeasuresWithoutUnitDescription|COUNT(*)|where "Unit" IS NULL|InteractionMeasures|DATAQUALITY|ALP
+16|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interaction_Measures|InteractionMeasuresNotAssociatedToInteractions|InteractionMeasuresNotAssociatedToInteractionsDescription|COUNT(*)|where "Int_InteractionID" IS NULL|InteractionMeasures|DATAQUALITY|ALP
+17|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Interaction_Measures|InteractionMeasuresCount|InteractionMeasuresCountDescription|COUNT(*)||InteractionMeasures|INFO|ALP
+18|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Documents|DocumentsWithoutInteractions|DocumentsWithoutInteractionsDescription|COUNT(*)|where "Int_DocumentID" is null|Documents|DATAQUALITY|ALP
+19|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.Documents|DocumentCount|DocumentCountDescription|COUNT(*)||Documents|INFO|ALP
+20|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.GenomicsAltHetero|GenomicsAlternateHeterozygousGenotypes|GenomicsAlternateHeterozygousGenotypesDescription|COUNT(*)||Genomics|INFO|ALP
+21|CDW|CDMDEFAULT|hc.hph.dqd.db.models::DQDCdwViews.GenomicsMultiallelic|GenomicsMultiallelicSites|GenomicsMultiallelicSitesDescription|COUNT(*)||Genomics|INFO|ALP

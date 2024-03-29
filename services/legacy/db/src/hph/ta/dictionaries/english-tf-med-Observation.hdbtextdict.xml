@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dictionary xmlns="http://www.com/ta/4.0">
+
+<entity_category name="OBSERVATION_PERFORMANCESTATUS">
+
+    <!-- ECOG -->
+    <!-- CUI : C3714786 -->
+	<entity_name standard_form="ECOG">
+		<variant name="ecog"/>
+		<variant name="oms"/>
+		<variant name="score oms"/>
+		<!--variant name="who"/-->
+		<variant name="who score"/>
+		<variant name="zubrod"/>
+		<variant name="Zubrod Score" />
+		<variant name="Zubrod Score Performance Status" />
+		<variant name="Zubrod Performance Status" />
+		<variant name="ECOG Performance Status" />
+		<variant name="ECOG Score" />
+		<variant name="PS" />
+	</entity_name>
+    
+    
+    <!-- Karnofsky -->
+    <!-- CUI : C0206065 -->
+	<entity_name standard_form="KPS">
+		<variant name="index de karnofski"/>
+		<variant name="index de karnofsky"/>
+		<variant name="index de karnovski"/>
+		<variant name="index de karnovsky"/>
+		<variant name="index karnofski"/>
+		<variant name="index karnofsky"/>
+		<variant name="index karnovski"/>
+		<variant name="index karnovsky"/>
+		<variant name="indice de karnofski"/>
+		<variant name="indice de karnofsky"/>
+		<variant name="indice de karnovski"/>
+		<variant name="indice de karnovsky"/>
+		<variant name="indice karnofski"/>
+		<variant name="indice karnofsky"/>
+		<variant name="indice karnovski"/>
+		<variant name="indice karnovsky"/>
+		<variant name="karnofski"/>
+		<variant name="karnofsky"/>
+		<variant name="karnovski"/>
+		<variant name="karnovsky"/>
+        	<variant name="Karnofsky index" />
+        	<variant name="Karnofsky performance status scale" />
+        	<variant name="Karnofsky scale" />
+        	<variant name="Karnofsky performance status" />
+		<variant name="KPS" />
+		<variant name="KI" />
+	</entity_name>
+
+    <!-- Lansky -->
+	<entity_name standard_form="LANSKY">
+        	<variant name="lansky"/>
+        	<variant name="lansky play"/>
+        	<variant name="lansky play index"/>
+        	<variant name="lansky play-performance status"/>
+        	<variant name="lansky play performance status"/>
+        	<variant name="lansky play performance status scale"/>
+        	<variant name="lansky index"/>
+        	<variant name="lansky scale"/>
+        	<variant name="lansky performance status"/>
+        	<variant name="lansky performance status scale"/>
+	</entity_name>
+    
+</entity_category>
+</dictionary>
+

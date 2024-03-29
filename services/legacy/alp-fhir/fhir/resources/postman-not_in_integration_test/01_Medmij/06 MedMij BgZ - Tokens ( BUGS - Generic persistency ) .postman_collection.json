@@ -1,0 +1,793 @@
+{
+	"info": {
+		"_postman_id": "4dbe0c61-5443-4b16-a004-b69764b64308",
+		"name": "Demo MedMij BgZ - Tokens( Bugs)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "lastn operation with multiple wrong code values",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5579aa3d-c875-4bb0-9c63-45ffed1a028a",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Response does not include string 'medmij-vitalsigns-bodyheight-01'\", function () {",
+							"    pm.expect(pm.response.text()).not.to.include(\"medmij-vitalsigns-bodyheight-01\");",
+							"});",
+							"",
+							"pm.test(\"Body is empty\", function () {",
+							"    pm.expect(pm.response.text()).match(/[(entry)]\\\"\\:\\[\\]/);",
+							"});",
+							"",
+							"pm.test(\"Count is 0\", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.total).to.be.a('number')",
+							"    pm.expect(jsonData.total).to.match(/[0]/)",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation/$lastn?patient.identifier=999911338&code=http://loinc.org|8302-22,http://loinc.org|8306-33,http://loinc.org|8308-99",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation",
+						"$lastn"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "999911338"
+						},
+						{
+							"key": "code",
+							"value": "http://loinc.org|8302-22,http://loinc.org|8306-33,http://loinc.org|8308-99"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "lastn operation with multiple code values",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c086157c-fff0-42dd-b991-6fe9960a520a",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"medmij-vitalsigns-bodyheight-01\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation/$lastn?patient.identifier=999911338&code=http://loinc.org|8302-2,http://loinc.org|8306-3,http://loinc.org|8308-9",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation",
+						"$lastn"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "999911338"
+						},
+						{
+							"key": "code",
+							"value": "http://loinc.org|8302-2,http://loinc.org|8306-3,http://loinc.org|8308-9"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "lastn on observation & category",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8559456f-358f-472c-887a-aaf28987fe00",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"snomed275711006\");",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"http://snomed.info/sct\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation/$lastn?patient.identifier=999911338&category=http://snomed.info/sct|275711006",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation",
+						"$lastn"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "999911338"
+						},
+						{
+							"key": "category",
+							"value": "http://snomed.info/sct|275711006"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "lastn on observation & wrong category value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7e921ba0-781e-417d-a2f9-d11594c08cdd",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Response does not include string 'snomed275711006'\", function () {",
+							"    pm.expect(pm.response.text()).not.to.include(\"snomed275711006\");",
+							"});",
+							"",
+							"pm.test(\"Body is empty\", function () {",
+							"    pm.expect(pm.response.text()).match(/[(entry)]\\\"\\:\\[\\]/);",
+							"});",
+							"",
+							"pm.test(\"Count is 0\", function () {",
+							"    var jsonData = pm.response.json()",
+							"    pm.expect(jsonData.total).to.be.a('number')",
+							"    pm.expect(jsonData.total).to.match(/[0]/)",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation/$lastn?patient.identifier=999911338&category=http://snomed.info/sct|27571100611",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation",
+						"$lastn"
+					],
+					"query": [
+						{
+							"key": "patient.identifier",
+							"value": "999911338"
+						},
+						{
+							"key": "category",
+							"value": "http://snomed.info/sct|27571100611"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get any condition with code using :in ( encoded url ) wrong code",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "692cca56-18f4-4f40-bd5f-8ae38bd2b7b6",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Response does not include string 'Moderate'\", function () {",
+							"    pm.expect(pm.response.text()).not.to.include(\"Moderate\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response does not include string 'Heart valve disorder'\", function () {",
+							"    pm.expect(pm.response.text()).not.to.include(\"Heart valve disorder\");",
+							"});",
+							"",
+							"pm.test(\"Response does not include string 'Cardiac chest pain'\", function () {",
+							"    pm.expect(pm.response.text()).not.to.include(\"Cardiac chest pain\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Condition?code:in=http%3A%2F%2Fhl7.org%2Ffhir%2Fv2%2F00789",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Condition"
+					],
+					"query": [
+						{
+							"key": "code:in",
+							"value": "http%3A%2F%2Fhl7.org%2Ffhir%2Fv2%2F00789"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get any observation with wrong  code using :in",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "214d7bea-a4fe-4dda-9733-af1598ce3d2c",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Response does not include string 'http://hl7.org/fhir/v2/0078'\", function () {",
+							"    pm.expect(pm.response.text()).not.to.include(\"http://hl7.org/fhir/v2/0078\");",
+							"});",
+							"",
+							"",
+							"",
+							"pm.test(\"Response does not include string 'T. van Beek'\", function () {",
+							"    pm.expect(pm.response.text()).not.to.include(\"T. van Beek\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation?code:in=http://hl7.org/fhir/v2/00789",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "code:in",
+							"value": "http://hl7.org/fhir/v2/00789"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation : multiple include",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f892f8f8-3395-41b2-9c2c-b1a511feb186",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"http://hl7.org/fhir/v2/0078\");",
+							"});",
+							"",
+							"",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"http://fhir.nl/fhir/NamingSystem/agb-z\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation?_include=Observation:subject&_include=Observation:performer",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "_include",
+							"value": "Observation:subject"
+						},
+						{
+							"key": "_include",
+							"value": "Observation:performer"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation : Single recurse include",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9a73a742-14bd-4180-8c99-51a2c7f9a67d",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/MedicationDispense?_include=MedicationDispense:authorizingPrescription&_include:recurse=MedicationRequest:requester",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"MedicationDispense"
+					],
+					"query": [
+						{
+							"key": "_include",
+							"value": "MedicationDispense:authorizingPrescription"
+						},
+						{
+							"key": "_include:recurse",
+							"value": "MedicationRequest:requester"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation : Single revinclude",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "99647933-daa6-4834-ab5e-32558dcd6b18",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Hematology test (procedure)\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation?_reinclude=DiagnosticReport:result",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "_reinclude",
+							"value": "DiagnosticReport:result"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check for Obsevation using datetime equal operator",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1442faff-efb0-4efc-ac77-d08b45d49145",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Should not include 2013-04-03T15:30:10+01:00 against 'issued' attribute \", function () {",
+							"    pm.expect(pm.response.text()).not.to.include(\"2013-04-03T15:30:10+01:00\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/DiagnosticReport?issued=ge2017-05-15T19:32:52+01:00",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"DiagnosticReport"
+					],
+					"query": [
+						{
+							"key": "issued",
+							"value": "ge2017-05-15T19:32:52+01:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check for Obsevation using datetime less then (le)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f81df373-8d1d-4782-80f8-fb8ecb0ba7b3",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Should not include 2017-05-15T10:30:10+01:00 against 'issued' attribute \", function () {",
+							"    pm.expect(pm.response.text()).not.to.include(\"2017-05-15T10:30:10+01:00\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation?issued=le2013-04-03T15:30:10+01:00",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "issued",
+							"value": "le2013-04-03T15:30:10+01:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all observation using Chained parameters",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "faa2dce8-7746-4b7e-9c66-8eb06de34ad8",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"T. van Beek\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{medmij_endpoint}}/fhir/Observation?subject.name=T. van Beek",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{medmij_endpoint}}",
+						"fhir",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "subject.name",
+							"value": "T. van Beek"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,45 @@
+VIEW "hc.hph.plugins.ccdi.internal.projects.ish.db.models::V_Diagnosis" ( 
+"_ProcessingMode",
+"OrgID", 
+"InteractionID", 
+"PatientID", 
+"InteractionType.OriginalValue", 
+"PeriodStart", 
+"PeriodEnd", 
+"AdmissionDiagInd",
+"TreatmentDiagInd",
+"DiagnosticCertainty",
+"DiagnosisTime",
+"FreeTextDiag",
+"IdKeyDiagCodingCat",
+"DiagnosisCode",
+"DischargeDiagInd",
+"ReferralDiagInd",
+"HospitalMainDiagInd",
+"SurgeryDiagInd") AS SELECT 
+    case when STORN = 'X' then 'D' else null end as "_ProcessingMode",
+    'ISH_' || case when FALAR in ('1','3') THEN ORGFA ELSE ORGPF END as "OrgID",
+    EINRI || FALNR || LFDNR || 'DIA' as "InteractionID",
+    PATNR as "PatientID",
+    'ISH_DIAGNOSIS' as "InteractionType.OriginalValue",
+    CASE
+    WHEN DIADT is not null AND LTRIM(RTRIM(DIADT)) <> '' AND DIADT <> '00000000'
+    THEN to_timestamp(to_date(trim(DIADT)) || ' ' || to_time(trim(DIAZT)))
+    END as "PeriodStart",
+    CASE
+    WHEN DIADT is not null AND LTRIM(RTRIM(DIADT)) <> '' AND DIADT <> '00000000'
+    THEN to_timestamp(to_date(trim(DIADT)) || ' ' || to_time(trim(DIAZT)))
+    END as "PeriodEnd",
+    AFDIA as "AdmissionDiagInd",          -- Admission Diagnosis Indicator    
+    BHDIA as "TreatmentDiagInd",          -- Treatment Diagnosis Indicator
+    DIAGW as "DiagnosticCertainty",       -- Diagnostic Certainty
+    DIAZT as "DiagnosisTime",             -- Diagnosis Time
+    DITXT as "FreeTextDiag",              -- Free Text for Diagnosis
+    DKAT1 as "IdKeyDiagCodingCat",        -- Identification Key of Diagnosis Coding Catalog
+    DKEY1 as "DiagnosisCode",             -- Diagnosis Code
+    ENDIA as "DischargeDiagInd",          -- Discharge Diagnosis Indicator
+    EWDIA as "ReferralDiagInd",           -- Referral Diagnosis Indicator
+    FHDIA as "HospitalMainDiagInd",       -- Hospital Main Diagnosis Indicator
+    KHDIA as "SurgeryDiagInd"             -- Surgery Diagnosis Indicator
+from "hc.hph.plugins.ccdi.internal.projects.ish.db.models::Diagnosis"
+where trim(DIAZT)is not null and length(trim(DIAZT)) > 0 and trim(DIADT) <> '00000000' WITH READ ONLY

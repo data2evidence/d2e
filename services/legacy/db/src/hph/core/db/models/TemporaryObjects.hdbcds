@@ -1,0 +1,12 @@
+namespace hc.hph.core.db.models;
+
+
+context TemporaryObjects
+{
+
+	table type ObjectList
+	{
+        ObjectName : String(5000);
+	};
+
+}

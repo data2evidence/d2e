@@ -1,0 +1,167 @@
+
+!!entity name = DiseaseStatus
+!!sub-entities = Progression, Regression, Remission, Stable
+
+!!French keywords:
+!!Progression = progresser, progression
+!!Regression = réponse, réponse partielle, régresser, régression
+!!Remission: réponse totale
+!!Stable; stable, stabilité
+
+
+
+!! STATUS: PROGRESSION
+#subgroup progression_modifier: {
+    <localisée>
+    | <massive>
+    | <lente>
+    | <\p{di}(polymétastatique)>
+    | <STEM:métastatique>
+    | <de> <la> <maladie>
+}
+
+#subgroup modifier_progression: {
+    <STEM:de> <STEM:allure>
+    | <STEM:reprise>
+}
+
+#subgroup OD_Progression__disease: {
+    [OD Progression] (
+        <STEM:progression> %(progression_modifier)?
+        | <STEM:évolution> %(progression_modifier)?
+        | %(modifier_progression)? <STEM:évolutif>
+    ) [/OD]
+}
+
+#subgroup disease__OD_Progression: {
+    [OD Progression] (
+        %(modifier_progression)? <STEM:évolutif>
+        | <en|avec>? <STEM:(évolutivité|évolution|rechute|progression)> %(progression_modifier)?
+    ) [/OD]
+}
+
+
+
+
+!! STATUS: REMISSION
+#subgroup OD_Remission: {
+    [OD Remission] (
+        <STEM:rémission>
+    ) [/OD]
+}
+
+!! STATUS:  REGRESSION
+#subgroup modifier_regression: {
+    <\p{ci}(bonne)>
+}
+
+#subgroup regression_modifier: {
+    <\p{ci}(métabolique)> <\p{ci}(partielle)>
+    | <STEM:de,POS:Prep> ( <POS:Num> <\%> | <[0-9]+\%> )
+}
+
+#subgroup OD_Regression__disease: {
+    [OD Regression] (
+        <\p{ci}(réponse|régression)> %(regression_modifier)?
+        | <\p{ci}(régression)>
+        | %(modifier_regression) <\p{ci}(réponse)>
+    ) [/OD]
+}
+
+#subgroup disease__OD_Regression: {
+    [OD Regression] (
+        <STEM:évolution> <STEM:favorable>
+        | <STEM:régresser>
+        | <STEM:régression>
+    ) [/OD]
+}
+
+
+
+!! STATUS: STABLE
+#subgroup stable_modifier: {
+    <en> <taille>
+}
+
+#subgroup disease__OD_Stable: {
+    [OD Stable] (
+        <STEM:stable,POS:Adj> %(stable_modifier)?
+        | <stabilisée?s?>
+    ) [/OD]
+}
+
+#subgroup OD_Stable__disease: {
+    [OD Stable] (
+        <STEM:stabilité> %(stable_modifier)?
+    ) [/OD]
+}
+
+
+
+!! STATUS: (main)
+#subgroup disease__OD_Status: {
+    %(disease__OD_Stable)
+    | %(OD_Remission)
+    | %(disease__OD_Progression)
+    | %(disease__OD_Regression)
+}
+
+#subgroup OD_Status__disease: {
+    %(OD_Stable__disease)
+    | %(OD_Progression__disease)
+    | %(OD_Regression__disease)
+}
+
+
+!!!!!!!!!!!!!!!!
+!! Disease
+#subgroup disease_modifier: {
+    (
+     <de>? <grade> <>
+    | <POS:Adj>
+    | <POS:Prep> <POS:Det>? <POS:Nn>+
+    | <POS:Prop> 
+    | <POS:Nn>
+    )+
+}
+
+#subgroup modifier_disease: {
+    <POS:Adj>
+}
+
+#subgroup TE_med_DIS: [TE CONDITION] <>+ [/TE]
+
+#subgroup OD_Disease__status: [OD Condition] %(TE_med_DIS) [/OD] %(disease_modifier)?
+
+#subgroup status__OD_Disease: %(modifier_disease)? [OD Condition] %(TE_med_DIS) [/OD]
+
+
+
+!!!!!!!!!!!
+!! LINKS
+#subgroup disease__status: {
+    <\,> 
+    | <STEM:(rester|restant)>
+    | <POS:Pron> <STEM:être> <POS:Adv>?
+    | <POS:Adv>
+    | <STEM:être>? <en> (<cours> <STEM:de,POS:Prep>)?
+    | <continue> <POS:Prep>
+    | <POS:Prep> 
+}
+
+#subgroup status__disease: {
+    (<au> <niveau> <POS:Adj>?)?
+    <POS:Prep>? <POS:Det>?
+}
+
+
+
+!!!!!!!!!!!!!!!!!
+!! DiseaseStatus
+#group Condition_ClinicalStatus: {
+    !! Disease >> Status
+    %(OD_Disease__status) %(disease__status)?  %(disease__OD_Status)
+    !! Status >> Diseasse
+    | %(OD_Status__disease)  %(status__disease)?  %(status__OD_Disease)
+}
+

@@ -1,0 +1,111 @@
+{
+	"id": "hcimscenario",
+	"resourceType": "ScenarioDefinition",
+	"category": "catalog",
+	"capabilities": {
+		"reference": "bgz2017-servercapabilities"
+	},
+	"deployment": [
+		{
+			"scope": "base",
+			"permission": [
+				{
+					"reference": "HCIMPatientGroupPermission"
+				}
+			],
+			"role": [
+				{
+					"reference": "HCIM_MRI_ACCESS_ROLE"
+				}
+			],
+			"persistency": [
+				{
+					"configuration": [
+						"permanent"
+					],
+					"definition": {
+						"reference": "HCIM_PATIENT"
+					}
+				},
+				{
+					"configuration": [
+						"permanent"
+					],
+					"definition": {
+						"reference": "CODED_PATIENT"
+					}
+				},
+				{
+					"configuration": [
+						"permanent"
+					],
+					"definition": {
+						"reference": "HCIM_PATIENT_IDENTIFICATION"
+					}
+				},
+				{
+					"configuration": [
+						"permanent"
+					],
+					"definition": {
+						"reference": "HCIM_PATIENT_NAME_INFORMATION"
+					}
+				},
+				{
+					"configuration": [
+						"permanent"
+					],
+					"definition": {
+						"reference": "HCIM_PATIENT_ADDRESS_INFORMATION"
+					}
+				},
+				{
+					"configuration": [
+						"permanent"
+					],
+					"definition": {
+						"reference": "HCIM_BODYWEIGHT"
+					}
+				}
+			],
+			"catalog": [
+				{
+					"reference": "patient_catalog"
+				},
+				{
+					"reference": "bodyweight_catalog"
+				}
+			]
+		},
+		{
+			"scope": "test",
+			"data": [
+				{
+					"reference": "HCIM_PATIENT_DATA"
+				},
+				{
+					"reference": "HCIM_PATIENT_IDENTIFICATION_DATA"
+				},
+				{
+					"reference": "HCIM_PATIENT_ADDRESS_INFORMATION_DATA"
+				},
+				{
+					"reference": "HCIM_BODYWEIGHT_DATA"
+				}
+			]
+		}
+	],
+	"parameter": [
+		{
+			"name": "endpoint",
+			"type": "string",
+			"optional": false
+		},
+		{
+			"name": "schema",
+			"type": "string",
+			"optional": true,
+			"defValueString": "HCIM"
+		}
+	]
+}

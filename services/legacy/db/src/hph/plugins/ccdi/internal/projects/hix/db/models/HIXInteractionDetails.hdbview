@@ -1,0 +1,96 @@
+VIEW "hc.hph.plugins.ccdi.internal.projects.hix.db.models::HIXInteractionDetails" ( "DocumentID", "LastUpdated", "PatientID", "InteractionID", "InteractionDetailItem", "Key", "Value", "KeyCodeSystem", "KeyCodeSystemVersion", "KeyCodeValue", "ValCodeSystem", "ValCodeSystemVersion", "ValCodeValue", "OrgID", "Source", "SourceID" ) AS select  
+        INT."DocumentID" AS "DocumentID",
+		INT."LastUpdated" AS "LastUpdated",    
+        INT."PatientID" AS "PatientID",
+        INT."InteractionID" AS "InteractionID", 
+        INTDET."Item03" AS "InteractionDetailItem", 
+        INTDET_KEY_TEXT."Value05" AS "Key",
+        INTDET_VAL_TEXT."Value05" AS "Value",
+        INTDET_KEY_CS."Value05" AS "KeyCodeSystem",
+        INTDET_KEY_CSV."Value05" AS "KeyCodeSystemVersion",
+        INTDET_KEY_CV."Value05" AS "KeyCodeValue",
+        INTDET_VAL_CS."Value05" AS "ValCodeSystem",
+        INTDET_VAL_CSV."Value05" AS "ValCodeSystemVersion",
+        INTDET_VAL_CV."Value05" AS "ValCodeValue",
+		ORG."Value04" AS "OrgID",
+		ifnull(SYSTYPE."Value05",'<??>') || '-' || ifnull(PRODNAME."Value05",'<??>')  AS "Source",
+        DWSRC."SourceID" as "SourceID"
+		
+		FROM "hc.hph.plugins.ccdi.internal.projects.hix.db.models::HIXInteractions" AS INT
+        
+		-- consider for interaction_details only
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML03" AS INTDET
+		on INT."DocumentID" = INTDET."DocumentID" -- same doc
+		AND INT."InteractionItem" = INTDET."Item02" -- same interaction
+		and (INTDET."Value03") = 'interaction_detail'
+
+		-- get text of the key
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS INTDET_KEY_TEXT
+		on INTDET."DocumentID" = INTDET_KEY_TEXT."DocumentID" -- same doc
+		AND INTDET."Item03" = INTDET_KEY_TEXT."Item03" -- same interaction_detail
+		and (INTDET_KEY_TEXT."Value04") = 'key'
+		and (INTDET_KEY_TEXT."Key05") = 'text'
+
+		-- get text of the value
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS INTDET_VAL_TEXT
+		on INTDET."DocumentID" = INTDET_VAL_TEXT."DocumentID" -- same doc
+		AND INTDET."Item03" = INTDET_VAL_TEXT."Item03" -- same interaction_detail
+		and (INTDET_VAL_TEXT."Value04") = 'value'
+		and (INTDET_VAL_TEXT."Key05") = 'text'
+
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML04" AS ORG
+		on INT."DocumentID" = ORG."DocumentID"   
+		AND ORG."Value00" = 'hix_clinical_document' 
+		AND ORG."Value01" = 'message_header' 
+		AND ORG."Value02" = 'sender' 
+		AND ORG."Value03" = 'sender_location_code' 
+   
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS SYSTYPE
+		on SYSTYPE."DocumentID" = ORG."DocumentID" 
+		AND SYSTYPE."Item02" = ORG."Item02" 
+		AND SYSTYPE."Value03" = 'system' 
+		AND SYSTYPE."Value04" = 'system_type'
+		
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS PRODNAME
+		on SYSTYPE."DocumentID" = PRODNAME."DocumentID" 
+		AND SYSTYPE."Item03" = PRODNAME."Item03" 	
+		AND PRODNAME."Value04" = 'product_name'
+
+		-- get code_system of the key
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS INTDET_KEY_CS
+		on INTDET_KEY_TEXT."DocumentID" = INTDET_KEY_CS."DocumentID" -- same doc
+		AND INTDET_KEY_TEXT."Item04" = INTDET_KEY_CS."Item04" -- same key
+		and (INTDET_KEY_CS."Key05") = 'code_system'
+
+		-- get code_system_version of the key
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS INTDET_KEY_CSV
+		on INTDET_KEY_TEXT."DocumentID" = INTDET_KEY_CSV."DocumentID" -- same doc
+		AND INTDET_KEY_TEXT."Item04" = INTDET_KEY_CSV."Item04" -- same key
+		and (INTDET_KEY_CSV."Key05") = 'code_system_version'
+
+		-- get code_value of the key
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS INTDET_KEY_CV
+		on INTDET_KEY_TEXT."DocumentID" = INTDET_KEY_CV."DocumentID" -- same doc
+		AND INTDET_KEY_TEXT."Item04" = INTDET_KEY_CV."Item04" -- same key
+		and (INTDET_KEY_CV."Key05") = 'code_value'
+
+		-- get code_system of the value
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS INTDET_VAL_CS
+		on INTDET_VAL_TEXT."DocumentID" = INTDET_VAL_CS."DocumentID" -- same doc
+		AND INTDET_VAL_TEXT."Item04" = INTDET_VAL_CS."Item04" -- same key
+		and (INTDET_VAL_CS."Key05") = 'code_system'
+
+		-- get code_system_version of the value
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS INTDET_VAL_CSV
+		on INTDET_VAL_TEXT."DocumentID" = INTDET_VAL_CSV."DocumentID" -- same doc
+		AND INTDET_VAL_TEXT."Item04" = INTDET_VAL_CSV."Item04" -- same key
+		and (INTDET_VAL_CSV."Key05") = 'code_system_version'
+
+		-- get code_value of the value
+		LEFT join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS INTDET_VAL_CV
+		on INTDET_VAL_TEXT."DocumentID" = INTDET_VAL_CV."DocumentID" -- same doc
+		AND INTDET_VAL_TEXT."Item04" = INTDET_VAL_CV."Item04" -- same key
+		and (INTDET_VAL_CV."Key05") = 'code_value'
+
+        LEFT JOIN "hc.hph.di.model::DataIntegration.DISource" DWSRC
+        ON DWSRC."Name" = ORG."Value04" || '::' || SYSTYPE."Value05" || '-' || PRODNAME."Value05" WITH READ ONLY

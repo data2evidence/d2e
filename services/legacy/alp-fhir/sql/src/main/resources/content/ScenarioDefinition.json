@@ -1,0 +1,399 @@
+{
+	"resourceType": "StructureDefinition",
+	"id": "ScenarioDefinition",
+	"url": "http://data4life.care/health/fhir/StructureDefinition/ScenarioDefinition",
+	"kind": "resource",
+	"name": "ScenarioDefinition",
+	"test": {
+		"div": "<div>Defines a Scenario which can be deployed on the Connected Health Platform</div>"
+	},
+	"type": "ScenarioDefinition",
+	"meta": {
+		"profile": [
+			"http://data4life.care/health/fhir/profile/StructureDefinition"
+		]
+	},
+	"extension": [
+		{
+			"uri": "http://data4life.care/health/fhir/extension/shortname",
+			"valueString": "ScenarioDefinition"
+		}
+	],
+	"snapshot": {
+		"element": [
+			{
+				"id": "ScenarioDefinition",
+				"path": "ScenarioDefinition",
+				"min": 0,
+				"max": "*"
+			},
+			{
+				"id": "ScenarioDefinition.id",
+				"short": "Logical id of this artifact",
+				"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+				"comment": "The only time that a resource does not have an id is when it is being submitted to the server using a create operation.",
+				"min": 0,
+				"max": "1",
+				"base": {
+					"path": "Resource.id",
+					"min": 0,
+					"max": "1"
+				},
+				"type": [
+					{
+						"code": "id"
+					}
+				],
+				"isSummary": true
+			},
+			{
+				"id": "ScenarioDefinition.url",
+				"short": "Canonical URL of this scenario definition",
+				"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+				"comment": "The only time that a resource does not have an id is when it is being submitted to the server using a create operation.",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "uri"
+					}
+				],
+				"isSummary": true
+			},
+			{
+				"id": "ScenarioDefinition.version",
+				"short": "Canonical Version of this scenario definition",
+				"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+				"comment": "The only time that a resource does not have an id is when it is being submitted to the server using a create operation.",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				],
+				"isSummary": true
+			},
+			{
+				"id": "ScenarioDefinition.category",
+				"path": "ScenarioDefinition.category",
+				"short": "catalog | generic",
+				"definition": "The category of a definition determines the persistence mechanism",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "code"
+					}
+				],
+				"isSummary": true,
+				"binding": {
+					"strength": "required",
+					"description": "The persistence category of this Scenario Definition.",
+					"valueSetReference": {
+						"reference": "http://data4life.care/health/fhir/ValueSet/ScenarioCategory"
+					}
+				}
+			},
+			{
+				"id": "ScenarioDefinition.capabilities",
+				"path": "ScenarioDefinition.capabilities",
+				"short": "Capability Statement for this scenario",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://hl7.org/fhir/StructureDefinition/CapabilityStatement"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.patientEverything",
+				"path": "ScenarioDefinition.patientEverything",
+				"short": "Definition of elements shall be returned in Patient.everything operation",
+				"min": "0",
+				"max": "*",
+				"type": [
+					{
+						"code": "BackboneElement"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.patientEverything.definition",
+				"path": "ScenarioDefinition.patientEverything.definition",
+				"short": "Definition of elements shall be returned in Patient.everything operation",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://hl7.org/fhir/StructureDefinition/StructureDefinition"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.patientEverything.element",
+				"path": "ScenarioDefinition.patientEverything.element",
+				"short": "Definition of elements shall be returned in Patient.everything operation",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.patientEverything.dateElement",
+				"path": "ScenarioDefinition.patientEverything.dateElement",
+				"short": "The date element will be used to filter following the start and end parameter",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.patientEverything.deep",
+				"path": "ScenarioDefinition.patientEverything.deep",
+				"short": "Definition of elements shall be returned in Patient.everything operation",
+				"min": "0",
+				"max": "*",
+				"type": [
+					{
+						"code": "BackboneElement"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.patientEverything.deep.definition",
+				"path": "ScenarioDefinition.patientEverything.deep.definition",
+				"short": "Definition of elements shall be returned in Patient.everything operation",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://hl7.org/fhir/StructureDefinition/StructureDefinition"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.patientEverything.deep.element",
+				"path": "ScenarioDefinition.patientEverything.deep.element",
+				"short": "Definition of elements shall be returned in Patient.everything operation",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.patientEverything.deep.dateElement",
+				"path": "ScenarioDefinition.patientEverything.deep.dateElement",
+				"short": "The date element will be used to filter following the start and end parameter",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.deployment",
+				"path": "ScenarioDefinition.deployment",
+				"short": "Deployment Descriptions",
+				"definition": "The deployment describes the resources to be deployed and actions to be performed",
+				"min": 0,
+				"max": "*",
+				"type": [
+					{
+						"code": "BackboneElement"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.deployment.scope",
+				"path": "ScenarioDefinition.deployment.scope",
+				"short": "Scope of this deployment scenario",
+				"definition": "Enables to apply filter for certain scope e.g. to deploy an endpoint including test artifacts",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.deployment.permission",
+				"path": "ScenarioDefinition.deployment.permission",
+				"short": "Permissions and Group mappings for this deployment",
+				"min": "1",
+				"max": "*",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://data4life.care/health/fhir/StructureDefinition/Permission"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.deployment.role",
+				"path": "ScenarioDefinition.deployment.role",
+				"short": "Roles for this deployment",
+				"min": "1",
+				"max": "*",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://data4life.care/health/fhir/StructureDefinition/Role"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.deployment.data",
+				"path": "ScenarioDefinition.deployment.data",
+				"short": "Data to be inserted",
+				"min": "1",
+				"max": "*",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://data4life.care/health/fhir/StructureDefinition/TableContent"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.deployment.persistency",
+				"path": "ScenarioDefinition.deployment.persistency",
+				"short": "Definitions for the persistence artifacts which are neededd for this scenario",
+				"min": "1",
+				"max": "*",
+				"type": [
+					{
+						"code": "BackboneElement"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.deployment.persistency.definition",
+				"path": "ScenarioDefinition.deployment.persistency.definition",
+				"short": "Definitions for the persistence artifacts which are neededd for this scenario",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://data4life.care/health/fhir/profile/Tabledefinition"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.deployment.persistency.configuration",
+				"path": "ScenarioDefinition.deployment.persistency.configuration",
+				"short": "staging|permanent|history",
+				"min": "1",
+				"max": "*",
+				"type": [
+					{
+						"code": "code"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.deployment.persistency.patientColumn",
+				"path": "ScenarioDefinition.deployment.persistency.configuration",
+				"short": "staging|permanent|history",
+				"min": "0",
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.deployment.catalog",
+				"path": "ScenarioDefinition.deployment.catalog",
+				"short": "Links the Catalog definitions of this scenario",
+				"min": "1",
+				"max": "*",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://data4life.care/health/fhir/StructureDefinition/CatalogDefinition"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.parameter",
+				"path": "ScenarioDefinition.parameter",
+				"short": "Parameters which have to be bound when creating a ScenarioImplementationRequest",
+				"definition": "Parameters which have to be bound when creating a ScenarioImplementationRequest",
+				"min": 1,
+				"max": "*",
+				"type": [
+					{
+						"code": "BackboneElement"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.parameter.name",
+				"path": "ScenarioDefinition.parameter.name",
+				"short": "Name of the Parameter to be bound",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.parameter.type",
+				"path": "ScenarioDefinition.parameter.type",
+				"short": "Type of the parameter (currently only string)",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.parameter.optional",
+				"path": "ScenarioDefinition.parameter.optional",
+				"short": "Whether this parameter is optional",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "boolean"
+					}
+				]
+			},
+			{
+				"id": "ScenarioDefinition.parameter.defValueString",
+				"path": "ScenarioDefinition.parameter.defValueString",
+				"short": "Default Value of the parameter (currently only string)",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			}
+		]
+	}
+}

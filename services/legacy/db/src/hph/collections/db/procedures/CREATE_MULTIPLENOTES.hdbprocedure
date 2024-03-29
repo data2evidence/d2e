@@ -1,0 +1,50 @@
+PROCEDURE "hc.hph.collections.db.procedures::CREATE_MULTIPLENOTES" (
+	IN it_note "hc.hph.collections.db.models::TT_NOTE",
+	 OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR" ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+	
+BEGIN
+
+declare lv_count BIGINT;
+declare i_i INTEGER;
+declare lv_noteid NVARCHAR (32);
+declare lv_collectionid NVARCHAR(32);
+
+select count(*) into lv_count from :it_note ;
+if :lv_count <0 then
+ot_error = 
+select 400 as http_status_code, 'Bad Request'as error_message, 'Error creating Note: No data to insert.' detail from "hc::DUMMY";
+	end if;
+	
+select top 1 "CollectionId" into lv_collectionid from :it_note;
+if lv_collectionid = '' then
+ot_error = 
+select 400 as http_status_code, 'Bad Request' as error_message , 'Error creating Note : CollectionId must not be empty.' detail from "hc::DUMMY";
+end if;
+
+insert into "hc.hph.collections.db.models::CollectionModel.Comment"
+            (
+    			"Id",
+    			"Collection.Id",
+    			"Item.Id",
+    			"Type", 
+    			"Text", 
+    			"CreatedBy",
+    			"CreatedAt",
+    			"Content"
+                
+            )
+            select
+    		    substring((select cast(SYSUUID as NVARCHAR(32)) || "ItemId" from "hc::DUMMY"), 1,32) as "Id",
+			    "CollectionId" ,
+			    "ItemId" , 
+			    "Type" , 
+			    "Text", 
+			    SESSION_CONTEXT('XS_APPLICATIONUSER') as "CreatedBy",
+			    CURRENT_UTCTIMESTAMP as "CreatedAt" ,
+			    "Content" as "Content" 
+			    from :it_note
+			;
+END;

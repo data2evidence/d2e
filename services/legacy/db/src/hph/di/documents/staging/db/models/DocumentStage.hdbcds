@@ -1,0 +1,89 @@
+namespace hc.hph.di.documents.staging.db.models;
+
+using hc.hph.cdw.db.models::DWTypes as DT;
+using hc.hph.di.documents.staging.db.models::DocumentProcessing as DP;
+
+
+context DocumentStage {
+    // Intermediate staging area for the Document Processing. All the plugins that need to use the HPH Document Processing, shall populate this table.
+    // Post document processing, documents are removed.
+    entity ProcessingStage{
+        key DWID         : DT.DWID;
+        key DWDateFrom   : UTCTimestamp default '0000-00-00';
+        DWSource         : DT.DWSource not null;// Shortname of the source which is used as delimiter for the DWID
+        DocumentID       : String(1024) not null;// Document ID 
+        DWAuditID        : DT.DWAuditID; // AuditLogId for a given document
+        BatchID          : Integer64 not null; // Used to process a set of documents together. It can be filled with DWAuditId of the profile
+        ProcessingMode   : String(1); // 'D' - For deletion, NULL for Create/Update
+        DWParentEntitySource : DT.DWSource; // If null, DWSource is used        
+        ParentEntityID   : String(1024); // Interaction Id or null
+        ParentEntityType : String(256); //Supported value: hc.hph.cdw.Interaction
+
+        FileName         : String(256);
+        MIMEType         : String(256);
+        Content          : LargeBinary;
+        Title            : String(1024);
+        Author           : String(1024);
+        Type             : String(128); //Check - if Type can be made available in the intermediate stage
+        LanguageCode     : String(2);
+
+        CreatedAt        : UTCTimestamp;
+        CreatedBy        : String(256);
+        ChangedAt        : UTCTimestamp;
+        ChangedBy        : String(256);
+    } technical configuration {
+        column store;
+    };
+
+     entity DocumentAPIStage {
+
+        key _PackageID: Integer;    // Records are loaded package-wise, starting from lowest package number (can be NULL)
+        _LoadTimestamp : DT.DWTimestamp;
+        key _SourceID : DT.DWSource;   // Only records that match the Profile SourceID of the given DI Profile are loaded
+        _ProcessingMode : String(1) ; // 'D' - For deletion, NULL for Create/Update
+        key DocumentID : String(1024) not null;
+
+        _ParentEntitySourceID : DT.DWSource; //If null, _SourceID is used
+        ParentEntityID : String(1024); // Interaction Id or null
+        ParentEntityType : String(256); //Supported value: hc.hph.cdw.Interaction, null
+
+        FileName        : String(256);
+        MIMEType        : String(256);
+        Content         : LargeBinary;
+        Title           : String(1024);
+        Author          : String(1024);
+        Type            : String(128); //Check - if Type can be made available in the intermediate stage
+        LanguageCode    : String(2);       
+        CreatedAt       : UTCTimestamp;
+        CreatedBy       : String(256);
+        ChangedAt       : UTCTimestamp;
+        ChangedBy       : String(256);
+    }; 
+
+    view DocumentProcessingStatus as select from ProcessingStage mixin { 
+    _Processing_Status : association [1..*] to DP.ProcessDocument on DWID = _Processing_Status.DWID AND DWDateFrom = _Processing_Status.DWDateFrom;
+
+    }into { 
+    	DWID,
+    	DWSource,
+    	DWDateFrom,
+    	DocumentID,    	
+    	BatchID,
+    	FileName,
+    	MIMEType,
+    	Content,
+    	Title,
+    	Author,    	
+    	Type,    	
+    	LanguageCode,
+    	CreatedAt,      
+        CreatedBy,  
+        ChangedAt,      
+        ChangedBy,  
+        ProcessingMode,
+        _Processing_Status.PipelineID,        
+        _Processing_Status.ScheduleID, 
+        _Processing_Status.DWAuditID        
+    };
+
+};

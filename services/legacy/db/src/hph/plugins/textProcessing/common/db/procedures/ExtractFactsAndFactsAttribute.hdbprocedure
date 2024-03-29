@@ -1,0 +1,89 @@
+PROCEDURE "hc.hph.plugins.textProcessing.common.db.procedures::ExtractFactsAndFactsAttribute" (
+in iv_plugiId NVARCHAR(256),
+in iv_ruleId NVARCHAR(32),
+in in_interactionType NVARCHAR(256),
+in it_ta_filtered_query CLOB,
+out ot_fact "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.PreFacts",
+out ot_fact_attr "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.PreFactAttributes"
+ ) 
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER 
+    AS
+BEGIN
+/***************************** 
+    Write your procedure logic 
+ *****************************/
+ DECLARE vt_fact_attr CLOB;
+ DECLARE ta_fact_attr CLOB;
+ DECLARE vt_facts CLOB;
+ DECLARE loop_count INTEGER;
+ DECLARE arr_value NVARCHAR(32) ARRAY;
+ DECLARE arr_value_code NVARCHAR(32) ARRAY;
+
+
+BEGIN    
+     DECLARE EXIT HANDLER FOR SQL_ERROR_CODE 288   -- duplicate table name
+         BEGIN
+            Drop TABLE "#Temp_PreFacts";
+            CREATE local TEMPORARY TABLE "#Temp_PreFacts" like "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.PreFacts";
+        END;
+      CREATE LOCAL TEMPORARY TABLE "#Temp_PreFacts" like "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.PreFacts";
+ END;
+BEGIN    
+     DECLARE EXIT HANDLER FOR SQL_ERROR_CODE 288   -- duplicate table name
+         BEGIN
+            Drop TABLE "#Temp_PreFactAttr";
+            CREATE local TEMPORARY TABLE "#Temp_PreFactAttr" like "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.PreFactAttributes";
+        END;
+      CREATE LOCAL TEMPORARY TABLE "#Temp_PreFactAttr" like "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.PreFactAttributes";
+ END;
+         
+         ta_fact_attr := 'select facts."FactID",facts."PluginID",facts."InteractionType",factAttr."Attribute",factAttr."Value", factAttr."AttributeType",factAttr."Codify",factAttr."CodeColumn" '||
+        'from "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.ConfiguredFacts" facts '||
+        'inner join '||
+        '"hc.hph.plugins.textProcessing.common.db.models::CDWMapping.ConfiguredFactAttributes" factAttr '||
+        'on facts."FactID" = factAttr."FactID" and facts."PluginID" = factAttr."PluginID" '||
+        'where facts."PluginID" = '''||:iv_plugiId ||''' and facts."FactID"='''||:iv_ruleId||'''';
+        
+          --get the fact and fact attributes for Rule $$rule$$
+          vt_facts := 'select * from (select *, concat("TA_RULE","TA_COUNTER") "_ID",''' ||:in_interactionType|| ''' "InteractionType" '||
+          'from (select *, SUBSTR_BEFORE("TA_NORMALIZED",''@'') "Value.Code", SUBSTR_AFTER("TA_NORMALIZED",''@'') "Value.CodeSystem" from ( '||it_ta_filtered_query||' ))) ';
+         
+          iv_values = select "Value","CodeColumn" from "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.ConfiguredFactAttributes" where "FactID" = :iv_ruleId and "PluginID" = :iv_plugiId and "AttributeType" = 'ColumnType';
+          select count(*) into loop_count from :iv_values;
+          arr_value = ARRAY_AGG(:iv_values."Value");
+          arr_value_code = ARRAY_AGG(:iv_values."CodeColumn");
+          
+          
+          WHILE loop_count > 0 DO
+            --Facts Attributes of ColumnType
+            vt_fact_attr := 'select  t1."DWID",t1."_ID", t1."InteractionType","TA_NORMALIZED",t2."Attribute" , '||:arr_value[loop_count]||
+            ' "Value", t2."Codify",case when t2."Codify" = true then SUBSTR_BEFORE(t1.'||:arr_value_code[loop_count]||',''@'') else null end "CodeValue.Code", '||
+            'case when t2."Codify" = true then SUBSTR_AFTER(t1.'||:arr_value_code[loop_count]||',''@'') else null end "CodeValue.CodeSystem" from ('|| vt_facts ||') t1 inner join ('||ta_fact_attr||') t2 on t1."InteractionType" = t2."InteractionType" '|| 
+            'where t2."AttributeType" = ''ColumnType'' and t2."Value" = '''||:arr_value[loop_count]||''''; 
+            
+            exec('INSERT into "#Temp_PreFactAttr"("DWID", "_ID", "InteractionType","TA_NORMALIZED","Attribute",   "Value","Codify","CodeValue.Code","CodeValue.CodeSystem") (select * from (' ||vt_fact_attr||' ))');
+            loop_count = :loop_count - 1;
+          END WHILE;
+          
+          vt_fact_attr := 'select  t1."DWID",t1."_ID", t1."InteractionType","TA_NORMALIZED",t2."Attribute" , t2."Value", t2."Codify",null "CodeValue.Code", '||
+            'null "CodeValue.CodeSystem" from ('|| vt_facts ||') t1 inner join ('||ta_fact_attr||') t2 on t1."InteractionType" = t2."InteractionType" '|| 
+          'where t2."AttributeType" <> ''ColumnType'''; 
+          
+          exec('INSERT into "#Temp_PreFactAttr"("DWID", "_ID", "InteractionType","TA_NORMALIZED","Attribute","Value","Codify","CodeValue.Code","CodeValue.CodeSystem") (select * from (' ||vt_fact_attr||' ))');
+          exec('INSERT into "#Temp_PreFactAttr"("DWID", "_ID", "InteractionType","TA_NORMALIZED","Attribute","Value") (select  t1."DWID",t1."_ID", t1."InteractionType","TA_NORMALIZED",''Offset'' "Attribute" , t1."TA_OFFSET" "Value" from ('|| vt_facts ||') t1)');
+          exec('INSERT into "#Temp_PreFactAttr"("DWID", "_ID", "InteractionType","TA_NORMALIZED","Attribute","Value") (select  t1."DWID",t1."_ID", t1."InteractionType","TA_NORMALIZED",''Sentence'' "Attribute" , t1."TA_SENTENCE" "Value" from ('|| vt_facts ||') t1)');
+          exec('INSERT into "#Temp_PreFactAttr"("DWID", "_ID", "InteractionType","TA_NORMALIZED","Attribute","Value") (select  t1."DWID",t1."_ID", t1."InteractionType","TA_NORMALIZED",''Paragraph'' "Attribute" , t1."TA_PARAGRAPH" "Value" from ('|| vt_facts ||') t1)');
+          exec('INSERT into "#Temp_PreFactAttr"("DWID", "_ID", "InteractionType","TA_NORMALIZED","Attribute","Value") (select  t1."DWID",t1."_ID", t1."InteractionType","TA_NORMALIZED",''Text'' "Attribute" , t1."TA_TOKEN" "Value" from ('|| vt_facts ||') t1)');
+          exec('INSERT into "#Temp_PreFacts"("FactID", "_ID", "DWID", "InteractionType","TA_NORMALIZED","TA_TYPE","Value.Code","Value.CodeSystem") (select '''||:iv_ruleId||''' "FactID", "_ID", "DWID","InteractionType","TA_NORMALIZED","TA_TYPE","Value.Code","Value.CodeSystem" from (' ||vt_facts||' ))');
+          
+          /***************************************************************************************************************************/
+          
+          ot_fact_attr = select "DWID", "_ID", "InteractionType", "TA_NORMALIZED", "Attribute", "Value", "Codify", "CodeValue.Code", "CodeValue.CodeSystem"
+                                from "#Temp_PreFactAttr";
+                                
+          ot_fact = select "FactID", "_ID", "DWID", "InteractionType", "TA_NORMALIZED", "TA_TYPE", "Value.Code", "Value.CodeSystem" 
+                                 from "#Temp_PreFacts";
+                                 
+          /***************************************************************************************************************************/                                 
+END;

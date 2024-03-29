@@ -1,0 +1,58 @@
+PROCEDURE "hc.hph.um.org.db.procs::get_org_details" (IN org_status NVARCHAR(100),
+out Orgdet table("ORGID" NVARCHAR(100),"ORGNAME" NVARCHAR(5000),STATUS NVARCHAR(100) , EXTERNAL_ORGID NVARCHAR(100)),
+OUT o_message TABLE ("Status" NVARCHAR(1), "Code" NVARCHAR(100), "Message" NVARCHAR(100)) ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+    AS
+	
+ 
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION   -- SQL_ERROR_CODE 301
+	BEGIN
+		os_message = SELECT 
+    				'E' as STATUS,
+    				::sql_error_code as ERROR_CODE,       -- SQL Error Code
+    				::sql_error_message as ERROR_MESSAGE  -- Error Message
+    				from "hc::DUMMY";
+	END;
+
+
+
+if(:org_status is not null)then
+
+Orgdet = select "OrgID" AS ORGID ,
+         "OrgName" as ORGNAME,
+         "Status"  as Status , "ExternalOrgID"  as EXTERNAL_ORGID from "hc.hph.cdw.db.models::Config.Org"  WHERE "Status"=org_status and(CURRENT_UTCTIMESTAMP < "ValidTo" or "ValidTo" IS NULL );
+
+
+else
+
+Orgdet = select "OrgID" AS ORGID ,
+         "OrgName" as ORGNAME,
+         "Status" as Status , "ExternalOrgID"  as EXTERNAL_ORGID from "hc.hph.cdw.db.models::Config.Org" WHERE 
+          CURRENT_UTCTIMESTAMP > "ValidFrom" and (CURRENT_UTCTIMESTAMP < "ValidTo" or "ValidTo" IS NULL );
+
+
+end if;
+
+
+	
+	o_message = select 'S' as "Status",
+					   null as "Code",
+	       			   'Success' as "Message"
+	   			from "hc::DUMMY";
+
+
+
+
+
+
+
+
+
+
+
+
+
+END;

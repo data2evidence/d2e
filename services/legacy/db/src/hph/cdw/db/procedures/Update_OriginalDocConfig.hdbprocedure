@@ -1,0 +1,28 @@
+PROCEDURE "hc.hph.cdw.db.procedures::Update_OriginalDocConfig" (
+	IN it_after "hc.hph.config.db.models::Configuration.Config",
+	IN it_before "hc.hph.config.db.models::Configuration.Config",
+	OUT ot_error "hc.hph.cdw.db.procedures::tt_error" ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 	/* DECLARE chkprivilege INTEGER; */
+	 DECLARE data NCLOB;
+
+  /* SELECT count(*) into chkprivilege from "hc::EFFECTIVE_APPLICATION_PRIVILEGES" where USER_NAME = SESSION_CONTEXT('XS_APPLICATIONUSER') and PRIVILEGE = 'hc.hph.cdw.services::CDWServiceAdministrator';
+  IF :chkprivilege = 0 then
+  ot_error = SELECT 403 AS http_status_code, 'Unauthorised Access' error_message, '' detail 
+             FROM "hc::DUMMY";  
+  ELSE */
+ select TO_NCLOB("Data") into data from :it_after;
+ UPDATE "hc.hph.config.db.models::Configuration.Config"
+	SET "Data" = :data, "Modifier" = 'DummyUser',"Modified" = CURRENT_TIMESTAMP
+	WHERE ("Id","Version") in (SELECT "Id","Version" FROM :it_after);
+	
+ ot_error = SELECT top 0 400 AS http_status_code, 'Bad 
+		Request' error_message, 'Error in updating configuration' 
+		detail FROM "hc::DUMMY";
+  /* END IF; */
+END;

@@ -1,0 +1,43 @@
+name: ALP dataflow-gen unit tests
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened, synchronize]
+  push:
+    branches:
+      - develop
+
+jobs:
+  test-alp-dataflow-gen:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Install dependencies
+      # protobuf-compiler required for python build dask-sql
+      run: sudo apt-get install protobuf-compiler
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - uses: dorny/paths-filter@v2
+      id: check_file_changed
+      with:
+        filters: |
+          alp_dataflow_gen_changed:
+            - 'services/alp-dataflow-gen/**'
+            
+    - name: Setup python if files have changed
+      uses: actions/setup-python@v2
+      if: github.ref_name == 'develop' || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
+      with:
+        python-version: 3.11.7
+        cache: 'pip'
+  
+    - name: Install pip packages if files have changed
+      if: github.ref_name == 'develop' || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
+      working-directory: ./services/alp-dataflow-gen
+      run: pip install -r requirements-dev.txt
+
+    - name: Run unit tests if files have changed
+      if: github.ref_name == 'develop' || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
+      working-directory: ./services/alp-dataflow-gen/pysrc
+      run: python3 -m pytest -v --disable-pytest-warnings

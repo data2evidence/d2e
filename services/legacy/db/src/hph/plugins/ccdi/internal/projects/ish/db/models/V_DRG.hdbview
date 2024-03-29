@@ -1,0 +1,37 @@
+VIEW "hc.hph.plugins.ccdi.internal.projects.ish.db.models::V_DRG" ( 
+"_ProcessingMode",
+"OrgID", 
+"InteractionID", 
+"PatientID", 
+"InteractionType.OriginalValue", 
+"PeriodStart", 
+"PeriodEnd", 
+"DRGCode",
+"CodeMDC",
+"DRGCatalogUsed",
+"SeverityOfIllnessDRG",
+"RiskOfMortalityDRG",
+"CatalogMDC",
+"CostWeightDRG") AS SELECT 
+    case when CANCEL_FLAG = 'X' then 'D' else null end as "_ProcessingMode",
+    null as "OrgID",
+    PATCASEID || INSTITUTION || DRG_SEQNO || LFDNR || 'DRG' as "InteractionID",
+    PATNR as "PatientID",
+    'ISH_DRG' as "InteractionType.OriginalValue",
+    CASE
+    WHEN DRG_CREAT_DATE is not null AND LTRIM(RTRIM(DRG_CREAT_DATE)) <> '' AND DRG_CREAT_DATE <> '00000000'
+    THEN to_timestamp(to_date(DRG_CREAT_DATE) || ' ' || to_time(DRG_CREAT_TIME))
+    END as "PeriodStart",
+    CASE
+    WHEN DRG_CREAT_DATE is not null AND LTRIM(RTRIM(DRG_CREAT_DATE)) <> '' AND DRG_CREAT_DATE <> '00000000'
+    THEN to_timestamp(to_date(DRG_CREAT_DATE) || ' ' || to_time(DRG_CREAT_TIME))
+    END as "PeriodEnd",   
+    DRG_CODE as "DRGCode", 
+    MDC_CODE as "CodeMDC",                        -- Code of Major Diagnostic Category (MDC)
+    DRG_CAT as "DRGCatalogUsed",                  -- DRG Catalog Used for Coding
+    SOI as "SeverityOfIllnessDRG",                -- Severity of Illness (for DRG Purposes)
+    ROM as "RiskOfMortalityDRG",                  -- Risk of Mortality (for DRG Purposes)
+    MDC_CAT as "CatalogMDC",                      -- Catalog for Major Diagnostic Category (MDC)
+    RTRIM(LTRIM(COST_WEIGHT)) as "CostWeightDRG"  -- Cost Weight for DRGs
+from "hc.hph.plugins.ccdi.internal.projects.ish.db.models::DRG"
+where trim(DRG_CREAT_DATE) <> '00000000' WITH READ ONLY

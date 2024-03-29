@@ -1,0 +1,48 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec::Entities.Expected",
+            "import_settings": {
+                "import_columns": [
+                    "DWID",
+                    "TA_TOKEN",
+                    "TA_TYPE",
+                    "TA_NORMALIZED",
+                    "TA_OFFSET",
+                    "TA_SECTION",
+                    "TA_MODALITY",
+                    "TA_POLARITY",
+                    "TA_REFERENCE",
+                    "TA_TIME_START",
+                    "TA_TIME_END",
+                    "TA_TIME_LINK",
+                    "TA_AMBIGUITY",
+                    "TA_CA_BEHAVIOR",
+                    "TA_CA_GRADE",
+                    "TA_CA_SITE",
+                    "TA_CA_SIZE",
+                    "TA_CA_STAGE_T",
+                    "TA_CA_STAGE_N",
+                    "TA_CA_STAGE_M",
+                    "TA_BIOM_RESULT",
+                    "TA_BIOM_TEST",
+                    "TA_BIOM_ALTER",
+                    "TA_BIOM_LOC",
+                    "TA_VALUE",
+                    "TA_UNIT"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec.fixtures::expected.csv",
+                "has_header": true,
+                "type_config": {
+                    "delimiter": ";",
+                    "do_quote": true,
+                    "quote_character": "\""
+                }
+            }
+        }
+    ]
+}

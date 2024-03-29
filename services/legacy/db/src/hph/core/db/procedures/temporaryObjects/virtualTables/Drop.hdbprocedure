@@ -1,0 +1,30 @@
+PROCEDURE "hc.hph.core.db.procedures.temporaryObjects.virtualTables::Drop" ( IN table_name NVARCHAR(255) )
+LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+BEGIN
+    DECLARE POLICY_ERROR CONDITION FOR SQL_ERROR_CODE 10001;
+    DECLARE table_exists INTEGER := 0;
+    DECLARE is_valid INTEGER := 0;
+    DECLARE schema VARCHAR(255);
+    DECLARE CURSOR table_privileges FOR
+        SELECT "PRIVILEGE", "GRANTEE" FROM "hc::GRANTED_PRIVILEGES" WHERE "GRANTEE_TYPE" = 'USER' AND "OBJECT_TYPE" = 'TABLE' AND "SCHEMA_NAME" = (SELECT CURRENT_SCHEMA FROM "hc::DUMMY") AND "OBJECT_NAME" = :table_name;
+    SELECT CURRENT_SCHEMA INTO schema FROM "hc::DUMMY";
+    -- Check if temporary object is to be created in the correct namespace
+    IF SUBSTRING( :table_name, 1, 50 ) <> 'hc.hph.core.db.models.generated.virtualTables.' THEN
+        SIGNAL POLICY_ERROR SET MESSAGE_TEXT = 'Invalid table name prefix for temporary object';
+    END IF;
+    
+    -- Check if remote source is supported by us
+    SELECT COUNT(*) INTO table_exists FROM "hc::VIRTUAL_TABLES" as VIRTUAL_TABLES  WHERE "SCHEMA_NAME" = :schema AND "TABLE_NAME" = :table_name;
+    SELECT COUNT(*) INTO is_valid FROM "hc::VIRTUAL_TABLES" as VIRTUAL_TABLES INNER JOIN "hc::REMOTE_SOURCES" as REMOTE_SOURCES ON "VIRTUAL_TABLES"."REMOTE_SOURCE_NAME" = "REMOTE_SOURCES"."REMOTE_SOURCE_NAME" WHERE "VIRTUAL_TABLES"."SCHEMA_NAME" = :schema AND "VIRTUAL_TABLES"."TABLE_NAME" = :table_name AND "REMOTE_SOURCES"."ADAPTER_NAME" IN ( 'ALP HPH Blob Adapter' );
+    IF :table_exists <> 0 AND :is_valid = 0 THEN
+        SIGNAL POLICY_ERROR SET MESSAGE_TEXT = 'Invalid virtual table';
+    END IF;
+
+    -- Create virtual table and grant SELECT permissions to technical user
+    FOR table_privilege AS table_privileges DO
+        EXEC 'REVOKE ' || :table_privilege."PRIVILEGE" || ' ON "' || ESCAPE_DOUBLE_QUOTES ( :table_name ) || '" FROM ' || :table_privilege."GRANTEE";
+    END FOR;
+    IF :table_exists <> 0 THEN
+        EXEC 'DROP TABLE "' || ESCAPE_DOUBLE_QUOTES ( :table_name ) || '" CASCADE';
+    END IF;
+END

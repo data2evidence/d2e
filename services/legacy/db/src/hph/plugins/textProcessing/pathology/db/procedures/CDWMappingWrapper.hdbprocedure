@@ -1,0 +1,16 @@
+PROCEDURE "hc.hph.plugins.textProcessing.pathology.db.procedures::CDWMappingWrapper" (
+in lv_pluginId NVARCHAR(256),
+out ot_facts "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.Fact",
+out ot_fact_attributes "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.FactAttributes" ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER 
+	--DEFAULT SCHEMA <default_schema_name>
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ declare ta_filtered CLOB;
+ ta_filtered := 'select * from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_FILTERED" ';
+ call "hc.hph.plugins.textProcessing.common.db.procedures::MapTAFilteredToFacts"(:lv_pluginId,:ta_filtered,ot_facts,ot_fact_attributes);
+END;

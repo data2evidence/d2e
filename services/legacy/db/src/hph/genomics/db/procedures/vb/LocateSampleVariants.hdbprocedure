@@ -1,0 +1,29 @@
+PROCEDURE "hc.hph.genomics.db.procedures.vb::LocateSampleVariants"(
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN chromosome_index INTEGER,
+        IN position INTEGER,
+        OUT variants "hc.hph.genomics.db.models::VariantBrowser.SampleVariants"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+    variants = SELECT
+        "Genotypes"."SampleIndex",
+        "Genotypes"."DWAuditID",
+        "Genotypes"."VariantIndex"
+    FROM
+        :sample_list AS "SampleList"
+    INNER JOIN
+        "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+    ON
+        "SampleList"."SampleIndex" = "Genotypes"."SampleIndex"
+    INNER JOIN
+        "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+    ON
+        "Genotypes"."DWAuditID" = "Variants"."DWAuditID" AND
+        "Genotypes"."VariantIndex" = "Variants"."VariantIndex" AND
+        "Variants"."ChromosomeIndex" = :chromosome_index AND
+        "Variants"."Position" = :position;
+END;

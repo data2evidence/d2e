@@ -1,0 +1,96 @@
+namespace hc.hph.di.statistics.db.model;
+
+using hc.hph.cdw.db.models::DWTypes as DT;
+
+context Statistics {
+
+	type CdtID : String(256);
+	type CdtIntegerID: Integer64;
+	type CdtPluginID : String(256);
+	type CdtLanguageCode : String(2);
+	type CdtName : String (512);
+	type CdtValue : String (512);
+	type CdtStatus : String(16);
+	type CdtAlias : String(64);
+    type CdtNumber: Integer;
+    type CdtDate: LocalDate;
+
+    table type Profiles{
+    	ProfileName : CdtName;
+    };
+    table type Sources{
+    	SourceID : DT.DWSource;
+    };
+    table type Extensions{
+    	ExtensionID : CdtID;
+    };
+    table type Entities{
+    	Entity: CdtName;
+    };
+    table type EntityRecord{
+    	Entity: CdtName;
+    	RecordCount:CdtNumber;
+    	Loads:CdtNumber;
+    };
+
+  
+
+	entity DataIngestionProfileLoads {
+		key DataIngestionID: CdtIntegerID;
+		key LoadDate:CdtDate;
+		ProfileID: DT.DWAuditID;
+		ProfileName:  CdtName;
+		Loads:CdtNumber;
+	} technical configuration {
+  column store;
+ };
+
+	entity DataIngestionExtensionLoads {
+		key DataIngestionID: CdtIntegerID;
+		key LoadDate:CdtDate;
+		ExtensionID: CdtID;
+		ExtensionName:  CdtName;
+		ExtensionAlias:  CdtAlias;
+		Loads:CdtNumber;
+	} technical configuration {
+  column store;
+ };
+
+	entity DataIngestionSourceLoads {
+		key DataIngestionID: CdtIntegerID;
+		key LoadDate:CdtDate;
+		SourceID: DT.DWSource;
+		SourceName:  CdtName;
+		Loads:CdtNumber;
+	} technical configuration {
+  column store;
+ };
+
+	entity DataIngestionEntityLoads {
+		key DataIngestionID: CdtIntegerID;
+		key LoadDate:CdtDate;
+		key Entity: CdtName;
+		Loads:CdtNumber;
+	} technical configuration {
+  column store;
+ };
+
+	entity DataIngestionLoadRecords {
+		key DataIngestionID: CdtIntegerID;
+		key LoadDate:CdtDate;
+		key AuditLogID: DT.DWAuditID;
+		key Entity:CdtName;
+		SourceID: DT.DWSource;
+		SourceName:  CdtName;
+		ExtensionID: CdtID;
+		ExtensionName:  CdtName;
+		ExtensionAlias:  CdtAlias;
+		ProfileID: DT.DWAuditID;
+		ProfileName:  CdtName;
+		Duration:Integer64;
+		RecordCount:CdtNumber;
+	} technical configuration {
+  column store;
+ };
+
+};

@@ -1,0 +1,8 @@
+env:
+  azureCR:
+    imageTag: latest
+  d4lNexus:
+    imageTag: latest
+
+secrets:
+  POSTGRES_HOST: postgres-rp-staging.private.os.fra1.alp-dev.org

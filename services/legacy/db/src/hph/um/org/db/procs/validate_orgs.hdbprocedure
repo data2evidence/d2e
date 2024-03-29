@@ -1,0 +1,162 @@
+PROCEDURE "hc.hph.um.org.db.procs::validate_orgs" ( 
+      IN orgs_details "hc.hph.um.org.db.models::ConfigTypes.Org_Details",
+	  IN dummy_org_details_eav "hc.hph.um.org.db.models::ConfigTypes.OrgAttrEAVForProc",
+      OUT o_message TABLE ("Status" NVARCHAR(1), "Code" NVARCHAR(100), "Message" NVARCHAR(100))
+) 
+      LANGUAGE SQLSCRIPT
+      SQL SECURITY DEFINER
+      AS
+BEGIN
+   
+    declare parent_org_not_exist condition for SQL_ERROR_CODE 10001;
+    declare org_already_exists condition for SQL_ERROR_CODE 10002;
+      
+    DECLARE count_all int;
+    DECLARE count_distinct int;
+    DECLARE parent_org_count int;
+    DECLARE org_id_count int;
+    DECLARE count int;
+    DECLARE update_list_count int;
+    DECLARE create_list_count int;
+    DECLARE status NVARCHAR(1);
+    DECLARE message NVARCHAR(100);
+    DECLARE parent_org_found "hc.hph.um.org.db.models::ConfigTypes.OrgIdStructForProc";
+    DECLARE update_list "hc.hph.um.org.db.models::ConfigTypes.Org_Details";
+    DECLARE update_list2 "hc.hph.um.org.db.models::ConfigTypes.OrgIdStructForProc";
+    DECLARE create_list "hc.hph.um.org.db.models::ConfigTypes.Org_Details";
+     									 
+	declare error_in_update_org condition for SQL_ERROR_CODE 10001;  
+	declare error_in_create_org condition for SQL_ERROR_CODE 10001;  
+     
+    
+    -- DECLARE dummy_org_details_eav "hc.hph.um.org.db.models::ConfigTypes.OrgAttrEAVForProc";
+    
+      declare exit handler for error_in_update_org
+      begin
+            o_message = select      'E' as "Status",
+                                          ::SQL_ERROR_CODE as "Code",
+                                          ::SQL_ERROR_MESSAGE as "Message"
+                              from "hc::DUMMY";    
+      end;
+      
+      declare exit handler for error_in_create_org
+      begin
+            o_message = select      'E' as "Status",
+                                          ::SQL_ERROR_CODE as "Code",
+                                          ::SQL_ERROR_MESSAGE as "Message"
+                              from "hc::DUMMY";    
+      end;
+         
+      declare exit handler for org_already_exists
+      begin
+            o_message = select      'E' as "Status",
+                                          ::SQL_ERROR_CODE as "Code",
+                                          ::SQL_ERROR_MESSAGE as "Message"
+                              from "hc::DUMMY";    
+      end;
+      
+      declare exit handler for parent_org_not_exist
+      begin
+            o_message = select      'E' as "Status",
+                                          ::SQL_ERROR_CODE as "Code",
+                                          ::SQL_ERROR_MESSAGE as "Message"
+                              from "hc::DUMMY";    
+      end;
+      
+
+      
+   
+      SELECT count("OrgID") INTO count_all FROM :orgs_details;
+      SELECT DISTINCT COUNT("OrgID")  INTO count_distinct FROM :orgs_details;
+      
+      
+      --checking for duplicate orgids in csv
+      IF count_all <> count_distinct THEN
+      signal org_already_exists set MESSAGE_TEXT = 'Duplicate org ids present in csv';
+            
+      END IF;
+      
+      --union of orgids in csv and db
+      parent_org_found=SELECT "OrgID"  FROM :orgs_details UNION(SELECT "OrgID" FROM "hc.hph.cdw.db.models::Config.Org" WHERE "Status"='Active' and(CURRENT_UTCTIMESTAMP < "ValidTo" or "ValidTo" IS NULL ));
+      
+     --( select count(*) INTO parent_org_count from 
+          --  (select "ParentOrgID" FROM :orgs_details as "org_det" inner join :parent_org_found as "org_db" on  "org_det"."ParentOrgID"="org_db"."OrgID");
+      
+      
+      
+      --select count(*) INTO parent_org_count from (select "ParentOrgID" FROM :orgs_details) as "org_det" where ("org_det"."ParentOrgID" not in (select "OrgID" from :parent_org_found) and "org_det"."ParentOrgID" <> '');
+      
+      
+      
+      select count(a."ParentOrgID") into parent_org_count from
+	 (select "ParentOrgID" from :orgs_details where "ParentOrgID" <> '' and "ParentOrgID"  is not null) a  LEFT OUTER JOIN
+	 (select "OrgID" from :parent_org_found) b 
+	  ON a."ParentOrgID" = b."OrgID" WHERE b."OrgID" IS NULL;
+      
+      --checking if parent org id is not valid, if not valid throw error
+      IF (:parent_org_count>0) THEN
+      
+      
+      signal parent_org_not_exist set MESSAGE_TEXT = 'Parent Org not found';
+      
+      END IF;
+       
+       
+     --  forming a batch of orgs which are to be updated
+     update_list = SELECT "orgdet".*
+     FROM :orgs_details as "orgdet" 
+     inner join 
+     "hc.hph.cdw.db.models::Config.Org" as "orgdb"
+     on "orgdet"."OrgID"="orgdb"."OrgID"
+     WHERE
+     (CURRENT_UTCTIMESTAMP > "orgdb"."ValidFrom" and (CURRENT_UTCTIMESTAMP < "orgdb"."ValidTo" or "orgdb"."ValidTo" IS NULL )) ;
+       
+       
+       
+      -- forming a batch of orgs which are to be created
+      create_list= select * from :orgs_details minus select * from :update_list;
+      
+      
+      select count(*) into update_list_count from :update_list;
+      select count(*) into create_list_count from :create_list;
+      
+      
+      
+      --checking id there is any org data to update ,if yes call update proc
+      if :update_list_count > 0 then
+      
+     CALL "hc.hph.um.org.db.procs::update_org"(:update_list, :dummy_org_details_eav, :o_message);
+     
+     end if;
+     
+     count := 0;
+     select count(*) into count from :o_message;
+     if count > 0 then
+	     select "Status" into status from :o_message;
+	     if status = 'E' then 
+	     	select "Message" into message from :o_message;
+	     	signal error_in_update_org set MESSAGE_TEXT = message;
+	     end if;
+     end if;
+     
+     --checking id there is any org data to update ,if yes call create proc
+     if :create_list_count >0  then
+     CALL "hc.hph.um.org.db.procs::create_org"(:create_list, :dummy_org_details_eav, :o_message);
+     end if;
+     
+     count := 0;
+     select count(*) into count from :o_message;
+     if count > 0 then
+	     select "Status" into status from :o_message;
+	     if status = 'E' then 
+	     	select "Message" into message from :o_message;
+	     	signal error_in_create_org set MESSAGE_TEXT = message;
+	     end if;
+     end if;
+     
+	o_message = select 'S' as "Status",
+					   null as "Code",
+	       			   'Organizational units added or modified successfully' as "Message"
+	   			from "hc::DUMMY"; 
+      
+END;

@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "mri-pg-config-helm.fullname" . }}-automate
+  labels:
+    {{- include "mri-pg-config-helm.labels" . | nindent 4 }}
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "mri-pg-config-helm.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: {{ tpl .Values.env.image.imageCredentials . | quote }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ tpl .Values.env.image.repository . }}/alp-mri-pg-config:{{ tpl .Values.env.image.tag . }}"
+          imagePullPolicy: {{ .Values.env.image.pullPolicy }}
+          envFrom:
+          - secretRef:
+              name: {{ include "mri-pg-config-helm.secret" . }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      restartPolicy: Never

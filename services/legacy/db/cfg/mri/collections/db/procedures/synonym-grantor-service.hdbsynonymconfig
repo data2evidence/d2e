@@ -1,0 +1,8 @@
+{
+    "hc.mri.collections.db.procedures::CREATE_COLLECTION": {
+        "target": {
+            "schema": "SYS",
+            "object": "DUMMY"
+        }
+    }
+}

@@ -1,0 +1,141 @@
+PROCEDURE "hc.hph.cdw.patientdeletion.procedures::CDWDisplayPatient" (IN DWSource NVARCHAR(5), IN PatientID NVARCHAR(100), 
+    OUT Patient_Attr "hc.hph.cdw.db.models::DWEntities.Patient_Attr",
+    OUT Patient_Key "hc.hph.cdw.db.models::DWEntities.Patient_Key",
+    OUT Observations_Attr "hc.hph.cdw.db.models::DWEntities.Observations_Attr",
+    OUT Observations_Key "hc.hph.cdw.db.models::DWEntities.Observations_Key",
+    OUT Interactions_Attr "hc.hph.cdw.db.models::DWEntities.Interactions_Attr",
+    OUT Condition_Key "hc.hph.cdw.db.models::DWEntities.Condition_Key",
+    OUT Condition_Attr "hc.hph.cdw.db.models::DWEntities.Condition_Attr",
+    OUT Interactions_Key "hc.hph.cdw.db.models::DWEntities.Interactions_Key",
+    OUT Interaction_Text "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Text",
+    OUT Interaction_Measures "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Measures",
+    OUT Interaction_Details "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details",
+    OUT Document_SearchIndex table ("DWID" VARBINARY(32)),
+    OUT TA_FILTERED "hc.hph.ta.models::PostProcessing.TA_FILTERED",
+    OUT TA_Document_Interactions_Link "hc.hph.cdw.db.models::DWDocuments.TA_Document_Interactions_Link",
+    OUT Interaction_Documents_Link "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link",
+    OUT Document_Key "hc.hph.cdw.db.models::DWDocuments.Document_Key",
+    OUT Document_Attr "hc.hph.cdw.db.models::DWDocuments.Document_Attr",
+    OUT Interaction_Documents_Link_Attr "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link_Attr")
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER AS
+    dwID VARBINARY(32);
+BEGIN
+    DECLARE err_Code NUMBER(5):=0;
+    DECLARE result_text NVARCHAR(100);
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            err_Code:= ::SQL_ERROR_CODE; 
+         
+            IF :err_Code= 1299 
+            THEN
+                result_text:= 'The DWSource and PatientID combination provided does not exist';
+            ELSE
+                result_text:= 'Please check log for error';
+            END IF;
+--        Result:='FAILURE:'||result_text;
+        SELECT :result_text AS ERROR from "hc::DUMMY";
+    END; 
+    --SELECT ::SQL_ERROR_CODE AS ERROR_CODE, ::SQL_ERROR_MESSAGE AS ERROR_MESSAGE FROM DUMMY; 
+    
+    select "DWID" into dwID from "hc.hph.cdw.db.models::DWEntities.Patient_Key" where "DWSource" = :DWSource and "PatientID" = :PatientID;
+    
+    -----------------DWDocuments-----------
+    
+    --Select from Interaction_Document_Link_Attr table
+    Interaction_Documents_Link_Attr = select * from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link_Attr" where "DWLinkID" in (select "DWLinkID" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link"
+     where "DWID_Interaction" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+      where "DWID_Patient" = :dwID)));
+      
+    
+    --Select from Document_Attr table
+    Document_Attr = select * from "hc.hph.cdw.db.models::DWDocuments.Document_Attr" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWDocuments.Document_Key"
+     where "DWID" in (select "DWID_Document" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Interaction" in (select "DWID" from
+      "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+       where "DWID_Patient" = :dwID))));
+    
+    
+    ---Select from Document Key table
+    Document_Key = select * from "hc.hph.cdw.db.models::DWDocuments.Document_Key" where "DWID" in (select "DWID_Document" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link"
+     where "DWID_Interaction" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+      where "DWID_Patient" = :dwID)));
+    
+    
+    --Select from Interactions_Documents_Link
+    Interaction_Documents_Link = select * from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Interaction" in (select "DWID"
+     from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+      where "DWID_Patient" = :dwID));
+      
+    --Select from TA_Document_Interactions_Link
+    TA_Document_Interactions_Link = select * from "hc.hph.cdw.db.models::DWDocuments.TA_Document_Interactions_Link" where "DWID_Interaction" in (select "DWID"
+     from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+      where "DWID_Patient" = :dwID));  
+    
+     --Select from PostProcessing.TA_FILTERED
+    TA_FILTERED = select * from "hc.hph.ta.models::PostProcessing.TA_FILTERED" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWDocuments.Document_Key"
+     where "DWID" in (select "DWID_Document" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Interaction" in (select "DWID" from
+      "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+       where "DWID_Patient" = :dwID))));
+    
+    --Select from Document_SearchIndex
+    Document_SearchIndex = select "DWID" from "hc.hph.cdw.db.models::Document_SearchIndex" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWDocuments.Document_Key"
+     where "DWID" in (select "DWID_Document" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Interaction" in (select "DWID" from
+      "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+       where "DWID_Patient" = :dwID))));
+    
+    ------------DWEntitiesEAV---------------
+    
+    --Select from Interaction_Details table
+    Interaction_Details = select * from "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Key"
+     where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID));
+    
+    --Select from Interaction_Measures table
+    Interaction_Measures = select * from "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Measures" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Key"
+     where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID));
+    
+    --Select from Interaction_Text table
+    Interaction_Text = select * from "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Text" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Key"
+     where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID));
+      
+    
+    ------------DWEntities-----------------------
+    
+    
+    --Select from Interactions_Key table
+    Interactions_Key = select * from "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID" in (select "DWID" from
+     "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID);
+     
+     
+    --Select from Condition_Attr table
+    Condition_Attr = select * from "hc.hph.cdw.db.models::DWEntities.Condition_Attr" where "DWID" in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Condition_Key" where "DWID"
+     in (select "DWID_Condition" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID));
+    
+    
+    --Select from Condition_Key table
+    Condition_Key = select * from "hc.hph.cdw.db.models::DWEntities.Condition_Key" where "DWID" in (select "DWID_Condition" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+     where "DWID_Patient" = :dwID);
+    
+    
+    --Select from Interactions_Attr table
+    Interactions_Attr = select * from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID_Patient" = :dwID;
+     
+     
+    --Select from Observations_Key table
+    Observations_Key = select * from "hc.hph.cdw.db.models::DWEntities.Observations_Key" where "DWID" in (select DWID from "hc.hph.cdw.db.models::DWEntities.Observations_Attr"
+     where "DWID_Patient" = :dwID);
+    
+    
+    --Select from Observations_Attr table
+    Observations_Attr = select * from "hc.hph.cdw.db.models::DWEntities.Observations_Attr" where "DWID_Patient" = :dwID;
+     
+     
+    --Select from Patient_Attr table
+    Patient_Attr = select * from "hc.hph.cdw.db.models::DWEntities.Patient_Attr" where "DWID" = :dwID;
+    
+    
+    --Select from Patient_Key table
+    Patient_Key = select * from "hc.hph.cdw.db.models::DWEntities.Patient_Key" where "DWID" = :dwID;
+    
+
+END;

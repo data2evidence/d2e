@@ -1,0 +1,45 @@
+PROCEDURE "hc.hph.plugins.vcf.db.procedures.mapping::HeaderDataSource" ( IN source_name VARCHAR(255), IN source_schema VARCHAR(255) )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY DEFINER
+   AS
+BEGIN SEQUENTIAL EXECUTION
+	DECLARE list_view_exists TINYINT := 0;
+	DECLARE content_view_exists TINYINT := 0;
+	SELECT COUNT(*) INTO list_view_exists FROM "hc::VIEWS" WHERE "SCHEMA_NAME" = 'CDMDEFAULT' AND "VIEW_NAME" = 'hc.hph.plugins.vcf.db.models.generated::InputList';
+	SELECT COUNT(*) INTO content_view_exists FROM "hc::VIEWS" WHERE "SCHEMA_NAME" = 'CDMDEFAULT' AND "VIEW_NAME" = 'hc.hph.plugins.vcf.db.models.generated::InputHeader';
+	IF :list_view_exists <> 0 THEN
+		EXEC 'drop view "hc.hph.plugins.vcf.db.models.generated::InputList"';
+	END IF;
+	IF :content_view_exists <> 0 THEN
+		EXEC 'drop view "hc.hph.plugins.vcf.db.models.generated::InputHeader"';
+	END IF;
+
+    IF :source_schema IS NULL THEN
+    	DECLARE virtual_table_exists TINYINT := 0;
+    	SELECT COUNT(*) INTO virtual_table_exists FROM "hc::VIRTUAL_TABLES" WHERE "SCHEMA_NAME" = 'CDMDEFAULT' AND "TABLE_NAME" = 'hc.hph.plugins.vcf.db.models.generated::InputListVirtualTable';
+    	IF :virtual_table_exists <> 0 THEN
+    		EXEC 'drop table "hc.hph.plugins.vcf.db.models.generated::InputListVirtualTable"';
+    	END IF;
+    	SELECT COUNT(*) INTO virtual_table_exists FROM "hc::VIRTUAL_TABLES" WHERE "SCHEMA_NAME" = 'CDMDEFAULT' AND "TABLE_NAME" = 'hc.hph.plugins.vcf.db.models.generated::InputHeaderVirtualTable';
+    	IF :virtual_table_exists <> 0 THEN
+    		EXEC 'drop table "hc.hph.plugins.vcf.db.models.generated::InputHeaderVirtualTable"';
+    	END IF;
+    END IF;
+    
+    IF :source_name IS NULL THEN
+    	EXEC 'create view "hc.hph.plugins.vcf.db.models.generated::InputList" as select ''Invalid input'' as "Filename", ''Invalid input'' as "DOCUMENTNAME",''Invalid input'' as "MIMETYPE", ''0'' as "SIZE", ''Invalid input'' as "LASTUPDATED" from "DUMMY"';
+        EXEC 'create view "hc.hph.plugins.vcf.db.models.generated::InputHeader" as select ''Invalid input'' as "Filename", ''Invalid input'' as "DOCUMENTNAME",''Invalid input'' as "MIMETYPE", ''Invalid input'' as "SIZE", ''Invalid input'' as "LASTUPDATED", ''Invalid input'' as "Content"  from "DUMMY"';
+    ELSEIF :source_schema IS NULL THEN
+        EXEC 'CREATE VIRTUAL TABLE "hc.hph.plugins.vcf.db.models.generated::InputListVirtualTable" AT "' || ESCAPE_DOUBLE_QUOTES( :source_name ) || '"."<NULL>"."<NULL>"."CDMDEFAULT_VT_FILES"';
+        EXEC 'CREATE VIRTUAL TABLE "hc.hph.plugins.vcf.db.models.generated::InputHeaderVirtualTable" AT "' || ESCAPE_DOUBLE_QUOTES( :source_name ) || '"."<NULL>"."<NULL>"."CDMDEFAULT_VT_BLOB"';
+    	EXEC 'create view "hc.hph.plugins.vcf.db.models.generated::InputList" as select "DOCUMENTID" as "Filename", DOCUMENTNAME, MIMETYPE, "SIZE" as "Size",LASTUPDATED from "hc.hph.plugins.vcf.db.models.generated::InputListVirtualTable"';
+    	EXEC 'create view "hc.hph.plugins.vcf.db.models.generated::InputHeader" as select "DOCUMENTID" AS "Filename", DOCUMENTNAME, MIMETYPE, SIZE, LASTUPDATED, "DOCUMENTCONTENT" AS "Content" from "hc.hph.plugins.vcf.db.models.generated::InputHeaderVirtualTable"';
+    	EXEC 'GRANT SELECT ON "hc.hph.plugins.vcf.db.models.generated::InputListVirtualTable" TO "hc.hph.plugins.vcf.roles::HC_HPH_PLUGINS_VCF_IMPORT_DYN_ROLE"';
+    	EXEC 'GRANT SELECT ON "hc.hph.plugins.vcf.db.models.generated::InputHeaderVirtualTable" TO "hc.hph.plugins.vcf.roles::HC_HPH_PLUGINS_VCF_IMPORT_DYN_ROLE"';
+    ELSE
+    	EXEC 'create view "hc.hph.plugins.vcf.db.models.generated::InputList" as select "Filename", '' '' as "DOCUMENTNAME", '' '' as MIMETYPE, '' ''  "Size", '' '' as LASTUPDATED from "' || ESCAPE_DOUBLE_QUOTES( :source_schema ) || '"."' || ESCAPE_DOUBLE_QUOTES( :source_name ) || '" group by "Filename"';
+    	EXEC 'create view "hc.hph.plugins.vcf.db.models.generated::InputHeader" as select "Filename", '' '' as DOCUMENTNAME, '' '' as MIMETYPE, '' '' as SIZE, '' '' as LASTUPDATED,  "Content" from "' || ESCAPE_DOUBLE_QUOTES( :source_schema ) || '"."' || ESCAPE_DOUBLE_QUOTES( :source_name ) || '"';
+    END IF;
+	EXEC 'GRANT SELECT ON "hc.hph.plugins.vcf.db.models.generated::InputList" TO "hc.hph.plugins.vcf.roles::HC_HPH_PLUGINS_VCF_IMPORT_DYN_ROLE"';
+	EXEC 'GRANT SELECT ON "hc.hph.plugins.vcf.db.models.generated::InputHeader" TO "hc.hph.plugins.vcf.roles::HC_HPH_PLUGINS_VCF_IMPORT_DYN_ROLE"';
+END

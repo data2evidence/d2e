@@ -1,0 +1,37 @@
+PROCEDURE "hc.hph.search.db.procedures::UpdateTermMappingItem" (
+	IN  it_update "hc.hph.search.db.models::Search.TermMappingItems",
+	IN  it_before "hc.hph.search.db.models::Search.TermMappingItems", --this parameter is an odata syntax requirement
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"
+)
+LANGUAGE SQLSCRIPT	SQL SECURITY DEFINER AS
+	lv_count BIGINT;
+BEGIN
+	select "MAPPING_ID" from "hc.hph.search.db.models::Search.TermMappings"
+		where "MAPPING_ID" in (select "MAPPING_ID" from :it_update) for update
+	;
+
+	select count(*) into lv_count from :it_update where length(trim(' ' from "MAPPING_ID")) = 0;
+	if :lv_count > 0 then
+		ot_error =
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating termmapping: MAPPING_ID field cannot be empty.' detail from "hc::DUMMY";
+		return;
+	end if;
+
+	select count(*) into lv_count from :it_update where length(trim(' ' from "USER_ID")) = 0;
+	if :lv_count > 0 then
+		ot_error =
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating termmapping: USER_ID field cannot be empty.' detail from "hc::DUMMY";
+		return;
+	end if;
+
+
+	update "hc.hph.search.db.models::Search.TermMappingItems" tm
+	set
+		tm."INACTIVE" = upd."INACTIVE",
+		tm."WEIGHT" = upd."WEIGHT",
+		tm."LANGUAGE_CODE" = upd."LANGUAGE_CODE"
+	FROM "hc.hph.search.db.models::Search.TermMappingItems" tm, :it_update upd
+		WHERE tm."MAPPING_ID" = upd."MAPPING_ID"
+		AND tm."USER_ID" = upd."USER_ID"
+	;
+END;

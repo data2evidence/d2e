@@ -1,0 +1,19 @@
+PROCEDURE "hc.hph.di.procedures::EditMappingDataProc" ( 
+	IN ConfigID INTEGER,
+	IN ConfigName NVARCHAR(512),
+	IN MappingConfiguration CLOB,
+	IN Description NVARCHAR(1024),
+	IN ModifiedBy NVARCHAR(512)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+ 	UPDATE  "hc.hph.di.model::DataIntegration.MappingConfiguration"
+ 		SET "Name" = :ConfigName,
+ 			"Configuration" = :MappingConfiguration,
+ 			"ModifiedBy" = :ModifiedBy,
+ 			"ModifiedAt" = CURRENT_TIMESTAMP,
+ 			"Description" = :Description
+ 		WHERE "ConfigurationID" = :ConfigID; 
+  
+END;      

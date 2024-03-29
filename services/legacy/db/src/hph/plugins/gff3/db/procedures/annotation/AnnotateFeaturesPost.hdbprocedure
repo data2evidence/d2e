@@ -1,0 +1,128 @@
+PROCEDURE "hc.hph.plugins.gff3.db.procedures.annotation::AnnotateFeaturesPost" (--IN dwAuditID int,
+	 IN RunAuditID bigint,
+	 IN chromosomeIndex int,
+    IN explicitRun int --0-no 1- yes with logs 
+) LANGUAGE SQLSCRIPT SQL SECURITY INVOKER AS 
+BEGIN DECLARE referenceID varchar(255); 
+DECLARE countTotal BigInt;
+
+--set the featAnnotations table to contain target table with given DWAuditID and chrIndex 
+if :explicitRun=0 then 
+    featAnnotations=select "RunAuditID","DWAuditID","ReferenceID","ChromosomeIndex","Region.Begin","Region.End","FeatureID","Class","FeatureName","Strand","Score","ParentID","Description","Sequence","Rank","PrePost","CDSPosition","ExonRank" from "hc.hph.plugins.gff3.db.models::Staging.FeaturesAnnotation" where "ChromosomeIndex"=:chromosomeIndex and "RunAuditID"=:RunAuditID ;
+else
+    featAnnotations=select "RunAuditID","DWAuditID","ReferenceID","ChromosomeIndex","Region.Begin","Region.End","FeatureID","Class","FeatureName","Strand","Score","ParentID","Description","Sequence","Rank","PrePost","CDSPosition","ExonRank" from "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" where "ChromosomeIndex"=:chromosomeIndex  and "RunAuditID"=:RunAuditID;--"DWAuditID"=:dwAuditID and 
+end if;
+
+--chk the count in target table 
+select count(*) into countTotal from :featAnnotations;
+if :countTotal >0 then
+    select  distinct "ReferenceID" into referenceID from :featAnnotations;
+ RankedCDSSeq = SELECT 
+     :RunAuditID as "RunAuditID", 
+	 ann."DWAuditID" ,
+	 ann."FeatureID",
+	ann."FeatureName",
+	ann."Region.Begin",
+	ann."Region.End",
+	ann."ChromosomeIndex",
+	ann."Rank",
+	ann."Class",
+	ann."Strand",
+	ann."ParentID",
+	seq."Region.Begin" as "SequenceBegin",
+	seq."Region.End" as "SequenceEnd",
+	 CASE WHEN seq."Region.Begin" = ann."Region.Begin" 
+THEN SUBSTRING( seq."Sequence",	ann."Region.Begin" - seq."Region.Begin"+1, ann."Region.End" - ann."Region.Begin") --+1
+	 WHEN seq."Region.Begin" <= ann."Region.Begin" AND seq."Region.End" > ann."Region.End" --remove =not sure
+THEN SUBSTRING( seq."Sequence",	 ann."Region.Begin" - seq."Region.Begin"+1, ann."Region.End" - ann."Region.Begin") 
+	 WHEN seq."Region.Begin" <= ann."Region.Begin" 
+THEN SUBSTRING( seq."Sequence",
+	 ann."Region.Begin" - seq."Region.Begin"+1)--+1 
+	 WHEN seq."Region.End" > ann."Region.End" --remove = not sure
+THEN SUBSTRING( seq."Sequence",
+	 1,	 ann."Region.End" - seq."Region.Begin") --remove + 1 as end is inclusive 
+ELSE seq."Sequence" 
+END AS "Sequence" 
+FROM :featAnnotations AS ann 
+INNER JOIN (select
+	 seqinternal."ChromosomeIndex", 
+	seqinternal."Region.Begin",
+	seqinternal."Region.End",
+	seqinternal."Sequence",
+	seqinternal."ReferenceID" 
+	from "hc.hph.genomics.db.models::Reference.Sequences" as seqinternal 
+	where seqinternal."ChromosomeIndex"=:chromosomeIndex 
+	and seqinternal."ReferenceID"=:referenceID) as seq ON ann."ReferenceID" = seq."ReferenceID" 
+AND ann."ChromosomeIndex" = seq."ChromosomeIndex" 
+AND (ann."Region.Begin" < seq."Region.End" 
+	AND ann."Region.End" > seq."Region.Begin")  -- removed = in both 
+AND ann."Class" IN ('CDS_region',
+	'start_codon',
+	'stop_codon') 
+;
+
+
+tab2 =select
+    RankedCDSSeq."RunAuditID" as "RunAuditID",
+	RankedCDSSeq."DWAuditID" as "DWAuditID",--
+	RankedCDSSeq."ChromosomeIndex",
+	 string_agg(RankedCDSSeq."Sequence" 
+		order by "SequenceBegin") as "Sequence",
+	 RankedCDSSeq."Rank",
+	 RankedCDSSeq."FeatureName",
+	 RankedCDSSeq."FeatureID",
+	 RankedCDSSeq."Class",
+	  RankedCDSSeq."Strand",
+	  RankedCDSSeq."ParentID"
+	from :RankedCDSSeq RankedCDSSeq 
+	group by "ChromosomeIndex",
+	"FeatureName",
+	"FeatureID",
+	"Rank",
+	"Class" ,
+	"DWAuditID", 
+    "RunAuditID",
+    "Strand",
+    "ParentID"
+	order by "ChromosomeIndex",
+	"FeatureName",
+	"Rank","Class","Strand","ParentID";
+
+
+ if :explicitRun = 1 then
+     update "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" set "Sequence"=null where "ChromosomeIndex"=:chromosomeIndex and "RunAuditID"=:RunAuditID;
+ 
+     update "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" tab1
+     set tab1."Sequence" = (select tab2."Sequence"  from :tab2 tab2
+        where tab2."Rank"=tab1."Rank" 
+	    and tab2."FeatureName"=tab1."FeatureName" 
+	    and tab2."FeatureID"=tab1."FeatureID"
+	    and tab2."RunAuditID"=tab1."RunAuditID" 
+	    and tab2."Class"=tab1."Class"
+	    and tab2."Strand"=tab1."Strand"
+	    and tab2."ParentID"=tab1."ParentID"
+	    and tab2."ChromosomeIndex"=tab1."ChromosomeIndex")
+     where tab1."RunAuditID"=:RunAuditID
+     and tab1."ChromosomeIndex"=:chromosomeIndex;
+  else 
+    update "hc.hph.plugins.gff3.db.models::Staging.FeaturesAnnotation" set "Sequence"=null where "ChromosomeIndex"=:chromosomeIndex and "RunAuditID"=:RunAuditID; 
+     
+    update "hc.hph.plugins.gff3.db.models::Staging.FeaturesAnnotation" tab1
+     set tab1."Sequence" = (select tab2."Sequence"  from :tab2 tab2
+        where tab2."Rank"=tab1."Rank" 
+	    and tab2."FeatureName"=tab1."FeatureName" 
+	    and tab2."FeatureID"=tab1."FeatureID"
+	    and tab2."RunAuditID"=tab1."RunAuditID" 
+	    and tab2."Class"=tab1."Class"
+	    and tab2."Strand"=tab1."Strand"
+	    and tab2."ParentID"=tab1."ParentID"
+	    and tab2."ChromosomeIndex"=tab1."ChromosomeIndex")
+     where tab1."RunAuditID"=:RunAuditID 
+     and tab1."ChromosomeIndex"=:chromosomeIndex; 
+
+ end if;
+
+end if;
+
+END 
+;

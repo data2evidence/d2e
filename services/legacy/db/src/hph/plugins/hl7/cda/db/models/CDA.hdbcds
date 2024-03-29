@@ -1,0 +1,248 @@
+namespace hc.hph.plugins.hl7.cda.db.models;
+using hc.hph.cdw.db.models::DWTypes.Contact;
+using hc.hph.cdw.db.models::DWTypes.Address;
+
+context CDA {
+
+    type CDAString: String(100);
+
+    context Mapping {
+
+        entity Section {
+            key SectionID: CDAString;
+            SectionName: CDAString;
+            IsSelected: hana.TINYINT;
+            ToEntry : association[1..*] to Entry on ToEntry.SectionID = SectionID;
+            ToEntryAttribute : association[1..*] to EntryAttribute on ToEntryAttribute.SectionID = SectionID;
+        } technical configuration {
+            column store;
+        };
+
+        entity Entry {
+            key SectionID: CDAString;
+            key EntryID: CDAString;
+            EntryName: CDAString;
+            EntryType: CDAString;
+            IsSelected: hana.TINYINT;
+            TargetEntity: CDAString;
+            ToEntryAttribute : association[1..*] to EntryAttribute on ToEntryAttribute.EntryID = EntryID;
+        } technical configuration {
+            column store;
+        };
+
+        entity EntryAttribute {
+            key SectionID: CDAString;
+            key EntryID: CDAString;
+            key AttributeID: CDAString;
+            AttributeName: CDAString;
+            IsSelected: hana.TINYINT;
+            TargetEntity: CDAString;
+            TargetAttribute: CDAString;
+        } technical configuration {
+            column store;
+        };
+
+    };
+
+    context Staging {
+
+        table type CDATemplate {
+            Root: CDAString;
+            Ext: CDAString;
+        };
+
+        table type CDACodedValue {
+            OriginalValue: CDAString;
+            OID: CDAString;
+            Code: CDAString;
+            CodeSystem: CDAString;
+            CodeSystemVersion: CDAString;
+        };
+
+        table type CDAPatientName {
+        	Prefix: CDAString;
+        	Given: CDAString;
+        	Family: CDAString;
+        };
+
+        table type CDAAddress {
+        	Street: CDAString;
+        	City: CDAString;
+        	PostalCode: CDAString;
+        	State: CDAString;
+        	Country: CDAString;
+        };
+
+        entity Documents {
+            key DocumentID: CDAString;
+            DocumentName: CDAString;
+            TemplateID: CDATemplate;
+            DocumentType: CDACodedValue;
+            Time: UTCTimestamp;
+            Confidentiality: CDACodedValue;
+            Language: CDACodedValue;
+            Realm: CDACodedValue;
+        } technical configuration {
+            column store;
+        };
+
+        entity Patients {
+            key DocumentID: CDAString;
+            key PatientID: CDAString;
+            PatientName: CDAPatientName;
+            Gender: CDACodedValue;
+            DateOfBirth: UTCTimestamp;
+            Address: CDAAddress;
+            Telecom: CDAString;
+            Race: CDACodedValue;
+            EthnicGroup: CDACodedValue;
+        } technical configuration {
+            column store;
+        };
+
+        entity Sections {
+            key DocumentID: CDAString;
+            key SectionID: CDAString;
+            SectionName: CDAString;
+            TemplateID: CDATemplate;
+        } technical configuration {
+            column store;
+        };
+
+        context Entries {
+
+        	table type CDAQuantity {
+        		Value: CDAString;
+        		Unit: CDAString;
+        	};
+
+	        entity Acts {
+	            key DocumentID: CDAString;
+                key SectionID: CDAString;
+                key EntryID: CDAString;
+	            EntryName: CDAString;
+	            TemplateID: CDATemplate;
+	            Code: CDACodedValue;
+	            Status: CDACodedValue;
+                StartTime: UTCTimestamp;
+	            EndTime: UTCTimestamp;
+                Priority: CDACodedValue;
+	            Language: CDACodedValue;
+	        } technical configuration {
+             column store;
+         };
+
+	        entity Encounters {
+	            key DocumentID: CDAString;
+                key SectionID: CDAString;
+                key EntryID: CDAString;
+	            EntryName: CDAString;
+	            TemplateID: CDATemplate;
+	            Code: CDACodedValue;
+	            Status: CDACodedValue;
+                StartTime: UTCTimestamp;
+	            EndTime: UTCTimestamp;
+                Priority: CDACodedValue;
+	        } technical configuration {
+                column store;
+         };
+
+	        entity Observations {
+	            key DocumentID: CDAString;
+                key SectionID: CDAString;
+                key EntryID: CDAString;
+	            EntryName: CDAString;
+	            TemplateID: CDATemplate;
+	            Code: CDACodedValue;
+	            Status: CDACodedValue;
+	            DerivationExpr: CDAString;
+                StartTime: UTCTimestamp;
+	            EndTime: UTCTimestamp;
+                Priority: CDACodedValue;
+                Language: CDACodedValue;
+                RepeatNumber: CDAString;
+                Value: CDAString;
+                Unit: CDAString;
+                Interpretation: CDACodedValue;
+                Method: CDACodedValue;
+                TargetSite: CDACodedValue;
+	        } technical configuration {
+                column store;
+         };
+
+	        entity Organizers {
+	            key DocumentID: CDAString;
+                key SectionID: CDAString;
+                key EntryID: CDAString;
+	            EntryName: CDAString;
+	            TemplateID: CDATemplate;
+	            Code: CDACodedValue;
+	            Status: CDACodedValue;
+                StartTime: UTCTimestamp;
+	            EndTime: UTCTimestamp;
+	        } technical configuration {
+             column store;
+         };
+
+	        entity Procedures {
+	            key DocumentID: CDAString;
+                key SectionID: CDAString;
+                key EntryID: CDAString;
+	            EntryName: CDAString;
+	            TemplateID: CDATemplate;
+	            Code: CDACodedValue;
+	            Status: CDACodedValue;
+                StartTime: UTCTimestamp;
+	            EndTime: UTCTimestamp;
+	            Priority: CDACodedValue;
+	            Language: CDACodedValue;
+	            Method: CDACodedValue;
+	            ApproachSite: CDACodedValue;
+	            TargetSite: CDACodedValue;
+	        } technical configuration {
+             column store;
+         };
+
+	        entity SubstanceAdministrations {
+	            key DocumentID: CDAString;
+                key SectionID: CDAString;
+                key EntryID: CDAString;
+	            EntryName: CDAString;
+	            TemplateID: CDATemplate;
+	            Code: CDACodedValue;
+	            Status: CDACodedValue;
+                EffectiveTime: UTCTimestamp;
+	            Priority: CDACodedValue;
+	            RepeatNumber: CDAString;
+	            Route: CDACodedValue;
+	            ApproachSite: CDACodedValue;
+	            DoseQuantity: CDAQuantity;
+	            RateQuantity: CDAQuantity;
+	            MaxDoseQuantity: CDAQuantity;
+	            AdministrationUnit: CDACodedValue;
+	        } technical configuration {
+             column store;
+         };
+
+	        entity Supplies {
+	            key DocumentID: CDAString;
+                key SectionID: CDAString;
+                key EntryID: CDAString;
+	            EntryName: CDAString;
+	            TemplateID: CDATemplate;
+	            Code: CDACodedValue;
+	            Status: CDACodedValue;
+                EffectiveTime: UTCTimestamp;
+	            Priority: CDACodedValue;
+	            RepeatNumber: CDAString;
+	            Quantity: CDAQuantity;
+	            ExpectedUseStartTime: UTCTimestamp;
+	            ExpectedUseEndTime: UTCTimestamp;
+	        } technical configuration {
+             column store;
+         };
+
+        };
+
+    };
+};

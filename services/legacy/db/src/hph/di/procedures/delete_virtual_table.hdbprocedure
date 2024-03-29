@@ -1,0 +1,8 @@
+PROCEDURE "hc.hph.di.procedures::delete_virtual_table" ( 
+	in virtualTableName nvarchar(512)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+	exec 'DROP TABLE "' || virtualTableName || '" CASCADE';
+END;

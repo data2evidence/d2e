@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hix_clinical_document hix_version="1">
+	<message_header>
+		<creation_timestamp>2015-10-06 21:56:01</creation_timestamp>
+		<test_data_indicator>1</test_data_indicator>
+		<phi_data_indicator>0</phi_data_indicator>
+		<sender>
+			<sender_ref_id/>
+			<sender_code>prac5_loc1</sender_code>
+			<sender_location_code>prac5_loc1</sender_location_code>
+			<system>
+				<system_type>EHR</system_type>
+				<vendor>CLQ Informatics</vendor>
+				<product_name>CLQ_TEST_DATA</product_name>
+				<version>1.0</version>
+				<system_instance>1</system_instance>
+			</system>
+		</sender>
+		<creator_agent>
+			<creator_org_name>ASCO</creator_org_name>
+			<software>
+				<vendor>Jitterbit</vendor>
+				<product_name>Jitterbit</product_name>
+				<product_version>8.3.0.15</product_version>
+				<configuration_version>1.0</configuration_version>
+				<canonical_data_model_version>1.0</canonical_data_model_version>
+			</software>
+		</creator_agent>
+		<receiver>
+			<receiver_code>CLQ</receiver_code>
+			<receiver_location_code/>
+			<system>
+				<system_type>CLQ</system_type>
+				<vendor>CLQ</vendor>
+				<product_name>CLQ</product_name>
+				<version>1.0</version>
+				<system_instance>1</system_instance>
+			</system>
+		</receiver>
+	</message_header>
+	<patient isvoided="0" pid="33952">
+		<patient_details code_system="SNOMED" code_system_version="2015" code_value="443709011" isvoided="0" src_pkid="33952" timestamp="2015-10-06 21:56:01" type="Patient Demographics">
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="184096005">Patient surname</key>
+				<value type="NVarchar">Clark</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="2770657016">City of residence</key>
+				<value type="NVarchar">Springfield</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="398070004">State</key>
+				<value type="NVarchar">MA</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="2766668013">Patient country</key>
+				<value type="NVarchar">United States</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="184102003">Patient postal code</key>
+				<value type="NVarchar">93396</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="429697006">Patient home telephone number</key>
+				<value type="NVarchar">(087)070-3026</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="2164240014">Patient first name</key>
+				<value type="NVarchar">Beverly</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="184099003">Date of birth</key>
+				<value type="NVarchar">1969-06-26</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="391746016">Gender</key>
+				<value type="NVarchar">F</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="286004017">Ethnicity</key>
+				<value type="NVarchar">Non Hispanic</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="265558016">Race</key>
+				<value type="NVarchar">Black or African American</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="729536019">Patient marital status</key>
+				<value type="NVarchar">M</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="284402010">Patient address</key>
+				<value type="NVarchar">73 Melby Crossing</value>
+			</patient_detail>
+		</patient_details>
+		<interaction code_system="CLQ" code_value="Procedure, Performed" isvoided="0" src_pkid="533952" type="Procedure, Performed">
+			<providers>
+				<provider isvoided="0" provider_ID="10003">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Laurentina</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Hummel</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Laurentina.Hummel @prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Tulsa</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1935-12-05</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">F</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">227799832</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">74156</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">OK</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">6739 Amoth Park</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">lhummel</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="260878002">T</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="67673008" type="NVarchar">T2</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Procedure Type</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="116783008" type="NVarchar">Clinical Staging Procedure</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2014_09_01" code_value="439272007">Procedure Date</key>
+				<value type="NVarchar">2014-11-25</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="277206009">N</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="443824009" type="NVarchar">pN1mi</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="277208005">M</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="261928007" type="NVarchar">M1b</value>
+			</interaction_detail>
+		</interaction>
+		<interaction code_system="CLQ" code_value="Medication, Administered" isvoided="0" src_pkid="233952" type="Medication, Administered">
+			<providers>
+				<provider isvoided="0" provider_ID="10003">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Laurentina</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Hummel</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Laurentina.Hummel @prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Tulsa</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1935-12-05</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">F</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">227799832</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">74156</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">OK</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">6739 Amoth Park</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">lhummel</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key>Medication Administered</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="416118004" type="NVarchar">Administered</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Medication Start Date</key>
+				<value type="NVarchar">2014-11-26</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Drug Administered</key>
+				<value code_system="RXNORM" code_system_version="2015-08" code_value="389230" type="NVarchar">Tamoxifen or Aromatase Inhibitor Therapy</value>
+			</interaction_detail>
+		</interaction>
+		<interaction code_system="CLQ" code_value="Diagnosis, Active" isvoided="0" src_pkid="143952" type="Diagnosis, Active">
+			<providers>
+				<provider isvoided="0" provider_ID="10003">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Laurentina</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Hummel</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Laurentina.Hummel @prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Tulsa</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1935-12-05</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">F</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">227799832</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">74156</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">OK</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">6739 Amoth Park</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">lhummel</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2014_09_01" code_value="413458017">Diagnosis Type</key>
+				<value type="NVarchar">S_Dx</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="LNC" code_system_version="250" code_value="33999-4">Diagnosis Status</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="55561003" type="NVarchar">Active</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Diagnosis Date</key>
+				<value type="NVarchar">2014-11-26</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="8319008">Diagnosis Code</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="417181009" type="NVarchar">417181009</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2014_09_01" code_value="14725018">Diagnosis</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="282291009" type="NVarchar">Present</value>
+			</interaction_detail>
+		</interaction>
+		<interaction code_system="CLQ" code_value="Encounter, Performed" isvoided="0" src_pkid="73952" type="Encounter, Performed">
+			<providers>
+				<provider isvoided="0" provider_ID="10003">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Laurentina</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Hummel</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Laurentina.Hummel @prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Tulsa</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1935-12-05</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">F</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">227799832</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">74156</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">OK</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">6739 Amoth Park</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">lhummel</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key>Encounter Type</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="390906007" type="NVarchar">Face-to-Face Interaction</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Encounter Date</key>
+				<value type="NVarchar">2014-12-05</value>
+			</interaction_detail>
+		</interaction>
+		<interaction code_system="CLQ" code_value="Encounter, Performed" isvoided="0" src_pkid="63952" type="Encounter, Performed">
+			<providers>
+				<provider isvoided="0" provider_ID="10003">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Laurentina</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Hummel</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Laurentina.Hummel @prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Tulsa</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1935-12-05</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">F</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">227799832</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">74156</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">OK</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">6739 Amoth Park</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">lhummel</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key>Encounter Type</key>
+				<value code_system="CPT" code_system_version="2015" code_value="99204" type="NVarchar">Office Visit</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Encounter Date</key>
+				<value type="NVarchar">2015-02-27</value>
+			</interaction_detail>
+		</interaction>
+		<interaction code_system="CLQ" code_value="Encounter, Performed" isvoided="0" src_pkid="53952" type="Encounter, Performed">
+			<providers>
+				<provider isvoided="0" provider_ID="10003">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Laurentina</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Hummel</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Laurentina.Hummel @prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Tulsa</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1935-12-05</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">F</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">227799832</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">74156</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">OK</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">6739 Amoth Park</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">lhummel</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key>Encounter Type</key>
+				<value code_system="CPT" code_system_version="2015" code_value="99205" type="NVarchar">Office Visit</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Encounter Date</key>
+				<value type="NVarchar">2014-11-19</value>
+			</interaction_detail>
+		</interaction>
+		<interaction code_system="CLQ" code_value="Diagnosis, Active" isvoided="0" src_pkid="43952" type="Diagnosis, Active">
+			<providers>
+				<provider isvoided="0" provider_ID="10003">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Laurentina</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Hummel</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider EMail</key>
+						<value type="NVarchar">Laurentina.Hummel @prac5.net</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider City</key>
+						<value type="NVarchar">Tulsa</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Country</key>
+						<value type="NVarchar">United States</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1935-12-05</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">F</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">227799832</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Postal Code</key>
+						<value type="NVarchar">74156</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider State</key>
+						<value type="NVarchar">OK</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Street Address</key>
+						<value type="NVarchar">6739 Amoth Park</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">lhummel</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="413458017">Diagnosis Type</key>
+				<value type="NVarchar">P_Dx</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="LNC" code_system_version="250" code_value="33999-4">Diagnosis Status</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="55561003" type="NVarchar">Active</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Diagnosis Date</key>
+				<value type="NVarchar">2014-11-20</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="8319008">Diagnosis Code</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="188151006" type="NVarchar">188151006</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="14725018">Diagnosis</key>
+				<value code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="282291009" type="NVarchar">Present</value>
+			</interaction_detail>
+		</interaction>
+	</patient>
+</hix_clinical_document>

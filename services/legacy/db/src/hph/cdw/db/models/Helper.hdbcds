@@ -1,0 +1,30 @@
+namespace hc.hph.cdw.db.models;
+
+using hc.hph.cdw.db.models::DWEntitiesEAV as DWEntEAV; 
+using "hc::USER_PARAMETERS" as User_Parameters;
+
+context Helper {
+
+    /*************************
+     *     TMP_TEXT_KEYS     *
+     *************************/
+
+    entity TmpTextKeys {
+
+        key InteractionTextID : String(500);
+        Value                 : String(500);
+        Score                 : String(500);
+
+        InteractionText_Assoc : association to DWEntEAV.Interaction_Text on InteractionText_Assoc.InteractionTextID = InteractionTextID;
+    } technical configuration {
+        row store;
+    };
+
+    
+    view UserParameters as select from User_Parameters {
+    	USER_NAME,
+    	PARAMETER,
+    	VALUE
+    } where USER_NAME = SESSION_CONTEXT('XS_APPLICATIONUSER');
+
+}

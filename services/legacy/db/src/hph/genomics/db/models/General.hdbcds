@@ -1,0 +1,152 @@
+namespace hc.hph.genomics.db.models;
+
+using hc.hph.genomics.db.models::Type as Type;
+using hc.hph.cdw.db.models::DWTypes as DWType;
+using hc.hph.cdw.db.models::DWEntities as DWEntity;
+using hc.hph.cdw.db.models::DWAnnotations as DWAnnotation;
+
+context General
+{
+
+
+	table type SampleList
+	{
+		SampleIndex : Type.SampleIndex;
+	};
+
+	table type SampleNames
+	{
+		SampleIndex : Type.SampleIndex;
+		SampleName : String(255);
+	};
+
+	// Sequences
+
+	entity Sequences
+	{
+		key SequenceID : String(255);
+		Value : Integer;
+	} technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+           migration disabled;
+  	};
+
+	// Samples within analysis
+
+    @DWAnnotation.Entity."Group" : 'Genomics'
+    @DWAnnotation.Entity.Name : 'Sample'
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.genomics.db.models::General.Samples"'}
+	entity Samples
+	{
+		key SampleIndex : Type.SampleIndex;
+		DWAuditID : Type.DWDocID;
+		DWSource : DWType.DWSource;
+		ReferenceID : Type.ReferenceID;
+		SampleID : String(255) null;
+		SampleClass : Type.SampleClass null;
+		PatientDWID : Type.DWID;
+		InteractionDWID : Type.DWID;
+		AnalysisDate : UTCTimestamp null;
+		OrgID : String(100) null;
+		Phenotype : String(5000);
+		Sex:String(10);
+		FamilyID:String(255);
+
+		PatientKey : Association to DWEntity.Patient_Key on PatientKey.DWID = PatientDWID;
+		PatientAttr : Association to DWEntity.Patient_Attr on PatientAttr.DWID = PatientDWID;
+		InteractionKey : Association to DWEntity.Interactions_Key on InteractionKey.DWID = InteractionDWID;
+		InteractionAttr : Association to DWEntity.Interactions_Attr on InteractionAttr.DWID = InteractionDWID;
+	} technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+           migration disabled;
+  	};
+
+	// Generated patients to be replicated into CDM
+
+
+	entity Patients
+	{
+		key PatientIndex : Type.PatientIndex;
+		//DWType.DWSource;
+		DWID : DWType.DWID;
+		DWSource : DWType.DWSource;
+		DWAuditID : Type.DWAuditID;
+
+		FamilyName : String(100); // Family name (often called 'Surname')
+		GivenName : String(100); // Given names (not always 'first'). Includes middle names
+		Gender : DWType.CodeableValue10; // Administrative gender
+		BirthDate : UTCDateTime; // The date and time of birth for the individual
+		Nationality : DWType.CodeableValue100; // Nationality of the patient
+		Address : DWType.Address; // Address of the patient
+	} technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+           migration disabled;
+  	};
+
+	entity Pedigree
+	{
+    
+		DWAuditID : Type.DWAuditID;
+		SourceSampleIndex : Type.SampleIndex;
+		TargetSampleIndex : Type.SampleIndex;
+		Relationship : String(5000);
+	} technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+           migration disabled;
+  	};
+
+    table type PedigreeSamples
+  	{
+	    SampleIndex : Type.SampleIndex;
+	    FamilyName : String(100);
+	    GivenName : String(100);
+	    BirthDate : UTCTimestamp;
+	    PatientDWID : String(64);
+	    Gender : String(100);
+	    AnalysisDate : UTCTimestamp;
+	    SampleClass : String(100);
+	    InteractionDWID : String(64);
+	    DWSource : DWType.DWSource;
+	    InteractionID : String(100);
+  	};
+
+  	table type PedigreeAlleles
+  	{
+	    SampleIndex : Type.SampleIndex;
+	    DWAuditID : Type.DWDocID;
+	    AlleleIndex : Integer;
+	    Allele : String(255);
+	    AlleleCount : Integer;
+  	};
+
+	table type SampleDetails
+	{
+	    FamilyName : String(100);
+	    GivenName : String(100);
+	    BirthDate : UTCTimestamp;
+	    PatientDWID : String(64);
+	    Gender : String(100);
+	    AnalysisDate : UTCTimestamp;
+	    SampleClass : String(100);
+	    InteractionDWID : String(64);
+	    SampleIndex : Type.SampleIndex;
+	    DWAuditID : Type.DWDocID;
+	    DWSource : DWType.DWSource;
+	    InteractionID : String(100);
+	    AlleleIndex : Integer;
+	    Allele : String(255);
+	    AlleleCount : Integer;
+	};
+    
+	// Session local sample group information
+	temporary entity SessionSampleGroups
+	{
+		SampleGroup : String(255);
+		SampleIndex : Type.SampleIndex;
+	};
+
+};

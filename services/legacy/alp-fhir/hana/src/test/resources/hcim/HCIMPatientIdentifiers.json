@@ -1,0 +1,220 @@
+{
+    "resourceType": "StructureDefinition",
+    "id": "HCIMPatientIdentifiers",
+    "url": "http://data4life.care/health/fhir/StructureDefinition/HCIMPatientIdentifiers",
+    "kind": "resource",
+    "type": "HCIMPatientIdentifiers",
+    "meta": {
+        "profile": [
+            "http://data4life.care/health/fhir/profile/Tabledefinition"
+        ]
+    },
+    "extension": [
+        {
+            "uri": "http://data4life.care/health/fhir/extension/schema",
+            "valueString": "FHIRGZ"
+        },
+        {
+            "uri": "http://data4life.care/health/fhir/extension/table",
+            "valueString": "PatientIdentifiers"
+        }
+    ],
+    "snapshot": {
+        "element": [
+            {
+                "id": "HCIMPatientIdentifiers",
+                "path": "HCIMPatientIdentifiers",
+                "min": 0,
+                "max": "*"
+            },
+            {
+                "id": "_RecordKey",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "_RecordKey"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/primaryKey",
+                        "valueBoolean": true
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_PatientRecordKey",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "_PatientRecordKey"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 16
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_IsPrimaryID",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "_IsPrimaryID"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "PatientIdentificationNumber",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "PatientIdentificationNumber"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "ID_System_name",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "ID_System_name"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "ID_System_OID",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "ID_System_OID"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "NVARCHAR"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnsize",
+                        "valuePositiveInt": 1024
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_validFrom",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "_validFrom"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "TIMESTAMP"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnPostfix",
+                        "valueString": " GENERATED ALWAYS AS ROW START"
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_validTo",
+                "min": 1,
+                "extension": [
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column",
+                        "valueString": "_validTo"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/column-type",
+                        "valueString": "TIMESTAMP"
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/notNull",
+                        "valueBoolean": true
+                    },
+                    {
+                        "uri": "http://data4life.care/health/fhir/extension/columnPostfix",
+                        "valueString": " GENERATED ALWAYS AS ROW END"
+                    }
+                ],
+                "max": "*"
+            }
+        ]
+    }
+}

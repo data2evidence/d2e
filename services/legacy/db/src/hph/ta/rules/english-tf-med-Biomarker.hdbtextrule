@@ -1,0 +1,452 @@
+!!(c) Copyright 2018 ALP. All rights reserved.
+!!
+!!ALP and the ALP logo are registered trademarks of ALP in Germany and other countries. Business Objects and the Business Objects logo are registered trademarks of Business Objects S.A., which is an ALP company.
+!!
+!!(c) Copyright 2017 ALP. All rights reserved.
+!!
+!!ALP and the ALP logo are registered trademarks of ALP in Germany and other countries. Business Objects and the Business Objects logo are registered trademarks of Business Objects S.A., which is an ALP company.
+!!
+!======================================================================
+! File Name: english-tf-med-Biomarker.rul 
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of Biomarkers and their relations
+!======================================================================
+
+!======================================================================
+!! BIOMARKERS:
+!======================================================================
+
+!======================================================================
+! OUTPUT FIELDS:
+!======================================================================
+
+! Biomarker group: med_RelationBiomarkerTestResult
+
+!At least two of the following subentities must be present to trigger the rule:
+
+!!Biomarker
+!!BiomarkerStatusEquivocal
+!!BiomarkerStatusNegative
+!!BiomarkerStatusPositive
+!!BiomarkerStatusUnknown
+!!BiomarkerTest
+!!Observation_CancerBiomarker_Component_Alteration
+!!BiomarkerAlterationNegative
+
+!Optional subentities:
+!!BiomarkerLocation
+!!BiomarkerPercent
+!!BiomarkerValue
+!======================================================================
+
+!======================================================================
+!! Common defines:
+!======================================================================
+#subgroup coord: (<\p{ci}(and|&|or)>|(<STEM:\,> <\p{ci}(and|&|or)>?)|</>|<\|>)
+
+#subgroup skipParens: <\(><~(\()>+<\)>
+
+#subgroup PrepOF: {(
+  (<\p{ci}(of|OF|Of|AT|at)> <\p{ci}(the|THE|AN?|an?)>? )
+| (<\p{ci}(involving|INVOLVING)> <\p{ci}(the|THE)>  )
+)}
+
+#subgroup PrepIN: {(
+  (<\p{ci}(in|IN|AT|at)> <\p{ci}(the|THE)>? )
+| (<\p{ci}(involving|INVOLVING)> <\p{ci}(the|THE)>  )
+)}
+
+#subgroup PrepFOR: {(
+  (<\p{ci}(for|FOR|For)> <\p{ci}(the|THE|AN?|an?)>? )
+)}
+
+#subgroup PrepALL: {(
+  ((<POS:Prep>|<\p{ci}(involving|INVOLVING)>) <\p{ci}(the|an?)>? )
+)}
+
+#subgroup Observed: {(
+<\p{ci}(PRESENT|present|Present|detected|observed|noticed|determined|identified|Detected|Observed|Noticed|Determined|Identified|DETECTED|OBSERVED|NOTICED|DETERMINED|IDENTIFIED|seen|noted|SEEN|NOTED|Noted|Seen|noticeable|perceptible|visible)>
+)}
+
+#subgroup LinkingV: {(
+<\p{ci}(WAS|WERE|was|were|IS|is|ARE|are|APPEAR(ED|S)?|appear(ed|s)?|SHOW(ED|S)?|show(ed|s)?|demonstrate(d|s)?|DEMONSTRATE(D|S)?)> 
+)}
+
+!======================================================================
+!!Entities coming from dictionaries
+!======================================================================
+
+#subgroup DictBiomarker: [OD Observation_CancerBiomarker_Normalized] [TE OBSERVATION_CANCERBIOMARKER_NORMALIZED] <>+ [/TE] [/OD]
+
+#subgroup DictBiomarkers: ( %(DictBiomarker) (%(coord) %(DictBiomarker) )* )
+
+#subgroup DictBiomarkerPar: ( <\(> %(DictBiomarker) <\)> )
+#subgroup Med_Biomarker: ( %(DictBiomarker) ( <\p{ci}((G|g)enes?|(P|p)rotein|(A|a)ntigen|(O|o)ncogenes?|(P|p)roto\-oncogenes?)> ){0,2} | %(DictBiomarkerPar) )+ 
+
+#subgroup Med_Biomarkers: ( <\(>? %(Med_Biomarker) (%(coord) %(Med_Biomarker) )*  <\)>? )
+
+
+#subgroup Med_Test: {(
+ ((%(DictBiomarkers) <>?)? [OD Observation_CancerBiomarker_Method] [TE OBSERVATION_CANCERBIOMARKER_METHOD] <>+ [/TE] <\p{ci}(stains?|staining|tests?|analysis)>? [/OD] 
+| (%(DictBiomarker) <\p{ci}(immunohistochemical)>?  <\p{ci}(stains?|staining|tests?|testing|analysis|assay)> ))
+(<\p{ci}(for|FOR|For|with)>? (%(DictBiomarkers)|<POS:Adj|Prop|Num|Nn>+))*
+)}
+
+!!======================================================================
+! Hard-coded entities:
+!!======================================================================
+
+#subgroup OtherAlt: {(
+  ( <(T|t)(ranslocation)？\([0-9][0-9]?;[0-9][0-9]?\)(\(q[0-9][0-9]?;q[0-9][0-9]?(\.[0-9])?\))?> )
+| ( <\p{ci}((T|t)(ranslocation))> <\(> <[0-9][0-9]?;[0-9][0-9]?> <\)> (<\(> <\(q[0-9][0-9]?;q[0-9][0-9]?(\.[0-9])?> <\)>)? )
+)}
+
+#subgroup OtherAlteration: { (
+[OD Observation_CancerBiomarker_Component_Alteration]%(OtherAlt)[/OD] 
+%(DictBiomarker)?
+) }
+
+#subgroup 17pdeletion: { [OD Observation_CancerBiomarker_Component_Alteration](
+  ( <del> <[1-9][0-9]?(p|q)> )
+| ( <del[1-9][0-9]?(p|q)> )
+| ( <del> <\(> <[1-9][0-9]?(p|q)> <\)> )
+| ( <del\([1-9][0-9]?(p|q)\)> )
+| ( <deletion[1-9][0-9]?(p|q)>)
+| ( <[1-9][0-9]?(p|q)> <\->? <deletion|del|syndrome>)
+)[/OD] }
+
+#subgroup OtherDeletion: { [OD Observation_CancerBiomarker_Component_Alteration](
+(  ( <(X|([1-9][0-9]?))(p|q)[1-9][0-9]((\.|\-)[1-9][0-9]?)?> )
+| ( <[1-9][0-9]?(p|q)[1-9][0-9](\.[1-9][0-9]?)?(\-)(p|q)[1-9][0-9](\.[1-9][0-9]?)?> )
+) %(skipParens)? <\p{ci}(deletion)>? <\p{ci}(syndrome)>?
+)[/OD] }
+
+#subgroup Nucleotides: { (
+<(T|A|G|C)(T|A|G|C)(T|A|G|C)(T|A|G|C)+>
+)}
+
+
+#subgroup DNAnucleotides: {[OD NucleotidesAlteration]  (
+  ( (<[a-z]\.[0-9]+>) <(T|A|G|C)((T|A|G|C)(T|A|G|C))?\-?\>(T|A|G|C)(T|A|G|C)(T|A|G|C)> )
+| ( <(\()?[a-z]\.[0-9]+(T|A|G|C){1,3}> <\>> <(T|A|G|C){1,3}>(<\)>)? )
+| ( <[a-z]\.[0-9]+([0-9]|\-|\+|_)*((ins|inv|dup|del)(T|A|G|C)*[0-9]*)+>) 
+| ( <\(?(T|A|G|C)((T|A|G|C)(T|A|G|C))?\-?\>(T|A|G|C)((T|A|G|C)(T|A|G|C))?> <\)>?)
+| ( <\(?([a-z]\.[0-9]+)?(T|A|G|C)((T|A|G|C)(T|A|G|C))?\-?\>(T|A|G|C)((T|A|G|C)(T|A|G|C))?\)?> <\)>?)
+| ( <(\()?([a-z]\.[0-9]+)?(T|A|G|C){1,3}> <\->? <\>> <(T|A|G|C){1,3}>(<\)>)? )
+|  %(Nucleotides)
+) [/OD] }
+
+#subgroup DictAminoCode: ( [TE AminoAcid] <>+ [/TE] | <His> | <Met> | <Sec> )
+
+#subgroup AminoAcids: {[OD AminoAcidAlteration]  (
+  (<([a-z]\.)?\(?(Leu|Ser|Ile|Glu|Val|Lys|Thr|Phe|Ala|Gly|Arg|Gln|Asp|Asn|Pro|Tyr|Met|His|Trp|Cys|Asx|Sec|Xaa|Glx|LEU|SER|ILE|GLU|VAL|LYS|THR|PHE|ALA|GLY|ARG|GLN|ASP|ASN|PRO|TYR|MET|HIS|TRP|CYS|ASX|SEC|XAA|GLX)[0-9]+(Leu|Ser|Ile|Glu|Val|Lys|Thr|Phe|Ala|Gly|Arg|Gln|Asp|Asn|Pro|Tyr|Met|His|Trp|Cys|Asx|Sec|Xaa|Glx|LEU|SER|ILE|GLU|VAL|LYS|THR|PHE|ALA|GLY|ARG|GLN|ASP|ASN|PRO|TYR|MET|HIS|TRP|CYS|ASX|SEC|XAA|GLX)> )
+| ( <(Leu|Ser|Ile|Glu|Val|Lys|Thr|Phe|Ala|Gly|Arg|Gln|Asp|Asn|Pro|Tyr|Met|His|Trp|Cys|Asx|Sec|Xaa|Glx|LEU|SER|ILE|GLU|VAL|LYS|THR|PHE|ALA|GLY|ARG|GLN|ASP|ASN|PRO|TYR|MET|HIS|TRP|CYS|ASX|SEC|XAA|GLX)[0-9]+> <(Leu|Ser|Ile|Glu|Val|Lys|Thr|Phe|Ala|Gly|Arg|Gln|Asp|Asn|Pro|Tyr|Met|His|Trp|Cys|Asx|Sec|Xaa|Glx|LEU|SER|ILE|GLU|VAL|LYS|THR|PHE|ALA|GLY|ARG|GLN|ASP|ASN|PRO|TYR|MET|HIS|TRP|CYS|ASX|SEC|XAA|GLX)> )
+| (  %(DictAminoCode) <[0-9]+> %(DictAminoCode) )
+!| ( <(A|B|C|D|E|F|G|H|I|K|L|M|N|P|Q|R|S|T|V|V|W|X|Y|Z)[0-9][0-9][0-9]?(A|B|C|D|E|F|G|H|I|K|L|M|N|P|Q|R|S|T|V|V|W|X|Y|Z)> )
+) [/OD] }
+
+#subgroup AAmutation: {[OD AminoAcidAlteration]  (
+  ( <(A|B|C|D|E|F|G|H|I|K|L|M|N|P|Q|R|S|T|V|V|W|X|Y|Z)[0-9][0-9][0-9]?(A|B|C|D|E|F|G|H|I|K|L|M|N|P|Q|R|S|T|V|V|W|X|Y|Z)> )
+| ( <(A|B|C|D|E|F|G|H|I|K|L|M|N|P|Q|R|S|T|V|V|W|X|Y|Z)[0-9][0-9][0-9]?(_|(A|B|C|D|E|F|G|H|I|K|L|M|N|P|Q|R|S|T|V|V|W|X|Y|Z)|[0-9])*((ins|inv|dup|del)(T|A|G|C)*)+> )
+) [/OD] }
+
+
+#subgroup GeneticAlteration: { (
+   ( <\(> ( %(DNAnucleotides) | %(AminoAcids) | %(AAmutation) )  <\)> ) 
+| ( %(DNAnucleotides) | %(AminoAcids) | %(AAmutation) )
+)+ }
+
+!#subgroup Bio_Change: [OD Observation_CancerBiomarker_Component_Alteration] [TE OBSERVATION_CANCERBIOMARKER_COMPONENT_ALTERATION] <>+ [/TE][/OD] | %(17pdeletion) | %(OtherDeletion) | %(OtherAlteration) 
+#subgroup Bio_Change: [OD Observation_CancerBiomarker_Component_Alteration] [TE OBSERVATION_CANCERBIOMARKER_COMPONENT_ALTERATION] <>+ [/TE][/OD] 
+
+#subgroup Med_Defect: { 
+( 
+!   <\(> ( %(Bio_Change) |  %(GeneticAlteration) ) <\)>
+   <\(>  %(Bio_Change)  <\)>
+|  %(Bio_Change) 
+!|  %(GeneticAlteration)
+!|  %(OtherAlteration)
+)+ 
+}
+
+
+!======================================================================
+! LOCATION
+!======================================================================
+#subgroup LocationKeywords: {
+( <\p{ci}(exons?)>
+| <\p{ci}(codons?)>
+| <\p{ci}(introns?)>
+)
+}
+!======================================================================
+#subgroup Location: {
+( <\(> %(LocationKeywords) ( <\(> <\p{ci}(s)> <\)> )? ( <(\-|and|or|to|\,|AND|OR|TO)>?  <POS:Num>)+ <\)> 
+  | %(LocationKeywords) ( <\(> <\p{ci}(s)> <\)> )? ( <(\-|and|or|to|\,|AND|OR|TO)>?  <POS:Num>)+
+)
+}
+
+!======================================================================
+#subgroup BioLocation: {
+[OD Observation_CancerBiomarker_Component_DNARegion] %(Location) ( <(\,|;)>? %(Location) )* [/OD]
+}
+
+
+!======================================================================
+
+!!======================================================================
+!! STATUS
+!!======================================================================
+
+#subgroup StatusKeywordsNounPos: {(
+  <\p{ci}(PRESENCE|Presence|presence)>
+| <\p{ci}(reactivity)>
+| <\p{ci}(staining)>
+)}
+
+!======================================================================
+#subgroup StatusKeywordsNounNeg: {(
+  <\p{ci}(ABSENCE|Absence|absence)>
+ | <\p{ci}(LACK|lack|Lack)>
+)}
+
+
+!======================================================================
+#subgroup StatusKeywordsAdjPos: {
+[OD POS](
+  ( (<\p{ci}(diffusely|Diffusely|DIFFUSELY|diffuse|Diffuse|DIFFUSE|focally|FOCALLY|Focally|strongly)> <\p{ci}(and|AND)>)? <\p{ci}(strong|focally|strongly|low|high|weakly|weak|Moderate|moderate|moderately|diffusely|variably|Strong|Focally|Strongly|Low|High|Weakly|Weak|Moderately|Diffusely|Variably|STRONG|FOCALLY|STRONGLY|LOW|HIGH|WEAKLY|WEAK|MODERATELY|DIFFUSELY|VARIABLY|Elevated|elevated)>* <\p{ci}(POSITIVE|Positive|positive|POSITIVITY|Positivity|positivity|IMMUNOPOSITIVE|Immunopositive|immunopositive|immunoreactive|IMMUNOREACTIVE|Immunoreactive|immunohistochemical|ELEVATED|Elevated|elevated)>)
+| (<\p{ci}(positive|weak|patchy|moderate)> <\p{ci}(and|to)>? <>? <\p{ci}(stains?|staining)>)
+| (<\p{ci}(partially)>? <\p{ci}(PRESENT|present|Present)>)
+| (<\p{ci}(pos|POS|Pos)>)
+| (<\p{ci}(focal)> <\p{ci}(weak)> <\p{ci}(positive|positivity)>?)
+| (<\p{ci}(negative|weakly|weak)> <\p{ci}(to)> <\p{ci}(strongly|focally|focal)> <\p{ci}(weak|positive)>)
+| (<\p{ci}(Moderate|moderate|Low|low|High|high|increased|Positive|positive)>+ <\p{ci}(defined)>? <\p{ci}(cell)>? <\p{ci}(PROLIFERATION|Proliferation|proliferation|PROLIFERATIVE|Proliferative|proliferative)>? <\p{ci}(rate|index|activity)>)
+| (<\p{ci}(Moderate|moderate|Low|low|High|high|increased|Positive|positive)>+ <\p{ci}(defined)>? <\p{ci}(cell)>? <\p{ci}(PROLIFERATION|Proliferation|proliferation)>)
+| (<\p{ci}(cell|defined)>? <\p{ci}(PROLIFERATION|Proliferation|proliferation|PROLIFERATIVE|Proliferative|proliferative)> <\p{ci}(rate|index|activity)>? %(LinkingV)? <\p{ci}(Moderate|moderate|Low|low|High|high|increased|Positive|positive)>)
+| (<\p{ci}(no)> <\p{ci}(loss)> <\p{ci}(of)> <\p{ci}(expression)>)
+)[/OD]
+}
+
+
+
+!======================================================================
+#subgroup StatusKeywordsAdjNeg: {
+[OD NEG](
+  <\p{ci}(Negative|NEGATIVE|negative)>
+| <\p{ci}(ABSENT|absent|Absent)>
+| <\p{ci}(neg|NEG|Neg)>
+| <\p{ci}(normal|Normal|NORMAL)>
+| <\p{ci}(non)> <\p{ci}(amplified)>
+| <\p{ci}(non)> <\p{ci}(mutated)>
+| <\p{ci}(non)> <\p{ci}(overexpressed)>
+| <\p{ci}(non)> <\p{ci}(immunopositive)>
+| <\p{ci}(non)> <\p{ci}(immunoreactive)>
+| <\p{ci}(non)> <\p{ci}(immunohistochemical)>
+| <\p{ci}(non\-?amplified)>
+| <\p{ci}(non\-?mutated)>
+| <\p{ci}(non\-?overexpressed)>
+| <\p{ci}(non\-?immunopositive)>
+| <\p{ci}(non\-?immunoreactive)>
+| <\p{ci}(non\-?immunohistochemical)>
+| <\p{ci}(not|NOT|Not|Non|NON|non?)> %(Observed)
+| <\p{ci}(not|NOT|Not|non?)> <\p{ci}(immunopositive|immunoreactive|immunohistochemical)>
+)[/OD]
+}
+
+
+!======================================================================
+#subgroup StatusKeywordsAdjEqui: {
+[OD IND](
+  <\p{ci}(equivocal|EQUIVOCAL|Equivocal)>
+| <\p{ci}(borderline)>
+)[/OD]
+}
+
+
+!======================================================================
+#subgroup StatusKeywordsAdjUnk: {
+[OD IE](
+  <\p{ci}(unknown)>
+| <\p{ci}(indeterminate)>
+| <\p{ci}(status|STATUS|Status)>? <\p{ci}(cannot|CANNOT|Cannot)> <\p{ci}(be)> %(Observed)
+)[/OD]
+}
+
+!======================================================================
+#subgroup StatusKeywordsAdj: {(
+     %(StatusKeywordsAdjPos) 
+   | %(StatusKeywordsAdjNeg) 
+   | %(StatusKeywordsAdjEqui) 
+   | %(StatusKeywordsAdjUnk) 
+)}
+
+!======================================================================
+#subgroup StatusMultiwords: {(
+  [OD POS](<\p{ci}(.+\-positive)>)[/OD]
+| [OD NEG](<\p{ci}(.+\-negative)>)[/OD]
+!| [OD POS](<\p{ci}(triple-positive)>)[/OD]
+!| [OD NEG](<\p{ci}(triple-negative)>)[/OD]
+!| <\p{ci}(triple)> [OD POS](<\p{ci}(positive)>)[/OD]
+!| <\p{ci}(triple)> [OD NEG](<\p{ci}(negative)>)[/OD]
+| [OD POS](<\p{ci}(.+\-pos)>)[/OD]
+| [OD NEG](<\p{ci}(.+\-neg)> )[/OD]
+| [OD POS](<\p{ci}(.+\-low)>)[/OD]
+| [OD POS](<\p{ci}(.+\-high)>)[/OD]
+!| [OD POS](<\p{ci}(([a-z]|[A-Z]).+\+)>)[/OD]
+|  [OD POS] [TE OBSERVATION_CANCERBIOMARKER_NORMALIZED] <(.+\+)>  [/TE] [/OD]
+)
+}
+
+!======================================================================
+#subgroup StatusPlusorMinus: {
+  [OD POS](<\+>)[/OD]
+!| [OD NEG](<\->)[/OD]
+}
+
+!======================================================================
+! ALTERATION
+!======================================================================
+
+#subgroup DefectAdj: {(
+     ( [OD NEG] <\p{ci}(not|NOT|Not|Non|NON|non)> (<\p{ci}(amplified|mutated|overexpressed|deleterious|over\-expressed)>|<STEM:\p{ci}(express), POS:V>) [/OD])
+|    ( [OD Observation_CancerBiomarker_Component_Alteration] <\p{ci}(amplified|mutated|deleterious|overexpressed|over\-expressed)> [/OD])
+|    ( [OD Observation_CancerBiomarker_Component_Alteration] <STEM:\p{ci}(express), POS:V> [/OD])
+)}
+
+#subgroup AllStatusAdj: {(
+ <\(>? (
+ %(DefectAdj) | %(StatusKeywordsAdj)
+) <\)>?
+)}
+
+!======================================================================
+! NUMERIC ENTITIES
+!======================================================================
+
+!from OOB
+
+#subgroup NumModifier: {(
+<(\<|\>|ABOUT|About|about|approximately|Approximately|APPROXIMATELY)> | (<(at|AT)> <(LEAST|Least|least|Most|MOST|most)>) | (<(UP|up|Up)> <(TO|to|To)>) | (<\p{ci}(greater|smaller|less)> <\p{ci}(than)>)
+)}
+
+#subgroup OtherPercent: <.[0-9]+\%>
+#subgroup Percent: <\(|\,>? <POS:Prep>? %(NumModifier)? [OD Observation_CancerBiomarker_Value] ([TE PERCENT] <>+ [/TE]|%(OtherPercent)) [/OD] <\)>?
+
+#subgroup BioNum: {	( <>? <\p{ci}(score)> <(of|OF|Of)>? )? (
+  ( [OD Observation_CancerBiomarker_Value]<[0-9]\.[0-9]> [/OD])
+| ( [OD Observation_CancerBiomarker_Value]<[0-9]\+[0-9]=[0-9]> [/OD])
+| ( [OD Observation_CancerBiomarker_Value]<[0-9]\+[0-9]> <=> <[0-9]> [/OD])
+| ( [OD Observation_CancerBiomarker_Value]<[0-9]> <\+> <[0-9]> (<=> <[0-9]>)?[/OD] )
+| ( [OD Observation_CancerBiomarker_Value]<[0-9]> <(of|OF|Of)> <[0-9]>[/OD])
+| ( [OD Observation_CancerBiomarker_Value]<[0-9]\+?> <(to|TO|To)> <[0-9]\+?> [/OD])
+| ( [OD Observation_CancerBiomarker_Value]<[0-9]> ( <(out|OUT|Out)>?  <(of|OF|Of|\+)> ) <[0-9]+> [/OD])
+| ( [OD Observation_CancerBiomarker_Value]<[0-9]\+> [/OD])
+| ( [OD Observation_CancerBiomarker_Value]<[0-9]> [/OD])
+)}
+
+#subgroup BioValue: {
+  <\(> %(BioNum) <\)>
+| (<\,>? %(BioNum))
+}
+
+#subgroup BioScore: {( [OD Observation_CancerBiomarker_Value] 
+( ( <\(> <\p{ci}(score)>? (<0>|<(1|2|3)\+>) ( <\p{ci}(to)> (<0>|<(1|2|3)\+>))? <>? <\)> ) | ( <\p{ci}(score)>? (<0>|<(1|2|3)\+>) ( <\p{ci}(to)> (<0>|<(1|2|3)\+>) )?)  ) 
+[/OD])}
+
+!======================================================================
+! BIOMARKER GROUP
+!======================================================================
+#subgroup SomeAdv: {( 
+<\p{ci}(also|both|all)>
+)}
+
+#subgroup Link: {( 
+  <\:|\->
+| %(LinkingV) %(SomeAdv)?
+)}
+
+#subgroup BioLoc: {( 
+(%(PrepIN)|%(PrepOF)) (%(Med_Biomarker)|%(BioLocation))
+)}
+
+#subgroup ByTest: {( 
+<\p{ci}(BY|by)> %(Med_Test)
+)}
+
+!!!============== Original rule =======================================================
+#group AA_Observation_CancerBiomarker: { (
+   ( (%(Med_Biomarker)|%(Med_Test))  <\p{ci}(status|results?|interpretation)>? (<\p{ci}(and)> <\p{ci}(status|results?|interpretation)>)? <\:|\-> )? (
+   (  %(Med_Biomarker) %(skipParens)?  %(Link)? %(AllStatusAdj) %(ByTest)? <\,|\:|\-|=>? %(BioValue) )
+|  (  %(Med_Biomarkers) %(skipParens)?  %(Link)? %(Percent)?  %(AllStatusAdj) ( %(BioValue) | %(Percent) )* )
+|  (  %(Med_Biomarker) %(skipParens)?  %(Link)? %(AllStatusAdj) %(PrepFOR)  %(Med_Defect) (%(PrepIN) %(BioLocation))? %(Med_Defect)? )
+|  (  %(Med_Biomarker) %(BioScore)  %(AllStatusAdj) %(PrepFOR)  %(Med_Defect)+ ( %(BioLoc) | %(ByTest))*   )
+|  (  %(DefectAdj) %(Med_Biomarker) %(Med_Defect)? %(ByTest)* )
+|  (  %(AllStatusAdj) %(PrepFOR)  %(Med_Defect) (%(PrepOF)| %(PrepIN) )  ( %(BioLocation) | %(Med_Defect) | %(Med_Biomarker) )+  ( %(PrepOF) %(Med_Biomarker) )? )
+
+
+! P53 immunohistochemical stain is negative in the tumor
+|  (  %(Med_Biomarkers) %(Med_Test) %(Link) %(AllStatusAdj)  )
+
+|  ( %(AllStatusAdj) %(PrepFOR) %(Med_Defect) %(ByTest) (<\(> %(BioNum) <\)>)? )
+
+! "negative for the L858R mutation in exon 21"
+!	"NEGATIVE FOR MUTATIONS IN CODONS 12 OR 13 OF KRAS"
+|  ( %(AllStatusAdj)              %(PrepFOR)  ( %(GeneticAlteration) | %(Med_Defect) )+  %(BioLoc)  %(PrepOF)  %(Med_Biomarker)        )
+|  ( %(AllStatusAdj)              %(PrepFOR)  ( %(BioLocation) | %(Med_Biomarker) | %(GeneticAlteration) | %(Med_Defect) )+  ( %(BioLoc) | %(ByTest) )+   )
+
+|  ( %(AllStatusAdj) %(BioScore)  %(PrepFOR)    %(Med_Biomarker)                      %(Med_Defect)?     %(ByTest)?   )
+|  ( %(AllStatusAdj)              %(PrepFOR)  %(Med_Biomarkers) ( (<\p{ci}(and)>|<\,>)+ %(PrepFOR)?  %(Med_Biomarker) )* )
+
+
+|  ( %(AllStatusAdj) <\p{ci}(BY|by)>? %(Med_Test) )
+
+
+|  ( ([OD NEG] %(StatusKeywordsNounNeg)[/OD])  %(PrepOF)  ( %(BioLocation) | %(Med_Biomarker) )* <>? %(Med_Defect)  %(BioLoc)?  )
+|  ( ([OD POS] %(StatusKeywordsNounPos)[/OD])  %(PrepOF)  ( %(BioLocation) | %(Med_Biomarker) )* <>? %(Med_Defect)  %(BioLoc)?  )
+|  ( ([OD NEG] %(StatusKeywordsNounNeg)[/OD])  %(PrepOF)  %(Med_Biomarker)    ( (<\p{ci}(or|OR|AND|and)>|<\,>)+ %(Med_Biomarker) )*  )
+
+|  ( <\p{ci}(NO|No|no|negative)> <[a-z]+>? <[a-z]+>? ([OD NEG] (%(StatusKeywordsNounPos)|<\p{ci}(POSITIVITY|Positivity|positivity)> ) [/OD])  <POS:Prep> %(Med_Biomarker) )
+
+|  ( (%(StatusKeywordsNounPos)|<\p{ci}(POSITIVITY|Positivity|positivity)> )  (%(PrepOF)|%(PrepFOR))  %(Med_Biomarkers)  %(Link)? ([OD NEG] <\p{ci}(NOT|not)> %(Observed) [/OD] )     )
+|  ( ([OD POS] %(StatusKeywordsNounPos)[/OD])  <POS:Prep>   (%(Med_Biomarker)|%(Med_Defect)) )
+
+|  ( (%(Med_Biomarker)|%(Med_Test)) %(skipParens)? %(Link)? (%(AllStatusAdj) |%(BioValue) | %(BioScore))+ (%(PrepFOR)  %(Med_Biomarkers))? (<\,>? <\p{ci}(and|AND)>? %(PrepFOR)?  %(Med_Biomarker) )* )
+
+! No EGFR alteration detected.
+|  ( <\p{ci}(NO|No|no|negative)> %(Med_Biomarker) %(Med_Defect) %(Link)? ([OD NEG] %(Observed) [/OD] ) %(ByTest)? )
+|  ( <\p{ci}(NO|No|no|negative)> %(Med_Defect) %(Link)?  ([OD NEG] %(Observed) [/OD])  %(BioLoc)+ %(ByTest)? )
+|  ( %(Med_Biomarker) %(Med_Defect)  %(Link) ([OD POS] %(Observed) [/OD] ) %(ByTest)? )
+|  ( %(Med_Defect) %(Link) ([OD POS] <POS:V> [/OD]) %(BioLoc)+ %(ByTest)? )
+|  ( %(Med_Biomarker) %(Med_Defect) %(skipParens)? %(Link)? <\:|\-|=>? ( %(BioValue)| %(AllStatusAdj) )+  )
+|  ( %(Med_Biomarker) %(Med_Defect) (%(Link)? %(AllStatusAdj))? %(ByTest)? )
+|  ( %(Med_Biomarker)? %(Med_Defect) %(Link)? %(AllStatusAdj) %(BioLoc)+ %(ByTest)? )
+|  ( %(Med_Biomarker) %(skipParens)? %(Link) %(AllStatusAdj) %(ByTest)? )
+|  ( %(Med_Biomarker) <>? %(Med_Test)? [OD POS]<\p{ci}(High|high|low|positive)>[/OD]? %(Percent) [OD POS]<\p{ci}(high|low|positive)>[/OD]?)
+
+|  ( [OD POS]<\p{ci}(Moderate|moderate|Low|low|High|high|increased|Positive|positive)>+[/OD] %(Med_Biomarker) <\p{ci}(defined)>? <\p{ci}(cell)>?  (<\p{ci}(PROLIFERATION|Proliferation|proliferation|PROLIFERATIVE|Proliferative|proliferative)>|<\p{ci}(rate|index|activity)>)+ )
+
+|  ( (%(Med_Biomarker)|%(Med_Defect)) <>{0, 2} <\p{ci}(rate|index|activity)> %(Link)? %(Percent))
+|  ( (%(Med_Biomarker)|%(Med_Defect)) <>?  %(AllStatusAdj) %(Percent)? %(ByTest)? )
+|  ( %(Med_Biomarker) %(StatusPlusorMinus) )
+|  ( %(BioLocation) %(Med_Defect) )
+|  ( %(BioLocation)? ( %(DNAnucleotides)|%(AminoAcids) )+ )
+|  ( %(Med_Biomarker) <\p{ci}(status|results?|interpretation)>? (<\p{ci}(and)> <\p{ci}(status|results?|interpretation)>)? <\:|\->  %(AllStatusAdj))
+|  ( %(StatusMultiwords) )
+! |  ( %(17pdeletion)  | %(OtherDeletion) |  %(GeneticAlteration) |  %(OtherAlteration) )+
+) %(GeneticAlteration)? 
+) }
+
+
+#group ZZ_Observation_CancerBiomarker: { (
+   ( (%(Med_Biomarker)|%(Med_Test))  <\p{ci}(status|results?|interpretation)>? (<\p{ci}(and)> <\p{ci}(status|results?|interpretation)>)? <\:|\-> )? (
+! "negative for the L858R mutation in exon 21"
+   ( %(AllStatusAdj) %(PrepFOR)  %(GeneticAlteration)?  (%(Med_Defect)|%(Med_Biomarker))+ )
+|  ( %(Med_Defect)+ ( %(BioLoc) | %(ByTest))+   )
+|  ( %(AllStatusAdj) %(Med_Biomarkers) ( (<\p{ci}(and)>|<\,>)+ %(PrepFOR)?  %(Med_Biomarker) )* )
+!	"Deleterious BRCA mutation"
+|  ( %(Med_Defect) %(Med_Biomarker) %(Med_Defect) )
+)
+) }
+
+

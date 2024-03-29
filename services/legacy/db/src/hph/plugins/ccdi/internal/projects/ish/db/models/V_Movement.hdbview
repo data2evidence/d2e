@@ -1,0 +1,31 @@
+VIEW "hc.hph.plugins.ccdi.internal.projects.ish.db.models::V_Movement" ( 
+"_ProcessingMode",
+"OrgID", 
+"InteractionID", 
+"PatientID", 
+"InteractionType.OriginalValue", 
+"PeriodStart", 
+"PeriodEnd", 
+"MovementCategory",
+"MovementType",
+"DepOrgUnitMov",
+"OrgUnitAssignedCase" ) AS SELECT 
+    case when STORN = 'X' then 'D' else null end as "_ProcessingMode",
+    'ISH_' || ORGPF as "OrgID",
+    EINRI || FALNR || LFDNR || 'MOV' as "InteractionID",
+    PATNR as "PatientID",
+    'ISH_MOVEMENT' as "InteractionType.OriginalValue",
+    CASE
+    WHEN BWIDT is not null AND LTRIM(RTRIM(BWIDT)) <> '' AND BWIDT <> '00000000'
+    THEN to_timestamp(to_date(BWIDT) || ' ' || to_time(BWIZT))
+    END as "PeriodStart",
+    CASE
+    WHEN BWEDT is not null AND LTRIM(RTRIM(BWEDT)) <> '' AND BWEDT <> '00000000'
+    THEN to_timestamp(to_date(BWEDT) || ' ' || to_time(BWEZT))
+    END as "PeriodEnd",   
+    BEWTY as "MovementCategory", 
+    BWART as "MovementType",
+    ORGFA as "DepOrgUnitMov",         -- Departmental Organizational Unit of Movement
+    ORGPF as "OrgUnitAssignedCase"    -- Organizational Unit Assigned to Case
+from "hc.hph.plugins.ccdi.internal.projects.ish.db.models::Movement"
+where BWEDT not like '9999%' WITH READ ONLY

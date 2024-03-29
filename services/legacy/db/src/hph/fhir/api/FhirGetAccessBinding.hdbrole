@@ -1,0 +1,17 @@
+{ 
+  "role":{ 
+    "name":"hc.hph.fhir.api::FhirGetAccessBinding", 
+    "object_privileges":[ 
+      { 
+        "name":"hc.hph.fhir.api::GrantAccess", 
+        "type":"PROCEDURE", 
+        "privileges":[ "EXECUTE" ]
+      },
+      { 
+        "name":"hc.hph.fhir.impl::GrantAccessInternal", 
+        "type":"PROCEDURE", 
+        "privileges":[ "EXECUTE" ]
+      } 
+    ] 
+  } 
+}

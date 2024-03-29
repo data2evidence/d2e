@@ -1,0 +1,70 @@
+# Postgres `alpdev_pg` database and user initialization
+- set `POSTGRES_TENANT_READ_PASSWORD` to value used in the [setup-db-credentials](3-setup-db-credentials.md) step
+```
+POSTGRES_TENANT_READ_PASSWORD=xxx
+POSTGRES_TENANT_ADMIN_PASSWORD=xxx
+```
+
+## Create read role
+- Run the following command:
+```bash
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_read_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_READ_PASSWORD}';"
+```
+- Expected successful response:
+> CREATE ROLE
+
+## Troubleshooting 
+- If you create the role with a blank password because ${POSTGRES_TENANT_READ_PASSWORD} is not set, then delete the role & create again with the following command:
+> docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "DROP ROLE postgres_tenant_read_user;"
+
+## Create admin role
+- Run the following command:
+```bash
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_admin_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_ADMIN_PASSWORD}';"
+```
+- Expected successful response:
+> CREATE ROLE
+
+
+## Create database `alpdev_pg`
+- Run the following command:
+```bash
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE DATABASE alpdev_pg;"
+```
+- Expected successful response: 
+> CREATE DATABASE
+
+
+## Alter admin role for schema creation
+- Run the following command:
+```bash
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg -c "ALTER ROLE postgres_tenant_admin_user CREATEROLE NOSUPERUSER NOCREATEDB NOREPLICATION NOBYPASSRLS;"
+```
+- Expected successful response:
+> ALTER ROLE
+
+## Grant read permission for future objects to read role
+- Run the following command:
+```bash
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg -c "ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO postgres_tenant_read_user; ALTER DEFAULT PRIVILEGES GRANT USAGE, SELECT ON SEQUENCES TO postgres_tenant_read_user; ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO postgres_tenant_read_user;"
+```
+- Expected successful response:
+>ALTER DEFAULT PRIVILEGES
+>
+>ALTER DEFAULT PRIVILEGES
+>
+>ALTER DEFAULT PRIVILEGES
+
+## Grant admin permission for future objects to admin role
+- Run the following command: 
+```bash
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg -c "GRANT CREATE ON DATABASE alpdev_pg TO postgres_tenant_admin_user WITH GRANT OPTION; ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO postgres_tenant_admin_user WITH GRANT OPTION; ALTER DEFAULT PRIVILEGES GRANT ALL ON SEQUENCES TO postgres_tenant_admin_user WITH GRANT OPTION; ALTER DEFAULT PRIVILEGES GRANT ALL ON FUNCTIONS TO postgres_tenant_admin_user WITH GRANT OPTION;"
+```
+- Expected successful response:
+>GRANT
+>
+>ALTER DEFAULT PRIVILEGES
+>
+>ALTER DEFAULT PRIVILEGES
+>
+>ALTER DEFAULT PRIVILEGES

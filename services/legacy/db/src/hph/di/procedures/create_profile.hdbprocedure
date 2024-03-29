@@ -1,0 +1,48 @@
+PROCEDURE "hc.hph.di.procedures::create_profile" ( 
+	  IN ProfileID BIGINT,
+	  IN ExtensionID NVARCHAR(256),
+      IN SourceID NVARCHAR(256),
+      IN ProfileName NVARCHAR(512),
+      IN ProfileDescription NVARCHAR(1024) ,
+      IN Status NVARCHAR(16) ,
+      IN LogLevel INTEGER,
+      IN ProfileJSONParams NCLOB,
+      IN AdditionalParams NCLOB,
+      IN ScheduleConfigID BIGINT,
+	  IN profileType NVARCHAR(512),
+	out ot_error "hc.hph.di.model::tt_error"
+	) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+
+	DECLARE lv_count1 INTEGER;
+	
+	if :ProfileID is null  then
+         ot_error = select 400 as http_status_code, 'Bad Request' error_message, 'PROCEDURE:create_profile()' detail from "hc::DUMMY";
+         return;
+    end if;
+    
+    SELECT count(*) into lv_count1 from "hc.hph.di.model::DataIntegration.JobProfile"  where "Name" = :ProfileName and "Status" <> 'Deleted';
+    
+    IF lv_count1 > 0 THEN
+   	   ot_error = select 500 as http_status_code, 'MSG_PROFILE_NAME_EXISTS' error_message, 'PROCEDURE:create_profile()' detail from "hc::DUMMY";
+	ELSE       
+	insert into "hc.hph.di.model::DataIntegration.JobProfile"("ProfileID", "ExtensionID","SourceID","Name","Description","CreatedAt","CreatedBy","Status","LogLevel","ProfileJSONParams","AdditionalParams","ScheduleConfigID","ProfileType") 
+		values (:ProfileID,
+		:ExtensionID,
+		:SourceID,
+		:ProfileName,
+		:ProfileDescription,
+		CURRENT_UTCTIMESTAMP,
+		(Select SESSION_CONTEXT('XS_APPLICATIONUSER') From "hc::DUMMY"),		
+		:Status,
+		:LogLevel,
+		TO_CHAR(:ProfileJSONParams),
+		TO_CHAR(:AdditionalParams),
+		:ScheduleConfigID,
+		:profileType
+		);
+	END IF;
+END;
+

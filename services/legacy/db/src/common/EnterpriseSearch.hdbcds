@@ -1,0 +1,44 @@
+/* Domain-specific annotations: EnterpriseSearch */
+
+namespace common;
+
+using common::CDSTypes.elementRef;
+
+annotation EnterpriseSearch
+{
+  /* annotation at view level */
+  enabled: Boolean;
+
+  /* annotation at element level */
+  key:       Boolean;
+
+  /* annotation at view level */
+  fieldGroupForSearchQuery: array of {
+    name : String(128); 
+    elements : array of elementRef; 
+  };
+
+  /* annotations at element level */
+  usageMode: array of String(20) enum {
+               AUTO_FACET='AUTO_FACET';
+               SUGGESTION='SUGGESTION';
+  };
+
+  presentationMode: array of String(20) enum {
+                      DETAIL='DETAIL';
+                      HIDDEN='HIDDEN';
+                      IMAGE='IMAGE';
+                      SUMMARY='SUMMARY';
+                      THUMBNAIL='THUMBNAIL';
+                      TITLE='TITLE';
+                      NONE='NONE';
+  };
+
+  snippets {
+    enabled:  Boolean;
+  };
+
+  highlighted {
+    enabled:  Boolean;
+  };
+};

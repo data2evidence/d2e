@@ -1,0 +1,22 @@
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::GetLastPackageID" ( 
+    IN _ProfileID INT,
+    IN _Source NVARCHAR(1000),
+    --IN _SourceID NVARCHAR(5),
+    OUT LastPackageID_ INT )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER 
+ 
+    AS
+BEGIN
+   
+    -- Handle no data found exception
+    DECLARE EXIT HANDLER FOR SQL_ERROR_CODE 1299 
+    BEGIN
+        LastPackageID_ := NULL;
+    END;
+    
+    SELECT "LastPackageID" INTO LastPackageID_
+    FROM "hc.hph.plugins.ccdi.db.models::Config.Loads"
+    WHERE "ProfileID" = :_ProfileID AND "Source" = :_Source;        
+    
+END;

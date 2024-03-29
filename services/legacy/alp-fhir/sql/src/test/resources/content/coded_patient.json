@@ -1,0 +1,70 @@
+{
+	"resourceType": "StructureDefinition",
+	"id": "CODED_PATIENT",
+	"url": "http://data4life-asia.care/health/fhir/StructureDefinition/CODED_PATIENT",
+	"kind": "resource",
+	"type": "CODED_PATIENT",
+	"meta": {
+		"profile": [
+			"http://data4life.care/health/fhir/profile/Viewdefinition"
+		]
+	},
+	"extension": [
+		{
+			"uri": "http://data4life-asia.care/health/fhir/extension/schema",
+			"valueString": "HCIM"
+		},
+		{
+			"uri": "http://data4life-asia.care/health/fhir/extension/table",
+			"valueString": "CODED_PATIENT"
+		},
+		{
+			"uri": "http://data4life-asia.care/health/fhir/extension/definition",
+			"valueString": "SELECT \"identification_number\", (CASE WHEN \"gender\"='F' THEN 'female' ELSE 'male' END) as GENDER from HCIM_PATIENT"
+		}
+	],
+	"snapshot": {
+		"element": [
+			{
+				"id": "CODED_PATIENT",
+				"path": "CODED_PATIENT",
+				"min": 0,
+				"max": "*"
+			},
+			{
+				"id": "GENDER",
+				"min": 0,
+				"extension": [
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/column",
+						"valueString": "GENDER"
+					},
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+						"valueString": "VARCHAR"
+					}
+				],
+				"max": "*"
+			},
+			{
+				"id": "identification_number",
+				"min": 0,
+				"extension": [
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/column",
+						"valueString": "identification_number"
+					},
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+						"valueString": "NVARCHAR"
+					},
+					{
+						"uri": "http://data4life-asia.care/health/fhir/extension/columnsize",
+						"valuePositiveInt": 64
+					}
+				],
+				"max": "*"
+			}
+		]
+	}
+}

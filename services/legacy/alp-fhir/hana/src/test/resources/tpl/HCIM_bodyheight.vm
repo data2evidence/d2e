@@ -1,0 +1,45 @@
+{
+    "resourceType": "Observation",
+    "id": "$Observation.identification_number",
+    "meta": {
+        "profile": [
+           "http://nictiz.nl/fhir/StructureDefinition/zib-BodyHeight"
+     	]
+     },
+     "category": [
+        {
+        	"coding": [
+            	{
+                	"system": "http://hl7.org/fhir/observation-category",
+                    "code": "vital-signs"
+                }
+            ]
+        }
+     ],
+     "code": {
+     	"coding": [
+            #if($Bodyheight.positionConcept)
+            {
+                #if($Bodyheight.positionCodesystemName)"system": "$Bodyheight.positionCodesystemName",#end
+                #if($Bodyheight.positionDisplay)"display": "$Bodyheight.positionDisplay",#end
+                "code": "$Bodyheight.positionConcept"
+            },
+            #end
+            {
+            	"system": "http://loinc.org",
+               	"code": "8302-2"
+            }
+        ]
+    },
+    "subject": {
+        "reference": "Patient/$Observation.subject"
+    },
+    "effectiveDateTime": "$Observation.datetime",
+    "valueQuantity": {
+        "value": $Bodyheight.heightValue,
+        "unit": "$Bodyheight.heightUnit",
+        "system": "http://unitsofmeasure.org",
+        "code": "$Bodyheight.heightUnit"
+    },
+    "status": "final"
+}

@@ -1,0 +1,209 @@
+{
+	"resourceType": "CatalogDefinition",
+	"id": "patient_catalog",
+	"target": {
+		"reference": "http://hl7.org/fhir/StructureDefinition/Patient"
+	},
+	"table": [
+		{
+			"id": "Patient",
+			"definition": {
+				"reference": "HCIM_PATIENT"
+			},
+			"cardinality": "1",
+			"referenceColumn": {
+				"type": "column",
+				"name": "identification_number"
+			}
+		},
+		{
+			"id": "PatientIdentifier",
+			"definition": {
+				"reference": "HCIM_PATIENT_IDENTIFICATION"
+			},
+			"cardinality": "*",
+			"referenceColumn": {
+				"type": "column",
+				"name": "identification_number"
+			}
+		},
+		{
+			"id": "PatientAddress",
+			"definition": {
+				"reference": "HCIM_PATIENT_ADDRESS_INFORMATION"
+			},
+			"cardinality": "*",
+			"referenceColumn": {
+				"type": "column",
+				"name": "identification_number"
+			}
+		},
+		{
+			"id": "PatientName",
+			"definition": {
+				"reference": "HCIM_PATIENT_NAME_INFORMATION"
+			},
+			"cardinality": "*",
+			"referenceColumn": {
+				"type": "column",
+				"name": "identification_number"
+			}
+		}
+	],
+	"mapping": [
+		{
+			"dataelement": "Patient.id",
+			"tableid": "Patient",
+			"type": "column",
+			"column": "identification_number",
+			"searchable": true
+		},
+		{
+			"dataelement": "Patient.identifier.value",
+			"tableid": "PatientIdentifier",
+			"type": "column",
+			"column": "PatientIdentification",
+			"searchable": true
+		},
+		{
+			"dataelement": "Patient.identifier.system",
+			"tableid": "PatientIdentifier",
+			"type": "column",
+			"column": "System",
+			"searchable": true
+		},
+		{
+			"dataelement": "Patient.meta.profile",
+			"tableid": "Patient",
+			"type": "value",
+			"value": "http://nictiz.nl/fhir/StructureDefinition/nl-core-patient",
+			"searchable": false
+		},
+		{
+			"dataelement": "Patient.active",
+			"tableid": "Patient",
+			"type": "value",
+			"value": "true",
+			"searchable": false
+		},
+		{
+			"dataelement": "Patient.birthDate",
+			"tableid": "Patient",
+			"type": "column",
+			"column": "dateOfBirth",
+			"searchable": false
+		},
+		{
+			"dataelement": "Patient.deceasedBoolean",
+			"tableid": "Patient",
+			"type": "column",
+			"column": "dateIndicator",
+			"searchable": false
+		},
+		{
+			"dataelement": "Patient.gender",
+			"tableid": "Patient",
+			"type": "column",
+			"column": "gender",
+			"conceptmap": {
+				"reference": "bgzgender"
+			},
+			"searchable": false
+		},
+		{
+			"dataelement": "Patient.name",
+			"tableid": "PatientName",
+			"type": "complex",
+			"children": [
+				{
+					"dataelement": "Patient.name.given",
+					"tableid": "PatientName",
+					"type": "column",
+					"column": "FirstNames"
+				},
+				{
+					"dataelement": "Patient.name.given",
+					"tableid": "PatientName",
+					"type": "column",
+					"column": "Initials"
+				},
+				{
+					"dataelement": "Patient.name.given",
+					"tableid": "PatientName",
+					"type": "column",
+					"column": "GivenName"
+				}
+			]
+		},
+		{
+			"dataelement": "Patient.address",
+			"tableid": "PatientAddress",
+			"type": "complex",
+			"children": [
+				{
+					"dataelement": "Patient.address.use",
+					"tableid": "PatientAddress",
+					"conceptMap": {
+						"reference": "bgzaddresstype"
+					},
+					"type": "column",
+					"column": "AddressType"
+				},
+				{
+					"dataelement": "Patient.address.type",
+					"tableid": "PatientAddress",
+					"type": "column",
+					"column": "AddressType"
+				},
+				{
+					"dataelement": "Patient.address.line",
+					"tableid": "PatientAddress",
+					"type": "expression",
+					"expression": "PatientAddress.Street&(' '+PatientAddress.HouseNumber+PatientAddress.HouseNumberLetter)"
+				},
+				{
+					"dataelement": "Patient.address.city",
+					"tableid": "PatientAddress",
+					"type": "column",
+					"column": "PlaceOfResidence"
+				},
+				{
+					"dataelement": "Patient.address.district",
+					"tableid": "PatientAddress",
+					"type": "column",
+					"column": "Municipality"
+				},
+				{
+					"dataelement": "Patient.address.postalCode",
+					"tableid": "PatientAddress",
+					"type": "column",
+					"column": "Postcode"
+				},
+				{
+					"dataelement": "Patient.address.country",
+					"tableid": "PatientAddress",
+					"type": "column",
+					"column": "Country"
+				}
+			]
+		},
+		{
+			"dataelement": "Patient.address.extension",
+			"tableid": "PatientAddress",
+			"condition": "PatientAddress.AddressType='HP'",
+			"type": "complex",
+			"children": [
+				{
+					"dataelement": "Patient.address.extension.url",
+					"type": "value",
+					"value": "http://fhir.nl/fhir/StructureDefinition/nl-core-address-official"
+				},
+				{
+					"dataelement": "Patient.address.extension.valueBoolean",
+					"type": "value",
+					"value": "true"
+				}
+			]
+		}
+	]
+}

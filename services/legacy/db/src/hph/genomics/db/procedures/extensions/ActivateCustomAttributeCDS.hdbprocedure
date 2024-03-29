@@ -1,0 +1,77 @@
+PROCEDURE "hc.hph.genomics.db.procedures.extensions::ActivateCustomAttributeCDS" ( IN force_activation TINYINT, IN audit_id INTEGER )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    AS
+BEGIN
+    -- check if activation is required
+    DECLARE requires_activation TINYINT := 0;
+    IF :force_activation = 0 THEN
+        SELECT COUNT(*) INTO requires_activation FROM "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" WHERE "Active" = 0;
+        IF :requires_activation = 0 THEN
+            SELECT COUNT(*) INTO requires_activation FROM "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAttributes" WHERE "Active" = 0;
+        END IF;
+    ELSE
+        requires_activation := 1;
+    END IF;
+    
+    -- activate if necessary
+    IF :requires_activation <> 0 THEN
+        DECLARE header VARBINARY(6) := strtobin( 'repoV2', 'UTF-8' );
+        DECLARE error_code INTEGER := 0;
+        DECLARE activeVersionExists NVARCHAR(5);
+        DECLARE version_number INTEGER := 0;
+        DECLARE repo_result BLOB;
+        DECLARE cds_content NCLOB;
+        DECLARE json VARBINARY(5000);
+        DECLARE json_length_bin VARBINARY(4);
+        DECLARE content_length_bin VARBINARY(4);
+        
+        -- get table lock to ensure there is no parallel attempt to update the data model
+        LOCK TABLE "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" IN EXCLUSIVE MODE;
+        
+        -- get previous version number
+        json := strtobin( '{"action":"exists","what":"object","session":{"sessionType":"1"},"object":{"package":"hc.hph.genomics.db.models.generated","name":"SNV","suffix":"hdbdd"}}', 'UTF-8' );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+        --CALL "SYS"."REPOSITORY_REST" ( :json, repo_result );
+        activeVersionExists := to_nvarchar( substr_before( substr_after( bintostr( to_varbinary( :repo_result ) ), '"exists": "' ), '"' ) );
+        if activeVersionExists <> 'true' THEN
+            version_number := 0;
+        ELSE
+            json := strtobin( '{"action":"read","what":"objectMetadata","session":{"sessionType":"1"},"object":{"package":"hc.hph.genomics.db.models.generated","name":"SNV","suffix":"hdbdd"}}', 'UTF-8' );
+            CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+          --  CALL "SYS"."REPOSITORY_REST" ( :json, repo_result );
+            CALL "hc.hph.core.db.procedures::CheckRepoResult" ( 'inactive version', :repo_result );
+            version_number := to_integer( substr_before( substr_after( bintostr( to_varbinary( :repo_result ) ), '"version_id": "' ), '"' ) );    
+        END IF;
+
+        -- create package if it doesn't exist
+        json := strtobin( '{"action":"create","what":"package","package":"hc.hph.genomics.db.models.generated","description":"","responsible":"","orig_lang":"","structural":"0","delivery_unit":"","du_vendor":"","text_collection":"","text_status":"","text_terminology_domain":"","hints_for_translation":"","texts":[],"inherit":"0"}', 'UTF-8' );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+        --CALL "SYS"."REPOSITORY_REST" ( :json, repo_result );
+
+        -- remove previously written but failed content
+        json := strtobin( '{"action":"delete","what":"revertObjects","session":{"sessionType":"2","owner":"","workspace":"hc.hph.genomics.db.procedures.model::ActivateCustomAttributeCDS"},"objList":[{"package":"hc.hph.genomics.db.models.generated","name":"SNV","suffix":"hdbdd"}]}', 'UTF-8' );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+       -- CALL "SYS"."REPOSITORY_REST" ( :json, repo_result );
+
+        -- generate CDS code
+        CALL "hc.hph.genomics.db.procedures.extensions::GenerateCustomAttributeCDS" ( :audit_id, cds_content );
+        
+        -- write content
+        json := strtobin( '{"action":"write","what":"object","session":{"sessionType":"2","owner":"","workspace":"hc.hph.genomics.db.procedures.model::ActivateCustomAttributeCDS"},"object":{"package":"hc.hph.genomics.db.models.generated","name":"SNV","suffix":"hdbdd"},"metadata":{"version_id":"' || ( :version_number ) || '","activated_at":"' || CURRENT_UTCTIMESTAMP || '","activated_by":"' || USER() || '","type":"1"},"determineReferences":"1","xrefList":[],"texts":[],"content_texts":[]}', 'UTF-8' );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :cds_content ), content_length_bin );
+        --CALL "SYS"."REPOSITORY_REST" ( hextobin( :header || hextobin( '02000000' ) || :json_length_bin || :json || :content_length_bin || strtobin( :cds_content, 'UTF-8' ) || hextobin( '00000000' ) ), repo_result );
+        CALL "hc.hph.core.db.procedures::CheckRepoResult" ( 'write', :repo_result );
+
+        -- activate content
+        json := strtobin( '{"action":"activate","what":"objects","session":{"sessionType":"2","owner":"","workspace":"hc.hph.genomics.db.procedures.model::ActivateCustomAttributeCDS"},"objList":[{"package":"hc.hph.genomics.db.models.generated","name":"SNV","suffix":"hdbdd"}],"activationMode":"0"}', 'UTF-8' );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+        --CALL "SYS"."REPOSITORY_REST" ( :json, repo_result );
+        CALL "hc.hph.core.db.procedures::CheckRepoResult" ( 'activate', :repo_result );
+        
+        -- update
+        UPDATE "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" SET "Active" = 1 WHERE "Active" = 0;
+        UPDATE "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAttributes" SET "Active" = 1 WHERE "Active" = 0;
+    END IF;
+END

@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:AccessControl="http://www.com/ndb/SQLCoreModelAccessControl.ecore" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" schemaVersion="3.0" id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.views::sps" applyPrivilegeType="NONE" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" dataCategory="DEFAULT" enforceSqlExecution="false" executionSemantic="UNDEFINED" outputViewType="Projection" xscCompatibilityMode="true">
+  <descriptions defaultDescription="modality, polarity, and reference"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="38"/>
+  <dataSources>
+    <DataSource id="ta" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="PolarityParents$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="PolaritySiblings$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="StatusEntities$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="StatusSameTokens$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="StatusParents$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="StatusSiblings$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="SubjectEntities$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="SubjectSameTokens$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="SubjectParents$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="SubjectSiblings$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="AddMprInfo$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="sections" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::sections</resourceUri>
+    </DataSource>
+  </dataSources>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:ProjectionView" id="PolarityEntities">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute datatype="NVARCHAR" id="POLARITY" length="100" expressionLanguage="COLUMN_ENGINE">
+          <formula>'Negative'</formula>
+        </calculatedViewAttribute>
+      </calculatedViewAttributes>
+      <restrictedViewAttributes/>
+      <input node="ta">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot; ='Negative')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="PolaritySameTokens" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="POLARITY"/>
+        <viewAttribute hidden="true" id="JOIN$TA_TOKEN$TA_TOKEN"/>
+        <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <input node="PolarityEntities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_TOKEN$TA_TOKEN"/>
+      <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="PolarityParents" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="POLARITY"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="PolarityParents$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <input node="PolaritySameTokens">
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_COUNTER"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="PolaritySiblings" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="POLARITY"/>
+        <viewAttribute hidden="true" id="JOIN$TA_PARENT$TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="PolaritySiblings$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_PARENT$TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <input node="PolarityParents">
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_PARENT$TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_PARENT$TA_COUNTER"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="StatusEntities">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute datatype="NVARCHAR" id="STATUS" length="100" expressionLanguage="COLUMN_ENGINE">
+          <formula>&quot;TA_TYPE&quot;</formula>
+        </calculatedViewAttribute>
+      </calculatedViewAttributes>
+      <restrictedViewAttributes/>
+      <input node="StatusEntities$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <filter>(in (&quot;TA_TYPE&quot;,'Provisional','Preparation'))</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="StatusSameTokens" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="STATUS"/>
+        <viewAttribute hidden="true" id="JOIN$TA_TOKEN$TA_TOKEN"/>
+        <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="StatusSameTokens$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <input node="StatusEntities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_TOKEN$TA_TOKEN"/>
+      <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="StatusParents" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="STATUS"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="StatusParents$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <input node="StatusSameTokens">
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_COUNTER"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="StatusSiblings" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="STATUS"/>
+        <viewAttribute hidden="true" id="JOIN$TA_PARENT$TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="StatusSiblings$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_PARENT$TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <input node="StatusParents">
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_PARENT$TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_PARENT$TA_COUNTER"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="SubjectEntities">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute datatype="NVARCHAR" id="SUBJECT" length="100" expressionLanguage="COLUMN_ENGINE">
+          <formula>&quot;TA_TYPE&quot;</formula>
+        </calculatedViewAttribute>
+      </calculatedViewAttributes>
+      <restrictedViewAttributes/>
+      <input node="SubjectEntities$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <filter>(in (&quot;TA_TYPE&quot;,'Other','FamilyMemberHistory'))</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="SubjectSameTokens" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="SUBJECT"/>
+        <viewAttribute hidden="true" id="JOIN$TA_TOKEN$TA_TOKEN"/>
+        <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="SubjectSameTokens$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <input node="SubjectEntities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_TOKEN$TA_TOKEN"/>
+      <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="SubjectParents" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="SUBJECT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="SubjectParents$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <input node="SubjectSameTokens">
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_COUNTER"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="SubjectSiblings" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="SUBJECT"/>
+        <viewAttribute hidden="true" id="JOIN$TA_PARENT$TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="SubjectSiblings$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_PARENT$TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <input node="SubjectParents">
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_PARENT$TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_PARENT$TA_COUNTER"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:UnionView" id="MprInfo">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="STATUS"/>
+        <viewAttribute id="POLARITY"/>
+        <viewAttribute id="SUBJECT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input emptyUnionBehavior="NO_ROW" node="PolaritySiblings">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="STATUS" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="SUBJECT" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="PolarityParents">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="STATUS" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="SUBJECT" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="PolaritySameTokens">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="STATUS" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="SUBJECT" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="StatusSiblings">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="POLARITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="SUBJECT" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="StatusParents">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="POLARITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="SUBJECT" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="StatusSameTokens">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="POLARITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="SUBJECT" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="SubjectSiblings">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="STATUS" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="POLARITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="SubjectParents">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="STATUS" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="POLARITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="SubjectSameTokens">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="STATUS" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="POLARITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:AggregationView" id="Aggregation">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute aggregationType="max" id="STATUS"/>
+        <viewAttribute aggregationType="max" id="POLARITY"/>
+        <viewAttribute aggregationType="max" id="SUBJECT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="MprInfo">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="AddMprInfo" cardinality="C1_N" joinType="leftOuter">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="STATUS"/>
+        <viewAttribute id="POLARITY"/>
+        <viewAttribute id="SUBJECT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="AddMprInfo$$$$hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <input node="Aggregation">
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_COUNTER"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="SectionInfo">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_SECTION"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="sections">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_SECTION" source="TA_SECTION"/>
+      </input>
+      <filter>(&quot;TA_SECTION&quot; ='COMPOSITION_SECTION_FAMILYHISTORY')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="AddSectionInfo" joinType="leftOuter">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_SECTION"/>
+        <viewAttribute id="STATUS"/>
+        <viewAttribute id="POLARITY"/>
+        <viewAttribute id="SUBJECT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="AddMprInfo">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+      </input>
+      <input node="SectionInfo">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_SECTION" source="TA_SECTION"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_COUNTER"/>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="AddSectionInfo">
+    <descriptions/>
+    <attributes>
+      <attribute id="DWID" order="4" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="DWID"/>
+        <keyMapping columnObjectName="AddSectionInfo" columnName="DWID"/>
+      </attribute>
+      <attribute id="TA_COUNTER" order="5" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_COUNTER"/>
+        <keyMapping columnObjectName="AddSectionInfo" columnName="TA_COUNTER"/>
+      </attribute>
+      <attribute id="STATUS" hidden="true" order="6" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="STATUS"/>
+        <keyMapping columnObjectName="AddSectionInfo" columnName="STATUS"/>
+      </attribute>
+      <attribute id="POLARITY" hidden="true" order="7" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="POLARITY"/>
+        <keyMapping columnObjectName="AddSectionInfo" columnName="POLARITY"/>
+      </attribute>
+      <attribute id="SUBJECT" hidden="true" order="8" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="SUBJECT"/>
+        <keyMapping columnObjectName="AddSectionInfo" columnName="SUBJECT"/>
+      </attribute>
+      <attribute id="TA_SECTION" hidden="true" order="9" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_SECTION"/>
+        <keyMapping columnObjectName="AddSectionInfo" columnName="TA_SECTION"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes>
+      <calculatedAttribute id="TA_STATUS" hidden="false" order="1" semanticType="empty" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_STATUS"/>
+        <keyCalculation datatype="NVARCHAR" expressionLanguage="COLUMN_ENGINE" length="100">
+          <formula>if(isnull(&quot;STATUS&quot;),'Confirmed',&quot;STATUS&quot;)</formula>
+        </keyCalculation>
+      </calculatedAttribute>
+      <calculatedAttribute id="TA_POLARITY" hidden="false" order="2" semanticType="empty" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_POLARITY"/>
+        <keyCalculation datatype="NVARCHAR" expressionLanguage="COLUMN_ENGINE" length="100">
+          <formula>if(isNull(&quot;POLARITY&quot;),'Positive',&quot;POLARITY&quot;)</formula>
+        </keyCalculation>
+      </calculatedAttribute>
+      <calculatedAttribute id="TA_SUBJECT" hidden="false" order="3" semanticType="empty" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_SUBJECT"/>
+        <keyCalculation datatype="NVARCHAR" expressionLanguage="COLUMN_ENGINE" length="100">
+          <formula>if(isnull(&quot;TA_SECTION&quot;),if(isnull(&quot;SUBJECT&quot;),'Patient',&quot;SUBJECT&quot;),'FamilyMemberHistory')</formula>
+        </keyCalculation>
+      </calculatedAttribute>
+    </calculatedAttributes>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures/>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+        <upperLeftCorner x="382" y="87"/>
+        <rectangleSize height="0" width="0"/>
+      </shape>
+      <shape expanded="true" modelObjectName="PolarityEntities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="130" y="965"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="PolaritySameTokens" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="120" y="869"/>
+        <rectangleSize height="66" width="161"/>
+      </shape>
+      <shape modelObjectName="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" modelObjectNameSpace="PolaritySameTokens" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="PolarityEntities" modelObjectNameSpace="PolaritySameTokens" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="PolarityParents" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="43" y="773"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape modelObjectName="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" modelObjectNameSpace="PolarityParents" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="PolaritySameTokens" modelObjectNameSpace="PolarityParents" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="PolaritySiblings" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="22" y="677"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape modelObjectName="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" modelObjectNameSpace="PolaritySiblings" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="PolarityParents" modelObjectNameSpace="PolaritySiblings" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="StatusEntities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="326" y="965"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="StatusSameTokens" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="316" y="869"/>
+        <rectangleSize height="82" width="161"/>
+      </shape>
+      <shape modelObjectName="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" modelObjectNameSpace="StatusSameTokens" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="StatusEntities" modelObjectNameSpace="StatusSameTokens" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="StatusParents" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="239" y="773"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape modelObjectName="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" modelObjectNameSpace="StatusParents" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="StatusSameTokens" modelObjectNameSpace="StatusParents" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="StatusSiblings" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="218" y="677"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape modelObjectName="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" modelObjectNameSpace="StatusSiblings" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="StatusParents" modelObjectNameSpace="StatusSiblings" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="SubjectEntities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="522" y="965"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="SubjectSameTokens" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="507" y="869"/>
+        <rectangleSize height="66" width="171"/>
+      </shape>
+      <shape modelObjectName="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" modelObjectNameSpace="SubjectSameTokens" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="SubjectEntities" modelObjectNameSpace="SubjectSameTokens" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="SubjectParents" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="435" y="773"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape modelObjectName="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" modelObjectNameSpace="SubjectParents" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="SubjectSameTokens" modelObjectNameSpace="SubjectParents" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="SubjectSiblings" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="414" y="677"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape modelObjectName="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" modelObjectNameSpace="SubjectSiblings" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="SubjectParents" modelObjectNameSpace="SubjectSiblings" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="MprInfo" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="305" y="435"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Aggregation" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="305" y="357"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="AddMprInfo" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="305" y="261"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape modelObjectName="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta" modelObjectNameSpace="AddMprInfo" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="Aggregation" modelObjectNameSpace="AddMprInfo" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape expanded="true" modelObjectName="SectionInfo" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="459" y="261"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="AddSectionInfo" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="375" y="165"/>
+        <rectangleSize height="82" width="155"/>
+      </shape>
+    
+      <shape modelObjectName="AddMprInfo" modelObjectNameSpace="AddSectionInfo" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="SectionInfo" modelObjectNameSpace="AddSectionInfo" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario> 

@@ -1,0 +1,12 @@
+PROCEDURE "hc.hph.di.procedures.validation::ValidateObject" ( IN schema_name NVARCHAR(255), IN object_name NVARCHAR(255), OUT status TINYINT )
+LANGUAGE SQLSCRIPT SQL SECURITY INVOKER READS SQL DATA AS
+BEGIN
+    DECLARE count INTEGER := 0;
+    SELECT COUNT(*) INTO count FROM (
+        SELECT TOP 1 OBJECT_OID FROM "hc::OBJECTS" WHERE "SCHEMA_NAME" = :schema_name AND "OBJECT_NAME" = :object_name
+    );
+    status := 0;
+    IF :count = 1 THEN
+        status := 1;
+    END IF;
+END

@@ -1,0 +1,10 @@
+{ 
+  "role":{ 
+    "name":"hc.hph.fhir.api::FhirAccessRole#", 
+    "schema_roles":[ 
+      { 
+        "names": ["hc.hph.cdw.api.fhir::FhirAccessRole#", "hc.hph.ots.api.fhir::FhirAccessRole#"] 
+      }
+    ]
+  } 
+}

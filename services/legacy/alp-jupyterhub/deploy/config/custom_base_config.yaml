@@ -1,0 +1,250 @@
+
+custom:
+  defaultK8sNamespace: "sg-dev"
+  alpReleaseName: "v23.1-kita-dake"
+  isD4LEnv: true
+
+hub:
+  db:
+    type: postgres
+    #type: sqlite-pvc
+    # pvc:
+    #   annotations:
+    #       helm.sh/resource-policy: "keep"
+    #   storageClassName: csi-sc-cinderplugin
+    url: "" # "postgres+psycopg2://<db-username>:<db-password>@<db-hostname>:<db-port>/<db-name>"
+  baseUrl: /jhub
+  service:
+    annotations:
+      prometheus.io/path: "/jhub/hub/metrics"
+      prometheus.io/scrape: "true"
+  networkPolicy:
+    enabled: true
+  extraEnv:
+    OAUTH2_AUTHORIZE_URL: https://alpsgdev.b2clogin.com/alpsgdev.onmicrosoft.com/oauth2/v2.0/authorize?p=b2c_1a_signin_resetpassword
+    OAUTH2_TOKEN_URL: https://alpsgdev.b2clogin.com/alpsgdev.onmicrosoft.com/oauth2/v2.0/token?p=b2c_1a_signin_resetpassword
+    # OAUTH2_USERDATA_URL: https://login.microsoftonline.com/f59c7915-9283-4fb5-b633-435b9145ca00/openid/userinfo
+    AAD_TENANT_ID: "f59c7915-9283-4fb5-b633-435b9145ca00"
+    OAUTH_CLIENT_ID: "" #passed from makefile
+    JUPYTER_ENABLE_LAB: 1
+  extraConfig:
+    myAuthConfig: |
+      c.CustomAzureAdOAuthenticator.username_claim = 'email'
+    jupyterlab: |
+      c.KubeSpawner.cmd = ['jupyter-labhub']
+      c.JupyterHub.authenticate_prometheus = False
+     #c.JupyterHub.internal_ssl = True
+     #c.JupyterHub.trusted_alt_names = ['DNS:alp-dev.alp-dev.org']
+    singleUserConfig: |
+      c.KubeSpawner.disable_user_config = True
+      c.KubeSpawner.args = ["--transport=ipc", "--debug"]
+      c.KubeSpawner.consecutive_failure_limit = 10
+      c.KubeSpawner.events_enabled = False
+      c.KubeSpawner.profile_list = [
+          {
+              'display_name': 'Data Science Researcher - Low (.5 vCPU, 1GB RAM)',
+              'slug': 'pyqe',
+              'default': True,
+              'kubespawner_override': {
+              }
+          }
+        ]
+    modifySingleUserPodConfig: |
+      from kubernetes import client
+      def modify_pod_hook(spawner, pod):
+          pod.spec.containers[0].security_context = client.V1SecurityContext(
+              allow_privilege_escalation=False,
+              run_as_non_root=True,
+              run_as_user=1000,
+              run_as_group=100,
+          )
+
+          pod.spec.containers[0].env.extend(
+            [{ "name": "JUPYTERHUB_SSL_KEYFILE",
+                  "value": "/home/jovyan/internal-ssl/user/user.key"
+                },
+                { "name": "JUPYTERHUB_SSL_CERTFILE",
+                  "value": "/home/jovyan/internal-ssl/user/user.crt"
+                },
+                { "name": "JUPYTERHUB_SSL_CLIENT_CA",
+                  "value": "/home/jovyan/internal-ssl/jhub-ca_trust.crt"
+                },
+                { "name": "PYQE_TLS_CLIENT_CA_CERT_PATH",
+                  "value": "/home/jovyan/internal-ssl/mri-app-router-ca-root-cert.pem"
+                },
+          ])
+
+          # This is to pass the email username to backup container
+          username = spawner.user.name
+          for container in pod.spec.containers:
+            userEnv = [{
+              "name": "JUPYTER_USERNAME",
+              "value": username
+            }]
+            if container.env is not None:
+              container.env.extend(userEnv)
+            else:
+              container.env = userEnv
+          return pod
+      c.KubeSpawner.modify_pod_hook = modify_pod_hook
+
+  initContainers:
+      - name: setup-tls
+        securityContext:
+          runAsUser: 1000
+        image: openjdk:8u212-jdk-alpine3.9
+        command:
+        - sh
+        - -c
+        - |
+          mkdir -p /srv/jupyterhub/tls-ca
+          cp -Rv /tls-tmp/* /srv/jupyterhub/tls-ca
+          cp -v /tls-tmp/hub-ca_trust.crt /srv/jupyterhub/tls-ca/hub-client-ca-trust.pem
+        volumeMounts:
+            - mountPath: /tls-tmp/hub-ca/hub-ca.crt
+              subPath: JHUB_CA_CERT
+              name: tls
+            - mountPath: /tls-tmp/hub-ca_trust.crt
+              subPath: JHUB_CA_CERT_TRUST
+              name: tls
+            - mountPath: /tls-tmp/hub-ca/hub-ca.key
+              subPath: JHUB_CA_KEY
+              name: tls
+            - mountPath: /tls-tmp/proxy-client-ca/proxy-client-ca.crt
+              subPath: JHUB_CLIENT_CA_CERT
+              name: tls
+            - mountPath: /tls-tmp/proxy-client-ca/proxy-client-ca.key
+              subPath: JHUB_CLIENT_CA_KEY
+              name: tls
+            - mountPath: /tls-tmp/digicert-ca_trust.crt
+              subPath: JHUB_AZURE_CA_CERT_TRUST
+              name: tls
+            - mountPath: /tls-tmp/mri-app-router-ca-root-cert.pem
+              subPath: JHUB_MRI_APP_ROUTER_CA_ROOT_CERT
+              name: tls
+            - mountPath: /srv/jupyterhub
+              name: hub-db-dir
+
+auth:
+  type: custom
+  scopes:
+    - openid offline_access
+  custom:
+    className: "CustomAzureAdOAuthenticator"
+
+prePuller:
+  hook:
+    enabled: false
+
+singleuser:
+  image:
+    azureCR:
+      registry: alpcr.azurecr.io
+      pullSecrets:
+      - alpcrregistrykeys
+    d4lNexus:
+      registry: alp-snapshots.alp-dev.org
+      pullSecrets: 
+      - alp-regsecret
+    repository: alp-jupyterhub/alp-jupyternb-single-user
+    pullPolicy: IfNotPresent
+  extraContainers:
+  - name: post-user-image
+    repository: alp-jupyterhub/alp-jupyternb-post
+  - name: files-backup
+    repository: alp-jupyterhub/alp-jupyternb-files-backup
+    resources:
+      limits:
+        cpu: 1
+        memory: "2G"
+      requests:
+        cpu: 0.5
+        memory: "500M"
+  initContainers:
+    - name: setup-tls
+      securityContext:
+        runAsUser: 1000
+      image: jamiehewland/openssl:1.1.0
+      command:
+      - /bin/bash
+      - -c
+      - |
+        mkdir -p /home/jovyan/internal-ssl/user
+        mkdir -p /tmp/tls
+        cp -R /tls-tmp/* /tmp/tls
+        cp /tls-tmp/jhub-ca_trust.crt /home/jovyan/internal-ssl
+        cp /tls-tmp/mri-app-router-ca-root-cert.pem /home/jovyan/internal-ssl
+
+        openssl req -nodes -newkey rsa:4096 -keyout /home/jovyan/internal-ssl/user/user.key \
+        -out /home/jovyan/internal-ssl/user/user.csr \
+        -subj "/C=SG/ST=SG/L=SG/O=Global Security/OU=IT Department/CN=data4life.care"
+
+        openssl x509 -req -days 825 -in /home/jovyan/internal-ssl/user/user.csr \
+        -extfile <(printf "subjectAltName=DNS:localhost,IP:127.0.0.1,IP:$(hostname -i),DNS:$CERT_HOSTNAME") \
+        -in /home/jovyan/internal-ssl/user/user.csr \
+        -CA /tmp/tls/proxy-client-ca/proxy-client-ca.crt \
+        -CAkey /tmp/tls/proxy-client-ca/proxy-client-ca.key \
+        -CAcreateserial \
+        -out /home/jovyan/internal-ssl/user/user.crt
+
+  storage:
+    capacity: 2Gi
+    dynamic:
+      storageClass: csi-rbd-sc
+  cpu:
+    limit: 1.5 #Since this is a float, Must not be surronded by double quotes
+    guarantee: 0.5 #Since this is a float, Must not be surronded by double quotes
+  memory:
+    limit: "4G"
+    guarantee: "1G"
+  extraEnv:
+    PYQE_URL: "https://alp-data.sg-dev.svc.cluster.local:5001/analytics-svc/"
+    PYQE_CONNECT_TIMEOUT: "60"
+    PYQE_READ_TIMEOUT: "200"
+    PYQE_JWT_AUDIENCE: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce"
+    PYQE_JWT_ALGORITHMS: "RS256"
+    PYQE_AZUREADB2C_CLIENT_ID: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce"
+    PYQE_TOKEN_TYPE: "ACCESS"
+    CONDA_PKGS_DIRS: "/home/jovyan/user/tmp/pkgs"
+    ALP_SYSTEM_ID: "fra1-d4l-dev"
+  networkPolicy:
+    enabled: true
+  defaultUrl: "/lab"
+  lifecycleHooks:
+    postStart:
+      exec:
+        command: ["mkdir", "-p", "/home/jovyan/user"]
+
+proxy:
+  secretToken: ""
+  service:
+    type: ClusterIP
+  networkPolicy:
+    enabled: true
+
+tls:
+  JHUB_CA_CERT:
+  JHUB_CA_CERT_TRUST:
+  JHUB_CA_KEY:
+  JHUB_CLIENT_CA_CERT:
+  JHUB_CLIENT_CA_KEY:
+  JHUB_CLIENT_CERT:
+  JHUB_CLIENT_KEY:
+  JHUB_AZURE_CA_CERT_TRUST:
+
+SWIFT:
+  OAUTH_URL:
+  PASSWORD:
+  TENANT:
+  USERNAME:
+  REMOTE_ALIAS:
+  CONTAINER:
+
+ingress:
+  enabled: true
+  annotations: {
+    kubernetes.io/ingress.class: nginx,
+    nginx.ingress.kubernetes.io/limit-rps: "50",
+    nginx.ingress.kubernetes.io/limit-connections: "160",
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+  }

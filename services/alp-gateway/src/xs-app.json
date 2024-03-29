@@ -1,0 +1,211 @@
+{ 
+  "routes":
+  [
+    {
+      "source":"^/portal/static/css/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/portal/static/css/"
+    },
+    {
+      "source":"^/portal/static/js/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/portal/static/js/"
+    },
+    {
+      "source":"^/portal/static/media/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/portal/static/media/"
+    },
+    {
+      "source":"^/portal/icons/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/portal/icons/"
+    },
+    {
+      "source":"^/portal/assets/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/portal/assets/"
+    },
+    {
+      "source":"^/portal",
+      "target":"index.html",
+      "targetPath":"/ui-files/portal/"
+    },
+    {
+      "source":"^/flow/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/flow/"
+    },
+    {
+      "source":"^/portalsvc",
+      "destination":"portal-svc"
+    },
+    {
+      "source":"^/system-portal",
+      "destination":"system-portal"
+    },
+    {
+      "source":"^/dataflow-mgmt",
+      "destination":"dataflow-mgmt"
+    },
+    {
+      "source":"^/usermgmt",
+      "destination":"usermgmt"
+    },
+    {
+      "source":"^/db-credentials",
+      "destination":"db-credentials-mgr"
+    },
+    {
+      "source": "^/alp-nifi-api",
+      "destination": "nifimgmt"
+    },
+    {
+      "source":"^/analytics-svc/api/services/bookmark(.*)$",
+      "destination":"bookmark-svc"
+    },
+    {  
+      "source":"^/analytics-svc/api/services/public/(.*)$",
+      "destination":"public-analytics-svc"
+    },
+    {  
+      "source":"^/analytics-svc/api/services/(.*)$",
+      "destination":"analytics-svc"
+    },
+    {  
+      "source":"^/analytics-svc/pa/services/(.*)$",
+      "destination":"analytics-svc"
+    },
+    {
+      "source":"^/analytics-svc/pa/config(.*)",
+      "destination":"app-router"
+    },
+    {
+      "source":"^/mri/(.*)",
+      "target": "$1",
+      "targetPath":"/ui-files/mri/"
+    },
+    {
+      "source":"^/log-viewer/(.*)",
+      "target": "$1",
+      "targetPath":"/ui-files/log-viewer/"
+    },
+    {
+      "source":"^/starboard-jupyter/(.*)",
+      "target": "$1",
+      "targetPath":"/ui-files/starboard-jupyter/"
+    },
+    {
+      "source":"^/starboard-notebook-base/(.*)",
+      "target": "$1",
+      "targetPath":"/ui-files/starboard-notebook-base/"
+    },
+    {
+      "source":"^/hc/hph/core/ui/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/mri-ui5/utils/core/"
+    },
+    {
+      "source": "^/hc/hph/config/global/ui/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/mri-ui5/utils/global/"
+    },
+    {
+      "source": "^/hc/mri/pa/config/ui/(.*)$",
+      "target": "$1",
+      "targetPath": "/ui-files/mri-ui5/PatientAnalyticsConfig/ui5/"
+    },
+    {
+      "source": "^/hc/mri/pa/ui/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/mri-ui5/mri-pa-ui/mri/"
+    },
+    {
+      "source": "^/hc/hph/genomics/ui/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/mri-ui5/genomics-ui/ui/"
+    },
+    {
+      "source": "^/hc/mri/pa/config/i18n/(.*)$",
+      "target": "$1",
+      "targetPath": "/ui-files/mri-ui5/PatientAnalyticsConfig/ui5/i18n/"
+    },
+    {
+      "source": "^/ui/core/(.*)$",
+      "target": "$1",
+      "targetPath": "/ui-files/ui5/resources/sap/ui/core/"
+    },
+    {
+      "source": "^/ui/m/(.*)$",
+      "target": "$1",
+      "targetPath": "/ui-files/ui5/resources/sap/m/"
+    },
+    {
+      "source": "^/hc/hph/patient/app/ui/(.*)$",
+      "target": "$1",
+      "targetPath": "/ui-files/mri-ui5/chp-ps-ui/"
+    },
+    {
+      "source": "^/hc/hph/cdw/config/i18n/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/mri-ui5/CDM/ui5/i18n/"
+    },
+    {
+      "source": "^/hc/hph/cdw/config/ui/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/mri-ui5/CDM/ui5/"
+    }, 
+    {  
+      "source":"^/hc/hph/patient/config/ui/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/mri-ui5/PatientSummaryConfig/ui5/"
+    },
+    {
+      "source":"^/hc/hph/patient/shared/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/mri-ui5/PatientSummaryConfig/ui5/shared/"
+    },
+    {  
+      "source":"^/hc/hph/patient/config/i18n/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/mri-ui5/PatientSummaryConfig/ui5/i18n/"
+    },
+    {
+      "source":"^/ui/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/ui5/resources/"
+    },
+    {
+      "source":"^/terminology",
+      "destination":"alp-terminology-svc"
+    },
+    {
+      "source":"^/alp-sqleditor",
+      "destination":"sqleditor"
+    },
+    {
+      "source":"^/alp-ai",
+      "destination":"alp-ai-svc"
+    },
+    {
+      "source":"^/meilisearch-svc",
+      "destination":"meilisearch-svc"
+    },
+    {
+      "source": "^/pa-config-svc/(.*)$",
+      "destination":"pa-config"
+    },
+    {
+      "source": "^/hc/hph/cdw/(.*)$",
+      "destination": "cdw"
+    },
+    {
+      "source": "^/hc/hph/config/services/(.*)$",
+      "destination": "cdw"
+    },
+    {
+      "source": "^/ps-config-svc/(.*)$",
+      "destination": "ps-config"
+    }
+  ]
+}

@@ -1,0 +1,463 @@
+!======================================================================
+! File Name: english-tf-med-Assertion.rul 
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of assertions of medical entities, 
+!          focusing on polarity, modality, reference and relation
+!======================================================================
+
+!======================================================================
+! OUTPUT FIELDS
+!======================================================================
+
+!! Main entity:		sub-entities
+
+!! polarity: 			1+ sub-entity Negative
+!! ModalityHypothetical: 	1+ sub-entity Provisional
+!! ModalityConditional: 	1+ sub-entity Provisional
+!! ModalityPossible: 		1+ sub-entity Provisional
+!! ModalityProposed: 		1+ sub-entity Preparation
+!! med_ReferenceNotAssociated: 	1+ sub-entity Other
+!! med_ReferenceFamily: 	1+ sub-entity FamilyMemberHistory
+!! AllergyIntolerance_Allergy: 	1+ sub-entity AllergyIntolerance_Reaction_Substance
+!! AllergyIntolerance_Intolerance: 	1+ sub-entity AllergyIntolerance_Reaction_Substance
+
+!======================================================================
+!!Entities for clinical reports
+!======================================================================
+
+#subgroup Med_Entity: ([TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE] )
+#subgroup MedProc_Entity: ([TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE] | [TE PROCEDURE_THERAPEUTIC] <>+ [/TE] | [TE OBSERVATION_LABORATORY] <>+ [/TE] | [TE PROCEDURE_DIAGNOSTIC] <>+ [/TE] )
+#subgroup Clinical_Entity: ([TE CONDITION] <>+ [/TE] | [TE OBSERVATION_SYMPTOM] <>+ [/TE] | [TE PROCEDURE_THERAPEUTIC] <>+ [/TE] | [TE OBSERVATION_LABORATORY] <>+ [/TE] | [TE PROCEDURE_DIAGNOSTIC] <>+ [/TE] | [TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE] | [TE COMPOSITION_SECTION_PROBLEM] <>+ [/TE] )
+#subgroup NotProc_Entity: ([TE CONDITION] <>+ [/TE] | [TE OBSERVATION_SYMPTOM] <>+ [/TE] | [TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE] | [TE COMPOSITION_SECTION_PROBLEM] <>+ [/TE] )
+#subgroup DisSymp_Entity: ([TE CONDITION] <>+ [/TE] | [TE OBSERVATION_SYMPTOM] <>+ [/TE] | [TE COMPOSITION_SECTION_PROBLEM] <>+ [/TE] )
+
+
+!======================================================================
+!copied here from pathology rules
+!These are key words that can trigger a rule, but are too generic to get a "histology" label
+#subgroup CancerGeneric: {(
+   (<\p{ci}(Cancer|Tumor|cancer|tumor|CANCER|TUMOR)>  <\p{ci}(cells?|masses|mass|Cells?|Masses|Mass|CELLS?|MASSES|MASS)> )
+|  (<\p{ci}(Cancers?|Tumors?|cancers?|tumors?|CANCERS?|TUMORS?|CA\.?|ca\.?|Ca\.?|(I|i)nvasion|(M|m)alignancy)> )
+)}
+
+!======================================================================
+!!Entities for pathology reports
+!======================================================================
+
+#subgroup Histology_Entity: ([TE OBSERVATION_CANCERHISTOLOGY_VALUE] <>+ [/TE] )
+#subgroup Anatomy_Entity: ([TE OBSERVATION_CANCERHISTOLOGY_BODYSITE] <>+ [/TE] )
+!#subgroup Procedure_Entity: ([TE PROCEDURE] <>+ [/TE] )
+#subgroup Alteration_Entity: ([TE OBSERVATION_CANCERBIOMARKER_COMPONENT_ALTERATION] <>+ [/TE] )
+#subgroup Behavior_Entity: ([TE OBSERVATION_CANCERHISTOLOGY_COMPONENT_BEHAVIOR] <>+ [/TE] )
+!#subgroup HistoType_Entity: ([TE HISTOTYPE] <>+ [/TE] )
+#subgroup GradeType_Entity: ([TE OBSERVATION_CANCERGRADE_NORMALIZED] <>+ [/TE] )
+#subgroup GradeValue_Entity: ([TE OBSERVATION_CANCERGRADE_VALUE] <>+ [/TE] )
+!#subgroup Margin_Entity: ([TE MARGIN] <>+ [/TE] )
+!#subgroup Appearance_Entity: ([TE APPEARANCE] <>+ [/TE] )
+#subgroup Modifier_Entity: ([TE MODIFIER] <>+ [/TE] )
+!#subgroup Biomarker_Entity: ([TE OBSERVATION_CANCERBIOMARKER_NORMALIZED] <>+ [/TE] )
+#subgroup med_Path_Entity: ([TE OBSERVATION_CANCERHISTOLOGY_VALUE_ICDO] <>+ [/TE] )
+
+
+!redefine this as some subentities above are now obsolete
+!#subgroup Pathology_Entity: (%(Histology_Entity) | %(Procedure_Entity) | %(Alteration_Entity) |  %(Behavior_Entity) | %(HistoType_Entity) | %(GradeType_Entity) | %(GradeValue_Entity) | %(Margin_Entity) | %(Appearance_Entity) | %(Modifier_Entity) |%(Biomarker_Entity) |%(med_Path_Entity) | %(CancerGeneric) )
+#subgroup Pathology_Entity: (%(Histology_Entity) | %(Alteration_Entity) |  %(Behavior_Entity) | %(GradeType_Entity) | %(GradeValue_Entity) | %(Modifier_Entity) | %(med_Path_Entity) | %(CancerGeneric) )
+
+!======================================================================
+!!All entities coming from dictionaries
+!======================================================================
+
+#subgroup Dict_Entity: (%(Clinical_Entity) | %(Pathology_Entity))
+
+!======================================================================
+!!coordination
+!======================================================================
+
+#subgroup coord: (<\p{ci}(and|&|or)>|(<STEM:\,> <\p{ci}(and|&|or)>?)|</>|<\|>)
+
+
+!======================================================================
+! NEGATIVE POLARITY
+!======================================================================
+
+#subgroup PolarityNEGATIVEPath: {
+( [OD Negative] %(Pathology_Entity) [/OD] ) 
+}
+#subgroup PolarityNEGATIVE: {
+ ( [OD Negative] %(Clinical_Entity) [/OD] (%(coord) <~(but|so|hence|during|when|while)>{0,2} [OD Negative] %(Clinical_Entity) [/OD])* )
+| %(PolarityNEGATIVEPath) 
+}
+#subgroup PolarityNEGATIVENotProc: {
+ ( [OD Negative] %(NotProc_Entity) [/OD] (%(coord) <~(but|so|hence|during|when|while)>{0,2} [OD Negative] %(NotProc_Entity) [/OD])* )
+| %(PolarityNEGATIVEPath)  
+}
+#subgroup PolarityNEGATIVEMedProc: {
+[OD Negative] %(MedProc_Entity) [/OD] (%(coord) <~(but|so|hence|during|when|while)>{0,2} [OD Negative] %(MedProc_Entity) [/OD])*
+}
+
+#subgroup NegativeKeywords: {
+   <\p{ci}(no)>
+|  <STEM:\p{ci}(not)>
+| (<\p{ci}(no)> <\p{ci}(other)>)
+| (<STEM:\p{ci}(not)> <\p{ci}(have)> <\p{ci}(any)>?)
+| (<STEM:\p{ci}(not)> <\p{ci}(feel)> <\p{ci}(any)>?)
+| (<STEM:\p{ci}(not)> <\p{ci}(reveal)> <\p{ci}(any)>?)
+| (<STEM:\p{ci}(not)> <\p{ci}(report)> <\p{ci}(any)>?)
+| (<STEM:\p{ci}(not)> <\p{ci}(experience)> <\p{ci}(any)>?)
+| (<\p{ci}(no)> <\p{ci}(known)>? <\p{ci}(family)>? <\p{ci}(history)> <\p{ci}(of)>)
+| <STEM:\p{ci}(avoid|omit|refuse)>
+| <STEM:\p{ci}(decline), POS:V>
+| <\p{ci}(deny|denies|denied|denying)>
+| <\p{ci}(without|w/o(ut)?|missing)>
+| <\p{ci}(none|nothing|nor|neither)>
+| <\p{ci}(unlikely|impossible)>
+| (<\p{ci}(no|without|w/o(ut)?|not|little)> <POS:Adj|Adv>? <>? <\p{ci}(evidence|source|indications?|signs?|suggestions?)> <POS:Prep>)
+| (<\p{ci}(evidence|indications?|signs?|suggestions?)> <\p{ci}(against)>)
+| (<STEM:\p{ci}(not|no)> <>? <\p{ci}(associated|consistent|compatible|comparable|suggestive|indicative)> <POS:Prep>)
+| (<\p{ci}(inconsistent|incompatible|incomparable)> <\p{ci}(with)>)
+| (<STEM:\p{ci}(not)> <\p{ci}(experiencing|feeling|having|revealing|reporting)>)
+|  <\p{ci}(never|hardly)>
+| (<\p{ci}(free|absence)> <\p{ci}(from|of)>)
+}
+
+#group polarity: {
+  ( %(NegativeKeywords) <STEM:~(;|\:|\(|\)|change|source|limit|aside|except|but|after|due|and|&)>{0,3} %(PolarityNEGATIVE))
+| ( %(PolarityNEGATIVEPath)  <\:|\->? <\p{ci}(no|not|none)> )
+| (<\p{ci}(stop|stops|stopped|stopping|ceases|ceased|ceasing)> <STEM:~(change|aside|except|but|after|secondary|due|and|&)>{0,3} %(PolarityNEGATIVE))
+| ( %(PolarityNEGATIVE) <~(but|if|with|;|\(|\))>{0,3} <\p{ci}(none|unwitnessed|unlikely|omitted|unnecessary|absent|ceased)>)
+| ( %(PolarityNEGATIVEMedProc) <~(but|if|with|;|\:|\(|\))>{0,3} <\p{ci}(held|withheld|stopped|discontinued)>)
+| (<\p{ci}(held|holding|withhold|withheld|withholding|discontinued?|ceased?|ceasing)> <~(;|\:|\(|\)|\,|&|but|and|if|of|due)>{0,3} %(PolarityNEGATIVEMedProc))
+| ( <\p{ci}(ruled)> <out> <for> <>? %(PolarityNEGATIVENotProc))
+| ( <\p{ci}(negative|neg)> <STEM:~(change|limit|aside|except|\,|and|&|due|;|\:|\(|\))>{0,3} %(PolarityNEGATIVENotProc))
+| ( %(PolarityNEGATIVENotProc) <~(but|if|and|&|with|\,|;|\(|\))>{0,3} <\p{ci}(negative|neg)>)
+| ( %(PolarityNEGATIVE) <~(\,|;|\:|\(|\)|and|&|but|if|although|while)>{0,2} <\p{ci}(not|unable)> <>{0,2} <\p{ci}(performed|conducted|occurred|occur|happened|happen|witnessed|observed|needed|necessary|seen|done|completed?)> )
+| (<\p{ci}(unable)> <to> <(perform|conduct|do|complete|give|take)>  %(PolarityNEGATIVEMedProc))
+| (<\p{ci}(non\-?complian(t|ce))> <with> <>{0,2} %(PolarityNEGATIVEMedProc))
+}
+
+!========================================================================
+! HYPOTHETICAL MODALITY
+!========================================================================
+
+#subgroup ModalityHYPOTHETICAL: {
+ ( [OD Provisional] %(Clinical_Entity) [/OD] (%(coord) <>{0,2} [OD Provisional] %(Clinical_Entity) [/OD])* )
+|( [OD Provisional] %(Pathology_Entity) [/OD] ) 
+}
+#subgroup ModalityHYPOTHETICALDisSymp: {
+ ( [OD Provisional] %(DisSymp_Entity) [/OD] (%(coord) <>{0,2} [OD Provisional] %(DisSymp_Entity) [/OD])* )
+|( [OD Provisional] %(Pathology_Entity) [/OD] ) 
+}
+
+#subgroup ModalityHypothetical: {
+  (<\p{ci}(if)> <~(\,|\.|;|and|&|\(|\))>{0,8} %(ModalityHYPOTHETICAL))
+| (<\p{ci}(prn|(p\.r\.n\.))> <~(\,|\.|;|and|&|\(|\))>{0,3} %(ModalityHYPOTHETICALDisSymp))
+| ((<\p{ci}(as)> <needed> <for>) <~(\,|\.|;|and|&|\(|\))>{0,3} %(ModalityHYPOTHETICALDisSymp))
+| ((<\p{ci}(in)> <case>) <~(\,|\.|;|and|&|\(|\))>{0,5} %(ModalityHYPOTHETICALDisSymp))
+}
+
+!========================================================================
+! CONDITIONAL MODALITY
+!========================================================================
+
+#subgroup ModalityCONDITIONALDisSympOne: {
+ ( [OD Provisional] ([TE CONDITION] <~((D|d)iabetes)>+ [/TE] | [TE OBSERVATION_SYMPTOM] <~((D|d)iabetes)>+ [/TE] ) [/OD] )
+|( [OD Provisional] %(Pathology_Entity) [/OD] ) 
+}
+
+#subgroup ModalityCONDITIONALDisSymp: {
+ ( [OD Provisional] %(DisSymp_Entity) [/OD] (%(coord) <>{0,2} [OD Provisional] %(DisSymp_Entity) [/OD])* )
+|( [OD Provisional] %(Pathology_Entity) [/OD] ) 
+}
+
+#subgroup ConditionIONs: {
+<(~(admiss|examinat|presentat|discuss|hypertens|hypotens|quest|confus|occlus|radiat|granulat|(dis)?continuat)ion),POS:Nn>
+}
+
+#subgroup ModalityConditional: {
+  ( %(ModalityCONDITIONALDisSymp) <~(\,|;|\(|\)|but|due|as|who)>{0,2} <(up)?on> 
+	(<(~(imag)ing),POS:V>|%(ConditionIONs)) )
+| ( %(ModalityCONDITIONALDisSymp) <with> %(ConditionIONs) )
+| ( %(ModalityCONDITIONALDisSympOne) <is|was> <worse> (<(up)?on>|(<when> <>{0,3})) %(Med_Entity) )
+| (<\p{ci}(causes|caused|produces|produced), POS:V> <~(\,|;|\(|\)|by)>{0,2} %(ModalityCONDITIONALDisSymp) )
+| (<\p{ci}(leads|led), POS:V> <to>  <~(\,|;|\(|\))>? %(ModalityCONDITIONALDisSymp) )
+| (<\p{ci}(gives|gave)> <him|her>  <~(\,|;|\(|\))>? %(ModalityCONDITIONALDisSymp) )
+}
+
+!======================================================================
+! POSSIBLE MODALITY
+!======================================================================
+#subgroup ModalityPOSSIBLE: {
+ ( [OD Provisional] %(Clinical_Entity) [/OD] (%(coord) <>{0,2} [OD Provisional] %(Clinical_Entity) [/OD])* )
+|( [OD Provisional] %(Pathology_Entity) [/OD] ) 
+}
+#subgroup ModalityPOSSIBLEDisSymp: {
+ ( [OD Provisional] %(DisSymp_Entity) [/OD] (%(coord) <>{0,2} [OD Provisional] %(DisSymp_Entity) [/OD])* )
+|( [OD Provisional] %(Pathology_Entity) [/OD] ) 
+}
+
+#subgroup PossibleDisSymp_Verbs: {
+  <STEM:\p{ci}(suspect|suggest|anticipate)>
+| (<STEM:\p{ci}(presume|appear)><to>)
+| (<STEM:\p{ci}(be)><felt|thought><to>)
+| (<\p{ci}(test(ed)?|examined?|inspect(ed)?|monitor(ed)|analy(s|z)ed?)><\p{ci}(for)>)
+| (<\p{ci}(unable)><\p{ci}(to)><\p{ci}(determine|decide)>)
+| (<\p{ci}(to)><look><for>)
+| (<rule><out>)
+| (<\p{ci}(may|could)><have|be|represent>)
+| (<\p{ci}(may|can|could)><result><in>)
+| (<STEM:\p{ci}(seem)><to><have|be|represent>)
+}
+
+#subgroup PossibleDisSymp_Ads: {
+  <\p{ci}(suspicious|questionable)>
+| (<\p{ci}(associated|consistent|compatible|comparable|suggestive|indicative|typical)> <POS:Prep>)
+}
+
+#subgroup PossibleDisSymp_Nouns: {
+  <STEM:\p{ci}(presumption)>
+| (<STEM:\p{ci}(suggestion|suspicion)><POS:Prep>)
+}
+
+#subgroup PossibleDisSympKeywords: {
+  %(PossibleDisSymp_Verbs)
+| %(PossibleDisSymp_Ads)
+| %(PossibleDisSymp_Nouns)
+}
+
+#subgroup Possible_Ads: {
+  <\p{ci}(possible|likely|probable|questionable)>
+| <\p{ci}(possibly|probably|presumably)>
+| <\p{ci}(unlikely|impossible)>
+}
+
+#subgroup Possible_Ads_Neg: {
+  (<less> <likely>)
+| <\p{ci}(unlikely|impossible)>
+}
+
+#subgroup Possible_Nouns: {
+  (<STEM:\p{ci}(goal|question)><POS:Prep>)
+| <STEM:\p{ci}(risk)>
+| <STEM:\p{ci}(possibility|likeliness|likelihood|probability)>
+}
+
+#subgroup PossibleKeywords: {
+  %(Possible_Ads)
+| %(Possible_Nouns)
+}
+
+#subgroup ModalityPossible: {
+  (%(PossibleDisSympKeywords) <~(\,|;|\(|\)|but|due|because|his|her|the|this|secondary)>{0,4} %(ModalityPOSSIBLEDisSymp))
+| (<STEM:\p{ci}(concern)> <~(\,|;|\(|\)|but|due|because|his|her|the|'s)>{0,4} %(ModalityPOSSIBLEDisSymp))
+| (%(PossibleKeywords) <~(\,|;|\(|\)|but|due|because|his|her|factors?)>{0,4} %(ModalityPOSSIBLE))
+| (%(ModalityPOSSIBLEDisSymp) <~(\,|;|\(|\)|but|due|and|&|because)>{0,3} %(Possible_Ads_Neg))
+| (<\p{ci}(potential(ly)?)> <~(\,|;|\(|\)|but|due|(I|i)nteractions?|INTERACTIONS?|caused?)>{0,4} %(ModalityPOSSIBLE))
+| (<\p{ci}(presumed|appear(ed|s)?|seem(ed|s)?)> %(ModalityPOSSIBLEDisSymp))
+| (%(ModalityPOSSIBLEDisSymp) <\p{ci}(presumed|suspected)>)
+| (<\p{ci}(whether)> <~(\,|\.|;|\(|\))>{0,8} %(ModalityPOSSIBLE))
+}
+
+
+!======================================================================
+! PROPOSED MODALITY
+!======================================================================
+
+#subgroup ModalityPROPOSEDMedProc: {
+! ( [OD Preparation] (%(MedProc_Entity)|%(Procedure_Entity)) [/OD] (%(coord) <>{0,2} [OD Preparation] (%(MedProc_Entity)|%(Procedure_Entity))  [/OD])* )
+ ( [OD Preparation] %(MedProc_Entity) [/OD] (%(coord) <>{0,2} [OD Preparation] %(MedProc_Entity) [/OD])* )
+}
+
+#subgroup Proposed_Verbs: {
+  <STEM:\p{ci}(advise|propose|suggest|recommend|request|plan|encourage|instruct|anticipate|schedule|desire|consent)>
+| (<STEM:\p{ci}(decide|prefer|choose)>)
+| (<STEM:\p{ci}(opt)><for>)
+| (<\p{ci}(would)><\p{ci}(like)>)
+| (<STEM:be><due><for>)
+| (<STEM:be><going><to>)
+}
+
+#subgroup Proposed_Verbs_Post: {
+  <advised|proposed|recommended|requested|planned|encouraged|instructed|anticipated|scheduled|desired|preferred|chosen|pending|optional|considered>
+}
+
+#subgroup Proposed_Modals: {
+  (<\p{ci}(should|could)><have>)
+| (<STEM:\p{ci}(arrange)><to><have>)
+| (<\p{ci}(would)><include>)
+| (<\p{ci}(needs?)><to><be><(.+ed),POS:V>)
+}
+
+#subgroup Proposed_Ads: {
+  (<\p{ci}(appropriate)><to>)
+| (<\p{ci}(upcoming|pending|optional|elective)>)
+}
+
+#subgroup Proposed_Nouns: {
+  <STEM:\p{ci}(advice|proposal|suggestion|recommendation|decision|option|candidate|list)>
+| (<STEM:\p{ci}(follow)><\p{ci}(up)>)
+| (<\p{ci}(follow\-?up)>)
+}
+
+#subgroup ProposedKeywords: {
+  %(Proposed_Verbs)
+| %(Proposed_Ads)
+| %(Proposed_Nouns)
+}
+
+#subgroup ModalityProposed: {
+  (%(ProposedKeywords) <~(\,|;|\(|\)|but|due|and|&|if)>{0,5} %(ModalityPROPOSEDMedProc))
+| (%(ModalityPROPOSEDMedProc) %(Proposed_Nouns))
+| (%(Proposed_Modals) <~(\,|;|\(|\)|but|due|and|&|if),POS:~(V)>{0,2} %(ModalityPROPOSEDMedProc))
+| (%(ModalityPROPOSEDMedProc) (<~(\,|;|\(|\)|but|due|and|&|if)>{0,4}<STEM:be>)? %(Proposed_Verbs_Post))
+| (%(ModalityPROPOSEDMedProc) ((<may|might> <need>)|<needs?>|<is>) <to> <be>)
+| (%(ModalityPROPOSEDMedProc) <>?<STEM:be><suggested>)
+| (<Please|please|Start|Stop|Avoid>  <~(\,|;|\(|\)|but|due|and|&|if)>{0,5} %(ModalityPROPOSEDMedProc))
+}
+
+#group status: {
+  %(ModalityPossible)
+| %(ModalityProposed)
+| %(ModalityHypothetical)
+| %(ModalityConditional)
+}
+
+
+!========================================================================
+! FAMILY REFERENCE
+!========================================================================
+
+#subgroup ReferenceFAMILY: {
+[OD FamilyMemberHistory]( %(Clinical_Entity) | %(Pathology_Entity)) [/OD] (%(coord) <>{0,2} [OD FamilyMemberHistory]( %(Clinical_Entity) | %(Pathology_Entity))[/OD])*
+}
+
+#subgroup FamilyNoun: {
+  <\p{ci}(famil(y|ies))>
+| <\p{ci}(brothers?)>
+| <\p{ci}(sisters?)>
+| <\p{ci}(siblings?)>
+| <\p{ci}(parents?)>
+| <\p{ci}(mother)>
+| <\p{ci}(father)>
+| <\p{ci}(mom)>
+| <\p{ci}(dad)>
+| <\p{ci}(offsprings?)>
+| <\p{ci}(sons?)>
+| <\p{ci}(daughters?)>
+| <\p{ci}(grandparents?)>
+| <\p{ci}(grandmother)>
+| <\p{ci}(grandfather)>
+| <\p{ci}(grandmom)>
+| <\p{ci}(granddad)>
+| <\p{ci}(grandchild(ren)?)>
+| <\p{ci}(grandsons?)>
+| <\p{ci}(granddaughters?)>
+| <\p{ci}(spouses?)>
+| <\p{ci}(partners?)>
+| <\p{ci}(husbands?)>
+| <\p{ci}(wifes?)>
+| <\p{ci}(cousins?)>
+| <\p{ci}(nephews?)>
+| <\p{ci}(nieces?)>
+| <\p{ci}(uncles?)>
+| <\p{ci}(aunts?)>
+}
+
+#subgroup FamilyNouns: {
+  %(FamilyNoun) (%(coord) <~(but|not)>{0,2} %(FamilyNoun) )*
+}
+
+#subgroup FamilyAdj: {
+  <\p{ci}(maternal|paternal|fraternal)>
+}
+
+
+#subgroup med_ReferenceFamily: {
+  ( %(FamilyNouns) <~(his|her)>{0,2} <\p{ci}(died)> <\p{ci}(of|from)> <>{0,2} %(ReferenceFAMILY))
+| (%(FamilyNouns) <~(his|her)>{0,4} %(ReferenceFAMILY))
+| (<\p{ci}(children|child)> <~(\,|;|\(|\)|but)>{0,4} %(ReferenceFAMILY))
+| (%(FamilyAdj) <POS:~(Punct)>{0,2} %(ReferenceFAMILY))
+| (%(ReferenceFAMILY) <~(per|\,|;|\(|\)|although|but|and|&|when|while|during|since|because)>{0,4} %(FamilyNouns))
+}
+
+!======================================================================
+! NOT ASSOCIATED REFERENCE
+!======================================================================
+
+#subgroup ReferenceNOTASSOCIATED: {
+ ( [OD Other] %(Clinical_Entity) [/OD] (%(coord) <>{0,2} [OD Other] %(Clinical_Entity) [/OD])* )
+|( [OD Other] %(Pathology_Entity) [/OD] ) 
+}
+
+#subgroup NotassociatedKeywords_Verbs: {
+  <STEM:\p{ci}(talk|read|discuss)>
+}
+
+#subgroup NotassociatedKeywords_Nouns: {
+  <STEM:\p{ci}(information|sessions?|discussions?|class(es)?|pamphlets?|brochures?|books?|booklets?|research(es)?|publications?)> <POS:Prep>
+}
+
+#subgroup NotassociatedKeywords: {
+  %(NotassociatedKeywords_Verbs)
+| %(NotassociatedKeywords_Nouns)
+}
+
+#subgroup med_ReferenceNotAssociated: {
+  (%(NotassociatedKeywords) <~(\,|;|\(|\)|but|due|his|her)>{0,4} %(ReferenceNOTASSOCIATED))
+}
+
+#group subject: {
+  %(med_ReferenceNotAssociated)
+| %(med_ReferenceFamily)
+}
+
+!======================================================================
+! ALLERGIC RELATION
+!======================================================================
+
+#subgroup RelationALLERGICMed: {
+[OD AllergyIntolerance_Reaction_Substance] %(Med_Entity) [/OD] (%(coord) <>{0,2} [OD AllergyIntolerance_Reaction_Substance] %(Med_Entity) [/OD])*
+}
+
+#subgroup AllergicKeywords: {
+  <\p{ci}(allerg(y|ies)|allergic)> <\p{ci}(to|\:)>
+}
+
+#group AllergyIntolerance_Allergy: {
+  (%(AllergicKeywords) <>{0,3} %(RelationALLERGICMed))
+}
+
+!======================================================================
+! INTOLERANT RELATION
+!======================================================================
+
+#subgroup RelationINTOLERANTMedProc: {
+[OD AllergyIntolerance_Reaction_Substance] %(MedProc_Entity) [/OD] (%(coord) <>{0,2} [OD AllergyIntolerance_Reaction_Substance] %(MedProc_Entity) [/OD])*
+}
+
+#subgroup Intolerant_Ads: {
+  (<\p{ci}(intoleran(ces?|t))> 
+  |(<\p{ci}(poor)><\p{ci}(tolerance)>)
+  |(<\p{ci}(not)><\p{ci}(tolerant)>)
+  | <\p{ci}((hyper)?sensitiv(e|ity))>
+  )<POS:Prep>
+}
+
+#subgroup Intolerant_Verbs: {
+  ((<\p{ci}(unable)><to>)|(<\p{ci}(not)><able><to>)|(<STEM:\p{ci}(can)><STEM:not>)) <tolerate>
+}
+
+#subgroup Intolerant_Nns: {
+  [OD Problem] (
+    <\p{ci}(intolerances?|(hyper)?sensitivit(y|ies))>
+  ) [/OD]
+}
+
+#subgroup IntolerantKeywords: {
+  %(Intolerant_Ads) | %(Intolerant_Verbs)
+}
+
+#group AllergyIntolerance_Intolerance: {(
+  (%(IntolerantKeywords) <>{0,3} %(RelationINTOLERANTMedProc))
+!| (%(RelationINTOLERANTMedProc)  %(Intolerant_Nns) )
+)}

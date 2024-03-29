@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" schemaVersion="2.3" defaultLanguage="$$language$$" defaultClient="$$client$$" hierarchiesSQLEnabled="false" executionSemantic="UNDEFINED" dataCategory="DEFAULT" id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.views::disambiguation_ready" xscCompatibilityMode="true" applyPrivilegeType="NONE" outputViewType="Projection" enforceSqlExecution="false">
+  <descriptions defaultDescription="test"></descriptions>
+  <localVariables></localVariables>
+  <variableMappings></variableMappings>
+  <informationModelLayout relativeWidthScenario="38"></informationModelLayout>
+  <dataSources>
+    <DataSource id="sections" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::sections</resourceUri>
+    </DataSource>
+    <DataSource id="mpr">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.views::sps</resourceUri>
+    </DataSource>
+    <DataSource id="ta" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+  </dataSources>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:UnionView" id="Info">
+      <descriptions></descriptions>
+      <viewAttributes>
+        <viewAttribute id="DWID"></viewAttribute>
+        <viewAttribute id="TA_COUNTER"></viewAttribute>
+        <viewAttribute id="TA_SECTION"></viewAttribute>
+        <viewAttribute id="TA_STATUS"></viewAttribute>
+        <viewAttribute id="TA_POLARITY"></viewAttribute>
+        <viewAttribute id="TA_SUBJECT"></viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes></calculatedViewAttributes>
+      <input node="#sections" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_SECTION" target="TA_SECTION"></mapping>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_STATUS"></mapping>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_POLARITY"></mapping>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_SUBJECT"></mapping>
+      </input>
+      <input node="#mpr" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"></mapping>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" null="true" value="" target="TA_SECTION"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_STATUS" target="TA_STATUS"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_POLARITY" target="TA_POLARITY"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_SUBJECT" target="TA_SUBJECT"></mapping>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:AggregationView" id="Collapsing">
+      <descriptions></descriptions>
+      <viewAttributes>
+        <viewAttribute id="DWID"></viewAttribute>
+        <viewAttribute id="TA_COUNTER"></viewAttribute>
+        <viewAttribute aggregationType="max" id="TA_SECTION"></viewAttribute>
+        <viewAttribute aggregationType="max" id="TA_STATUS"></viewAttribute>
+        <viewAttribute aggregationType="max" id="TA_POLARITY"></viewAttribute>
+        <viewAttribute aggregationType="max" id="TA_SUBJECT"></viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes></calculatedViewAttributes>
+      <input node="#Info">
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_SECTION" target="TA_SECTION"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_STATUS" target="TA_STATUS"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_POLARITY" target="TA_POLARITY"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_SUBJECT" target="TA_SUBJECT"></mapping>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" joinType="inner" id="AddInfoToTA">
+      <descriptions></descriptions>
+      <viewAttributes>
+        <viewAttribute id="DWID"></viewAttribute>
+        <viewAttribute id="TA_RULE"></viewAttribute>
+        <viewAttribute id="TA_COUNTER"></viewAttribute>
+        <viewAttribute id="TA_TOKEN"></viewAttribute>
+        <viewAttribute id="TA_LANGUAGE"></viewAttribute>
+        <viewAttribute id="TA_TYPE"></viewAttribute>
+        <viewAttribute id="TA_NORMALIZED"></viewAttribute>
+        <viewAttribute id="TA_STEM"></viewAttribute>
+        <viewAttribute id="TA_PARAGRAPH"></viewAttribute>
+        <viewAttribute id="TA_SENTENCE"></viewAttribute>
+        <viewAttribute id="TA_CREATED_AT"></viewAttribute>
+        <viewAttribute id="TA_OFFSET"></viewAttribute>
+        <viewAttribute id="TA_PARENT"></viewAttribute>
+        <viewAttribute id="TA_SECTION"></viewAttribute>
+        <viewAttribute id="TA_STATUS"></viewAttribute>
+        <viewAttribute id="TA_POLARITY"></viewAttribute>
+        <viewAttribute id="TA_SUBJECT"></viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes></calculatedViewAttributes>
+      <input node="#ta">
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_RULE" target="TA_RULE"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_TOKEN" target="TA_TOKEN"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_LANGUAGE" target="TA_LANGUAGE"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_TYPE" target="TA_TYPE"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_NORMALIZED" target="TA_NORMALIZED"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_STEM" target="TA_STEM"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_PARAGRAPH" target="TA_PARAGRAPH"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_SENTENCE" target="TA_SENTENCE"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_CREATED_AT" target="TA_CREATED_AT"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_OFFSET" target="TA_OFFSET"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_PARENT" target="TA_PARENT"></mapping>
+      </input>
+      <input node="#Collapsing">
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_SECTION" target="TA_SECTION"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_STATUS" target="TA_STATUS"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_POLARITY" target="TA_POLARITY"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_SUBJECT" target="TA_SUBJECT"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="DWID" target="DWID"></mapping>
+        <mapping xsi:type="Calculation:AttributeMapping" source="TA_COUNTER" target="TA_COUNTER"></mapping>
+      </input>
+      <joinAttribute name="DWID"></joinAttribute>
+      <joinAttribute name="TA_COUNTER"></joinAttribute>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="AddInfoToTA">
+    <descriptions></descriptions>
+    <attributes>
+      <attribute id="DWID" displayAttribute="false" order="1" attributeHierarchyActive="false">
+        <descriptions defaultDescription="DWID"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="DWID"></keyMapping>
+      </attribute>
+      <attribute id="TA_RULE" displayAttribute="false" order="2" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_RULE"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_RULE"></keyMapping>
+      </attribute>
+      <attribute id="TA_COUNTER" displayAttribute="false" order="3" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_COUNTER"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_COUNTER"></keyMapping>
+      </attribute>
+      <attribute id="TA_TOKEN" displayAttribute="false" order="4" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_TOKEN"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_TOKEN"></keyMapping>
+      </attribute>
+      <attribute id="TA_LANGUAGE" displayAttribute="false" order="5" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_LANGUAGE"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_LANGUAGE"></keyMapping>
+      </attribute>
+      <attribute id="TA_TYPE" displayAttribute="false" order="6" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_TYPE"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_TYPE"></keyMapping>
+      </attribute>
+      <attribute id="TA_NORMALIZED" displayAttribute="false" order="7" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_NORMALIZED"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_NORMALIZED"></keyMapping>
+      </attribute>
+      <attribute id="TA_STEM" displayAttribute="false" order="8" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_STEM"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_STEM"></keyMapping>
+      </attribute>
+      <attribute id="TA_PARAGRAPH" displayAttribute="false" order="9" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_PARAGRAPH"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_PARAGRAPH"></keyMapping>
+      </attribute>
+      <attribute id="TA_SENTENCE" displayAttribute="false" order="10" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_SENTENCE"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_SENTENCE"></keyMapping>
+      </attribute>
+      <attribute id="TA_CREATED_AT" displayAttribute="false" order="11" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CREATED_AT"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_CREATED_AT"></keyMapping>
+      </attribute>
+      <attribute id="TA_OFFSET" displayAttribute="false" order="12" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_OFFSET"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_OFFSET"></keyMapping>
+      </attribute>
+      <attribute id="TA_PARENT" displayAttribute="false" order="13" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_PARENT"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_PARENT"></keyMapping>
+      </attribute>
+      <attribute id="TA_SECTION" displayAttribute="false" order="14" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_SECTION"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_SECTION"></keyMapping>
+      </attribute>
+      <attribute id="TA_STATUS" displayAttribute="false" order="15" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_STATUS"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_STATUS"></keyMapping>
+      </attribute>
+      <attribute id="TA_POLARITY" displayAttribute="false" order="16" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_POLARITY"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_POLARITY"></keyMapping>
+      </attribute>
+      <attribute id="TA_SUBJECT" displayAttribute="false" order="17" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_SUBJECT"></descriptions>
+        <keyMapping columnObjectName="AddInfoToTA" columnName="TA_SUBJECT"></keyMapping>
+      </attribute>
+    </attributes>
+    <calculatedAttributes></calculatedAttributes>
+    <privateDataFoundation>
+      <tableProxies></tableProxies>
+      <joins></joins>
+      <layout>
+        <shapes></shapes>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures></baseMeasures>
+    <calculatedMeasures></calculatedMeasures>
+    <restrictedMeasures></restrictedMeasures>
+    <localDimensions></localDimensions>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectNameSpace="MeasureGroup" modelObjectName="Output">
+        <upperLeftCorner x="22" y="87"></upperLeftCorner>
+        <rectangleSize width="0" height="0"></rectangleSize>
+      </shape>
+      <shape expanded="true" modelObjectNameSpace="CalculationView" modelObjectName="Info">
+        <upperLeftCorner x="22" y="339"></upperLeftCorner>
+        <rectangleSize width="-1" height="-1"></rectangleSize>
+      </shape>
+      <shape expanded="true" modelObjectNameSpace="CalculationView" modelObjectName="Collapsing">
+        <upperLeftCorner x="22" y="261"></upperLeftCorner>
+        <rectangleSize width="-1" height="-1"></rectangleSize>
+      </shape>
+      <shape expanded="true" modelObjectNameSpace="CalculationView" modelObjectName="AddInfoToTA">
+        <upperLeftCorner x="22" y="165"></upperLeftCorner>
+        <rectangleSize width="-1" height="-1"></rectangleSize>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario>

@@ -1,0 +1,179 @@
+swagger: "2.0"
+info:
+  version: "3.0 - FP0"
+  title: ALP bookmark service
+  description: .
+
+basePath: /analytics-svc/api/services/bookmark
+
+schemes:
+  - http
+  - https
+produces:
+  - application/json
+paths:
+  /:
+    x-swagger-router-controller: bookmark
+    get:
+      description: Get a list of bookmarks that have the same paConfigId
+      operationId: getBookmarkList
+      parameters:
+        - name: paConfigId
+          in: query
+          description: The patient analytics config Id of the system
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/BookmarkListResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      description: Add a new bookmark
+      operationId: addBookmark
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: bookmark
+          description: The bookmark to create.
+          schema:
+            type: object
+            required:
+              - bookmark
+            properties:
+              bookmark:
+                type: string
+              bookmarkname:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /{bookmarkId}:
+    x-swagger-router-controller: bookmark
+    put:
+      description: update a bookmark
+      operationId: updateBookmark
+      parameters:
+        - in: path 
+          name: bookmarkId         
+          description: bookmark id
+          required: true
+          type: string
+        - in: body
+          name: bookmark
+          description: The bookmark to update.
+          schema:
+            type: object
+            properties:
+              bookmark:
+                type: string
+              newName:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      description: Deletes a bookmark
+      operationId: deleteBookmark
+      parameters:
+        - name: bookmarkId
+          in: path
+          description: bookmark id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /bookmarkIds:
+    x-swagger-router-controller: bookmark
+    get:
+      description: get bookmarks based on bookmarkIds
+      operationId: getBookmarksById
+      parameters:
+        - name: ids
+          required: true
+          description: comma separated list of cohort ids
+          in: query
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+definitions:
+  BookmarkListResponse:
+    type: object
+    description: Bookmark request body
+    properties:
+      bookmarks:
+        type: array
+        items:
+          $ref: '#/definitions/Bookmark'
+        description: Array of bookmarks
+  Bookmark:
+    type: object
+    description: Bookmark request body
+    required: [bookmarkname, bookmark, type]
+    properties:
+      bmkId:
+        type: string
+        description: bookmark id
+      bookmarkname:
+        type: string
+        description: Name of the shared bookmark
+      bookmark:
+        type: string
+        description: Stringified JSON bookmark definition
+      type:
+        type: string
+        description: Type of bookmark
+  BookmarkEntry:
+    type: object
+    description: Bookmark request body
+    required: [bookmarkId, data]
+    properties:
+      bookmarkId:
+        type: string
+        description: Id of bookmark
+      data:
+        type: string
+        description: Stringified data
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string

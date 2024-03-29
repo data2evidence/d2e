@@ -1,0 +1,1 @@
+TYPE "hc.hph.um.org.db.models::TT_UM_ERROR" AS TABLE  ( "Status" NVARCHAR  CS_STRING, "Code" NVARCHAR(100)  CS_STRING, "Message" NVARCHAR(100)  CS_STRING ) 

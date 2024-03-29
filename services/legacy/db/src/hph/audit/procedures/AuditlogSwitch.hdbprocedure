@@ -1,0 +1,28 @@
+PROCEDURE "hc.hph.audit.procedures::AuditlogSwitch" ( IN action NVARCHAR(256), IN threshold INTEGER,
+    OUT switch NVARCHAR(256)
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+  -- DEFAULT SCHEMA <default_schema_name>
+   AS
+BEGIN
+
+  DECLARE tempData NCLOB;
+
+  if LOWER (:action) = 'enable' then tempData = 'true' ;
+  else tempData = 'false' ;
+  end if;
+  
+  
+  UPSERT "hc.hph.config.db.models::Configuration.Config" 
+  values('chp.audit','2','A','AuditLog','Switch',:tempData,'','','SYSTEM','',(Select SESSION_CONTEXT('XS_APPLICATIONUSER') From "hc::DUMMY"),CURRENT_UTCTIMESTAMP)with primary key;
+ 
+ if ::ROWCOUNT = 1 and :tempData = 'true'
+  then switch = 'ENABLED' ;
+  else switch = 'DISABLED' ;
+  end if;
+
+  UPSERT "hc.hph.config.db.models::Configuration.Config" 
+  values('CHPAuditLogThreshold','2','A','AuditLogThreshold','HC/HPH/AUDIT/SETTING',TO_NVARCHAR(:threshold),'','','SYSTEM','',(Select SESSION_CONTEXT('XS_APPLICATIONUSER') From "hc::DUMMY"),CURRENT_UTCTIMESTAMP)with primary key;
+  
+END

@@ -1,0 +1,345 @@
+namespace hc.hph.genomics.db.models;
+
+using hc.hph.genomics.db.models::Type as Type;
+using hc.hph.genomics.db.models::General as General;
+using hc.hph.genomics.db.models::Reference as Reference;
+using hc.hph.genomics.db.models.generated::SNV as Generated;
+using hc.hph.cdw.db.models::DWAnnotations as DWAnnotation;
+
+context SNV
+{
+
+	// Analysis header items
+
+	entity Headers
+	{
+		key DWAuditID : Type.DWDocID;
+		key RowIndex : Integer;
+		key KeyValueIndex : Integer;
+		HeaderKey : String(255);
+		ValueKey : String(255) null;
+		Value : LargeString null;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+
+
+	// Variants
+
+    @DWAnnotation.Entity."Group" : 'Genomics'
+    @DWAnnotation.Entity.Name : 'Variant'
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.genomics.db.models::SNV.Variants"'}
+	entity Variants
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Integer;
+		ChromosomeIndex : Type.ChromosomeIndex;
+		Position : Type.Position;
+		VariantID : String(255) null;
+		Quality : Type.FloatValue null;
+		Filter : Generated.Filters;
+		Attr : Generated.VariantAttributes;
+		Genes: Association to Reference.Features on ChromosomeIndex = Genes.ChromosomeIndex and Position between Genes.Region."Begin" and ( Genes.Region."End" - 1 ) and Genes.Class = 'gene';
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+
+	entity VariantIDs
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Integer;
+		VariantID : String(255);
+		Variant : Association to Variants on DWAuditID = Variant.DWAuditID and VariantIndex = Variant.VariantIndex;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+    
+    @DWAnnotation.Entity.Name : 'Variant'
+	entity VariantMultiValueAttributes
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Integer;
+		ValueIndex : Integer;
+		Attr : Generated.VariantMultiValueAttributes;
+		Variant : Association to Variants on DWAuditID = Variant.DWAuditID and VariantIndex = Variant.VariantIndex;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+
+    
+    @DWAnnotation.Entity.Name : 'Variant'
+	entity VariantStructuredAttributes
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Integer;
+		ValueIndex : Integer;
+		Attr : Generated.VariantStructuredAttributes;
+		Variant : Association to Variants on DWAuditID = Variant.DWAuditID and VariantIndex = Variant.VariantIndex;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+    
+    @DWAnnotation.Entity."Group" : 'Genomics'
+    @DWAnnotation.Entity.Name : 'VcfFile'
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.genomics.db.models::SNV.Variants"', CountAttribute : 'DISTINCT "DWAuditID"'}
+	entity VariantAlleles
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Integer;
+		AlleleIndex : Integer;
+		Allele : Type.AlleleContent null;
+		Attr : Generated.VariantAlleleAttributes;
+		Variant : Association to Variants on DWAuditID = Variant.DWAuditID and VariantIndex = Variant.VariantIndex;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+
+	// Genotypes
+
+    @DWAnnotation.Entity."Group" : 'Genomics'
+    @DWAnnotation.Entity.Name : 'Genotype'
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.genomics.db.models::SNV.Genotypes"'}
+	entity Genotypes
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Integer;
+		SampleIndex : Type.SampleIndex;
+		Phased : Type.BooleanValue null;
+		ReferenceAlleleCount : Integer;
+		CopyNumber : Integer;
+        Zygosity : String(100);
+		Attr : Generated.GenotypeAttributes;
+		Sample : Association to General.Samples on SampleIndex = Sample.SampleIndex;
+		Variant : Association to Variants on DWAuditID = Variant.DWAuditID and VariantIndex = Variant.VariantIndex;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+
+    @DWAnnotation.Entity.Name : 'Genotype'
+	entity GenotypeMultiValueAttributes
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Integer;
+		SampleIndex : Type.SampleIndex;
+		ValueIndex : Integer;
+		Attr : Generated.GenotypeMultiValueAttributes;
+		Sample : Association to General.Samples on SampleIndex = Sample.SampleIndex;
+		Variant : Association to Variants on DWAuditID = Variant.DWAuditID and VariantIndex = Variant.VariantIndex;
+		Genotype : Association to Genotypes on DWAuditID = Genotype.DWAuditID and VariantIndex = Genotype.VariantIndex and SampleIndex = Genotype.SampleIndex;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+    
+    @DWAnnotation.Entity.Name : 'Genotype'
+	entity GenotypeAlleles
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Integer;
+		SampleIndex : Type.SampleIndex;
+		AlleleIndex : Integer;
+		AlleleCount : Integer;
+		Attr : Generated.GenotypeAlleleAttributes;
+		VariantAnnotation: Association to VariantAnnotations on DWAuditID = VariantAnnotation.DWAuditID and VariantIndex = VariantAnnotation.VariantIndex and AlleleIndex = VariantAnnotation.AlleleIndex;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+
+    @DWAnnotation.Entity."Group" : 'Genomics'
+    @DWAnnotation.Entity.Name : 'Haplotype'
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.genomics.db.models::SNV.Haplotypes"'}
+	entity Haplotypes
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Integer;
+		SampleIndex : Type.SampleIndex;
+		HaplotypeIndex : Integer;
+		AlleleIndex : Integer null;
+		Sample : Association to General.Samples on SampleIndex = Sample.SampleIndex;
+		Variant : Association to Variants on DWAuditID = Variant.DWAuditID and VariantIndex = Variant.VariantIndex;
+		Genotype : Association to Genotypes on DWAuditID = Genotype.DWAuditID and VariantIndex = Genotype.VariantIndex and SampleIndex = Genotype.SampleIndex;
+		VariantAllele : Association to VariantAlleles on DWAuditID = VariantAllele.DWAuditID and VariantIndex = VariantAllele.VariantIndex and AlleleIndex = VariantAllele.AlleleIndex;
+		VariantAnnotation: Association to VariantAnnotations on DWAuditID = VariantAnnotation.DWAuditID and VariantIndex = VariantAnnotation.VariantIndex and AlleleIndex = VariantAnnotation.AlleleIndex;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+
+	// Allele counts
+/*
+	view GenotypeAlleles as select from Haplotypes
+	{
+		DWAuditID,
+		VariantIndex,
+		SampleIndex,
+		AlleleIndex,
+		count(*) as AlleleCount
+	}
+	group by
+		DWAuditID,
+		ChromosomeIndex,
+		Position,
+		SampleIndex,
+		AlleleIndex;
+*/
+	view ReferenceAlleleCounts as select from GenotypeAlleles
+	{
+		DWAuditID,
+		VariantIndex,
+		SampleIndex,
+		sum(case when AlleleIndex = 0 then AlleleCount else 0 end) as ReferenceAlleleCount,
+		sum(case when AlleleIndex <> 0 then AlleleCount else 0 end) as AlternativeAlleleCount,
+		sum(AlleleCount) as Multiplicity
+	}
+	group by
+		DWAuditID,
+		VariantIndex,
+		SampleIndex;
+
+	// Annotations
+
+/*
+	table type VariantAnnotations
+	{
+		GeneName : String(255);
+		Region : String(255); // tf_binding_site, five_prime_UTR, three_prime_UTR, intron, trans_splice_donor_site, trans_splice_acceptor_site, start_codon, stop_codon, CDS_region, intergenic_region
+	};
+
+	table type AlleleAnnotations
+	{
+		MutationType : String(255);
+	};
+
+	table type GenotypeAnnotations
+	{
+		Origin : String(255); // germline_variant, de_novo_variant, somatic_variant, paternal_variant, maternal_variant, ...
+	};
+*/
+
+	entity GlobalVariantAnnotations
+	{
+		ReferenceID : Type.ReferenceID;
+		ChromosomeIndex : Type.ChromosomeIndex;
+		Position : Type.Position;
+		Allele : Type.AlleleContent;
+		ChromosomeName : String(255);
+		GeneName : Type.FeatureName;
+		Region : Type.VariantRegion;
+		SequenceAlteration : Type.SequenceAlteration;
+		AminoAcid : Type.RefAltCombination;
+		MutationType : Type.MutationType;
+		Chromosome : Association to Reference.Chromosomes on ReferenceID = Chromosome.ReferenceID and ChromosomeIndex = Chromosome.ChromosomeIndex;
+		ReferenceSequence : Association to Reference.Sequences on ReferenceID = ReferenceSequence.ReferenceID and ChromosomeIndex = ReferenceSequence.ChromosomeIndex and Position between ReferenceSequence.Region."Begin" and ReferenceSequence.Region."End"-1;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+    
+    @DWAnnotation.Entity."Group" : 'Genomics'
+    @DWAnnotation.Entity.Name : 'VariantAnnotation'
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.genomics.db.models::SNV.VariantAnnotations"'}
+	entity VariantAnnotations
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Type.Position;
+		AlleleIndex : Integer;
+		ChromosomeIndex : Type.ChromosomeIndex;
+		Position : Type.Position;
+		//Allele : Type.AlleleContent null;
+		GeneName : Type.FeatureName;
+		Region : Type.VariantRegion;
+		SequenceAlteration : Type.SequenceAlteration;
+		AminoAcid : Type.RefAltCombination;
+		MutationType : Type.MutationType;
+		//Chromosome : Association to Reference.Chromosomes on Analysis.ReferenceID = Chromosome.ReferenceID and ChromosomeIndex = Chromosome.ChromosomeIndex;
+		Variant : Association to Variants on DWAuditID = Variant.DWAuditID and VariantIndex = Variant.VariantIndex;
+		VariantAllele : Association to VariantAlleles on DWAuditID = VariantAllele.DWAuditID and VariantIndex = VariantAllele.VariantIndex and AlleleIndex = VariantAllele.AlleleIndex;
+		Genotype : Association to Genotypes on DWAuditID = Genotype.DWAuditID and VariantIndex = Genotype.VariantIndex and Genotype.ReferenceAlleleCount < Genotype.CopyNumber;
+		GenotypeAllele : Association to GenotypeAlleles on DWAuditID = GenotypeAllele.DWAuditID and VariantIndex = GenotypeAllele.VariantIndex and AlleleIndex = GenotypeAllele.AlleleIndex and GenotypeAllele.AlleleCount > 0;
+	    CDSPosition:Integer64 null;
+		Transcript:String(100) null;
+		Protein:String(100) null;
+        ExonRank:Integer64 null;
+		RunAuditID : Type.DWDocID default -1;
+	
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+           migration disabled;
+	};
+
+    table type VariantAnnotationDetails
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Type.Position;
+		AlleleIndex : Integer;
+		ChromosomeIndex : Type.ChromosomeIndex;
+		Position : Type.Position;
+		GeneName : Type.FeatureName;
+		Region : Type.VariantRegion;
+		SequenceAlteration : Type.SequenceAlteration;
+		AminoAcid1 : Type.RefAltCombination;
+		MutationType : Type.MutationType;
+	    CDSPosition:Integer64;
+		Transcript:String(100);
+		Protein:String(100);
+        ExonRank:Integer64;
+		Allele: Type.RefAltCombination;
+		CDSAllele: Type.RefAltCombination;
+	    AminoAcid3 :Type.RefAltCombination;
+	};
+    
+    table type DWAuditIDList
+	{
+		DWAuditID : Type.DWDocID;
+	};
+
+	table type VariantIDList
+	{
+		VariantIndex : Integer;
+		VariantID : String(255);
+	};
+    
+	entity FlatVariants
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Integer;
+		ChromosomeIndex : Type.ChromosomeIndex;
+		Position : Type.Position;
+		Quality : Type.FloatValue null;
+		Filter : Generated.Filters;
+		AlleleIndexRef : Integer;
+		AlleleRef : Type.AlleleContent null;
+		AlleleIndexAlt : Integer;
+		AlleleAlt : Type.AlleleContent null;
+		AlleleCountRef : Integer;
+		AlleleCountAlt : Integer;
+		CopyNumber : Integer;
+		Genes: Association to Reference.Features on ChromosomeIndex = Genes.ChromosomeIndex and Position between Genes.Region."Begin" and ( Genes.Region."End" - 1 ) and Genes.Class = 'gene';
+        VariantAllele : Association to VariantAlleles on DWAuditID = VariantAllele.DWAuditID and VariantIndex = VariantAllele.VariantIndex and AlleleIndexRef = VariantAllele.AlleleIndex;
+        VariantAlleleAlt : Association to VariantAlleles on DWAuditID = VariantAlleleAlt.DWAuditID and VariantIndex = VariantAlleleAlt.VariantIndex and AlleleIndexAlt = VariantAlleleAlt.AlleleIndex;
+        GenotypeAllele : Association to GenotypeAlleles on DWAuditID = GenotypeAllele.DWAuditID and VariantIndex = GenotypeAllele.VariantIndex and AlleleIndexRef = GenotypeAllele.AlleleIndex;
+	} technical configuration {
+	   column store;
+	   partition by keeping existing layout;
+	};			
+};

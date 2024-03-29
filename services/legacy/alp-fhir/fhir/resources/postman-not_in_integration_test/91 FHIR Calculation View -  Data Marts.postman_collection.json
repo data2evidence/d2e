@@ -1,0 +1,45 @@
+{
+	"id": "f16cd376-2611-4c01-848b-8832fba933f2",
+	"name": "91 FHIR Calculation View -  Data Marts",
+	"description": "Postman Collection for creation of calculation view.",
+	"order": [
+		"1234ad42-efcf-a95d-802e-9ca1cc460bf0"
+	],
+	"folders": [],
+	"folders_order": [],
+	"timestamp": 1521611343315,
+	"owner": "610831",
+	"public": false,
+	"requests": [
+		{
+			"id": "1234ad42-efcf-a95d-802e-9ca1cc460bf0",
+			"headers": "Content-Type: application/json\n",
+			"headerData": [
+				{
+					"key": "Content-Type",
+					"value": "application/json",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"url": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/mart",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "POST",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1521612944577,
+			"name": "Calculation View Creation",
+			"description": "",
+			"collectionId": "f16cd376-2611-4c01-848b-8832fba933f2",
+			"responses": [],
+			"rawModeData": "{  \r\n   \"id\":\"SmartVitalSigns\",\r\n   \"type\":{  \r\n      \"type\":\"calculationview\",\r\n      \"schema\":\"{{endpoint}}_VITALSGIGNS\"\r\n   },\r\n   \"views\":[  \r\n      {  \r\n         \"type\":\"sqlview\",\r\n         \"query\":{  \r\n            \"type\":\"query\",\r\n            \"name\":\"PatientHeight\",\r\n            \"from\":{  \r\n               \"type\":\"from\",\r\n               \"definition\":\"Patient\"\r\n            },\r\n            \"joins\":[  \r\n               {  \r\n                  \"type\":\"join\",\r\n                  \"definition\":\"Observation\",\r\n                  \"link\":{  \r\n                     \"type\":\"resultelement\",\r\n                     \"definition\":\"Observation\",\r\n                     \"path\":\"Observation.subject.reference\"\r\n                  }\r\n               }\r\n            ],\r\n            \"filter\":{  \r\n               \"type\":\"binaryexpression\",\r\n               \"left\":{  \r\n                  \"type\":\"binaryexpression\",\r\n                  \"left\":{  \r\n                     \"type\":\"binaryexpression\",\r\n                     \"left\":{  \r\n                        \"type\":\"resultelement\",\r\n                        \"definition\":\"Observation\",\r\n                        \"path\":\"Observation.code.text\"\r\n                     },\r\n                     \"operation\":\"=\",\r\n                     \"right\":{  \r\n                        \"type\":\"stringexpression\",\r\n                        \"value\":\"height\"\r\n                     }\r\n                  },\r\n                  \"operation\":\" OR \",\r\n                  \"right\":{  \r\n                     \"type\":\"binaryexpression\",\r\n                     \"left\":{  \r\n                        \"type\":\"resultelement\",\r\n                        \"definition\":\"Observation\",\r\n                        \"path\":\"Observation.code.text\"\r\n                     },\r\n                     \"operation\":\"=\",\r\n                     \"right\":{  \r\n                        \"type\":\"stringexpression\",\r\n                        \"value\":\"Body Height\"\r\n                     }\r\n                  }\r\n               },\r\n               \"operation\":\" AND \",\r\n               \"right\":{  \r\n                  \"type\":\"isnullexpression\",\r\n                  \"expression\":{  \r\n                     \"type\":\"resultelement\",\r\n                     \"definition\":\"Patient\",\r\n                     \"path\":\"Patient.address.city\"\r\n                  },\r\n                  \"isNot\":true\r\n               }\r\n            },\r\n            \"out\":[  \r\n               {  \r\n                  \"type\":\"resultelement\",\r\n                  \"definition\":\"Patient\",\r\n                  \"path\":\"Patient.id\"\r\n               },\r\n               {  \r\n                  \"type\":\"resultelement\",\r\n                  \"definition\":\"Patient\",\r\n                  \"path\":\"Patient.gender\"\r\n               },\r\n               {  \r\n                  \"type\":\"resultelement\",\r\n                  \"definition\":\"Patient\",\r\n                  \"path\":\"Patient.birthDate\"\r\n               },\r\n               {  \r\n                  \"type\":\"resultelement\",\r\n                  \"definition\":\"Patient\",\r\n                  \"path\":\"Patient.address[0].city\"\r\n               },\r\n               {  \r\n                  \"type\":\"resultelement\",\r\n                  \"definition\":\"Patient\",\r\n                  \"path\":\"Patient.address[0].state\"\r\n               },\r\n               {  \r\n                  \"type\":\"resultelement\",\r\n                  \"definition\":\"Patient\",\r\n                  \"path\":\"Patient.address[0].country\"\r\n               },\r\n               {  \r\n                  \"type\":\"resultelement\",\r\n                  \"definition\":\"Observation\",\r\n                  \"path\":\"Observation.code.coding[0].code\"\r\n               },\r\n               {  \r\n                  \"type\":\"resultelement\",\r\n                  \"definition\":\"Observation\",\r\n                  \"path\":\"Observation.valueQuantity.value\"\r\n               }\r\n            ],\r\n            \"limit\":{  \r\n               \"type\":\"limit\",\r\n               \"limit\":1000\r\n            }\r\n         }\r\n      }\r\n   ]\r\n}"
+		}
+	]
+}

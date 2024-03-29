@@ -1,0 +1,31 @@
+PROCEDURE "hc.hph.core.db.procedures::CheckRepoResult" ( IN context NVARCHAR(255), IN repo_result BLOB )
+LANGUAGE SQLSCRIPT SQL SECURITY INVOKER READS SQL DATA AS
+BEGIN
+    DECLARE ACTIVATION_ERROR CONDITION FOR SQL_ERROR_CODE 10001;
+    DECLARE error_code INTEGER := NULL;
+
+	IF LENGTH( :repo_result ) <= 5000 THEN
+		DECLARE repo_result_json NCLOB := SUBSTR_AFTER( SUBSTRING( BINTOSTR( TO_VARBINARY( :repo_result ) ), 15 ), '"error-code": "' );
+		WHILE LENGTH( :repo_result_json ) > 0 DO
+			error_code := TO_INTEGER( SUBSTR_BEFORE( :repo_result_json, '"' ) );
+			IF :error_code <> 0 AND :error_code <> 40137 THEN
+				DECLARE error_message NVARCHAR(5000) := 'Error in ' || :context || ': ';
+				DECLARE quotation_mark INTEGER := LOCATE( SUBSTR_AFTER( :repo_result_json, '"error-msg": "' ), '"' );
+				repo_result_json := SUBSTR_AFTER( :repo_result_json, '"error-msg": "' );
+				WHILE :quotation_mark > 1 DO
+					IF SUBSTRING( :repo_result_json, :quotation_mark - 1 ) = '\' THEN
+						error_message := :error_message || SUBSTRING( :repo_result_json, 1, :quotation_mark - 2 ) || '"';
+						repo_result_json := SUBSTRING( :repo_result_json, :quotation_mark + 1 );
+						quotation_mark := LOCATE( :repo_result_json, '"' );
+					ELSE
+						error_message := :error_message || SUBSTRING( :repo_result_json, 1, :quotation_mark - 1 );
+						repo_result_json := '';
+						quotation_mark := 0;
+					END IF;
+				END WHILE;
+				SIGNAL ACTIVATION_ERROR SET MESSAGE_TEXT = :error_message;
+			END IF;
+			repo_result_json := SUBSTR_AFTER( :repo_result_json, '"error-code": "' );
+		END WHILE;
+	END IF;
+END

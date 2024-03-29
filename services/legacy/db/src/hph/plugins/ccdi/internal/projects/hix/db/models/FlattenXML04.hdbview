@@ -1,0 +1,26 @@
+VIEW "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML04" ( "DocumentID", "LastUpdated", "Item00", "Key00", "Value00", "Item01", "Key01", "Value01", "Item02", "Key02", "Value02", "Item03", "Key03", "Value03", "Item04", "Key04", "Value04" ) AS SELECT
+    S0."DocumentID",
+    S0."LastUpdated",    
+    S0."Item" AS "Item00", S0."Key" AS "Key00", S0."Value" AS "Value00",
+    S1."Item" AS "Item01", S1."Key" AS "Key01", S1."Value" AS "Value01",
+    S2."Item" AS "Item02", S2."Key" AS "Key02", S2."Value" AS "Value02",
+    S3."Item" AS "Item03", S3."Key" AS "Key03", S3."Value" AS "Value03",
+    S4."Item" AS "Item04", S4."Key" AS "Key04", S4."Value" AS "Value04"
+    FROM "hc.hph.plugins.ccdi.internal.projects.hix.db.models::Stage.Xml" S0
+    
+    LEFT JOIN "hc.hph.plugins.ccdi.internal.projects.hix.db.models::Stage.Xml" S1
+    ON S0."DocumentID" = S1."DocumentID" 
+    AND S0."Item" = S1."Parent"
+    
+    LEFT JOIN "hc.hph.plugins.ccdi.internal.projects.hix.db.models::Stage.Xml" S2
+    ON S1."DocumentID" = S2."DocumentID" 
+    AND S1."Item" = S2."Parent"
+    
+    LEFT JOIN "hc.hph.plugins.ccdi.internal.projects.hix.db.models::Stage.Xml" S3
+    ON S2."DocumentID" = S3."DocumentID" 
+    AND S2."Item" = S3."Parent"
+    
+    LEFT JOIN "hc.hph.plugins.ccdi.internal.projects.hix.db.models::Stage.Xml" S4
+    ON S3."DocumentID" = S4."DocumentID" 
+    AND S3."Item" = S4."Parent"
+    WHERE S0."Level" = 1 WITH READ ONLY

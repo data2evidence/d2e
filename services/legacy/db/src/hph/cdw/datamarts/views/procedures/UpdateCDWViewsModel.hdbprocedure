@@ -1,0 +1,22 @@
+PROCEDURE "hc.hph.cdw.datamarts.views.procedures::UpdateCDWViewsModel" (
+            IN param1 NVARCHAR(1024),
+            IN param2 NVARCHAR(1024),
+            IN param3 NVARCHAR(1024),
+            IN param4 NVARCHAR(1024),
+            IN param5 CLOB,
+            IN param6 NVARCHAR(1024),
+            IN param7 NVARCHAR(1024),
+            IN param8 CLOB,
+            IN param9 INTEGER,
+            IN param10 TIMESTAMP,
+            IN param11 NVARCHAR(1024)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+
+    UPSERT "hc.hph.cdw.datamarts.views.models::CDWConfigViews.CDWConfigDatamarts"
+    ("ViewId", "Id", "ConfigStatus", "ConfigName", "ConfigData", "Version", "ConfigType", "ModifiedConfigData","isDeleted","CreatedAt","CreatedBy")
+    VALUES (param1,param2,param3,param4,param5,param6,param7, param8, param9, param10, param11) WITH PRIMARY KEY;
+	
+END;

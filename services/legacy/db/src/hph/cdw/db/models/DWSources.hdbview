@@ -1,0 +1,25 @@
+VIEW "hc.hph.cdw.db.models::DWSources" ( "SourceID", "Name", "Documents", "Group" ) AS ((SELECT 'hc.hph.plugins.documents:'||Source."SourceID" as "SourceID", Source."Name", count(Docs."DWSource") as "Documents", 
+	   CASE 
+       		WHEN Config."Id" IS NULL
+       		THEN '3'
+       		ELSE '2'
+       END  AS "Group"        
+FROM  "hc.hph.di.model::DataIntegration.DISource" AS Source
+LEFT OUTER JOIN "hc.hph.config.db.models::Configuration.Config" As Config
+ON Source."SourceID" = SUBSTR_AFTER(Config."Id",'documents:')
+LEFT OUTER JOIN "hc.hph.cdw.db.models::DWDocuments.Document_Key" As Docs
+ON Source."SourceID" = Docs."DWSource"
+group by Source."SourceID",Source."Name",Config."Id") UNION (SELECT 'hc.hph.plugins.documents:000000' "SourceID", 'Fallback Configuration' "Name",sum(FallbackDocs."Documents") "Documents", '1' "Group" from (
+SELECT 'hc.hph.plugins.documents:'||Source."SourceID" as "SourceID", Source."Name", count(Docs."DWSource") as "Documents", 
+	   CASE 
+       		WHEN Config."Id" IS NULL
+       		THEN '3'
+       		ELSE '2'
+       END  AS "Group"        
+FROM  "hc.hph.di.model::DataIntegration.DISource" AS Source
+LEFT OUTER JOIN "hc.hph.config.db.models::Configuration.Config" As Config
+ON Source."SourceID" = SUBSTR_AFTER(Config."Id",'documents:')
+LEFT OUTER JOIN "hc.hph.cdw.db.models::DWDocuments.Document_Key" As Docs
+ON Source."SourceID" = Docs."DWSource"
+group by Source."SourceID",Source."Name",Config."Id"
+) As FallbackDocs)) WITH READ ONLY

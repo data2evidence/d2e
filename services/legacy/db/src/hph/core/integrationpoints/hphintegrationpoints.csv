@@ -1,0 +1,9 @@
+EXTENSIONPOINT_ID|VERSION|COMPONENT|SCHEMA|MULTIPLICITY|XSJSLIBRARY|NAME_KEY|DESCRIPTION_KEY
+hc.hph.cdw.documents.OriginalDocumentAccess|1.0|Foundation for health Document Access Service|{}|*|hc.hph.cdw.documents.DocumentAccessExtensionProvider.xsjslib|DOC_ACCESS_EXTNPOINT_NAME_KEY|DOC_ACCESS_EXTNPOINT_DESC_KEY
+hc.hph.di.documents.DocumentProcessingConfiguration|1.0|Foundation for health Document Processing Configuration|{}|*|hc.hph.di.documents.services.lib.DocumentProcessingExtensionProvider.xsjslib|DOCUMENT_PROCESSING_CONFIGURATION_EXTNPOINT_NAME_KEY|DOCUMENT_PROCESSING_CONFIGURATION_EXTNPOINT_DESC_KEY
+hc.hph.di.documents.TextProcessingConfiguration|1.0|Foundation for health Text Processing Configuration|{}|*|hc.hph.di.documents.services.lib.TATextProcessingExtensionProvider.xsjslib|TEXT_PROCESSING_CONFIGURATION_EXTNPOINT_NAME_KEY|TEXT_PROCESSING_CONFIGURATION_EXTNPOINT_DESC_KEY
+hc.hph.di.plugin|1.0|HPH data integration|{}|*|hc.hph.di.services.lib.DIExtensionProvider.xsjslib|DI_EXTNPOINT_NAME_KEY|DI_EXTNPOINT_DESC_KEY
+hc.hph.patient.app.interaction|1.0|Patient Summary|{}|*|null|PS_I_EXTNPOINT_NAME_KEY|PS_I_EXTNPOINT_DESC_KEY
+hc.hph.patient.app.tab|1.0|Patient Summary|{}|*|null|PS_T_EXTNPOINT_NAME_KEY|PS_T_EXTNPOINT_DESC_KEY
+hc.hph.patient.app.tab|1.1|Patient Summary|{}|*|null|PS_T_EXTNPOINT_NAME_KEY|PS_T_EXTNPOINT_DESC_KEY
+hc.hph.patient.app.widget|1.0|Patient Summary|{}|*|null|PS_W_EXTNPOINT_NAME_KEY|PS_W_EXTNPOINT_DESC_KEY

@@ -1,0 +1,4 @@
+.envir
+environment.json
+/jsdoc
+/.nyc_output

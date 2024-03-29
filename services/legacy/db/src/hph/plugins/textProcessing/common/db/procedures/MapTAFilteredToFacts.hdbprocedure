@@ -1,0 +1,98 @@
+PROCEDURE "hc.hph.plugins.textProcessing.common.db.procedures::MapTAFilteredToFacts" ( 
+in iv_plugiId NVARCHAR(256),
+in it_ta_filtered CLOB,
+out ot_facts "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.Fact",
+out ot_fact_attributes "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.FactAttributes"
+) 
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    AS
+BEGIN 
+/***************************** 
+    Write your procedure logic 
+    
+ *****************************/
+ DECLARE iv_pluginPrefix NVARCHAR(5);
+ DECLARE ta_cond NVARCHAR(1024);
+ DECLARE vt_filtered CLOB;
+ DECLARE CURSOR c_rules FOR (SELECT "FactID", "InteractionType","TA_Condition"
+   FROM "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.ConfiguredFacts" WHERE "PluginID"  = :iv_plugiId AND ("Active" = true or "Active" is null));
+    
+ BEGIN
+     DECLARE EXIT HANDLER FOR SQL_ERROR_CODE 288   -- duplicate table name
+         BEGIN
+            DROP TABLE "#Temp_Fact";
+            CREATE local TEMPORARY TABLE "#Temp_Fact" like "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.Fact";
+             
+        END;
+     CREATE LOCAL TEMPORARY TABLE "#Temp_Fact" like "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.Fact";
+       
+ END;
+ 
+ BEGIN
+     DECLARE EXIT HANDLER FOR SQL_ERROR_CODE 288   -- duplicate table name
+         BEGIN
+            DROP TABLE "#Temp_FactAttr";
+            CREATE local TEMPORARY TABLE "#Temp_FactAttr" like "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.FactAttributes";
+        END;
+     CREATE LOCAL TEMPORARY TABLE "#Temp_FactAttr" like "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.FactAttributes";
+       
+ END;
+    
+     --Select prefix for the interaction       
+     select "InteractionPrefix" into iv_pluginPrefix from (
+     select top 1 "PluginID","InteractionPrefix" from (select  "PluginID","InteractionPrefix" from "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.PluginConfiguration" where "PluginID" = :iv_plugiId));
+     
+--*********************************************************************************************************
+    
+   FOR rule AS c_rules DO
+          select rule."TA_Condition" into ta_cond from "hc::DUMMY";   
+          vt_filtered := 'select * from ('|| it_ta_filtered || ') where '||:ta_cond;
+          
+          --Extract Facts and Fact Attribute applying Rules
+          call "hc.hph.plugins.textProcessing.common.db.procedures::ExtractFactsAndFactsAttribute" (:iv_plugiId,rule."FactID",rule."InteractionType",:vt_filtered,ot_fact,ot_attr);
+          
+          vt_fact_attr = select "DWID", "_ID", "InteractionType","TA_NORMALIZED","Attribute" "Attribute.OriginalValue",
+                                    "Value" "Value.OriginalValue","Codify","CodeValue.Code","CodeValue.CodeSystem" from :ot_attr;
+          
+          --Map Code and CodeSystem       
+          a_facts = select facts.*, concat(:iv_pluginPrefix,concat(ConfiguredFacts."FactID",facts."_ID")) "ID" from :ot_fact facts 
+          inner join "hc.hph.plugins.textProcessing.common.db.models::CDWMapping.ConfiguredFacts" ConfiguredFacts
+          on facts."FactID" = ConfiguredFacts."FactID" where ConfiguredFacts."PluginID" = :iv_plugiId and (ConfiguredFacts."Active" = true or ConfiguredFacts."Active" is null);
+        
+        
+          --Multiple entries are created for ambiguous FromCode to ToCode value
+          a_fact_attr = select t1."DWID", t1."InteractionType",t1."TA_NORMALIZED",t1."Attribute.OriginalValue",
+          t1."Value.OriginalValue",t1."Codify",case when to_boolean(t1."Codify") = true then IFNULL(c1."ToCode", t1."CodeValue.Code") else null end "CodeValue.Code",
+          case when to_boolean(t1."Codify") = true then IFNULL(c1."ToVocabularyID", t1."CodeValue.CodeSystem") else null end "CodeValue.CodeSystem", facts."ID" from :a_facts facts  
+          inner join :vt_fact_attr t1  
+          on t1."DWID" = facts."DWID" and t1."InteractionType" = facts."InteractionType" and t1."_ID" = facts."_ID"  
+          left outer join "hc.hph.ots::Views.ConceptTranslation" c1 
+          ON c1."TypeVocabularyID" = 'TextAnalysisEntityTypes' and to_boolean(t1."Codify") = true and 
+          facts."TA_TYPE" = c1."TypeCode" and facts."Value.Code" = c1."FromCode" and facts."Value.CodeSystem" = c1."FromVocabularyID";
+            
+             insert into "#Temp_Fact"("ID" ,"DWID_Document","InteractionType.OriginalValue", "InteractionType.Code",
+          "InteractionType.CodeSystem","InteractionType.CodeSystemVersion") (select "ID" ,"DWID","InteractionType" "InteractionType.OriginalValue", null "InteractionType.Code", 
+          null "InteractionType.CodeSystem",null "InteractionType.CodeSystemVersion" from :a_facts);
+             
+             insert into "#Temp_FactAttr"("ID","DWID_Document", "InteractionType.OriginalValue", 
+          "Attribute.OriginalValue",
+          "Value.OriginalValue", "Value.Code","Value.CodeSystem") (select "ID","DWID", "InteractionType" "InteractionType.OriginalValue",
+          "Attribute.OriginalValue",
+          "Value.OriginalValue", "CodeValue.Code","CodeValue.CodeSystem" from :a_fact_attr);
+    
+   END FOR;
+  
+--************************************************************************** 
+  ot_facts = select "ID" ,"DWID_Document","InteractionType.OriginalValue", null "InteractionType.Code", 
+  null "InteractionType.CodeSystem",null "InteractionType.CodeSystemVersion" from "#Temp_Fact";
+  
+  ot_fact_attributes = select "ID","DWID_Document", "InteractionType.OriginalValue",null "InteractionType.Code",
+  null "InteractionType.CodeSystem",null "InteractionType.CodeSystemVersion",
+  "Attribute.OriginalValue",null "Attribute.Code", null "Attribute.CodeSystem",
+  null "Attribute.CodeSystemVersion",
+  "Value.OriginalValue", "Value.Code","Value.CodeSystem",null "Value.CodeSystemVersion" from "#Temp_FactAttr";
+    
+--************************************************************************** 
+    
+END;

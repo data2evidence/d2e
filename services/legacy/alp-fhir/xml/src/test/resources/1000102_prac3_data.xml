@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hix_clinical_document hix_version="1">
+	<message_header>
+		<creation_timestamp>2015-10-06 17:43:03</creation_timestamp>
+		<test_data_indicator>1</test_data_indicator>
+		<phi_data_indicator>0</phi_data_indicator>
+		<sender>
+			<sender_ref_id/>
+			<sender_code>prac3</sender_code>
+			<sender_location_code>prac3</sender_location_code>
+			<system>
+				<system_type>EHR</system_type>
+				<vendor>CLQ Informatics</vendor>
+				<product_name>CLQ_TEST_DATA</product_name>
+				<version>1.0</version>
+				<system_instance>1</system_instance>
+			</system>
+		</sender>
+		<creator_agent>
+			<creator_org_name>ASCO</creator_org_name>
+			<software>
+				<vendor>Jitterbit</vendor>
+				<product_name>Jitterbit</product_name>
+				<product_version>8.3.0.15</product_version>
+				<configuration_version>1.0</configuration_version>
+				<canonical_data_model_version>1.0</canonical_data_model_version>
+			</software>
+		</creator_agent>
+		<receiver>
+			<receiver_code>CLQ</receiver_code>
+			<receiver_location_code/>
+			<system>
+				<system_type>CLQ</system_type>
+				<vendor>CLQ</vendor>
+				<product_name>CLQ</product_name>
+				<version>1.0</version>
+				<system_instance>1</system_instance>
+			</system>
+		</receiver>
+	</message_header>
+	<patient isvoided="0" pid="1000102">
+		<patient_details code_system="SNOMED" code_system_version="2015" code_value="443709011" isvoided="0" src_pkid="1000102" timestamp="2015-10-06 17:43:03" type="Patient Demographics">
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="2164240014">Patient first name</key>
+				<value type="NVarchar">Mary</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="184096005">Patient surname</key>
+				<value type="NVarchar">Schulz</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="729536019">Patient marital status</key>
+				<value type="NVarchar">M</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="284402010">Patient address</key>
+				<value type="NVarchar">6670 Lake Earl Dr</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="2770657016">City of residence</key>
+				<value type="NVarchar">Crescent City</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="184102003">Patient postal code</key>
+				<value type="NVarchar">95531</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="398070004">State</key>
+				<value type="NVarchar">CA</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="2766668013">Patient country</key>
+				<value type="NVarchar">United States</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="391746016">Gender</key>
+				<value type="NVarchar">M</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="265558016">Race</key>
+				<value type="NVarchar">White</value>
+			</patient_detail>
+			<patient_detail>
+				<key code_system="SNOMEDCT_US" code_system_version="2015-03" code_value="184099003">Date of birth</key>
+				<value type="NVarchar">1946-07-18</value>
+			</patient_detail>
+		</patient_details>
+		<interaction code_value="Encounter, Performed" isvoided="0" src_pkid="60019" timestamp="2015-10-06" type="Encounter, Performed">
+			<providers>
+				<provider isvoided="0" provider_ID="CONNIE_3">
+					<provider_detail>
+						<key>Provider First Name</key>
+						<value type="NVarchar">Connie</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Last Name</key>
+						<value type="NVarchar">Struart</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider NPI</key>
+						<value type="NVarchar">93849948274</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Email</key>
+						<value type="NVarchar">CStuart@prac3.org</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider User Name</key>
+						<value type="NVarchar">CStuart</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider Gender</key>
+						<value type="NVarchar">F</value>
+					</provider_detail>
+					<provider_detail>
+						<key>Provider DOB</key>
+						<value type="NVarchar">1956-04-14</value>
+					</provider_detail>
+				</provider>
+			</providers>
+			<interaction_detail>
+				<key>Encounter Type</key>
+				<value code_system="CPT" code_system_version="2015" code_value="99201" type="NVarchar">Office Visit</value>
+			</interaction_detail>
+			<interaction_detail>
+				<key>Encounter Date</key>
+				<value type="NVarchar">2015-10-06</value>
+			</interaction_detail>
+		</interaction>
+	</patient>
+</hix_clinical_document>

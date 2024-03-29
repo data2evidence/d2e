@@ -1,0 +1,20 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::FinalizeRun" 
+(
+in iv_auditlogID bigint
+)
+LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+delete from "hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage" 
+where ("DWID","DWDateFrom") in 
+(select distinct "DWID", "DWDateFrom" from "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status"
+where "DWAuditID" = :iv_auditlogID
+and "ActionName" = 'Finalize'
+and "Status" = 'Finalized');
+	 
+END;

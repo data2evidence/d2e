@@ -1,0 +1,131 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.core.tableP13n.db.models::P13nModel.TableP13nConfiguration",
+            "import_settings": {
+                "include_filter": [
+                    {
+                        "Id": "GDTitle",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDPreview",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDAuthor",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDPatientID",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDSourcePatientID",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDPatientName",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDFamilyName",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDGivenName",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDLanguageCode",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDFileName",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDMIMEType",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDCreatedBy",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDCreatedAt",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDChangedBy",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDChangedAt",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDAction",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    },
+                    {
+                        "Id": "GDDocumentID",
+                        "HANAUserName": "LEGACY",
+                        "TableId": "guardedDocumentsList"
+                    }
+                ],
+                "import_columns": [
+                    "Id",
+                    "HANAUserName",
+                    "TableId",
+                    "ColumnOrder",
+                    "Text",
+                    "ColumnId",
+                    "Visible",
+                    "Personalizable",
+                    "Sortable",
+                    "Filterable",
+                    "Type"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.search.db.dataload::p13nGuardedDocuments.csv",
+                "has_header": false,
+                "type_config": {
+                    "delimiter": ";"
+                }
+            },
+            "column_mappings": {
+                "Id": 1,
+                "HANAUserName": 2,
+                "TableId": 3,
+                "ColumnOrder": 4,
+                "Text": 5,
+                "ColumnId": 6,
+                "Visible": 7,
+                "Personalizable": 8,
+                "Sortable": 9,
+                "Filterable": 10,
+                "Type": 11
+            }
+        }
+    ]
+}

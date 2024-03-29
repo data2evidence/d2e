@@ -1,0 +1,101 @@
+###
+### A complete description of a Prefect Deployment for flow 'execute-strategus'
+###
+name: strategus_deployment
+description: null
+version: 082b93153447b1706968ce4610eae2d9
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: default-agent-pool
+tags: ['strategus']
+parameters: {
+  analysis_spec: {
+    "sharedResources": [],
+    "moduleSpecifications": []
+  },
+  options: {
+    "workSchema": "strategus",
+    "cdmSchema": "cdmdefault",
+    "databaseCode": "alpdev_pg",
+    "vocabSchemaName": "cdmvocab",
+  }
+}
+schedule: null
+is_schedule_active: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: .
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: execute-strategus
+manifest_path: null
+storage: null
+path: "/app/pysrc"
+entrypoint: main.py:execute_strategus_flow
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    analysis_spec:
+      title: analysis_spec
+      position: 0
+      allOf:
+      - $ref: '#/definitions/StrategusAnalysisType'
+    options:
+      title: options
+      position: 1
+      allOf:
+      - $ref: '#/definitions/StrategusOptionsType'
+  required:
+  - analysis_spec
+  - options
+  definitions:
+    StrategusAnalysisType:
+      title: StrategusAnalysisType
+      type: object
+      properties:
+        sharedResources:
+          title: Sharedresources
+          type: array
+          items: {}
+        moduleSpecifications:
+          title: Modulespecifications
+          type: array
+          items: {}
+      required:
+      - sharedResources
+      - moduleSpecifications
+    StrategusOptionsType:
+      title: StrategusOptionsType
+      type: object
+      properties:
+        workSchema:
+          title: Workschema
+          type: string
+        cdmSchema:
+          title: Cdmschema
+          type: string
+        databaseCode:
+          title: databasecode
+          type: string
+        vocabSchemaName:
+          title: Vocabschemaname
+          type: string
+      required:
+      - workSchema
+      - cdmSchema
+      - databaseCode
+      - vocabSchemaName
+timestamp: '2024-01-16T09:05:52.350259+00:00'
+triggers: []
+enforce_parameter_schema: null

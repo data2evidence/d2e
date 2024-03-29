@@ -1,0 +1,50 @@
+PROCEDURE "hc.hph.collections.db.procedures::UPDATE_COLLECTION" ( 
+	
+	IN  it_update "hc.hph.collections.db.models::TT_SV_COLLECTION", 
+	IN  it_before "hc.hph.collections.db.models::TT_SV_COLLECTION",
+	
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR" 
+) 
+LANGUAGE SQLSCRIPT	SQL SECURITY DEFINER AS
+	lv_count BIGINT;
+	lv_check BIGINT;
+BEGIN
+	select "Id" from "hc.hph.collections.db.models::CollectionModel.Collection"
+		where "Id" in (select "Id" from :it_update) for update
+	;
+
+	select count(*) into lv_count from :it_update;
+	select count(*) into lv_check  
+		from :it_update upd
+		inner join "hc.hph.collections.db.models::CollectionModel.Participant" p on
+		p."Collection.Id" = upd."Id" AND 
+		SESSION_CONTEXT('XS_APPLICATIONUSER') = p."HANAUserName"
+	WHERE p."Privilege.Id" != '1'
+	;
+	
+	if :lv_count != :lv_check then 
+		ot_error = 
+			select 403 as http_status_code, 'Write access forbidden' error_message, 'Error updating collections - permission denied.' detail from "hc::DUMMY";
+		
+		return;	
+	end if;
+	
+	select count(*) into lv_count from :it_update where length(trim(' ' from "Title")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating collections: Title field cannot be empty.' detail from "hc::DUMMY";
+			
+		return;	
+	end if;
+	 	
+
+	update "hc.hph.collections.db.models::CollectionModel.Collection" col
+	set 
+		col."Title" = upd."Title",
+		col."Description" = upd."Description",
+		col."ChangedBy" = SESSION_CONTEXT('XS_APPLICATIONUSER'),
+		col."ChangedAt" = CURRENT_UTCTIMESTAMP
+	FROM "hc.hph.collections.db.models::CollectionModel.Collection" col, :it_update upd
+		WHERE col."Id" = upd."Id"
+	;	 
+END;

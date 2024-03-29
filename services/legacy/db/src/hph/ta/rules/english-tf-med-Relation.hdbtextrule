@@ -1,0 +1,914 @@
+!======================================================================
+! File Name: english-tf-med-Relation.rul 
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of assertions of medical entities, 
+!          focusing on polarity, modality, reference and relation
+!======================================================================
+
+!======================================================================
+! DEPENDENCIES:
+! > DICTIONARY english-tf-med-Medication-RxNorm
+! >>>> ENTITY_NAME MedicationStatement_Medication
+! > DICTIONARY english-tf-med-Disease-NCIm
+! >>>> ENTITY_NAME Condition
+! > DICTIONARY english-tf-med-Symptom-NCIm
+! >>>> ENTITY_NAME Observation_Symptom
+! > DICTIONARY english-tf-med-TherapProcedure-NCIm
+! >>>> ENTITY_NAME Procedure_Therapeutic
+! > DICTIONARY english-tf-med-DiagProcedure-NCIm
+! >>>> ENTITY_NAME Procedure_Diagnostic
+! > DICTIONARY english-tf-med-LabTest-NCIm
+! >>>> ENTITY_NAME Observation_Laboratory
+! > DICTIONARY english-tf-med-SectionHeading
+! >>>> ENTITY_NAME med_SECTION_* (all med_SECTION_ entity categories)
+! > DICTIONARY english-tf-med-Anatomy-NCIm
+! >>>> ENTITY_NAME BodySite
+!======================================================================
+
+!======================================================================
+! OUTPUT:
+! > ENTITY DiseaseStatus
+! >>>> SUBENTITY Progression {0,1} (can be one and only one of these four)
+! >>>> SUBENTITY Regression {0,1}
+! >>>> SUBENTITY Remission {0,1}
+! >>>> SUBENTITY Stable {0,1}
+!======================================================================
+
+!======================================================================
+!!coordination
+!======================================================================
+
+#subgroup coord: (<\p{ci}(and|&|or)>|(<\,> <\p{ci}(and|&|or)>?)|</>|<\|>)
+
+!======================================================================
+!!Entities for clinical reports
+!======================================================================
+
+
+#subgroup Med_Entity: {(
+([TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE] )
+)}
+
+#subgroup Med_Entities: {
+[OD AdverseEvent_SuspectEntity_Instance] %(Med_Entity) [/OD] (%(coord) <>{0,2} [OD AdverseEvent_SuspectEntity_Instance] %(Med_Entity) [/OD])*
+}
+
+#subgroup MedProc_Entity_Added: {(
+<\p{ci}(anthracycline|narcotics|sulfa|halcyon)> 
+|(<\p{ci}(beta)><\p{ci}(blockers?)>)
+|(<\p{ci}(extubat(ed?|ion))>)
+|(<\p{ci}(hickman)> (<\p{ci}(catheter)>)?)
+|(<\p{ci}(epidural)>)
+!|(<\p{ci}(extubated?)>)
+|(<\p{ci}(IV)> (<POS:Nn>)?)
+!|(<\p{ci}(PICC)><\p{ci}(line)>)
+|(<\p{ci}(vent)>)
+|(<\p{ci}(steroids?)>)
+|([TE OBSERVATION_SYMPTOM|CONDITION] <> [/TE] <\p{ci}(medications?)>)
+|(<\p{ci}(anti\-?emetics?)>)
+)}
+
+#subgroup MedProc_Entity: {(
+[OD AdverseEvent_SuspectEntity_Instance] (
+  [TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE]
+| [TE PROCEDURE_THERAPEUTIC] <>+ [/TE] 
+| [TE PROCEDURE_DIAGNOSTIC] <>+ [/TE]
+| (<POS:(Adj|Nn|Prop)>{1,2} <\p{ci}(therapy|overdose|overuse|administration|treatment|repair|surgery|drip|injection|placement)>)
+| (<\p{ci}(overdose|overuse|administration|treatment|surgery|placement)> <\p{ci}(of|on)> <POS:Det>? <POS:(Adj|Nn|Prop)>+)
+| %(MedProc_Entity_Added)
+) [/OD]
+)}
+
+#subgroup MedProc_Entities: {
+ %(MedProc_Entity) ((%(coord)|<\p{ci}(with)>) <>? %(MedProc_Entity))*
+}
+
+#subgroup MedProcT_Entity: {(
+[OD AdverseEvent_SuspectEntity_Instance] (
+  [TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE]
+| [TE PROCEDURE_THERAPEUTIC] <>+ [/TE] 
+| (<POS:(Adj|Nn|Prop)>{1,2} <\p{ci}(therapy|overdose|overuse|administration|treatment|repair|surgery|drip|injection|placement)>)
+| (<\p{ci}(overdose|overuse|administration|surgery|injection|placement)> <\p{ci}(of|on)> <POS:Det>? <POS:(Adj|Nn|Prop)>+)
+| %(MedProc_Entity_Added)
+) [/OD]
+)}
+
+#subgroup MedProcT_Entities: {
+ %(MedProcT_Entity) ((%(coord)|<\p{ci}(with)>) <>? %(MedProcT_Entity))*
+}
+
+#subgroup inducedWord: {(
+<.+\-(induced|produced|related|associated|triggered)>
+)}
+
+#subgroup MedProcInduced_Entity: {(
+[OD AdverseEvent_SuspectEntity_Instance] (
+  [TE MEDICATIONSTATEMENT_MEDICATION] <>* %(inducedWord) [/TE] 
+| [TE PROCEDURE_THERAPEUTIC] <>* %(inducedWord)  [/TE] 
+| [TE PROCEDURE_DIAGNOSTIC] <>* %(inducedWord) [/TE]
+| <.*\-induced>
+) [/OD]
+)}
+!!OD Test is only used for the i2b2 relation rules, and it is not output currently
+#subgroup ProcD_Entity: ([OD Test] ([TE OBSERVATION_LABORATORY] <>+ [/TE] | [TE PROCEDURE_DIAGNOSTIC] <>+ [/TE] ) [/OD])
+
+#subgroup ProcD_Entities: {
+ %(ProcD_Entity) (%(coord) <>? %(ProcD_Entity))*
+}
+
+
+#subgroup MedProcLab_Entity: ([TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE] | [TE PROCEDURE_THERAPEUTIC] <>+ [/TE] | [TE OBSERVATION_LABORATORY] <>+ [/TE] | [TE PROCEDURE_DIAGNOSTIC] <>+ [/TE] )
+#subgroup Clinical_Entity: ([TE CONDITION] <>+ [/TE] | [TE OBSERVATION_SYMPTOM] <>+ [/TE] | [TE PROCEDURE_THERAPEUTIC] <>+ [/TE] | [TE OBSERVATION_LABORATORY] <>+ [/TE] | [TE PROCEDURE_DIAGNOSTIC] <>+ [/TE] | [TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE] | [TE COMPOSITION_SECTION_PROBLEM] <>+ [/TE] )
+#subgroup NotProc_Entity: ([TE CONDITION] <>+ [/TE] | [TE OBSERVATION_SYMPTOM] <>+ [/TE] | [TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE] | [TE COMPOSITION_SECTION_PROBLEM] <>+ [/TE] )
+
+
+#subgroup severity_NoOD: {(
+  <\p{ci} (acute|extensive|massive|widespread|fatal|intense|severe|significant|high|noticeable|multiple|increased|elevated|decreased|worsening|additional|low|mild|some|any|minimal|small)> 
+|(<a|A>? <bit|Bit|little|Little> <of|Of>? <a|A>?)
+|(<\p{ci}(first|second|third)> <\p{ci}(degree)>)
+|(<\p{ci}(stage|degree)> <POS:Num>)
+)}
+
+!!#subgroup severity: {(
+!! [OD Severity] %(severity_NoOD) [/OD]
+!!)}
+
+#subgroup DisSymp_Entity_Added: {(
+  <\p{ci}(bleed(ing)?|expired|death|died)>
+| (<~((F|f)ollow(ing)?),POS:(Adj|Nn|Prop)>{1,2} <\p{ci}(symptoms?|complications?)>) !When there is an expression like "the following complications", we want to extract the actual list of complications, not the phrase "following complications"
+| (((<\p{ci}(platelet)>)|(<\p{ci}(white|red)><\p{ci}(blood)><\p{ci}(cell)>?)) <\p{ci}(count)> ((<>? <STEM:\p{ci}(fall|drop)>)|(<STEM:\p{ci}(stay)> <POS:Adv>? <\p{ci}(low)>)))
+| (<\p{ci}(throat)> <\p{ci}(tighten(ing)?)>)
+| (<\p{ci}(bradycardic|aspiration|coronary)> <STEM: event>)
+| (<\p{ci}(pna)>)
+| (<\p{ci}(hypotn)>)
+| (<\p{ci}(reaction),POS:Nn>)
+| (<STEM: mental> <STEM: status>)
+| (<C\.> <diff> <colitis>)
+|(<\p{ci}(chylothoraces)>)
+|(<STEM: adult> <STEM: respiratory> <STEM: distress> <STEM: syndrome>)
+|(<STEM: difficulty> <POS: Prep> <STEM: ambulation>)
+|(<STEM: leukemic> <STEM: disease>)
+|(<GIST>)
+)}
+
+!!adding two new versions of this subgroup in order to split conditions and symptoms for DiseaseStatus rule
+! the OD Problem here is only used for the DROP rule
+#subgroup DisSymp_Entity: (%(severity_NoOD)? <~(OUT|Out|out|NO|No|no), POS:~(Punct|Prep|Conj)>? ([TE BODYSITE]<>+[/TE])? [OD Problem] ([TE CONDITION] <STEM:~(ALLERGY|(A|a)llergy|(HYPER)?SENSITIVITY|((H|h)yper)?(S|s)ensitivity)>+ [/TE] | [TE OBSERVATION_SYMPTOM] <STEM:~(GOOD|(G|g)ood|NORMAL|(N|n)ormal|RECOVER|(R|r)ecover|STABLE|(S|s)table|ALLERGY|(A|a)llergy|(HYPER)?SENSITIVITY|((H|h)yper)?(S|s)ensitivity|(D|d)ied|sips)>+ [/TE] | [TE COMPOSITION_SECTION_PROBLEM] <>+ [/TE] | %(DisSymp_Entity_Added) ) [/OD])
+#subgroup DisOnly_Entity: (%(severity_NoOD)? <~(OUT|Out|out|NO|No|no), POS:~(Punct|Prep|Conj)>? ([TE BODYSITE]<>+[/TE])? [OD Condition] ([TE CONDITION] <STEM:~(ALLERGY|(A|a)llergy|(HYPER)?SENSITIVITY|((H|h)yper)?(S|s)ensitivity)>+ [/TE] | [TE COMPOSITION_SECTION_PROBLEM] <>+ [/TE] | %(DisSymp_Entity_Added) ) [/OD])
+!!!<MC> decided to leave subgroup DisSymp_Entity_Added as part of Condition only (not symptom)
+#subgroup SympOnly_Entity: (%(severity_NoOD)? <~(OUT|Out|out|NO|No|no), POS:~(Punct|Prep|Conj)>? ([TE BODYSITE]<>+[/TE])? [OD Observation_Symptom] ([TE OBSERVATION_SYMPTOM] <STEM:~(GOOD|(G|g)ood|NORMAL|(N|n)ormal|RECOVER|(R|r)ecover|STABLE|(S|s)table|ALLERGY|(A|a)llergy|(HYPER)?SENSITIVITY|((H|h)yper)?(S|s)ensitivity|(D|d)ied|sips)>+ [/TE] ) [/OD])
+
+
+!! MC September 2018 - Commenting this out since every statement that uses this subgroup is also commented out
+!#subgroup DisSymp_Entity_NoOD: (%(severity_NoOD)? <~(OUT|Out|out|NO|No|no), POS:~(Punct|Prep|Conj)>? ([TE CONDITION] <>+ [/TE] | [TE OBSERVATION_SYMPTOM] <STEM:~(GOOD|(G|g)ood|NORMAL|(N|n)ormal|RECOVER|(R|r)ecover|STABLE|(S|s)table|(D|d)ied|sips)>+ [/TE] | [TE COMPOSITION_SECTION_PROBLEM] <>+ [/TE] | %(DisSymp_Entity_Added) ) )
+
+
+!!adding two new versions of this subgroup in order to split conditions and symptoms for DiseaseStatus rule
+#subgroup DisSymp_Entities: {
+ %(DisSymp_Entity) <STEM: formation>? ((%(coord)|((<\p{ci}(in)> <\p{ci}(association)>)?<\p{ci}(with)>)) %(DisSymp_Entity))*
+}
+
+
+#subgroup DisOnly_Entities: {
+ %(DisOnly_Entity) <STEM: formation>? ((%(coord)|((<\p{ci}(in)> <\p{ci}(association)>)?<\p{ci}(with)>)) %(DisOnly_Entity))*
+}
+
+#subgroup SympOnly_Entities: {
+ %(SympOnly_Entity) <STEM: formation>? ((%(coord)|((<\p{ci}(in)> <\p{ci}(association)>)?<\p{ci}(with)>)) %(SympOnly_Entity))*
+}
+
+
+
+!! MC - this subgroup is not used in DiseaseStatus, and it is actually not actively used as the statement that uses it is commented out
+#subgroup DisSymp_Entity_OneWord: [OD Problem] <\p{ci}(intoxication|lesion|hives|overdose|hyp(er|o)(tension|tn)|angiopathy)> [/OD]
+
+!! MC - this subgroup is not used in DiseaseStatus, and it is actually not actively used as the statement that uses it is commented out
+#subgroup DisSymp_Entity_Cause: [OD Problem][TE OBSERVATION_SYMPTOM] <\p{ci}(cause)> <\p{ci}(of)> <>+ [/TE][/OD]
+
+
+!======================================================================
+!  DISEASE STATUS
+!======================================================================
+#subgroup progressionKeyNouns: {(
+[OD Progression](
+<STEM:\p{ci}(progression|expansion|metastasis|mets|relapse|recurrence|re\-?admission|persistence)>
+)[/OD]
+)}
+
+#subgroup progressionKeyAdjs: {(
+[OD Progression](
+<\p{ci}(progressi(ng|ve)|expanding|metastatic|transitioned|worsening|relapsing|recurring|recurrent|persistent|re\-?(admitt|occurr)ed|persisted|unremitting)>
+|(<\p{ci}(second)><\p{ci}(primary)>)
+)[/OD]
+)}
+
+#subgroup progressionKeyVerbs: {(
+<POS: Adv>?
+[OD Progression](
+ <STEM:\p{ci}(progress|expand|worsen|relapse|recur|persist|re\-?(admit|occur))>
+)[/OD]
+)}
+
+#subgroup ClauseBetweenDisSympAndStatus: {(
+  (<STEM: have>? <STEM: be>)
+| (<STEM: with> <STEM: interval>)
+| (((<POS: Prep> <POS: Det>? <STEM: right|left>? [TE BODYSITE] <>* [/TE])|(<STEM: as> <POS: Det>? <STEM: adult|child|infant|toddler|teenager>)|(<STEM: post> [TE BODYSITE] <>+ [/TE] <STEM: harvest>)) <\,>? <STEM: that|which> <STEM: have>?)
+| (<STEM: as> <POS: Adv>? <STEM: observe|note|find>)
+| (<STEM: appear|continue> <POS: Part-Inf>)
+| (<STEM: be> <STEM: consider> (<POS: Adj> <POS: Prep|Conj>)?)
+| ((<POS: Prep> <>{0,2})? <POS: ~(Prop)>? <\,>? <POS: Conj>? <STEM: that|which> <STEM: may|might>? <STEM: have>? <POS: Adv>?)
+| (<POS: Prep> [TE DATE|YEAR|MONTH]<>*[/TE] <POS: Prep>)
+| (<\,>? <STEM: consistent> <POS: Prep>)
+| (<STEM: represent> <POS: Det>?)
+| (<POS: Conj> <STEM: document|documented|observe|observed> <POS: Adj>?)
+)}
+
+!#subgroup progression: {(
+! ( %(progressionKeyNouns) <POS:Prep> <STEM: his|her|their>? %(DisSymp_Entities))
+!!|( %(DisSymp_Entities) <>{0,15} %(progressionKeyNouns))
+!| (%(DisSymp_Entities) %(ClauseBetweenDisSympAndStatus)? (%(progressionKeyVerbs)|%(progressionKeyNouns)|%(progressionKeyAdjs)))
+!! (%(DisSymp_Entity_NoOD) <~(;)>*?)? 
+!|( ([OD Progression] <STEM: metastasis|metastases> [/OD]|%(progressionKeyAdjs)) ((<POS: Prep>? <POS:(Det|Pron|Nn|Prop|Adj)>?)|(<STEM: admission> <POS: Prep>)) %(DisSymp_Entities))
+!| (%(progressionKeyAdjs) <POS: Conj> %(DisSymp_Entities))
+!|( [OD Progression]<\p{ci}(new|additional)>[/OD] %(DisSymp_Entities))
+!!|( %(DisSymp_Entities) <~(;),POS:~(Conj)>*? (%(progressionKeyVerbs)| %(progressionKeyAdjs)))
+!|([TE CONDITION][OD Progression]<\p{ci}(progressive)>[/OD][OD Problem]<>+[/OD] [/TE]) 
+!|([TE OBSERVATION_SYMPTOM] [OD Progression]<\p{ci}(progressive)>[/OD][OD Problem]<>+[/OD] [/TE])
+!|([TE COMPOSITION_SECTION_PROBLEM] [OD Progression]<\p{ci}(progressive)>[/OD][OD Problem]<>+[/OD] [/TE]
+!|((%(DisSymp_Entities) <POS: Prep> <POS: Adj>?)? (([TE BODYSITE] <>* [/TE])|(<L[0-9]{0,1}>)) (%(coord) [TE BODYSITE] <>* [/TE])? [OD Progression] <\p{ci}(mets|metastases)> [/OD])
+!|( %(DisSymp_Entities) [OD Progression]<\p{ci}(continued)>[/OD])
+!)
+!)}
+
+
+#subgroup progressionCond: {(
+ ( %(progressionKeyNouns) <POS:Prep> <STEM: his|her|their>? %(DisOnly_Entities))
+| (%(DisOnly_Entities) %(ClauseBetweenDisSympAndStatus)? (%(progressionKeyVerbs)|%(progressionKeyNouns)|%(progressionKeyAdjs)))
+|( ([OD Progression] <STEM: metastasis|metastases> [/OD]|%(progressionKeyAdjs)) ((<POS: Prep>? <POS:(Det|Pron|Nn|Prop|Adj)>?)|(<STEM: admission> <POS: Prep>)) %(DisOnly_Entities))
+| (%(progressionKeyAdjs) <POS: Conj> %(DisOnly_Entities))
+|( [OD Progression]<\p{ci}(new|additional)>[/OD] %(DisOnly_Entities))
+|([TE CONDITION][OD Progression]<\p{ci}(progressive)>[/OD][OD Condition]<>+[/OD] [/TE]) 
+|([TE COMPOSITION_SECTION_PROBLEM] [OD Progression]<\p{ci}(progressive)>[/OD][OD Condition]<>+[/OD] [/TE]
+|((%(DisOnly_Entities) <POS: Prep> <POS: Adj>?)? (([TE BODYSITE] <>* [/TE])|(<L[0-9]{0,1}>)) (%(coord) [TE BODYSITE] <>* [/TE])? [OD Progression] <\p{ci}(mets|metastases)> [/OD])
+|( %(DisOnly_Entities) [OD Progression]<\p{ci}(continued)>[/OD])
+)
+)}
+
+#subgroup progressionSymp: {(
+ ( %(progressionKeyNouns) <POS:Prep> <STEM: his|her|their>? %(SympOnly_Entities))
+| (%(SympOnly_Entities) %(ClauseBetweenDisSympAndStatus)? (%(progressionKeyVerbs)|%(progressionKeyNouns)|%(progressionKeyAdjs)))
+|( ([OD Progression] <STEM: metastasis|metastases> [/OD]|%(progressionKeyAdjs)) ((<POS: Prep>? <POS:(Det|Pron|Nn|Prop|Adj)>?)|(<STEM: admission> <POS: Prep>)) %(SympOnly_Entities))
+| (%(progressionKeyAdjs) <POS: Conj> %(SympOnly_Entities))
+|( [OD Progression]<\p{ci}(new|additional)>[/OD] %(SympOnly_Entities))
+|([TE OBSERVATION_SYMPTOM][OD Progression]<\p{ci}(progressive)>[/OD][OD Observation_Symptom]<>+[/OD] [/TE]) 
+|([TE COMPOSITION_SECTION_PROBLEM] [OD Progression]<\p{ci}(progressive)>[/OD][OD Observation_Symptom]<>+[/OD] [/TE]
+|((%(SympOnly_Entities) <POS: Prep> <POS: Adj>?)? (([TE BODYSITE] <>* [/TE])|(<L[0-9]{0,1}>)) (%(coord) [TE BODYSITE] <>* [/TE])? [OD Progression] <\p{ci}(mets|metastases)> [/OD])
+|( %(SympOnly_Entities) [OD Progression]<\p{ci}(continued)>[/OD])
+)
+)}
+
+
+
+#subgroup remissionKeyNouns: {(
+[OD Remission](
+<STEM:\p{ci}(remission|recovery)>
+)[/OD]
+)}
+
+#subgroup remissionKeyAdjs: {(
+[OD Remission](
+ <\p{ci}(remitting|resolved|recovered|resolving|recovering)>
+|(<\p{ci}(symptom|disease)><\->?<\p{ci}(free)>)
+|(<\p{ci}((symptom|disease)\-?free)>)
+)[/OD]
+)}
+
+#subgroup remissionKeyVerbs: {(
+[OD Remission](
+(<STEM:\p{ci}(remit|resolve)>)
+|(<STEM: continue> <STEM: to> <STEM: improve>)
+)[/OD]
+)}
+
+!#subgroup remission: {(
+! ( %(remissionKeyNouns) <POS:Prep> %(DisSymp_Entities) )
+!|( %(DisSymp_Entities) %(remissionKeyNouns))
+!! (%(DisSymp_Entity_NoOD) <~(;)>*?)? 
+!|( (([OD Remission] <STEM: asymptomatic> [/OD])|%(remissionKeyAdjs)) <POS: Prep>? <POS:(Det|Pron|Nn|Prop|Adj)>? %(DisSymp_Entities) )
+!|( %(DisSymp_Entities) %(ClauseBetweenDisSympAndStatus)? (%(remissionKeyVerbs)|%(remissionKeyAdjs)|%(remissionKeyNouns)) )
+!)}
+
+#subgroup remissionCond: {(
+ ( %(remissionKeyNouns) <POS:Prep> %(DisOnly_Entities) )
+|( %(DisOnly_Entities) %(remissionKeyNouns))
+|( (([OD Remission] <STEM: asymptomatic> [/OD])|%(remissionKeyAdjs)) <POS: Prep>? <POS:(Det|Pron|Nn|Prop|Adj)>? %(DisOnly_Entities) )
+|( %(DisOnly_Entities) %(ClauseBetweenDisSympAndStatus)? (%(remissionKeyVerbs)|%(remissionKeyAdjs)|%(remissionKeyNouns)) )
+)}
+
+#subgroup remissionSymp: {(
+ ( %(remissionKeyNouns) <POS:Prep> %(SympOnly_Entities) )
+|( %(SympOnly_Entities) %(remissionKeyNouns))
+|( (([OD Remission] <STEM: asymptomatic> [/OD])|%(remissionKeyAdjs)) <POS: Prep>? <POS:(Det|Pron|Nn|Prop|Adj)>? %(SympOnly_Entities) )
+|( %(SympOnly_Entities) %(ClauseBetweenDisSympAndStatus)? (%(remissionKeyVerbs)|%(remissionKeyAdjs)|%(remissionKeyNouns)) )
+)}
+
+
+
+#subgroup regressionKeyNouns: {(
+[OD Regression](
+<STEM:\p{ci}(regression)>
+)[/OD]
+)}
+
+#subgroup regressionKeyAdjs: {(
+[OD Regression](
+<\p{ci}(regressing|regressed)>
+)[/OD]
+)}
+
+#subgroup regressionKeyVerbs: {(
+[OD Regression](
+<STEM:\p{ci}(regress)>
+)[/OD]
+)}
+
+!#subgroup regression: {(
+! ( %(regressionKeyNouns) <POS:Prep> <STEM: his|her|their>? %(DisSymp_Entities) )
+!|( %(DisSymp_Entities) %(regressionKeyNouns))
+!! (%(DisSymp_Entity_NoOD) <~(;)>*?)?
+!|( %(regressionKeyAdjs) <POS: Prep>? <POS:(Det|Pron|Nn|Prop|Adj)>? %(DisSymp_Entities) )
+!|( %(DisSymp_Entities) %(ClauseBetweenDisSympAndStatus)? (%(regressionKeyVerbs)|%(regressionKeyAdjs)|%(regressionKeyNouns)) )
+!)}
+
+
+#subgroup regressionCond: {(
+ ( %(regressionKeyNouns) <POS:Prep> <STEM: his|her|their>? %(DisOnly_Entities) )
+|( %(DisOnly_Entities) %(regressionKeyNouns))
+|( %(regressionKeyAdjs) <POS: Prep>? <POS:(Det|Pron|Nn|Prop|Adj)>? %(DisOnly_Entities) )
+|( %(DisOnly_Entities) %(ClauseBetweenDisSympAndStatus)? (%(regressionKeyVerbs)|%(regressionKeyAdjs)|%(regressionKeyNouns)) )
+)}
+
+#subgroup regressionSymp: {(
+ ( %(regressionKeyNouns) <POS:Prep> <STEM: his|her|their>? %(SympOnly_Entities) )
+|( %(SympOnly_Entities) %(regressionKeyNouns))
+|( %(regressionKeyAdjs) <POS: Prep>? <POS:(Det|Pron|Nn|Prop|Adj)>? %(SympOnly_Entities) )
+|( %(SympOnly_Entities) %(ClauseBetweenDisSympAndStatus)? (%(regressionKeyVerbs)|%(regressionKeyAdjs)|%(regressionKeyNouns)) )
+)}
+
+
+
+
+#subgroup stableKeyAdjs: {(
+[OD Stable](
+ <\p{ci}(stable)>
+)[/OD]
+)}
+
+#subgroup stableKeyVerbs: {(
+[OD Stable](
+<STEM:\p{ci}(stabilize)>
+)[/OD]
+)}
+
+
+!#subgroup stable: {(
+! ( %(stableKeyAdjs) <POS:(Det|Pron|Nn|Prop|Adj)>? %(DisSymp_Entities) )
+!|( %(DisSymp_Entities) <~(;|failure)>*? (%(remissionKeyVerbs)|%(remissionKeyAdjs)) )
+!)}
+
+
+#subgroup stableCond: {(
+ ( %(stableKeyAdjs) <POS:(Det|Pron|Nn|Prop|Adj)>? %(DisOnly_Entities) )
+|( %(DisOnly_Entities) <~(;|failure)>*? (%(remissionKeyVerbs)|%(remissionKeyAdjs)) )
+)}
+
+
+
+#subgroup stableSymp: {(
+ ( %(stableKeyAdjs) <POS:(Det|Pron|Nn|Prop|Adj)>? %(SympOnly_Entities) )
+|( %(SympOnly_Entities) <~(;|failure)>*? (%(remissionKeyVerbs)|%(remissionKeyAdjs)) )
+)}
+
+
+
+#subgroup deathKeywords: {(
+[OD Death](
+  <\p{ci}(death|died|expired|deceased)>
+!  <\p{ci}(death|died|passed|expired|deceased)>
+| (<\p{ci}(passed)><\p{ci}(away)>)
+)[/OD]
+)}
+
+!#subgroup death: {(
+! (%(deathKeywords) (<>{0, 4} %(DisSymp_Entities))?)
+!|((%(DisSymp_Entities) <>{0, 4})? %(deathKeywords))
+!)}
+
+#subgroup deathCond: {(
+ (%(deathKeywords) (<>{0, 4} %(DisOnly_Entities))?)
+|((%(DisOnly_Entities) <>{0, 4})? %(deathKeywords))
+)}
+
+#subgroup deathSymp: {(
+ (%(deathKeywords) (<>{0, 4} %(DisOnly_Entities))?)
+|((%(DisOnly_Entities) <>{0, 4})? %(deathKeywords))
+)}
+
+
+!#group DiseaseStatus: {(
+!  %(progression)
+!| %(regression)
+!| %(remission)
+!| %(stable)
+!)}
+
+
+#group Condition_ClinicalStatus: {(
+  %(progressionCond)
+| %(regressionCond)
+| %(remissionCond)
+| %(stableCond)
+| %(deathCond)
+)}
+
+#group Observation_Symptom_Component_ClinicalStatus: {(
+  %(progressionSymp)
+| %(regressionSymp)
+| %(remissionSymp)
+| %(stableSymp)
+| %(deathSymp)
+)}
+
+
+
+#subgroup hospitalCourse: [SN] <>+ [TE COMPOSITION_SECTION_HOSPITALCOURSE] <>+ [/TE] <>+[/SN]
+
+#group DROP_DiseaseStatus: {(
+( %(DisSymp_Entities) <>{0,13} <\p{ci}(for|from|vs|vs\.)> <>? %(progressionKeyNouns))
+| (%(progressionKeyNouns) <vs\.|vs> %(DisSymp_Entities))
+| %(hospitalCourse)
+| <POS: Det>? [TE OBSERVATION_SYMPTOM] <STEM: R> <STEM: wave> [/TE] <STEM: progression>
+| <STEM: additional> <>? <sips>
+)}
+
+
+!======================================================================
+!  RELATIONS
+!======================================================================
+
+!======================================================================
+! TrWP RELATION
+!======================================================================
+
+#subgroup althoughWord: {(
+  <\p{ci}(although|though|despite)>
+| (<\p{ci}(in)> <\p{ci}(spite)> <\p{ci}(of)>)
+)}
+
+#subgroup althoughStruct: {(
+ %(althoughWord) <>{0,5} %(MedProcT_Entities)
+)}
+
+#subgroup butStruct: {(
+ <\p{ci}(but)> <>{0,5} %(DisSymp_Entities)
+)}
+
+#subgroup ineffective: {(
+(<\p{ci}(not?|poor|minimal|min\.?|without|w/o)> <\p{ci}(any)>? <\p{ci}(relief|response|effect(ive)?|improvement)> )
+|<\p{ci}(ineffective(ly)?|unsuccessful(ly)?)>
+)}
+! ( %(MedProcT_Entities) <>{0,5} %(ineffective) )
+
+#subgroup noRelief: {(
+  ( %(ineffective) <POS:Prep> <POS:Det|Pron|Nn|Prop|Adj>{0,2} %(MedProcT_Entities) )
+| ( %(MedProcT_Entities) <>{0,3} %(DisSymp_Entities) <>{0,2} %(ineffective) )
+| ( %(MedProcT_Entities) <>{0,2} %(ineffective) <>{0,5} %(DisSymp_Entities) )
+| ( %(DisSymp_Entities) <>{0,10} %(MedProcT_Entities) <>{0,2} %(ineffective) )
+| ( %(DisSymp_Entities) <>{0,5} (<STEM:\p{ci}(not)>|<STEM:\p{ci}(fail)><to>) <STEM:\p{ci}(relieve|respond|affect(ed)?)> <>{0,5} %(MedProcT_Entities) )
+| ( %(MedProcT_Entities) <>{0,10} %(DisSymp_Entities) <>? <STEM:\p{ci}(not)> <STEM:\p{ci}(relieve|respond|affect)>)
+| ( %(MedProcT_Entities) <>{0,5} (<STEM:\p{ci}(not)>|<STEM:\p{ci}(fail)><to>) <STEM:\p{ci}(alleviate|relieve|improve|succeed)> <>{0,5} %(DisSymp_Entities) )
+| ( %(DisSymp_Entities) <>{0,5} <\p{ci}(resistant)> <\p{ci}(to)> <POS:Det|Pron|Nn|Prop|Adj>{0,2} %(MedProcT_Entities) )
+| ( %(MedProcT_Entities) <>? %(ineffective))
+)}
+
+#subgroup worsenKeywords: {(
+  <STEM:\p{ci}(worsen|precipitated?|exacerbated?|aggravated?|relapse|recur|persist|re\-?occur)>
+)}
+
+#subgroup worsen: {(
+  ( %(DisSymp_Entities) <POS:~(Conj)>{0,5} %(worsenKeywords) <>{0,3} %(MedProcT_Entities) )
+| ( %(worsenKeywords) <>? %(DisSymp_Entities) <>{0,3} %(MedProcT_Entities) )
+| ( %(MedProcT_Entities) <>{0,5} %(worsenKeywords) <POS:Prep> <POS:Det|Pron|Nn|Prop|Adj>{0,3}  %(DisSymp_Entities) )
+| ( %(MedProcT_Entities) <>{0,5} <STEM:\p{ci}(make|leave)> <>? %(DisSymp_Entities) <\p{ci}(worse|harder)> )
+| ( %(MedProcT_Entities) <POS:Punct>? (<\p{ci}(and|he|she)>|(<\p{ci}(the)><\p{ci}(patient)>)) <\p{ci}(had|developed)> <POS:Adj>? %(DisSymp_Entities) )
+| ( <\p{ci}(developed)> <POS:Adj>? %(DisSymp_Entities) <POS:Punct>{0,3} %(MedProcT_Entities))
+)}
+
+!#group TreatmentWorsensProblem: {(
+!  (%(althoughStruct) <>{0,5} %(DisSymp_Entities))
+!| (%(DisSymp_Entities) <STEM:~(cure|heal|improve|alleviate|recover|relieve|resolve|better|good|subside)>{0,5} %(althoughStruct))
+!| (%(MedProcT_Entities) <>{0,5} %(butStruct))
+!| %(worsen)
+!| %(noRelief)
+!)}
+
+
+!======================================================================
+! TrCP RELATION
+!======================================================================
+
+#subgroup Allergic: {(
+  ([OD AdverseEvent_Reaction] (<\p{ci}((A|a)llerg(y|ies))>|(<\p{ci}(allergic)> <POS:Nn>{0,2}) )[/OD] <\p{ci}((include(s|d)?)|to|from|\:|\-)> <>{0,4} %(Med_Entities))
+| ([OD AdverseEvent_Reaction] (<\p{ci}((A|a)llerg(y|ies))>|(<\p{ci}(allergic)> <POS:Nn>{0,2}) )[/OD] <\p{ci}((include(s|d)?)|to|from|\:|\-)> [OD AdverseEvent_SuspectEntity_Instance] <POS:Prop> [/OD])
+| ([OD AdverseEvent_Reaction] <\p{ci}(allergic)> [/OD] %(DisSymp_Entities) <\p{ci}(from|with)> %(Med_Entities))
+| ([OD AdverseEvent_Reaction] <POS:Adj|Prop> <\p{ci}(reactions?)> [/OD] <\p{ci}(include(s|d)?|to|from|with|\:|\-\-?)> <>{0,4} %(Med_Entities))
+| (%(Med_Entities) [OD AdverseEvent_Reaction] <\p{ci}(allerg(y|ies))> [/OD])
+| ([TE CONDITION] [OD AdverseEvent_SuspectEntity_Instance]<POS:Prop>+[/OD] [OD AdverseEvent_Reaction]<\p{ci}(allerg(y|ies)|allergic)>[/OD] [/TE])
+| ([TE CONDITION] [OD AdverseEvent_Reaction]<\p{ci}((A|a)llerg(y|ies)|allergic)>[/OD] <\p{ci}(to|\:|\-\-?)>+ [OD AdverseEvent_SuspectEntity_Instance]<POS:Prop>+[/OD][/TE] 
+   ( %(coord)? %(Med_Entities))? )
+)}
+
+#subgroup Intolerant_Nns: {
+  [OD AdverseEvent_Reaction] (
+    <\p{ci}(intolerances?)> 
+  ) [/OD] 
+}
+
+#subgroup Sensitive_Nns: {
+  [OD AdverseEvent_Reaction] (
+     <\p{ci}((hyper)?sensitivity)>
+  ) [/OD]
+}
+
+#subgroup Intolerant_Ads: {
+  ([OD AdverseEvent_Reaction] (
+    <\p{ci}(intoleran(ces?|t))> 
+  |(<\p{ci}(poor)><\p{ci}(tolerance)>)
+  |(<\p{ci}(not)><\p{ci}(tolerant)>)
+  ) [/OD] 
+  )<POS:Prep>
+}
+
+#subgroup Sensitive_Ads: {
+  ([OD AdverseEvent_Reaction] (
+    <\p{ci}((hyper)?sensitiv(e|ity))>
+  ) [/OD]
+  )<POS:Prep>
+}
+
+#subgroup Intolerant_Verbs: {
+   [OD AdverseEvent_Reaction] ((<\p{ci}(unable|inability)><to>)|(<\p{ci}(not)><able><to>)|(<STEM:\p{ci}(can|do)><STEM:not>)) 
+      <\p{ci}(tolerate)> [/OD] 
+}
+
+#subgroup Intolerant: {(
+  (( %(Intolerant_Ads) | %(Intolerant_Verbs) ) <>{0,2} %(MedProcT_Entities) )
+| (<STEM:\p{ci}(tolerate)>  <>{0,2} %(MedProcT_Entities) <>{0,2} <\p{ci}(with)>  <>?  %(DisSymp_Entities) )
+| (%(MedProcT_Entities)  %(Intolerant_Nns) )
+!| (%(MedProcT_Entities) <>*? %(Intolerant_Verbs) <>? %(DisSymp_Entities))
+)}
+
+#subgroup Sensitive: {(
+  ( %(Sensitive_Ads) <>{0,2} %(MedProcT_Entities) )
+| (%(MedProcT_Entities) %(Sensitive_Nns) )
+)}
+
+#subgroup StatusPost: {(
+(<\p{ci}(status)> <\p{ci}(post)>)
+|<(S|s)/(P|p)>
+|(<S|s> </> <P|p>)
+)}
+
+#subgroup dueTo: {(
+  (<\p{ci}(secondary|due)> <TO|To|to>)
+| <\p{ci}(given)>
+| (<(in|IN|In)> <\p{ci}(the)>? <\p{ci}(setting)> <OF|Of|of>)
+| (<\p{ci}(because)> <\p{ci}(of)>?)
+)}
+
+!!!MC commented this out as this subgroup is not used in any rule
+!#subgroup resultAfter: {(
+!  ( %(MedProcT_Entities) <>{0,10} <STEM:\p{ci}(effect|cause|induce|produce|provoke|precipitate|result|contribute|account|responsible|consequent(ly)?|subsequent(ly)?|adverse(ly)?)> <>{0,2} %(DisSymp_Entities) )
+!| (%(MedProcT_Entities) <>*? %(Intolerant_Verbs) <POS:Det>? %(DisSymp_Entities))
+!| ( %(MedProcT_Entities) <>{0,2} <\-> <\>> <>{0,2} %(DisSymp_Entities))
+!| ( %(MedProcT_Entities) <\(> <>{0,2} %(DisSymp_Entities) <>{0,4} <\)>)
+!| ( %(MedProcT_Entities) <>{0,3} <\p{ci}(gives?|gave)> <>{0,2} %(DisSymp_Entities) )
+!| ( %(DisSymp_Entities)  <STEM:~(resect),POS:~(Punct|Conj)>{0,10} <\p{ci}(result(s|ed)?|complicat(ed?|ing|ion)|after|when|while|since|from|follow(ing)?|because|during|adverse(ly)?)>  <POS:~(Punct|Conj)>{0,3} %(MedProcT_Entities))
+!| ( ((<\p{ci}(result|after|when|while|since|from|follow(ing)?|because|during)>  <POS:~(Punct)>{0,3}) |(<\p{ci}(on)> <~((D|d)ischarge|DISCHARGE|(O|o)rder|ORDER|(F|f)or|FOR)>{0,2})) %(MedProcT_Entities) <~(for|For|FOR|given|Given|GIVEN|((P|p)\.?(R|r)\.?(N|n)\.?)),POS:~(Part-Inf|Punct|Conj)>{0,5} %(DisSymp_Entities))
+!| ( %(DisSymp_Entities) <~(.*(control(led)?|treated|repaired|lead|patients?|trial|resistant)),POS:~(Punct|Conj)>{0,2} <\p{ci}(under|to|in|from|by|at)> <>{0,2} %(MedProcT_Entities))
+!| ( %(DisSymp_Entities)  <POS:~(Punct|Conj)>? <in|IN>  <POS:~(Punct|Conj|Num)>{0,4} <STEM:\p{ci}(treat(ment|ed)?|receiv(e|ing)|tak(e|ing)|administer|undergo(ing)?|given?|us(e|ing)|exposed)> <>{0,3} %(MedProcT_Entities))
+!| ( %(MedProcT_Entities) %(DisSymp_Entity_OneWord))
+!| ( [TE CONDITION][OD AdverseEvent_SuspectEntity_Instance]<~(PORTAL|(P|p)ortal), POS:(Nn|Prop)>+[/OD] %(DisSymp_Entity_OneWord) [/TE])
+!| ( %(MedProcT_Entities) <\->? <\p{ci}(induced|produced|related|associated|triggered)> <~(NO|No|no)>? %(DisSymp_Entities))
+!| ( %(MedProcT_Entities) <\->? <\p{ci}(with)> <~(OUT|Out|out|NO|No|no)>? %(DisSymp_Entities))
+!| ( %(MedProcInduced_Entity)  <POS:~(Punct)>? %(DisSymp_Entities))
+!| ( [TE CONDITION] %(MedProcInduced_Entity) [OD AdverseEvent_Reaction] <>* [/OD] [/TE])
+!| ( %(DisSymp_Entities) <\p{ci}(with)> %(MedProcT_Entities))
+!| ( %(DisSymp_Entities)   <POS:~(Punct|Conj)>{0,5} (%(MedProcInduced_Entity) | (%(MedProcT_Entities) <\->? <\p{ci}(induced|produced|related|associated)>)) )
+!| ( %(DisSymp_Entities) <>{0,3}  <POS:~(Punct|Conj)>*? <\p{ci}(induced|produced|related|associated)> <>{0,2} %(MedProcT_Entities))
+!| ( %(DisSymp_Entity_Cause) <>{0,2} %(MedProcT_Entities))
+!!| ( %(DisSymp_Entity) <~(with|is),POS:~(Punct|Conj)>{0,2} %(StatusPost) <POS:(Det|Pron|Nn|Prop|Adj)>{0,2} %(MedProcT_Entities))
+!!| ( %(StatusPost) <POS:(Det|Pron|Nn|Prop|Adj)>{0,2} %(MedProcT_Entities) <~(with),POS:~(Prep|Punct|Conj|V)>{0,3} %(DisSymp_Entities))
+!| ( %(DisSymp_Entities) <>{0,7} <\p{ci}(settings?)> <\p{ci}(of)> <>{0,2} %(MedProcT_Entities))
+!| ( %(DisSymp_Entities) <>{0,4} ((<\p{ci}(consistent|compatible)> <\p{ci}(with)>)|<\p{ci}(c\/w)>) <>{0,2} %(MedProcT_Entities))
+!| ( %(MedProcT_Entities) <>{0,2} <\p{ci}(terminated|discontinued|(d/c'd)|withheld|held|stopped|ceased)> <(by|By|BY|with|With|WITH)>  <POS:~(Punct|Conj)>{0,3} %(DisSymp_Entities) )
+!| ( %(MedProcT_Entities) <>{0,6} <\p{ci}(complicated)> <(by|By|BY|with|With|WITH)>  <POS:~(Punct|Conj)>{0,3} %(DisSymp_Entities) )
+!| ( %(MedProcT_Entities) <>{0,2} <\p{ci}(on|under|from|with)> <\p{ci}(which)> <>{0,5} %(DisSymp_Entities) )
+!| ( %(DisSymp_Entities) <>{0,10} <\p{ci}(secondary|subsequent|due|attributed|related|relation|associated|association|response|reaction|caused|induced|produced|provoked|triggered)> <TO|To|to|with|With|WITH|by|By|BY>  <POS:~(Punct)>{0,4} %(MedProcT_Entities))
+!| ( <STEM:\p{ci}(cause|reason|consequence), POS:Nn> <POS:Prep> <>{0,3} %(DisSymp_Entities) <~(.*(control(led)?|treated|repaired))>{0,5} %(MedProcT_Entities))
+!| ( %(MedProcT_Entities) <>{0,5} <STEM:\p{ci}(cause|reason|consequence|risk), POS:Nn> <POS:Prep> <>{0,3} %(DisSymp_Entities))
+!| ( %(MedProcT_Entities) <>{0,5} <\p{ci}(held|withheld|stopped|discontinued|(d/c'd)|terminated|decreased|ceased)> <>{0,3} %(dueTo)  <POS:~(Punct)>{0,3} %(DisSymp_Entities))
+!| ( <\p{ci}(hold|withhold|stop|discontinue|terminate|cease)> <POS:~(V|Punct|Conj)>? %(MedProcT_Entities) <>{0,3} %(dueTo)  <POS:~(Punct)>{0,3} %(DisSymp_Entities))
+!| ( [TE CONDITION] [OD AdverseEvent_SuspectEntity_Instance]<>+[/OD] <\p{ci}(induced|produced|related|associated|triggered)> [OD AdverseEvent_Reaction]<>+[/OD] [/TE])
+!| (%(MedProcT_Entities) <\p{ci}(resulting)> <\p{ci}(in)> %(DisSymp_Entities))
+!| (%(MedProcT_Entities) <>{0,3} <\p{ci}(had)> <>{0,2} %(DisSymp_Entities))
+!)}
+
+#subgroup sideEffectKeywords: {(
+ [OD AdverseEvent_Reaction] (<\p{ci}(side|adverse)> <\p{ci}(effects?)>)[/OD]
+|[OD AdverseEvent_Reaction] <\p{ci}(symptoms?)>[/OD]
+)}
+
+#subgroup sideEffect: {(
+  ( %(DisSymp_Entities) <>{0,3} %(sideEffectKeywords) <> <>? %(MedProcT_Entities))
+| ( %(MedProcT_Entities) <>{0,3} %(sideEffectKeywords) <> <>? %(DisSymp_Entities) )
+| ( %(sideEffectKeywords) <POS:Prep> <>? %(MedProcT_Entities) <>{0,3} %(DisSymp_Entities) )
+| ( %(sideEffectKeywords) <POS:Prep> <>? %(MedProcT_Entities))
+)}
+
+#subgroup interactionKeyword: {(
+[OD AdverseEvent_Reaction] <\p{ci}(interactions?)> [/OD]
+)}
+
+#subgroup interaction: {(
+ (%(MedProcT_Entities) %(interactionKeyword))
+|(%(interactionKeyword) <POS:V>? <POS:Prep> <POS:Det>? <>? %(MedProcT_Entities) 
+   (<\p{ci}(and|with)> <POS:Det>? <>? (%(DisSymp_Entities)|%(MedProcT_Entities)))?)
+)}
+
+#define PatientWords: patient|pt\.?|s?he|they|his|her|their
+
+!#group AdverseEvent: {(
+!  (<STEM: get> <POS: Adv>? %(DisSymp_Entities) <POS: Prep> %(MedProc_Entities))
+!| (<STEM: issue> <POS: Prep> %(DisSymp_Entities) <STEM: with> %(MedProc_Entities))
+!| (%(DisSymp_Entities) <STEM: at> <STEM: time> <STEM: of> %(MedProcT_Entities))
+!| (%(DisSymp_Entities) <POS: Prep> <POS: Adj>{0,2} %(MedProcT_Entities) <\.>)
+!| (%(DisSymp_Entities)  <\,>? (<STEM: DX|diagnose> <POS: Prep>? [TE DATE|MONTH|YEAR]<>*[/TE])? ((<STEM: status>? <STEM: to|post|after>)|((<s> <\/> <p>)|(<s\/p>))) (<STEM: %(PatientWords)>|<POS: Det|Num>)? %(MedProcT_Entities))
+!| (%(DisSymp_Entities) (<POS: Prep> [TE DATE]<>*[/TE])? <STEM: after|following|since|during> (<POS: Det|Num> (([TE MEASURE]<>*[/TE])|(<POS: Adj>)|(<STEM: dose> <POS: Prep>))?)? %(MedProcT_Entities))
+!| (%(DisSymp_Entities)  (<STEM: on|in> <POS: Num>)? (<\,>|<STEM: be>)? ((<POS: Adv>)|(<STEM: most>?<STEM: likely|possibly>))? ((<STEM: feel|felt>? <STEM: secondary|due|relate|related> <STEM: to>)|(<STEM: originate|originating>? <STEM: from>)|(<STEM: consistent> <STEM: with>)) <POS: Det>? (<STEM: complication> <POS: Prep>)? <POS: Adj>? (<STEM: risk> <POS: Prep>)? %(MedProcT_Entities)) ! tongue biting secondary to Fentanyl
+!| (%(MedProcT_Entities) <POS: Conj>? <STEM: be>? <STEM: discontinue|stop|cease> ((<STEM: secondary|due> <STEM: to>)|(<STEM: because> <STEM: of>)|(<POS: Prep> <POS: Det>? <STEM: setting> <POS: Prep>)) (<STEM: problem> <STEM: with>)? <POS: Det>? (<POS: Adj> <STEM: episode|outbreak> <POS: Prep>)? %(DisSymp_Entity)) 
+!| (%(MedProcT_Entities) <\,>? <STEM: that|which>? (<STEM: %(PatientWords)> <STEM: say|claim>)? <STEM: have>? <STEM: cause> %(DisSymp_Entities)) 
+!| (%(MedProcT_Entities) (<POS: Prep> [TE DATE]<>*[/TE])? <\,>? ((<STEM: be>? <POS: Adv>? <STEM: complicate> <STEM: by>)|(<STEM: secondary> <STEM: to>)) (<STEM: problem> <STEM: with>)? (<STEM: Inc>|<POS: Adj>)? (<STEM: risk> <POS: Prep>)? <POS: Adj>? %(DisSymp_Entities))
+!| (%(MedProcT_Entities) <\,>? ((<POS: Prep> <POS: Adj>)|(<POS: Det>? <STEM: %(PatientWords)> <STEM: have>?)) %(DisSymp_Entities))
+!| (%(DisSymp_Entities) (<POS: Prep> <>{1,3})? <STEM: in> <POS: Det>? <STEM: setting> <STEM: of> %(MedProcT_Entities))  ! CMB infection in the setting of Campath
+!| (<STEM: since> %(MedProcT_Entities) <STEM: %(PatientWords)> <STEM: have> %(DisSymp_Entities)) ! since chemo pt has nausea
+!| (%(MedProcT_Entities) <STEM: associate|relate> <POS: Prep>? %(DisSymp_Entities)) 
+!| (%(MedProcT_Entities) <POS: Conj>? <STEM: have>? <STEM: have> (<STEM: episode> <STEM: of>)? %(DisSymp_Entities)) ! ventilation associated pneumonia
+!| (%(DisSymp_Entities) <STEM: associate|relate> <POS: Prep> <POS: Det>? %(MedProcT_Entities))
+!| (%(DisSymp_Entities) <STEM: that|which>? (<STEM: %(PatientWords)>|<STEM: be>)? (<STEM: feel> <STEM: to> <STEM: be>)? <STEM: attribute|due> <POS: Prep> <POS: Det>? %(MedProcT_Entities))
+!)}
+
+!======================================================================
+! TrIP RELATION
+!======================================================================
+
+#subgroup improve: {(
+ ( %(DisSymp_Entities) <~(\(|\))>{0,4} <STEM:\p{ci}(cure|heal|improve|alleviate|recover|relieve|resolve|better|good|subside|respond|reverse|subside|disappear|discontinue|manage)> <POS:~(Punct),STEM:~(AND|(A|a)nd)>{1,3} %(MedProcT_Entities) )
+| (%(MedProcT_Entities) <>{0,5} <STEM:\p{ci}(cure|heal|improve|alleviate|reduce|relieve|resolve|reverse|prevent|avoid)> <>? %(DisSymp_Entities) )
+| (%(MedProcT_Entities) <STEM:~(not)>{0,3} <\p{ci}(effective(ly)?|efficacious(ly)?)> <>? %(DisSymp_Entities) )
+| (%(MedProcT_Entities) <>{0,5} %(DisSymp_Entities) <\p{ci}(better|effectively|efficaciously)> )
+)}
+
+#subgroup improveKeywords: {(
+  <\p{ci}(cured|healed|improved|alleviated|normalized|reduced|recovered|relieved|resolved|reversed|better|good|improvement|alleviation|relief|subsided|managed)>
+)}
+
+#subgroup improveStruct: {(
+  (%(improveKeywords) <>{0,2} %(DisSymp_Entities))
+| (%(DisSymp_Entities) <>{0,2} %(improveKeywords))
+)}
+
+#subgroup betterAfter: {(
+  ( %(improveStruct) <>{0,3} <\p{ci}(after|when|while|since|from|follow(ing|ed|s)?|because|during)> <>{0,3} %(MedProcT_Entities))
+| ( <\p{ci}(after|when|while|since|from|following|because|during)> <>{0,3} %(MedProcT_Entities) <>{0,4} %(improveStruct))
+| ( %(improveStruct) <\p{ci}(on|with|under)> %(MedProcT_Entities))
+| ( %(improveStruct) <>{0,2} %(StatusPost) <>? %(MedProcT_Entities))
+| ( %(improveStruct) <>{0,5} <\p{ci}(settings?)> <\p{ci}(of)> <>{0,2} %(MedProcT_Entities))
+| ( %(MedProcT_Entities) <>{0,2} <\p{ci}(on|under|from)> <\p{ci}(which)> <>{0,3} %(improveStruct) )
+| ( %(MedProcT_Entities) <>{0,2} <\p{ci}(on|under|from)> <\p{ci}(which)> <>{0,3} %(improveStruct) )
+| ( %(improveStruct) <>{0,5} <\p{ci}(secondary|due|attributed|related|relation|associated|association|response|reaction)> <TO|To|to|with|With|WITH> <>? %(MedProcT_Entities))
+| ( %(DisSymp_Entities) <STEM:~(not|fail)>{0,2} <STEM:(stop|cease|subside|cease)> <>{0,3} <\p{ci}(after|when|while|since|from|follow(ing)?|because|during)> <>{0,5} %(MedProcT_Entities))
+)}
+
+!#group TreatmentImprovesProblem: {(
+!  %(improve)
+!| %(betterAfter)
+!| ( %(DisSymp_Entities) <POS:~(Punct|Conj)>{0,2} (( %(Intolerant_Ads) | %(Intolerant_Verbs) ) <POS:~(Punct|Conj)>{0,2} %(MedProcT_Entities) )
+!)
+!)}
+
+
+!======================================================================
+! TeRP RELATION   
+!======================================================================
+
+#subgroup revealWord: {(
+  <STEM:\p{ci}(reveal|show|find|demonstrate|document|prove|note|correlate|identify|indicate)> 
+| <(\:|\-\-?)>
+)}
+
+
+#subgroup reveal: {(
+  (%(ProcD_Entities) <>{0,5} %(revealWord) <>{0,4} %(DisSymp_Entities) )
+| (<On|ON|on> %(ProcD_Entities) <>{0,5} %(DisSymp_Entities) )
+| (%(DisSymp_Entities) <>? <\p{ci}(on|under|with|to|in|from|by)> <>{0,2} %(ProcD_Entities))
+| (%(ProcD_Entities) <>{0,3} <\p{ci}(and|\,)>+ %(DisSymp_Entities) <>{0,3} %(revealWord)  )
+| (%(ProcD_Entities) <>{0,4} <\p{ci}(there)> <\p{ci}(is|are|was|were)> <>{0,2} %(DisSymp_Entities) )
+| (%(ProcD_Entities) <>{0,4} <\p{ci}(remarkable|notable|positive|negative)> <\p{ci}(for)> <>{0,2} %(DisSymp_Entities) )
+| (%(ProcD_Entities) <>{0,2} ((<\p{ci}(consistent|compatible)> <\p{ci}(with)>)|<\p{ci}(c\/w)>) <>{0,2} %(DisSymp_Entities) )
+| (%(DisSymp_Entities) <>{0,2} <\p{ci}(evidenced|proven)> <\p{ci}(with|by)> <>{0,2} %(ProcD_Entities) )
+)}
+
+#subgroup TestRevealsProblem: {(
+ <>* %(reveal)
+)}
+
+!======================================================================
+! TeCP RELATION
+!======================================================================
+
+#subgroup conductWord: {(
+  <STEM:\p{ci}(perform|do|complete|order|plan|conduct|schedule|obtain|place|check|pending)> 
+)}
+
+
+#subgroup conduct: {(
+  (%(ProcD_Entities) <>{0,6} <POS:Part-Inf> <POS:~(Punct)>{0,4} %(DisSymp_Entities) )
+| (%(ProcD_Entities) <>{0,3} <for|FOR|For> <>? %(DisSymp_Entities) )
+| (%(ProcD_Entities) <POS:~(Punct)>{0,2} %(conductWord) <>{0,4} %(DisSymp_Entities) )
+| (%(conductWord) %(ProcD_Entities) <>{0,4} %(DisSymp_Entities) )
+)}
+
+#subgroup TestConductedForProblem: {(
+ <>* %(conduct)
+)}
+
+
+!======================================================================
+! PIP RELATION
+!======================================================================
+
+#subgroup indicate: {(
+( %(DisSymp_Entities) <>{0,5} <\p{ci}(secondary|due|attributed|related|relation|associated|association|contribute(s|d)?|compose(s|d)?|component|correlate)> <TO|To|to|with|With|WITH|of|Of|OF> <>{0,2} %(DisSymp_Entities))
+|( %(DisSymp_Entities) <>{0,5} <STEM:\p{ci}(indicate|show|demonstrate)> <>{0,2} %(DisSymp_Entities))
+)}
+
+#subgroup ProblemIndicatesProblem: {(
+ <>* %(indicate)
+)}
+
+!======================================================================
+! DROP RELATIONS
+!======================================================================
+
+#subgroup neutralKeywords: {(
+  (<(In|in|IN)> <(need)> <(of)> )
+| (<\p{ci}(response)> <\p{ci}(rate)> )
+| (<STEM:\p{ci}(need|require|necessitat(e|ing))> )
+)}
+
+#subgroup recommendKeywords: {(
+  (<STEM:\p{ci}(recommend|suggest)>)
+| (<\p{ci}(widely|often)> <\p{ci}(used)> )
+)}
+
+#subgroup treatKeywords: {(
+  (<STEM:\p{ci}(for|control|manage|treat(ment)?|given?|((P|p)\.?(R|r)\.?(N|n)\.?))>)
+| (<POS:Part-Inf> )
+)}
+
+!Copied from english-tf-med-Assertion.rul
+#subgroup FamilyNoun: {
+  <\p{ci}(famil(y|ies))>
+| <\p{ci}(brothers?)>
+| <\p{ci}(sisters?)>
+| <\p{ci}(siblings?)>
+| <\p{ci}(parents?)>
+| <\p{ci}(mother)>
+| <\p{ci}(father)>
+| <\p{ci}(mom)>
+| <\p{ci}(dad)>
+| <\p{ci}(offsprings?)>
+| <\p{ci}(sons?)>
+| <\p{ci}(daughters?)>
+| <\p{ci}(grandparents?)>
+| <\p{ci}(grandmother)>
+| <\p{ci}(grandfather)>
+| <\p{ci}(grandmom)>
+| <\p{ci}(granddad)>
+| <\p{ci}(grandchild(ren)?)>
+| <\p{ci}(grandsons?)>
+| <\p{ci}(granddaughters?)>
+| <\p{ci}(spouses?)>
+| <\p{ci}(partners?)>
+| <\p{ci}(husbands?)>
+| <\p{ci}(wifes?)>
+| <\p{ci}(cousins?)>
+| <\p{ci}(nephews?)>
+| <\p{ci}(nieces?)>
+| <\p{ci}(uncles?)>
+| <\p{ci}(aunts?)>
+}
+
+#subgroup FamilyAdj: {
+  <\p{ci}(maternal|paternal|fraternal)>
+}
+
+#subgroup FamilyTerm: {
+  %(FamilyNoun)
+| %(FamilyAdj)
+}
+
+#subgroup TreatmentNeutral: {(
+ (
+  (  (%(neutralKeywords)|%(recommendKeywords)) <>{0,2} %(MedProc_Entities) <POS:~(Punct)>{0,4} %(DisSymp_Entities))
+| (  %(DisSymp_Entities) <>{0,2} (%(neutralKeywords)|%(treatKeywords)) <POS:~(Punct)>{0,2} %(MedProc_Entities))
+| (  %(MedProc_Entities) <~(notable)>{0,3} (%(recommendKeywords)|%(treatKeywords)) <POS:~(Punct)>{0,2} %(DisSymp_Entities))
+| (  %(DisSymp_Entities) <>{0,3} <\p{ci}(prior|leading)> <\p{ci}(to)> <POS:Det>? <>? %(MedProc_Entities))
+| (  %(DisSymp_Entities) <>{0,3} %(FamilyTerm) <>{0,3} %(MedProc_Entities))
+| ( %(MedProc_Entities) <>{0,3} <> %(DisSymp_Entities) <>{0,3} %(FamilyTerm))
+| (%(FamilyTerm) <>{0,3} %(DisSymp_Entities) <>{0,3} %(MedProc_Entities))
+| (%(FamilyTerm) <>{0,3} %(MedProc_Entities) <>{0,3} %(DisSymp_Entities))
+| (%(DisSymp_Entities) <>{0,3} <_+> <>{0,3} %(MedProc_Entities))
+| ( %(MedProcT_Entities) <\->? <\p{ci}(with)> <>? %(DisSymp_Entities) <\p{ci}(control)>)
+| (<\p{ci}((col)?ostomy)> <>{0,2} <\p{ci}(stool)>)
+| (<>{0,8} <\p{ci}(stool)> <>{0,2} <\p{ci}((col)?ostomy)>)
+| (<\p{ci}(bowel)> <\p{ci}(resection)> <>{0,2} <\p{ci}(colostomy)>)
+| (<>? <\p{ci}(DVT|fibrillation)> <\p{ci}on> <\p{ci}coumadin>)
+!| (<>{0,3}  %(MedProcT_Entities) <>{0,3} %(revealWord) <>{0,5} %(DisSymp_Entities))
+| ( %(DisSymp_Entities) <>{0,2} <\p{ci}(on|under|to|in|from|by|at|post)> <>{0,2} %(MedProcT_Entities) <\p{ci}(list)>)
+| ( <\p{ci}(progression)> <\p{ci}(of)> <>{0,4} %(DisSymp_Entities) <>{0,2} <\p{ci}(on|under|to|in|from|by|at|post)> <>{0,2} %(MedProcT_Entities))
+| ( %(treatKeywords) <>{0,2} %(DisSymp_Entities) <\p{ci}(with)> %(MedProcT_Entities))
+| ( %(DisSymp_Entities) <>{0,2} %(worsenKeywords) <\p{ci}(and)> %(MedProcT_Entities) <>{0,3} <STEM:\p{ci}(start)>)
+| ( <\p{ci}(without)> %(MedProcT_Entities) <>{0,5} %(DisSymp_Entities))
+| ( %(MedProcT_Entities) <\p{ci}(but)> <>{0,3} <\p{ci}(before|previous(ly)?|last)> <>{0,3} %(DisSymp_Entities))
+| ( \p{ci}<coronary> \p{ci}<artery> \p{ci}<disease> \p{ci}<with> \p{ci}<coronary> \p{ci}<artery> \p{ci}<bypass> \p{ci}<graft>)
+| ( \p{ci}<cad> \p{ci}<with> \p{ci}<coronary> \p{ci}<artery> \p{ci}<bypass> \p{ci}<graft>)
+| ( \p{ci}<cad> \p{ci}<with> \p{ci}<cabg>)
+| (<>{0,4} <\p{ci}(gm)> <\/> <>{0,4})
+|(<\p{ci}(continue)> <>{0,8} <\p{ci}(prophylaxis)>)
+|(<\p{ci}(dressing)> <>{0,8} <\p{ci}(drainage)>)
+)
+)}
+
+#subgroup unableToDoSo: {(
+ %(MedProcT_Entities) <>{0,5} <\p{ci}(but)> <>{0,5} (<\p{ci}(unable)>|(<\p{ci}(not)><\p{ci}(able)>)) <\p{ci}(to)> <\p{ci}(do)> <\p{ci}(so)>
+)}
+
+#subgroup section: {(
+  ([TE COMPOSITION_SECTION_ADMISSION] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_ALLERGIES] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_ASSESSMENT] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_CONSULTATION] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_DATE] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_DIAGNOSIS] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_DIAGNOSTICDATA] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_DISCHARGE] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_DOCUMENTHEADING] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_FAMILYHISTORY] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_FOLLOWUP] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_HISTORY] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_HOSPITALCOURSE] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_MAILHEADER] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_MEDICATIONS] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_METADATA] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_PATIENT] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_PHYSICALEXAM] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_PROCEDURE] <>*? [/TE])
+| ([TE COMPOSITION_SECTION_SOCIALHISTORY] <>*? [/TE])
+)}
+
+!#subgroup sectionBreak: [SN] <>*? ((%(MedProcT_Entities) <>*?  <>*? %(DisSymp_Entities))|(%(DisSymp_Entities) <>*?  <>*? %(MedProcT_Entities))) <>*? [/SN]
+
+#subgroup sectionBreak: [SN] <>*? ((%(MedProcT_Entities) <>*? [TE COMPOSITION_SECTION_HISTORY] <>*? [/TE] <>*? %(DisSymp_Entities))|(%(DisSymp_Entities) <>*? [TE COMPOSITION_SECTION_HISTORY] <>*? [/TE] <>*? %(MedProcT_Entities))) <>*? [/SN]
+
+!#group DROP_AdverseEvent: {(
+! %(TreatmentImprovesProblem)
+!|%(TreatmentNeutral)
+!|%(sectionBreak)
+!)}
+
+!#group DROP_TreatmentWorsensProblem: {(
+!%(TreatmentImprovesProblem)
+!|%(AdverseEvent)
+!|%(TreatmentNeutral)
+!|%(unableToDoSo)
+!|%(sectionBreak)
+!)}
+
+!#group DROP_TreatmentImprovesProblem: {(
+! %(TreatmentNeutral)
+!|%(sectionBreak)
+!)}
+

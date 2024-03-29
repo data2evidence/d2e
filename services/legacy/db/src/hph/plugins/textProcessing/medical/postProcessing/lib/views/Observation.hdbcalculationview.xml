@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.views::Observation" applyPrivilegeType="NONE" dataCategory="DEFAULT" schemaVersion="3.0" outputViewType="Aggregation" cacheInvalidationPeriod="NONE" enforceSqlExecution="false">
+<descriptions defaultDescription="med_Observation"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp" type="TABLE_FUNCTION">
+    <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp</resourceUri>
+  </DataSource>
+</dataSources>
+<calculationViews>
+  <calculationView xsi:type="Calculation:ProjectionView" id="med_Observation_table" filterExpressionLanguage="COLUMN_ENGINE">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TOKEN">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_PARENT">
+        <descriptions defaultDescription="TA_PARENT"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+    </input>
+    <filter>(in (&quot;TA_TYPE&quot;,'Observation_Laboratory_Normalized','Observation_PerformanceStatus','Observation_Laboratory_Value','Observation_Laboratory_Unit','Observation_PerformanceStatus_Value','Observation_PerformanceStatus_Unit','Observation_BodyWeight','Observation_BodyWeight_Value','Observation_BodyWeight_Unit','Observation_BMI','Observation_BMI_Value','Observation_BMI_Unit','Observation_BodyTemperature','Observation_BodyTemperature_Value','Observation_BodyTemperature_Unit','Observation_BloodPressure','Observation_BloodPressure_Value','Observation_BloodPressure_Unit','Observation_BloodPressure_Component_Systolic','Observation_BloodPressure_Component_Systolic_Value','Observation_BloodPressure_Component_Systolic_Unit','Observation_BloodPressure_Component_Diastolic','Observation_BloodPressure_Component_Diastolic_Value','Observation_BloodPressure_Component_Diastolic_Unit','Observation_HeartRate','Observation_HeartRate_Value','Observation_HeartRate_Unit','Observation_OxygenSaturation','Observation_OxygenSaturation_Value','Observation_OxygenSaturation_Unit','Observation_RespirationRate','Observation_RespirationRate_Value','Observation_RespirationRate_Unit','OBSERVATION_PERFORMANCESTATUS','OBSERVATION_LABORATORY'))</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:ProjectionView" id="LabTestPerfStatusNormalized" filterExpressionLanguage="COLUMN_ENGINE">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="med_Observation_table">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+    </input>
+    <filter>(in (&quot;TA_TYPE&quot;,'OBSERVATION_PERFORMANCESTATUS','OBSERVATION_LABORATORY'))</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:ProjectionView" id="LabTestPerformanceStatus" filterExpressionLanguage="COLUMN_ENGINE">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_PARENT">
+        <descriptions defaultDescription="TA_PARENT"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OFFSET">
+        <descriptions defaultDescription="TA_OFFSET"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="med_Observation_table">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+    </input>
+    <filter>(in(&quot;TA_TYPE&quot;,'Observation_Laboratory_Normalized','Observation_PerformanceStatus'))</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:ProjectionView" id="TA_OBSERVATION" filterExpressionLanguage="COLUMN_ENGINE">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OBSERVATION">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER">
+        <descriptions defaultDescription="TA_PARENT"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="med_Observation_table">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OBSERVATION" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+    </input>
+    <filter>(in(&quot;TA_OBSERVATION&quot;,'Observation_BodyWeight','Observation_BMI','Observation_BodyTemperature','Observation_BloodPressure','Observation_BloodPressure_Component_Systolic','Observation_BloodPressure_Component_Diastolic','Observation_HeartRate','Observation_OxygenSaturation','Observation_RespirationRate'))</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:AggregationView" id="FirstTA_OBS_VALUE" filterExpressionLanguage="COLUMN_ENGINE" ignoreMultipleOutputsForFilter="false">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_PARENT">
+        <descriptions defaultDescription="TA_PARENT"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER" aggregationType="min">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="med_Observation_table">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+    </input>
+    <filter>(not isNull(&quot;TA_PARENT&quot;)) AND (in(&quot;TA_TYPE&quot;,'Observation_Laboratory_Value','Observation_PerformanceStatus_Value','Observation_BodyWeight_Value','Observation_BMI_Value','Observation_BodyTemperature_Value','Observation_BloodPressure_Value','Observation_BloodPressure_Component_Systolic_Value','Observation_BloodPressure_Component_Diastolic_Value','Observation_HeartRate_Value','Observation_OxygenSaturation_Value','Observation_RespirationRate_Value'))</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:AggregationView" id="FirstTA_OBS_UNIT" filterExpressionLanguage="COLUMN_ENGINE">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_PARENT">
+        <descriptions defaultDescription="TA_PARENT"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER" aggregationType="min">
+        <descriptions defaultDescription="TA_COUNTER"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="med_Observation_table">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+    </input>
+    <filter>(in(&quot;TA_TYPE&quot;,'Observation_Laboratory_Unit','Observation_PerformanceStatus_Unit','Observation_BodyWeight_Unit','Observation_BMI_Unit','Observation_BodyTemperature_Unit','Observation_BloodPressure_Unit','Observation_BloodPressure_Component_Systolic_Unit','Observation_BloodPressure_Component_Diastolic_Unit','Observation_HeartRate_Unit','Observation_OxygenSaturation_Unit','Observation_RespirationRate_Unit')) AND (not isNull(&quot;TA_PARENT&quot;))</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="TA_OBS_VALUEwithToken" cardinality="CN_N" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OBS_VALUE">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER" aggregationType="sum">
+        <descriptions defaultDescription="TA_PARENT"/>
+      </viewAttribute>
+      <viewAttribute hidden="true" id="JOIN$TA_COUNTER$TA_COUNTER"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="med_Observation_table">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OBS_VALUE" source="TA_TOKEN"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_COUNTER$TA_COUNTER" source="TA_COUNTER"/>
+    </input>
+    <input node="FirstTA_OBS_VALUE">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_COUNTER$TA_COUNTER" source="TA_COUNTER"/>
+    </input>
+    <joinAttribute name="DWID"/>
+    <joinAttribute name="JOIN$TA_COUNTER$TA_COUNTER"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="TA_OBS_UNITwithToken" cardinality="CN_N" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER" aggregationType="sum">
+        <descriptions defaultDescription="TA_PARENT"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OBS_UNIT">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+      <viewAttribute hidden="true" id="JOIN$TA_COUNTER$TA_COUNTER"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="med_Observation_table">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OBS_UNIT" source="TA_TOKEN"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_COUNTER$TA_COUNTER" source="TA_COUNTER"/>
+    </input>
+    <input node="FirstTA_OBS_UNIT">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_COUNTER$TA_COUNTER" source="TA_COUNTER"/>
+    </input>
+    <joinAttribute name="DWID"/>
+    <joinAttribute name="JOIN$TA_COUNTER$TA_COUNTER"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1" cardinality="CN_N" joinType="leftOuter">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_TYPE">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+      <viewAttribute id="TA_PARENT" aggregationType="sum">
+        <descriptions defaultDescription="TA_PARENT"/>
+      </viewAttribute>
+      <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="LabTestPerformanceStatus">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+    </input>
+    <input node="LabTestPerfStatusNormalized">
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+    </input>
+    <joinAttribute name="DWID"/>
+    <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:UnionView" id="ObservationInfoUnion">
+    <viewAttributes>
+      <viewAttribute id="DWID">
+        <descriptions defaultDescription="DWID"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OBSERVATION">
+        <descriptions defaultDescription="TA_TYPE"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OBS_VALUE">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+      <viewAttribute id="TA_OBS_UNIT">
+        <descriptions defaultDescription="TA_TOKEN"/>
+      </viewAttribute>
+      <viewAttribute id="TA_COUNTER" aggregationType="sum">
+        <descriptions defaultDescription="TA_PARENT"/>
+      </viewAttribute>
+      <viewAttribute id="TA_NORMALIZED">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <restrictedViewAttributes/>
+    <input node="TA_OBS_VALUEwithToken" emptyUnionBehavior="NO_ROW">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_OBSERVATION" null="true" value=""/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OBS_VALUE" source="TA_OBS_VALUE"/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_OBS_UNIT" null="true" value=""/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_NORMALIZED" null="true" value=""/>
+    </input>
+    <input node="TA_OBS_UNITwithToken" emptyUnionBehavior="NO_ROW">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_OBSERVATION" null="true" value=""/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_OBS_VALUE" null="true" value=""/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OBS_UNIT" source="TA_OBS_UNIT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_NORMALIZED" null="true" value=""/>
+    </input>
+    <input node="TA_OBSERVATION" emptyUnionBehavior="NO_ROW">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OBSERVATION" source="TA_OBSERVATION"/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_OBS_VALUE" null="true" value=""/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_OBS_UNIT" null="true" value=""/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_NORMALIZED" null="true" value=""/>
+    </input>
+    <input node="Join_1" emptyUnionBehavior="NO_ROW">
+      <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_OBSERVATION" source="TA_TYPE"/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_OBS_VALUE" null="true" value=""/>
+      <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_OBS_UNIT" null="true" value=""/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+    </input>
+  </calculationView>
+</calculationViews>
+<logicalModel id="ObservationInfoUnion">
+  <attributes>
+    <attribute id="DWID" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="DWID"/>
+      <keyMapping columnObjectName="ObservationInfoUnion" columnName="DWID"/>
+    </attribute>
+    <attribute id="TA_COUNTER" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="TA_PARENT"/>
+      <keyMapping columnObjectName="ObservationInfoUnion" columnName="TA_COUNTER"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="TA_OBS_VALUE" order="1" aggregationType="max" measureType="simple">
+      <descriptions defaultDescription="TA_TOKEN"/>
+      <measureMapping columnObjectName="ObservationInfoUnion" columnName="TA_OBS_VALUE"/>
+    </measure>
+    <measure id="TA_OBS_UNIT" order="2" aggregationType="max" measureType="simple">
+      <descriptions defaultDescription="TA_TOKEN"/>
+      <measureMapping columnObjectName="ObservationInfoUnion" columnName="TA_OBS_UNIT"/>
+    </measure>
+    <measure id="TA_OBSERVATION" order="4" aggregationType="max" measureType="simple">
+      <descriptions defaultDescription="TA_TYPE"/>
+      <measureMapping columnObjectName="ObservationInfoUnion" columnName="TA_OBSERVATION"/>
+    </measure>
+    <measure id="TA_NORMALIZED" order="6" aggregationType="max" measureType="simple">
+      <descriptions defaultDescription="TA_NORMALIZED"/>
+      <measureMapping columnObjectName="ObservationInfoUnion" columnName="TA_NORMALIZED"/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="100" y="105"/>
+    
+      <rectangleSize width="160"/>
+    </shape>
+  
+    <shape expanded="true" modelObjectName="med_Observation_table" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="80" y="683"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="LabTestPerfStatusNormalized" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-262" y="480"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="LabTestPerformanceStatus" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-75" y="483"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="TA_OBSERVATION" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="100" y="472"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="FirstTA_OBS_VALUE" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="302" y="496"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="FirstTA_OBS_UNIT" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="490" y="472"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="TA_OBS_VALUEwithToken" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="190" y="335"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="med_Observation_table" modelObjectNameSpace="TA_OBS_VALUEwithToken" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape modelObjectName="FirstTA_OBS_VALUE" modelObjectNameSpace="TA_OBS_VALUEwithToken" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+  
+    <shape expanded="true" modelObjectName="TA_OBS_UNITwithToken" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="472" y="335"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="med_Observation_table" modelObjectNameSpace="TA_OBS_UNITwithToken" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape modelObjectName="FirstTA_OBS_UNIT" modelObjectNameSpace="TA_OBS_UNITwithToken" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="393" y="41"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-182" y="303"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="LabTestPerformanceStatus" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape modelObjectName="LabTestPerfStatusNormalized" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape expanded="true" modelObjectName="ObservationInfoUnion" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="97" y="196"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario> 

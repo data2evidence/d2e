@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" schemaVersion="2.3" id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.views::determine_ambiguity_status" applyPrivilegeType="NONE" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" dataCategory="CUBE" enforceSqlExecution="false" executionSemantic="UNDEFINED" outputViewType="Projection" xscCompatibilityMode="true">
+  <descriptions defaultDescription="determine_ambiguity_status"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="27"/>
+  <dataSources>
+    <DataSource id="count_overlapping_rows">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.views::count_overlapping_rows</resourceUri>
+    </DataSource>
+  </dataSources>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:ProjectionView" id="calculate_ambiguity_status">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="DUPLICATE_COUNT"/>
+      </viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute datatype="NVARCHAR" id="TA_AMBIGUITY" length="100" expressionLanguage="COLUMN_ENGINE">
+          <formula>if(&quot;DUPLICATE_COUNT&quot; > 1,'Ambiguous','Unambiguous')</formula>
+        </calculatedViewAttribute>
+      </calculatedViewAttributes>
+      <input node="#count_overlapping_rows">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DUPLICATE_COUNT" source="DUPLICATE_COUNT"/>
+      </input>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="calculate_ambiguity_status">
+    <descriptions/>
+    <attributes>
+      <attribute id="DWID" order="1" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="DWID"/>
+        <keyMapping columnObjectName="calculate_ambiguity_status" columnName="DWID"/>
+      </attribute>
+      <attribute id="TA_COUNTER" order="2" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_COUNTER"/>
+        <keyMapping columnObjectName="calculate_ambiguity_status" columnName="TA_COUNTER"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures>
+      <measure id="TA_AMBIGUITY" order="3" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_AMBIGUITY"/>
+        <measureMapping columnObjectName="calculate_ambiguity_status" columnName="TA_AMBIGUITY"/>
+      </measure>
+    </baseMeasures>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+        <upperLeftCorner x="40" y="85"/>
+        <rectangleSize height="0" width="0"/>
+      </shape>
+      <shape expanded="true" modelObjectName="calculate_ambiguity_status" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="50" y="230"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario>

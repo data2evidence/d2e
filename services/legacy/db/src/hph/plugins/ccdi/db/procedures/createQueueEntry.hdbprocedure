@@ -1,0 +1,32 @@
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::createQueueEntry" (
+		in profileId	BIGINT,
+		in auditLogId	BIGINT,
+		in auditLogDetailId	BIGINT,
+		in taskType	NVARCHAR(100),
+		in oJsonString NCLOB
+   ) 
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+
+   --READS SQL DATA AS
+   AS   
+BEGIN    
+
+INSERT INTO "hc.hph.plugins.ccdi.db.models::Tasks.Queue" (
+ "taskId",
+ "profileId",
+ "auditLogId",
+ "auditLogDetailId",
+ "taskType",
+ "oJsonString"
+)
+VALUES (
+ "hc.hph.plugins.ccdi.db.models::taskId".nextval,
+ profileId,
+ auditLogId,
+ auditLogDetailId,
+ taskType,
+ oJsonString 
+);
+
+END;

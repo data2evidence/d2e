@@ -1,0 +1,17 @@
+PROCEDURE "hc.hph.plugins.fasta.db.procedures::cleanUp" (
+	IN auditID BIGINT,
+	IN referenceID VARCHAR(200)
+	) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+	
+BEGIN
+CALL "hc.hph.di.procedures::clean_logs" ( :auditID );
+
+DELETE FROM "hc.hph.genomics.db.models::Reference.Sequences" WHERE "ReferenceID" = ESCAPE_SINGLE_QUOTES(:referenceID);
+DELETE FROM "hc.hph.genomics.db.models::Reference.Chromosomes" WHERE "ReferenceID" = ESCAPE_SINGLE_QUOTES(:referenceID);
+DELETE FROM "hc.hph.genomics.db.models::Reference.Codons" WHERE "ReferenceID" = ESCAPE_SINGLE_QUOTES(:referenceID);
+
+call "hc.hph.plugins.fasta.db.procedures::deleteStatus" (:auditID);
+
+END;

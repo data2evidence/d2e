@@ -1,0 +1,8 @@
+procedure "hc.hph.plugins.searchextension.pubmed.db.procedures::Import"()
+	language sqlscript
+	sql security definer
+	as
+begin
+
+end
+;

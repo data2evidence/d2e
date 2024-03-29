@@ -1,0 +1,16 @@
+TDTitle;LEGACY;TemplateDocumentsList;0;HPH_PAT_CONTENT_RELDOC_TABLE_DOC_TITLE;Title;X;;X;;string
+TDPreview;LEGACY;TemplateDocumentsList;1;HPH_PAT_CONTENT_RELDOC_TABLE_PREVIEW;Preview;X;;X;;string
+TDAuthor;LEGACY;TemplateDocumentsList;2;HPH_PAT_CONTENT_RELDOC_TABLE_AUTHOR;Author;X;X;X;X;string
+TDPatientID;LEGACY;TemplateDocumentsList;3;;;;;;;string
+TDSourcePatientID;LEGACY;TemplateDocumentsList;4;PATIENT_ID;SourcePatientID;;X;X;X;string
+TDPatientName;LEGACY;TemplateDocumentsList;5;PATIENTNAME;PatientName;X;X;;;string
+TDFamilyName;LEGACY;TemplateDocumentsList;6;FAMILYNAME;FamilyName;;;X;X;string
+TDGivenName;LEGACY;TemplateDocumentsList;7;GIVENNAME;GivenName;;;X;X;string
+TDLanguageCode;LEGACY;TemplateDocumentsList;8;HPH_PAT_CONTENT_RELDOC_TABLE_LANGUAGE_CODE;LanguageCode;;X;X;X;string
+TDFileName;LEGACY;TemplateDocumentsList;9;HPH_PAT_CONTENT_RELDOC_TABLE_FILE_NAME;FileName;;X;X;X;string
+TDMIMEType;LEGACY;TemplateDocumentsList;10;HPH_PAT_CONTENT_RELDOC_TABLE_MIME_TYPE;MIMEType;;X;X;X;string
+TDCreatedBy;LEGACY;TemplateDocumentsList;11;HPH_PAT_CONTENT_RELDOC_TABLE_CREATED_BY;CreatedBy;;X;X;X;string
+TDCreatedAt;LEGACY;TemplateDocumentsList;12;HPH_PAT_CONTENT_RELDOC_TABLE_CREATION_DATE;CreatedAt;;X;X;X;date
+TDChangedBy;LEGACY;TemplateDocumentsList;13;HPH_PAT_CONTENT_RELDOC_TABLE_CHANGED_BY;ChangedBy;;X;X;X;string
+TDChangedAt;LEGACY;TemplateDocumentsList;14;HPH_PAT_CONTENT_RELDOC_TABLE_MODIFICATION_DATE;ChangedAt;;X;X;X;string
+TDAction;LEGACY;TemplateDocumentsList;15;;;X;;;;string

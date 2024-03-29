@@ -1,0 +1,109 @@
+{
+	"xsappname": "fhirserver",
+	"scopes": [
+		{
+			"name": "$XSAPPNAME.FHIR_INIT_ADMIN",
+			"description": "Scope required to initialize/format a FHIR Server. All the tables/content will be formatted."
+		},
+		{
+			"name": "$XSAPPNAME.FHIR_CONTENT_ADMIN",
+			"description": "Scope required to add/modify a FHIR Server Content."
+		},
+		{
+			"name": "$XSAPPNAME.FHIR_SCENARIO_ADMIN",
+			"description": "Scope required to create/read/update/delete a scneario."
+		},
+		{
+			"name": "$XSAPPNAME.FHIR_COMPLETE_PATIENT_DELETE_ADMIN",
+			"description": "Scope required to read complete patient data."
+		},
+		{
+			"name": "$XSAPPNAME.FHIR_COMPLETE_PATIENT_READ_ADMIN",
+			"description": "Scope required to delete complete patient data."
+		}
+	],
+	"attributes": [
+		{
+			"name": "endpoint",
+			"description": "FHIR End-Point name which admin has access for configurations",
+			"valueType": "string"
+		},
+		{
+			"name": "groupId",
+			"description": "Value of the groupId attribute that is specified in the Permission Respuece. This grants access to FHIR Resources",
+			"valueType": "string"
+		},
+		{
+			"name": "socialSecurityNumber",
+			"description": "An identifier for patient",
+			"valueType": "string"
+		},
+		{
+			"name": "identifierSystem",
+			"description": "A System that enabled an identifier to be refered from",
+			"valueType": "string"
+		}
+	],
+	"role-templates": [
+		{
+			"name": "fhir_UAA",
+			"description": "These are scopes required for UAA API's.",
+			"scope-references": [
+				"xs_user.read",
+				"xs_user.write",
+				"xs_authorization.read",
+				"xs_authorization.write"
+			]
+		},
+		{
+			"name": "fhir_InitAdministration",
+			"description": "This is required to create role that can do the Initialization of FHIR Server as an Administrator",
+			"scope-references": [
+				"$XSAPPNAME.FHIR_INIT_ADMIN"
+			]
+		},
+		{
+			"name": "fhir_ContentAdministration",
+			"description": "This is required to create role that can upload and verify Content deployment on FHIR Server as an Administrator",
+			"scope-references": [
+				"$XSAPPNAME.FHIR_CONTENT_ADMIN"
+			]
+		},
+		{
+			"name": "fhir_ScenarioAdministration",
+			"description": "This is required to create role that can create/read/update/modify FHIR Server Scenario as an Administrator",
+			"scope-references": [
+				"$XSAPPNAME.FHIR_SCENARIO_ADMIN"
+			],
+			"attribute-references": [
+				"endpoint"
+			]
+		},
+		{
+			"name": "fhir_CompletePatientDataDeletion",
+			"description": "This is required to create role that can read complete patient data",
+			"scope-references": [
+				"$XSAPPNAME.FHIR_COMPLETE_PATIENT_DELETE_ADMIN"
+			]
+		},
+		{
+			"name": "fhir_CompletePatientDataReporting",
+			"description": "This is required to create role that can delete complete patient data",
+			"scope-references": [
+				"$XSAPPNAME.FHIR_COMPLETE_PATIENT_READ_ADMIN"
+			]
+		},
+		{
+			"name": "fhir_Authorization",
+			"description": "This is required to create role that can help end-users access FHIR API's",
+			"attribute-references": [
+				"groupId",
+				"socialSecurityNumber",
+				"identifierSystem"
+			]
+		}
+	],
+	"authorities": [
+		"$ACCEPT_GRANTED_AUTHORITIES"
+	]
+}

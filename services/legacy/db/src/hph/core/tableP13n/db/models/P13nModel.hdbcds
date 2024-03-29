@@ -1,0 +1,47 @@
+namespace hc.hph.core.tableP13n.db.models;
+context P13nModel {
+	entity TableP13n {
+	    key Id:  				String(1024) not null; 	// Identifier of the Column
+	   	key HANAUserName:		String(1024) not null;
+	   	key TableId:			String(1024) not null;
+	    ColumnOrder: 			Integer; 				// order of the column				
+	    Text:					String(1024) default '';// text of the column header
+	    ColumnId:				String(1024) default '';// text of the column header
+	    Visible: 				String(1); 			// visibility of the column	
+	    Personalizable: 		String(1);  
+	    Sortable:				String(1); 
+	    Filterable:				String(1); 
+	    Type:					String(100);
+	} technical configuration {
+     column store;
+ }; 
+
+	entity TableP13nConfiguration {
+	    key Id:  				String(1024) not null; 	// Identifier of the Column
+	    key HANAUserName:		String(1024) not null;
+	   	key TableId:			String(1024) not null;
+	   	ColumnOrder: 			Integer; 				// order of the column		
+	    Text:					String(1024) default '';// text of the column header
+	    ColumnId:				String(1024) default '';// text of the column header
+	    Visible: 				String(1); 			// visibility of the column	
+	    Personalizable: 		String(1);  
+	    Sortable:				String(1); 
+	    Filterable:				String(1); 
+	    Type:					String(100);
+	} technical configuration {
+     column store;
+ }; 
+
+	entity TableP13nPersonalization {
+	    key Id:  				String(1024) not null; 	// Identifier of the Column
+	   	key HANAUserName:		String(1024) not null;
+	   	key TableId:			String(1024) not null;
+	    ColumnOrder: 			Integer; 				// order of the column				
+	    Visible: 				String(1); 			// visibility of the column	
+	} technical configuration {
+     column store;
+ }; 
+};
+
+
+ 

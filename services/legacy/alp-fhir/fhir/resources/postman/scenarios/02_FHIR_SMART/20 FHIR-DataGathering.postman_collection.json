@@ -1,0 +1,61 @@
+{
+	"info": {
+		"_postman_id": "09d821a6-2d81-4dd3-9477-0c3bcb773d17",
+		"name": "20 FHIR-DataGathering - Remote Server & SMART",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Upload SMART Dataset as Zip-File from FileSystem",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ba03986b-35c1-45ab-993f-199523620bf6",
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "../../../testdata/SMART.zip"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/upload",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

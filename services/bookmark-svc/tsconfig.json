@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "removeComments": false,
+    "preserveConstEnums": false,
+    "sourceMap": true,
+    "declaration": true,
+    "outDir": "target",
+    "rootDir": ".",
+    "target": "ES2017",
+    "esModuleInterop": true,
+    "types": ["jasmine"],
+    "noErrorTruncation": true,
+    "strict": false
+  },
+  "include": ["src", "spec", "typings"],
+  "exclude": ["envConverter"]
+}

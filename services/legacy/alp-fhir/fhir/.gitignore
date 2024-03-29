@@ -1,0 +1,17 @@
+.classpath
+.settings
+.project
+build/
+target/
+bin/
+.mta
+*.mtar
+.idea
+*.iml
+javaw_*.log
+.vscode
+/test.*
+newman-run-report-*.xml
+node_modules/
+scripts/postmanRunner/package-lock.json
+

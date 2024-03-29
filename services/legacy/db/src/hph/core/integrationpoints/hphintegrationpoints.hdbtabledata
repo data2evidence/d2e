@@ -1,0 +1,62 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.core.model::PluginFramework.ExtensionPoint",
+            "import_settings": {
+                "include_filter": [
+                    {
+                        "EXTENSIONPOINT_ID": "hc.hph.cdw.documents.OriginalDocumentAccess",
+                        "VERSION": "1.0"
+                    },
+                    {
+                        "EXTENSIONPOINT_ID": "hc.hph.di.documents.DocumentProcessingConfiguration",
+                        "VERSION": "1.0"
+                    },
+                    {
+                        "EXTENSIONPOINT_ID": "hc.hph.di.documents.TextProcessingConfiguration",
+                        "VERSION": "1.0"
+                    },
+                    {
+                        "EXTENSIONPOINT_ID": "hc.hph.di.plugin",
+                        "VERSION": "1.0"
+                    },
+                    {
+                        "EXTENSIONPOINT_ID": "hc.hph.patient.app.interaction",
+                        "VERSION": "1.0"
+                    },
+                    {
+                        "EXTENSIONPOINT_ID": "hc.hph.patient.app.tab",
+                        "VERSION": "1.0"
+                    },
+                    {
+                        "EXTENSIONPOINT_ID": "hc.hph.patient.app.tab",
+                        "VERSION": "1.1"
+                    },
+                    {
+                        "EXTENSIONPOINT_ID": "hc.hph.patient.app.widget",
+                        "VERSION": "1.0"
+                    }
+                ],
+                "import_columns": [
+                    "EXTENSIONPOINT_ID",
+                    "VERSION",
+                    "COMPONENT",
+                    "SCHEMA",
+                    "MULTIPLICITY",
+                    "XSJSLIBRARY",
+                    "NAME_KEY",
+                    "DESCRIPTION_KEY"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.core.integrationpoints::hphintegrationpoints.csv",
+                "has_header": true,
+                "type_config": {
+                    "delimiter": "|"
+                }
+            }
+        }
+    ]
+}

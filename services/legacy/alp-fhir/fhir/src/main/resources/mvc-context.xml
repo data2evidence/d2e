@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+        
+        
+    <!-- This will automatically switch on the default httpmessageconverters -->
+
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
+        <mvc:message-converters register-defaults="true">
+
+            <bean id="fHIRJsonConverter" class="com.legacy.health.fhir.converter.FHIRJsonConverter" />
+            <bean id="fHIRXmlConverter" class="com.legacy.health.fhir.converter.FHIRXmlConverter" />
+           
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+ 
+     <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**" />
+            <mvc:exclude-mapping path="/**" />
+            <mvc:exclude-mapping path="/" />
+             <mvc:exclude-mapping path="/init" />
+            <mvc:exclude-mapping path="/info" />
+            <mvc:exclude-mapping path="/v2/api-docs" />
+            <mvc:exclude-mapping path="/swagger-resources" />
+            <mvc:exclude-mapping path="/swagger-resources/**" />
+            <mvc:exclude-mapping path="/swagger-ui.html" />
+            <mvc:exclude-mapping path="/webjars/**" />
+            <mvc:exclude-mapping path="/*/fhir/CapabilityStatement**" />
+            <bean id="tenantRequestInterceptor" class="com.legacy.health.fhir.interceptor.TenantRequestInterceptor" />
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**" />
+            <bean id="requestProcessingTimeInterceptor" class="com.legacy.health.fhir.interceptor.RequestProcessingTimeInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors> 
+ 
+    <!-- 
+   <bean id="fhirDAOToFhirJsonConversionService" class="com.legacy.health.platform.converters.FhirDAOToFhirJsonConversionService"/>
+   <bean id="fhirDAOToFhirXmlConversionService" class="com.legacy.health.platform.converters.FhirDAOToFhirXmlConversionService"/>
+   <bean id="fhirDAOToFhirAvroConversionService" class="com.legacy.health.platform.converters.FhirDAOToFhirAvroConversionService"/>
+    -->
+ 
+    <bean id="contentNegotiationManager" primary="true" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="defaultContentType" value="application/fhir+json" />
+        <property name="favorParameter" value="true" />
+        <property name="parameterName" value="_format" />
+        <property name="mediaTypes">
+            <map>
+        
+                <!-- FHIR JSON mappings -->
+                <entry key="json" value="application/fhir+json" />
+                <entry key="fhir+json" value="application/fhir+json" />
+                <entry key="json+fhir" value="application/fhir+json" />
+                <entry key="application/json" value="application/fhir+json" />
+                <entry key="application/fhir+json" value="application/fhir+json" />
+            
+                <!-- FHIR XML mappings -->
+                <entry key="xml" value="application/fhir+xml" />
+                <entry key="fhir+xml" value="application/fhir+xml" />
+                <entry key="xml+fhir" value="application/fhir+xml" />
+                <entry key="application/xml" value="application/fhir+xml" />
+                <entry key="application/fhir+xml" value="application/fhir+xml" />
+            
+                <!-- FHIR AVRO mappings -->
+                <!-- still to do.. -->
+                <entry key="avro" value="application/fhir+avro" />
+                <entry key="fhir+avro" value="application/fhir+avro" />
+                <entry key="avro+fhir" value="application/fhir+avro" />
+                <entry key="application/fhir+avro" value="application/fhir+avro" />
+            
+            </map>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
+    </bean>
+
+    <bean class="org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator" />
+
+    <!-- <bean class="com.legacy.health.fhir.meta.repsitory.MetaRepositoryImpl" /> -->
+</beans> 

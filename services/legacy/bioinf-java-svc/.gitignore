@@ -1,0 +1,8 @@
+.idea
+*.class
+*.iml
+*.vcf
+*.vcf.gz
+target
+nbactions.xml
+/bin/

@@ -1,0 +1,45 @@
+PROCEDURE "hc.hph.eula.procedures::CREATE_EULA_LANGUAGE" ( 
+	IN  it_new "hc.hph.eula.model::SV_EULA_LANGUAGES",
+	OUT ot_error "hc.hph.eula.model::TT_ODATA_ERROR" 
+
+	) 
+	
+	LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count INTEGER;
+	lv_newid NVARCHAR(32);
+	lv_eulaid NVARCHAR(1024);
+	lv_newlangid NVARCHAR(32);
+BEGIN
+	select count(*) into lv_count from "hc.hph.eula.model::Eula_Model.Eula" where ID = (select top 1 ID from :it_new);
+	if :lv_count = 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Eula does not exist ' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	select count(*) into lv_count 
+		from "hc.hph.eula.model::Eula_Model.EulaDescription" 
+		where ID = (select top 1 ID from :it_new) and  
+			  "LanguageISOCode" = (select top 1 "DescriptionLanguageISOCode" from :it_new) and "DescribedInstance.VersionNo" = (select top 1 "VersionNo" from :it_new);
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'LanguageExists' error_message, 'Eula Language already exists' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	select count(*)	into lv_count 
+		from :it_new 
+		where length(trim(' ' from "Name")) = 0 OR
+			  length(trim(' ' from "Description")) = 0 OR
+			  length(trim(' ' from "Text")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error creating Eula: Fill in all required fields' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	select cast(SYSUUID as NVARCHAR(32)) into lv_newlangid from "hc::DUMMY";
+	
+	insert into "hc.hph.eula.model::Eula_Model.EulaDescription"("ID", "DescribedInstance.ID","DescribedInstance.VersionNo", "LanguageISOCode", "Name", "Label", "Description", "Text", "CreatedAt","CreatedBy")
+		select top 1 :lv_newlangid as ID, ID, "VersionNo" , "DescriptionLanguageISOCode", "Name", "Label", "Description", "Text", CURRENT_UTCTIMESTAMP, SESSION_CONTEXT ('XS_APPLICATIONUSER') from :it_new;
+END;

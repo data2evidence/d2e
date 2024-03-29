@@ -1,0 +1,25 @@
+PROCEDURE "hc.hph.plugins.gff3.db.procedures::adapter_gff3" (  
+		IN profileID BIGINT, 
+		IN auditID BIGINT, 
+		IN schemaname VARCHAR(100),
+		IN featureTable VARCHAR(100),
+		IN logTable varchar(100),
+		IN traceTable varchar(100),
+		IN referenceID NVARCHAR(255)
+		)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+	--insert into staging table
+	EXEC 'INSERT INTO "hc.hph.plugins.gff3.db.models::Staging.Features" 
+	("ReferenceID", "DWAuditID", "ChromosomeIndex", "Region.Begin", "Region.End", "FeatureID", "Class", "FeatureName", "Strand", "Frame", "Score", "ParentID", "Description", "FileChromosomeName", "Color") 
+	SELECT ''' ||:referenceID || ''', '|| :auditID ||', "ChromosomeIndex", "Region.Begin", "Region.End", TO_CHAR("FeatureID"), TO_CHAR("Class"), 
+	TO_CHAR("FeatureName"), TO_CHAR("Strand"), "Frame", "Score", TO_CHAR("ParentID"), TO_CHAR("Description"), TO_CHAR("FileChromosomeName"),null 
+	FROM "' || ESCAPE_DOUBLE_QUOTES(:schemaName) || '"."' || ESCAPE_DOUBLE_QUOTES(:featureTable) || '"';
+	
+	-- update staging table with maping entries from mapping UI
+	UPDATE "hc.hph.plugins.gff3.db.models::Staging.Features" SET "ChromosomeIndex" = (SELECT "ChromosomeIndex" FROM 
+	"hc.hph.plugins.gff3.db.models::Staging.Chromosomes" 
+	WHERE "hc.hph.plugins.gff3.db.models::Staging.Features"."FileChromosomeName" = "hc.hph.plugins.gff3.db.models::Staging.Chromosomes"."ChromosomeName"
+	AND "hc.hph.plugins.gff3.db.models::Staging.Features"."DWAuditID" = "hc.hph.plugins.gff3.db.models::Staging.Chromosomes"."DWAuditID");
+END;

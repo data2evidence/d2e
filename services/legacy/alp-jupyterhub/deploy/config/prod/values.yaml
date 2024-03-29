@@ -1,0 +1,55 @@
+custom:
+  hostname: "research.data4life.care"
+
+hub:
+  extraEnv:
+    OAUTH2_AUTHORIZE_URL: "https://d4lresearch.b2clogin.com/d4lresearch.onmicrosoft.com/oauth2/v2.0/authorize?p=b2c_1a_signin_resetpassword"
+    OAUTH2_TOKEN_URL: "https://d4lresearch.b2clogin.com/d4lresearch.onmicrosoft.com/oauth2/v2.0/token?p=b2c_1a_signin_resetpassword"
+    OAUTH_CALLBACK_URL: "https://research.data4life.care/jhub/hub/oauth_callback"
+    OAUTH2_USERDATA_URL: "https://login.microsoftonline.com/92142ada-6a35-4696-a448-6c40659389f1/openid/userinfo"
+    AAD_TENANT_ID: "92142ada-6a35-4696-a448-6c40659389f1"
+  extraConfig:
+    jupyterlab: |
+      #c.Spawner.cmd = ['jupyter-labhub']
+      c.JupyterHub.authenticate_prometheus = False
+  db:
+    #type: sqlite-memory
+    pvc:
+      storageClassName: csi-rbd-sc
+  baseUrl: /jhub
+  service:
+    annotations:
+      prometheus.io/path: "/jhub/hub/metrics"
+      prometheus.io/scrape: "true"
+
+auth:
+  type: custom
+  state:
+    enabled: true
+  admin:
+    access: true
+    users:
+
+singleuser:
+  image:
+    d4lNexus:
+      registry: alp-docker-releases.alp-dev.org
+      tag: 'v23.1-kita-dake'
+    azureCR:
+      tag: 'v23.1-kita-dake'
+  extraEnv:
+    PYQE_JWT_AUDIENCE: "d34ece38-f90e-41c0-8960-c76a432fcf9b"
+    PYQE_AZUREADB2C_CLIENT_ID: "d34ece38-f90e-41c0-8960-c76a432fcf9b"
+
+ingress:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "content-security-policy: default-src 'self'; frame-src 'self' blob:; img-src 'self' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https: wss:; object-src 'self' blob:; report-uri /jhub/hub/security/csp-report";
+  hosts:
+    - research.data4life.care
+  tls:
+    - hosts:
+      - research.data4life.care
+      secretName: tls-data4life.care

@@ -1,0 +1,63 @@
+{
+    "resourceType": "CapabilityStatement",
+    "url": "http://nictiz.nl/fhir/CapabilityStatement/mimic",
+    "version": "1.0",
+    "name": "mimic",
+    "status": "active",
+    "date": "2018-06-30",
+    "publisher": "D4L",
+    "contact": [],
+    "description": "This CapabilityStatement defines an Endpoint for handling of MIMIC Data.",
+    "copyright": "CC0",
+    "kind": "requirements",
+    "fhirVersion": "3.0.1",
+    "acceptUnknown": "both",
+    "format": [
+        "xml",
+        "json"
+    ],
+    "extension": [
+        {
+            "url": "http://data4life.care/health/fhir/StructureDefinition/endpoint-type",
+            "valueCode": "relational-structuremap"
+        },
+        {
+            "url": "http://data4life.care/health/fhir/StructureDefinition/structuremap",
+            "valueUri": "http://data4life.care/health/fhir/StructureMap/mimic"
+        }
+    ],
+    "profile": [],
+    "rest": [
+        {
+            "mode": "server",
+            "resource": [
+                {
+                    "type": "MimicPatient",
+                    "interaction": [
+                        {
+                            "code": "search-type"
+                        }
+                    ],
+                    "searchParam": [
+                        {
+                            "name": "identifier",
+                            "type": "token"
+                        }
+                    ]
+                },
+                {
+                    "type": "MimicAdmissionr",
+                    "interaction": [],
+                    "searchInclude": [],
+                    "searchParam": []
+                }
+            ],
+            "interaction": [
+                {
+                    "code": "batch"
+                }
+            ],
+            "operation": []
+        }
+    ]
+}

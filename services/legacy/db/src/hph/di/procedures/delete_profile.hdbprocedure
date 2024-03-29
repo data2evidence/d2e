@@ -1,0 +1,22 @@
+PROCEDURE "hc.hph.di.procedures::delete_profile" (
+	IN ProfileID BIGINT,
+	out ot_error "hc.hph.di.model::tt_error"
+	) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS	
+BEGIN
+	
+	if :ProfileID is null  then
+         ot_error = select 400 as http_status_code, 'Bad Request' error_message, 'PROCEDURE:delete_profile()' detail from "hc::DUMMY";
+         return;
+    end if;
+
+	update "hc.hph.di.model::DataIntegration.JobProfile" profile set
+		  profile."ModifiedAt" = CURRENT_UTCTIMESTAMP,
+		   profile."ModifiedBy" = (Select SESSION_CONTEXT('XS_APPLICATIONUSER') From "hc::DUMMY"),
+           profile."Status" ='Deleted'      	   
+	    FROM "hc.hph.di.model::DataIntegration.JobProfile" profile
+	    where profile."ProfileID" = :ProfileID;	 
+END;
+
+

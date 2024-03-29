@@ -1,0 +1,147 @@
+{
+  "resourceType": "TableContent",
+  "id": "HCIMAddressInformation_DATA",
+  "url": "http://data4life-asia.care/health/fhir/StructureDefinition/HCIMAddressInformation_DATA",
+  "version": "0.1",
+  "definition": {
+    "reference": "HCIMAddressInformation"
+  },
+  "row": [
+    {
+      "column": [
+        {
+          "name": "_RecordKey",
+          "valueString": "\u0001"
+        },
+        {
+          "name": "_BelongsTo",
+          "valueString": "\u0001"
+        },
+        {
+          "name": "Street",
+          "valueString": "Yellow Brick Rd."
+        },
+        {
+          "name": "HouseNumber",
+          "valueString": "12"
+        },
+        {
+          "name": "HouseNumberLetter",
+          "valueString": "A"
+        },
+        {
+          "name": "HouseNumberAddition",
+          "valueString": "Door 12"
+        },
+        {
+          "name": "_HouseNumberIndication",
+          "valueString": ">> BEI"
+        },
+        {
+          "name": "HouseNumberIndication_CD",
+          "valueString": "by"
+        },
+        {
+          "name": "Postcode",
+          "valueString": "90120"
+        },
+        {
+          "name": "PlaceOfResidence",
+          "valueString": "Kingslanding"
+        },
+        {
+          "name": "Municipality",
+          "valueString": "Kingslanding Shire"
+        },
+        {
+          "name": "_Country",
+          "valueString": ">> WESTEROS "
+        },
+        {
+          "name": "Country_CD",
+          "valueString": "9999"
+        },
+        {
+          "name": "AdditionalInformation",
+          "valueString": "Nothing to add"
+        },
+        {
+          "name": "_AddressType",
+          "valueString": ">> Visit address"
+        },
+        {
+          "name": "AddressType_CD",
+          "valueString": "PHYS"
+        }
+      ]
+    },
+    {
+      "column": [
+        {
+          "name": "_RecordKey",
+          "valueString": "\u0002"
+        },
+        {
+          "name": "_BelongsTo",
+          "valueString": "\u0001\u0002"
+        },
+        {
+          "name": "Street",
+          "valueString": "Yellow Brick Rd."
+        },
+        {
+          "name": "HouseNumber",
+          "valueString": "12"
+        },
+        {
+          "name": "HouseNumberLetter",
+          "valueString": "A"
+        },
+        {
+          "name": "HouseNumberAddition",
+          "valueString": "Door 13"
+        },
+        {
+          "name": "_HouseNumberIndication",
+          "valueString": ">> BEI"
+        },
+        {
+          "name": "HouseNumberIndication_CD",
+          "valueString": "by"
+        },
+        {
+          "name": "Postcode",
+          "valueString": "90120"
+        },
+        {
+          "name": "PlaceOfResidence",
+          "valueString": "Kingslanding"
+        },
+        {
+          "name": "Municipality",
+          "valueString": "Kingslanding Shire"
+        },
+        {
+          "name": "_Country",
+          "valueString": ">> WESTEROS "
+        },
+        {
+          "name": "Country_CD",
+          "valueString": "9999"
+        },
+        {
+          "name": "AdditionalInformation",
+          "valueString": "Nothing to add"
+        },
+        {
+          "name": "_AddressType",
+          "valueString": ">> Visit address"
+        },
+        {
+          "name": "AddressType_CD",
+          "valueString": "PHYS"
+        }
+      ]
+    }
+  ]
+}

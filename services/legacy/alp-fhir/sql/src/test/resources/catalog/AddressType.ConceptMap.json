@@ -1,0 +1,94 @@
+{
+  "resourceType": "ConceptMap",
+  "id": "bgzaddresstype",
+  "text": {
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">A mapping between HCIM Address Type Codes and FHIR address use</div>"
+  },
+  "url": "http://data4life-asia.care/health/fhir/ConceptMap/bgzaddresstype",
+  "version": "20180925",
+  "name": "HCIM/FHIR Address Type Mapping",
+  "title": "FHIR/v3 Address Type Mapping",
+  "status": "draft",
+  "experimental": false,
+  "date": "2019-09-25",
+  "publisher": "D4L",
+  "contact": [],
+  "description": "A mapping between HCIM Address Type Codes and FHIR address use",
+  "useContext": [],
+  "purpose": "To help  map from HCIM Addresses to FHIR",
+  "sourceUri": "https://zibs.nl/wiki/AddressInformation-v1.0(2017EN)#AddressTypeCodelist",
+  "targetUri": "http://hl7.org/fhir/ValueSet/address-use",
+  "group": [
+    {
+      "source": "https://zibs.nl/wiki/AddressInformation-v1.0(2017EN)#AddressTypeCodelist",
+      "target": "http://hl7.org/fhir/ValueSet/address-use",
+      "element": [
+        {
+          "code": "HP",
+          "display": "Primary Home",
+          "target": [
+            {
+              "code": "home",
+              "display": "Home"
+            }
+          ]
+        },
+        {
+          "code": "PHYS",
+          "display": "Visit Address",
+          "target": [
+            {
+              "code": "home",
+              "display": "Home"
+            }
+          ]
+        },
+        {
+          "code": "PST",
+          "display": "Postal Address",
+          "target": [
+            {
+              "code": "home",
+              "display": "Home"
+            }
+          ]
+        },
+        {
+          "code": "WP",
+          "display": "Work Place",
+          "target": [
+            {
+              "code": "work",
+              "display": "Work"
+            }
+          ]
+        },
+        {
+          "code": "TMP",
+          "display": "Temporary Address",
+          "target": [
+            {
+              "code": "temp",
+              "display": "Temporary"
+            }
+          ]
+        },
+        {
+          "code": "HV",
+          "display": "Vacation Home",
+          "target": [
+            {
+              "code": "temp",
+              "display": "Temporary"
+            }
+          ]
+        }
+      ],
+      "unmapped": {
+        "mode": "fixed",
+        "code": "old",
+        "display": "Old/Unknown/Incorrect"
+      }
+    }
+  ]
+}

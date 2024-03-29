@@ -1,0 +1,409 @@
+namespace hc.hph.cdw.db.models;
+
+using hc.hph.cdw.db.models::DWTypes as DT;
+using hc.hph.cdw.db.models::DWAnnotations as DWAnnotation;
+using hc.hph.di.model::DataIntegration as DI;
+//using hc.hph.custom.cdw.db.models::DWExtendFP00 as ExtFP00;
+//using hc.hph.custom.cdw.db.models::DWExtendFP01 as ExtFP01;
+using hc.hph.cdw.db.models::Ref as Ref;
+
+
+context DWEntities {
+        
+    /*********************
+     *     CONDITION     *
+     *********************/
+    
+    @DWAnnotation.Entity.Name : 'Condition'
+    @DWAnnotation.Entity."Group" : 'ClinicalDataWarehouse'
+    @DWAnnotation.Entity.WriteEnabled : True
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.cdw.db.models::DWViews.Condition"'}
+    @DWAnnotation.Table.Type : #Key
+    entity Condition_Key {
+
+        key DWID : DT.DWID;
+        //key DWPartition : String(10);
+        
+        DWSource : DT.DWSource not null;
+        DWAuditID : DT.DWAuditID not null;
+        @DWAnnotation.Column : { Type: #BusinessKey }
+        ConditionID : String(100) not null;
+            
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;     
+        Condition_Attr_Assoc : association to Condition_Attr on Condition_Attr_Assoc.DWID = DWID;     
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+    };
+
+    @DWAnnotation.Entity.Name : 'Condition'
+    @DWAnnotation.Table.Type : #Attribute
+    @DWAnnotation.Table.Label : 'Condition Attributes'
+    entity Condition_Attr {
+  
+        key DWDateFrom: DT.DWTimestamp; 
+        key DWID : DT.DWID;
+        DWDateTo : DT.DWTimestamp;
+        DWAuditID : DT.DWAuditID not null;
+    
+        ConditionType : String(100);
+        Description : String(5000);
+        
+     //   Extend : ExtFP00."Condition";
+        
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Condition_Key_Assoc : association to Condition_Key on Condition_Key_Assoc.DWID = DWID;    
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+        index DWIndex on (DWDateTo) asc;
+
+        FULLTEXT INDEX Descriptiondx ON ( Description )
+        SEARCH ONLY OFF
+        PHRASE INDEX RATIO 0.0
+        FAST PREPROCESS ON;
+    };
+    
+    /*********************
+     *      PATIENT      *
+     *********************/
+       
+    @DWAnnotation.Entity.Name : 'Patient'
+    @DWAnnotation.Entity."Group" : 'ClinicalDataWarehouse'
+    @DWAnnotation.Entity.WriteEnabled : True
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.cdw.db.models::DWViews.Patient"'}
+    @DWAnnotation.Table.Type : #Key
+    entity Patient_Key {
+
+        key DWID : DT.DWID;
+        DWSource : DT.DWSource not null;    
+        DWAuditID : DT.DWAuditID not null;
+
+        @DWAnnotation.Column : { Type: #BusinessKey }
+        PatientID : String(100) not null;
+                
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Patient_Attr_Assoc : association to Patient_Attr on Patient_Attr_Assoc.DWID = DWID;
+        Patient_BestRecord_Attr_Assoc : association to Patient_BestRecord_Attr 
+            on Patient_BestRecord_Attr_Assoc.DWID = DWID;
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+        
+          FULLTEXT INDEX PatientIDIdx ON ( PatientID )
+        SEARCH ONLY OFF
+        PHRASE INDEX RATIO 0.0
+        ASYNC
+        FAST PREPROCESS ON;
+    };
+           
+    @DWAnnotation.Entity.Name : 'Patient'
+    @DWAnnotation.Table.Type : #Attribute
+    @DWAnnotation.Table.Label : 'Patient Attributes'
+    entity Patient_Attr {
+    
+        key DWDateFrom: DT.DWTimestamp;
+        key DWID : DT.DWID;
+        DWDateTo : DT.DWTimestamp;
+        DWAuditID : DT.DWAuditID not null;
+             
+        @DWAnnotation.Column : { Type: #SemanticValidFrom }
+        key ValidFrom : LocalDate; // From date since when the record is semantically valid
+        @DWAnnotation.Column : { Type: #SemanticValidTo }
+        ValidTo : LocalDate; // To date until when the record is semantically valid
+        
+        FamilyName : String(100); // Family name (often called 'Surname')    
+        GivenName : String(100); // Given names (not always 'first'). Includes middle names        
+        Title : DT.CodeableValue100; // Administrative title (also called 'form of address')
+        Gender : DT.CodeableValue100; // Administrative gender        
+        
+        BirthDate : UTCDateTime; // The date and time of birth for the individual
+        MultipleBirthOrder : hana.TINYINT; // Indicates whether the patient is part of a multiple or indicates the actual birth order
+        DeceasedDate : UTCDateTime; // The date and time of death for the individual
+        MaritalStatus : DT.CodeableValue100; // Patient's most recent marital (civil) status       
+        Nationality : DT.CodeableValue100; // Nationality of the patient        
+        Address : DT.Address; // Address of the patient
+        Telecom : DT.Contact; // Technology-mediated contact details
+        OrgID   : String(100); //OrgID that is linked to Config.
+        
+        //Extend : ExtFP00.Patient;
+        
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Patient_Key_Assoc : association to Patient_Key on Patient_Key_Assoc.DWID = DWID;
+        
+    } technical configuration {
+        column store;       
+        fulltext index fti_FamilyName     on (FamilyName) fast preprocess off fuzzy search index on;
+        fulltext index fti_GivenName     on (GivenName) fast preprocess off fuzzy search index on;
+        fulltext index fti_AddressCity     on (Address.City) fast preprocess off fuzzy search index on; 
+        index DWIndex on (DWDateTo) asc;
+        partition by keeping existing layout;
+    };
+    
+    @DWAnnotation.Entity.Name : 'Patient'
+    @DWAnnotation.Table.Type : #Attribute
+    @DWAnnotation.Table.Label : 'Patient BestRecordID'   
+    @DWAnnotation.Table.WriteEnabled : True
+    entity Patient_BestRecord_Attr {
+
+        key DWDateFrom      : DT.DWTimestamp;       
+        key DWID            : DT.DWID;                  // DWID of Patient_Key
+        DWDateTo            : DT.DWTimestamp;           
+        DWAuditID           : DT.DWAuditID not null;
+                
+        PatientBestRecordID : DT.GeneratedID not null; // GUIDs or Sequences. Generated by HANA or any ETL tools.
+                
+        Audit_Assoc         : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Patient_Key_Assoc   : association to Patient_Key on Patient_Key_Assoc.DWID = DWID;
+        Patient_Best_Record_Assoc : association to Ref.PatientBestRecord on Patient_Best_Record_Assoc.PatientBestRecordID = PatientBestRecordID; 
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+    };
+       
+    
+    /*********************
+     *    OBSERVATIONS   *
+     *********************/ 
+    
+    @DWAnnotation.Entity.Name : 'Observation'
+    @DWAnnotation.Entity."Group" : 'ClinicalDataWarehouse'
+    @DWAnnotation.Entity.WriteEnabled : True
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.cdw.db.models::DWViews.Observations"'}
+    @DWAnnotation.Table.Type : #Key   
+    entity Observations_Key {
+
+        key DWID : DT.DWID;
+        DWSource : DT.DWSource not null;    
+        DWAuditID : DT.DWAuditID not null;
+        @DWAnnotation.Column : { Type: #BusinessKey }
+        ObsID : String(100) not null;
+        
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Observations_Attr_Assoc : association to Observations_Attr on Observations_Attr_Assoc.DWID = DWID;         
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+    };
+        
+    @DWAnnotation.Entity.Name : 'Observation'
+    @DWAnnotation.Table.Type : #Attribute
+    @DWAnnotation.Table.Label : 'Observation Attributes'   
+    entity Observations_Attr {
+    
+        key DWDateFrom: DT.DWTimestamp;
+        key DWID : DT.DWID;
+        DWDateTo : DT.DWTimestamp;
+        DWAuditID : DT.DWAuditID not null;
+        
+        @DWAnnotation.Column : { Type: #ForeignKey, Entity : { Name : 'Patient' } }
+        DWID_Patient : DT.DWID;
+        
+        ObsType : String(100);
+        ObsCharValue : String(255);
+        ObsNumValue : Decimal(34,10);
+        ObsUnit : String(100);
+        ObsTime : UTCTimestamp;
+        OrgID : String(100); // Organization that is the custodian of the record
+    
+        //Extend : ExtFP00.Observations;
+        
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Observations_Key_Assoc : association to Observations_Key on Observations_Key_Assoc.DWID = DWID;
+        Patient_Key_Assoc : association to Patient_Key on Patient_Key_Assoc.DWID = DWID_Patient;
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+        index DWIndex on (DWDateTo) asc;
+    };
+    
+    /*********************
+     *    INTERACTIONS   *
+     *********************/
+ 
+    @DWAnnotation.Entity.Name : 'Interaction'
+    @DWAnnotation.Entity."Group" : 'ClinicalDataWarehouse'
+    @DWAnnotation.Entity.WriteEnabled : True
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.cdw.db.models::DWViews.Interactions"'}
+    @DWAnnotation.Table.Type : #Key
+    entity Interactions_Key {
+
+        key DWID : DT.DWID;
+        DWSource : DT.DWSource not null;    
+        DWAuditID : DT.DWAuditID not null;
+        @DWAnnotation.Column : { Type: #BusinessKey }
+        InteractionID : String(100) not null;
+   
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Int_Atr_Ass : association to Interactions_Attr on Int_Atr_Ass.DWID = DWID;
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+    };
+    
+    @DWAnnotation.Entity.Name : 'Interaction'
+    @DWAnnotation.Table.Type : #Attribute
+    @DWAnnotation.Table.Label : 'Interaction Attributes'
+    entity Interactions_Attr {
+    
+        key DWDateFrom: DT.DWTimestamp;
+        key DWID : DT.DWID;
+        DWDateTo : DT.DWTimestamp;
+        DWAuditID : DT.DWAuditID not null;
+        
+        @DWAnnotation.Column : { Type: #ForeignKey, Entity : { Name : 'Patient' } }
+        DWID_Patient : DT.DWID;
+        
+        @DWAnnotation.Column : { Type: #ForeignKey, Entity : { Name : 'Interaction' } }
+        DWID_ParentInteraction : DT.DWID;    
+        
+        @DWAnnotation.Column : { Type: #ForeignKey, Entity : { Name : 'Condition' } }
+        DWID_Condition : DT.DWID;    
+        
+        InteractionType : DT.CodeableValue100;
+        InteractionStatus : String(100); // Current state of the interaction
+        PeriodStart : UTCTimestamp; // Starting time with inclusive boundary
+        PeriodEnd : UTCTimestamp; // End time with inclusive boundary, if not ongoing
+        PeriodTimezone : String(64); // Timezone defining the local time of the period start and end time
+        
+        OrgID : String(100); // Organization that is the custodian of the record
+                
+        //Extend : ExtFP00.Interactions;
+                
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Interactions_Key_Assoc : association to Interactions_Key on Interactions_Key_Assoc.DWID = DWID;
+        ParentInteractions_Key_Assoc : association to Interactions_Key on ParentInteractions_Key_Assoc.DWID = DWID_ParentInteraction;
+        Patient_Key_Assoc : association to Patient_Key on Patient_Key_Assoc.DWID = DWID_Patient;
+        Condition_Key_Assoc : association to Condition_Key on Condition_Key_Assoc.DWID = DWID_Condition;  
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+        index DWIndex on (DWDateTo) asc;
+    };
+    
+    
+    /*********************
+     *    PRACTITIONER   *
+     *********************/
+     
+    @DWAnnotation.Entity.Name : 'Practitioner'
+    @DWAnnotation.Entity."Group" : 'ClinicalDataWarehouse'
+    @DWAnnotation.Entity.WriteEnabled : True
+    @DWAnnotation.Entity.ActiveRecordCount : { CountObject : '"hc.hph.cdw.db.models::DWViews.Practitioner"'}
+    @DWAnnotation.Table.Type : #Key
+    entity Practitioner_Key {
+
+        key DWID    : DT.DWID;
+        DWSource    : DT.DWSource not null;    
+        DWAuditID   : DT.DWAuditID not null;
+        
+   
+        @DWAnnotation.Column : { Type: #BusinessKey }
+        PractitionerID : String(100) not null;
+                
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Practitioner_Attr_Assoc : association to Practitioner_Attr on Practitioner_Attr_Assoc.DWID = DWID;
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+          FULLTEXT INDEX PractitionerIDIdx ON ( PractitionerID )
+        SEARCH ONLY OFF
+        PHRASE INDEX RATIO 0.0
+        ASYNC
+        FAST PREPROCESS ON;
+    };
+          
+    @DWAnnotation.Entity.Name : 'Practitioner'
+    @DWAnnotation.Table.Type : #Attribute
+    @DWAnnotation.Table.Label : 'Practitioner Attributes' 
+    entity Practitioner_Attr {
+    
+        key DWDateFrom      : DT.DWTimestamp;
+        key DWID            : DT.DWID;
+        DWDateTo            : DT.DWTimestamp;
+        DWAuditID           : DT.DWAuditID not null;
+             
+        @DWAnnotation.Column : { Type: #SemanticValidFrom }
+        key ValidFrom       : LocalDate;            // From date since when the record is semantically valid
+        @DWAnnotation.Column : { Type: #SemanticValidTo }
+        ValidTo             : LocalDate;            // To date until when the record is semantically valid
+        
+        OrgID               : String(100);          // Org to which Practitioner is associated to.
+
+        FamilyName          : String(100);          // Family name (often called 'Surname')    
+
+        GivenName           : String(100);          // Given names (not always 'first'). Includes middle names        
+        Title               : DT.CodeableValue100;  // Administrative title (also called 'form of address')
+        Gender              : DT.CodeableValue100;  // Administrative gender        
+        BirthDate           : UTCDateTime;          // The date and time of birth for the individual
+        
+        MaritalStatus       : DT.CodeableValue100;  // Most recent marital (civil) status       
+        Nationality         : DT.CodeableValue100;  // Nationality        
+        Address             : DT.Address;           // Address
+        Telecom             : DT.Contact;           // Technology-mediated contact details
+        
+        Role                : DT.CodeableValue100;  // Role of a practitioner at Org. codified value.
+        Speciality          : DT.CodeableValue100;  // Specific speciality the practitioner is associated with at the Org.
+        PreferredLanguage   : String(100);          // Preferred Language of communication with Patients.
+        
+        //Extend              : ExtFP01.Practitioner;     // Extensions for Practitioner
+        
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Practitioner_Key_Assoc : association to Practitioner_Key on Practitioner_Key_Assoc.DWID = DWID;
+        
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+        index DWIndex on (DWDateTo) asc;
+        fulltext index fti_FamilyName     on (FamilyName) fast preprocess off fuzzy search index on;
+        fulltext index fti_GivenName     on (GivenName) fast preprocess off fuzzy search index on;
+    };  
+   
+    /*** Practitioner to patient link ***/
+    @DWAnnotation.Link.Name : 'PatientPractitioner'
+    @DWAnnotation.Link."Group" : 'ClinicalDataWarehouse'
+    @DWAnnotation.Link.WriteEnabled : True
+    @DWAnnotation.Table.Type : #Link
+    entity Patient_Practitioner_Link {
+    
+        key DWLinkID        : DT.DWID;
+                
+        @DWAnnotation.Column : { Type: #ForeignKey, Entity : { Name : 'Patient' } }
+        DWID_Patient        : DT.DWID not null;
+        @DWAnnotation.Column : { Type: #ForeignKey, Entity : { Name : 'Practitioner' } }
+        DWID_Practitioner   : DT.DWID not null;
+
+        DWDateTo            : DT.DWTimestamp;
+        DWAuditID           : DT.DWAuditID not null;       
+
+        Patient_Key_Assoc : association to Patient_Key on Patient_Key_Assoc.DWID = DWID_Patient;
+        Practitioner_Key_Assoc : association to Practitioner_Key on Practitioner_Key_Assoc.DWID = DWID_Practitioner;
+        Patient_Practitioner_Link_Attr_Assoc : association to Patient_Practitioner_Link_Attr on Patient_Practitioner_Link_Attr_Assoc.DWLinkID = DWLinkID;
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID; 
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+    };     
+
+    /*** Practitioner to patient link Attributes ***/
+    @DWAnnotation.Link.Name : 'PatientPractitioner'
+    @DWAnnotation.Table.Type : #LinkAttribute
+    @DWAnnotation.Table.Label : 'PatientPractitioner Attributes'
+    entity Patient_Practitioner_Link_Attr {
+        
+        key DWDateFrom      : DT.DWTimestamp;
+        key DWLinkID        : DT.DWID;
+        DWDateTo            : DT.DWTimestamp;
+        DWAuditID           : DT.DWAuditID not null;       
+
+        Role                : DT.CodeableValue100;                        // Role played by Practitioner with a patient
+        //Extend              : ExtFP01.Practitioner_Patient_Link_Attr;     // To add more attributes for Practitioner.
+        
+        Practitioner_Link_Assoc : association to Patient_Practitioner_Link on Practitioner_Link_Assoc.DWLinkID = DWLinkID;
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+    };
+       
+};

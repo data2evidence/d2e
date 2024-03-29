@@ -1,0 +1,31 @@
+{
+  "name": "ps-config",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node target/src/main.js",
+    "compile": "tsc",
+    "start:docker": "if [ \"$LOCAL_DEBUG\" == \"true\" ] ; then yarn dev; else yarn start; fi",
+    "dev": "tsnd --inspect=0.0.0.0:9209 --respawn ./src/main.ts"
+  },
+  "engines": {
+    "node": ">=18.14.0"
+  },
+  "dependencies": {
+    "@alp/alp-metadata": "1.0.2",
+    "@alp/alp-config-utils": "1.0.20",
+    "@alp/alp-base-utils": "1.1.9",
+    "@sap/textbundle": "2.2.1",
+    "@sap/xsenv": "^3.3.2",
+    "body-parser": "1.18.3",
+    "express": "^4.18",
+    "typescript": "4.4.4",
+    "dotenv": "16.0.1",
+    "ts-node-dev": "^2.0.0",
+    "zod": "3.20.6"
+  },
+  "devDependencies": {
+    "@types/node": "^18",
+    "tslint": "^6.1.3"
+  }
+}

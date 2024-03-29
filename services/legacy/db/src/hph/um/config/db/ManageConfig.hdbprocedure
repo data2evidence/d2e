@@ -1,0 +1,54 @@
+PROCEDURE "hc.hph.um.config.db::ManageConfig" 
+	(	IN default_attribs "hc.hph.cdw.db.models::Config.OrgAttribs",
+		IN custom_attribs "hc.hph.cdw.db.models::Config.OrgAttribs",
+	  	OUT o_message TABLE ("Status" NVARCHAR(1), "Code" NVARCHAR(100), "Message" NVARCHAR(100)) )
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+	
+	declare v_creator NVARCHAR(256); 
+	declare v_current_timestamp TIMESTAMP;
+	declare invalid_input condition for SQL_ERROR_CODE 10051;
+
+	declare cursor def_attrs for select * from :default_attribs;
+	declare cursor cust_attrs for select * from :custom_attribs;
+
+	declare exit handler for invalid_input
+		select ::SQL_ERROR_CODE || ::SQL_ERROR_MESSAGE from "hc::DUMMY";
+
+	declare exit handler for SQLEXCEPTION
+	begin	
+		o_message = select  
+	    				'E' as "Status",
+	    				::sql_error_code as "Code", 
+	    				::sql_error_message as "Message"
+    				from "hc::DUMMY";
+	end;
+	
+	select session_context('XS_APPLICATIONUSER') into v_creator from "hc::DUMMY";
+	select current_utctimestamp into v_current_timestamp from "hc::DUMMY";
+	
+	--Save already existing default org attributes details.
+	for def_attr AS def_attrs do
+	update "hc.hph.cdw.db.models::Config.OrgAttribs"
+		set "Visible" = def_attr."Visible", "Required" = def_attr."Required", 
+		"UpdatedBy" = def_attr."UpdatedBy", "UpdatedAt" = def_attr."UpdatedAt" 
+		where "AttribID" = def_attr."AttribID";
+	end for; 
+
+		--Save already existing default org attributes details.
+	for cust_attr AS cust_attrs do
+	update "hc.hph.cdw.db.models::Config.OrgAttribs"
+		set "Visible" = cust_attr."Visible", "Required" = cust_attr."Required", 
+		"UpdatedBy" = cust_attr."UpdatedBy", "UpdatedAt" = cust_attr."UpdatedAt" 
+		where "AttribID" = cust_attr."AttribID";
+	end for; 		 
+
+	o_message = select  
+	    			'S' as "Status",
+	    			'' as "Code", 
+	    			'Success' as "Message"
+    			from "hc::DUMMY";
+
+END;

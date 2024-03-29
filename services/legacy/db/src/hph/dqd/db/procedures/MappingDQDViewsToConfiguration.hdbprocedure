@@ -1,0 +1,11 @@
+PROCEDURE "hc.hph.dqd.db.procedures::MappingDQDViewsToConfiguration" (IN category NVARCHAR(60),IN groupname NVARCHAR(100)) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+	DECLARE CURSOR views FOR (SELECT "MeasureID","TitleKey","DescriptionKey","CatObject","Function","Expression","Status","Delivery" from "hc.hph.dqd.db.models::DQDConfig.DQDConfiguration" where "Category"= :category and "GroupName"=:groupname ORDER BY "MeasureID");
+	TRUNCATE TABLE "hc.hph.dqd.db.models::DQDConfig.DQDTemp";
+	FOR item AS views DO
+		call "hc.hph.dqd.db.procedures::ExceptionHandlerForDQD"(item."MeasureID",item."CatObject",item."TitleKey",item."DescriptionKey",item."Function",item."Expression",item."Status",item."Delivery");
+	END FOR;
+END;

@@ -1,0 +1,17 @@
+namespace hc.hph.custom.cdw.db.models;
+
+context DWExtendFP00 {
+
+	type "Condition" {};
+
+	type Patient {};
+
+	type Observations {};
+
+	type Interactions {};
+
+	type Document {};
+
+	type Interaction_Document_Link {};
+
+};

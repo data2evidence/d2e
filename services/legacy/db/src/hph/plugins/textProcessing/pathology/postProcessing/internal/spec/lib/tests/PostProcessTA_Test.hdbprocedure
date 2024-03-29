@@ -1,0 +1,88 @@
+procedure "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec.lib.tests::PostProcessTA_Test"
+	language sqlscript
+	sql security definer as
+begin
+
+	declare lv_batch_id  nvarchar(1024) := 'hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec';
+	declare lv_config_id nvarchar(1024) := 'hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec';
+	declare lv_count     int;
+	
+	-- table variable necessary for nested call
+	lt_ta =
+		select *
+		from "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec::Entities.TA"
+	;
+	
+	call "hc.hph.plugins.textProcessing.pathology.postProcessing.lib::PostProcessTA"(
+		:lv_config_id,
+		:lv_batch_id,
+		:lt_ta
+	);
+	
+	lt_expected =
+		select
+			"DWID",
+			"TA_TOKEN",
+			"TA_TYPE",
+			"TA_NORMALIZED",
+			"TA_OFFSET"
+		from "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec::Entities.Expected"
+	;
+	
+	lt_actual =
+		select
+			"DWID",
+			"TA_TOKEN",
+			"TA_TYPE",
+			"TA_NORMALIZED",
+			"TA_OFFSET"
+		from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_FILTERED"
+		where "CONFIG_ID" = :lv_config_id
+	;
+	
+	select count(*)
+	into lv_count
+	from (
+		select *
+		from :lt_expected
+		
+		except
+		
+		select *
+		from :lt_actual
+	);
+	
+	if (:lv_count > 0) then
+		insert into "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec::Entities.Assertions"(
+			"Description",
+			"Detail"
+		)
+		values('False Positives',:lv_count)
+		;
+	end if
+	;
+	
+	select count(*)
+	into lv_count
+	from (
+		select *
+		from :lt_actual
+		
+		except
+		
+		select *
+		from :lt_expected
+	);
+	
+	if (:lv_count > 0) then
+		insert into "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec::Entities.Assertions"(
+			"Description",
+			"Detail"
+		)
+		values('False Negatives',:lv_count)
+		;
+	end if
+	;
+	
+end
+;

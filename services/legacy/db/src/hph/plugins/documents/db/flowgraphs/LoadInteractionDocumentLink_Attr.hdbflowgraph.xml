@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<flowgraph:ContainerNode xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowgraph="http://www.com/ndb/flowgraph/1.0" xmi:id="_V3nhwIVCEea9B4XSVEFSug" name="LOADINTERACTIONLINKDOCUMENTLINK_ATTR" generateProcedure="false" generateTask="true">
+  <annotations xmi:id="_V31kMIVCEea9B4XSVEFSug" key="afm.layout">
+    <annotations xmi:id="_V31kMYVCEea9B4XSVEFSug" key="x" value="10"/>
+    <annotations xmi:id="_V31kMoVCEea9B4XSVEFSug" key="y" value="10"/>
+  </annotations>
+  <annotations xmi:id="_V31kM4VCEea9B4XSVEFSug" key="afm.palette" value="">
+    <annotations xmi:id="_V31kNIVCEea9B4XSVEFSug" key="additions" value=""/>
+  </annotations>
+  <annotations xmi:id="_1EROMIVGEea9B4XSVEFSug" key="afm.nodeType" value="ContainerNode"/>
+  <annotations xmi:id="_1FA1EIVGEea9B4XSVEFSug" key="afm.nodeInputs"/>
+  <annotations xmi:id="_1FYogIVGEea9B4XSVEFSug" key="afm.nodeOutputs"/>
+  <tableMappings xmi:id="_k9BaoIVCEea9B4XSVEFSug" source="_j5NNOIVCEea9B4XSVEFSug" target="_gVEYGIVCEea9B4XSVEFSug">
+    <attributeMappings xmi:id="_k9BaoYVCEea9B4XSVEFSug" source="_j5NNOYVCEea9B4XSVEFSug" target="_kyaGEIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BaooVCEea9B4XSVEFSug" source="_j5NNOoVCEea9B4XSVEFSug" target="_kyfloIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9Bao4VCEea9B4XSVEFSug" source="_j5NNO4VCEea9B4XSVEFSug" target="_kyjQAIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BapIVCEea9B4XSVEFSug" source="_j5NNPIVCEea9B4XSVEFSug" target="_kyp9sIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BapYVCEea9B4XSVEFSug" source="_j5NNPYVCEea9B4XSVEFSug" target="_kywEUIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BapoVCEea9B4XSVEFSug" source="_j5NNPoVCEea9B4XSVEFSug" target="_ky2K8IVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9Bap4VCEea9B4XSVEFSug" source="_j5NNP4VCEea9B4XSVEFSug" target="_ky7qgIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BaqIVCEea9B4XSVEFSug" source="_j5NNQIVCEea9B4XSVEFSug" target="_kzBxIIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BaqYVCEea9B4XSVEFSug" source="_j5NNQYVCEea9B4XSVEFSug" target="_kzIe0IVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BaqoVCEea9B4XSVEFSug" source="_j5NNQoVCEea9B4XSVEFSug" target="_kzPMgIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9Baq4VCEea9B4XSVEFSug" source="_j5N0QIVCEea9B4XSVEFSug" target="_kzUsEIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BarIVCEea9B4XSVEFSug" source="_j5N0QYVCEea9B4XSVEFSug" target="_kzZkkIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BarYVCEea9B4XSVEFSug" source="_j5N0QoVCEea9B4XSVEFSug" target="_kzfrMIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BaroVCEea9B4XSVEFSug" source="_j5N0Q4VCEea9B4XSVEFSug" target="_kzlx0IVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9Bar4VCEea9B4XSVEFSug" source="_j5N0RIVCEea9B4XSVEFSug" target="_kzr4cIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BasIVCEea9B4XSVEFSug" source="_j5N0RYVCEea9B4XSVEFSug" target="_kzww8IVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BasYVCEea9B4XSVEFSug" source="_j5N0RoVCEea9B4XSVEFSug" target="_kz23kIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BasoVCEea9B4XSVEFSug" source="_j5N0R4VCEea9B4XSVEFSug" target="_kz8-MIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9Bas4VCEea9B4XSVEFSug" source="_j5N0SIVCEea9B4XSVEFSug" target="_k0CdwIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BatIVCEea9B4XSVEFSug" source="_j5N0SYVCEea9B4XSVEFSug" target="_k0IkYIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BatYVCEea9B4XSVEFSug" source="_j5N0SoVCEea9B4XSVEFSug" target="_k0OrAIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9BatoVCEea9B4XSVEFSug" source="_j5N0S4VCEea9B4XSVEFSug" target="_k0VYsIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_k9Bat4VCEea9B4XSVEFSug" source="_j5N0TIVCEea9B4XSVEFSug" target="_k0ctcIVCEea9B4XSVEFSug"/>
+  </tableMappings>
+  <tableMappings xmi:id="_zWRYIIVCEea9B4XSVEFSug" source="_gVEYGYVCEea9B4XSVEFSug" target="_yry3yIVCEea9B4XSVEFSug">
+    <attributeMappings xmi:id="_zWRYIYVCEea9B4XSVEFSug" source="_k2xosIVCEea9B4XSVEFSug" target="_zKT_wIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYIoVCEea9B4XSVEFSug" source="_k23vUIVCEea9B4XSVEFSug" target="_zKaGYIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYI4VCEea9B4XSVEFSug" source="_k29O4IVCEea9B4XSVEFSug" target="_zKfl8IVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYJIVCEea9B4XSVEFSug" source="_k3CHYIVCEea9B4XSVEFSug" target="_zKmToIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYJYVCEea9B4XSVEFSug" source="_k3JcIIVCEea9B4XSVEFSug" target="_zKsaQIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYJoVCEea9B4XSVEFSug" source="_k3OUoIVCEea9B4XSVEFSug" target="_zKx50IVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYJ4VCEea9B4XSVEFSug" source="_k3UbQIVCEea9B4XSVEFSug" target="_zK3ZYIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYKIVCEea9B4XSVEFSug" source="_k3Z60IVCEea9B4XSVEFSug" target="_zK7DwIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYKYVCEea9B4XSVEFSug" source="_k3gBcIVCEea9B4XSVEFSug" target="_zLENsIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYKoVCEea9B4XSVEFSug" source="_k3lhAIVCEea9B4XSVEFSug" target="_zLK7YIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYK4VCEea9B4XSVEFSug" source="_k3rnoIVCEea9B4XSVEFSug" target="_zLRCAIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYLIVCEea9B4XSVEFSug" source="_k3y8YIVCEea9B4XSVEFSug" target="_zLY90IVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYLYVCEea9B4XSVEFSug" source="_k34b8IVCEea9B4XSVEFSug" target="_zLfrgIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYLoVCEea9B4XSVEFSug" source="_k397gIVCEea9B4XSVEFSug" target="_zLnAQIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYL4VCEea9B4XSVEFSug" source="_k4DbEIVCEea9B4XSVEFSug" target="_zLr4wIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYMIVCEea9B4XSVEFSug" source="_k4Kv0IVCEea9B4XSVEFSug" target="_zLx_YIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYMYVCEea9B4XSVEFSug" source="_k4QPYIVCEea9B4XSVEFSug" target="_zL8-gIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYMoVCEea9B4XSVEFSug" source="_k4Vu8IVCEea9B4XSVEFSug" target="_zMDFIIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYM4VCEea9B4XSVEFSug" source="_k4bOgIVCEea9B4XSVEFSug" target="_zMJy0IVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYNIVCEea9B4XSVEFSug" source="_k4guEIVCEea9B4XSVEFSug" target="_zMQggIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYNYVCEea9B4XSVEFSug" source="_k4m0sIVCEea9B4XSVEFSug" target="_zMXOMIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYNoVCEea9B4XSVEFSug" source="_k4rtMIVCEea9B4XSVEFSug" target="_zMctwIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zWRYN4VCEea9B4XSVEFSug" source="_k4xz0IVCEea9B4XSVEFSug" target="_zMl3sIVCEea9B4XSVEFSug"/>
+  </tableMappings>
+  <tableMappings xmi:id="_z0rLaoVCEea9B4XSVEFSug" source="_x_qxmIVCEea9B4XSVEFSug" target="_yry3yYVCEea9B4XSVEFSug">
+    <attributeMappings xmi:id="_z0rLa4VCEea9B4XSVEFSug" source="_x_qxmYVCEea9B4XSVEFSug" target="_z0qkUIVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_z0rLbIVCEea9B4XSVEFSug" source="_x_qxmoVCEea9B4XSVEFSug" target="_z0qkUYVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_z0rLbYVCEea9B4XSVEFSug" source="_x_qxm4VCEea9B4XSVEFSug" target="_z0qkUoVCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_z0rLboVCEea9B4XSVEFSug" source="_x_qxnIVCEea9B4XSVEFSug" target="_z0qkU4VCEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_z0rLb4VCEea9B4XSVEFSug" source="_x_qxnYVCEea9B4XSVEFSug" target="_z0qkVIVCEea9B4XSVEFSug"/>
+  </tableMappings>
+  <tableMappings xmi:id="_pbvE0IVGEea9B4XSVEFSug" source="_yry3yoVCEea9B4XSVEFSug" target="_o_M52IVGEea9B4XSVEFSug">
+    <attributeMappings xmi:id="_pbvE0YVGEea9B4XSVEFSug" source="_03Cf8IVFEea9B4XSVEFSug" target="_pZqoQIVGEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_pbvE0oVGEea9B4XSVEFSug" source="_zPZ7IIVCEea9B4XSVEFSug" target="_pZxV8IVGEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_pbvE04VGEea9B4XSVEFSug" source="_z0rLY4VCEea9B4XSVEFSug" target="_pZ21gIVGEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_pbvE1IVGEea9B4XSVEFSug" source="_Y4r-sIVFEea9B4XSVEFSug" target="_pZ9jMIVGEea9B4XSVEFSug"/>
+  </tableMappings>
+  <tableMappings xmi:id="_zt_XwIVGEea9B4XSVEFSug" source="_o_M52YVGEea9B4XSVEFSug" target="_y--8uIVGEea9B4XSVEFSug">
+    <attributeMappings xmi:id="_zt_XwYVGEea9B4XSVEFSug" source="_pacrYIVGEea9B4XSVEFSug" target="_y--8uoVGEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zt_XwoVGEea9B4XSVEFSug" source="_pajZEIVGEea9B4XSVEFSug" target="_y--8uYVGEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zt_Xw4VGEea9B4XSVEFSug" source="_pao4oIVGEea9B4XSVEFSug" target="_y--8vIVGEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zt_XxIVGEea9B4XSVEFSug" source="_pavmUIVGEea9B4XSVEFSug" target="_y--8u4VGEea9B4XSVEFSug"/>
+    <attributeMappings xmi:id="_zt_XxYVGEea9B4XSVEFSug" source="_rXKPsIVGEea9B4XSVEFSug" target="_y--8vYVGEea9B4XSVEFSug"/>
+  </tableMappings>
+  <nodes xsi:type="flowgraph:FilterNode" xmi:id="_gVEYEIVCEea9B4XSVEFSug" name="FILTER" expression="&quot;INPUT&quot;.&quot;ParentAuditLogID&quot;=$$DWAuditID$$ and &quot;INPUT&quot;.&quot;ScheduleID&quot; = $$ScheduleID$$">
+    <annotations xmi:id="_gVEYEYVCEea9B4XSVEFSug" key="afm.description" value="Filter the data"/>
+    <annotations xmi:id="_gVEYEoVCEea9B4XSVEFSug" key="afm.displayName" value="Filter"/>
+    <annotations xmi:id="_gVEYE4VCEea9B4XSVEFSug" key="afm.layout">
+      <annotations xmi:id="_gVEYFIVCEea9B4XSVEFSug" key="x" value="150"/>
+      <annotations xmi:id="_gVEYFYVCEea9B4XSVEFSug" key="y" value="54"/>
+      <annotations xmi:id="_gVEYFoVCEea9B4XSVEFSug" key="width" value="100"/>
+      <annotations xmi:id="_gVEYF4VCEea9B4XSVEFSug" key="height" value="84"/>
+    </annotations>
+    <annotations xmi:id="_1FxqEIVGEea9B4XSVEFSug" key="afm.nodeType" value="FilterNode"/>
+    <annotations xmi:id="_1GnXkIVGEea9B4XSVEFSug" key="afm.nodeInputs">
+      <annotations xmi:id="_1HCOUIVGEea9B4XSVEFSug" key="INPUT" value="DATA"/>
+    </annotations>
+    <annotations xmi:id="_1IQWUIVGEea9B4XSVEFSug" key="afm.nodeOutputs">
+      <annotations xmi:id="_1ItpUIVGEea9B4XSVEFSug" key="OUTPUT" value="INPUT1"/>
+    </annotations>
+    <inputs xmi:id="_gVEYGIVCEea9B4XSVEFSug" name="INPUT" kind="TABLE">
+      <attributes xmi:id="_kyaGEIVCEea9B4XSVEFSug" name="DocumentID" type="NVARCHAR" nullable="false" length="1024" scale="0"/>
+      <attributes xmi:id="_kyfloIVCEea9B4XSVEFSug" name="CreatedAt" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_kyjQAIVCEea9B4XSVEFSug" name="DWParentEntitySource" type="NVARCHAR" nullable="true" length="5" scale="0"/>
+      <attributes xmi:id="_kyp9sIVCEea9B4XSVEFSug" name="CreatedBy" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_kywEUIVCEea9B4XSVEFSug" name="DWAuditID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_ky2K8IVCEea9B4XSVEFSug" name="ChangedAt" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_ky7qgIVCEea9B4XSVEFSug" name="BatchID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_kzBxIIVCEea9B4XSVEFSug" name="ChangedBy" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_kzIe0IVCEea9B4XSVEFSug" name="FileName" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_kzPMgIVCEea9B4XSVEFSug" name="ProcessingMode" type="NVARCHAR" nullable="true" length="1" scale="0"/>
+      <attributes xmi:id="_kzUsEIVCEea9B4XSVEFSug" name="MIMEType" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_kzZkkIVCEea9B4XSVEFSug" name="ParentEntityID" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_kzfrMIVCEea9B4XSVEFSug" name="Content" type="BLOB" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_kzlx0IVCEea9B4XSVEFSug" name="ParentEntityType" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_kzr4cIVCEea9B4XSVEFSug" name="Title" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_kzww8IVCEea9B4XSVEFSug" name="ParentAuditLogID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_kz23kIVCEea9B4XSVEFSug" name="Author" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_kz8-MIVCEea9B4XSVEFSug" name="DWDateFrom" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_k0CdwIVCEea9B4XSVEFSug" name="DWID" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_k0IkYIVCEea9B4XSVEFSug" name="Type" type="NVARCHAR" nullable="true" length="128" scale="0"/>
+      <attributes xmi:id="_k0OrAIVCEea9B4XSVEFSug" name="ScheduleID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_k0VYsIVCEea9B4XSVEFSug" name="DWSource" type="NVARCHAR" nullable="false" length="5" scale="0"/>
+      <attributes xmi:id="_k0ctcIVCEea9B4XSVEFSug" name="LanguageCode" type="NVARCHAR" nullable="true" length="2" scale="0"/>
+    </inputs>
+    <outputs xmi:id="_gVEYGYVCEea9B4XSVEFSug" name="OUTPUT" kind="TABLE">
+      <attributes xmi:id="_k2xosIVCEea9B4XSVEFSug" name="DocumentID" type="NVARCHAR" nullable="false" length="1024" scale="0"/>
+      <attributes xmi:id="_k23vUIVCEea9B4XSVEFSug" name="CreatedAt" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_k29O4IVCEea9B4XSVEFSug" name="DWParentEntitySource" type="NVARCHAR" nullable="true" length="5" scale="0"/>
+      <attributes xmi:id="_k3CHYIVCEea9B4XSVEFSug" name="CreatedBy" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_k3JcIIVCEea9B4XSVEFSug" name="DWAuditID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_k3OUoIVCEea9B4XSVEFSug" name="ChangedAt" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_k3UbQIVCEea9B4XSVEFSug" name="BatchID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_k3Z60IVCEea9B4XSVEFSug" name="ChangedBy" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_k3gBcIVCEea9B4XSVEFSug" name="FileName" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_k3lhAIVCEea9B4XSVEFSug" name="ProcessingMode" type="NVARCHAR" nullable="true" length="1" scale="0"/>
+      <attributes xmi:id="_k3rnoIVCEea9B4XSVEFSug" name="MIMEType" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_k3y8YIVCEea9B4XSVEFSug" name="ParentEntityID" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_k34b8IVCEea9B4XSVEFSug" name="Content" type="BLOB" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_k397gIVCEea9B4XSVEFSug" name="ParentEntityType" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_k4DbEIVCEea9B4XSVEFSug" name="Title" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_k4Kv0IVCEea9B4XSVEFSug" name="ParentAuditLogID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_k4QPYIVCEea9B4XSVEFSug" name="Author" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_k4Vu8IVCEea9B4XSVEFSug" name="DWDateFrom" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_k4bOgIVCEea9B4XSVEFSug" name="DWID" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_k4guEIVCEea9B4XSVEFSug" name="Type" type="NVARCHAR" nullable="true" length="128" scale="0"/>
+      <attributes xmi:id="_k4m0sIVCEea9B4XSVEFSug" name="ScheduleID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_k4rtMIVCEea9B4XSVEFSug" name="DWSource" type="NVARCHAR" nullable="false" length="5" scale="0"/>
+      <attributes xmi:id="_k4xz0IVCEea9B4XSVEFSug" name="LanguageCode" type="NVARCHAR" nullable="true" length="2" scale="0"/>
+    </outputs>
+    <tableMappings xmi:id="_k43TYIVCEea9B4XSVEFSug" source="_gVEYGIVCEea9B4XSVEFSug" target="_gVEYGYVCEea9B4XSVEFSug">
+      <attributeMappings xmi:id="_k5CSgIVCEea9B4XSVEFSug" source="_kyaGEIVCEea9B4XSVEFSug" target="_k2xosIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k5NRoIVCEea9B4XSVEFSug" source="_kyfloIVCEea9B4XSVEFSug" target="_k23vUIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k5YQwIVCEea9B4XSVEFSug" source="_kyjQAIVCEea9B4XSVEFSug" target="_k29O4IVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k5j28IVCEea9B4XSVEFSug" source="_kyp9sIVCEea9B4XSVEFSug" target="_k3CHYIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k5u2EIVCEea9B4XSVEFSug" source="_kywEUIVCEea9B4XSVEFSug" target="_k3JcIIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k57qYIVCEea9B4XSVEFSug" source="_ky2K8IVCEea9B4XSVEFSug" target="_k3OUoIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k6HQkIVCEea9B4XSVEFSug" source="_ky7qgIVCEea9B4XSVEFSug" target="_k3UbQIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k6RBkIVCEea9B4XSVEFSug" source="_kzBxIIVCEea9B4XSVEFSug" target="_k3Z60IVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k6dO0IVCEea9B4XSVEFSug" source="_kzIe0IVCEea9B4XSVEFSug" target="_k3gBcIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k6o1AIVCEea9B4XSVEFSug" source="_kzPMgIVCEea9B4XSVEFSug" target="_k3lhAIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k61pUIVCEea9B4XSVEFSug" source="_kzUsEIVCEea9B4XSVEFSug" target="_k3rnoIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k7ABYIVCEea9B4XSVEFSug" source="_kzZkkIVCEea9B4XSVEFSug" target="_k3y8YIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k7LnkIVCEea9B4XSVEFSug" source="_kzfrMIVCEea9B4XSVEFSug" target="_k34b8IVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k7UxgIVCEea9B4XSVEFSug" source="_kzlx0IVCEea9B4XSVEFSug" target="_k397gIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k7iM4IVCEea9B4XSVEFSug" source="_kzr4cIVCEea9B4XSVEFSug" target="_k4DbEIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k7sk8IVCEea9B4XSVEFSug" source="_kzww8IVCEea9B4XSVEFSug" target="_k4Kv0IVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k73kEIVCEea9B4XSVEFSug" source="_kz23kIVCEea9B4XSVEFSug" target="_k4QPYIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k8DKQIVCEea9B4XSVEFSug" source="_kz8-MIVCEea9B4XSVEFSug" target="_k4Vu8IVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k8OJYIVCEea9B4XSVEFSug" source="_k0CdwIVCEea9B4XSVEFSug" target="_k4bOgIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k8YhcIVCEea9B4XSVEFSug" source="_k0IkYIVCEea9B4XSVEFSug" target="_k4guEIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k8kusIVCEea9B4XSVEFSug" source="_k0OrAIVCEea9B4XSVEFSug" target="_k4m0sIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k8vt0IVCEea9B4XSVEFSug" source="_k0VYsIVCEea9B4XSVEFSug" target="_k4rtMIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_k877EIVCEea9B4XSVEFSug" source="_k0ctcIVCEea9B4XSVEFSug" target="_k4xz0IVCEea9B4XSVEFSug"/>
+    </tableMappings>
+  </nodes>
+  <nodes xsi:type="flowgraph:DataNode" xmi:id="_j5NNMIVCEea9B4XSVEFSug" name="CDMDEFAULT_HC_HPH_PLUGINS_DOCUMENTS_DB_MODELS__INTERFACE_PROCESSINGSTAGEVIEW" type="DATABASE_VIEW" catalogObjectName="hc.hph.plugins.documents.db.models::Interface.ProcessingStageView" dataLayout="ROW" truncateTable="false">
+    <annotations xmi:id="_j5NNMYVCEea9B4XSVEFSug" key="afm.description" value="Read data from a catalog or repository object"/>
+    <annotations xmi:id="_j5NNMoVCEea9B4XSVEFSug" key="afm.displayName" value="Data Source"/>
+    <annotations xmi:id="_j5NNM4VCEea9B4XSVEFSug" key="afm.layout">
+      <annotations xmi:id="_j5NNNIVCEea9B4XSVEFSug" key="x" value="20"/>
+      <annotations xmi:id="_j5NNNYVCEea9B4XSVEFSug" key="y" value="58"/>
+      <annotations xmi:id="_j5NNNoVCEea9B4XSVEFSug" key="width" value="100"/>
+      <annotations xmi:id="_j5NNN4VCEea9B4XSVEFSug" key="height" value="64"/>
+    </annotations>
+    <annotations xmi:id="_1J3f4IVGEea9B4XSVEFSug" key="afm.nodeType" value="DataNode"/>
+    <annotations xmi:id="_1KoU4IVGEea9B4XSVEFSug" key="afm.nodeInputs"/>
+    <annotations xmi:id="_1LAvYIVGEea9B4XSVEFSug" key="afm.nodeOutputs">
+      <annotations xmi:id="_1LYi0IVGEea9B4XSVEFSug" key="DATA" value="INPUT"/>
+    </annotations>
+    <outputs xmi:id="_j5NNOIVCEea9B4XSVEFSug" name="DATA" kind="TABLE">
+      <attributes xmi:id="_j5NNOYVCEea9B4XSVEFSug" name="DocumentID" type="NVARCHAR" nullable="false" length="1024" scale="0"/>
+      <attributes xmi:id="_j5NNOoVCEea9B4XSVEFSug" name="CreatedAt" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_j5NNO4VCEea9B4XSVEFSug" name="DWParentEntitySource" type="NVARCHAR" nullable="true" length="5" scale="0"/>
+      <attributes xmi:id="_j5NNPIVCEea9B4XSVEFSug" name="CreatedBy" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_j5NNPYVCEea9B4XSVEFSug" name="DWAuditID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_j5NNPoVCEea9B4XSVEFSug" name="ChangedAt" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_j5NNP4VCEea9B4XSVEFSug" name="BatchID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_j5NNQIVCEea9B4XSVEFSug" name="ChangedBy" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_j5NNQYVCEea9B4XSVEFSug" name="FileName" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_j5NNQoVCEea9B4XSVEFSug" name="ProcessingMode" type="NVARCHAR" nullable="true" length="1" scale="0"/>
+      <attributes xmi:id="_j5N0QIVCEea9B4XSVEFSug" name="MIMEType" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_j5N0QYVCEea9B4XSVEFSug" name="ParentEntityID" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_j5N0QoVCEea9B4XSVEFSug" name="Content" type="BLOB" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_j5N0Q4VCEea9B4XSVEFSug" name="ParentEntityType" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_j5N0RIVCEea9B4XSVEFSug" name="Title" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_j5N0RYVCEea9B4XSVEFSug" name="ParentAuditLogID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_j5N0RoVCEea9B4XSVEFSug" name="Author" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_j5N0R4VCEea9B4XSVEFSug" name="DWDateFrom" type="TIMESTAMP" nullable="false" length="0" scale="0" defaultValue="0000-00-00"/>
+      <attributes xmi:id="_j5N0SIVCEea9B4XSVEFSug" name="DWID" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_j5N0SYVCEea9B4XSVEFSug" name="Type" type="NVARCHAR" nullable="true" length="128" scale="0"/>
+      <attributes xmi:id="_j5N0SoVCEea9B4XSVEFSug" name="ScheduleID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_j5N0S4VCEea9B4XSVEFSug" name="DWSource" type="NVARCHAR" nullable="false" length="5" scale="0"/>
+      <attributes xmi:id="_j5N0TIVCEea9B4XSVEFSug" name="LanguageCode" type="NVARCHAR" nullable="true" length="2" scale="0"/>
+    </outputs>
+  </nodes>
+  <nodes xsi:type="flowgraph:DataNode" xmi:id="_x_qxkIVCEea9B4XSVEFSug" name="CDMDEFAULT_HC_HPH_CDW_DB_MODELS__DWDOCUMENTS_INTERACTION_DOCUMENTS_LINK" type="DATABASE_TABLE" catalogObjectName="hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" dataLayout="COLUMN" truncateTable="false">
+    <annotations xmi:id="_x_qxkYVCEea9B4XSVEFSug" key="afm.description" value="Read data from a catalog or repository object"/>
+    <annotations xmi:id="_x_qxkoVCEea9B4XSVEFSug" key="afm.displayName" value="Data Source"/>
+    <annotations xmi:id="_x_qxk4VCEea9B4XSVEFSug" key="afm.layout">
+      <annotations xmi:id="_x_qxlIVCEea9B4XSVEFSug" key="x" value="150"/>
+      <annotations xmi:id="_x_qxlYVCEea9B4XSVEFSug" key="y" value="191"/>
+      <annotations xmi:id="_x_qxloVCEea9B4XSVEFSug" key="width" value="100"/>
+      <annotations xmi:id="_x_qxl4VCEea9B4XSVEFSug" key="height" value="64"/>
+    </annotations>
+    <annotations xmi:id="_1Mf9IIVGEea9B4XSVEFSug" key="afm.nodeType" value="DataNode"/>
+    <annotations xmi:id="_1NNu0IVGEea9B4XSVEFSug" key="afm.nodeInputs"/>
+    <annotations xmi:id="_1NolkIVGEea9B4XSVEFSug" key="afm.nodeOutputs">
+      <annotations xmi:id="_1OAZAIVGEea9B4XSVEFSug" key="DATA_2" value="INPUT2"/>
+    </annotations>
+    <outputs xmi:id="_x_qxmIVCEea9B4XSVEFSug" name="DATA_2" kind="TABLE">
+      <attributes xmi:id="_x_qxmYVCEea9B4XSVEFSug" name="DWAuditID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_x_qxmoVCEea9B4XSVEFSug" name="DWDateTo" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_x_qxm4VCEea9B4XSVEFSug" name="DWID_Document" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_x_qxnIVCEea9B4XSVEFSug" name="DWID_Interaction" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_x_qxnYVCEea9B4XSVEFSug" name="DWLinkID" type="VARBINARY" nullable="false" length="32" scale="0"/>
+    </outputs>
+  </nodes>
+  <nodes xsi:type="flowgraph:JoinNode" xmi:id="_yry3wIVCEea9B4XSVEFSug" name="JOIN">
+    <annotations xmi:id="_yry3wYVCEea9B4XSVEFSug" key="afm.description" value="Join two input sources"/>
+    <annotations xmi:id="_yry3woVCEea9B4XSVEFSug" key="afm.displayName" value="Join"/>
+    <annotations xmi:id="_yry3w4VCEea9B4XSVEFSug" key="afm.layout">
+      <annotations xmi:id="_yry3xIVCEea9B4XSVEFSug" key="x" value="306"/>
+      <annotations xmi:id="_yry3xYVCEea9B4XSVEFSug" key="y" value="98"/>
+      <annotations xmi:id="_yry3xoVCEea9B4XSVEFSug" key="width" value="100"/>
+      <annotations xmi:id="_yry3x4VCEea9B4XSVEFSug" key="height" value="104"/>
+    </annotations>
+    <annotations xmi:id="_1PGlMIVGEea9B4XSVEFSug" key="afm.nodeType" value="JoinNode"/>
+    <annotations xmi:id="_1P4BQIVGEea9B4XSVEFSug" key="afm.nodeInputs">
+      <annotations xmi:id="_1QRp4IVGEea9B4XSVEFSug" key="INPUT1" value="OUTPUT"/>
+      <annotations xmi:id="_1QoPMIVGEea9B4XSVEFSug" key="INPUT2" value="DATA_2"/>
+    </annotations>
+    <annotations xmi:id="_1Sf3cIVGEea9B4XSVEFSug" key="afm.nodeOutputs">
+      <annotations xmi:id="_1S11sIVGEea9B4XSVEFSug" key="OUTPUT_2" value="INPUT_2"/>
+    </annotations>
+    <inputs xmi:id="_yry3yIVCEea9B4XSVEFSug" name="INPUT1" kind="TABLE">
+      <attributes xmi:id="_zKT_wIVCEea9B4XSVEFSug" name="DocumentID" type="NVARCHAR" nullable="false" length="1024" scale="0"/>
+      <attributes xmi:id="_zKaGYIVCEea9B4XSVEFSug" name="CreatedAt" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_zKfl8IVCEea9B4XSVEFSug" name="DWParentEntitySource" type="NVARCHAR" nullable="true" length="5" scale="0"/>
+      <attributes xmi:id="_zKmToIVCEea9B4XSVEFSug" name="CreatedBy" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_zKsaQIVCEea9B4XSVEFSug" name="DWAuditID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_zKx50IVCEea9B4XSVEFSug" name="ChangedAt" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_zK3ZYIVCEea9B4XSVEFSug" name="BatchID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_zK7DwIVCEea9B4XSVEFSug" name="ChangedBy" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_zLENsIVCEea9B4XSVEFSug" name="FileName" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_zLK7YIVCEea9B4XSVEFSug" name="ProcessingMode" type="NVARCHAR" nullable="true" length="1" scale="0"/>
+      <attributes xmi:id="_zLRCAIVCEea9B4XSVEFSug" name="MIMEType" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_zLY90IVCEea9B4XSVEFSug" name="ParentEntityID" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_zLfrgIVCEea9B4XSVEFSug" name="Content" type="BLOB" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_zLnAQIVCEea9B4XSVEFSug" name="ParentEntityType" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+      <attributes xmi:id="_zLr4wIVCEea9B4XSVEFSug" name="Title" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_zLx_YIVCEea9B4XSVEFSug" name="ParentAuditLogID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_zL8-gIVCEea9B4XSVEFSug" name="Author" type="NVARCHAR" nullable="true" length="1024" scale="0"/>
+      <attributes xmi:id="_zMDFIIVCEea9B4XSVEFSug" name="DWDateFrom" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_zMJy0IVCEea9B4XSVEFSug" name="DWID" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_zMQggIVCEea9B4XSVEFSug" name="Type" type="NVARCHAR" nullable="true" length="128" scale="0"/>
+      <attributes xmi:id="_zMXOMIVCEea9B4XSVEFSug" name="ScheduleID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_zMctwIVCEea9B4XSVEFSug" name="DWSource" type="NVARCHAR" nullable="false" length="5" scale="0"/>
+      <attributes xmi:id="_zMl3sIVCEea9B4XSVEFSug" name="LanguageCode" type="NVARCHAR" nullable="true" length="2" scale="0"/>
+    </inputs>
+    <inputs xmi:id="_yry3yYVCEea9B4XSVEFSug" name="INPUT2" kind="TABLE">
+      <attributes xmi:id="_z0qkUIVCEea9B4XSVEFSug" name="DWAuditID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_z0qkUYVCEea9B4XSVEFSug" name="DWDateTo" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_z0qkUoVCEea9B4XSVEFSug" name="DWID_Document" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_z0qkU4VCEea9B4XSVEFSug" name="DWID_Interaction" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_z0qkVIVCEea9B4XSVEFSug" name="DWLinkID" type="VARBINARY" nullable="false" length="32" scale="0"/>
+    </inputs>
+    <outputs xmi:id="_yry3yoVCEea9B4XSVEFSug" name="OUTPUT_2" kind="TABLE">
+      <attributes xmi:id="_03Cf8IVFEea9B4XSVEFSug" name="DWDateFrom" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_zPZ7IIVCEea9B4XSVEFSug" name="DWAuditID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_z0rLY4VCEea9B4XSVEFSug" name="DWLinkID" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_Y4r-sIVFEea9B4XSVEFSug" name="DWDateTo" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+    </outputs>
+    <tableMappings xmi:id="_zRm6kIVCEea9B4XSVEFSug" source="_yry3yIVCEea9B4XSVEFSug" target="_yry3yoVCEea9B4XSVEFSug">
+      <attributeMappings xmi:id="_zSoOQIVCEea9B4XSVEFSug" source="_zKsaQIVCEea9B4XSVEFSug" target="_zPZ7IIVCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_nKok4IVGEea9B4XSVEFSug" source="_zMDFIIVCEea9B4XSVEFSug" target="_03Cf8IVFEea9B4XSVEFSug"/>
+    </tableMappings>
+    <tableMappings xmi:id="_z0rLZIVCEea9B4XSVEFSug" source="_yry3yYVCEea9B4XSVEFSug" target="_yry3yoVCEea9B4XSVEFSug">
+      <attributeMappings xmi:id="_z0rLaYVCEea9B4XSVEFSug" source="_z0qkVIVCEea9B4XSVEFSug" target="_z0rLY4VCEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_eNpRMIVFEea9B4XSVEFSug" source="_z0qkUYVCEea9B4XSVEFSug" target="_Y4r-sIVFEea9B4XSVEFSug"/>
+    </tableMappings>
+    <joinDefinitions xmi:id="_KpPvYIVDEea9B4XSVEFSug" left="_yry3yIVCEea9B4XSVEFSug" right="_yry3yYVCEea9B4XSVEFSug" type="INNER" condition="&quot;INPUT1&quot;.&quot;DWAuditID&quot;=&quot;INPUT2&quot;.&quot;DWAuditID&quot;"/>
+  </nodes>
+  <nodes xsi:type="flowgraph:FilterNode" xmi:id="_o_M50IVGEea9B4XSVEFSug" name="FILTER_2">
+    <annotations xmi:id="_o_M50YVGEea9B4XSVEFSug" key="afm.description" value="Filter the data"/>
+    <annotations xmi:id="_o_M50oVGEea9B4XSVEFSug" key="afm.displayName" value="Filter"/>
+    <annotations xmi:id="_o_M504VGEea9B4XSVEFSug" key="afm.layout">
+      <annotations xmi:id="_o_M51IVGEea9B4XSVEFSug" key="x" value="450"/>
+      <annotations xmi:id="_o_M51YVGEea9B4XSVEFSug" key="y" value="120"/>
+      <annotations xmi:id="_o_M51oVGEea9B4XSVEFSug" key="width" value="100"/>
+      <annotations xmi:id="_o_M514VGEea9B4XSVEFSug" key="height" value="84"/>
+    </annotations>
+    <annotations xmi:id="_1T-eIIVGEea9B4XSVEFSug" key="afm.nodeType" value="FilterNode"/>
+    <annotations xmi:id="_1UvTIIVGEea9B4XSVEFSug" key="afm.nodeInputs">
+      <annotations xmi:id="_1VHtoIVGEea9B4XSVEFSug" key="INPUT_2" value="OUTPUT_2"/>
+    </annotations>
+    <annotations xmi:id="_1WPH8IVGEea9B4XSVEFSug" key="afm.nodeOutputs">
+      <annotations xmi:id="_1Wj4EIVGEea9B4XSVEFSug" key="OUTPUT_3" value="DATA_3"/>
+    </annotations>
+    <inputs xmi:id="_o_M52IVGEea9B4XSVEFSug" name="INPUT_2" kind="TABLE">
+      <attributes xmi:id="_pZqoQIVGEea9B4XSVEFSug" name="DWDateFrom" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_pZxV8IVGEea9B4XSVEFSug" name="DWAuditID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_pZ21gIVGEea9B4XSVEFSug" name="DWLinkID" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_pZ9jMIVGEea9B4XSVEFSug" name="DWDateTo" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+    </inputs>
+    <outputs xmi:id="_o_M52YVGEea9B4XSVEFSug" name="OUTPUT_3" kind="TABLE">
+      <attributes xmi:id="_pacrYIVGEea9B4XSVEFSug" name="DWDateFrom" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_pajZEIVGEea9B4XSVEFSug" name="DWAuditID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_pao4oIVGEea9B4XSVEFSug" name="DWLinkID" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_pavmUIVGEea9B4XSVEFSug" name="DWDateTo" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_rXKPsIVGEea9B4XSVEFSug" name="LinkType" type="NVARCHAR" nullable="true" length="256" scale="0" expression="null"/>
+    </outputs>
+    <tableMappings xmi:id="_pa1F4IVGEea9B4XSVEFSug" source="_o_M52IVGEea9B4XSVEFSug" target="_o_M52YVGEea9B4XSVEFSug">
+      <attributeMappings xmi:id="_pbChQIVGEea9B4XSVEFSug" source="_pZqoQIVGEea9B4XSVEFSug" target="_pacrYIVGEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_pbP8oIVGEea9B4XSVEFSug" source="_pZxV8IVGEea9B4XSVEFSug" target="_pajZEIVGEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_pbcJ4IVGEea9B4XSVEFSug" source="_pZ21gIVGEea9B4XSVEFSug" target="_pao4oIVGEea9B4XSVEFSug"/>
+      <attributeMappings xmi:id="_pbo-MIVGEea9B4XSVEFSug" source="_pZ9jMIVGEea9B4XSVEFSug" target="_pavmUIVGEea9B4XSVEFSug"/>
+    </tableMappings>
+  </nodes>
+  <nodes xsi:type="flowgraph:DataNode" xmi:id="_y--8sIVGEea9B4XSVEFSug" name="CDMDEFAULT_HC_HPH_CDW_DB_MODELS__DWDOCUMENTS_INTERACTION_DOCUMENTS_LINK_ATTR" type="DATABASE_TABLE" catalogObjectName="hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link_Attr" dataLayout="COLUMN" truncateTable="false">
+    <annotations xmi:id="_y--8sYVGEea9B4XSVEFSug" key="afm.description" value="Write data to a catalog object"/>
+    <annotations xmi:id="_y--8soVGEea9B4XSVEFSug" key="afm.displayName" value="Data Sink"/>
+    <annotations xmi:id="_y--8s4VGEea9B4XSVEFSug" key="afm.layout">
+      <annotations xmi:id="_y--8tIVGEea9B4XSVEFSug" key="x" value="582"/>
+      <annotations xmi:id="_y--8tYVGEea9B4XSVEFSug" key="y" value="124"/>
+      <annotations xmi:id="_y--8toVGEea9B4XSVEFSug" key="width" value="100"/>
+      <annotations xmi:id="_y--8t4VGEea9B4XSVEFSug" key="height" value="64"/>
+    </annotations>
+    <annotations xmi:id="_1XsggIVGEea9B4XSVEFSug" key="afm.nodeType" value="DataNode"/>
+    <annotations xmi:id="_1Yt0MIVGEea9B4XSVEFSug" key="afm.nodeInputs">
+      <annotations xmi:id="_1ZTDAIVGEea9B4XSVEFSug" key="DATA_3" value="OUTPUT_3"/>
+    </annotations>
+    <annotations xmi:id="_1avNcIVGEea9B4XSVEFSug" key="afm.nodeOutputs"/>
+    <inputs xmi:id="_y--8uIVGEea9B4XSVEFSug" name="DATA_3" kind="TABLE">
+      <attributes xmi:id="_y--8uYVGEea9B4XSVEFSug" name="DWAuditID" type="BIGINT" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_y--8uoVGEea9B4XSVEFSug" name="DWDateFrom" type="TIMESTAMP" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_y--8u4VGEea9B4XSVEFSug" name="DWDateTo" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_y--8vIVGEea9B4XSVEFSug" name="DWLinkID" type="VARBINARY" nullable="false" length="32" scale="0"/>
+      <attributes xmi:id="_y--8vYVGEea9B4XSVEFSug" name="LinkType" type="NVARCHAR" nullable="true" length="256" scale="0"/>
+    </inputs>
+  </nodes>
+  <variables xmi:id="_XyIGoIVCEea9B4XSVEFSug" name="DWAuditID" type="VARCHAR" nullable="false" length="0" scale="0" defaultValue="''" kind="expression"/>
+  <variables xmi:id="_o8x70KZfEeaAn8ftlUFM1A" name="ScheduleID" type="VARCHAR" nullable="false" length="0" scale="0" defaultValue="''" kind="expression"/>
+</flowgraph:ContainerNode>

@@ -1,0 +1,9 @@
+1;1;hhp.tax.Patient;Pending;;en
+2;1;hhp.tax.Patient;Included;;en
+3;1;hhp.tax.Patient;Excluded;;en
+1;1;hhp.tax.Patient;Ausstehend;;de
+2;1;hhp.tax.Patient;Einbezogen;;de
+3;1;hhp.tax.Patient;Ausgeschlossen;;de
+1;1;hhp.tax.Patient;En attente;;fr
+2;1;hhp.tax.Patient;Inclus;;fr
+3;1;hhp.tax.Patient;Exclu;;fr

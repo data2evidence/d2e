@@ -1,0 +1,17 @@
+procedure "hc.hph.ta.models.transformations.postprocessing::StagePrefiltered"(
+    in iv_config_id   nvarchar(1024),
+    in iv_ta_batch_id nvarchar(1024),
+    in it_ta_batch    "hc.hph.ta.models.transformations.postprocessing::TT_TA"
+  )
+  language sqlscript
+  sql security definer
+  as
+begin
+
+declare DoNotUseException condition for sql_error_code 11000;
+	
+	signal DoNotUseException
+	set message_text = '<ta-exception>{"ExceptionType":"DoNotUseException","Error":"This procedure is deprecated, do not use"}</ta-exception>'
+	;
+end
+;

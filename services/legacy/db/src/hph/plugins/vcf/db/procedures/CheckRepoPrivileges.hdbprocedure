@@ -1,0 +1,12 @@
+PROCEDURE "hc.hph.plugins.vcf.db.procedures::CheckRepoPrivileges" ()
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    READS SQL DATA AS
+BEGIN
+    DECLARE PRIVILEGE_ERROR CONDITION FOR SQL_ERROR_CODE 10002;
+    DECLARE has_system_priv VARCHAR(5) := 'FALSE';
+    SELECT "HAS_PRIVILEGES" INTO has_system_priv FROM "hc::SCHEMAS" WHERE "SCHEMA_NAME" = 'SYSTEM';
+    IF :has_system_priv <> 'TRUE' THEN
+        SIGNAL PRIVILEGE_ERROR SET MESSAGE_TEXT = 'Missing privileges on schema SYSTEM for user _SYS_REPO';
+    END IF;
+END

@@ -1,0 +1,53 @@
+namespace hc.hph.genomics.db.models.extensions;
+
+context Attribute
+{
+
+	context Type
+	{
+		type BooleanValue : hana.TINYINT;
+		type DWAuditID : Integer64;
+		type Level : String(14); // values: Variant, VariantAllele, Genotype, GenotypeAllele
+		type DataType : String(10); // values: Flag, Integer, Float, String, Character, Structured
+
+		type FlagValue : BooleanValue;
+		type CharacterValue : String(1);
+		type StringValue : String(5000);
+		type IntegerValue : Integer;
+		type FloatValue : hana.REAL;
+	}
+
+	entity CustomAttributes
+	{
+		key AttributeName : String(255);
+		key Level : Type.Level;
+		DataType : Type.DataType;
+		ArraySize : Integer null;
+		Description : LargeString null;
+		DWAuditID : Type.DWAuditID;
+		Active : Type.BooleanValue;
+	} technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+           migration disabled;
+  	};
+
+	entity StructuredCustomAttributes
+	{
+		key StructuredAttributeName : String(255);
+		key Level : Type.Level;
+		key AttributeName : String(255);
+		AttributeIndex : Integer;
+		DWAuditID : Type.DWAuditID;
+		Separator : String(1);
+		DataType : Type.DataType;
+		NullValue : String(255) null;
+		Active : Type.BooleanValue;
+		StructuredAttribute : Association to CustomAttributes on StructuredAttributeName = StructuredAttribute.AttributeName and Level = StructuredAttribute.Level;
+	} technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+           migration disabled;
+  	};
+
+}

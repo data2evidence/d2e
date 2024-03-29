@@ -1,0 +1,18 @@
+VIEW "hc.hph.core.tableP13n.db.models::SV_TABLEP13N" ( "Id", "HANAUserName", "ColumnOrder", "Text", "Visible", "TableId", "ColumnId", "Sortable", "Filterable", "Personalizable", "Type" ) AS SELECT
+    COALESCE(b."Id", a."Id") AS "Id",
+    COALESCE(b."HANAUserName", a."HANAUserName") AS "HANAUserName",
+    COALESCE(b."ColumnOrder", a."ColumnOrder") AS "ColumnOrder",
+    a."Text" AS "Text",
+    COALESCE(b."Visible", a."Visible") AS "Visible",
+    a."TableId" AS "TableId",
+    a."ColumnId" AS "ColumnId",
+    a."Sortable" AS "Sortable",
+    a."Filterable" AS "Filterable",
+    a."Personalizable" AS "Personalizable",
+    a."Type" AS "Type"
+FROM
+ (SELECT * FROM "hc.hph.core.tableP13n.db.models::P13nModel.TableP13nConfiguration" WHERE "HANAUserName" IN ('LEGACY')) AS a
+LEFT OUTER JOIN 
+ (SELECT * FROM "hc.hph.core.tableP13n.db.models::P13nModel.TableP13nPersonalization" WHERE "HANAUserName" IN (SESSION_CONTEXT('APPLICATIONUSER'))) AS b 
+ ON
+ a."Id" = b."Id" WITH READ ONLY

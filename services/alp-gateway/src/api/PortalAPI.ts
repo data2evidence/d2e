@@ -1,0 +1,178 @@
+import { Service } from 'typedi'
+import axios, { AxiosRequestConfig } from 'axios'
+import { createLogger } from '../Logger'
+import https from 'https'
+import { env } from '../env'
+
+interface CreateDatasetInput {
+  id: string
+  type: string
+  tokenDatasetCode: string
+  tenantId: string
+  dialect: string
+  databaseCode: string
+  schemaName: string
+  vocabSchemaName: string
+  dataModel: string
+  visibilityStatus: string
+  detail: {
+    name: string
+    summary: string
+    description: string
+    showRequestAccess: boolean
+  }
+  dashboards: {
+    name: string
+    url: string
+  }[]
+  attributes: {
+    attributeId: string
+    value: string
+  }[]
+  tags: string[]
+}
+
+interface CopyDatasetInput {
+  id: string
+  sourceDatasetId: string
+  newDatasetName: string
+  schemaName?: string
+}
+@Service()
+export class PortalAPI {
+  private readonly baseURL: string
+  private readonly httpsAgent: any
+  private readonly logger = createLogger(this.constructor.name)
+  private readonly token: string
+
+  constructor(token: string) {
+    this.token = token
+    if (!token) {
+      throw new Error('No token passed for Portal API!')
+    }
+    if (env.PORTAL_BASE_URL) {
+      this.baseURL = env.PORTAL_BASE_URL
+      this.httpsAgent = new https.Agent({
+        rejectUnauthorized:
+          this.baseURL.startsWith('https://localhost:') ||
+          this.baseURL.startsWith('https://alp-minerva-gateway-') ||
+          this.baseURL.startsWith('https://alp-mercury-approuter:')
+            ? false
+            : true
+      })
+    } else {
+      throw new Error('No url is set for PortalAPI')
+    }
+  }
+
+  private async getRequestConfig() {
+    let options: AxiosRequestConfig = {}
+
+    options = {
+      headers: {
+        Authorization: this.token
+      },
+      httpsAgent: this.httpsAgent
+    }
+
+    return options
+  }
+
+  async getTenants() {
+    try {
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}tenant/list`
+      const result = await axios.get(url, options)
+      return result.data
+    } catch (error) {
+      this.logger.error('Error getting tenants')
+      throw new Error('Error getting tenants')
+    }
+  }
+
+  async getDatasets() {
+    try {
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}dataset/list`
+      const result = await axios.get(url, options)
+      return result.data
+    } catch (error) {
+      this.logger.error('Error while getting datasets')
+      throw new Error('Error while getting datasets')
+    }
+  }
+
+  async getDataset(id: string) {
+    try {
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}dataset/${id}`
+      const result = await axios.get(url, options)
+      return result.data
+    } catch (error) {
+      this.logger.error(`Error while getting dataset ${id}`)
+      throw new Error(`Error while getting dataset ${id}`)
+    }
+  }
+
+  async getDatasetDashboard(id: string) {
+    try {
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}dataset/dashboard/${id}`
+      const result = await axios.get(url, options)
+      return result.data
+    } catch (error) {
+      this.logger.error(`Error while getting dataset dashboard ${id}`)
+      throw new Error(`Error while getting dataset dashboard ${id}`)
+    }
+  }
+
+  async getStudiesAsSystemAdmin() {
+    try {
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}dataset/list?role=systemAdmin`
+      const result = await axios.get(url, options)
+      return result.data
+    } catch (error) {
+      this.logger.error('Error getting studies')
+      throw new Error('Error getting studies')
+    }
+  }
+
+  async hasDataset(tokenDatasetCode: string) {
+    try {
+      const options = await this.getRequestConfig()
+      options.params = { tokenDatasetCode }
+      const url = `${this.baseURL}dataset`
+      const result = await axios.head(url, options)
+      return result.status === 200
+    } catch (error) {
+      const errorMessage = `Error while finding dataset with token dataset code ${tokenDatasetCode}`
+      this.logger.error(`${errorMessage}: ${error}`)
+      throw new Error(errorMessage)
+    }
+  }
+
+  async createDataset(input: CreateDatasetInput) {
+    try {
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}dataset`
+      const result = await axios.post(url, input, options)
+      return result.data
+    } catch (error) {
+      this.logger.error(`Error creating dataset. ${error}`)
+      throw new Error(`Error creating dataset. ${error}`)
+    }
+  }
+
+  async copyDataset(input: CopyDatasetInput) {
+    try {
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}dataset/snapshot`
+      const result = await axios.post(url, input, options)
+      return result.data
+    } catch (error) {
+      this.logger.error(`Error copying dataset. ${error}`)
+      throw new Error('Error copying dataset')
+    }
+  }
+}

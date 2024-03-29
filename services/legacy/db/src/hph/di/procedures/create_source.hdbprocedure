@@ -1,0 +1,34 @@
+PROCEDURE "hc.hph.di.procedures::create_source" ( 
+	IN SourceID NVARCHAR(5),
+	IN SourceName NVARCHAR(512),
+	IN SourceDescription NVARCHAR(1024),
+	OUT ot_error "hc.hph.di.model::tt_error"
+	) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER as
+	BEGIN
+	declare lv_count Integer;
+	declare lv_count1 Integer;
+	
+    
+   SELECT count(*) into lv_count from "hc.hph.di.model::DataIntegration.DISource"  where "SourceID" = :SourceID;
+   
+   SELECT count(*) into lv_count1 from "hc.hph.di.model::DataIntegration.DISource"  where "Name" = :SourceName;
+   
+   IF lv_count > 0 THEN
+   	   ot_error = select 500 as http_status_code, 'MSG_DWSOURCE_ID_EXISTS' error_message, 'PROCEDURE:create_source()' detail from "hc::DUMMY";
+   ELSE IF lv_count1 > 0 THEN
+	   ot_error = select 500 as http_status_code, 'MSG_DWSOURCE_NAME_EXISTS' error_message, 'PROCEDURE:create_source()' detail from "hc::DUMMY";
+   	ELSE
+		INSERT INTO "hc.hph.di.model::DataIntegration.DISource" 
+        (SELECT :SourceID as "SourceID",
+        	   :SourceName as "Name",
+        	   :SourceDescription as "Description",
+        	   (SELECT CURRENT_TIMESTAMP FROM "hc::DUMMY") as "CreatedAt",
+			   (SELECT SESSION_CONTEXT('XS_APPLICATIONUSER') FROM "hc::DUMMY") as "CreatedBy",
+			   '' as "ModifiedAt",
+			   '' as "ModifiedBy"
+        	FROM "hc::DUMMY");
+   END IF;
+   END IF;
+END;

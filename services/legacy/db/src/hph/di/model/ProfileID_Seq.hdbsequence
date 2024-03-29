@@ -1,0 +1,1 @@
+SEQUENCE "hc.hph.di.model::ProfileID_Seq" RESET BY SELECT IFNULL(MAX("ProfileID")+1,1) FROM "hc.hph.di.model::DataIntegration.JobProfile"

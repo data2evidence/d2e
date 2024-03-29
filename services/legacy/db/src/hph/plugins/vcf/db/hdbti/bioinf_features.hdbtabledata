@@ -1,0 +1,28 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.plugins.vcf.db.models::Mapping.Features",
+            "import_settings": {
+                "include_filter": [
+                    {
+                        "DWAuditID": "0"
+                    }
+                ],
+                "import_columns": [
+                    "DWAuditID",
+                    "Feature",
+                    "Version"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.plugins.vcf.db.hdbti::bioinf_features.csv",
+                "has_header": true,
+                "type_config": {
+                    "delimiter": ";"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,29 @@
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::getQueueEntryError" (
+	IN auditLogId	BIGINT,
+	OUT ERROR_MESSAGE NVARCHAR(2048),
+	OUT STARTED_AT LONGDATE,
+	OUT FINISHED_AT LONGDATE,
+	OUT THREAD_ID BIGINT
+	) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+
+	--READS SQL DATA 
+	AS
+BEGIN
+
+DECLARE scheduleId BIGINT;
+DECLARE STARTED_AT_QueueEntry TIMESTAMP;
+
+SELECT MIN("ADDED_AT") INTO STARTED_AT_QueueEntry FROM "hc.hph.plugins.ccdi.db.models::Tasks.Queue" WHERE "auditLogId"=:auditLogId;
+
+CALL "hc.hph.plugins.ccdi.db.procedures::retrieveNotedScheduleId" (auditLogId, scheduleId);
+
+SELECT TOP 1 "ERROR_MESSAGE", "STARTED_AT", "FINISHED_AT", "THREAD_ID" INTO ERROR_MESSAGE, STARTED_AT, FINISHED_AT, THREAD_ID
+FROM "hc::JOB_LOG" WHERE
+ "NAME"='hc.hph.di.jobs::DataIntegration'
+ and ID=:scheduleId
+ and "STATUS"='ERROR'
+ and "STARTED_AT">=STARTED_AT_QueueEntry;
+
+END;

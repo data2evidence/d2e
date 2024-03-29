@@ -1,0 +1,6 @@
+TYPE "hc.hph.plugins.vcf.db.models.cdw::PatientKeysType" AS TABLE (
+	"DWID" VARBINARY(64),
+	"DWAuditID" BIGINT,
+	"DWSource" NVARCHAR(5),
+	"PatientID" VARCHAR(100)
+)

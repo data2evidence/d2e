@@ -1,0 +1,527 @@
+!!(c) Copyright 2017 ALP. All rights reserved.
+!!
+!!ALP and the ALP logo are registered trademarks of ALP in Germany and other countries. Business Objects and the Business Objects logo are registered trademarks of Business Objects S.A., which is an ALP company.
+!!
+!======================================================================
+! File Name: english-tf-med-Medication.rul 
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of Medications and their relations
+!======================================================================
+
+!======================================================================
+!! MEDICATIONS:
+!======================================================================
+
+!======================================================================
+! OUTPUT FIELDS:
+! Medication, Dosage, Route, Frequency, Duration, Reason
+!======================================================================
+
+! Medication group: MedicationStatement
+
+!======================================================================
+
+#subgroup skipParens: <\(><~(\()>+<\)>
+
+!!YM: created these 2 subgroups because POS:Num matches percents (5%, 12.5%). This messes Strength extraction ("2%" in "lidocaine 2% cream" would otherwise be extracted as dosage)
+#subgroup NumWithoutPercent: <(([0-9]+(\.[0-9]+)?)|[a-zA-Z]+),POS:Num>
+
+#subgroup RangeOrAlternation: <STEM: to|or|\->
+
+#subgroup NumericalRange: {(
+  <[0-9].*[0-9]>
+| <STEM: single|double|triple|maximum|minimum|few|many|extra>
+)}
+#subgroup NumRangeWithoutPercent: {(
+( %(NumWithoutPercent) (%(RangeOrAlternation) %(NumWithoutPercent))? (<\(> %(NumWithoutPercent) <\)>)? )
+| (%(NumericalRange))
+)}
+
+#subgroup NumRange: {(
+( <POS:Num> (%(RangeOrAlternation) <POS:Num>)? (<\(> <POS:Num> <\)>)? )
+| (%(NumericalRange))
+)}
+
+#define DoseVocabulary: {(
+	ampoule
+|	applicator
+|	auto\-?injector
+|	balm
+|	balsam
+|	bar
+|	bottle
+|	bolus
+|	cartridge
+|	cleanser
+|	dispenser
+|	dentrifice
+|	douche
+|	drip
+|	implant
+|	elixir
+|	enema
+|	oint
+|	Oint
+|	troche
+|	mouthwash
+|	washing
+|	washings
+|	(muco\-?)?adhesives?
+|	aerosol
+|	bath
+|	bulk
+|	cake
+|	capsule
+|	cap
+|	caplet
+|	cream
+|	gauze
+|	gum
+|	concentration
+|	concentrate
+|	cloth
+|	DurationPost
+|	dropperette
+|	dropperettes
+|	extract
+|	emulsion
+|	expectorant
+|	fluid
+|	film
+|	film\-?forming
+|	foam
+|	tablet
+|	tab
+|	gel
+|	gel\-?forming
+|	jel
+|	jels
+|	granule
+|	inhalant
+|	inhaler
+|	infusion
+|	injection
+|	jelly
+|	kit
+|	liquid
+|	lotion
+|	lozenge
+|	nebulizer
+|	nebulization
+|	[Nn]ebs?
+|	NEB
+|	NEBS
+|	oil
+|	ointment
+|	powder
+|	plaster
+|	paste
+|	patch
+|	pack
+|	pen
+|	pill
+|	puffer
+|	pump
+|	pellet
+|	scrub
+|	shampoo
+|	soap
+|	shot
+|	syringe
+|	Ssyrs?
+|	ssyrs?
+|	suspension
+|	susps?
+|	Susps?
+|	solution
+|	soln?
+|	Soln?
+|	syrup
+|	spray
+|	sponge
+|	swab
+|	suppository
+|	suppositories
+|	suppo?s?
+|	Suppo?s?
+|	stick
+|	taper
+|	tincture
+|	toothpaste
+|	towelette
+|	vial
+|	wipe
+|	wax
+|	wash
+|	wafer
+)}
+#subgroup doseform: {(
+[OD MedicationStatement_Medication_Form](
+  <STEM: %(DoseVocabulary)>
+| <STEM: augmented> <STEM: topical> <STEM: gel|cream|lotion|ointment>
+| <STEM: mouth> <STEM: wash>
+| <STEM: amps?>
+| <STEM: disintegrating|effervescent> <STEM: oral> <STEM: tab|tablet>
+| <STEM: dry> <STEM: powder> <STEM: inhaler>
+| <STEM: topical> <STEM: liquedified> <STEM: gas>
+| <STEM: gas> <STEM: for> <STEM: inhalation>
+| <STEM: metered|meter> <STEM: dose> <STEM: inhaler>
+| <STEM: medicate|medicated> <STEM: bar> <STEM: soap>
+| <STEM: medicate|medicated> <STEM: liquid> <STEM: soap>
+| <STEM: meter|metered> <STEM: dose> <STEM: nasal> <STEM: spray>
+| <STEM: mucous> <STEM: membrane> <STEM: topical> <STEM: solution>
+| <STEM: granule> <STEM: for> <STEM: oral> <STEM: solution|suspension>
+| <STEM: buccal> <STEM: film|tablet>
+| <STEM: chewable> <STEM: tablet>
+| <STEM: chewing> <STEM: gum>
+| <STEM: dental> <STEM: cream|drop|gel|paste|solution>
+| <STEM: drug> <STEM: implant>
+| <STEM: epidural> <STEM: plastic|pre\-?filled|syringe|vial>
+| <STEM: implant> <STEM: gel|wafer>
+| <STEM: inhalant> <STEM: powder|solution>
+| <STEM: inhalation> <STEM: aerosol|[Aa]mpul|blister|capsule|cartridge|hfa|mist|solution|vial>
+| <STEM: injectable> <STEM: foam|solution|suspension>
+| <STEM: injection> <STEM: [Aa]mpuls?|bulk|cartridge|elastomeric|infusion|[Ii]ntravo?enous|kit|plastic|pre\-?filled|syringe|vial>
+| <STEM: [Ii]ntraartic> <STEM: syringe>
+| <STEM: [Ii]ntracaver> <STEM: kit>
+| <STEM: [Ii]ntraderm> <STEM: syringe|vials>
+| <STEM: [Ii]ntramusc> <STEM: [Aa]mpul|kit|pen|suspensions|syringe|vial>
+| <STEM: [Ii]ntraocula?r> <STEM: implant|syringe|vial>
+| <STEM: [Ii]ntraperitoneal> <STEM: solution>
+| <STEM: [Ii]ntrathec> <STEM: [Aa]mpul|syringe|vial>
+| <STEM: [Ii]ntratracheal> <STEM: suspension>
+| <STEM: [Ii]ntraven> <STEM: [Aa]mpul|cartridge|[Dd]ehp(\-?free)?|emulsion|foam|infusion|kit|plastic|pre\-?filled|syringe|vial>
+| <STEM: [Ii]ntravesic> <STEM: solution|vial>
+| <STEM: irrigration> <STEM: [Aa]mpul|solution|vial>
+| <STEM: jet> <STEM: injector>
+| <STEM: medicated> <STEM: pad|patch|shampoo|tape>
+| <STEM: [Mm]iscell(aneous)?> <STEM: aerosol|kit|liquid|oil|solution|tablet|towelette|wax>
+| <STEM: mucosal> <STEM: spray>
+| <STEM: nasal> <STEM: aerosol|[Aa]mpul|drop|gel|inhalant|jelly|ointment|powder|solution|spray|suspension>
+| <STEM: [Oo]phthalmic> <STEM: cream|dropperette|drop|gel(\-?forming)?|ointment|solutions?|suspension>
+| <STEM: oral> <STEM: capsule|combination|concentrate|cream|drop|elixir|emulsion|expectorant|flake|foam|gel|granule|gum|kit|liquid|lozenge|oil|ointment|packet|pellet|pill|powder|pre\-?filled|solution|spray|strip|[Ss]usp|suspension|syringe|syrup|tablet|tincture|wafer>
+| <STEM: [Oo]tic> <STEM: combination|dropperette|drop|ointment|solution|suspension>
+| <STEM: pen> <STEM: injector>
+| <STEM: perfusion> <STEM: vial>
+| <STEM: pre\-?filled> <STEM: applicator|syringe>
+| <STEM: rectal> <STEM: cream|enema|foam|gel|kit|lotion|ointment|solution|spray|suppository>
+| <STEM: sublingual> <STEM: drop|film|lozenge|spray|tab|tablet>
+| <STEM: topical> <STEM: adhesive|aerosol|bar|bath|cake|cleanser|combination|cream|drop|emulsion|film(\-?forming)?|foam|gel|jelly|kit>
+| <\p{ci}(sub\-?q)> <STEM: [Aa]mpul|[Aa]uto\-?[Ii]njectors?|cartridge|insulin|kit|pen|syringe|vial>
+| <STEM: epidural> <STEM: plastic|pre\-?filled|syringe|vial>
+| <STEM: ophthalmic> <STEM: irrigation> <STEM: solution>
+| <I\.?N\.?[JH]?\.?>
+| <((i\.n\.[jh]?)|in[jh])\.?>
+| <STEM: nasal>? <STEM: inhale|inhaler|inhaled|inhalation>
+| <STEM: INF\.?|[Ii]nf\.?>
+| <STEM: swish> <STEM: and|&> <STEM: swallow>
+| <STEM: sustain|sustained|[Ss]ust\.?|extend|extended|control|controll?ed|timed?|rapid|delay|delayed|immediate|[Ii]mmed\.?|long\-acting|slow> <STEM: release|[Rr]el\.?|REL\.?|delivery> (<\(> <[Ee]\.?[Cc]\.?> <\)>)?
+| <[DdEe][Rr]> ! Delayed/Extended Release
+| <STEM: long> <STEM: acting>
+| <LA|XR|XL|CD|CR|TR>
+| <[Ss]ust\.?|SUST\.?|([SEI]\.?R\.?)>
+| <POS:Adj|V-PaPart>? <\p{ci}(.+\-[Rr]el\.?|.+\-[Rr]elease)> (<\(> <[Ee]\.?[Cc]\.?> <\)>)?
+| <POS:Adj|V-PaPart>? <\p{ci}(.+\-REL\.?|.+\-RELEASE)> (<\(> <[Ee]\.?[Cc]\.?> <\)>)?
+| <STEM: slide|sliding> <STEM: scale>
+| <POS:Adj|V-PaPart> <STEM: scale|micronize|[Mm]icronized|coated>
+| <POS:Adj|V-PaPart>? <\p{ci}(.+[Mm]icronized|.+[Cc]oated)>
+| <\p{ci}(gtt)>
+)[/OD]
+)}
+
+#subgroup strengthUnit: {(
+ <([Mm]cg\.?)|(MCG\.?)>
+|<[Mm][Ee][Qq]\.?(/[Mm]?[Ll])?>
+|<STEM: milliequivalents?>
+|<STEM: (milli|micro)?gram|GM|gm>
+|<STEM: strength>
+|<[Mm][Gg]/[Mm]?[Ll2]>
+|<[Mm][Gg]/[Kk]?[Gg]>
+|<[Ii][Uu]/[Kk]?[Gg]>
+!|((<((i|I)?\.?(u|U)\.?)>|<((m|M)?\.?(g|G)\.?)>|<((m|M)((e|E)(q|Q)|(L|l))\.?)>) (</|per><POS:Num>?<((K|k)?(G|g))|((M|m)?(L|l|2))>)*)
+|((<[Ii]?\.?[Uu]\.?>|<[Mm]?\.?[Gg]\.?>|<[Mm](([Ee][Qq])|([Ll]))\.?> ) (</|per> <POS:Num>? <[MmKk]?[GgLl2]\.?>){0,2})
+|( <[Mm][Cc]?[Gg]/[A-Za-z]+\.?> )
+|<([Uu]ni?ts?/mls?|UNI?TS?/MLS?)>
+|(<[Uu]ni?ts?></|per><POS:Num>*<mls?>)
+|(<UNI?TS?></|per><POS:Num>*<MLS?>)
+)}
+
+!(</|per> <POS:Num> %(strengthUnit))*
+#subgroup strength: {(
+  [OD MedicationStatement_Medication_Ingredient_Amount] (%(NumRange) %(strengthUnit) )[/OD]
+|[OD MedicationStatement_Medication_Ingredient_Amount] ( <[0-9]+(M|m|K|k)?(G|g|L|l)\.?\-[0-9].*(M|m|K|k)?(G|g|L|l)\.?> )[/OD]
+| %(strengthUnit)
+)}
+
+#subgroup otherUnit: {(
+ <(([Tt]b?sp\.?)|(TB?SP\.?))>
+|<STEM: teaspoon|teaspoonful>
+|<STEM: tablespoon>
+|<STEM: milliliter|millilitre|liter|litre>
+|<[Mm]?[Ll]\.?>
+|<(Oz|OZ|oz|lbs?|LBS?)\.>
+|<STEM: ounce|pound>
+|<[Cc]\.?[Cc]\.?>
+|<(([Rr]ept?\.?)|(REPT?\.?))>
+|<STEM: bag|dose|load|dose|puff>
+|<([TtGg]\-)?([Tt]ubes?|TUBES?)>
+|<STEM: unit|supplement|supplementation|regimen|requirement>
+)}
+
+!#subgroup doseUnit: {(
+!! %(otherUnit)
+!|%(doseform)
+!)}
+
+
+#subgroup Suff: {(
+ %(strength)
+! |%(doseUnit)
+|( %(otherUnit) | %(doseform) )
+)}
+
+#subgroup AddMedication: {(
+   <\p{ci}((EC)?ASA|Celesone|Keflex|CZI|Avadia|BB|beta\-blockers?|PRBCs?|Sulfa|KCL|Levoflox|Levo|Nitropaste|nitro|Penothiazone|duo\-?neb)>
+|  <STEM: Statin|statin|antibiotic|hydration|(multi)?vitamin|diuretic|diuretics|hypoglyca?emic|hypoglyca?emics|opiate|opiates>
+|  <STEM: pain>  <STEM: control>? <STEM: medication>  
+|  <STEM: beta>  <STEM: blocker>
+|  <STEM: regular> <STEM: insulin>
+|  <STEM: insulin> (<STEM:\,> <STEM: regular>)? 
+|  <STEM: Normal|normal> <STEM: saline> <STEM: flush>?
+|  <STEM: kinase> <STEM: inhibitor>
+)}
+
+#subgroup DictMedication: {(
+[OD MedicationStatement_Medication](
+!!([TE MEDICATIONSTATEMENT_MEDICATION]<~(.*(induced|produced|related|associated|triggered))>+[/TE] | %(AddMedication))  !!YM  (moved neg context to DROP rule)
+([TE MEDICATIONSTATEMENT_MEDICATION]<>*[/TE] | %(AddMedication))   !!YM
+)[/OD]  %(Suff)?
+)}
+
+!Descriptors that can appear in parentheses after a medication name but are not themselves a medication name
+#subgroup medicationModifier: {(
+<STEM: human> <STEM: recombinant>
+)}
+
+#subgroup Medication: {(
+ %(DictMedication) (<\(> %(medicationModifier) <\)> )?
+ !(<([a-zA-Z])+,POS:Adj|V-PaPart|V-PrPart>? <([a-zA-Z])+,POS:Nn>)*
+)}
+
+#subgroup Unit: {(
+( %(strength)
+|([OD MedicationStatement_Dosage_Dose]%(NumRangeWithoutPercent) %(otherUnit)[/OD])
+|([OD MedicationStatement_Dosage_Dose]%(NumRangeWithoutPercent)[/OD] %(doseform))
+|[OD MedicationStatement_Dosage_Dose](<[0-9]+(\.[0-9]+)?(L|l|U|u|Y|y|UNT|unt|Unt|mcg|MCG|Mcg|Meq|MEQ|(mg/m2)|(MG/M2))>)[/OD]
+|[OD MedicationStatement_Medication_Ingredient_Amount]([TE PERCENT]<>+[/TE])[/OD]
+) 
+)}
+
+#subgroup Doseform: {(
+(<POS:Punct>|<STEM: and|&|or>|<by>)? %(doseform)
+)}
+
+!| (<POS:Adv>? <POS:Prep> [OD MedicationStatement_Dosage_Dose](%(NumRange) %(Suff)?)[/OD])
+!| ([OD MedicationStatement_Dosage_Dose]<[0-9]+\.[0-9]+> %(Suff)?[/OD])
+
+#subgroup Dosage: {(
+<POS:Punct>? <STEM: and|&|or|then>? (
+((<POS:Adv>?<POS:Prep>)*
+(
+  (%(Unit) (<\p{ci}(x|X|\-|/)>? %(Unit)){0,5})
+| <[Uu]\.?[Dd]\.?>
+| (<[Uu][Tt]\.?> <(dict|DICT)\.?>)
+| <[Ss]\.?[Aa]\.?>
+))
+)
+)}
+
+#define RouteVocabulary: {(
+	oral
+|	nasal
+|	intra\-?(dermal|nasal|venous|musc(ular)?|ocular|perit(oneal)?|thecal|trac(heal)?|uteri(ne)?|vo?en(ous)?)
+|	topical
+|	vaginal
+|	sublingual
+|	BUCC
+|	buccal
+|	intraperitoneal
+|	sublingual
+|	subcutaneous
+|	auricular
+|	cutaneous
+|	injectable
+|	rectal
+|	non\-?oral
+|	transderm(al)?
+|	transmucosal
+|	urethral
+)}
+
+#subgroup Route: {(
+<POS:Punct>? <STEM: and|&|or|then>? (
+[OD MedicationStatement_Dosage_Route](
+   <[Pp]\.?[Oo]\.?>
+|  <[Tt]\.[Oo]\.>
+|  <POS:Prep> <STEM: mouth|nose>
+|  <STEM: under> <STEM: the> <STEM: tongue>
+|  <STEM: %(RouteVocabulary)(ly)?>
+|  <[PpSsUu]\.?[Rr]\.?>
+|  <STEM: per> <STEM: rectum>
+|  <[Ii]\.?[Mm]\.?[Ii]?\.?>
+|  (<[Ii]\.?[Vv]\.?[Pp]?\.?[Bb]?\.?> <\p{ci}(inj\.?|injections?)>?)
+|  <[Ii]\.?[DdPp]\.?>
+|  <[Tt]\.?[Oo]?\.?[Pp]\.?>
+|  <[Ss]\.?[CcLl]\.?>
+|  <\p{ci}(BUCC)>
+|  <\p{ci}(MDI)>
+|  <[Ii]\.?[Pp]\.?>
+|  <[Oo]\.?[sSUu]\.?>
+|  <\p{ci}(subcu?|sub\-?q\.?|subcut)>
+|  <\p{ci}(ophth(almic)?)>
+|  <\p{ci}(otic)>
+)[/OD])
+)}
+
+#subgroup FreqKeywords: {(
+   (<STEM: daily|nightly|weekly|biweekly|monthly|bimonthly|frequent|frequently>)
+|  (<[BbTt]\.?[Ii]\.?[DdWw]\.?>)
+|  (<[Tt]\.?[Dd]\.?[Ss]\.?>)
+|  (((<POS:Num> <STEM: time|times>)|<STEM: once|twice>|<\p{ci}([0-9]+[Xx])>)((<STEM: a|per|PER|every|/> <STEM: hour|day|week|month|morning|afternoon|evening|night>)|(<STEM: in> <STEM: the> <STEM: morning|afternoon|evening|night>))?)  
+|  (<STEM: every|each|q\.?|Q\.?|per|PER|/|this> <STEM: other>? <STEM: hour|day|bedtime|week|month|Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|morning|afternoon|evening|night>)
+|  (<STEM: every|q|Q> <POS:Num> (<\p{ci}(to|\-)> <POS:Num>)? <STEM: minute|hour|day|week|month|morning|afternoon|evening|night>)
+|  (<[Qq]\.?[OoIiAa]\.?[Dd]\.?>)
+|  (<[Qq]\.?[Hh]\.?[Ss]\.?>)
+|  (<[Qq](\.|\-)?(WK|wk|[Aa]\.?[MmCc]\.?|[Pp]\.?[Mm]\.?|D|d|WEEK|[Ww]eek|DAY|[Dd]ay|NIGHT|[Nn]ight|[Mm]orning|[Aa]fternoon|[Ee]vening)\.?>)
+|  (<STEM: (Q|q)\.?|every> <STEM: other>? <(WK|wk|WEEK|[Ww]eek|DAY|[Dd]ay|NIGHT|[Nn]ight|[Aa]\.?[Mm]\.?|[Pp]\.?[Mm]\.?|D|d|[Mm]orning|[Aa]fternoon|[Ee]vening)\.?>)
+|  (<([Qq]\.?[1-9]\-?[0-9]?\.?(h|H|min|MIN|Min|[Hh]ours?|[Mm]inutes?|[Dd]ays?|[Nn]ights?)\.?)> <\.>?)
+|  (<([Qq]\.?[Qq]\.?[Hh]\.?)>)
+|  (<(ALT|alt)\.?> <[Hh]\.?>)
+|  (<(ALT|alt)\.?[Hh]\.?>)
+|  (<[Qq]\.?[1-9]\-?[0-9]?> <STEM: (h|H|min|hour|minute|day)\.?>?)
+|  (<[Qq]\.?> <\.>? <[1-9]\-?[0-9]?\.?(h|H|min|MIN|Min|[Hh]ours?|[Mm]inutes?|[Dd]ays?)\.?>)
+|  (<[Qq]\.?> <\.>? <[1-9]\-?[0-9]?\.?> <STEM: (h|H|min|hour|minute|day|week)\.?>?)
+|  (<[Qq]\.?> <\.>? (<STEM: other>|<POS:Num>)? <STEM: hour|minute|week|day|night>)
+|  (<[Qq]\.?>? <([Hh]\.?[Ss]\.?)> )
+|  (<[Qq]\.?>? <([PpAa]\.?[Cc]\.?)> )
+|  (<[Qq]\.?([Hh]\.?[Ss]\.?)> )
+| ( <STEM: at> <POS:Num> <[AaPp]\.?[Mm]\.?> )
+|  (<STEM: every|each|q\.?|Q\.?|per|/>? <POS:Num> <STEM: (hr|HR)\.?>)
+)}
+
+
+#subgroup Temporal: {(
+<POS:Punct>? <STEM: and|&|or|then>? (
+!<\p{ci}(and|&|or|then)>? (
+  ( <STEM: at|before|after|with|w\/|W\/> <STEM: each|every>? <STEM: meal|dinner|lunch|breakfast|bed(time)?|noon> )
+)
+)}
+
+!(<POS:Num><\.>)?
+
+#subgroup Frequency: {(
+<POS:Punct>? <STEM: and|&|or|then>? [OD MedicationStatement_Dosage_Rate] %(FreqKeywords) [/OD]
+!<\p{ci}(and|&|or|then)>? [OD MedicationStatement_Dosage_Rate] %(FreqKeywords) [/OD]
+)}
+
+#subgroup Duration: {(
+<POS:Punct>? <STEM: and|&|or|then>? (
+!<\p{ci}(and|&|or|then)>? (
+[OD MedicationStatement_Dosage_Timing_Duration](
+   (((<STEM: x|X|times|time> (<POS:Num>|<\p{ci}([0-9]+)>))|<\p{ci}((x|X)[0-9]+)>) <STEM: dose|minute|hour|day|night|week|month|year>?)
+|  (<STEM: for>? ((<STEM: at> <STEM: least|most>)|<STEM: another> )? (<POS:Num>|(<STEM: a><STEM: few|couple>)|<STEM: several>) <STEM: more>? <STEM: minute|hour|day|night|week|month|year>)
+|  (<POS:Prep>? <POS:Det>? ((<POS:Num> <STEM: day|night|week|month>)|<\p{ci}([0-9]+\-(day|night|week|month|year))>) <STEM: course|period>)
+|  (<POS:Prep>? <POS:Det> <STEM: course|period> <POS:Prep> <POS:Num> <STEM: minute|hour|day|night|week|month|year> )
+|  (<STEM: during> <STEM: spring|summer|fall|winter> <STEM: break>)
+|  (<STEM: until> <STEM: the> <STEM: symptom> <STEM: disappear>)
+|  (<STEM: until> <STEM: it> <STEM: is> <STEM: finished>)
+|  (<STEM: until> <POS:~(Punct)>+ )
+|  (<STEM: until> <STEM: ready> <STEM: for> <\p{ci}(d/c)> <STEM: home>)
+|  (<STEM: for>? <STEM: as> <STEM: long> <STEM: as> <STEM: need|needed>)
+|  <STEM: temporarily|today|tonight> 
+)[/OD]
+)
+)}
+
+#subgroup DurationPost: {(
+<POS:Punct>? (<STEM: number> <STEM: of> <STEM: dose> <STEM: require|required>? %(skipParens)? <\:> [OD MedicationStatement_Dosage_Timing_Duration]<POS:Num> [/OD])
+!(<\p{ci}((N|n)umber|NUMBER)> <\p{ci}(of)> <\p{ci}(doses)> <\p{ci}(required)>? %(skipParens)? <\:> [OD MedicationStatement_Dosage_Timing_Duration]<POS:Num> [/OD])
+)}
+
+#subgroup DurationAll: {(
+%(Duration) | %(DurationPost)
+)}
+
+
+#subgroup AsNeeded: {(
+<POS:Punct>? (
+!(
+   <[Pp]\.?[Rr]\.?[Nn]\.?> ([OD MedicationStatement_Reason]<POS:Adj|V-PaPart|Det>? <POS:(Nn|V-PrPart)>[/OD])?
+| ( <STEM: as> <STEM: need|needed|necessary>)
+| ( <STEM: if> <STEM: there><STEM: be><STEM: a> <STEM: need>)
+| ( <[Ss]\.?[Oo]\.?[Ss]\.?>)
+| ( <si|SI> <(op|OP)\.?> <sit|SIT>)
+)
+(<STEM: for> [OD MedicationStatement_Reason](
+  (<POS:Prep|Pron>? <POS:(Adj|Nn|Prop)>)+
+)[/OD])?
+)}
+
+#subgroup Reason: {(
+<POS:Punct>? (
+!(
+<>? <STEM: for|reason> <\:>?
+[OD MedicationStatement_Reason](
+  (<POS:Prep|Pron>? <STEM:~(life),POS:(Adj|Nn|Prop)>)+
+)[/OD]
+)
+)}
+
+#subgroup MedVerb: {(
+<POS:Punct>? <STEM: and|&|or|then|be>? (
+!<\p{ci}(and|&|or|then|is|was|are|were)>? (
+<STEM:given?|use|taken?|Appl|apply?>
+|(<STEM:(alternate|alternating)> <POS:Prep>)
+)
+)}
+
+#subgroup PreMedication: {(
+ (%(Doseform)|%(Route)|%(Dosage)|%(Duration)){1,3} <POS:Prep>?
+)}
+
+#subgroup BodyWeight: {(
+ <[Bb]\.?[Ww]\.?> 
+| (<\p{ci}(body)><\p{ci}(weight)>)
+)}
+
+!(%(Doseform)|<[a-zA-Z]+,POS:Nn>)? 
+
+#subgroup SigRoute: {(
+	<((S|s)ig|SIG|(R|r)oute|ROUTE)>
+)}
+
+#group AA_MedicationStatement: {(
+  %(PreMedication)? %(Medication) <\)>? ( %(otherUnit) | %(doseform) ) (%(Dosage) | %(Doseform) | %(NumRange) | (%(SigRoute) <POS:Punct>?) | %(MedVerb) | %(BodyWeight) | %(Route) | %(Frequency) | %(DurationAll) | %(Temporal) | %(AsNeeded) | %(Reason) | <POS:Punct> )*
+)}
+
+#group ZZ_MedicationStatement: {(
+  %(PreMedication)? %(Medication) <\)>? (%(Dosage) | %(Doseform) | %(NumRange) | (%(SigRoute) <POS:Punct>) | %(MedVerb) | %(BodyWeight) | %(Route) | %(Frequency) | %(DurationAll) | %(Temporal) | %(AsNeeded) | %(Reason) )*
+)}
+
+#group MedicationStatement: {(
+  %(PreMedication)? %(Medication) <\)>? (%(Dosage) | %(Doseform) | %(NumRange) | (%(SigRoute) ) | %(MedVerb) | %(BodyWeight) | %(Route) | %(Frequency) | %(DurationAll) | %(Temporal) | %(AsNeeded) | %(Reason))*
+)}
+
+#group DROP_MedicationStatement: {(
+  (<STEM: protein> <STEM: expression>)
+| (<>{0,3} <STEM: method|receptor|mutation>)
+| (<\p{ci}(formalin)> <STEM: fix|fixed|fixation>)
+| (<\p{ci}(biotin\-free)>)
+| (<>{0,5} <\p{ci}(method)>)
+| (<STEM:titanium> <>? <STEM:plate|plating>)
+| (<STEM:high> <STEM:cholesterol>)
+| (<\p{ci}(lead)> <STEM:hazard>)
+| (<>{0,2} <.*\-(induced|produced|related|associated|triggered)> <>{0,2})
+| (<protein\-like> <>?)
+)}

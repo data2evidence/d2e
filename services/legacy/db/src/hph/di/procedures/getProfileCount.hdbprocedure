@@ -1,0 +1,9 @@
+PROCEDURE "hc.hph.di.procedures::getProfileCount" ( IN EXTENSIONID NVARCHAR(256), OUT profileCount INT ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	READS SQL DATA AS
+BEGIN
+
+	SELECT count(*) into profileCount FROM "hc.hph.di.model::DataIntegration.JobProfile" WHERE "ExtensionID" = :EXTENSIONID  AND "Status" <> 'Deleted';
+
+END;

@@ -1,0 +1,46 @@
+PROCEDURE "hc.hph.collections.db.procedures::UPDATE_PARTICIPANT" ( 
+	
+	IN  it_update "hc.hph.collections.db.models::TT_ALL_PARTICIPANTS", 
+	IN  it_before "hc.hph.collections.db.models::TT_ALL_PARTICIPANTS",
+	
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"
+
+	) 
+	
+	LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count INTEGER;
+	lv_owner_count INTEGER;
+	lv_privilegeid_session STRING;
+	lv_privilegeid_user STRING;
+	iv_privilegeid STRING;
+	iv_userid STRING;
+	lv_collectionid STRING;
+BEGIN
+	select "CollectionId", "PrivilegeId", "HANAUserName" into lv_collectionid, iv_privilegeid, iv_userid  from :it_update;
+	select "Privilege.Id" into lv_privilegeid_session from "hc.hph.collections.db.models::CollectionModel.Participant" where "HANAUserName" = SESSION_CONTEXT('XS_APPLICATIONUSER') AND "Collection.Id" = lv_collectionid;
+	select "Privilege.Id" into lv_privilegeid_user from "hc.hph.collections.db.models::CollectionModel.Participant" where "HANAUserName" = iv_userid AND "Collection.Id" = lv_collectionid;
+	select count("HANAUserName") into lv_owner_count from "hc.hph.collections.db.models::CollectionModel.Participant" where  "Collection.Id" = lv_collectionid AND "Privilege.Id" = '3';
+	-- No need to update?
+	if lv_privilegeid_user = iv_privilegeid then
+		return;
+	end if;
+	-- Authorized ?
+	if :lv_privilegeid_session = '1' then
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating collection participants: Not authorized to update participant.' detail from "hc::DUMMY";			
+		return;	
+	end if;
+	if :lv_privilegeid_session = '2' and :iv_privilegeid = '3' then
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating collection participants: Not authorized to update participant to Owner.' detail from "hc::DUMMY";			
+		return;	
+	end if;
+	if lv_privilegeid_user = '3' and lv_owner_count < 2 then
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error delting collection participants: Not authorized to delete last owner.' detail from "hc::DUMMY";			
+		return;	
+	end if;
+	
+	
+	update "hc.hph.collections.db.models::CollectionModel.Participant" set  "Privilege.Id" = iv_privilegeid where "HANAUserName" = iv_userid AND "Collection.Id" = lv_collectionid; 	 
+END;

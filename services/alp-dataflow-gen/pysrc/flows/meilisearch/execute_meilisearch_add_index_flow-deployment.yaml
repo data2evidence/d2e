@@ -1,0 +1,77 @@
+###
+### A complete description of a Prefect Deployment for flow 'execute-add-search-index-flow'
+###
+name: add_search_index
+description: null
+version: f4e994fc65e2f1158ca55c950ff40022
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: null
+tags: ["add_search_index"]
+parameters:
+  {
+    options: {
+      "token": "${BEARER TOKEN}",
+      "databaseCode": "alpdev_pg",
+      "vocabSchemaName": "cdmvocab",
+      "tableName": "concept",
+    }
+  }
+schedule: null
+is_schedule_active: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: null
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: execute-add-search-index-flow
+manifest_path: null
+storage: null
+path: /app/pysrc
+entrypoint: main.py:execute_meilisearch_add_index_flow
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    options:
+      title: options
+      position: 0
+      allOf:
+      - $ref: '#/definitions/meilisearchAddIndexType'
+  required:
+  - options
+  definitions:
+    meilisearchAddIndexType:
+      title: meilisearchAddIndexType
+      type: object
+      properties:
+        token:
+          title: Token
+          type: string
+        databaseCode:
+          title: Databasecode
+          type: string
+        vocabSchemaName:
+          title: Vocabschemaname
+          type: string
+        tableName:
+          title: Tablename
+          type: string
+      required:
+      - token
+      - databaseCode
+      - vocabSchemaName
+      - tableName
+timestamp: '2023-12-29T09:30:13.875758+00:00'
+triggers: []
+enforce_parameter_schema: null

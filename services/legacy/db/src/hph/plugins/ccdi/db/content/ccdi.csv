@@ -1,0 +1,80 @@
+Package;FileName;Version;Active;Content;CreatedBy;CreatedAt;Status;Errors
+'com.chp.plugins.ccdi.config';'CCDI.ccdi.json';'1';1;'{
+    "Run" : {
+        "CDWLoad" : true
+    },
+	"Target": {
+		"Patient": {
+			"TargetTableName": "\"hc.hph.plugins.ccdi.db.models::Stage.Patient\""
+		},
+		"Observation": {
+			"TargetTableName": "\"hc.hph.plugins.ccdi.db.models::Stage.Observations\"",
+			"LogColumn": "ObsType"
+		},
+		"Condition": {
+			"TargetTableName": "\"hc.hph.plugins.ccdi.db.models::Stage.Conditions\"",
+			"LogColumn": "ConditionType"
+		},
+		"Practitioner": {
+			"TargetTableName": "\"hc.hph.plugins.ccdi.db.models::Stage.Practitioner\""
+		},
+		"Patient_Practitioner": {
+			"TargetTableName": "\"hc.hph.plugins.ccdi.db.models::Stage.Patient_Practitioner\""
+		},
+		"Interaction": {
+			"TargetTableName": "\"hc.hph.plugins.ccdi.db.models::Stage.Interactions\"",
+			"LogColumn": "InteractionType.OriginalValue"
+		},
+		"InteractionDetail": {
+			"TargetTableName": "\"hc.hph.plugins.ccdi.db.models::Stage.InteractionDetails\"",
+			"LogColumn": "Attribute.OriginalValue"
+		},
+		"InteractionMeasure": {
+			"TargetTableName": "\"hc.hph.plugins.ccdi.db.models::Stage.InteractionMeasures\"",
+			"LogColumn": "Attribute.OriginalValue"
+		},
+		"InteractionText": {
+			"TargetTableName": "\"hc.hph.plugins.ccdi.db.models::Stage.InteractionText\"",
+			"LogColumn": "Attribute"
+		},
+		"InteractionDocument": {
+			"TargetTableName": "\"hc.hph.plugins.ccdi.db.models::Stage.Interaction_Documents_Link\"",
+			"LogColumn": "InteractionID"
+		},
+		"ProcessingStage": {
+			"InitialCleanUp": false,
+			"FinalCleanUp": false,
+			"TargetTableName": "\"hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage\""
+		}
+	},
+	"SourceTargetMap": [
+		{
+			"SourceObjectName": "\"hc.hph.plugins.ccdi.db.models::Stage.Document\"",
+			"ProcessingStage": [
+				{
+					"DWDateFrom": "CURRENT_TIMESTAMP",
+					"DWID": "\"hc.hph.cdw.db.etl::HashDWID\"( \"_SourceID\", \"DocumentID\" )",
+					"DWAuditID": "<AUDITLOGID>",
+					"DWSource": "\"_SourceID\"",
+					"DocumentID": "\"DocumentID\"",
+					"BatchID": "\'200\'",
+					"ProcessingMode": "null",
+					"DWParentEntitySource":"\"_ParentEntitySourceID\"",
+					"ParentEntityID": "\"ParentEntityID\"",
+					"ParentEntityType": "\'hc.hph.cdw.Interaction\'",
+					"FileName": "\"FileName\"",
+					"MIMEType": "\"MIMEType\"",
+					"Content": "\"Content\"",
+					"Title": "\"Title\"",
+					"Author": "\"Author\"",
+					"Type": "\"Type\"",
+					"LanguageCode": "\"LanguageCode\"",
+					"CreatedAt": "\"CreatedAt\"",
+					"CreatedBy": "\"CreatedBy\"",
+					"ChangedAt": "\"ChangedAt\"",
+					"ChangedBy": "\"ChangedBy\""
+				}
+			]
+		}
+	]
+}';'ALP';'2018-06-26 23:23:23';'Activated';

@@ -1,0 +1,69 @@
+namespace hc.hph.ta.models;
+
+context PostProcessing {
+
+  entity "TA_FILTERED" {
+     key CONFIG_ID  : String(1024);
+     key DWID       : Binary(32);
+     key TA_RULE    : String(200);
+     key TA_COUNTER : Integer64;
+     TA_TOKEN       : String(5000);
+     TA_LANGUAGE    : String(2);
+     TA_TYPE        : String(100);
+     TA_NORMALIZED  : String(5000);
+     TA_STEM        : String(5000);
+     TA_PARAGRAPH   : Integer;
+     TA_SENTENCE    : Integer;
+     TA_CREATED_AT  : UTCDateTime;
+     TA_OFFSET      : Integer64;
+     TA_PARENT      : Integer64;
+     TA_SECTION     : String(100);
+     TA_MODALITY    : String(100);
+     TA_POLARITY    : String(100);
+     TA_REFERENCE   : String(100);
+     TA_TIME_START  : UTCDateTime;
+     TA_TIME_END    : UTCDateTime;
+     TA_TIME_LINK   : String(100);
+     TA_AMBIGUITY   : String(100); 
+  } technical configuration {
+     column store;
+  };
+
+
+  temporary entity "TA_TEMP" {
+     CONFIG_ID      : String(1024);
+     BATCH_ID       : String(1024) not null;
+     DWID           : Binary(32);
+     TA_RULE        : String(200);
+     TA_COUNTER     : Integer64;
+     TA_TOKEN       : String(5000);
+     TA_LANGUAGE    : String(2);
+     TA_TYPE        : String(100);
+     TA_NORMALIZED  : String(5000);
+     TA_STEM        : String(5000);
+     TA_PARAGRAPH   : Integer;
+     TA_SENTENCE    : Integer;
+     TA_CREATED_AT  : UTCDateTime;
+     TA_OFFSET      : Integer64;
+     TA_PARENT      : Integer64;
+     TA_SECTION     : String(100);
+     TA_MODALITY    : String(100);
+     TA_POLARITY    : String(100);
+     TA_REFERENCE   : String(100);
+     TA_TIME_START  : UTCDateTime;
+     TA_TIME_END    : UTCDateTime;
+     TA_TIME_LINK   : String(100);
+  } technical configuration {
+     row store;
+  };
+
+  entity "TA_CONFIG" {
+    key CONFIG_ID       : String(1024);
+    key EXTRACTION_TYPE : String(100);         // TA_TYPE, TA_SECTION, TA_MODALITY, TA_POLARITY, TA_REFERENCE
+    key EXTRACTION_ID   : String(100);         // med_ANAT@NCIm, med_DIS@NCIm, ..., ModFactual, ...
+    SELECTED            : String(1) not null;  // ' ' or 'X'
+  } technical configuration {
+    column store;
+  };
+
+};

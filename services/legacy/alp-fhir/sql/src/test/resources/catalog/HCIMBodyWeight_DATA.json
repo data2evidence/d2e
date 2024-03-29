@@ -1,0 +1,87 @@
+{
+	"resourceType": "TableContent",
+	"id": "HCIMBodyWeight_DATA",
+	"definition": {
+		"reference": "HCIMBodyWeight"
+	},
+	"row": [
+		{
+			"column": [
+				{
+					"name": "_RecordKey",
+					"valueString": "P\u0001"
+				},
+				{
+					"name": "_WeightValue",
+					"valueString": ">>72 kg"
+				},
+				{
+					"name": "WeightValue_g",
+					"valueString": "7200.000"
+				},
+				{
+					"name": "Comment"
+				},
+				{
+					"name": "_WeightDateTime",
+					"valueString": ">>08-02-2013"
+				},
+				{
+					"name": "_WeigthDateTime_Timezone",
+					"valueString": ">>Europe/Amsterdam"
+				},
+				{
+					"name": "WeightDateTime",
+					"valueString": "2013-02-07T22:00:00Z"
+				},
+				{
+					"name": "_Clothing",
+					"valueString": ">>light clothing"
+				},
+				{
+					"name": "Clothing_CD",
+					"valueString": "MINIMAL"
+				},
+				{
+					"name": "InformationSource_PatientAsInformationSource::Patient",
+					"valueString": "\u0001"
+				},
+				{
+					"name": "InformationSource_HealthProfessional"
+				},
+				{
+					"name": "InformationSource_RelatedPersonAsInformationSource::ContactPerson"
+				},
+				{
+					"name": "Author_PatientAsAuthor::Patient"
+				},
+				{
+					"name": "Author_HealthProfessionalAsAuthor::HealthProfessional",
+					"valueString": "1"
+				},
+				{
+					"name": "Author_RelatedPersonAsAuthor::ContactPerson"
+				},
+				{
+					"name": "Subject_Patient",
+					"valueString": "\u0001"
+				},
+				{
+					"name": "Subject_RelatedPersonAsSubject::ContactPerson"
+				},
+				{
+					"name": "_DateTime",
+					"valueString": ">>20.09.2018"
+				},
+				{
+					"name": "_DateTime_Timezone",
+					"valueString": ">>Europe/Amsterdam"
+				},
+				{
+					"name": "DateTime",
+					"valueString": "2018-09-19T20:00:00Z"
+				}
+			]
+		}
+	]
+}

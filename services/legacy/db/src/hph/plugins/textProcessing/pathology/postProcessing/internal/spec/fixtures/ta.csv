@@ -1,0 +1,201 @@
+DWID;TA_RULE;TA_COUNTER;TA_TOKEN;TA_LANGUAGE;TA_TYPE;TA_NORMALIZED;TA_STEM;TA_PARAGRAPH;TA_SENTENCE;TA_CREATED_AT;TA_OFFSET;TA_PARENT
+0;Entity Extraction;1;Clinical History:;en;med_SECTION_HISTORY;MEDICAL HISTORY:;;5;5;15.07.2016 11:00:29.0;57;
+0;Entity Extraction;2;breast;en;ANATOMY;C50.9@ICDO3;;6;6;15.07.2016 11:00:29.0;83;
+0;Entity Extraction;3;Final Diagnosis:;en;med_SECTION_DIAGNOSIS;DIAGNOSIS:;;7;7;15.07.2016 11:00:29.0;98;
+0;Entity Extraction;4;Breast;en;ANATOMY;C50.9@ICDO3;;8;8;15.07.2016 11:00:29.0;117;
+0;Entity Extraction;5;Mass:;en;med_SECTION_PHYS_EXAM;HEENT:;;8;8;15.07.2016 11:00:29.0;144;
+0;Entity Extraction;6;Infiltrating;en;BEHAVIOR;cancer_behavior3;;8;8;15.07.2016 11:00:29.0;150;
+0;Entity Extraction;7;Infiltrating Ductal Carcinoma;en;med_CancerHistology;;;8;8;15.07.2016 11:00:29.0;150;
+0;Entity Extraction;8;Infiltrating;en;CancerBehavior;;;8;8;15.07.2016 11:00:29.0;150;7
+0;Entity Extraction;9;Ductal Carcinoma;en;med_HISTO/ICDO3;8500/3@ICDO3;;8;8;15.07.2016 11:00:29.0;163;
+0;Entity Extraction;10;Nuclear Grade 2 of 3;en;med_CancerGrade;;;8;8;15.07.2016 11:00:29.0;181;
+0;Entity Extraction;11;Nuclear Grade;en;GradeType;;;8;8;15.07.2016 11:00:29.0;181;10
+0;Entity Extraction;12;2 of 3;en;GradeValue;;;8;8;15.07.2016 11:00:29.0;195;10
+0;Entity Extraction;13;Perineural Invasion;en;med_CancerHistology;;;8;8;15.07.2016 11:00:29.0;219;
+0;Entity Extraction;14;1.0cm;en;MEASURE;;;8;8;15.07.2016 11:00:29.0;281;
+0;Entity Extraction;15;Note:;en;med_SECTION_METADATA;NOTE TYPE:;;9;9;15.07.2016 11:00:29.0;347;
+0;Entity Extraction;16;invasive;en;BEHAVIOR;cancer_behavior3;;10;10;15.07.2016 11:00:29.0;377;
+0;Entity Extraction;17;invasive ductal carcinoma of the right breast;en;med_CancerHistology;;;10;10;15.07.2016 11:00:29.0;377;
+0;Entity Extraction;18;invasive;en;CancerBehavior;;;10;10;15.07.2016 11:00:29.0;377;17
+0;Entity Extraction;19;ductal carcinoma;en;med_HISTO/ICDO3;8500/3@ICDO3;;10;10;15.07.2016 11:00:29.0;386;
+0;Entity Extraction;20;right breast;en;CancerSite;;;10;10;15.07.2016 11:00:29.0;410;17
+0;Entity Extraction;21;breast;en;ANATOMY;C50.9@ICDO3;;10;10;15.07.2016 11:00:29.0;416;
+0;Entity Extraction;22;2.3cm;en;MEASURE;;;10;10;15.07.2016 11:00:29.0;424;
+0;Entity Extraction;23;lymph node;en;ANATOMY;C77.9@ICDO3;;10;10;15.07.2016 11:00:29.0;466;
+0;Entity Extraction;24;S10;en;med_GENE/HGNC;10383@HGNC;;10;11;15.07.2016 11:00:29.0;534;
+0;Entity Extraction;25;S10;en;med_GENE/HGNC;9564@HGNC;;10;11;15.07.2016 11:00:29.0;534;
+0;Entity Extraction;26;S10;en;med_GENE/HGNC;6470@HGNC;;10;11;15.07.2016 11:00:29.0;534;
+0;Entity Extraction;27;Her 2;en;Biomarker;;;10;14;15.07.2016 11:00:29.0;783;28
+0;Entity Extraction;28;Her 2 overexpression;en;med_Biomarker;;;10;14;15.07.2016 11:00:29.0;783;
+0;Entity Extraction;29;Her 2;en;med_GENE/HGNC;3430@HGNC;;10;14;15.07.2016 11:00:29.0;783;
+0;Entity Extraction;30;overexpression;en;BiomarkerAlteration;;;10;14;15.07.2016 11:00:29.0;789;28
+0;Entity Extraction;31;overexpression;en;ALTERATION_TYPE;EXPRESSION;;10;14;15.07.2016 11:00:29.0;789;
+0;Entity Extraction;32;NOTE:;en;med_SECTION_METADATA;NOTE TYPE:;;11;15;15.07.2016 11:00:29.0;922;
+0;Entity Extraction;33;Comment:;en;med_SECTION_FOLLOWUP;FOLLOWUP:;;12;16;15.07.2016 11:00:29.0;1042;
+0;Entity Extraction;34;Gross Description:;en;med_SECTION_ASSESSMENT;ASSESSMENT:;;13;17;15.07.2016 11:00:29.0;1145;
+0;Entity Extraction;35;breast;en;ANATOMY;C50.9@ICDO3;;14;18;15.07.2016 11:00:29.0;1203;
+0;Entity Extraction;36;2 x 1.6;en;MEASURE;;;14;18;15.07.2016 11:00:29.0;1222;
+0;Entity Extraction;37;1.3cm;en;MEASURE;;;14;18;15.07.2016 11:00:29.0;1232;
+0;Entity Extraction;38;1.0 x 1.0;en;MEASURE;;;14;19;15.07.2016 11:00:29.0;1328;
+0;Entity Extraction;39;0.7cm;en;MEASURE;;;14;19;15.07.2016 11:00:29.0;1340;
+0;Entity Extraction;40;adipose tissue;en;ANATOMY;C49.9@ICDO3;;14;20;15.07.2016 11:00:29.0;1519;
+0;Entity Extraction;41;Note:;en;med_SECTION_METADATA;NOTE TYPE:;;15;23;15.07.2016 11:00:29.0;1668;
+0;Entity Extraction;42;Microscopic Description:;en;med_SECTION_DIAG_DATA;TESTS/LABS:;;17;25;15.07.2016 11:00:29.0;1778;
+0;Entity Extraction;43;breast;en;ANATOMY;C50.9@ICDO3;;19;27;15.07.2016 11:00:29.0;1833;
+0;Entity Extraction;44;Addendum Comment:;en;med_SECTION_FOLLOWUP;FOLLOWUP:;;20;28;15.07.2016 11:00:29.0;1882;
+0;Entity Extraction;45;HER2 protein overexpression;en;med_Biomarker;;;20;28;15.07.2016 11:00:29.0;2021;
+0;Entity Extraction;46;HER2 protein;en;Biomarker;;;20;28;15.07.2016 11:00:29.0;2021;45
+0;Entity Extraction;47;overexpression;en;ALTERATION_TYPE;EXPRESSION;;20;28;15.07.2016 11:00:29.0;2034;
+0;Entity Extraction;48;overexpression;en;BiomarkerAlteration;;;20;28;15.07.2016 11:00:29.0;2034;45
+0;Entity Extraction;49;IMMUNOHISTOCHEMISTRY TECHNICAL INFORMATION:;en;med_SECTION_DIAG_DATA;TESTS/LABS:;;21;29;15.07.2016 11:00:29.0;2156;
+0;Entity Extraction;50;SUMMATION OF FINDINGS:;en;med_SECTION_ASSESSMENT;ASSESSMENT:;;22;32;15.07.2016 11:00:29.0;2652;
+0;Entity Extraction;51;Estrogen Receptor (VECTOR CLONE 6F11) is strongly and diffusely immunoreactive;en;med_Biomarker;;;22;32;15.07.2016 11:00:29.0;2680;
+0;Entity Extraction;52;Estrogen Receptor;en;Biomarker;;;22;32;15.07.2016 11:00:29.0;2680;51
+0;Entity Extraction;53;strongly and diffusely immunoreactive;en;BiomarkerStatusPositive;;;22;32;15.07.2016 11:00:29.0;2721;51
+0;Entity Extraction;54;Progesterone Receptor (DAKO Clone PgR 636) is strongly and diffusely immunoreactive in greater than 95%;en;med_Biomarker;;;22;33;15.07.2016 11:00:29.0;2833;
+0;Entity Extraction;55;Progesterone Receptor;en;Biomarker;;;22;33;15.07.2016 11:00:29.0;2833;54
+0;Entity Extraction;56;PgR;en;med_GENE/HGNC;8910@HGNC;;22;33;15.07.2016 11:00:29.0;2867;
+0;Entity Extraction;57;strongly and diffusely immunoreactive;en;BiomarkerStatusPositive;;;22;33;15.07.2016 11:00:29.0;2879;54
+0;Entity Extraction;58;95%;en;BiomarkerScore;;;22;33;15.07.2016 11:00:29.0;2933;54
+0;Entity Extraction;59;Herceptest (DAKO) shows equivocal;en;med_Biomarker;;;22;34;15.07.2016 11:00:29.0;2991;
+0;Entity Extraction;60;Herceptest (DAKO);en;BiomarkerTest;;;22;34;15.07.2016 11:00:29.0;2991;59
+0;Entity Extraction;61;equivocal;en;BiomarkerStatusEquivocal;;;22;34;15.07.2016 11:00:29.0;3015;59
+0;Entity Extraction;62;NOTE:;en;med_SECTION_METADATA;NOTE TYPE:;;23;36;15.07.2016 11:00:29.0;3260;
+0;Entity Extraction;63;Positive Estrogen Receptor;en;med_Biomarker;;;23;36;15.07.2016 11:00:29.0;3268;
+0;Entity Extraction;64;Positive;en;BiomarkerStatusPositive;;;23;36;15.07.2016 11:00:29.0;3268;63
+0;Entity Extraction;65;Estrogen Receptor;en;Biomarker;;;23;36;15.07.2016 11:00:29.0;3277;63
+0;Entity Extraction;66;Positive Progesterone receptor;en;med_Biomarker;;;23;37;15.07.2016 11:00:29.0;3375;
+0;Entity Extraction;67;Positive;en;BiomarkerStatusPositive;;;23;37;15.07.2016 11:00:29.0;3375;66
+0;Entity Extraction;68;Progesterone receptor;en;Biomarker;;;23;37;15.07.2016 11:00:29.0;3384;66
+0;Entity Extraction;69;NOTE:;en;med_SECTION_METADATA;NOTE TYPE:;;23;40;15.07.2016 11:00:29.0;3729;
+0;Entity Extraction;70;invasive;en;BEHAVIOR;cancer_behavior3;;23;40;15.07.2016 11:00:29.0;3915;
+0;Entity Extraction;71;invasive cancer cells;en;med_CancerHistology;;;23;40;15.07.2016 11:00:29.0;3915;
+0;Entity Extraction;72;invasive;en;CancerBehavior;;;23;40;15.07.2016 11:00:29.0;3915;71
+0;Entity Extraction;73;Comment:;en;med_SECTION_FOLLOWUP;FOLLOWUP:;;24;43;15.07.2016 11:00:29.0;4255;
+96;Entity Extraction;1;Clinical History:;en;med_SECTION_HISTORY;MEDICAL HISTORY:;;5;5;07.07.2016 14:30:36.0;66;
+96;Entity Extraction;2;Cancer of the right breast;en;med_CancerHistology;;;5;5;07.07.2016 14:30:36.0;85;
+96;Entity Extraction;3;right breast;en;CancerSite;;;5;5;07.07.2016 14:30:36.0;99;2
+96;Entity Extraction;4;breast;en;ANATOMY;C50.9@ICDO3;;5;5;07.07.2016 14:30:36.0;105;
+96;Entity Extraction;5;Post-Operative Diagnosis:;en;med_SECTION_DIAGNOSIS;PREOPERATIVE DIAGNOSIS:;;6;6;07.07.2016 14:30:36.0;114;
+96;Entity Extraction;6;Post-Operative Diagnosis:;en;med_SECTION_DIAGNOSIS;POSTOPERATIVE DIAGNOSIS:;;6;6;07.07.2016 14:30:36.0;114;
+96;Entity Extraction;7;Pre-Operative Diagnosis:;en;med_SECTION_DIAGNOSIS;PREOPERATIVE DIAGNOSIS:;;7;7;07.07.2016 14:30:36.0;167;
+96;Entity Extraction;8;PreOperative Diagnosis:;en;med_SECTION_DIAGNOSIS;PREOPERATIVE DIAGNOSIS:;;8;8;07.07.2016 14:30:36.0;241;
+96;Entity Extraction;9;Post Operative Diagnosis:;en;med_SECTION_DIAGNOSIS;PREOPERATIVE DIAGNOSIS:;;9;9;07.07.2016 14:30:36.0;310;
+96;Entity Extraction;10;Final Diagnosis:;en;med_SECTION_DIAGNOSIS;DIAGNOSIS:;;10;10;07.07.2016 14:30:36.0;363;
+96;Entity Extraction;11;Breast Tumor Information:;en;med_SECTION_DIAG_DATA;TESTS/LABS:;;11;11;07.07.2016 14:30:36.0;423;
+96;Entity Extraction;12;Operative procedure:;en;med_SECTION_PROCEDURE;PROCEDURE:;;11;11;07.07.2016 14:30:36.0;450;
+96;Entity Extraction;13;breast;en;ANATOMY;C50.9@ICDO3;;11;11;07.07.2016 14:30:36.0;480;
+96;Entity Extraction;14;Histologic Type:;en;med_SECTION_DIAG_DATA;TESTS/LABS:;;11;11;07.07.2016 14:30:36.0;499;
+96;Entity Extraction;15;Duct carcinoma in-situ;en;HISTOLOGY;PRECANCER;;11;11;07.07.2016 14:30:36.0;519;
+96;Entity Extraction;16;Duct carcinoma in-situ;en;med_CancerHistology;;;11;11;07.07.2016 14:30:36.0;519;
+96;Entity Extraction;17;Duct carcinoma in-situ;en;CancerHistology;;;11;11;07.07.2016 14:30:36.0;519;16
+96;Entity Extraction;18;Nuclear grade;en;GradeType;;;11;11;07.07.2016 14:30:36.0;543;19
+96;Entity Extraction;19;Nuclear grade:    Intermediate (2);en;med_CancerGrade;;;11;11;07.07.2016 14:30:36.0;543;
+96;Entity Extraction;20;Intermediate (2);en;GradeValue;;;11;11;07.07.2016 14:30:36.0;561;19
+96;Entity Extraction;21;high-grade;en;med_CancerGrade;;;11;11;07.07.2016 14:30:36.0;589;
+96;Entity Extraction;22;high-grade;en;GradeValue;;;11;11;07.07.2016 14:30:36.0;589;21
+96;Entity Extraction;23;comedo carcinoma;en;med_CancerHistology;;;11;11;07.07.2016 14:30:36.0;600;
+96;Entity Extraction;24;carcinoma;en;CancerHistology;;;11;11;07.07.2016 14:30:36.0;607;23
+96;Entity Extraction;25;carcinoma;en;med_HISTO/ICDO3;8010/3@ICDO3;;11;11;07.07.2016 14:30:36.0;607;
+96;Entity Extraction;26;carcinoma;en;HISTOLOGY;CARCINOMA;;11;11;07.07.2016 14:30:36.0;607;
+96;Entity Extraction;27;Necrosis:;en;med_SECTION_PROBLEM;PROBLEM SPECIFICATION:;;11;11;07.07.2016 14:30:36.0;622;
+96;Entity Extraction;28;comedo carcinoma;en;med_CancerHistology;;;11;11;07.07.2016 14:30:36.0;723;
+96;Entity Extraction;29;carcinoma;en;CancerHistology;;;11;11;07.07.2016 14:30:36.0;730;28
+96;Entity Extraction;30;carcinoma;en;med_HISTO/ICDO3;8010/3@ICDO3;;11;11;07.07.2016 14:30:36.0;730;
+96;Entity Extraction;31;carcinoma;en;HISTOLOGY;CARCINOMA;;11;11;07.07.2016 14:30:36.0;730;
+96;Entity Extraction;32;Margins:;en;med_SECTION_DIAG_DATA;TESTS/LABS:;;11;11;07.07.2016 14:30:36.0;750;
+96;Entity Extraction;33;free of tumor;en;Polarity;;;11;11;07.07.2016 14:30:36.0;769;
+96;Entity Extraction;34;"tumor
+Size:";en;med_SECTION_DIAG_DATA;TESTS/LABS:;;11;11;07.07.2016 14:30:36.0;777;
+96;Entity Extraction;35;"tumor
+Size:    1.2 cm";en;med_CancerSize;;;11;11;07.07.2016 14:30:36.0;777;
+96;Entity Extraction;36;tumor;en;PolNegative;;;11;11;07.07.2016 14:30:36.0;777;33
+96;Entity Extraction;37;1.2 cm;en;Size;;;11;11;07.07.2016 14:30:36.0;793;35
+96;Entity Extraction;38;1.2 cm;en;MEASURE;;;11;11;07.07.2016 14:30:36.0;793;
+96;Entity Extraction;39;duct carcinoma in-situ;en;HISTOLOGY;PRECANCER;;11;11;07.07.2016 14:30:36.0;814;
+96;Entity Extraction;40;duct carcinoma in-situ;en;med_CancerHistology;;;11;11;07.07.2016 14:30:36.0;814;
+96;Entity Extraction;41;duct carcinoma in-situ;en;CancerHistology;;;11;11;07.07.2016 14:30:36.0;814;40
+96;Entity Extraction;42;Microcalcifications:;en;med_SECTION_PROBLEM;PROBLEM SPECIFICATION:;;11;11;07.07.2016 14:30:36.0;839;
+96;Entity Extraction;43;DCIS;en;med_CancerHistology;;;11;11;07.07.2016 14:30:36.0;883;
+96;Entity Extraction;44;DCIS;en;HISTOLOGY;PRECANCER;;11;11;07.07.2016 14:30:36.0;883;
+96;Entity Extraction;45;DCIS;en;med_HISTO/ICDO3;8500/2@ICDO3;;11;11;07.07.2016 14:30:36.0;883;
+96;Entity Extraction;46;Special studies:;en;med_SECTION_DIAG_DATA;TESTS/LABS:;;11;11;07.07.2016 14:30:36.0;922;
+96;Entity Extraction;47;ER;en;med_GENE/HGNC;3467@HGNC;;12;12;07.07.2016 14:30:36.0;1002;
+96;Entity Extraction;48;ER;en;med_GENE/HGNC;3443@HGNC;;12;12;07.07.2016 14:30:36.0;1002;
+96;Entity Extraction;49;PR;en;med_GENE/HGNC;18216@HGNC;;12;12;07.07.2016 14:30:36.0;1020;
+96;Entity Extraction;50;PR-negative;en;BiomarkerStatusNegative;;;12;12;07.07.2016 14:30:36.0;1020;51
+96;Entity Extraction;51;PR-negative;en;med_Biomarker;;;12;12;07.07.2016 14:30:36.0;1020;
+96;Entity Extraction;52;PR;en;med_GENE/HGNC;9367@HGNC;;12;12;07.07.2016 14:30:36.0;1020;
+96;Entity Extraction;53;PR;en;med_GENE/HGNC;8910@HGNC;;12;12;07.07.2016 14:30:36.0;1020;
+96;Entity Extraction;54;PR;en;med_GENE/HGNC;39004@HGNC;;12;12;07.07.2016 14:30:36.0;1020;
+96;Entity Extraction;55;skin;en;ANATOMY;C44.9@ICDO3;;12;12;07.07.2016 14:30:36.0;1054;
+96;Entity Extraction;56;pTis N0(i-)(sn);en;med_CancerStage;;;12;12;07.07.2016 14:30:36.0;1096;
+96;Entity Extraction;57;pTis;en;StageT;;;12;12;07.07.2016 14:30:36.0;1096;56
+96;Entity Extraction;58;N0(i-)(sn);en;StageN;;;12;12;07.07.2016 14:30:36.0;1101;56
+96;Entity Extraction;59;axilla;en;ANATOMY;C76.1@ICDO3;;13;13;07.07.2016 14:30:36.0;1143;
+96;Entity Extraction;60;Lymph node;en;ANATOMY;C77.9@ICDO3;;13;13;07.07.2016 14:30:36.0;1160;
+96;Entity Extraction;61;negative for metastasis;en;med_CancerStage;;;13;13;07.07.2016 14:30:36.0;1172;
+96;Entity Extraction;62;negative for metastasis;en;StageM;;;13;13;07.07.2016 14:30:36.0;1172;61
+96;Entity Extraction;63;axilla;en;ANATOMY;C76.1@ICDO3;;14;14;07.07.2016 14:30:36.0;1233;
+96;Entity Extraction;64;Lymph node;en;ANATOMY;C77.9@ICDO3;;14;14;07.07.2016 14:30:36.0;1250;
+96;Entity Extraction;65;negative for metastasis;en;med_CancerStage;;;14;14;07.07.2016 14:30:36.0;1262;
+96;Entity Extraction;66;negative for metastasis;en;StageM;;;14;14;07.07.2016 14:30:36.0;1262;65
+96;Entity Extraction;67;Gross Description:;en;med_SECTION_ASSESSMENT;ASSESSMENT:;;15;15;07.07.2016 14:30:36.0;1298;
+96;Entity Extraction;68;breast;en;ANATOMY;C50.9@ICDO3;;16;16;07.07.2016 14:30:36.0;1352;
+96;Entity Extraction;69;skin;en;ANATOMY;C44.9@ICDO3;;16;16;07.07.2016 14:30:36.0;1409;
+96;Entity Extraction;70;17.0 x 16.0 x 4.0 cm.;en;MEASURE;;;16;16;07.07.2016 14:30:36.0;1451;
+96;Entity Extraction;71;skin;en;ANATOMY;C44.9@ICDO3;;16;16;07.07.2016 14:30:36.0;1478;
+96;Entity Extraction;72;10.4 x 5.2 cm.;en;MEASURE;;;16;16;07.07.2016 14:30:36.0;1500;
+96;Entity Extraction;73;skin;en;ANATOMY;C44.9@ICDO3;;16;16;07.07.2016 14:30:36.0;1541;
+96;Entity Extraction;74;nipple;en;ANATOMY;C50.0@ICDO3;;16;16;07.07.2016 14:30:36.0;1577;
+96;Entity Extraction;75;areola;en;ANATOMY;C50.0@ICDO3;;16;16;07.07.2016 14:30:36.0;1588;
+96;Entity Extraction;76;3.5 cm;en;MEASURE;;;16;16;07.07.2016 14:30:36.0;1605;
+96;Entity Extraction;77;nipple;en;ANATOMY;C50.0@ICDO3;;16;17;07.07.2016 14:30:36.0;1652;
+96;Entity Extraction;78;areola;en;ANATOMY;C50.0@ICDO3;;16;17;07.07.2016 14:30:36.0;1663;
+96;Entity Extraction;79;0.9 cm;en;MEASURE;;;16;17;07.07.2016 14:30:36.0;1729;
+96;Entity Extraction;80;1.5 x 1.3 x 1.0 cm;en;MEASURE;;;16;20;07.07.2016 14:30:36.0;1965;
+96;Entity Extraction;81;1.6 cm;en;MEASURE;;;16;20;07.07.2016 14:30:36.0;1993;
+96;Entity Extraction;82;summary:;en;med_SECTION_METADATA;METADATA;;16;23;07.07.2016 14:30:36.0;2140;
+96;Entity Extraction;83;nipple;en;ANATOMY;C50.0@ICDO3;;16;23;07.07.2016 14:30:36.0;2159;
+96;Entity Extraction;84;areola;en;ANATOMY;C50.0@ICDO3;;16;23;07.07.2016 14:30:36.0;2170;
+96;Entity Extraction;85;axillary;en;ANATOMY;C76.1@ICDO3;;16;23;07.07.2016 14:30:36.0;2269;
+96;Entity Extraction;86;axillary;en;ANATOMY;C76.1@ICDO3;;17;24;07.07.2016 14:30:36.0;2331;
+96;Entity Extraction;87;soft tissue;en;ANATOMY;C49.9@ICDO3;;17;24;07.07.2016 14:30:36.0;2420;
+96;Entity Extraction;88;0.9 x 0.7 x 0.6 cm.;en;MEASURE;;;17;24;07.07.2016 14:30:36.0;2442;
+96;Entity Extraction;89;soft tissue;en;ANATOMY;C49.9@ICDO3;;18;25;07.07.2016 14:30:36.0;2630;
+96;Entity Extraction;90;0.7 x 0.5 x 0.4 cm.;en;MEASURE;;;18;25;07.07.2016 14:30:36.0;2652;
+96;Entity Extraction;91;Microscopic Description:;en;med_SECTION_DIAG_DATA;TESTS/LABS:;;19;26;07.07.2016 14:30:36.0;2709;
+96;Entity Extraction;92;skin;en;ANATOMY;C44.9@ICDO3;;20;27;07.07.2016 14:30:36.0;2751;
+96;Entity Extraction;93;breast;en;ANATOMY;C50.9@ICDO3;;20;28;07.07.2016 14:30:36.0;2804;
+96;Entity Extraction;94;duct carcinoma in-situ;en;CancerHistology;;;20;28;07.07.2016 14:30:36.0;2840;95
+96;Entity Extraction;95;duct carcinoma in-situ;en;med_CancerHistology;;;20;28;07.07.2016 14:30:36.0;2840;
+96;Entity Extraction;96;duct carcinoma in-situ;en;HISTOLOGY;PRECANCER;;20;28;07.07.2016 14:30:36.0;2840;
+96;Entity Extraction;97;intermediate and focal high nuclear grade;en;med_CancerGrade;;;20;28;07.07.2016 14:30:36.0;2866;
+96;Entity Extraction;98;intermediate and focal high nuclear grade;en;GradeValue;;;20;28;07.07.2016 14:30:36.0;2866;97
+96;Entity Extraction;99;questionable infiltrative;en;ModalityPossible;;;20;29;07.07.2016 14:30:36.0;2980;
+96;Entity Extraction;100;infiltrative;en;ModPossible;;;20;29;07.07.2016 14:30:36.0;2993;99
+96;Entity Extraction;101;infiltrative;en;BEHAVIOR;cancer_behavior3;;20;29;07.07.2016 14:30:36.0;2993;
+96;Entity Extraction;102;p63;en;med_GENE/HGNC;15979@HGNC;;20;29;07.07.2016 14:30:36.0;3053;
+96;Entity Extraction;103;p63;en;med_GENE/HGNC;12640@HGNC;;20;29;07.07.2016 14:30:36.0;3053;
+96;Entity Extraction;104;p63;en;med_GENE/HGNC;16991@HGNC;;20;29;07.07.2016 14:30:36.0;3053;
+96;Entity Extraction;105;myosin;en;med_GENE/HGNC;23212@HGNC;;20;29;07.07.2016 14:30:36.0;3058;
+96;Entity Extraction;106;no evidence of invasive;en;Polarity;;;20;30;07.07.2016 14:30:36.0;3131;
+96;Entity Extraction;107;invasive;en;PolNegative;;;20;30;07.07.2016 14:30:36.0;3146;106
+96;Entity Extraction;108;invasive;en;BEHAVIOR;cancer_behavior3;;20;30;07.07.2016 14:30:36.0;3146;
+96;Entity Extraction;109;invasive neoplasia;en;med_CancerHistology;;;20;30;07.07.2016 14:30:36.0;3146;
+96;Entity Extraction;110;invasive;en;CancerBehavior;;;20;30;07.07.2016 14:30:36.0;3146;109
+96;Entity Extraction;111;neoplasia;en;CancerHistology;;;20;30;07.07.2016 14:30:36.0;3155;109
+96;Entity Extraction;112;neoplasia;en;HISTOLOGY;cancer_histology;;20;30;07.07.2016 14:30:36.0;3155;
+96;Entity Extraction;113;lymph node;en;ANATOMY;C77.9@ICDO3;;21;31;07.07.2016 14:30:36.0;3186;
+96;Entity Extraction;114;no evidence of metastasis;en;med_CancerStage;;;21;31;07.07.2016 14:30:36.0;3205;
+96;Entity Extraction;115;no evidence of metastasis;en;StageM;;;21;31;07.07.2016 14:30:36.0;3205;114
+96;Entity Extraction;116;no evidence of micrometastasis;en;med_CancerStage;;;21;32;07.07.2016 14:30:36.0;3285;
+96;Entity Extraction;117;no evidence of micrometastasis;en;StageM;;;21;32;07.07.2016 14:30:36.0;3285;116
+96;Entity Extraction;118;lymph node;en;ANATOMY;C77.9@ICDO3;;22;33;07.07.2016 14:30:36.0;3338;
+96;Entity Extraction;119;no metastasis;en;med_CancerStage;;;22;33;07.07.2016 14:30:36.0;3361;
+96;Entity Extraction;120;no metastasis;en;StageM;;;22;33;07.07.2016 14:30:36.0;3361;119
+96;Entity Extraction;121;no evidence of micrometastasis;en;med_CancerStage;;;22;34;07.07.2016 14:30:36.0;3422;
+96;Entity Extraction;122;no evidence of micrometastasis;en;StageM;;;22;34;07.07.2016 14:30:36.0;3422;121
+96;Entity Extraction;123;breast;en;ANATOMY;C50.9@ICDO3;;23;35;07.07.2016 14:30:36.0;3468;
+96;Entity Extraction;124;axillary;en;ANATOMY;C76.1@ICDO3;;23;35;07.07.2016 14:30:36.0;3485;
+96;Entity Extraction;125;axillary;en;ANATOMY;C76.1@ICDO3;;23;35;07.07.2016 14:30:36.0;3521;

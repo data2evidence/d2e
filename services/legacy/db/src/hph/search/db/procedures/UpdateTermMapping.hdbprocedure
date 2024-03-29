@@ -1,0 +1,45 @@
+PROCEDURE "hc.hph.search.db.procedures::UpdateTermMapping" (  
+	IN  it_update "hc.hph.search.db.models::TT_SV_TERMMAPPINGS",
+	IN  it_before "hc.hph.search.db.models::TT_SV_TERMMAPPINGS",
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"
+)
+LANGUAGE SQLSCRIPT	SQL SECURITY DEFINER AS
+	lv_count BIGINT;
+BEGIN
+	select "MAPPING_ID" from "hc.hph.search.db.models::Search.TermMappings"
+		where "MAPPING_ID" in (select "MAPPING_ID" from :it_update) for update
+	;
+
+	select count(*) into lv_count from :it_update where length(trim(' ' from "MAPPING_ID")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating termmapping: MAPPING_ID field cannot be empty.' detail from "hc::DUMMY";
+		return;	
+	end if;	
+
+	select count(*) into lv_count from :it_update where length(trim(' ' from "TERM_1")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating termmapping: Term_1 field cannot be empty.' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	select count(*) into lv_count from :it_update where length(trim(' ' from "TERM_2")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating termmapping: Term_2 field cannot be empty.' detail from "hc::DUMMY";
+		return;	
+	end if;	
+	 	
+
+	update "hc.hph.search.db.models::Search.TermMappings" tm
+	set 
+		tm."TERM_1" = upd."TERM_1",
+		tm."TERM_2" = upd."TERM_2",
+		tm."LANGUAGE_CODE" = upd."LANGUAGE_CODE",
+		tm."LIST_ID" = upd."LIST_ID",
+		tm."WEIGHT" = upd."WEIGHT"
+	FROM "hc.hph.search.db.models::Search.TermMappings" tm, :it_update upd
+		WHERE tm."MAPPING_ID" = upd."MAPPING_ID"
+	;	 
+END;

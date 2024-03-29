@@ -1,0 +1,141 @@
+{
+    "resourceType": "StructureDefinition",
+    "id": "HCIMObservationView",
+    "url": "http://data4life-asia.care/health/fhir/StructureDefinition/HCIMObservationView",
+    "kind": "resource",
+    "type": "HCIMObservationView",
+    "meta": {
+        "profile": [
+            "http://data4life.care/health/fhir/profile/Viewdefinition"
+        ]
+    },
+    "extension": [
+        {
+            "uri": "http://data4life.care/health/fhir/extension/schema",
+            "valueString": "FHIR"
+        },
+        {
+            "uri": "http://data4life-asia.care/health/fhir/extension/table",
+            "valueString": "ObservationView"
+        },
+        {
+            "uri": "http://data4life-asia.care/health/fhir/extension/definition",
+            "valueString": "((select \t\"_RecordKey\",\r\n\t\t\"BloodPressureDateTime\" as \"EffectiveDataTime\",\r\n\t\t'http://hl7.org/fhir/observation-category' as \"CategorySystem\",\r\n\t\t'vital-signs' as \"CategoryCode\",\r\n\t\t'http ://loinc.org' as \"CodeSystem\",\r\n\t\t'85354-9' as \"CodeCode\",\r\n\t\t\"Subject_Patient\" as \"SubjectPatient\"\r\n\t\tfrom %%SCHEMA%%.\"BloodPressure\") UNION (select \r\n\t\t\"_RecordKey\",\r\n\t\t\"WeightDateTime\" as \"EffectiveDataTime\",\r\n\t\t'http://hl7.org/fhir/observation-category' as \"CategorySystem\",\r\n\t\t'vital-signs' as \"CategoryCode\",\r\n\t\t'http ://loinc.org' as \"CodeSystem\",\r\n\t\t'29463-7' as \"CodeCode\",\r\n\t\t\"Subject_Patient\" as \"SubjectPatient\"\r\n\t\tfrom %%SCHEMA%%.\"BodyWeight\"))"
+        }
+    ],
+    "snapshot": {
+        "element": [
+            {
+                "id": "HCIMObservationView",
+                "path": "HCIMObservationView",
+                "min": 0,
+                "max": "*"
+            },
+            {
+                "id": "CategorySystem",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "CategorySystem"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARCHAR"
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "CategoryCode",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "CategoryCode"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARCHAR"
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "CodeSystem",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "CodeSystem"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARCHAR"
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "CodeCode",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "CodeCode"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARCHAR"
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "SubjectPatient",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "SubjectPatient"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "_RecordKey",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "_RecordKey"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "VARBINARY"
+                    }
+                ],
+                "max": "*"
+            },
+            {
+                "id": "EffectiveDataTime",
+                "min": 0,
+                "extension": [
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column",
+                        "valueString": "EffectiveDataTime"
+                    },
+                    {
+                        "uri": "http://data4life-asia.care/health/fhir/extension/column-type",
+                        "valueString": "TIMESTAMP"
+                    }
+                ],
+                "max": "*"
+            }
+        ]
+    }
+}

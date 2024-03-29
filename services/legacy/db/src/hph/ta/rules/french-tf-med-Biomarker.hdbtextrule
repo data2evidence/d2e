@@ -1,0 +1,244 @@
+!======================================================================
+! File Name: french-tf-med-Biomarker.hdbtextrul
+! Author: Pierre Marchal (PI IC HC Platform FR)
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of biomarkers and their relations
+!======================================================================
+
+
+!======================================================================
+! OUTPUT FIELDS:
+!======================================================================
+
+! Biomarker group: med_Biomarker
+
+!At least two of the following subentities must be present to trigger the rule:
+
+!!Biomarker
+!!BiomarkerStatusEquivocal
+!!BiomarkerStatusNegative
+!!BiomarkerStatusPositive
+!!BiomarkerStatusUnknown
+!!BiomarkerTest
+!!BiomarkerAlteration
+
+!Optional subentities:
+!!BiomarkerLocation
+!!BiomarkerScore
+!======================================================================
+
+
+
+!!!!!!!!!!!!!!!!!!!!!
+!! BIOMARKER SCORE
+#subgroup Score: {
+    [OD Observation_CancerBiomarker_Value] (
+        <\p{ci}(score)> <[0-9]+> <\+>?
+        | <log> <ratio> <POS:Num>
+    ) [/OD]
+}
+
+#subgroup OD_Score: {
+   %(Score)
+    | <\(> %(Score) <\)>
+}
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!
+!! BIOMARKER LOCATION
+#subgroup Location: {
+    ( <POS:Det> | <l> <''> | <au> <niveau> <POS:Prep> <POS:Det>? )?
+    [OD Observation_CancerBiomarker_Component_DNARegion] (
+        ( <exons> | <exon> ( <\(> <s> <\)> | <s> )? )
+            ( <(\-|[0-9]+)+>+ | <(\,|[0-9]+)+>+ )
+            ( <et> <[0-9]+> )?
+        | <codon> <[0-9]+>
+    ) [/OD]
+}
+
+#subgroup OD_Location: {
+    <\(> %(Location) <\)>
+    | %(Location)
+}
+
+
+
+!!!!!!!!!!!!
+!! STATUS
+#subgroup biomarker__OD_Status: {
+    [OD POS] (
+        <\:>? <STEM:positif>
+        | <\+>
+        | <STEM:être> <POS:Adv>? <STEM:positif>
+        | <STEM:avoir>? <STEM:être> <STEM:identifier>
+        | <STEM:être>? <STEM:informatif>
+    ) [/OD]
+    | [OD NEG] (
+        <\:>? <STEM:négatif>
+        | <\->
+        | <STEM:être>? <non> <STEM:contributif>
+    ) [/OD]
+    | [OD IE] (
+        <\:>? <en> <cours>
+        | <\:>? <non> <STEM:réaliser>
+    ) [/OD]
+}
+
+#subgroup OD_Status__biomarker: {
+    [OD NEG] (
+        <\p{ci}(négativité)> <STEM:être>? <STEM:retrouver> <pour>
+        | <\p{ci}(statut)> <négatif> <de>
+    ) [/OD]
+}
+
+#subgroup test__OD_Status: {
+    [OD POS] (
+        <STEM:avoir>? <STEM:confirmer>
+    ) [/OD]
+    | [OD IE] (
+        <STEM:être>? <en> <attente> 
+    ) [/OD]
+}
+
+#subgroup OD_Status__test: {
+    [OD POS] (
+        <STEM:confirmer> <par>
+    ) [/OD]
+    | [OD IE] (
+        <\p{ci}(en)> <attente> <POS:Prep> <STEM:résultat> <POS:Prep>
+    ) [/OD]
+}
+
+#subgroup OD_Status__alteration: {
+    [OD POS] (
+        <STEM:observer>
+        | <STEM:avoir>? <STEM:retrouver>
+        | <STEM:mettre> <en> <évidence>
+        | <STEM:présence> ( <POS:Prep> | <d> <''> )
+        | <STEM:exister>
+    ) [/OD]
+    | [OD NEG] (
+        <\p{ci}(absence)> <de>
+        | <\p{ci}(pas)> <de> <positivité> <pour>
+        | <STEM:aucun>
+        | <\p{ci}(pas)> <de>
+        | <STEM:ne> <STEM:être> <pas> <STEM:porteur> <POS:Prep>
+    ) [/OD]
+    | [OD IE] (
+        <\p{ci}(pas)> <possible> <de> <conclure> <sur>
+    ) [/OD]
+}
+
+
+
+!!!!!!!!!!!!!!!!
+!! ALTERATION 
+#subgroup TE_ALTERATION_TYPE: {
+    [OD Observation_CancerBiomarker_Component_Alteration] (
+        [TE OBSERVATION_CANCERBIOMARKER_COMPONENT_ALTERATION]  <>+ [/TE]
+        | [TE OBSERVATION_CANCERBIOMARKER_COMPONENT_ALTERATION] <mutation> [/TE] <[A-Z][0-9]+[A-Z]>
+    ) [/OD]
+}
+
+#subgroup OD_Alteration: {
+    ( <POS:Det,STEM:~(aucun)> | <POS:Det,STEM:~(aucun)> <POS:Adj>)?
+    %(TE_ALTERATION_TYPE)
+    ( <POS:Adj>+ | <dans> <la> <tumeur> | <POS:Adv> <POS:Adj> )?
+}
+
+
+
+!!!!!!!!!!!!!!!!!!!!
+!! BIOMARKER TEST
+#subgroup TE_BIO_TEST_TYPE: [OD Observation_CancerBiomarker_Method] [TE OBSERVATION_CANCERBIOMARKER_METHOD] <>+ [/TE] [/OD]
+
+#subgroup OD_Test: {
+    <POS:Det>? %(TE_BIO_TEST_TYPE)
+}
+
+
+
+!!!!!!!!!!!!!!!
+!! BIOMARKER
+#subgroup TE_med_GENE: {
+    [OD Observation_CancerBiomarker_Normalized] [TE OBSERVATION_CANCERBIOMARKER_NORMALIZED] <>* <~(\-)> [/TE] [/OD]
+    ( <\-> [OD Observation_CancerBiomarker_Normalized] [TE OBSERVATION_CANCERBIOMARKER_NORMALIZED] <>+ [/TE] [/OD] )*
+}
+
+#subgroup Biomarker: {
+    ( <POS:Det> | <\(> <POS:Det> <\)> )?
+    (
+        <STEM:varier> <STEM:pathogène>
+        | <STEM:(g[èê]nes?|protéine|oncoprotéine|anticorps)> ( <\(> <s> <\)> )?
+        | <STEM:(promoteur|marqueur)>
+    )?
+    ( <POS:Prep> <POS:Det>? )?
+    %(TE_med_GENE)
+}
+
+#subgroup OD_Biomarker: {
+    %(Biomarker) ( <\(> %(Biomarker) <\)> )?
+    (
+        ( <\,> <et> | <\,> | <et> )
+        %(Biomarker) ( <\(> %(Biomarker) <\)> )?
+    )*
+}
+
+#subgroup OD_Biomarker_BiomarkerStatus: {
+    [OD POS] [TE OBSERVATION_CANCERBIOMARKER_NORMALIZED] <>* <.*\+>  [/TE] [/OD]
+    | [OD NEG] [TE OBSERVATION_CANCERBIOMARKER_NORMALIZED] <>* <.*\-> [/TE] [/OD]
+}
+
+
+!!!!!!!!!!!
+!! LINKS
+#subgroup alteration__biomarker: <POS:Prep> | <POS:Prep> <STEM:niveau> <POS:Prep> | <de> <\(> <s> <\)>
+#subgroup location__biomarker: <POS:Prep>
+#subgroup biomarker__test: <par> | <STEM:avoir>? <STEM:être> <STEM:effectuer> <par>
+#subgroup alteration__location: <POS:Prep>
+
+
+
+!!!!!!!!!!
+!! MISC
+#subgroup filler: {
+    ! appears in many IGR documents (probably auto-generated) 
+    <sur> ( <l> <''> | <l'> ) <ADN> <tumoral> <testé> <dans> <la> <limite> <de> <la> <technique> <utilisée>
+}
+
+
+
+!!!!!!!!!!
+!! MAIN
+!! (because of a bug preventing the longest match from being returned I had to write my rules in a redundant way)
+#group Observation_CancerBiomarker: {
+    %(OD_Alteration) %(alteration__biomarker)? %(OD_Biomarker) %(OD_Status__test) %(OD_Test)
+    | %(OD_Alteration) %(alteration__biomarker)? %(OD_Biomarker)
+    | %(OD_Alteration) %(alteration__biomarker)? %(OD_Biomarker) %(biomarker__OD_Status)
+    | %(OD_Alteration) %(alteration__biomarker)? %(OD_Biomarker) %(OD_Score)
+    | %(OD_Alteration) %(alteration__biomarker)? %(OD_Biomarker) %(biomarker__test)? %(OD_Test)
+    | %(OD_Alteration) %(alteration__biomarker)? %(OD_Biomarker) %(biomarker__test)? %(OD_Test) %(test__OD_Status)
+    | %(OD_Biomarker) %(biomarker__OD_Status)
+    | %(OD_Biomarker) %(biomarker__OD_Status) %(OD_Score)
+    | %(OD_Biomarker) %(OD_Alteration)
+    | %(OD_Status__alteration) %(OD_Alteration) %(alteration__location) %(OD_Location) %(location__biomarker) %(OD_Biomarker) %(OD_Location)
+    | %(OD_Status__alteration) %(OD_Alteration) %(alteration__location) %(OD_Location) %(location__biomarker) %(OD_Biomarker)
+    | %(OD_Status__alteration) %(OD_Alteration) %(alteration__biomarker)? %(OD_Biomarker)
+    | %(OD_Status__alteration) %(OD_Alteration) %(alteration__biomarker)? %(OD_Biomarker) %(filler)? %(OD_Location)
+    | %(OD_Status__biomarker) %(OD_Biomarker)
+    | %(OD_Status__biomarker) %(OD_Biomarker) %(OD_Score)
+    | %(OD_Status__test) %(OD_Test) %(OD_Biomarker)
+    | %(OD_Test) %(OD_Biomarker) %(biomarker__OD_Status)
+    | %(OD_Test) %(test__OD_Status) %(OD_Alteration) %(OD_Biomarker)
+    | %(OD_Test) %(OD_Biomarker) %(OD_Alteration)
+    | %(OD_Test) %(OD_Biomarker)
+    | %(OD_Alteration) %(alteration__location) %(OD_Location) %(location__biomarker) %(OD_Biomarker) %(biomarker__test) %(OD_Test)
+    | %(OD_Status__alteration) %(OD_Alteration) %(OD_Location)
+    | %(OD_Biomarker) <\:> %(OD_Status__alteration) %(OD_Alteration) <POS:Prep> <POS:Det> <STEM:gène>
+    | %(OD_Biomarker_BiomarkerStatus)
+    | %(OD_Test) %(OD_Biomarker_BiomarkerStatus)
+    | %(OD_Biomarker_BiomarkerStatus) %(OD_Score)
+    | %(OD_Alteration) %(alteration__biomarker)? %(OD_Biomarker_BiomarkerStatus)
+}
+

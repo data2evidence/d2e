@@ -1,0 +1,20 @@
+PROCEDURE "hc.hph.search.db.procedures::CreateTermMappingUiClosed" (
+    
+	IN  it_new "hc.hph.search.db.models::TT_SV_TERMMAPPINGUICLOSED",
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"    
+    
+)
+	LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count INTEGER;
+BEGIN
+
+	select count(*) into lv_count from :it_new;
+	
+	if :lv_count > 1 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error createing TermMappingUiClosed.' as detail from "hc::DUMMY";
+    end if;
+
+	insert into "hc.hph.search.db.models::Search.TermMappingUiClosed" ("USER_ID" ) VALUES (SESSION_CONTEXT( 'APPLICATIONUSER' )) ;
+	
+END

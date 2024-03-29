@@ -1,0 +1,40 @@
+PROCEDURE "hc.hph.di.procedures::update_adapter_logs" (
+				in ParentAuditLogID BIGINT,
+				in in_details "hc.hph.di.model::DataIntegration.CdtAdapterLog", 
+				in in_trace "hc.hph.di.model::DataIntegration.CdtAdapterTrace") 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+	ExtensionID nvarchar(256);
+	ProfileID BIGINT;
+	SourceID nvarchar(5);
+BEGIN
+
+	declare source_found INT := 0;																
+
+	
+	select "ExtensionID" into ExtensionID from "hc.hph.di.model::DataIntegration.AuditLog" where "AuditLogID" = :ParentAuditLogID;
+	select "ProfileID" into ProfileID from "hc.hph.di.model::DataIntegration.AuditLog" where "AuditLogID" = :ParentAuditLogID;
+	
+	--source could be existing or non existing in a profile and hence in audit log as well.
+	select count(*) into source_found from "hc.hph.di.model::DataIntegration.AuditLog" where "AuditLogID" = :ParentAuditLogID;
+   	if :source_found = 0 then 
+   	 	SourceID := '';
+   	else 
+   	 	select "SourceID" into SourceID from "hc.hph.di.model::DataIntegration.AuditLog" where "AuditLogID" = :ParentAuditLogID;
+   	end if; 	
+
+	insert into "hc.hph.di.model::DataIntegration.AuditLog" ("AuditLogID", "ParentAuditLogID", "ExtensionID", "ProfileID", "SourceID", "Status",
+ 																	"ProcessID", "ProcessType", "StartTime", "EndTime", "DocumentID",
+ 																	"DocumentURI", "DocumentName", "DocumentSize", "DocumentType", "Notes" )
+ 																	select "hc.hph.di.model::AuditLogID_Seq".NEXTVAL, 
+ 																	:ParentAuditLogID, :ExtensionID, :ProfileID, :SourceID, "STATUS", "LOGDETAILID",'',
+ 																	"STARTTIME", "ENDTIME", "DOCUMENTID",'','',"DOCUMENTSIZE", "DOCUMENTTYPE","NOTES" from :in_details;
+ 	insert into "hc.hph.di.model::DataIntegration.AuditLogTrace"("LogTraceID", "AuditLogID", "Status", "Timestamp", "Location", "Text")
+ 		select "LOGTRACEID", (select "AuditLogID" from "hc.hph.di.model::DataIntegration.AuditLog" where "ProcessID" = "LOGDETAILID"), "LOGSTATUS", "LOGTIMESTAMP", "LOGLOCATION", "LOGMESSAGE" from :in_trace;												
+																			
+END;
+
+
+
+
+

@@ -1,0 +1,19 @@
+#if ($cardinality=="1")
+	private $type $name;
+	public void set$firstUpperName( $type $name){
+		this.$name = $name;
+	}
+	public $type get$firstUpperName(){
+		ensureResolved();
+		return $name;
+	}
+#else
+	private List<$type> $name = new ArrayList<$type>();
+	public void set$firstUpperName( List<$type> $name){
+		this.$name .addAll($name);
+	}
+	public List<$type> get$firstUpperName(){
+		ensureResolved();
+		return  Collections.unmodifiableList( this.$name);
+	}
+#end

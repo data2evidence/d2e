@@ -1,0 +1,33 @@
+PROCEDURE "hc.hph.genomics.db.procedures.vb::AlleleStatistics" ( 
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN chromosome_index INTEGER,
+        IN position INTEGER,
+        IN allele NVARCHAR( 255 ),
+        OUT affected_count INTEGER,
+        OUT sample_count INTEGER
+    )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   READS SQL DATA AS
+BEGIN
+    SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+    
+    SELECT
+            COUNT( DISTINCT "AllSamples"."PatientDWID" ) INTO affected_count
+        FROM
+            :sample_list as "Samples"
+            INNER JOIN "hc.hph.genomics.db.models::General.Samples" as "AllSamples"
+                ON "Samples"."SampleIndex" = "AllSamples"."SampleIndex"
+            JOIN  "hc.hph.genomics.db.models::SNV.GenotypeAlleles" AS "GenotypeAlleles"
+                ON "GenotypeAlleles"."SampleIndex" = "Samples"."SampleIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+                ON "GenotypeAlleles"."DWAuditID" = "Variants"."DWAuditID"
+                AND "GenotypeAlleles"."VariantIndex" = "Variants"."VariantIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.VariantAlleles" AS "VariantAlleles"
+                ON "Variants"."DWAuditID" = "VariantAlleles"."DWAuditID"
+                AND "Variants"."VariantIndex" = "VariantAlleles"."VariantIndex"
+        WHERE "GenotypeAlleles"."AlleleCount" > 0
+            AND "VariantAlleles"."Allele" = :allele
+            AND "Variants"."ChromosomeIndex" = :chromosome_index
+            AND "Variants"."Position" = :position;
+END

@@ -1,0 +1,302 @@
+procedure "hc.hph.search.db.procedures::GenerateCommonTermMappings" (
+	in iv_sab nvarchar(100),
+	in iv_tablename nvarchar(100) --'hc.hph.search.db.models::Staging.Terms'
+)
+	language sqlscript
+	sql security definer
+	as
+begin
+
+	declare lv_count int;
+	declare lv_ddl nvarchar(5000);
+	declare lv_truncate_term_index nvarchar(400);
+
+
+	-----------------------------------------------------------------------------------------------
+	-- Reset staging tables
+	-----------------------------------------------------------------------------------------------
+
+	lv_truncate_term_index :='truncate table ';
+	lv_truncate_term_index := lv_truncate_term_index || '"$TA_legacy.hc.hph.search.db.models::Staging.Terms.term_index" ';
+	exec(:lv_truncate_term_index)
+	;
+	truncate table "hc.hph.search.db.models::Staging.Terms"
+	;
+	truncate table "hc.hph.search.db.models::Staging.Term_Word_Rel"
+	;
+	truncate table "hc.hph.search.db.models::Staging.Wordmappings"
+	;
+
+	-----------------------------------------------------------------------------------------------
+	-- Copy all English terms from source iv_sab in OTS term table to Terms
+	-----------------------------------------------------------------------------------------------
+
+	insert into "hc.hph.search.db.models::Staging.Terms" (
+		"TermID",
+		"CUI",
+		"Term",
+		"Lang",
+		"Wordset",
+		"Wordcount"
+	)
+	select
+		(select cast(sysuuid as varchar) as uuid from "hc::DUMMY") as "TermID",
+		t_translations."FromCode",
+		t_to_concept_terms."TermText",
+		t_to_concept_terms."TermLanguage",
+		null,
+		null
+	from "hc.hph.ots::Views.ConceptTranslation" t_translations
+	inner join "hc.hph.ots::Views.ConceptTerms" t_from_concept_terms
+		on  t_translations."FromVocabularyID" = 'ots.NCIm.CUI'
+		and t_translations."FromCode"         = t_from_concept_terms."ConceptCode"
+	inner join "hc.hph.ots::Views.ConceptTerms" t_to_concept_terms
+		on  t_translations."ToVocabularyID"     =  :iv_sab
+		and t_translations."ToCode"             =  t_to_concept_terms."ConceptCode"
+		and t_to_concept_terms."ConceptCode"  <> 'NOCODE'
+		and t_to_concept_terms."TermLanguage" =  'en'
+		and t_to_concept_terms."TermText"     =  t_from_concept_terms."TermText"
+	group by
+		t_translations."FromCode",
+		t_to_concept_terms."TermText",
+		t_to_concept_terms."TermLanguage"
+	;
+
+	commit;  -- trigger indexing
+
+
+	-----------------------------------------------------------------------------------------------
+	-- Busy wait for index to finish
+	-----------------------------------------------------------------------------------------------
+
+	loop
+		select count(*) into lv_count
+		from "hc::M_FULLTEXT_QUEUES"
+		where "TABLE_NAME" = :iv_tablename
+		  and "QUEUE_DOCUMENT_COUNT" > 0
+		;
+
+		if :lv_count = 0 then
+			break;
+		end if
+		;
+	end loop
+	;
+
+
+	-----------------------------------------------------------------------------------------------
+	-- Fill Term_Word_Rel words, excluding punctuation, one-character words and stopwords
+	-----------------------------------------------------------------------------------------------
+
+
+	lv_ddl := 'insert into "hc.hph.search.db.models::Staging.Term_Word_Rel" ( "TermID", "Word", "Lang" ) ';
+	lv_ddl := lv_ddl || 'select "TermID", "Word", "Lang"	from ( ';
+	lv_ddl := lv_ddl || 'select "TermID", coalesce("TA_STEM", "TA_NORMALIZED") as "Word", "TA_LANGUAGE" as "Lang" ';
+	lv_ddl := lv_ddl || 'from ' || '"$TA_legacy.hc.hph.search.db.models::Staging.Terms.term_index" order by "TermID" ) ';
+	lv_ddl := lv_ddl || 'where "Word" is not null ';
+	--exludes e.g. punctuation
+--		and length("Word") > 1 --Python code and comments conflict on excluding one-character words
+--		and "Word" not in ('of', 'the', 'an', 'in', 'at', '''s', 'as', 'and') --excludes stopwords, but will also remove "AS" from "AS element"
+	exec( :lv_ddl );
+
+
+	-----------------------------------------------------------------------------------------------
+	-- Update Terms table with wordcounts and word sets
+	-----------------------------------------------------------------------------------------------
+
+	update "hc.hph.search.db.models::Staging.Terms" terms
+	set terms."Wordset" = words."Wordset",
+		terms."Wordcount" = words."Wordcount"
+	from "hc.hph.search.db.models::Staging.Terms" terms, (
+		select "TermID", count(*) as "Wordcount", STRING_AGG("Word", ',') as "Wordset"
+		from "hc.hph.search.db.models::Staging.Term_Word_Rel"
+		group by "TermID"
+	) words
+	where terms."TermID" = words."TermID"
+	;
+
+
+	-----------------------------------------------------------------------------------------------
+	-- Remove terms that have no associated words in Term_Word_Rel
+	-----------------------------------------------------------------------------------------------
+
+	delete
+	from "hc.hph.search.db.models::Staging.Terms"
+	where "Wordset" is null
+	;
+
+
+	-----------------------------------------------------------------------------------------------
+	-- Rule 1: Map all one-word terms with the same code onto each other
+	-----------------------------------------------------------------------------------------------
+
+	insert into "hc.hph.search.db.models::Staging.Wordmappings" (
+		"MappingID",
+		"ListID",
+		"LanguageCode",
+		"Term1",
+		"Term2",
+		"Weight"
+	)
+	select (SELECT CAST(SYSUUID as VARCHAR) as UUID FROM "hc::DUMMY") as "MappingID", --TODO: move to next step
+		'hc.hph' as "ListID", table1."Lang" as "LanguageCode",
+		table1."Word" as "Term1", table2."Word" as "Term2", 1.0 as "Weight"
+	from (
+		select terms."CUI", words."Word", terms."Lang"
+		from "hc.hph.search.db.models::Staging.Terms" terms
+		inner join "hc.hph.search.db.models::Staging.Term_Word_Rel" words
+			on terms."TermID" = words."TermID"
+		where "Wordcount" = 1
+	) table1
+	inner join (
+		select terms."CUI", words."Word", terms."Lang"
+		from "hc.hph.search.db.models::Staging.Terms" terms
+		inner join "hc.hph.search.db.models::Staging.Term_Word_Rel" words
+			on terms."TermID" = words."TermID"
+		where "Wordcount" = 1
+	) table2
+	on table2."CUI" = table1."CUI"
+	and table2."Word" <> table1."Word"
+	;
+
+
+	-----------------------------------------------------------------------------------------------
+	-- Choose distinct mappings for insert into TermMappings (ignore duplicates in Wordmappings)
+	-----------------------------------------------------------------------------------------------
+
+	lt_new_mappings =
+		select
+		 	min("MappingID") as "MAPPING_ID",
+			min("ListID") as "LIST_ID",
+			min("LanguageCode") as "LANGUAGE_CODE",
+			t_distinct_keys."Term1" as "TERM_1",
+			t_distinct_keys."Term2" as "TERM_2",
+			max("Weight") as "WEIGHT",
+			0 as "EXISTS"
+		from (
+			select distinct "Term1", "Term2"
+			from "hc.hph.search.db.models::Staging.Wordmappings"
+		) t_distinct_keys
+
+		inner join "hc.hph.search.db.models::Staging.Wordmappings" t_wordmappings
+		on t_wordmappings."Term1" = t_distinct_keys."Term1"
+		and t_wordmappings."Term2" = t_distinct_keys."Term2"
+
+		group by
+			t_distinct_keys."Term1",
+			t_distinct_keys."Term2"
+		;
+
+
+	-----------------------------------------------------------------------------------------------
+	-- Insert mappings and source entries only if they do not exist
+	-----------------------------------------------------------------------------------------------
+
+	lt_does_exist =
+		select
+			ifnull(existing_mappings."MAPPING_ID", new_mappings."MAPPING_ID") as "MAPPING_ID",
+			new_mappings."LIST_ID",
+			new_mappings."TERM_1",
+			new_mappings."TERM_2",
+			new_mappings."LANGUAGE_CODE",
+			new_mappings."WEIGHT",
+			case when existing_mappings."MAPPING_ID" is null then 0 else 1 end as "EXISTS"
+		from :lt_new_mappings as new_mappings
+		left outer join "hc.hph.search.db.models::Search.TermMappings" as existing_mappings
+			on new_mappings."TERM_1" = existing_mappings."TERM_1"
+				and new_mappings."TERM_2" = existing_mappings."TERM_2"
+		;
+
+	insert into "hc.hph.search.db.models::Search.TermMappings" (
+		"MAPPING_ID",
+		"LIST_ID",
+		"LANGUAGE_CODE",
+		"TERM_1",
+		"TERM_2",
+		"WEIGHT"
+	)
+	select
+		"MAPPING_ID",
+		"LIST_ID",
+		"LANGUAGE_CODE",
+		"TERM_1",
+		"TERM_2",
+		"WEIGHT"
+	from :lt_does_exist
+	where "EXISTS" = 0
+	;
+
+	insert into "hc.hph.search.db.models::Search.TermMappingSource" (
+		"MAPPING_ID", "VOCABULARY_ID", "CREATED_AT", "CREATED_BY"
+	)
+	select
+		"MAPPING_ID",
+		:iv_sab as "VOCABULARY_ID",
+		current_timestamp as "CREATED_AT",
+		session_context('APPLICATIONUSER') as "CREATED_BY"
+	from :lt_does_exist
+	where "EXISTS" = 0
+	;
+
+	insert into "hc.hph.search.db.models::Search.TermMappingSource" (
+		"MAPPING_ID",
+		"VOCABULARY_ID",
+		"CREATED_AT",
+		"CREATED_BY"
+	)
+	select
+		"MAPPING_ID",
+		:iv_sab as "VOCABULARY_ID",
+		current_timestamp as "CREATED_AT",
+		session_context('APPLICATIONUSER') as "CREATED_BY"
+	from :lt_does_exist
+	where "EXISTS" = 1
+		and ("MAPPING_ID", :iv_sab) not in (
+			select
+				"MAPPING_ID",
+				"VOCABULARY_ID"
+			from "hc.hph.search.db.models::Search.TermMappingSource"
+		)
+	;
+
+
+	-----------------------------------------------------------------------------------------------
+	-- Delete mappings when a new version of the ontology no longer generates them
+	-----------------------------------------------------------------------------------------------
+
+	lt_is_deprecated =
+		select
+			ifnull(new_mappings."MAPPING_ID", existing_mappings."MAPPING_ID") as "MAPPING_ID",
+			case when new_mappings."MAPPING_ID" is null then 1 else 0 end as "DEPRECATED"
+		from "hc.hph.search.db.models::Search.TermMappings" as existing_mappings
+		left outer join :lt_new_mappings as new_mappings
+			on existing_mappings."TERM_1" = new_mappings."TERM_1"
+				and existing_mappings."TERM_2" = new_mappings."TERM_2"
+		;
+
+	delete from "hc.hph.search.db.models::Search.TermMappings"
+		where MAPPING_ID in (
+			select MAPPING_ID
+			from :lt_is_deprecated
+			where "DEPRECATED" = 1
+		)
+			and MAPPING_ID not in (
+				select MAPPING_ID
+				from "hc.hph.search.db.models::Search.TermMappingSource"
+				where "VOCABULARY_ID" <> :iv_sab
+			)
+			and LIST_ID <> 'hc.hph.custom'
+			and LIST_ID = 'hc.hph'
+	;
+
+	delete from "hc.hph.search.db.models::Search.TermMappingSource"
+		where MAPPING_ID in (
+			select MAPPING_ID
+			from :lt_is_deprecated
+			where "DEPRECATED" = 1
+		)
+			and "VOCABULARY_ID" = :iv_sab
+	;
+
+end
+;

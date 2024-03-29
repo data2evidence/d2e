@@ -1,0 +1,17 @@
+GDTitle;LEGACY;guardedDocumentsList;0;HPH_PAT_CONTENT_RELDOC_TABLE_DOC_TITLE;Title;X;;X;;string
+GDPreview;LEGACY;guardedDocumentsList;1;HPH_PAT_CONTENT_RELDOC_TABLE_PREVIEW;Preview;X;;X;;string
+GDAuthor;LEGACY;guardedDocumentsList;2;HPH_PAT_CONTENT_RELDOC_TABLE_AUTHOR;Author;X;X;X;X;string
+GDPatientID;LEGACY;guardedDocumentsList;3;;;;;;;string
+GDSourcePatientID;LEGACY;guardedDocumentsList;4;PATIENT_ID;SourcePatientID;;X;X;X;string
+GDPatientName;LEGACY;guardedDocumentsList;5;PATIENTNAME;PatientName;X;X;;;string
+GDFamilyName;LEGACY;guardedDocumentsList;6;FAMILYNAME;FamilyName;;;X;X;string
+GDGivenName;LEGACY;guardedDocumentsList;7;GIVENNAME;GivenName;;;X;X;string
+GDLanguageCode;LEGACY;guardedDocumentsList;8;HPH_PAT_CONTENT_RELDOC_TABLE_LANGUAGE_CODE;LanguageCode;;X;X;X;string
+GDFileName;LEGACY;guardedDocumentsList;9;HPH_PAT_CONTENT_RELDOC_TABLE_FILE_NAME;FileName;;X;X;X;string
+GDMIMEType;LEGACY;guardedDocumentsList;10;HPH_PAT_CONTENT_RELDOC_TABLE_MIME_TYPE;MIMEType;;X;X;X;string
+GDCreatedBy;LEGACY;guardedDocumentsList;11;HPH_PAT_CONTENT_RELDOC_TABLE_CREATED_BY;CreatedBy;;X;X;X;string
+GDCreatedAt;LEGACY;guardedDocumentsList;12;HPH_PAT_CONTENT_RELDOC_TABLE_CREATION_DATE;CreatedAt;;X;X;X;date
+GDChangedBy;LEGACY;guardedDocumentsList;13;HPH_PAT_CONTENT_RELDOC_TABLE_CHANGED_BY;ChangedBy;;X;X;X;string
+GDChangedAt;LEGACY;guardedDocumentsList;14;HPH_PAT_CONTENT_RELDOC_TABLE_MODIFICATION_DATE;ChangedAt;;X;X;X;string
+GDAction;LEGACY;guardedDocumentsList;15;;;X;;;;string
+GDDocumentID;LEGACY;guardedDocumentsList;16;;;;;;;string

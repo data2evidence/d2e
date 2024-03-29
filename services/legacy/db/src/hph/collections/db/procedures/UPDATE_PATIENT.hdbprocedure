@@ -1,0 +1,60 @@
+PROCEDURE "hc.hph.collections.db.procedures::UPDATE_PATIENT" ( 
+	IN  it_update  "hc.hph.collections.db.models::TT_PATIENT_ITEM", 
+	IN  it_before "hc.hph.collections.db.models::TT_PATIENT_ITEM",
+	
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR" 
+) 
+	--LANGUAGE SQLSCRIPT
+	--SQL SECURITY INVOKER 
+	--DEFAULT SCHEMA <default_schema_name>
+	--READS SQL DATA AS
+	
+	LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count BIGINT;
+	lv_check BIGINT;
+	
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 	select "Id" from "hc.hph.collections.db.models::CollectionModel.Collection"
+		where "Id" in (select "Id" from :it_update) for update
+	;
+	
+	select count(*) into lv_count from :it_update;
+	select count(*) into lv_check 
+		from :it_update item
+		inner join "hc.hph.collections.db.models::CollectionModel.Participant" p on
+		p."Collection.Id" = item."CollectionId"
+		and p."HANAUserName" = SESSION_CONTEXT('XS_APPLICATIONUSER')	
+		and p."Privilege.Id" != '1'
+	;
+	
+	if lv_count != :lv_check then 
+		ot_error = 
+			select 403 as http_status_code, 'Write access forbidden' error_message, 'Error updating collections - permission denied.' detail from "hc::DUMMY";
+		
+		return;	
+	end if;	
+	
+	update "hc.hph.collections.db.models::CollectionModel.Item" item
+	set 
+		item."ChangedBy" = SESSION_CONTEXT('XS_APPLICATIONUSER'),
+		item."ChangedAt" = CURRENT_UTCTIMESTAMP,
+		item."Status.Id" = upd."StatusId"
+	FROM "hc.hph.collections.db.models::CollectionModel.Item" item, :it_update upd
+		WHERE 
+			item."Id" = upd."Id"
+		and item."ItemType" = upd."ItemType"
+		and item."Collection.Id" = upd."CollectionId"
+	;
+	
+	update "hc.hph.collections.db.models::CollectionModel.Collection" col
+	set 
+		col."ChangedBy" = SESSION_CONTEXT('XS_APPLICATIONUSER'),
+		col."ChangedAt" = CURRENT_UTCTIMESTAMP
+	FROM "hc.hph.collections.db.models::CollectionModel.Collection" col, :it_update upd
+		WHERE col."Id" = upd."CollectionId"
+	;	
+ 
+END;

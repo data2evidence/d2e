@@ -1,0 +1,293 @@
+	{
+		"resourceType": "StructureDefinition",
+		"id": "Permission",
+		"url": "http://data4life.care/health/fhir/StructureDefinition/Permission",
+		"kind": "resource",
+		"name": "Permission",
+		"test": {
+			"div": "<div>Defines the permissions for a group</div>"
+		},
+		"type": "Permission",
+		"meta": {
+			"profile": [
+				"http://data4life.care/health/fhir/profile/StructureDefinition"
+			]
+		},
+		"snapshot": {
+			"element": [
+				{
+					"id": "Permission",
+					"path": "Permission",
+					"min": 0,
+					"max": "*"
+				},
+				{
+					"id": "Permission.id",
+					"short": "Logical id of this artifact",
+					"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+					"comment": "The only time that a resource does not have an id is when it is being submitted to the server using a create operation.",
+					"min": 0,
+					"max": "1",
+					"base": {
+						"path": "Resource.id",
+						"min": 0,
+						"max": "1"
+					},
+					"type": [
+						{
+							"code": "id"
+						}
+					],
+					"isSummary": true
+				},
+				{
+					"id": "Permission.url",
+					"short": "Canonical URL of this permission",
+					"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+					"min": 0,
+					"max": "1",
+					"type": [
+						{
+							"code": "uri"
+						}
+					],
+					"isSummary": true
+				},
+				{
+					"id": "TableContent.version",
+					"short": "Canonical Version of this permission",
+					"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+					"min": 0,
+					"max": "1",
+					"type": [
+						{
+							"code": "string"
+						}
+					],
+					"isSummary": true
+				},
+				{
+					"id": "Permission.group",
+					"path": "Permission.group",
+					"short": "The permissions are defined for this group",
+					"definition": "The permissions are defined for this group",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "id"
+						}
+					]
+				},
+				{
+					"id": "Permission.requiredAttributes",
+					"path": "Permission.requiredAttributes",
+					"short": "The SAML attributes that are required and referenced by this Security Group",
+					"definition": "The SAML attributes that are required and referenced by this Security Group",
+					"min": 1,
+					"max": "*",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				},
+				{
+					"id": "Permission.restPermission",
+					"path": "Permission.restPermission",
+					"short": "Describe the rest permissions for this group",
+					"description": "Describe the rest permissions for this group",
+					"min": 1,
+					"max": "*",
+					"type": [
+						{
+							"code": "BackboneElement"
+						}
+					]
+				},
+				{
+					"id": "Permission.restPermission.type",
+					"path": "Permission.restPermission.type",
+					"short": "resource | compartement | URL",
+					"description": "Describes the scope of this permission",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "code"
+						}
+					]
+				},
+				{
+					"id": "Permission.restPermission.definition",
+					"path": "Permission.restPermission.definition",
+					"short": "FHIR Resource Type which for which permissions are set",
+					"description": "FHIRResourceTypewhichforwhichpermissionsareset",
+					"min": 0,
+					"max": "1",
+					"type": [
+						{
+							"code": "Reference",
+							"targetProfile": "http://hl7.org/fhir/StructureDefinition/StructureDefinition"
+						}
+					]
+				},
+				{
+					"id": "Permission.restPermission.endpoint",
+					"path": "Permission.restPermission.endpoint",
+					"short": "FHIR endpoint for which permissions are set",
+					"description": "EndPoint permission, required when URL is the type",
+					"min": 0,
+					"max": "1",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				},
+				{
+					"id": "Permission.restPermission.grant",
+					"path": "Permission.restPermission.grant",
+					"short": "create | read | update | patch | delete | history | vread | search",
+					"description": "Describes the scope of this permission",
+					"min": 1,
+					"max": "*",
+					"type": [
+						{
+							"code": "code"
+						}
+					]
+				},
+				{
+					"id": "Permission.restPermission.operation",
+					"path": "Permission.restPermission.operation",
+					"description": "List of operations supported",
+					"min": 0,
+					"max": "*",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				},
+				{
+					"id": "Permission.instancePermission",
+					"path": "Permission.instancePermission",
+					"short": "Describe the instance permissions for this group",
+					"description": "Describe the instance permissions for this group",
+					"min": 1,
+					"max": "*",
+					"type": [
+						{
+							"code": "BackboneElement"
+						}
+					]
+				},
+				{
+					"id": "Permission.instancePermission.type",
+					"path": "Permission.restPermission.type",
+					"short": "resource | compartement",
+					"description": "Describes the scope of this permission",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "code"
+						}
+					]
+				},
+				{
+					"id": "Permission.instancePermission.definition",
+					"path": "Permission.instancePermission.definition",
+					"short": "FHIR Resource Type which for which permissions are set",
+					"description": "FHIRResourceTypewhichforwhichpermissionsareset",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "Reference",
+							"targetProfile": "http://hl7.org/fhir/StructureDefinition/StructureDefinition"
+						}
+					]
+				},
+				{
+					"id": "Permission.instancePermission.grant",
+					"path": "Permission.instancePermission.grant",
+					"short": "create | read | update | patch | delete | history | vread | search",
+					"description": "Describes the scope of this permission",
+					"min": 1,
+					"max": "*",
+					"type": [
+						{
+							"code": "code"
+						}
+					]
+				},
+				{
+					"id": "Permission.instancePermission.constraintType",
+					"path": "Permission.instancetPermission.constraintType",
+					"short": "elementMap | fhirpath | no-constraint",
+					"description": "Describes how the permission shall be evaluated",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "code"
+						}
+					]
+				},
+				{
+					"id": "Permission.instancePermission.element",
+					"path": "Permission.instancePermission.element",
+					"short": "Defines the element within the resource which has to be equal the value",
+					"description": "Defines the element within the resource which has to be equal the value",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				},
+				{
+					"id": "Permission.instancePermission.value",
+					"path": "Permission.instancePermission.value",
+					"short": "Defines the value within the resource which has to be equal the element",
+					"description": "Defines the value within the resource which has to be equal the element",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				},
+				{
+					"id": "Permission.instancePermission.expression",
+					"path": "Permission.instancePermission.expression",
+					"short": "Boolean FHIRPath Expression which determines granting access",
+					"description": "Boolean FHIRPath Expression which determines granting access",
+					"min": 1,
+					"max": "1",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				},
+				{
+					"id": "Permission.instancePermission.endpoint",
+					"path": "Permission.instancePermission.endpoint",
+					"short": "FHIR endpoint for which permissions are set",
+					"description": "Instance permission, required when URL is the type",
+					"min": 0,
+					"max": "1",
+					"type": [
+						{
+							"code": "string"
+						}
+					]
+				}
+			]
+		}
+	}

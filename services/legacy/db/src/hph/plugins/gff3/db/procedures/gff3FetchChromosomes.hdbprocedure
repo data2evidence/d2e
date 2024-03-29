@@ -1,0 +1,28 @@
+PROCEDURE "hc.hph.plugins.gff3.db.procedures::gff3FetchChromosomes" ( 
+IN schemaname VARCHAR(100),
+IN chromTable VARCHAR(100),
+IN refID NVARCHAR(255),
+OUT out_chrom table("ChromosomeName" NVARCHAR(255))) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER AS
+BEGIN
+/***************************** 
+	Write your procedure logic
+	create local temp table 
+	read from virtual table 
+	insert into locl temp
+	return select * from local  temp
+	
+	 
+ *****************************/
+ --,"MD5Hash" VARBINARY))
+DELETE FROM "hc.hph.plugins.gff3.db.models::Staging.HeaderChromosomes";
+
+EXEC 'INSERT INTO "hc.hph.plugins.gff3.db.models::Staging.HeaderChromosomes"
+SELECT "ChromosomeName"  from "' || ESCAPE_DOUBLE_QUOTES(:schemaname) || '"."' || ESCAPE_DOUBLE_QUOTES(:chromTable) || '"';
+
+
+out_chrom = select "ChromosomeName" from  "hc.hph.plugins.gff3.db.models::Staging.HeaderChromosomes";
+ 
+END;
+--

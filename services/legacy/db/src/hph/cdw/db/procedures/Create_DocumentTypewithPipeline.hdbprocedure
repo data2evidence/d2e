@@ -1,0 +1,21 @@
+PROCEDURE "hc.hph.cdw.db.procedures::Create_DocumentTypewithPipeline" (
+	IN documentType NVARCHAR(128),
+	OUT flag varchar(5)) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+
+DECLARE document INTEGER;
+DECLARE duplicate INTEGER;
+
+	select count("DWDocumentType") into duplicate from "hc.hph.cdw.db.models::DWDocuments.Document_Type" where "DWDocumentType" = :documentType;
+	IF :duplicate = 0 then
+	  INSERT INTO "hc.hph.cdw.db.models::DWDocuments.Document_Type"("DWDocumentType") VALUES(:documentType);
+	  INSERT INTO "hc.hph.di.documents.staging.db.models::DocumentProcessing.DocumentTypePipelineMapping"("PipelineID","DWDocumentType","CreatedAt","CreatedBy") 
+	  VALUES ('hc.hph.plugins.documents.DocumentProcessingPipeline',:documentType,CURRENT_TIMESTAMP,SESSION_CONTEXT( 'APPLICATIONUSER' ));
+	  commit;
+	  flag:='TRUE';
+	ELSE
+	  flag:='FALSE';
+	END IF;	
+END;

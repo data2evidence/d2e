@@ -1,0 +1,161 @@
+PROCEDURE "hc.hph.eula.procedures::UPDATE_FULL_EULA" ( 
+	IN  it_update "hc.hph.eula.model::SV_EULA",
+	IN  it_before "hc.hph.eula.model::SV_EULA",
+	OUT ot_error "hc.hph.eula.model::TT_ODATA_ERROR" 
+	) 
+	
+	LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count INTEGER;
+	lv_fromdate DATE;
+	lv_todate DATE;
+	lv_version INTEGER;
+	lv_name NVARCHAR(256);
+	lv_agency NVARCHAR(32);
+	lv_neweualid NVARCHAR(1024);
+	lv_active NVARCHAR(32);
+	newEulaId nvarchar(1024);
+	newEulaIdName nvarchar(256);
+	lv_currentdate DATE;
+	lv_newfromdate DATE;
+	lv_newtodate DATE;
+	lv_lang NVARCHAR(32);
+	lv_updateVersion INTEGER;
+	
+	lv_dName NVARCHAR(256);
+	lv_dLabel NVARCHAR(100);
+	lv_dDescription NVARCHAR(5000);
+	lv_dText NCLOB;
+	
+BEGIN
+    -- Eula exists ?
+    select top 1 "ID", "IdName" into newEulaId, newEulaIdName from :it_update;
+    call "hc.hph.eula.procedures::EXISTS_EULA" ( newEulaId, newEulaIdName, lv_count );
+    if :lv_count = 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating Eula: Eula does not exist.' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	-- Eula Exists but name already used 
+	select count(*) into lv_count 
+		from "hc.hph.eula.model::Eula_Model.Eula"
+		where "ID" != newEulaId  AND 
+			  "IdName" = newEulaIdName;  
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'EulaExists' error_message, 'Error updating Eula: Eula with name already exists.' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	
+    -- Empty name or id or Language fields
+	select count(*) into lv_count 
+		from :it_update 
+		where length(trim(' ' from "ID")) = 0 OR
+			  length(trim(' ' from "IdName")) = 0 OR
+			  length(trim(' ' from "LangName")) = 0 OR
+			  length(trim(' ' from "LangDesc")) = 0 OR
+			  length(trim(' ' from "LangText")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating Eula: ID and Name cannot be empty.' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	-- Empty start or enddate
+	select count(*) into lv_count from :it_update where length(trim(' ' from "ValidFromPointInTime")) = 0 OR length(trim(' ' from "ValidToPointInTime")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error updating Eula: Start date and End date need to be filled' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	select cast(SYSUUID as NVARCHAR(32)) into lv_neweualid from "hc::DUMMY";
+	select TOP 1 "VersionNo" into lv_version from "hc.hph.eula.model::Eula_Model.Eula" where "ID" = newEulaId ORDER BY "VersionNo" DESC;
+	--select TOP 1 "IdName" into lv_name from "hc.hph.eula.model::Eula_Model.Eula" where "ID" = newEulaId ORDER BY "VersionNo" DESC;
+	select "IdName" into lv_name from :it_update where "ID" = newEulaId;
+	select "VersionNo" into lv_updateVersion from :it_update where "ID" = newEulaId;
+	select "LangISO" into lv_lang from :it_update where "ID" = newEulaId;
+	select "ValidFromPointInTime" into lv_newfromdate from :it_update where "ID" = newEulaId;
+	select "ValidToPointInTime" into lv_newtodate from :it_update where "ID" = newEulaId;
+	
+	select TOP 1 "AgencyId" into lv_agency from "hc.hph.eula.model::Eula_Model.Eula" where "ID" = newEulaId AND "VersionNo" = lv_updateVersion ORDER BY "VersionNo" DESC;
+	select TOP 1 "ValidFromPointInTime" into lv_fromdate from "hc.hph.eula.model::Eula_Model.Eula" where "ID" = newEulaId AND "VersionNo" = lv_updateVersion ORDER BY "VersionNo" DESC;
+	select TOP 1 "ValidToPointInTime" into lv_todate from "hc.hph.eula.model::Eula_Model.Eula" where "ID" = newEulaId AND "VersionNo" = lv_updateVersion ORDER BY "VersionNo" DESC;
+	select TOP 1 "Active" into lv_active from "hc.hph.eula.model::Eula_Model.Eula" where "ID" = newEulaId AND "VersionNo" = lv_updateVersion ORDER BY "VersionNo" DESC;
+	
+	-- Wrong Validity Range 
+	select count(*) into lv_count from :it_update where "ValidFromPointInTime" > "ValidToPointInTime";
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Start date cannot be after enddate' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	if :lv_fromdate = lv_newfromdate then
+		SELECT CAST(ADD_DAYS(TO_DATE(lv_fromdate, 'YYYY-MM-DD'),1) as timestamp) into lv_fromdate FROM "hc::DUMMY";
+	else
+		select "ValidFromPointInTime" into lv_fromdate from :it_update where "ID" = newEulaId;
+	end if;	
+	
+	SELECT CURRENT_DATE into lv_currentdate FROM "hc::DUMMY";
+	if :lv_fromdate < lv_currentdate  then
+		SELECT CURRENT_DATE into lv_fromdate FROM "hc::DUMMY";
+	end if;
+	
+	if :lv_todate = lv_newtodate then
+		SELECT CAST(ADD_DAYS(TO_DATE(lv_fromdate, 'YYYY-MM-DD'),1) as timestamp) into lv_todate FROM "hc::DUMMY";
+	else
+		select "ValidToPointInTime" into lv_todate from :it_update where "ID" = newEulaId;
+	end if;	
+	
+	
+	if :lv_active = 'X' then
+		insert into "hc.hph.eula.model::Eula_Model.Eula" values(newEulaId,lv_version+1,lv_name,lv_agency,lv_fromdate,lv_todate,'');
+		
+		--SELECT "Name" into lv_dName FROM "hc.hph.eula.model::Eula_Model.EulaDescription" WHERE "ID" = newEulaId AND "LanguageISOCode" = 'en';
+		SELECT  TOP 1 "Label" into lv_dLabel FROM "hc.hph.eula.model::Eula_Model.EulaDescription" WHERE "DescribedInstance.ID" = newEulaId AND "LanguageISOCode" = lv_lang;
+		--SELECT "Description" into lv_dDescription FROM "hc.hph.eula.model::Eula_Model.EulaDescription" WHERE "ID" = newEulaId AND "LanguageISOCode" = 'en';
+		--SELECT "Text" into lv_dText FROM "hc.hph.eula.model::Eula_Model.EulaDescription" WHERE "ID" = newEulaId AND "LanguageISOCode" = 'en';
+		
+		SELECT "LangName" into lv_dName FROM :it_update WHERE "ID" = newEulaId;
+		--SELECT "Label" into lv_dLabel FROM :it_update WHERE "ID" = newEulaId AND "LanguageISOCode" = 'en';
+		SELECT "LangDesc" into lv_dDescription FROM :it_update WHERE "ID" = newEulaId;
+		SELECT "LangText" into lv_dText FROM :it_update WHERE "ID" = newEulaId;
+		
+		insert into "hc.hph.eula.model::Eula_Model.EulaDescription" values(lv_neweualid, lv_lang , newEulaId, lv_version+1, lv_dName, lv_dLabel,lv_dDescription, lv_dText, CURRENT_UTCTIMESTAMP, SESSION_CONTEXT ('XS_APPLICATIONUSER'));
+		
+		
+	else
+		
+	 	select "ValidFromPointInTime" into lv_fromdate from :it_update;
+		if :lv_fromdate <= :lv_currentdate  then
+			SELECT CAST(ADD_DAYS(TO_DATE(lv_currentdate, 'YYYY-MM-DD'),1) as timestamp) into lv_fromdate FROM "hc::DUMMY";
+		end if;
+		
+		select "ValidToPointInTime" into lv_todate from :it_update;
+		if :lv_todate < :lv_fromdate then
+			SELECT CAST(ADD_DAYS(TO_DATE(lv_fromdate, 'YYYY-MM-DD'),1) as timestamp) into lv_todate FROM "hc::DUMMY";
+		end if;
+	
+		update "hc.hph.eula.model::Eula_Model.Eula" eula 
+		set eula."IdName" = upd."IdName",
+			--eula."ValidFromPointInTime" = upd."ValidFromPointInTime",
+			eula."ValidFromPointInTime" = :lv_fromdate,
+			eula."ValidToPointInTime" = :lv_todate
+		FROM "hc.hph.eula.model::Eula_Model.Eula" eula, :it_update upd
+		WHERE eula."ID" = upd."ID" AND eula."VersionNo" = lv_updateVersion;
+		
+		update "hc.hph.eula.model::Eula_Model.EulaDescription" eula 
+		set eula."Name" = upd."LangName",
+			eula."Description" = upd."LangDesc",
+			eula."Text" = upd."LangText"
+		FROM "hc.hph.eula.model::Eula_Model.EulaDescription" eula, :it_update upd
+		WHERE eula."DescribedInstance.ID" = upd."ID" AND 
+			  eula."LanguageISOCode" = upd."LangISO" AND eula."DescribedInstance.VersionNo" = lv_updateVersion;
+		
+	end if;
+	
+	
+	
+END;

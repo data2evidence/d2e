@@ -1,0 +1,122 @@
+namespace hc.hph.plugins.vcf.db.models;
+
+using hc.hph.genomics.db.models::Type as Type;
+
+context Staging
+{
+
+	entity Files
+	{
+		key Filename : String(1024);
+		Content : LargeBinary;
+	} technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+           migration disabled;
+  	};
+	
+	
+	entity VariantAnnotations
+	{
+		DWAuditID : Type.DWDocID;
+		VariantIndex : Type.Position;
+		AlleleIndex : Integer;
+		ChromosomeIndex : Type.ChromosomeIndex;
+		Position : Type.Position;
+		GeneName : Type.FeatureName;
+		Region : Type.VariantRegion;
+		SequenceAlteration : Type.SequenceAlteration;
+		AminoAcid : Type.RefAltCombination;
+		MutationType : Type.MutationType;
+		CDSPosition:Integer64 null;
+		Transcript:String(255) null;
+		Protein:String(255) null;
+		ExonRank:Integer64 null;
+		RunAuditID : Type.DWDocID;
+	
+	} technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+  	};
+  	
+
+	table type geneNonCodingType
+	{
+    	DWAuditID : Type.DWDocID;
+		VariantIndex : Type.Position;
+		ChromosomeIndex : Type.ChromosomeIndex;
+		Position : Type.Position;
+		AlleleIndex : Integer;
+	    ALTALLELE: String(10);
+        REFALLELE :String(10);
+        FeatureName: String(255);
+        Class: String(255);
+        VT :String(10);
+        GENENAME :String(100);
+        Region :String(255);
+        Strand :String(1);
+        Transcript :String(255);
+        ExonRank:Integer64 ;
+        RunAuditID : Type.DWDocID;
+	};
+
+    table type geneCodingType
+    {
+    	DWAuditID : Type.DWDocID;
+		VariantIndex : Type.Position;
+		ChromosomeIndex : Type.ChromosomeIndex;
+		Position : Type.Position;
+		AlleleIndex : Integer;
+	    ALTALLELE: String(10);
+        REFALLELE :String(10);
+        //--FeatureName: String(255);
+        VT :String(10);
+        GENENAME :String(100);
+        Region :String(255);
+        Class: String(255);
+ 	    REFCODON: String(3);
+ 	    ALTCODON:String(3);
+ 	    Strand: String(1);
+ 	    CDSPosition:Integer64 ;
+ 	    Transcript :String(255);
+ 	    Protein:String(255);
+ 	    ExonRank:Integer64 ;
+ 	    RunAuditID : Type.DWDocID;
+    };
+
+    
+    entity GenomicsMigration {
+        ProfileAuditID : Type.DWDocID;
+        DocumentAuditID : Type.DWDocID;
+        FeatureAuditID : Type.DWDocID;
+    } technical configuration {
+ 	   column store;
+ 	   partition by keeping existing layout;
+           migration disabled;
+  	};
+    table type sampleDocType{
+        fileName: String(1024);
+        sampleId: String(255);
+        DWSource: String(100);
+        DWSourceFlag: String(100);
+        PatientID: String(100);
+        PatientIDFlag: String(100);
+        IntType: String(100);
+        IntDate: UTCTimestamp;
+        sourceURI: String(1024);
+    };
+    table type samplePatientType{
+        FamilyName: String(100);
+        PatientID: String(5000);
+        Gender: String(100);
+        PatientDBID: String(100);
+        GivenName: String(100);
+        BirthDate: String(100);
+        sampleId: String(255);
+        fileName: String(1024);
+        IntType: String(100);
+        IntDate: UTCTimestamp;
+        sourceURI: String(1024);
+		Scope: hana.TINYINT;
+    };
+};

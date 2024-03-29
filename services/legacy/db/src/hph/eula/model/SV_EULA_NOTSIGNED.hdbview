@@ -1,0 +1,21 @@
+VIEW "hc.hph.eula.model::SV_EULA_NOTSIGNED" ( "EulaName", "Name", "Label", "Description", "ID", "Text", "Language", "VersionNo" ) AS SELECT 
+		EU."IdName" AS "EulaName",
+        ED."Name" AS "Name",
+        ED."Label" AS "Label",
+        ED."Description" AS "Description",
+        EU."ID" AS "ID", 
+        ED."Text" AS "Text",
+        ED."LanguageISOCode" AS "Language",
+        ED."DescribedInstance.VersionNo" AS "VersionNo"
+    from "hc.hph.eula.model::Eula_Model.Eula" as EU
+    LEFT OUTER JOIN "hc.hph.eula.model::Eula_Model.EulaAgreement" as EA
+        on  EA."AgreedEula.ID" = EU."ID" AND 
+        	EA."AgreedEula.VersionNo" = EU."VersionNo" AND 
+            EA."Signee" = SESSION_CONTEXT('XS_APPLICATIONUSER')
+    INNER JOIN "hc.hph.eula.model::Eula_Model.EulaDescription" as ED
+        on ED."DescribedInstance.ID" = EU.ID AND ED."DescribedInstance.VersionNo" = EU."VersionNo" 
+    WHERE ( EA."SignDate" IS NULL  OR
+            EA."SignDate" < EU."ValidFromPointInTime" OR
+            EA."SignDate" > EU."ValidToPointInTime" OR
+            EA."Signee" IS NULL) AND EU."Active"='X' AND EU."VersionNo" = (SELECT MAX("VersionNo") FROM "hc.hph.eula.model::Eula_Model.Eula" WHERE "ID" = EU."ID" AND "Active"='X' AND current_utctimestamp between "ValidFromPointInTime" AND "ValidToPointInTime") AND
+            current_utctimestamp between EU."ValidFromPointInTime" AND EU."ValidToPointInTime" WITH READ ONLY

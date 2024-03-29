@@ -1,0 +1,90 @@
+{
+  "resourceType": "TableContent",
+  "id": "HCIMContactPerson_DATA",
+  "url": "http://data4life-asia.care/health/fhir/StructureDefinition/HCIMContactPerson_DATA",
+  "version": "0.1",
+  "definition": {
+    "reference": "HCIMContactPerson"
+  },
+  "row": [
+    {
+      "column": [
+        {
+          "name": "_RecordKey",
+          "valueString": "\u0001\u0002"
+        },
+        {
+          "name": "FirstName",
+          "valueString": "Petra"
+        },
+        {
+          "name": "Initial"
+        },
+        {
+          "name": "GivenName"
+        },
+        {
+          "name": "_NameUsage",
+          "valueString": ">>NIX GENAUES WAS MAN NICHT"
+        },
+        {
+          "name": "NameUsage_CD",
+          "valueString": "UNK"
+        },
+        {
+          "name": "Prefix",
+          "valueString": "Mr."
+        },
+        {
+          "name": "LastName",
+          "valueString": "Parker"
+        },
+        {
+          "name": "PartnerPrefix"
+        },
+        {
+          "name": "PartnerLastName"
+        },
+        {
+          "name": "InformationSource_PatientAsInformationSource::Patient",
+          "valueString": "\u0001"
+        },
+        {
+          "name": "InformationSource_HealthProfessional"
+        },
+        {
+          "name": "InformationSource_RelatedPersonAsInformationSource::ContactPerson"
+        },
+        {
+          "name": "Author_PatientAsAuthor::Patient"
+        },
+        {
+          "name": "Author_HealthProfessionalAsAuthor::HealthProfessional",
+          "valueString": "1"
+        },
+        {
+          "name": "Author_RelatedPersonAsAuthor::ContactPerson"
+        },
+        {
+          "name": "Subject_Patient",
+          "valueString": "\u0001"
+        },
+        {
+          "name": "Subject_RelatedPersonAsSubject::ContactPerson"
+        },
+        {
+          "name": "_DateTime",
+          "valueString": ">>20.09.2018"
+        },
+        {
+          "name": "_DateTime_Timezone",
+          "valueString": ">>Europe/Amsterdam"
+        },
+        {
+          "name": "DateTime",
+          "valueString": "2018-09-19T20:00:00Z"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+PROCEDURE "hc.hph.genomics.db.procedures.vb::RegionData"(
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN class NVARCHAR(255),
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        OUT regionAttributes "hc.hph.genomics.db.models::VariantBrowser.RegionDefinition"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+	regionAttributes = SELECT 
+	    region."ChromosomeIndex" AS "ChromosomeIndex",
+	    region."Region.Begin" AS "Begin", 
+	    region."Region.End" AS "End",
+	    region."Score" AS "Score",
+	    region."Color" AS "Color"
+	FROM
+	   "hc.hph.genomics.db.models::SV.Regions" AS region
+	INNER JOIN
+	    :sample_list AS sample
+	ON
+	    region."SampleID" = sample."SampleIndex"
+	WHERE
+	    ( :class IS NULL OR region."Class" = :class OR region."Class" LIKE :class || '.%') AND
+	    :reference_id = region."ReferenceID" AND
+	    ( :chromosome_index IS NULL OR (
+	        "ChromosomeIndex" = :chromosome_index AND
+	        region."Region.End" >= :begin_position AND
+	        region."Region.Begin" <= :end_position
+	    ) )
+	ORDER BY
+	    region."Region.Begin";
+END;

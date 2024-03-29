@@ -1,0 +1,74 @@
+[
+    {
+        "role": "Patient1",
+        "roletemplate": "fhir_Authorization",
+        "attributes": {
+            "groupId": {
+                "value": "HCIMPatientGroup",
+                "source": "static"
+            },
+            "socialSecurityNumber": {
+                "value": "12332332",
+                "source": "static"
+            },
+            "identifierSystem": {
+                "value": "2.16.840.1.113883.2.4.6.3",
+                "source": "static"
+            }
+        }
+    },
+    {
+        "role": "Patient2",
+        "roletemplate": "fhir_Authorization",
+        "attributes": {
+            "groupId": {
+                "value": "HCIMPatientGroup",
+                "source": "static"
+            },
+            "socialSecurityNumber": {
+                "value": "47110815",
+                "source": "static"
+            },
+            "identifierSystem": {
+                "value": "2.16.840.1.113883.2.4.6.3",
+                "source": "static"
+            }
+        }
+    },
+    {
+        "role": "AdminInitAuth",
+        "roletemplate": "fhir_InitAdministration"
+    },
+    {
+        "role": "AdminContentAuth",
+        "roletemplate": "fhir_ContentAdministration"
+    },
+    {
+        "role": "AdminScenarioAuth_HCIM_DEMO",
+        "roletemplate": "fhir_ScenarioAdministration",
+        "attributes": {
+            "endpoint": {
+                "value": "hcim_demo",
+                "source": "static"
+            }
+        }
+    },
+    {
+        "role": "AdminScenarioAuth_HCIM_SCENARIO",
+        "roletemplate": "fhir_ScenarioAdministration",
+        "attributes": {
+            "endpoint": {
+                "value": "hcim_scenario",
+                "source": "static"
+            }
+        }
+    },
+    {
+        "role": "AdminCompletePatientDelete",
+        "roletemplate": "fhir_CompletePatientDataDeletion"
+    },
+    {
+        "role": "AdminCompletePatientRead",
+        "roletemplate": "fhir_CompletePatientDataReporting"
+    }
+]

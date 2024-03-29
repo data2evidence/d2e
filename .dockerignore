@@ -1,0 +1,13 @@
+**/node_modules
+**/.env
+**/spec
+**/target
+build
+config
+docs
+jenkinsfile
+node_modules
+tests
+
+#Exclude specific files/folders
+!build/hana

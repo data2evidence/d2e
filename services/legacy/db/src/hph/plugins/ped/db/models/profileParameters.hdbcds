@@ -1,0 +1,18 @@
+namespace hc.hph.plugins.ped.db.models;
+
+
+context profileParameters
+{
+
+entity pedParameters
+{
+schemaName : String(256);
+pedigreeVT : String(256);
+samplesVT : String(256);
+logDetailVT : String(256);
+logTraceVT : String(256);
+};
+
+
+
+};

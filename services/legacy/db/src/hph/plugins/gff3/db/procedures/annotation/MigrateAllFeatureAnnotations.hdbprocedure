@@ -1,0 +1,25 @@
+PROCEDURE "hc.hph.plugins.gff3.db.procedures.annotation::MigrateAllFeatureAnnotations" ()
+  LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+DECLARE CURSOR c_ChromosomeCalls FOR
+        select distinct "ChromosomeIndex","RunAuditID" from "hc.hph.genomics.db.models::Reference.FeaturesAnnotation";
+        
+DECLARE CURSOR c_calls FOR
+   select "ProfileAuditID","FeatureAuditID" from "hc.hph.plugins.gff3.db.models::Staging.GenomicsMigration";
+    FOR cur_row as c_calls DO
+--clear logs of this in trace table 
+    "hc.hph.di.procedures::clean_logs" ( cur_row."ProfileAuditID");
+    call "hc.hph.plugins.gff3.db.procedures.annotation::AnnotateFeatures"(cur_row."ProfileAuditID",cur_row."FeatureAuditID",1);
+  END FOR;
+
+
+    FOR cur_chr as c_ChromosomeCalls DO    
+      call "hc.hph.plugins.gff3.db.procedures.annotation::AnnotateFeaturesPost"(cur_chr."RunAuditID",cur_chr."ChromosomeIndex",1);
+      call "hc.hph.plugins.gff3.db.procedures.annotation::AnnotateFeaturesPrePost"(cur_chr."RunAuditID",cur_chr."ChromosomeIndex",1);
+    END FOR;
+
+
+  Delete from "hc.hph.plugins.gff3.db.models::Staging.GenomicsMigration";
+END;
+

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dictionary xmlns="http://www.com/ta/4.0">
+
+
+  <!--
+  The following dictionary contain stop words or expression.
+  The goal is to identify expressions in which medical entities 
+  should be IGNORED. 
+  For example, "sterile" is the expression "in a sterile fashion" 
+  should not be extracted as a medical entity.
+   -->
+
+
+<entity_category name="STOPWORD">
+      <entity_name standard_form="sterile fashion"/>
+      <entity_name standard_form="sterile manner"/>
+      <entity_name standard_form="sterile gauze"/>
+
+      <entity_name standard_form="recherche de mutation des exons"/>
+
+
+</entity_category>
+</dictionary>
+

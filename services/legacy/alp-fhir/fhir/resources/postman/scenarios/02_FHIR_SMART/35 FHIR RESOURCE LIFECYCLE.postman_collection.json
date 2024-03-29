@@ -1,0 +1,366 @@
+{
+	"info": {
+		"_postman_id": "863e8dac-3816-47c7-ae00-f97cf866be8d",
+		"name": "35 FHIR RESOURCE LIFECYCLE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CREATE RESOURCE",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e0b8f936-645f-4c88-8bd1-2fbca3a9a2eb",
+						"type": "text/javascript",
+						"exec": [
+							"var res = {",
+							"        \"resourceType\": \"Observation\",",
+							"        \"id\": \"LIFECYCLE_TEST\",",
+							"        \"status\": \"final\",",
+							"        \"code\": {",
+							"          \"coding\": [",
+							"            {",
+							"              \"system\": \"http://loinc.org\",",
+							"              \"code\": \"58941-6\",",
+							"              \"display\": \"Transcutaneous Bilirubin\"",
+							"            }",
+							"          ]",
+							"        },",
+							"        \"subject\": {",
+							"          \"reference\": \"Patient/BILIBABY\"",
+							"        },",
+							"        \"effectiveDateTime\": \"2017-01-11T15:12:00.000Z\",",
+							"        \"valueQuantity\": {",
+							"          \"value\": 7,",
+							"          \"unit\": \"mg/dL\",",
+							"          \"code\": \"mg/dL\"",
+							"        },",
+							"        \"category\": {",
+							"          \"coding\": [",
+							"            {}",
+							"          ]",
+							"        }",
+							"      };",
+							"",
+							"pm.test(\"Status code is 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    pm.response.to.have.status(\"Created\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response).to.eql(res);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"resourceType\": \"Observation\",\r\n        \"id\": \"LIFECYCLE_TEST\",\r\n        \"status\": \"final\",\r\n        \"code\": {\r\n          \"coding\": [\r\n            {\r\n              \"system\": \"http://loinc.org\",\r\n              \"code\": \"58941-6\",\r\n              \"display\": \"Transcutaneous Bilirubin\"\r\n            }\r\n          ]\r\n        },\r\n        \"subject\": {\r\n          \"reference\": \"Patient/BILIBABY\"\r\n        },\r\n        \"effectiveDateTime\": \"2017-01-11T15:12:00.000Z\",\r\n        \"valueQuantity\": {\r\n          \"value\": 7,\r\n          \"unit\": \"mg/dL\",\r\n          \"code\": \"mg/dL\"\r\n        },\r\n        \"category\": {\r\n          \"coding\": [\r\n            {}\r\n          ]\r\n        }\r\n      }"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/Observation",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"Observation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Observation After Creation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6ff909d2-a760-4b64-adba-26d074598be0",
+						"type": "text/javascript",
+						"exec": [
+							"var res = \"<Observation xmlns='http://hl7.org/fhir'><id value='LIFECYCLE_TEST'/><status value='final'/><category><coding/></category><code><coding><system value='http://loinc.org'/><code value='58941-6'/><display value='Transcutaneous Bilirubin'/></coding></code><subject><reference value='Patient/BILIBABY'/></subject><effectiveDateTime value='2017-01-11T15:12:00.000Z'/><valueQuantity><value value='7'/><unit value='mg/dL'/><code value='mg/dL'/></valueQuantity></Observation>\";",
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+xml\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    pm.expect(xml2Json(responseBody)).to.eql(xml2Json(res));",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/fhir+xml"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"type\":\"query\",\n\t\"from\":{\"type\":\"from\",\"definition\":\"Patient\"},\n\t\"name\":\"TestObservationQuery\",\n\t\"filter\":{\"type\":\"binaryexpression\",\n\t\t\t\"left\":{\"type\":\"resultelement\",\"definition\":\"Patient\",\"path\":\"Patient.gender\"},\n\t\t\t\"right\":{\"type\":\"stringexpression\",\"value\":\"male\"},\n\t\t\t\"operation\":\"=\"},\n\t\"out\":[{\"type\":\"resultelement\",\"definition\":\"Patient\"}]\n\t\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/Observation/LIFECYCLE_TEST",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"Observation",
+						"LIFECYCLE_TEST"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Observation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0bf12d69-fa02-42bb-bfa8-9fb845a20196",
+						"type": "text/javascript",
+						"exec": [
+							"var res = {",
+							"    \"resourceType\": \"Observation\",",
+							"    \"id\": \"LIFECYCLE_TEST\",",
+							"    \"status\": \"final\",",
+							"    \"code\": {",
+							"        \"coding\": [",
+							"            {",
+							"                \"system\": \"http://loinc.org\",",
+							"                \"code\": \"58941-6\",",
+							"                \"display\": \"Transcutaneous Bilirubin\"",
+							"            }",
+							"        ]",
+							"    },",
+							"    \"subject\": {",
+							"        \"reference\": \"Patient/BILIBABY\"",
+							"    },",
+							"    \"effectiveDateTime\": \"2017-01-11T15:12:00.000Z\",",
+							"    \"valueQuantity\": {",
+							"        \"value\": 20,",
+							"        \"unit\": \"mg/dL\",",
+							"        \"code\": \"mg/dL\"",
+							"    },",
+							"    \"category\": {",
+							"        \"coding\": [",
+							"            {}",
+							"        ]",
+							"    },",
+							"    \"meta\": {",
+							"        \"lastUpdated\": \"2017-11-04T19:50:32\",",
+							"        \"versionId\": \"urn:uuid:68d12752-6f98-45ff-b0bc-72a76e685758\"",
+							"    }",
+							"};",
+							"",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.have.status(\"OK\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response).to.eql(res);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/fhir+json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"resourceType\": \"Observation\",\n    \"id\": \"LIFECYCLE_TEST\",\n    \"status\": \"final\",\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://loinc.org\",\n                \"code\": \"58941-6\",\n                \"display\": \"Transcutaneous Bilirubin\"\n            }\n        ]\n    },\n    \"subject\": {\n        \"reference\": \"Patient/BILIBABY\"\n    },\n    \"effectiveDateTime\": \"2017-01-11T15:12:00.000Z\",\n    \"valueQuantity\": {\n        \"value\": 20,\n        \"unit\": \"mg/dL\",\n        \"code\": \"mg/dL\"\n    },\n    \"category\": {\n        \"coding\": [\n            {}\n        ]\n    },\n    \"meta\": {\n        \"lastUpdated\": \"2017-11-04T19:50:32\",\n        \"versionId\": \"urn:uuid:68d12752-6f98-45ff-b0bc-72a76e685758\"\n    }\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/Observation/LIFECYCLE_TEST",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"Observation",
+						"LIFECYCLE_TEST"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE OBSERVATION",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "deec31f6-c8f9-414e-b293-55311a29ddb9",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 204 No Content\", function () {",
+							"    pm.response.to.have.status(204);",
+							"    pm.response.to.have.status(\"No Content\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    pm.expect(responseBody).to.eql(\"\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/Observation/LIFECYCLE_TEST",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"Observation",
+						"LIFECYCLE_TEST"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Observation After Deletion",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cf7b6066-cf5a-49f6-adcf-f73e42d85a7e",
+						"type": "text/javascript",
+						"exec": [
+							"var oo = {",
+							"    \"resourceType\": \"OperationOutcome\",",
+							"    \"issue\": [",
+							"        {",
+							"            \"severity\": \"error\",",
+							"            \"code\": \"not-found\",",
+							"            \"details\": {",
+							"                \"text\": \"Resource [Observation] with id [LIFECYCLE_TEST] not found.\"",
+							"            }",
+							"        }",
+							"    ]",
+							"};",
+							"",
+							"pm.test(\"Status code is 404 Not Found\", function () {",
+							"    pm.response.to.have.status(404);",
+							"    pm.response.to.have.status(\"Not Found\");",
+							"});",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(postman.getResponseHeader(\"Content-Type\")).to.include(\"application/fhir+json\");",
+							"});",
+							"",
+							"pm.test(\"Validate Response Body\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response).to.eql(oo);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/fhir+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"type\":\"query\",\n\t\"from\":{\"type\":\"from\",\"definition\":\"Patient\"},\n\t\"name\":\"TestObservationQuery\",\n\t\"filter\":{\"type\":\"binaryexpression\",\n\t\t\t\"left\":{\"type\":\"resultelement\",\"definition\":\"Patient\",\"path\":\"Patient.gender\"},\n\t\t\t\"right\":{\"type\":\"stringexpression\",\"value\":\"male\"},\n\t\t\t\"operation\":\"=\"},\n\t\"out\":[{\"type\":\"resultelement\",\"definition\":\"Patient\"}]\n\t\n}"
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/{{endpoint}}/fhir/Observation/LIFECYCLE_TEST",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"{{endpoint}}",
+						"fhir",
+						"Observation",
+						"LIFECYCLE_TEST"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

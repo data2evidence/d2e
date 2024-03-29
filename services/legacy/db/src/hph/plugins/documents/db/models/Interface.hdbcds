@@ -1,0 +1,48 @@
+namespace hc.hph.plugins.documents.db.models;
+
+using hc.hph.di.documents.staging.db.models::DocumentStage as stage;
+using hc.hph.di.documents.staging.db.models::DocumentProcessing as status;
+using hc.hph.di.model::DataIntegration as DIConf;
+context Interface {
+
+	view ProcessingStageActiveRecords as select from stage.ProcessingStage{
+		DWID,
+		DWDateFrom
+	};
+
+	view StatusActiveRecords as select from status.Status {
+		DWID,
+		DWDateFrom,
+		ScheduleID
+	} where "ActionName" = 'Initialize';
+
+	view ProcessingStageView as select from stage.ProcessingStage mixin {
+        _AuditLog : association[1..*] to DIConf.AuditLog on _AuditLog.DocumentID = DocumentID and _AuditLog.SourceID = DWSource;
+        _ActiveRecords : association[1..1] to ProcessingStageActiveRecords on _ActiveRecords.DWID = DWID and _ActiveRecords.DWDateFrom = DWDateFrom;
+        _StatusActiveRecords : association[1..*] to StatusActiveRecords on _StatusActiveRecords.DWID = DWID and _StatusActiveRecords.DWDateFrom = DWDateFrom;
+    } into {
+        DWID,      
+        DWSource,   
+        DocumentID, 
+        DWParentEntitySource,
+        _AuditLog.AuditLogID as DWAuditID, 
+        BatchID,        
+        FileName,
+        MIMEType,
+        Content,
+        Title,
+        Author,
+        Type,
+        LanguageCode,       
+        CreatedAt,
+        CreatedBy,
+        ChangedAt,
+        ChangedBy,
+        ProcessingMode,
+        ParentEntityID,
+        ParentEntityType,
+        _AuditLog.ParentAuditLogID,
+        _ActiveRecords.DWDateFrom,
+        _StatusActiveRecords.ScheduleID       
+    } where _ActiveRecords.DWDateFrom is not null;   
+};

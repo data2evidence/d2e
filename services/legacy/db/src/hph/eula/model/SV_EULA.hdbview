@@ -1,0 +1,66 @@
+VIEW "hc.hph.eula.model::SV_EULA" ( "Group", "ID", "IdName", "ValidFromPointInTime", "ValidToPointInTime", "Active", "VersionNo", "LangISO", "LangName", "LangLabel", "LangDesc", "LangText" ) AS SELECT  	
+		"Group",
+		ID,
+		"IdName",
+		"ValidFromPointInTime",                               
+	    "ValidToPointInTime",
+	    "Active",
+	    "VersionNo",
+	    "LangISO",
+	    "LangName",
+	    "LangLabel",
+	    "LangDesc",
+	    "LangText" from 
+(SELECT 1 as "Group",
+		ID,
+		"IdName",
+		"ValidFromPointInTime",                               
+	    "ValidToPointInTime",
+	    "Active",
+	    "VersionNo",
+	    cast('' as NVARCHAR(2)) as "LangISO",
+	    cast('' as NVARCHAR(100)) as "LangName",
+	    cast('' as NVARCHAR(100)) as "LangLabel",
+	    cast('' as NVARCHAR(5000)) as "LangDesc",
+	    cast('' as NCLOB) as "LangText"
+	        
+	from "hc.hph.eula.model::Eula_Model.Eula"
+	where "AgencyId" IS NULL AND 
+		  "ValidToPointInTime" >= current_date AND 
+		  "ValidFromPointInTime" <= current_date
+
+UNION ALL 
+	SELECT 
+		2 as "Group",
+		ID,
+		"IdName",
+		"ValidFromPointInTime",                               
+        "ValidToPointInTime",
+        "Active",
+        "VersionNo",
+        cast('' as NVARCHAR(2)) as "LangISO",
+        cast('' as NVARCHAR(100)) as "LangName",
+        cast('' as NVARCHAR(100)) as "LangLabel",
+        cast('' as NVARCHAR(5000)) as "LangDesc",
+        cast('' as NCLOB) as "LangText"
+            
+	from "hc.hph.eula.model::Eula_Model.Eula"
+	where "AgencyId" IS NULL AND 
+		  "ValidFromPointInTime" > current_date 
+UNION ALL 
+	SELECT 
+		3 as "Group",
+		ID,
+		"IdName",
+		"ValidFromPointInTime",                               
+        "ValidToPointInTime",
+        "Active",
+        "VersionNo",
+        cast('' as NVARCHAR(2)) as "LangISO",
+        cast('' as NVARCHAR(100)) as "LangName",
+        cast('' as NVARCHAR(100)) as "LangLabel",
+        cast('' as NVARCHAR(5000)) as "LangDesc",
+        cast('' as NCLOB) as "LangText"          
+	from "hc.hph.eula.model::Eula_Model.Eula"
+	where "AgencyId" IS NULL AND 
+		  "ValidToPointInTime" < current_date) ORDER BY "Group" WITH READ ONLY

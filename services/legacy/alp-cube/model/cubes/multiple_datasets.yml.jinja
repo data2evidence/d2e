@@ -1,0 +1,40 @@
+{# Retrieve list of schemas by calling the get_schemas function imported from globals.py #}
+{%- set custom_schemas = get_schemas() %}
+
+cubes:
+  {# Loop over the list of retrieved schemas #}
+  {%- for schema_name in custom_schemas %}
+  {# Loop over the list of retrieved table metadata #}
+  {%- for cube in load_multiple_datasets()["cubes"] %}
+ 
+  - name: {{ cube.name + schema_name}}
+    sql_table: {{ schema_name + "." + cube.name }}
+    data_source: default
+    refresh_key:
+      every: 1 hour
+
+  {%- if cube.measures is not none and cube.measures|length > 0 %}
+    measures:
+      {%- for measure in cube.measures %}
+      - name: {{ measure.name }}
+        type: {{ measure.type }}
+      {%- if measure.sql %}
+        sql: {{ measure.sql }}
+      {%- endif %}
+      {%- endfor %}
+  {%- endif %}
+
+  {%- if cube.dimensions is not none and cube.dimensions|length > 0 %}
+    dimensions:
+      {%- for dimension in cube.dimensions %}
+      - name: {{ dimension.name }}
+        type: {{ dimension.type }}
+      {%- if dimension.sql %}
+        sql: {{ dimension.sql }}
+      {%- endif %}
+      {%- endfor %}
+  {%- endif %}
+
+
+  {%- endfor -%}
+  {%- endfor -%}

@@ -1,0 +1,50 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::ClearDocuments" (IN dwid VARBINARY(32),IN stg NVARCHAR(32),IN cdw NVARCHAR(32)) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER 
+	--DEFAULT SCHEMA <default_schema_name>
+	 AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+ 	--insert into "Test1"values('Hello');
+ 	declare count_dwid INTEGER;
+ 	if :stg='true'
+ 	THEN
+	delete from "hc.hph.di.documents.WorkBench.db.models::DWBViews.ProcessingStage_WB" where "DWID"=:dwid;
+ 	delete from "hc.hph.plugins.documents.db.models::TA.Results" where "DWID"=:dwid ;
+ 	--delete from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_FILTERED" where "DWID"=:dwid;
+	--delete from "hc.hph.plugins.textProcessing.medical.postProcessing::Entities.TA_FILTERED" where "DWID"=:dwid;
+	--delete from "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" where "DWID"=:dwid ;
+	END IF ;
+	
+	if :cdw='true'
+	THEN 
+	delete from "hc.hph.di.documents.WorkBench.db.models::DWBViews.ProcessingStage_WB" where "DWID"=:dwid;
+ 	delete from "hc.hph.plugins.documents.db.models::TA.Results" where "DWID"=:dwid ;
+ 	--delete from "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.TA_FILTERED" where "DWID"=:dwid;
+	--delete from "hc.hph.plugins.textProcessing.medical.postProcessing::Entities.TA_FILTERED" where "DWID"=:dwid;
+	--delete from "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" where "DWID"=:dwid ;
+ 	
+ 	delete from "hc.hph.cdw.db.models::DWDocuments.Document_Key" where "DWID"=:dwid ;
+ 	delete from "hc.hph.cdw.db.models::Document_SearchIndex" where "DWID"=:dwid ;
+ 	delete from "hc.hph.cdw.db.models::DWDocuments.Document_Attr" where "DWID"=:dwid ;
+ 	delete from "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" where DWID IN ( SELECT "DWID_Interaction" FROM  "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Document"= :dwid );
+ 	delete from  "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" where "DWID"=:dwid ;
+ 	
+ 	
+ 	select count(*) into count_dwid from  "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Document"=:dwid and "DWLinkID" IN(Select "DWLinkID" from "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link_Attr" where "LinkType" is null);
+ 	if(:count_dwid=1)
+ 	then
+ 	delete from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID" IN  ( SELECT "DWID_Interaction" FROM  "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Document"= :dwid );
+ 	DELETE FROM  "hc.hph.cdw.db.models::DWEntities.Interactions_Key" where "DWID"  IN ( SELECT "DWID_Interaction" FROM  "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Document"= :dwid  );
+ 	else
+ 	delete from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" where "DWID" IN  ( SELECT "DWID_Interaction" FROM  "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Document"= :dwid );
+ 	end if;
+  	delete FROM  "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link" where "DWID_Document"= :dwid ;
+  	--delete FROM  "hc.hph.cdw.db.models::DWDocuments.Interaction_Documents_Link_Attr" where "DWID_Document"= :dwid ;
+ 	
+	END IF ;
+ 
+END;

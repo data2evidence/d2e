@@ -1,0 +1,238 @@
+!======================================================================
+! File Name: french-tf-med-Pathology.hdbtextrul
+! Author: Pierre Marchal (PI IC HC Platform FR)
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of pathology report specific entities
+!======================================================================
+
+
+!======================================================================
+! OUTPUT FIELDS:
+!======================================================================
+
+! Main cancer group: med_CancerHistology
+
+!The following subentity must be present to trigger the rule:
+!!CancerHistology
+
+!Optional subentities:
+!!CancerBehavior
+!!GradeType
+!!GradeValue
+!!CancerSite
+
+
+! Peripheral entities:
+!       1) med_CancerGrade;
+!       2) med_CancerSize;
+!       3) med_CancerStage;
+!======================================================================
+
+
+
+!!!!!!!!!!!!!!!!!!
+!! CANCER STAGE
+
+#subgroup parentheses: <\(> <~(\(|\))>+ <\)>
+
+#define tnm_t: [cpy]?T([xX01234]|is)[abc]?
+#define tnm_n: [cpy]?N[xX0123][abc]?
+#define tnm_m: [cpy]?M[01][abc]?
+
+#subgroup stage_modifier: {
+    <d'emblée>
+}
+
+#subgroup OD_CancerStage_ambiguous : {
+    (
+        <STEM:stade> <([0-5]|I|II|III|IV)>
+    )
+    %(stage_modifier)?
+}
+
+
+
+!!!!!!!!!!!!!!!!!!
+!! CANCER GRADE
+
+#subgroup gradevalue_modifier: {
+    <kératisant>
+}
+
+#subgroup OD_CancerGradeType: {
+    [OD Observation_CancerGrade_Normalized] [TE OBSERVATION_CANCERGRADE_NORMALIZED] <>+ [/TE] [/OD]
+}
+
+#subgroup OD_CancerGradeValue: {
+    [OD Observation_CancerGrade_Value] [TE OBSERVATION_CANCERGRADE_VALUE] <~(grade.*)> <>* [/TE] [/OD]
+    %(gradevalue_modifier)?
+}
+
+#subgroup OD_CancerGradeValue_ambiguous: {
+    [OD Observation_CancerGrade_Value] (
+        <[\<\>]> <[0-9]>
+        | <[0-9]|10> ( <\(> <[0-9]> <\+> <[0-9]> <\)> )?
+        | <[0-9]\-([1-9]|10)>
+        | <\p{ci}(i|ii|iii|iv)>
+    ) [/OD]
+}
+
+
+!!!!!!!!!!!!!!!!!!!!!
+!! CANCER BEHAVIOR
+#subgroup TE_BEHAVIOR: [OD Observation_CancerHistology_Component_Behavior] [TE OBSERVATION_CANCERHISTOLOGY_COMPONENT_BEHAVIOR] <>+ [/TE] [/OD]
+
+#subgroup behavior_modifier_left: {
+    <récidive>
+    | <maladie>
+}
+
+#subgroup behavior_modifier_right: {
+    <synchrones?>
+}
+
+#subgroup OD_CancerBehavior: {
+    %(behavior_modifier_left)?
+    %(TE_BEHAVIOR) 
+    %(behavior_modifier_right)?
+}
+
+
+
+!!!!!!!!!!!!!!!!!
+!! CANCER SITE
+#subgroup TE_ANATOMY: [TE OBSERVATION_CANCERHISTOLOGY_BODYSITE] <>+ [/TE]
+#subgroup TE_ANAT: [OD Observation_CancerHistology_BodySite] %(TE_ANATOMY) [/OD]
+
+#subgroup site_modifier: {
+    <STEM:récidiver?> 
+    | <initialement>
+}
+
+#subgroup site_modifier_left: {
+    <para\-central>
+    | <STEM:bas>
+    | <STEM:haut>
+    | <l'> <ensemble> <POS:Prep> <POS:Det>?
+}
+
+#subgroup site_modifier_right: {
+    %(parentheses)
+    | <para\-central>
+    | <STEM:droit>
+    | <STEM:gauche>
+    | <STEM:bas>
+    | <STEM:haut>
+}
+
+#subgroup CancerSite: {
+    %(site_modifier)?
+    ( <\p{ci}(aux?)> <\p{ci}(niveaux?)> )? <POS:Prep>? <POS:Det>?
+    ! dealing with the longest match bug... (it still doesn't work on some examples)
+    ( (%(site_modifier_left)+ %(TE_ANAT) %(site_modifier_right)+)
+        | %(site_modifier_left)+ %(TE_ANAT)
+        | %(TE_ANAT) %(site_modifier_right)+
+        | %(TE_ANAT) )
+}
+
+#subgroup OD_CancerSite:{
+    %(CancerSite)
+    ( <\,>? <et|puis>? <POS:Adv>? %(CancerSite) )*
+}
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!
+!! CANCER HISTOLOGY
+#subgroup TE_med_HISTO: [TE OBSERVATION_CANCERHISTOLOGY_VALUE_ICDO] <>+ [/TE]
+#subgroup TE_HISTO: [OD Observation_CancerHistology_Value_ICDO] %(TE_med_HISTO) [/OD]
+
+#subgroup _histology_modifier:{
+    <STEM:(symptomatique|primitif|superficiel|polymorphe)>
+    | <POS:Adv>? <\p{di}(réséqué)>
+    | <\p{ci}(épidermoïde|epidermoide|épidermoide|epidermoïde|papillaire)>
+    | <de> <type> ( <épidermoïde> | <canalaire> | <papillaire> )
+    | <\p{ci}(kératinisant|keratinisant)>
+    | <\p{ci}(muco\-sécrétant|mucoi\-secretant)>
+    | <à> <cha[iî]ne> <l[ée]g[èe]re> <\p{ci}(kappa)>
+    | <\p{ci}(de)>? <\p{ci}(type)> ( <I|II|III|IV|V> | <[12345]> )
+    | <triple> <négatif>
+}
+
+#subgroup histology_modifier: {
+    ( <\,>? <\p{ci}(et)>? %(_histology_modifier) ){1,3}
+}
+
+#subgroup OD_CancerHistology:{
+    %(TE_HISTO) %(histology_modifier)?
+}
+
+
+
+!!!!!!!!!!!!!!!!!
+!! CANCER SIZE
+#subgroup size_keyword_modifier: {
+    <nécrotique>
+}
+
+#subgroup size_keyword: {
+    [TE CANCER__SIZE@KEYWORD] <>+ [/TE]
+    %(size_keyword_modifier)?
+}
+
+#subgroup size_modifier: {
+    <environ>
+    | <grand> <axe>
+    | ( <le> <grand> <axe> | <la> <taille> )
+      <STEM:pouvoir>? <STEM:être> <STEM:(estimer|évaluer)> <à>
+    | <STEM:mesurer>
+}
+
+#subgroup OD_CancerSize: {
+    %(size_modifier)?
+    [OD Observation_CancerSize_Value] (
+        <POS:Num> <\p{ci}(cm|mm)>
+        | <POS:Num> ( <\p{ci}(x)> <POS:Num> ){1,2} <\p{ci}(mm|cm)>
+        | <POS:Num> <\p{ci}(mm|cm)> ( <\p{ci}(x)> <POS:Num> <\p{ci}(mm|cm)> ){1,2} 
+    ) [/OD]
+    ( <POS:Prep>? %(size_modifier) )?
+}
+
+
+
+!!!!!!!!!!!
+!! LINKS
+#subgroup behavior__histology: <POS:Prep> <POS:Det>?
+
+#subgroup behavior__site: <\,>? <surtout>
+
+#subgroup histology__grade: <\p{ci}(de)> <\p{ci}(type)>
+
+#subgroup histology__site: {
+    <\p{ci}(de)> <\p{ci}(type)>
+    | <de> <présentation>
+    | <\,>? <STEM:récidiver> <POS:Prep>
+    | <avec> <localisations?>
+    | <\,>
+}
+
+#subgroup histology__behavior: <\,>? <avec> <POS:Det>? | <\,>? <en> | <\,>
+
+#subgroup histology__histology: <\p{ci}(de)> <\p{ci}(type)>
+
+#subgroup histology__size: {
+    <POS:Prep>
+    | <\,>? <dont> 
+}
+
+#subgroup histology__stage: <\,> 
+
+#subgroup site__size: {
+    <POS:Prep>
+    | <\,>? <dont>
+}
+
+
+
+
+

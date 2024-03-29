@@ -1,0 +1,49 @@
+_schema-version: "2.0"
+ID: com.legacy.health.fhir
+version: 1.0.6
+modules:
+  - name: fhirserver
+    type: custom
+    build-parameters:
+      builder: fetcher
+      fetcher-opts:
+         repo-type: maven
+         repo-coordinates: com.legacy.health.fhir:fhir:0.1.11
+    requires:
+      - name: fhir_uaa_default
+      - name: fhir-instancemanager
+      - name: fhir_auditlog
+      - name: chp-hdi
+        parameters:
+          config:
+            roles: legacy.fhir.api::FhirGetAccessBinding
+
+    provides:
+      - name: fhirserver_api
+        properties:
+          url: '${default-url}'
+    properties:
+      JWT_TRUST_ACL: "[{\"clientid\":\"*\",\"identityzone\":\"*\"}]"
+         
+resources:
+  - name: fhir_auditlog
+    type: com.legacy.xs.auditlog
+    properties:
+      container-name: ${service-name}
+
+  - name: chp-hdi
+    type: org.cloudfoundry.existing-service
+
+  - name: fhir_uaa_default
+    type: com.legacy.xs.uaa-space
+    parameters:
+      path: './xs-security.json'
+#      service: xsuaa
+#      service-plan: default
+
+  - name: fhir-instancemanager
+    type: com.legacy.xs.managed-hana-schema
+    parameters:
+       service: managed-hana
+       plan: schema
+       service-plan: schema

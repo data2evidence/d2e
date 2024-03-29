@@ -1,0 +1,50 @@
+procedure "hc.hph.search.db.procedures::UpdateActivationForCommonTermMappings" (
+	in  it_update "hc.hph.search.db.models::TT_SV_TERMMAPPINGACTIVATION",
+	in  it_before "hc.hph.search.db.models::TT_SV_TERMMAPPINGACTIVATION", --this parameter is an odata syntax requirement
+	out ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"
+)
+	language sqlscript
+	sql security definer
+	as
+	lv_count bigint;
+begin
+	select "MAPPING_ID" from "hc.hph.search.db.models::Search.TermMappings"
+		where "MAPPING_ID" in (select "MAPPING_ID" from :it_update) for update
+	;
+
+	select count(*) into lv_count from :it_update where length(trim(' ' from "MAPPING_ID")) = 0;
+	if :lv_count > 0 then
+		ot_error =
+			select 400 as http_status_code,
+				'Bad Request' error_message,
+				'Error activating common term mapping: MAPPING_ID field can''t be empty.' detail
+			from "hc::DUMMY";
+		return;
+	end if;
+
+	delete from "hc.hph.search.db.models::Search.TermMappingItems" items
+	where "MAPPING_ID" in (
+		select "MAPPING_ID"
+		from :it_update
+		where "INACTIVE" = ''
+	)
+	;
+
+	insert into "hc.hph.search.db.models::Search.TermMappingItems" (
+		"MAPPING_ID",
+		"USER_ID",
+		"INACTIVE",
+		"WEIGHT",
+		"LANGUAGE_CODE"
+	)
+	select
+		"MAPPING_ID",
+		session_context('APPLICATIONUSER') as "USER_ID",
+		"INACTIVE",
+		"WEIGHT",
+		"LANGUAGE_CODE"
+	from :it_update
+	where "INACTIVE" = 'X'
+	;
+
+end

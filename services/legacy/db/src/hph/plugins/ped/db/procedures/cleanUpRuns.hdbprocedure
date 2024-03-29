@@ -1,0 +1,33 @@
+PROCEDURE "hc.hph.plugins.ped.db.procedures::cleanUpRuns" ( IN profile_id INTEGER, IN audit_id INTEGER )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   AS
+BEGIN
+   DECLARE CURSOR active_audit_log_entries FOR
+        SELECT
+            "AuditLogID"
+        FROM
+            "hc.hph.di.model::DataIntegration.AuditLog"
+        WHERE
+            "AuditLogID" < :audit_id AND
+            "ProfileID" = :profile_id AND
+            "ExtensionID" LIKE 'hc.hph.plugins.ped.%' AND
+            "Status" IN ( 'Queued', 'Running' ) AND
+            ( "ParentAuditLogID" IS NULL OR "ParentAuditLogID" = 0 );
+
+    LOCK TABLE "hc.hph.di.model::DataIntegration.AuditLog" IN EXCLUSIVE MODE;
+    FOR active_audit_log_entry AS active_audit_log_entries DO
+        DECLARE is_still_active INTEGER := 0;
+        SELECT
+            COUNT( * ) INTO is_still_active
+        FROM
+            "hc::JOB_SCHEDULES"
+        WHERE
+            "PARAMETER" LIKE '{%,"AuditLogID":' || :active_audit_log_entry."AuditLogID" || ',"ProfileID":' || :profile_id || ',%}' AND
+            "JOB_NAME" = 'hc.hph.di.jobs::DataIntegration';
+        IF :is_still_active = 0 THEN
+            CALL "hc.hph.di.procedures::set_audit_log_failed" ( :active_audit_log_entry."AuditLogID", 'No background job found' );
+        END IF;
+    END FOR;
+    COMMIT;
+END

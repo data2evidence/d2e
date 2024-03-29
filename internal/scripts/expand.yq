@@ -1,0 +1,1 @@
+. as $item ireduce ({}; . * $item ) | explode(.) | (.. | select(tag == "!!str")) |= envsubst

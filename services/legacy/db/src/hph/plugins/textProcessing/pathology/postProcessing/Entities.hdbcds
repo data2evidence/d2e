@@ -1,0 +1,99 @@
+namespace hc.hph.plugins.textProcessing.pathology.postProcessing;
+
+context Entities {
+
+
+	entity TA_FILTERED {
+		key CONFIG_ID           : String(1024);
+		key DWID                : Binary(32);
+		key TA_RULE             : String(200);
+		key TA_COUNTER          : Integer64;
+		    TA_TOKEN            : String(5000);
+		    TA_LANGUAGE         : String(2);
+		    TA_TYPE             : String(100);
+		    TA_NORMALIZED       : String(5000);
+		    TA_STEM             : String(5000);
+		    TA_PARAGRAPH        : Integer;
+		    TA_SENTENCE         : Integer;
+		    TA_CREATED_AT       : UTCDateTime;
+		    TA_OFFSET           : Integer64;
+		    TA_PARENT           : Integer64;
+		    TA_SECTION          : String(100);
+		    TA_STATUS         : String(100);
+		    TA_POLARITY         : String(100);
+		    TA_SUBJECT        : String(100);
+		    TA_TIME_START       : UTCDateTime;
+		    TA_TIME_END         : UTCDateTime;
+		    TA_TIME_LINK        : String(100);
+		    TA_AMBIGUITY        : String(100); 
+		    TA_CA_BEHAVIOR      : String(100);
+		    TA_CA_SIZE          : String(100);
+		    TA_CA_BODYSITE          : String(100);
+		    TA_CA_STAGE_T       : String(100);
+		    TA_CA_STAGE_N       : String(100);
+		    TA_CA_STAGE_M       : String(100);
+		    TA_CA_GRADE_NORMALIZED    : String(100);
+		    TA_CA_GRADE_VALUE   : String(100);
+		    TA_BIOM_INTERPRETATION      : String(250);
+		    TA_BIOM_METHOD        : String(250);
+		    TA_BIOM_ALTERATION       : String(250);
+		    TA_BIOM_DNAREGION         : String(250);
+		    TA_BIOM_VALUE       : String(250);
+		    TA_OBS_VALUE            : String(100);  /* Integer */
+		    TA_OBS_UNIT             : String(100);
+		    TA_CA_STAGE_N_DENOMINATOR		: String(100);
+		    TA_CA_STAGE_N_NUMERATOR		: String(100);
+		    TA_CA_STAGE_N_INTERPRETATION		: String(100);
+		    TA_CA_STAGE_N_BODYSITE		: String(100);
+		    TA_CA_STAGE_N_LATERALITY	: String(100);
+			
+	} technical configuration {
+      column store;
+ };
+
+	temporary entity TA_EXT {
+	   CONFIG_ID      : String(1024) not null;
+	   BATCH_ID       : String(1024) not null;
+	   DWID           : String(100)   not null;
+	   TA_RULE        : String(200);
+	   TA_COUNTER     : Integer64;
+	   TA_TOKEN       : String(5000);
+	   TA_LANGUAGE    : String(2);
+	   TA_TYPE        : String(100);
+	   TA_NORMALIZED  : String(5000);
+	   TA_STEM        : String(5000);
+	   TA_PARAGRAPH   : Integer;
+	   TA_SENTENCE    : Integer;
+	   TA_CREATED_AT  : UTCDateTime;
+	   TA_OFFSET      : Integer64;
+	   TA_PARENT      : Integer64;
+	   TA_AMBIGUITY   : String(100);
+	} technical configuration {
+    row store;
+ };
+
+	entity TA_CONFIG {
+		key CONFIG_ID       : String(1024);
+		key EXTRACTION_TYPE : String(100);  // TA_TYPE, TA_SECTION, TA_STATUS, TA_POLARITY, TA_SUBJECT
+		key EXTRACTION_ID   : String(100);  // med_ANAT@NCIm, med_DIS@NCIm, ..., Confirmed, ...
+		    SELECTED        : String(1);    // 'X'
+	} technical configuration {
+      column store;
+ };
+
+	entity "TA_COLLAPSING_PATH_CONFIG" {
+    	TARGET				: String(100);
+    	SOURCE				: String(100);
+	} technical configuration {
+     column store;
+ };
+ 
+ 
+	entity "FHIR_MAPPING" {
+    	NON_FHIR			: String(100);
+    	FHIR				: String(100);
+	} technical configuration {
+     column store;
+ };
+
+};

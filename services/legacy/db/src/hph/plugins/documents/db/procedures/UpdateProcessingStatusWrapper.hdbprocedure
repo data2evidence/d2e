@@ -1,0 +1,34 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::UpdateProcessingStatusWrapper" 
+(
+in in_scheduleID bigint,
+in in_Action nvarchar(128),
+in in_status nvarchar(128)
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+ declare lt_status table("DWID" varbinary(32),
+						 "DWDateFrom" timestamp,
+					 	 "ActionName" nvarchar(128), 
+					 	 "PipelineID" nvarchar(256),
+						 "DWAuditID" bigint, 
+						 "Status" nvarchar(128),
+						 "ScheduleID" bigint,
+						 "ActionStartedON" timestamp);
+						 
+ declare CurTime timestamp;
+ CurTime := now();
+ 
+ lt_status = select "DWID", "DWDateFrom", "ActionName", "PipelineID", "DWAuditID", :in_status "Status", "ScheduleID", "ActionStartedON"
+ 			 from "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status"
+ 			 where "ScheduleID" = :in_scheduleID
+ 			 and "ActionName" = :in_Action;
+ 			 
+ call "hc.hph.plugins.documents.db.procedures::UpdateProcessingStatus"(:lt_status);
+ 
+END;

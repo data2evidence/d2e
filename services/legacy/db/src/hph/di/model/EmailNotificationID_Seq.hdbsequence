@@ -1,0 +1,1 @@
+SEQUENCE "hc.hph.di.model::EmailNotificationID_Seq" RESET BY SELECT IFNULL(MAX("NotificationID")+1,1) FROM "hc.hph.di.model::DataIntegration.EmailQueue"

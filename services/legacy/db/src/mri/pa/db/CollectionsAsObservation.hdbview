@@ -1,0 +1,15 @@
+VIEW "hc.mri.pa.db::CollectionsAsObservation" ( "PATIENT_ID", "OBS_CHAR_VAL", "OBS_TYPE", "STATUS_ID" ) AS select P."PATIENT_ID",
+
+ CONCAT(C."Title",
+CONCAT (' -- ',
+CONCAT((select "entry" FROM "hc.hph.um.user.db::userTable.USER_ATTRIBUTES" where "attribute_id"='FIRSTNAME' and "username"=C."CreatedBy"),
+CONCAT (' ',
+(select "entry" FROM "hc.hph.um.user.db::userTable.USER_ATTRIBUTES" where "attribute_id"='LASTNAME' and "username"=C."CreatedBy")
+)))) AS OBS_CHAR_VAL ,
+
+ 'COLLECTION' AS OBS_TYPE,
+ I."Status.Id" AS STATUS_ID
+    from "hc.hph.collections.db.models::CollectionModel.UserCollections" C
+    inner join "hc.hph.collections.db.models::CollectionModel.Item" I
+    on C."Id"=I."Collection.Id"
+    inner join "hc.hph.cdw.db.models::InterfaceViews.PATIENT" P on I."Id"=P."PATIENT_ID" WITH READ ONLY

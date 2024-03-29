@@ -1,0 +1,20 @@
+PROCEDURE "hc.hph.search.db.procedures::DeleteTermMappingUiClosed"( 
+	
+	IN  it_delete "hc.hph.search.db.models::Search.TermMappingUiClosed",
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"
+	) 
+	
+LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count BIGINT;
+BEGIN
+    
+	select count(*) into lv_count from :it_delete;
+	if :lv_count > 1 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error createing TermMappingUiClosed.' as detail from "hc::DUMMY";
+    end if;
+
+	delete from "hc.hph.search.db.models::Search.TermMappingUiClosed" where "USER_ID"  = SESSION_CONTEXT( 'APPLICATIONUSER' ) ;
+
+
+END;

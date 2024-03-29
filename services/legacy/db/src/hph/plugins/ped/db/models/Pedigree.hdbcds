@@ -1,0 +1,49 @@
+namespace hc.hph.plugins.ped.db.models;
+using hc.hph.genomics.db.models::Type as Type;
+using hc.hph.cdw.db.models::DWTypes as DWType;
+using hc.hph.cdw.db.models::DWEntities as DWEntity;
+context Pedigree {
+	entity Ped
+	{
+
+		DWAuditID : Type.DWAuditID;
+		SourceSampleID : String(255) null;
+		TargetSampleID : String(255) null;
+		SourceSampleIndex : Type.SampleIndex;
+		TargetSampleIndex : Type.SampleIndex;
+		Relationship : String(5000);
+	} technical configuration {
+  column store;
+ };
+
+	
+	entity Samples
+	{
+		key SampleIndex : Type.SampleIndex;
+		DWAuditID : Type.DWDocID;
+		DWSource : DWType.DWSource;
+		ReferenceID : Type.ReferenceID;
+		SampleID : String(255) null;
+		SampleClass : Type.SampleClass null;
+		PatientDWID : Type.DWID;
+		InteractionDWID : Type.DWID;
+		AnalysisDate : UTCTimestamp null;
+		OrgID : String(100) null;
+		Phenotype : String(5000);
+		Sex:String(10);
+		FamilyID:String(255);
+		DocumentID : String(255);
+	} technical configuration {
+  column store;
+ };
+
+    entity PedMapping
+    {
+        key DWAuditID : Type.DWDocID;
+        key documentID : String(255);
+        SampleID : String(255);
+    } technical configuration {
+        column store;
+    };
+
+};

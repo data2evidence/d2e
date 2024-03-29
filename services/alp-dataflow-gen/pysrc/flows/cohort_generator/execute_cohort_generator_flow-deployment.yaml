@@ -1,0 +1,175 @@
+###
+### A complete description of a Prefect Deployment for flow 'execute-cohort-generator-flow'
+###
+name: cohort_generator
+description: null
+version: 2acf90ce35318b1c7042adf1d6a70cab
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: null
+tags: []
+parameters:
+  {
+    options:
+      {
+        databaseCode: "ALPDEV",
+        schemaName: "CDMSYNPUF1K",
+        vocabSchemaName: "CDMVOCAB",
+        datasetId: "703c5d8a-a1d9-4d42-a314-5b9aad513390",
+        description: "test description",
+        owner: "test owner",
+        token: "REPLACE_WITH_BEARER_TOKEN",
+        cohortJson:
+          {
+            "id": 1783342,
+            "name": "Test Cohort",
+            "createdDate": 1689067241969,
+            "modifiedDate": 1696477773166,
+            "hasWriteAccess": false,
+            "tags": [],
+            "expressionType": "SIMPLE_EXPRESSION",
+            "expression":
+              {
+                "cdmVersionRange": ">=5.0.0",
+                "PrimaryCriteria":
+                  {
+                    "CriteriaList":
+                      [{ "VisitOccurrence": { "VisitTypeExclude": false } }],
+                    "ObservationWindow": { "PriorDays": 0, "PostDays": 0 },
+                    "PrimaryCriteriaLimit": { "Type": "All" },
+                  },
+                "ConceptSets": [],
+                "QualifiedLimit": { "Type": "First" },
+                "ExpressionLimit": { "Type": "All" },
+                "InclusionRules":
+                  [
+                    {
+                      "name": "Age",
+                      "expression":
+                        {
+                          "Type": "ALL",
+                          "CriteriaList": [],
+                          "DemographicCriteriaList":
+                            [{ "Age": { "Value": 18, "Op": "gt" } }],
+                          "Groups": [],
+                        },
+                    },
+                  ],
+                "CensoringCriteria": [],
+                "CollapseSettings": { "CollapseType": "ERA", "EraPad": 0 },
+                "CensorWindow": {},
+              },
+          },
+      },
+  }
+schedule: null
+is_schedule_active: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: null
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: execute-cohort-generator-flow
+manifest_path: null
+storage: null
+path: /app/pysrc
+entrypoint: main.py:execute_cohort_generator_flow
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    options:
+      title: options
+      position: 0
+      allOf:
+      - $ref: '#/definitions/cohortGeneratorOptionsType'
+  required:
+  - options
+  definitions:
+    cohortJsonType:
+      title: cohortJsonType
+      type: object
+      properties:
+        id:
+          title: Id
+          type: integer
+        name:
+          title: Name
+          type: string
+        createdDate:
+          title: Createddate
+          type: integer
+        modifiedDate:
+          title: Modifieddate
+          type: integer
+        hasWriteAccess:
+          title: Haswriteaccess
+          type: boolean
+        tags:
+          title: Tags
+          type: array
+          items: {}
+        expressionType:
+          title: Expressiontype
+          type: string
+        expression:
+          title: Expression
+          type: object
+      required:
+      - id
+      - name
+      - createdDate
+      - modifiedDate
+      - hasWriteAccess
+      - tags
+      - expressionType
+      - expression
+    cohortGeneratorOptionsType:
+      title: cohortGeneratorOptionsType
+      type: object
+      properties:
+        databaseCode:
+          title: Databasecode
+          type: string
+        schemaName:
+          title: Schemaname
+          type: string
+        vocabSchemaName:
+          title: Vocabschemaname
+          type: string
+        cohortJson:
+          $ref: '#/definitions/cohortJsonType'
+        datasetId:
+          title: Datasetid
+          type: string
+        description:
+          title: Description
+          type: string
+        owner:
+          title: Owner
+          type: string
+        token:
+          title: Token
+          type: string
+      required:
+      - databaseCode
+      - schemaName
+      - vocabSchemaName
+      - cohortJson
+      - datasetId
+      - description
+      - owner
+      - token
+timestamp: "2023-10-05T05:58:25.207682+00:00"
+triggers: []
+enforce_parameter_schema: null

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "commonjs",
+    "lib": ["dom", "es2019", "esnext.asynciterable"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "outDir": "target/src",
+    "rootDir": "./src",
+    "baseUrl": "./src"
+  },
+  "include": ["src/**/*", "src/app.ts"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}

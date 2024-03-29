@@ -1,0 +1,22 @@
+PROCEDURE "hc.hph.eula.procedures::ACTIVATE_EULA" (
+
+	IN  it_new "hc.hph.eula.model::TT_EULA_ACTIVATE",
+	OUT ot_error "hc.hph.eula.model::TT_ODATA_ERROR" 
+	) 
+	LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count INTEGER;
+	lv_eulaid NVARCHAR(32);
+	lv_version INTEGEr;
+BEGIN
+	select count(*)	into lv_count from :it_new where length(trim(' ' from "ID")) = 0 OR length(trim(' ' from "VersionNo")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error Activating Eula' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	SELECT "ID" into lv_eulaid from :it_new;
+	SELECT "VersionNo" into lv_version from :it_new;
+	
+ 	update "hc.hph.eula.model::Eula_Model.Eula" set "Active" = 'X' WHERE "ID" = :lv_eulaid AND "VersionNo" = :lv_version;
+END;

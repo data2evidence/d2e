@@ -1,0 +1,22 @@
+VIEW "hc.hph.plugins.ccdi.internal.projects.hix.db.models::OrgSourceDistinct" ( "OrgID", "Source" ) AS select  
+  		ORG."Value04" AS "OrgID",
+    	ifnull(SYSTYPE."Value05",'<??>') || '-' || ifnull(PRODNAME."Value05",'<??>')  AS "Source"		
+ 		FROM "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML04" AS ORG
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS SYSTYPE
+		on SYSTYPE."DocumentID" = ORG."DocumentID" 
+    	AND SYSTYPE."Item02" = ORG."Item02" 
+    	AND SYSTYPE."Value03" = 'system' 
+    	AND SYSTYPE."Value04" = 'system_type'
+		  
+    	AND ORG."Value00" = 'hix_clinical_document' 
+    	AND ORG."Value01" = 'message_header' 
+    	AND ORG."Value02" = 'sender' 
+    	AND ORG."Value03" = 'sender_location_code' 
+   
+		
+		INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS PRODNAME
+		on SYSTYPE."DocumentID" = PRODNAME."DocumentID" 
+    	AND SYSTYPE."Item03" = PRODNAME."Item03" 	
+     	AND PRODNAME."Value04" = 'product_name'
+     	group by   		ORG."Value04" ,
+    	ifnull(SYSTYPE."Value05",'<??>') || '-' || ifnull(PRODNAME."Value05",'<??>') WITH READ ONLY

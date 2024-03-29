@@ -1,0 +1,23 @@
+PROCEDURE "hc.hph.di.statistics.db.procedures::getEntityLoadStatistics" (
+	IN START_DATE DATE,
+	IN END_DATE DATE,
+	IN Entity "hc.hph.di.statistics.db.model::Statistics.Entities",
+	OUT STATISTICS "hc.hph.di.statistics.db.model::Statistics.DataIngestionEntityLoads"
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA AS
+BEGIN
+	DECLARE EntityValues INTEGER := 0;
+	SELECT COUNT(*) INTO EntityValues FROM :Entity;
+	
+	IF :EntityValues=0 THEN
+		STATISTICS=SELECT * FROM
+		"hc.hph.di.statistics.db.model::Statistics.DataIngestionEntityLoads"
+		WHERE "LoadDate" BETWEEN :START_DATE AND :END_DATE;
+	ELSE
+		STATISTICS=SELECT * FROM
+		"hc.hph.di.statistics.db.model::Statistics.DataIngestionEntityLoads"
+		WHERE "Entity" IN(SELECT "Entity" FROM :Entity) AND "LoadDate" BETWEEN :START_DATE AND :END_DATE;
+	END IF;
+END;

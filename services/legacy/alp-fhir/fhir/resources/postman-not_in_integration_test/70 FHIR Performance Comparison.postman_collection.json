@@ -1,0 +1,68 @@
+{
+	"variables": [],
+	"info": {
+		"name": "70 FHIR Performance Comparison",
+		"_postman_id": "8751fc13-2a94-ce33-13dd-04cc55aa2b63",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Smart Health Mock Server - Single Resource ",
+			"request": {
+				"url": "https://sb-mock-fhir-dstu2.smarthealthit.org/smartdstu2/data/Patient/smart-7777705",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Access Smart Health IT MockServer - Complex Query",
+			"request": {
+				"url": {
+					"raw": "https://sb-mock-fhir-dstu2.smarthealthit.org/mock-api/smartdstu2/data/Observation?code=http%3A%2F%2Floinc.org%7C29463-7%2Chttp%3A%2F%2Floinc.org%7C3141-9%2Chttp%3A%2F%2Floinc.org%7C8302-2%2Chttp%3A%2F%2Floinc.org%7C8306-3%2Chttp%3A%2F%2Floinc.org%7C8287-5%2Chttp%3A%2F%2Floinc.org%7C39156-5%2Chttp%3A%2F%2Floinc.org%7C18185-9%2Chttp%3A%2F%2Floinc.org%7C37362-1%2Chttp%3A%2F%2Floinc.org%7C11884-4&patient=smart-7777705",
+					"protocol": "https",
+					"host": [
+						"sb-mock-fhir-dstu2",
+						"smarthealthit",
+						"org"
+					],
+					"path": [
+						"mock-api",
+						"smartdstu2",
+						"data",
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "http%3A%2F%2Floinc.org%7C29463-7%2Chttp%3A%2F%2Floinc.org%7C3141-9%2Chttp%3A%2F%2Floinc.org%7C8302-2%2Chttp%3A%2F%2Floinc.org%7C8306-3%2Chttp%3A%2F%2Floinc.org%7C8287-5%2Chttp%3A%2F%2Floinc.org%7C39156-5%2Chttp%3A%2F%2Floinc.org%7C18185-9%2Chttp%3A%2F%2Floinc.org%7C37362-1%2Chttp%3A%2F%2Floinc.org%7C11884-4",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "patient",
+							"value": "smart-7777705",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

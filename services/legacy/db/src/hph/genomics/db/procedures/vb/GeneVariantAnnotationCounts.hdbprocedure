@@ -1,0 +1,125 @@
+PROCEDURE "hc.hph.genomics.db.procedures.vb::GeneVariantAnnotationCounts" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN variant_grouping "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping",
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        IN binSize DOUBLE,
+        IN annotationGrouping BOOLEAN,
+        OUT gene_variant_counts "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationCounts",
+        OUT sample_count INTEGER 
+    )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER
+     AS
+BEGIN
+    SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+    -- return a list of genes with the number of affected samples
+    IF annotationGrouping = true
+    THEN
+    gene_variant_counts = 
+    SELECT "GeneName", "ChromosomeIndex", "Grouping", "Begin", "End", SUM("Weight") as "Count", "Bin"
+        FROM ( 
+            SELECT "GeneName", "ChromosomeIndex", "SampleIndex", "Grouping", "Begin", "End", "Bin", ( 1 / count(*) OVER (Partition by "GeneName", "ChromosomeIndex", "SampleIndex") ) as "Weight" 
+            FROM ( 
+                SELECT "Features"."FeatureName" AS "GeneName",
+                    "Variants"."ChromosomeIndex" AS "ChromosomeIndex",
+                    "Samples"."SampleIndex",
+                    :variant_grouping."Grouping" as "Grouping",
+                    MIN( "Features"."Region.Begin" ) AS "Begin",
+                    MAX( "Features"."Region.End" ) AS "End",
+                    FLOOR( ( FLOOR( MIN( "Features"."Region.Begin" ) + MAX( "Features"."Region.End" ) / 2 ) ) / :binSize ) AS "Bin"
+                FROM
+                    :sample_list as "Samples" 
+                    JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+                        ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+                    JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+                        ON "Variants"."DWAuditID" = "Genotypes"."DWAuditID" 
+                        AND "Variants"."VariantIndex" = "Genotypes"."VariantIndex" 
+                    JOIN :variant_grouping
+                        ON :variant_grouping."DWAuditID" = "Genotypes"."DWAuditID" 
+                        AND :variant_grouping."VariantIndex" = "Genotypes"."VariantIndex" 
+                    JOIN "hc.hph.genomics.db.models::Reference.Features" AS "Features"
+                        ON "Variants"."ChromosomeIndex" = "Features"."ChromosomeIndex"
+                        AND "Variants"."Position" BETWEEN "Features"."Region.Begin" AND "Features"."Region.End" - 1 
+                        AND "Features"."Class" = 'gene'
+                WHERE
+                    "Genotypes"."ReferenceAlleleCount" != "Genotypes"."CopyNumber" 
+                    AND "Features"."ReferenceID" = :reference_id
+                    AND (
+                        :end_position IS NULL
+                        OR (
+                            "Features"."Region.Begin" < :end_position
+                            AND "Features"."Region.End" > :begin_position
+                        )
+                    )
+                GROUP BY
+                    "Variants"."ChromosomeIndex",
+                    "Features"."FeatureName",
+                    :variant_grouping."Grouping",
+                    "Samples"."SampleIndex"
+                ORDER BY
+                     "Variants"."ChromosomeIndex",
+                     --"Features"."FeatureName",
+                     FLOOR( ( FLOOR( MIN( "Features"."Region.Begin" ) + MAX( "Features"."Region.End" ) / 2 ) ) / :binSize ),
+                     "Samples"."SampleIndex",
+                     :variant_grouping."Grouping"
+                )
+            )
+    GROUP BY 
+        "GeneName", 
+        "ChromosomeIndex", 
+        "Begin", 
+        "End", 
+        "Grouping", 
+        "Bin"
+    ORDER BY
+         "ChromosomeIndex",
+         "GeneName",
+         "Bin",
+         "Grouping";
+    ELSE
+     gene_variant_counts =        
+        SELECT
+            "Features"."FeatureName" AS "GeneName" ,
+            "Variants"."ChromosomeIndex" AS "ChromosomeIndex",
+            NULL AS "Grouping",
+            MIN ( "Features"."Region.Begin" ) AS "Begin",
+            MAX ( "Features"."Region.End" ) AS "End",
+            COUNT( DISTINCT "AllSamples"."PatientDWID" ) as "Count",
+            NULL AS "Bin"
+        FROM
+            :sample_list as "Samples"
+            JOIN "hc.hph.genomics.db.models::General.Samples" AS "AllSamples"
+			    ON "Samples"."SampleIndex" = "AllSamples"."SampleIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+                ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+                ON "Genotypes"."DWAuditID" = "Variants"."DWAuditID"
+                AND "Genotypes"."VariantIndex" = "Variants"."VariantIndex"
+            JOIN "hc.hph.genomics.db.models::Reference.Features" AS "Features"
+                ON "Variants"."ChromosomeIndex" = "Features"."ChromosomeIndex"
+                AND "Variants"."Position" BETWEEN "Features"."Region.Begin" AND "Features"."Region.End" - 1
+                AND "Features"."Class" = 'gene'
+        WHERE
+            "Genotypes"."ReferenceAlleleCount" != "Genotypes"."CopyNumber" 
+            AND "Features"."ReferenceID" = :reference_id
+            AND (
+                :end_position IS NULL
+                OR (
+                    "Features"."Region.Begin" < :end_position
+                    AND "Features"."Region.End" > :begin_position
+                )
+            )
+        GROUP BY
+            "Variants"."ChromosomeIndex",
+            "Features"."FeatureName"
+        ORDER BY
+             "Variants"."ChromosomeIndex";
+    END IF;
+    
+    IF :chromosome_index IS NOT NULL THEN
+        gene_variant_counts = SELECT * FROM :gene_variant_counts WHERE "ChromosomeIndex" = :chromosome_index;
+    END IF;
+END

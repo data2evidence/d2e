@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--(c) Copyright 2017 ALP. All rights reserved.
+
+ALP and the ALP logo are registered trademarks of ALP in Germany and other countries. Business Objects and the Business Objects logo are registered trademarks of Business Objects S.A., which is an ALP company.
+-->
+<dictionary xmlns="http://www.com/ta/4.0">
+<entity_category name="COMPOSITION_SECTION_METADATA">
+  <entity_name standard_form="METADATA:">
+    <variant name="status:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_ADMISSION">
+   <entity_name standard_form="ADMISSION:">
+    <variant name="Einweisung ins Krankenhaus:"/>
+    <variant name="Einweisung:"/>
+   </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_ALLERGIES">
+  <entity_name standard_form="ALLERGIES:">
+    <variant name="Allergien:" />
+    <variant name="Arzneimittelallergie:"/>
+    <variant name="Medikamentenunverträglichkeit:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_ASSESSMENT">
+  <entity_name standard_form="ASSESSMENT:">
+    <variant name="Karnofsky-Index:" />
+    <variant name="Äußere Inspektion:" />
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_CONSULTATION">
+  <entity_name standard_form="CONSULTATION:">
+    <variant name="Anwesender Arzt:"/>
+    <variant name="Behandelnder Arzt:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_DATE">
+  <entity_name standard_form="CONSULT DATE:">
+    <variant name="Datum der Untersuchung:"/>
+  </entity_name>
+
+  <entity_name standard_form="ADMISSION DATE:">
+    <variant name="Datum der Einweisung:"/>
+  </entity_name>
+
+  <entity_name standard_form="DISCHARGE DATE:">
+    <variant name="Entlassungstermin:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_DIAGNOSIS">
+  <entity_name standard_form="DIAGNOSIS:">
+    <variant name="Diagnose:" />
+    <variant name="Diagnose zu:"/>
+    <variant name="Diagnose nach Paraffineinbettung:"/>
+    <variant name="DIAGNOSEN:" />
+    <variant name="Kommentar:" />
+    <variant name="Onkologische Diagnosen:"/>
+    <variant name="Nichtonkologische Diagnosen:" />
+    <variant name="Zusammenfassende Beurteilung:" />
+    <variant name="Metastasierung:" />
+    <variant name="aktuelle Metastasierung: "/>
+    <variant name="Histologie:" />
+    <variant name="Histologischer Befund:"/>
+    <variant name="Befund:"/>
+    <variant name="Befund bei Aufnahme:" />
+    <variant name="Klinischer Befund:"/>
+    <variant name="Anamnese und Befund:" />
+    <variant name="CT Befund Beurteilung:" />
+    <variant name="Anamnestischer Untersuchungsbefund:" />
+    <variant name="Klinischer Untersuchungsbefund:"/>
+    <variant name="UNTERSUCHUNGSBEFUND:" />
+    <variant name="Immunhistologie:" />
+    <variant name="Nachbericht Pathologie:" />
+    <variant name="Pathologischer Nachbericht:" />
+    <variant name="Mikroskopie:" />
+    <variant name="NACHBERICHT:" />
+    <variant name="Remissionsstatus:" />
+    <variant name="Tumorstadium:" />
+    <variant name="TNM-Stadium:"/>
+    <variant name="Stadium:"/>
+    <variant name="Mutationsstatus:"/>
+    <variant name="Tumorklassifikation:"/>
+    <variant name="initiales Tumorstadium:" />
+    <variant name="Tumorverschlüsselung:"/>
+    <variant name="TNM-Klassifikation:"/>
+    <variant name="pTNM-Klassifikation:"/>
+    <variant name="Vorläufige TNM-Klassifikation:"/>
+    <variant name="vorläufige TNM- Situation:"/>
+    <variant name="Begutachtung:"/>
+    <variant name="Die makroskopische und histologische Begutachtung ergibt:"/>
+    <variant name="Klassifikation:"/>
+    <variant name="B-Klassifikation:"/>
+    <variant name="B-Kategorie:"/>
+    <variant name="R-Klassifikation:"/>
+    <variant name="R-Status:"/>
+    <variant name="R-Situation:"/>
+    <variant name="Lokale R-Situation:"/>
+    <variant name="G-Score:"/>
+    <variant name="Grading:"/>
+    <variant name="ICD-Code:"/>
+    <variant name="ICD:"/>
+    <variant name="ICD-O-DA-M:"/>
+    <variant name="Lokalisation:"/>
+    <variant name="Klinische Angaben:"/>
+    <variant name="Nebenbefundlich:"/>
+    <!-- <variant name="Gleason-Score:"/> -->
+    <variant name="Lokale R-Klassifikation."/>
+    <variant name="Beurteilung:"/>
+    <variant name="ND:"/>
+    <variant name="TNM:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_DIAGNOSTICDATA">
+  <entity_name standard_form="TESTS/LABS:">
+    <variant name="Biopsien:" />
+    <variant name="Tumormarker:" />
+    <variant name="Untersuchungen:" />
+    <variant name="Allgemeines Labor:" />
+    <variant name="Speziallabor:" />
+    <variant name="Labor:"/>
+    <variant name="ÖGD:" />
+    <variant name="EKG:"/>
+    <variant name="Koloskopie:" />
+    <variant name="Rectal-digitale Untersuchung:" />
+    <variant name="ERCP Befund vom ? . ? . ?"/>
+    <variant name="Sono-Abdomen vom ? . ? . ?"/>
+    <variant name="Sonographie Abdomen vom ? . ? . ? :"/>
+    <variant name="Sonographie Abdomen ( ? MHz) vom ? . ? . ? :"/>
+    <variant name="Abdomen-Sonographie ( ? MHz) vom ? . ? . ? :"/>
+    <variant name="Abdomen-Sonographie vom ? . ? . ? :"/>
+    <variant name="Einbettung:"/>
+    <variant name="Vollständige Einbettung:"/>
+    <variant name="die immunhistologische Untersuchung des Materials ergibt folgendes:"/>
+    <variant name="Makroskopie:" />
+    <variant name="Schnellschnittdurchsage:"/>
+    <variant name="Carcinomgewebe/Prostatavolumen:"/>
+    <variant name="Gesamtanteil des Tumors am Prostatastanzgewebe:"/>
+    <variant name="Blut:"/>
+    <variant name="Knochenmarkszytologie:"/>
+    <variant name="Knochenmarksbiopsie:"/>
+    <variant name="Färbungen:"/>
+    <variant name="Differenzierung:"/>
+    <variant name="Zelldichte:"/>
+    <variant name="Zytoplasmata:"/>
+    <variant name="Kerne:"/>
+    <variant name="Mitosen:"/>
+    <variant name="Nekrosen:"/>
+    <variant name="Gefäße:"/>
+    <variant name="Infiltrationsmuster:"/>
+    <variant name="BPL CT ? mit KM vom ? . ? . ? :"/>
+    <variant name="MRT ? nativ + KM vom ? . ? . ? :"/>
+    <variant name="MRT Multiplanare Rekonstruktion vom ? . ? . ? :"/>
+    <variant name="Computergestützte Nachverarbeitung von MR-Datensätzen vom ? . ? . ? :"/>
+    <variant name="CT BPL ? nativ vom ? . ? . ? :"/>
+    <variant name="BPL CT ? nativ vom ? . ? . ? :"/>
+    <variant name="Endosonographie:"/>
+    <variant name="MRT-Abdomen:"/>
+    <variant name="CT ? mit KM inkl. sagittaler und koronarer Rekonstruktionen vom ? . ? . ? :"/>
+    <variant name="Rö. Thorax i. Liegen a.p.-Aufnahme vom ? . ? . ? :"/>
+    <variant name="Thorax-Sonographie ( ? MHz) vom ? . ? . ? :"/>
+    <variant name="MRT des ? (KM-i.v.) vom ? . ? . ? :"/>
+    <variant name="CT Hals/Thorax/Abdomen (KM-i.v.+p.o.) vom ? . ? . ? :"/>
+    <variant name="Posttherapeutische Verteilungsszintigraphie am ? . ? . ? :"/>
+  </entity_name>
+
+  <entity_name standard_form="TEST DATA AT DISCHARGE:">
+    <variant name="Labor bei Entlassung:" />
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_DISCHARGE">
+  <entity_name standard_form="DISCHARGE:">
+    <variant name="Entlassung:"/>
+  </entity_name>
+
+  <entity_name standard_form="DEATH DETAILS:">
+    <variant name="Todesursache:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_FAMILYHISTORY">
+  <entity_name standard_form="FAMILY_HISTORY:">
+    <variant name="Familienanamnese:" />
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_FOLLOWUP">
+  <entity_name standard_form="FOLLOWUP:">
+    <variant name="Procedere:" />
+    <variant name="Therapieempfehlung:" />
+    <variant name="Empfehlungen:" />
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_HISTORY">
+  <entity_name standard_form="HISTORY:">
+    <variant name="Anamnese:" />
+    <variant name="ANAMNESE:" />
+    <variant name="Aktuelle Anamnese:" />
+    <variant name="Aktuell:" />
+    <variant name="Chronologie:" />
+    <variant name="Anamnestische Angaben:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_HOSPITALCOURSE">
+  <entity_name standard_form="HOSPITAL COURSE:">
+     <variant name="Krankenhausverlauf:"/>
+     <variant name="Postoperativer Verlauf:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_MAILHEADER">
+  <entity_name standard_form="MAIL:">
+     <variant name="Von:"/>
+     <variant name="An:"/>
+     <variant name="Cc:"/>
+     <variant name="Betreff:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_MEDICATIONS">
+  <entity_name standard_form="MEDS:">
+    <variant name="Aktuelle Medikation:" />
+    <variant name="Medikation:" />
+    <variant name="Bei Bedarf:"/>
+  </entity_name>
+
+  <entity_name standard_form="DISCHARGE MEDS:">
+    <variant name="Empfohlene Medikation bei Entlassung:" />
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_PATIENT">
+  <entity_name standard_form="PATIENT INFO:">
+    <variant name="Patient:"/>
+    <variant name="Patientin:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_PHYSICALEXAM">
+  <entity_name standard_form="PHYSICAL EXAM:">
+    <variant name="Untersuchungsbefund:"/>
+    <variant name="Jetzige Anamnese:"/>
+    <variant name="Mundschleimhaut:"/>
+    <variant name="Herz und Kreislauf:"/>
+    <variant name="Inspektion:"/>
+    <variant name="Lunge:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_PROBLEM">
+  <entity_name standard_form="PROBLEM:">
+    <variant name="Chronischer Schmerz:"/>
+    <variant name="Orthostatische Hypotension:"/>
+    <variant name="Diabetes:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_PROCEDURE">
+  <entity_name standard_form="PROCEDURE:">
+    <variant name="Material:" />
+    <variant name="Therapie:" />
+    <variant name="Therapie und Verlauf:" />
+    <variant name="Therapie/Verlauf:"/>
+  </entity_name>
+</entity_category>
+
+<entity_category name="COMPOSITION_SECTION_SOCIALHISTORY">
+  <entity_name standard_form="SOCIAL_HISTORY:">
+    <variant name="Sozialanamnese:" />
+    <variant name="Berufsanamnese:" />
+    <variant name="Genussmittel:" />
+  </entity_name>
+</entity_category>
+
+</dictionary>

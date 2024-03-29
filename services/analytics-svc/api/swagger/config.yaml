@@ -1,0 +1,128 @@
+  /config/:
+    x-swagger-router-controller: config
+    get:
+      description: List of configs
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      description: Add a new config
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+  /config/default:
+    x-swagger-router-controller: config
+    get:
+      description: Gets default config
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      description: Sets default config
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+  /config/loadFromFile:
+    x-swagger-router-controller: config
+    get:
+      description: Loads config from file // we should remove this
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+  /config/suggest:
+    x-swagger-router-controller: config
+    get:
+      description: .
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+  /config/{configId}/{configVersion}:
+    x-swagger-router-controller: config
+    get:
+      description: Return Config
+      parameters:
+        - name: configId
+          in: path
+          description: .
+          required: true
+          type: string
+        - name: configVersion
+          in: path
+          description: .
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      description: Deletes a config
+      parameters:
+        - name: configId
+          in: path
+          description: .
+          required: true
+          type: string
+        - name: configVersion
+          in: path
+          description: .
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+  /config/{configId}/{configVersion}/validate:
+    x-swagger-router-controller: config
+    get:
+      description: Validates a config
+      parameters:
+        - name: configId
+          in: path
+          description: .
+          required: true
+          type: string
+        - name: configVersion
+          in: path
+          description: .
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"
+  /config/{configId}/{configVersion}/activate:
+    x-swagger-router-controller: config
+    get:
+      description: Activates a config
+      parameters:
+        - name: configId
+          in: path
+          description: .
+          required: true
+          type: string
+        - name: configVersion
+          in: path
+          description: .
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Error"

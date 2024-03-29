@@ -1,0 +1,11 @@
+namespace hc.hph.custom.cdw.db.models;
+
+context DWExtendFP01 {
+
+	type PatientBestRecord {};
+
+	type Practitioner {};
+
+	type Practitioner_Patient_Link_Attr {};
+
+};

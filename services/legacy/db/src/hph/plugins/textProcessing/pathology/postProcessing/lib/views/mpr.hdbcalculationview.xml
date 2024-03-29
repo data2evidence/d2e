@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:AccessControl="http://www.com/ndb/SQLCoreModelAccessControl.ecore" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" schemaVersion="2.3" id="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::mpr" applyPrivilegeType="NONE" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" dataCategory="DEFAULT" enforceSqlExecution="false" executionSemantic="UNDEFINED" outputViewType="Projection" xscCompatibilityMode="true">
+  <descriptions defaultDescription="mpr"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="28"/>
+  <dataSources>
+    <DataSource id="ta" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="Polarity$$$$ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="Reference$$$$ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="Subentities$$$$ta$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::ta</resourceUri>
+    </DataSource>
+    <DataSource id="pathology_entities" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::pathology_entities</resourceUri>
+    </DataSource>
+    <DataSource id="sections" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::sections</resourceUri>
+    </DataSource>
+  </dataSources>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Modality">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="STATUS"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#ta">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="TA_TYPE"/>
+      </input>
+      <filter>(in (&quot;STATUS&quot;,'Provisional', 'Preparation'))</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Polarity">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="POLARITY"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Polarity$$$$ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="TA_TYPE"/>
+      </input>
+      <filter>(&quot;POLARITY&quot; ='Negative')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Reference">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="SUBJECT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Reference$$$$ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="TA_TYPE"/>
+      </input>
+      <filter>(in (&quot;SUBJECT&quot;,'Other','FamilyMemberHistory'))</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Subentities">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="TA_PARENT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Subentities$$$$ta$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      </input>
+      <filter>(not isNull(&quot;TA_PARENT&quot;))</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="ModalitySubentities" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="STATUS"/>
+        <viewAttribute hidden="true" id="JOIN$TA_TOKEN$TA_TOKEN"/>
+        <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Modality">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <input node="#Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_TOKEN$TA_TOKEN"/>
+      <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="PolaritySubentities" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="POLARITY"/>
+        <viewAttribute hidden="true" id="JOIN$TA_TOKEN$TA_TOKEN"/>
+        <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Polarity">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <input node="#Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_TOKEN$TA_TOKEN"/>
+      <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="ReferenceSubentities" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="SUBJECT"/>
+        <viewAttribute hidden="true" id="JOIN$TA_TOKEN$TA_TOKEN"/>
+        <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Reference">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <input node="#Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_TOKEN$TA_TOKEN"/>
+      <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:UnionView" id="MprSubentities">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="STATUS"/>
+        <viewAttribute id="POLARITY"/>
+        <viewAttribute id="SUBJECT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input emptyUnionBehavior="NO_ROW" node="#ModalitySubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="POLARITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="SUBJECT" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="#PolaritySubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="STATUS" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="SUBJECT" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="#ReferenceSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="STATUS" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="POLARITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Entities">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#pathology_entities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="MapMprInfo" cardinality="C1_N" joinType="leftOuter">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="STATUS"/>
+        <viewAttribute id="POLARITY"/>
+        <viewAttribute id="SUBJECT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Entities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <input node="#MprSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_COUNTER"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="FamilyHistorySection">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_SECTION"/>
+      </viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute datatype="NVARCHAR" id="SUBJECT" length="100" expressionLanguage="COLUMN_ENGINE">
+          <formula>'FamilyMemberHistory'</formula>
+        </calculatedViewAttribute>
+      </calculatedViewAttributes>
+      <input node="#sections">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_SECTION" source="TA_SECTION"/>
+      </input>
+      <filter>(&quot;TA_SECTION&quot; ='COMPOSITION_SECTION_FAMILYHISTORY')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:UnionView" id="AddFamilyHistoryInfo">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="STATUS"/>
+        <viewAttribute id="POLARITY"/>
+        <viewAttribute id="SUBJECT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input emptyUnionBehavior="NO_ROW" node="#MapMprInfo">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="#FamilyHistorySection">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="STATUS" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="POLARITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:AggregationView" id="Collapsing">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute aggregationType="max" id="STATUS"/>
+        <viewAttribute aggregationType="max" id="POLARITY"/>
+        <viewAttribute aggregationType="max" id="SUBJECT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#AddFamilyHistoryInfo">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="STATUS" source="STATUS"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="POLARITY" source="POLARITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SUBJECT" source="SUBJECT"/>
+      </input>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Collapsing">
+    <descriptions/>
+    <attributes>
+      <attribute id="DWID" order="1" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="DWID"/>
+        <keyMapping columnObjectName="Collapsing" columnName="DWID"/>
+      </attribute>
+      <attribute id="TA_COUNTER" order="2" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_COUNTER"/>
+        <keyMapping columnObjectName="Collapsing" columnName="TA_COUNTER"/>
+      </attribute>
+      <attribute id="STATUS" hidden="true" order="3" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="STATUS"/>
+        <keyMapping columnObjectName="Collapsing" columnName="STATUS"/>
+      </attribute>
+      <attribute id="POLARITY" hidden="true" order="4" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="POLARITY"/>
+        <keyMapping columnObjectName="Collapsing" columnName="POLARITY"/>
+      </attribute>
+      <attribute id="SUBJECT" hidden="true" order="5" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="SUBJECT"/>
+        <keyMapping columnObjectName="Collapsing" columnName="SUBJECT"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes>
+      <calculatedAttribute id="TA_STATUS" hidden="false" order="6" semanticType="empty" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_STATUS"/>
+        <keyCalculation datatype="NVARCHAR" expressionLanguage="COLUMN_ENGINE" length="100">
+          <formula>if(isnull(&quot;STATUS&quot;),'Confirmed',&quot;STATUS&quot;)</formula>
+        </keyCalculation>
+      </calculatedAttribute>
+      <calculatedAttribute id="TA_POLARITY" hidden="false" order="7" semanticType="empty" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_POLARITY"/>
+        <keyCalculation datatype="NVARCHAR" expressionLanguage="COLUMN_ENGINE" length="100">
+          <formula>if(isnull(&quot;POLARITY&quot;),'Positive',&quot;POLARITY&quot;)</formula>
+        </keyCalculation>
+      </calculatedAttribute>
+      <calculatedAttribute id="TA_SUBJECT" hidden="false" order="8" semanticType="empty" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_SUBJECT"/>
+        <keyCalculation datatype="NVARCHAR" expressionLanguage="COLUMN_ENGINE" length="100">
+          <formula>if(isnull(&quot;SUBJECT&quot;),'Patient',&quot;SUBJECT&quot;)</formula>
+        </keyCalculation>
+      </calculatedAttribute>
+    </calculatedAttributes>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures/>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+        <upperLeftCorner x="284" y="87"/>
+        <rectangleSize height="0" width="0"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Modality" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="22" y="685"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Polarity" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="176" y="685"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Reference" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="484" y="685"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Subentities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="330" y="685"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="ModalitySubentities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="59" y="589"/>
+        <rectangleSize height="82" width="184"/>
+      </shape>
+      <shape expanded="true" modelObjectName="PolaritySubentities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="257" y="589"/>
+        <rectangleSize height="82" width="179"/>
+      </shape>
+      <shape expanded="true" modelObjectName="ReferenceSubentities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="450" y="589"/>
+        <rectangleSize height="82" width="194"/>
+      </shape>
+      <shape expanded="true" modelObjectName="MprSubentities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="276" y="455"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Entities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="122" y="455"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="MapMprInfo" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="191" y="359"/>
+        <rectangleSize height="82" width="152"/>
+      </shape>
+      <shape expanded="true" modelObjectName="FamilyHistorySection" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="357" y="359"/>
+        <rectangleSize height="64" width="170"/>
+      </shape>
+      <shape expanded="true" modelObjectName="AddFamilyHistoryInfo" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="274" y="243"/>
+        <rectangleSize height="102" width="160"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Collapsing" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="284" y="165"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario>

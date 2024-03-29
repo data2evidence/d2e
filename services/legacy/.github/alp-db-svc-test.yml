@@ -1,0 +1,184 @@
+name: ALP db-svc and ingestion-svc integration tests with Azure Hana database and local Postgres database
+
+on:
+  push:
+    branches-ignore: [develop]
+  workflow_dispatch:
+
+# Run only one job per branch
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}-db-svc-tests # Run the latest push
+  cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
+
+
+jobs:
+  test-alp-db-svc-and-ingestion-svc:
+    if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    runs-on: ubuntu-latest
+    env:
+      # DB-SVC ENV
+      LB__LOG_LEVEL: "severe"
+      DB_SVC__LOG_LEVEL: "error"
+      DB_SVC__DEBUG: "false"
+      DB_SVC__PORT: "3333"
+      DB_SVC__PATH: "/alpdb"
+      OMOP__VOCAB_SCHEMA: "CDMVOCAB"
+      HANA__READ_ROLE: "TENANT_READ_ROLE"
+      B2C__ALP_APP__CLIENT_ID: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce"
+      AD__IDENTITY_METADATA: "https://login.microsoftonline.com/f59c7915-9283-4fb5-b633-435b9145ca00/v2.0/.well-known/openid-configuration"
+      AD__AUDIENCE: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce, 3da7b194-8456-4ef1-a790-00ef6360decd"
+      SKIP_AUTH: "TRUE"
+      DISABLE_SSL: "TRUE"
+      ROLLBACK_SCHEMA_CREATION_FOR_LIQUIBASE_SCRIPT_FAILURE: "TRUE"
+      HANA__TENANT_CONFIGS: "{}"
+      INTEGRATION_TEST__HANA__TENANT_CONFIGS: ${{ secrets.ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_GERMANY }}
+      PG__TENANT_CONFIGS: '{"alp":{"host":"localhost","port":"5432","databaseName":"alp","postgresAdminUser":"postgres","postgresAdminPassword":"Toor1234","postgresReadUser":"postgres_tenant_read_user","postgresReadPassword":"Toor1234"}}'
+      PG__READ_ROLE: "POSTGRES_TENANT_READ_ROLE"
+
+      # INGESTION-SVC ENV
+      ALP_INGESTION_HTTP_PORT: "3444"
+      ALP_INGESTION_BASE_PATH: "/alp-ingestion"
+      OAUTH_CLIENT_ID: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce"
+      OAUTH_AD_META: "https://login.microsoftonline.com/f59c7915-9283-4fb5-b633-435b9145ca00/v2.0/.well-known/openid-configuration"
+      POSTGRES_CONNECTION_CONFIG: "{}"
+      POSTGRES_DATABASES_CREDENTIALS: "{}"
+      PG__DATA_INGESTION__DB_NAME: "alp"
+      PHDP_DD_DECRYPTION_PRIVATE_KEYS: ${{ secrets.SYS__PHDP_DD_DECRYPTION__PRIVATE_PKEYS }}
+      ALP_INGESTION_LOGLEVEL: "debug"
+      INTEGRATION_TEST__POSTGRES_CONNECTION_CONFIG: '{"host": "localhost", "port": 5432,  "statement_timeout": 60000, "query_timeout": 60000, "connectionTimeoutMillis": 60000, "idle_in_transaction_session_timeout": 60000}'
+      INTEGRATION_TEST__POSTGRES_DATABASES_CREDENTIALS: '{"alp" : {"user": "postgres", "password": "Toor1234", "schema" : "fhir_data"}}'
+      DEBUG: "TRUE"
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "Toor1234"
+          POSTGRES_DB: "alp"
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/checkout@v4
+        name: sameBranch checkout (OverrideRepo)
+        id: sameBranch-checkout
+        continue-on-error: true
+        with:
+          repository:  ${{ vars.OVERRIDE_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout-cone-mode: false
+          ref: ${{ github.ref_name }}
+
+      - shell: bash
+        name: sameBranch checkout test
+        id: sameBranch-checkout-test
+        run: |
+          ls -lhtr tmp
+          [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        name: develop branch checkout (sameBranch checkout fails)
+        if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
+        with:
+          repository:  ${{ vars.OVERRIDE_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout-cone-mode: false
+          ref: develop
+
+      - shell: bash
+        name: merge files from override
+        id: merge_files_from_override
+        run: |
+          ls -l tmp/alp-data-node-override
+          cp -prnl ./tmp/alp-data-node-override/* .
+          ls -l ./services/alp-db-svc/db/drivers
+          ln -s tmp/alp-data-node-override alp-data-node-override
+          ls -l alp-data-node-override/build
+
+      - shell: bash
+        # Give an id to the step, so we can reference it later
+        name: check if files changed
+        id: check_file_changed
+        run: |
+          # Fetch develop & get file changes from feature branch
+          git fetch origin develop
+
+          # Diff HEAD with the last commit of develop & filter for 'services/alp-db-svc/**'
+          diff=$(git diff --name-only origin/develop HEAD | grep '^services/alp-db-svc/**' || :)
+
+          # Check if a file under services/alp-db-svc/** has changed (added, modified, deleted)
+          hasDiff=$(if [ ${#diff} -gt 0 ] ; then echo "True" ; else echo "False"; fi)
+
+          # Set the output named "has_dbsvc_changed"
+          echo "has_dbsvc_changed=$hasDiff" >> $GITHUB_OUTPUT
+          echo "Files changed: $diff"
+          echo "Does db-svc have changes: $hasDiff"
+
+      - uses: actions/setup-node@v3
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        with:
+          node-version: "18.14.0"
+
+      - name: Build Project (DB-SVC)
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        run: |
+          # Build alp-libs dependencies for alp-db-svc
+          yarn
+          yarn workspace @alp/alp-base-utils run compile
+          pwd
+
+          # Build alp-db-svc
+          cd services/alp-db-svc
+          yarn
+          yarn compile
+      - name: Build Project (INGESTION-SVC)
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        run: |
+          cd services/ingestion-svc
+          yarn install && yarn compile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_PKGS_NPM_TOKEN }}
+
+      - name: Setup Test DB (postgres)
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        working-directory: ./services/alp-db-svc
+        run: |
+          # Create cdmvocab and cdmdefault schema for db-svc integration tests
+          yarn workspace alp-db-svc cdm-install-script post /alpdb/postgres/database/alp/data-model/omop5-4/schema/cdmvocab "{\"cleansedSchemaOption\": false}" && yarn workspace alp-db-svc cdm-install-script post /alpdb/postgres/database/alp/data-model/omop5-4/schema/cdmdefault "{\"cleansedSchemaOption\": false}"
+
+          # Create fhir_data schema for ingestion-svc integration tests
+          yarn workspace alp-db-svc cdm-install-staging-area-script create_staging_area postgres alp fhir_data fhir_data
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_PKGS_NPM_TOKEN }}
+      - name: Run integration tests for INGESTION-SVC
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        working-directory: ./services/ingestion-svc
+        run: |
+          npm run test
+
+      - name: Run integration tests for DB-SVC POSTGRES
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        working-directory: ./services/alp-db-svc
+        # run only if files in 'has_dbsvc_changed' is set to 'True'
+        # if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        run: |
+          npm run pgtest
+      - name: Run integration tests for DB-SVC HANA
+        working-directory: ./services/alp-db-svc
+        # run only if files in 'has_dbsvc_changed' is set to 'True'
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        run: |
+          npm run test

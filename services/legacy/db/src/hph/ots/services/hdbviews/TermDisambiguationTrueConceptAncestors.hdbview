@@ -1,0 +1,6 @@
+VIEW "hc.hph.ots.services.hdbviews::TermDisambiguationTrueConceptAncestors" ( "Concept", "AncestorConcept" ) AS 
+select
+	null as "Concept",
+	null as "AncestorConcept"
+from "hc::DUMMY"
+where 0 = 1

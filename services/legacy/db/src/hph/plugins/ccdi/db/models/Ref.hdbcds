@@ -1,0 +1,17 @@
+
+namespace hc.hph.plugins.ccdi.db.models;
+
+
+context Ref {
+  
+
+
+    entity "ValueMap" {
+    
+         RuleSet: String(100) not null;
+         XVal: String(1000);
+         YVal: String(1000);		   
+    };
+
+};
+

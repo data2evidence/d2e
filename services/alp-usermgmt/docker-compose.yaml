@@ -1,0 +1,11 @@
+version: "3"
+services:
+  alp-usermgmt-svc:
+    build:
+      context: .
+    container_name: alp-usermgmt-svc
+    env_file:
+      - .env.example
+      - .env
+    ports:
+      - 9001:9001

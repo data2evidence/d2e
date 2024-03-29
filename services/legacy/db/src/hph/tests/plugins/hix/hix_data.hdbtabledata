@@ -1,0 +1,110 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.plugins.hix.db.models::hix_test.XMLStage",
+            "import_settings": {
+                "import_columns": [
+                    "DOCUMENTID",
+                    "LASTUPDATED",
+                    "ITEM",
+                    "LEVEL",
+                    "PARENT",
+                    "TYPE",
+                    "KEY",
+                    "VALUE",
+                    "VALUE_EXT",
+                    "BINVALUE"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.tests.plugins.hix::hix_data_XMLStage.csv",
+                "has_header": false,
+                "type_config": {
+                    "delimiter": ",",
+                    "do_quote": true,
+                    "quote_character": "\""
+                }
+            },
+            "column_mappings": {
+                "DOCUMENTID": 1,
+                "LASTUPDATED": 2,
+                "ITEM": 3,
+                "LEVEL": 4,
+                "PARENT": 5,
+                "TYPE": 6,
+                "KEY": 7,
+                "VALUE": 8,
+                "VALUE_EXT": 9,
+                "BINVALUE": 10
+            }
+        },
+        {
+            "target_table": "hc.hph.plugins.hix.db.models::hix_test.LogDetail",
+            "import_settings": {
+                "import_columns": [
+                    "LOGDETAILID",
+                    "DOCUMENTID",
+                    "STATUS",
+                    "NOTES",
+                    "STARTTIME",
+                    "ENDTIME",
+                    "DOCUMENTTYPE",
+                    "DOCUMENTSIZE",
+                    "DOCUMENTLASTUPDATED"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.tests.plugins.hix::hix_data_LogDetail.csv",
+                "has_header": false,
+                "type_config": {
+                    "delimiter": ",",
+                    "do_quote": true,
+                    "quote_character": "\""
+                }
+            },
+            "column_mappings": {
+                "LOGDETAILID": 1,
+                "DOCUMENTID": 2,
+                "STATUS": 3,
+                "NOTES": 4,
+                "STARTTIME": 5,
+                "ENDTIME": 6,
+                "DOCUMENTTYPE": 7,
+                "DOCUMENTSIZE": 8,
+                "DOCUMENTLASTUPDATED": 9
+            }
+        },
+        {
+            "target_table": "hc.hph.plugins.hix.db.models::hix_test.FileList",
+            "import_settings": {
+                "import_columns": [
+                    "DOCUMENTID",
+                    "DOCUMENTNAME",
+                    "MIMETYPE",
+                    "SIZE",
+                    "LASTUPDATED"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.tests.plugins.hix::hix_data_FileList.csv",
+                "has_header": false,
+                "type_config": {
+                    "delimiter": ",",
+                    "do_quote": true,
+                    "quote_character": "\""
+                }
+            },
+            "column_mappings": {
+                "DOCUMENTID": 1,
+                "DOCUMENTNAME": 2,
+                "MIMETYPE": 3,
+                "SIZE": 4,
+                "LASTUPDATED": 5
+            }
+        }
+    ]
+}

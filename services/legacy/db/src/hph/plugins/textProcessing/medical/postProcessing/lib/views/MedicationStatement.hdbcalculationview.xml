@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" schemaVersion="3.0" id="hc.hph.plugins.textProcessing.medical.postProcessing.lib.views::MedicationStatement" applyPrivilegeType="NONE" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" dataCategory="CUBE" enforceSqlExecution="false" executionSemantic="UNDEFINED" outputViewType="Aggregation" xscCompatibilityMode="true">
+  <descriptions defaultDescription="med_Medication"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="27"/>
+  <dataSources>
+    <DataSource id="ta_temp" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp</resourceUri>
+    </DataSource>
+  </dataSources>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Medication_Subentities" filterExpressionLanguage="COLUMN_ENGINE">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_PARENT"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="ta_temp">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='MedicationStatement_Medication') or (&quot;TA_TYPE&quot;='MedicationStatement_Dosage_Dose') or (&quot;TA_TYPE&quot;='MedicationStatement_Medication_Form') or (&quot;TA_TYPE&quot;='MedicationStatement_Medication_Ingredient_Amount') or (&quot;TA_TYPE&quot;='MedicationStatement_Dosage_Route') or (&quot;TA_TYPE&quot;='MedicationStatement_Dosage_Rate') or (&quot;TA_TYPE&quot;='MedicationStatement_Dosage_Timing_Duration') or (&quot;TA_TYPE&quot;='MedicationStatement_Reason')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Medication" filterExpressionLanguage="COLUMN_ENGINE">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_MEDS_MEDICATION"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Medication_Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_MEDICATION" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='MedicationStatement_Medication')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Dosage" filterExpressionLanguage="COLUMN_ENGINE">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_MEDS_DOSAGE_DOSE"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Medication_Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_DOSAGE_DOSE" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='MedicationStatement_Dosage_Dose')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Doseform" filterExpressionLanguage="COLUMN_ENGINE">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_MEDS_FORM"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Medication_Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_FORM" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='MedicationStatement_Medication_Form')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Strength" filterExpressionLanguage="COLUMN_ENGINE">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_MEDS_INGREDIENT_AMOUNT"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Medication_Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_INGREDIENT_AMOUNT" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='MedicationStatement_Medication_Ingredient_Amount')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Route" filterExpressionLanguage="COLUMN_ENGINE">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_MEDS_DOSAGE_ROUTE"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Medication_Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_DOSAGE_ROUTE" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='MedicationStatement_Dosage_Route')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Frequency" filterExpressionLanguage="COLUMN_ENGINE">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_MEDS_DOSAGE_RATE"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Medication_Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_DOSAGE_RATE" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='MedicationStatement_Dosage_Rate')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Duration" filterExpressionLanguage="COLUMN_ENGINE">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_MEDS_DOSAGE_DURATION"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Medication_Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_DOSAGE_DURATION" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='MedicationStatement_Dosage_Timing_Duration')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Reason" filterExpressionLanguage="COLUMN_ENGINE">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_MEDS_REASON"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Medication_Subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_REASON" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='MedicationStatement_Reason')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:UnionView" id="Union_1">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_MEDS_MEDICATION"/>
+        <viewAttribute id="TA_MEDS_DOSAGE_DOSE"/>
+        <viewAttribute id="TA_MEDS_FORM"/>
+        <viewAttribute id="TA_MEDS_INGREDIENT_AMOUNT"/>
+        <viewAttribute id="TA_MEDS_DOSAGE_ROUTE"/>
+        <viewAttribute id="TA_MEDS_DOSAGE_RATE"/>
+        <viewAttribute id="TA_MEDS_DOSAGE_DURATION"/>
+        <viewAttribute id="TA_MEDS_REASON"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input emptyUnionBehavior="NO_ROW" node="Medication">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_MEDICATION" source="TA_MEDS_MEDICATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DOSE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_FORM" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_INGREDIENT_AMOUNT" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_ROUTE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_RATE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DURATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_REASON" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="Dosage">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_MEDICATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_DOSAGE_DOSE" source="TA_MEDS_DOSAGE_DOSE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_FORM" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_INGREDIENT_AMOUNT" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_ROUTE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_RATE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DURATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_REASON" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="Doseform">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_MEDICATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DOSE" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_FORM" source="TA_MEDS_FORM"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_INGREDIENT_AMOUNT" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_ROUTE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_RATE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DURATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_REASON" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="Strength">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_MEDICATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DOSE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_FORM" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_INGREDIENT_AMOUNT" source="TA_MEDS_INGREDIENT_AMOUNT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_ROUTE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_RATE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DURATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_REASON" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="Route">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_MEDICATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DOSE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_FORM" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_INGREDIENT_AMOUNT" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_DOSAGE_ROUTE" source="TA_MEDS_DOSAGE_ROUTE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_RATE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DURATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_REASON" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="Frequency">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_MEDICATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DOSE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_FORM" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_INGREDIENT_AMOUNT" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_ROUTE" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_DOSAGE_RATE" source="TA_MEDS_DOSAGE_RATE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DURATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_REASON" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="Duration">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_MEDICATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DOSE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_FORM" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_INGREDIENT_AMOUNT" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_ROUTE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_RATE" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_DOSAGE_DURATION" source="TA_MEDS_DOSAGE_DURATION"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_REASON" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="Reason">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_MEDICATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DOSE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_FORM" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_INGREDIENT_AMOUNT" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_ROUTE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_RATE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_MEDS_DOSAGE_DURATION" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_MEDS_REASON" source="TA_MEDS_REASON"/>
+      </input>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Union_1">
+    <descriptions/>
+    <attributes>
+      <attribute id="DWID" order="1" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="DWID"/>
+        <keyMapping columnObjectName="Union_1" columnName="DWID"/>
+      </attribute>
+      <attribute id="TA_COUNTER" order="2" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_COUNTER"/>
+        <keyMapping columnObjectName="Union_1" columnName="TA_COUNTER"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures>
+      <measure id="TA_MEDS_MEDICATION" order="3" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_MEDS_MEDICATION"/>
+        <measureMapping columnObjectName="Union_1" columnName="TA_MEDS_MEDICATION"/>
+      </measure>
+      <measure id="TA_MEDS_DOSAGE_DOSE" order="4" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_MEDS_DOSAGE_DOSE"/>
+        <measureMapping columnObjectName="Union_1" columnName="TA_MEDS_DOSAGE_DOSE"/>
+      </measure>
+      <measure id="TA_MEDS_FORM" order="5" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_MEDS_FORM"/>
+        <measureMapping columnObjectName="Union_1" columnName="TA_MEDS_FORM"/>
+      </measure>
+      <measure id="TA_MEDS_INGREDIENT_AMOUNT" order="6" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_MEDS_INGREDIENT_AMOUNT"/>
+        <measureMapping columnObjectName="Union_1" columnName="TA_MEDS_INGREDIENT_AMOUNT"/>
+      </measure>
+      <measure id="TA_MEDS_DOSAGE_ROUTE" order="7" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_MEDS_DOSAGE_ROUTE"/>
+        <measureMapping columnObjectName="Union_1" columnName="TA_MEDS_DOSAGE_ROUTE"/>
+      </measure>
+      <measure id="TA_MEDS_DOSAGE_RATE" order="8" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_MEDS_DOSAGE_RATE"/>
+        <measureMapping columnObjectName="Union_1" columnName="TA_MEDS_DOSAGE_RATE"/>
+      </measure>
+      <measure id="TA_MEDS_DOSAGE_DURATION" order="9" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_MEDS_DOSAGE_DURATION"/>
+        <measureMapping columnObjectName="Union_1" columnName="TA_MEDS_DOSAGE_DURATION"/>
+      </measure>
+      <measure id="TA_MEDS_REASON" order="10" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_MEDS_REASON"/>
+        <measureMapping columnObjectName="Union_1" columnName="TA_MEDS_REASON"/>
+      </measure>
+    </baseMeasures>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+        <upperLeftCorner x="181" y="105"/>
+        <rectangleSize height="0" width="140"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Medication_Subentities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="160" y="530"/>
+        <rectangleSize height="64" width="181"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Medication" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="-410" y="360"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Dosage" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="-230" y="360"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Doseform" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="-40" y="360"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Strength" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="120" y="360"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Route" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="300" y="360"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Frequency" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="470" y="360"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Duration" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="640" y="360"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Reason" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="820" y="358"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Union_1" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="370" y="143"/>
+        <rectangleSize height="-1" width="140"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario> 

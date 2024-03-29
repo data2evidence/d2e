@@ -1,0 +1,3 @@
+domain,description,provider
+medical,Text Processing Configuration for Extraction Core Medical,ALP
+pathology,Text Processing Configuration for Extraction Core Pathology,ALP

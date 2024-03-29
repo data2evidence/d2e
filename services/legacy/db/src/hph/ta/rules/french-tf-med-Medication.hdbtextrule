@@ -1,0 +1,288 @@
+!!(c) Copyright 2018 ALP. All rights reserved.
+!!
+!!ALP and the ALP logo are registered trademarks of ALP in Germany and other countries. Business Objects and the Business Objects logo are registered trademarks of Business Objects S.A., which is an ALP company.
+!!
+!!!!!!!!!!!!!!!
+!! Dose form
+#subgroup OD_DoseForm: {
+    [OD MedicationStatement_Medication_Form] (
+        <cps?>
+        | <comprimés?>
+        | <pilules?>
+        | <gouttes?>
+        | <patchs?>
+        | <sachets?>
+        | <flacons?>
+    ) [/OD]
+}
+
+
+
+!!!!!!!!!!!!
+!! Duration
+
+#subgroup date: {
+    <3[01]|[12][0-9]|0?[1-9]> <[\-\.\/]>? <1[012]|0?[1-9]> <[\-\.\/]>? <(19|20)?[0-9]{2}>
+    | <(3[01]|[12][0-9]|0?[1-9])[\-\.\/](1[012]|0?[1-9])[\-\.\/]((19|20)?[0-9]{2})>
+    | <3[01]|[12][0-9]|0?[1-9]> <\p{ci}(janvier|février|mars|avril|mai|juin|août|septembre|octobre|novembre|décembre)>
+}
+
+#subgroup OD_Duration: {
+    [OD MedicationStatement_Dosage_Timing_Duration] (
+        <sur> <[0-9]+> <STEM:(minute|heure)>
+        | <de> <[jJ][0-9]+> <\p{di}(à)> <[jJ][0-9]+>
+        | <[jJ][0-9]+\-[jJ][0-9]+>
+        | <pendant> <POS:Num> <\p{ci}(j|jours?|semaines?|mois)>
+        | (<POS:Num> <\p{ci}(j|jours?|semaines?|mois)> <sur>)? <POS:Num> <\p{ci}(j|jours?|semaines?|mois)>
+        | <du> (<POS:Num> | %(date)) <au> %(date)
+    )+ [/OD]
+}
+
+
+
+!!!!!!!!!!!!
+!! Reason
+!! TODO rely on a dictionary of disorders to extract "Reason" attribute like in "Nausées améliorées par la prise de PRIMPERAN""
+#subgroup diso : {
+     <douleurs?>
+    | <anxiété>
+    | <nausées>
+    | <vomissements>
+    | <diarrhées>
+    | [TE CONDITION] <>+ [/TE]
+}
+
+#subgroup OD_Reason: {
+    [OD MedicationStatement_Reason] (
+        <si> ( <\,>? <et|ou>? %(diso) )+
+        | <si> <besoin> | <\p{ci}(SB)>
+        | <à> <la> <demande>
+        | ( <pour> | <contre> )(
+            <POS:Det>? %(diso)
+            )
+        | <en>? <STEM:prévention> <POS:Prep> <POS:Det>? <>
+            ( ( <\,> | <et> ) <POS:Prep>? <POS:Det>? <> )*
+    ) [/OD]
+}
+
+#subgroup OD_Reason_before_medication: {
+    [OD MedicationStatement_Reason] <POS:Nn> <POS:Adj>? [/OD] (
+        <pour> <STEM:lequel> <POS:Pron> <STEM:prendre> <POS:Prep>
+        | <STEM:(améliorer|calmer)> <par> (<la> <prise>)? <POS:Prep>
+    )
+    | <\p{ci}(en)> <cas> <de> [OD MedicationStatement_Reason] %(diso) [/OD]
+}
+
+
+
+!!!!!!!!!!!
+!! Route
+#subgroup Route_np: {
+    <injection> ( <sous\-cutan[ée]e> | <SC> )
+    | <injection> <intra\-art[ée]rielle>
+    | <IV>
+    | <\p{ci}(bains?)> <\p{ci}(de)> <\p{ci}(bouche)>
+    | <appl>
+}
+
+#subgroup OD_Route_np: {
+    [OD MedicationStatement_Dosage_Route] %(Route_np) [/OD]
+}
+
+#subgroup OD_Route: {
+    [OD MedicationStatement_Dosage_Route] (
+        ( <par> | <en> ) %(Route_np) 
+        | <per> <os> | <P\.O>
+    ) [/OD]
+}
+
+
+
+!!!!!!!!!!!!!!!
+!! Frequency
+#subgroup Frequency_modifier: {
+    <jusqu'> <[àa]>
+}
+
+#subgroup PerTimeUnit: {
+    ( <\/> | <par> ) <\p{ci}(j\.?|jour|sem\.?|semaine)> 
+    | <toutes|tous> <les> ( <[0-9]+([hH]|hrs)>  | <[0-9]+> <[hH]|hrs> )
+    | <le>? <matin|midi|soir> (<\,>? <et>? <matin|midi|soir>)*
+}
+
+#subgroup OD_PerTimeUnit: {
+    [OD MedicationStatement_Dosage_Rate] %(PerTimeUnit) [/OD]
+}
+
+#subgroup OD_Frequency: {
+    [OD MedicationStatement_Dosage_Rate] ( 
+        %(Frequency_modifier)? (
+            <[xX][123456]> | <[xX]> <[123456]>
+            | <[123456][xX]> | <[123456]> <[xX]>
+            | (<[123456]|une|deux|trois|quatre|cinq|six> <\p{di}(à)>)? <[123456]|une|deux|trois|quatre|cinq|six> <fois|prises?>
+        ) %(PerTimeUnit)+
+        | <quotidien> | <hebdomadaire> | <mensuel>
+        | <pluri> <quotidiens?>
+        | <[0-6]\-[0-6]\-[0-6]>
+    ) [/OD]
+}
+
+
+
+!!!!!!!!!!!!!!
+!! Strength 
+#subgroup OD_Strength_ambiguous: {
+    [OD MedicationStatement_Medication_Ingredient_Amount] ( 
+        <[1-9][0-9]?[05]0?>
+        | <0[\,\.][123456789]>
+    ) [/OD]
+}
+
+#subgroup OD_Strength_percent: {
+    [OD MedicationStatement_Medication_Ingredient_Amount] (
+        <POS:Num> <\%>
+    ) [/OD]
+}
+
+#subgroup OD_Strength: {
+    [OD MedicationStatement_Medication_Ingredient_Amount] (
+        <POS:Num> <\p{ci}(ml|µg|mg|g)>
+        | <[0-9]+([\.\,][0-9]+)(ml|mg|g|ML|MG|G)>
+        | <POS:Num> <\%>
+    ) [/OD]
+}
+
+
+
+!!!!!!!!!!!!
+!! Dosage
+#subgroup Dosage_modifier: {
+    <max(imum)?>
+    | <jusqu'> <[àa]>
+    | <à> <dose> <progressive> <jusqu'> <[àa]>
+    | <à> <la> <dose> <initiale> <de>
+    | <à> <la> <dose> <de>
+    | <à>
+}
+
+#subgroup OD_Dosage_ambiguous:{
+    [OD MedicationStatement_Dosage_Dose] %(Dosage_modifier)? (
+        <[1234]> | <1\/[24]> | <1> <\+> <1\/[24]>
+        | <[123]> <\p{di}(à)> <[234]>
+    ) [/OD]
+}
+
+#subgroup OD_Dosage: {
+    [OD MedicationStatement_Dosage_Dose] %(Dosage_modifier)? (
+        ( <POS:Num>+ <\p{ci}(µg|mg|g|ml|µg\/h)> | <[0-9]+(µg|mg|g|ml|µg\/h|MG|ML|G)> )
+        | <POS:Num>+ <mg/m²> <soit> ( <POS:Num>+ <(mg|MG)> | <[0-9]+(mg|MG)> )
+        | <AUC[0-9]+> <soit> ( <POS:Num>+ <(mg|MG)> | <[0-9]+(mg|MG)> )
+    ) [/OD]
+}
+
+
+
+!!!!!!!!!!!!!!!!
+!! Medication
+#subgroup Medication_modifier: {
+    <\p{ci}(LP)>
+    | <\p{ci}(COLLYRE)>   
+}
+
+#subgroup TE_Medication: {
+    [TE MEDICATIONSTATEMENT_MEDICATION] <>+ [/TE]
+}
+
+#subgroup Medication: {
+    %(Medication_modifier)*
+    %(TE_Medication)
+    %(Medication_modifier)*
+}
+
+#subgroup OD_Medication: {
+    [OD MedicationStatement_Medication] %(Medication) [/OD]
+}
+
+#subgroup OD_Medication_pp: {
+    ( <à> <POS:Det> 
+        | <POS:Prep>
+    ) %(OD_Medication)
+}
+
+
+
+!!!!!!!!!!
+!! MISC
+#subgroup separator: {
+    <\.> <\.>+ | <\:> | <\,>
+}
+
+
+
+!!!!!!!!!!!!!!!!!!!!
+!! med_Medication 
+!! (because of a bug preventing the longest match from being returned I had to write my rules in a redundant way)
+#group MedicationStatement: {
+    %(OD_Medication)
+    | %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_Medication_pp)
+    | %(OD_Medication) %(OD_Dosage)
+    | %(OD_Medication) %(OD_Dosage) %(OD_Reason)
+    | %(OD_Medication) %(OD_Dosage) %(OD_Dosage_ambiguous) %(OD_Route_np) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Dosage) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_Reason)
+    | %(OD_Medication) %(OD_Dosage) %(OD_Frequency)
+    | %(OD_Medication) %(OD_Dosage) %(OD_Frequency) %(OD_Reason)
+    | %(OD_Medication) %(OD_Dosage) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Dosage) %(OD_PerTimeUnit) %(OD_Duration)
+    | %(OD_Medication) %(OD_Dosage) %(OD_PerTimeUnit) %(OD_Reason)
+    | %(OD_Medication) %(OD_Dosage) %(OD_PerTimeUnit) %(OD_Route)
+    | %(OD_Medication) %(OD_Dosage) %(OD_PerTimeUnit) ( <\,> | <et> ) %(OD_Dosage) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Dosage) %(OD_Duration)
+    | %(OD_Medication) %(OD_Dosage) %(OD_Route) %(OD_Duration)
+    | %(OD_Medication) %(OD_Dosage) %(separator) %(OD_Dosage_ambiguous) %(OD_Route_np) %(OD_PerTimeUnit) %(OD_Duration)
+    | %(OD_Medication) %(OD_Dosage) %(separator) %(OD_Frequency) %(OD_Duration)
+    | %(OD_Medication) %(OD_Dosage) %(separator) %(OD_Frequency) 
+    | %(OD_Medication) %(OD_Dosage_ambiguous) %(OD_Frequency)
+    | %(OD_Medication) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_Duration)
+    | %(OD_Medication) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_Frequency) %(OD_Reason)
+    | %(OD_Medication) %(OD_DoseForm) %(OD_Dosage) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Frequency)
+    | %(OD_Medication) %(OD_Frequency) %(OD_Reason)
+    | %(OD_Medication) %(OD_Duration)
+    | %(OD_Medication) %(OD_Reason)
+    | %(OD_Medication) %(OD_Reason) <\(> %(OD_Dosage_ambiguous) %(OD_PerTimeUnit) <\)>
+    | %(OD_Medication) %(OD_Strength) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Strength) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_PerTimeUnit) %(OD_Reason)
+    | %(OD_Medication) %(OD_Strength) %(separator) %(OD_Dosage) %(OD_Frequency) %(OD_Duration)
+    | %(OD_Medication) %(OD_Strength) %(separator) %(OD_Frequency)
+    | %(OD_Medication) %(OD_Strength) %(separator) %(OD_Frequency) %(OD_Duration)
+    | %(OD_Medication) %(OD_Strength) %(separator) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_PerTimeUnit) %(OD_Duration)
+    | %(OD_Medication) %(OD_Strength) %(separator) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_Frequency) %(OD_Duration)
+    | %(OD_Medication) %(OD_Strength_percent)
+    | %(OD_Medication) %(OD_Strength_ambiguous)
+    | %(OD_Medication) %(OD_Strength_ambiguous) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Strength_ambiguous) %(OD_Dosage_ambiguous) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Strength_ambiguous) %(OD_Dosage_ambiguous) %(OD_PerTimeUnit) <et> %(OD_Dosage_ambiguous) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Strength_ambiguous) %(OD_Dosage_ambiguous) %(OD_Route_np) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Strength_ambiguous) %(OD_Frequency)
+    | %(OD_Medication) %(OD_Strength_ambiguous) %(separator) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_PerTimeUnit)
+    | %(OD_Medication) %(OD_Strength_ambiguous) %(separator) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_PerTimeUnit) %(OD_Duration)
+    | %(OD_Medication) %(separator) %(OD_Dosage)
+    | %(OD_Medication) %(separator) %(OD_Dosage) %(OD_PerTimeUnit) %(OD_Duration)
+    | %(OD_Medication) %(separator) %(OD_Frequency) %(OD_Duration)
+    | %(OD_Medication) %(separator) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_Frequency) %(OD_Duration)
+    | %(OD_Medication) %(separator) %(OD_Dosage_ambiguous) %(OD_DoseForm) %(OD_PerTimeUnit) %(OD_Duration)
+    | %(OD_Medication) %(separator) %(OD_Dosage_ambiguous) %(OD_Route_np) %(OD_PerTimeUnit) %(OD_Duration)
+    | %(OD_Reason_before_medication) %(OD_Medication)
+    | %(OD_Reason_before_medication) %(separator) %(OD_Medication)
+    | %(OD_Route_np) %(OD_Medication_pp)
+    | %(OD_Route_np) %(OD_Frequency) %(OD_Medication_pp)
+    | %(OD_Route_np) %(OD_Medication_pp) %(OD_Dosage)
+}
+
+
+
+
+
+
+

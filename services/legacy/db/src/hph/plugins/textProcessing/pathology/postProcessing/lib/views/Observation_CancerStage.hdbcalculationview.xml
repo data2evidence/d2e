@@ -1,0 +1,1023 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:AccessControl="http://www.com/ndb/SQLCoreModelAccessControl.ecore" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" schemaVersion="3.0" id="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerStage" applyPrivilegeType="NONE" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" dataCategory="DEFAULT" enforceSqlExecution="false" executionSemantic="UNDEFINED" outputViewType="Projection" xscCompatibilityMode="true">
+  <descriptions defaultDescription="Observation_CancerStage"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="23"/>
+  <dataSources>
+    <DataSource id="uncollapsible_subentities" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::uncollapsible_subentities</resourceUri>
+    </DataSource>
+  </dataSources>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:ProjectionView" id="UncollapsibleSubentities">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_TOKEN"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_PARENT"/>
+      
+        <viewAttribute id="TA_NORMALIZED">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute>
+        <viewAttribute id="TA_OFFSET">
+          <descriptions defaultDescription="TA_OFFSET"/>
+        </viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="uncollapsible_subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerStage_Component_T">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_CA_STAGE_T"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="UncollapsibleSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_T" source="TA_TOKEN"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot; ='Observation_CancerStage_Component_T')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerStage_Component_N">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_CA_STAGE_N"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="UncollapsibleSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N" source="TA_TOKEN"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot; ='Observation_CancerStage_Component_N')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerStage_Component_M">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_CA_STAGE_M"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="UncollapsibleSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_M" source="TA_TOKEN"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot; ='Observation_CancerStage_Component_M')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerStage_Value_Summarized" filterExpressionLanguage="SQL">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+      
+        <viewAttribute id="TA_TOKEN">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TYPE">
+          <descriptions defaultDescription="TA_TYPE"/>
+        </viewAttribute>
+        <viewAttribute id="TA_NORMALIZED">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute></viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute id="TA_CA_STAGE_N_INTERPRETATION" datatype="NVARCHAR" length="100" expressionLanguage="COLUMN_ENGINE">
+          <formula>if(instr(&quot;TA_TOKEN&quot;,'N0'),
+  'negative',
+if(instr(&quot;TA_TOKEN&quot;, 'NX'),
+   'unknown',
+if(instr(&quot;TA_TOKEN&quot;,'N'),
+  'positive',
+  &quot;TA_NORMALIZED&quot;)))</formula>
+        </calculatedViewAttribute>
+      </calculatedViewAttributes>
+      <restrictedViewAttributes/>
+      <input node="UncollapsibleSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='Observation_CancerStage_Value_TNMComplete') or (&quot;TA_TYPE&quot;='Observation_CancerStage_Value_Summarized')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerLymphNodes_BodySite" filterExpressionLanguage="SQL">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+      
+        <viewAttribute id="TA_CA_STAGE_N_BODYSITE">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TYPE">
+          <descriptions defaultDescription="TA_TYPE"/>
+        </viewAttribute></viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="UncollapsibleSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_BODYSITE" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='Observation_CancerLymphNodes_BodySite')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerLymphNodes_Component_Laterality" filterExpressionLanguage="SQL">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_LATERALITY">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TYPE">
+          <descriptions defaultDescription="TA_TYPE"/>
+        </viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="UncollapsibleSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_LATERALITY" source="TA_TOKEN"/>
+on        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='Observation_CancerLymphNodes_Component_Laterality')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerLymphNodes_Value_Numerator" filterExpressionLanguage="SQL">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+      
+        <viewAttribute id="TA_TYPE">
+          <descriptions defaultDescription="TA_TYPE"/>
+        </viewAttribute></viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute id="TA_CA_STAGE_N_INTERPRETATION" datatype="NVARCHAR" length="100" expressionLanguage="SQL">
+          <formula>'positive'</formula>
+        </calculatedViewAttribute>
+      </calculatedViewAttributes>
+      <restrictedViewAttributes/>
+      <input node="StageNInvolved">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='Observation_CancerLymphNodes_Value_Numerator_Pos')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="StageNInvolved" filterExpressionLanguage="COLUMN_ENGINE">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TYPE">
+          <descriptions defaultDescription="TA_TYPE"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TOKEN">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_OFFSET">
+          <descriptions defaultDescription="TA_OFFSET"/>
+        </viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="UncollapsibleSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <filter>(in(&quot;TA_TYPE&quot;, 'Observation_CancerLymphNodes_Value_Numerator_Pos', 'Observation_CancerLymphNodes_Value_Numerator_Neg'))</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="stageNInvolved_Num" cardinality="CN_N" joinType="inner" multiJoinNode="stageNInvolved_Num" multiJoinCentralTable="StageNInvolved" multiJoinOrder="Outside In">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT" aggregationType="sum">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_NUMERATOR">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute>
+        <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+        <viewAttribute hidden="true" id="JOIN$TA_TOKEN$TA_TOKEN"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="StageNInvolved">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+      </input>
+      <input node="DIGIT_NUMBER">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" source="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+      <joinAttribute name="JOIN$TA_TOKEN$TA_TOKEN"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="DIGIT_NUMBER" filterExpressionLanguage="SQL">
+      <viewAttributes>
+        <viewAttribute id="TA_NORMALIZED">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_OFFSET">
+          <descriptions defaultDescription="TA_OFFSET"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TOKEN">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="IS_RATIO">
+          <descriptions defaultDescription="IS_RATIO"/>
+        </viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="DIGIT">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="IS_RATIO" source="IS_RATIO"/>
+      </input>
+      <filter>(&quot;IS_RATIO&quot; = 0)</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="DIGIT" filterExpressionLanguage="COLUMN_ENGINE">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TOKEN">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_NORMALIZED">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute>
+        <viewAttribute id="TA_OFFSET">
+          <descriptions defaultDescription="TA_OFFSET"/>
+        </viewAttribute>
+      
+        <viewAttribute id="TA_TYPE">
+          <descriptions defaultDescription="TA_TYPE"/>
+        </viewAttribute></viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute id="IS_RATIO" datatype="INTEGER" expressionLanguage="COLUMN_ENGINE">
+          <formula>if(instr(&quot;TA_TOKEN&quot;, '/') &gt; 0, 1, 0) </formula>
+        </calculatedViewAttribute>
+      </calculatedViewAttributes>
+      <restrictedViewAttributes/>
+      <input node="UncollapsibleSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='DIGIT')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="Observation_CancerLymphNodes_Value_Denominator_Num" cardinality="CN_N" joinType="inner">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT" aggregationType="sum">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_DENOMINATOR">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute>
+        <viewAttribute hidden="true" id="JOIN$TA_TOKEN$TA_TOKEN"/>
+        <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Observation_CancerLymphNodes_Value_Denominator">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <input node="DIGIT_NUMBER">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" source="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_TOKEN$TA_TOKEN"/>
+      <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerLymphNodes_Value_Denominator" filterExpressionLanguage="SQL">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TOKEN">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_OFFSET">
+          <descriptions defaultDescription="TA_OFFSET"/>
+        </viewAttribute>
+      
+        <viewAttribute id="TA_TYPE">
+          <descriptions defaultDescription="TA_TYPE"/>
+        </viewAttribute></viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="UncollapsibleSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='Observation_CancerLymphNodes_Value_Denominator')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="Observation_CancerLymphNodes_Value_Denominator_Ratio" cardinality="CN_N" joinType="inner">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT" aggregationType="sum">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_DENOMINATOR">
+          <descriptions defaultDescription="RIGHT_DIGIT"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_NUMERATOR">
+          <descriptions defaultDescription="LEFT_DIGIT"/>
+        </viewAttribute>
+        <viewAttribute hidden="true" id="JOIN$TA_TOKEN$TA_TOKEN"/>
+        <viewAttribute hidden="true" id="JOIN$TA_OFFSET$TA_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Observation_CancerLymphNodes_Value_Denominator">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <input node="DIGIT_RATIO">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" source="RIGHT_DIGIT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" source="LEFT_DIGIT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_TOKEN$TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_OFFSET$TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_TOKEN$TA_TOKEN"/>
+      <joinAttribute name="JOIN$TA_OFFSET$TA_OFFSET"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="DIGIT_RATIO" filterExpressionLanguage="COLUMN_ENGINE">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TOKEN">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_OFFSET">
+          <descriptions defaultDescription="TA_OFFSET"/>
+        </viewAttribute>
+        <viewAttribute id="IS_RATIO">
+          <descriptions defaultDescription="IS_RATIO"/>
+        </viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute id="RIGHT_DIGIT" datatype="NVARCHAR" length="100" expressionLanguage="COLUMN_ENGINE">
+          <formula>rightstr(&quot;TA_TOKEN&quot;,strlen(&quot;TA_TOKEN&quot;) - instr(&quot;TA_TOKEN&quot;,'/'))</formula>
+        </calculatedViewAttribute>
+      
+        <calculatedViewAttribute id="LEFT_DIGIT" datatype="NVARCHAR" length="5000" expressionLanguage="COLUMN_ENGINE">
+      
+          <formula>leftstr(&quot;TA_TOKEN&quot;,instr(&quot;TA_TOKEN&quot;,'/')-1)</formula>
+      
+        </calculatedViewAttribute></calculatedViewAttributes>
+      <restrictedViewAttributes/>
+      <input node="DIGIT">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="IS_RATIO" source="IS_RATIO"/>
+      </input>
+      <filter>(match(&quot;TA_TOKEN&quot;, '*/*')) and (&quot;IS_RATIO&quot; = 1)</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="StageNInvolvedNegative" filterExpressionLanguage="SQL">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+      
+        <viewAttribute id="TA_TYPE">
+          <descriptions defaultDescription="TA_TYPE"/>
+        </viewAttribute></viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute id="TA_CA_STAGE_N_INTERPRETATION" datatype="NVARCHAR" length="100" expressionLanguage="SQL">
+          <formula>'negative'</formula>
+        </calculatedViewAttribute>
+      </calculatedViewAttributes>
+      <restrictedViewAttributes/>
+      <input node="StageNInvolved">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='Observation_CancerLymphNodes_Value_Numerator_Neg')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerLymphNodes_Interpretation" filterExpressionLanguage="SQL">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TOKEN">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TYPE">
+          <descriptions defaultDescription="TA_TYPE"/>
+        </viewAttribute>
+        <viewAttribute id="TA_NORMALIZED">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute>
+        <viewAttribute id="TA_OFFSET">
+          <descriptions defaultDescription="TA_OFFSET"/>
+        </viewAttribute>
+        <viewAttribute id="TA_PARENT">
+          <descriptions defaultDescription="TA_PARENT"/>
+        </viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="UncollapsibleSubentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_NORMALIZED" source="TA_NORMALIZED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot;='Observation_CancerLymphNodes_Interpretation')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:UnionView" id="Union">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_COUNTER" aggregationType="sum">
+          <descriptions defaultDescription="TA_COUNTER"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_T">
+          <descriptions defaultDescription="TA_CA_STAGE_T"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N">
+          <descriptions defaultDescription="TA_CA_STAGE_N"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_M">
+          <descriptions defaultDescription="TA_CA_STAGE_M"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_BODYSITE">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_LATERALITY">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_DENOMINATOR">
+          <descriptions defaultDescription="RIGHT_DIGIT"/>
+        </viewAttribute>
+      
+        <viewAttribute id="TA_CA_STAGE_N_NUMERATOR">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute>
+      
+        <viewAttribute id="TA_CA_STAGE_N_INTERPRETATION">
+          <descriptions defaultDescription="TA_CA_STAGE_N_INTERPRETATION"/>
+        </viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Observation_CancerStage_Component_T" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_T" source="TA_CA_STAGE_T"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_M" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_BODYSITE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_LATERALITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" null="true" value=""/>
+      </input>
+      <input node="Observation_CancerStage_Component_N" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_T" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N" source="TA_CA_STAGE_N"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_M" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_BODYSITE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_LATERALITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" null="true" value=""/>
+      </input>
+      <input node="Observation_CancerStage_Component_M" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_T" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_M" source="TA_CA_STAGE_M"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_BODYSITE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_LATERALITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" null="true" value=""/>
+      </input>
+      <input node="Observation_CancerLymphNodes_Value_Numerator" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_T" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_M" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_BODYSITE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_LATERALITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" source="TA_CA_STAGE_N_INTERPRETATION"/>
+      </input>
+      <input node="StageNInvolvedNegative" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_T" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_M" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_BODYSITE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_LATERALITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" source="TA_CA_STAGE_N_INTERPRETATION"/>
+      </input>
+      <input node="Observation_CancerStage_Value_Summarized" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_T" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_M" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_BODYSITE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_LATERALITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" source="TA_CA_STAGE_N_INTERPRETATION"/>
+      </input>
+      <input node="Observation_CancerLymphNodes_BodySite" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_T" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_M" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_BODYSITE" source="TA_CA_STAGE_N_BODYSITE"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_LATERALITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" null="true" value=""/>
+      </input>
+      <input node="Observation_CancerLymphNodes_Component_Laterality" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_T" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_M" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_BODYSITE" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_LATERALITY" source="TA_CA_STAGE_N_LATERALITY"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" null="true" value=""/>
+      </input>
+    
+      <input node="Observation_CancerLymphNodes_Value_Denominator_Ratio" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_T" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_M" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_BODYSITE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_LATERALITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" source="TA_CA_STAGE_N_DENOMINATOR"/>
+      
+    
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" source="TA_CA_STAGE_N_NUMERATOR"/>
+    
+      
+    
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" null="true" value=""/>
+    
+      </input>
+      <input node="Observation_CancerLymphNodes_Value_Denominator_Num" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_T" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_M" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_BODYSITE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_LATERALITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" source="TA_CA_STAGE_N_DENOMINATOR"/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" null="true" value=""/>
+      </input>
+      <input node="stageNInvolved_Num" emptyUnionBehavior="NO_ROW">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_T" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_M" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_BODYSITE" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_LATERALITY" null="true" value=""/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" null="true" value=""/>
+      
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" source="TA_CA_STAGE_N_NUMERATOR"/>
+      
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" null="true" value=""/>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:AggregationView" id="Aggregation">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_COUNTER">
+          <descriptions defaultDescription="TA_COUNTER"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_T" aggregationType="max">
+          <descriptions defaultDescription="TA_CA_STAGE_T"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N" aggregationType="max">
+          <descriptions defaultDescription="TA_CA_STAGE_N"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_M" aggregationType="max">
+          <descriptions defaultDescription="TA_CA_STAGE_M"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_BODYSITE" aggregationType="max">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_LATERALITY" aggregationType="max">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_DENOMINATOR" aggregationType="max">
+          <descriptions defaultDescription="RIGHT_DIGIT"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_NUMERATOR" aggregationType="max">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_INTERPRETATION" aggregationType="max">
+          <descriptions defaultDescription="TA_CA_STAGE_N_INTERPRETATION"/>
+        </viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <restrictedViewAttributes/>
+      <input node="Union">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_T" source="TA_CA_STAGE_T"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N" source="TA_CA_STAGE_N"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_M" source="TA_CA_STAGE_M"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_BODYSITE" source="TA_CA_STAGE_N_BODYSITE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_LATERALITY" source="TA_CA_STAGE_N_LATERALITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" source="TA_CA_STAGE_N_DENOMINATOR"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" source="TA_CA_STAGE_N_NUMERATOR"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_INTERPRETATION" source="TA_CA_STAGE_N_INTERPRETATION"/>
+      </input>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="Join_1" cardinality="CN_N" joinType="leftOuter">
+      <viewAttributes>
+        <viewAttribute id="DWID">
+          <descriptions defaultDescription="DWID"/>
+        </viewAttribute>
+        <viewAttribute id="TA_COUNTER" aggregationType="sum">
+          <descriptions defaultDescription="TA_COUNTER"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_T" aggregationType="max">
+          <descriptions defaultDescription="TA_CA_STAGE_T"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N" aggregationType="max">
+          <descriptions defaultDescription="TA_CA_STAGE_N"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_M" aggregationType="max">
+          <descriptions defaultDescription="TA_CA_STAGE_M"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_BODYSITE" aggregationType="max">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_LATERALITY" aggregationType="max">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_DENOMINATOR" aggregationType="max">
+          <descriptions defaultDescription="RIGHT_DIGIT"/>
+        </viewAttribute>
+        <viewAttribute id="TA_CA_STAGE_N_NUMERATOR" aggregationType="max">
+          <descriptions defaultDescription="TA_NORMALIZED"/>
+        </viewAttribute>
+        <viewAttribute id="TMP_STAGE_N_RESULT" aggregationType="max">
+          <descriptions defaultDescription="TA_CA_STAGE_N_INTERPRETATION"/>
+        </viewAttribute>
+        <viewAttribute id="TA_TOKEN">
+          <descriptions defaultDescription="TA_TOKEN"/>
+        </viewAttribute>
+      </viewAttributes>
+      <calculatedViewAttributes>
+        <calculatedViewAttribute id="TA_CA_STAGE_N_INTERPRETATION" datatype="NVARCHAR" length="128" expressionLanguage="COLUMN_ENGINE">
+          <formula>if(not(isnull(&quot;TA_CA_STAGE_N_NUMERATOR&quot;)),
+  if(&quot;TA_CA_STAGE_N_NUMERATOR&quot;='0','negative','positive'),
+if(not(isnull(&quot;TA_CA_STAGE_N&quot;)),
+  if(instr(&quot;TA_CA_STAGE_N&quot;,'N0') &gt; 0,'negative',if(instr(&quot;TA_CA_STAGE_N&quot;, 'NX') &gt; 0, 'unknown', 'positive')),
+if(not(isnull(&quot;TMP_STAGE_N_RESULT&quot;)),
+  &quot;TMP_STAGE_N_RESULT&quot;,
+lower(&quot;TA_TOKEN&quot;))))</formula>
+        </calculatedViewAttribute>
+      </calculatedViewAttributes>
+      <restrictedViewAttributes/>
+      <input node="Aggregation">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_T" source="TA_CA_STAGE_T"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N" source="TA_CA_STAGE_N"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_M" source="TA_CA_STAGE_M"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_BODYSITE" source="TA_CA_STAGE_N_BODYSITE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_LATERALITY" source="TA_CA_STAGE_N_LATERALITY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_DENOMINATOR" source="TA_CA_STAGE_N_DENOMINATOR"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_STAGE_N_NUMERATOR" source="TA_CA_STAGE_N_NUMERATOR"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TMP_STAGE_N_RESULT" source="TA_CA_STAGE_N_INTERPRETATION"/>
+      </input>
+      <input node="Observation_CancerLymphNodes_Interpretation">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TOKEN" source="TA_TOKEN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_COUNTER"/>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Join_1">
+    <descriptions/>
+    <attributes>
+      <attribute id="DWID" order="1" displayAttribute="false" attributeHierarchyActive="false">
+        <descriptions defaultDescription="DWID"/>
+        <keyMapping columnObjectName="Join_1" columnName="DWID"/>
+      </attribute>
+      <attribute id="TA_COUNTER" order="2" displayAttribute="false" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_COUNTER"/>
+        <keyMapping columnObjectName="Join_1" columnName="TA_COUNTER"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_T" order="3" displayAttribute="false" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_T"/>
+        <keyMapping columnObjectName="Join_1" columnName="TA_CA_STAGE_T"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N" order="4" displayAttribute="false" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_N"/>
+        <keyMapping columnObjectName="Join_1" columnName="TA_CA_STAGE_N"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_M" order="5" displayAttribute="false" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_M"/>
+        <keyMapping columnObjectName="Join_1" columnName="TA_CA_STAGE_M"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N_LATERALITY" order="6" displayAttribute="false" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_TOKEN"/>
+        <keyMapping columnObjectName="Join_1" columnName="TA_CA_STAGE_N_LATERALITY"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N_BODYSITE" order="7" displayAttribute="false" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_TOKEN"/>
+        <keyMapping columnObjectName="Join_1" columnName="TA_CA_STAGE_N_BODYSITE"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N_DENOMINATOR" order="8" displayAttribute="false" attributeHierarchyActive="false">
+        <descriptions defaultDescription="RIGHT_DIGIT"/>
+        <keyMapping columnObjectName="Join_1" columnName="TA_CA_STAGE_N_DENOMINATOR"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N_NUMERATOR" order="9" displayAttribute="false" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_NORMALIZED"/>
+        <keyMapping columnObjectName="Join_1" columnName="TA_CA_STAGE_N_NUMERATOR"/>
+      </attribute>
+      <attribute id="TA_CA_STAGE_N_INTERPRETATION" order="10" displayAttribute="false" attributeHierarchyActive="false">
+        <descriptions defaultDescription="TA_CA_STAGE_N_INTERPRETATION"/>
+        <keyMapping columnObjectName="Join_1" columnName="TA_CA_STAGE_N_INTERPRETATION"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures/>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+        <upperLeftCorner x="622" y="112"/>
+        <rectangleSize height="0" width="140"/>
+      </shape>
+      <shape expanded="true" modelObjectName="UncollapsibleSubentities" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="803" y="1426"/>
+        <rectangleSize height="66" width="181"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerStage_Component_T" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="301" y="1201"/>
+        <rectangleSize height="-1" width="140"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerStage_Component_N" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="1464" y="1201"/>
+        <rectangleSize height="-1" width="140"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerStage_Component_M" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="1274" y="1201"/>
+        <rectangleSize height="-1" width="140"/>
+      </shape>
+    
+      <shape expanded="true" modelObjectName="Observation_CancerStage_Value_Summarized" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="807" y="1201"/>
+        <rectangleSize height="30" width="156"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerLymphNodes_BodySite" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="1654" y="1201"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerLymphNodes_Component_Laterality" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="1025" y="1201"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerLymphNodes_Value_Numerator" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="1353" y="864"/>
+        <rectangleSize height="30" width="132"/>
+      </shape>
+    
+    
+      <shape expanded="true" modelObjectName="StageNInvolved" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="1299" y="1036"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape expanded="true" modelObjectName="stageNInvolved_Num" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="947" y="856"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape modelObjectName="StageNInvolved" modelObjectNameSpace="stageNInvolved_Num" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="DIGIT_NUMBER" modelObjectNameSpace="stageNInvolved_Num" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="620" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+    
+      <shape expanded="true" modelObjectName="DIGIT_NUMBER" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="716" y="1036"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape expanded="true" modelObjectName="DIGIT" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="533" y="1201"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerLymphNodes_Value_Denominator_Num" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="710" y="856"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape modelObjectName="Observation_CancerLymphNodes_Value_Denominator" modelObjectNameSpace="Observation_CancerLymphNodes_Value_Denominator_Num" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="DIGIT_NUMBER" modelObjectNameSpace="Observation_CancerLymphNodes_Value_Denominator_Num" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+    
+      <shape expanded="true" modelObjectName="Observation_CancerLymphNodes_Value_Denominator" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="296" y="1036"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerLymphNodes_Value_Denominator_Ratio" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="479" y="856"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape modelObjectName="Observation_CancerLymphNodes_Value_Denominator" modelObjectNameSpace="Observation_CancerLymphNodes_Value_Denominator_Ratio" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+      <shape modelObjectName="DIGIT_RATIO" modelObjectNameSpace="Observation_CancerLymphNodes_Value_Denominator_Ratio" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+    
+      <shape expanded="true" modelObjectName="DIGIT_RATIO" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="506" y="1036"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape expanded="true" modelObjectName="StageNInvolvedNegative" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="1178" y="864"/>
+        <rectangleSize height="30" width="125"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerLymphNodes_Interpretation" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="92" y="1201"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Union" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="960" y="481"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+    
+      <shape expanded="true" modelObjectName="Aggregation" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="960" y="376"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+    
+      <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="612" y="217"/>
+        <rectangleSize height="30" width="160"/>
+      </shape>
+      <shape modelObjectName="Aggregation" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="20" y="30"/>
+        <rectangleSize width="277.72119140625"/>
+      </shape>
+      <shape modelObjectName="Observation_CancerLymphNodes_Interpretation" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+        <upperLeftCorner x="320" y="30"/>
+        <rectangleSize width="250"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario>

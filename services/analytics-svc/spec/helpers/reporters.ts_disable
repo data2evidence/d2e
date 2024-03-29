@@ -1,0 +1,35 @@
+import {DisplayProcessor, SpecReporter} from "jasmine-spec-reporter";
+import SuiteInfo = jasmine.SuiteInfo;
+import * as reporters from "jasmine-reporters";
+
+
+class CustomProcessor extends DisplayProcessor {
+    public displayJasmineStarted(info: SuiteInfo, log: string): string {
+        return `TypeScript ${log}`;
+    }
+}
+
+jasmine.getEnv().clearReporters();
+jasmine.getEnv().addReporter(new SpecReporter({
+    customProcessors: [CustomProcessor],
+    spec: {
+        displayPending: true,
+        displayStacktrace: true,
+        displayFailed: true,
+        displaySuccessful: true,
+        displayErrorMessages: true,
+      },
+      colors: {
+        enabled: true,
+      },
+      summary: {
+        displayDuration: true,
+        displayFailed: true,
+        displaySuccessful: true,
+      },
+}));
+let junitReporter = new reporters.JUnitXmlReporter({
+    savePath: __dirname,
+    consolidateAll: false,
+});
+jasmine.getEnv().addReporter(junitReporter);

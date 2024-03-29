@@ -1,0 +1,19 @@
+PROCEDURE "hc.hph.di.procedures::deactivate_diextension" ( 
+      IN ExtensionId NVARCHAR(256) ,
+      IN PluginId NVARCHAR(256) ,
+      IN XSJSLibrary NVARCHAR(512),
+      IN JsonMetadata NCLOB,
+      IN Provider NVARCHAR(512) ,
+      IN Status NVARCHAR(16) ,
+      IN TextBundle NVARCHAR(512),
+      IN ExtensionName NVARCHAR(512),
+      IN ExtensionDescription NVARCHAR(1024)
+) 
+       LANGUAGE SQLSCRIPT
+       SQL SECURITY INVOKER AS
+BEGIN
+			UPDATE "hc.hph.di.model::DataIntegration.DIExtension" DIExtension SET
+        	DIExtension."Status" = :Status
+        	FROM "hc.hph.di.model::DataIntegration.DIExtension" DIExtension
+        	WHERE DIExtension."ExtensionID" = :ExtensionId;
+END;

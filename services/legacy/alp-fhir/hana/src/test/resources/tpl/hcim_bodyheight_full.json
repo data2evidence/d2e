@@ -1,0 +1,94 @@
+{
+	"resource": "http://hl7.org/fhir/StructureDefinition/Observation",
+	"tables": [
+		{
+			"id": "Bodyheight",
+			"schema": "HCIM",
+			"table": "HCIM_BODYHEIGHT",
+			"resourceLink": {
+				"type": "column",
+				"column": "identification_number"
+			},
+			"max":"1",
+			"columns":[
+				{"name":"identification_number"},
+  				{"name":"information_source_patient"},
+  				{"name":"information_source_professional"},
+  				{"name":"information_source_contact_person"},
+  				{"name":"author_patient"},
+			    {"name":"author_professional"},
+			    {"name":"author_contact_person"},
+			    {"name":"subject"},
+			    {"name":"datetime"},
+			    {"name":"heightValue"},
+			    {"name":"heightUnit"},
+			    {"name":"heightDate"},
+			    {"name":"comment"}, 
+			    {"name":"positionConceptName"},
+			    {"name":"positionConcept"},
+			    {"name":"positionCodesystemName"},
+			    {"name":"positionCodesystemOid"},
+			    {"name":"positionDisplay"}
+		   ]
+			
+		}
+	],
+	"elements": [
+		
+	],
+	"mapping":[
+		{
+			"dataelement":"Observation.meta.profile",
+			"tableid": "BodyHeight",
+			"type":"value",
+			"value":"http://nictiz.nl/fhir/StructureDefinition/zib-BodyHeight"
+		},	
+		{
+			"dataelement":"Observation.code.coding",
+			"tableid":"BodyHeight",
+			"dependson":["positionConcept"],
+			"type":"complex",
+			"elements":[
+				{
+					"dataelement":"system",
+					"type":"column",
+					"column":"positionCodesystemName"
+				},
+				{
+					"dataelement":"code",
+					"type":"column",
+					"column":"positionCodeConcept"
+				},
+				{
+					"dataelement":"display",
+					"type":"column",
+					"column":"positionDisplay"
+				}	
+			]
+		},
+		{
+			"dataelement":"Observation.valueQuantity.value",
+			"tableid": "BodyHeight",
+			"type":"column",
+			"column":"heightValue"
+		},
+		{
+			"dataelement":"Observation.valueQuantity.unit",
+			"tableid": "BodyHeight",
+			"type":"column",
+			"column":"heightUnit"
+		},
+		{
+			"dataelement":"Observation.valueQuantity.system",
+			"tableid": "BodyHeight",
+			"type":"value",
+			"column":"http://unitsofmeasure.org"
+		},
+		{
+			"dataelement":"Observation.valueQuantity.code",
+			"tableid": "BodyHeight",
+			"type":"column",
+			"column":"heightUnit"
+		}
+	]
+}

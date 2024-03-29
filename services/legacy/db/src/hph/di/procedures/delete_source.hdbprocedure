@@ -1,0 +1,18 @@
+PROCEDURE "hc.hph.di.procedures::delete_source" ( 
+    IN SourceID NVARCHAR(5),
+    OUT ot_error INTEGER
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER as
+BEGIN
+	declare lv_count INTEGER;
+
+   SELECT count(*) into lv_count from (SELECT "SourceID" from "hc.hph.di.model::DataIntegration.AuditLog" where "ParentAuditLogID" = 0 union select "SourceID" from "hc.hph.di.model::DataIntegration.JobProfile" where "Status" <> 'Deleted') WHERE "SourceID" = :SourceID;
+
+   IF lv_count > 0 THEN
+   	   SELECT lv_count into ot_error from "hc::DUMMY";
+   ELSE
+   	   DELETE FROM "hc.hph.di.model::DataIntegration.DISource" WHERE "SourceID" = :SourceID;
+   	   SELECT lv_count into ot_error from "hc::DUMMY";
+   END IF;
+END;

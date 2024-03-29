@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:AccessControl="http://www.com/ndb/SQLCoreModelAccessControl.ecore" xmlns:Calculation="http://www.com/ndb/BiModelCalculation.ecore" schemaVersion="2.3" id="hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::Observation_CancerGrade" applyPrivilegeType="NONE" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" dataCategory="DEFAULT" enforceSqlExecution="false" executionSemantic="UNDEFINED" outputViewType="Aggregation" xscCompatibilityMode="true">
+  <descriptions defaultDescription="Observation_CancerStage"/>
+  <localVariables/>
+  <variableMappings/>
+  <informationModelLayout relativeWidthScenario="22"/>
+  <dataSources>
+    <DataSource id="collapsing">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.views::collapsing</resourceUri>
+    </DataSource>
+    <DataSource id="uncollapsible_subentities" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::uncollapsible_subentities</resourceUri>
+    </DataSource>
+    <DataSource id="pathology_entities" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::pathology_entities</resourceUri>
+    </DataSource>
+    <DataSource id="Observation_CancerHistology$$$$pathology_entities$$" type="TABLE_FUNCTION">
+      <resourceUri>hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::pathology_entities</resourceUri>
+    </DataSource>
+  </dataSources>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerGrade_Normalized">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_TYPE"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="TA_CA_GRADE_NORMALIZED"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#collapsing">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_GRADE_NORMALIZED" source="TA_NORMALIZED"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot; ='Observation_CancerGrade_Normalized')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerGrade_Value">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_TYPE"/>
+         <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="TA_CA_GRADE_VALUE"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#uncollapsible_subentities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_GRADE_VALUE" source="TA_TOKEN"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot; ='Observation_CancerGrade_Value')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerGrade">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_TYPE"/>
+        </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#pathology_entities">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot; ='Observation_CancerGrade')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="GradeObservation_CancerGrade_Normalized" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="TA_CA_GRADE_NORMALIZED"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Observation_CancerGrade_Normalized">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_GRADE_NORMALIZED" source="TA_CA_GRADE_NORMALIZED"/>
+      </input>
+      <input node="#Observation_CancerGrade">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_COUNTER"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_PARENT"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="Observation_CancerHistology">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_TYPE"/>
+        </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Observation_CancerHistology$$$$pathology_entities$$">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_TYPE" source="TA_TYPE"/>
+      </input>
+      <filter>(&quot;TA_TYPE&quot; ='Observation_CancerHistology')</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="HistologyObservation_CancerGrade_Normalized" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute hidden="true" id="JOIN$TA_PARENT$TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Observation_CancerGrade_Normalized">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_PARENT$TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <input node="#Observation_CancerHistology">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_PARENT$TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_PARENT$TA_COUNTER"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="CheckObservation_CancerGrade_Normalized" cardinality="C1_N" joinType="leftOuter">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="TA_CA_GRADE_NORMALIZED"/>
+        <viewAttribute id="OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#GradeObservation_CancerGrade_Normalized">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_GRADE_NORMALIZED" source="TA_CA_GRADE_NORMALIZED"/>
+      </input>
+      <input node="#HistologyObservation_CancerGrade_Normalized">
+        <mapping xsi:type="Calculation:AttributeMapping" target="OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_OFFSET"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="FilterType">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET"/>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_CA_GRADE_NORMALIZED"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#CheckObservation_CancerGrade_Normalized">
+        <mapping xsi:type="Calculation:AttributeMapping" target="OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET" source="OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_GRADE_NORMALIZED" source="TA_CA_GRADE_NORMALIZED"/>
+      </input>
+      <filter>(isNull(&quot;OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET&quot;))</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="GradeObservation_CancerGrade_Value" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="TA_CA_GRADE_VALUE"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Observation_CancerGrade_Value">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_GRADE_VALUE" source="TA_CA_GRADE_VALUE"/>
+      </input>
+      <input node="#Observation_CancerGrade">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_COUNTER"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_PARENT"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="HistologyObservation_CancerGrade_Value" cardinality="C1_N" joinType="inner">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute hidden="true" id="JOIN$TA_PARENT$TA_COUNTER"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Observation_CancerGrade_Value">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_PARENT$TA_COUNTER" source="TA_PARENT"/>
+      </input>
+      <input node="#Observation_CancerHistology">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TA_PARENT$TA_COUNTER" source="TA_COUNTER"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="JOIN$TA_PARENT$TA_COUNTER"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="CheckObservation_CancerGrade_Value" cardinality="C1_N" joinType="leftOuter">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_OFFSET"/>
+        <viewAttribute id="TA_PARENT"/>
+        <viewAttribute id="TA_CA_GRADE_VALUE"/>
+        <viewAttribute id="OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#GradeObservation_CancerGrade_Value">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_PARENT" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_GRADE_VALUE" source="TA_CA_GRADE_VALUE"/>
+      </input>
+      <input node="#HistologyObservation_CancerGrade_Value">
+        <mapping xsi:type="Calculation:AttributeMapping" target="OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET" source="TA_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_OFFSET" source="TA_OFFSET"/>
+      </input>
+      <joinAttribute name="DWID"/>
+      <joinAttribute name="TA_OFFSET"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:ProjectionView" id="FilterValue">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET"/>
+         <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_CA_GRADE_VALUE"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#CheckObservation_CancerGrade_Value">
+        <mapping xsi:type="Calculation:AttributeMapping" target="OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET" source="OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_PARENT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_GRADE_VALUE" source="TA_CA_GRADE_VALUE"/>
+      </input>
+      <filter>(isNull(&quot;OBSERVATION_CANCERHISTOLOGY_VALUE_OFFSET&quot;))</filter>
+    </calculationView>
+    <calculationView xsi:type="Calculation:UnionView" id="Union">
+      <descriptions/>
+      <viewAttributes>
+        <viewAttribute id="DWID"/>
+        <viewAttribute id="TA_COUNTER"/>
+        <viewAttribute id="TA_CA_GRADE_NORMALIZED"/>
+        <viewAttribute id="TA_CA_GRADE_VALUE"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input emptyUnionBehavior="NO_ROW" node="#FilterType">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_GRADE_NORMALIZED" source="TA_CA_GRADE_NORMALIZED"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_GRADE_VALUE" null="true" value=""/>
+      </input>
+      <input emptyUnionBehavior="NO_ROW" node="#FilterValue">
+        <mapping xsi:type="Calculation:AttributeMapping" target="DWID" source="DWID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_COUNTER" source="TA_COUNTER"/>
+        <mapping xsi:type="Calculation:ConstantAttributeMapping" target="TA_CA_GRADE_NORMALIZED" null="true" value=""/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="TA_CA_GRADE_VALUE" source="TA_CA_GRADE_VALUE"/>
+      </input>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Union">
+    <descriptions/>
+    <attributes>
+      <attribute id="DWID" order="1" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="DWID"/>
+        <keyMapping columnObjectName="Union" columnName="DWID"/>
+      </attribute>
+      <attribute id="TA_COUNTER" order="2" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="TA_COUNTER"/>
+        <keyMapping columnObjectName="Union" columnName="TA_COUNTER"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures>
+      <measure id="TA_CA_GRADE_NORMALIZED" order="3" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_CA_GRADE_NORMALIZED"/>
+        <measureMapping columnObjectName="Union" columnName="TA_CA_GRADE_NORMALIZED"/>
+      </measure>
+      <measure id="TA_CA_GRADE_VALUE" order="4" aggregationType="max" measureType="simple">
+        <descriptions defaultDescription="TA_CA_GRADE_VALUE"/>
+        <measureMapping columnObjectName="Union" columnName="TA_CA_GRADE_VALUE"/>
+      </measure>
+    </baseMeasures>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+        <upperLeftCorner x="260" y="87"/>
+        <rectangleSize height="0" width="0"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerGrade_Normalized" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="23" y="551"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerGrade_Value" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="496" y="551"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerGrade" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="177" y="551"/>
+        <rectangleSize height="64" width="151"/>
+      </shape>
+      <shape expanded="true" modelObjectName="GradeObservation_CancerGrade_Normalized" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="22" y="455"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Observation_CancerHistology" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="342" y="551"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="HistologyObservation_CancerGrade_Normalized" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="176" y="455"/>
+        <rectangleSize height="82" width="151"/>
+      </shape>
+      <shape expanded="true" modelObjectName="CheckObservation_CancerGrade_Normalized" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="181" y="359"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="FilterType" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="183" y="281"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="GradeObservation_CancerGrade_Value" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="341" y="455"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="HistologyObservation_CancerGrade_Value" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="495" y="455"/>
+        <rectangleSize height="66" width="151"/>
+      </shape>
+      <shape expanded="true" modelObjectName="CheckObservation_CancerGrade_Value" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="341" y="359"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="FilterValue" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="337" y="281"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Union" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="260" y="165"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario>

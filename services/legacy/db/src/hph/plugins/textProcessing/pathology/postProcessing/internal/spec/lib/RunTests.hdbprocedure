@@ -1,0 +1,13 @@
+procedure "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec.lib::RunTests"
+	language sqlscript
+	sql security definer as
+begin
+
+	call "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec.lib::SetUp";
+	
+	call "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec.lib.tests::PostProcessTA_Test";
+
+	call "hc.hph.plugins.textProcessing.pathology.postProcessing.internal.spec.lib::TearDown";
+
+end
+;

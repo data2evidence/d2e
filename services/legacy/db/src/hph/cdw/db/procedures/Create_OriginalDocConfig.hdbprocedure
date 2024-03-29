@@ -1,0 +1,26 @@
+PROCEDURE "hc.hph.cdw.db.procedures::Create_OriginalDocConfig" (
+	IN it_row "hc.hph.config.db.models::Configuration.Config",
+	OUT ot_error "hc.hph.cdw.db.procedures::tt_error" ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+  DECLARE chkprivilege INTEGER;
+
+  /* SELECT count(*) into chkprivilege from "hc::EFFECTIVE_APPLICATION_PRIVILEGES" where USER_NAME = SESSION_CONTEXT('XS_APPLICATIONUSER') and PRIVILEGE = 'hc.hph.cdw.services::CDWServiceAdministrator';
+  IF :chkprivilege = 0 then
+  ot_error = SELECT 403 AS http_status_code, 'Unauthorised Access' error_message, '' detail 
+             FROM "hc::DUMMY";  
+  ELSE */
+ 
+	INSERT INTO "hc.hph.config.db.models::Configuration.Config"
+		("Id","Version","Name","Type","Data","Creator","Created","Modifier","Modified")
+		SELECT "Id","Version","Name","Type", TO_NCLOB("Data"), SESSION_CONTEXT('XS_APPLICATIONUSER'), CURRENT_TIMESTAMP, '' "Modifier",'' "Modified" from :it_row;
+	
+	ot_error = SELECT top 0 400 AS http_status_code, 'Bad 
+		Request' error_message, 'Error in configuring' 
+		detail FROM "hc::DUMMY";
+  /*END IF; */
+END;

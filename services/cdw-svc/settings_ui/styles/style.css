@@ -1,0 +1,100 @@
+.sapGlobalPanel {
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+.sapGlobalSettingForm,
+.sapGlobalSettingForm>div,
+.sapGlobalSettingForm>div>div,
+.sapGlobalSettingForm>div>div.sapUiFormResLayout>div {
+    background-color: transparent;
+}
+
+li.sapGlobalSettingLanguageForm.sapMLIB {
+    background-color: transparent;
+    border-bottom: 0px;
+}
+
+.sapGlobalSettingLanguageList .sapMListNoData {
+    background-color: transparent;
+}
+
+.sapGlobalSettingAddLanguage {
+    float: right;
+    margin-right: 30%;
+}
+
+.sapUiSizeCompact .sapGlobalMasterListItem {
+    height: 4rem;
+}
+
+.sapGlobalSettingFormSolo .sapUiRFL[role="form"] {
+    background-color: transparent;
+}
+
+.sapGlobalSettingFormGroup .sapUiRFL {
+    padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    width: 100% !important;
+}
+
+.sapGlobalSettingFormGroup .sapUiRFL[role="form"] {
+    padding-bottom: 20px;
+}
+
+.sapGlobalSettingFlexbox .sapMFlexItem {
+    width: 800px;
+    margin-bottom: 20px;
+}
+
+
+/* Toolbar */
+
+.sapGlobalSettingFormGroup .sapMIBar {
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 50px;
+    height: 41px;
+    padding-right: 50px;
+}
+
+
+/* styles for the validity elements */
+
+div[data-class="sapGlobalSettingBorderError"] {
+    border: 1px solid #e52929;
+}
+
+.sapMeValidityElem {
+    margin: 5px 0;
+    padding: 5px 8px 3px 8px;
+}
+
+.sapMeValidityElem .sapUiIcon {
+    padding-right: 5px;
+}
+
+.sapMeValidityElem.sapMeValid {
+    display: none;
+}
+
+.sapMeValidityElem.sapMeWarning {
+    background-color: #f4b800;
+}
+
+.sapMeValidityElem.sapMeWarning .sapUiIcon,
+.sapMeValidityElem.sapMeWarning .sapMText {
+    color: #000000;
+}
+
+.sapMeValidityElem.sapMeInvalid {
+    background-color: #e52929;
+}
+
+.sapMeValidityElem.sapMeInvalid .sapUiIcon,
+.sapMeValidityElem.sapMeInvalid .sapMText {
+    color: #ffffff;
+}

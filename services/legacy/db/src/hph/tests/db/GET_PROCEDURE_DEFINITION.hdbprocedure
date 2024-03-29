@@ -1,0 +1,16 @@
+procedure "hc.hph.tests.db::GET_PROCEDURE_DEFINITION" (  in SCHEMANAME NVARCHAR(256) ,  in PREFIX NVARCHAR(512) ,  out RESULT "hc.hph.tests.db::GET_PROCEDURE_DEFINITION/tabletype/RESULT"  ) language SQLSCRIPT sql security definer reads sql data as 
+ /********* Begin Procedure Script ************/ 
+BEGIN 
+	CALL "hc.hph.tests.db::GET_DEPENDENCY_LEVELS"(:PREFIX || '%',DEPENDENCY_LEVELS);
+
+	RESULT = 
+	    SELECT V.PROCEDURE_NAME AS PROCEDURENAME, V.DEFINITION AS DEFINITION
+	    FROM "hc::PROCEDURES" V,
+	      :DEPENDENCY_LEVELS D
+	    WHERE 
+	    	V.PROCEDURE_NAME = D.OBJECT_NAME 
+	    	AND V.SCHEMA_NAME = :SCHEMANAME
+	    ORDER BY D."LEVEL" DESC
+	;
+END;
+ /********* End Procedure Script ************/

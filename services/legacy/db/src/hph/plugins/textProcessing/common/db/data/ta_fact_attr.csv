@@ -1,0 +1,100 @@
+FactID|PluginID|AttributeID|Attribute|Value|AttributeType|Codify|VocabularyID|CodeColumn
+Rule_1|hc.hph.plugins.textProcessing.medical|1|Diagnosis Date|<document date>|DateType|0||
+Rule_1|hc.hph.plugins.textProcessing.medical|2|Diagnosis Status|ACTIVE|StaticType|0||
+Rule_1|hc.hph.plugins.textProcessing.medical|3|Diagnosis Code|TA_TOKEN|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_1|hc.hph.plugins.textProcessing.medical|4|Diagnosis Severity|TA_COND_SEVERITY|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_2|hc.hph.plugins.textProcessing.medical|1|Diagnosis Date|<document date>|DateType|0||
+Rule_2|hc.hph.plugins.textProcessing.medical|2|Diagnosis Status|ACTIVE|StaticType|0||
+Rule_2|hc.hph.plugins.textProcessing.medical|3|Diagnosis Code|TA_TOKEN|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_2|hc.hph.plugins.textProcessing.medical|4|Diagnosis Severity|TA_COND_SEVERITY|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_3|hc.hph.plugins.textProcessing.medical|1|Diagnosis Date|<document date>|DateType|0||
+Rule_3|hc.hph.plugins.textProcessing.medical|2|Diagnosis Status|ACTIVE|StaticType|0||
+Rule_3|hc.hph.plugins.textProcessing.medical|3|Diagnosis Code|TA_TOKEN|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_3|hc.hph.plugins.textProcessing.medical|4|Diagnosis Severity|TA_COND_SEVERITY|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_4|hc.hph.plugins.textProcessing.medical|1|Diagnosis Date|<document date>|DateType|0||
+Rule_4|hc.hph.plugins.textProcessing.medical|2|Diagnosis Status|INACTIVE|StaticType|0||
+Rule_4|hc.hph.plugins.textProcessing.medical|3|Diagnosis Code|TA_TOKEN|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_5|hc.hph.plugins.textProcessing.medical|1|Diagnosis Date|<document date>|DateType|0||
+Rule_5|hc.hph.plugins.textProcessing.medical|2|Diagnosis Status|INACTIVE|StaticType|0||
+Rule_5|hc.hph.plugins.textProcessing.medical|3|Diagnosis Code|TA_TOKEN|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_6|hc.hph.plugins.textProcessing.medical|1|Diagnosis Date|<document date>|DateType|0||
+Rule_6|hc.hph.plugins.textProcessing.medical|2|Diagnosis Status|INACTIVE|StaticType|0||
+Rule_6|hc.hph.plugins.textProcessing.medical|3|Diagnosis Code|TA_TOKEN|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_7|hc.hph.plugins.textProcessing.medical|1|Diagnosis Date|<document date>|DateType|0||
+Rule_7|hc.hph.plugins.textProcessing.medical|2|Diagnosis Status|FAMILY|StaticType|0||
+Rule_7|hc.hph.plugins.textProcessing.medical|3|Diagnosis Code|TA_TOKEN|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_8|hc.hph.plugins.textProcessing.medical|1|Diagnosis Date|<document date>|DateType|0||
+Rule_8|hc.hph.plugins.textProcessing.medical|2|Diagnosis Status|FAMILY|StaticType|0||
+Rule_8|hc.hph.plugins.textProcessing.medical|3|Diagnosis Code|TA_TOKEN|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_9|hc.hph.plugins.textProcessing.medical|1|Diagnosis Date|<document date>|DateType|0||
+Rule_9|hc.hph.plugins.textProcessing.medical|2|Diagnosis Status|FAMILY|StaticType|0||
+Rule_9|hc.hph.plugins.textProcessing.medical|3|Diagnosis Code|TA_TOKEN|ColumnType|1|ots.ICD.ICD10CM|TA_NORMALIZED
+Rule_10|hc.hph.plugins.textProcessing.medical|1|Medication Start Date|<document date>|DateType|0||
+Rule_10|hc.hph.plugins.textProcessing.medical|2|Medication Name|TA_TOKEN|ColumnType|1|ots.RXNORM|TA_NORMALIZED
+Rule_10|hc.hph.plugins.textProcessing.medical|3|Medication Status|ACTIVE|StaticType|0||
+Rule_10|hc.hph.plugins.textProcessing.medical|4|Medication Frequency|TA_MEDS_DOSAGE_RATE|ColumnType|0||TA_NORMALIZED
+Rule_10|hc.hph.plugins.textProcessing.medical|5|Medication Duration|TA_MEDS_DOSAGE_DURATION|ColumnType|0||TA_NORMALIZED
+Rule_10|hc.hph.plugins.textProcessing.medical|6|Medication Reason|TA_MEDS_REASON|ColumnType|0||TA_NORMALIZED
+Rule_10|hc.hph.plugins.textProcessing.medical|7|Medication Route|TA_MEDS_DOSAGE_ROUTE|ColumnType|0||TA_NORMALIZED
+Rule_10|hc.hph.plugins.textProcessing.medical|8|Medication Strength|TA_MEDS_INGREDIENT_AMOUNT|ColumnType|0||TA_NORMALIZED
+Rule_10|hc.hph.plugins.textProcessing.medical|9|Medication Doseform|TA_MEDS_FORM|ColumnType|0||TA_NORMALIZED
+Rule_10|hc.hph.plugins.textProcessing.medical|10|Medication Dosage|TA_MEDS_DOSAGE_DOSE|ColumnType|0||TA_NORMALIZED
+Rule_11|hc.hph.plugins.textProcessing.medical|1|Medication Allergy Date|<document date>|DateType|0||
+Rule_11|hc.hph.plugins.textProcessing.medical|2|Medication Name|TA_TOKEN|ColumnType|1|ots.RXNORM|TA_NORMALIZED
+Rule_11|hc.hph.plugins.textProcessing.medical|3|Medication Status|ALLERGY|StaticType|0||
+Rule_12|hc.hph.plugins.textProcessing.medical|1|Laboratory Test Date|<document date>|DateType|0||
+Rule_12|hc.hph.plugins.textProcessing.medical|2|Laboratory Test Code|TA_TOKEN|ColumnType|1|ots.SNOMED.SNOMEDCT_US|TA_NORMALIZED
+Rule_12|hc.hph.plugins.textProcessing.medical|3|Laboratory Test Value|TA_OBS_VALUE|ColumnType|0||TA_NORMALIZED
+Rule_12|hc.hph.plugins.textProcessing.medical|4|Laboratory Test Unit|TA_OBS_UNIT|ColumnType|0||TA_NORMALIZED
+Rule_13|hc.hph.plugins.textProcessing.medical|1|Laboratory Test Date|<document date>|DateType|0||
+Rule_13|hc.hph.plugins.textProcessing.medical|2|Laboratory Test Code|TA_TOKEN|ColumnType|1|ots.SNOMED.SNOMEDCT_US|TA_NORMALIZED
+Rule_13|hc.hph.plugins.textProcessing.medical|3|Laboratory Test Value|TA_OBS_VALUE|ColumnType|0||TA_NORMALIZED
+Rule_13|hc.hph.plugins.textProcessing.medical|4|Laboratory Test Unit|TA_OBS_UNIT|ColumnType|0||TA_NORMALIZED
+Rule_14|hc.hph.plugins.textProcessing.medical|1|Laboratory Test Date|<document date>|DateType|0||
+Rule_14|hc.hph.plugins.textProcessing.medical|2|Laboratory Test Code|TA_TOKEN|ColumnType|1|ots.SNOMED.SNOMEDCT_US|TA_NORMALIZED
+Rule_15|hc.hph.plugins.textProcessing.medical|1|Exam Date|<document date>|DateType|0||
+Rule_15|hc.hph.plugins.textProcessing.medical|2|Exam Code|TA_TOKEN|ColumnType|1|ots.SNOMED.SNOMEDCT_US|TA_NORMALIZED
+Rule_15|hc.hph.plugins.textProcessing.medical|3|Exam Type|TA_OBSERVATION|ColumnType|0||TA_OBSERVATION
+Rule_15|hc.hph.plugins.textProcessing.medical|4|Exam Value|TA_OBS_VALUE|ColumnType|0||TA_NORMALIZED
+Rule_15|hc.hph.plugins.textProcessing.medical|5|Exam Unit|TA_OBS_UNIT|ColumnType|0||TA_NORMALIZED
+Rule_16|hc.hph.plugins.textProcessing.medical|1|Exam Date|<document date>|DateType|0||
+Rule_16|hc.hph.plugins.textProcessing.medical|2|Exam Name|TA_NORMALIZED|ColumnType|1||TA_NORMALIZED
+Rule_16|hc.hph.plugins.textProcessing.medical|3|Exam Type|TA_OBSERVATION|ColumnType|0||TA_OBSERVATION
+Rule_16|hc.hph.plugins.textProcessing.medical|4|Exam Value|TA_OBS_VALUE|ColumnType|0||TA_NORMALIZED
+Rule_16|hc.hph.plugins.textProcessing.medical|5|Exam Unit|TA_OBS_UNIT|ColumnType|0||TA_NORMALIZED
+Rule_17|hc.hph.plugins.textProcessing.medical|1|Exam Date|<document date>|DateType|0||
+Rule_17|hc.hph.plugins.textProcessing.medical|2|Exam Code|TA_TOKEN|ColumnType|1|ots.SNOMED.SNOMEDCT_US|TA_NORMALIZED
+Rule_18|hc.hph.plugins.textProcessing.medical|1|Procedure Date|<document date>|DateType|0||
+Rule_18|hc.hph.plugins.textProcessing.medical|2|Procedure Code|TA_TOKEN|ColumnType|1|ots.SNOMED.SNOMEDCT_US|TA_NORMALIZED
+Rule_19|hc.hph.plugins.textProcessing.medical|1|Procedure Date|<document date>|DateType|0||
+Rule_19|hc.hph.plugins.textProcessing.medical|2|Procedure Code|TA_TOKEN|ColumnType|1|ots.SNOMED.SNOMEDCT_US|TA_NORMALIZED
+Rule_1|hc.hph.plugins.textProcessing.pathology|1|Lab Test Date|<document date>|DateType|0||
+Rule_1|hc.hph.plugins.textProcessing.pathology|2|Lab Test Name|TA_NORMALIZED|ColumnType|1||TA_NORMALIZED
+Rule_1|hc.hph.plugins.textProcessing.pathology|3|Lab Test Value|IFNULL(TA_BIOM_VALUE, IFNULL(TA_BIOM_INTERPRETATION, TA_OBS_VALUE))|ColumnType|0||TA_NORMALIZED
+Rule_1|hc.hph.plugins.textProcessing.pathology|4|Lab Test Unit|TA_OBS_UNIT|ColumnType|0||TA_NORMALIZED
+Rule_1|hc.hph.plugins.textProcessing.pathology|5|Biomarker Test Used|TA_BIOM_METHOD|ColumnType|0||TA_NORMALIZED
+Rule_1|hc.hph.plugins.textProcessing.pathology|6|Biomarker Alteration|TA_BIOM_ALTERATION|ColumnType|0||TA_NORMALIZED
+Rule_1|hc.hph.plugins.textProcessing.pathology|7|Biomarker Location|TA_BIOM_DNAREGION|ColumnType|0||TA_NORMALIZED
+Rule_2|hc.hph.plugins.textProcessing.pathology|1|Procedure Date|<document date>|DateType|0||
+Rule_2|hc.hph.plugins.textProcessing.pathology|2|Procedure Code|TA_NORMALIZED|ColumnType|1||TA_NORMALIZED
+Rule_2|hc.hph.plugins.textProcessing.pathology|3|Behavior of Tumor ICD03|TA_CA_BEHAVIOR|ColumnType|0||TA_NORMALIZED
+Rule_2|hc.hph.plugins.textProcessing.pathology|4|Grade of Tumor ICD03|TA_CA_GRADE_VALUE|ColumnType|0||TA_NORMALIZED
+Rule_2|hc.hph.plugins.textProcessing.pathology|5|Tumor Size|TA_CA_SIZE|ColumnType|0||TA_NORMALIZED
+Rule_2|hc.hph.plugins.textProcessing.pathology|6|Cancer Site|TA_CA_BODYSITE|ColumnType|0||TA_NORMALIZED
+Rule_3|hc.hph.plugins.textProcessing.pathology|1|Grade Assessment Date|<document date>|DateType|0||
+Rule_3|hc.hph.plugins.textProcessing.pathology|2|Grade Assessment Token|TA_TOKEN|ColumnType|0||TA_NORMALIZED
+Rule_3|hc.hph.plugins.textProcessing.pathology|3|Grade Assessment Type|TA_CA_GRADE_NORMALIZED|ColumnType|0||TA_NORMALIZED
+Rule_3|hc.hph.plugins.textProcessing.pathology|4|Grade Assessment Value|TA_CA_GRADE_VALUE|ColumnType|0||TA_NORMALIZED
+Rule_4|hc.hph.plugins.textProcessing.pathology|1|Stage Assessment Date|<document date>|DateType|0||
+Rule_4|hc.hph.plugins.textProcessing.pathology|2|Stage Assessment Token|TA_TOKEN|ColumnType|0||TA_NORMALIZED
+Rule_4|hc.hph.plugins.textProcessing.pathology|3|Stage Assessment T-Score|TA_CA_STAGE_T|ColumnType|0||TA_NORMALIZED
+Rule_4|hc.hph.plugins.textProcessing.pathology|4|Stage Assessment N-Score|TA_CA_STAGE_N|ColumnType|0||TA_NORMALIZED
+Rule_4|hc.hph.plugins.textProcessing.pathology|5|Stage Assessment M-Score|TA_CA_STAGE_M|ColumnType|0||TA_NORMALIZED
+Rule_4|hc.hph.plugins.textProcessing.pathology|6|Number Of Nodes Examined|TA_CA_STAGE_N_DENOMINATOR|ColumnType|0||TA_NORMALIZED
+Rule_4|hc.hph.plugins.textProcessing.pathology|7|Number Of Nodes Involved|TA_CA_STAGE_N_NUMERATOR|ColumnType|0||TA_NORMALIZED
+Rule_4|hc.hph.plugins.textProcessing.pathology|8|Node Involvement Result|TA_CA_STAGE_N_INTERPRETATION|ColumnType|0||TA_NORMALIZED
+Rule_4|hc.hph.plugins.textProcessing.pathology|9|Node Involvement Location|TA_CA_STAGE_N_BODYSITE|ColumnType|0||TA_NORMALIZED
+Rule_4|hc.hph.plugins.textProcessing.pathology|10|Node involvement Laterality|TA_CA_STAGE_N_LATERALITY|ColumnType|0||TA_NORMALIZED
+Rule_5|hc.hph.plugins.textProcessing.pathology|1|Tumor Size Assessment Date|<document date>|DateType|0||
+Rule_5|hc.hph.plugins.textProcessing.pathology|2|Tumor Size Assessment Token|TA_TOKEN|ColumnType|0||TA_NORMALIZED
+Rule_5|hc.hph.plugins.textProcessing.pathology|3|Tumor Size Assessment Value|TA_CA_SIZE|ColumnType|0||TA_NORMALIZED

@@ -1,0 +1,186 @@
+/**
+ * Delete all records from CDW for given Audit Log ID.
+ 
+ * @param[in]  {BIGINT}         _AuditLogID - Audit Log ID
+ */
+PROCEDURE "hc.hph.plugins.ccdi.db.procedures::RollbackToTimestamp"( IN _time TIMESTAMP ) 
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+ 
+    AS
+BEGIN
+    ---------------
+    -- Documents --
+    ---------------
+
+    -- delete newer records
+    DELETE from "hc.hph.cdw.db.models::DWDocuments.Document_Attr"
+    WHERE "DWDateFrom" > _time;
+    
+    -- make last record current record
+    UPDATE "hc.hph.cdw.db.models::DWDocuments.Document_Attr"
+    SET "DWDateTo" = null
+    WHERE "DWDateFrom" <= _time and _time < "DWDateTo";
+
+    -- remove keys without attributes
+    DELETE from "hc.hph.cdw.db.models::DWDocuments.Document_Key"
+    WHERE "DWID" not in (select "DWID" from "hc.hph.cdw.db.models::DWDocuments.Document_Attr");
+    
+    --------------
+    -- Patients --
+    --------------
+    
+    -- delete newer records
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Patient_Attr"
+    WHERE "DWDateFrom" > _time;
+    
+    -- make last record current record
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Patient_Attr"
+    SET "DWDateTo" = null
+    WHERE "DWDateFrom" <= _time and _time < "DWDateTo";
+
+    -- remove keys without attributes
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Patient_Key"
+    WHERE "DWID" not in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Patient_Attr");
+
+
+    -------------------
+    -- Practitioners --
+    -------------------
+
+    -- delete newer records
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Practitioner_Attr"
+    WHERE "DWDateFrom" > _time;
+    
+    -- make last record current record
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Practitioner_Attr"
+    SET "DWDateTo" = null
+    WHERE "DWDateFrom" <= _time and _time < "DWDateTo";
+
+    -- remove keys without attributes
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Practitioner_Key"
+    WHERE "DWID" not in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Practitioner_Attr");
+    
+
+    -----------------------------------
+    -- Patient Practitioner Mappings --
+    -----------------------------------
+
+    -- delete newer records
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link_Attr"
+    WHERE "DWDateFrom" > _time;
+    
+    -- make last record current record
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link_Attr"
+    SET "DWDateTo" = null
+    WHERE "DWDateFrom" <= _time and _time < "DWDateTo";
+
+    -- remove links without attributes
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link"
+    WHERE "DWLinkID" not in (select "DWLinkID" from "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link_Attr");
+
+    -- remove links without patient keys
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link"
+    WHERE "DWID_Patient" not in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Patient_Key");
+    
+    -- remove links without practitioner keys
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link"
+    WHERE "DWID_Practitioner" not in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Practitioner_Key");
+
+    -- remove attributes without links
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link_Attr"
+    WHERE "DWLinkID" not in (select "DWLinkID" from "hc.hph.cdw.db.models::DWEntities.Patient_Practitioner_Link");
+
+
+    ------------------
+    -- Interactions --
+    ------------------
+
+    -- delete newer records
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+    WHERE "DWDateFrom" > _time;
+    
+    -- make last record current record
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Interactions_Attr"
+    SET "DWDateTo" = null
+    WHERE "DWDateFrom" <= _time and _time < "DWDateTo";
+
+    -- remove keys without attributes
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Interactions_Key"
+    WHERE "DWID" not in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Interactions_Attr");
+
+    ------------------------
+    -- InteractionDetails --
+    ------------------------
+
+    -- delete newer records
+    DELETE from "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details"
+    WHERE "DWDateFrom" > _time;
+    
+    -- make last record current record
+    UPDATE "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details"
+    SET "DWDateTo" = null
+    WHERE "DWDateFrom" <= _time and _time < "DWDateTo";
+
+    -------------------------
+    -- InteractionMeasures --
+    -------------------------
+
+    -- delete newer records
+    DELETE from "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Measures"
+    WHERE "DWDateFrom" > _time;
+    
+    -- make last record current record
+    UPDATE "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Measures"
+    SET "DWDateTo" = null
+    WHERE "DWDateFrom" <= _time and _time < "DWDateTo";
+
+    ---------------------
+    -- InteractionText --
+    ---------------------
+
+    -- delete newer records
+    DELETE from "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Text"
+    WHERE "DWDateFrom" > _time;
+    
+    -- make last record current record
+    UPDATE "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Text"
+    SET "DWDateTo" = null
+    WHERE "DWDateFrom" <= _time and _time < "DWDateTo";
+
+    ------------------
+    -- Observations --
+    ------------------
+    
+    -- delete newer records
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Observations_Attr"
+    WHERE "DWDateFrom" > _time;
+    
+    -- make last record current record
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Observations_Attr"
+    SET "DWDateTo" = null
+    WHERE "DWDateFrom" <= _time and _time < "DWDateTo";
+
+    -- remove keys without attributes
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Observations_Key"
+    WHERE "DWID" not in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Observations_Attr");
+
+    ----------------
+    -- Conditions --
+    ----------------
+    
+    -- delete newer records
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Condition_Attr"
+    WHERE "DWDateFrom" > _time;
+    
+    -- make last record current record
+    UPDATE "hc.hph.cdw.db.models::DWEntities.Condition_Attr"
+    SET "DWDateTo" = null
+    WHERE "DWDateFrom" <= _time and _time < "DWDateTo";
+
+    -- remove keys without attributes
+    DELETE from "hc.hph.cdw.db.models::DWEntities.Condition_Key"
+    WHERE "DWID" not in (select "DWID" from "hc.hph.cdw.db.models::DWEntities.Condition_Attr");
+
+    
+END;

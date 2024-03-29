@@ -1,0 +1,7 @@
+PROCEDURE "hc.hph.search.services::UpdateValueVocabularyID" 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+    Update "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" 
+    	SET "ValueVocabularyID" =  (SELECT "ID" FROM "hc.hph.ots::Views.Vocabularies" VOC WHERE VOC."ExternalID" = "Value.CodeSystem") ;                    
+END;

@@ -1,0 +1,251 @@
+PROCEDURE "hc.hph.genomics.db.procedures.vb::VariantInformation" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN chromosome_index INTEGER,
+        IN position INTEGER,
+        OUT attributes "hc.hph.genomics.db.models::VariantBrowser.FullyQualifiedAttributes"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+AS
+BEGIN
+    DECLARE schema_array VARCHAR( 255 ) ARRAY;
+    DECLARE table_array VARCHAR( 255 ) ARRAY;
+    DECLARE attribute_array VARCHAR( 255 ) ARRAY;
+    DECLARE attribute_count INTEGER := 0;
+    DECLARE attribute_selection NCLOB := '';
+    
+    -- declare iterators and queries
+    DECLARE CURSOR filters FOR
+        SELECT
+            "AttributeName"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Filter' AND
+            "DataType" = 'Flag' AND
+            "ArraySize" = 0 AND
+            "AttributeName" <> 'PASS' AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Variant' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2 AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_allele_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'VariantAllele' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2 AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_multi_value_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Variant' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            ( "ArraySize" IS NULL OR "ArraySize" > 1 ) AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_structured_attributes FOR
+        SELECT
+            "StructAttr"."StructuredAttributeName" AS "StructuredAttributeName",
+            "StructAttr"."AttributeName" AS "AttributeName",
+            "StructAttr"."DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" AS "CustAttr"
+        INNER JOIN
+            "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAttributes" AS "StructAttr"
+        ON
+            "CustAttr"."AttributeName" = "StructAttr"."StructuredAttributeName" AND
+            "CustAttr"."Level" = "StructAttr"."Level"
+        WHERE
+            "StructAttr"."Level" = 'Variant' AND
+            "CustAttr"."DataType" = 'Structured' AND
+            "StructAttr"."DataType" IN ( 'Integer', 'Float', 'String', 'Allele' ) AND
+            "CustAttr"."Active" <> 0 AND
+            "StructAttr"."Active" <> 0
+        ORDER BY
+            "StructAttr"."StructuredAttributeName",
+            "StructAttr"."AttributeName";
+    DECLARE CURSOR genotype_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Genotype' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2 AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR genotype_allele_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'GenotypeAllele' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2 AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR genotype_multi_value_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Genotype' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            ( "ArraySize" IS NULL OR "ArraySize" > 1 ) AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    
+    -- populate sample variants table
+    CALL "hc.hph.genomics.db.procedures.vb::LocateSampleVariants" ( :sample_list, :chromosome_index, :position, variants );
+    INSERT INTO "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" SELECT * FROM :variants;
+    
+    -- query variant attributes
+    attribute_selection := '"SampleVariants"."SampleIndex", "Variants"."Quality", "Variants"."Filter.PASS"';
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'CDMDEFAULT';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Variants';
+    attribute_array[ :attribute_count ] := 'Quality';
+    schema_array[ :attribute_count ] := 'CDMDEFAULT';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Variants';
+    attribute_array[ :attribute_count ] := 'Filter.PASS';
+    FOR row_result AS filters DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'CDMDEFAULT';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Variants';
+        attribute_array[ :attribute_count ] := 'Filter.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "Variants"."Filter.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    FOR row_result AS variant_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'CDMDEFAULT';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Variants';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "Variants"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.Variants" AS "Variants" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "Variants"."DWAuditID" = "SampleVariants"."DWAuditID" AND "Variants"."VariantIndex" = "SampleVariants"."VariantIndex"';
+    
+    -- query variant IDs
+    SELECT "SampleVariants"."SampleIndex", "VariantIDs"."VariantID" FROM "hc.hph.genomics.db.models::SNV.VariantIDs" AS "VariantIDs" INNER JOIN :variants AS "SampleVariants" ON "VariantIDs"."DWAuditID" = "SampleVariants"."DWAuditID" AND "VariantIDs"."VariantIndex" = "SampleVariants"."VariantIndex" WHERE "VariantIDs"."VariantID" IS NOT NULL GROUP BY "SampleVariants"."SampleIndex", "VariantIDs"."VariantID";
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'CDMDEFAULT';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.VariantIDs';
+    attribute_array[ :attribute_count ] := 'VariantID';
+    
+    -- query variant allele attributes
+    attribute_selection := '"SampleVariants"."SampleIndex", "VariantAlleles"."AlleleIndex", "VariantAlleles"."Allele"';
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'CDMDEFAULT';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.VariantAlleles';
+    attribute_array[ :attribute_count ] := 'Allele';
+    FOR row_result AS variant_allele_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'CDMDEFAULT';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.VariantAlleles';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "VariantAlleles"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.VariantAlleles" AS "VariantAlleles" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "VariantAlleles"."DWAuditID" = "SampleVariants"."DWAuditID" AND "VariantAlleles"."VariantIndex" = "SampleVariants"."VariantIndex"';
+
+    -- query variant multi-value attributes
+    attribute_selection := '"SampleVariants"."SampleIndex"';
+    FOR row_result AS variant_multi_value_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'CDMDEFAULT';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "VariantAttributes"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes" AS "VariantAttributes" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "VariantAttributes"."DWAuditID" = "SampleVariants"."DWAuditID" AND "VariantAttributes"."VariantIndex" = "SampleVariants"."VariantIndex" ORDER BY "VariantAttributes"."ValueIndex"';
+
+    -- query structured variant attributes
+    attribute_selection := '"SampleVariants"."SampleIndex", "VariantAttributes"."ValueIndex"';
+    FOR row_result AS variant_structured_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'CDMDEFAULT';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.VariantStructuredAttributes';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName" || '.' || row_result."StructuredAttributeName";
+        attribute_selection := :attribute_selection || ', "VariantAttributes"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"."' || ESCAPE_DOUBLE_QUOTES( row_result."StructuredAttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes" AS "VariantAttributes" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "VariantAttributes"."DWAuditID" = "SampleVariants"."DWAuditID" AND "VariantAttributes"."VariantIndex" = "SampleVariants"."VariantIndex" ORDER BY "VariantAttributes"."ValueIndex"';
+
+    -- query genotype attributes
+    attribute_selection := '"SampleVariants"."SampleIndex", "Genotypes"."CopyNumber", "Genotypes"."Zygosity"';
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'CDMDEFAULT';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Genotypes';
+    attribute_array[ :attribute_count ] := 'CopyNumber';
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'CDMDEFAULT';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Genotypes';
+    attribute_array[ :attribute_count ] := 'Zygosity';
+    FOR row_result AS genotype_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'CDMDEFAULT';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Genotypes';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "Genotypes"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "Genotypes"."DWAuditID" = "SampleVariants"."DWAuditID" AND "Genotypes"."VariantIndex" = "SampleVariants"."VariantIndex" AND "Genotypes"."SampleIndex" = "SampleVariants"."SampleIndex"';
+    
+    -- query genotype allele attributes
+    attribute_selection := '"SampleVariants"."SampleIndex", "GenotypeAlleles"."AlleleIndex", "GenotypeAlleles"."AlleleCount"';
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'CDMDEFAULT';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.GenotypeAlleles';
+    attribute_array[ :attribute_count ] := 'AlleleCount';
+    FOR row_result AS genotype_allele_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'CDMDEFAULT';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.GenotypeAlleles';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "GenotypeAlleles"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.GenotypeAlleles" AS "GenotypeAlleles" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "GenotypeAlleles"."DWAuditID" = "SampleVariants"."DWAuditID" AND "GenotypeAlleles"."VariantIndex" = "SampleVariants"."VariantIndex" AND "GenotypeAlleles"."SampleIndex" = "SampleVariants"."SampleIndex"';
+
+    -- query genotype multi-value attributes
+    attribute_selection := '"SampleVariants"."SampleIndex"';
+    FOR row_result AS genotype_multi_value_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'CDMDEFAULT';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "GenotypeAttributes"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes" AS "GenotypeAttributes" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "GenotypeAttributes"."DWAuditID" = "SampleVariants"."DWAuditID" AND "GenotypeAttributes"."VariantIndex" = "SampleVariants"."VariantIndex" AND "GenotypeAttributes"."SampleIndex" = "SampleVariants"."SampleIndex" ORDER BY "GenotypeAttributes"."ValueIndex"';
+    
+    -- return accessed attributes
+    attributes = UNNEST( :schema_array, :table_array, :attribute_array ) AS ( "SchemaName", "TableName", "AttributeName" );
+END;

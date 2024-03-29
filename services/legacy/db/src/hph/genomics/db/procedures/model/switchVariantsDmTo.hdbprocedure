@@ -1,0 +1,11 @@
+PROCEDURE "hc.hph.genomics.db.procedures.model::switchVariantsDmTo" ( TargetTable NVARCHAR(100) )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY DEFINER AS
+BEGIN
+	DECLARE synonym_exists TINYINT := 0;
+	SELECT COUNT(*) INTO synonym_exists FROM "hc::SYNONYMS" WHERE "SYNONYM_NAME" = 'hc.hph.genomics.db.models.generated::FlatVariants' AND "SCHEMA_NAME" = 'CDMDEFAULT';
+	IF :synonym_exists <> 0 THEN
+		EXEC 'drop synonym "hc.hph.genomics.db.models.generated::FlatVariants"';
+	END IF;
+	EXEC 'create synonym "hc.hph.genomics.db.models.generated::FlatVariants" FOR CDMDEFAULT."' || ESCAPE_DOUBLE_QUOTES(TargetTable) || '"';
+END

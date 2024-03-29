@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<flowgraph:ContainerNode xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowgraph="http://www.com/ndb/flowgraph/1.0" xmi:id="_qQ9Z8B16EeaVI4VmOqL0Sg" name="IMPORTPEDIGREE" generateProcedure="false" generateTask="true">
+  <annotations xmi:id="_qQ9Z8R16EeaVI4VmOqL0Sg" key="afm.layout">
+    <annotations xmi:id="_qQ9Z8h16EeaVI4VmOqL0Sg" key="x" value="10"/>
+    <annotations xmi:id="_qQ9Z8x16EeaVI4VmOqL0Sg" key="y" value="10"/>
+  </annotations>
+  <annotations xmi:id="_qQ9Z9B16EeaVI4VmOqL0Sg" key="afm.palette" value="">
+    <annotations xmi:id="_qQ9Z9R16EeaVI4VmOqL0Sg" key="additions" value=""/>
+  </annotations>
+  <annotations xmi:id="_9syHMB1_EeaVI4VmOqL0Sg" key="afm.nodeType" value="ContainerNode"/>
+  <annotations xmi:id="_9syuQB1_EeaVI4VmOqL0Sg" key="afm.nodeInputs">
+    <annotations xmi:id="_9syuQR1_EeaVI4VmOqL0Sg" key="PEDIGREE_VT" value=""/>
+  </annotations>
+  <annotations xmi:id="_9syuQh1_EeaVI4VmOqL0Sg" key="afm.nodeOutputs"/>
+  <inputs xmi:id="_jgL-0B18EeaVI4VmOqL0Sg" name="PEDIGREE_VT" kind="TABLE">
+    <attributes xmi:id="_jgL-0R18EeaVI4VmOqL0Sg" name="SourceSampleID" type="VARCHAR" nullable="true" length="255" scale="0"/>
+    <attributes xmi:id="_jgL-0h18EeaVI4VmOqL0Sg" name="TargetSampleID" type="VARCHAR" nullable="true" length="255" scale="0"/>
+    <attributes xmi:id="_jgL-0x18EeaVI4VmOqL0Sg" name="Relationship" type="VARCHAR" nullable="true" length="255" scale="0"/>
+  </inputs>
+  <tableMappings xmi:id="_rXrfgB18EeaVI4VmOqL0Sg" source="_jgL-0B18EeaVI4VmOqL0Sg" target="_qJU2CB18EeaVI4VmOqL0Sg">
+    <attributeMappings xmi:id="_rXrfgR18EeaVI4VmOqL0Sg" source="_jgL-0R18EeaVI4VmOqL0Sg" target="_rVFegB18EeaVI4VmOqL0Sg"/>
+    <attributeMappings xmi:id="_rXrfgh18EeaVI4VmOqL0Sg" source="_jgL-0h18EeaVI4VmOqL0Sg" target="_rVJv8B18EeaVI4VmOqL0Sg"/>
+    <attributeMappings xmi:id="_rXrfgx18EeaVI4VmOqL0Sg" source="_jgL-0x18EeaVI4VmOqL0Sg" target="_rVOocB18EeaVI4VmOqL0Sg"/>
+  </tableMappings>
+  <tableMappings xmi:id="_wHxFECP4Eea2gsqidgbnrw" source="_qJU2CR18EeaVI4VmOqL0Sg" target="_uwd69CP4Eea2gsqidgbnrw">
+    <attributeMappings xmi:id="_wHxFESP4Eea2gsqidgbnrw" source="_rVixgB18EeaVI4VmOqL0Sg" target="_uwd69iP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wHxFEiP4Eea2gsqidgbnrw" source="_rVwz8B18EeaVI4VmOqL0Sg" target="_uwd69yP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wHxFEyP4Eea2gsqidgbnrw" source="_rV-PUB18EeaVI4VmOqL0Sg" target="_uwd6-CP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wHxFFCP4Eea2gsqidgbnrw" source="_BSctsB19EeaVI4VmOqL0Sg" target="_uwd69SP4Eea2gsqidgbnrw"/>
+  </tableMappings>
+  <tableMappings xmi:id="_wtY6oCP4Eea2gsqidgbnrw" source="_rHqoSCP4Eea2gsqidgbnrw" target="_uwd6-SP4Eea2gsqidgbnrw">
+    <attributeMappings xmi:id="_wtY6oSP4Eea2gsqidgbnrw" source="_rHqoSSP4Eea2gsqidgbnrw" target="_uwd6_iP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6oiP4Eea2gsqidgbnrw" source="_rHqoSiP4Eea2gsqidgbnrw" target="_uwd7ASP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6oyP4Eea2gsqidgbnrw" source="_rHqoSyP4Eea2gsqidgbnrw" target="_uwd7BCP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6pCP4Eea2gsqidgbnrw" source="_rHqoTCP4Eea2gsqidgbnrw" target="_uwd6_CP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6pSP4Eea2gsqidgbnrw" source="_rHqoTSP4Eea2gsqidgbnrw" target="_uwd6-yP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6piP4Eea2gsqidgbnrw" source="_rHqoTiP4Eea2gsqidgbnrw" target="_uwd6_SP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6pyP4Eea2gsqidgbnrw" source="_rHqoTyP4Eea2gsqidgbnrw" target="_uwd7ACP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6qCP4Eea2gsqidgbnrw" source="_rHqoUCP4Eea2gsqidgbnrw" target="_uwd6-iP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6qSP4Eea2gsqidgbnrw" source="_rHqoUSP4Eea2gsqidgbnrw" target="_uwd7AyP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6qiP4Eea2gsqidgbnrw" source="_rHqoUiP4Eea2gsqidgbnrw" target="_uwd7ByP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6qyP4Eea2gsqidgbnrw" source="_rHqoUyP4Eea2gsqidgbnrw" target="_uwd7BSP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6rCP4Eea2gsqidgbnrw" source="_rHqoVCP4Eea2gsqidgbnrw" target="_uwd7AiP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6rSP4Eea2gsqidgbnrw" source="_rHqoVSP4Eea2gsqidgbnrw" target="_uwd6_yP4Eea2gsqidgbnrw"/>
+    <attributeMappings xmi:id="_wtY6riP4Eea2gsqidgbnrw" source="_rHqoViP4Eea2gsqidgbnrw" target="_uwd7BiP4Eea2gsqidgbnrw"/>
+  </tableMappings>
+  <tableMappings xmi:id="_xlb88CP4Eea2gsqidgbnrw" source="_uwd7CCP4Eea2gsqidgbnrw" target="_4pjoeB2AEeaVI4VmOqL0Sg">
+    <attributeMappings xmi:id="_xlb88SP4Eea2gsqidgbnrw" source="_uwd7CSP4Eea2gsqidgbnrw" target="_4pjoeR2AEeaVI4VmOqL0Sg"/>
+    <attributeMappings xmi:id="_xlb88iP4Eea2gsqidgbnrw" source="_uwd7CiP4Eea2gsqidgbnrw" target="_4pjoeh2AEeaVI4VmOqL0Sg"/>
+    <attributeMappings xmi:id="_xlb88yP4Eea2gsqidgbnrw" source="_uwd7CyP4Eea2gsqidgbnrw" target="_4pjoex2AEeaVI4VmOqL0Sg"/>
+    <attributeMappings xmi:id="_xlb89CP4Eea2gsqidgbnrw" source="_uwd7DCP4Eea2gsqidgbnrw" target="_4pjofB2AEeaVI4VmOqL0Sg"/>
+    <attributeMappings xmi:id="_xlb89SP4Eea2gsqidgbnrw" source="_uwd7DSP4Eea2gsqidgbnrw" target="_4pjofR2AEeaVI4VmOqL0Sg"/>
+    <attributeMappings xmi:id="_xlb89iP4Eea2gsqidgbnrw" source="_uwd7DiP4Eea2gsqidgbnrw" target="_4pjofh2AEeaVI4VmOqL0Sg"/>
+  </tableMappings>
+  <nodes xsi:type="flowgraph:FilterNode" xmi:id="_qJU2AB18EeaVI4VmOqL0Sg" name="FILTER">
+    <annotations xmi:id="_qJU2AR18EeaVI4VmOqL0Sg" key="afm.description" value="Filter the data"/>
+    <annotations xmi:id="_qJU2Ah18EeaVI4VmOqL0Sg" key="afm.displayName" value="Filter"/>
+    <annotations xmi:id="_qJU2Ax18EeaVI4VmOqL0Sg" key="afm.layout">
+      <annotations xmi:id="_qJU2BB18EeaVI4VmOqL0Sg" key="x" value="96"/>
+      <annotations xmi:id="_qJU2BR18EeaVI4VmOqL0Sg" key="y" value="157"/>
+      <annotations xmi:id="_qJU2Bh18EeaVI4VmOqL0Sg" key="width" value="100"/>
+      <annotations xmi:id="_qJU2Bx18EeaVI4VmOqL0Sg" key="height" value="84"/>
+    </annotations>
+    <annotations xmi:id="_9syuRx1_EeaVI4VmOqL0Sg" key="afm.nodeType" value="FilterNode"/>
+    <annotations xmi:id="_9syuSB1_EeaVI4VmOqL0Sg" key="afm.nodeInputs">
+      <annotations xmi:id="_9syuSR1_EeaVI4VmOqL0Sg" key="INPUT" value="PEDIGREE_VT"/>
+    </annotations>
+    <annotations xmi:id="_9szVUB1_EeaVI4VmOqL0Sg" key="afm.nodeOutputs">
+      <annotations xmi:id="_9szVUR1_EeaVI4VmOqL0Sg" key="OUTPUT" value="PEDVT"/>
+    </annotations>
+    <inputs xmi:id="_qJU2CB18EeaVI4VmOqL0Sg" name="INPUT" kind="TABLE">
+      <attributes xmi:id="_rVFegB18EeaVI4VmOqL0Sg" name="SourceSampleID" type="VARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_rVJv8B18EeaVI4VmOqL0Sg" name="TargetSampleID" type="VARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_rVOocB18EeaVI4VmOqL0Sg" name="Relationship" type="VARCHAR" nullable="true" length="255" scale="0"/>
+    </inputs>
+    <outputs xmi:id="_qJU2CR18EeaVI4VmOqL0Sg" name="OUTPUT" kind="TABLE">
+      <attributes xmi:id="_rVixgB18EeaVI4VmOqL0Sg" name="SourceSampleID" type="NVARCHAR" nullable="true" length="255" scale="0" expression="TO_NVARCHAR(&quot;INPUT&quot;.&quot;SourceSampleID&quot;)"/>
+      <attributes xmi:id="_rVwz8B18EeaVI4VmOqL0Sg" name="TargetSampleID" type="NVARCHAR" nullable="true" length="255" scale="0" expression="TO_NVARCHAR(&quot;INPUT&quot;.&quot;TargetSampleID&quot;)"/>
+      <attributes xmi:id="_rV-PUB18EeaVI4VmOqL0Sg" name="Relationship" type="NVARCHAR" nullable="true" length="5000" scale="0" expression="TO_NVARCHAR(&quot;INPUT&quot;.&quot;Relationship&quot;)"/>
+      <attributes xmi:id="_BSctsB19EeaVI4VmOqL0Sg" name="DWAuditID" type="BIGINT" nullable="false" length="0" scale="0" expression="$$AuditID$$"/>
+    </outputs>
+    <tableMappings xmi:id="_rWM40B18EeaVI4VmOqL0Sg" source="_qJU2CB18EeaVI4VmOqL0Sg" target="_qJU2CR18EeaVI4VmOqL0Sg"/>
+  </nodes>
+  <nodes xsi:type="flowgraph:DataNode" xmi:id="_4pjocB2AEeaVI4VmOqL0Sg" name="CDMDEFAULT_HC_HPH_PLUGINS_PED_DB_MODELS__PEDIGREE_PED" type="DATABASE_TABLE" catalogObjectName="hc.hph.plugins.ped.db.models::Pedigree.Ped" dataLayout="COLUMN" truncateTable="false">
+    <annotations xmi:id="_4pjocR2AEeaVI4VmOqL0Sg" key="afm.description" value="Write data to a catalog object"/>
+    <annotations xmi:id="_4pjoch2AEeaVI4VmOqL0Sg" key="afm.displayName" value="Data Sink"/>
+    <annotations xmi:id="_4pjocx2AEeaVI4VmOqL0Sg" key="afm.layout">
+      <annotations xmi:id="_4pjodB2AEeaVI4VmOqL0Sg" key="x" value="574"/>
+      <annotations xmi:id="_4pjodR2AEeaVI4VmOqL0Sg" key="y" value="260"/>
+      <annotations xmi:id="_4pjodh2AEeaVI4VmOqL0Sg" key="width" value="100"/>
+      <annotations xmi:id="_4pjodx2AEeaVI4VmOqL0Sg" key="height" value="64"/>
+    </annotations>
+    <annotations xmi:id="_w8qjUB2CEeaVI4VmOqL0Sg" key="afm.nodeType" value="DataNode"/>
+    <annotations xmi:id="_w9Xt8B2CEeaVI4VmOqL0Sg" key="afm.nodeInputs">
+      <annotations xmi:id="_w9u6UB2CEeaVI4VmOqL0Sg" key="DATA_2" value="ORESULT"/>
+    </annotations>
+    <annotations xmi:id="_w-z4YB2CEeaVI4VmOqL0Sg" key="afm.nodeOutputs"/>
+    <inputs xmi:id="_4pjoeB2AEeaVI4VmOqL0Sg" name="DATA_2" kind="TABLE">
+      <attributes xmi:id="_4pjoeR2AEeaVI4VmOqL0Sg" name="DWAuditID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_4pjoeh2AEeaVI4VmOqL0Sg" name="Relationship" type="NVARCHAR" nullable="true" length="5000" scale="0"/>
+      <attributes xmi:id="_4pjoex2AEeaVI4VmOqL0Sg" name="SourceSampleID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_4pjofB2AEeaVI4VmOqL0Sg" name="SourceSampleIndex" type="INTEGER" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_4pjofR2AEeaVI4VmOqL0Sg" name="TargetSampleID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_4pjofh2AEeaVI4VmOqL0Sg" name="TargetSampleIndex" type="INTEGER" nullable="true" length="0" scale="0"/>
+    </inputs>
+  </nodes>
+  <nodes xsi:type="flowgraph:DataNode" xmi:id="_rHqoQCP4Eea2gsqidgbnrw" name="CDMDEFAULT_HC_HPH_PLUGINS_PED_DB_MODELS__PEDIGREE_SAMPLES" type="DATABASE_TABLE" catalogObjectName="hc.hph.plugins.ped.db.models::Pedigree.Samples" dataLayout="COLUMN" truncateTable="false">
+    <annotations xmi:id="_rHqoQSP4Eea2gsqidgbnrw" key="afm.description" value="Read data from a catalog or repository object"/>
+    <annotations xmi:id="_rHqoQiP4Eea2gsqidgbnrw" key="afm.displayName" value="Data Source"/>
+    <annotations xmi:id="_rHqoQyP4Eea2gsqidgbnrw" key="afm.layout">
+      <annotations xmi:id="_rHqoRCP4Eea2gsqidgbnrw" key="x" value="145"/>
+      <annotations xmi:id="_rHqoRSP4Eea2gsqidgbnrw" key="y" value="360"/>
+      <annotations xmi:id="_rHqoRiP4Eea2gsqidgbnrw" key="width" value="100"/>
+      <annotations xmi:id="_rHqoRyP4Eea2gsqidgbnrw" key="height" value="64"/>
+    </annotations>
+    <annotations xmi:id="_yRS9YCP4Eea2gsqidgbnrw" key="afm.nodeType" value="DataNode"/>
+    <annotations xmi:id="_yRyFkCP4Eea2gsqidgbnrw" key="afm.nodeInputs"/>
+    <annotations xmi:id="_ySAIACP4Eea2gsqidgbnrw" key="afm.nodeOutputs">
+      <annotations xmi:id="_ySOKcCP4Eea2gsqidgbnrw" key="DATA" value="SAMPLE"/>
+    </annotations>
+    <outputs xmi:id="_rHqoSCP4Eea2gsqidgbnrw" name="DATA" kind="TABLE">
+      <attributes xmi:id="_rHqoSSP4Eea2gsqidgbnrw" name="AnalysisDate" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_rHqoSiP4Eea2gsqidgbnrw" name="DWAuditID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_rHqoSyP4Eea2gsqidgbnrw" name="DWSource" type="NVARCHAR" nullable="true" length="5" scale="0"/>
+      <attributes xmi:id="_rHqoTCP4Eea2gsqidgbnrw" name="DocumentID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_rHqoTSP4Eea2gsqidgbnrw" name="FamilyID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_rHqoTiP4Eea2gsqidgbnrw" name="InteractionDWID" type="VARBINARY" nullable="true" length="32" scale="0"/>
+      <attributes xmi:id="_rHqoTyP4Eea2gsqidgbnrw" name="OrgID" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="_rHqoUCP4Eea2gsqidgbnrw" name="PatientDWID" type="VARBINARY" nullable="true" length="32" scale="0"/>
+      <attributes xmi:id="_rHqoUSP4Eea2gsqidgbnrw" name="Phenotype" type="NVARCHAR" nullable="true" length="5000" scale="0"/>
+      <attributes xmi:id="_rHqoUiP4Eea2gsqidgbnrw" name="ReferenceID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_rHqoUyP4Eea2gsqidgbnrw" name="SampleClass" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_rHqoVCP4Eea2gsqidgbnrw" name="SampleID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_rHqoVSP4Eea2gsqidgbnrw" name="SampleIndex" type="INTEGER" nullable="false" length="0" scale="0"/>
+      <attributes xmi:id="_rHqoViP4Eea2gsqidgbnrw" name="Sex" type="NVARCHAR" nullable="true" length="10" scale="0"/>
+    </outputs>
+  </nodes>
+  <nodes xsi:type="flowgraph:ProcedureNode" xmi:id="_uwd68CP4Eea2gsqidgbnrw" name="JOINPEDSAMPLE" type="DATABASE" procedureName="hc.hph.plugins.ped.db.procedures::joinPedSample">
+    <annotations xmi:id="_uwd68SP4Eea2gsqidgbnrw" key="afm.layout">
+      <annotations xmi:id="_uwd68iP4Eea2gsqidgbnrw" key="x" value="371"/>
+      <annotations xmi:id="_uwd68yP4Eea2gsqidgbnrw" key="y" value="246"/>
+    </annotations>
+    <annotations xmi:id="_yS6uACP4Eea2gsqidgbnrw" key="afm.nodeType" value="ProcedureNode"/>
+    <annotations xmi:id="_yTZPICP4Eea2gsqidgbnrw" key="afm.nodeInputs">
+      <annotations xmi:id="_yTnRkCP4Eea2gsqidgbnrw" key="PEDVT" value="OUTPUT"/>
+      <annotations xmi:id="_yT3JMCP4Eea2gsqidgbnrw" key="SAMPLE" value="DATA"/>
+    </annotations>
+    <annotations xmi:id="_yVIUgCP4Eea2gsqidgbnrw" key="afm.nodeOutputs">
+      <annotations xmi:id="_yVVv4CP4Eea2gsqidgbnrw" key="ORESULT" value="DATA_2"/>
+    </annotations>
+    <inputs xmi:id="_uwd69CP4Eea2gsqidgbnrw" name="PEDVT" kind="TABLE">
+      <attributes xmi:id="_uwd69SP4Eea2gsqidgbnrw" name="DWAuditID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_uwd69iP4Eea2gsqidgbnrw" name="SourceSampleID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_uwd69yP4Eea2gsqidgbnrw" name="TargetSampleID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_uwd6-CP4Eea2gsqidgbnrw" name="Relationship" type="NVARCHAR" nullable="true" length="5000" scale="0"/>
+    </inputs>
+    <inputs xmi:id="_uwd6-SP4Eea2gsqidgbnrw" name="SAMPLE" kind="TABLE">
+      <attributes xmi:id="_uwd6-iP4Eea2gsqidgbnrw" name="PatientDWID" type="VARBINARY" nullable="true" length="32" scale="0"/>
+      <attributes xmi:id="_uwd6-yP4Eea2gsqidgbnrw" name="FamilyID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_uwd6_CP4Eea2gsqidgbnrw" name="DocumentID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_uwd6_SP4Eea2gsqidgbnrw" name="InteractionDWID" type="VARBINARY" nullable="true" length="32" scale="0"/>
+      <attributes xmi:id="_uwd6_iP4Eea2gsqidgbnrw" name="AnalysisDate" type="TIMESTAMP" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_uwd6_yP4Eea2gsqidgbnrw" name="SampleIndex" type="INTEGER" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_uwd7ACP4Eea2gsqidgbnrw" name="OrgID" type="NVARCHAR" nullable="true" length="100" scale="0"/>
+      <attributes xmi:id="_uwd7ASP4Eea2gsqidgbnrw" name="DWAuditID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_uwd7AiP4Eea2gsqidgbnrw" name="SampleID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_uwd7AyP4Eea2gsqidgbnrw" name="Phenotype" type="NVARCHAR" nullable="true" length="5000" scale="0"/>
+      <attributes xmi:id="_uwd7BCP4Eea2gsqidgbnrw" name="DWSource" type="NVARCHAR" nullable="true" length="5" scale="0"/>
+      <attributes xmi:id="_uwd7BSP4Eea2gsqidgbnrw" name="SampleClass" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_uwd7BiP4Eea2gsqidgbnrw" name="Sex" type="NVARCHAR" nullable="true" length="10" scale="0"/>
+      <attributes xmi:id="_uwd7ByP4Eea2gsqidgbnrw" name="ReferenceID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+    </inputs>
+    <outputs xmi:id="_uwd7CCP4Eea2gsqidgbnrw" name="ORESULT" kind="TABLE">
+      <attributes xmi:id="_uwd7CSP4Eea2gsqidgbnrw" name="DWAuditID" type="BIGINT" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_uwd7CiP4Eea2gsqidgbnrw" name="Relationship" type="NVARCHAR" nullable="true" length="5000" scale="0"/>
+      <attributes xmi:id="_uwd7CyP4Eea2gsqidgbnrw" name="SourceSampleID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_uwd7DCP4Eea2gsqidgbnrw" name="SourceSampleIndex" type="INTEGER" nullable="true" length="0" scale="0"/>
+      <attributes xmi:id="_uwd7DSP4Eea2gsqidgbnrw" name="TargetSampleID" type="NVARCHAR" nullable="true" length="255" scale="0"/>
+      <attributes xmi:id="_uwd7DiP4Eea2gsqidgbnrw" name="TargetSampleIndex" type="INTEGER" nullable="true" length="0" scale="0"/>
+    </outputs>
+  </nodes>
+  <variables xmi:id="_PkFAQB19EeaVI4VmOqL0Sg" name="AuditID" type="VARCHAR" nullable="false" length="0" scale="0" defaultValue="-1" kind="expression"/>
+</flowgraph:ContainerNode>

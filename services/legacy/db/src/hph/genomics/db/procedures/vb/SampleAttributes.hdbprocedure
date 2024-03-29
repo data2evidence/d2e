@@ -1,0 +1,30 @@
+PROCEDURE "hc.hph.genomics.db.procedures.vb::SampleAttributes" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        OUT sample_attributes "hc.hph.genomics.db.models::VariantBrowser.SampleAttributes"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+    AS
+BEGIN
+    sample_attributes = SELECT
+        "Samples"."SampleIndex",
+        "Details"."Attribute.OriginalValue" AS "Attribute",
+        "Details"."Value.OriginalValue" AS "Value"
+    FROM
+        :sample_list AS "SampleList"
+    INNER JOIN
+        "hc.hph.genomics.db.models::General.Samples" AS "Samples"
+    ON
+        "SampleList"."SampleIndex" = "Samples"."SampleIndex"
+    INNER JOIN
+        "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" AS "Details"
+    ON
+        "Samples"."InteractionDWID" = "Details"."DWID"
+    WHERE
+        "Details"."Attribute.OriginalValue" <> 'SampleIndex'
+    ORDER BY
+        "Samples"."SampleIndex",
+        "Details"."Attribute.OriginalValue",
+        "Details"."Value.OriginalValue";
+END;

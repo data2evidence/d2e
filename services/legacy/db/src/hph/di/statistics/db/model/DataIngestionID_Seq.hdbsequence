@@ -1,0 +1,1 @@
+SEQUENCE "hc.hph.di.statistics.db.model::DataIngestionID_Seq" RESET BY SELECT IFNULL(MAX("DataIngestionID")+1,1) FROM "hc.hph.di.statistics.db.model::Statistics.DataIngestionProfileLoads"

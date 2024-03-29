@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="specs/cdw_api/load.har" tests="2" time="3.155179666666667">
+    <testcase classname="legacy/cdw/internal/tests/interface_load.xsjs?packageID=1" name="" assertion="" time="1.5048426666666668" message="legacy/cdw/internal/tests/interface_load.xsjs?packageID=1,0.747--1.642966333333333,1.507--1.5048426666666668,0.280099--0.417267,NaN--0.09051683130531893,0.387--0.12920377480897718">
+      <system-out>Request URL and parameters: http://test-system-url:8000/legacy/cdw/internal/tests/interface_load.xsjs?packageID=1&#10; Payload: &#10; Cached End2End(Old): 0.747&#10; Cached End2End(New):1.642966333333333 &#10; Non Cached End2End(Old): 1.507 &#10; Non Cached End2End(New):1.5048426666666668&#10; Database Processing(Old): 0.280099&#10; Database Processing(New):0.417267&#10; SD Cached: 0 % &#10; SD Non Cached: 0 %</system-out>
+    </testcase>
+    <testcase classname="legacy/cdw/internal/tests/interface_load.xsjs?packageID=2" name="" assertion="" time="1.6503370000000002" message="legacy/cdw/internal/tests/interface_load.xsjs?packageID=2,0.753--1.6724936666666665,1.605--1.6503370000000002,0.302174--0.4627553333333333,NaN--0.04732061076904601,0.387--0.18381678222802914">
+      <system-out>Request URL and parameters: http://test-system-url:8000/legacy/cdw/internal/tests/interface_load.xsjs?packageID=2&#10; Payload: &#10; Cached End2End(Old): 0.753&#10; Cached End2End(New):1.6724936666666665 &#10; Non Cached End2End(Old): 1.605 &#10; Non Cached End2End(New):1.6503370000000002&#10; Database Processing(Old): 0.302174&#10; Database Processing(New):0.4627553333333333&#10; SD Cached: 0 % &#10; SD Non Cached: 0 %</system-out>
+    </testcase>
+  </testsuite>
+</testsuites>

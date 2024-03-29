@@ -1,0 +1,37 @@
+PROCEDURE "hc.hph.plugins.documents.db.procedures::SetDocumentStatus" 
+(
+in iv_auditLogID bigint
+) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+ 
+declare lv_notes nvarchar(1024);
+declare lt_progress table("AuditLogID" bigint,
+					  "FinalStatus" nvarchar(128), 
+					  "TotalDocuments" bigint,
+					  "Failed" bigint,
+					  "Successful" bigint,
+					  "InProcess" bigint);
+declare lt_trace table("DocumentID" nvarchar(1024), 
+				     "FileName" nvarchar(256),
+				     "Action" nvarchar(256),
+				     "Status" nvarchar(128), 
+				     "Trace" nvarchar(1024));
+declare lt_documentStatus table("DocumentID" nvarchar(1024),
+							"Status" nvarchar(128));
+declare lt_unprocessedDocuments table("DocumentID" nvarchar(1024));
+							
+ -- get the document status
+ call "hc.hph.plugins.documents.db.procedures::GetRunProgress"(:iv_auditLogID, 0, 'false', :lv_notes, :lt_progress, :lt_trace, :lt_documentStatus, lt_unprocessedDocuments);
+ 
+ update "hc.hph.di.model::DataIntegration.AuditLog" auditlog set
+	    		 "Status" = docStatus."Status" from 
+	    		 "hc.hph.di.model::DataIntegration.AuditLog" auditlog, :lt_documentStatus docStatus
+	    		 where auditLog."ParentAuditLogID" = :iv_auditLogID
+	    		 and docStatus."DocumentID" = auditLog."DocumentID";
+END;

@@ -1,0 +1,598 @@
+!======================================================================
+! File Name: french-tf-med-Observation.rul 
+! Author: ALP Text Analysis
+! Project Name: Medical Fact Extraction
+! Content: Rules for the extraction of med_Observation
+!======================================================================
+!======================================================================
+! DEPENDENCIES:
+! > DICTIONARY french-tf-med-LaboratoryTest
+! >>>> ENTITY_NAME med_LAB_TEST
+! > DICTIONARY french-tf-med-Observation
+! >>>> ENTITY_NAME PS_SCORING_SYSTEM
+!======================================================================
+!======================================================================
+! OUTPUT:
+! > ENTITY med_Observation
+! >>>> SUBENTITY Type <BMI, BodyWeight, BodyHeight, BodyTemp, BP,
+!   HeartRate, OxygenSat, RespRate, PerformanceStatus, LabTest> {1}
+!       TODO: BPSystolic, BPDiastolic
+! >>>> SUBENTITY Value {1,2}
+! >>>> SUEBTNTIY unit {0,2}
+!======================================================================
+
+
+
+
+!==============================================================================
+! MISCELLANEOUS
+!==============================================================================
+#subgroup adv: {
+    <POS:Adv>
+    | <globalement>
+    | <plutôt>
+    | <à> <peu> <près>
+    | <parfaitement>
+    | <tout\-à\-fait>
+    | <un> <peu>
+}
+
+#subgroup sep: {
+    <\:>
+    | <=>
+    | <aux> <alentours> <des?> | <autour> <des?> | <STEM:de> <environ>
+    | ( <STEM:(être|est)>? <égale?|=> | <POS:Adv> | <STEM:(côté|coter|estimer|conserver)> )? <à>
+    | <POS:Adv>
+    | <STEM:être>? %(adv)? <de>
+    | <maintenu|stabilisé> <à>
+    | <qui>? <STEM:(être|rester)> <POS:Adv>? ( <POS:Adj> | <STEM:comprendre> )? <à>?
+    | <STEM:se> <STEM:être>? <STEM:stabiliser> <à>
+    | ( <peut> <être> )? <STEM:(chiffrer|évaluer)> <à>?
+}
+
+#subgroup percent: {
+    [TE PERCENT] <>+ [/TE]
+    | ( [TE PERCENT] <>+ [/TE] | <POS:Num> ) ( <\-> | <voire?> | <tendance> | <tendant> <vers> ) [TE PERCENT] <>+ [/TE]
+    | <\p{ci}(de)>? ( [TE PERCENT] <>+ [/TE] | <POS:Num> ) <\p{ci}(à|a)> [TE PERCENT] <>+ [/TE]
+    | <\p{ci}(entre)> ( [TE PERCENT] <>+ [/TE] | <POS:Num> ) <\p{ci}(et)> [TE PERCENT] <>+ [/TE]
+}
+
+!======================================================================
+! PerformanceStatus
+!======================================================================
+
+#subgroup OD_PS_keyword: {
+    [OD Observation_PerformanceStatus] (
+        [TE OBSERVATION_PERFORMANCESTATUS] <>+ [/TE]
+    ) [/OD]
+}
+
+#subgroup PS_modifier: {
+    <POS:Adv>? <POS:Prep> <POS:Det>? <POS:Nn>
+    | <STEM:être>? <POS:Adj>
+    | <ce> <jour>
+    | <STEM:que> <POS:Pron> <POS:V>
+    | <STEM:(évaluer|altérer)>
+    | <\(> [TE OBSERVATION_PERFORMANCESTATUS] <>+ [/TE] <\)>
+    | <le|au> [TE DATE] <>+ [/TE]
+    | <POS:Adv> <POS:Adj>
+    | ( <du> | <de> <la> ) <patiente?>
+}
+
+#define ecog: [0-5]|[Oo]\.?|(i|ii|iii|iv|v|I|II|III|IV|V)
+
+#subgroup ECOG_value: {
+    <%(ecog)>
+    | <%(ecog)[\-/]%(ecog)>
+    | <%(ecog)> ( <\-> | <voire?> | <limite> | <tendance> | <tendant> <vers> ) <%(ecog)>
+    | <\p{ci}(de)>? <%(ecog)> <\p{ci}(à|a)> <%(ecog)>
+    | <\p{ci}(entre)> <%(ecog)> <\p{ci}(et)> <%(ecog)>
+}
+
+#subgroup KPS_value: {
+    %(percent)
+    | <[1-9]0[\-/]([2-9]0|100)\%>
+    | <[1-9]0|100>
+    | <[1-9]0> <\-|à> <[2-9]0|100>
+}
+
+#subgroup OD_PSValue: {
+    [OD Observation_PerformanceStatus_Value] (
+        %(ECOG_value)
+        | %(KPS_value)
+    ) [/OD]
+}
+
+
+#subgroup OD_PerformanceStatus: {
+    %(OD_PS_keyword)
+    %(PS_modifier)*
+    %(sep)*
+    %(OD_PSValue)
+}
+
+
+!======================================================================
+! LabTest
+!======================================================================
+
+#subgroup LabTest_modifier: {
+    <STEM:total>
+    | <STEM:(augmenter|diminuer)>
+    | ( <avant> | <POS:Prep> ) <POS:Nn>
+    | <STEM:corriger>
+}
+
+#subgroup OD_LabTest_keyword: {
+    [OD Observation_Laboratory_Normalized] [TE OBSERVATION_LABORATORY] <>+ [/TE] [/OD]
+}
+
+
+! longest-match-bug: avoid using quantifiers 
+#subgroup OD_LabTestValue: {
+    [OD Observation_Laboratory_Value] <[\<\>]>? (
+        <[0-9]+>
+        | <[0-9]+[\,\.][0-9]+>
+        | <[0-9]{1,3}> <[0-9]{3}>
+        | <[0-9]{1,3}> <[0-9]{3}[\,\.][0-9]+>
+        | <[0-9]{1,3}> <[0-9]{3}> <[0-9]{3}>
+        | <[0-9]{1,3}> <[0-9]{3}> <[0-9]{3}[\,\.][0-9]+>
+    ) [/OD]
+}
+
+#subgroup OD_LabTestUnit: {
+    [OD Observation_Laboratory_Unit] ( 
+        <\p{ci}((mc?|n)?g\.?(\/(m|d|f)?L\.?)?)>
+        | <\p{ci}(([nm]?mol|meq)\/l)>
+        | <\p{ci}(mmhg|cmhg)>
+        | <\p{ci}([mdf]?l)>
+        | (<STEM: per> <STEM: ml>)
+        | (<\p{ci}(m[o0]sm\/(km)?g)>)
+        | (<\p{ci}((m|n)?g\/(micro|deci|milli|kilo)?lit(re|er))>)
+        | (<\p{ci}(m\/second)>)
+        | (<STEM: gram> <\/> <\p{ci}([mdf]?l)>)
+        | (<\/> <STEM: cmm\.?>)
+        | <umm?ol/[lL]> | <µmm?ol/[lL]>
+        | <UI/[Ll]>
+        | <ml/mn>
+        | <\p{ci}(n)>
+        | </mm3>
+    ) [/OD]
+}
+
+#define value__labtestunit: /(mm3)
+
+! longest-match-bug: avoid using quantifiers 
+#subgroup OD_LabTestValueUnit: {
+    [OD Observation_Laboratory_Value] <[\<\>]>? (
+        %(percent)
+        | <[0-9]+[nN]>
+        | <[0-9]+\*> <la> <normale>
+        | <[0-9]+%(value__labtestunit)>
+        | <[0-9]+[\,\.][0-9]+%(value__labtestunit)>
+        | <[0-9]{1,3}> <[0-9]{3}%(value__labtestunit)>
+        | <[0-9]{1,3}> <[0-9]{3}[\,\.][0-9]+%(value__labtestunit)>
+        | <[0-9]{1,3}> <[0-9]{3}> <[0-9]{3}%(value__labtestunit)>
+        | <[0-9]{1,3}> <[0-9]{3}> <[0-9]{3}[\,\.][0-9]+%(value__labtestunit)>
+    ) [/OD]
+}
+
+#subgroup OD_LabTest: {
+    %(OD_LabTest_keyword)
+    %(LabTest_modifier)?
+    %(sep)?
+    ( %(OD_LabTestValue) %(OD_LabTestUnit)?
+        | %(OD_LabTestValueUnit) )
+    | %(OD_LabTestValue)  %(OD_LabTest_keyword)
+}
+
+
+!======================================================================
+! BodyWeight
+!======================================================================
+
+#subgroup OD_BodyWeight_keyword: {
+    [OD Observation_BodyWeight] (
+        <\p{ci}(poids)>
+        | <\p{ci}(surpoids)>
+        | <\p{ci}(pèse)>
+        | <\p{ci}(fait|faisait)>
+    ) [/OD]
+}
+
+#subgroup BodyWeight_modifier: {
+    <\p{ci}(actuel)>
+    | <ce> <jour>
+    | <en> ( <baisse> | <hausse> | <augmentation> | <diminution> )
+    | <POS:Adv>? <POS:Adj> 
+    | ( <POS:Prep> | <avant> ) <POS:Det>? <POS:Nn>
+    | ( <POS:Prep> | <avant> ) <POS:Det>? [NP] <>{1,5} [/NP]
+    | <tout> <au> <long> <POS:Prep> <POS:Nn>
+    | <en> [TE DATE] <>+ [/TE]
+    | <\(> <>{0,5} <\)>
+}
+
+#define bodyweight_unit_kg: \p{ci}(kgs?|kilos?|kilogrammes?|k)
+
+#subgroup OD_BodyWeightValueKg: {
+    [OD Observation_BodyWeight_Value] (
+        <[1-3][0-9]{2}([\.\,][0-9]{1,3})?>
+        | <[1-9][0-9]([\.\,][0-9]{1,3})?>
+        | <[1-9]([\.\,][0-9]{1,3})?>
+    ) [/OD]
+}
+
+#subgroup OD_BodyWeightUnitKg: {
+    [OD Observation_BodyWeight_Unit] (
+        <%(bodyweight_unit_kg)>
+    ) [/OD]
+}
+
+#subgroup OD_BodyWeightValueUnitKg: {
+    [OD Observation_BodyWeight_Value] (
+        <[1-3][0-9]{2}([\.\,][0-9]{1,3})?%(bodyweight_unit_kg)>
+        | <[1-9][0-9]([\.\,][0-9]{1,3})?%(bodyweight_unit_kg)>
+        | <[1-9]([\.\,][0-9]{1,3})?%(bodyweight_unit_kg)>
+        | <[1-3][0-9]{2}%(bodyweight_unit_kg)[0-9]{1,3}>
+        | <[1-9][0-9]%(bodyweight_unit_kg)[0-9]{1,3}>
+        | <[1-9]%(bodyweight_unit_kg)[0-9]{1,3}>
+        | <[1-3][0-9]{2}> <%(bodyweight_unit_kg)> <[0-9]{1,3}>
+        | <[1-9][0-9]> <%(bodyweight_unit_kg)> <[0-9]{1,3}>
+        | <[1-9]> <%(bodyweight_unit_kg)> <[0-9]{1,3}>
+        | <[1-3][0-9]{2}%(bodyweight_unit_kg)> <[0-9]{1,3}>
+        | <[1-9][0-9]%(bodyweight_unit_kg)> <[0-9]{1,3}>
+        | <[1-9]%(bodyweight_unit_kg)> <[0-9]{1,3}>
+        | <[1-3][0-9]{2}> <%(bodyweight_unit_kg)[0-9]{1,3}>
+        | <[1-9][0-9]> <%(bodyweight_unit_kg)[0-9]{1,3}>
+        | <[1-9]> <%(bodyweight_unit_kg)[0-9]{1,3}>
+    ) [/OD]
+}
+
+#subgroup OD_BodyWeightKg: {
+    %(OD_BodyWeightValueKg) %(OD_BodyWeightUnitKg)
+    | %(OD_BodyWeightValueUnitKg)
+}
+
+
+#define bodyweight_unit_g: \p{ci}(gs?|grs?|grammes)
+
+#subgroup OD_BodyWeightValueG: {
+    [OD Observation_BodyWeight_Value] (
+        <[1-9][0-9]{3}>
+    ) [/OD]
+}
+
+#subgroup OD_BodyWeightUnitG: {
+    [OD Observation_BodyWeight_Unit] (
+        <%(bodyweight_unit_g)>
+    ) [/OD]
+}
+
+#subgroup OD_BodyWeightValueUnitG: {
+    [OD Observation_BodyWeight_Value] (
+        <[1-9][0-9]{3}%(bodyweight_unit_g)>
+    ) [/OD]
+}
+
+#subgroup OD_BodyWeightG: {
+    %(OD_BodyWeightValueG) %(OD_BodyWeightUnitG)
+    | %(OD_BodyWeightValueUnitG)
+}
+
+#subgroup OD_BodyWeight: {
+    %(OD_BodyWeight_keyword)
+    %(BodyWeight_modifier)*
+    %(sep)?
+    ( %(OD_BodyWeightKg) | %(OD_BodyWeightG) )
+    | %(OD_BodyWeight_keyword) %(BodyWeight_modifier)* <\(> <en>? %(OD_BodyWeightUnitG) <\)> %(sep)? %(OD_BodyWeightValueG)
+    | %(OD_BodyWeight_keyword) %(BodyWeight_modifier)* <\(> <en>? %(OD_BodyWeightUnitKg) <\)> %(sep)? %(OD_BodyWeightValueKg)
+}
+
+
+!======================================================================
+! BodyHeight
+!======================================================================
+
+#subgroup OD_BodyHeight_keyword: {
+    [OD Observation_BodyHeight] (
+        <\p{ci}(taille)>
+        | <\p{ci}(mesure)>
+    ) [/OD]
+}
+
+#subgroup OD_BodyHeightValueM: {
+    [OD Observation_BodyHeight_Value] (
+        <[0-2][\.\,][0-9]+>
+    ) [/OD]
+}
+
+#subgroup OD_BodyHeightUnitM: {
+    [OD Observation_BodyHeight_Unit] (
+        <\p{ci}(m|mètres?|metres?)>
+    ) [/OD]
+}
+
+#subgroup OD_BodyHeightValueUnitM: {
+    [OD Observation_BodyHeight_Value] (
+        <[0-2]>  <\p{ci}(m|mètres?|metres?)> <[0-9]+>
+        | <[0-2][mM][0-9]+>
+    ) [/OD]
+}
+
+#subgroup OD_BodyHeightM: {
+    %(OD_BodyHeightValueM) %(OD_BodyHeightUnitM)
+    | %(OD_BodyHeightValueUnitM)
+}
+
+#subgroup OD_BodyHeightValueCm: {
+    [OD Observation_BodyHeight_Value] (
+        <[12]?[0-9]{2}>
+    ) [/OD]
+}
+
+#subgroup OD_BodyHeightUnitCm: {
+    [OD Observation_BodyHeight_Unit] (
+        <\p{ci}(cm|centimètres|centimetres)>
+    ) [/OD]
+}
+
+#subgroup OD_BodyHeightValueUnitCm: {
+    [OD Observation_BodyHeight_Value] <[12]?[0-9]{2}cm> [/OD]
+}
+
+#subgroup OD_BodyHeightCm: {
+    %(OD_BodyHeightValueCm) %(OD_BodyHeightUnitCm)
+    | %(OD_BodyHeightValueUnitCm)
+}
+
+#subgroup OD_BodyHeight: {
+    %(OD_BodyHeight_keyword)
+    %(sep)? 
+    ( %(OD_BodyHeightM) | %(OD_BodyHeightCm) )
+    | %(OD_BodyHeight_keyword) <\(> <en>? %(OD_BodyHeightUnitCm) <\)> %(sep)? %(OD_BodyHeightValueCm)
+    | %(OD_BodyHeight_keyword) <\(> <en>? %(OD_BodyHeightUnitM) <\)> %(sep)? %(OD_BodyHeightValueM)
+}
+
+!======================================================================
+! BMI
+!======================================================================
+
+#subgroup OD_BMI_keyword: {
+    [OD Observation_BMI] (
+        <IMC>
+        | <\p{ci}(indice)> <\p{ci}(de)> <\p{ci}(masse)> <\p{ci}(corporel(le)?)>
+    ) [/OD]
+}
+
+#subgroup OD_BMIValue: {
+    [OD Observation_BMI_Value] (
+        <[0-9]+([\.\,][0-9]+)?((KG|Kg|kg)/m[²2])?> 
+    ) [/OD]
+}
+
+#subgroup OD_BMIUnit: {
+    [OD Observation_BMI_Unit] (
+        <\p{ci}(kg/m²|kg/m2)>
+        | <\p{ci}(kg)> </> <\p{ci}(m²|m2)>
+        | <\p{ci}(kg/)> <\p{ci}(m²|m2)>
+        | <\p{ci}(kg)> <\p{ci}(/m²|/m2)>
+    ) [/OD]
+}
+
+#subgroup OD_BMI: {
+    %(OD_BMI_keyword)
+    %(sep)?
+    %(OD_BMIValue)
+    %(OD_BMIUnit)?
+}
+
+
+!======================================================================
+! OxygenSat
+!======================================================================
+
+#subgroup OD_OxygenSat_keyword: {
+    [OD Observation_OxygenSaturation] (
+        <\p{ci}(saturation)> <\p{ci}(oxygene|oxygène|o2)>?
+        | <\p{ci}(sat)>
+        | <\p{ci}(saO2)> | <\p{ci}(satO2)> | <\p{ci}(spo2)>
+    ) [/OD]
+    ( <\p{ci}(en)>? ( <\p{ci}(AA)> | <air> <ambiant> ) )?
+}
+
+#subgroup OD_OxygenSatValue: {
+    [OD Observation_OxygenSaturation_Value] (
+       <1?[0-9]?[0-9]?> <\%> 
+       | <1?[0-9]?[0-9]?\%> 
+    ) [/OD]
+}
+
+#subgroup OD_OxygenSat: {
+    %(OD_OxygenSat_keyword)
+    %(sep)?
+    %(OD_OxygenSatValue)
+}
+
+
+
+
+!======================================================================
+! RespRate
+!======================================================================
+
+#subgroup OD_RespRate_keyword: {
+    [OD Observation_RespirationRate] (
+        <FR>
+        | <\p{ci}(fréquence|frequence)> <\p{ci}(respiratoire)>
+    ) [/OD]
+}
+
+#subgroup OD_RespRateValue: {
+    [OD Observation_RespirationRate_Value] (
+        <[1-9]?[0-9]>
+    ) [/OD]
+}
+
+#subgroup OD_RespRateUnit: {
+    [OD Observation_RespirationRate_Unit] (
+        </\p{ci}(mn|min|minute)>
+        | </|par> <minute|mn|min>
+    ) [/OD]
+}
+
+#subgroup OD_RespRateValueuUnit: {
+    [OD Observation_RespirationRate_Value] (
+        <[1-9]?[0-9]/\p{ci}(mn|min|minute)>
+    ) [/OD]
+}
+
+#subgroup OD_RespRate: {
+    %(OD_RespRate_keyword)
+    %(sep)?
+    ( %(OD_RespRateValue) %(OD_RespRateUnit)?
+        | %(OD_RespRateValueuUnit) )
+}
+
+
+!==============================================================================
+! HeartRate
+!==============================================================================
+
+#subgroup OD_HeartRate_keyword: {
+    [OD Observation_HeartRate] (
+        <\p{ci}(pouls)>
+        | <FC>
+        | <\p{ci}(fréquence|frequence)> <\p{ci}(cardiaque)>
+    ) [/OD]
+}
+
+#define heartrate_value: 1?[0-9]{1,2}
+
+#subgroup OD_HeartRateValue: {
+    [OD Observation_HeartRate_Value] (
+        <%(heartrate_value)>
+        | <%(heartrate_value)/\p{ci}(mn|min|minute)>
+    ) [/OD]
+}
+
+#subgroup OD_HeartRateUnit: {
+    [OD Observation_HeartRate_Unit] (
+        </\p{ci}(mn|min|minute)>
+        | <\p{ci}(bat)/\p{ci}(mn|min|minute)>
+        | <\p{ci}(batts)/\p{ci}(mn|min|minute)>
+        | </|par> <minute|mn|min>
+    ) [/OD]
+}
+
+#subgroup OD_HeartRate: {
+    %(OD_HeartRate_keyword)
+    %(sep)?
+    %(OD_HeartRateValue)
+    %(OD_HeartRateUnit)?
+}
+
+!==============================================================================
+! BP (BloodPressure)
+!==============================================================================
+
+#subgroup OD_BP_keyword: {
+    [OD Observation_BloodPressure] (
+        <TA> | <PA>
+        | <\p{ci}(pression|tension)> <\p{ci}(artérielle|arterielle)>
+        | <\p{ci}(tension)>
+    ) [/OD]
+}
+
+#define bp_value: [12]?[0-9]{1,2}
+
+#subgroup OD_BPValue: {
+    [OD Observation_BloodPressure_Value] (
+        <%(bp_value)/%(bp_value)>
+        | <%(bp_value)> </> <%(bp_value)>
+        | <%(bp_value)/> <%(bp_value)>
+        | <%(bp_value)> </%(bp_value)>
+    ) [/OD]
+}
+
+#subgroup OD_BPUnit: {
+    [OD Observation_BloodPressure_Unit] <\p{ci}(cmhg|mmhg)> [/OD]
+}
+
+#subgroup BP_keyword__BPValue: {
+    <\p{ci}(à|a)>
+    | <un> <peu> <limite> <\p{ci}(à|a)> 
+    | <POS:Prep> <POS:Det>? <POS:Nn> <STEM:(gauche|droit)>?
+    | <STEM:(allonger|coucher|debout)>
+}
+
+#subgroup OD_BP: {
+    %(OD_BP_keyword)
+    %(sep)?
+    %(BP_keyword__BPValue)?
+    %(sep)?
+    %(OD_BPValue)
+    %(OD_BPUnit)?
+}
+
+!==============================================================================
+! BodyTemp
+!==============================================================================
+
+#subgroup OD_BodyTemp_keyword: {
+    [OD Observation_BodyTemperature] (
+        <T°> | <T>
+        | <\p{ci}(température|temperature)>
+    ) [/OD]
+}
+
+#subgroup OD_BodyTempValue: {
+    [OD Observation_BodyTemperature_Value] <[234][0-9]([\.\,][0-9])?°?> [/OD]
+}
+
+#subgroup OD_BodyTempUnit: {
+    [OD Observation_BodyTemperature_Unit] <\p{ci}(°C)> [/OD]
+}
+
+#subgroup OD_BodyTemp: {
+    %(OD_BodyTemp_keyword)
+    %(sep)?
+    %(OD_BodyTempValue)
+    %(OD_BodyTempUnit)?
+}
+
+
+!======================================================================
+! med_Observation
+!======================================================================
+
+
+#group Observation: {
+    %(OD_BodyTemp)
+    | %(OD_BP)
+    | %(OD_HeartRate)
+    | %(OD_RespRate)
+    | %(OD_OxygenSat)
+    | %(OD_BMI)
+    | %(OD_BodyHeight)
+    | %(OD_BodyWeight)
+    | %(OD_LabTest)
+    | %(OD_PerformanceStatus)
+}
+
+
+
+!======================================================================
+! DROP rules
+!======================================================================
+
+#subgroup BodyWeight_drop: {
+    <prise> <de>
+}
+
+#group DROP_Observation: {
+    %(BodyWeight_drop) %(OD_BodyWeight)
+}
+
+
+
+

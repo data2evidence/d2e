@@ -1,0 +1,12 @@
+.project
+.settings
+.classpath
+.mta
+*.class
+target/
+*.mtar
+*.jar
+
+app-router/node_modules/
+app-router/node/
+app-router/resources/

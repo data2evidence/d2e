@@ -1,0 +1,64 @@
+  #set( $addressuse = {"HP" : "home", "TMP" : "temp","WP":"work","HV":"temp","PHYS":"home","PST":"home"}) 
+  "address":[
+  #set($aset="")
+  #foreach($address in $PatientAddress)
+    $aset{       
+           
+            "use":"$!addressuse.get("$address.AddressType")",
+            "_use":[{
+                "extension":[
+                	{
+                    "url":"http://hl7.org/fhir/StructureDefinition/iso21090-AD-use",
+                    "valueString":"$address.AddressType"
+                    }
+                ]
+            }
+            ],
+            "type":"$!address.AddressType",
+            "line": [
+                "$!address.Street $!address.HouseNumber$!address.HouseNumberLetter"
+            ],
+            "_line": [
+                {
+                    "extension": [
+                    	#set($ssep="")
+                        #if($address.Street)
+                        $ssep{
+                            "url":"http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName",
+                            "valueString":"$address.Street"
+                        }
+                        #set($ssep=",")
+                        #end
+                        #if($address.HouseNumber)
+                        $ssep{
+                            "url":"http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-houseNumber",
+                            "valueString":"$address.HouseNumber"
+                        }
+                        #set($ssep=",")
+                        #end
+                        #if($address.HouseNumberLetter)
+                        $ssep{
+                            "url":"http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-buildingNumbersuffix",
+                            "valueString":"$address.HouseNumberLetter"
+                        }
+                        #set($ssep=",")
+                        #end
+                    ]
+                }
+            ],
+            #if($address.PlaceOfResidence)"city":"$address.PlaceOfResidence",#end
+            #if($address.Municipality)"district":"$address.Municipality",#end
+            #if($address.Postcode)"postalcode":"$address.Postcode",#end
+            #if($address.Country)"country":"$address.Country",#end
+            "extension": [
+            #if($address.AddressType=="HP")
+                {
+                    "url":"http://fhir.nl/fhir/StructureDefinition/nl-core-address-official",
+                    "valueBoolean":true
+                }
+            #end
+            ]
+        }
+    #set($aset=",")
+  #end
+   ],

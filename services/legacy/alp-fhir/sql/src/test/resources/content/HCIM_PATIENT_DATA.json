@@ -1,0 +1,69 @@
+{
+	"resourceType": "TableContent",
+	"id": "HCIM_PATIENT_DATA",
+	"definition": {
+		"reference": "HCIM_PATIENT"
+	},
+	"row": [
+		{
+			"column": [
+				{
+					"name": "identification_number",
+					"valueString": "1"
+				},
+				{
+					"name": "subject",
+					"valueString": "1"
+				},
+				{
+					"name": "gender",
+					"valueString": "M"
+				},
+				{
+					"name": "dateOfBirth",
+					"valueString": "1970-03-04"
+				}
+			]
+		},
+		{
+			"column": [
+				{
+					"name": "identification_number",
+					"valueString": "999911338"
+				},
+				{
+					"name": "subject",
+					"valueString": "999911338"
+				},
+				{
+					"name": "gender",
+					"valueString": "F"
+				},
+				{
+					"name": "dateOfBirth",
+					"valueString": "2000-03-20"
+				}
+			]
+		},
+		{
+			"column": [
+				{
+					"name": "identification_number",
+					"valueString": "999911339"
+				},
+				{
+					"name": "subject",
+					"valueString": "999911339"
+				},
+				{
+					"name": "gender",
+					"valueString": "M"
+				},
+				{
+					"name": "dateOfBirth",
+					"valueString": "2010-05-24"
+				}
+			]
+		}
+	]
+}

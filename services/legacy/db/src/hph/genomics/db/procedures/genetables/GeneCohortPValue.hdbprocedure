@@ -1,0 +1,69 @@
+PROCEDURE "hc.hph.genomics.db.procedures.genetables::GeneCohortPValue" (IN GenesAffectedinCohort "hc.hph.genomics.db.models::VariantBrowser.GeneAffectedinCohort"
+, OUT PValue "hc.hph.genomics.db.models::VariantBrowser.PValue") 
+      LANGUAGE SQLSCRIPT
+      SQL SECURITY DEFINER AS 
+n         BIGINT;
+a         BIGINT;
+b         BIGINT;
+c         BIGINT;
+d         BIGINT;
+sumab     BIGINT;
+sumcd     BIGINT;
+sumac     BIGINT;
+sumbd     BIGINT;
+loga      DOUBLE;
+logb      DOUBLE;
+logc      DOUBLE;
+logd      DOUBLE;
+logsumab  DOUBLE;
+logsumcd  DOUBLE;
+logsumac  DOUBLE;
+logsumbd  DOUBLE;
+logsum    DOUBLE;
+OnePValue DOUBLE;
+
+CURSOR PVal for 
+select * from :GenesAffectedinCohort;
+
+BEGIN
+
+FOR GeneAffectedinCohort AS PVal DO
+
+a := GeneAffectedinCohort."Cohort1Affected";
+b := GeneAffectedinCohort."Cohort2Affected";
+c := GeneAffectedinCohort."Cohort1Total" - a;
+d := GeneAffectedinCohort."Cohort2Total" - b;
+sumab := a + b + 1;
+sumcd := c + d + 1;
+sumac := a + c + 1; 
+sumbd := b + d + 1;
+n := GeneAffectedinCohort."Cohort1Total" + GeneAffectedinCohort."Cohort2Total" + 1;
+c := c + 1;
+d := d + 1;
+a := a + 1;
+b := b + 1;
+
+-- log factorial with Stirlings approximation ==> (x - 0.5)*LN(x) - x + 0.5*LN(2*PI) + 1.0/(12.0*x) 
+loga := (a - 0.5) * LN(a) - a + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * a);
+logb := (b - 0.5) * LN(b) - b + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * b);
+logc := (c - 0.5) * LN(c) - c + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * c);
+logd := (d - 0.5) * LN(d) - d + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * d);
+
+logsumab := (sumab - 0.5) * LN(sumab) - sumab + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * sumab); 
+logsumcd := (sumcd - 0.5) * LN(sumcd) - sumcd + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * sumcd);
+logsumac := (sumac - 0.5) * LN(sumac) - sumac + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * sumac);
+logsumbd := (sumbd - 0.5) * LN(sumbd) - sumbd + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * sumbd);
+   
+logsum := (n - 0.5) * LN(n) - n + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * n);
+
+-- Log of PValue ==> [log{(a+b)!} + log{(c+d)!} + log{(a+c)!} + log{(b+d)!}] − [log{N!} + log{a!} + log{b!} + log{c!} + log{d!}] 
+OnePValue := (logsumab + logsumcd + logsumac + logsumbd) - (logsum + loga + logb + logc + logd);
+
+PValue = select GeneAffectedinCohort."GeneName", 
+				OnePValue AS "PValue"
+                from "hc::DUMMY"
+			UNION ALL 
+			select * from :PValue;
+END FOR ;
+
+END;

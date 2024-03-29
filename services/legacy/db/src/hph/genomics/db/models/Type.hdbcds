@@ -1,0 +1,56 @@
+namespace hc.hph.genomics.db.models;
+
+using hc.hph.cdw.db.models::DWTypes as DWType;
+
+
+context Type
+{
+
+	type BooleanValue : hana.TINYINT;
+	type StringValue : String(5000);
+	type FloatValue : hana.REAL; // alternative: BinaryFloat
+
+	type PatientIndex : Integer;
+	type SampleIndex : Integer;
+	type ChromosomeIndex : Integer;
+	type ReferenceID : String(255);
+	type DWAuditID : DWType.DWAuditID;
+	type DWDocID : DWType.DWAuditID;
+	type DWID : DWType.DWID;
+
+	type DataSource : String(255);
+	type SampleClass : String(255); // VCF_import
+	type AlleleContent : String(255);
+
+	type Position : Integer;
+
+	table type PositionInterval
+	{
+		"Begin" : Position;
+		"End" : Position;
+	};
+
+	table type RefAltCombination
+	{
+		Reference : AlleleContent;
+		Alternative : AlleleContent;
+	};
+
+	type FeatureName : String(1024);
+	type VariantRegion : String(255); // tf_binding_site, five_prime_UTR, three_prime_UTR, intron, trans_splice_donor_site, trans_splice_acceptor_site, start_codon, stop_codon, CDS_region, intergenic_region
+	type SequenceAlteration : String(255); // insertion, deletion, substitution
+	type MutationType : String(255);
+
+
+
+	// Temporarily added to solve merge conflict with hph.di
+	type AttributeLevel : String(14); // values: Variant, VariantAllele, Genotype, GenotypeAllele
+	type AttributeDataType : String(9); // values: Flag, Integer, Float, String, Character
+
+	type FlagAttributeValue : BooleanValue;
+	type CharacterAttributeValue : String(1);
+	type StringAttributeValue : String(5000);
+	type IntegerAttributeValue : Integer;
+	type FloatAttributeValue : hana.REAL;
+
+};

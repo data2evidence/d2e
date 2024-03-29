@@ -1,0 +1,98 @@
+namespace hc.hph.cdw.db.models;
+
+using hc.hph.cdw.db.models::DWTypes as DT;
+using hc.hph.cdw.db.models::DWAnnotations as DWAnnotation;
+using hc.hph.cdw.db.models::DWEntities as DWEnt; 
+using hc.hph.di.model::DataIntegration as DI;
+
+
+context DWEntitiesEAV {
+
+       
+    @DWAnnotation.Entity.Name : 'Interaction'
+    @DWAnnotation.Table.Type : #EAV
+    @DWAnnotation.Table.Label : 'Interaction Detail'
+    entity Interaction_Details {
+    
+        DWDateFrom : DT.DWTimestamp;        
+        DWID : DT.DWID;
+        DWAuditID : DT.DWAuditID not null;
+        DWDateTo: DT.DWTimestamp;
+        
+        @DWAnnotation.Column : { Type: #EntityAttribute, Element : 'OriginalValue' }   
+        Attribute : DT.CodeableValue100;
+        
+		Value : DT.CodeableValue5000;
+		ValueVocabularyID : String(100);
+    
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Interactions_Key_Assoc : association to DWEnt.Interactions_Key on Interactions_Key_Assoc.DWID = DWID;    
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+        index DWIndex on (DWID, DWDateTo) asc;
+
+                 FULLTEXT INDEX ValueIdx ON ( Value.Code )
+        FUZZY SEARCH INDEX ON
+        SEARCH ONLY OFF
+        PHRASE INDEX RATIO 0.0
+        FAST PREPROCESS ON;
+    };   
+    
+    
+    @DWAnnotation.Entity.Name : 'Interaction'
+    @DWAnnotation.Table.Type : #EAV
+    @DWAnnotation.Table.Label : 'Interaction Measure'
+    entity Interaction_Measures {
+    
+        DWDateFrom : DT.DWTimestamp;        
+        DWID : DT.DWID;
+        DWAuditID : DT.DWAuditID not null;
+        DWDateTo: DT.DWTimestamp;
+        
+        @DWAnnotation.Column : { Type: #EntityAttribute, Element : 'OriginalValue' }
+        Attribute : DT.CodeableValue100;
+        Unit : String(100);
+        Value : Decimal(34,10); 
+        
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Interactions_Key_Assoc : association to DWEnt.Interactions_Key on Interactions_Key_Assoc.DWID = DWID;  
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+        index DWIndex on (DWID, DWDateTo) asc;
+    };
+
+    
+    @DWAnnotation.Entity.Name : 'Interaction'
+    @DWAnnotation.Table.Type : #EAV
+    @DWAnnotation.Table.Label : 'Interaction Text'
+    entity Interaction_Text {
+            
+        DWDateFrom : DT.DWTimestamp;        
+        DWID : DT.DWID;
+        DWAuditID : DT.DWAuditID not null;
+        DWDateTo: DT.DWTimestamp;
+        
+        InteractionTextID : String(100);        
+        @DWAnnotation.Column : { Type: #EntityAttribute } 
+        Attribute : String(100);        
+        Value : String(5000);
+        Lang : String(50);
+        
+        Audit_Assoc : association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+        Interactions_Key_Assoc : association to DWEnt.Interactions_Key on Interactions_Key_Assoc.DWID = DWID;  
+    } technical configuration {
+        column store;
+        partition by keeping existing layout;
+        index DWIndex on (DWID, DWDateTo,InteractionTextID) asc;
+
+        
+          FULLTEXT INDEX ValueIdx ON ( Value )
+        FUZZY SEARCH INDEX ON
+        SEARCH ONLY OFF
+        PHRASE INDEX RATIO 0.0
+        FAST PREPROCESS ON;
+
+    };  
+};

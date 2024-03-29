@@ -1,0 +1,14 @@
+PROCEDURE "hc.hph.cdw.db.procedures::Create_DocumentTypePipelineMapping" ( 
+	IN it_row table("PipelineID" nvarchar(256), "DWDocumentType" nvarchar(256), "TAConfiguration" nvarchar(256)),
+	OUT ot_error "hc.hph.cdw.db.procedures::tt_error") 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+ 
+    INSERT INTO "hc.hph.di.documents.staging.db.models::DocumentProcessing.DocumentTypePipelineMapping"("PipelineID","DWDocumentType","CreatedAt","CreatedBy") 
+	  (SELECT "PipelineID","DWDocumentType", CURRENT_TIMESTAMP "CreatedAt",SESSION_CONTEXT( 'APPLICATIONUSER' ) "CreatedBy" FROM :it_row);
+    
+	ot_error = SELECT top 0 400 AS http_status_code, 'Bad 
+		Request' error_message, 'Error in creating document type text processing mapping' 
+		detail FROM "hc::DUMMY";
+END;

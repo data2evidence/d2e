@@ -1,0 +1,488 @@
+{
+	"resourceType": "CapabilityStatement",
+	"url": "http://nictiz.nl/fhir/CapabilityStatement/bgz-servercapabilities",
+	"version": "1.0",
+	"name": "DutchPatientSummaryServer",
+	"status": "active",
+	"date": "2017-09-25",
+	"publisher": "Nictiz",
+	"contact": [
+		{
+			"name": "Nictiz",
+			"telecom": [
+				{
+					"system": "email",
+					"value": "info@nictiz.nl",
+					"use": "work"
+				}
+			]
+		}
+	],
+	"description": "This CapabilityStatement describes the minimal requirements for a server to expose the Basisgegevensset Zorg (Dutch Patient Summary).",
+	"copyright": "CC0",
+	"kind": "requirements",
+	"fhirVersion": "3.0.1",
+	"acceptUnknown": "both",
+	"format": [
+		"xml",
+		"json"
+	],
+	"profile": [
+		{
+			"reference": "http://fhir.nl/fhir/StructureDefinition/nl-core-patient"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-Payer"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-Concern"
+		},
+		{
+			"reference": "http://fhir.nl/fhir/StructureDefinition/nl-core-organization"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-TreatmentDirective"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-AdvanceDirective"
+		},
+		{
+			"reference": "http://fhir.nl/fhir/StructureDefinition/nl-core-relatedperson"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-FunctionalOrMentalStatus"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-LivingSituation"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-DrugUse"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-AlcoholUse"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-TobaccoUse"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-NutritionAdvice"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-Alert"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-AllergyIntolerance"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-MedicationUse"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-MedicalAidProduct"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-MedicalAid"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-Vaccination"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-VaccinationRecommendation"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-BloodPressure"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-BodyWeight"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-BodyHeight"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-LaboratoryTestResult-Observation"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-LaboratoryTestResult-DiagnosticReport"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-LaboratoryTestResult-Specimen"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-Procedure"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-Contact"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-ProcedureRequest"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-MedicationAgreement"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-VaccinationRecommendation"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-MedicalAidRequest"
+		},
+		{
+			"reference": "http://nictiz.nl/fhir/StructureDefinition/zib-Appointment"
+		},
+		{
+			"reference": "http://fhir.nl/fhir/StructureDefinition/nl-core-practitioner"
+		},
+		{
+			"reference": "http://fhir.nl/fhir/StructureDefinition/nl-core-practitionerrole"
+		}
+	],
+	"rest": [
+		{
+			"mode": "server",
+			"resource": [
+				{
+					"type": "Patient",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchInclude": [
+						"general-practitioner"
+					],
+					"searchParam": [
+						{
+							"name": "identifier",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "Organization",
+					"interaction": [],
+					"searchInclude": [],
+					"searchParam": []
+				},
+				{
+					"type": "DiagnosticReport",
+					"interaction": [],
+					"searchInclude": [],
+					"searchParam": []
+				},
+				{
+					"type": "Practitioner",
+					"interaction": [],
+					"searchInclude": [],
+					"searchParam": []
+				},
+				{
+					"type": "Coverage",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchInclude": [
+						"Coverage:payor:Patient,Organization"
+					],
+					"searchParam": [
+						{
+							"name": "subscriber",
+							"type": "reference"
+						}
+					]
+				},
+				{
+					"type": "Consent",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "category",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "Observation",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "category",
+							"type": "token"
+						},
+						{
+							"name": "code",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "Condition",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "category",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "NutritionOrder",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "status",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "Flag",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						}
+					]
+				},
+				{
+					"type": "AllergyIntolerance",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						}
+					]
+				},
+				{
+					"type": "MedicationStatement",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchInclude": [
+						"MedicationStatement.medication"
+					],
+					"searchParam": [
+						{
+							"name": "status",
+							"type": "token"
+						},
+						{
+							"name": "category",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "MedicationRequest",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchInclude": [
+						"MedicationRequest.medication"
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "status",
+							"type": "token"
+						},
+						{
+							"name": "category",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "DeviceUseStatement",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchInclude": [
+						"DeviceUseStatement:device"
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						}
+					]
+				},
+				{
+					"type": "Procedure",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "category",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "Encounter",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "class",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "ProcedureRequest",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "category",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "MedicationDispense",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "category",
+							"type": "token"
+						},
+						{
+							"name": "status",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "DeviceRequest",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "status",
+							"type": "token"
+						}
+					]
+				},
+				{
+					"type": "Appointment",
+					"interaction": [
+						{
+							"code": "search-type"
+						}
+					],
+					"searchParam": [
+						{
+							"name": "patient",
+							"type": "reference"
+						},
+						{
+							"name": "status",
+							"type": "token"
+						}
+					]
+				}
+			],
+			"interaction": [
+				{
+					"code": "batch"
+				}
+			],
+			"operation": [
+				{
+					"name": "Last N Observations Query",
+					"definition": {
+						"reference": "http://hl7.org/fhir/OperationDefinition/Observation-lastn"
+					}
+				}
+			]
+		}
+	]
+}

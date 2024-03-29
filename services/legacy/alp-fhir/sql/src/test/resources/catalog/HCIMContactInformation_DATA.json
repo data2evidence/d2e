@@ -1,0 +1,53 @@
+{
+	"resourceType": "TableContent",
+	"id": "HCIMContactInformation_DATA",
+	"definition": {
+		"reference": "HCIMContactInformation"
+	},
+	"row": [
+		{
+			"column": [
+				{
+					"name": "_RecordKey",
+					"valueString": "\u0001"
+				},
+				{
+					"name": "_BelongsToPerson",
+					"valueString": "\u0001"
+				},
+				{
+					"name": "TelephoneNumber",
+					"valueString": "0815/4711"
+				},
+				{
+					"name": "_NumberType",
+					"valueString": ">>Home Number "
+				},
+				{
+					"name": "NumberType_CD",
+					"valueString": "HP"
+				},
+				{
+					"name": "_TelecomType",
+					"valueString": ">>Festanschluss"
+				},
+				{
+					"name": "TelecomType_CD",
+					"valueString": "LL"
+				},
+				{
+					"name": "EmailAddress",
+					"valueString": "joe@doe.com"
+				},
+				{
+					"name": "_EmailAddressType",
+					"valueString": ">>Rubbeldubbel"
+				},
+				{
+					"name": "EmailAddressType_CD",
+					"valueString": "WP"
+				}
+			]
+		}
+	]
+}

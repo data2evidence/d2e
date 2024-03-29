@@ -1,0 +1,10 @@
+PROCEDURE "hc.hph.di.procedures.validation::ValidateOrgID" ( IN org_id NVARCHAR(255), OUT status TINYINT )
+LANGUAGE SQLSCRIPT SQL SECURITY INVOKER READS SQL DATA AS
+BEGIN
+    DECLARE count INTEGER := 0;
+    SELECT COUNT(*) INTO count FROM "hc.hph.cdw.db.models::Config.Org" WHERE "OrgID" = :org_id AND "Status" = 'Active' AND ( ( "ValidFrom" <= CURRENT_UTCTIMESTAMP AND "ValidTo" IS NULL ) OR CURRENT_UTCTIMESTAMP BETWEEN "ValidFrom" AND "ValidTo" );
+    status := 0;
+    IF :count = 1 THEN
+        status := 1;
+    END IF;
+END

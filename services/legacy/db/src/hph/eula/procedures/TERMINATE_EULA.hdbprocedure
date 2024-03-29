@@ -1,0 +1,32 @@
+PROCEDURE "hc.hph.eula.procedures::TERMINATE_EULA" (
+
+	IN  it_new "hc.hph.eula.model::TT_EULA_DETAILS",
+	OUT ot_error "hc.hph.eula.model::TT_ODATA_ERROR" 
+	) 
+	LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count INTEGER;
+	lv_eulaid NVARCHAR(32);
+	lv_todate DATE;
+	lv_fromdate DATE;
+	lv_version INTEGEr;
+BEGIN
+	select count(*)	into lv_count from :it_new where length(trim(' ' from "ID")) = 0 OR length(trim(' ' from "VersionNo")) = 0 OR length(trim(' ' from "ValidToPointInTime")) = 0;
+	if :lv_count > 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Error Activating Eula' detail from "hc::DUMMY";
+		return;	
+	end if;
+	
+	SELECT "ID" into lv_eulaid from :it_new;
+	SELECT "VersionNo" into lv_version from :it_new;
+	SELECT "ValidToPointInTime" into lv_todate from :it_new;
+	SELECT "ValidFromPointInTime" into lv_fromdate from "hc.hph.eula.model::Eula_Model.Eula" WHERE "ID" = :lv_eulaid AND "VersionNo" = :lv_version;
+	
+	if :lv_todate < :lv_fromdate  then
+		SELECT "ValidToPointInTime" into lv_fromdate FROM :it_new;
+	end if;
+	
+	--SELECT CAST(TO_DATE(CURRENT_DATE, 'YYYY-MM-DD') as timestamp)into lv_todate FROM DUMMY;
+	
+ 	update "hc.hph.eula.model::Eula_Model.Eula" set "ValidToPointInTime" = :lv_todate , "ValidFromPointInTime" = :lv_fromdate WHERE "ID" = :lv_eulaid AND "VersionNo" = :lv_version;
+END;

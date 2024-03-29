@@ -1,0 +1,158 @@
+{
+	"resourceType": "StructureDefinition",
+	"id": "Scenario",
+	"url": "http://data4life.care/health/fhir/StructureDefinition/Scenario",
+	"kind": "resource",
+	"name": "Scenario",
+	"test": {
+		"div": "<div>Defines a Scenario which can be deployed on the Connected Health Platform</div>"
+	},
+	"type": "Scenario",
+	"meta": {
+		"profile": [
+			"http://data4life.care/health/fhir/profile/StructureDefinition"
+		]
+	},
+	"extension": [
+		{
+			"uri": "http://data4life.care/health/fhir/extension/shortname",
+			"valueString": "ScenarioImplementationRequest"
+		}
+	],
+	"snapshot": {
+		"element": [
+			{
+				"id": "Scenario",
+				"path": "Scenario",
+				"min": 0,
+				"max": "*"
+			},
+			{
+				"id": "Scenario.id",
+				"short": "Logical id of this artifact",
+				"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+				"comment": "The only time that a resource does not have an id is when it is being submitted to the server using a create operation.",
+				"min": 0,
+				"max": "1",
+				"base": {
+					"path": "Resource.id",
+					"min": 0,
+					"max": "1"
+				},
+				"type": [
+					{
+						"code": "id"
+					}
+				],
+				"isSummary": true
+			},
+			{
+				"id": "Scenario.url",
+				"short": "Logical id of this scenario",
+				"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+				"comment": "The only time that a resource does not have an id is when it is being submitted to the server using a create operation.",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "uri"
+					}
+				],
+				"isSummary": true
+			},
+			{
+				"id": "Scenario.version",
+				"short": "Logical version of this scenario",
+				"definition": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+				"comment": "The only time that a resource does not have an id is when it is being submitted to the server using a create operation.",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				],
+				"isSummary": true
+			},
+			{
+				"id": "Scenario.scope",
+				"path": "Scenario.scope",
+				"short": "The scopes of the definition to be implemented",
+				"definition": "The scopes of the definition to be implemented",
+				"min": 0,
+				"max": "*",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "Scenario.permission",
+				"path": "Scenario.permission",
+				"short": "The permissions of this scenario",
+				"definition": "The permissions of this scenario, in addition to the one provides through the Scenario Definition",
+				"min": 0,
+				"max": "*",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://data4life.care/health/fhir/StructureDefinition/Permission"
+					}
+				]
+			},
+			{
+				"id": "Scenario.definition",
+				"path": "Scenario.definition",
+				"short": "The ScenarioDefinition this request implements",
+				"min": "1",
+				"max": "1",
+				"type": [
+					{
+						"code": "Reference",
+						"targetProfile": "http://data4life.care/health/fhir/StructureDefinition/ScenarioDefinition"
+					}
+				]
+			},
+			{
+				"id": "Scenario.parameter",
+				"path": "ScenarioDefinition.parameter",
+				"short": "Parameters used to bind the scenario",
+				"definition": "Parameters used to bind the scenario",
+				"min": 0,
+				"max": "*",
+				"type": [
+					{
+						"code": "BackboneElement"
+					}
+				]
+			},
+			{
+				"id": "Scenario.parameter.name",
+				"path": "Scenario.parameter.name",
+				"short": "Name of the parameter",
+				"definition": "Name of the parameter",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			},
+			{
+				"id": "Scenario.parameter.valueString",
+				"path": "Scenario.parameter.valueString",
+				"short": "String value of the Parameter",
+				"definition": "String value of the Parameter",
+				"min": 0,
+				"max": "1",
+				"type": [
+					{
+						"code": "string"
+					}
+				]
+			}
+		]
+	}
+}

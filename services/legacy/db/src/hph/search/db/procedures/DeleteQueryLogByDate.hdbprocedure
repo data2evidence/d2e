@@ -1,0 +1,31 @@
+PROCEDURE "hc.hph.search.db.procedures::DeleteQueryLogByDate"( 
+	
+	IN  iv_lifetime INT,
+	OUT ov_cnt INT,
+	OUT ot_error "hc.hph.core.db.models::TT_ODATA_ERROR"
+	) 
+	
+LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS
+	lv_count BIGINT;
+BEGIN
+
+	if :iv_lifetime = 0 then 
+		ot_error = 
+			select 400 as http_status_code, 'Bad Request' error_message, 'Lifetime must be > 0.' DETAIL from "hc::DUMMY";
+		return;	
+	end if;	
+
+
+    lt_delete_ids = select EXEC_ID from "hc.hph.search.db.models::QueryLog.HEADER" 
+        where EXEC_TSTP < CAST(ADD_DAYS (TO_DATE (CURRENT_TIMESTAMP), :iv_lifetime ) as TIMESTAMP) for update;
+
+    select count(*) into ov_cnt from :lt_delete_ids;
+
+	delete from "hc.hph.search.db.models::QueryLog.DETAILS"
+		where "EXEC_ID" in (select "EXEC_ID" from :lt_delete_ids);
+
+	delete from "hc.hph.search.db.models::QueryLog.HEADER"
+		where "EXEC_ID" in (select "EXEC_ID" from :lt_delete_ids) ;	
+	
+		
+END;

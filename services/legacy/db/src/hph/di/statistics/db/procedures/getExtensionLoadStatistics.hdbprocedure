@@ -1,0 +1,38 @@
+PROCEDURE "hc.hph.di.statistics.db.procedures::getExtensionLoadStatistics" (
+	IN START_DATE DATE,
+	IN END_DATE DATE,
+	IN lang NVARCHAR(5),
+	IN Extensions "hc.hph.di.statistics.db.model::Statistics.Extensions",
+	OUT STATISTICS "hc.hph.di.statistics.db.model::Statistics.DataIngestionExtensionLoads"
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	READS SQL DATA AS
+BEGIN
+	DECLARE ExtensionValues INTEGER := 0;
+	SELECT COUNT(*) INTO ExtensionValues FROM :Extensions;
+	
+	IF :ExtensionValues=0 THEN
+		STATISTICS=SELECT extension."DataIngestionID",extension."LoadDate",extension."ExtensionID",
+		 CASE WHEN textbundle."CONTENT" is null THEN extension."ExtensionName"
+		 	 WHEN textbundle."CONTENT" is not null THEN
+		 	 (Select textbundle."CONTENT" from "hc::ACTIVE_CONTENT_TEXT_CONTENT" as textbundle where textbundle."TEXT_ID"=extension."ExtensionName" and textbundle."LANG" = :lang)
+		 	 END as "ExtensionName",
+		CASE WHEN textbundle."CONTENT" is null THEN extension."ExtensionAlias" ELSE textbundle."CONTENT" END as "ExtensionAlias",
+		extension."Loads" 
+		FROM "hc.hph.di.statistics.db.model::Statistics.DataIngestionExtensionLoads" as extension
+		LEFT OUTER JOIN "hc::ACTIVE_CONTENT_TEXT_CONTENT" as textbundle on extension."ExtensionAlias" = textbundle."TEXT_ID" and textbundle."LANG" = :lang
+		WHERE "LoadDate" BETWEEN :START_DATE AND :END_DATE;
+	ELSE
+		STATISTICS=SELECT extension."DataIngestionID",extension."LoadDate",extension."ExtensionID",
+		CASE WHEN textbundle."CONTENT" is null THEN extension."ExtensionName"
+			 WHEN textbundle."CONTENT" is not null THEN
+			 (Select textbundle."CONTENT" from "hc::ACTIVE_CONTENT_TEXT_CONTENT" as textbundle where textbundle."TEXT_ID"=extension."ExtensionName" and textbundle."LANG" = :lang)
+			 END as "ExtensionName",
+		CASE WHEN textbundle."CONTENT" is null THEN extension."ExtensionAlias" ELSE textbundle."CONTENT" END as "ExtensionAlias",
+		extension."Loads" 
+		FROM "hc.hph.di.statistics.db.model::Statistics.DataIngestionExtensionLoads" as extension
+		LEFT OUTER JOIN "hc::ACTIVE_CONTENT_TEXT_CONTENT" as textbundle on extension."ExtensionAlias" = textbundle."TEXT_ID" and textbundle."LANG" = :lang
+		WHERE "ExtensionID" IN(SELECT "ExtensionID" FROM :Extensions) AND extension."LoadDate" BETWEEN :START_DATE AND :END_DATE;
+	END IF;
+END;

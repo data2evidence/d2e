@@ -1,0 +1,30 @@
+PROCEDURE "hc.hph.plugins.bed.db.procedures::fetchVTfromRemoteSource" ( 
+IN remoteSource NVARCHAR(255),
+OUT bedParameters "hc.hph.plugins.bed.db.models::profileParameters.bedParameters"
+)		
+      LANGUAGE SQLSCRIPT		
+      SQL SECURITY DEFINER AS		
+BEGIN	
+
+DECLARE schemaName NVARCHAR(256);		
+DECLARE regionVT NVARCHAR(256);	
+DECLARE chromVT NVARCHAR(256);	
+DECLARE logDetailVT NVARCHAR(256);		
+DECLARE logTraceVT NVARCHAR(256);
+
+CREATE LOCAL TEMPORARY TABLE "#profileParameters_bed" ("schemaName" NVARCHAR(256), "regionVT" NVARCHAR(256), 
+"chromVT" NVARCHAR(256), "logDetailVT" NVARCHAR(256), "logTraceVT" NVARCHAR(256));
+
+select TOP 1 "SCHEMA_NAME" into schemaName from "hc::VIRTUAL_TABLES" where "REMOTE_SOURCE_NAME" = :remoteSource;
+select TOP 1 "TABLE_NAME" into regionVT from "hc::VIRTUAL_TABLES" where "REMOTE_SOURCE_NAME" = :remoteSource and "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_BED_FEATURE';
+select TOP 1 "TABLE_NAME" into chromVT from "hc::VIRTUAL_TABLES" where "REMOTE_SOURCE_NAME" = :remoteSource and "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_BED_CHROMOSOME';
+select TOP 1 "TABLE_NAME" into logDetailVT from "hc::VIRTUAL_TABLES" where "REMOTE_SOURCE_NAME" = :remoteSource and "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_LOG_DETAIL';
+select TOP 1 "TABLE_NAME" into logTraceVT from "hc::VIRTUAL_TABLES" where "REMOTE_SOURCE_NAME" = :remoteSource and "REMOTE_OBJECT_NAME" = 'CDMDEFAULT_VT_LOG_TRACE';
+
+EXEC 'INSERT INTO "#profileParameters_bed"  
+VALUES (''' ||ESCAPE_SINGLE_QUOTES(:schemaName) || ''', ''' ||ESCAPE_SINGLE_QUOTES(:regionVT) || ''', ''' ||ESCAPE_SINGLE_QUOTES(:chromVT) || ''',
+''' ||ESCAPE_SINGLE_QUOTES(:logDetailVT) || ''', ''' ||ESCAPE_SINGLE_QUOTES(:logTraceVT) || ''')';
+
+bedParameters = select * from "#profileParameters_bed";
+
+END;

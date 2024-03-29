@@ -1,0 +1,199 @@
+name: Docker Build & Push
+run-name: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
+
+on: 
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+  push:
+      branches:
+        - develop
+  workflow_dispatch:
+    inputs:
+      repo_name:
+        default: d2e
+        description: Select RepoName
+        required: false
+        type: choice
+        options:
+          - alp-os/d2e
+          - alp-os/dev-afreen-d2e
+          - alp-os/dev-alicia-d2e
+          - alp-os/dev-brandan-d2e
+          - alp-os/dev-brian-d2e
+          - alp-os/dev-hengxian-d2e
+          - alp-os/dev-jerome-d2e
+          - alp-os/dev-khairul-d2e
+          - alp-os/dev-nadirah-d2e
+          - alp-os/dev-nicholas-d2e
+          - alp-os/dev-peter-d2e
+          - alp-os/dev-qiya-d2e
+          - alp-os/dev-ragavan-d2e
+          - alp-os/dev-santan-d2e
+          - alp-os/dev-satish-d2e
+          - alp-os/dev-suwarno-d2e
+          - alp-os/dev-zed-d2e
+      branch_name:
+        default: develop
+        description: Enter BranchName
+        required: true
+        type: string
+
+concurrency: 
+  group: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build
+  cancel-in-progress: true
+
+env:
+  BRANCH_NAME: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
+  REPO_NAME: ${{ github.event.inputs.repo_name || github.event.pull_request.head.repo.name || github.event.repository.name }} # workflow_dispatch || pull_request || push
+  REPO_FULL_NAME: ${{ github.event.inputs.repo_name || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+    - id: setup
+      run: |
+        echo repo_name="${REPO_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+        echo branch_name="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+    outputs:
+      branch_name: ${{ steps.setup.outputs.branch_name }}
+      repo_name: ${{ steps.setup.outputs.repo_name }}
+  run:
+    if: (needs.setup.outputs.branch_name == 'develop' ||  contains('release', needs.setup.outputs.branch_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
+    needs: setup
+    runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.docker_tag.outputs.tag_name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: alp-data-node/analytics-svc
+            directory: ./services/analytics-svc
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/query-gen-svc
+            directory: ./services/query-gen-svc
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/bookmark-svc
+            directory: ./services/bookmark-svc
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/alp-db-svc
+            directory: ./services/alp-db-svc
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/alp-usermgmt
+            directory: ./services/alp-usermgmt
+            context: ./services/alp-usermgmt
+            fileName: Dockerfile
+          - name: alp-data-node/alp-db-credentials
+            directory: ./services/alp-db-credentials
+            context: ./services/alp-db-credentials
+            fileName: Dockerfile
+          - name: alp-data-node/alp-portal-server
+            directory: ./services/alp-portal-server
+            context: ./services/alp-portal-server
+            fileName: Dockerfile
+            platforms: linux/amd64
+          - name: alp-data-node/alp-dataflow
+            directory: ./services/alp-dataflow
+            context: ./services/alp-dataflow
+            fileName: Dockerfile
+            platforms: linux/amd64
+          - name: alp-data-node/alp-pg-mgmt-init
+            directory: ./services/alp-pg-management
+            context: ./services/alp-pg-management
+            fileName: Dockerfile
+          - name: alp-data-node/alp-gateway
+            directory: ./services/alp-gateway
+            context: ./services/alp-gateway
+            fileName: Dockerfile
+          - name: alp-data-node/alp-terminology-svc
+            directory: ./services/alp-terminology-svc
+            context: .
+            fileName: Dockerfile
+            platforms: linux/amd64
+          - name: alp-data-node/alp-dataflow-gen
+            directory: ./services/alp-dataflow-gen
+            context: .
+            fileName: Dockerfile
+            platforms: linux/amd64
+            pull: true
+          - name: alp-data-node/alp-sqleditor
+            directory: ./services/alp-sqleditor
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/mri-pa-config
+            directory: ./services/mri-pa-config
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/mri-pg-config
+            directory: ./services/mri-pg-config
+            context: ./services/mri-pg-config
+            fileName: Dockerfile
+          - name: alp-data-node/mri-cdw-svc
+            directory: ./services/cdw-svc
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/mri-ps-config
+            directory: ./services/ps-config
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/alp-logto
+            directory: ./services/alp-logto
+            context: ./services/alp-logto
+            fileName: Dockerfile
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.BRANCH_NAME }}
+        repository: ${{ env.REPO_FULL_NAME }}
+
+    - name: Login to ACR
+      uses: docker/login-action@v3.1.0
+      with:
+        registry: alpcr.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Get docker tag name
+      id: docker_tag
+      shell: bash
+      run: |
+          if [ $BRANCH_NAME == "develop" ]; then
+            echo "tag_name=develop" | tee -a $GITHUB_OUTPUT
+            echo "is_push=true" | tee -a $GITHUB_OUTPUT
+          elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
+              echo "tag_name=$BRANCH_NAME" | tee -a $GITHUB_OUTPUT
+              echo "is_push=true" | tee -a $GITHUB_OUTPUT
+          else
+              echo "is_push=false" | tee -a $GITHUB_OUTPUT
+              echo "tag_name=$(echo ${{ github.sha }} | cut -c1-8)" | tee -a $GITHUB_OUTPUT
+          fi
+          
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+  
+    - uses: docker/setup-buildx-action@v3.2.0
+      id: builder
+
+    - name: Build and push
+      uses: docker/build-push-action@v5.3.0
+      with:
+        builder: ${{ steps.builder.outputs.name }}
+        platforms: 'linux/amd64'
+        context: ${{ matrix.context }}
+        pull: ${{ matrix.pull || false }}
+        file:  ${{ matrix.directory }}/${{ matrix.fileName }}
+        push: ${{ steps.docker_tag.outputs.is_push }}
+        tags: alpcr.azurecr.io/${{ matrix.name }}:${{ steps.docker_tag.outputs.tag_name }}
+        build-args: |
+          docker_image_prefix=alpcr.azurecr.io
+          GIT_COMMIT_ARG=${{ github.sha }}

@@ -1,0 +1,30 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "hc.hph.collections.db.models::CollectionModel.ParticipantPrivilege",
+            "import_settings": {
+                "import_columns": [
+                    "Id",
+                    "LanguageIsoCode",
+                    "Title",
+                    "Description"
+                ]
+            },
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "hc.hph.collections.db.data_loads::ParticipantPrivilege.csv",
+                "has_header": false,
+                "type_config": {
+                    "delimiter": ";"
+                }
+            },
+            "column_mappings": {
+                "Id": 1,
+                "LanguageIsoCode": 2,
+                "Title": 3,
+                "Description": 4
+            }
+        }
+    ]
+}

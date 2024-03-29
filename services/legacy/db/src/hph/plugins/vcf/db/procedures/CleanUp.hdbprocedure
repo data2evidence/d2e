@@ -1,0 +1,47 @@
+PROCEDURE "hc.hph.plugins.vcf.db.procedures::CleanUp" ( IN DWAuditID INTEGER, OUT document_count INTEGER )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    AS
+BEGIN
+	DECLARE CURSOR relatedAuditIDs
+        FOR SELECT "AuditLogID", "ParentAuditLogID" FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "ParentAuditLogID" = :DWAuditID or "AuditLogID" = :DWAuditID;
+	document_count := 0;
+    FOR relatedAuditID as relatedAuditIDs DO
+		IF relatedAuditID."ParentAuditLogID" IS NULL OR relatedAuditID."ParentAuditLogID" = 0 THEN
+            -- delete from CDW context
+            EXEC 'DELETE FROM "hc.hph.cdw.db.models::DWEntities.Patient_Attr" WHERE "DWAuditID" = ' || :relatedAuditID."AuditLogID";
+            EXEC 'DELETE FROM "hc.hph.cdw.db.models::DWEntities.Patient_Key" WHERE "DWAuditID" = ' || :relatedAuditID."AuditLogID";
+            EXEC 'DELETE FROM "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" WHERE "DWAuditID" = ' || :relatedAuditID."AuditLogID";
+            EXEC 'DELETE FROM "hc.hph.cdw.db.models::DWEntities.Interactions_Key" WHERE "DWAuditID" = ' || :relatedAuditID."AuditLogID";
+            EXEC 'DELETE FROM "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" WHERE "DWAuditID" = ' || :relatedAuditID."AuditLogID";
+            -- delete from Attribute context
+            EXEC 'DELETE FROM "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" WHERE "DWAuditID" = ' || :relatedAuditID."AuditLogID" || ' AND "Active" = 0';
+            EXEC 'DELETE FROM "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAttributes" WHERE "DWAuditID" = ' || :relatedAuditID."AuditLogID" || ' AND "Active" = 0';
+            -- delete from General context
+            EXEC 'DELETE FROM "hc.hph.genomics.db.models::General.Samples" WHERE "DWAuditID" = ' || :relatedAuditID."AuditLogID";
+            EXEC 'DELETE FROM "hc.hph.genomics.db.models::General.Patients" WHERE "DWAuditID" = ' || :relatedAuditID."AuditLogID";
+            -- delete audit log traces
+    		EXEC 'DELETE FROM "hc.hph.di.model::DataIntegration.AuditLogTrace" WHERE "AuditLogID" = ' || relatedAuditID."AuditLogID";
+		ELSE
+		    document_count := :document_count + 1;
+            -- delete from Trace context
+			EXEC 'DELETE FROM "hc.hph.plugins.vcf.db.models::Trace.Progress" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+			EXEC 'DELETE FROM "hc.hph.plugins.vcf.db.models::Trace.ImportResult" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+		    -- delete from SNV context
+			EXEC 'DELETE FROM "hc.hph.genomics.db.models::SNV.Headers" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+			EXEC 'DELETE FROM "hc.hph.genomics.db.models::SNV.Variants" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+			EXEC 'DELETE FROM "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+			EXEC 'DELETE FROM "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+			EXEC 'DELETE FROM "hc.hph.genomics.db.models::SNV.VariantAlleles" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+			EXEC 'DELETE FROM "hc.hph.genomics.db.models::SNV.Genotypes" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+			EXEC 'DELETE FROM "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+			EXEC 'DELETE FROM "hc.hph.genomics.db.models::SNV.GenotypeAlleles" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+			EXEC 'DELETE FROM "hc.hph.genomics.db.models::SNV.Haplotypes" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+			EXEC 'DELETE FROM "hc.hph.genomics.db.models::SNV.VariantAnnotations" WHERE "DWAuditID" = ' || relatedAuditID."AuditLogID";
+            -- delete audit log sub-entries
+    		EXEC 'DELETE FROM "hc.hph.di.model::DataIntegration.AuditLogTrace" WHERE "AuditLogID" = ' || relatedAuditID."AuditLogID";
+    		EXEC 'DELETE FROM "hc.hph.di.model::DataIntegration.AuditLog" WHERE "AuditLogID" = ' || relatedAuditID."AuditLogID";
+        END IF;
+	END FOR;
+	COMMIT;
+END

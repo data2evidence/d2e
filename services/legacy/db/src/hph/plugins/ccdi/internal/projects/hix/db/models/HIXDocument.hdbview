@@ -1,0 +1,76 @@
+VIEW "hc.hph.plugins.ccdi.internal.projects.hix.db.models::HIXDocument" ( "DocumentID", "PatientID", "InteractionID", "DocumentType", "MIMEType", "ValueExt", "BinValue", "IsVoided", "OrgID", "Source", "SourceID" ) AS select
+
+BTYPE."DocumentID" || '-' || BTYPE."Item05" as "DocumentID",
+BPID."Value02" as "PatientID",
+BSRC."Value03" as "InteractionID",
+BKEY."Value05" as "DocumentType",
+BMIME."Value05" as "MIMEType",
+BSTR."Value05" AS "ValueExt",
+BSTR."BinValue05" AS "BinValue",
+INT_IV."Value03" AS "IsVoided",
+ORG."Value04" AS "OrgID",
+ifnull(SYSTYPE."Value05",'<??>') || '-' || ifnull(PRODNAME."Value05",'<??>')  AS "Source",
+DWSRC."SourceID" as "SourceID"
+
+from  "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05Binary" AS BTYPE
+
+INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML04" AS ORG
+on BTYPE."DocumentID" = ORG."DocumentID"   
+AND ORG."Value00" = 'hix_clinical_document' 
+AND ORG."Value01" = 'message_header' 
+AND ORG."Value02" = 'sender' 
+AND ORG."Value03" = 'sender_location_code' 
+   
+INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS SYSTYPE
+on SYSTYPE."DocumentID" = ORG."DocumentID" 
+AND SYSTYPE."Item02" = ORG."Item02" 
+AND SYSTYPE."Value03" = 'system' 
+AND SYSTYPE."Value04" = 'system_type'
+		
+INNER join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05" AS PRODNAME
+on SYSTYPE."DocumentID" = PRODNAME."DocumentID" 
+AND SYSTYPE."Item03" = PRODNAME."Item03" 	
+AND PRODNAME."Value04" = 'product_name'
+
+inner join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05Binary" AS BSTR
+on    BTYPE."DocumentID" = BSTR."DocumentID" 
+and   BTYPE."Item04" = BSTR."Item04" -- same doc and value 
+and   BTYPE."Value01" = 'patient'  
+and   BTYPE."Value02" = 'interaction' 
+and   BTYPE."Value03" = 'interaction_detail'
+and   BTYPE."Value04" = 'value'
+and   BTYPE."Key05" = 'type'  
+and   BTYPE."Value05" = 'BLOB'
+and   BSTR."Key05" = 'text'
+
+inner join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05Binary" AS BPID
+on    BTYPE."DocumentID" = BPID."DocumentID" 
+and   BTYPE."Item01" = BPID."Item01" -- same doc and patient 
+and   BPID."Value01" = 'patient'
+and   BPID."Key02" = 'pid'  
+
+inner join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05Binary" AS BSRC
+on    BTYPE."DocumentID" = BSRC."DocumentID" 
+and   BTYPE."Item02" = BSRC."Item02" -- same doc and interaction 
+and   BSRC."Value02" = 'interaction'
+and   BSRC."Key03" = 'src_pkid'  
+
+inner join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05Binary" AS BKEY
+on    BTYPE."DocumentID" = BKEY."DocumentID" 
+and   BTYPE."Item03" = BKEY."Item03" -- same doc and interaction_detail 
+and   BKEY."Value03" = 'interaction_detail'
+and   BKEY."Value04" = 'key'
+and   BKEY."Key05" = 'text'
+
+left join "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05Binary" AS BMIME
+on    BTYPE."DocumentID" = BMIME."DocumentID" 
+and   BTYPE."Item04" = BMIME."Item04" -- same doc and value 
+and   BMIME."Key05" = 'mime_type'  
+
+LEFT JOIN "hc.hph.plugins.ccdi.internal.projects.hix.db.models::FlattenXML05Binary" INT_IV
+ON BSTR."DocumentID" = INT_IV."DocumentID"
+AND BSTR."Item02" = INT_IV."Item02"  -- same interaction
+AND INT_IV."Key03" = 'isvoided'
+
+LEFT JOIN "hc.hph.di.model::DataIntegration.DISource" DWSRC
+ON DWSRC."Name" = ORG."Value04" || '::' || SYSTYPE."Value05" || '-' || PRODNAME."Value05" WITH READ ONLY

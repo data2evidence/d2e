@@ -1,0 +1,1159 @@
+User;Application;Rank;Created;LastUpdated;Configuration
+;hc.mri.pa;0;;;'{
+  "trackConfig": [
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.overview.TrackGroup",
+          "properties": {
+            "titlePrefix": "{i18n>MRI_PA_VB_CHART_GENE_VARIANTS}",
+            "pluginId": "vb.TrackGroups.getSessionGroups",
+            "trackHeight": 25,
+            "minTrackHeight": 8,
+            "maxHeight": 80,
+            "maxCount": 10,
+            "parameters": {
+              "dataset": "session"
+            },
+            "colors": "{settingsModel>/colorPalette}"
+          },
+          "aggrName": "overviewTracks",
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.overview.GeneVariantTrack",
+              "properties": {
+                "initPlugin": "vb.GeneVariantTrack.getGeneVariantsOverview"
+              },
+              "aggrName": "templateTrack"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.ReferenceTrack",
+          "properties": {
+            "name": "{i18n>MRI_PA_VB_CHART_REFERENCE}",
+            "initPlugin": "vb.ReferenceTrack.init",
+            "dataPlugin": "vb.ReferenceTrack.fullReload",
+            "color": "#009de0"
+          },
+          "aggrName": "chromosomeTracks"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.TrackGroup",
+          "properties": {
+            "titlePrefix": "{i18n>MRI_PA_VB_CHART_GENE_VARIANTS}",
+            "pluginId": "vb.TrackGroups.getSessionGroups",
+            "parameters": {
+              "dataset": "session"
+            },
+            "colors": "{settingsModel>/colorPalette}",
+            "trackHeight": 50,
+            "minTrackHeight": 20,
+            "maxHeight": 550,
+            "maxCount": 10
+          },
+          "aggrName": "chromosomeTracks",
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.GeneVariantTrack",
+              "properties": {
+                "initPlugin": "vb.GeneVariantTrack.init",
+                "dataPlugin": "vb.GeneVariantTrack.fullReload"
+              },
+              "aggrName": "templateTrack"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.TrackGroup",
+          "properties": {
+            "titlePrefix": "{i18n>MRI_PA_VB_CHART_QUALITATIVE_DATA}",
+            "pluginId": "vb.TrackGroups.getSessionGroups",
+            "parameters": {
+              "dataset": "session"
+            },
+            "colors": "{settingsModel>/colorPalette}",
+            "trackHeight": 50,
+            "minTrackHeight": 50,
+            "maxHeight": 550,
+            "maxCount": 10
+          },
+          "aggrName": "chromosomeTracks",
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.QualitativeTrack",
+              "properties": {
+                "initPlugin": "vb.QualitativeTrack.init",
+                "binSize": 15,
+                "height": 100
+              },
+              "aggrName": "templateTrack"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.FeatureTrack",
+          "properties": {
+            "initPlugin": "vb.FeatureTrack.init",
+            "color": "#007f0e",
+            "name": "{i18n>MRI_PA_VB_CHART_GENES}",
+            "height": 100,
+            "classes": "gene"
+          },
+          "aggrName": "chromosomeTracks"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.TranslationTrack",
+          "properties": {
+            "dataPlugin": "vb.TranslationTrack.fullReload",
+            "color": "#ff7f0e",
+            "name": "{i18n>MRI_PA_VB_CHART_TRANSLATIONS}"
+          },
+          "aggrName": "chromosomeTracks"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.site.Section",
+          "properties": {
+            "key": "alleles",
+            "title": "{i18n.vb>common.Alleles}"
+          },
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.site.AllelesSectionTrack",
+              "properties": {
+                "pluginId": "vb.SiteTracks.getAlleles",
+                "alleles": "{result/alleles}",
+                "error": "{error}"
+              },
+              "control": [
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.CohortStatsDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.GroupStatistics.getAlleleStats",
+                    "dataPlugin": "vb.TrackGroups.getSessionGroups",
+                    "statistics": "{statistics}"
+                  },
+                  "aggrName": "tracks"
+                },
+			    {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkListDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getAlleleDetails"
+                  },
+                  "control": [
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{ids}",
+                        "pattern": "^rs([0-9]+)$",
+                        "text": "dbSNP (\\\\0)",
+                        "href": "https://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=\\\\1"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{transcriptAnnotations}",
+                        "pattern": "^(NM_[^:\\\\(]*)(\\\\(.*\\\\))?:(c\\\\..*)$",
+                        "text": "ClinVar (\\\\1:\\\\3)",
+                        "href":  "https://www.ncbi.nlm.nih.gov/clinvar/?term=\\\\1%3A\\\\3"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{ids}",
+                        "pattern": "^COSM([0-9]+)$",
+                        "text": "COSMIC (\\\\0)",
+                        "href": "http://cancer.sanger.ac.uk/cosmic/mutation/overview?id=\\\\1"
+                        },
+                        "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{transcriptAnnotations}",
+                        "pattern": "^(NM_[^:\\\\(]*)\\\\((.*)\\\\):(c\\\\..*)$",
+                        "text": "COSMIC (\\\\2:\\\\3)",
+                        "href": "http://cancer.sanger.ac.uk/cosmic/search?q=\\\\2%3A\\\\3"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{transcriptAnnotations}",
+                        "pattern": "^(NM_.*)(\\\\(.*\\\\))?:(c\\\\..*)$",
+                        "text": "Mutalyzer (\\\\0)",
+                        "href": "https://mutalyzer.nl/name-checker?description=\\\\1%3A\\\\3"
+                        },
+                        "aggrName": "generators"
+                        }
+                    ],
+                    "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.ButtonDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getAlleleLocations",
+                    "icon": "sap-icon://add-filter",
+                    "text": "{i18n>MRI_PA_VB_ADD_FILTER}",
+                    "width": "100%",
+                    "payload": "{location}"
+                  },
+                  "events": {
+                    "press": "onAlleleFilter"
+                  },
+                  "aggrName": "tracks"
+                }
+              ],
+              "aggrName": "tracks"
+            }
+          ],
+          "aggrName": "siteSections"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.site.Section",
+          "properties": {
+            "key": "genes",
+            "title": "{i18n.vb>common.Genes}"
+          },
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.site.GenesSectionTrack",
+              "properties": {
+                "pluginId": "vb.SiteTracks.getGenes",
+                "genes": "{result/genes}",
+                "error": "{error}"
+              },
+              "control": [
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.CohortStatsDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.GroupStatistics.getGeneStats",
+                    "dataPlugin": "vb.TrackGroups.getSessionGroups",
+                    "statistics": "{statistics}"
+                  },
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.GeneDescriptionDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getGeneDescriptions",
+                    "description": "{description}"
+                  },
+                  "aggrName": "tracks"
+                },
+				 {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkListDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getGeneNames"
+                  },
+                 "control": [
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "Ensembl (\\\\0)",
+                        "href": "http://www.ensembl.org/Human/Search/Results?q=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "NCBI (\\\\0)",
+                        "href": "https://www.ncbi.nlm.nih.gov/gene/?term=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "ClinVar (\\\\0)",
+                        "href":  "https://www.ncbi.nlm.nih.gov/clinvar/?term=\\\\0%5Bgene%5D"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "COSMIC (\\\\0)",
+                        "href": "http://cancer.sanger.ac.uk/cosmic/gene/analysis?ln=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "Proteomics (\\\\0)",
+                        "href": "https://www.proteomicsdb.org/proteomicsdb/#human/search/query?protein_name=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    }
+                  ],
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.ButtonDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getGeneNames",
+                    "icon": "sap-icon://add-filter",
+                    "text": "{i18n>MRI_PA_VB_ADD_FILTER}",
+                    "width": "100%",
+                    "payload": "{name}"
+                  },
+                  "events": {
+                    "press": "onGeneFilter"
+                  },
+                  "aggrName": "tracks"
+                }
+              ],
+              "aggrName": "tracks"
+            }
+          ],
+          "aggrName": "siteSections"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.site.Section",
+          "properties": {
+            "key": "samples",
+            "title": "{i18n.vb>common.Samples}",
+            "lazyLoading": true
+          },
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.site.SamplesSectionTrack",
+              "properties": {
+                "pluginId": "vb.SampleSiteTracks.getSamples",
+                "splitPlugin": "vb.TrackGroups.getSessionGroups",
+                "sampleGroups": "{result/sampleGroups}",
+                "warning": "{result/warning}",
+                "error": "{error}"
+              },
+              "control": [
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.AttributesDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SampleSiteTracks.getSampleAttributes",
+                    "title": "{i18n.vb>siteTrack.SampleAttributes}",
+                    "attributes": "{sampleAttributes}",
+                    "sectionField": "allele",
+                    "sectionTitle": "siteTrack.AlleleSection",
+                    "attributePrefix": "siteTrack.SampleAttribute"
+                  },
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.AttributesDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SampleSiteTracks.getVariantAttributes",
+                    "title": "{i18n.vb>siteTrack.VariantAttributes}",
+                    "attributes": "{variantAttributes}",
+                    "sectionField": "allele",
+                    "sectionTitle": "siteTrack.AlleleSection",
+                    "attributePrefix": "siteTrack.VariantAttribute"
+                  },
+                  "aggrName": "tracks"
+                }
+              ],
+              "aggrName": "tracks"
+            }
+          ],
+          "aggrName": "siteSections"
+        }
+      ]
+    }
+  ]
+}'
+;hc.hph.plugins.psvb;0;;;'{
+  "trackConfig": [
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.overview.TrackGroup",
+          "properties": {
+            "titlePrefix": "{i18n>PSVB_VB_VARIANT_DENSITY}",
+            "pluginId": "vb.TrackGroups.getSessionGroups",
+            "colors": [
+              "green"
+            ],
+            "trackHeight": 20,
+            "minTrackHeight": 5,
+            "maxHeight": 50,
+            "maxCount": 5
+          },
+          "aggrName": "overviewTracks",
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.overview.VariantDensityTrack",
+              "properties": {
+                "initPlugin": "vb.VariantTrack.getGenomeVariantDensity"
+              },
+              "aggrName": "templateTrack"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.ReferenceTrack",
+          "properties": {
+            "name": "{i18n>PSVB_VB_REFERENCE}",
+            "initPlugin": "vb.ReferenceTrack.init",
+            "dataPlugin": "vb.ReferenceTrack.fullReload",
+            "color": "#009de0"
+          },
+          "aggrName": "chromosomeTracks"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.TrackGroup",
+          "properties": {
+            "titlePrefix": "{i18n>PSVB_VB_VARIANT_DENSITY}",
+            "pluginId": "vb.TrackGroups.getSessionGroups",
+            "colors": [
+              "#FF530D"
+            ],
+            "trackHeight": 50,
+            "minTrackHeight": 20,
+            "maxHeight": 350,
+            "maxCount": 5
+          },
+          "aggrName": "chromosomeTracks",
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.VariantTrack",
+              "properties": {
+                "initPlugin": "vb.VariantTrack.init",
+                "dataPlugin": "vb.VariantTrack.fullReload"
+              },
+              "aggrName": "templateTrack"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.TrackGroup",
+          "properties": {
+            "titlePrefix": "{i18n>PSVB_VB_CHART_QUALITATIVE_DATA}",
+            "pluginId": "vb.TrackGroups.getSessionGroups",
+            "colors": "#996633",
+            "trackHeight": 50,
+            "minTrackHeight": 20,
+            "maxHeight": 350,
+            "maxCount": 5
+          },
+          "aggrName": "chromosomeTracks",
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.QualitativeTrack",
+              "properties": {
+                "initPlugin": "vb.QualitativeTrack.init",
+                "binSize": 15
+              },
+              "aggrName": "templateTrack"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.FeatureTrack",
+          "properties": {
+            "initPlugin": "vb.FeatureTrack.init",
+            "color": "#007f0e",
+            "name": "{i18n>PSVB_VB_GENES}",
+            "height": 100,
+            "classes": "gene"
+          },
+          "aggrName": "chromosomeTracks"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.TranslationTrack",
+          "properties": {
+            "dataPlugin": "vb.TranslationTrack.fullReload",
+            "color": "#ff7f0e",
+            "name": "{i18n>PSVB_VB_TRANSLATIONS}"
+          },
+          "aggrName": "chromosomeTracks"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.site.Section",
+          "properties": {
+            "key": "alleles",
+            "title": "{i18n.vb>common.Alleles}"
+          },
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.site.AllelesSectionTrack",
+              "properties": {
+                "pluginId": "vb.SiteTracks.getAlleles",
+                "alleles": "{result/alleles}",
+                "error": "{error}"
+              },
+              "control": [
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.CohortStatsDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.GroupStatistics.getAlleleStats",
+                    "dataPlugin": "vb.TrackGroups.getSessionGroups",
+                    "statistics": "{statistics}"
+                  },
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkListDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getAlleleDetails"
+                  },
+                  "control": [
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{ids}",
+                        "pattern": "^rs([0-9]+)$",
+                        "text": "dbSNP (\\\\0)",
+                        "href": "https://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=\\\\1"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{transcriptAnnotations}",
+                        "pattern": "^(NM_[^:\\\\(]*)(\\\\(.*\\\\))?:(c\\\\..*)$",
+                        "text": "ClinVar (\\\\1:\\\\3)",
+                        "href":  "https://www.ncbi.nlm.nih.gov/clinvar/?term=\\\\1%3A\\\\3"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{ids}",
+                        "pattern": "^COSM([0-9]+)$",
+                        "text": "COSMIC (\\\\0)",
+                        "href": "http://cancer.sanger.ac.uk/cosmic/mutation/overview?id=\\\\1"
+                        },
+                        "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{transcriptAnnotations}",
+                        "pattern": "^(NM_[^:\\\\(]*)\\\\((.*)\\\\):(c\\\\..*)$",
+                        "text": "COSMIC (\\\\2:\\\\3)",
+                        "href": "http://cancer.sanger.ac.uk/cosmic/search?q=\\\\2%3A\\\\3"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{transcriptAnnotations}",
+                        "pattern": "^(NM_.*)(\\\\(.*\\\\))?:(c\\\\..*)$",
+                        "text": "Mutalyzer (\\\\0)",
+                        "href": "https://mutalyzer.nl/name-checker?description=\\\\1%3A\\\\3"
+                        },
+                        "aggrName": "generators"
+                        }
+                    ],
+                    "aggrName": "tracks"
+                }
+              ],
+              "aggrName": "tracks"
+            }
+          ],
+          "aggrName": "siteSections"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.site.Section",
+          "properties": {
+            "key": "genes",
+            "title": "{i18n.vb>common.Genes}"
+          },
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.site.GenesSectionTrack",
+              "properties": {
+                "pluginId": "vb.SiteTracks.getGenes",
+                "genes": "{result/genes}",
+                "error": "{error}"
+              },
+              "control": [
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.CohortStatsDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.GroupStatistics.getGeneStats",
+                    "dataPlugin": "vb.TrackGroups.getSessionGroups",
+                    "statistics": "{statistics}"
+                  },
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.GeneDescriptionDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getGeneDescriptions",
+                    "description": "{description}"
+                  },
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkListDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getGeneNames"
+                  },
+                 "control": [
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "Ensembl (\\\\0)",
+                        "href": "http://www.ensembl.org/Human/Search/Results?q=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "NCBI (\\\\0)",
+                        "href": "https://www.ncbi.nlm.nih.gov/gene/?term=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "ClinVar (\\\\0)",
+                        "href":  "https://www.ncbi.nlm.nih.gov/clinvar/?term=\\\\0%5Bgene%5D"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "COSMIC (\\\\0)",
+                        "href": "http://cancer.sanger.ac.uk/cosmic/gene/analysis?ln=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "Proteomics (\\\\0)",
+                        "href": "https://www.proteomicsdb.org/proteomicsdb/#human/search/query?protein_name=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    }
+                  ],
+                  "aggrName": "tracks"
+                }
+              ],
+              "aggrName": "tracks"
+            }
+          ],
+          "aggrName": "siteSections"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.site.Section",
+          "properties": {
+            "key": "samples",
+            "title": "{i18n.vb>common.Samples}",
+            "lazyLoading": false
+          },
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.site.SamplesSectionTrack",
+              "properties": {
+                "pluginId": "vb.SampleSiteTracks.getSamples",
+                "splitPlugin": "vb.TrackGroups.getSessionGroups",
+                "sampleGroups": "{result/sampleGroups}",
+                "warning": "{result/warning}",
+                "error": "{error}"
+              },
+              "control": [
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.AttributesDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SampleSiteTracks.getSampleAttributes",
+                    "title": "{i18n.vb>siteTrack.SampleAttributes}",
+                    "attributes": "{sampleAttributes}",
+                    "sectionField": "allele",
+                    "sectionTitle": "siteTrack.AlleleSection",
+                    "attributePrefix": "siteTrack.SampleAttribute"
+                  },
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.AttributesDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SampleSiteTracks.getVariantAttributes",
+                    "title": "{i18n.vb>siteTrack.VariantAttributes}",
+                    "attributes": "{variantAttributes}",
+                    "sectionField": "allele",
+                    "sectionTitle": "siteTrack.AlleleSection",
+                    "attributePrefix": "siteTrack.VariantAttribute"
+                  },
+                  "aggrName": "tracks"
+                }
+              ],
+              "aggrName": "tracks"
+            }
+          ],
+          "aggrName": "siteSections"
+        }
+      ]
+    }
+  ]
+}'
+;hc.hph.plugins.psvbAll;0;;;'{
+  "trackConfig": [
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.overview.TrackGroup",
+          "properties": {
+            "titlePrefix": "{i18n>PSVB_ALL_VB_VARIANT_DENSITY}",
+            "pluginId": "vb.TrackGroups.getSessionSamples",
+            "colors": [
+              "green"
+            ],
+            "trackHeight": 20,
+            "minTrackHeight": 5,
+            "maxHeight": 50,
+            "maxCount": 5
+          },
+          "aggrName": "overviewTracks",
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.overview.VariantDensityTrack",
+              "properties": {
+                "initPlugin": "vb.VariantTrack.getGenomeVariantDensity"
+              },
+              "aggrName": "templateTrack"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.ReferenceTrack",
+          "properties": {
+            "name": "{i18n>PSVB_ALL_VB_REFERENCE}",
+            "initPlugin": "vb.ReferenceTrack.init",
+            "dataPlugin": "vb.ReferenceTrack.fullReload",
+            "color": "#009de0"
+          },
+          "aggrName": "chromosomeTracks"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.TrackGroup",
+          "properties": {
+            "titlePrefix": "{i18n>PSVB_ALL_VB_VARIANT_DENSITY}",
+            "pluginId": "vb.TrackGroups.getSessionSamples",
+            "colors": [
+              "#FF530D"
+            ],
+            "trackHeight": 50,
+            "minTrackHeight": 20,
+            "maxHeight": 350,
+            "maxCount": 5
+          },
+          "aggrName": "chromosomeTracks",
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.VariantTrack",
+              "properties": {
+                "initPlugin": "vb.VariantTrack.init",
+                "dataPlugin": "vb.VariantTrack.fullReload"
+              },
+              "aggrName": "templateTrack"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.TrackGroup",
+          "properties": {
+            "titlePrefix": "{i18n>PSVB_ALL_VB_VARIANT_DENSITY}",
+            "pluginId": "vb.TrackGroups.getSessionSamples",
+            "colors": "#996633",
+            "trackHeight": 50,
+            "minTrackHeight": 20,
+            "maxHeight": 350,
+            "maxCount": 5
+          },
+          "aggrName": "chromosomeTracks",
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.QualitativeTrack",
+              "properties": {
+                "initPlugin": "vb.QualitativeTrack.init",
+                "binSize": 15
+              },
+              "aggrName": "templateTrack"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.FeatureTrack",
+          "properties": {
+            "initPlugin": "vb.FeatureTrack.init",
+            "color": "#007f0e",
+            "name": "{i18n>PSVB_ALL_VB_GENES}",
+            "height": 100,
+            "classes": "gene"
+          },
+          "aggrName": "chromosomeTracks"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.chromosome.TranslationTrack",
+          "properties": {
+            "dataPlugin": "vb.TranslationTrack.fullReload",
+            "color": "#ff7f0e",
+            "name": "{i18n>PSVB_ALL_VB_TRANSLATIONS}"
+          },
+          "aggrName": "chromosomeTracks"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.site.Section",
+          "properties": {
+            "key": "alleles",
+            "title": "{i18n.vb>common.Alleles}"
+          },
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.site.AllelesSectionTrack",
+              "properties": {
+                "pluginId": "vb.SiteTracks.getAlleles",
+                "alleles": "{result/alleles}",
+                "error": "{error}"
+              },
+              "control": [
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.CohortStatsDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.GroupStatistics.getAlleleStats",
+                    "dataPlugin": "vb.TrackGroups.getSessionSamples",
+                    "statistics": "{statistics}"
+                  },
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkListDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getAlleleDetails"
+                  },
+                  "control": [
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{ids}",
+                        "pattern": "^rs([0-9]+)$",
+                        "text": "dbSNP (\\\\0)",
+                        "href": "https://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=\\\\1"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{transcriptAnnotations}",
+                        "pattern": "^(NM_[^:\\\\(]*)(\\\\(.*\\\\))?:(c\\\\..*)$",
+                        "text": "ClinVar (\\\\1:\\\\3)",
+                        "href":  "https://www.ncbi.nlm.nih.gov/clinvar/?term=\\\\1%3A\\\\3"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{ids}",
+                        "pattern": "^COSM([0-9]+)$",
+                        "text": "COSMIC (\\\\0)",
+                        "href": "http://cancer.sanger.ac.uk/cosmic/mutation/overview?id=\\\\1"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{transcriptAnnotations}",
+                        "pattern": "^(NM_[^:\\\\(]*)\\\\((.*)\\\\):(c\\\\..*)$",
+                        "text": "COSMIC (\\\\2:\\\\3)",
+                        "href": "http://cancer.sanger.ac.uk/cosmic/search?q=\\\\2%3A\\\\3"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{transcriptAnnotations}",
+                        "pattern": "^(NM_.*)(\\\\(.*\\\\))?:(c\\\\..*)$",
+                        "text": "Mutalyzer (\\\\0)",
+                        "href": "https://mutalyzer.nl/name-checker?description=\\\\1%3A\\\\3"
+                        },
+                        "aggrName": "generators"
+                        }
+                    ],
+                    "aggrName": "tracks"
+                }
+              ],
+              "aggrName": "tracks"
+            }
+          ],
+          "aggrName": "siteSections"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.site.Section",
+          "properties": {
+            "key": "genes",
+            "title": "{i18n.vb>common.Genes}"
+          },
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.site.GenesSectionTrack",
+              "properties": {
+                "pluginId": "vb.SiteTracks.getGenes",
+                "genes": "{result/genes}",
+                "error": "{error}"
+              },
+              "control": [
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.CohortStatsDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.GroupStatistics.getGeneStats",
+                    "dataPlugin": "vb.TrackGroups.getSessionSamples",
+                    "statistics": "{statistics}"
+                  },
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.GeneDescriptionDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getGeneDescriptions",
+                    "description": "{description}"
+                  },
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkListDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SiteTracks.getGeneNames"
+                  },
+                 "control": [
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "Ensembl (\\\\0)",
+                        "href": "http://www.ensembl.org/Human/Search/Results?q=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "NCBI (\\\\0)",
+                        "href": "https://www.ncbi.nlm.nih.gov/gene/?term=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "ClinVar (\\\\0)",
+                        "href":  "https://www.ncbi.nlm.nih.gov/clinvar/?term=\\\\0%5Bgene%5D"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "COSMIC (\\\\0)",
+                        "href": "http://cancer.sanger.ac.uk/cosmic/gene/analysis?ln=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    },
+                    {
+                      "controlName": "hc.hph.genomics.ui.lib.vb.site.LinkGenerator",
+                      "properties": {
+                        "source": "{name}",
+                        "text": "Proteomics (\\\\0)",
+                        "href": "https://www.proteomicsdb.org/proteomicsdb/#human/search/query?protein_name=\\\\0"
+                      },
+                      "aggrName": "generators"
+                    }
+                  ],
+                  "aggrName": "tracks"
+                }
+              ],
+              "aggrName": "tracks"
+            }
+          ],
+          "aggrName": "siteSections"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "hc.hph.genomics.ui.lib.vb.site.Section",
+          "properties": {
+            "key": "samples",
+            "title": "{i18n.vb>common.Samples}",
+            "lazyLoading": false
+          },
+          "control": [
+            {
+              "controlName": "hc.hph.genomics.ui.lib.vb.site.SamplesSectionTrack",
+              "properties": {
+                "pluginId": "vb.SampleSiteTracks.getSamples",
+                "splitPlugin": "vb.TrackGroups.getSessionSamples",
+                "sampleGroups": "{result/sampleGroups}",
+                "warning": "{result/warning}",
+                "error": "{error}"
+              },
+              "control": [
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.AttributesDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SampleSiteTracks.getSampleAttributes",
+                    "title": "{i18n.vb>siteTrack.SampleAttributes}",
+                    "attributes": "{sampleAttributes}",
+                    "sectionField": "allele",
+                    "sectionTitle": "siteTrack.AlleleSection",
+                    "attributePrefix": "siteTrack.SampleAttribute"
+                  },
+                  "aggrName": "tracks"
+                },
+                {
+                  "controlName": "hc.hph.genomics.ui.lib.vb.site.AttributesDetailsTrack",
+                  "properties": {
+                    "pluginId": "vb.SampleSiteTracks.getVariantAttributes",
+                    "title": "{i18n.vb>siteTrack.VariantAttributes}",
+                    "attributes": "{variantAttributes}",
+                    "sectionField": "allele",
+                    "sectionTitle": "siteTrack.AlleleSection",
+                    "attributePrefix": "siteTrack.VariantAttribute"
+                  },
+                  "aggrName": "tracks"
+                }
+              ],
+              "aggrName": "tracks"
+            }
+          ],
+          "aggrName": "siteSections"
+        }
+      ]
+    },
+    {
+      "control": [
+        {
+          "controlName": "m.FlexItemData",
+          "aggrName": "layoutData",
+          "properties": {
+            "growFactor": 1
+          }
+        }
+      ]
+    }
+  ]
+}'

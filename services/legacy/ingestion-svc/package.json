@@ -1,0 +1,44 @@
+{
+  "name": "alp-ingestion-svc",
+  "version": "0.1.0",
+  "description": "Handle data ingestion",
+  "main": "target/app.js",
+  "scripts": {
+    "start": "node target/app.js",
+    "dev": "tsnd --respawn --transpile-only src/app.ts",
+    "compile": "tsc",
+    "buildstart": "tsc && node target/app.js",
+    "test": "NODE_ENV=TEST jest --runInBand --verbose"
+  },
+  "keywords": [],
+  "author": "D4L",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/async": "^3.2.3",
+    "@types/express": "^4.17.13",
+    "@types/jest": "^29.2.4",
+    "@types/node": "18.19.18",
+    "@types/passport": "^1.0.4",
+    "@types/passport-azure-ad": "^4.0.7",
+    "jest": "^29.3.1",
+    "supertest": "^6.3.3",
+    "ts-node-dev": "^1.1.6",
+    "tslint": "^5.12.1",
+    "typescript": "4.4.4"
+  },
+  "dependencies": {
+    "@godaddy/terminus": "^4.4.1",
+    "async": "^3.2.1",
+    "client-swift": "^0.1.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.6.1",
+    "multer": "^1.4.4",
+    "passport": "^0.4.1",
+    "passport-azure-ad": "^4.3.0",
+    "pg": "^8.7.1",
+    "pg-promise": "^10.11.0",
+    "ts-jest": "^29.0.3",
+    "winston": "^3.3.3"
+  }
+}

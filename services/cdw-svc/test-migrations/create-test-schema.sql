@@ -1,0 +1,1 @@
+CREATE schema cdw_test_schema;
