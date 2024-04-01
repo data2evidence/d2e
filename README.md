@@ -43,7 +43,7 @@ notes:
 ```
 yarn start:minerva --wait; sleep 60
 ```
-- if issues see: [troubleshooting.md](docs/troubleshooting)
+- if issues see: [troubleshooting.md](docs/troubleshooting/README.md)
 
 ## Data Load
 - see: [2-load](docs/2-load)
