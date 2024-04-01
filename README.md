@@ -7,8 +7,8 @@ see: [1-install](docs/1-setup)
 - yarn
 - openssl
 
-## Clone this git repository
-- see: [cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
+## Clone repository
+- see: [Cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 
 ## Build
 - standard build
@@ -34,8 +34,7 @@ yarn start:ui --wait
 ```
 notes:
 - invokes docker compose up
-- defaults to develop branch image
-- detects branch if ui repo directory is `../d2e-ui`
+- detects `../d2e-ui` branch or defaults to develop branch
 
 ## (Re)Start App
 - docker compose up - approx 5 minutes
