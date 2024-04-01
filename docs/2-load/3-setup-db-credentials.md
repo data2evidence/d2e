@@ -5,6 +5,7 @@
 - Login as the new admin user
 - Select **Admin** view in dropdown view on top left
 - Select **Setup** on top right
+  - URL is now https://localhost:41100/portal/systemadmin/setup
 - Select **Databases** **Configure** button
 - Select **Add database**
 - Add the values from the table/image:
@@ -24,8 +25,8 @@ Read password | ********* | `@`
 
 notes:
 - `*` - schema/usernames are the values expected for sample data load steps - do not change 
-- `@` - passwords are required for the sample data load steps - make a secure note of these secrets
-- sample data load are the next steps
+- `@` - create a random password
+- make a secure note of these secrets as they are required for the sample data load steps
   - [load-synpuf1k](5-load-synpuf1k.md)
   - [load-vocabd](6-load-vocab.md)
 
