@@ -8,25 +8,24 @@ on:
         type: choice
         required: true
         description: Select a repo
-        default: d2e
         options:
           - d2e
-          - dev-afreen-d2e
-          - dev-alicia-d2e
-          - dev-brandan-d2e
-          - dev-brian-d2e
-          - dev-hengxian-d2e
-          - dev-jerome-d2e
-          - dev-khairul-d2e
-          - dev-nadirah-d2e
-          - dev-nicholas-d2e
-          - dev-peter-d2e
-          - dev-qiya-d2e
-          - dev-ragavan-d2e
-          - dev-santan-d2e
-          - dev-satish-d2e
-          - dev-suwarno-d2e
-          - dev-zed-d2e
+          - d2e-dev-afreen
+          - d2e-dev-alicia
+          - d2e-dev-brandan
+          - d2e-dev-brian
+          - d2e-dev-hengxian
+          - d2e-dev-jerome
+          - d2e-dev-karthik
+          - d2e-dev-khairul
+          - d2e-dev-nadirah
+          - d2e-dev-nicholas
+          - d2e-dev-peter
+          - d2e-dev-qiya
+          - d2e-dev-ragavan
+          - d2e-dev-santan
+          - d2e-dev-satish
+          - d2e-dev-suwarno
       env:
         type: environment
         description: Select the environment
@@ -80,7 +79,8 @@ jobs:
       with:
         clean: false
         repository: ${{ github.repository_owner }}/${{ github.event.inputs.repo }}
-        token: ${{ github.event.inputs.repo == 'd2e' && secrets.GITHUB_TOKEN || secrets.CI_PAT }}
+        token: ${{ secrets.CI_PAT }}
+        # token: ${{ github.event.inputs.repo == 'd2e' && secrets.GITHUB_TOKEN || secrets.CI_PAT }}
         ref: ${{ env.DOCKER_TAG_NAME }}
 
     - shell: bash
