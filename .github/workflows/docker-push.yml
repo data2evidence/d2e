@@ -34,7 +34,7 @@ on:
           - alp-os/dev-zed-d2e
       branch_name:
         default: develop
-        description: Enter BranchName
+        description: Enter BranchName / Release Tag Name
         required: true
         type: string
 
@@ -154,6 +154,7 @@ jobs:
       with:
         ref: ${{ env.BRANCH_NAME }}
         repository: ${{ env.REPO_FULL_NAME }}
+        token: ${{ secrets.CI_PAT }}
 
     - name: Login to ACR
       uses: docker/login-action@v3.1.0

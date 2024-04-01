@@ -8,14 +8,20 @@ on:
 
   workflow_dispatch:
     inputs:
+      docker_tag_name:
+        default: develop
+        description: Enter BranchName / Release Tag Name
+        required: true
+        type: string
       env:
         type: environment
         description: Select the environment
         required: true
         default: alp-dev-sg-2
+      
 
 env:
-  DOCKER_TAG_NAME: develop
+  DOCKER_TAG_NAME: ${{ github.event.inputs.docker_tag_name }}
   ENV_NAME: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
   ENV_TYPE: remote
 
