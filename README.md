@@ -10,11 +10,14 @@ see: [1-install](docs/1-setup)
 ## Clone repository
 - see: [Cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 
-# Authenticate to private docker registry
+## Authenticate to private docker registry
 - Request credentials from D2E support
 ```
 docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 ```
+
+## Troubleshooting
+- see: [troubleshooting](docs/troubleshooting/README.md)
 
 ## Generate dotenv
 - see: [README-vars.md](docs/README-vars.md)
@@ -43,7 +46,6 @@ notes:
 ```
 yarn start:minerva --wait; sleep 60
 ```
-- if issues see: [troubleshooting.md](docs/troubleshooting/README.md)
 
 ## Data Load
 - see: [2-load](docs/2-load)
