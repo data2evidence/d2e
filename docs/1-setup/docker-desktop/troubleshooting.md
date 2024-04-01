@@ -16,7 +16,7 @@ info Visit https://yarnpkg.com/en/docs/cli/run for
 - Open Settings>General
 - Uncheck **Use Virtualization framework** & select **gRPC FUSE**
 
-> ![Docker-Desktop-disable-Virtualization-framework](../images/Docker-Desktop-disable-Virtualization-framework.png)
+> ![Docker-Desktop-disable-Virtualization-framework](./../images/Docker-Desktop-disable-Virtualization-framework.png)
 
 ## Latest Docker Compose DNS lookup fails with multiple networks
 - dataflowgen-agent is on a separate network named `data` for security

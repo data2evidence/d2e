@@ -1,10 +1,11 @@
 # Analytics Platform (ALP)
 
 ## Install pre-requisites
-see: [1-install](docs/1-install)
+see: [1-install](docs/1-setup)
 - docker
 - nodejs
 - yarn
+- openssl
 
 ## Clone this git repository
 - see: [cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
