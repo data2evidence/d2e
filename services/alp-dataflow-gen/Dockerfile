@@ -1,4 +1,4 @@
-FROM alpcr.azurecr.io/alp-dataflow-gen-base:v0.2-alpha as dbsvc-build
+FROM alpcr.azurecr.io/alp-dataflow-gen-base:develop as dbsvc-build
 
 # Install node and yarn
 RUN mkdir -p /usr/local/node
