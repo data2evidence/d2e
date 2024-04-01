@@ -26,10 +26,10 @@ export class DbMeta {
         from information_schema.columns 
         where table_schema = ?::text AND TABLE_NAME = ?::text 
         UNION 
-        SELECT attname as \"COLUMN_NAME\" 
-        from pg_attribute 
-        WHERE  attrelid = concat(?::text, '."', ?::text, '"') 
-        ORDER BY \"COLUMN_NAME\"`
+        SELECT column_name as \"COLUMN_NAME\" 
+        from duckdb_columns() 
+        WHERE schema_name = ?::text and table_name = ?::text
+        ORDER BY \"column_name\"`
       }else{
         query = `SELECT COLUMN_NAME 
         FROM TABLE_COLUMNS

@@ -1,19 +1,23 @@
 # Analytics Platform (ALP)
 
 ## Install pre-requisites
-see: [1-install](docs/1-install)
+see: [1-install](docs/1-setup)
 - docker
 - nodejs
 - yarn
+- openssl
 
-## Clone this git repository
-- see: [cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
+## Clone repository
+- see: [Cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 
-## Build
-- standard build
+## Authenticate to private docker registry
+- Request credentials from D2E support
 ```
-yarn build:minerva
+docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 ```
+
+## Troubleshooting
+- see: [troubleshooting](docs/troubleshooting/README.md)
 
 ## Generate dotenv
 - see: [README-vars.md](docs/README-vars.md)
@@ -22,19 +26,20 @@ yarn build:minerva
 yarn gen:dotenv
 ```
 
+## Build
+- standard build
+```
+yarn build:minerva
+```
+
 ## Start UI
-- login to private docker registry
-```
-docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
-```
 - start ui
 ```
 yarn start:ui --wait
 ```
 notes:
 - invokes docker compose up
-- defaults to develop branch image
-- detects branch if ui repo directory is `../d2e-ui`
+- detects `../d2e-ui` branch or defaults to develop branch
 
 ## (Re)Start App
 - docker compose up - approx 5 minutes
