@@ -1,16 +1,14 @@
-## integration tests - `analytics-svc`, `query-gen-svc` & `bookmark-svc`
+## Integration tests - `analytics-svc`, `query-gen-svc` & `bookmark-svc`
 - Navigate to the root of ALP repo (i.e. the `alp-data-node` folder)
-```
+```bash
 cd alp-data-node
 ```
 - Build the required services
-```
-yarn
+```bash
 yarn build --no-ui
-
 ```
 - Create the test schema. Replace the placeholders with the correct HANA server details & the user credentials.
-```
+```bash
 export HANASERVER=<HANA_SERVER>
 export HDIUSER=TENANT_ADMIN_USER
 export HDIPORT=<HANA_PORT>
@@ -24,7 +22,7 @@ export VCAP_SERVICES='{"mridb":[{"name":"OMOP","credentials":{"host":"${HANASERV
 yarn inittestdb
 ```
 - Create the PG config schema
-```
+```bash
 export PG_HOST="localhost"
 export PG_PORT=41190
 export PG_DATABASE="alp"
@@ -41,18 +39,17 @@ export NODE_ENV="development"
 yarn workspace mri-pg-config migrate
 ```
 - Start the `query-gen-svc` 
-```
+```bash
 PORT=41008 yarn workspace query-gen run start
 ```
 - Trigger the `query-gen-svc` tests
-```
+```bash
 yarn workspace query-gen run test
 ```
 - Trigger the `analytics-svc` tests
-```
+```bash
 yarn workspace analytics run testci
 ```
 
 ## Note
 The integration tests use `alp-dbcli` npm package to create the HANA artefacts. The actual file (i.e. `alp-dbcli-v1.0.0.tgz`) can be downloaded from 1Password.
-
