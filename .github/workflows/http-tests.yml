@@ -104,7 +104,7 @@ jobs:
         run: |
           pwd
           mkdir -p internal/build
-          op read --out-file internal/build/alp-dbcli-v1.0.0.tgz "op://Singapore/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
+          op read --out-file internal/build/alp-dbcli-v1.0.0.tgz "op://${{ vars.OP_VAULT_NAME }}/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
           ls -l internal/build
 
       - name: create .env.local for docker-compose in system services
