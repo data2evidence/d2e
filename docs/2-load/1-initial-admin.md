@@ -1,7 +1,7 @@
 # Login as Initial Admin
 
 ## Confirm /etc/hosts
-- See: [install docker-compose](../3-configure/docs/1-install#docker-compose)
+- See: [install docker-compose](../4-configure/docs/1-install#docker-compose)
 - Confirm `127.0.0.1 host.docker.internal` is present in `/etc/hosts` with the following command
 ```
 cat /etc/hosts

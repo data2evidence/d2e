@@ -1,10 +1,10 @@
 name: DockerCompose AzureDev Deploy
-run-name: ${{ github.event.inputs.env }} ${{ github.event.inputs.repo }}
+run-name: ${{ github.event.inputs.env }} ${{ github.event.inputs.repo_full_name }}
 
 on:
   workflow_dispatch:
     inputs:
-      repo_name:
+      repo_full_name:
         description: Select RepoName
         options:
           - alp-os/d2e
@@ -15,6 +15,7 @@ on:
           - alp-os/d2e-dev-hengxian
           - alp-os/d2e-dev-jerome
           - alp-os/d2e-dev-khairul
+          - alp-os/d2e-dev-karthik
           - alp-os/d2e-dev-nadirah
           - alp-os/d2e-dev-nicholas
           - alp-os/d2e-dev-peter
@@ -23,7 +24,6 @@ on:
           - alp-os/d2e-dev-santan
           - alp-os/d2e-dev-satish
           - alp-os/d2e-dev-suwarno
-          - alp-os/d2e-dev-zed
         required: true
         type: choice
       env:
@@ -72,14 +72,14 @@ jobs:
     runs-on: [ "${{ github.event.inputs.env }}", self-hosted, Linux, X64 ]
     steps:
     - run: |
-        echo REPO=${{ github.repository_owner }}/${{ github.event.inputs.repo }} | tee -a "$GITHUB_OUTPUT"
+        echo REPO=${{ github.event.inputs.repo_full_name }} | tee -a "$GITHUB_OUTPUT"
 
     - uses: actions/checkout@v4.1.1
       name: checkout d2e repo
       with:
         clean: false
         ref: ${{ env.DOCKER_TAG_NAME }}
-        repository: ${{ github.event.inputs.repo_name }}
+        repository: ${{ github.event.inputs.repo_full_name }}
         token: ${{ secrets.CI_PAT }}
 
     - shell: bash

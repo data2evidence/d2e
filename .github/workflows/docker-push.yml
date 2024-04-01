@@ -6,31 +6,32 @@ on:
     types: [opened, reopened, ready_for_review, synchronize]
   push:
       branches:
-      - develop
+        - develop
   workflow_dispatch:
     inputs:
-      repo_name:
+      repo_full_name:
+        default: d2e
         description: Select RepoName
+        required: false
+        type: choice
         options:
           - alp-os/d2e
-          - alp-os/d2e-dev-afreen
-          - alp-os/d2e-dev-alicia
-          - alp-os/d2e-dev-brandan
-          - alp-os/d2e-dev-brian
-          - alp-os/d2e-dev-hengxian
-          - alp-os/d2e-dev-jerome
-          - alp-os/d2e-dev-khairul
-          - alp-os/d2e-dev-nadirah
-          - alp-os/d2e-dev-nicholas
-          - alp-os/d2e-dev-peter
-          - alp-os/d2e-dev-qiya
-          - alp-os/d2e-dev-ragavan
-          - alp-os/d2e-dev-santan
-          - alp-os/d2e-dev-satish
-          - alp-os/d2e-dev-suwarno
-          - alp-os/d2e-dev-zed
-        required: true
-        type: choice
+          - alp-os/dev-afreen-d2e
+          - alp-os/dev-alicia-d2e
+          - alp-os/dev-brandan-d2e
+          - alp-os/dev-brian-d2e
+          - alp-os/dev-hengxian-d2e
+          - alp-os/dev-jerome-d2e
+          - alp-os/dev-khairul-d2e
+          - alp-os/dev-nadirah-d2e
+          - alp-os/dev-nicholas-d2e
+          - alp-os/dev-peter-d2e
+          - alp-os/dev-qiya-d2e
+          - alp-os/dev-ragavan-d2e
+          - alp-os/dev-santan-d2e
+          - alp-os/dev-satish-d2e
+          - alp-os/dev-suwarno-d2e
+          - alp-os/dev-zed-d2e
       branch_name:
         default: develop
         description: Enter BranchName
@@ -43,8 +44,7 @@ concurrency:
 
 env:
   BRANCH_NAME: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
-  REPO_NAME: ${{ github.event.inputs.repo_name || github.event.pull_request.head.repo.name || github.event.repository.name }} # workflow_dispatch || pull_request || push
-  REPO_FULL_NAME: ${{ github.event.inputs.repo_name || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
+  REPO_FULL_NAME: ${{ github.event.inputs.repo_full_name || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
 
 jobs:
   setup:
@@ -52,7 +52,7 @@ jobs:
     steps:
     - id: setup
       run: |
-        echo repo_name="${REPO_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+        echo repo_full_name="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
         echo branch_name="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
     - name: Dump GitHub context
       env:
@@ -60,7 +60,7 @@ jobs:
       run: echo "$GITHUB_CONTEXT"
     outputs:
       branch_name: ${{ steps.setup.outputs.branch_name }}
-      repo_name: ${{ steps.setup.outputs.repo_name }}
+      repo_full_name: ${{ steps.setup.outputs.repo_full_name }}
   run:
     if: (needs.setup.outputs.branch_name == 'develop' ||  contains('release', needs.setup.outputs.branch_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
     needs: setup
@@ -154,7 +154,6 @@ jobs:
       with:
         ref: ${{ env.BRANCH_NAME }}
         repository: ${{ env.REPO_FULL_NAME }}
-        token: ${{ secrets.CI_PAT }}
 
     - name: Login to ACR
       uses: docker/login-action@v3.1.0
