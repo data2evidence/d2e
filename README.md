@@ -10,6 +10,12 @@ see: [1-install](docs/1-setup)
 ## Clone repository
 - see: [Cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 
+# Authenticate to private docker registry
+- Request credentials from D2E support
+```
+docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
+```
+
 ## Build
 - standard build
 ```
@@ -24,10 +30,6 @@ yarn gen:dotenv
 ```
 
 ## Start UI
-- login to private docker registry
-```
-docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
-```
 - start ui
 ```
 yarn start:ui --wait
