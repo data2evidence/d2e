@@ -17043,7 +17043,7 @@ const paConfig = {
       downloadEnabled: true,
       collectionEnabled: true,
       beginVisible: true,
-      pageSize: 65,
+      pageSize: 20,
     },
     vb: {
       visible: true,
