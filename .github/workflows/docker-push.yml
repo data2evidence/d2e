@@ -34,7 +34,7 @@ on:
           - alp-os/dev-zed-d2e
       branch_name:
         default: develop
-        description: Enter BranchName
+        description: Enter BranchName / TagName
         required: true
         type: string
 
