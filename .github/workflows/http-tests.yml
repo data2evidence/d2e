@@ -103,8 +103,8 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         run: |
           pwd
-          mkdir -p alp-data-node-override/build
-          op read --out-file alp-data-node-override/build/alp-dbcli-v1.0.0.tgz "op://Singapore/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
+          mkdir -p internal/build
+          op read --out-file internal/build/alp-dbcli-v1.0.0.tgz "op://${{ vars.OP_VAULT_NAME }}/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
           ls -l internal/build
 
       - name: create .env.local for docker-compose in system services
