@@ -4,33 +4,33 @@ run-name: ${{ github.event.inputs.env }} ${{ github.event.inputs.repo }}
 on:
   workflow_dispatch:
     inputs:
-      repo:
-        type: choice
-        required: true
-        description: Select a repo
+      repo_name:
+        description: Select RepoName
         options:
-          - d2e
-          - d2e-dev-afreen
-          - d2e-dev-alicia
-          - d2e-dev-brandan
-          - d2e-dev-brian
-          - d2e-dev-hengxian
-          - d2e-dev-jerome
-          - d2e-dev-karthik
-          - d2e-dev-khairul
-          - d2e-dev-nadirah
-          - d2e-dev-nicholas
-          - d2e-dev-peter
-          - d2e-dev-qiya
-          - d2e-dev-ragavan
-          - d2e-dev-santan
-          - d2e-dev-satish
-          - d2e-dev-suwarno
+          - alp-os/d2e
+          - alp-os/d2e-dev-afreen
+          - alp-os/d2e-dev-alicia
+          - alp-os/d2e-dev-brandan
+          - alp-os/d2e-dev-brian
+          - alp-os/d2e-dev-hengxian
+          - alp-os/d2e-dev-jerome
+          - alp-os/d2e-dev-khairul
+          - alp-os/d2e-dev-nadirah
+          - alp-os/d2e-dev-nicholas
+          - alp-os/d2e-dev-peter
+          - alp-os/d2e-dev-qiya
+          - alp-os/d2e-dev-ragavan
+          - alp-os/d2e-dev-santan
+          - alp-os/d2e-dev-satish
+          - alp-os/d2e-dev-suwarno
+          - alp-os/d2e-dev-zed
+        required: true
+        type: choice
       env:
-        type: environment
+        default: alp-dev-sg-1
         description: Select the environment
         required: true
-        default: alp-dev-sg-1
+        type: environment
       docker-tag-develop:
         description: tag:*:develop
         type: boolean
@@ -61,7 +61,7 @@ env:
   ENV_NAME: ${{ github.event.inputs.env }}
   ENV_TYPE: remote
 
-concurrency: 
+concurrency:
   group: az-dc-deploy-${{ github.event.inputs.env }}
   cancel-in-progress: true
 
@@ -78,10 +78,9 @@ jobs:
       name: checkout d2e repo
       with:
         clean: false
-        repository: ${{ github.repository_owner }}/${{ github.event.inputs.repo }}
-        token: ${{ secrets.CI_PAT }}
-        # token: ${{ github.event.inputs.repo == 'd2e' && secrets.GITHUB_TOKEN || secrets.CI_PAT }}
         ref: ${{ env.DOCKER_TAG_NAME }}
+        repository: ${{ github.event.inputs.repo_name }}
+        token: ${{ secrets.CI_PAT }}
 
     - shell: bash
       id: override-repo
