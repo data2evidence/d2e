@@ -16,17 +16,17 @@ see: [1-install](docs/1-setup)
 docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 ```
 
-## Build
-- standard build
-```
-yarn build:minerva
-```
-
 ## Generate dotenv
 - see: [README-vars.md](docs/README-vars.md)
 - auto-generate secrets from [env.example](env.example) template to `.env.local`
 ```
 yarn gen:dotenv
+```
+
+## Build
+- standard build
+```
+yarn build:minerva
 ```
 
 ## Start UI
