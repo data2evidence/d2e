@@ -426,6 +426,26 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['DELETE']
   },
   {
+    path: '^/dataflow-mgmt/analysisflow/(.*)',
+    scopes: ['dataflowmgmt.analysisflow.read'],
+    httpMethods: ['GET']
+  },
+  {
+    path: '^/dataflow-mgmt/analysisflow(.*)',
+    scopes: ['dataflowmgmt.analysisflow.add'],
+    httpMethods: ['POST']
+  },
+  {
+    path: `^/dataflow-mgmt/analysisflow/${UUID}`,
+    scopes: ['dataflowmgmt.analysisflow.delete'],
+    httpMethods: ['DELETE']
+  },
+  {
+    path: '^/dataflow-mgmt/analysisflow/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    scopes: ['dataflowmgmt.analysisflow.revision.delete'],
+    httpMethods: ['DELETE']
+  },
+  {
     path: '^/dataflow-mgmt/db-svc/(run|dataset-attributes|fetch-version-info)$',
     scopes: ['dataflowmgmt.dbsvc.flowRun.run'],
     httpMethods: ['POST']
@@ -852,7 +872,12 @@ export const ROLE_SCOPES = {
     'gateway.db.dataset.versionInfo.read',
     'gateway.db.schema.update',
     'gateway.terminology.hybridSearchConfig.read',
-    'gateway.terminology.hybridSearchConfig.update'
+    'gateway.terminology.hybridSearchConfig.update',
+    // TODO: remove after make analysis flow to researcher portal
+    'dataflowmgmt.analysisflow.read',
+    'dataflowmgmt.analysisflow.add',
+    'dataflowmgmt.analysisflow.delete',
+    'dataflowmgmt.analysisflow.revision.delete'
   ],
   ALP_DASHBOARD_VIEWER: ['gateway.dashboardGate.content'],
   TENANT_VIEWER: [
@@ -892,7 +917,11 @@ export const ROLE_SCOPES = {
     'gateway.terminology.concept.filterOptions.read',
     'gateway.terminology.concept.recommended.read',
     'gateway.terminology.fhir.read',
-    'gateway.terminology.hybridSearchConfig.read'
+    'gateway.terminology.hybridSearchConfig.read',
+    'dataflowmgmt.analysisflow.read',
+    'dataflowmgmt.analysisflow.add',
+    'dataflowmgmt.analysisflow.delete',
+    'dataflowmgmt.analysisflow.revision.delete'
   ],
   ALP_SHARED: ['usermgmt.group.read', 'usermgmt.group.add', 'usermgmt.group.delete'],
   USER_MGMT_GROUP_DELETE: ['usermgmt.group.delete'],

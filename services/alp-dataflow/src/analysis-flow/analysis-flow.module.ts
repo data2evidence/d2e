@@ -11,4 +11,4 @@ import { IsDataflowNameExistConstraint } from './validator'
   imports: [TypeOrmModule.forFeature([Analysisflow, AnalysisflowRevision, AnalysisflowResult, AnalysisflowRun])],
   exports: [DataflowService]
 })
-export class DataflowModule {}
+export class AnalysisflowModule {}
