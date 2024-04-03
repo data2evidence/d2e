@@ -9,7 +9,7 @@ import CallBackInterface = connLib.CallBackInterface
 import { QueryObject as qo } from '@alp/alp-base-utils'
 import QueryObject = qo.QueryObject
 export import utils = require('@alp/alp-base-utils')
-import { IBookmark } from '../../types'
+import { IBookmark } from '../types'
 /**
  * This method was created so it can be spied on during testing (without affecting utils)
  */

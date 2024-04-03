@@ -1,4 +1,4 @@
-import { queryBookmarks } from '../../mri/endpoint/bookmarkservice'
+import { queryBookmarks } from '../../bookmark/bookmarkservice'
 import { EnvVarUtils } from '@alp/alp-base-utils'
 import { getUser, getUserMgmtId } from '../../utils/User'
 import MRIEndpointErrorHandler from '../../utils/MRIEndpointErrorHandler'
