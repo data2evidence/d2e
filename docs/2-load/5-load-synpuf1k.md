@@ -3,6 +3,7 @@
 - Synthetic Public Use Files (SynPUFs) provide sample patient data
 
 ## Download Public SynPUF-1k
+- Open a terminal in the root of `alp` repo
 - Run the following command to download synpuf1k54
 ```
 wget https://caruscloud.uniklinikum-dresden.de/index.php/s/Qog8B5WCTHFHmjW/download -O ~/Downloads/synpuf1k54.tar.gz
@@ -135,4 +136,4 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
 > TRUNCATE TABLE
 
 see: 
-- [troubleshooting/load-synpuf1k](../troubleshooting/kb-empty-database-credentials.md)
+- [troubleshooting/load-synpuf1k](../knowledgebase/dbcreds/missing-db-creds.md)

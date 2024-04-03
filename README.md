@@ -17,7 +17,7 @@ docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 ```
 
 ## Troubleshooting
-- see: [troubleshooting](docs/troubleshooting)
+- see: [troubleshooting](docs/knowledgebase)
 
 ## Generate dotenv
 - see: [environment variables](docs/1-setup/environment-variables.md)
