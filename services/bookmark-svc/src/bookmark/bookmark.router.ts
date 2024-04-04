@@ -7,6 +7,7 @@ import { plainToInstance } from 'class-transformer'
 import { queryBookmarks } from './bookmarkservice'
 import { getUser, getUserMgmtId } from '../utils/User'
 import MRIEndpointErrorHandler from '../utils/MRIEndpointErrorHandler'
+import { checkBookmarkId, checkContainsBookmark } from '../middleware/route-check'
 
 @Service()
 export class BookmarkRouter {
@@ -52,7 +53,7 @@ export class BookmarkRouter {
       }
     })
 
-    this.router.post('/', async (req: IMRIRequest, res: Response, next: NextFunction) => {
+    this.router.post('/', checkContainsBookmark, async (req: IMRIRequest, res: Response, next: NextFunction) => {
       this.log.info('Create bookmark')
       try {
         const { configConnection } = req.dbConnections
@@ -60,14 +61,6 @@ export class BookmarkRouter {
         const language = user.lang
         const userId = getUserMgmtId(user)
 
-        if (!req.body.bookmark) {
-          res.status(500).send(
-            MRIEndpointErrorHandler({
-              err: new Error('BookmarkId is required'),
-              language,
-            })
-          )
-        }
         req.body.cmd = 'insert'
 
         queryBookmarks(req.body, userId, EnvVarUtils.getBookmarksTable(), configConnection, (err, data) => {
@@ -82,7 +75,7 @@ export class BookmarkRouter {
       }
     })
 
-    this.router.put('/:bookmarkId', async (req: IMRIRequest, res: Response, next: NextFunction) => {
+    this.router.put('/:bookmarkId', checkBookmarkId, async (req: IMRIRequest, res: Response, next: NextFunction) => {
       this.log.info('Update bookmark')
       try {
         const { configConnection } = req.dbConnections
@@ -91,27 +84,6 @@ export class BookmarkRouter {
         const userId = getUserMgmtId(user)
 
         const { bookmarkId } = req.params
-        if (!bookmarkId) {
-          res.status(500).send(
-            MRIEndpointErrorHandler({
-              err: new Error('BookmarkId is required'),
-              language,
-            })
-          )
-        }
-
-        if (req.body.cmd !== 'update' && req.body.cmd !== 'rename') {
-          return res.status(500).send(
-            MRIEndpointErrorHandler({
-              err: new Error('Not a valid command'),
-              language,
-            })
-          )
-        }
-
-        if (req.body.cmd === 'update') {
-          req.body.bookmark = req.params.bookmark
-        }
 
         req.body.bmkId = bookmarkId
 
@@ -127,7 +99,7 @@ export class BookmarkRouter {
       }
     })
 
-    this.router.delete('/:bookmarkId', async (req: IMRIRequest, res: Response, next: NextFunction) => {
+    this.router.delete('/:bookmarkId', checkBookmarkId, async (req: IMRIRequest, res: Response, next: NextFunction) => {
       this.log.info('Delete bookmark')
 
       try {
@@ -137,14 +109,6 @@ export class BookmarkRouter {
         const userId = getUserMgmtId(user)
 
         const { bookmarkId } = req.params
-        if (!bookmarkId) {
-          res.status(500).send(
-            MRIEndpointErrorHandler({
-              err: new Error('BookmarkId is required'),
-              language,
-            })
-          )
-        }
 
         req.body.cmd = 'delete'
         req.body.bmkId = bookmarkId
