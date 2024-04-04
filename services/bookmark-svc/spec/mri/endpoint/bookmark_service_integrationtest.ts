@@ -158,7 +158,6 @@ function verifyQueryCalls(shouldHaveBeenCalled) {
 }
 
 describe('TEST SUITE TO DEFINE THE BEHAVIOR OF THE BOOKMARK ENDPOINT', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 600000
   beforeAll(done => {
     testsLogger(
       '\n\n-----------------------------Test class:bookmark_service_integrationtest.ts -----------------------------\n'
