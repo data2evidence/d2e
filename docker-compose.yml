@@ -52,6 +52,7 @@ x-envs:
     PG__MAX_POOL: 10
     PG__MIN_POOL: 0
     PG__PORT: ${PG_PORT:-5432}
+    # change to
   plugins: &x-plugins |
     {
       "researcher": [
@@ -89,7 +90,8 @@ x-envs:
             "RESEARCHER"
           ],
           "route": "starboard",
-          "subMenus": "true"
+          "subMenus": "true",
+          "type": "Analysis"
         },
         {
           "enabled": true,
@@ -101,6 +103,20 @@ x-envs:
             "RESEARCHER"
           ],
           "type": "Concepts"
+        },
+        {
+          "enabled": true,
+          "featureFlag": "analysisFlow",
+          "name": "Analysis",
+          "route": "analysis",
+          "data": {
+            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
+          },
+          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
+          "requiredRoles": [
+            "RESEARCHER"
+          ],
+          "type": "Analysis"
         }
       ],
       "setup": [
