@@ -15,7 +15,6 @@ export interface IMRIRequest extends Request {
     studies: any
     cachedAt: number
   }
-  swagger: any
   fileName?: string
 }
 export interface Map<T> {
