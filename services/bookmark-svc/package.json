@@ -4,7 +4,7 @@
   "description": "Patient Analytics",
   "private": true,
   "scripts": {
-    "test": "jest --detectOpenHandles",
+    "test": "jest --runInBand --forceExit",
     "lint": "tslint --config ./tslint.json --project ./tsconfig.json",
     "start": "node target/src/main.js",
     "start:docker": "if [ \"$LOCAL_DEBUG\" == \"true\" ] ; then yarn dev; else yarn start; fi",
