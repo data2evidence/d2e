@@ -22,6 +22,7 @@ import {
 import { SystemPortalAPI } from '../../api/portal-api';
 import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { Request } from 'express';
+import * as datefns from 'date-fns';
 
 // Placed outside as FHIR server is unable to access
 const logger = createLogger('ConceptService');
@@ -228,7 +229,7 @@ export class ConceptService {
           mappedConceptIds.push(hit.concept_id_2);
         });
       });
-      
+
       const meilisearchResult = await meilisearchApi.getMultipleExactConcepts(
         mappedConceptIds,
         `${databaseName}_${vocabSchemaName}_concept`,
@@ -362,7 +363,11 @@ export class ConceptService {
       code: item.concept_code,
       validStartDate: item.valid_start_date ? item.valid_start_date : '',
       validEndDate: item.valid_end_date ? item.valid_end_date : '',
-      validity: new Date(item.valid_end_date) > today ? 'Valid' : 'Invalid',
+      validity:
+        datefns.parse(item.valid_end_date, 'dd/MM/yyyy, HH:mm:ss', new Date()) >
+        today
+          ? 'Valid'
+          : 'Invalid',
     };
     return details;
   }
