@@ -212,3 +212,11 @@ export type FhirConceptMap = {
   resourceType: string;
   group: FhirConceptMapGroup[];
 };
+
+export type Filters = {
+  conceptClassId: string[];
+  domainId: string[];
+  standardConcept: string[];
+  vocabularyId: string[];
+  validity: ('Valid' | 'Invalid')[];
+};
