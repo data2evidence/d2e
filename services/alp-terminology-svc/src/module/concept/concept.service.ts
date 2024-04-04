@@ -18,6 +18,7 @@ import {
   FhirConceptMapElementWithExt,
   FhirConceptMapElementTarget,
   IConcept,
+  Filters,
 } from '../../utils/types';
 import { SystemPortalAPI } from '../../api/portal-api';
 import { MeilisearchAPI } from '../../api/meilisearch-api';
@@ -44,14 +45,16 @@ export class ConceptService {
     rowsPerPage: number,
     datasetId: string,
     searchText: string,
-    filters?: {
-      conceptClassId: string[];
-      domainId: string[];
-      standardConcept: string[];
-      vocabularyId: string[];
-    },
+    filters?: Filters,
   ) {
     logger.info('Get list of concepts');
+    const completeFilters = {
+      conceptClassId: filters?.conceptClassId ?? [],
+      domainId: filters?.domainId ?? [],
+      standardConcept: filters?.standardConcept ?? [],
+      vocabularyId: filters?.vocabularyId ?? [],
+      validity: filters?.validity ?? [],
+    };
     const pageNumber = Math.floor(offset / rowsPerPage);
     const { databaseName, vocabSchemaName } = await this.getDatasetDetails(
       datasetId,
@@ -65,7 +68,7 @@ export class ConceptService {
         Number(rowsPerPage),
         searchText,
         `${databaseName}_${vocabSchemaName}_concept`,
-        filters,
+        completeFilters,
       );
       return this.meilisearchResultMapping(meilisearchResult);
     } catch (err) {
@@ -286,12 +289,7 @@ export class ConceptService {
   async getConceptFilterOptions(
     datasetId: string,
     searchText: string,
-    filters: {
-      conceptClassId: string[];
-      domainId: string[];
-      standardConcept: string[];
-      vocabularyId: string[];
-    },
+    filters: Filters,
   ) {
     try {
       const { databaseName, vocabSchemaName } = await this.getDatasetDetails(
@@ -300,25 +298,37 @@ export class ConceptService {
       );
       const meilisearchApi = new MeilisearchAPI();
       const meiliIndex = `${databaseName}_${vocabSchemaName}_concept`;
-      const conceptClassIdFacets = await meilisearchApi.getConceptFilterOptions(
-        meiliIndex,
-        searchText,
-        { ...filters, conceptClassId: [] },
-      );
-      const domainIdFacets = await meilisearchApi.getConceptFilterOptions(
-        meiliIndex,
-        searchText,
-        { ...filters, domainId: [] },
-      );
+      const conceptClassIdFacets =
+        await meilisearchApi.getConceptFilterOptionsFaceted(
+          meiliIndex,
+          searchText,
+          { ...filters, conceptClassId: [] },
+        );
+      const domainIdFacets =
+        await meilisearchApi.getConceptFilterOptionsFaceted(
+          meiliIndex,
+          searchText,
+          { ...filters, domainId: [] },
+        );
       const standardConceptFacets =
-        await meilisearchApi.getConceptFilterOptions(meiliIndex, searchText, {
-          ...filters,
-          standardConcept: [],
-        });
-      const vocabularyIdFacets = await meilisearchApi.getConceptFilterOptions(
+        await meilisearchApi.getConceptFilterOptionsFaceted(
+          meiliIndex,
+          searchText,
+          {
+            ...filters,
+            standardConcept: [],
+          },
+        );
+      const vocabularyIdFacets =
+        await meilisearchApi.getConceptFilterOptionsFaceted(
+          meiliIndex,
+          searchText,
+          { ...filters, vocabularyId: [] },
+        );
+      const validity = await meilisearchApi.getConceptFilterOptionsValidity(
         meiliIndex,
         searchText,
-        { ...filters, vocabularyId: [] },
+        { ...filters, validity: [] },
       );
       const filterOptions = {
         conceptClassId: conceptClassIdFacets.facetDistribution.concept_class_id,
@@ -326,6 +336,7 @@ export class ConceptService {
         standardConcept:
           standardConceptFacets.facetDistribution.standard_concept,
         vocabularyId: vocabularyIdFacets.facetDistribution.vocabulary_id,
+        validity,
         // concept is a derived value, not from meilisearch index
         concept: (() => {
           const standardConcepts =
