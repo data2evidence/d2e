@@ -27,7 +27,7 @@ sudo snap install docker
 ```
 
 #### macos
-- For background on issues see: [Docker Desktop troubleshooting](../knowledgebase/docker/docker-desktop.md)
+- For background on issues see: [Docker Desktop troubleshooting](../knowledgebase/docker-compose/docker-desktop.md)
 
 #### Install Docker Desktop 4.19.0 (2023-04)
 - This is a workaround for Docker Compose with multiple networks DNS looks issue in latest version 

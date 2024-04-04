@@ -4,6 +4,7 @@
   "description": "ALP Data Node",
   "license": "MIT",
   "scripts": {
+    "dc": "PROFILES_CMD=$(echo $PROFILE_NAMES | awk -v RS=, -v ORS=' ' '{print \"--profile\",$1}'); FILES_CMD=($(for PROFILE_NAME in $(echo $PROFILE_NAMES | tr ',' '\n'); do export PROFILE_NAME; yq '.services[] | select(.profiles[] == env(PROFILE_NAME)) | \"--file \" + .container_name + \"/docker-compose.yml\"' docker-compose.yml; done)); CMD=$(echo docker compose --file docker-compose.yml ${PROFILES_CMD} ${FILES_CMD[@]} up); echo ${CMD[@]}; # ${CMD[@]}",
     "gen:dotenv": "scripts/gen-dotenv.sh && yarn gen:tls",
     "gen:tls": "scripts/gen-tls.sh",
 
