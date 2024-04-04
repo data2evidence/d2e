@@ -1,7 +1,7 @@
 # Analytics Platform (ALP)
 
 ## Install pre-requisites
-see: [1-install](docs/1-setup)
+see: [1-install](docs/1-setup/README.md)
 - docker
 - nodejs
 - yarn
@@ -17,10 +17,10 @@ docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 ```
 
 ## Troubleshooting
-- see: [troubleshooting](docs/troubleshooting/README.md)
+- see: [troubleshooting](docs/troubleshooting)
 
 ## Generate dotenv
-- see: [README-vars.md](docs/README-vars.md)
+- see: [environment variables](docs/1-setup/environment-variables.md)
 - auto-generate secrets from [env.example](env.example) template to `.env.local`
 ```
 yarn gen:dotenv
@@ -54,4 +54,4 @@ yarn start:minerva --wait; sleep 60
 - see: [3-configure](docs/3-configure)
 
 ## Integration Tests
-- see: [4-integration-tests](docs/4-integration-tests.md)
+- see: [4-integration-tests](docs/4-integration-tests)
