@@ -17,9 +17,10 @@ describe('BookmarkRouter', () => {
       { path: `/bookmarkIds`, method: 'delete' },
     ]
 
-    test.each(routes)('`$method` exists on $path', route => {
+    test.each(routes)('`$method` exists on $path', (route, done) => {
       expect(router.stack.some(s => Object.keys(s.route.methods).includes(route.method))).toBe(true)
       expect(router.stack.some(s => s.route.path === route.path)).toBe(true)
+      done()
     })
   })
 })
