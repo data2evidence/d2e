@@ -1,30 +1,33 @@
 # DNS lookup fails with Docker Compose multiple networks
+
 ## Symptoms
 - impacts multiple versions of docker desktop including latest
 - dataflowgen-agent is on a separate network named `data` for security
 - sample error message
 > alp-dataflow-gen-agent-1 | Failed to get databases: Error: getaddrinfo ENOTFOUND alp-minerva-gateway-1
 - see: https://forums.docker.com/t/docker-compose-refuses-to-attach-multiple-networks/136776/9
+
 ## workaround#1 - replace docker-compose binary
-- https://github.com/docker/compose/issues/11533#issuecomment-2026242708
-- https://github.com/docker/compose/releases
-```
-VERSION=v2.26.1
+- from: https://github.com/docker/compose/issues/11533#issuecomment-2026242708
+- latest release version from https://github.com/docker/compose/releases
+```bash
+NEW_VERSION=v2.26.1
 ARCH=aarch64
 ARCH=x86_64
-URL=https://github.com/docker/compose/releases/download/$VERSION/docker-compose-darwin-$ARCH
+URL=https://github.com/docker/compose/releases/download/$NEW_VERSION/docker-compose-darwin-$ARCH
 DC_PATH=~/.docker/cli-plugins/docker-compose
 DC_TMP=/tmp/docker-compose
-OLD_VERSION=$($DC_PATH --version | awk '{print $NF}')
-echo OLD_VERSION=$OLD_VERSION
+
+OLD_VERSION=$($DC_PATH --version | awk '{print $NF}'); echo OLD_VERSION=$OLD_VERSION
 mv -v $DC_PATH $DC_PATH.$OLD_VERSION
 curl -L -o $DC_TMP $URL
 chmod u+x $DC_TMP
 $DC_TMP --version
 cp -v $DC_TMP $DC_PATH
-cp -v $DC_PATH $DC_PATH.$VERSION
+cp -v $DC_PATH $DC_PATH.$NEW_VERSION
 docker compose version
 ```
+
 ## workaround#2 - remove data network
 - edit docker-compose.yml
 - add the following to dataflow-gen-agent-1
@@ -37,6 +40,7 @@ network:
 network:
   - data
 ```
+
 ## workaround#3 - revert to older Docker Desktop without issue - not effective
 - uninstall dc-desktop & install docker 4.19.0 from 2023-04-27
 - download installer from https://docs.docker.com/desktop/release-notes
