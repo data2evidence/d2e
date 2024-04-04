@@ -349,6 +349,9 @@ export class ConceptService {
   private mapConceptWithFhirValueSetExpansionContains(item: IConcept) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    // valid_end_date is in seconds while js timestamp is in ms
+    const validity =
+      item.valid_end_date > Number(new Date()) / 1000 ? 'Valid' : 'Invalid';
     const details: FhirValueSetExpansionContainsWithExt = {
       conceptId: item.concept_id,
       display: item.concept_name,
@@ -361,13 +364,13 @@ export class ConceptService {
           ? 'Non-standard'
           : 'Standard',
       code: item.concept_code,
-      validStartDate: item.valid_start_date ? item.valid_start_date : '',
-      validEndDate: item.valid_end_date ? item.valid_end_date : '',
-      validity:
-        datefns.parse(item.valid_end_date, 'dd/MM/yyyy, HH:mm:ss', new Date()) >
-        today
-          ? 'Valid'
-          : 'Invalid',
+      validStartDate: item.valid_start_date
+        ? new Date(item.valid_start_date).toISOString()
+        : '',
+      validEndDate: item.valid_end_date
+        ? new Date(item.valid_end_date).toISOString()
+        : '',
+      validity,
     };
     return details;
   }

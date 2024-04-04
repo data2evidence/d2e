@@ -165,6 +165,10 @@ services:
     environment:
       LOCAL_DEBUG: "true"
 
+  alp-minerva-meilisearch-svc:
+    ports:
+      - 41111:41111
+
   alp-minerva-pa-config-svc:
     build:
       context: .
