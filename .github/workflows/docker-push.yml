@@ -148,6 +148,10 @@ jobs:
             directory: ./services/alp-logto
             context: ./services/alp-logto
             fileName: Dockerfile
+          - name: alp-data-node/alp-fhir-server
+            directory: ./services/alp-fhir
+            context: ./services/alp-fhir
+            fileName: Dockerfile
 
     steps:
     - uses: actions/checkout@v4
