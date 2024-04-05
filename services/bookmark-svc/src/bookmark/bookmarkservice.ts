@@ -9,7 +9,7 @@ import CallBackInterface = connLib.CallBackInterface
 import { QueryObject as qo } from '@alp/alp-base-utils'
 import QueryObject = qo.QueryObject
 export import utils = require('@alp/alp-base-utils')
-import { IBookmark } from '../types'
+import { IBookmark, QueryObjectResultType, BookmarkQueryResultType } from '../types'
 /**
  * This method was created so it can be spied on during testing (without affecting utils)
  */
@@ -89,7 +89,7 @@ export function _loadAllBookmarks(
   connection: ConnectionInterface,
   callback: CallBackInterface
 ) {
-  let query = QueryObject.format(getAllBookmarksQuery(table), paConfigId)
+  let query: QueryObject = QueryObject.format(getAllBookmarksQuery(table), paConfigId)
   query.executeQuery(connection, (err, result) => {
     if (err) {
       callback(err, null)
@@ -132,18 +132,17 @@ export async function loadSingleBookmark(
   connection: ConnectionInterface,
   callback?: CallBackInterface
 ) {
-  let query = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, userId)
+  let query: QueryObject = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, userId)
 
   return new Promise<{ bookmarks: IBookmark[] }>(async (resolve, reject) => {
     try {
-      // const result = await query.executeQuery<IBookmark[]>(connection);
-      const result: any = await query.executeQuery(connection)
+      const result: QueryObjectResultType<Array<BookmarkQueryResultType>> = await query.executeQuery(connection)
 
       // TODO: this is a temp code, will be used until ViewName column added to the CI DB.
       if (result && result.data && result.data.length > 0) {
         result.data.forEach(el => {
-          if (el.ViewName && el.ViewName === 'NoValue') {
-            el.ViewName = null
+          if (el.viewname && el.viewname === 'NoValue') {
+            el.viewname = null
           }
         })
       }
@@ -196,7 +195,7 @@ export function _insertBookmark(
 
   let bmkId = createBookmarkId(bookmarkName)
 
-  let query = QueryObject.format(
+  let query: QueryObject = QueryObject.format(
     INSERT_BOOKMARKS,
     bmkId,
     userId,
@@ -245,7 +244,7 @@ export function _deleteBookmark(
   }
   // first get the bookmark record for the given params
   let fnGetBookmark = cb => {
-    let qry = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, userId)
+    let qry: QueryObject = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, userId)
     qry.executeQuery(configConnection, (err, bookmarks) => {
       if (err) {
         cb(err)
@@ -260,7 +259,12 @@ export function _deleteBookmark(
     if (bookmarks && bookmarks.data && bookmarks.data.length > 0) {
       let DELETE_BOOKMARK = `DELETE FROM ${table} WHERE user_id = %s AND id = %s AND pa_config_id = %s AND(type = 'BOOKMARK' OR type IS NULL)`
 
-      let query = QueryObject.format(DELETE_BOOKMARK, bookmarks.data[0].userId, bookmarks.data[0].bmkId, paConfigId)
+      let query: QueryObject = QueryObject.format(
+        DELETE_BOOKMARK,
+        bookmarks.data[0].userId,
+        bookmarks.data[0].bmkId,
+        paConfigId
+      )
 
       query.executeUpdate(configConnection, (err, result) => {
         if (err) {
@@ -319,7 +323,7 @@ export function _renameBookmark(
 ) {
   let UPDATE_BOOKMARK = `UPDATE ${table} SET bookmark_name = %s, modified = CURRENT_TIMESTAMP, version = version + 1, pa_config_id = %s, cdm_config_id = %s, cdm_config_version = %s WHERE user_id = %s AND id = %s AND (type = 'BOOKMARK' OR type IS NULL)`
 
-  let query = QueryObject.format(
+  let query: QueryObject = QueryObject.format(
     UPDATE_BOOKMARK,
     newBookmarkName,
     paConfigId,
@@ -377,7 +381,7 @@ export function _updateBookmark( //TODO remove user input
 ) {
   let UPDATE_BOOKMARK = `UPDATE ${table} SET bookmark = %s, modified = CURRENT_TIMESTAMP, version = version + 1, shared = %s, pa_config_id = %s, cdm_config_id = %s, cdm_config_version = %s WHERE user_id = %s AND  id = %s AND (type = 'BOOKMARK' OR type IS NULL)`
 
-  let query = QueryObject.format(
+  let query: QueryObject = QueryObject.format(
     UPDATE_BOOKMARK,
     bookmark,
     shareBookmark.toString(),
