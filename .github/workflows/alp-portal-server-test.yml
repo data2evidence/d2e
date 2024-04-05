@@ -1,4 +1,4 @@
-name: ALP Portal Server unit tests
+name: D2E Portal Server unit tests
 
 on:
   pull_request:

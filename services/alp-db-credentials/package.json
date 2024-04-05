@@ -1,7 +1,7 @@
 {
   "name": "alp-db-credentials",
   "version": "1.0.0",
-  "description": "ALP Database Credentials Manager",
+  "description": "D2E Database Credentials Manager",
   "main": "dist/index.js",
   "license": "MIT",
   "private": true,

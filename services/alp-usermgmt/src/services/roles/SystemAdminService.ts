@@ -16,7 +16,7 @@ export class SystemAdminService {
       throw new Error(`Unable to find group for role ${ROLES.ALP_SYSTEM_ADMIN}`)
     }
 
-    this.logger.info(`Register ALP system admin for ${userId}`)
+    this.logger.info(`Register D2E system admin for ${userId}`)
     return await this.userGroupService.registerUserToGroup(userId, group.id)
   }
 
@@ -27,7 +27,7 @@ export class SystemAdminService {
       throw new Error(`Unable to find group for role ${ROLES.ALP_SYSTEM_ADMIN}`)
     }
 
-    this.logger.info(`Withdraw ALP system admin for ${userId}`)
+    this.logger.info(`Withdraw D2E system admin for ${userId}`)
     return await this.userGroupService.withdrawUserFromGroup(userId, group.id)
   }
 }

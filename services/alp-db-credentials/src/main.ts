@@ -63,7 +63,7 @@ class App {
   start() {
     runMigrations().then(() => {
       this.app.listen(PORT)
-      logger.info(`🚀 ALP DB Credentials Manager started successfully!. Server listening on port ${PORT}`)
+      logger.info(`🚀 D2E DB Credentials Manager started successfully!. Server listening on port ${PORT}`)
     })
   }
 }

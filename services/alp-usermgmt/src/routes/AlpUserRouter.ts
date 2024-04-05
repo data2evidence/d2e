@@ -21,7 +21,7 @@ export class AlpUserRouter {
   private registerRoutes() {
     this.router.get('/', async (req: IAppRequest, res: Response, next: NextFunction) => {
       const alpUsers: { [userId: string]: IUserWithRoles } = {}
-      this.logger.info('Get ALP users')
+      this.logger.info('Get D2E users')
 
       try {
         const userAdmins = await this.userAdminService.getUsers()
@@ -29,7 +29,7 @@ export class AlpUserRouter {
 
         return res.status(200).json(Object.values(alpUsers))
       } catch (err) {
-        this.logger.error(`Error when getting ALP users: ${JSON.stringify(err)}`)
+        this.logger.error(`Error when getting D2E users: ${JSON.stringify(err)}`)
         return next(err)
       }
     })

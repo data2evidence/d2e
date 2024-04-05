@@ -1,4 +1,4 @@
-# ALP Portal server
+# D2E Portal server
 
 Manage datasets via REST API (proxy) or database (standalone)
 

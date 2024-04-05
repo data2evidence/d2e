@@ -1,4 +1,4 @@
-name: ALP DB-Svc integration tests with Azure Hana database and local Postgres database
+name: D2E DB-Svc integration tests with Azure Hana database and local Postgres database
 
 on:
   pull_request:

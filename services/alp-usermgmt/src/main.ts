@@ -60,4 +60,4 @@ class Server {
 }
 
 new Server().start()
-logger.info(`🚀 ALP User Management started successfully!. Server listening on port ${PORT}`)
+logger.info(`🚀 D2E User Management started successfully!. Server listening on port ${PORT}`)

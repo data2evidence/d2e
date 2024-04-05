@@ -15,10 +15,10 @@ export const isUserSystemAdmin = async (token, idpUserId) => {
   const alp_role_system_admin = userGroupMetadata.alp_role_system_admin;
 
   if (alp_role_system_admin) {
-    logger.info("User has ALP System Admin role");
+    logger.info("User has D2E System Admin role");
     return true;
   }
-  logger.error("User has no ALP System Admin role");
+  logger.error("User has no D2E System Admin role");
   return false;
 };
 

@@ -124,11 +124,11 @@ async function ensureAlpSysAdminAuthorized(req, res, next) {
   const alp_role_system_admin = userGroupMetadata.alp_role_system_admin
 
   if (alp_role_system_admin) {
-    logger.info('Authorized access for ALP System Admin')
+    logger.info('Authorized access for D2E System Admin')
     return next()
   }
-  logger.error('User has no ALP System Admin role')
-  return res.status(403).send('User has no ALP System Admin role')
+  logger.error('User has no D2E System Admin role')
+  return res.status(403).send('User has no D2E System Admin role')
 }
 
 function encode(string: string) {
@@ -549,7 +549,7 @@ const dashboardGateRoutes = Container.get(DashboardGateRouter)
 app.use(dashboardGateRoutes.router)
 
 if (env.SSL_PRIVATE_KEY === undefined || env.SSL_PUBLIC_CERT === undefined) {
-  logger.error('Unable to launch ALP Gateway due to missing SSL env variable.')
+  logger.error('Unable to launch D2E Gateway due to missing SSL env variable.')
   process.exit(1)
 }
 
@@ -565,4 +565,4 @@ const server = https.createServer(
 )
 
 server.listen(PORT)
-logger.info(`🚀 ALP Gateway started on port ${PORT}`)
+logger.info(`🚀 D2E Gateway started on port ${PORT}`)

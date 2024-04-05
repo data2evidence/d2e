@@ -91,7 +91,7 @@ SKIP_AUTH=TRUE
 local=true
 ```
 
-4. Start ALP 
+4. Start D2E 
 ```
 yarn start:minerva
 ``` 

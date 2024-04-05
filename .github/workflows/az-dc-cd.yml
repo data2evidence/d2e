@@ -105,7 +105,7 @@ jobs:
       run: |
         yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
 
-        # Run ALP services
+        # Run D2E services
         yarn remote:minerva up --remove-orphans --force-recreate --wait --pull always
         EXIT_CODE=$?
 

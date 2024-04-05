@@ -22,7 +22,7 @@ export class AlpDataAdminRouter {
   private registerRoutes() {
     this.router.get('/', async (req: IAppRequest, res: Response, next: NextFunction) => {
       const dataAdmins: { [userId: string]: IUserWithRolesInfo } = {}
-      this.logger.info('Get ALP data admins')
+      this.logger.info('Get D2E data admins')
 
       try {
         const sqleditorAdmins = await this.sqleditorAdminService.getUsers()
@@ -33,7 +33,7 @@ export class AlpDataAdminRouter {
 
         return res.status(200).json(Object.values(dataAdmins))
       } catch (err) {
-        this.logger.error(`Error when getting ALP data admins: ${JSON.stringify(err)}`)
+        this.logger.error(`Error when getting D2E data admins: ${JSON.stringify(err)}`)
         return next(err)
       }
     })

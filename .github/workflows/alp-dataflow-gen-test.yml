@@ -1,4 +1,4 @@
-name: ALP dataflow-gen unit tests
+name: D2E dataflow-gen unit tests
 
 on:
   pull_request:

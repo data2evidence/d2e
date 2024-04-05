@@ -1,6 +1,6 @@
-# ALP Dataflow
+# D2E Dataflow
 
-Manage Dataflow from ALP Portal and transform dataflows into parameters for Prefect flow runs
+Manage Dataflow from D2E Portal and transform dataflows into parameters for Prefect flow runs
 
 ## Description
 
