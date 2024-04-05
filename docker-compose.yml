@@ -1433,7 +1433,6 @@ services:
   
   alp-fhir-server:
     container_name: &c26 alp-minerva-fhir-server-${BASE_PORT:-1}
-    # entrypoint: ['tail', "-f", "/dev/null"]
     entrypoint: ['./start.sh']
     image: alp-fhir-server:develop
     logging:
