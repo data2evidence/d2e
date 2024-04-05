@@ -1,4 +1,4 @@
-# Analytics Platform (ALP)
+# Analytics Platform (D2E)
 
 ## Install pre-requisites
 see: [1-setup](docs/1-setup/README.md)
@@ -12,7 +12,7 @@ see: [1-setup](docs/1-setup/README.md)
 docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 ```
 
-## Troubleshooting
+## Knowledgebase
 - see: [knowledgebase](docs/knowledgebase)
 
 ## Generate dotenv
@@ -38,6 +38,7 @@ notes:
 - detects `../d2e-ui` branch or defaults to develop branch
 
 ## (Re)Start App
+- ensure ui is started
 - docker compose up - approx 5 minutes
 ```
 yarn start:minerva --wait; sleep 60
@@ -49,5 +50,14 @@ yarn start:minerva --wait; sleep 60
 ## Configure
 - see: [3-configure](docs/3-configure)
 
-## Integration Tests
-- see: [4-integration-tests](docs/4-integration-tests)
+## Stop
+- when completed stop all containers
+```
+yarn stop:minerva
+```
+
+## Clean-up
+- when completed remove all containers volume
+```
+yarn clean:minerva
+```

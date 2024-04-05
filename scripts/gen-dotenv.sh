@@ -10,7 +10,7 @@ tmp_file=.env.tmp
 
 passphrase_length=10
 password_length=30
-x509_subject="/C=SG/O=ALP Dev"
+x509_subject="/C=SG/O=D2E Dev"
 
 # vars
 echo '' > $tmp_file 

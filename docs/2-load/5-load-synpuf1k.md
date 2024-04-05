@@ -1,9 +1,9 @@
 # Download & transform SynPUF-1k
-- Initially, the ALP system does not contain any data
+- Initially, the D2E system does not contain any data
 - Synthetic Public Use Files (SynPUFs) provide sample patient data
 
 ## Download Public SynPUF-1k
-- Open a terminal in the root of `alp` repo
+- Open a terminal in the root of `d2e` repo
 - Run the following command to download synpuf1k54
 ```
 wget https://caruscloud.uniklinikum-dresden.de/index.php/s/Qog8B5WCTHFHmjW/download -O ~/Downloads/synpuf1k54.tar.gz
@@ -11,7 +11,7 @@ wget https://caruscloud.uniklinikum-dresden.de/index.php/s/Qog8B5WCTHFHmjW/downl
 - Source: [https://forums.ohdsi.org/t/1k-sample-of-simulated-cms-synpuf-data-in-cdmv5-format-available-for-download/728/39](https://forums.ohdsi.org/t/1k-sample-of-simulated-cms-synpuf-data-in-cdmv5-format-available-for-download/728/39) 
 
 ## Transform csv files to expected format
-- Open a terminal in the root of `alp` repo
+- Open a terminal in the root of `d2e` repo
 - Run the following commands to define directories
 ```bash
 ALP_DN_REPO_DIR=$PWD
@@ -80,9 +80,9 @@ wc -l *
 
 **Reminder: Before running the next steps**
 > - [Grant postgres_tenant_admin_user permissions](4-set-pg-permissions.md)
-> - Ensure the ALP system is up
+> - Ensure the D2E system is up
 
-- Navigate back to root folder `alp` and Run the following command to seed postgres cdm schemas with synpuf-1k
+- Navigate back to root folder `d2e` and Run the following command to seed postgres cdm schemas with synpuf-1k
 ```bash
 cd $ALP_DN_REPO_DIR
 yarn seed-postgres-cdm-schemas alpdev_pg cdmdefault

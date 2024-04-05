@@ -1,4 +1,4 @@
-## ALP-METADATA
+## D2E-METADATA
 - Client for accessing metadata in alp-portal
 
 ## LOCAL DEVELOPMENT

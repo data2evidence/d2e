@@ -25,6 +25,9 @@ zip -r ~/Downloads/$PLUGIN_PACKAGE_NAME.zip . -x ".git*" -x "*/.*"
 > ![](../images/dataflow/AddFlowDialog.png)
 
 - Select the zipped plugin and click on **Add**
+- notes: 
+  - Docker container shows upload logs
+  - progress is not reported
 
 - After approx 5 minutes select Jobs tab to confirm flow has uploaded successfully
 > ![](../images/dataflow/JobsTable.png)

@@ -1,7 +1,7 @@
 {
   "name": "alp-data-node",
   "version": "1.0.0",
-  "description": "ALP Data Node",
+  "description": "D2E Data Node",
   "license": "MIT",
   "scripts": {
     "gen:dotenv": "scripts/gen-dotenv.sh && yarn gen:tls",

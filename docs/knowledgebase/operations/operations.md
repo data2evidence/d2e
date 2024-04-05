@@ -1,4 +1,10 @@
 # Docker Containers
+## clean start
+- remove all container & volumes
+- generate new passwords
+```
+alias clean="yarn clean:minerva && yarn gen:dotenv"
+```
 ## build
 - build with progress and logging
 ```
@@ -9,8 +15,8 @@ alias build="yarn build:minerva --progress=plain | tee ~/Downloads/build-$(date 
 ```
 alias start="yarn start:ui --remove-orphans --wait && yarn start:minerva --remove-orphans --force-recreate | tee ~/Downloads/start-$(date '+%Y%m%dT%H%M').log"
 ```
-## start & build
-## stop all containers
+## stop
+- stop ui & minerva
 ```
-docker ps -aq | xargs -n 1 docker rm -f
+alias stop="yarn stop:ui && yarn stop:minerva"
 ```
