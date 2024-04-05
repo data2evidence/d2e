@@ -62,16 +62,16 @@ export class DataCharacterizationService {
 
     const datasetId = dataCharacterizationFlowRunDto.datasetId
     const comment = dataCharacterizationFlowRunDto.comment
-    let vocabSchemaName = dataCharacterizationFlowRunDto.vocabSchemaName
+    let vocabSchema = dataCharacterizationFlowRunDto.vocabSchemaName
     const releaseId = dataCharacterizationFlowRunDto.releaseId
     const excludeAnalysisIds = dataCharacterizationFlowRunDto.excludeAnalysisIds ?? ''
 
-    const { dialect, databaseCode, schemaName } = await this.portalServerApi.getDataset(datasetId)
+    const { dialect, databaseCode, schemaName, vocabSchemaName } = await this.portalServerApi.getDataset(datasetId)
 
     const dataCharacterizationResultsSchema = `${schemaName}_DATA_CHARACTERIZATION_${Date.now()}`
 
-    if (!vocabSchemaName) {
-      vocabSchemaName = await this.analyticsSvcApi.getVocabSchemaFromCdmSchema(dialect, databaseCode, schemaName)
+    if (!vocabSchema) {
+      vocabSchema = vocabSchemaName
     }
 
     const releaseDate = (await this.getReleaseDate(releaseId)).split('T')[0]
@@ -85,7 +85,7 @@ export class DataCharacterizationService {
         databaseCode,
         datasetId,
         cdmVersionNumber,
-        vocabSchemaName,
+        vocabSchema,
         comment,
         resultsSchema: dataCharacterizationResultsSchema,
         excludeAnalysisIds,
