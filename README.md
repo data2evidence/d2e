@@ -1,11 +1,7 @@
 # Analytics Platform (ALP)
 
 ## Install pre-requisites
-see: [1-install](docs/1-setup/README.md)
-- docker
-- nodejs
-- yarn
-- openssl
+see: [1-setup](docs/1-setup/README.md)
 
 ## Clone repository
 - see: [Cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
@@ -17,7 +13,7 @@ docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 ```
 
 ## Troubleshooting
-- see: [troubleshooting](docs/knowledgebase)
+- see: [knowledgebase](docs/knowledgebase)
 
 ## Generate dotenv
 - see: [environment variables](docs/1-setup/environment-variables.md)
