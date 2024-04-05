@@ -55,8 +55,6 @@ Manage Database Objects in an Automated way
   - Using Client-credentials flow with `alp-data` as client id
 - To update maintenance script for \*\*\_ADMIN_USER admin user schema: `PUT <process.env.DB_SVC__PATH>/hana/database/<tenant-name>/maintenance/schema/<admin-user-schema>`
   - Using Client-credentials flow with `alp-data` as client id
-- Update metadata of Hana schema: `PUT <process.env.DB_SVC__PATH>/hana/database/study-name/<study-name>/schema/<schema-name>`
-  - Using Client-credentials flow with `alp-data` as client id
 - Load Sypuf1k data into Hana schema: `PUT <process.env.DB_SVC__PATH>/hana/database/<tenant-name>/importdata?schema=<schema>`
 
 #### Postgres
