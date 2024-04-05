@@ -1,7 +1,7 @@
 # Docker Containers
 ## build with logging
 ```
-yarn build:minerva docker build --progress=plain | tee ~/Downloads/build-$(date '+%Y%m%dT%H%M').log
+yarn build:minerva --progress=plain | tee ~/Downloads/build-$(date '+%Y%m%dT%H%M').log
 ```
 ## start with logging
 ```
