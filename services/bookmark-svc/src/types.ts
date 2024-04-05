@@ -4,6 +4,72 @@
 import { Connection } from '@alp/alp-base-utils'
 import ConnectionInterface = Connection.ConnectionInterface
 import { Request } from 'express'
+import { z } from 'zod'
+
+export const bookmarkIdSchema = z.object({
+  query: z
+    .object({
+      paConfigId: z.string(),
+      r: z.string(),
+    })
+    .required(),
+})
+
+export const bookmarkIdsSchema = z.object({
+  query: z
+    .object({
+      ids: z.string(),
+    })
+    .required(),
+})
+
+export const createBookmarkSchema = z.object({
+  body: z
+    .object({
+      bookmark: z.string(),
+      bookmarkname: z.string().optional(),
+      paConfigId: z.string(),
+      cdmConfigId: z.string(),
+      cdmConfigVersion: z.string(),
+      shareBookmark: z.boolean(),
+      cmd: z.string(),
+    })
+    .required(),
+})
+
+export const updateBookmarkSchema = z.object({
+  params: z
+    .object({
+      bookmarkId: z.string(),
+    })
+    .required(),
+  body: z
+    .object({
+      cmd: z.string(),
+      newName: z.string().optional(),
+      paConfigId: z.string(),
+      cdmConfigId: z.string(),
+      cdmConfigVersion: z.string(),
+    })
+    .required(),
+})
+
+export const deleteBookmarkSchema = z.object({
+  params: z
+    .object({
+      bookmarkId: z.string(),
+    })
+    .required(),
+  body: z
+    .object({
+      cmd: z.string(),
+      paConfigId: z.string(),
+      cdmConfigId: z.string(),
+      cdmConfigVersion: z.string(),
+    })
+    .required(),
+})
+
 export interface IMRIRequest extends Request {
   dbConnections: {
     analyticsConnection: ConnectionInterface
