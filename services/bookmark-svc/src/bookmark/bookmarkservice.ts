@@ -461,15 +461,15 @@ export function queryBookmarks(
   callback: CallBackInterface
 ) {
   try {
-    let cmd = requestParameters.cmd
-    let bookmark = requestParameters.bookmark
-    let bookmarkId = requestParameters.bmkId
-    let bookmarkIds = requestParameters.bmkIds
-    let viewName = requestParameters.viewName
-    let paConfigId = requestParameters.paConfigId
-    let cdmConfigId = requestParameters.cdmConfigId
-    let cdmConfigVersion = requestParameters.cdmConfigVersion
-    let shareBookmark = requestParameters.shareBookmark
+    let cmd: string = requestParameters.cmd
+    let bookmark: string = requestParameters.bookmark
+    let bookmarkId: string = requestParameters.bmkId
+    let bookmarkIds: string[] = requestParameters.bmkIds
+    let viewName: string = requestParameters.viewName
+    let paConfigId: string = requestParameters.paConfigId
+    let cdmConfigId: string = requestParameters.cdmConfigId
+    let cdmConfigVersion: string = requestParameters.cdmConfigVersion
+    let shareBookmark: boolean = requestParameters.shareBookmark
 
     let cb = (err, result) => {
       if (err) {
