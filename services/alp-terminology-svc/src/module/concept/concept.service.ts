@@ -238,9 +238,12 @@ export class ConceptService {
         `${databaseName}_${vocabSchemaName}_concept`,
         false,
       );
-      return meilisearchResult.map(
-        (result) => this.meilisearchResultMapping(result).expansion.contains[0],
-      );
+      return meilisearchResult
+        .map(
+          (result) =>
+            this.meilisearchResultMapping(result).expansion.contains[0],
+        )
+        .filter((result) => result != null);
     } catch (err) {
       logger.error(err);
       throw err;
