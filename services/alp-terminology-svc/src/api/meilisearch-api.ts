@@ -292,15 +292,13 @@ export class MeilisearchAPI {
       const filter = exactSearchFilter.concat();
       return {
         indexUid: index,
-        limit: 1,
         filter,
       };
     });
-    const result = await axios.post<{ results: IMeilisearchGetConceptRecommended[] }>(
-      url,
-      { queries },
-      options,
-    );
+    const result = await axios.post<{
+      results: IMeilisearchGetConceptRecommended[];
+    }>(url, { queries }, options);
+    console.log(result.data.results);
     return result.data.results;
   }
 
