@@ -228,15 +228,16 @@ export class ConceptService {
           mappedConceptIds.push(hit.concept_id_2);
         });
       });
-      
+
       const meilisearchResult = await meilisearchApi.getMultipleExactConcepts(
         mappedConceptIds,
         `${databaseName}_${vocabSchemaName}_concept`,
         false,
       );
-      return meilisearchResult.map(
-        (result) => this.meilisearchResultMapping(result).expansion.contains[0],
-      );
+      return meilisearchResult.map((result) => {
+        if (this.meilisearchResultMapping(result).expansion.contains.length > 0)
+          return this.meilisearchResultMapping(result).expansion.contains[0];
+      });
     } catch (err) {
       logger.error(err);
       throw err;
