@@ -69,7 +69,6 @@ async function createDuckdbDatabaseFromPostgres() {
         "procedure_occurrence",
         "provider",
         "relationship",
-        "schema_metadata",
         "source_to_concept_map",
         "specimen",
         "visit_detail",

@@ -253,34 +253,6 @@ export default class DBRouter {
       [this.updateMaintenanceScript]
     );
 
-    //PUT
-    //database/:tenant/study-name/:studyName/schema/:schema
-    registerRouterHandler(
-      this.router,
-      HTTP_METHOD.PUT,
-      "/database/:tenant/study-name/:studyName/schema/:schema",
-      [
-        param("dialect")
-          .isIn([config.DB.HANA, config.DB.POSTGRES])
-          .withMessage("Route is not supported for this dialect"),
-        param("tenant")
-          .isIn(config.getTenants(dialect))
-          .notEmpty()
-          .matches(this.dbObjectNameValidationRegExp)
-          .withMessage("Tenant database name is invalid"),
-        param("studyName")
-          .isLength({ min: 1, max: 255 }) // following the max length in alp-portal
-          .withMessage(
-            "Study name is invalid. It should not be longer than 255 characters"
-          ),
-        param("schema")
-          .notEmpty()
-          .matches(this.schemaNameRegExp)
-          .withMessage("Schema name is invalid"),
-      ],
-      [this.updateStudyNameForSchema]
-    );
-
     //DELETE
     //database/:tenant/data-model/omop5-4/count/:rollbackCount
     registerRouterHandler(
@@ -2091,51 +2063,6 @@ export default class DBRouter {
         };
         res.status(500).json(httpResponse);
       });
-  };
-
-  updateStudyNameForSchema = (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    const tenant = req.params.tenant;
-    const studyName = req.params.studyName;
-    const schema = req.params.schema;
-
-    this.dbDao.getDBConnectionByTenant(
-      tenant,
-      req,
-      res,
-      (err: Error, dbConnection: ConnectionInterface) => {
-        if (err) {
-          this.logger.error(`Error unable to get DB Connection!\n${err.stack}`);
-          return next(err);
-        }
-        this.dbDao.updateStudyNameForSchema(
-          dbConnection,
-          studyName,
-          schema,
-          utils.asyncRouterCallback(
-            "Study name update for schema is successful!",
-            "Study name update for schema has failed!",
-            res,
-            next
-          )
-        );
-      }
-    );
-    // .catch((err) => {
-    //   this.logger.error(
-    //     `Error while updating study name for schema!\n${err.stack}`
-    //   );
-    //   const httpResponse = {
-    //     message: "failed to update study name for schema!",
-    //     successfulSchemas: [],
-    //     failedSchemas: [schema],
-    //     errorOccurred: true,
-    //   };
-    //   res.status(500).json(httpResponse);
-    // });
   };
 
   //Create Questionnaire Definition
