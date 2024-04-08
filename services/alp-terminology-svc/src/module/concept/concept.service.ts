@@ -363,27 +363,33 @@ export class ConceptService {
     // valid_end_date is in seconds while js timestamp is in ms
     const validity =
       item.valid_end_date > Number(new Date()) / 1000 ? 'Valid' : 'Invalid';
-    const details: FhirValueSetExpansionContainsWithExt = {
-      conceptId: item.concept_id,
-      display: item.concept_name,
-      domainId: item.domain_id,
-      system: item.vocabulary_id,
-      conceptClassId: item.concept_class_id,
-      standardConcept: item.standard_concept,
-      concept:
-        item.standard_concept == null || item.standard_concept !== 'S'
-          ? 'Non-standard'
-          : 'Standard',
-      code: item.concept_code,
-      validStartDate: item.valid_start_date
-        ? new Date(item.valid_start_date).toISOString()
-        : '',
-      validEndDate: item.valid_end_date
-        ? new Date(item.valid_end_date).toISOString()
-        : '',
-      validity,
-    };
-    return details;
+      try {
+        const details: FhirValueSetExpansionContainsWithExt = {
+          conceptId: item.concept_id,
+          display: item.concept_name,
+          domainId: item.domain_id,
+          system: item.vocabulary_id,
+          conceptClassId: item.concept_class_id,
+          standardConcept: item.standard_concept,
+          concept:
+            item.standard_concept == null || item.standard_concept !== 'S'
+              ? 'Non-standard'
+              : 'Standard',
+          code: item.concept_code,
+          validStartDate: item.valid_start_date
+            ? new Date(item.valid_start_date).toISOString()
+            : '',
+          validEndDate: item.valid_end_date
+            ? new Date(item.valid_end_date).toISOString()
+            : '',
+          validity,
+        };
+        return details;
+      } catch (err) {
+        logger.error(JSON.stringify(item));
+        logger.error(JSON.stringify(err));
+        throw err;
+      }
   }
   private meilisearchResultMapping(
     meilisearchResult: IMeilisearchConcept,
