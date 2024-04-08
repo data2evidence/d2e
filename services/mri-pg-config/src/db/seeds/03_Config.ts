@@ -39,7 +39,7 @@ export async function seed(knex: Knex): Promise<void> {
         Version: "1",
         Status: "A",
         Name: "OMOP_GDM_DM_DUCKDB",
-        Type: "HC/HPH/CDW/DUCKDB",
+        Type: "HC/HPH/CDW",
         Data: cdwConfigDuckdb,
         ParentId: "",
         ParentVersion: "",
@@ -53,7 +53,7 @@ export async function seed(knex: Knex): Promise<void> {
         Version: "A",
         Status: "",
         Name: "OMOP_GDM_PA_CONF_DUCKDB",
-        Type: "HC/MRI/PA/DUCKDB",
+        Type: "HC/MRI/PA",
         Data: paConfigDuckdb,
         ParentId: "e10f83a0-ade9-4a33-90ae-cf760813943c",
         ParentVersion: "1",
@@ -24560,6 +24560,47 @@ const cdwConfigDuckdb = {
           'birth_datetime',
         ],
       },
+      Gender: {
+        name: 'Gender concept id',
+        disabledLangName: [
+          {
+            lang: 'en',
+            value: '',
+            visible: true,
+          },
+          {
+            lang: 'de',
+            value: '',
+            visible: true,
+          },
+          {
+            lang: 'fr',
+            value: '',
+            visible: true,
+          },
+          {
+            lang: 'es',
+            value: '',
+            visible: true,
+          },
+          {
+            lang: 'pt',
+            value: '',
+            visible: true,
+          },
+          {
+            lang: 'zh',
+            value: '',
+            visible: true,
+          },
+        ],
+        type: 'text',
+        expression: '@PATIENT."gender_concept_id"',
+        referenceFilter: '@REF.DOMAIN_ID = \'Gender\' AND @REF.STANDARD_CONCEPT = \'S\' AND (@REF.CONCEPT_NAME) LIKE_REGEXPR \'@SEARCH_QUERY\' FLAG \'i\'',
+        referenceExpression: '@REF.CONCEPT_NAME',
+        order: 7,
+        useRefValue: true,
+      },
       ethnicityconceptid: {
         name: 'Ethnicity concept id',
         disabledLangName: [
@@ -25321,6 +25362,26 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Ethnicity source value",
+        },
+        {
+          source: "patient.attributes.Gender",
+          ordered: false,
+          cached: true,
+          useRefText: false,
+          useRefValue: true,
+          category: true,
+          measure: false,
+          filtercard: {
+            initial: true,
+            visible: true,
+            order: 10,
+          },
+          patientlist: {
+            initial: true,
+            visible: true,
+            linkColumn: false,
+          },
+          modelName: "Gender",
         },
         {
           source: "patient.attributes.gendersourcevalue",
