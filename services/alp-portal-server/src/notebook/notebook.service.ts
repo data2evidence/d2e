@@ -60,7 +60,8 @@ export class NotebookService {
     try {
       const notebook = await this.getNotebook(notebookUpdateDto.id)
       if (notebook.userId !== this.userId) {
-        delete notebookUpdateDto.isShared
+        this.logger.error('Notebook does not belong to user!')
+        throw new InternalServerErrorException('Notebook does not belong to user!')
       }
       await this.notebookRepo.update(
         { id: notebookUpdateDto.id, userId: this.userId },

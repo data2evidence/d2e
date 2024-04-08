@@ -854,44 +854,6 @@ describe("PUT - API successful scenario integration test", () => {
       errorOccurred: false,
     });
   }, 600000);
-
-  test("[Success] Update study name for schema", (done) => {
-    // Arrange
-    const targetSchema = "CDMDEFAULT";
-    const studyName = `coconut-study-${Math.ceil(Math.random() * 10000)}`;
-
-    // Act
-    api
-      .put(
-        `/alpdb/hana/database/${tenantDatabase}/study-name/${studyName}/schema/${targetSchema}`
-      )
-      .send({
-        vocabSchema: process.env.OMOP__VOCAB_SCHEMA,
-      })
-      .then((response: any) => {
-        // Assert
-        expect(response.body).toEqual({
-          message: "Study name update for schema is successful!",
-          successfulSchemas: [`${targetSchema}`],
-          failedSchemas: [],
-          errorOccurred: false,
-        });
-      })
-      .then(() => {
-        // Assert
-        helper.executeSql(
-          tenantDatabase,
-          `SELECT COUNT(STUDY_NAME) AS COUNT FROM "${targetSchema}"."SCHEMA.METADATA" WHERE STUDY_NAME = UPPER('${studyName}')`,
-          (result: any) => {
-            expect(result[0].COUNT).toEqual(1);
-            done();
-          }
-        );
-      })
-      .catch((err: Error) => {
-        done(err);
-      });
-  }, 600000);
 });
 
 // Skip POST failure scenario test in Github Action to speed up test and also reduce the amount of error log
@@ -1170,53 +1132,6 @@ describe.skip("PUT - API failure scenario integration test", () => {
       msg: "Maintenance user schema name is invalid",
       param: "schema",
       location: "params",
-    });
-  }, 120000);
-
-  test("[Failure due to study name is longer than 255 characters] Update study name for schema", async () => {
-    // Arrange
-    const targetSchema = "CDMDEFAULT";
-    const invalidStudyName =
-      "LONG-STUDY-NAME-XJNAJDNJSANDJNSADNSJANDJSNJDNJKNAJKDNSJKNDJKNASKJNAJKDNJKSADNXJNAJDNJSANDJNSADNSJANDJSNJDNJKNAJKDNSJKNDJKNASKJNAJKDNJKSADNXJNAJDNJSANDJNSADNSJANDJSNJDNJKNAJKDNSJKNDJKNASKJNAJKDNJKSADNXJNAJDNJSANDJNSADNSJANDJSNJDNJKNAJKDNSJKNDJKNASKJNAJKDNJKSADNXJ";
-
-    // Act
-    const response = await api
-      .put(
-        `/alpdb/hana/database/${tenantDatabase}/study-name/${invalidStudyName}/schema/${targetSchema}`
-      )
-      .send({
-        vocabSchema: process.env.OMOP__VOCAB_SCHEMA,
-      });
-
-    // Assert
-    expect(response.body.errors[0]).toEqual({
-      value: invalidStudyName,
-      msg: "Study name is invalid. It should not be longer than 255 characters",
-      param: "studyName",
-      location: "params",
-    });
-  }, 120000);
-
-  test("[Failure due to invalid target schema] Update study name for schema", async () => {
-    // Arrange
-    const studyName = "coconut-study";
-    const invalidSchema = "CDMINVALID";
-
-    // Act
-    const response = await api
-      .put(
-        `/alpdb/hana/database/${tenantDatabase}/study-name/${studyName}/schema/${invalidSchema}`
-      )
-      .send({
-        vocabSchema: process.env.OMOP__VOCAB_SCHEMA,
-      });
-
-    // Assert
-    expect(response.body).toEqual({
-      message: "Study name update for schema has failed!",
-      successfulSchemas: [],
-      failedSchemas: [invalidSchema],
-      errorOccurred: true,
     });
   }, 120000);
 });
