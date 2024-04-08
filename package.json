@@ -42,7 +42,7 @@
 
     "build:minerva-test": "yarn local:minerva build",
 
-    "start:minerva-test": "yarn local:minerva start",
+    "start:minerva-test": "yarn local:minerva up",
 
 
     "local:cube:minerva": "yarn local:minerva --profile cube",
