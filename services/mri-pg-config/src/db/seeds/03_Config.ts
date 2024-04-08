@@ -17136,7 +17136,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           startdate: {
-            name: 'Start Date',
+            name: 'Condition Era Start Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -17174,7 +17174,7 @@ const cdwConfigDuckdb = {
             order: 1,
           },
           enddate: {
-            name: 'End Date',
+            name: 'Condition Era End Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -17250,7 +17250,7 @@ const cdwConfigDuckdb = {
             order: 3,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -17448,7 +17448,7 @@ const cdwConfigDuckdb = {
             order: 0,
           },
           enddate: {
-            name: 'End Date',
+            name: 'Condition End Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -17486,7 +17486,7 @@ const cdwConfigDuckdb = {
             order: 1,
           },
           startdate: {
-            name: 'Start Date',
+            name: 'Condition Start Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -17524,7 +17524,7 @@ const cdwConfigDuckdb = {
             order: 2,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -18000,7 +18000,7 @@ const cdwConfigDuckdb = {
             useRefText: true,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -18038,7 +18038,7 @@ const cdwConfigDuckdb = {
             order: 2,
           },
           deathdatetime: {
-            name: 'Death Date/Time',
+            name: 'Death Datetime',
             disabledLangName: [
               {
                 lang: 'en',
@@ -18196,7 +18196,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           enddate: {
-            name: 'End Date',
+            name: 'Device Exposure End Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -18234,7 +18234,7 @@ const cdwConfigDuckdb = {
             order: 0,
           },
           startdate: {
-            name: 'Start Date',
+            name: 'Device Exposure Start Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -18272,7 +18272,7 @@ const cdwConfigDuckdb = {
             order: 1,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -18552,7 +18552,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -18590,7 +18590,7 @@ const cdwConfigDuckdb = {
             order: 2,
           },
           enddate: {
-            name: 'End Date',
+            name: 'Dose Era End Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -18628,7 +18628,7 @@ const cdwConfigDuckdb = {
             order: 3,
           },
           startdate: {
-            name: 'Start Date',
+            name: 'Dose Era Start Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -18944,7 +18944,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           enddate: {
-            name: 'End Date',
+            name: 'Drug Era End Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -18982,7 +18982,7 @@ const cdwConfigDuckdb = {
             order: 0,
           },
           startdate: {
-            name: 'Start Date',
+            name: 'Drug Era Start Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -19020,7 +19020,7 @@ const cdwConfigDuckdb = {
             order: 1,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -19294,7 +19294,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           enddatetime: {
-            name: 'End Date/Time',
+            name: 'Drug Exposure End Datetime',
             disabledLangName: [
               {
                 lang: 'en',
@@ -19370,7 +19370,7 @@ const cdwConfigDuckdb = {
             order: 1,
           },
           startdatetime: {
-            name: 'Start Date/Time',
+            name: 'Drug Exposure Start Datetime',
             disabledLangName: [
               {
                 lang: 'en',
@@ -19446,7 +19446,7 @@ const cdwConfigDuckdb = {
             order: 3,
           },
           enddate: {
-            name: 'End Date',
+            name: 'Drug Exposure End Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -19484,7 +19484,7 @@ const cdwConfigDuckdb = {
             order: 4,
           },
           startdate: {
-            name: 'Start Date',
+            name: 'Drug Exposure Start Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -19636,7 +19636,7 @@ const cdwConfigDuckdb = {
             order: 11,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -20038,7 +20038,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           numval: {
-            name: 'Value (numeric)',
+            name: 'Value As Number',
             disabledLangName: [
               {
                 lang: 'en',
@@ -20114,7 +20114,7 @@ const cdwConfigDuckdb = {
             order: 3,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -20546,7 +20546,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           obsdatetime: {
-            name: 'Observation Date/Time',
+            name: 'Observation Datetime',
             disabledLangName: [
               {
                 lang: 'en',
@@ -20584,7 +20584,7 @@ const cdwConfigDuckdb = {
             order: 1,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -20698,7 +20698,7 @@ const cdwConfigDuckdb = {
             order: 4,
           },
           verbatimtext: {
-            name: 'Value (verbatim)',
+            name: 'Value as string',
             disabledLangName: [
               {
                 lang: 'en',
@@ -20736,7 +20736,7 @@ const cdwConfigDuckdb = {
             order: 8,
           },
           numval: {
-            name: 'Value (numeric)',
+            name: 'Value as number',
             disabledLangName: [
               {
                 lang: 'en',
@@ -21218,7 +21218,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           enddate: {
-            name: 'End Date',
+            name: 'Observation Period End Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -21256,7 +21256,7 @@ const cdwConfigDuckdb = {
             order: 0,
           },
           startdate: {
-            name: 'Start Date',
+            name: 'Observation Period Start Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -21294,7 +21294,7 @@ const cdwConfigDuckdb = {
             order: 1,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -21494,7 +21494,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           enddate: {
-            name: 'End Date',
+            name: 'Payer Plan Period End Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -21532,7 +21532,7 @@ const cdwConfigDuckdb = {
             order: 0,
           },
           startdate: {
-            name: 'Start Date',
+            name: 'Payer Plan Period Start Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -21570,7 +21570,7 @@ const cdwConfigDuckdb = {
             order: 1,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -21688,7 +21688,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           procdatetime: {
-            name: 'Procedure Start Date/Time',
+            name: 'Procedure Start Datetime',
             disabledLangName: [
               {
                 lang: 'en',
@@ -21878,7 +21878,7 @@ const cdwConfigDuckdb = {
             order: 4,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -22116,7 +22116,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -22230,7 +22230,7 @@ const cdwConfigDuckdb = {
             order: 7,
           },
           specimendatetime: {
-            name: 'Specimen Date/Time',
+            name: 'Specimen Datetime',
             disabledLangName: [
               {
                 lang: 'en',
@@ -22758,7 +22758,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           enddate: {
-            name: 'End Date',
+            name: 'Visit End Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -22796,7 +22796,7 @@ const cdwConfigDuckdb = {
             order: 0,
           },
           startdate: {
-            name: 'Start Date',
+            name: 'Visit Start Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -22834,7 +22834,7 @@ const cdwConfigDuckdb = {
             order: 1,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -23111,7 +23111,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           consentdatetime: {
-            name: 'Consent Date/Time',
+            name: 'Consent Datetime',
             disabledLangName: [
               {
                 lang: 'en',
@@ -23149,7 +23149,7 @@ const cdwConfigDuckdb = {
             order: 0,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Person id',
             disabledLangName: [
               {
                 lang: 'de',
@@ -24438,7 +24438,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           cohortdefinitionid: {
-            name: 'Cohort ID',
+            name: 'Cohort Definition Id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -24478,7 +24478,7 @@ const cdwConfigDuckdb = {
             useRefText: true,
           },
           pid: {
-            name: 'Patient Id',
+            name: 'Subject Id',
             disabledLangName: [
               {
                 lang: 'en',
@@ -24520,7 +24520,7 @@ const cdwConfigDuckdb = {
     },
     attributes: {
       pid: {
-        name: 'Patient ID',
+        name: 'Person id',
         disabledLangName: [],
         type: 'text',
         expression: 'CAST (@PATIENT."person_id" AS VARCHAR)',
@@ -24551,7 +24551,7 @@ const cdwConfigDuckdb = {
         order: 3,
       },
       dateOfBirth: {
-        name: 'Date of Birth',
+        name: 'Birth Datetime',
         disabledLangName: [],
         type: 'datetime',
         expression: '@PATIENT."birth_datetime"',
@@ -25481,7 +25481,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient ID",
+          modelName: "Person id",
         },
         {
           source: "patient.attributes.pcount",
@@ -25561,7 +25561,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Date of Birth",
+          modelName: "Birth Datetime",
         },
       ],
       initialPatientlistColumn: true,
@@ -25717,7 +25717,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source:
@@ -25738,7 +25738,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Start Date",
+          modelName: "Condition Start Date",
         },
         {
           source: "patient.interactions.conditionoccurrence.attributes.enddate",
@@ -25758,7 +25758,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "End Date",
+          modelName: "Condition End Date",
         },
         {
           source:
@@ -25952,7 +25952,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.visit.attributes.startdate",
@@ -25972,7 +25972,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Start Date",
+          modelName: "Visit Start Date",
         },
         {
           source: "patient.interactions.visit.attributes.enddate",
@@ -25992,7 +25992,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "End Date",
+          modelName: "Visit End Date",
         },
         {
           source: "patient.interactions.visit.attributes.visittypeconceptid",
@@ -26298,7 +26298,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Specimen Date/Time",
+          modelName: "Specimen Datetime",
         },
         {
           source: "patient.interactions.specimen.attributes.quantity",
@@ -26438,7 +26438,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source:
@@ -26634,7 +26634,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.proc.attributes.modifierconceptid",
@@ -26714,7 +26714,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Procedure Date",
+          modelName: "Procedure Start Date",
         },
         {
           source: "patient.interactions.proc.attributes.procconceptid",
@@ -26774,7 +26774,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Procedure Date/Time",
+          modelName: "Procedure Datetime",
         },
       ],
       initialPatientlistColumn: false,
@@ -26824,7 +26824,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.ppperiod.attributes.startdate",
@@ -26844,7 +26844,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Start Date",
+          modelName: "Payer Plan Period Start Date",
         },
         {
           source: "patient.interactions.ppperiod.attributes.enddate",
@@ -26864,7 +26864,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "End Date",
+          modelName: "Payer Plan Period End Date",
         },
       ],
       initialPatientlistColumn: false,
@@ -26956,7 +26956,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.obsperiod.attributes.startdate",
@@ -26976,7 +26976,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Start Date",
+          modelName: "Observation Period Start Date",
         },
         {
           source: "patient.interactions.obsperiod.attributes.enddate",
@@ -26996,7 +26996,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "End Date",
+          modelName: "Observation Period End Date",
         },
       ],
       initialPatientlistColumn: false,
@@ -27068,7 +27068,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Value (numeric)",
+          modelName: "Value as number",
         },
         {
           source:
@@ -27130,7 +27130,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Value (verbatim)",
+          modelName: "Value as string",
         },
         {
           source:
@@ -27252,7 +27252,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.observation.attributes.obsdatetime",
@@ -27272,7 +27272,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Observation Date/Time",
+          modelName: "Observation Datetime",
         },
         {
           source: "patient.interactions.observation.attributes.unitconceptid",
@@ -27445,7 +27445,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.measurement.attributes.measurementdate",
@@ -27506,7 +27506,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Value (numeric)",
+          modelName: "Value As Number",
         },
         {
           source:
@@ -27747,7 +27747,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source:
@@ -27768,7 +27768,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Consent Date/Time",
+          modelName: "Consent Datetime",
         },
       ],
       initialPatientlistColumn: false,
@@ -27839,7 +27839,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.drugexposure.attributes.sig",
@@ -28000,7 +28000,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Start Date",
+          modelName: "Drug Exposure Start Date",
         },
         {
           source:
@@ -28062,7 +28062,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "End Date",
+          modelName: "Drug Exposure End Date",
         },
         {
           source: "patient.interactions.drugexposure.attributes.stopreason",
@@ -28102,7 +28102,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Start Date/Time",
+          modelName: "Drug Exposure Start Datetime",
         },
         {
           source: "patient.interactions.drugexposure.attributes.refills",
@@ -28142,7 +28142,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "End Date/Time",
+          modelName: "Drug Exposure End Datetime",
         },
       ],
       initialPatientlistColumn: false,
@@ -28252,7 +28252,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.drugera.attributes.startdate",
@@ -28272,7 +28272,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Start Date",
+          modelName: "Drug Era Start Date",
         },
         {
           source: "patient.interactions.drugera.attributes.enddate",
@@ -28292,7 +28292,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "End Date",
+          modelName: "Drug Era End Date",
         },
         {
           source: "patient.interactions.drugera.attributes.drugconceptid",
@@ -28402,7 +28402,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Start Date",
+          modelName: "Dose Era Start Date",
         },
         {
           source: "patient.interactions.doseera.attributes.enddate",
@@ -28422,7 +28422,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "End Date",
+          modelName: "Dose Era End Date",
         },
         {
           source: "patient.interactions.doseera.attributes.pid",
@@ -28442,7 +28442,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.doseera.attributes.unitconceptset",
@@ -28574,7 +28574,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source:
@@ -28636,7 +28636,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Start Date",
+          modelName: "Device Exposure Start Date",
         },
         {
           source: "patient.interactions.deviceexposure.attributes.enddate",
@@ -28656,7 +28656,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "End Date",
+          modelName: "Device Exposure End Date",
         },
         {
           source:
@@ -28727,7 +28727,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Death Date/Time",
+          modelName: "Death Datetime",
         },
         {
           source: "patient.interactions.death.attributes.pid",
@@ -28747,7 +28747,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.death.attributes.deathtypeconceptset",
@@ -28858,7 +28858,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Patient Id",
+          modelName: "Person id",
         },
         {
           source: "patient.interactions.conditionera.attributes.count",
@@ -28898,7 +28898,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "End Date",
+          modelName: "Condition Era End Date",
         },
         {
           source: "patient.interactions.conditionera.attributes.startdate",
@@ -28918,7 +28918,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Start Date",
+          modelName: "Condition Era Start Date",
         },
       ],
       initialPatientlistColumn: false,
@@ -29208,7 +29208,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Cohort Id",
+          modelName: "Cohort Definition Id",
         },
         {
           source: "patient.interactions.cohort.attributes.pid",
@@ -29228,7 +29228,7 @@ const paConfigDuckdb = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Cohort Patient",
+          modelName: "Subject Id",
         },
       ],
       initialPatientlistColumn: false,
