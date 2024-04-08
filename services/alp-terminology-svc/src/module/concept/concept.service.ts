@@ -385,6 +385,7 @@ export class ConceptService {
           validity,
         };
         logger.info(JSON.stringify(item));
+        logger.info(JSON.stringify(details));
         return details;
       } catch (err) {
         logger.error(JSON.stringify(item));
