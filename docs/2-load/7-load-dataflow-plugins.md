@@ -17,6 +17,19 @@ cd <plugin-directory>
 PLUGIN_PACKAGE_NAME="${PWD##*/}"; echo PLUGIN_PACKAGE_NAME=$PLUGIN_PACKAGE_NAME
 zip -r ~/Downloads/$PLUGIN_PACKAGE_NAME.zip . -x ".git*" -x "*/.*"
 ```
+- scripted
+```bash
+BASE_DIR=$PWD
+for PLUGIN_PACKAGE_NAME in dqd-plugin datamodel-plugin; do 
+  cd $BASE_DIR/$PLUGIN_PACKAGE_NAME
+  git pull
+  ZIPFILE=~/Downloads/$PLUGIN_PACKAGE_NAME.zip
+  rm $ZIPFILE
+  zip -q -r $ZIPFILE . -x ".git*" -x "*/.*"
+  ls -lh $ZIPFILE
+done
+cd $BASE_DIR
+```
 ### Upload Plugin zipfile
 - In Portal, navigate to the **Jobs** page in the Admin portal
 > ![](../images/dataflow/JobsPage.png)
