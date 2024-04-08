@@ -53,7 +53,10 @@ const main = () => {
     // set default cdw config path
     log.info("TESTSCHEMA :" + configCredentials.schema);
   } else {
-    analyticsCredential = xsenv.cfServiceCredentials({ tag: "cdw" });
+    let cdwService = xsenv.filterServices({ tag: "cdw" })
+    analyticsCredential = cdwService.length > 0?
+    cdwService[0].credentials
+    : {};
     configCredentials = JSON.parse(env.CONFIG_CONNECTION);
   }
 
