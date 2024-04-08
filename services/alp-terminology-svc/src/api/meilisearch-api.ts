@@ -298,7 +298,6 @@ export class MeilisearchAPI {
     const result = await axios.post<{
       results: IMeilisearchGetConceptRecommended[];
     }>(url, { queries }, options);
-    console.log(result.data.results);
     return result.data.results;
   }
 
