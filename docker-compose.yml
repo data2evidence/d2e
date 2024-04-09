@@ -789,7 +789,10 @@ services:
          "usermgmt": "http://alp-minerva-user-mgmt-${BASE_PORT}:41104"
         }
       DB_CREDENTIALS__PUBLIC_KEYS: |
-        {"Internal": "${DB_CREDENTIALS__INTERNAL__PUBLIC_KEY}","DataPlatform": ""}
+        {
+          "DataPlatform": "",
+          "Internal": "${DB_CREDENTIALS__INTERNAL__PUBLIC_KEY}"
+        }
       GATEWAY__API_ALLOWED_DOMAINS: |-
         http://alp-minerva-sqleditor:8888/
         http://alp-minerva-user-mgmt-${BASE_PORT:-1}:41${BASE_PORT:-1}04/
