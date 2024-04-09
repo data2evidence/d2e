@@ -19,7 +19,8 @@ MEILISEARCH_INDEX_CONFIG = {
                 "concept_class_id",
                 "standard_concept",
                 "invalid_reason",
-                "concept_name"
+                "concept_name",
+                "valid_end_date"
             ],
             **MEILISEARCH_INDEX_GLOBAL_SETTINGS
         }
