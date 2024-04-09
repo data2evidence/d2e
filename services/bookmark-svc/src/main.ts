@@ -13,6 +13,7 @@ import {
   utils,
 } from '@alp/alp-base-utils'
 import express from 'express'
+import https from 'https'
 import helmet from 'helmet'
 import path from 'path'
 import * as xsenv from '@sap/xsenv'
@@ -23,6 +24,7 @@ import { useContainer } from 'class-validator'
 import Routes from './routes'
 
 import { IMRIRequest } from './types'
+import { env } from './env'
 
 dotenv.config()
 const log = Logger.CreateLogger('bookmark-log')
@@ -119,7 +121,16 @@ const main = async () => {
   await registerRoutes(app)
   utils.setupGlobalErrorHandling(app, log)
 
-  app.listen(port)
+  const server = https.createServer(
+    {
+      key: env.SSL_PRIVATE_KEY,
+      cert: env.SSL_PUBLIC_CERT,
+      maxHeaderSize: 8192 * 10,
+    },
+    app
+  )
+
+  server.listen(port)
   log.info(`🚀 Bookmark svc started successfully!. Server listening on port ${port}`)
 }
 
