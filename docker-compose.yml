@@ -52,7 +52,6 @@ x-envs:
     PG__MAX_POOL: 10
     PG__MIN_POOL: 0
     PG__PORT: ${PG_PORT:-5432}
-    # change to
   plugins: &x-plugins |
     {
       "researcher": [
