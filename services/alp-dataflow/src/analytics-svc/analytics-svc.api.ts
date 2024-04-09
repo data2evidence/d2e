@@ -19,15 +19,18 @@ export class AnalyticsSvcAPI {
     if (env.ANALYTICS_SVC_API_URL) {
       this.url = env.ANALYTICS_SVC_API_URL
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true,
+        rejectUnauthorized: this.isUnauthorized(),
         ca: env.DATAFLOW_CA_CERT
       })
     } else {
       throw new Error('No url is set for AnalyticsSvcAPI')
     }
+  }
+
+  isUnauthorized(): boolean {
+    return this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
+      ? false
+      : true
   }
 
   async getDataCharacterizationResults(
