@@ -5,7 +5,6 @@ import { runMigrations } from './common/data-source/db-migration'
 import { env } from './env'
 import { getLogLevels } from './logger'
 import { useContainer } from 'class-validator'
-import https from 'https'
 
 const httpsOptions = {
   key: env.SSL_PRIVATE_KEY,
