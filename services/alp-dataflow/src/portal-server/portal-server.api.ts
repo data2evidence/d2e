@@ -19,15 +19,15 @@ export class PortalServerAPI {
     if (env.PORTAL_SERVER_API_URL) {
       this.url = env.PORTAL_SERVER_API_URL
       this.httpsAgent = new Agent({
-        rejectUnauthorized: this.isUnauthorized(),
-        ca: env.DATAFLOW_CA_CERT
+        rejectUnauthorized: this.isAuthorized(),
+        ca: this.isAuthorized() ? env.DATAFLOW_CA_CERT : null
       })
     } else {
       throw new Error('No url is set for PortalServerAPI')
     }
   }
 
-  isUnauthorized(): boolean {
+  isAuthorized(): boolean {
     return this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
       ? false
       : true
