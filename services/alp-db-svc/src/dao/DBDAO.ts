@@ -814,58 +814,6 @@ class DBDAO {
     };
   };
 
-  updateStudyNameForSchema = (
-    db: any,
-    studyName: string,
-    schema: string,
-    callback: (err: any, result: any) => any
-  ) => {
-    const hanaTableName = "SCHEMA.METADATA";
-    let tableName =
-      this.dialect === config.DB.HANA
-        ? hanaTableName
-        : dbUtils.convertNameToPg(hanaTableName);
-    db.executeQuery(
-      `SELECT * from "${schema}"."${tableName}"`,
-      [],
-      (err: any, result: any) => {
-        if (err) {
-          callback(err, [{ error: { message: schema } }]);
-        } else {
-          if (result.length === 0) {
-            db.executeQuery(
-              `INSERT INTO "${schema}"."${tableName}" (STUDY_NAME, CREATED_AT) VALUES (?, NOW())`,
-              [{ value: studyName }],
-              (err: any, result: any) => {
-                if (err) {
-                  callback(err, [{ error: { message: schema } }]);
-                } else {
-                  this.logger.info(`Inserted study name for ${schema} schema`);
-                  callback(null, [{ value: schema, changelogs: result }]);
-                }
-              }
-            );
-          } else if (result[0].STUDY_NAME !== studyName) {
-            db.executeQuery(
-              `UPDATE "${schema}"."${tableName}" SET STUDY_NAME = ?, UPDATED_AT = NOW()`,
-              [{ value: studyName }],
-              (err: any, result: any) => {
-                if (err) {
-                  callback(err, [{ error: { message: schema } }]);
-                } else {
-                  this.logger.info(`Updated study name for ${schema} schema`);
-                  callback(null, [{ value: schema, changelogs: result }]);
-                }
-              }
-            );
-          } else {
-            callback(null, [{ value: schema, changelogs: result }]);
-          }
-        }
-      }
-    );
-  };
-
   // hana and postgres
   insertCDMVersion = (
     db: any,
