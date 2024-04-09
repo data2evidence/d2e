@@ -35,5 +35,9 @@ export const env = {
   SYSTEM_NAME: process.env.ALP__SYSTEM_NAME,
   PORTAL_PLUGINS: process.env.PLUGINS__JSON,
 
-  ANALYTICS_SVC_API_BASE_URL: process.env.ANALYTICS_SVC__API_BASE_URL
+  ANALYTICS_SVC_API_BASE_URL: process.env.ANALYTICS_SVC__API_BASE_URL,
+
+  SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
+  SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
+  PORTAL_SERVER_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
 }

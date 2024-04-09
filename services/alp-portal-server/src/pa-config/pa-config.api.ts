@@ -36,14 +36,18 @@ export class PaConfigApi {
     if (env.PA_CONFIG_API_URL) {
       this.url = env.PA_CONFIG_API_URL
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true
+        rejectUnauthorized: this.isUnauthorized(),
+        ca: this.isUnauthorized ? null : env.PORTAL_SERVER_CA_CERT
       })
     } else {
       throw new Error('No url is set for PaConfigApi')
     }
+  }
+
+  isUnauthorized(): boolean {
+    return this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
+      ? false
+      : true
   }
 
   async getAllConfigs() {
