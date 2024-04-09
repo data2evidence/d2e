@@ -9,6 +9,7 @@ import {
 } from "@alp/alp-base-utils";
 import * as xsenv from "@sap/xsenv";
 import * as express from "express";
+import { createServer } from "https";
 import bodyParser = require("body-parser");
 import appConfigEndpoint from "./psconfig/configAppEndpoint";
 import configEndpoint from "./psconfig/configEndpoint";
@@ -113,7 +114,16 @@ function initRoutes(conn) {
 
   app.use("/check-readiness", healthCheckMiddleware);
 
-  app.listen(port);
+  const server = createServer(
+    {
+      key: env.SSL_PRIVATE_KEY,
+      cert: env.SSL_PUBLIC_CERT,
+      maxHeaderSize: 8192 * 10,
+    },
+    app
+  );
+
+  server.listen(port);
   console.log("====================================================");
   console.log("PS Config started on port " + port);
   console.log("====================================================");
