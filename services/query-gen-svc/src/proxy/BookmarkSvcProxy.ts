@@ -21,11 +21,11 @@ export async function loadBookmarks(
 
     if (envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun()) {
         // this flow is only for integration test
-        urlParams = new URL(`http://localhost:41005`);
-        protocolLib = http;
+        urlParams = new URL(`https://localhost:41005`);
+        protocolLib = https;
     } else {
-        urlParams = new URL("http://alp-minerva-bookmark-svc-1:41110");
-        protocolLib = http;
+        urlParams = new URL("https://alp-minerva-bookmark-svc-1:41110");
+        protocolLib = https;
     }
 
     hostname = urlParams.hostname;
@@ -49,6 +49,10 @@ export async function loadBookmarks(
             hostname === "localhost" || hostname === "alp-mercury-approuter"
                 ? false
                 : true,
+        ca:
+            hostname === "localhost" || hostname === "alp-mercury-approuter"
+                ? null
+                : process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
 
     switch (bookmark_cmd) {

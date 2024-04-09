@@ -14,6 +14,7 @@ import * as swagger from "@alp/swagger-node-runner";
 import noCacheMiddleware from "./middleware/NoCache";
 import timerMiddleware from "./middleware/Timer";
 import os = require("os");
+import https from "https";
 
 dotenv.config();
 const log = Logger.CreateLogger("query-gen-log");
@@ -83,7 +84,16 @@ const main = async () => {
     await initSwaggerRoutes(app);
     utils.setupGlobalErrorHandling(app, log);
 
-    app.listen(port);
+    const server = https.createServer(
+        {
+            key: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, "\n"),
+            cert: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, "\n"),
+            maxHeaderSize: 8192 * 10,
+        },
+        app
+    );
+
+    server.listen(port);
     log.info(
         `🚀 Query-gen svc started successfully!. Server listening on port ${port} [hostname: ${os.hostname}...`
     );
