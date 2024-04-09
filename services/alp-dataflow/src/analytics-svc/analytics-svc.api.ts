@@ -22,7 +22,8 @@ export class AnalyticsSvcAPI {
         rejectUnauthorized:
           this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
             ? false
-            : true
+            : true,
+        ca: env.DATAFLOW_CA_CERT
       })
     } else {
       throw new Error('No url is set for AnalyticsSvcAPI')
