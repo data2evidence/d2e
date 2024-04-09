@@ -16,22 +16,22 @@ on:
         type: choice
         options:
           - alp-os/d2e
-          - alp-os/dev-afreen-d2e
-          - alp-os/dev-alicia-d2e
-          - alp-os/dev-brandan-d2e
-          - alp-os/dev-brian-d2e
-          - alp-os/dev-hengxian-d2e
-          - alp-os/dev-jerome-d2e
-          - alp-os/dev-khairul-d2e
-          - alp-os/dev-nadirah-d2e
-          - alp-os/dev-nicholas-d2e
-          - alp-os/dev-peter-d2e
-          - alp-os/dev-qiya-d2e
-          - alp-os/dev-ragavan-d2e
-          - alp-os/dev-santan-d2e
-          - alp-os/dev-satish-d2e
-          - alp-os/dev-suwarno-d2e
-          - alp-os/dev-zed-d2e
+          - alp-os/d2e-dev-afreen
+          - alp-os/d2e-dev-alicia
+          - alp-os/d2e-dev-brandan
+          - alp-os/d2e-dev-brian
+          - alp-os/d2e-dev-hengxian
+          - alp-os/d2e-dev-jerome
+          - alp-os/d2e-dev-khairul
+          - alp-os/d2e-dev-karthik
+          - alp-os/d2e-dev-nadirah
+          - alp-os/d2e-dev-nicholas
+          - alp-os/d2e-dev-peter
+          - alp-os/d2e-dev-qiya
+          - alp-os/d2e-dev-ragavan
+          - alp-os/d2e-dev-santan
+          - alp-os/d2e-dev-satish
+          - alp-os/d2e-dev-suwarno
       branch_name:
         default: develop
         description: Enter BranchName / Release Tag Name
