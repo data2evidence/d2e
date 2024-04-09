@@ -1,4 +1,5 @@
 import { env, envVarUtils } from "./configs";
+import https from "https";
 import * as xsenv from "@sap/xsenv";
 import {
   getUser,
@@ -34,7 +35,8 @@ const noCache = (req, res, next) => {
 const main = () => {
   const app = express();
   app.use("/check-liveness", healthCheckMiddleware);
-  const mountPath = env.NODE_ENV === "production" ? env.ENV_MOUNT_PATH : "../../";
+  const mountPath =
+    env.NODE_ENV === "production" ? env.ENV_MOUNT_PATH : "../../";
   const envFile = `${mountPath}default-env.json`;
   xsenv.loadEnv(envVarUtils.getEnvFile(envFile));
 
@@ -70,7 +72,16 @@ const main = () => {
     }
     next(err);
   });
-  const server = app.listen(port);
+
+  const server = https.createServer(
+    {
+      key: env.SSL_PRIVATE_KEY,
+      cert: env.SSL_PUBLIC_CERT,
+    },
+    app
+  );
+
+  server.listen(port);
   log.info(
     `🚀 CDW Config Application started successfully!. Server listening on port ${port}`
   );
@@ -91,17 +102,24 @@ const getConnections = async ({
 }> => {
   let analyticsConnection;
   if (env.USE_DUCKDB === "true") {
-    log.info("Use Duckdb")
+    log.info("Use Duckdb");
     // Use duckdb as analyticsConnection if USE_DUCKDB flag is set to true
-    const { duckdbSchemaFileName, vocabSchemaFileName } = await getFileName(analyticsCredentials.databaseName, analyticsCredentials.schema, analyticsCredentials.vocabSchema)
-    analyticsConnection =  await getDuckdbDBConnection(duckdbSchemaFileName, vocabSchemaFileName)
-} else {
-  analyticsConnection =
-    await dbConnectionUtil.DBConnectionUtil.getDBConnection({
-      credentials: analyticsCredentials,
-      schema: analyticsCredentials.cdwSchema || analyticsCredentials.schema,
-      userObj,
-    });
+    const { duckdbSchemaFileName, vocabSchemaFileName } = await getFileName(
+      analyticsCredentials.databaseName,
+      analyticsCredentials.schema,
+      analyticsCredentials.vocabSchema
+    );
+    analyticsConnection = await getDuckdbDBConnection(
+      duckdbSchemaFileName,
+      vocabSchemaFileName
+    );
+  } else {
+    analyticsConnection =
+      await dbConnectionUtil.DBConnectionUtil.getDBConnection({
+        credentials: analyticsCredentials,
+        schema: analyticsCredentials.cdwSchema || analyticsCredentials.schema,
+        userObj,
+      });
   }
   const configConnection =
     await dbConnectionUtil.DBConnectionUtil.getDBConnection({
