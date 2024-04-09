@@ -1,22 +1,3 @@
-create type "hc.hph.genomics.db.models::General.SampleList" as table ("SampleIndex" integer);
-create type "hc.hph.genomics.db.models::General.SampleNames" as table (
-	"SampleIndex" integer,
-	"SampleName" varchar(255)
-);
-create table "hc.hph.genomics.db.models::General.Sequences" ("SequenceID" varchar(255), "Value" integer);
-create table "hc.hph.genomics.db.models::General.Patients" (
-	"PatientIndex" Integer,
-	"DWID" Binary,
-	"DWSource" varchar(5),
-	"DWAuditID" Integer,
-	"FamilyName" varchar(100),
-	"GivenName" varchar(100),
-	"Gender" varchar(10),
-	-- TODO       maybe a Array is preferred
-	"BirthDate" datetime,
-	"Nationality" varchar(100),
-	"Address" varchar(1000) -- TODO       may be a Array is preferred?
-);
 create table "hc.hph.cdw.db.models::DWEntities.Patient_Key" (
 	"DWID" Binary,
 	"DWSource" nvarchar(5) not null,
@@ -106,7 +87,7 @@ create table "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" (
 	Join "hc.hph.cdw.db.models::DWEntities.Interactions_Key" as "Interactions_Key_Assoc" on "Interactions_Key_Assoc"."DWID" = "DWID",
 	Join "hc.hph.cdw.db.models::DWEntities.Interactions_Key" as "ParentInteractions_Key_Assoc" on "ParentInteractions_Key_Assoc"."DWID" = "DWID_ParentInteraction",
 	Join "hc.hph.cdw.db.models::DWEntities.Patient_Key" as "Patient_Key_Assoc" on "Patient_Key_Assoc"."DWID" = "DWID_Patient",
-	Join "hc.hph.cdw.db.models::DWEntities.Condition_Key" as "Condition_Key_Assoc" on "Patient_Key_Assoc"."DWID" = "DWID_Condition"
+	Join "hc.hph.cdw.db.models::DWEntities.Condition_Key" as "Condition_Key_Assoc" on "Condition_Key_Assoc"."DWID" = "DWID_Condition"
 );
 create table "hc.hph.cdw.db.models::DWEntities.Interactions_Key" (
 	"DWID" binary,
@@ -117,25 +98,47 @@ create table "hc.hph.cdw.db.models::DWEntities.Interactions_Key" (
 	--Audit_Assoc: association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
 	Join "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" as "Int_Atr_Ass" on "Int_Atr_Ass"."DWID" = "DWID"
 );
+
+------------------
+create type "hc.hph.genomics.db.models::General.SampleList" as table ("SampleIndex" integer);
+create type "hc.hph.genomics.db.models::General.SampleNames" as table (
+	"SampleIndex" integer,
+	"SampleName" varchar(255)
+);
+create table "hc.hph.genomics.db.models::General.Sequences" ("SequenceID" varchar(255), "Value" integer);
+create table "hc.hph.genomics.db.models::General.Patients" (
+	"PatientIndex" Integer,
+	"DWID" Binary,
+	"DWSource" varchar(5),
+	"DWAuditID" Integer,
+	"FamilyName" varchar(100),
+	"GivenName" varchar(100),
+	"Gender" varchar(10),
+	-- TODO       maybe a Array is preferred
+	"BirthDate" datetime,
+	"Nationality" varchar(100),
+	"Address" varchar(1000) -- TODO       may be a Array is preferred?
+);
+
 create table "hc.hph.genomics.db.models::General.Samples" (
 	"SampleIndex" integer,
 	"DWAuditID" Integer,
 	"DWSource" varchar(5),
 	"ReferenceID" varchar(255),
-	"SampleID varchar(255)" null,
-	"SampleClass varchar(255)" null,
+	"SampleID" varchar(255) null,
+	"SampleClass" varchar(255) null,
 	"PatientDWID" Binary,
 	"InteractionDWID" Binary,
-	"AnalysisDate Timestamp" null,
-	"OrgID varchar(100)" null,
+	"AnalysisDate" Timestamp null,
+	"OrgID" varchar(100) null,
 	"Phenotype" varchar(5000),
 	"Sex" varchar(10),
 	"FamilyID" varchar(255)
 ) with associations (
-	join "hc.hph.cdw.db.models::DWEntities.Patient_Key" as "patientkey" on "patientkey"."DWID" = "PatientDWID",
-	join "hc.hph.cdw.db.models::DWEntities.Patient_Attr" as "patientattr" on "patientattr"."DWID" = "PatientDWID",
+	join "hc.hph.cdw.db.models::DWEntities.Patient_Key" as "PatientKey" on "PatientKey"."DWID" = "PatientDWID",
+	join "hc.hph.cdw.db.models::DWEntities.Patient_Attr" as "PatientAttr" on "PatientAttr"."DWID" = "PatientDWID",
 	join "hc.hph.cdw.db.models::DWEntities.Interactions_Key" as "InteractionKey" on "InteractionKey"."DWID" = "InteractionDWID",
-	join "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" as "interactionattr" on "interactionattr"."DWID" = "InteractionDWID"
+	join "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" as "interactionAttr" on "interactionAttr"."DWID" = "InteractionDWID"
 );
 create table "hc.hph.genomics.db.models::General.Pedigree" (
 	"DWAuditID" Integer,
@@ -184,6 +187,7 @@ create table "hc.hph.genomics.db.models::General.SessionSampleGroups" (
 	"SampleGroup" varchar(255),
 	"SampleIndex" integer
 );
+-------------------
 create table "hc.hph.genomics.db.models::Reference.Chromosomes" (
 	"DWAuditID" Integer,
 	"ReferenceID" varchar(255),
@@ -266,13 +270,15 @@ create table "hc.hph.genomics.db.models::Reference.Codons" (
 	"aminoacid" varchar(1),
 	"aminoacidshort" varchar(10)
 );
+
+--------------------
 create table "hc.hph.genomics.db.models::SNV.Headers" (
 	"DWAuditID" Integer,
 	"rowindex" integer,
 	"keyvalueindex" integer,
 	"headerkey" varchar(255),
 	"valuekey" varchar(255) null,
-	value varchar(5000) null
+	"value" varchar(5000) null
 );
 create table "hc.hph.genomics.db.models::SNV.Variants" (
 	"DWAuditID" Integer,
@@ -294,8 +300,8 @@ create table "hc.hph.genomics.db.models::SNV.VariantIDs" (
 	"VariantIndex" integer,
 	"VariantID" varchar(255)
 ) with associations (
-	join "hc.hph.genomics.db.models::SNV.Variants" as "variant" on "DWAuditID" = "variant"."DWAuditID"
-	and "VariantIndex" = "variant"."VariantIndex"
+	join "hc.hph.genomics.db.models::SNV.Variants" as "Variant" on "DWAuditID" = "Variant"."DWAuditID"
+	and "VariantIndex" = "Variant"."VariantIndex"
 );
 create table "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes" (
 	"DWAuditID" Integer,
@@ -303,8 +309,8 @@ create table "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes" (
 	"ValueIndex" integer,
 	"Attr" varchar(1000) -- generated.variantmultivalueattributes, -- todo
 ) with associations (
-	join "hc.hph.genomics.db.models::SNV.Variants" as "variant" on "DWAuditID" = "variant"."DWAuditID"
-	and "VariantIndex" = "variant"."VariantIndex"
+	join "hc.hph.genomics.db.models::SNV.Variants" as "Variant" on "DWAuditID" = "Variant"."DWAuditID"
+	and "VariantIndex" = "Variant"."VariantIndex"
 );
 create table "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes" (
 	"DWAuditID" Integer,
@@ -312,8 +318,8 @@ create table "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes" (
 	"ValueIndex" Integer,
 	"Attr" varchar(1000) -- Generated.VariantStructuredAttributes, -- TODO
 ) with associations(
-	join "hc.hph.genomics.db.models::SNV.Variants" as "variant" on "DWAuditID" = "variant"."DWAuditID"
-	and "VariantIndex" = "variant"."VariantIndex"
+	join "hc.hph.genomics.db.models::SNV.Variants" as "Variant" on "DWAuditID" = "Variant"."DWAuditID"
+	and "VariantIndex" = "Variant"."VariantIndex"
 );
 create table "hc.hph.genomics.db.models::SNV.VariantAlleles" (
 	"DWAuditID" Integer,
@@ -322,9 +328,10 @@ create table "hc.hph.genomics.db.models::SNV.VariantAlleles" (
 	"Allele" varchar(255) null,
 	"Attr" varchar(1000) -- Generated.VariantAlleleAttributes, -- TODO
 ) with associations (
-	join "hc.hph.genomics.db.models::SNV.Variants" as "variant" on "DWAuditID" = "variant"."DWAuditID"
-	and "VariantIndex" = "variant"."VariantIndex"
+	join "hc.hph.genomics.db.models::SNV.Variants" as "Variant" on "DWAuditID" = "Variant"."DWAuditID"
+	and "VariantIndex" = "Variant"."VariantIndex"
 );
+---------------------
 create table "hc.hph.genomics.db.models::SNV.Genotypes" (
 	"DWAuditID" Integer,
 	"VariantIndex" Integer,
@@ -336,8 +343,8 @@ create table "hc.hph.genomics.db.models::SNV.Genotypes" (
 	"Attr" varchar(1000) -- Generated.GenotypeAttributes,
 ) with associations (
 	join "hc.hph.genomics.db.models::General.Samples" as "Sample" on "SampleIndex" = "Sample"."SampleIndex",
-	join "hc.hph.genomics.db.models::SNV.Variants" as "variant" on "DWAuditID" = "variant"."DWAuditID"
-	and "VariantIndex" = "variant"."VariantIndex"
+	join "hc.hph.genomics.db.models::SNV.Variants" as "Variant" on "DWAuditID" = "Variant"."DWAuditID"
+	and "VariantIndex" = "Variant"."VariantIndex"
 );
 create table "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes" (
 	"DWAuditID" Integer,
@@ -347,8 +354,8 @@ create table "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes" (
 	"Attr" varchar(1000) -- Generated.GenotypeMultiValueAttributes,
 ) with associations (
 	join "hc.hph.genomics.db.models::General.Samples" as "Sample" on "SampleIndex" = "Sample"."SampleIndex",
-	join "hc.hph.genomics.db.models::SNV.Variants" as "variant" on "DWAuditID" = "variant"."DWAuditID"
-	and "VariantIndex" = "variant"."VariantIndex",
+	join "hc.hph.genomics.db.models::SNV.Variants" as "Variant" on "DWAuditID" = "Variant"."DWAuditID"
+	and "VariantIndex" = "Variant"."VariantIndex",
 	join "hc.hph.genomics.db.models::SNV.Genotypes" as "Genotype" on "DWAuditID" = "Genotype"."DWAuditID"
 	and "VariantIndex" = "Genotype"."VariantIndex"
 	and "SampleIndex" = "Genotype"."SampleIndex"
@@ -373,37 +380,37 @@ create table "hc.hph.genomics.db.models::SNV.Haplotypes" (
 	"AlleleIndex" Integer null
 ) with associations (
 	join "hc.hph.genomics.db.models::General.Samples" as "Sample" on "SampleIndex" = "Sample"."SampleIndex",
-	join "hc.hph.genomics.db.models::SNV.Variants" as "variant" on "DWAuditID" = "variant"."DWAuditID"
-	and "VariantIndex" = "variant"."VariantIndex",
+	join "hc.hph.genomics.db.models::SNV.Variants" as "Variant" on "DWAuditID" = "Variant"."DWAuditID"
+	and "VariantIndex" = "Variant"."VariantIndex",
 	join "hc.hph.genomics.db.models::SNV.Genotypes" as "Genotype" on "DWAuditID" = "Genotype"."DWAuditID"
 	and "VariantIndex" = "Genotype"."VariantIndex"
 	and "SampleIndex" = "Genotype"."SampleIndex",
-	join "hc.hph.genomics.db.models::SNV.VariantAlleles" as "VariantAlleles" on "DWAuditID" = "VariantAlleles"."DWAuditID"
-	and "VariantIndex" = "VariantAlleles"."VariantIndex"
-	and "AlleleIndexRef" = "VariantAlleles"."AlleleIndex",
+	join "hc.hph.genomics.db.models::SNV.VariantAlleles" as "VariantAllele" on "DWAuditID" = "VariantAllele"."DWAuditID"
+	and "VariantIndex" = "VariantAllele"."VariantIndex"
+	and "AlleleIndex" = "VariantAllele"."AlleleIndex",
 	join "hc.hph.genomics.db.models::SNV.VariantAnnotations" as "VariantAnnotation" on "DWAuditID" = "VariantAnnotation"."DWAuditID"
 	and "VariantIndex" = "VariantAnnotation"."VariantIndex"
 	and "AlleleIndex" = "VariantAnnotation"."AlleleIndex"
 );
 create view "hc.hph.genomics.db.models::SNV.ReferenceAlleleCounts" as
-select DWAuditID,
-	VariantIndex,
-	SampleIndex,
+select "DWAuditID",
+	"VariantIndex",
+	"SampleIndex",
 	sum(
 		case
-			when AlleleIndex = 0 then AlleleCount
+			when "AlleleIndex" = 0 then "AlleleCount"
 			else 0
-		end ")" as ReferenceAlleleCount,
+		end ) as "ReferenceAlleleCount",
 		sum(
 			case
-				when AlleleIndex <> 0 then AlleleCount
+				when "AlleleIndex" <> 0 then "AlleleCount"
 				else 0
-			end ")" as AlternativeAlleleCount,
-			sum(AlleleCount) as Multiplicity
+			end ) as "AlternativeAlleleCount",
+			sum("AlleleCount") as "Multiplicity"
 			from "hc.hph.genomics.db.models::SNV.GenotypeAlleles"
-			group by DWAuditID,
-				VariantIndex,
-				SampleIndex;
+			group by "DWAuditID",
+				"VariantIndex",
+				"SampleIndex";
 create table "hc.hph.genomics.db.models::SNV.GlobalVariantAnnotations" (
 	"ReferenceID" varchar(255),
 	"ChromosomeIndex" Integer,
@@ -418,7 +425,7 @@ create table "hc.hph.genomics.db.models::SNV.GlobalVariantAnnotations" (
 	"MutationType" varchar(255)
 ) with associations (
 	JOIN "hc.hph.genomics.db.models::Reference.Chromosomes" as "chromosome" on "ReferenceID" = "chromosome"."ReferenceID"
-	and "ChromosomeIndex" = "chromosome"."ChromosomeIndex"
+	and "ChromosomeIndex" = "chromosome"."ChromosomeIndex",
 	join "hc.hph.genomics.db.models::Reference.Sequences" as "ReferenceSequence" on "ReferenceID" = "ReferenceSequence"."ReferenceID"
 	and "ChromosomeIndex" = "ReferenceSequence"."ChromosomeIndex"
 	and "Position" between "ReferenceSequence"."beginregion" and "ReferenceSequence"."endregion" - 1
@@ -441,11 +448,11 @@ create table "hc.hph.genomics.db.models::SNV.VariantAnnotations" (
 	"ExonRank" Integer null,
 	"RunAuditID" Integer default -1
 ) with associations (
-	join "hc.hph.genomics.db.models::SNV.Variants" as "variant" on "DWAuditID" = "variant"."DWAuditID"
-	and "VariantIndex" = "variant"."VariantIndex",
-	join "hc.hph.genomics.db.models::SNV.VariantAlleles" as "VariantAlleles" on "DWAuditID" = "VariantAlleles"."DWAuditID"
-	and "VariantIndex" = "VariantAlleles"."VariantIndex"
-	and "AlleleIndexRef" = "VariantAlleles"."AlleleIndex",
+	join "hc.hph.genomics.db.models::SNV.Variants" as "Variant" on "DWAuditID" = "Variant"."DWAuditID"
+	and "VariantIndex" = "Variant"."VariantIndex",
+	join "hc.hph.genomics.db.models::SNV.VariantAlleles" as "VariantAllele" on "DWAuditID" = "VariantAllele"."DWAuditID"
+	and "VariantIndex" = "VariantAllele"."VariantIndex"
+	and "AlleleIndex" = "VariantAllele"."AlleleIndex",
 	join "hc.hph.genomics.db.models::SNV.Genotypes" as "Genotype" on "DWAuditID" = "Genotype"."DWAuditID"
 	and "VariantIndex" = "Genotype"."VariantIndex"
 	and "Genotype"."ReferenceAlleleCount" < "Genotype"."CopyNumber",
@@ -500,12 +507,12 @@ create table "hc.hph.genomics.db.models::SNV.FlatVariants" (
 	join "hc.hph.genomics.db.models::Reference.Features" as "Genes" on "ChromosomeIndex" = "Genes"."ChromosomeIndex"
 	and "Position" between "Genes"."beginregion" and ("Genes"."endregion" - 1)
 	and "Genes"."Class" = 'gene',
-	join "hc.hph.genomics.db.models::SNV.VariantAlleles" as "VariantAlleles" on "DWAuditID" = "VariantAlleles"."DWAuditID"
-	and "VariantIndex" = "VariantAlleles"."VariantIndex"
-	and "AlleleIndexRef" = "VariantAlleles"."AlleleIndex",
-	join "hc.hph.genomics.db.models::SNV.VariantAlleles" as "VariantAlleles" on "DWAuditID" = "VariantAlleles"."DWAuditID"
-	and "VariantIndex" = "VariantAlleles"."VariantIndex"
-	and "AlleleIndexRef" = "VariantAlleles"."AlleleIndex",
+	join "hc.hph.genomics.db.models::SNV.VariantAlleles" as "VariantAllele" on "DWAuditID" = "VariantAllele"."DWAuditID"
+	and "VariantIndex" = "VariantAllele"."VariantIndex"
+	and "AlleleIndexRef" = "VariantAllele"."AlleleIndex",
+	join "hc.hph.genomics.db.models::SNV.VariantAlleles" as "VariantAlleleAlt" on "DWAuditID" = "VariantAlleleAlt"."DWAuditID"
+	and "VariantIndex" = "VariantAlleleAlt"."VariantIndex"
+	and "AlleleIndexRef" = "VariantAlleleAlt"."AlleleIndex",
 	join "hc.hph.genomics.db.models::SNV.GenotypeAlleles" as "GenotypeAllele" on "DWAuditID" = "GenotypeAllele"."DWAuditID"
 	and "VariantIndex" = "GenotypeAllele"."VariantIndex"
 	and "AlleleIndexRef" = "GenotypeAllele"."AlleleIndex"
@@ -530,6 +537,7 @@ create table "hc.hph.genomics.db.models::SV.Regions" (
 	"FileChromosomeName" varchar(255) null,
 	"Color" varchar(255) null
 );
+-------------------
 create table "hc.hph.genomics.db.models::VariantBrowser.BrowserConfiguration" (
 	"User" varchar(255),
 	"Application" varchar(255),
@@ -553,19 +561,19 @@ create table "hc.hph.genomics.db.models::VariantBrowser.FilteredVariantAnnotatio
 );
 -- todo: association is required
 create view "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants" as
-select DWAuditID,
-	VariantAnnotation.Variant.ChromosomeIndex,
-	VariantAnnotation.Variant.Position,
-	VariantAnnotation.Variant.VariantIndex,
-	SampleIndex,
-	AlleleIndex,
-	VariantAnnotation.VariantAllele.Allele,
-	AlleleCount
+select "DWAuditID",
+	"VariantAnnotation"."Variant"."ChromosomeIndex",
+	"VariantAnnotation"."Variant"."Position",
+	"VariantAnnotation"."Variant"."VariantIndex",
+	"SampleIndex",
+	"AlleleIndex",
+	"VariantAnnotation"."VariantAllele"."Allele",
+	"AlleleCount"
 from "hc.hph.genomics.db.models::SNV.GenotypeAlleles"
-order by VariantAnnotation.Variant.ChromosomeIndex,
-	VariantAnnotation.Variant.Position,
-	SampleIndex,
-	AlleleIndex;
+order by "VariantAnnotation"."Variant"."ChromosomeIndex",
+	"VariantAnnotation"."Variant"."Position",
+	"SampleIndex",
+	"AlleleIndex";
 create type "hc.hph.genomics.db.models::VariantBrowser.GroupedDataModelVariants" as table (
 	"Position" Integer,
 	"AlleleIndex" Integer,
@@ -576,30 +584,30 @@ create type "hc.hph.genomics.db.models::VariantBrowser.GroupedDataModelVariants"
 );
 -- todo: association is required
 create view "hc.hph.genomics.db.models::VariantBrowser.GeneVariants" as
-select SampleIndex,
-	"Variant.Genes.FeatureName" as "GeneName",
-	Variant.Genes.ReferenceID,
-	Variant.Genes.FeatureID,
-	"MIN(Variant.ChromosomeIndex)" as "ChromosomeIndex",
-	"MIN(Variant.Genes.beginregion)" as "Begin",
-	MAX(Variant.Genes.endregion) as "End"
+select "SampleIndex",
+	"Variant"."Genes"."FeatureName" as "GeneName",
+	"Variant"."Genes"."ReferenceID",
+	"Variant"."Genes"."FeatureID",
+	MIN("Variant"."ChromosomeIndex") as "ChromosomeIndex",
+	MIN("Variant"."Genes"."beginregion") as "Begin",
+	MAX("Variant"."Genes"."endregion") as "End"
 from "hc.hph.genomics.db.models::SNV.Genotypes"
-where ReferenceAlleleCount <> CopyNumber
-group by SampleIndex,
-	Variant.Genes.ReferenceID,
-	Variant.Genes.FeatureID,
-	Variant.Genes.FeatureName;
+where "ReferenceAlleleCount" <> "CopyNumber"
+group by "SampleIndex",
+	"Variant"."Genes"."ReferenceID",
+	"Variant"."Genes"."FeatureID",
+	"Variant"."Genes"."FeatureName";
 -- todo: association is required
 create view "hc.hph.genomics.db.models::VariantBrowser.GeneVariantAnnotations" as
-select Genotype.SampleIndex,
-	GeneName,
-	ChromosomeIndex,
-	"MIN(Position)" as "Begin",
-	MAX(Position) as "End"
+select "Genotype"."SampleIndex",
+	"GeneName",
+	"ChromosomeIndex",
+	MIN("Position") as "Begin",
+	MAX("Position") as "End"
 from "hc.hph.genomics.db.models::SNV.VariantAnnotations"
-group by Genotype.SampleIndex,
-	GeneName,
-	ChromosomeIndex;
+group by "Genotype"."SampleIndex",
+	"GeneName",
+	"ChromosomeIndex";
 create type "hc.hph.genomics.db.models::VariantBrowser.DisplayVariants" as table (
 	"Position" Integer,
 	"Allele" varchar(255),
@@ -761,6 +769,7 @@ create type "hc.hph.genomics.db.models::VariantBrowser.GeneAltCohortGroup" as ta
 	"lastName" varchar(100),
 	"birthDate" datetime
 );
+------------------
 create table "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" (
 	"AttributeName" varchar(255),
 	"level" varchar(14),
@@ -781,6 +790,7 @@ create table "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAt
 	"NullValue" varchar(255) null,
 	"Active" tinyint
 );
+------------------
 create table "hc.hph.genomics.internal.db.models::GenomeScans.Quantities" (
 	"Quantity" varchar(5000),
 	"ChromosomeIndex" integer,
@@ -795,48 +805,49 @@ create table "hc.hph.genomics.internal.db.models::GenomeScans.Connections" (
 	"TargetPosition" Integer,
 	"Value" real
 );
+-------------------
 create view "hc.hph.genomics.db.models::MRI.Variants" as
-select Genotype.Sample.PatientKey.DWID,
-	Genotype.SampleIndex,
-	Genotype.Sample.SampleClass,
-	GenotypeAllele.AlleleCount,
-	ChromosomeIndex,
-	"Position + 1" as Position,
-	GeneName,
-	Region,
-	SequenceAlteration,
-	MutationType
-from "hc.hph.genomics.db.models::SNV..VariantAnnotations"
-where AlleleIndex > 0;
+select "Genotype"."Sample"."PatientKey"."DWID",
+	"Genotype"."SampleIndex",
+	"Genotype"."Sample"."SampleClass",
+	"GenotypeAllele"."AlleleCount",
+	"ChromosomeIndex",
+	"Position" + 1 as Position,
+	"GeneName",
+	"Region",
+	"SequenceAlteration",
+	"MutationType"
+from "hc.hph.genomics.db.models::SNV.VariantAnnotations"
+where "AlleleIndex" > 0;
 create view "hc.hph.genomics.db.models::MRI.VariantInteractions" as
-select VariantAnnotation.Genotype.Sample.PatientDWID as PATIENT_ID,
-	"VariantAnnotation.ChromosomeIndex || '_' || TO_VARCHAR(DWAuditID) || '_' || TO_VARCHAR(VariantIndex) || TO_VARCHAR(AlleleIndex) || IFNULL('_' || VariantAnnotation.GeneName, '')" AS INTERACTION_ID,
-	"TO_BIGINT(VariantAnnotation.ChromosomeIndex) * 1000000000 + VariantAnnotation.Position" as POSITION_START,
-	"TO_BIGINT(VariantAnnotation.ChromosomeIndex) * 1000000000 + VariantAnnotation.Position" as POSITION_END,
-	"VariantAnnotation.SequenceAlteration" as SEQUENCE_ALTERATION,
-	"VariantAnnotation.GeneName" as GENE_NAME,
-	"VariantAnnotation.Region" as REGION,
-	"VariantAnnotation." AminoAcid.Reference "" as AA_REF,
-	"VariantAnnotation." AminoAcid.Alternative "" as AA_ALT,
-	VariantAnnotation.MutationType as VARIANT_TYPE
+select "VariantAnnotation"."Genotype"."Sample"."PatientDWID" as PATIENT_ID,
+	"VariantAnnotation"."ChromosomeIndex" || '_' || TO_VARCHAR("DWAuditID") || '_' || TO_VARCHAR("VariantIndex") || TO_VARCHAR("AlleleIndex") || IFNULL('_' || "VariantAnnotation"."GeneName", '') AS INTERACTION_ID,
+	TO_BIGINT("VariantAnnotation"."ChromosomeIndex") * 1000000000 + "VariantAnnotation"."Position" as POSITION_START,
+	TO_BIGINT("VariantAnnotation"."ChromosomeIndex") * 1000000000 + "VariantAnnotation"."Position" as POSITION_END,
+	"VariantAnnotation"."SequenceAlteration" as SEQUENCE_ALTERATION,
+	"VariantAnnotation"."GeneName" as GENE_NAME,
+	"VariantAnnotation"."Region" as REGION,
+	"VariantAnnotation"."AminoAcid.Reference" as AA_REF,
+	"VariantAnnotation"."AminoAcid.Alternative" as AA_ALT,
+	"VariantAnnotation"."MutationType" as VARIANT_TYPE
 from "hc.hph.genomics.db.models::SNV.GenotypeAlleles"
-where AlleleIndex > 0
-	AND AlleleCount > 0;
+where "AlleleIndex" > 0
+	AND "AlleleCount" > 0;
 create view "hc.hph.genomics.db.models::MRI.VariantInteractionsDWViews" as
-select VariantAnnotation.Genotype.Sample.PatientDWID as "PatientID",
-	"VariantAnnotation.ChromosomeIndex || '_' || TO_VARCHAR(DWAuditID) || '_' || TO_VARCHAR(VariantIndex) || TO_VARCHAR(AlleleIndex) || IFNULL('_' || VariantAnnotation.GeneName, '')" AS "InteractionID",
-	"TO_BIGINT(VariantAnnotation.ChromosomeIndex) * 1000000000 + VariantAnnotation.Position" as POSITION_START,
-	"TO_BIGINT(VariantAnnotation.ChromosomeIndex) * 1000000000 + VariantAnnotation.Position" as POSITION_END,
-	"VariantAnnotation.SequenceAlteration" as SEQUENCE_ALTERATION,
-	"VariantAnnotation.GeneName" as GENE_NAME,
-	"VariantAnnotation.Region" as REGION,
-	"VariantAnnotation." AminoAcid.Reference "" as AA_REF,
-	"VariantAnnotation." AminoAcid.Alternative "" as AA_ALT,
-	"VariantAnnotation.MutationType" as VARIANT_TYPE,
+select "VariantAnnotation"."Genotype"."Sample"."PatientDWID" as "PatientID",
+	"VariantAnnotation"."ChromosomeIndex" || '_' || TO_VARCHAR("DWAuditID") || '_' || TO_VARCHAR("VariantIndex") || TO_VARCHAR("AlleleIndex") || IFNULL('_' || "VariantAnnotation"."GeneName", '') AS "InteractionID",
+	TO_BIGINT("VariantAnnotation"."ChromosomeIndex") * 1000000000 + "VariantAnnotation"."Position" as POSITION_START,
+	TO_BIGINT("VariantAnnotation"."ChromosomeIndex") * 1000000000 + "VariantAnnotation"."Position" as POSITION_END,
+	"VariantAnnotation"."SequenceAlteration" as SEQUENCE_ALTERATION,
+	"VariantAnnotation"."GeneName" as GENE_NAME,
+	"VariantAnnotation"."Region" as REGION,
+	"VariantAnnotation"."AminoAcid.Reference" as AA_REF,
+	"VariantAnnotation"."AminoAcid.Alternative" as AA_ALT,
+	"VariantAnnotation"."MutationType" as VARIANT_TYPE,
 	"DWAuditID" AS "DWAuditID",
 	"VariantIndex" AS "VariantIndex",
 	"AlleleIndex" AS "AlleleIndex",
-	SampleIndex AS "SampleIndex"
+	"SampleIndex" AS "SampleIndex"
 from "hc.hph.genomics.db.models::SNV.GenotypeAlleles"
-where AlleleIndex > 0
-	AND AlleleCount > 0;
+where "AlleleIndex" > 0
+	AND "AlleleCount" > 0;
