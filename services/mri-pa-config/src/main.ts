@@ -220,7 +220,15 @@ function initRoutes() {
 
   app.use("/check-readiness", healthCheckMiddleware);
 
-  const server = app.listen(port);
+  const server = https.createServer(
+    {
+      key: env.SSL_PRIVATE_KEY,
+      cert: env.SSL_PUBLIC_CERT,
+    },
+    app
+  );
+
+  server.listen(port);
 
   log.info(
     `🚀 MRI PA Config started successfully!. Server listening on port ${port}`
