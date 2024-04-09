@@ -118,9 +118,18 @@ def execute_add_index_flow(options: meilisearchAddIndexType):
     finally:
         conn.close()
 
-# Convert datetime.date values into str
+
 def parseDates(row):
-    return [element if not isDateType(element) else element.strftime("%d/%m/%Y, %H:%M:%S") for element in row]
+    result = []
+    for element in row:
+        if isinstance(element, date):
+            datetime_element = datetime.combine(element, datetime.min.time())
+            result.append(int(datetime_element.timestamp()))
+        elif isinstance(element, datetime):
+            result.append(int(element.timestamp()))
+        else:
+            result.append(element)
+    return result
 
 
 def isDateType(element) -> bool:
