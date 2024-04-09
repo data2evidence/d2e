@@ -61,6 +61,9 @@ export const getProperties = (): any => {
         : process.env.TLS__INTERNAL__KEY
         ? process.env.TLS__INTERNAL__KEY.replace(/\\n/g, "\n")
         : null,
+      db_svc_ca_cert: isProd
+        ? process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n")
+        : null,
       minio_region: isProd
         ? readFileSync(`${k8sPathPrefix}/MINIO__REGION`, "utf-8")
         : process.env.MINIO__REGION,
