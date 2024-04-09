@@ -4,6 +4,7 @@ import { Agent } from 'https';
 import { env } from '../env';
 import { createLogger } from '../logger';
 import {
+  Filters,
   IMeilisearchConcept,
   IMeilisearchGetConceptRecommended,
   IMeilisearchGetDescendants,
@@ -41,12 +42,7 @@ export class MeilisearchAPI {
     rowsPerPage: number,
     searchText = '',
     index: string,
-    filters: {
-      conceptClassId: string[];
-      domainId: string[];
-      standardConcept: string[];
-      vocabularyId: string[];
-    },
+    filters: Filters,
   ): Promise<IMeilisearchConcept> {
     const errorMessage = 'Error while getting concepts';
     try {
@@ -179,15 +175,10 @@ export class MeilisearchAPI {
     }
   }
 
-  async getConceptFilterOptions(
+  async getConceptFilterOptionsFaceted(
     index: string,
     searchText: string,
-    filters: {
-      conceptClassId: string[];
-      domainId: string[];
-      standardConcept: string[];
-      vocabularyId: string[];
-    },
+    filters: Filters,
   ): Promise<IMeilisearchConcept> {
     // Facet search has a 100 result limit, which is not affected by maxValuesPerFacet setting.
     // Hence using normal search as workaround to get all facets
@@ -200,12 +191,56 @@ export class MeilisearchAPI {
       facets: ['*'],
       filter: this.generateMeiliFilter(filters),
       // Since we do not need the search results, just getting 1 value
-      // using page and hitsPerPage instead of limit to get access to totalHits
-      page: 1,
-      hitsPerPage: 1,
+      // using page and hitsPerPage instead of limit param to get access to totalHits
+      // limit param will return estimatedTotalHits instead
+      hitsPerPage: 0,
     };
     const result = await axios.post<IMeilisearchConcept>(url, data, options);
-    return result.data;
+    const facetedOptions = result.data;
+    return facetedOptions;
+  }
+
+  async getConceptFilterOptionsValidity(
+    index: string,
+    searchText: string,
+    filters: Filters,
+  ): Promise<{ Valid: number; Invalid: number }> {
+    // Facet search has a 100 result limit, which is not affected by maxValuesPerFacet setting.
+    // Hence using normal search as workaround to get all facets
+    // https://www.meilisearch.com/docs/learn/advanced/known_limitations#facet-search-limitation
+
+    const options = await this.createOptions();
+    const url = `${this.url}indexes/${index}/search`;
+    const resultAll = await axios.post<IMeilisearchConcept>(
+      url,
+      {
+        q: searchText,
+        filter: this.generateMeiliFilter({ ...filters, validity: [] }),
+        // Since we do not need the search results, just getting 1 value
+        // using page and hitsPerPage instead of limit param to get access to totalHits
+        // limit param will return estimatedTotalHits instead
+        hitsPerPage: 0,
+      },
+      options,
+    );
+    const resultValid = await axios.post<IMeilisearchConcept>(
+      url,
+      {
+        q: searchText,
+        filter: this.generateMeiliFilter({ ...filters, validity: ['Valid'] }),
+        // Since we do not need the search results, just getting 1 value
+        // using page and hitsPerPage instead of limit param to get access to totalHits
+        // limit param will return estimatedTotalHits instead
+        hitsPerPage: 0,
+      },
+      options,
+    );
+    const totalDocuments = resultAll.data.totalHits;
+    const totalValid = resultValid.data.totalHits;
+    return {
+      Valid: totalValid,
+      Invalid: totalDocuments - totalValid,
+    };
   }
 
   private async createOptions(): Promise<AxiosRequestConfig> {
@@ -217,12 +252,7 @@ export class MeilisearchAPI {
     };
   }
 
-  private generateMeiliFilter(filters: {
-    conceptClassId: string[];
-    domainId: string[];
-    standardConcept: string[];
-    vocabularyId: string[];
-  }): string[][] {
+  private generateMeiliFilter(filters: Filters): string[][] {
     // Filter is an array of array which is needed for OR and AND logic
     // https://www.meilisearch.com/docs/learn/fine_tuning_results/filtering#creating-filter-expressions-with-arrays
     const conceptClassIdFilter = filters.conceptClassId.map((filterValue) => {
@@ -239,11 +269,22 @@ export class MeilisearchAPI {
     const vocabularyIdFilter = filters.vocabularyId.map((filterValue) => {
       return `${INDEX_ATTRIBUTES.concept.vocabularyId} = '${filterValue}'`;
     });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todaySeconds = Math.floor(Number(today) / 1000);
+    const validityFilter = filters.validity.map((filterValue) => {
+      if (filterValue === 'Valid') {
+        return `${INDEX_ATTRIBUTES.concept.validEndDate} >= ${todaySeconds}`;
+      } else {
+        return `${INDEX_ATTRIBUTES.concept.validEndDate} < ${todaySeconds}`;
+      }
+    });
     return [
       conceptClassIdFilter,
       domainIdFilter,
       standardConceptFilter,
       vocabularyIdFilter,
+      validityFilter,
     ];
   }
 
