@@ -330,6 +330,13 @@ export class NodePgConnection implements DBSvcConnectionInterface {
             /COLUMN_NAME as "value" FROM TABLE_COLUMNS WHERE SCHEMA_NAME/gi,
             'COLUMN_NAME AS "value" from information_schema.columns where table_schema'
         );
+
+        // Replace TABLE_NAME FROM SYS.M_TABLES WHERE SCHEMA_NAME=
+        temp = temp.replace(
+            /TABLE_NAME FROM SYS.M_TABLES WHERE SCHEMA_NAME=(\%s|\?) AND \(TABLE_NAME/gi,
+            `tablename as "TABLE_NAME" from pg_catalog.pg_tables where schemaname=? AND (UPPER(tablename)`
+        );
+
         // Replace VIEW_COLUMNS with pg_attribute
         temp = temp.replace(
             /COLUMN_NAME as \"value\" FROM VIEW_COLUMNS WHERE SCHEMA_NAME = (\%s|\?) AND VIEW_NAME = (\%s|\?)/gi,
