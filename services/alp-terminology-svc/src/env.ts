@@ -27,6 +27,10 @@ const Env = z.object({
     .string()
     .refine((val) => !isNaN(parseInt(val)))
     .transform(Number),
+
+  SSL_PRIVATE_KEY: z.string(),
+  SSL_PUBLIC_CERT: z.string(),
+  TERMINOLOGY_CA_CERT: z.string(),
 });
 
 const result = Env.safeParse(process.env);

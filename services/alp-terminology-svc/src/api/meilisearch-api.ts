@@ -21,15 +21,19 @@ export class MeilisearchAPI {
     if (env.MEILISEARCH__API_URL) {
       this.url = env.MEILISEARCH__API_URL;
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') ||
-          this.url.startsWith('https://alp-minerva-meilisearch-')
-            ? false
-            : true,
+        rejectUnauthorized: this.isAuthorized(),
+        ca: this.isAuthorized() ? env.TERMINOLOGY_CA_CERT : null,
       });
     } else {
       throw new Error('No url is set for MeilisearchAPI');
     }
+  }
+
+  isAuthorized(): boolean {
+    return this.url.startsWith('https://localhost:') ||
+      this.url.startsWith('https://alp-minerva-gateway-')
+      ? false
+      : true;
   }
 
   async getConcepts(
@@ -296,11 +300,9 @@ export class MeilisearchAPI {
         filter,
       };
     });
-    const result = await axios.post<{ results: IMeilisearchGetConceptRecommended[] }>(
-      url,
-      { queries },
-      options,
-    );
+    const result = await axios.post<{
+      results: IMeilisearchGetConceptRecommended[];
+    }>(url, { queries }, options);
     return result.data.results;
   }
 
