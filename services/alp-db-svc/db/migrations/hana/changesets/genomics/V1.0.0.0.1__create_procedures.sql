@@ -29,1524 +29,17 @@
 
 
 
-create or replace procedure P_AlleleStatistics ( 
-        IN sample_list SampleList,
-        IN chromosome_index INTEGER,
-        IN position INTEGER,
-        IN allele NVARCHAR( 255 ),
-        OUT affected_count INTEGER,
-        OUT sample_count INTEGER
-    )
-   LANGUAGE SQLSCRIPT
-   SQL SECURITY INVOKER
-   READS SQL DATA AS
-BEGIN
-    SELECT COUNT( DISTINCT PatientDWID ) INTO sample_count FROM :sample_list AS samples INNER JOIN Samples AS all_samples ON samples.SampleIndex = all_samples.SampleIndex;
-    
-    SELECT
-            COUNT( DISTINCT AllSamples.PatientDWID ) INTO affected_count
-        FROM
-            :sample_list AS Samples
-            INNER JOIN Samples AS AllSamples
-                ON Samples.SampleIndex = AllSamples.SampleIndex
-            JOIN  GenotypeAlleles AS GenotypeAlleles
-                ON GenotypeAlleles.SampleIndex = Samples.SampleIndex
-            JOIN Variants AS Variants
-                ON GenotypeAlleles.DWAuditID = Variants.DWAuditID
-                AND GenotypeAlleles.VariantIndex = Variants.VariantIndex
-            JOIN VariantAlleles AS VariantAlleles
-                ON Variants.DWAuditID = VariantAlleles.DWAuditID
-                AND Variants.VariantIndex = VariantAlleles.VariantIndex
-        WHERE GenotypeAlleles.AlleleCount > 0
-            AND VariantAlleles.Allele = :allele
-            AND Variants.ChromosomeIndex = :chromosome_index
-            AND Variants.Position = :position;
-END;
 
 
-create or replace procedure P_DisplayVariants (
-        IN sample_list SampleList,
-        IN variant_grouping VariantAnnotationGrouping,
-        IN chromosome_index INTEGER,
-        IN begin_position INTEGER,
-        IN end_position INTEGER,
-        OUT display_variants GroupedDisplayVariants,
-        OUT sample_count INTEGER
-    )
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY INVOKER
-    READS SQL DATA AS
-BEGIN
-    DECLARE position_array INTEGER ARRAY;
-    DECLARE allele_array VARCHAR( 255 ) ARRAY;
-    DECLARE grouping_array TINYINT ARRAY;
-    DECLARE allele_count_array INTEGER ARRAY;
-    DECLARE copy_number_array INTEGER ARRAY;
-    DECLARE reference_allele VARCHAR( 255 );
-    DECLARE variant_group TINYINT;
-    DECLARE alternative_allele VARCHAR( 255 );
-    DECLARE position_cursor INTEGER;
-    DECLARE inner_position_cursor INTEGER;
-    DECLARE outer_position_cursor INTEGER;
-    DECLARE row_index INTEGER := 1;
-    DECLARE groupingCount INTEGER;
-    DECLARE last_reference_allele VARCHAR( 255 );
-    DECLARE CURSOR grouped_variants ( data_model_variants GroupedDataModelVariants ) FOR
-        SELECT
-            Position,
-            AlleleIndex,
-            Allele,
-            AlleleCount,
-            SUM( AlleleCount / GroupCount ) OVER ( PARTITION BY Position ) AS CopyNumber,
-            Grouping
-        FROM
-            :data_model_variants 
-        ORDER BY
-            Position ASC,
-            AlleleIndex ASC;
-
-    -- find sites overlapping selected area
-    variant_positions = SELECT DISTINCT
-            Position
-        FROM
-            DataModelVariants
-        WHERE
-            ChromosomeIndex = :chromosome_index AND
-            Position < :end_position AND
-            Position + LENGTH( Allele ) >= :begin_position AND
-            ( AlleleIndex = 0 OR AlleleCount > 0 );
-
-    SELECT COUNT( * ) INTO groupingCount FROM :variant_grouping;
-    IF groupingCount > 0 THEN
-        -- query data model variants
-        SELECT COUNT( DISTINCT PatientDWID ) INTO sample_count FROM :sample_list AS samples INNER JOIN Samples AS all_samples ON samples.SampleIndex = all_samples.SampleIndex;
-        IF :sample_count = 1 THEN
-            DECLARE sample_index INTEGER;
-            SELECT SampleIndex INTO sample_index FROM :sample_list;
-    
-            data_model_variants = SELECT
-                    variants.Position,
-                    variants.AlleleIndex,
-                    variants.Allele,
-                    SUM( variants.AlleleCount ) AS AlleleCount
-                FROM
-                    DataModelVariants AS variants
-                WHERE
-                    variants.ChromosomeIndex = :chromosome_index AND
-                    variants.Position IN ( SELECT * FROM :variant_positions ) AND
-                    variants.SampleIndex = :sample_index AND
-                    ( variants.AlleleIndex = 0 OR variants.AlleleCount > 0 )
-                GROUP BY
-                    variants.Position,
-                    variants.AlleleIndex,
-                    variants.Allele;
-        ELSEIF :sample_count > 1 THEN
-            data_model_variants = SELECT
-                    variants.Position,
-                    variants.AlleleIndex,
-                    variants.Allele,
-                    SUM( variants.AlleleCount ) AS AlleleCount
-                FROM
-                    DataModelVariants AS variants
-                WHERE
-                    variants.ChromosomeIndex = :chromosome_index AND
-                    variants.Position IN ( SELECT * FROM :variant_positions ) AND
-                    variants.SampleIndex IN ( SELECT * FROM :sample_list ) AND
-                    ( variants.AlleleIndex = 0 OR variants.AlleleCount > 0 )
-                GROUP BY
-                    variants.Position,
-                    variants.AlleleIndex,
-                    variants.Allele;
-        END IF;
-            
-        allele_grouping = SELECT 
-            variants.Position,
-            variants.AlleleIndex, 
-            groups.Grouping
-            FROM :variant_grouping AS groups
-            JOIN DataModelVariants AS variants
-                ON groups.DWAuditID = variants.DWAuditID AND
-                groups.VariantIndex = variants.VariantIndex AND
-                groups.AlleleIndex = variants.AlleleIndex;            
-    
-        grouped_data_model_variants = SELECT 
-            variants.Position,
-            variants.AlleleIndex,
-            variants.Allele,
-            groups.Grouping,
-            COUNT(*) OVER ( PARTITION BY variants.Position, variants.AlleleIndex ) AS GroupCount,
-            variants.AlleleCount
-            FROM :data_model_variants AS variants
-            LEFT OUTER JOIN :allele_grouping AS groups
-                ON variants.Position = groups.Position AND
-                variants.AlleleIndex = groups.AlleleIndex
-            ORDER BY
-                variants.Position,
-                variants.AlleleIndex,
-                groups.Grouping;
-    
-        -- iterate over data model variants transforming them into display variants
-        IF :sample_count > 0 THEN
-        	FOR variant AS grouped_variants ( :grouped_data_model_variants ) DO
-        	    IF variant.Position = :outer_position_cursor THEN
-        	        reference_allele := last_reference_allele;
-        	    ELSE
-        	        reference_allele := 'N';
-        	    END IF;
-        	    IF variant.AlleleIndex = 0 THEN
-        	        reference_allele := variant.Allele;
-        	        last_reference_allele := variant.Allele;
-        	        outer_position_cursor := variant.Position;
-        	    ELSEIF variant.AlleleIndex > 0 AND variant.AlleleCount > 0 THEN
-        	        variant_group := variant.Grouping;
-        	        grouping_array[ :row_index ] := variant_group;
-        	        alternative_allele := variant.Allele;
-        	        inner_position_cursor := variant.Position;
-        	        WHILE LENGTH( :reference_allele ) > 0 OR LENGTH( :alternative_allele ) > 0 DO
-        	            IF LENGTH( :reference_allele ) <= 1 AND LENGTH( :alternative_allele ) > LENGTH( :reference_allele ) THEN -- insertion
-                            position_array[ :row_index ] := :inner_position_cursor;
-                            allele_count_array[ :row_index ] := variant.AlleleCount;
-                            copy_number_array[ :row_index ] := variant.CopyNumber;
-                            allele_array[ :row_index ] := :alternative_allele;
-            	            BREAK;
-        	            ELSEIF LENGTH( :alternative_allele ) = 0 THEN -- deletion
-                            allele_array[ :row_index ] := '';
-            	            reference_allele := SUBSTRING( :reference_allele, 2 );
-        	            ELSEIF SUBSTRING( :reference_allele, 1, 1 ) <> SUBSTRING( :alternative_allele, 1, 1 ) THEN -- substitution
-                            allele_array[ :row_index ] := SUBSTRING( :alternative_allele, 1, 1 );
-            	            reference_allele := SUBSTRING( :reference_allele, 2 );
-            	            alternative_allele := SUBSTRING( :alternative_allele, 2 );
-        	            ELSE -- reference
-            	            reference_allele := SUBSTRING( :reference_allele, 2 );
-            	            alternative_allele := SUBSTRING( :alternative_allele, 2 );
-            	            inner_position_cursor := :inner_position_cursor + 1;
-        	                CONTINUE;
-        	            END IF;
-        
-                        position_array[ :row_index ] := :inner_position_cursor;
-                        allele_count_array[ :row_index ] := variant.AlleleCount;
-                        copy_number_array[ :row_index ] := variant.CopyNumber;
-                        
-        
-        	            inner_position_cursor := :inner_position_cursor + 1;
-        	            row_index := :row_index + 1;
-        	        END WHILE;
-        	    END IF;
-            END FOR;
-        END IF;
-        -- create output table and combine overlapping alleles
-        grouped_unaggregated_display_variants = UNNEST( :position_array, :allele_array, :allele_count_array, :copy_number_array, :grouping_array ) AS ( Position, Allele, AlleleCount, CopyNumber, Grouping );
-        display_variants = SELECT
-                Position,
-                Allele,
-                Grouping,
-                SUM( AlleleCount ) AS AlleleCount,
-                MAX( CopyNumber ) AS CopyNumber
-            FROM
-                :grouped_unaggregated_display_variants
-            WHERE
-                Position BETWEEN :begin_position AND
-                :end_position - 1 
-            GROUP BY
-                Position,
-                Allele,
-                Grouping
-            ORDER BY
-                Position ASC,
-                AlleleCount DESC,
-                Grouping;
-        
-    ELSE
-        DECLARE CURSOR variants ( data_model_variants DataModelVariants ) FOR
-        SELECT
-            Position,
-            AlleleIndex,
-            Allele,
-            AlleleCount,
-            SUM( AlleleCount ) OVER ( PARTITION BY Position ) AS CopyNumber
-        FROM
-            :data_model_variants
-        ORDER BY
-            Position ASC,
-            AlleleIndex ASC;
-            
-        -- query data model variants
-        SELECT COUNT( DISTINCT PatientDWID ) INTO sample_count FROM :sample_list AS samples INNER JOIN Samples AS all_samples ON samples.SampleIndex = all_samples.SampleIndex;
-        IF :sample_count = 1 THEN
-            DECLARE sample_index INTEGER;
-            SELECT SampleIndex INTO sample_index FROM :sample_list;
-    
-            data_model_variants = SELECT
-                    Position,
-                    AlleleIndex,
-                    Allele,
-                    SUM( AlleleCount ) AS AlleleCount
-                FROM
-                    DataModelVariants
-                WHERE
-                    ChromosomeIndex = :chromosome_index AND
-                    Position IN ( SELECT * FROM :variant_positions ) AND
-                    SampleIndex = :sample_index AND
-                    ( AlleleIndex = 0 OR AlleleCount > 0 )
-                GROUP BY
-                    Position,
-                    AlleleIndex,
-                    Allele
-                ORDER BY
-                    Position,
-                    AlleleIndex;
-        ELSEIF :sample_count > 1 THEN
-            data_model_variants = SELECT
-                    Position,
-                    AlleleIndex,
-                    Allele,
-                    SUM( AlleleCount ) AS AlleleCount
-                FROM
-                    DataModelVariants
-                WHERE
-                    ChromosomeIndex = :chromosome_index AND
-                    Position IN ( SELECT * FROM :variant_positions ) AND
-                    SampleIndex IN ( SELECT * FROM :sample_list ) AND
-                    ( AlleleIndex = 0 OR AlleleCount > 0 )
-                GROUP BY
-                    Position,
-                    AlleleIndex,
-                    Allele
-                ORDER BY
-                    Position,
-                    AlleleIndex;
-        END IF;
-    
-        -- iterate over data model variants transforming them into display variants
-        IF :sample_count > 0 THEN
-        	FOR variant AS variants ( :data_model_variants ) DO
-        	    IF variant.Position = :outer_position_cursor THEN
-        	        reference_allele := last_reference_allele;
-        	    ELSE
-        	        reference_allele := 'N';
-        	    END IF;
-        	    IF variant.AlleleIndex = 0 THEN
-        	        reference_allele := variant.Allele;
-        	        last_reference_allele := variant.Allele;
-        	        outer_position_cursor := variant.Position;
-        	    ELSEIF variant.AlleleIndex > 0 AND variant.AlleleCount > 0 THEN
-        	        alternative_allele := variant.Allele;
-        	        inner_position_cursor := variant.Position;
-        	        WHILE LENGTH( :reference_allele ) > 0 OR LENGTH( :alternative_allele ) > 0 DO
-        	            IF LENGTH( :reference_allele ) <= 1 AND LENGTH( :alternative_allele ) > LENGTH( :reference_allele ) THEN -- insertion
-                            position_array[ :row_index ] := :inner_position_cursor;
-                            allele_count_array[ :row_index ] := variant.AlleleCount;
-                            copy_number_array[ :row_index ] := variant.CopyNumber;
-                            allele_array[ :row_index ] := :alternative_allele;
-            	            BREAK;
-        	            ELSEIF LENGTH( :alternative_allele ) = 0 THEN -- deletion
-                            allele_array[ :row_index ] := '';
-            	            reference_allele := SUBSTRING( :reference_allele, 2 );
-        	            ELSEIF SUBSTRING( :reference_allele, 1, 1 ) <> SUBSTRING( :alternative_allele, 1, 1 ) THEN -- substitution
-                            allele_array[ :row_index ] := SUBSTRING( :alternative_allele, 1, 1 );
-            	            reference_allele := SUBSTRING( :reference_allele, 2 );
-            	            alternative_allele := SUBSTRING( :alternative_allele, 2 );
-        	            ELSE -- reference
-            	            reference_allele := SUBSTRING( :reference_allele, 2 );
-            	            alternative_allele := SUBSTRING( :alternative_allele, 2 );
-            	            inner_position_cursor := :inner_position_cursor + 1;
-        	                CONTINUE;
-        	            END IF;
-        
-                        position_array[ :row_index ] := :inner_position_cursor;
-                        allele_count_array[ :row_index ] := variant.AlleleCount;
-                        copy_number_array[ :row_index ] := variant.CopyNumber;
-                        
-        
-        	            inner_position_cursor := :inner_position_cursor + 1;
-        	            row_index := :row_index + 1;
-        	        END WHILE;
-        	    END IF;
-            END FOR;
-        END IF;
-        
-        -- create output table and combine overlapping alleles
-        unaggregated_display_variants = UNNEST( :position_array, :allele_array, :allele_count_array, :copy_number_array ) AS ( Position, Allele, AlleleCount, CopyNumber );
-        display_variants = SELECT
-                Position,
-                Allele,
-                CAST( NULL AS TINYINT ) AS Grouping,
-                SUM( AlleleCount ) AS AlleleCount,
-                MAX( CopyNumber ) AS CopyNumber
-            FROM
-                :unaggregated_display_variants
-            WHERE
-                Position BETWEEN :begin_position AND :end_position - 1
-            GROUP BY
-                Position,
-                Allele
-            ORDER BY
-                Position ASC,
-                AlleleCount DESC;
-    END IF;
-    
-END;
 
 
-create or replace procedure P_GeneVariantAnnotationCounts (
-        IN sample_list SampleList,
-        IN variant_grouping VariantAnnotationGrouping,
-        IN reference_id NVARCHAR(255),
-        IN chromosome_index INTEGER,
-        IN begin_position INTEGER,
-        IN end_position INTEGER,
-        IN binSize DOUBLE,
-        IN annotationGrouping BOOLEAN,
-        OUT gene_variant_counts VariantAnnotationCounts,
-        OUT sample_count INTEGER 
-    )
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY INVOKER
-     AS
-BEGIN
-    SELECT COUNT( DISTINCT PatientDWID ) INTO sample_count FROM :sample_list AS samples INNER JOIN Samples AS all_samples ON samples.SampleIndex = all_samples.SampleIndex;
-    -- return a list of genes with the number of affected samples
-    IF annotationGrouping = true
-    THEN
-    gene_variant_counts = 
-    SELECT GeneName, ChromosomeIndex, Grouping, "Begin", "End", SUM(Weight) AS Count, Bin
-        FROM ( 
-            SELECT GeneName, ChromosomeIndex, SampleIndex, Grouping, "Begin", "End", Bin, ( 1 / count(*) OVER (Partition by GeneName, ChromosomeIndex, SampleIndex) ) AS Weight 
-            FROM ( 
-                SELECT Features.FeatureName AS GeneName,
-                    Variants.ChromosomeIndex AS ChromosomeIndex,
-                    Samples.SampleIndex,
-                    :variant_grouping.Grouping AS Grouping,
-                    MIN( Features.beginregion ) AS "Begin",
-                    MAX( Features.endregion ) AS "End",
-                    FLOOR( ( FLOOR( MIN( Features.beginregion ) + MAX( Features.endregion ) / 2 ) ) / :binSize ) AS Bin
-                FROM
-                    :sample_list AS Samples 
-                    JOIN Genotypes AS Genotypes
-                        ON Genotypes.SampleIndex = Samples.SampleIndex
-                    JOIN Variants AS Variants
-                        ON Variants.DWAuditID = Genotypes.DWAuditID 
-                        AND Variants.VariantIndex = Genotypes.VariantIndex 
-                    JOIN :variant_grouping
-                        ON :variant_grouping.DWAuditID = Genotypes.DWAuditID 
-                        AND :variant_grouping.VariantIndex = Genotypes.VariantIndex 
-                    JOIN Features AS Features
-                        ON Variants.ChromosomeIndex = Features.ChromosomeIndex
-                        AND Variants.Position BETWEEN Features.beginregion AND Features.endregion - 1 
-                        AND Features.Class = 'gene'
-                WHERE
-                    Genotypes.ReferenceAlleleCount != Genotypes.CopyNumber 
-                    AND Features.ReferenceID = :reference_id
-                    AND (
-                        :end_position IS NULL
-                        OR (
-                            Features.beginregion < :end_position
-                            AND Features.endregion > :begin_position
-                        )
-                    )
-                GROUP BY
-                    Variants.ChromosomeIndex,
-                    Features.FeatureName,
-                    :variant_grouping.Grouping,
-                    Samples.SampleIndex
-                ORDER BY
-                     Variants.ChromosomeIndex,
-                     --Features.FeatureName,
-                     FLOOR( ( FLOOR( MIN( Features.beginregion ) + MAX( Features.endregion ) / 2 ) ) / :binSize ),
-                     Samples.SampleIndex,
-                     :variant_grouping.Grouping
-                )
-            )
-    GROUP BY 
-        GeneName, 
-        ChromosomeIndex, 
-        "Begin", 
-        "End", 
-        Grouping, 
-        Bin
-    ORDER BY
-         ChromosomeIndex,
-         GeneName,
-         Bin,
-         Grouping;
-    ELSE
-     gene_variant_counts =        
-        SELECT
-            Features.FeatureName AS GeneName ,
-            Variants.ChromosomeIndex AS ChromosomeIndex,
-            NULL AS Grouping,
-            MIN ( Features.beginregion ) AS "Begin",
-            MAX ( Features.endregion ) AS "End",
-            COUNT( DISTINCT AllSamples.PatientDWID ) AS Count,
-            NULL AS Bin
-        FROM
-            :sample_list AS Samples
-            JOIN Samples AS AllSamples
-			    ON Samples.SampleIndex = AllSamples.SampleIndex
-            JOIN Genotypes AS Genotypes
-                ON Genotypes.SampleIndex = Samples.SampleIndex
-            JOIN Variants AS Variants
-                ON Genotypes.DWAuditID = Variants.DWAuditID
-                AND Genotypes.VariantIndex = Variants.VariantIndex
-            JOIN Features AS Features
-                ON Variants.ChromosomeIndex = Features.ChromosomeIndex
-                AND Variants.Position BETWEEN Features.beginregion AND Features.endregion - 1
-                AND Features.Class = 'gene'
-        WHERE
-            Genotypes.ReferenceAlleleCount != Genotypes.CopyNumber 
-            AND Features.ReferenceID = :reference_id
-            AND (
-                :end_position IS NULL
-                OR (
-                    Features.beginregion < :end_position
-                    AND Features.endregion > :begin_position
-                )
-            )
-        GROUP BY
-            Variants.ChromosomeIndex,
-            Features.FeatureName
-        ORDER BY
-             Variants.ChromosomeIndex;
-    END IF;
-    
-    IF :chromosome_index IS NOT NULL THEN
-        gene_variant_counts = SELECT * FROM :gene_variant_counts WHERE ChromosomeIndex = :chromosome_index;
-    END IF;
-END;
 
 
-create or replace procedure P_GeneVariantCounts (
-        IN sample_list SampleList,
-        IN reference_id NVARCHAR(255),
-        IN chromosome_index INTEGER,
-        IN begin_position INTEGER,
-        IN end_position INTEGER,
-        OUT gene_variant_counts RegionCounts,
-        OUT sample_count INTEGER
-    )
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY INVOKER
-    READS SQL DATA AS
-BEGIN
-    SELECT COUNT( DISTINCT PatientDWID ) INTO sample_count FROM :sample_list AS samples INNER JOIN Samples AS all_samples ON samples.SampleIndex = all_samples.SampleIndex;
-
-    -- return a list of genes with the number of affected patients
-    gene_variant_counts =        
-        SELECT
-            Features.FeatureName AS GeneName ,
-            Variants.ChromosomeIndex AS ChromosomeIndex,
-            MIN ( Features.beginregion ) AS "Begin",
-            MAX ( Features.endregion ) AS "End",
-            COUNT( DISTINCT AllSamples.PatientDWID ) AS Count
-        FROM
-            :sample_list AS Samples
-            INNER JOIN Samples AS AllSamples
-                ON Samples.SampleIndex = AllSamples.SampleIndex
-            JOIN Genotypes AS Genotypes
-                ON Genotypes.SampleIndex = Samples.SampleIndex
-            JOIN Variants AS Variants
-                ON Genotypes.DWAuditID = Variants.DWAuditID
-                AND Genotypes.VariantIndex = Variants.VariantIndex
-            JOIN Features AS Features
-                ON Variants.ChromosomeIndex = Features.ChromosomeIndex
-                AND Variants.Position BETWEEN Features.beginregion AND Features.endregion - 1
-                AND Features.Class = 'gene'
-        WHERE
-            Genotypes.ReferenceAlleleCount != Genotypes.CopyNumber 
-            AND Features.ReferenceID = :reference_id
-            AND (
-                :end_position IS NULL
-                OR (
-                    Features.beginregion < :end_position
-                    AND Features.endregion > :begin_position
-                )
-            )
-        GROUP BY
-            Variants.ChromosomeIndex,
-            Features.FeatureName
-        ORDER BY
-             Variants.ChromosomeIndex;
-    IF :chromosome_index IS NOT NULL THEN
-        gene_variant_counts = SELECT * FROM :gene_variant_counts WHERE ChromosomeIndex = :chromosome_index;
-    END IF;
-END;
 
 
-create or replace procedure P_GetVariantDetails (
-		IN inputDWAuditID DWAuditIDList, 
-		IN chromosomeIdx BIGINT, 
-		IN positionVal BIGINT, 
-		IN referenceID varchar(255), 
-		OUT resultOut VariantAnnotationDetails, 
-		OUT variantIdOut VariantIDList
-	)
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY DEFINER
-AS
-BEGIN
-	DECLARE countRows INTEGER;
-	DECLARE countVariantRows INTEGER;
-
-	resultOut = SELECT DISTINCT 
-				vann.DWAuditID, 
-				vann.VariantIndex, 
-				vann.AlleleIndex, 
-				vann.ChromosomeIndex, 
-				vann.Position, 
-				vann.GeneName, 
-				vann.Region, 
-				vann.SequenceAlteration, 
-				vann."AminoAcid.Reference" AS "AminoAcid1.Reference", 
-				vann."AminoAcid.Alternative" AS "AminoAcid1.Alternative", 
-				vann.MutationType, 
-				vann.CDSPosition, 
-				vann.Transcript, 
-				vann.Protein, 
-				vann.ExonRank, 
-				ref.Allele AS "Allele.Reference", 
-				va.Allele AS "Allele.Alternative", 
-				case when Feat.Strand = '-' then 
-				  GetReverseComplement (ref.Allele)
-				  else 	ref.Allele end AS "CDSAllele.Reference", 
-				case when Feat.Strand = '-' then 
-				  GetReverseComplement (va.Allele)
-				  else 	va.Allele end AS "CDSAllele.Alternative", 
-				getAminoAcidName(
-					vann."AminoAcid.Reference", 
-					'THREE'
-				) AS "AminoAcid3.Reference", 
-				getAminoAcidName(
-					vann."AminoAcid.Alternative", 
-					'THREE'
-				) AS "AminoAcid3.Alternative"
-			--Feat.Strand AS Strand	
-			FROM VariantAnnotations AS vann
-				INNER JOIN VariantAlleles AS va
-				ON vann.DWAuditID = va.DWAuditID
-					AND va.VariantIndex = vann.VariantIndex
-					AND va.AlleleIndex > 0
-				INNER JOIN VariantAlleles AS ref
-				ON vann.DWAuditID = ref.DWAuditID
-					AND ref.VariantIndex = vann.VariantIndex
-					AND ref.AlleleIndex = 0
-			   inner join FeaturesAnnotation  AS feat
-			    on feat.GeneName = vann.GeneName
-			    and feat.Transcript = vann.Transcript
-			    and feat.FeatureName = vann.Protein
-			    and feat.ChromosomeIndex = :chromosomeIdx
-			    and feat.ReferenceID = :referenceID
-			WHERE (vann.DWAuditID IN (SELECT DWAuditID FROM :inputDWAuditID))
-				AND vann.Position = :positionVal
-				AND vann.ChromosomeIndex = :chromosomeIdx;
-	
-	
-	
-	SELECT count(*) INTO countRows FROM :resultOut;
-
-	
-	IF (:countRows = 0) THEN
-      select count(*) into countVariantRows from Variants v 
-      INNER JOIN VariantAlleles AS va
-	  ON v.DWAuditID = va.DWAuditID
-	  AND v.VariantIndex = va.VariantIndex
-      where Position = :positionVal AND ChromosomeIndex = :chromosomeIdx and v.DWAuditID IN (SELECT DWAuditID FROM :inputDWAuditID);
-      
-        IF ( :countVariantRows = 0 ) THEN
-        
-         resultOut = SELECT null AS DWAuditID, 
-					null AS VariantIndex, 
-					null AS AlleleIndex, 
-					seq.ChromosomeIndex, 
-					:positionVal AS Position, 
-					null AS GeneName, 
-					null AS Region, 
-					null AS SequenceAlteration, 
-					null AS "AminoAcid1.Reference", 
-					null AS "AminoAcid1.Alternative", 
-					null AS MutationType, 
-					null AS CDSPosition, 
-					null AS Transcript, 
-					null AS Protein, 
-					null AS ExonRank, 
-					SUBSTRING (TO_CHAR(seq.Sequence), :positionVal - seq.beginregion +1,1) AS "Allele.Reference", 
-					null AS "Allele.Alternative", 
-					SUBSTRING (TO_CHAR(seq.Sequence), :positionVal - seq.beginregion +1,1) AS "CDSAllele.Reference", 
-					null AS "CDSAllele.Alternative", 
-					null AS "AminoAcid3.Reference", 
-					null AS "AminoAcid3.Alternative"
-					--null AS Strand
-				FROM referencesequences AS seq 
-				where  ChromosomeIndex = :chromosomeIdx  and ReferenceID = :referenceID and 
-				:positionVal between seq.beginregion and seq.endregion;
-         ELSE        			
-		resultOut = SELECT
-                    variants.DWAuditID,
-					variants.VariantIndex, 
-					null AS AlleleIndex, 
-					variants.ChromosomeIndex, 
-					variants.Position, 
-					null AS GeneName, 
-					null AS Region, 
-					null AS SequenceAlteration, 
-					null AS "AminoAcid1.Reference", 
-					null AS "AminoAcid1.Alternative", 
-					null AS MutationType, 
-					null AS CDSPosition, 
-					null AS Transcript, 
-					null AS Protein, 
-					null AS ExonRank, 
-					ref.Allele AS "Allele.Reference", 
-					va.Allele AS "Allele.Alternative", 
-					ref.Allele AS "CDSAllele.Reference", 
-					va.Allele AS "CDSAllele.Alternative", 
-					null AS "AminoAcid3.Reference", 
-					null AS "AminoAcid3.Alternative"
-					--null AS Strand
-				FROM Variants AS variants
-					INNER JOIN VariantAlleles AS va
-					ON variants.DWAuditID = va.DWAuditID
-						AND va.VariantIndex = variants.VariantIndex
-						AND va.AlleleIndex > 0
-					INNER JOIN VariantAlleles AS ref
-					ON variants.DWAuditID = ref.DWAuditID
-						AND ref.VariantIndex = variants.VariantIndex
-						AND ref.AlleleIndex = 0
-				WHERE (variants.DWAuditID IN (SELECT DWAuditID FROM :inputDWAuditID))
-					AND variants.Position = :positionVal
-					AND variants.ChromosomeIndex = :chromosomeIdx;
-	END IF;
-	
-	END IF;
-	
-	variantIdOut = SELECT DISTINCT variants.VariantIndex, 
-				vaID.VariantID
-			FROM :resultOut AS variants
-				INNER JOIN VariantIDs AS vaID
-				ON vaID.VariantIndex = variants.VariantIndex
-				AND vaID.DWAuditID = variants.DWAuditID
-				AND vaID.VariantID IS NOT NULL;
-					
-					
-	variantIdOut = SELECT VariantIndex,string_agg(VariantID,',') AS VariantID
-			FROM :variantIdOut
-			GROUP BY VariantIndex;
-END;
 
 
-create or replace procedure P_LocateSampleVariants(
-        IN sample_list SampleList,
-        IN chromosome_index INTEGER,
-        IN position INTEGER,
-        OUT variants SampleVariants
-	)
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY INVOKER
-	READS SQL DATA
-AS
-BEGIN
-    variants = SELECT
-        Genotypes.SampleIndex,
-        Genotypes.DWAuditID,
-        Genotypes.VariantIndex
-    FROM
-        :sample_list AS SampleList
-    INNER JOIN
-        Genotypes AS Genotypes
-    ON
-        SampleList.SampleIndex = Genotypes.SampleIndex
-    INNER JOIN
-        Variants AS Variants
-    ON
-        Genotypes.DWAuditID = Variants.DWAuditID AND
-        Genotypes.VariantIndex = Variants.VariantIndex AND
-        Variants.ChromosomeIndex = :chromosome_index AND
-        Variants.Position = :position;
-END;
 
-
-create or replace procedure P_MutationDataAnnotation(
-		IN sample_list SampleList,
-		IN reference_id NVARCHAR(255), 
-		IN chromosome_index INTEGER,
-		IN begin_position INTEGER,
-		IN end_position INTEGER,
-		IN variant_grouping VariantAnnotationGrouping,
-		OUT mutation_data MutationDataAnnotation,
-		OUT affected_count INTEGER,
-		OUT sample_count INTEGER
-	)
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY INVOKER
-	READS SQL DATA
-AS
-BEGIN
-	DECLARE total_mutation INTEGER;
-
-    SELECT COUNT( DISTINCT PatientDWID ) INTO sample_count FROM :sample_list AS samples INNER JOIN Samples AS all_samples ON samples.SampleIndex = all_samples.SampleIndex;
-  
-    SELECT 
-		COUNT( DISTINCT AllSamples.PatientDWID )
-	INTO
-		affected_count
-	FROM :sample_list AS Samples
-		JOIN Samples AS AllSamples
-			ON Samples.SampleIndex = AllSamples.SampleIndex
-		JOIN Genotypes AS Genotypes
-			ON Genotypes.SampleIndex = Samples.SampleIndex
-		JOIN :variant_grouping
-			ON Genotypes.DWAuditID = :variant_grouping.DWAuditID 
-			AND Genotypes.VariantIndex = :variant_grouping.VariantIndex
-		JOIN Variants AS Variants
-			ON :variant_grouping.DWAuditID = Variants.DWAuditID
-			AND :variant_grouping.VariantIndex = Variants.VariantIndex
-	WHERE AllSamples.ReferenceID = :reference_id
-		AND Variants.ChromosomeIndex = :chromosome_index
-		AND Variants.Position < :end_position
-		AND Variants.Position >= :begin_position;
-    
-	affected_group = SELECT
-	        :variant_grouping.Grouping AS Grouping
-	    FROM :sample_list AS Samples
-            JOIN Genotypes AS Genotypes
-                ON Genotypes.SampleIndex = Samples.SampleIndex
-            JOIN :variant_grouping
-                ON Genotypes.DWAuditID = :variant_grouping.DWAuditID 
-                AND Genotypes.VariantIndex = :variant_grouping.VariantIndex
-            JOIN Variants AS Variants
-                ON :variant_grouping.DWAuditID = Variants.DWAuditID
-                AND :variant_grouping.VariantIndex = Variants.VariantIndex
-            JOIN Features AS Features
-                ON Variants.ChromosomeIndex = Features.ChromosomeIndex
-		WHERE Features.ReferenceID = :reference_id
-		    AND Variants.ChromosomeIndex = :chromosome_index
-    		AND Variants.Position < :end_position
-            AND Variants.Position >= :begin_position;
-            
-	mutation_per_group = SELECT Grouping, COUNT ( * ) AS Count
-    	FROM :affected_group
-    	GROUP BY Grouping
-    	ORDER BY Grouping;
-	
-    SELECT COUNT( * ) INTO total_mutation FROM :affected_group;
-	
-	mutation_data = SELECT "mutation_per_group".Grouping, "mutation_per_group".Count / :total_mutation AS Percent
-        FROM :mutation_per_group AS "mutation_per_group"
-    	GROUP BY "mutation_per_group".Grouping,
-    		"mutation_per_group".Count
-    	ORDER BY "mutation_per_group".Grouping;
-END;
-
-
-create or replace procedure P_QualitativeData(
-		IN sample_list SampleList,
-		IN reference_id NVARCHAR(255), 
-		IN chromosome_index INTEGER, 
-		IN begin_position INTEGER, 
-		IN end_position INTEGER, 
-		IN bin_size REAL,
-		IN variant_grouping VariantAnnotationGrouping,
-		OUT qualitative_data QualitativeData
-	)
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY INVOKER
-	READS SQL DATA
-AS
-BEGIN
-	DECLARE total_patient_count INTEGER;
-
-	SELECT
-		COUNT( DISTINCT PatientDWID ) INTO total_patient_count
-	FROM
-		:sample_list AS samples
-	INNER JOIN
-		Samples AS all_samples
-	ON
-		samples.SampleIndex = all_samples.SampleIndex;
-	
-	variants =
-		SELECT 
-			FLOOR( ( Variants.Position - :begin_position ) / :bin_size ) AS BinIndex,
-			:variant_grouping.Grouping AS Grouping,
-			Variants.Position,
-			AllSamples.PatientDWID
-		FROM
-			:sample_list AS Samples
-		INNER JOIN
-			Samples AS AllSamples
-		ON
-			Samples.SampleIndex = AllSamples.SampleIndex
-		INNER JOIN
-			Genotypes AS Genotypes
-		ON
-			Samples.SampleIndex = Genotypes.SampleIndex
-		INNER JOIN
-			Variants AS Variants
-		ON
-			Genotypes.DWAuditID = Variants.DWAuditID
-			AND Genotypes.VariantIndex = Variants.VariantIndex
-		INNER JOIN
-			:variant_grouping
-		ON
-			Variants.DWAuditID = :variant_grouping.DWAuditID
-			AND Variants.VariantIndex = :variant_grouping.VariantIndex
-		WHERE
-			AllSamples.ReferenceID = :reference_id
-			AND Variants.ChromosomeIndex = :chromosome_index
-			AND Variants.Position < :end_position
-			AND Variants.Position >= :begin_position
-			AND Genotypes.ReferenceAlleleCount < Genotypes.CopyNumber;
-
-	binned_patient_variants =
-		SELECT
-			BinIndex,
-			MIN( Grouping ) AS Grouping, -- in case of multiple groups per patient, choose the one with highest priority
-			MIN( Position ) AS BeginPos,
-			MAX( Position ) AS EndPos,
-			( DENSE_RANK() OVER ( PARTITION BY BinIndex ORDER BY PatientDWID ASC ) + DENSE_RANK() OVER ( PARTITION BY BinIndex ORDER BY PatientDWID DESC ) - 1 ) AS BinPatientCount, -- workaround for COUNT( DISTINCT ... ) to work with window function
-			PatientDWID
-		FROM
-			:variants
-		GROUP BY
-			BinIndex,
-			PatientDWID;
-	
-	qualitative_data =
-		SELECT
-			BinIndex,
-			Grouping,
-			MIN( BeginPos ) AS BeginPos,
-			MAX( EndPos ) AS EndPos,
-			MAX( BinPatientCount ) / :total_patient_count AS BinPatientFraction,
-			COUNT( PatientDWID ) / MAX( BinPatientCount ) AS GroupPatientFraction
-		FROM
-			:binned_patient_variants
-		GROUP BY
-			BinIndex, 
-			Grouping
-		ORDER BY
-			BinIndex,
-			Grouping;
-END;
-
-create or replace procedure P_QuantitativeData (
-        IN sample_list_name NVARCHAR (255),
-        IN reference_id NVARCHAR (255),
-        IN chromosome_index INTEGER,
-        IN begin_position INTEGER,
-        IN end_position INTEGER,
-        IN bin_size REAL,
-        IN level_name NVARCHAR (255),
-        IN col_name NVARCHAR (255),
-        IN aggregation NVARCHAR (255),
-        OUT white_list_invalid NVARCHAR (5000)
-    )
-    
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY INVOKER
-    AS
-    BEGIN
-        
-        DECLARE sql_str_aggr NVARCHAR (5000);
-        DECLARE sql_aggr_where NVARCHAR (5000);
-        
-        DECLARE invalid_param CONDITION FOR SQL_ERROR_CODE 10001;
-        DECLARE EXIT HANDLER FOR SQLEXCEPTION
-        BEGIN
-            white_list_invalid := ::SQL_ERROR_MESSAGE;
-        END;
-        
-        IF :level_name <> 'Variants' AND :level_name <> 'Genotypes' THEN
-            SIGNAL invalid_param SET MESSAGE_TEXT = 'Level '|| :level_name || ' is not allowed';
-        END IF;
-        
-        IF upper( :aggregation ) <> 'MAX' AND upper( :aggregation ) <> 'MIN' AND upper( :aggregation ) <> 'AVG' THEN
-            SIGNAL invalid_param SET MESSAGE_TEXT = 'Aggregate '|| :aggregation || ' is not allowed';
-        END IF;
-        
-        /* To avoid NULL Conversion exception in dynamic SQL */
-        IF :chromosome_index IS NULL
-        THEN
-            sql_aggr_where := '';
-        ELSE
-            sql_aggr_where := 'AND Variants.ChromosomeIndex = ' || :chromosome_index;
-        END IF;
-
-        IF :end_position IS NOT NULL
-        THEN
-            sql_aggr_where := :sql_aggr_where || ' AND Variants.Position BETWEEN '||:begin_position ||' AND '|| ( :end_position - 1 );
-        END IF;
-        
-        /*Get all the scores irrespective of position to get the aggregated score*/ 
-        sql_str_aggr := 'SELECT
-                ChromosomeIndex,
-                ' || :aggregation || '(Score) AS Score,
-                BinIndex
-            FROM
-            (
-                SELECT
-                    Variants.ChromosomeIndex AS ChromosomeIndex,"'
-                    || ESCAPE_DOUBLE_QUOTES( :level_name ) || '"."' || ESCAPE_DOUBLE_QUOTES( :col_name ) || '" AS Score,
-                    FLOOR( ( Variants.Position - ' || :begin_position || ' ) / ' || :bin_size || ' ) AS BinIndex
-                FROM
-                    "' || ESCAPE_DOUBLE_QUOTES( :sample_list_name ) || '" AS Samples
-                    JOIN Genotypes AS Genotypes
-                        ON Genotypes.SampleIndex = Samples.SampleIndex
-                    JOIN Variants AS Variants
-                        ON Genotypes.DWAuditID = Variants.DWAuditID
-                    JOIN Features AS Features
-                        ON Variants.ChromosomeIndex = Features.ChromosomeIndex
-                WHERE
-                    Genotypes.ReferenceAlleleCount != Genotypes.CopyNumber
-                    AND "' || ESCAPE_DOUBLE_QUOTES( :level_name ) || '"."' || ESCAPE_DOUBLE_QUOTES( :col_name ) || '" > 0
-                    AND Features.ReferenceID = ''' || ESCAPE_SINGLE_QUOTES( :reference_id  ) || '''' || :sql_aggr_where || '
-            )
-            GROUP BY
-                ChromosomeIndex,
-                BinIndex
-            ORDER BY
-                ChromosomeIndex,
-                BinIndex';
-        EXECUTE IMMEDIATE :sql_str_aggr;
-    END;
-
-
-create or replace procedure P_RegionData(
-        IN sample_list SampleList,
-        IN class NVARCHAR(255),
-        IN reference_id NVARCHAR(255),
-        IN chromosome_index INTEGER,
-        IN begin_position INTEGER,
-        IN end_position INTEGER,
-        OUT regionAttributes RegionDefinition
-	)
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY INVOKER
-	READS SQL DATA
-AS
-BEGIN
-	regionAttributes = SELECT 
-	    region.ChromosomeIndex AS ChromosomeIndex,
-	    region.beginregion AS "Begin", 
-	    region.endregion AS "End",
-	    region.Score AS Score,
-	    region.Color AS Color
-	FROM
-	   Regions AS region
-	INNER JOIN
-	    :sample_list AS sample
-	ON
-	    region.SampleID = sample.SampleIndex
-	WHERE
-	    ( :class IS NULL OR region.Class = :class OR region.Class LIKE :class || '.%') AND
-	    :reference_id = region.ReferenceID AND
-	    ( :chromosome_index IS NULL OR (
-	        ChromosomeIndex = :chromosome_index AND
-	        region.endregion >= :begin_position AND
-	        region.beginregion <= :end_position
-	    ) )
-	ORDER BY
-	    region.beginregion;
-END;
-
-create or replace procedure P_RegionNONSampleData(
-        IN class NVARCHAR(255),
-        IN reference_id NVARCHAR(255),
-        IN chromosome_index INTEGER,
-        IN begin_position INTEGER,
-        IN end_position INTEGER,
-        OUT regionAttributes RegionDefinition
-	)
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY INVOKER
-	READS SQL DATA
-AS
-BEGIN
-	regionAttributes = SELECT 
-	    region.ChromosomeIndex AS ChromosomeIndex,
-	    region.beginregion AS "Begin", 
-	    region.endregion AS "End",
-	    region.Score AS Score,
-	    region.Color AS Color
-	FROM
-	   Features AS region
-	WHERE
-	     ( :class IS NULL OR region.Class = :class OR region.Class LIKE :class || '.%') AND
-	    :reference_id = region.ReferenceID AND
-	    ( :chromosome_index IS NULL OR (
-	        ChromosomeIndex = :chromosome_index AND
-	        region.endregion >= :begin_position AND
-	        region.beginregion <= :end_position
-	    ) )
-	ORDER BY
-	    region.beginregion;
-END;
-
-
-create or replace procedure P_VariantAnnotationCounts (
-        IN sample_list SampleList,
-        IN variant_grouping VariantAnnotationGrouping,
-        IN reference_id NVARCHAR(255),
-        IN chromosome_index INTEGER,
-        IN begin_position INTEGER,
-        IN end_position INTEGER,
-        IN bin_size REAL,
-        OUT chromosome_infos ChromosomeInfos,
-        OUT variant_counts VariantDensityAnnotationCounts,
-        OUT sample_count INTEGER,
-        OUT max_density REAL
-    ) 
-    LANGUAGE SQLSCRIPT 
-    SQL SECURITY INVOKER
-    READS SQL DATA AS
-BEGIN
-    chromosome_infos = SELECT       
-            ChromosomeIndex,
-            CASE WHEN :end_position IS NOT NULL AND :end_position < Size THEN :end_position ELSE Size END AS Size,
-            CEIL( Size / :bin_size ) AS BinCount
-        FROM
-            Chromosomes
-        WHERE
-            ( :chromosome_index IS NULL OR ChromosomeIndex = :chromosome_index ) AND
-            ReferenceID = :reference_id
-        ORDER BY
-            ChromosomeIndex;
-
-    -- return a list of variants with their bin index
-    SELECT COUNT( DISTINCT PatientDWID ) INTO sample_count FROM :sample_list AS samples INNER JOIN Samples AS all_samples ON samples.SampleIndex = all_samples.SampleIndex;
-    IF :sample_count = 1 THEN
-        DECLARE sample_index INTEGER;
-        SELECT SampleIndex INTO sample_index FROM :sample_list;
-        
-        binned_variants = SELECT
-                Variants.ChromosomeIndex,
-                Variants.VariantIndex,
-                Variants.DWAuditID,
-                CAST( FLOOR( ( Position - :begin_position ) / :bin_size ) AS INTEGER ) AS BinIndex,
-                Variants.AlleleIndex,
-                MAX( Variants.AlleleIndex ) OVER ( PARTITION BY Variants.ChromosomeIndex, Position, SampleIndex ) AS MaxAlleleIndex,
-                Variants.SampleIndex
-            FROM
-                DataModelVariants AS Variants
-            INNER JOIN
-                :chromosome_infos AS Chromosomes
-            ON
-                Variants.ChromosomeIndex = Chromosomes.ChromosomeIndex
-            WHERE
-                ( :chromosome_index IS NULL OR Variants.ChromosomeIndex = :chromosome_index ) AND
-                ( :end_position IS NULL OR Position BETWEEN :begin_position AND :end_position - 1 ) AND
-                Position < Size AND
-                SampleIndex = :sample_index AND
-                Variants.AlleleIndex > 0 AND
-                AlleleCount > 0 AND
-                Variants.SampleIndex = :sample_index;
-    ELSE
-        binned_variants = SELECT
-                Variants.ChromosomeIndex,
-                Variants.VariantIndex,
-                Variants.DWAuditID,
-                CAST( FLOOR( ( Position - :begin_position ) / :bin_size ) AS INTEGER ) AS BinIndex,
-                Variants.AlleleIndex,
-                MAX( Variants.AlleleIndex ) OVER ( PARTITION BY Variants.ChromosomeIndex, Position, SampleIndex ) AS MaxAlleleIndex,
-                Variants.SampleIndex
-            FROM
-                DataModelVariants AS Variants
-            INNER JOIN
-                :chromosome_infos AS Chromosomes
-            ON
-                Variants.ChromosomeIndex = Chromosomes.ChromosomeIndex
-            WHERE
-                ( :chromosome_index IS NULL OR Variants.ChromosomeIndex = :chromosome_index ) AND
-                ( :end_position IS NULL OR Position BETWEEN :begin_position AND :end_position - 1 ) AND
-                Position < Size AND
-                SampleIndex IN ( SELECT SampleIndex FROM :sample_list ) AND
-                Variants.AlleleIndex > 0 AND
-                AlleleCount > 0 AND
-                Variants.SampleIndex IN ( SELECT SampleIndex FROM :sample_list );
-    END IF;
-    
-    -- aggregate bins and return result
-    variant_counts = SELECT
-            ChromosomeIndex, 
-            BinIndex,
-            COUNT( * ) AS VariantCount,
-            Grouping
-        FROM
-            :binned_variants
-        JOIN :variant_grouping 
-            ON
-                :variant_grouping.AlleleIndex = :binned_variants.AlleleIndex AND
-                :variant_grouping.VariantIndex = :binned_variants.VariantIndex AND
-                :variant_grouping.DWAuditID = :binned_variants.DWAuditID 
-        WHERE
-            MaxAlleleIndex = :binned_variants.AlleleIndex
-        GROUP BY
-            ChromosomeIndex,
-            BinIndex,
-            Grouping
-        ORDER BY
-            ChromosomeIndex,
-            BinIndex;
-            
-    SELECT
-        MAX( Count ) / ( :bin_size * sample_count )
-        INTO max_density
-        FROM
-        (
-            SELECT
-                SUM( VariantCount ) AS Count
-                FROM
-                :variant_counts
-                GROUP BY
-                    ChromosomeIndex,
-                    BinIndex
-                ORDER BY
-                    ChromosomeIndex,
-                    Count DESC
-        );
-END;
-
-
-create or replace procedure P_VariantCounts (
-        IN sample_list SampleList,
-        IN reference_id NVARCHAR(255),
-        IN chromosome_index INTEGER,
-        IN begin_position INTEGER,
-        IN end_position INTEGER,
-        IN bin_size REAL,
-        OUT chromosome_infos ChromosomeInfos,
-        OUT variant_counts VariantCounts,
-        OUT sample_count INTEGER
-    )
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY INVOKER
-    READS SQL DATA AS
-BEGIN
-    chromosome_infos = SELECT
-            ChromosomeIndex,
-            CASE WHEN :end_position IS NOT NULL AND :end_position < Size THEN :end_position ELSE Size END AS Size,
-            CEIL( Size / :bin_size ) AS BinCount
-        FROM
-            Chromosomes
-        WHERE
-            ( :chromosome_index IS NULL OR ChromosomeIndex = :chromosome_index ) AND
-            ReferenceID = :reference_id
-        ORDER BY
-            ChromosomeIndex;
-
-    -- return a list of variants with their bin index
-    SELECT COUNT( DISTINCT PatientDWID ) INTO sample_count FROM :sample_list AS samples INNER JOIN Samples AS all_samples ON samples.SampleIndex = all_samples.SampleIndex;
-    IF :sample_count = 1 THEN
-        DECLARE sample_index INTEGER;
-        SELECT SampleIndex INTO sample_index FROM :sample_list;
-        
-        binned_variants = SELECT
-                Variants.ChromosomeIndex,
-                CAST( FLOOR( ( Position - :begin_position ) / :bin_size ) AS INTEGER ) AS BinIndex,
-                AlleleIndex,
-                MAX( AlleleIndex ) OVER ( PARTITION BY Variants.ChromosomeIndex, Position, SampleIndex ) AS MaxAlleleIndex
-            FROM
-                DataModelVariants AS Variants
-            INNER JOIN
-                :chromosome_infos AS Chromosomes
-            ON
-                Variants.ChromosomeIndex = Chromosomes.ChromosomeIndex
-            WHERE
-                ( :chromosome_index IS NULL OR Variants.ChromosomeIndex = :chromosome_index ) AND
-                ( :end_position IS NULL OR Position BETWEEN :begin_position AND :end_position - 1 ) AND
-                Position < Size AND
-                SampleIndex = :sample_index AND
-                AlleleIndex > 0 AND
-                AlleleCount > 0;
-    ELSE
-        binned_variants = SELECT
-                Variants.ChromosomeIndex,
-                CAST( FLOOR( ( Position - :begin_position ) / :bin_size ) AS INTEGER ) AS BinIndex,
-                AlleleIndex,
-                MAX( AlleleIndex ) OVER ( PARTITION BY Variants.ChromosomeIndex, Position, SampleIndex ) AS MaxAlleleIndex
-            FROM
-                DataModelVariants AS Variants
-            INNER JOIN
-                :chromosome_infos AS Chromosomes
-            ON
-                Variants.ChromosomeIndex = Chromosomes.ChromosomeIndex
-            WHERE
-                ( :chromosome_index IS NULL OR Variants.ChromosomeIndex = :chromosome_index ) AND
-                ( :end_position IS NULL OR Position BETWEEN :begin_position AND :end_position - 1 ) AND
-                Position < Size AND
-                SampleIndex IN ( SELECT SampleIndex FROM :sample_list ) AND
-                AlleleIndex > 0 AND
-                AlleleCount > 0;
-    END IF;
-    
-    -- aggregate bins and return result
-    variant_counts = SELECT
-            ChromosomeIndex,
-            BinIndex,
-            COUNT( * ) AS VariantCount
-        FROM
-            :binned_variants
-        WHERE 
-            MaxAlleleIndex = AlleleIndex
-        GROUP BY
-            ChromosomeIndex,
-            BinIndex
-        ORDER BY
-            ChromosomeIndex,
-            BinIndex;
-END;
-
-
-create or replace procedure P_VariantInformation (
-        IN sample_list SampleList,
-        IN chromosome_index INTEGER,
-        IN position INTEGER,
-        OUT attributes FullyQualifiedAttributes
-	)
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY INVOKER
-AS
-BEGIN
-    DECLARE schema_array VARCHAR( 255 ) ARRAY;
-    DECLARE table_array VARCHAR( 255 ) ARRAY;
-    DECLARE attribute_array VARCHAR( 255 ) ARRAY;
-    DECLARE attribute_count INTEGER := 0;
-    DECLARE attribute_selection NCLOB := '';
-    
-    -- declare iterators and queries
-    DECLARE CURSOR filters FOR
-        SELECT
-            AttributeName
-        FROM
-            CustomAttributes
-        WHERE
-            Level = 'Filter' AND
-            DataType = 'Flag' AND
-            ArraySize = 0 AND
-            AttributeName <> 'PASS' AND
-            Active <> 0
-        ORDER BY
-            AttributeName;
-    DECLARE CURSOR variant_attributes FOR
-        SELECT
-            AttributeName,
-            DataType
-        FROM
-            CustomAttributes
-        WHERE
-            Level = 'Variant' AND
-            DataType IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
-            ArraySize < 2 AND
-            Active <> 0
-        ORDER BY
-            AttributeName;
-    DECLARE CURSOR variant_allele_attributes FOR
-        SELECT
-            AttributeName,
-            DataType
-        FROM
-            CustomAttributes
-        WHERE
-            Level = 'VariantAllele' AND
-            DataType IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
-            ArraySize < 2 AND
-            Active <> 0
-        ORDER BY
-            AttributeName;
-    DECLARE CURSOR variant_multi_value_attributes FOR
-        SELECT
-            AttributeName,
-            DataType
-        FROM
-            CustomAttributes
-        WHERE
-            Level = 'Variant' AND
-            DataType IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
-            ( ArraySize IS NULL OR ArraySize > 1 ) AND
-            Active <> 0
-        ORDER BY
-            AttributeName;
-    DECLARE CURSOR variant_structured_attributes FOR
-        SELECT
-            StructAttr.StructuredAttributeName AS StructuredAttributeName,
-            StructAttr.AttributeName AS AttributeName,
-            StructAttr.DataType
-        FROM
-            CustomAttributes AS CustAttr
-        INNER JOIN
-            StructuredCustomAttributes AS StructAttr
-        ON
-            CustAttr.AttributeName = StructAttr.StructuredAttributeName AND
-            CustAttr.Level = StructAttr.Level
-        WHERE
-            StructAttr.Level = 'Variant' AND
-            CustAttr.DataType = 'Structured' AND
-            StructAttr.DataType IN ( 'Integer', 'Float', 'String', 'Allele' ) AND
-            CustAttr.Active <> 0 AND
-            StructAttr.Active <> 0
-        ORDER BY
-            StructAttr.StructuredAttributeName,
-            StructAttr.AttributeName;
-    DECLARE CURSOR genotype_attributes FOR
-        SELECT
-            AttributeName,
-            DataType
-        FROM
-            CustomAttributes
-        WHERE
-            Level = 'Genotype' AND
-            DataType IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
-            ArraySize < 2 AND
-            Active <> 0
-        ORDER BY
-            AttributeName;
-    DECLARE CURSOR genotype_allele_attributes FOR
-        SELECT
-            AttributeName,
-            DataType
-        FROM
-            CustomAttributes
-        WHERE
-            Level = 'GenotypeAllele' AND
-            DataType IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
-            ArraySize < 2 AND
-            Active <> 0
-        ORDER BY
-            AttributeName;
-    DECLARE CURSOR genotype_multi_value_attributes FOR
-        SELECT
-            AttributeName,
-            DataType
-        FROM
-            CustomAttributes
-        WHERE
-            Level = 'Genotype' AND
-            DataType IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
-            ( ArraySize IS NULL OR ArraySize > 1 ) AND
-            Active <> 0
-        ORDER BY
-            AttributeName;
-    
-    -- populate sample variants table
-    CALL P_LocateSampleVariants ( :sample_list, :chromosome_index, :position, variants );
-    INSERT INTO SampleVariants SELECT * FROM :variants;
-    
-    -- query variant attributes
-    attribute_selection := 'SampleVariants.SampleIndex, Variants.Quality, Variants."Filter.PASS"';
-    attribute_count := :attribute_count + 1;
-    schema_array[ :attribute_count ] := 'CDMDEFAULT';
-    table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.Variants';
-    attribute_array[ :attribute_count ] := 'Quality';
-    schema_array[ :attribute_count ] := 'CDMDEFAULT';
-    table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.Variants';
-    attribute_array[ :attribute_count ] := 'Filter.PASS';
-    FOR row_result AS filters DO
-        attribute_count := :attribute_count + 1;
-        schema_array[ :attribute_count ] := 'CDMDEFAULT';
-        table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.Variants';
-        attribute_array[ :attribute_count ] := 'Filter.' || row_result.AttributeName;
-        attribute_selection := :attribute_selection || ', Variants."Filter.' || ESCAPE_DOUBLE_QUOTES( row_result.AttributeName ) || '"';
-    END FOR;
-    FOR row_result AS variant_attributes DO
-        attribute_count := :attribute_count + 1;
-        schema_array[ :attribute_count ] := 'CDMDEFAULT';
-        table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.Variants';
-        attribute_array[ :attribute_count ] := 'Attr.' || row_result.AttributeName;
-        attribute_selection := :attribute_selection || ', Variants."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result.AttributeName ) || '"';
-    END FOR;
-    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM Variants AS Variants INNER JOIN SampleVariants AS SampleVariants ON Variants.DWAuditID = SampleVariants.DWAuditID AND Variants.VariantIndex = SampleVariants.VariantIndex';
-    
-    -- query variant IDs
-    SELECT SampleVariants.SampleIndex, VariantIDs.VariantID FROM VariantIDs AS VariantIDs INNER JOIN :variants AS SampleVariants ON VariantIDs.DWAuditID = SampleVariants.DWAuditID AND VariantIDs.VariantIndex = SampleVariants.VariantIndex WHERE VariantIDs.VariantID IS NOT NULL GROUP BY SampleVariants.SampleIndex, VariantIDs.VariantID;
-    attribute_count := :attribute_count + 1;
-    schema_array[ :attribute_count ] := 'CDMDEFAULT';
-    table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.VariantIDs';
-    attribute_array[ :attribute_count ] := 'VariantID';
-    
-    -- query variant allele attributes
-    attribute_selection := 'SampleVariants.SampleIndex, VariantAlleles.AlleleIndex, VariantAlleles.Allele';
-    attribute_count := :attribute_count + 1;
-    schema_array[ :attribute_count ] := 'CDMDEFAULT';
-    table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.VariantAlleles';
-    attribute_array[ :attribute_count ] := 'Allele';
-    FOR row_result AS variant_allele_attributes DO
-        attribute_count := :attribute_count + 1;
-        schema_array[ :attribute_count ] := 'CDMDEFAULT';
-        table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.VariantAlleles';
-        attribute_array[ :attribute_count ] := 'Attr.' || row_result.AttributeName;
-        attribute_selection := :attribute_selection || ', VariantAlleles."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result.AttributeName ) || '"';
-    END FOR;
-    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM VariantAlleles AS VariantAlleles INNER JOIN SampleVariants AS SampleVariants ON VariantAlleles.DWAuditID = SampleVariants.DWAuditID AND VariantAlleles.VariantIndex = SampleVariants.VariantIndex';
-
-    -- query variant multi-value attributes
-    attribute_selection := 'SampleVariants.SampleIndex';
-    FOR row_result AS variant_multi_value_attributes DO
-        attribute_count := :attribute_count + 1;
-        schema_array[ :attribute_count ] := 'CDMDEFAULT';
-        table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.VariantMultiValueAttributes';
-        attribute_array[ :attribute_count ] := 'Attr.' || row_result.AttributeName;
-        attribute_selection := :attribute_selection || ', VariantAttributes."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result.AttributeName ) || '"';
-    END FOR;
-    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM VariantMultiValueAttributes AS VariantAttributes INNER JOIN SampleVariants AS SampleVariants ON VariantAttributes.DWAuditID = SampleVariants.DWAuditID AND VariantAttributes.VariantIndex = SampleVariants.VariantIndex ORDER BY VariantAttributes.ValueIndex';
-
-    -- query structured variant attributes
-    attribute_selection := 'SampleVariants.SampleIndex, VariantAttributes.ValueIndex';
-    FOR row_result AS variant_structured_attributes DO
-        attribute_count := :attribute_count + 1;
-        schema_array[ :attribute_count ] := 'CDMDEFAULT';
-        table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.VariantStructuredAttributes';
-        attribute_array[ :attribute_count ] := 'Attr.' || row_result.AttributeName || '.' || row_result.StructuredAttributeName;
-        attribute_selection := :attribute_selection || ', VariantAttributes."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result.AttributeName ) || '"."' || ESCAPE_DOUBLE_QUOTES( row_result.StructuredAttributeName ) || '"';
-    END FOR;
-    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM VariantStructuredAttributes AS VariantAttributes INNER JOIN SampleVariants AS SampleVariants ON VariantAttributes.DWAuditID = SampleVariants.DWAuditID AND VariantAttributes.VariantIndex = SampleVariants.VariantIndex ORDER BY VariantAttributes.ValueIndex';
-
-    -- query genotype attributes
-    attribute_selection := 'SampleVariants.SampleIndex, Genotypes.CopyNumber, Genotypes.Zygosity';
-    attribute_count := :attribute_count + 1;
-    schema_array[ :attribute_count ] := 'CDMDEFAULT';
-    table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.Genotypes';
-    attribute_array[ :attribute_count ] := 'CopyNumber';
-    attribute_count := :attribute_count + 1;
-    schema_array[ :attribute_count ] := 'CDMDEFAULT';
-    table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.Genotypes';
-    attribute_array[ :attribute_count ] := 'Zygosity';
-    FOR row_result AS genotype_attributes DO
-        attribute_count := :attribute_count + 1;
-        schema_array[ :attribute_count ] := 'CDMDEFAULT';
-        table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.Genotypes';
-        attribute_array[ :attribute_count ] := 'Attr.' || row_result.AttributeName;
-        attribute_selection := :attribute_selection || ', Genotypes."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result.AttributeName ) || '"';
-    END FOR;
-    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM Genotypes AS Genotypes INNER JOIN SampleVariants AS SampleVariants ON Genotypes.DWAuditID = SampleVariants.DWAuditID AND Genotypes.VariantIndex = SampleVariants.VariantIndex AND Genotypes.SampleIndex = SampleVariants.SampleIndex';
-    
-    -- query genotype allele attributes
-    attribute_selection := 'SampleVariants.SampleIndex, GenotypeAlleles.AlleleIndex, GenotypeAlleles.AlleleCount';
-    attribute_count := :attribute_count + 1;
-    schema_array[ :attribute_count ] := 'CDMDEFAULT';
-    table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.GenotypeAlleles';
-    attribute_array[ :attribute_count ] := 'AlleleCount';
-    FOR row_result AS genotype_allele_attributes DO
-        attribute_count := :attribute_count + 1;
-        schema_array[ :attribute_count ] := 'CDMDEFAULT';
-        table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.GenotypeAlleles';
-        attribute_array[ :attribute_count ] := 'Attr.' || row_result.AttributeName;
-        attribute_selection := :attribute_selection || ', GenotypeAlleles."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result.AttributeName ) || '"';
-    END FOR;
-    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM GenotypeAlleles AS GenotypeAlleles INNER JOIN SampleVariants AS SampleVariants ON GenotypeAlleles.DWAuditID = SampleVariants.DWAuditID AND GenotypeAlleles.VariantIndex = SampleVariants.VariantIndex AND GenotypeAlleles.SampleIndex = SampleVariants.SampleIndex';
-
-    -- query genotype multi-value attributes
-    attribute_selection := 'SampleVariants.SampleIndex';
-    FOR row_result AS genotype_multi_value_attributes DO
-        attribute_count := :attribute_count + 1;
-        schema_array[ :attribute_count ] := 'CDMDEFAULT';
-        table_array[ :attribute_count ] := 'legacy.genomics.db.models::SNV.GenotypeMultiValueAttributes';
-        attribute_array[ :attribute_count ] := 'Attr.' || row_result.AttributeName;
-        attribute_selection := :attribute_selection || ', GenotypeAttributes."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result.AttributeName ) || '"';
-    END FOR;
-    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM GenotypeMultiValueAttributes AS GenotypeAttributes INNER JOIN SampleVariants AS SampleVariants ON GenotypeAttributes.DWAuditID = SampleVariants.DWAuditID AND GenotypeAttributes.VariantIndex = SampleVariants.VariantIndex AND GenotypeAttributes.SampleIndex = SampleVariants.SampleIndex ORDER BY GenotypeAttributes.ValueIndex';
-    
-    -- return accessed attributes
-    attributes = UNNEST( :schema_array, :table_array, :attribute_array ) AS ( SchemaName, TableName, AttributeName );
-END;
 
 
 
@@ -2424,6 +917,25 @@ BEGIN
 END;
 
 ---------- ADDING REARRANGED FUNCTIONS & PROCEDURES FROM HERE ------------
+CREATE OR REPLACE FUNCTION "hc.hph.genomics.db.functions::StripNullBytes" ( input NVARCHAR(5000) )
+RETURNS output NVARCHAR(5000)
+LANGUAGE SQLScript AS
+BEGIN
+      DECLARE buffer NVARCHAR(5000) := BINTOHEX( TO_BINARY( input ) );
+      IF :input IS NULL THEN
+        output := NULL;
+      ELSE
+          output := '';
+          WHILE LENGTH( :buffer ) > 1 DO
+                IF SUBSTRING( :buffer, 1, 2 ) <> '00' THEN
+                      output := :output || SUBSTRING( :buffer, 1, 2 );
+                END IF;
+                buffer := SUBSTRING( :buffer, 3 );
+          END WHILE;
+          output := BINTOSTR( HEXTOBIN( :output ) );
+    END IF;
+END;
+
 create or replace Function "hc.hph.genomics.db.procedures.annotation::getAminoAcidName" (
 	 aminoAcid nvarchar(1000),
 	 format nvarchar(1000) ) RETURNS aminoAcidName nvarchar(1000) LANGUAGE SQLSCRIPT AS 
@@ -2719,7 +1231,7 @@ BEGIN
 			repo_result_json := SUBSTR_AFTER( :repo_result_json, '"error-code": "' );
 		END WHILE;
 	END IF;
-END
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.core.db.procedures::BinaryInteger" ( IN int_number INTEGER, OUT binary_number VARBINARY(4) )
    LANGUAGE SQLSCRIPT
@@ -2742,7 +1254,7 @@ BEGIN
         binary_number := :binary_number || HEXTOBIN( :hex );
         buffer := :buffer / 16;
     END WHILE;
-END
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.extensions::GenerateCustomAttributeCDS" ( IN audit_id INTEGER, OUT content NCLOB )
     LANGUAGE SQLSCRIPT
@@ -2984,7 +1496,7 @@ BEGIN
     
     -- write footer
     content := :content || :indent || '};' || :newline || :newline || '}' || :newline;
-END
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.extensions::ActivateCustomAttributeCDS" ( IN force_activation TINYINT, IN audit_id INTEGER )
     LANGUAGE SQLSCRIPT
@@ -3062,7 +1574,7 @@ BEGIN
         UPDATE "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" SET "Active" = 1 WHERE "Active" = 0;
         UPDATE "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAttributes" SET "Active" = 1 WHERE "Active" = 0;
     END IF;
-END
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.genetables::GeneAlteration" (
     IN sample_list "hc.hph.genomics.db.models::General.SampleList",
@@ -3207,7 +1719,7 @@ BEGIN
                             CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
                             CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC;
 	END IF;
-END 
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.genetables::GeneCohortPValue" (
         IN GenesAffectedinCohort "hc.hph.genomics.db.models::VariantBrowser.GeneAffectedinCohort",
@@ -3395,9 +1907,9 @@ BEGIN
                     LIMIT 100;
         
     END IF;
-   END
+   END;
    
-   CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::DeletePatient" ( IN PatientId VARBINARY(32) )
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::DeletePatient" ( IN PatientId VARBINARY(32) )
     LANGUAGE SQLSCRIPT
     SQL SECURITY DEFINER
     AS
@@ -3439,7 +1951,7 @@ BEGIN
             END FOR;
         END;
    	END FOR;
-END
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::DeletePatientWorkAround" ( IN PatientIdChar NVarchar(64) )
     LANGUAGE SQLSCRIPT
@@ -3447,7 +1959,7 @@ CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::DeletePatientW
     AS
 BEGIN
   CALL "hc.hph.genomics.db.procedures.model::DeletePatient" (HEXTOBIN (  :PatientIdChar ));
-END
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::GetPatientInfo" ( IN PatientId VARBINARY(32),
     OUT  Genotypes "hc.hph.genomics.db.models::SNV.Genotypes",
@@ -3502,7 +2014,7 @@ BEGIN
             END FOR;
         END;
     END FOR;
-END
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::GetPatientInfoWorkAround" ( IN PatientIdChar NVarchar(64),
     OUT Genotypes "hc.hph.genomics.db.models::SNV.Genotypes",
@@ -3534,7 +2046,7 @@ BEGIN
         Headers,
         VariantAnnotations
     );
-END
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::SampleNames" (
         IN sample_list "hc.hph.genomics.db.models::General.SampleList",
@@ -3555,7 +2067,7 @@ BEGIN
             "QuerySamples"."SampleIndex" = "KnownSamples"."SampleIndex"
         ORDER BY
             "SampleID";
-END
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::switchVariantsDmTo" ( TargetTable NVARCHAR(100) )
    LANGUAGE SQLSCRIPT
@@ -3567,7 +2079,7 @@ BEGIN
 		EXEC 'drop synonym "hc.hph.genomics.db.models::SNV.FlatVariants"';
 	END IF;
 	EXEC 'create synonym "hc.hph.genomics.db.models::SNV.FlatVariants" FOR "ALP"."' || ESCAPE_DOUBLE_QUOTES(TargetTable) || '"';
-END
+END;
 
 CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::updateNextSampleSequence" ( 
 IN reserveCount INT) 
@@ -3615,6 +2127,1696 @@ ELSE
 	INSERT INTO "hc.hph.genomics.db.models::General.Sequences" ("SequenceID","Value") VALUES ('SampleIndex',:value);
 END IF;
 
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::AlleleStatistics" ( 
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN chromosome_index INTEGER,
+        IN position INTEGER,
+        IN allele NVARCHAR( 255 ),
+        OUT affected_count INTEGER,
+        OUT sample_count INTEGER
+    )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   READS SQL DATA AS
+BEGIN
+    SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+    
+    SELECT
+            COUNT( DISTINCT "AllSamples"."PatientDWID" ) INTO affected_count
+        FROM
+            :sample_list as "Samples"
+            INNER JOIN "hc.hph.genomics.db.models::General.Samples" as "AllSamples"
+                ON "Samples"."SampleIndex" = "AllSamples"."SampleIndex"
+            JOIN  "hc.hph.genomics.db.models::SNV.GenotypeAlleles" AS "GenotypeAlleles"
+                ON "GenotypeAlleles"."SampleIndex" = "Samples"."SampleIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+                ON "GenotypeAlleles"."DWAuditID" = "Variants"."DWAuditID"
+                AND "GenotypeAlleles"."VariantIndex" = "Variants"."VariantIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.VariantAlleles" AS "VariantAlleles"
+                ON "Variants"."DWAuditID" = "VariantAlleles"."DWAuditID"
+                AND "Variants"."VariantIndex" = "VariantAlleles"."VariantIndex"
+        WHERE "GenotypeAlleles"."AlleleCount" > 0
+            AND "VariantAlleles"."Allele" = :allele
+            AND "Variants"."ChromosomeIndex" = :chromosome_index
+            AND "Variants"."Position" = :position;
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::DisplayVariants" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN variant_grouping "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping",
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        OUT display_variants "hc.hph.genomics.db.models::VariantBrowser.GroupedDisplayVariants",
+        OUT sample_count INTEGER
+    )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER
+    READS SQL DATA AS
+BEGIN
+    DECLARE position_array INTEGER ARRAY;
+    DECLARE allele_array VARCHAR( 255 ) ARRAY;
+    DECLARE grouping_array TINYINT ARRAY;
+    DECLARE allele_count_array INTEGER ARRAY;
+    DECLARE copy_number_array INTEGER ARRAY;
+    DECLARE reference_allele VARCHAR( 255 );
+    DECLARE variant_group TINYINT;
+    DECLARE alternative_allele VARCHAR( 255 );
+    DECLARE position_cursor INTEGER;
+    DECLARE inner_position_cursor INTEGER;
+    DECLARE outer_position_cursor INTEGER;
+    DECLARE row_index INTEGER := 1;
+    DECLARE groupingCount INTEGER;
+    DECLARE last_reference_allele VARCHAR( 255 );
+    DECLARE CURSOR grouped_variants ( data_model_variants "hc.hph.genomics.db.models::VariantBrowser.GroupedDataModelVariants" ) FOR
+        SELECT
+            "Position",
+            "AlleleIndex",
+            "Allele",
+            "AlleleCount",
+            SUM( "AlleleCount" / "GroupCount" ) OVER ( PARTITION BY "Position" ) AS "CopyNumber",
+            "Grouping"
+        FROM
+            :data_model_variants 
+        ORDER BY
+            "Position" ASC,
+            "AlleleIndex" ASC;
+
+    -- find sites overlapping selected area
+    variant_positions = SELECT DISTINCT
+            "Position"
+        FROM
+            "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants"
+        WHERE
+            "ChromosomeIndex" = :chromosome_index AND
+            "Position" < :end_position AND
+            "Position" + LENGTH( "Allele" ) >= :begin_position AND
+            ( "AlleleIndex" = 0 OR "AlleleCount" > 0 );
+
+    SELECT COUNT( * ) INTO groupingCount FROM :variant_grouping;
+    IF groupingCount > 0 THEN
+        -- query data model variants
+        SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+        IF :sample_count = 1 THEN
+            DECLARE sample_index INTEGER;
+            SELECT "SampleIndex" INTO sample_index FROM :sample_list;
+    
+            data_model_variants = SELECT
+                    variants."Position",
+                    variants."AlleleIndex",
+                    variants."Allele",
+                    SUM( variants."AlleleCount" ) AS "AlleleCount"
+                FROM
+                    "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants" AS variants
+                WHERE
+                    variants."ChromosomeIndex" = :chromosome_index AND
+                    variants."Position" IN ( SELECT * FROM :variant_positions ) AND
+                    variants."SampleIndex" = :sample_index AND
+                    ( variants."AlleleIndex" = 0 OR variants."AlleleCount" > 0 )
+                GROUP BY
+                    variants."Position",
+                    variants."AlleleIndex",
+                    variants."Allele";
+        ELSEIF :sample_count > 1 THEN
+            data_model_variants = SELECT
+                    variants."Position",
+                    variants."AlleleIndex",
+                    variants."Allele",
+                    SUM( variants."AlleleCount" ) AS "AlleleCount"
+                FROM
+                    "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants" AS variants
+                WHERE
+                    variants."ChromosomeIndex" = :chromosome_index AND
+                    variants."Position" IN ( SELECT * FROM :variant_positions ) AND
+                    variants."SampleIndex" IN ( SELECT * FROM :sample_list ) AND
+                    ( variants."AlleleIndex" = 0 OR variants."AlleleCount" > 0 )
+                GROUP BY
+                    variants."Position",
+                    variants."AlleleIndex",
+                    variants."Allele";
+        END IF;
+            
+        allele_grouping = SELECT 
+            variants."Position",
+            variants."AlleleIndex", 
+            groups."Grouping"
+            FROM :variant_grouping AS groups
+            JOIN "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants" AS variants
+                ON groups."DWAuditID" = variants."DWAuditID" AND
+                groups."VariantIndex" = variants."VariantIndex" AND
+                groups."AlleleIndex" = variants."AlleleIndex";            
+    
+        grouped_data_model_variants = SELECT 
+            variants."Position",
+            variants."AlleleIndex",
+            variants."Allele",
+            groups."Grouping",
+            COUNT(*) OVER ( PARTITION BY variants."Position", variants."AlleleIndex" ) AS "GroupCount",
+            variants."AlleleCount"
+            FROM :data_model_variants AS variants
+            LEFT OUTER JOIN :allele_grouping AS groups
+                ON variants."Position" = groups."Position" AND
+                variants."AlleleIndex" = groups."AlleleIndex"
+            ORDER BY
+                variants."Position",
+                variants."AlleleIndex",
+                groups."Grouping";
+    
+        -- iterate over data model variants transforming them into display variants
+        IF :sample_count > 0 THEN
+        	FOR variant AS grouped_variants ( :grouped_data_model_variants ) DO
+        	    IF variant."Position" = :outer_position_cursor THEN
+        	        reference_allele := last_reference_allele;
+        	    ELSE
+        	        reference_allele := 'N';
+        	    END IF;
+        	    IF variant."AlleleIndex" = 0 THEN
+        	        reference_allele := variant."Allele";
+        	        last_reference_allele := variant."Allele";
+        	        outer_position_cursor := variant."Position";
+        	    ELSEIF variant."AlleleIndex" > 0 AND variant."AlleleCount" > 0 THEN
+        	        variant_group := variant."Grouping";
+        	        grouping_array[ :row_index ] := variant_group;
+        	        alternative_allele := variant."Allele";
+        	        inner_position_cursor := variant."Position";
+        	        WHILE LENGTH( :reference_allele ) > 0 OR LENGTH( :alternative_allele ) > 0 DO
+        	            IF LENGTH( :reference_allele ) <= 1 AND LENGTH( :alternative_allele ) > LENGTH( :reference_allele ) THEN -- insertion
+                            position_array[ :row_index ] := :inner_position_cursor;
+                            allele_count_array[ :row_index ] := variant."AlleleCount";
+                            copy_number_array[ :row_index ] := variant."CopyNumber";
+                            allele_array[ :row_index ] := :alternative_allele;
+            	            BREAK;
+        	            ELSEIF LENGTH( :alternative_allele ) = 0 THEN -- deletion
+                            allele_array[ :row_index ] := '';
+            	            reference_allele := SUBSTRING( :reference_allele, 2 );
+        	            ELSEIF SUBSTRING( :reference_allele, 1, 1 ) <> SUBSTRING( :alternative_allele, 1, 1 ) THEN -- substitution
+                            allele_array[ :row_index ] := SUBSTRING( :alternative_allele, 1, 1 );
+            	            reference_allele := SUBSTRING( :reference_allele, 2 );
+            	            alternative_allele := SUBSTRING( :alternative_allele, 2 );
+        	            ELSE -- reference
+            	            reference_allele := SUBSTRING( :reference_allele, 2 );
+            	            alternative_allele := SUBSTRING( :alternative_allele, 2 );
+            	            inner_position_cursor := :inner_position_cursor + 1;
+        	                CONTINUE;
+        	            END IF;
+        
+                        position_array[ :row_index ] := :inner_position_cursor;
+                        allele_count_array[ :row_index ] := variant."AlleleCount";
+                        copy_number_array[ :row_index ] := variant."CopyNumber";
+                        
+        
+        	            inner_position_cursor := :inner_position_cursor + 1;
+        	            row_index := :row_index + 1;
+        	        END WHILE;
+        	    END IF;
+            END FOR;
+        END IF;
+        -- create output table and combine overlapping alleles
+        grouped_unaggregated_display_variants = UNNEST( :position_array, :allele_array, :allele_count_array, :copy_number_array, :grouping_array ) AS ( "Position", "Allele", "AlleleCount", "CopyNumber", "Grouping" );
+        display_variants = SELECT
+                "Position",
+                "Allele",
+                "Grouping",
+                SUM( "AlleleCount" ) AS "AlleleCount",
+                MAX( "CopyNumber" ) AS "CopyNumber"
+            FROM
+                :grouped_unaggregated_display_variants
+            WHERE
+                "Position" BETWEEN :begin_position AND
+                :end_position - 1 
+            GROUP BY
+                "Position",
+                "Allele",
+                "Grouping"
+            ORDER BY
+                "Position" ASC,
+                "AlleleCount" DESC,
+                "Grouping";
+        
+    ELSE
+        DECLARE CURSOR variants ( data_model_variants "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants" ) FOR
+        SELECT
+            "Position",
+            "AlleleIndex",
+            "Allele",
+            "AlleleCount",
+            SUM( "AlleleCount" ) OVER ( PARTITION BY "Position" ) AS "CopyNumber"
+        FROM
+            :data_model_variants
+        ORDER BY
+            "Position" ASC,
+            "AlleleIndex" ASC;
+            
+        -- query data model variants
+        SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+        IF :sample_count = 1 THEN
+            DECLARE sample_index INTEGER;
+            SELECT "SampleIndex" INTO sample_index FROM :sample_list;
+    
+            data_model_variants = SELECT
+                    "Position",
+                    "AlleleIndex",
+                    "Allele",
+                    SUM( "AlleleCount" ) AS "AlleleCount"
+                FROM
+                    "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants"
+                WHERE
+                    "ChromosomeIndex" = :chromosome_index AND
+                    "Position" IN ( SELECT * FROM :variant_positions ) AND
+                    "SampleIndex" = :sample_index AND
+                    ( "AlleleIndex" = 0 OR "AlleleCount" > 0 )
+                GROUP BY
+                    "Position",
+                    "AlleleIndex",
+                    "Allele"
+                ORDER BY
+                    "Position",
+                    "AlleleIndex";
+        ELSEIF :sample_count > 1 THEN
+            data_model_variants = SELECT
+                    "Position",
+                    "AlleleIndex",
+                    "Allele",
+                    SUM( "AlleleCount" ) AS "AlleleCount"
+                FROM
+                    "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants"
+                WHERE
+                    "ChromosomeIndex" = :chromosome_index AND
+                    "Position" IN ( SELECT * FROM :variant_positions ) AND
+                    "SampleIndex" IN ( SELECT * FROM :sample_list ) AND
+                    ( "AlleleIndex" = 0 OR "AlleleCount" > 0 )
+                GROUP BY
+                    "Position",
+                    "AlleleIndex",
+                    "Allele"
+                ORDER BY
+                    "Position",
+                    "AlleleIndex";
+        END IF;
+    
+        -- iterate over data model variants transforming them into display variants
+        IF :sample_count > 0 THEN
+        	FOR variant AS variants ( :data_model_variants ) DO
+        	    IF variant."Position" = :outer_position_cursor THEN
+        	        reference_allele := last_reference_allele;
+        	    ELSE
+        	        reference_allele := 'N';
+        	    END IF;
+        	    IF variant."AlleleIndex" = 0 THEN
+        	        reference_allele := variant."Allele";
+        	        last_reference_allele := variant."Allele";
+        	        outer_position_cursor := variant."Position";
+        	    ELSEIF variant."AlleleIndex" > 0 AND variant."AlleleCount" > 0 THEN
+        	        alternative_allele := variant."Allele";
+        	        inner_position_cursor := variant."Position";
+        	        WHILE LENGTH( :reference_allele ) > 0 OR LENGTH( :alternative_allele ) > 0 DO
+        	            IF LENGTH( :reference_allele ) <= 1 AND LENGTH( :alternative_allele ) > LENGTH( :reference_allele ) THEN -- insertion
+                            position_array[ :row_index ] := :inner_position_cursor;
+                            allele_count_array[ :row_index ] := variant."AlleleCount";
+                            copy_number_array[ :row_index ] := variant."CopyNumber";
+                            allele_array[ :row_index ] := :alternative_allele;
+            	            BREAK;
+        	            ELSEIF LENGTH( :alternative_allele ) = 0 THEN -- deletion
+                            allele_array[ :row_index ] := '';
+            	            reference_allele := SUBSTRING( :reference_allele, 2 );
+        	            ELSEIF SUBSTRING( :reference_allele, 1, 1 ) <> SUBSTRING( :alternative_allele, 1, 1 ) THEN -- substitution
+                            allele_array[ :row_index ] := SUBSTRING( :alternative_allele, 1, 1 );
+            	            reference_allele := SUBSTRING( :reference_allele, 2 );
+            	            alternative_allele := SUBSTRING( :alternative_allele, 2 );
+        	            ELSE -- reference
+            	            reference_allele := SUBSTRING( :reference_allele, 2 );
+            	            alternative_allele := SUBSTRING( :alternative_allele, 2 );
+            	            inner_position_cursor := :inner_position_cursor + 1;
+        	                CONTINUE;
+        	            END IF;
+        
+                        position_array[ :row_index ] := :inner_position_cursor;
+                        allele_count_array[ :row_index ] := variant."AlleleCount";
+                        copy_number_array[ :row_index ] := variant."CopyNumber";
+                        
+        
+        	            inner_position_cursor := :inner_position_cursor + 1;
+        	            row_index := :row_index + 1;
+        	        END WHILE;
+        	    END IF;
+            END FOR;
+        END IF;
+        
+        -- create output table and combine overlapping alleles
+        unaggregated_display_variants = UNNEST( :position_array, :allele_array, :allele_count_array, :copy_number_array ) AS ( "Position", "Allele", "AlleleCount", "CopyNumber" );
+        display_variants = SELECT
+                "Position",
+                "Allele",
+                CAST( NULL AS TINYINT ) AS "Grouping",
+                SUM( "AlleleCount" ) AS "AlleleCount",
+                MAX( "CopyNumber" ) AS "CopyNumber"
+            FROM
+                :unaggregated_display_variants
+            WHERE
+                "Position" BETWEEN :begin_position AND :end_position - 1
+            GROUP BY
+                "Position",
+                "Allele"
+            ORDER BY
+                "Position" ASC,
+                "AlleleCount" DESC;
+    END IF;
+    
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::GeneData"(
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN position INTEGER,
+        OUT geneAttributes "hc.hph.genomics.db.models::VariantBrowser.GeneDefinition"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+	geneAttributes = SELECT
+        genes."FeatureName" as "GeneName",
+        MAX( "hc.hph.genomics.db.functions::StripNullBytes"( genes."Description" ) ) as "Description" ,
+        synonyms."TermText" as "Synonym"
+	FROM
+	   "hc.hph.genomics.db.models::Reference.Features" AS genes
+	LEFT OUTER JOIN
+	    "hc.hph.ots::Views.ConceptTerms" as symbols
+	ON
+	    genes."FeatureName" = symbols."TermText" AND
+        symbols."ConceptVocabularyID" = 'ots.NCBI.GENE' AND
+        symbols."TermType" = 'symbol'
+    LEFT OUTER JOIN
+	    "hc.hph.ots::Views.ConceptTerms" as synonyms
+	ON
+	    symbols."ConceptCode" = synonyms."ConceptCode" AND
+        symbols."ConceptVocabularyID" = 'ots.NCBI.GENE' AND
+        synonyms."TermType" = 'synonym'
+	WHERE
+	    :reference_id = genes."ReferenceID" AND
+	    :position between genes."beginregion" AND genes."endregion"-1 AND
+	    :chromosome_index = genes."ChromosomeIndex" AND
+	    genes."Class" = 'gene'
+	GROUP BY
+	    genes."FeatureName",
+	    synonyms."TermText"
+	ORDER BY
+	   genes."FeatureName",
+	   synonyms."TermText";
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::GeneVariantAnnotationCounts" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN variant_grouping "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping",
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        IN binSize DOUBLE,
+        IN annotationGrouping BOOLEAN,
+        OUT gene_variant_counts "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationCounts",
+        OUT sample_count INTEGER 
+    )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER
+     AS
+BEGIN
+    SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+    -- return a list of genes with the number of affected samples
+    IF annotationGrouping = true
+    THEN
+    gene_variant_counts = 
+    SELECT "GeneName", "ChromosomeIndex", "Grouping", "Begin", "End", SUM("Weight") as "Count", "Bin"
+        FROM ( 
+            SELECT "GeneName", "ChromosomeIndex", "SampleIndex", "Grouping", "Begin", "End", "Bin", ( 1 / count(*) OVER (Partition by "GeneName", "ChromosomeIndex", "SampleIndex") ) as "Weight" 
+            FROM ( 
+                SELECT "Features"."FeatureName" AS "GeneName",
+                    "Variants"."ChromosomeIndex" AS "ChromosomeIndex",
+                    "Samples"."SampleIndex",
+                    :variant_grouping."Grouping" as "Grouping",
+                    MIN( "Features"."beginregion" ) AS "Begin",
+                    MAX( "Features"."endregion" ) AS "End",
+                    FLOOR( ( FLOOR( MIN( "Features"."beginregion" ) + MAX( "Features"."endregion" ) / 2 ) ) / :binSize ) AS "Bin"
+                FROM
+                    :sample_list as "Samples" 
+                    JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+                        ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+                    JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+                        ON "Variants"."DWAuditID" = "Genotypes"."DWAuditID" 
+                        AND "Variants"."VariantIndex" = "Genotypes"."VariantIndex" 
+                    JOIN :variant_grouping
+                        ON :variant_grouping."DWAuditID" = "Genotypes"."DWAuditID" 
+                        AND :variant_grouping."VariantIndex" = "Genotypes"."VariantIndex" 
+                    JOIN "hc.hph.genomics.db.models::Reference.Features" AS "Features"
+                        ON "Variants"."ChromosomeIndex" = "Features"."ChromosomeIndex"
+                        AND "Variants"."Position" BETWEEN "Features"."beginregion" AND "Features"."endregion" - 1 
+                        AND "Features"."Class" = 'gene'
+                WHERE
+                    "Genotypes"."ReferenceAlleleCount" != "Genotypes"."CopyNumber" 
+                    AND "Features"."ReferenceID" = :reference_id
+                    AND (
+                        :end_position IS NULL
+                        OR (
+                            "Features"."beginregion" < :end_position
+                            AND "Features"."endregion" > :begin_position
+                        )
+                    )
+                GROUP BY
+                    "Variants"."ChromosomeIndex",
+                    "Features"."FeatureName",
+                    :variant_grouping."Grouping",
+                    "Samples"."SampleIndex"
+                ORDER BY
+                     "Variants"."ChromosomeIndex",
+                     --"Features"."FeatureName",
+                     FLOOR( ( FLOOR( MIN( "Features"."beginregion" ) + MAX( "Features"."endregion" ) / 2 ) ) / :binSize ),
+                     "Samples"."SampleIndex",
+                     :variant_grouping."Grouping"
+                )
+            )
+    GROUP BY 
+        "GeneName", 
+        "ChromosomeIndex", 
+        "Begin", 
+        "End", 
+        "Grouping", 
+        "Bin"
+    ORDER BY
+         "ChromosomeIndex",
+         "GeneName",
+         "Bin",
+         "Grouping";
+    ELSE
+     gene_variant_counts =        
+        SELECT
+            "Features"."FeatureName" AS "GeneName" ,
+            "Variants"."ChromosomeIndex" AS "ChromosomeIndex",
+            NULL AS "Grouping",
+            MIN ( "Features"."beginregion" ) AS "Begin",
+            MAX ( "Features"."endregion" ) AS "End",
+            COUNT( DISTINCT "AllSamples"."PatientDWID" ) as "Count",
+            NULL AS "Bin"
+        FROM
+            :sample_list as "Samples"
+            JOIN "hc.hph.genomics.db.models::General.Samples" AS "AllSamples"
+			    ON "Samples"."SampleIndex" = "AllSamples"."SampleIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+                ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+                ON "Genotypes"."DWAuditID" = "Variants"."DWAuditID"
+                AND "Genotypes"."VariantIndex" = "Variants"."VariantIndex"
+            JOIN "hc.hph.genomics.db.models::Reference.Features" AS "Features"
+                ON "Variants"."ChromosomeIndex" = "Features"."ChromosomeIndex"
+                AND "Variants"."Position" BETWEEN "Features"."beginregion" AND "Features"."endregion" - 1
+                AND "Features"."Class" = 'gene'
+        WHERE
+            "Genotypes"."ReferenceAlleleCount" != "Genotypes"."CopyNumber" 
+            AND "Features"."ReferenceID" = :reference_id
+            AND (
+                :end_position IS NULL
+                OR (
+                    "Features"."beginregion" < :end_position
+                    AND "Features"."endregion" > :begin_position
+                )
+            )
+        GROUP BY
+            "Variants"."ChromosomeIndex",
+            "Features"."FeatureName"
+        ORDER BY
+             "Variants"."ChromosomeIndex";
+    END IF;
+    
+    IF :chromosome_index IS NOT NULL THEN
+        gene_variant_counts = SELECT * FROM :gene_variant_counts WHERE "ChromosomeIndex" = :chromosome_index;
+    END IF;
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::GeneVariantCounts" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        OUT gene_variant_counts "hc.hph.genomics.db.models::VariantBrowser.RegionCounts",
+        OUT sample_count INTEGER
+    )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER
+    READS SQL DATA AS
+BEGIN
+    SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+
+    -- return a list of genes with the number of affected patients
+    gene_variant_counts =        
+        SELECT
+            "Features"."FeatureName" AS "GeneName" ,
+            "Variants"."ChromosomeIndex" AS "ChromosomeIndex",
+            MIN ( "Features"."beginregion" ) AS "Begin",
+            MAX ( "Features"."endregion" ) AS "End",
+            COUNT( DISTINCT "AllSamples"."PatientDWID" ) as "Count"
+        FROM
+            :sample_list as "Samples"
+            INNER JOIN "hc.hph.genomics.db.models::General.Samples" as "AllSamples"
+                ON "Samples"."SampleIndex" = "AllSamples"."SampleIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+                ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+                ON "Genotypes"."DWAuditID" = "Variants"."DWAuditID"
+                AND "Genotypes"."VariantIndex" = "Variants"."VariantIndex"
+            JOIN "hc.hph.genomics.db.models::Reference.Features" AS "Features"
+                ON "Variants"."ChromosomeIndex" = "Features"."ChromosomeIndex"
+                AND "Variants"."Position" BETWEEN "Features"."beginregion" AND "Features"."endregion" - 1
+                AND "Features"."Class" = 'gene'
+        WHERE
+            "Genotypes"."ReferenceAlleleCount" != "Genotypes"."CopyNumber" 
+            AND "Features"."ReferenceID" = :reference_id
+            AND (
+                :end_position IS NULL
+                OR (
+                    "Features"."beginregion" < :end_position
+                    AND "Features"."endregion" > :begin_position
+                )
+            )
+        GROUP BY
+            "Variants"."ChromosomeIndex",
+            "Features"."FeatureName"
+        ORDER BY
+             "Variants"."ChromosomeIndex";
+    IF :chromosome_index IS NOT NULL THEN
+        gene_variant_counts = SELECT * FROM :gene_variant_counts WHERE "ChromosomeIndex" = :chromosome_index;
+    END IF;
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::GetVariantDetails" (
+		IN inputDWAuditID "hc.hph.genomics.db.models::SNV.DWAuditIDList", 
+		IN chromosomeIdx BIGINT, 
+		IN positionVal BIGINT, 
+		IN referenceID varchar(255), 
+		OUT resultOut "hc.hph.genomics.db.models::SNV.VariantAnnotationDetails", 
+		OUT variantIdOut "hc.hph.genomics.db.models::SNV.VariantIDList"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER
+AS
+BEGIN
+	DECLARE countRows INTEGER;
+	DECLARE countVariantRows INTEGER;
+
+	resultOut = SELECT DISTINCT 
+				vann."DWAuditID", 
+				vann."VariantIndex", 
+				vann."AlleleIndex", 
+				vann."ChromosomeIndex", 
+				vann."Position", 
+				vann."GeneName", 
+				vann."Region", 
+				vann."SequenceAlteration", 
+				vann."AminoAcid.Reference" AS "AminoAcid1.Reference", 
+				vann."AminoAcid.Alternative" AS "AminoAcid1.Alternative", 
+				vann."MutationType", 
+				vann."CDSPosition", 
+				vann."Transcript", 
+				vann."Protein", 
+				vann."ExonRank", 
+				ref."Allele" AS "Allele.Reference", 
+				va."Allele" AS "Allele.Alternative", 
+				case when Feat."Strand" = '-' then 
+				  "hc.hph.genomics.db.procedures.annotation::GetReverseComplement" (ref."Allele")
+				  else 	ref."Allele" end AS "CDSAllele.Reference", 
+				case when Feat."Strand" = '-' then 
+				  "hc.hph.genomics.db.procedures.annotation::GetReverseComplement" (va."Allele")
+				  else 	va."Allele" end AS "CDSAllele.Alternative", 
+				"hc.hph.genomics.db.procedures.annotation::getAminoAcidName"(
+					vann."AminoAcid.Reference", 
+					'THREE'
+				) AS "AminoAcid3.Reference", 
+				"hc.hph.genomics.db.procedures.annotation::getAminoAcidName"(
+					vann."AminoAcid.Alternative", 
+					'THREE'
+				) AS "AminoAcid3.Alternative"
+			--Feat."Strand" as "Strand"	
+			FROM "hc.hph.genomics.db.models::SNV.VariantAnnotations" AS vann
+				INNER JOIN "hc.hph.genomics.db.models::SNV.VariantAlleles" AS va
+				ON vann."DWAuditID" = va."DWAuditID"
+					AND va."VariantIndex" = vann."VariantIndex"
+					AND va."AlleleIndex" > 0
+				INNER JOIN "hc.hph.genomics.db.models::SNV.VariantAlleles" AS ref
+				ON vann."DWAuditID" = ref."DWAuditID"
+					AND ref."VariantIndex" = vann."VariantIndex"
+					AND ref."AlleleIndex" = 0
+			   inner join "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  AS feat
+			    on feat."GeneName" = vann."GeneName"
+			    and feat."Transcript" = vann."Transcript"
+			    and feat."FeatureName" = vann."Protein"
+			    and feat."ChromosomeIndex" = :chromosomeIdx
+			    and feat."ReferenceID" = :referenceID
+			WHERE (vann."DWAuditID" IN (SELECT "DWAuditID" FROM :inputDWAuditID))
+				AND vann."Position" = :positionVal
+				AND vann."ChromosomeIndex" = :chromosomeIdx;
+	
+	
+	
+	SELECT count(*) INTO countRows FROM :resultOut;
+
+	
+	IF (:countRows = 0) THEN
+      select count(*) into countVariantRows from "hc.hph.genomics.db.models::SNV.Variants" v 
+      INNER JOIN "hc.hph.genomics.db.models::SNV.VariantAlleles" AS va
+	  ON v."DWAuditID" = va."DWAuditID"
+	  AND v."VariantIndex" = va."VariantIndex"
+      where "Position" = :positionVal AND "ChromosomeIndex" = :chromosomeIdx and v."DWAuditID" IN (SELECT "DWAuditID" FROM :inputDWAuditID);
+      
+        IF ( :countVariantRows = 0 ) THEN
+        
+         resultOut = SELECT null AS "DWAuditID", 
+					null AS "VariantIndex", 
+					null AS "AlleleIndex", 
+					seq."ChromosomeIndex", 
+					:positionVal as "Position", 
+					null AS "GeneName", 
+					null AS "Region", 
+					null AS "SequenceAlteration", 
+					null AS "AminoAcid1.Reference", 
+					null AS "AminoAcid1.Alternative", 
+					null AS "MutationType", 
+					null AS "CDSPosition", 
+					null AS "Transcript", 
+					null AS "Protein", 
+					null AS "ExonRank", 
+					SUBSTRING (TO_CHAR(seq."Sequence"), :positionVal - seq."beginregion" +1,1) AS "Allele.Reference", 
+					null AS "Allele.Alternative", 
+					SUBSTRING (TO_CHAR(seq."Sequence"), :positionVal - seq."beginregion" +1,1) AS "CDSAllele.Reference", 
+					null AS "CDSAllele.Alternative", 
+					null AS "AminoAcid3.Reference", 
+					null AS "AminoAcid3.Alternative"
+					--null as "Strand"
+				FROM "hc.hph.genomics.db.models::Reference.Sequences" AS seq 
+				where  "ChromosomeIndex" = :chromosomeIdx  and "ReferenceID" = :referenceID and 
+				:positionVal between seq."beginregion" and seq."endregion";
+         ELSE        			
+		resultOut = SELECT
+                    variants."DWAuditID",
+					variants."VariantIndex", 
+					null AS "AlleleIndex", 
+					variants."ChromosomeIndex", 
+					variants."Position", 
+					null AS "GeneName", 
+					null AS "Region", 
+					null AS "SequenceAlteration", 
+					null AS "AminoAcid1.Reference", 
+					null AS "AminoAcid1.Alternative", 
+					null AS "MutationType", 
+					null AS "CDSPosition", 
+					null AS "Transcript", 
+					null AS "Protein", 
+					null AS "ExonRank", 
+					ref."Allele" AS "Allele.Reference", 
+					va."Allele" AS "Allele.Alternative", 
+					ref."Allele" AS "CDSAllele.Reference", 
+					va."Allele" AS "CDSAllele.Alternative", 
+					null AS "AminoAcid3.Reference", 
+					null AS "AminoAcid3.Alternative"
+					--null as "Strand"
+				FROM "hc.hph.genomics.db.models::SNV.Variants" AS variants
+					INNER JOIN "hc.hph.genomics.db.models::SNV.VariantAlleles" AS va
+					ON variants."DWAuditID" = va."DWAuditID"
+						AND va."VariantIndex" = variants."VariantIndex"
+						AND va."AlleleIndex" > 0
+					INNER JOIN "hc.hph.genomics.db.models::SNV.VariantAlleles" AS ref
+					ON variants."DWAuditID" = ref."DWAuditID"
+						AND ref."VariantIndex" = variants."VariantIndex"
+						AND ref."AlleleIndex" = 0
+				WHERE (variants."DWAuditID" IN (SELECT "DWAuditID" FROM :inputDWAuditID))
+					AND variants."Position" = :positionVal
+					AND variants."ChromosomeIndex" = :chromosomeIdx;
+	END IF;
+	
+	END IF;
+	
+	variantIdOut = SELECT DISTINCT variants."VariantIndex", 
+				vaID."VariantID"
+			FROM :resultOut AS variants
+				INNER JOIN "hc.hph.genomics.db.models::SNV.VariantIDs" AS vaID
+				ON vaID."VariantIndex" = variants."VariantIndex"
+				AND vaID."DWAuditID" = variants."DWAuditID"
+				AND vaID."VariantID" IS NOT NULL;
+					
+					
+	variantIdOut = SELECT "VariantIndex",string_agg("VariantID",',') AS "VariantID"
+			FROM :variantIdOut
+			GROUP BY "VariantIndex";
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::LocateSampleVariants"(
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN chromosome_index INTEGER,
+        IN position INTEGER,
+        OUT variants "hc.hph.genomics.db.models::VariantBrowser.SampleVariants"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+    variants = SELECT
+        "Genotypes"."SampleIndex",
+        "Genotypes"."DWAuditID",
+        "Genotypes"."VariantIndex"
+    FROM
+        :sample_list AS "SampleList"
+    INNER JOIN
+        "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+    ON
+        "SampleList"."SampleIndex" = "Genotypes"."SampleIndex"
+    INNER JOIN
+        "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+    ON
+        "Genotypes"."DWAuditID" = "Variants"."DWAuditID" AND
+        "Genotypes"."VariantIndex" = "Variants"."VariantIndex" AND
+        "Variants"."ChromosomeIndex" = :chromosome_index AND
+        "Variants"."Position" = :position;
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::MutationDataAnnotation"(
+		IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+		IN reference_id NVARCHAR(255), 
+		IN chromosome_index INTEGER,
+		IN begin_position INTEGER,
+		IN end_position INTEGER,
+		IN variant_grouping "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping",
+		OUT mutation_data "hc.hph.genomics.db.models::VariantBrowser.MutationDataAnnotation",
+		OUT affected_count INTEGER,
+		OUT sample_count INTEGER
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+	DECLARE total_mutation INTEGER;
+
+    SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+  
+    SELECT 
+		COUNT( DISTINCT "AllSamples"."PatientDWID" )
+	INTO
+		affected_count
+	FROM :sample_list AS "Samples"
+		JOIN "hc.hph.genomics.db.models::General.Samples" AS "AllSamples"
+			ON "Samples"."SampleIndex" = "AllSamples"."SampleIndex"
+		JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+			ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+		JOIN :variant_grouping
+			ON "Genotypes"."DWAuditID" = :variant_grouping."DWAuditID" 
+			AND "Genotypes"."VariantIndex" = :variant_grouping."VariantIndex"
+		JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+			ON :variant_grouping."DWAuditID" = "Variants"."DWAuditID"
+			AND :variant_grouping."VariantIndex" = "Variants"."VariantIndex"
+	WHERE "AllSamples"."ReferenceID" = :reference_id
+		AND "Variants"."ChromosomeIndex" = :chromosome_index
+		AND "Variants"."Position" < :end_position
+		AND "Variants"."Position" >= :begin_position;
+    
+	affected_group = SELECT
+	        :variant_grouping."Grouping" AS "Grouping"
+	    FROM :sample_list AS "Samples"
+            JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+                ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+            JOIN :variant_grouping
+                ON "Genotypes"."DWAuditID" = :variant_grouping."DWAuditID" 
+                AND "Genotypes"."VariantIndex" = :variant_grouping."VariantIndex"
+            JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+                ON :variant_grouping."DWAuditID" = "Variants"."DWAuditID"
+                AND :variant_grouping."VariantIndex" = "Variants"."VariantIndex"
+            JOIN "hc.hph.genomics.db.models::Reference.Features" AS "Features"
+                ON "Variants"."ChromosomeIndex" = "Features"."ChromosomeIndex"
+		WHERE "Features"."ReferenceID" = :reference_id
+		    AND "Variants"."ChromosomeIndex" = :chromosome_index
+    		AND "Variants"."Position" < :end_position
+            AND "Variants"."Position" >= :begin_position;
+            
+	mutation_per_group = SELECT "Grouping", COUNT ( * ) AS "Count"
+    	FROM :affected_group
+    	GROUP BY "Grouping"
+    	ORDER BY "Grouping";
+	
+    SELECT COUNT( * ) INTO total_mutation FROM :affected_group;
+	
+	mutation_data = SELECT "mutation_per_group"."Grouping", "mutation_per_group"."Count" / :total_mutation AS "Percent"
+        FROM :mutation_per_group AS "mutation_per_group"
+    	GROUP BY "mutation_per_group"."Grouping",
+    		"mutation_per_group"."Count"
+    	ORDER BY "mutation_per_group"."Grouping";
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::QualitativeData"(
+		IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+		IN reference_id NVARCHAR(255), 
+		IN chromosome_index INTEGER, 
+		IN begin_position INTEGER, 
+		IN end_position INTEGER, 
+		IN bin_size REAL,
+		IN variant_grouping "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping",
+		OUT qualitative_data "hc.hph.genomics.db.models::VariantBrowser.QualitativeData"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+	DECLARE total_patient_count INTEGER;
+
+	SELECT
+		COUNT( DISTINCT "PatientDWID" ) INTO total_patient_count
+	FROM
+		:sample_list AS samples
+	INNER JOIN
+		"hc.hph.genomics.db.models::General.Samples" AS all_samples
+	ON
+		samples."SampleIndex" = all_samples."SampleIndex";
+	
+	variants =
+		SELECT 
+			FLOOR( ( "Variants"."Position" - :begin_position ) / :bin_size ) AS "BinIndex",
+			:variant_grouping."Grouping" AS "Grouping",
+			"Variants"."Position",
+			"AllSamples"."PatientDWID"
+		FROM
+			:sample_list AS "Samples"
+		INNER JOIN
+			"hc.hph.genomics.db.models::General.Samples" AS "AllSamples"
+		ON
+			"Samples"."SampleIndex" = "AllSamples"."SampleIndex"
+		INNER JOIN
+			"hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+		ON
+			"Samples"."SampleIndex" = "Genotypes"."SampleIndex"
+		INNER JOIN
+			"hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+		ON
+			"Genotypes"."DWAuditID" = "Variants"."DWAuditID"
+			AND "Genotypes"."VariantIndex" = "Variants"."VariantIndex"
+		INNER JOIN
+			:variant_grouping
+		ON
+			"Variants"."DWAuditID" = :variant_grouping."DWAuditID"
+			AND "Variants"."VariantIndex" = :variant_grouping."VariantIndex"
+		WHERE
+			"AllSamples"."ReferenceID" = :reference_id
+			AND "Variants"."ChromosomeIndex" = :chromosome_index
+			AND "Variants"."Position" < :end_position
+			AND "Variants"."Position" >= :begin_position
+			AND "Genotypes"."ReferenceAlleleCount" < "Genotypes"."CopyNumber";
+
+	binned_patient_variants =
+		SELECT
+			"BinIndex",
+			MIN( "Grouping" ) AS "Grouping", -- in case of multiple groups per patient, choose the one with highest priority
+			MIN( "Position" ) AS "BeginPos",
+			MAX( "Position" ) AS "EndPos",
+			( DENSE_RANK() OVER ( PARTITION BY "BinIndex" ORDER BY "PatientDWID" ASC ) + DENSE_RANK() OVER ( PARTITION BY "BinIndex" ORDER BY "PatientDWID" DESC ) - 1 ) AS "BinPatientCount", -- workaround for COUNT( DISTINCT ... ) to work with window function
+			"PatientDWID"
+		FROM
+			:variants
+		GROUP BY
+			"BinIndex",
+			"PatientDWID";
+	
+	qualitative_data =
+		SELECT
+			"BinIndex",
+			"Grouping",
+			MIN( "BeginPos" ) AS "BeginPos",
+			MAX( "EndPos" ) AS "EndPos",
+			MAX( "BinPatientCount" ) / :total_patient_count AS "BinPatientFraction",
+			COUNT( "PatientDWID" ) / MAX( "BinPatientCount" ) AS "GroupPatientFraction"
+		FROM
+			:binned_patient_variants
+		GROUP BY
+			"BinIndex", 
+			"Grouping"
+		ORDER BY
+			"BinIndex",
+			"Grouping";
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::QuantitativeData" (
+        IN sample_list_name NVARCHAR (255),
+        IN reference_id NVARCHAR (255),
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        IN bin_size REAL,
+        IN level_name NVARCHAR (255),
+        IN col_name NVARCHAR (255),
+        IN aggregation NVARCHAR (255),
+        OUT white_list_invalid NVARCHAR (5000)
+    )
+    
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER
+    AS
+    BEGIN
+        
+        DECLARE sql_str_aggr NVARCHAR (5000);
+        DECLARE sql_aggr_where NVARCHAR (5000);
+        
+        DECLARE invalid_param CONDITION FOR SQL_ERROR_CODE 10001;
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            white_list_invalid := ::SQL_ERROR_MESSAGE;
+        END;
+        
+        IF :level_name <> 'Variants' AND :level_name <> 'Genotypes' THEN
+            SIGNAL invalid_param SET MESSAGE_TEXT = 'Level '|| :level_name || ' is not allowed';
+        END IF;
+        
+        IF upper( :aggregation ) <> 'MAX' AND upper( :aggregation ) <> 'MIN' AND upper( :aggregation ) <> 'AVG' THEN
+            SIGNAL invalid_param SET MESSAGE_TEXT = 'Aggregate '|| :aggregation || ' is not allowed';
+        END IF;
+        
+        /* To avoid NULL Conversion exception in dynamic SQL */
+        IF :chromosome_index IS NULL
+        THEN
+            sql_aggr_where := '';
+        ELSE
+            sql_aggr_where := 'AND "Variants"."ChromosomeIndex" = ' || :chromosome_index;
+        END IF;
+
+        IF :end_position IS NOT NULL
+        THEN
+            sql_aggr_where := :sql_aggr_where || ' AND "Variants"."Position" BETWEEN '||:begin_position ||' AND '|| ( :end_position - 1 );
+        END IF;
+        
+        /*Get all the scores irrespective of position to get the aggregated score*/ 
+        sql_str_aggr := 'SELECT
+                "ChromosomeIndex",
+                ' || :aggregation || '("Score") as "Score",
+                "BinIndex"
+            FROM
+            (
+                SELECT
+                    "Variants"."ChromosomeIndex" AS "ChromosomeIndex","'
+                    || ESCAPE_DOUBLE_QUOTES( :level_name ) || '"."' || ESCAPE_DOUBLE_QUOTES( :col_name ) || '" AS "Score",
+                    FLOOR( ( "Variants"."Position" - ' || :begin_position || ' ) / ' || :bin_size || ' ) AS "BinIndex"
+                FROM
+                    "' || ESCAPE_DOUBLE_QUOTES( :sample_list_name ) || '" AS "Samples"
+                    JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+                        ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+                    JOIN "hc.hph.genomics.db.models::SNV.Variants" AS "Variants"
+                        ON "Genotypes"."DWAuditID" = "Variants"."DWAuditID"
+                    JOIN "hc.hph.genomics.db.models::Reference.Features" AS "Features"
+                        ON "Variants"."ChromosomeIndex" = "Features"."ChromosomeIndex"
+                WHERE
+                    "Genotypes"."ReferenceAlleleCount" != "Genotypes"."CopyNumber"
+                    AND "' || ESCAPE_DOUBLE_QUOTES( :level_name ) || '"."' || ESCAPE_DOUBLE_QUOTES( :col_name ) || '" > 0
+                    AND "Features"."ReferenceID" = ''' || ESCAPE_SINGLE_QUOTES( :reference_id  ) || '''' || :sql_aggr_where || '
+            )
+            GROUP BY
+                "ChromosomeIndex",
+                "BinIndex"
+            ORDER BY
+                "ChromosomeIndex",
+                "BinIndex"';
+        EXECUTE IMMEDIATE :sql_str_aggr;
+    END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::RegionData"(
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN class NVARCHAR(255),
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        OUT regionAttributes "hc.hph.genomics.db.models::VariantBrowser.RegionDefinition"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+	regionAttributes = SELECT 
+	    region."ChromosomeIndex" AS "ChromosomeIndex",
+	    region."beginregion" AS "Begin", 
+	    region."endregion" AS "End",
+	    region."Score" AS "Score",
+	    region."Color" AS "Color"
+	FROM
+	   "hc.hph.genomics.db.models::SV.Regions" AS region
+	INNER JOIN
+	    :sample_list AS sample
+	ON
+	    region."SampleID" = sample."SampleIndex"
+	WHERE
+	    ( :class IS NULL OR region."Class" = :class OR region."Class" LIKE :class || '.%') AND
+	    :reference_id = region."ReferenceID" AND
+	    ( :chromosome_index IS NULL OR (
+	        "ChromosomeIndex" = :chromosome_index AND
+	        region."endregion" >= :begin_position AND
+	        region."beginregion" <= :end_position
+	    ) )
+	ORDER BY
+	    region."beginregion";
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::RegionNONSampleData"(
+        IN class NVARCHAR(255),
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        OUT regionAttributes "hc.hph.genomics.db.models::VariantBrowser.RegionDefinition"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+	regionAttributes = SELECT 
+	    region."ChromosomeIndex" AS "ChromosomeIndex",
+	    region."beginregion" AS "Begin", 
+	    region."endregion" AS "End",
+	    region."Score" AS "Score",
+	    region."Color" AS "Color"
+	FROM
+	   "hc.hph.genomics.db.models::Reference.Features" AS region
+	WHERE
+	     ( :class IS NULL OR region."Class" = :class OR region."Class" LIKE :class || '.%') AND
+	    :reference_id = region."ReferenceID" AND
+	    ( :chromosome_index IS NULL OR (
+	        "ChromosomeIndex" = :chromosome_index AND
+	        region."endregion" >= :begin_position AND
+	        region."beginregion" <= :end_position
+	    ) )
+	ORDER BY
+	    region."beginregion";
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::SampleAttributes" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        OUT sample_attributes "hc.hph.genomics.db.models::VariantBrowser.SampleAttributes"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+    AS
+BEGIN
+    sample_attributes = SELECT
+        "Samples"."SampleIndex",
+        "Details"."Attribute.OriginalValue" AS "Attribute",
+        "Details"."Value.OriginalValue" AS "Value"
+    FROM
+        :sample_list AS "SampleList"
+    INNER JOIN
+        "hc.hph.genomics.db.models::General.Samples" AS "Samples"
+    ON
+        "SampleList"."SampleIndex" = "Samples"."SampleIndex"
+    INNER JOIN
+        "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" AS "Details"
+    ON
+        "Samples"."InteractionDWID" = "Details"."DWID"
+    WHERE
+        "Details"."Attribute.OriginalValue" <> 'SampleIndex'
+    ORDER BY
+        "Samples"."SampleIndex",
+        "Details"."Attribute.OriginalValue",
+        "Details"."Value.OriginalValue";
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::SampleList"(
+	IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+	IN reference_id NVARCHAR(255),
+	IN chromosome_index INTEGER,
+	IN position INTEGER,
+	IN guarded_patients "hc.hph.genomics.db.models::General.Patients", -- TODO: implement guarded patient equivalent 
+	OUT samples "hc.hph.genomics.db.models::General.SampleDetails",
+	OUT visible_patient_count INTEGER,
+	OUT total_patient_count INTEGER
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+READS SQL DATA
+AS
+BEGIN
+	allSamples = SELECT
+		p."FamilyName",
+		p."GivenName",
+		p."BirthDate",
+		s."PatientDWID",
+		p."Gender.OriginalValue" AS "Gender",
+		s."AnalysisDate",
+		s."SampleClass",
+		s."InteractionDWID",
+		ga."SampleIndex",
+		v."DWAuditID",
+		ik."DWSource",
+		ik."InteractionID",
+		va."AlleleIndex",
+		va."Allele",
+		ga."AlleleCount"
+	FROM
+		"hc.hph.genomics.db.models::SNV.GenotypeAlleles" AS ga
+	INNER JOIN
+		:sample_list AS sl
+	ON
+		ga."SampleIndex" = sl."SampleIndex"
+	INNER JOIN
+		"hc.hph.genomics.db.models::General.Samples" AS s
+	ON
+		ga."SampleIndex" = s."SampleIndex"
+	INNER JOIN
+		"hc.hph.cdw.db.models::DWEntities.Patient_Attr" AS p
+	ON
+		s."PatientDWID" = p."DWID"
+	INNER JOIN
+		"hc.hph.cdw.db.models::DWEntities.Interactions_Key" AS ik
+	ON
+		s."InteractionDWID" = ik."DWID"
+	INNER JOIN
+		"hc.hph.genomics.db.models::SNV.Variants" AS v
+	ON
+		ga."DWAuditID" = v."DWAuditID" AND
+		ga."VariantIndex" = v."VariantIndex"
+	INNER JOIN
+		"hc.hph.genomics.db.models::SNV.Genotypes" AS g
+	ON
+		ga."DWAuditID" = g."DWAuditID" AND
+		ga."VariantIndex" = g."VariantIndex" AND
+		ga."SampleIndex" = g."SampleIndex"
+	INNER JOIN
+		"hc.hph.genomics.db.models::SNV.VariantAlleles" AS va
+	ON
+		ga."DWAuditID" = va."DWAuditID" AND
+		ga."VariantIndex" = va."VariantIndex" AND
+		ga."AlleleIndex" = va."AlleleIndex"
+	WHERE
+		:reference_id = s."ReferenceID" AND
+		:chromosome_index = v."ChromosomeIndex" AND
+		:position = v."Position";
+	
+	samples = SELECT
+		s."FamilyName",
+		s."GivenName",
+		s."BirthDate",
+		BINTOHEX( s."PatientDWID" ) AS "PatientDWID",
+		s."Gender",
+		s."AnalysisDate",
+		s."SampleClass",
+		BINTOHEX( s."InteractionDWID" ) AS "InteractionDWID",
+		s."SampleIndex",
+		s."DWAuditID",
+		s."DWSource",
+		s."InteractionID",
+		s."AlleleIndex",
+		s."Allele",
+		s."AlleleCount"
+	FROM
+		:allSamples AS s
+	INNER JOIN
+		:guarded_patients AS gp
+	ON
+		s."PatientDWID" = gp."DWID"
+	ORDER BY
+		s."FamilyName",
+		s."GivenName",
+		s."BirthDate",
+		s."PatientDWID",
+		s."Gender",
+		s."AnalysisDate",
+		s."SampleClass",
+		s."SampleIndex",
+		s."AlleleIndex";
+	
+	SELECT COUNT( DISTINCT "PatientDWID" ) INTO visible_patient_count FROM :samples;
+	SELECT COUNT( DISTINCT "PatientDWID" ) INTO total_patient_count FROM :allSamples;
+END;
+
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::VariantAnnotationCounts" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN variant_grouping "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping",
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        IN bin_size REAL,
+        OUT chromosome_infos "hc.hph.genomics.db.models::VariantBrowser.ChromosomeInfos",
+        OUT variant_counts "hc.hph.genomics.db.models::VariantBrowser.VariantDensityAnnotationCounts",
+        OUT sample_count INTEGER,
+        OUT max_density REAL
+    ) 
+    LANGUAGE SQLSCRIPT 
+    SQL SECURITY INVOKER
+    READS SQL DATA AS
+BEGIN
+    chromosome_infos = SELECT       
+            "ChromosomeIndex",
+            CASE WHEN :end_position IS NOT NULL AND :end_position < "Size" THEN :end_position ELSE "Size" END AS "Size",
+            CEIL( "Size" / :bin_size ) AS "BinCount"
+        FROM
+            "hc.hph.genomics.db.models::Reference.Chromosomes"
+        WHERE
+            ( :chromosome_index IS NULL OR "ChromosomeIndex" = :chromosome_index ) AND
+            "ReferenceID" = :reference_id
+        ORDER BY
+            "ChromosomeIndex";
+
+    -- return a list of variants with their bin index
+    SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+    IF :sample_count = 1 THEN
+        DECLARE sample_index INTEGER;
+        SELECT "SampleIndex" INTO sample_index FROM :sample_list;
+        
+        binned_variants = SELECT
+                "Variants"."ChromosomeIndex",
+                "Variants"."VariantIndex",
+                "Variants"."DWAuditID",
+                CAST( FLOOR( ( "Position" - :begin_position ) / :bin_size ) AS INTEGER ) AS "BinIndex",
+                "Variants"."AlleleIndex",
+                MAX( "Variants"."AlleleIndex" ) OVER ( PARTITION BY "Variants"."ChromosomeIndex", "Position", "SampleIndex" ) AS "MaxAlleleIndex",
+                "Variants"."SampleIndex"
+            FROM
+                "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants" AS "Variants"
+            INNER JOIN
+                :chromosome_infos AS "Chromosomes"
+            ON
+                "Variants"."ChromosomeIndex" = "Chromosomes"."ChromosomeIndex"
+            WHERE
+                ( :chromosome_index IS NULL OR "Variants"."ChromosomeIndex" = :chromosome_index ) AND
+                ( :end_position IS NULL OR "Position" BETWEEN :begin_position AND :end_position - 1 ) AND
+                "Position" < "Size" AND
+                "SampleIndex" = :sample_index AND
+                "Variants"."AlleleIndex" > 0 AND
+                "AlleleCount" > 0 AND
+                "Variants"."SampleIndex" = :sample_index;
+    ELSE
+        binned_variants = SELECT
+                "Variants"."ChromosomeIndex",
+                "Variants"."VariantIndex",
+                "Variants"."DWAuditID",
+                CAST( FLOOR( ( "Position" - :begin_position ) / :bin_size ) AS INTEGER ) AS "BinIndex",
+                "Variants"."AlleleIndex",
+                MAX( "Variants"."AlleleIndex" ) OVER ( PARTITION BY "Variants"."ChromosomeIndex", "Position", "SampleIndex" ) AS "MaxAlleleIndex",
+                "Variants"."SampleIndex"
+            FROM
+                "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants" AS "Variants"
+            INNER JOIN
+                :chromosome_infos AS "Chromosomes"
+            ON
+                "Variants"."ChromosomeIndex" = "Chromosomes"."ChromosomeIndex"
+            WHERE
+                ( :chromosome_index IS NULL OR "Variants"."ChromosomeIndex" = :chromosome_index ) AND
+                ( :end_position IS NULL OR "Position" BETWEEN :begin_position AND :end_position - 1 ) AND
+                "Position" < "Size" AND
+                "SampleIndex" IN ( SELECT "SampleIndex" FROM :sample_list ) AND
+                "Variants"."AlleleIndex" > 0 AND
+                "AlleleCount" > 0 AND
+                "Variants"."SampleIndex" IN ( SELECT "SampleIndex"FROM :sample_list );
+    END IF;
+    
+    -- aggregate bins and return result
+    variant_counts = SELECT
+            "ChromosomeIndex", 
+            "BinIndex",
+            COUNT( * ) AS "VariantCount",
+            "Grouping"
+        FROM
+            :binned_variants
+        JOIN :variant_grouping 
+            ON
+                :variant_grouping."AlleleIndex" = :binned_variants."AlleleIndex" AND
+                :variant_grouping."VariantIndex" = :binned_variants."VariantIndex" AND
+                :variant_grouping."DWAuditID" = :binned_variants."DWAuditID" 
+        WHERE
+            "MaxAlleleIndex" = :binned_variants."AlleleIndex"
+        GROUP BY
+            "ChromosomeIndex",
+            "BinIndex",
+            "Grouping"
+        ORDER BY
+            "ChromosomeIndex",
+            "BinIndex";
+            
+    SELECT
+        MAX( "Count" ) / ( :bin_size * sample_count )
+        INTO max_density
+        FROM
+        (
+            SELECT
+                SUM( "VariantCount" ) AS "Count"
+                FROM
+                :variant_counts
+                GROUP BY
+                    "ChromosomeIndex",
+                    "BinIndex"
+                ORDER BY
+                    "ChromosomeIndex",
+                    "Count" DESC
+        );
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::VariantCounts" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN reference_id NVARCHAR(255),
+        IN chromosome_index INTEGER,
+        IN begin_position INTEGER,
+        IN end_position INTEGER,
+        IN bin_size REAL,
+        OUT chromosome_infos "hc.hph.genomics.db.models::VariantBrowser.ChromosomeInfos",
+        OUT variant_counts "hc.hph.genomics.db.models::VariantBrowser.VariantCounts",
+        OUT sample_count INTEGER
+    )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER
+    READS SQL DATA AS
+BEGIN
+    chromosome_infos = SELECT
+            "ChromosomeIndex",
+            CASE WHEN :end_position IS NOT NULL AND :end_position < "Size" THEN :end_position ELSE "Size" END AS "Size",
+            CEIL( "Size" / :bin_size ) AS "BinCount"
+        FROM
+            "hc.hph.genomics.db.models::Reference.Chromosomes"
+        WHERE
+            ( :chromosome_index IS NULL OR "ChromosomeIndex" = :chromosome_index ) AND
+            "ReferenceID" = :reference_id
+        ORDER BY
+            "ChromosomeIndex";
+
+    -- return a list of variants with their bin index
+    SELECT COUNT( DISTINCT "PatientDWID" ) INTO sample_count FROM :sample_list AS samples INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS all_samples ON samples."SampleIndex" = all_samples."SampleIndex";
+    IF :sample_count = 1 THEN
+        DECLARE sample_index INTEGER;
+        SELECT "SampleIndex" INTO sample_index FROM :sample_list;
+        
+        binned_variants = SELECT
+                "Variants"."ChromosomeIndex",
+                CAST( FLOOR( ( "Position" - :begin_position ) / :bin_size ) AS INTEGER ) AS "BinIndex",
+                "AlleleIndex",
+                MAX( "AlleleIndex" ) OVER ( PARTITION BY "Variants"."ChromosomeIndex", "Position", "SampleIndex" ) AS "MaxAlleleIndex"
+            FROM
+                "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants" AS "Variants"
+            INNER JOIN
+                :chromosome_infos AS "Chromosomes"
+            ON
+                "Variants"."ChromosomeIndex" = "Chromosomes"."ChromosomeIndex"
+            WHERE
+                ( :chromosome_index IS NULL OR "Variants"."ChromosomeIndex" = :chromosome_index ) AND
+                ( :end_position IS NULL OR "Position" BETWEEN :begin_position AND :end_position - 1 ) AND
+                "Position" < "Size" AND
+                "SampleIndex" = :sample_index AND
+                "AlleleIndex" > 0 AND
+                "AlleleCount" > 0;
+    ELSE
+        binned_variants = SELECT
+                "Variants"."ChromosomeIndex",
+                CAST( FLOOR( ( "Position" - :begin_position ) / :bin_size ) AS INTEGER ) AS "BinIndex",
+                "AlleleIndex",
+                MAX( "AlleleIndex" ) OVER ( PARTITION BY "Variants"."ChromosomeIndex", "Position", "SampleIndex" ) AS "MaxAlleleIndex"
+            FROM
+                "hc.hph.genomics.db.models::VariantBrowser.DataModelVariants" AS "Variants"
+            INNER JOIN
+                :chromosome_infos AS "Chromosomes"
+            ON
+                "Variants"."ChromosomeIndex" = "Chromosomes"."ChromosomeIndex"
+            WHERE
+                ( :chromosome_index IS NULL OR "Variants"."ChromosomeIndex" = :chromosome_index ) AND
+                ( :end_position IS NULL OR "Position" BETWEEN :begin_position AND :end_position - 1 ) AND
+                "Position" < "Size" AND
+                "SampleIndex" IN ( SELECT "SampleIndex" FROM :sample_list ) AND
+                "AlleleIndex" > 0 AND
+                "AlleleCount" > 0;
+    END IF;
+    
+    -- aggregate bins and return result
+    variant_counts = SELECT
+            "ChromosomeIndex",
+            "BinIndex",
+            COUNT( * ) AS "VariantCount"
+        FROM
+            :binned_variants
+        WHERE 
+            "MaxAlleleIndex" = "AlleleIndex"
+        GROUP BY
+            "ChromosomeIndex",
+            "BinIndex"
+        ORDER BY
+            "ChromosomeIndex",
+            "BinIndex";
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.vb::VariantInformation" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        IN chromosome_index INTEGER,
+        IN position INTEGER,
+        OUT attributes "hc.hph.genomics.db.models::VariantBrowser.FullyQualifiedAttributes"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+AS
+BEGIN
+    DECLARE schema_array VARCHAR( 255 ) ARRAY;
+    DECLARE table_array VARCHAR( 255 ) ARRAY;
+    DECLARE attribute_array VARCHAR( 255 ) ARRAY;
+    DECLARE attribute_count INTEGER := 0;
+    DECLARE attribute_selection NCLOB := '';
+    
+    -- declare iterators and queries
+    DECLARE CURSOR filters FOR
+        SELECT
+            "AttributeName"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Filter' AND
+            "DataType" = 'Flag' AND
+            "ArraySize" = 0 AND
+            "AttributeName" <> 'PASS' AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Variant' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2 AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_allele_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'VariantAllele' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2 AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_multi_value_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Variant' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            ( "ArraySize" IS NULL OR "ArraySize" > 1 ) AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_structured_attributes FOR
+        SELECT
+            "StructAttr"."StructuredAttributeName" AS "StructuredAttributeName",
+            "StructAttr"."AttributeName" AS "AttributeName",
+            "StructAttr"."DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" AS "CustAttr"
+        INNER JOIN
+            "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAttributes" AS "StructAttr"
+        ON
+            "CustAttr"."AttributeName" = "StructAttr"."StructuredAttributeName" AND
+            "CustAttr"."Level" = "StructAttr"."Level"
+        WHERE
+            "StructAttr"."Level" = 'Variant' AND
+            "CustAttr"."DataType" = 'Structured' AND
+            "StructAttr"."DataType" IN ( 'Integer', 'Float', 'String', 'Allele' ) AND
+            "CustAttr"."Active" <> 0 AND
+            "StructAttr"."Active" <> 0
+        ORDER BY
+            "StructAttr"."StructuredAttributeName",
+            "StructAttr"."AttributeName";
+    DECLARE CURSOR genotype_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Genotype' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2 AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR genotype_allele_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'GenotypeAllele' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2 AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR genotype_multi_value_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Genotype' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            ( "ArraySize" IS NULL OR "ArraySize" > 1 ) AND
+            "Active" <> 0
+        ORDER BY
+            "AttributeName";
+    
+    -- populate sample variants table
+    CALL "hc.hph.genomics.db.procedures.vb::LocateSampleVariants" ( :sample_list, :chromosome_index, :position, variants );
+    INSERT INTO "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" SELECT * FROM :variants;
+    
+    -- query variant attributes
+    attribute_selection := '"SampleVariants"."SampleIndex", "Variants"."Quality", "Variants"."Filter.PASS"';
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'SAP_HPH';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Variants';
+    attribute_array[ :attribute_count ] := 'Quality';
+    schema_array[ :attribute_count ] := 'SAP_HPH';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Variants';
+    attribute_array[ :attribute_count ] := 'Filter.PASS';
+    FOR row_result AS filters DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'SAP_HPH';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Variants';
+        attribute_array[ :attribute_count ] := 'Filter.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "Variants"."Filter.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    FOR row_result AS variant_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'SAP_HPH';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Variants';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "Variants"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.Variants" AS "Variants" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "Variants"."DWAuditID" = "SampleVariants"."DWAuditID" AND "Variants"."VariantIndex" = "SampleVariants"."VariantIndex"';
+    
+    -- query variant IDs
+    SELECT "SampleVariants"."SampleIndex", "VariantIDs"."VariantID" FROM "hc.hph.genomics.db.models::SNV.VariantIDs" AS "VariantIDs" INNER JOIN :variants AS "SampleVariants" ON "VariantIDs"."DWAuditID" = "SampleVariants"."DWAuditID" AND "VariantIDs"."VariantIndex" = "SampleVariants"."VariantIndex" WHERE "VariantIDs"."VariantID" IS NOT NULL GROUP BY "SampleVariants"."SampleIndex", "VariantIDs"."VariantID";
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'SAP_HPH';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.VariantIDs';
+    attribute_array[ :attribute_count ] := 'VariantID';
+    
+    -- query variant allele attributes
+    attribute_selection := '"SampleVariants"."SampleIndex", "VariantAlleles"."AlleleIndex", "VariantAlleles"."Allele"';
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'SAP_HPH';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.VariantAlleles';
+    attribute_array[ :attribute_count ] := 'Allele';
+    FOR row_result AS variant_allele_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'SAP_HPH';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.VariantAlleles';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "VariantAlleles"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.VariantAlleles" AS "VariantAlleles" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "VariantAlleles"."DWAuditID" = "SampleVariants"."DWAuditID" AND "VariantAlleles"."VariantIndex" = "SampleVariants"."VariantIndex"';
+
+    -- query variant multi-value attributes
+    attribute_selection := '"SampleVariants"."SampleIndex"';
+    FOR row_result AS variant_multi_value_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'SAP_HPH';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "VariantAttributes"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes" AS "VariantAttributes" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "VariantAttributes"."DWAuditID" = "SampleVariants"."DWAuditID" AND "VariantAttributes"."VariantIndex" = "SampleVariants"."VariantIndex" ORDER BY "VariantAttributes"."ValueIndex"';
+
+    -- query structured variant attributes
+    attribute_selection := '"SampleVariants"."SampleIndex", "VariantAttributes"."ValueIndex"';
+    FOR row_result AS variant_structured_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'SAP_HPH';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.VariantStructuredAttributes';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName" || '.' || row_result."StructuredAttributeName";
+        attribute_selection := :attribute_selection || ', "VariantAttributes"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"."' || ESCAPE_DOUBLE_QUOTES( row_result."StructuredAttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes" AS "VariantAttributes" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "VariantAttributes"."DWAuditID" = "SampleVariants"."DWAuditID" AND "VariantAttributes"."VariantIndex" = "SampleVariants"."VariantIndex" ORDER BY "VariantAttributes"."ValueIndex"';
+
+    -- query genotype attributes
+    attribute_selection := '"SampleVariants"."SampleIndex", "Genotypes"."CopyNumber", "Genotypes"."Zygosity"';
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'SAP_HPH';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Genotypes';
+    attribute_array[ :attribute_count ] := 'CopyNumber';
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'SAP_HPH';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Genotypes';
+    attribute_array[ :attribute_count ] := 'Zygosity';
+    FOR row_result AS genotype_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'SAP_HPH';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.Genotypes';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "Genotypes"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "Genotypes"."DWAuditID" = "SampleVariants"."DWAuditID" AND "Genotypes"."VariantIndex" = "SampleVariants"."VariantIndex" AND "Genotypes"."SampleIndex" = "SampleVariants"."SampleIndex"';
+    
+    -- query genotype allele attributes
+    attribute_selection := '"SampleVariants"."SampleIndex", "GenotypeAlleles"."AlleleIndex", "GenotypeAlleles"."AlleleCount"';
+    attribute_count := :attribute_count + 1;
+    schema_array[ :attribute_count ] := 'SAP_HPH';
+    table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.GenotypeAlleles';
+    attribute_array[ :attribute_count ] := 'AlleleCount';
+    FOR row_result AS genotype_allele_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'SAP_HPH';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.GenotypeAlleles';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "GenotypeAlleles"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.GenotypeAlleles" AS "GenotypeAlleles" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "GenotypeAlleles"."DWAuditID" = "SampleVariants"."DWAuditID" AND "GenotypeAlleles"."VariantIndex" = "SampleVariants"."VariantIndex" AND "GenotypeAlleles"."SampleIndex" = "SampleVariants"."SampleIndex"';
+
+    -- query genotype multi-value attributes
+    attribute_selection := '"SampleVariants"."SampleIndex"';
+    FOR row_result AS genotype_multi_value_attributes DO
+        attribute_count := :attribute_count + 1;
+        schema_array[ :attribute_count ] := 'SAP_HPH';
+        table_array[ :attribute_count ] := 'hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes';
+        attribute_array[ :attribute_count ] := 'Attr.' || row_result."AttributeName";
+        attribute_selection := :attribute_selection || ', "GenotypeAttributes"."Attr.' || ESCAPE_DOUBLE_QUOTES( row_result."AttributeName" ) || '"';
+    END FOR;
+    EXECUTE IMMEDIATE 'SELECT ' || :attribute_selection || ' FROM "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes" AS "GenotypeAttributes" INNER JOIN "hc.hph.genomics.db.models::VariantBrowser.SampleVariants" AS "SampleVariants" ON "GenotypeAttributes"."DWAuditID" = "SampleVariants"."DWAuditID" AND "GenotypeAttributes"."VariantIndex" = "SampleVariants"."VariantIndex" AND "GenotypeAttributes"."SampleIndex" = "SampleVariants"."SampleIndex" ORDER BY "GenotypeAttributes"."ValueIndex"';
+    
+    -- return accessed attributes
+    attributes = UNNEST( :schema_array, :table_array, :attribute_array ) AS ( "SchemaName", "TableName", "AttributeName" );
 END;
 
 
