@@ -1,922 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
---  DONE
-
-   
---  DONE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-create or replace procedure P_AnnotateFeatures (
-		IN iProfileAuditID BIGINT,
-		IN dwAuditID BIGINT
-	)
-	LANGUAGE SQLSCRIPT 
-	SQL SECURITY INVOKER
-	AS 
-BEGIN
-
-
- featWithGene = select
-	 feat.DWAuditID,
-	 feat.ReferenceID,
-	 feat.FeatureID,
-	 feat.ChromosomeIndex,
-	 feat.Class,
-	 feat.FeatureName,
-	 feat.beginregion,
-	 feat.endregion,
-	 feat.Strand,
-	 feat.Frame,
-	 feat.Score,
-	 feat.ParentID,
-	 gene.FeatureID as GENE 
-from Features as feat 
-inner join (select
-	 FeatureID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion 
-	from Features 
-	where Class = 'mRNA' 
-	and DWAuditID = dwAuditID) as gene on (feat.ChromosomeIndex = gene.ChromosomeIndex 
-	and feat.ParentID=gene.FeatureID) 
-where feat.DWAuditID = dwAuditID 
-;
-exons = select
-	 featExon.DWAuditID,
-	 featExon.ReferenceID,
-	 featExon.FeatureID,
-	 featExon.ChromosomeIndex,
-	 featExon.Class,
-	 featExon.FeatureName,
-	 featExon.beginregion,
-	 featExon.endregion,
-	 featExon.Strand,
-	 featExon.Frame,
-	 featExon.Score,
-	 featExon.ParentID,
-	 featExon.GENE,
-	 ROW_NUMBER() over (partition by featExon.ChromosomeIndex,
-	 featExon.GENE 
-	Order by featExon.beginregion) AS Rank 
-from :featWithGene as featExon 
-where featExon.Class = 'exon' 
-order by featExon.ChromosomeIndex,
-	 featExon.GENE,
-	 Rank asc 
-;
-cds = select
-	 featCDS.DWAuditID,
-	 featCDS.ReferenceID,
-	 featCDS.FeatureID,
-	 featCDS.ChromosomeIndex,
-	 featCDS.Class,
-	 featCDS.FeatureName,
-	 featCDS.beginregion,
-	 featCDS.endregion,
-	 featCDS.Strand,
-	 featCDS.Frame,
-	 featCDS.Score,
-	 featCDS.ParentID,
-	 featCDS.GENE,
-	 ROW_NUMBER() over (partition by featCDS.ChromosomeIndex,
-	 featCDS.GENE 
-	Order by featCDS.beginregion) AS Rank 
-from :featWithGene as featCDS 
-where featCDS.Class = 'CDS' 
-order by featCDS.ChromosomeIndex,
-	 featCDS.GENE,
-	 Rank asc 
-;
-
---Annotate 5'Prime and 3'Prime UTR
- -- 5'Prime UTR when the first CDS is within first exon
-insert 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
-	-- Frame,
-	 Score,
-	 ParentID,
-	 Description,
-	 Sequence, Rank, PrePost)(select
-	 exon.DWAuditID,
-	 exon.ReferenceID,
-	 exon.ChromosomeIndex,
-	  exon.beginregion as beginregion,
-	 (cds.beginregion-1) as endregion,
-	case when exon.Strand='+'  then ('five_prime_UTR' || exon.FeatureID)
-	else ('three_prime_UTR' || exon.FeatureID) end AS FeatureID,
-	case when exon.Strand='+'  then 'five_prime_UTR' else 'three_prime_UTR' end,
-	 null,
-	 exon.Strand,
---	 exon.Frame,
-	 exon.Score,
-	 exon.FeatureID,
-	case when exon.Strand='+'  then 'five_prime_UTR' else 'three_prime_UTR' end,
-	null, null, null
-	from :exons as exon 
-	INNER JOIN :cds as cds on (exon.GENE = cds.GENE 
-		and exon.ChromosomeIndex = cds.ChromosomeIndex 
-		and cds.Rank =1 
-		--and cds.beginregion != exon.beginregion 
-		and cds.beginregion between exon.beginregion 
-		and exon.endregion )) 
-;
-
--- 5'Prime UTR when the first CDS is not within first exon this excludes the 5'Prime which is contained in the first cds
--- All exons that appear before first cds are marked as 5'Prime UTRs
-insert 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
---	 Frame,
-	 Score,
-	 ParentID,
-	 Description,
-	 Sequence, Rank, PrePost)(select
-	 exon.DWAuditID,
-	 exon.ReferenceID,
-	 exon.ChromosomeIndex,
-	 exon.beginregion,
-	 exon.endregion,
-	case when exon.Strand='+' then ('five_prime_UTR' || exon.FeatureID)
-	else ('three_prime_UTR' || exon.FeatureID) end ,
-case when exon.Strand='+' then 'five_prime_UTR'
-else 'three_prime_UTR' end,
-	 null,
-	 exon.Strand,
-	 --exon.Frame,
-	 exon.Score,
-	 exon.FeatureID,
-case when exon.Strand='+' then 'five_prime_UTR'
-else 'three_prime_UTR' end,
-NULL, NULL, NULL
-	from :exons as exon 
-	INNER JOIN :cds as cds on (exon.GENE = cds.GENE 
-		and exon.ChromosomeIndex=cds.ChromosomeIndex 
-		and (select
-	 beginregion 
-			from :cds as innerCDS 
-			where innerCDS.GENE=exon.GENE 
-			and innerCDS.ChromosomeIndex=exon.ChromosomeIndex 
-			and innerCDS.Rank=1 
-			and cds.Rank=1)> exon.endregion -- and cds.beginregion > exon.endregion 
- 
-		and cds.beginregion != exon.beginregion) ) 
-;
--- 3'Prime UTR when the last CDS is  within exon
-insert 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
-	-- Frame,
-	 Score,
-	 ParentID,
-	 Description,
-	 Sequence, Rank, PrePost) (select
-	 exon.DWAuditID,
-	 exon.ReferenceID,
-	 exon.ChromosomeIndex,
-	 cds.endregion+1,
-	 (exon.endregion),
-case when exon.Strand='+' then ('three_prime_UTR' || exon.FeatureID)
-else ('five_prime_UTR' || exon.FeatureID) end ,
-	case when exon.Strand='+' then 'three_prime_UTR'
-	else 'five_prime_UTR' end,
-	 null,
-	 exon.Strand,
---	 exon.Frame,
-	 exon.Score,
-	 exon.ParentID,
-case when exon.Strand='+' then 'three_prime_UTR' 
-else 'five_prime_UTR' end,
-NULL, NULL, NULL 
-	from :exons as exon 
-	INNER JOIN :cds as cds on (cds.endregion != exon.endregion 
-		and exon.GENE = cds.GENE 
-		and exon.ChromosomeIndex = cds.ChromosomeIndex 
-		and (select
-	 max(cdsSecondInner.beginregion) 
-			from :cds as cdsSecondInner 
-			where cdsSecondInner.GENE = exon.GENE 
-			and cdsSecondInner.ChromosomeIndex = exon.ChromosomeIndex 
-			and cds.Rank = (select
-	 max (Rank) 
-				from :cds as innerCDS 
-				where innerCDS.GENE = exon.GENE 
-				and innerCDS.ChromosomeIndex = exon.ChromosomeIndex)) between exon.beginregion 
-		and exon.endregion ) ) 
-;
- -- 3'Prime UTR after the last CDS. All exons after last CDS are marked as 3'Prime
-insert 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
---	 Frame,
-	 Score,
-	 ParentID,
-	 Description,
-	 Sequence, Rank, PrePost)(select
-	 distinct exon.DWAuditID,
-	 exon.ReferenceID,
-	 exon.ChromosomeIndex,
-	 exon.beginregion,
-	 exon.endregion,
-	 case when exon.Strand='+' then ('three_prime_UTR' || exon.FeatureID)
-	 else ('five_prime_UTR' || exon.FeatureID) end,
-	 case when exon.Strand='+' then 'three_prime_UTR'
-	 else 'five_prime_UTR' end ,
-	 null,
-	 exon.Strand,
---	 exon.Frame,
-	 exon.Score,
-	 exon.FeatureID,
-	 case when exon.Strand='+' then 'three_prime_UTR' 
-	 else 'five_prime_UTR' end,
-NULL, NULL, NULL
-	from :exons as exon 
-	INNER JOIN :cds as cds on (exon.GENE = cds.GENE 
-		and exon.beginregion > (select
-	 max(innerCDS.endregion ) 
-			from :cds as innerCDS 
-			where innerCDS.GENE = exon.GENE 
-			and innerCDS.ChromosomeIndex = exon.ChromosomeIndex) ) ) 
-;
-
-
- --Annotate introns
-introns = select
-	 T1.DWAuditID,
-	 T1.ReferenceID,
-	 T1.ChromosomeIndex,
-	 T1.endregion+4 as beginregion,
-	 T2.beginregion-4 as endregion,
-	 T1.GENE||'intron'||T1.Rank AS FeatureID,
-	 'intron' AS Class,
-	 T1.GENE||'intron'||T1.Rank AS Name,
-	 T1.Strand,
---	 T1.Frame,
-	 T1.Score,
-	 T1.ParentID AS ParentID,
-	 'intron' AS Description 
-from :exons as T1 
-INNER JOIN :exons as T2 on (T1.endregion < T2.endregion 
-	and T1.Rank =T2.Rank-1 
-	and T1.ChromosomeIndex=T2.ChromosomeIndex 
-	and T1.GENE=T2.GENE 
-	and T1.Rank <T2.Rank) 
-order by T1.GENE 
-;
-insert 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
---	 Frame,
-	 Score,
-	 ParentID,
-	 Description,
-	 Sequence, Rank, PrePost) (select
-	 introns.DWAuditID,
-	 introns.ReferenceID,
-	 introns.ChromosomeIndex,
-	 introns.beginregion,
-	 introns.endregion,
-	 introns.FeatureID,
-	 introns.Class,
-	 null,
-	 introns.Strand,
-	-- introns.Frame,
-	 introns.Score,
-	 introns.ParentID,
-	 introns.Description,
-NULL, NULL, NULL 
-	from :introns as introns 
-	where introns.beginregion < introns.endregion) 
-;
-
-
- --Annotate trans_splice_donor_site
-insert 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
-	 --Frame,
-	 Score,
-	 ParentID,
-	 Description,
-	 Sequence, Rank, PrePost) (select
-	 introns.DWAuditID,
-	 introns.ReferenceID,
-	 introns.ChromosomeIndex,
-	 introns.beginregion-3,
-	 introns.beginregion-1,
-	 introns.FeatureID ||'trans_splice_donor_site',
-	 'trans_splice_donor_site',
-	 null,
-	 introns.Strand,
-	-- introns.Frame,
-	 introns.Score,
-	 introns.ParentID,
-	 'trans_splice_donor_site',
-NULL, NULL, NULL 
-	from :introns as introns) 
-;
-
-
- --Annotate trans_splice_acceptor_site
-insert 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
-	-- Frame,
-	 Score,
-	 ParentID,
-	 Description,
-	 Sequence, Rank, PrePost) (select
-	 introns.DWAuditID,
-	 introns.ReferenceID,
-	 introns.ChromosomeIndex,
-	 introns.endregion+1,
-	 introns.endregion+3,
-	 introns.FeatureID ||'trans_splice_acceptor_site',
-	 'trans_splice_acceptor_site',
-	 null,
-	 introns.Strand,
---	 introns.Frame,
-	 introns.Score,
-	 introns.ParentID,
-	 'trans_splice_acceptor_site',
-NULL, NULL, NULL 
-	from :introns as introns) 
-;
-
- --Annotate intergenic regions
-intergenic_region = select
-	 feat.DWAuditID,
-	 feat.ReferenceID,
-	 feat.FeatureID,
-	 feat.ChromosomeIndex,
-	 feat.Class,
-	 feat.FeatureName,
-	 feat.beginregion,
-	 feat.endregion,
-	 feat.Strand,
-	-- feat.Frame,
-	 feat.Score,
-	 feat.ParentID,
-	 ROW_NUMBER() over (partition by feat.ChromosomeIndex 
-	Order by feat.beginregion) AS Rank 
-from Features as feat 
-where feat.Class='gene' 
-and feat.DWAuditID = dwAuditID 
-;
- insert 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
-	-- Frame,
-	 Score,
-	 ParentID,
-	 Description,
-	 Sequence, Rank, PrePost) (select
-	 T1.DWAuditID,
-	 T1.ReferenceID,
-	 T1.ChromosomeIndex,
-	 T1.endregion+1,
-	 T2.beginregion-1,
-	 T1.FeatureID||'intergenic_region'||T1.Rank,
-	 'intergenic_region',
-	 null,
-	 T1.Strand,
---	 T1.Frame,
-	 T1.Score,
-	 T1.ParentID,
-	 'intergenic_region',
-NULL, NULL, NULL 
-	from :intergenic_region as T1 
-	INNER JOIN :intergenic_region as T2 on (T1.Rank =T2.Rank-1 
-		and T1.ChromosomeIndex=T2.ChromosomeIndex) 
-	and T2.beginregion > T1.endregion+1 
-	order by T1.ChromosomeIndex) 
-;
-
-
- --Annotate start and stop codons
-cdsGroup = select
-	 feat.DWAuditID,
-	 feat.ReferenceID,
-	 feat.FeatureID,
-	 feat.ChromosomeIndex,
-	 feat.Class,
-	 feat.FeatureName,
-	 feat.beginregion,
-	 feat.endregion,
-	 feat.Strand,
-	-- feat.Frame,
-	 feat.Score,
-	 feat.ParentID,
-	case when feat.Strand = '+' then
-	  ROW_NUMBER() over (partition by feat.ChromosomeIndex,
-	 feat.FeatureName 
-	Order by feat.beginregion) 
-else
- ROW_NUMBER() over (partition by feat.ChromosomeIndex,
-feat.FeatureName 
-Order by feat.beginregion desc) end
-	AS Rank,	
-	 feat.Description 
-from Features as feat 
-where Class='CDS' 
-and feat.FeatureName is not null 
-and TRIM(COALESCE(feat.FeatureName,'')) != '' 
-and feat.DWAuditID = :dwAuditID order by feat.FeatureName,feat.beginregion
-;
-
-
-
-insert into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,ChromosomeIndex,beginregion,endregion,FeatureID,Class,FeatureName,
-	  Strand,
-	  --Frame,
-	  Score, ParentID, Description,Sequence,Rank,PrePost) (
-	 select
-	 cdsGroup.DWAuditID,
-	 cdsGroup.ReferenceID,
-	 cdsGroup.ChromosomeIndex,
-	 case when cdsGroup.Strand = '+' then
-	 cdsGroup.beginregion else 
-	 cdsGroup.endregion-2 end as beginregion ,
-	 case when cdsGroup.Strand = '+' then
-	 cdsGroup.beginregion +2
-	 else 
-	 	 cdsGroup.endregion end
-	  as endregion,
-	'start_codon_' ||cdsGroup.FeatureID ,
-     'start_codon' ,
-	 cdsGroup.FeatureName,
-	 cdsGroup.Strand,
-	-- cdsGroup.Frame,
-	 cdsGroup.Score,
-	 cdsGroup.FeatureName,
-	 'start_codon' ,
-	'' AS Sequence,
-	0 AS Rank,
-	NULL AS PrePost
-	from :cdsGroup as cdsGroup 
-	where cdsGroup.FeatureName is not null 
-	and TRIM(COALESCE(cdsGroup.FeatureName,
-	 '')) != '' 
-	and cdsGroup.Rank = 1) 
-;
-
-
-insert 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
---	 Frame,
-	 Score,
-	 ParentID,
-	 Description,
-	 Sequence,Rank,PrePost) (select
-	 cdsGroup.DWAuditID,
-	 cdsGroup.ReferenceID,
-	 cdsGroup.ChromosomeIndex,
-	 case when cdsGroup.Strand = '+'  then
-	 cdsGroup.endregion-2
-	 else 	 cdsGroup.beginregion end as beginregion,
-	 case when cdsGroup.Strand = '+'  then
-	 cdsGroup.endregion
-	 else cdsGroup.beginregion+2 end as endregion,
-	 'stop_codon_' ||cdsGroup.FeatureID ,
-	'stop_codon' ,
-	 cdsGroup.FeatureName,
-	 cdsGroup.Strand,
---	 cdsGroup.Frame,
-	 cdsGroup.Score,
-	 cdsGroup.FeatureName,
-	 'stop_codon' ,
-	'' AS Sequence,
-	(cdsGroup.Rank+1) AS Rank,
-	NULL AS PrePost
-	from :cdsGroup as cdsGroup 
-	where cdsGroup.FeatureName is not null 
-	and TRIM(COALESCE(cdsGroup.FeatureName,
-	 '')) != '' 
-	and cdsGroup.Rank =(select
-	 max(cdsGroupInner.Rank) 
-		from :cdsGroup as cdsGroupInner 
-		where cdsGroup.FeatureName = cdsGroupInner.FeatureName 
-		and cdsGroup.ChromosomeIndex = cdsGroupInner.ChromosomeIndex 
-		group by cdsGroupInner.FeatureName)) 
-;
-
- --Annotate CDS
- insert --for in-between cds eg cds 2, cds3 and cds4 in a cds1-cds5 range of CDS's
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
---	 Frame,
-	 Score,
-	 ParentID,
-	 Description,
-	  Sequence,Rank,PrePost) (select
-	 cdsGroup.DWAuditID,
-	 cdsGroup.ReferenceID,
-	 cdsGroup.ChromosomeIndex,
-	 cdsGroup.beginregion,
-	 cdsGroup.endregion,
-	 cdsGroup.FeatureID,
-	 'CDS_region',
-	 cdsGroup.FeatureName,
-	 cdsGroup.Strand,
---	 cdsGroup.Frame,
-	 cdsGroup.Score,
-	 cdsGroup.ParentID,
-	 cdsGroup.Description,
-	 '' AS Sequence,
-	  cdsGroup.Rank AS Rank,
-	  NULL AS PrePost
-	from :cdsGroup as cdsGroup 
-	where cdsGroup.FeatureName is not null 
-	and TRIM(COALESCE(cdsGroup.FeatureName,
-	 '')) != '' -- and cdsGroup.endregion-cdsGroup.beginregion >3 
- 
-	and cdsGroup.Rank >(select
-	 min(cdsGroupMinInner.Rank) 
-		from :cdsGroup as cdsGroupMinInner 
-		where cdsGroup.FeatureName = cdsGroupMinInner.FeatureName 
-		and cdsGroup.ChromosomeIndex = cdsGroupMinInner.ChromosomeIndex 
-		group by cdsGroupMinInner.FeatureName) 
-	and cdsGroup.Rank < (select
-	 max(cdsGroupInner.Rank) 
-		from :cdsGroup as cdsGroupInner 
-		where cdsGroup.FeatureName = cdsGroupInner.FeatureName 
-		and cdsGroup.ChromosomeIndex = cdsGroupInner.ChromosomeIndex 
-		group by cdsGroupInner.FeatureName) ) 
-;
-
-
-insert -- for cds1 in a cds-range  whose length > 1 and cds1 is not the start codon i.e length =3 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
---	 Frame,
-	 Score,
-	 ParentID,
-	 Description,
- Sequence,Rank,PrePost) (select
-	 cdsGroup.DWAuditID,
-	 cdsGroup.ReferenceID,
-	 cdsGroup.ChromosomeIndex,
-case when cdsGroup.Strand='+' then
-	 cdsGroup.beginregion+3 
-	 else cdsGroup.beginregion
-	 end as beginregion,
-	 case when cdsGroup.Strand='+' then
-	 cdsGroup.endregion
-	 else cdsGroup.endregion -3  end
-	 as endregion,
-	 cdsGroup.FeatureID,
-	 'CDS_region',
-	 cdsGroup.FeatureName,
-	 cdsGroup.Strand,
---	 cdsGroup.Frame,
-	 cdsGroup.Score,
-	 cdsGroup.ParentID,
-	 cdsGroup.Description,
-	 '' AS Sequence,
-	 cdsGroup.Rank AS Rank,
-	 NULL AS PrePost 
-	from :cdsGroup as cdsGroup 
-	where cdsGroup.FeatureName is not null 
-	and TRIM(COALESCE(cdsGroup.FeatureName,
-	 '')) != '' 
-	and cdsGroup.Rank = 1 
-	and ( cdsGroup.endregion-cdsGroup.beginregion +1 ) >3 
-	and (select
-	 max(cdsGroupInner.Rank) 
-		from :cdsGroup as cdsGroupInner 
-		where cdsGroup.FeatureName = cdsGroupInner.FeatureName 
-		and cdsGroup.ChromosomeIndex = cdsGroupInner.ChromosomeIndex 
-		group by cdsGroupInner.FeatureName) >1) 
-;
-
- insert -- for cds1 in a cds-range  whose length = 1 and cds1 is not the start codon i.e length =3 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
---	 Frame,
-	 Score,
-	 ParentID,
-	 Description,
- Sequence,Rank,PrePost) (select
-	 cdsGroup.DWAuditID,
-	 cdsGroup.ReferenceID,
-	 cdsGroup.ChromosomeIndex,
-	 cdsGroup.beginregion+3,
-	 cdsGroup.endregion-3,
-	 cdsGroup.FeatureID,
-	 'CDS_region',
-	 cdsGroup.FeatureName,
-	 cdsGroup.Strand,
---	 cdsGroup.Frame,
-	 cdsGroup.Score,
-	 cdsGroup.ParentID,
-	 cdsGroup.Description, 
-	  '' AS Sequence,
-	 	 cdsGroup.Rank AS Rank,
-	 	 NULL AS PrePost
-	from :cdsGroup as cdsGroup 
-	where cdsGroup.FeatureName is not null 
-	and TRIM(COALESCE(cdsGroup.FeatureName,
-	 '')) != '' 
-	and cdsGroup.Rank = 1 
-	and ( cdsGroup.endregion-cdsGroup.beginregion +1 )>3 
-	and (select
-	 max(cdsGroupInner.Rank) 
-		from :cdsGroup as cdsGroupInner 
-		where cdsGroup.FeatureName = cdsGroupInner.FeatureName 
-		and cdsGroup.ChromosomeIndex = cdsGroupInner.ChromosomeIndex 
-		group by cdsGroupInner.FeatureName) =1) 
-;
-
--- for last cds eg cds 5 in a cds1-cds5 range of CDS's
- insert 
-into FeaturesAnnotation (DWAuditID,
-	 ReferenceID,
-	 ChromosomeIndex,
-	 beginregion,
-	 endregion,
-	 FeatureID,
-	 Class,
-	 FeatureName,
-	 Strand,
---	 Frame,
-	 Score,
-	 ParentID,
-	 Description,Sequence,Rank,PrePost) (select
-	 cdsGroup.DWAuditID,
-	 cdsGroup.ReferenceID,
-	 cdsGroup.ChromosomeIndex,
-case when cdsGroup.Strand='+' then
-	 cdsGroup.beginregion 
-	 else cdsGroup.beginregion+3 end  as beginregion,
-case when cdsGroup.Strand='+' then
-	 cdsGroup.endregion-3
-	 else cdsGroup.endregion end as endregion,
-	 cdsGroup.FeatureID,
-	 'CDS_region',
-	 cdsGroup.FeatureName,
-	 cdsGroup.Strand,
---	 cdsGroup.Frame,
-	 cdsGroup.Score,
-	 cdsGroup.ParentID,
-	 cdsGroup.Description, 
-	 '' AS Sequence,
-     cdsGroup.Rank AS Rank,
-     NULL AS PrePost
-	from :cdsGroup as cdsGroup 
-	where cdsGroup.FeatureName is not null 
-	and TRIM(COALESCE(cdsGroup.FeatureName,
-	 '')) != '' 
-	and ( cdsGroup.endregion-cdsGroup.beginregion +1 ) >3 
-	and cdsGroup.Rank >1 
-	and cdsGroup.Rank =(select
-	 max(cdsGroupInner.Rank) 
-		from :cdsGroup as cdsGroupInner 
-		where cdsGroup.FeatureName = cdsGroupInner.FeatureName 
-		and cdsGroup.ChromosomeIndex = cdsGroupInner.ChromosomeIndex 
-		group by cdsGroupInner.FeatureName)) 
-;
-
-
---Rank correction for cds rank and stop codon
-update FeaturesAnnotation  s1 set s1.Rank=(select s1.Rank -(s2.minRank-1) from  
-(select FeatureName,min(Rank) as minRank from FeaturesAnnotation  where ChromosomeIndex=s1.ChromosomeIndex 
-and Class ='CDS_region' group by FeatureName ) as s2
-where s1.FeatureName=s2.FeatureName )
-where s1.Class in ('CDS_region','stop_codon') and DWAuditID=:dwAuditID;
-
-
---update cds_pos column
-update FeaturesAnnotation  t1 set t1.CDSPosition=
-( select sum(ABS(endregion-beginregion)+1) from  FeaturesAnnotation  t2 where t2.Rank < t1.Rank
-and t2.FeatureName=t1.FeatureName and  t2.ChromosomeIndex= t1.ChromosomeIndex and t2.DWAuditID=t1.DWAuditID ) where --t1.Strand='+' and  
-t1.DWAuditID=:dwAuditID ;
-
---update where ever start codon cds_pos =0
-update FeaturesAnnotation  set CDSPosition=0 where Rank=0 and 
-DWAuditID=:dwAuditID ;
-
-
-
-END;
-
-
-create or replace procedure P_MutationData(
-		IN sample_list SampleList,
-		IN reference_id NVARCHAR(255), 
-		IN chromosome_index INTEGER, 
-		IN begin_position INTEGER, 
-		IN end_position INTEGER, 
-		OUT mutation_data MutationData,
-		OUT affected_gene AffectedGene
-	)
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY INVOKER
-	READS SQL DATA
-AS
-BEGIN
-	DECLARE sample_count INTEGER;
-
-	SELECT COUNT( * )	INTO sample_count FROM :sample_list;
-  
-	all_mutation = SELECT 
-            VariantAnnotations.MutationType AS MutationType,
-            COUNT( DISTINCT Samples.SampleIndex ) AS SampleCount,
-            VariantAnnotations.GeneName AS GeneName
-	    FROM :sample_list AS Samples
-            JOIN Genotypes AS Genotypes
-                ON Genotypes.SampleIndex = Samples.SampleIndex
-            JOIN  VariantAnnotations AS VariantAnnotations
-                ON Genotypes.DWAuditID = VariantAnnotations.DWAuditID
-                AND Genotypes.VariantIndex = VariantAnnotations.VariantIndex
-		WHERE VariantAnnotations.ChromosomeIndex = :chromosome_index
-		    AND VariantAnnotations.Position < :end_position
-            AND VariantAnnotations.Position >= :begin_position
-		GROUP BY VariantAnnotations.GeneName,
-		    VariantAnnotations.Position,
-		    VariantAnnotations.MutationType
-		ORDER BY GeneName NULLS LAST;
-		
-    affected_gene_list = SELECT CASE WHEN GeneName IS NULL THEN 'intergenic' ELSE GeneName END AS GeneName, 
-	        AVG( SampleCount ) / :sample_count * 100 AS Percent
-		FROM :all_mutation
-		GROUP BY GeneName
-		ORDER BY GeneName ASC;
-		
-	affected_gene = SELECT "affected_gene_list".GeneName, features.Description, "affected_gene_list".Percent
-	    FROM :affected_gene_list AS "affected_gene_list"
-	    LEFT OUTER JOIN Features AS features
-	    ON "affected_gene_list".GeneName = features.FeatureName;
-	 
- 	mutation_per_gene = SELECT CASE WHEN GeneName IS NULL THEN 'intergenic' ELSE GeneName END AS GeneName, MutationType, COUNT ( * ) AS Count
-    	FROM :all_mutation 
-    	GROUP BY GeneName, 
-    	    MutationType
-    	ORDER BY GeneName;
-	
-    totalMutationPerGene = SELECT GeneName, SUM( Count ) AS Count
-    	FROM :mutation_per_gene
-    	GROUP BY GeneName
-    	ORDER BY GeneName;
-	    
-	mutation_data = SELECT "mutation_per_gene".GeneName, "mutation_per_gene".MutationType, "mutation_per_gene".Count / "total_mutation_per_gene".Count AS Percent
-            FROM :mutation_per_gene AS "mutation_per_gene"
-        	     JOIN :totalMutationPerGene AS "total_mutation_per_gene"
-        	      ON "mutation_per_gene".GeneName = "total_mutation_per_gene".GeneName
-        	GROUP BY "mutation_per_gene".GeneName,
-        		"mutation_per_gene".MutationType,
-        		"mutation_per_gene".Count,
-        		"total_mutation_per_gene".Count
-        	ORDER BY "mutation_per_gene".GeneName,
-        	    "mutation_per_gene".MutationType;
-        	    
-END;
-
-
-
-create or replace FUNCTION StripNullBytes ( input NVARCHAR(5000) )
-RETURNS output NVARCHAR(5000)
-LANGUAGE SQLScript AS
-BEGIN
-      DECLARE buffer NVARCHAR(5000) := BINTOHEX( TO_BINARY( input ) );
-      IF :input IS NULL THEN
-        output := NULL;
-      ELSE
-          output := '';
-          WHILE LENGTH( :buffer ) > 1 DO
-                IF SUBSTRING( :buffer, 1, 2 ) <> '00' THEN
-                      output := :output || SUBSTRING( :buffer, 1, 2 );
-                END IF;
-                buffer := SUBSTRING( :buffer, 3 );
-          END WHILE;
-          output := BINTOSTR( HEXTOBIN( :output ) );
-    END IF;
-END;
-
----------- ADDING REARRANGED FUNCTIONS & PROCEDURES FROM HERE ------------
 CREATE OR REPLACE FUNCTION "hc.hph.genomics.db.functions::StripNullBytes" ( input NVARCHAR(5000) )
 RETURNS output NVARCHAR(5000)
 LANGUAGE SQLScript AS
@@ -3817,6 +2898,1484 @@ BEGIN
     
     -- return accessed attributes
     attributes = UNNEST( :schema_array, :table_array, :attribute_array ) AS ( "SchemaName", "TableName", "AttributeName" );
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.internal.db.procedures.annotation::AnnotateFeatures" (
+		IN iProfileAuditID BIGINT,
+		IN dwAuditID BIGINT
+	)
+	LANGUAGE SQLSCRIPT 
+	SQL SECURITY INVOKER
+	AS 
+BEGIN
+
+
+ featWithGene = select
+	 feat."DWAuditID",
+	 feat."ReferenceID",
+	 feat."FeatureID",
+	 feat."ChromosomeIndex",
+	 feat."Class",
+	 feat."FeatureName",
+	 feat."beginregion",
+	 feat."endregion",
+	 feat."Strand",
+	 feat."Frame",
+	 feat."Score",
+	 feat."ParentID",
+	 gene."FeatureID" as GENE 
+from "hc.hph.genomics.db.models::Reference.Features" as feat 
+inner join (select
+	 "FeatureID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion" 
+	from "hc.hph.genomics.db.models::Reference.Features" 
+	where "Class" = 'mRNA' 
+	and "DWAuditID" = dwAuditID) as gene on (feat."ChromosomeIndex" = gene."ChromosomeIndex" 
+	and feat."ParentID"=gene."FeatureID") 
+where feat."DWAuditID" = dwAuditID 
+;
+exons = select
+	 featExon."DWAuditID",
+	 featExon."ReferenceID",
+	 featExon."FeatureID",
+	 featExon."ChromosomeIndex",
+	 featExon."Class",
+	 featExon."FeatureName",
+	 featExon."beginregion",
+	 featExon."endregion",
+	 featExon."Strand",
+	 featExon."Frame",
+	 featExon."Score",
+	 featExon."ParentID",
+	 featExon."GENE",
+	 ROW_NUMBER() over (partition by featExon."ChromosomeIndex",
+	 featExon."GENE" 
+	Order by featExon."beginregion") as "Rank" 
+from :featWithGene as featExon 
+where featExon."Class" = 'exon' 
+order by featExon."ChromosomeIndex",
+	 featExon."GENE",
+	 "Rank" asc 
+;
+cds = select
+	 featCDS."DWAuditID",
+	 featCDS."ReferenceID",
+	 featCDS."FeatureID",
+	 featCDS."ChromosomeIndex",
+	 featCDS."Class",
+	 featCDS."FeatureName",
+	 featCDS."beginregion",
+	 featCDS."endregion",
+	 featCDS."Strand",
+	 featCDS."Frame",
+	 featCDS."Score",
+	 featCDS."ParentID",
+	 featCDS."GENE",
+	 ROW_NUMBER() over (partition by featCDS."ChromosomeIndex",
+	 featCDS."GENE" 
+	Order by featCDS."beginregion") as "Rank" 
+from :featWithGene as featCDS 
+where featCDS."Class" = 'CDS' 
+order by featCDS."ChromosomeIndex",
+	 featCDS."GENE",
+	 "Rank" asc 
+;
+
+--Annotate 5'Prime and 3'Prime UTR
+ -- 5'Prime UTR when the first CDS is within first exon
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+	-- "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost")(select
+	 exon."DWAuditID",
+	 exon."ReferenceID",
+	 exon."ChromosomeIndex",
+	  exon."beginregion" as "beginregion",
+	 (cds."beginregion"-1) as "endregion",
+	case when exon."Strand"='+'  then ('five_prime_UTR' || exon."FeatureID")
+	else ('three_prime_UTR' || exon."FeatureID") end as "FeatureID",
+	case when exon."Strand"='+'  then 'five_prime_UTR' else 'three_prime_UTR' end,
+	 null,
+	 exon."Strand",
+--	 exon."Frame",
+	 exon."Score",
+	 exon."FeatureID",
+	case when exon."Strand"='+'  then 'five_prime_UTR' else 'three_prime_UTR' end,
+	null, null, null
+	from :exons as exon 
+	INNER JOIN :cds as cds on (exon."GENE" = cds."GENE" 
+		and exon."ChromosomeIndex" = cds."ChromosomeIndex" 
+		and cds."Rank" =1 
+		--and cds."beginregion" != exon."beginregion" 
+		and cds."beginregion" between exon."beginregion" 
+		and exon."endregion" )) 
+;
+
+-- 5'Prime UTR when the first CDS is not within first exon this excludes the 5'Prime which is contained in the first cds
+-- All exons that appear before first cds are marked as 5'Prime UTRs
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost")(select
+	 exon."DWAuditID",
+	 exon."ReferenceID",
+	 exon."ChromosomeIndex",
+	 exon."beginregion",
+	 exon."endregion",
+	case when exon."Strand"='+' then ('five_prime_UTR' || exon."FeatureID")
+	else ('three_prime_UTR' || exon."FeatureID") end ,
+case when exon."Strand"='+' then 'five_prime_UTR'
+else 'three_prime_UTR' end,
+	 null,
+	 exon."Strand",
+	 --exon."Frame",
+	 exon."Score",
+	 exon."FeatureID",
+case when exon."Strand"='+' then 'five_prime_UTR'
+else 'three_prime_UTR' end,
+NULL, NULL, NULL
+	from :exons as exon 
+	INNER JOIN :cds as cds on (exon."GENE" = cds."GENE" 
+		and exon."ChromosomeIndex"=cds."ChromosomeIndex" 
+		and (select
+	 "beginregion" 
+			from :cds as innerCDS 
+			where innerCDS."GENE"=exon."GENE" 
+			and innerCDS."ChromosomeIndex"=exon."ChromosomeIndex" 
+			and innerCDS."Rank"=1 
+			and cds."Rank"=1)> exon."endregion" -- and cds."beginregion" > exon."endregion" 
+ 
+		and cds."beginregion" != exon."beginregion") ) 
+;
+-- 3'Prime UTR when the last CDS is  within exon
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+	-- "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost") (select
+	 exon."DWAuditID",
+	 exon."ReferenceID",
+	 exon."ChromosomeIndex",
+	 cds."endregion"+1,
+	 (exon."endregion"),
+case when exon."Strand"='+' then ('three_prime_UTR' || exon."FeatureID")
+else ('five_prime_UTR' || exon."FeatureID") end ,
+	case when exon."Strand"='+' then 'three_prime_UTR'
+	else 'five_prime_UTR' end,
+	 null,
+	 exon."Strand",
+--	 exon."Frame",
+	 exon."Score",
+	 exon."ParentID",
+case when exon."Strand"='+' then 'three_prime_UTR' 
+else 'five_prime_UTR' end,
+NULL, NULL, NULL 
+	from :exons as exon 
+	INNER JOIN :cds as cds on (cds."endregion" != exon."endregion" 
+		and exon."GENE" = cds."GENE" 
+		and exon."ChromosomeIndex" = cds."ChromosomeIndex" 
+		and (select
+	 max(cdsSecondInner."beginregion") 
+			from :cds as cdsSecondInner 
+			where cdsSecondInner."GENE" = exon."GENE" 
+			and cdsSecondInner."ChromosomeIndex" = exon."ChromosomeIndex" 
+			and cds."Rank" = (select
+	 max ("Rank") 
+				from :cds as innerCDS 
+				where innerCDS."GENE" = exon."GENE" 
+				and innerCDS."ChromosomeIndex" = exon."ChromosomeIndex")) between exon."beginregion" 
+		and exon."endregion" ) ) 
+;
+ -- 3'Prime UTR after the last CDS. All exons after last CDS are marked as 3'Prime
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost")(select
+	 distinct exon."DWAuditID",
+	 exon."ReferenceID",
+	 exon."ChromosomeIndex",
+	 exon."beginregion",
+	 exon."endregion",
+	 case when exon."Strand"='+' then ('three_prime_UTR' || exon."FeatureID")
+	 else ('five_prime_UTR' || exon."FeatureID") end,
+	 case when exon."Strand"='+' then 'three_prime_UTR'
+	 else 'five_prime_UTR' end ,
+	 null,
+	 exon."Strand",
+--	 exon."Frame",
+	 exon."Score",
+	 exon."FeatureID",
+	 case when exon."Strand"='+' then 'three_prime_UTR' 
+	 else 'five_prime_UTR' end,
+NULL, NULL, NULL
+	from :exons as exon 
+	INNER JOIN :cds as cds on (exon."GENE" = cds."GENE" 
+		and exon."beginregion" > (select
+	 max(innerCDS."endregion" ) 
+			from :cds as innerCDS 
+			where innerCDS."GENE" = exon."GENE" 
+			and innerCDS."ChromosomeIndex" = exon."ChromosomeIndex") ) ) 
+;
+
+
+ --Annotate introns
+introns = select
+	 T1."DWAuditID",
+	 T1."ReferenceID",
+	 T1."ChromosomeIndex",
+	 T1."endregion"+4 as "beginregion",
+	 T2."beginregion"-4 as "endregion",
+	 T1."GENE"||'intron'||T1."Rank" as "FeatureID",
+	 'intron' as "Class",
+	 T1."GENE"||'intron'||T1."Rank" as "Name",
+	 T1."Strand",
+--	 T1."Frame",
+	 T1."Score",
+	 T1."ParentID" as "ParentID",
+	 'intron' as "Description" 
+from :exons as T1 
+INNER JOIN :exons as T2 on (T1."endregion" < T2."endregion" 
+	and T1."Rank" =T2."Rank"-1 
+	and T1."ChromosomeIndex"=T2."ChromosomeIndex" 
+	and T1."GENE"=T2."GENE" 
+	and T1."Rank" <T2."Rank") 
+order by T1."GENE" 
+;
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost") (select
+	 introns."DWAuditID",
+	 introns."ReferenceID",
+	 introns."ChromosomeIndex",
+	 introns."beginregion",
+	 introns."endregion",
+	 introns."FeatureID",
+	 introns."Class",
+	 null,
+	 introns."Strand",
+	-- introns."Frame",
+	 introns."Score",
+	 introns."ParentID",
+	 introns."Description",
+NULL, NULL, NULL 
+	from :introns as introns 
+	where introns."beginregion" < introns."endregion") 
+;
+
+
+ --Annotate trans_splice_donor_site
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+	 --"Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost") (select
+	 introns."DWAuditID",
+	 introns."ReferenceID",
+	 introns."ChromosomeIndex",
+	 introns."beginregion"-3,
+	 introns."beginregion"-1,
+	 introns."FeatureID" ||'trans_splice_donor_site',
+	 'trans_splice_donor_site',
+	 null,
+	 introns."Strand",
+	-- introns."Frame",
+	 introns."Score",
+	 introns."ParentID",
+	 'trans_splice_donor_site',
+NULL, NULL, NULL 
+	from :introns as introns) 
+;
+
+
+ --Annotate trans_splice_acceptor_site
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+	-- "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost") (select
+	 introns."DWAuditID",
+	 introns."ReferenceID",
+	 introns."ChromosomeIndex",
+	 introns."endregion"+1,
+	 introns."endregion"+3,
+	 introns."FeatureID" ||'trans_splice_acceptor_site',
+	 'trans_splice_acceptor_site',
+	 null,
+	 introns."Strand",
+--	 introns."Frame",
+	 introns."Score",
+	 introns."ParentID",
+	 'trans_splice_acceptor_site',
+NULL, NULL, NULL 
+	from :introns as introns) 
+;
+
+ --Annotate intergenic regions
+intergenic_region = select
+	 feat."DWAuditID",
+	 feat."ReferenceID",
+	 feat."FeatureID",
+	 feat."ChromosomeIndex",
+	 feat."Class",
+	 feat."FeatureName",
+	 feat."beginregion",
+	 feat."endregion",
+	 feat."Strand",
+	-- feat."Frame",
+	 feat."Score",
+	 feat."ParentID",
+	 ROW_NUMBER() over (partition by feat."ChromosomeIndex" 
+	Order by feat."beginregion") as "Rank" 
+from "hc.hph.genomics.db.models::Reference.Features" as feat 
+where feat."Class"='gene' 
+and feat."DWAuditID" = dwAuditID 
+;
+ insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+	-- "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence", "Rank", "PrePost") (select
+	 T1."DWAuditID",
+	 T1."ReferenceID",
+	 T1."ChromosomeIndex",
+	 T1."endregion"+1,
+	 T2."beginregion"-1,
+	 T1."FeatureID"||'intergenic_region'||T1."Rank",
+	 'intergenic_region',
+	 null,
+	 T1."Strand",
+--	 T1."Frame",
+	 T1."Score",
+	 T1."ParentID",
+	 'intergenic_region',
+NULL, NULL, NULL 
+	from :intergenic_region as T1 
+	INNER JOIN :intergenic_region as T2 on (T1."Rank" =T2."Rank"-1 
+		and T1."ChromosomeIndex"=T2."ChromosomeIndex") 
+	and T2."beginregion" > T1."endregion"+1 
+	order by T1."ChromosomeIndex") 
+;
+
+
+ --Annotate start and stop codons
+cdsGroup = select
+	 feat."DWAuditID",
+	 feat."ReferenceID",
+	 feat."FeatureID",
+	 feat."ChromosomeIndex",
+	 feat."Class",
+	 feat."FeatureName",
+	 feat."beginregion",
+	 feat."endregion",
+	 feat."Strand",
+	-- feat."Frame",
+	 feat."Score",
+	 feat."ParentID",
+	case when feat."Strand" = '+' then
+	  ROW_NUMBER() over (partition by feat."ChromosomeIndex",
+	 feat."FeatureName" 
+	Order by feat."beginregion") 
+else
+ ROW_NUMBER() over (partition by feat."ChromosomeIndex",
+feat."FeatureName" 
+Order by feat."beginregion" desc) end
+	as "Rank",	
+	 feat."Description" 
+from "hc.hph.genomics.db.models::Reference.Features" as feat 
+where "Class"='CDS' 
+and feat."FeatureName" is not null 
+and TRIM(COALESCE(feat."FeatureName",'')) != '' 
+and feat."DWAuditID" = :dwAuditID order by feat."FeatureName",feat."beginregion"
+;
+
+
+
+insert into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID","ChromosomeIndex","beginregion","endregion","FeatureID","Class","FeatureName",
+	  "Strand",
+	  --"Frame",
+	  "Score", "ParentID", "Description","Sequence","Rank","PrePost") (
+	 select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+	 case when cdsGroup."Strand" = '+' then
+	 cdsGroup."beginregion" else 
+	 cdsGroup."endregion"-2 end as "beginregion" ,
+	 case when cdsGroup."Strand" = '+' then
+	 cdsGroup."beginregion" +2
+	 else 
+	 	 cdsGroup."endregion" end
+	  as "endregion",
+	'start_codon_' ||cdsGroup."FeatureID" ,
+     'start_codon' ,
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+	-- cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."FeatureName",
+	 'start_codon' ,
+	'' as "Sequence",
+	0 as "Rank",
+	NULL AS "PrePost"
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' 
+	and cdsGroup."Rank" = 1) 
+;
+
+
+insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	 "Sequence","Rank","PrePost") (select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+	 case when cdsGroup."Strand" = '+'  then
+	 cdsGroup."endregion"-2
+	 else 	 cdsGroup."beginregion" end as "beginregion",
+	 case when cdsGroup."Strand" = '+'  then
+	 cdsGroup."endregion"
+	 else cdsGroup."beginregion"+2 end as "endregion",
+	 'stop_codon_' ||cdsGroup."FeatureID" ,
+	'stop_codon' ,
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+--	 cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."FeatureName",
+	 'stop_codon' ,
+	'' as "Sequence",
+	(cdsGroup."Rank"+1) as "Rank",
+	NULL AS "PrePost"
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' 
+	and cdsGroup."Rank" =(select
+	 max(cdsGroupInner."Rank") 
+		from :cdsGroup as cdsGroupInner 
+		where cdsGroup."FeatureName" = cdsGroupInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupInner."ChromosomeIndex" 
+		group by cdsGroupInner."FeatureName")) 
+;
+
+ --Annotate CDS
+ insert --for in-between cds eg cds 2, cds3 and cds4 in a cds1-cds5 range of CDS's
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+	  "Sequence","Rank","PrePost") (select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+	 cdsGroup."beginregion",
+	 cdsGroup."endregion",
+	 cdsGroup."FeatureID",
+	 'CDS_region',
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+--	 cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."ParentID",
+	 cdsGroup."Description",
+	 '' as "Sequence",
+	  cdsGroup."Rank" as "Rank",
+	  NULL AS "PrePost"
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' -- and cdsGroup."endregion"-cdsGroup."beginregion" >3 
+ 
+	and cdsGroup."Rank" >(select
+	 min(cdsGroupMinInner."Rank") 
+		from :cdsGroup as cdsGroupMinInner 
+		where cdsGroup."FeatureName" = cdsGroupMinInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupMinInner."ChromosomeIndex" 
+		group by cdsGroupMinInner."FeatureName") 
+	and cdsGroup."Rank" < (select
+	 max(cdsGroupInner."Rank") 
+		from :cdsGroup as cdsGroupInner 
+		where cdsGroup."FeatureName" = cdsGroupInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupInner."ChromosomeIndex" 
+		group by cdsGroupInner."FeatureName") ) 
+;
+
+
+insert -- for cds1 in a cds-range  whose length > 1 and cds1 is not the start codon i.e length =3 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+ "Sequence","Rank","PrePost") (select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+case when cdsGroup."Strand"='+' then
+	 cdsGroup."beginregion"+3 
+	 else cdsGroup."beginregion"
+	 end as "beginregion",
+	 case when cdsGroup."Strand"='+' then
+	 cdsGroup."endregion"
+	 else cdsGroup."endregion" -3  end
+	 as "endregion",
+	 cdsGroup."FeatureID",
+	 'CDS_region',
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+--	 cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."ParentID",
+	 cdsGroup."Description",
+	 '' as "Sequence",
+	 cdsGroup."Rank" as "Rank",
+	 NULL AS "PrePost" 
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' 
+	and cdsGroup."Rank" = 1 
+	and ( cdsGroup."endregion"-cdsGroup."beginregion" +1 ) >3 
+	and (select
+	 max(cdsGroupInner."Rank") 
+		from :cdsGroup as cdsGroupInner 
+		where cdsGroup."FeatureName" = cdsGroupInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupInner."ChromosomeIndex" 
+		group by cdsGroupInner."FeatureName") >1) 
+;
+
+ insert -- for cds1 in a cds-range  whose length = 1 and cds1 is not the start codon i.e length =3 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description",
+ "Sequence","Rank","PrePost") (select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+	 cdsGroup."beginregion"+3,
+	 cdsGroup."endregion"-3,
+	 cdsGroup."FeatureID",
+	 'CDS_region',
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+--	 cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."ParentID",
+	 cdsGroup."Description", 
+	  '' as "Sequence",
+	 	 cdsGroup."Rank" as "Rank",
+	 	 NULL AS "PrePost"
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' 
+	and cdsGroup."Rank" = 1 
+	and ( cdsGroup."endregion"-cdsGroup."beginregion" +1 )>3 
+	and (select
+	 max(cdsGroupInner."Rank") 
+		from :cdsGroup as cdsGroupInner 
+		where cdsGroup."FeatureName" = cdsGroupInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupInner."ChromosomeIndex" 
+		group by cdsGroupInner."FeatureName") =1) 
+;
+
+-- for last cds eg cds 5 in a cds1-cds5 range of CDS's
+ insert 
+into "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" ("DWAuditID",
+	 "ReferenceID",
+	 "ChromosomeIndex",
+	 "beginregion",
+	 "endregion",
+	 "FeatureID",
+	 "Class",
+	 "FeatureName",
+	 "Strand",
+--	 "Frame",
+	 "Score",
+	 "ParentID",
+	 "Description","Sequence","Rank","PrePost") (select
+	 cdsGroup."DWAuditID",
+	 cdsGroup."ReferenceID",
+	 cdsGroup."ChromosomeIndex",
+case when cdsGroup."Strand"='+' then
+	 cdsGroup."beginregion" 
+	 else cdsGroup."beginregion"+3 end  as "beginregion",
+case when cdsGroup."Strand"='+' then
+	 cdsGroup."endregion"-3
+	 else cdsGroup."endregion" end as "endregion",
+	 cdsGroup."FeatureID",
+	 'CDS_region',
+	 cdsGroup."FeatureName",
+	 cdsGroup."Strand",
+--	 cdsGroup."Frame",
+	 cdsGroup."Score",
+	 cdsGroup."ParentID",
+	 cdsGroup."Description", 
+	 '' as "Sequence",
+     cdsGroup."Rank" as "Rank",
+     NULL AS "PrePost"
+	from :cdsGroup as cdsGroup 
+	where cdsGroup."FeatureName" is not null 
+	and TRIM(COALESCE(cdsGroup."FeatureName",
+	 '')) != '' 
+	and ( cdsGroup."endregion"-cdsGroup."beginregion" +1 ) >3 
+	and cdsGroup."Rank" >1 
+	and cdsGroup."Rank" =(select
+	 max(cdsGroupInner."Rank") 
+		from :cdsGroup as cdsGroupInner 
+		where cdsGroup."FeatureName" = cdsGroupInner."FeatureName" 
+		and cdsGroup."ChromosomeIndex" = cdsGroupInner."ChromosomeIndex" 
+		group by cdsGroupInner."FeatureName")) 
+;
+
+
+--Rank correction for cds rank and stop codon
+update "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  s1 set s1."Rank"=(select s1."Rank" -(s2.minRank-1) from  
+(select "FeatureName",min("Rank") as minRank from "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  where "ChromosomeIndex"=s1."ChromosomeIndex" 
+and "Class" ='CDS_region' group by "FeatureName" ) as s2
+where s1."FeatureName"=s2."FeatureName" )
+where s1."Class" in ('CDS_region','stop_codon') and "DWAuditID"=:dwAuditID;
+
+
+--update cds_pos column
+update "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  t1 set t1."CDSPosition"=
+( select sum(ABS("endregion"-"beginregion")+1) from  "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  t2 where t2."Rank" < t1."Rank"
+and t2."FeatureName"=t1."FeatureName" and  t2."ChromosomeIndex"= t1."ChromosomeIndex" and t2."DWAuditID"=t1."DWAuditID" ) where --t1."Strand"='+' and  
+t1."DWAuditID"=:dwAuditID ;
+
+--update where ever start codon cds_pos =0
+update "hc.hph.genomics.db.models::Reference.FeaturesAnnotation"  set "CDSPosition"=0 where "Rank"=0 and 
+"DWAuditID"=:dwAuditID ;
+
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.plugins.vcf.db.procedures.annotation::VCFNegativeStrandAnnotation" (IN geneAnnotationNonCoding "hc.hph.plugins.vcf.db.models::Staging.geneNonCodingType",
+	 IN dwAuditID int,
+	 IN dwAuditIDFeatureTable int,
+	 OUT geneAnnotationCoding "hc.hph.plugins.vcf.db.models::Staging.geneCodingType") Language SQLSCRIPT SQL SECURITY INVOKER AS 
+begin geneAnnotationCoding=select
+	 geneAnnotationNonCoding."DWAuditID",
+	 geneAnnotationNonCoding."VariantIndex",
+	 geneAnnotationNonCoding."ChromosomeIndex",
+	 geneAnnotationNonCoding."Position",
+	 geneAnnotationNonCoding."AlleleIndex",
+	 geneAnnotationNonCoding."ALTALLELE",
+	 geneAnnotationNonCoding."REFALLELE",
+	 geneAnnotationNonCoding."VT",
+	 geneAnnotationNonCoding."GENENAME",
+	 geneAnnotationNonCoding."Region",
+	 geneAnnotationNonCoding."Class",
+	 case when geneAnnotationNonCoding."Class" not in ('CDS_region',
+	 'start_codon',
+	 'stop_codon',
+	 'five_prime_UTR',
+	 'three_prime_UTR') 
+then null 
+--case 1 --pos 1 and pos= cds begin + get 2 from previous CDS 
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=0 
+and geneAnnotationNonCoding."Position" =  Seq."beginregion"
+and Seq."Rank" >1 
+then concat (SUBSTRING (Seq."PrePost",1,2),geneAnnotationNonCoding."REFALLELE")
+
+--case 2 --pos 1 and pos= cds begin +1 last NB lies in prev line  
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+3)=0 
+and geneAnnotationNonCoding."Position" = Seq."beginregion"+1 
+and Seq."Rank" >1 
+then SUBSTRING (Seq."PrePost",2,1)|| SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 1,--SUBSTRING(TO_CHAR("Sequence"),geneAnnotationNonCoding."Position"-Seq."beginregion"+1)-1
+	 2) 
+-- pos 1  ideal case snip prev 2 NB 
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=0 
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" +1)-2,
+	 3) 
+	 
+
+-- position 2 and 1 nucleotide in next line --case 6
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=1 
+and  geneAnnotationNonCoding."Position" = Seq."endregion" - 1
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" +1 )-1,
+	 2) || SUBSTRING(Seq."PrePost",3,1) 
+	 
+	 -- position 2 and 1 nucleotide in previous line --case 7
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=1 
+and Seq."beginregion" = geneAnnotationNonCoding."Position" 
+and Seq."Rank" >1 
+then SUBSTRING(Seq."PrePost",
+	 2,
+	 1) || SUBSTRING(TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" +1 ),
+	 2) 
+ 
+ -- position 2  --case 2 - ideal case go one NB back and snip 3 
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=1 
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" + 1 )-1,
+	 3) 
+-- pos 3 and 1 nucleotide in next line --case 3
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=2 
+and  geneAnnotationNonCoding."Position" = (Seq."endregion"-1)-1
+then SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" +1 ),
+	 2) || SUBSTRING(Seq."PrePost",3,1)
+	  
+-- pos 3 and 2 nucleotides in next line --case 4
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=2 
+and geneAnnotationNonCoding."Position" = Seq."endregion" -1
+then geneAnnotationNonCoding."REFALLELE" || SUBSTRING(Seq."PrePost",
+	 3,2)
+	 
+ -- position 3 ideal case  --case 8
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=2 
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" + 1 ),
+	 3) 
+END as REFCODON,
+	 --geneAnnotationNonCoding."ALTALLELE",
+case when geneAnnotationNonCoding."Class" not in ('CDS_region',
+	 'start_codon',
+	 'stop_codon',
+	 'five_prime_UTR',
+	 'three_prime_UTR') 
+then null 
+--case 1 --pos 1 and pos= cds begin + get 2 from previous CDS 
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=0 
+and geneAnnotationNonCoding."Position" =  Seq."beginregion"
+and Seq."Rank" >1 
+then concat (SUBSTRING (Seq."PrePost",1,2),geneAnnotationNonCoding."ALTALLELE")
+
+--case 2 --pos 1 and pos= cds begin +1 last NB lies in prev line  
+when mod(abs((Seq."endregion"-1) - geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+3)=0 
+and geneAnnotationNonCoding."Position" = Seq."beginregion"+1 
+and Seq."Rank" >1 
+then SUBSTRING (Seq."PrePost",2,1)|| SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 1,--SUBSTRING(TO_CHAR("Sequence"),geneAnnotationNonCoding."Position"-Seq."beginregion"+1)-1
+	 1)||geneAnnotationNonCoding."ALTALLELE" 
+-- pos 1  ideal case snip prev 2 NB 
+when mod(abs( (Seq."endregion"-1) -geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=0 
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" +1)-2,
+	 2) ||geneAnnotationNonCoding."ALTALLELE"
+	 
+
+-- position 2 and 1 nucleotide in next line --case 6
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=1 
+and  geneAnnotationNonCoding."Position" = Seq."endregion" - 1
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" +1 )-1,
+	 1)|| geneAnnotationNonCoding."ALTALLELE" || SUBSTRING(Seq."PrePost",3,1) 
+	 
+	 -- position 2 and 1 nucleotide in previous line --case 7
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=1 
+and Seq."beginregion" = geneAnnotationNonCoding."Position" 
+and Seq."Rank" >1 
+then SUBSTRING(Seq."PrePost",
+	 2,
+	 1) ||geneAnnotationNonCoding."ALTALLELE"|| SUBSTRING(TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" +1 )+1,
+	 1) 
+ 
+ -- position 2  --case 2 - ideal case go one NB back and snip 3 
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=1 
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" + 1 )-1,
+	 1)||geneAnnotationNonCoding."ALTALLELE"|| SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" + 1 )+1,
+	 1)
+-- pos 3 and 1 nucleotide in next line --case 3
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=2 
+and  geneAnnotationNonCoding."Position" = (Seq."endregion"-1)-1
+then geneAnnotationNonCoding."ALTALLELE"|| SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" +1 )+1,
+	 1) || SUBSTRING(Seq."PrePost",3,1)
+	  
+-- pos 3 and 2 nucleotides in next line --case 4
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=2 
+and geneAnnotationNonCoding."Position" = Seq."endregion" -1
+then geneAnnotationNonCoding."ALTALLELE" || SUBSTRING(Seq."PrePost",
+	 3,2)
+	 
+ -- position 3 ideal case  --case 8
+when mod(abs((Seq."endregion"-1)-geneAnnotationNonCoding."Position")+Seq."CDSPosition",
+	 3)=2 
+THEN geneAnnotationNonCoding."ALTALLELE"|| SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 abs(geneAnnotationNonCoding."Position"-Seq."beginregion" + 1 )+1,
+	 2) 
+END as "ALTCODON",
+	 geneAnnotationNonCoding."Strand",
+	 abs( ( Seq."endregion" - 1 ) - geneAnnotationNonCoding."Position")+Seq."CDSPosition" as "CDSPosition",
+	 geneAnnotationNonCoding."Transcript" as "Transcript",
+	 geneAnnotationNonCoding."FeatureName" as "Protein",
+	 geneAnnotationNonCoding."ExonRank" as "ExonRank",
+	 geneAnnotationNonCoding."RunAuditID"
+from :geneAnnotationNonCoding as geneAnnotationNonCoding 
+left outer join "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" as Seq on (Seq."ChromosomeIndex"=geneAnnotationNonCoding."ChromosomeIndex" 
+	and geneAnnotationNonCoding."Position" between Seq."beginregion" 
+	and Seq."endregion"-1 
+	and Seq."FeatureName"= geneAnnotationNonCoding."FeatureName"
+	and Seq."Transcript"= geneAnnotationNonCoding."Transcript"
+	and (geneAnnotationNonCoding."DWAuditID" = :dwAuditID 
+		or :dwAuditID is null) 
+	and Seq."RunAuditID" = :dwAuditIDFeatureTable) --and Seq."Strand"='+'--and LENGTH(Seq."PrePost") >=2
+ 
+where geneAnnotationNonCoding."AlleleIndex" >0 
+and (geneAnnotationNonCoding."DWAuditID" = :dwAuditID 
+	or :dwAuditID is null) 
+and geneAnnotationNonCoding."Class" in ('CDS_region',
+	 'start_codon',
+	 'stop_codon',
+	 'five_prime_UTR',
+	 'three_prime_UTR') 
+order by geneAnnotationNonCoding."Position" 
+;
+ 
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.plugins.vcf.db.procedures.annotation::VCFPositiveStrandAnnotation" (IN geneAnnotationNonCoding "hc.hph.plugins.vcf.db.models::Staging.geneNonCodingType",
+	 IN dwAuditID int,
+	 IN dwAuditIDFeatureTable int,
+	 OUT geneAnnotationCoding "hc.hph.plugins.vcf.db.models::Staging.geneCodingType") Language SQLSCRIPT SQL SECURITY INVOKER AS 
+begin geneAnnotationCoding = select
+	 geneAnnotationNonCoding."DWAuditID",
+	 geneAnnotationNonCoding."VariantIndex",
+	 geneAnnotationNonCoding."ChromosomeIndex",
+	 geneAnnotationNonCoding."Position",
+	 geneAnnotationNonCoding."AlleleIndex",
+	 geneAnnotationNonCoding."ALTALLELE",
+	 geneAnnotationNonCoding."REFALLELE",
+	 geneAnnotationNonCoding."VT",
+	 geneAnnotationNonCoding."GENENAME",
+	 geneAnnotationNonCoding."Region",
+	 geneAnnotationNonCoding."Class",
+	 -- Accounting for 0 based index by adding 1
+case -- position 3 and 2 nucleotide in previous line
+when geneAnnotationNonCoding."Class" not in ('CDS_region',
+	 'start_codon',
+	 'stop_codon',
+	 'five_prime_UTR',
+	 'three_prime_UTR') 
+then null 
+ -- 2nd position in the last sequence get one nucleotide from the post
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=1 
+and geneAnnotationNonCoding."Position" = Seq."endregion" -1  --and Seq."beginregion" = geneAnnotationNonCoding."Position"
+and Seq."Rank" >1 --do we need this 
+then SUBSTRING (TO_CHAR(Seq."Sequence"),
+	(geneAnnotationNonCoding."Position"-Seq."beginregion"+1)-1,
+	2)|| SUBSTRING (Seq."PrePost",
+	3,
+	1) 
+-- 2nd position in the first sequence get one nucleotide from pre
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=1 
+and geneAnnotationNonCoding."Position" = Seq."beginregion" 
+and Seq."Rank" >1 
+then SUBSTRING (Seq."PrePost",
+	2,
+	1)|| SUBSTRING (TO_CHAR(Seq."Sequence"),
+	1,--geneAnnotationNonCoding."Position"-Seq."beginregion"+1,
+	2) 
+-- 2nd position   --case 2 --ideal
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=1 
+THEN SUBSTRING(TO_CHAR(Seq."Sequence"),
+	(geneAnnotationNonCoding."Position"-Seq."beginregion"+1)-1, --one NB back and extract 3
+	3) 
+
+-- 3rd position in the second CDS, get 2 nucleotides from the pre
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=2 
+and geneAnnotationNonCoding."Position" = Seq."beginregion" 
+then SUBSTRING(Seq."PrePost",
+	1,
+	2) || SUBSTRING (TO_CHAR(Seq."Sequence"),
+	1,--geneAnnotationNonCoding."Position"-Seq."beginregion"+1,
+	1) 
+-- 3rd position in the second CDS, get 1 nucleotide from the pre --case 4
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=2 
+and geneAnnotationNonCoding."Position" = Seq."beginregion"+1 
+then SUBSTRING(Seq."PrePost",
+	2,
+	1) || SUBSTRING (TO_CHAR(Seq."Sequence"),
+	1,--(geneAnnotationNonCoding."Position"-Seq."beginregion"+1)-1,
+	2) 
+-- position 3  ideal case
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=2 
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 (geneAnnotationNonCoding."Position"-Seq."beginregion"+1)-2,--two NB back and extract 3
+	 3) 
+-- position 1 one nucleotide in sequence end get other two from post
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=0 
+and geneAnnotationNonCoding."Position" = Seq."endregion"-1 
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	(geneAnnotationNonCoding."Position"-Seq."beginregion"+1),
+	1)|| SUBSTRING(Seq."PrePost",
+	3,
+	2) 
+-- position 1 2 nucleotide in sequence end-1 get other 1 from post
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=0 
+and geneAnnotationNonCoding."Position"+1 = Seq."endregion"-1 
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	(geneAnnotationNonCoding."Position"-Seq."beginregion"+1),
+	2)|| SUBSTRING(Seq."PrePost",
+	3,
+	1) 
+-- position 1 ideal
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=0 
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	geneAnnotationNonCoding."Position"-Seq."beginregion"+1,
+	3) 
+END as REFCODON,
+	 case when geneAnnotationNonCoding."Class" not in ('CDS_region',
+	 'start_codon',
+	 'stop_codon',
+	 'five_prime_UTR',
+	 'three_prime_UTR') 
+then null 
+-- 2nd position in the last index of cds get one nucleotide from the post --geneAnnotationNonCoding."ALTALLELE"
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=1 
+and geneAnnotationNonCoding."Position" = Seq."endregion" -1  --and Seq."beginregion" = geneAnnotationNonCoding."Position"
+and Seq."Rank" >1 --do we need this 
+then SUBSTRING (TO_CHAR(Seq."Sequence"),
+	(geneAnnotationNonCoding."Position"-Seq."beginregion"+1)-1,
+	1)|| geneAnnotationNonCoding."ALTALLELE"|| SUBSTRING (Seq."PrePost",3,1)
+-- 2nd position in the first index get one nucleotide from pre
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=1 
+and geneAnnotationNonCoding."Position" = Seq."beginregion" 
+and Seq."Rank" >1 
+then SUBSTRING (Seq."PrePost",
+	2,
+	1)|| geneAnnotationNonCoding."ALTALLELE"|| SUBSTRING (TO_CHAR(Seq."Sequence"),
+	2,--(geneAnnotationNonCoding."Position"-Seq."beginregion"+1)+1,
+	1) 
+-- 2nd position   --case 2 --ideal
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=1 
+THEN SUBSTRING(TO_CHAR(Seq."Sequence"),
+	(geneAnnotationNonCoding."Position"-Seq."beginregion"+1)-1, --one NB back and extract 1
+	1)||geneAnnotationNonCoding."ALTALLELE"|| 
+    SUBSTRING(TO_CHAR(Seq."Sequence"),
+	(geneAnnotationNonCoding."Position"-Seq."beginregion"+1)+1, --one NB front and extract 1
+	1) 
+-- 3rd position in the second CDS, get 2 nucleotides from the pre
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=2 
+and geneAnnotationNonCoding."Position" = Seq."beginregion" 
+then SUBSTRING(Seq."PrePost",
+	1,
+	2) || geneAnnotationNonCoding."ALTALLELE"
+-- 3rd position in the second CDS, get 1 nucleotide from the pre --case 4
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=2 
+and geneAnnotationNonCoding."Position" = Seq."beginregion"+1 
+then SUBSTRING(Seq."PrePost",
+	2,
+	1) ||  SUBSTRING (TO_CHAR(Seq."Sequence"),
+	1,--(geneAnnotationNonCoding."Position"-Seq."beginregion"+1)-1
+	1)||geneAnnotationNonCoding."ALTALLELE" 
+-- position 3  ideal case
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=2 
+THEN SUBSTRING (TO_CHAR(Seq."Sequence"),
+	 (geneAnnotationNonCoding."Position"-Seq."beginregion"+1)-2,--two NB back and extract 3
+	 2)||geneAnnotationNonCoding."ALTALLELE" 
+	 
+	 
+-- position 1 one nucleotide in sequence end get other two from post
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=0 
+and geneAnnotationNonCoding."Position" = Seq."endregion"-1 
+THEN geneAnnotationNonCoding."ALTALLELE"||  SUBSTRING(Seq."PrePost",
+	3,
+	2) 
+-- position 1 ...2 nucleotide in sequence end-1 get other 1 from post
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=0 
+and geneAnnotationNonCoding."Position"+1 = Seq."endregion"-1 
+THEN geneAnnotationNonCoding."ALTALLELE"|| SUBSTRING (TO_CHAR(Seq."Sequence"),
+	(geneAnnotationNonCoding."Position"-Seq."beginregion"+1)+1,
+	1)|| SUBSTRING(Seq."PrePost",
+	3,
+	1) 
+-- position 1 ideal
+when mod(abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition",
+	3)=0 
+THEN geneAnnotationNonCoding."ALTALLELE"||SUBSTRING (TO_CHAR(Seq."Sequence"),
+	(geneAnnotationNonCoding."Position"-Seq."beginregion"+1)+1,--go to next NB and extract 2 
+	2) 
+END as "ALTCODON",
+	 geneAnnotationNonCoding."Strand",
+	 (abs(geneAnnotationNonCoding."Position"-Seq."beginregion")+Seq."CDSPosition") as "CDSPosition" ,
+	 geneAnnotationNonCoding."Transcript" as "Transcript",
+	 geneAnnotationNonCoding."FeatureName" as "Protein",
+	 geneAnnotationNonCoding."ExonRank" as "ExonRank",
+	 geneAnnotationNonCoding."RunAuditID"
+from :geneAnnotationNonCoding as geneAnnotationNonCoding 
+left outer join "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" as Seq on (Seq."ChromosomeIndex"=geneAnnotationNonCoding."ChromosomeIndex" 
+	and geneAnnotationNonCoding."Position" between Seq."beginregion" 
+	and Seq."endregion"-1 
+	and Seq."FeatureName"= geneAnnotationNonCoding."FeatureName"
+	and Seq."Transcript"= geneAnnotationNonCoding."Transcript"
+	and (geneAnnotationNonCoding."DWAuditID" = :dwAuditID 
+		or :dwAuditID is null) 
+	and Seq."RunAuditID" = :dwAuditIDFeatureTable) --and Seq."Strand"='+'--and LENGTH(Seq."PrePost") >=2
+       
+where geneAnnotationNonCoding."AlleleIndex" >0 
+and (geneAnnotationNonCoding."DWAuditID" = :dwAuditID 
+	or :dwAuditID is null) 
+and geneAnnotationNonCoding."Class" in ('CDS_region',
+	'start_codon',
+	 'stop_codon',
+	'five_prime_UTR',
+	'three_prime_UTR') 
+order by geneAnnotationNonCoding."Position"
+;
+ 
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.internal.db.procedures.annotation::AnnotateVCF" ( 
+		IN dwAuditID BIGINT,
+	 	IN dwAuditIDFeatureTable BIGINT
+	 ) 
+	 Language SQLSCRIPT 
+	 SQL SECURITY DEFINER 
+	 AS 
+begin 
+
+declare referenceID String ;
+select distinct "ReferenceID" 
+into referenceID 
+from "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" 
+where "DWAuditID"= :dwAuditIDFeatureTable ;
+
+delete from "hc.hph.genomics.db.models::SNV.VariantAnnotations"  where "DWAuditID"=:dwAuditID;
+
+ geneAnnotationNonCoding = select
+	 va."DWAuditID",
+	 va."VariantIndex",
+	 variants."ChromosomeIndex",
+	 variants."Position",
+	 va."AlleleIndex",
+	 va."Allele" as ALTALLELE,
+	 ref."Allele" as REFALLELE,
+ 	 featAnnotate."FeatureName" as "FeatureName",
+	 featAnnotate."Class",
+	 case when length(ref."Allele") = length(va."Allele") 
+THEN case when length(ref."Allele") =1 
+THEN 'SNP' 
+ELSE 'MNP' 
+END 
+ELSE case WHEN length(ref."Allele") > length(va."Allele") 
+THEN CASE WHEN locate(ref."Allele",
+	 va."Allele") > 0 
+THEN 'DEL' 
+ELSE 'MIXED' 
+END 
+ELSE CASE WHEN length(va."Allele") >length(ref."Allele") 
+THEN CASE WHEN locate(va."Allele",
+	 ref."Allele") >0 
+THEN 'INS' 
+ELSE 'MIXED' 
+END 
+END 
+END 
+END as vt,
+	 (case when featAnnotate."Class" = 'intergenic_region' 
+	then null 
+	else innerFeat."FeatureID" 
+	end) as "GENENAME",
+	 featAnnotate."Class" as "Region",
+	 featAnnotate."Strand" 
+	 
+from "hc.hph.genomics.db.models::SNV.VariantAlleles" as va 
+inner join "hc.hph.genomics.db.models::SNV.Variants" as variants on (va."VariantIndex" = variants."VariantIndex" 
+	and va."AlleleIndex" >0 
+	and (variants."DWAuditID" = :dwAuditID 
+		or :dwAuditID is null) 
+	and variants."DWAuditID" = va."DWAuditID") 
+inner join "hc.hph.genomics.db.models::Reference.Chromosomes" as chromosomes on (variants."ChromosomeIndex" = chromosomes."ChromosomeIndex" 
+	and (va."DWAuditID" = :dwAuditID 
+		or :dwAuditID is null) 
+	and chromosomes."ReferenceID"=:referenceID) 
+inner join (select
+	 "Allele",
+	 "DWAuditID",
+	 "VariantIndex" 
+	from "hc.hph.genomics.db.models::SNV.VariantAlleles" 
+	where "AlleleIndex" =0 
+	and ("DWAuditID"=:dwAuditID 
+		or :dwAuditID is null))as ref on (ref."VariantIndex" = va."VariantIndex" 
+	and ref."DWAuditID" = va."DWAuditID" 
+	and (ref."DWAuditID"=:dwAuditID 
+		or :dwAuditID is null) 
+	and va."AlleleIndex" >0) 
+left outer join "hc.hph.genomics.db.models::Reference.Features" as innerFeat on (innerFeat."ChromosomeIndex" = variants."ChromosomeIndex" 
+	and innerFeat."Class" ='gene' 
+	and variants."Position" between innerFeat."beginregion" 
+	and innerFeat."endregion"-1 
+	and (variants."DWAuditID" = :dwAuditID 
+		or :dwAuditID is null) --can we skip this and use only FA table
+	and innerFeat."DWAuditID"= :dwAuditIDFeatureTable) 
+left outer join "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" as featAnnotate on (featAnnotate."ChromosomeIndex" = variants."ChromosomeIndex" 
+	and variants."Position" between featAnnotate."beginregion" 
+	and featAnnotate."endregion"-1 
+	and featAnnotate."DWAuditID" = :dwAuditIDFeatureTable 
+	and (va."DWAuditID" = :dwAuditID 
+		or :dwAuditID is null)) 
+where va."AlleleIndex" >0 
+and (va."DWAuditID" = :dwAuditID 
+	or :dwAuditID is null) 
+and va."DWAuditID" = variants."DWAuditID" -- and featAnnotate."Class" in ('five_prime_UTR','intergenic_region','intron','three_prime_UTR','trans_splice_acceptor_site','trans_splice_donor_site')
+;
+geneAnnotationNonCodingNeg=select * from :geneAnnotationNonCoding where "Strand"='-' order by "VariantIndex";
+geneAnnotationNonCodingPos=select * from :geneAnnotationNonCoding where "Strand"='+' order by "VariantIndex";
+
+call "hc.hph.plugins.vcf.db.procedures.annotation::VCFNegativeStrandAnnotation"(:geneAnnotationNonCodingNeg,:dwAuditID,:dwAuditIDFeatureTable,geneAnnotationCodingNeg);
+call "hc.hph.plugins.vcf.db.procedures.annotation::VCFPositiveStrandAnnotation"(:geneAnnotationNonCodingPos,:dwAuditID,:dwAuditIDFeatureTable,geneAnnotationCodingPos);
+geneAnnotationCoding = 
+select * from :geneAnnotationCodingPos 
+union all
+select * from :geneAnnotationCodingNeg;
+
+--select * from :geneAnnotationCoding;
+
+
+aminoAcid = select
+	 vtfinal."DWAuditID",
+	 vtfinal."VariantIndex",
+	 vtfinal."AlleleIndex",
+	 vtfinal."ChromosomeIndex",
+	 vtfinal."Position",
+	 vtfinal."GENENAME",
+	 vtfinal."Region",
+	 vtfinal.vt,
+ 	 vtfinal.REFCODON ,
+	 vtfinal."ALTALLELE",
+	 vtfinal."REFALLELE",
+	 vtfinal."CDSPosition",
+	 (select
+	 "AminoAcid" 
+	from "hc.hph.genomics.db.models::Reference.Codons" as codons 
+	where codons."ChromosomeIndex" = vtfinal."ChromosomeIndex" 
+	and codons."ReferenceID" = :referenceID 
+	and codons."Codon"= (case when vtfinal."Strand" = '-' 
+		then "hc.hph.genomics.db.procedures.annotation::GetReverseComplement" (vtfinal.ALTCODON) 
+		else vtfinal.ALTCODON 
+		end)) as "ALTAMINO",
+	 (select
+	 "AminoAcid" 
+	from "hc.hph.genomics.db.models::Reference.Codons" as codons 
+	where codons."ChromosomeIndex" = vtfinal."ChromosomeIndex" 
+	and codons."ReferenceID" = :referenceID 
+	and codons."Codon"= (case when vtfinal."Strand" = '-' 
+		then "hc.hph.genomics.db.procedures.annotation::GetReverseComplement" (vtfinal.REFCODON) 
+		else vtfinal.REFCODON 
+		end)) as "REFAMINO" 
+from :geneAnnotationCoding as vtfinal 
+;
+ insert 
+into "hc.hph.genomics.db.models::SNV.VariantAnnotations" ("DWAuditID",
+	 "VariantIndex",
+	 "AlleleIndex",
+	 "ChromosomeIndex",
+	 "Position",
+	 "GeneName",
+	 "Region",
+	 "SequenceAlteration",
+	 "AminoAcid.Reference",
+	 "AminoAcid.Alternative",
+	 "MutationType") (select
+	 distinct geneAnnotationNonCoding."DWAuditID",
+	 geneAnnotationNonCoding."VariantIndex",
+	 geneAnnotationNonCoding."AlleleIndex",
+	 geneAnnotationNonCoding."ChromosomeIndex",
+	 geneAnnotationNonCoding."Position",
+	 geneAnnotationNonCoding."GENENAME",
+	 geneAnnotationNonCoding."Region",
+	 geneAnnotationNonCoding.vt,
+	 null,
+	 null,
+	 "hc.hph.genomics.db.procedures.annotation::GetMutationType" (geneAnnotationNonCoding."Region",
+	 null,
+	 null,
+	 null,
+	 null,
+	 geneAnnotationNonCoding.vt)
+    from :geneAnnotationNonCoding as geneAnnotationNonCoding -- where geneAnnotationNonCoding."Region" in ('five_prime_UTR','intergenic_region','intron','three_prime_UTR','trans_splice_acceptor_site','trans_splice_donor_site',null,''));
+ 
+	where geneAnnotationNonCoding."Region" not in ('CDS_region',
+	 'start_codon',
+	 'stop_codon',
+	 'five_prime_UTR',
+	 'three_prime_UTR') 
+	or geneAnnotationNonCoding."Region" is null) 
+;
+
+insert 
+into "hc.hph.genomics.db.models::SNV.VariantAnnotations" ("DWAuditID",
+	 "VariantIndex",
+	 "AlleleIndex",
+	 "ChromosomeIndex",
+	 "Position",
+	 "GeneName",
+	 "Region",
+	 "SequenceAlteration",
+	 "AminoAcid.Reference",
+	 "AminoAcid.Alternative",
+	 "MutationType","CDSPosition") (select
+	 distinct aminoAcid."DWAuditID",
+	 aminoAcid."VariantIndex",
+	 aminoAcid."AlleleIndex",
+	 aminoAcid."ChromosomeIndex",
+	 aminoAcid."Position",
+	 aminoAcid."GENENAME",
+	 aminoAcid."Region",
+	 aminoAcid.vt,
+	 (case when aminoAcid.vt = 'INS' 
+		or aminoAcid.vt = 'DEL' 
+		then null 
+		else aminoAcid.REFAMINO 
+		end),
+	 (case when aminoAcid.vt = 'INS' 
+		or aminoAcid.vt = 'DEL' 
+		then null 
+		else aminoAcid.ALTAMINO 
+		end),
+	 "hc.hph.genomics.db.procedures.annotation::GetMutationType" (aminoAcid."Region",
+	 aminoAcid."REFALLELE",
+	 aminoAcid."ALTALLELE",
+	 aminoAcid."REFAMINO",
+	 aminoAcid."ALTAMINO",
+	 aminoAcid.vt),
+	 aminoAcid."CDSPosition"
+	from :aminoAcid as aminoAcid ) 
+;
+
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.internal.db.procedures.vb::MutationData"(
+		IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+		IN reference_id NVARCHAR(255), 
+		IN chromosome_index INTEGER, 
+		IN begin_position INTEGER, 
+		IN end_position INTEGER, 
+		OUT mutation_data "hc.hph.genomics.db.models::VariantBrowser.MutationData",
+		OUT affected_gene "hc.hph.genomics.db.models::VariantBrowser.AffectedGene"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	READS SQL DATA
+AS
+BEGIN
+	DECLARE sample_count INTEGER;
+
+	SELECT COUNT( * )	INTO sample_count FROM :sample_list;
+  
+	all_mutation = SELECT 
+            "VariantAnnotations"."MutationType" as "MutationType",
+            COUNT( DISTINCT "Samples"."SampleIndex" ) as "SampleCount",
+            "VariantAnnotations"."GeneName" as "GeneName"
+	    FROM :sample_list as "Samples"
+            JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS "Genotypes"
+                ON "Genotypes"."SampleIndex" = "Samples"."SampleIndex"
+            JOIN  "hc.hph.genomics.db.models::SNV.VariantAnnotations" AS "VariantAnnotations"
+                ON "Genotypes"."DWAuditID" = "VariantAnnotations"."DWAuditID"
+                AND "Genotypes"."VariantIndex" = "VariantAnnotations"."VariantIndex"
+		WHERE "VariantAnnotations"."ChromosomeIndex" = :chromosome_index
+		    AND "VariantAnnotations"."Position" < :end_position
+            AND "VariantAnnotations"."Position" >= :begin_position
+		GROUP BY "VariantAnnotations"."GeneName",
+		    "VariantAnnotations"."Position",
+		    "VariantAnnotations"."MutationType"
+		ORDER BY "GeneName" NULLS LAST;
+		
+    affected_gene_list = SELECT CASE WHEN "GeneName" IS NULL THEN 'intergenic' ELSE "GeneName" END AS "GeneName", 
+	        AVG( "SampleCount" ) / :sample_count * 100 as "Percent"
+		FROM :all_mutation
+		GROUP BY "GeneName"
+		ORDER BY "GeneName" ASC;
+		
+	affected_gene = SELECT "affected_gene_list"."GeneName", "features"."Description", "affected_gene_list"."Percent"
+	    FROM :affected_gene_list AS "affected_gene_list"
+	    LEFT OUTER JOIN "hc.hph.genomics.db.models::Reference.Features" AS "features"
+	    ON "affected_gene_list"."GeneName" = "features"."FeatureName";
+	 
+ 	mutation_per_gene = SELECT CASE WHEN "GeneName" IS NULL THEN 'intergenic' ELSE "GeneName" END AS "GeneName", "MutationType", COUNT ( * ) as "Count"
+    	FROM :all_mutation 
+    	GROUP BY "GeneName", 
+    	    "MutationType"
+    	ORDER BY "GeneName";
+	
+    totalMutationPerGene = SELECT "GeneName", SUM( "Count" ) as "Count"
+    	FROM :mutation_per_gene
+    	GROUP BY "GeneName"
+    	ORDER BY "GeneName";
+	    
+	mutation_data = SELECT "mutation_per_gene"."GeneName", "mutation_per_gene"."MutationType", "mutation_per_gene"."Count" / "total_mutation_per_gene"."Count" as "Percent"
+            FROM :mutation_per_gene AS "mutation_per_gene"
+        	     JOIN :totalMutationPerGene AS "total_mutation_per_gene"
+        	      ON "mutation_per_gene"."GeneName" = "total_mutation_per_gene"."GeneName"
+        	GROUP BY "mutation_per_gene"."GeneName",
+        		"mutation_per_gene"."MutationType",
+        		"mutation_per_gene"."Count",
+        		"total_mutation_per_gene"."Count"
+        	ORDER BY "mutation_per_gene"."GeneName",
+        	    "mutation_per_gene"."MutationType";
+        	    
 END;
 
 
