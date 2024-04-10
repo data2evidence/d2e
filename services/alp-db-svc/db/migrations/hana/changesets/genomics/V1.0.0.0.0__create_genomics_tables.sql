@@ -283,10 +283,10 @@ create table "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" (
 	"Description" varchar(5000) null,
 	"Sequence" clob null,
 	"Rank" integer null,
-	"prepost" varchar(6) null,
-	"cdsposition" integer null,
+	"PrePost" varchar(6) null,
+	"CDSPosition" integer null,
 	"exonrank" integer null,
-	"runauditid" integer default -1,
+	"RunAuditID" integer default -1,
 	"Transcript" varchar(100) null,
 	"GeneName" varchar(100) null
 ) with associations (
@@ -883,3 +883,44 @@ select "VariantAnnotation"."Genotype"."Sample"."PatientDWID" as "PatientID",
 from "hc.hph.genomics.db.models::SNV.GenotypeAlleles"
 where "AlleleIndex" > 0
 	AND "AlleleCount" > 0;
+---------
+create type "hc.hph.plugins.vcf.db.models::Staging.geneNonCodingType" as table (
+	"DWAuditID" integer,
+	"VariantIndex" integer,
+	"ChromosomeIndex" integer,
+	"Position" integer,
+	"AlleleIndex" integer,
+	"ALTALLELE" varchar(10),
+	"REFALLELE" varchar(10),
+	"FeatureName" varchar(255),
+	"Class" varchar(255),
+	"VT" varchar(10),
+	"GENENAME" varchar(100),
+	"Region" varchar(255),
+	"Strand" varchar(1),
+	"Transcript" varchar(255),
+	"ExonRank" integer,
+	"RunAuditID" integer
+);
+create type "hc.hph.plugins.vcf.db.models::Staging.geneCodingType" as table (
+	"DWAuditID" integer,
+	"VariantIndex" integer,
+	"ChromosomeIndex" integer,
+	"Position" integer,
+	"AlleleIndex" integer,
+	"ALTALLELE" varchar(10),
+	"REFALLELE" varchar(10),
+	--FeatureName: String(255);
+	"VT" varchar(10),
+	"GENENAME" varchar(100),
+	"Region" varchar(255),
+	"Class" varchar(255),
+	"REFCODON" varchar(3),
+	"ALTCODON" varchar(3),
+	"Strand" varchar(1),
+	"CDSPosition" integer,
+	"Transcript" varchar(255),
+	"Protein" varchar(255),
+	"ExonRank" integer,
+	"RunAuditID" integer
+);
