@@ -266,9 +266,9 @@ create table "hc.hph.genomics.db.models::Reference.Codons" (
 	"DWAuditID" Integer,
 	"ReferenceID" varchar(255),
 	"ChromosomeIndex" integer,
-	"codon" varchar(3),
-	"aminoacid" varchar(1),
-	"aminoacidshort" varchar(10)
+	"Codon" varchar(3),
+	"AminoAcid" varchar(1),
+	"AminoAcidShort" varchar(10)
 );
 
 --------------------
@@ -751,7 +751,7 @@ create type "hc.hph.genomics.db.models::VariantBrowser.GeneAlteration" as table 
 	"Patient fraction" Double,
 	"index" Integer,
 	"interactionDWID" varchar(255),
-	"Class" varchar(255),
+	"class" varchar(255),
 	"patientDWID" varchar(255),
 	"sampleID" varchar(255),
 	"firstName" varchar(100),
@@ -762,7 +762,7 @@ create type "hc.hph.genomics.db.models::VariantBrowser.GeneAlteration" as table 
 create type "hc.hph.genomics.db.models::VariantBrowser.GeneAltCohortGroup" as table (
 	"index" Integer,
 	"interactionDWID" varchar(255),
-	"Class" varchar(255),
+	"class" varchar(255),
 	"patientDWID" varchar(255),
 	"sampleID" varchar(255),
 	"firstName" varchar(100),
@@ -772,7 +772,7 @@ create type "hc.hph.genomics.db.models::VariantBrowser.GeneAltCohortGroup" as ta
 ------------------
 create table "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" (
 	"AttributeName" varchar(255),
-	"level" varchar(14),
+	"Level" varchar(14),
 	"DataType" varchar(9),
 	"ArraySize" integer null,
 	"Description" varchar(5000) null,
@@ -780,8 +780,8 @@ create table "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" 
 	"Active" tinyint
 );
 create table "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAttributes" (
-	"structuredattributename" varchar(255),
-	"level" varchar(14),
+	"StructuredAttributeName" varchar(255),
+	"Level" varchar(14),
 	"AttributeName" varchar(255),
 	"AttributeIndex" integer,
 	"DWAuditID" INTEGER,
