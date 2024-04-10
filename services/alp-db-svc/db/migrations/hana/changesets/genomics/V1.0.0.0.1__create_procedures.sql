@@ -18,218 +18,15 @@
 
    
 --  DONE
-   create or replace procedure P_DeletePatient ( IN PatientId VARBINARY(32) )
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY DEFINER
-    AS
-BEGIN 
-  -- get all SampleIdx that match this PatientId
-  DECLARE CURSOR sample_idx_cursor
-    FOR SELECT SampleIndex
-		FROM Samples
-   		WHERE PatientDWID = :PatientId;
-   			
-   	FOR sample_idx AS sample_idx_cursor DO
-   		relevantAuditIds = SELECT DWAuditID
-			FROM Genotypes
-   			WHERE SampleIndex = :sample_idx.SampleIndex;
-   			
-   		-- Delete data corresponding directly to the patientid
-   		DELETE FROM Genotypes WHERE SampleIndex = :sample_idx.SampleIndex;
-   		DELETE FROM GenotypeMultiValueAttributes WHERE SampleIndex = :sample_idx.SampleIndex;
-   		DELETE FROM Haplotypes WHERE SampleIndex = :sample_idx.SampleIndex;
-   		DELETE FROM GenotypeAlleles WHERE SampleIndex = :sample_idx.SampleIndex;
-   		DELETE FROM Samples WHERE SampleIndex = :sample_idx.SampleIndex;
-   		
-   		--Look for empty analysis
-   		BEGIN
-    		DECLARE CURSOR audit_id_cursor
-        		FOR SELECT DWAuditID
-    			    FROM :relevantAuditIds;
-    		DECLARE sample_count INTEGER;
-    	    FOR audit_id AS audit_id_cursor DO
-    	        SELECT COUNT(SampleIndex) INTO sample_count FROM Genotypes WHERE DWAuditID = :audit_id.DWAuditID;
-    	        IF sample_count = 0 THEN
-    	            DELETE FROM Variants WHERE DWAuditID = :audit_id.DWAuditID;
-    	            DELETE FROM VariantMultiValueAttributes WHERE DWAuditID = :audit_id.DWAuditID;
-    	            DELETE FROM VariantAlleles WHERE DWAuditID = :audit_id.DWAuditID;
-    	            DELETE FROM VariantStructuredAttributes WHERE DWAuditID = :audit_id.DWAuditID;
-    	            DELETE FROM Headers WHERE DWAuditID = :audit_id.DWAuditID;
-    	            DELETE FROM VariantAnnotations WHERE DWAuditID = :audit_id.DWAuditID;
-    	        END IF;
-            END FOR;
-        END;
-   	END FOR;
-END;
-
-create or replace procedure P_DeletePatientWorkAround ( IN PatientIdChar NVarchar(64) )
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY DEFINER
-    AS
-BEGIN
-  CALL P_DeletePatient (HEXTOBIN (  :PatientIdChar ));
-END;
 
 
-create or replace procedure P_GetPatientInfo ( IN PatientId VARBINARY(32),
-    OUT  Genotypes Genotypes,
-    OUT GenotypeMultiValueAttributes GenotypeMultiValueAttributes,
-    OUT Haplotypes Haplotypes,
-    OUT GenotypeAlleles GenotypeAlleles,
-    OUT Samples Samples,
-    OUT Variants Variants,
-    OUT VariantMultiValueAttributes VariantMultiValueAttributes,
-    OUT VariantAlleles VariantAlleles,
-    OUT VariantStructuredAttributes VariantStructuredAttributes,
-    OUT Headers Headers,
-    OUT VariantAnnotations VariantAnnotations)
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY DEFINER
-    AS
-BEGIN 
-  -- get all SampleIdx that match this PatientId
-  DECLARE CURSOR sample_idx_cursor
-    FOR SELECT SampleIndex
-        FROM Samples
-        WHERE PatientDWID = :PatientId;
-            
-    FOR sample_idx AS sample_idx_cursor DO
-        relevantAuditIds = SELECT DWAuditID
-            FROM Genotypes
-            WHERE SampleIndex = :sample_idx.SampleIndex;
-            
-        -- Delete data corresponding directly to the patientid
-        Genotypes = SELECT * FROM Genotypes WHERE SampleIndex = :sample_idx.SampleIndex;
-        GenotypeMultiValueAttributes = SELECT * FROM GenotypeMultiValueAttributes WHERE SampleIndex = :sample_idx.SampleIndex;
-        Haplotypes = SELECT * FROM Haplotypes WHERE SampleIndex = :sample_idx.SampleIndex;
-        GenotypeAlleles = SELECT * FROM GenotypeAlleles WHERE SampleIndex = :sample_idx.SampleIndex;
-        Samples = SELECT * FROM Samples WHERE SampleIndex = :sample_idx.SampleIndex;
-        
-        --Look for empty analysis
-        BEGIN
-            DECLARE CURSOR audit_id_cursor
-                FOR SELECT DWAuditID
-                    FROM :relevantAuditIds;
-            DECLARE sample_count INTEGER;
-            FOR audit_id AS audit_id_cursor DO
-                SELECT COUNT(SampleIndex) INTO sample_count FROM Genotypes WHERE SampleIndex = :sample_idx.SampleIndex;
-                IF sample_count = 0 THEN
-                    Variants = SELECT * FROM Variants WHERE DWAuditID = :audit_id.DWAuditID;
-                    VariantMultiValueAttributes = SELECT * FROM VariantMultiValueAttributes WHERE DWAuditID = :audit_id.DWAuditID;
-                    VariantAlleles = SELECT * FROM VariantAlleles WHERE DWAuditID = :audit_id.DWAuditID;
-                    VariantStructuredAttributes = SELECT * FROM VariantStructuredAttributes WHERE DWAuditID = :audit_id.DWAuditID;
-                    Headers = SELECT * FROM Headers WHERE DWAuditID = :audit_id.DWAuditID;
-                    VariantAnnotations = SELECT * FROM VariantAnnotations WHERE DWAuditID = :audit_id.DWAuditID;
-                END IF;
-            END FOR;
-        END;
-    END FOR;
-END;
 
 
-create or replace procedure P_GetPatientInfoWorkAround ( IN PatientIdChar NVarchar(64),
-    OUT Genotypes Genotypes,
-    OUT GenotypeMultiValueAttributes GenotypeMultiValueAttributes,
-    OUT Haplotypes Haplotypes,
-    OUT GenotypeAlleles GenotypeAlleles,
-    OUT Samples Samples,
-    OUT Variants Variants,
-    OUT VariantMultiValueAttributes VariantMultiValueAttributes,
-    OUT VariantAlleles VariantAlleles,
-    OUT VariantStructuredAttributes VariantStructuredAttributes,
-    OUT Headers Headers,
-    OUT VariantAnnotations VariantAnnotations)
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY DEFINER
-    AS
-BEGIN
-    CALL P_GetPatientInfo(
-        HEXTOBIN(:PatientIdChar),
-        Genotypes,
-        GenotypeMultiValueAttributes,
-        Haplotypes,
-        GenotypeAlleles,
-        Samples,
-        Variants,
-        VariantMultiValueAttributes,
-        VariantAlleles,
-        VariantStructuredAttributes,
-        Headers,
-        VariantAnnotations
-    );
-END;
 
 
-create or replace procedure P_SampleNames (
-        IN sample_list SampleList,
-        OUT sample_names SampleNames
-    )
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY INVOKER
-    READS SQL DATA AS
-BEGIN
-    sample_names = SELECT
-            QuerySamples.SampleIndex,
-            KnownSamples.SampleID AS SampleName
-        FROM
-            :sample_list AS QuerySamples
-        LEFT OUTER JOIN
-            Samples AS KnownSamples
-        ON
-            QuerySamples.SampleIndex = KnownSamples.SampleIndex
-        ORDER BY
-            SampleID;
-END;
 
 
-create or replace procedure P_updateNextSampleSequence ( 
-IN reserveCount INT) 
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY DEFINER AS
-BEGIN
- 
-DECLARE count INT;
-DECLARE value INT;
-DECLARE endValue INT;
 
---Generating sequence for each Sample
-SELECT COUNT(*) into count FROM Sequences WHERE SequenceID='SampleIndex';
-
-IF :count=1 THEN
-   SELECT TOP 1 Value INTO value FROM Sequences WHERE SequenceID='SampleIndex';
-   SELECT TOP 1 Value INTO endValue FROM Sequences WHERE SequenceID='SampleIndex';	
-ELSE
-	value := -1;
-	endValue := -1;
-	INSERT INTO Sequences (SequenceID,Value) VALUES ('SampleIndex',:value);
-END IF;
-
-END;
-
-
-create or replace procedure P_updateSampleSequence ( 
-IN reserveCount INT) 
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY DEFINER AS
-BEGIN
- 
-DECLARE count INT;
-DECLARE value INT;
-DECLARE endValue INT;
-
---Generating sequence for each Sample
-SELECT COUNT(*) into count FROM Sequences WHERE SequenceID='SampleIndex';
-
-IF :count=1 THEN
-   SELECT TOP 1 Value INTO value FROM Sequences WHERE SequenceID='SampleIndex';
-   SELECT TOP 1 Value INTO endValue FROM Sequences WHERE SequenceID='SampleIndex';	
-ELSE
-	value := -1;
-	endValue := -1;
-	INSERT INTO Sequences (SequenceID,Value) VALUES ('SampleIndex',:value);
-END IF;
-
-END;
 
 
 create or replace procedure P_AlleleStatistics ( 
@@ -3600,5 +3397,224 @@ BEGIN
     END IF;
    END
    
-   
+   CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::DeletePatient" ( IN PatientId VARBINARY(32) )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    AS
+BEGIN 
+  -- get all SampleIdx that match this PatientId
+  DECLARE CURSOR sample_idx_cursor
+    FOR SELECT "SampleIndex"
+		FROM "hc.hph.genomics.db.models::General.Samples"
+   		WHERE "PatientDWID" = :PatientId;
+   			
+   	FOR sample_idx AS sample_idx_cursor DO
+   		relevantAuditIds = SELECT "DWAuditID"
+			FROM "hc.hph.genomics.db.models::SNV.Genotypes"
+   			WHERE "SampleIndex" = :sample_idx."SampleIndex";
+   			
+   		-- Delete data corresponding directly to the patientid
+   		DELETE FROM "hc.hph.genomics.db.models::SNV.Genotypes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+   		DELETE FROM "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+   		DELETE FROM "hc.hph.genomics.db.models::SNV.Haplotypes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+   		DELETE FROM "hc.hph.genomics.db.models::SNV.GenotypeAlleles" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+   		DELETE FROM "hc.hph.genomics.db.models::General.Samples" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+   		
+   		--Look for empty analysis
+   		BEGIN
+    		DECLARE CURSOR audit_id_cursor
+        		FOR SELECT "DWAuditID"
+    			    FROM :relevantAuditIds;
+    		DECLARE sample_count INTEGER;
+    	    FOR audit_id AS audit_id_cursor DO
+    	        SELECT COUNT("SampleIndex") INTO sample_count FROM "hc.hph.genomics.db.models::SNV.Genotypes" WHERE "DWAuditID" = :audit_id."DWAuditID";
+    	        IF sample_count = 0 THEN
+    	            DELETE FROM "hc.hph.genomics.db.models::SNV.Variants" WHERE "DWAuditID" = :audit_id."DWAuditID";
+    	            DELETE FROM "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes" WHERE "DWAuditID" = :audit_id."DWAuditID";
+    	            DELETE FROM "hc.hph.genomics.db.models::SNV.VariantAlleles" WHERE "DWAuditID" = :audit_id."DWAuditID";
+    	            DELETE FROM "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes" WHERE "DWAuditID" = :audit_id."DWAuditID";
+    	            DELETE FROM "hc.hph.genomics.db.models::SNV.Headers" WHERE "DWAuditID" = :audit_id."DWAuditID";
+    	            DELETE FROM "hc.hph.genomics.db.models::SNV.VariantAnnotations" WHERE "DWAuditID" = :audit_id."DWAuditID";
+    	        END IF;
+            END FOR;
+        END;
+   	END FOR;
+END
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::DeletePatientWorkAround" ( IN PatientIdChar NVarchar(64) )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    AS
+BEGIN
+  CALL "hc.hph.genomics.db.procedures.model::DeletePatient" (HEXTOBIN (  :PatientIdChar ));
+END
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::GetPatientInfo" ( IN PatientId VARBINARY(32),
+    OUT  Genotypes "hc.hph.genomics.db.models::SNV.Genotypes",
+    OUT GenotypeMultiValueAttributes "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes",
+    OUT Haplotypes "hc.hph.genomics.db.models::SNV.Haplotypes",
+    OUT GenotypeAlleles "hc.hph.genomics.db.models::SNV.GenotypeAlleles",
+    OUT Samples "hc.hph.genomics.db.models::General.Samples",
+    OUT Variants "hc.hph.genomics.db.models::SNV.Variants",
+    OUT VariantMultiValueAttributes "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes",
+    OUT VariantAlleles "hc.hph.genomics.db.models::SNV.VariantAlleles",
+    OUT VariantStructuredAttributes "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes",
+    OUT Headers "hc.hph.genomics.db.models::SNV.Headers",
+    OUT VariantAnnotations "hc.hph.genomics.db.models::SNV.VariantAnnotations")
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    AS
+BEGIN 
+  -- get all SampleIdx that match this PatientId
+  DECLARE CURSOR sample_idx_cursor
+    FOR SELECT "SampleIndex"
+        FROM "hc.hph.genomics.db.models::General.Samples"
+        WHERE "PatientDWID" = :PatientId;
+            
+    FOR sample_idx AS sample_idx_cursor DO
+        relevantAuditIds = SELECT "DWAuditID"
+            FROM "hc.hph.genomics.db.models::SNV.Genotypes"
+            WHERE "SampleIndex" = :sample_idx."SampleIndex";
+            
+        -- Delete data corresponding directly to the patientid
+        Genotypes = SELECT * FROM "hc.hph.genomics.db.models::SNV.Genotypes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+        GenotypeMultiValueAttributes = SELECT * FROM "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+        Haplotypes = SELECT * FROM "hc.hph.genomics.db.models::SNV.Haplotypes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+        GenotypeAlleles = SELECT * FROM "hc.hph.genomics.db.models::SNV.GenotypeAlleles" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+        Samples = SELECT * FROM "hc.hph.genomics.db.models::General.Samples" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+        
+        --Look for empty analysis
+        BEGIN
+            DECLARE CURSOR audit_id_cursor
+                FOR SELECT "DWAuditID"
+                    FROM :relevantAuditIds;
+            DECLARE sample_count INTEGER;
+            FOR audit_id AS audit_id_cursor DO
+                SELECT COUNT("SampleIndex") INTO sample_count FROM "hc.hph.genomics.db.models::SNV.Genotypes" WHERE "SampleIndex" = :sample_idx."SampleIndex";
+                IF sample_count = 0 THEN
+                    Variants = SELECT * FROM "hc.hph.genomics.db.models::SNV.Variants" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                    VariantMultiValueAttributes = SELECT * FROM "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                    VariantAlleles = SELECT * FROM "hc.hph.genomics.db.models::SNV.VariantAlleles" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                    VariantStructuredAttributes = SELECT * FROM "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                    Headers = SELECT * FROM "hc.hph.genomics.db.models::SNV.Headers" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                    VariantAnnotations = SELECT * FROM "hc.hph.genomics.db.models::SNV.VariantAnnotations" WHERE "DWAuditID" = :audit_id."DWAuditID";
+                END IF;
+            END FOR;
+        END;
+    END FOR;
+END
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::GetPatientInfoWorkAround" ( IN PatientIdChar NVarchar(64),
+    OUT Genotypes "hc.hph.genomics.db.models::SNV.Genotypes",
+    OUT GenotypeMultiValueAttributes "hc.hph.genomics.db.models::SNV.GenotypeMultiValueAttributes",
+    OUT Haplotypes "hc.hph.genomics.db.models::SNV.Haplotypes",
+    OUT GenotypeAlleles "hc.hph.genomics.db.models::SNV.GenotypeAlleles",
+    OUT Samples "hc.hph.genomics.db.models::General.Samples",
+    OUT Variants "hc.hph.genomics.db.models::SNV.Variants",
+    OUT VariantMultiValueAttributes "hc.hph.genomics.db.models::SNV.VariantMultiValueAttributes",
+    OUT VariantAlleles "hc.hph.genomics.db.models::SNV.VariantAlleles",
+    OUT VariantStructuredAttributes "hc.hph.genomics.db.models::SNV.VariantStructuredAttributes",
+    OUT Headers "hc.hph.genomics.db.models::SNV.Headers",
+    OUT VariantAnnotations "hc.hph.genomics.db.models::SNV.VariantAnnotations")
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    AS
+BEGIN
+    CALL "hc.hph.genomics.db.procedures.model::GetPatientInfo"(
+        HEXTOBIN(:PatientIdChar),
+        Genotypes,
+        GenotypeMultiValueAttributes,
+        Haplotypes,
+        GenotypeAlleles,
+        Samples,
+        Variants,
+        VariantMultiValueAttributes,
+        VariantAlleles,
+        VariantStructuredAttributes,
+        Headers,
+        VariantAnnotations
+    );
+END
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::SampleNames" (
+        IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+        OUT sample_names "hc.hph.genomics.db.models::General.SampleNames"
+    )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER
+    READS SQL DATA AS
+BEGIN
+    sample_names = SELECT
+            "QuerySamples"."SampleIndex",
+            "KnownSamples"."SampleID" as "SampleName"
+        FROM
+            :sample_list AS "QuerySamples"
+        LEFT OUTER JOIN
+            "hc.hph.genomics.db.models::General.Samples" AS "KnownSamples"
+        ON
+            "QuerySamples"."SampleIndex" = "KnownSamples"."SampleIndex"
+        ORDER BY
+            "SampleID";
+END
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::switchVariantsDmTo" ( TargetTable NVARCHAR(100) )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY DEFINER AS
+BEGIN
+	DECLARE synonym_exists TINYINT := 0;
+	SELECT COUNT(*) INTO synonym_exists FROM "SYS"."SYNONYMS" WHERE "SYNONYM_NAME" = 'hc.hph.genomics.db.models::SNV.FlatVariants' AND "SCHEMA_NAME" = 'ALP';
+	IF :synonym_exists <> 0 THEN
+		EXEC 'drop synonym "hc.hph.genomics.db.models::SNV.FlatVariants"';
+	END IF;
+	EXEC 'create synonym "hc.hph.genomics.db.models::SNV.FlatVariants" FOR "ALP"."' || ESCAPE_DOUBLE_QUOTES(TargetTable) || '"';
+END
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::updateNextSampleSequence" ( 
+IN reserveCount INT) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+ 
+DECLARE count INT;
+DECLARE value INT;
+DECLARE endValue INT;
+
+--Generating sequence for each Sample
+SELECT COUNT(*) into count FROM "hc.hph.genomics.db.models::General.Sequences" WHERE "SequenceID"='SampleIndex';
+
+IF :count=1 THEN
+   SELECT TOP 1 "Value" INTO value FROM "hc.hph.genomics.db.models::General.Sequences" WHERE "SequenceID"='SampleIndex';
+   SELECT TOP 1 "Value" INTO endValue FROM "hc.hph.genomics.db.models::General.Sequences" WHERE "SequenceID"='SampleIndex';	
+ELSE
+	value := -1;
+	endValue := -1;
+	INSERT INTO "hc.hph.genomics.db.models::General.Sequences" ("SequenceID","Value") VALUES ('SampleIndex',:value);
+END IF;
+
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.model::updateSampleSequence" ( 
+IN reserveCount INT) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+ 
+DECLARE count INT;
+DECLARE value INT;
+DECLARE endValue INT;
+
+--Generating sequence for each Sample
+SELECT COUNT(*) into count FROM "hc.hph.genomics.db.models::General.Sequences" WHERE "SequenceID"='SampleIndex';
+
+IF :count=1 THEN
+   SELECT TOP 1 "Value" INTO value FROM "hc.hph.genomics.db.models::General.Sequences" WHERE "SequenceID"='SampleIndex';
+   SELECT TOP 1 "Value" INTO endValue FROM "hc.hph.genomics.db.models::General.Sequences" WHERE "SequenceID"='SampleIndex';	
+ELSE
+	value := -1;
+	endValue := -1;
+	INSERT INTO "hc.hph.genomics.db.models::General.Sequences" ("SequenceID","Value") VALUES ('SampleIndex',:value);
+END IF;
+
+END;
+
 
