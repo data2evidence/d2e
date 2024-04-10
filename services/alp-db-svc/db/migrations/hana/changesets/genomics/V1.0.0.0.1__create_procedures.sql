@@ -1,613 +1,21 @@
 
-CREATE OR REPLACE procedure P_FillCodonsTable ( audit_id INTEGER ) AS
-BEGIN
-    DECLARE CURSOR chromosomes FOR
-        SELECT
-            ReferenceID,
-            ChromosomeIndex
-        FROM
-            Chromosomes
-        WHERE
-            DWAuditID = :audit_id;
-    
-    FOR chromosome AS chromosomes DO
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'AAA', 'K','Lys');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'AAC', 'N','Asn');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'AAG', 'K','Lys');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'AAT', 'N','Asn');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'ACA', 'T','Thr');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'ACC', 'T','Thr');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'ACG', 'T','Thr');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'ACT', 'T','Thr');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'AGA', 'R','Arg');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'AGC', 'S','Ser');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'AGG', 'R','Arg');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'AGT', 'S','Ser');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'ATA', 'I','Ile');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'ATC', 'I','Ile');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'ATG', 'M','Met');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'ATT', 'I','Ile');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CAA', 'Q','Gln');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CAC', 'H','His');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CAG', 'Q','Gln');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CAT', 'H','His');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CCA', 'P','Pro');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CCC', 'P','Pro');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CCG', 'P','Pro');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CCT', 'P','Pro');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CGA', 'R','Arg');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CGC', 'R','Arg');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CGG', 'R','Arg');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CGT', 'R','Arg');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CTA', 'L','Leu');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CTC', 'L','Leu');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CTG', 'L','Leu');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'CTT', 'L','Leu');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GAA', 'E','Glu');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GAC', 'D','Asp');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GAG', 'E','Glu');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GAT', 'D','Asp');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GCA', 'A','Ala');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GCC', 'A','Ala');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GCG', 'A','Ala');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GCT', 'A','Ala');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GGA', 'G','Gly');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GGC', 'G','Gly');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GGG', 'G','Gly');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GGT', 'G','Gly');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GTA', 'V','Val');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GTC', 'V','Val');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GTG', 'V','Val');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'GTT', 'V','Val');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TAA', '.','.');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TAC', 'Y','Tyr');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TAG', '.','.');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TAT', 'Y','Tyr');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TCA', 'S','Ser');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TCC', 'S','Ser');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TCG', 'S','Ser');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TCT', 'S','Ser');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TGA', '.','.');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TGC', 'C','Cys');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TGG', 'W','Trp');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TGT', 'C','Cys');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TTA', 'L','Leu');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TTC', 'F','Phe');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TTG', 'L','Leu');
-        INSERT INTO Codons ( DWAuditID, ReferenceID, ChromosomeIndex, Codon, AminoAcid ,AminoAcidShort) VALUES ( :audit_id, chromosome.ReferenceID, chromosome.ChromosomeIndex, 'TTT', 'F','Phe');
-    END FOR;
-END;
 
 
-create or replace FUNCTION GetMutationType (region nvarchar(1000),
-	 refAllele nvarchar(1000),
-	 altAllele nvarchar(1000),
-	 refAmino nvarchar(1000),
-	 altAmino nvarchar(1000),
-	 vt nvarchar(1000) ) RETURNS mutationType nvarchar(1000) LANGUAGE SQLSCRIPT AS 
-BEGIN 
-if vt= 'INS' 
-or vt = 'DEL' 
-or ( region = 'CDS_region' 
-	and (refAmino is null 
-		or altAmino is null)) 
-or region is null 
-then mutationType = null
-;
-elseif altAmino = 'M' 
-and region = 'five_prime_UTR' 
-then mutationType ='5_prime_UTR_premature_start_codon_variant' 
-;
-elseif region = 'five_prime_UTR' 
-then mutationType ='5_prime_UTR_variant' 
-;
-elseif region= 'intergenic_region' 
-then mutationType ='intergenic_variant' 
-;
-elseif region= 'intron' 
-then mutationType ='intron_variant' 
-;
-elseif region= 'three_prime_UTR' 
-then mutationType ='3_prime_UTR_variant' 
-;
-elseif region= 'CDS_region' 
-and altAmino='.' 
-then mutationType ='stop_gained' 
-;
-elseif region= 'start_codon' 
-then mutationType ='start_lost' 
-;
-elseif region= 'CDS_region' 
-and altAmino != refAmino 
-then mutationType ='missense_variant' 
-;
-elseif region= 'CDS_region' 
-and altAmino = refAmino 
-then mutationType ='synonymous_variant' 
-;
-elseif region= 'stop_codon' 
-and altAmino = refAmino 
-then mutationType ='stop_retained_variant' 
-;
-elseif region= 'stop_codon' 
-and altAmino != refAmino 
-then mutationType ='stop_lost' 
-;
---elseif region= 'CDS_region' and round (abs(length(altAllele) - length(refAllele)/3)) = abs(length(altAllele) - length(refAllele)/3)
-elseif region= 'CDS_region' 
-and mod(length(altAllele) - length(refAllele),
-	 3) = 0 
-and length(refAllele) < length(altAllele) 
-then mutationType ='inframe_insertion' 
-;
-elseif region= 'CDS_region' 
-and mod(length(altAllele) - length(refAllele),
-	 3) = 0 
-and length(refAllele) > length(altAllele) 
-then mutationType ='inframe_deletion' 
-;
-elseif region= 'CDS_region' 
-and mod(length(altAllele) - length(refAllele),
-	 3) !=0 
-and length(refAllele) < length(altAllele) 
-then mutationType ='frame_shift_elongation' 
-;
-elseif region= 'CDS_region' 
-and mod(length(altAllele) - length(refAllele),
-	 3) !=0 
-and length(refAllele) > length(altAllele) 
-then mutationType ='frame_shift_truncation' 
-;
-elseif region= 'trans_splice_acceptor_site' 
-then mutationType = 'splice_acceptor_variant' 
-;
-elseif region= 'trans_splice_donor_site' 
-then mutationType = 'splice_donor_variant' 
-;
- 
-END IF;      
- 
-END;
 
 
-create or replace Function getAminoAcidName (
-	 aminoAcid nvarchar(1000),
-	 format nvarchar(1000) ) RETURNS aminoAcidName nvarchar(1000) LANGUAGE SQLSCRIPT AS 
-BEGIN 
-if UPPER(:format)= 'THREE' then
-  if UPPER(:aminoAcid) = 'A'
-    then aminoAcidName ='Ala' ;
-   elseif UPPER(:aminoAcid) = 'B'
-     then aminoAcidName ='Asx' ;    
-   elseif UPPER(:aminoAcid) = 'C'
-     then aminoAcidName ='Cys' ;
-   elseif UPPER(:aminoAcid) = 'D'
-    then aminoAcidName ='Asp' ;
-   elseif UPPER(:aminoAcid) = 'E'
-    then aminoAcidName ='Glu' ;
-   elseif UPPER(:aminoAcid) = 'F'
-    then aminoAcidName ='Phe' ;
-   elseif UPPER(:aminoAcid) = 'G'
-    then aminoAcidName ='Gly' ;
-   elseif UPPER(:aminoAcid) = 'H'
-    then aminoAcidName ='His' ;
-   elseif UPPER(:aminoAcid) = 'I'
-    then aminoAcidName ='Ile' ;
-   elseif UPPER(:aminoAcid) = 'K'
-    then aminoAcidName ='Lys' ;
-   elseif UPPER(:aminoAcid) = 'L'
-    then aminoAcidName ='Leu' ;
-   elseif UPPER(:aminoAcid) = 'M'
-    then aminoAcidName ='Met' ;
-   elseif UPPER(:aminoAcid) = 'N'
-    then aminoAcidName ='Asn' ;
-   elseif UPPER(:aminoAcid) = 'P'
-    then aminoAcidName ='Pro' ;
-   elseif UPPER(:aminoAcid) = 'Q'
-    then aminoAcidName ='Gln' ;
-   elseif UPPER(:aminoAcid) = 'R'
-    then aminoAcidName ='Arg' ;
-   elseif UPPER(:aminoAcid) = 'S'
-    then aminoAcidName ='Ser' ;
-   elseif UPPER(:aminoAcid) = 'T'
-    then aminoAcidName ='Thr' ;
-   elseif UPPER(:aminoAcid) = 'U'
-    then aminoAcidName ='Sec' ;
-   elseif UPPER(:aminoAcid) = 'V'
-    then aminoAcidName ='Val' ;
-   elseif UPPER(:aminoAcid) = 'W'
-    then aminoAcidName ='Trp' ;
-   elseif UPPER(:aminoAcid) = 'X'
-    then aminoAcidName ='Xaa' ;
-   elseif UPPER(:aminoAcid) = 'Y'
-    then aminoAcidName ='Tyr' ;
-   elseif UPPER(:aminoAcid) = 'Z'
-    then aminoAcidName ='Glx' ;
-   elseif UPPER(:aminoAcid) = '*'
-    then aminoAcidName ='*' ;   
-   elseif UPPER(:aminoAcid) = '.'
-    then aminoAcidName ='*' ;  
-   end if;    
-else 
-aminoAcidName =aminoAcid ;
- end if ;
- 
-END;
 
 
-create or replace Function GetReverseComplement (codon nvarchar(1000)) 
-       RETURNS modifiedCodon nvarchar(1000)
-       LANGUAGE SQLSCRIPT AS
-BEGIN
-
-declare count int default 0;
-declare base nvarchar(1000) default '';
-modifiedCodon = '';
-codon:=UPPER(codon);
-
- while count < length(codon) do
-count = count +1;
-base = substr(codon,count,1);
-  if base = 'A'
-  THEN 
-  modifiedCodon = 'T' || modifiedCodon;
-  end if; 
-  if base = 'G'
-  THEN
-  modifiedCodon = 'C' || modifiedCodon;
-  end if;
-  if base = 'C'
-  THEN
-  modifiedCodon = 'G' || modifiedCodon;
-  end if;
-  if base = 'T'
-  THEN
-  modifiedCodon = 'A' || modifiedCodon;
-  end if;
-end while;
-END;
-
-create or replace procedure P_GeneAlteration (
-    IN sample_list SampleList,
-    IN variant_grouping VariantAnnotationGrouping,
-    IN annotationGrouping BOOLEAN,
-    IN sortColumn NVARCHAR(255),
-    IN sortType NVARCHAR(10),
-    IN reference NVARCHAR(255),
-    IN guardedPatients Patients, -- TODO: change to Patient View
-    OUT output GeneAlteration,
-    OUT cohortgroup GeneAltCohortGroup)
-   LANGUAGE SQLSCRIPT
-   READS SQL DATA AS
-BEGIN
-   DECLARE totalPatients INTEGER;
-
-   SELECT COUNT(DISTINCT S.PatientDWID) INTO totalPatients 
-   FROM 
-    SessionSampleGroups  TT       -- /* temporary temple for getting patients from cohorts*/
-        JOIN Samples AS S
-	           ON TT.SampleIndex = S.SampleIndex
-        -- TODO
-	    INNER JOIN :guardedPatients AS gp
-	        ON S.PatientDWID = gp.DWID; 
-
-    cohortgroup = SELECT S.SampleIndex AS index,
-                    BINTOHEX(S.InteractionDWID) AS interactionDWID,
-                    S.SampleClass AS class,
-                    BINTOHEX(S.PatientDWID) AS patientDWID,
-                    S.SampleID AS sampleID,
-                    PA.GivenName AS firstName,
-                    PA.FamilyName AS lastName,
-                    PA.BirthDate AS birthDate
-                    FROM
-                    	:sample_list TT
-                        	JOIN Samples AS S
-	                        	ON TT.SampleIndex = S.SampleIndex
-                            JOIN Patient_Attr AS PA 
-	                        	ON PA.DWID=S.PatientDWID
-                            -- TODO
-	                        INNER JOIN :guardedPatients AS gp
-	                            ON S.PatientDWID = gp.DWID;
-
-   IF annotationGrouping = true
-   THEN
-            geneGroup = SELECT GA.GeneName AS "Gene name",
-                            ROUND((COUNT(DISTINCT CG.patientDWID) / :totalPatients * 100), 4) AS "Patient fraction"
-                         FROM 
-                            :cohortgroup AS CG
-                                JOIN Genotypes AS G
-        	                        ON CG.index = G.SampleIndex AND G.ReferenceAlleleCount <> G.CopyNumber
-        	                    JOIN Variants AS UV
-        	                        ON G.DWAuditID = UV.DWAuditID AND G.VariantIndex = UV.VariantIndex
-        	                    JOIN (SELECT DISTINCT CASE WHEN FeatureName IS NULL OR FeatureName = '' THEN FeatureID ELSE FeatureName END AS GeneName,
-        	                        ChromosomeIndex,beginregion,endregion FROM Features WHERE ReferenceID=:reference AND Class='gene') AS GA
-        	                        ON UV.ChromosomeIndex = GA.ChromosomeIndex AND UV.Position>= GA.beginregion AND UV.Position< GA.endregion
-        	                    JOIN :variant_grouping
-                                    ON :variant_grouping.DWAuditID = G.DWAuditID AND :variant_grouping.VariantIndex = G.VariantIndex 
-        	            GROUP BY GA.GeneName        	           
-            	        ORDER BY 
-                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
-                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
-                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
-                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC
-	                    LIMIT 100;  
-			
-			output = SELECT DISTINCT GA.GeneName AS "Gene name",
-                    GS."Patient fraction" AS "Patient fraction",
-                    CG.index AS index,
-                    CG.interactionDWID AS interactionDWID,
-                    CG.class AS class,
-                    CG.patientDWID AS patientDWID,
-                    CG.sampleID AS sampleID,
-                    CG.firstName AS firstName,
-                    CG.lastName AS lastName,
-                    CG.birthDate AS birthDate,
-                    :variant_grouping.Grouping AS Grouping
-                    FROM
-                    	:cohortgroup AS CG
-	                        JOIN Genotypes AS G
-	                        	ON CG.index = G.SampleIndex AND G.ReferenceAlleleCount <> G.CopyNumber
-	                        JOIN Variants AS UV
-	                           	ON G.DWAuditID = UV.DWAuditID AND G.VariantIndex = UV.VariantIndex
-	                        JOIN :variant_grouping
-                                ON :variant_grouping.DWAuditID = G.DWAuditID AND :variant_grouping.VariantIndex = G.VariantIndex
-	                        JOIN (SELECT DISTINCT CASE WHEN FeatureName IS NULL OR FeatureName = '' THEN FeatureID ELSE FeatureName END AS GeneName,
-	                            ChromosomeIndex,beginregion,endregion FROM Features WHERE ReferenceID=:reference AND Class='gene') AS GA
-	                        	ON UV.ChromosomeIndex = GA.ChromosomeIndex AND UV.Position>= GA.beginregion AND UV.Position< GA.endregion
-	                       JOIN :geneGroup AS GS
-                                ON GA.GeneName= GS."Gene name"
-					ORDER BY 
-                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
-                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
-                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
-                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC;
-	                    
-	    
-	ELSE
-			geneGroup = SELECT GA.GeneName AS "Gene name",
-						 ROUND((COUNT(DISTINCT CG.patientDWID) / :totalPatients * 100), 4) AS "Patient fraction"
-						 FROM 
-							:cohortgroup AS CG
-								JOIN Genotypes AS G
-									ON CG.index = G.SampleIndex AND G.ReferenceAlleleCount <> G.CopyNumber
-							    JOIN Variants AS UV
-									ON G.DWAuditID = UV.DWAuditID AND G.VariantIndex = UV.VariantIndex
-								JOIN (SELECT DISTINCT CASE WHEN FeatureName IS NULL OR FeatureName = '' THEN FeatureID ELSE FeatureName END AS GeneName,
-	                            ChromosomeIndex,beginregion,endregion FROM Features WHERE ReferenceID=:reference AND Class='gene') AS GA
-	                        	ON UV.ChromosomeIndex = GA.ChromosomeIndex AND UV.Position>= GA.beginregion AND UV.Position< GA.endregion
-						GROUP BY GA.GeneName
-						ORDER BY 
-                                CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
-                                CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
-                                CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
-                                CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC
-						LIMIT 100;
-						
-			output = SELECT DISTINCT GA.GeneName AS "Gene name",
-                    GS."Patient fraction" AS "Patient fraction",
-                    CG.index AS index,
-                    CG.interactionDWID AS interactionDWID,
-                    CG.class AS class,
-                    CG.patientDWID AS patientDWID,
-                    CG.sampleID AS sampleID,
-                    CG.firstName AS firstName,
-                    CG.lastName AS lastName,
-                    CG.birthDate AS birthDate,
-                    0 AS Grouping
-                    FROM
-                    	:cohortgroup AS CG
-	                        JOIN Genotypes AS G
-	                        	ON CG.index = G.SampleIndex AND G.ReferenceAlleleCount <> G.CopyNumber
-	                        JOIN Variants AS UV
-	                           	ON G.DWAuditID = UV.DWAuditID AND G.VariantIndex = UV.VariantIndex
-	                        JOIN (SELECT DISTINCT CASE WHEN FeatureName IS NULL OR FeatureName = '' THEN FeatureID ELSE FeatureName END AS GeneName,
-	                            ChromosomeIndex,beginregion,endregion FROM Features WHERE ReferenceID=:reference AND Class='gene') AS GA
-	                        	ON UV.ChromosomeIndex = GA.ChromosomeIndex AND UV.Position>= GA.beginregion AND UV.Position< GA.endregion
-	                       JOIN :geneGroup AS GS
-                                ON GA.GeneName= GS."Gene name"
-					ORDER BY 
-                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
-                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
-                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
-                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC;
-	END IF;
-END;
 
 
-create or replace procedure P_GeneCohortPValue (IN GenesAffectedinCohort GeneAffectedinCohort
-, OUT PValue PValue) 
-      LANGUAGE SQLSCRIPT AS 
-n         BIGINT;
-a         BIGINT;
-b         BIGINT;
-c         BIGINT;
-d         BIGINT;
-sumab     BIGINT;
-sumcd     BIGINT;
-sumac     BIGINT;
-sumbd     BIGINT;
-loga      DOUBLE;
-logb      DOUBLE;
-logc      DOUBLE;
-logd      DOUBLE;
-logsumab  DOUBLE;
-logsumcd  DOUBLE;
-logsumac  DOUBLE;
-logsumbd  DOUBLE;
-logsum    DOUBLE;
-OnePValue DOUBLE;
-
-CURSOR PVal for 
-select * from :GenesAffectedinCohort;
-
-BEGIN
-
-FOR GeneAffectedinCohort AS PVal DO
-
-a := GeneAffectedinCohort.Cohort1Affected;
-b := GeneAffectedinCohort.Cohort2Affected;
-c := GeneAffectedinCohort.Cohort1Total - a;
-d := GeneAffectedinCohort.Cohort2Total - b;
-sumab := a + b + 1;
-sumcd := c + d + 1;
-sumac := a + c + 1; 
-sumbd := b + d + 1;
-n := GeneAffectedinCohort.Cohort1Total + GeneAffectedinCohort.Cohort2Total + 1;
-c := c + 1;
-d := d + 1;
-a := a + 1;
-b := b + 1;
-
--- log factorial with Stirlings approximation ==> (x - 0.5)*LN(x) - x + 0.5*LN(2*PI) + 1.0/(12.0*x) 
-loga := (a - 0.5) * LN(a) - a + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * a);
-logb := (b - 0.5) * LN(b) - b + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * b);
-logc := (c - 0.5) * LN(c) - c + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * c);
-logd := (d - 0.5) * LN(d) - d + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * d);
-
-logsumab := (sumab - 0.5) * LN(sumab) - sumab + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * sumab); 
-logsumcd := (sumcd - 0.5) * LN(sumcd) - sumcd + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * sumcd);
-logsumac := (sumac - 0.5) * LN(sumac) - sumac + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * sumac);
-logsumbd := (sumbd - 0.5) * LN(sumbd) - sumbd + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * sumbd);
-   
-logsum := (n - 0.5) * LN(n) - n + 0.5 * LN(2 * 3.14159) + 1.0/(12.0 * n);
-
--- Log of PValue ==> [log{(a+b)!} + log{(c+d)!} + log{(a+c)!} + log{(b+d)!}] − [log{N!} + log{a!} + log{b!} + log{c!} + log{d!}] 
-OnePValue := (logsumab + logsumcd + logsumac + logsumbd) - (logsum + loga + logb + logc + logd);
-
-PValue = select GeneAffectedinCohort.GeneName, 
-				OnePValue AS PValue
-                from DUMMY
-			UNION ALL 
-			select * from :PValue;
-END FOR ;
-
-END;
 
 
-create or replace procedure P_GeneCorrelation (
-	IN sample_list SampleList,
-	IN variant_grouping VariantAnnotationGrouping,
-	IN reference NVARCHAR(255),
-	OUT output_table table(GeneName NVARCHAR(255),
-						   PatientDWID NVARCHAR(255),
-						   TotalPatients INTEGER)
-	)
-   	LANGUAGE SQLSCRIPT
-  	 READS SQL DATA AS
-BEGIN
-	DECLARE totalPatients INTEGER;
-   
-   	SELECT COUNT(DISTINCT S.PatientDWID) INTO totalPatients 
-   	FROM 
-   	:sample_list TT
-    	INNER JOIN Samples AS S
-	    	ON TT.SampleIndex = S.SampleIndex;
 
-	output_table = SELECT DISTINCT
-		F.GeneName AS GeneName,
-	 	BINTOHEX(S.PatientDWID) AS PatientDWID,
-	 	:totalPatients AS TotalPatients
-	FROM 
-	:sample_list TT
-    	INNER JOIN Samples AS S
-	    	ON TT.SampleIndex = S.SampleIndex
-	    INNER JOIN Genotypes AS G
-	        ON TT.SampleIndex = G.SampleIndex AND G.ReferenceAlleleCount <> G.CopyNumber
-	    INNER JOIN Variants AS UV
-           	ON G.DWAuditID = UV.DWAuditID AND G.VariantIndex = UV.VariantIndex
-        INNER JOIN :variant_grouping
-        	ON :variant_grouping.DWAuditID = UV.DWAuditID AND :variant_grouping.VariantIndex = UV.VariantIndex
-        INNER JOIN (SELECT DISTINCT CASE WHEN FeatureName IS NULL OR FeatureName = '' THEN FeatureID ELSE FeatureName END AS GeneName,
-			  ChromosomeIndex,beginregion,endregion 
-    	      FROM Features WHERE ReferenceID=:reference AND Class='gene') AS F
-    	      ON UV.ChromosomeIndex = F.ChromosomeIndex AND UV.Position BETWEEN F.beginregion AND F.endregion-1
-    ORDER BY GeneName;
-      
-END;
+
+
+
  
 --  DONE
-create or replace procedure P_GeneSummary (
-    IN sample_list SampleList,
-    IN variant_grouping VariantAnnotationGrouping,
-    IN annotationGrouping BOOLEAN,
-    IN sortColumn NVARCHAR(255),
-    IN sortType NVARCHAR(10),
-    IN reference NVARCHAR(255),
-    OUT output_table GeneSummary)
-   LANGUAGE SQLSCRIPT
-   READS SQL DATA AS
-BEGIN
-   DECLARE totalPatients INTEGER;
-   
-   SELECT COUNT(DISTINCT S.PatientDWID) INTO totalPatients 
-   FROM 
-    :sample_list TT                   /* temporary temple for getting patients from cohorts*/
-        JOIN Samples AS S
-	           ON TT.SampleIndex = S.SampleIndex;
-	
-	IF annotationGrouping = true
-    THEN  
-        output_table = SELECT GA.GeneName AS "Gene name",
-        COUNT(DISTINCT S.PatientDWID) AS "Patient count", 
-        ROUND((COUNT(DISTINCT S.PatientDWID) / :totalPatients * 100),4) AS "Patient fraction",
-        COUNT(DISTINCT UV.VariantIndex)AS "Variant count", 
-        :totalPatients AS "Total patients"
-        FROM 
-    	:sample_list TT
-        JOIN Samples AS S
-    	    ON TT.SampleIndex = S.SampleIndex
-    	JOIN Genotypes AS G
-    	    ON TT.SampleIndex = G.SampleIndex AND G.ReferenceAlleleCount <> G.CopyNumber
-    	JOIN Variants AS UV
-    	    ON G.DWAuditID = UV.DWAuditID AND G.VariantIndex = UV.VariantIndex
-    	JOIN :variant_grouping
-            ON :variant_grouping.DWAuditID = UV.DWAuditID AND :variant_grouping.VariantIndex = UV.VariantIndex
-    	JOIN (SELECT DISTINCT CASE WHEN FeatureName IS NULL OR FeatureName = '' THEN FeatureID ELSE FeatureName END AS GeneName,
-                ChromosomeIndex,beginregion,endregion 
-                FROM Features WHERE ReferenceID=:reference AND Class='gene') AS GA
-    	            ON UV.ChromosomeIndex = GA.ChromosomeIndex AND UV.Position>= GA.beginregion AND UV.Position< GA.endregion
-                GROUP BY GA.GeneName
-                ORDER BY CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
-                         CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
-                         CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
-                         CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC,
-                         CASE WHEN :sortColumn = 'Patient count' AND :sortType = 'ASC' THEN "Patient count" ELSE NULL END ASC,
-                         CASE WHEN :sortColumn = 'Patient count' AND :sortType = 'DESC' THEN "Patient count" ELSE NULL END DESC,
-                         CASE WHEN :sortColumn = 'Variant count' AND :sortType = 'ASC' THEN "Variant count" ELSE NULL END ASC,
-                         CASE WHEN :sortColumn = 'Variant count' AND :sortType = 'DESC' THEN "Variant count" ELSE NULL END DESC
-                LIMIT 100 ;
-            
-    ELSE 
-    output_table = SELECT GA.GeneName AS "Gene name",
-                    COUNT(DISTINCT S.PatientDWID) AS "Patient count", 
-                    ROUND((COUNT(DISTINCT S.PatientDWID) / :totalPatients * 100),4) AS "Patient fraction",
-                    COUNT(DISTINCT UV.VariantIndex)AS "Variant count", 
-                    :totalPatients AS "Total patients"
-                    FROM 
-	                    :sample_list TT
-                        	JOIN Samples AS S
-	                        	ON TT.SampleIndex = S.SampleIndex
-	                        JOIN Genotypes AS G
-	                        	ON TT.SampleIndex = G.SampleIndex AND G.ReferenceAlleleCount <> G.CopyNumber
-	                        JOIN Variants AS UV
-	                           	ON G.DWAuditID = UV.DWAuditID AND G.VariantIndex = UV.VariantIndex
-	                        JOIN (SELECT DISTINCT CASE WHEN FeatureName IS NULL OR FeatureName = '' THEN FeatureID ELSE FeatureName END AS GeneName,
-	                              ChromosomeIndex,beginregion,endregion 
-                                  FROM Features WHERE ReferenceID=:reference AND Class='gene') AS GA
-	                        	ON UV.ChromosomeIndex = GA.ChromosomeIndex AND UV.Position>= GA.beginregion AND UV.Position< GA.endregion
-                    GROUP BY GA.GeneName
-                    ORDER BY CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
-                             CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
-                             CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
-                             CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC,
-                             CASE WHEN :sortColumn = 'Patient count' AND :sortType = 'ASC' THEN "Patient count" ELSE NULL END ASC,
-                             CASE WHEN :sortColumn = 'Patient count' AND :sortType = 'DESC' THEN "Patient count" ELSE NULL END DESC,
-                             CASE WHEN :sortColumn = 'Variant count' AND :sortType = 'ASC' THEN "Variant count" ELSE NULL END ASC,
-                             CASE WHEN :sortColumn = 'Variant count' AND :sortType = 'DESC' THEN "Variant count" ELSE NULL END DESC
-                    LIMIT 100;
-        
-    END IF;
-   END;
+
    
 --  DONE
    create or replace procedure P_DeletePatient ( IN PatientId VARBINARY(32) )
@@ -3218,4 +2626,979 @@ BEGIN
     END IF;
 END;
 
+---------- ADDING REARRANGED FUNCTIONS & PROCEDURES FROM HERE ------------
+create or replace Function "hc.hph.genomics.db.procedures.annotation::getAminoAcidName" (
+	 aminoAcid nvarchar(1000),
+	 format nvarchar(1000) ) RETURNS aminoAcidName nvarchar(1000) LANGUAGE SQLSCRIPT AS 
+BEGIN 
+if UPPER(:format)= 'THREE' then
+  if UPPER(:aminoAcid) = 'A'
+    then aminoAcidName ='Ala' ;
+   elseif UPPER(:aminoAcid) = 'B'
+     then aminoAcidName ='Asx' ;    
+   elseif UPPER(:aminoAcid) = 'C'
+     then aminoAcidName ='Cys' ;
+   elseif UPPER(:aminoAcid) = 'D'
+    then aminoAcidName ='Asp' ;
+   elseif UPPER(:aminoAcid) = 'E'
+    then aminoAcidName ='Glu' ;
+   elseif UPPER(:aminoAcid) = 'F'
+    then aminoAcidName ='Phe' ;
+   elseif UPPER(:aminoAcid) = 'G'
+    then aminoAcidName ='Gly' ;
+   elseif UPPER(:aminoAcid) = 'H'
+    then aminoAcidName ='His' ;
+   elseif UPPER(:aminoAcid) = 'I'
+    then aminoAcidName ='Ile' ;
+   elseif UPPER(:aminoAcid) = 'K'
+    then aminoAcidName ='Lys' ;
+   elseif UPPER(:aminoAcid) = 'L'
+    then aminoAcidName ='Leu' ;
+   elseif UPPER(:aminoAcid) = 'M'
+    then aminoAcidName ='Met' ;
+   elseif UPPER(:aminoAcid) = 'N'
+    then aminoAcidName ='Asn' ;
+   elseif UPPER(:aminoAcid) = 'P'
+    then aminoAcidName ='Pro' ;
+   elseif UPPER(:aminoAcid) = 'Q'
+    then aminoAcidName ='Gln' ;
+   elseif UPPER(:aminoAcid) = 'R'
+    then aminoAcidName ='Arg' ;
+   elseif UPPER(:aminoAcid) = 'S'
+    then aminoAcidName ='Ser' ;
+   elseif UPPER(:aminoAcid) = 'T'
+    then aminoAcidName ='Thr' ;
+   elseif UPPER(:aminoAcid) = 'U'
+    then aminoAcidName ='Sec' ;
+   elseif UPPER(:aminoAcid) = 'V'
+    then aminoAcidName ='Val' ;
+   elseif UPPER(:aminoAcid) = 'W'
+    then aminoAcidName ='Trp' ;
+   elseif UPPER(:aminoAcid) = 'X'
+    then aminoAcidName ='Xaa' ;
+   elseif UPPER(:aminoAcid) = 'Y'
+    then aminoAcidName ='Tyr' ;
+   elseif UPPER(:aminoAcid) = 'Z'
+    then aminoAcidName ='Glx' ;
+   elseif UPPER(:aminoAcid) = '*'
+    then aminoAcidName ='*' ;   
+   elseif UPPER(:aminoAcid) = '.'
+    then aminoAcidName ='*' ;  
+   end if;    
+else 
+aminoAcidName =aminoAcid ;
+ end if ;
+ 
+END;
+
+create or replace FUNCTION "hc.hph.genomics.db.procedures.annotation::GetMutationType" (region nvarchar(1000),
+	 refAllele nvarchar(1000),
+	 altAllele nvarchar(1000),
+	 refAmino nvarchar(1000),
+	 altAmino nvarchar(1000),
+	 vt nvarchar(1000) ) RETURNS mutationType nvarchar(1000) LANGUAGE SQLSCRIPT AS 
+BEGIN 
+if vt= 'INS' 
+or vt = 'DEL' 
+or ( region = 'CDS_region' 
+	and (refAmino is null 
+		or altAmino is null)) 
+or region is null 
+then mutationType = null
+;
+elseif altAmino = 'M' 
+and region = 'five_prime_UTR' 
+then mutationType ='5_prime_UTR_premature_start_codon_variant' 
+;
+elseif region = 'five_prime_UTR' 
+then mutationType ='5_prime_UTR_variant' 
+;
+elseif region= 'intergenic_region' 
+then mutationType ='intergenic_variant' 
+;
+elseif region= 'intron' 
+then mutationType ='intron_variant' 
+;
+elseif region= 'three_prime_UTR' 
+then mutationType ='3_prime_UTR_variant' 
+;
+elseif region= 'CDS_region' 
+and altAmino='.' 
+then mutationType ='stop_gained' 
+;
+elseif region= 'start_codon' 
+then mutationType ='start_lost' 
+;
+elseif region= 'CDS_region' 
+and altAmino != refAmino 
+then mutationType ='missense_variant' 
+;
+elseif region= 'CDS_region' 
+and altAmino = refAmino 
+then mutationType ='synonymous_variant' 
+;
+elseif region= 'stop_codon' 
+and altAmino = refAmino 
+then mutationType ='stop_retained_variant' 
+;
+elseif region= 'stop_codon' 
+and altAmino != refAmino 
+then mutationType ='stop_lost' 
+;
+--elseif region= 'CDS_region' and round (abs(length(altAllele) - length(refAllele)/3)) = abs(length(altAllele) - length(refAllele)/3)
+elseif region= 'CDS_region' 
+and mod(length(altAllele) - length(refAllele),
+	 3) = 0 
+and length(refAllele) < length(altAllele) 
+then mutationType ='inframe_insertion' 
+;
+elseif region= 'CDS_region' 
+and mod(length(altAllele) - length(refAllele),
+	 3) = 0 
+and length(refAllele) > length(altAllele) 
+then mutationType ='inframe_deletion' 
+;
+elseif region= 'CDS_region' 
+and mod(length(altAllele) - length(refAllele),
+	 3) !=0 
+and length(refAllele) < length(altAllele) 
+then mutationType ='frame_shift_elongation' 
+;
+elseif region= 'CDS_region' 
+and mod(length(altAllele) - length(refAllele),
+	 3) !=0 
+and length(refAllele) > length(altAllele) 
+then mutationType ='frame_shift_truncation' 
+;
+elseif region= 'trans_splice_acceptor_site' 
+then mutationType = 'splice_acceptor_variant' 
+;
+elseif region= 'trans_splice_donor_site' 
+then mutationType = 'splice_donor_variant' 
+;
+ 
+END IF;      
+ 
+END;
+
+create or replace Function "hc.hph.genomics.db.procedures.annotation::GetReverseComplement" (codon nvarchar(1000)) 
+       RETURNS modifiedCodon nvarchar(1000)
+       LANGUAGE SQLSCRIPT AS
+BEGIN
+
+declare count int default 0;
+declare base nvarchar(1000) default '';
+modifiedCodon = '';
+codon:=UPPER(codon);
+
+ while count < length(codon) do
+count = count +1;
+base = substr(codon,count,1);
+  if base = 'A'
+  THEN 
+  modifiedCodon = 'T' || modifiedCodon;
+  end if; 
+  if base = 'G'
+  THEN
+  modifiedCodon = 'C' || modifiedCodon;
+  end if;
+  if base = 'C'
+  THEN
+  modifiedCodon = 'G' || modifiedCodon;
+  end if;
+  if base = 'T'
+  THEN
+  modifiedCodon = 'A' || modifiedCodon;
+  end if;
+end while;
+END;
+-------------------------------
+CREATE OR REPLACE procedure "hc.hph.genomics.db.procedures.annotation::FillCodonsTable" ( audit_id INTEGER ) AS
+BEGIN
+    DECLARE CURSOR chromosomes FOR
+        SELECT
+            "ReferenceID",
+            "ChromosomeIndex"
+        FROM
+            "hc.hph.genomics.db.models::Reference.Chromosomes"
+        WHERE
+            "DWAuditID" = :audit_id;
+    
+    FOR chromosome AS chromosomes DO
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'AAA', 'K','Lys');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'AAC', 'N','Asn');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'AAG', 'K','Lys');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'AAT', 'N','Asn');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'ACA', 'T','Thr');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'ACC', 'T','Thr');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'ACG', 'T','Thr');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'ACT', 'T','Thr');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'AGA', 'R','Arg');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'AGC', 'S','Ser');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'AGG', 'R','Arg');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'AGT', 'S','Ser');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'ATA', 'I','Ile');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'ATC', 'I','Ile');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'ATG', 'M','Met');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'ATT', 'I','Ile');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CAA', 'Q','Gln');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CAC', 'H','His');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CAG', 'Q','Gln');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CAT', 'H','His');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CCA', 'P','Pro');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CCC', 'P','Pro');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CCG', 'P','Pro');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CCT', 'P','Pro');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CGA', 'R','Arg');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CGC', 'R','Arg');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CGG', 'R','Arg');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CGT', 'R','Arg');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CTA', 'L','Leu');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CTC', 'L','Leu');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CTG', 'L','Leu');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'CTT', 'L','Leu');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GAA', 'E','Glu');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GAC', 'D','Asp');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GAG', 'E','Glu');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GAT', 'D','Asp');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GCA', 'A','Ala');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GCC', 'A','Ala');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GCG', 'A','Ala');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GCT', 'A','Ala');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GGA', 'G','Gly');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GGC', 'G','Gly');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GGG', 'G','Gly');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GGT', 'G','Gly');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GTA', 'V','Val');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GTC', 'V','Val');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GTG', 'V','Val');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'GTT', 'V','Val');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TAA', '.','.');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TAC', 'Y','Tyr');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TAG', '.','.');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TAT', 'Y','Tyr');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TCA', 'S','Ser');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TCC', 'S','Ser');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TCG', 'S','Ser');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TCT', 'S','Ser');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TGA', '.','.');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TGC', 'C','Cys');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TGG', 'W','Trp');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TGT', 'C','Cys');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TTA', 'L','Leu');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TTC', 'F','Phe');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TTG', 'L','Leu');
+        INSERT INTO "hc.hph.genomics.db.models::Reference.Codons" ( "DWAuditID", "ReferenceID", "ChromosomeIndex", "Codon", "AminoAcid" ,"AminoAcidShort") VALUES ( :audit_id, chromosome."ReferenceID", chromosome."ChromosomeIndex", 'TTT', 'F','Phe');
+    END FOR;
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.core.db.procedures::CheckRepoResult" ( IN context NVARCHAR(255), IN repo_result BLOB )
+LANGUAGE SQLSCRIPT SQL SECURITY INVOKER READS SQL DATA AS
+BEGIN
+    DECLARE ACTIVATION_ERROR CONDITION FOR SQL_ERROR_CODE 10001;
+    DECLARE error_code INTEGER := NULL;
+
+	IF LENGTH( :repo_result ) <= 5000 THEN
+		DECLARE repo_result_json NCLOB := SUBSTR_AFTER( SUBSTRING( BINTOSTR( TO_VARBINARY( :repo_result ) ), 15 ), '"error-code": "' );
+		WHILE LENGTH( :repo_result_json ) > 0 DO
+			error_code := TO_INTEGER( SUBSTR_BEFORE( :repo_result_json, '"' ) );
+			IF :error_code <> 0 AND :error_code <> 40137 THEN
+				DECLARE error_message NVARCHAR(5000) := 'Error in ' || :context || ': ';
+				DECLARE quotation_mark INTEGER := LOCATE( SUBSTR_AFTER( :repo_result_json, '"error-msg": "' ), '"' );
+				repo_result_json := SUBSTR_AFTER( :repo_result_json, '"error-msg": "' );
+				WHILE :quotation_mark > 1 DO
+					IF SUBSTRING( :repo_result_json, :quotation_mark - 1 ) = '\' THEN
+						error_message := :error_message || SUBSTRING( :repo_result_json, 1, :quotation_mark - 2 ) || '"';
+						repo_result_json := SUBSTRING( :repo_result_json, :quotation_mark + 1 );
+						quotation_mark := LOCATE( :repo_result_json, '"' );
+					ELSE
+						error_message := :error_message || SUBSTRING( :repo_result_json, 1, :quotation_mark - 1 );
+						repo_result_json := '';
+						quotation_mark := 0;
+					END IF;
+				END WHILE;
+				SIGNAL ACTIVATION_ERROR SET MESSAGE_TEXT = :error_message;
+			END IF;
+			repo_result_json := SUBSTR_AFTER( :repo_result_json, '"error-code": "' );
+		END WHILE;
+	END IF;
+END
+
+CREATE OR REPLACE PROCEDURE "hc.hph.core.db.procedures::BinaryInteger" ( IN int_number INTEGER, OUT binary_number VARBINARY(4) )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   READS SQL DATA AS
+BEGIN
+    DECLARE buffer INTEGER := :int_number;
+    DECLARE hex VARCHAR(2);
+
+    hex := CHAR( CASE WHEN BITAND( :buffer, 15 ) < 10 THEN BITAND( :buffer, 15 ) + 48 ELSE BITAND( :buffer, 15 ) + 55 END );
+    buffer := :buffer / 16;
+    hex := CHAR( CASE WHEN BITAND( :buffer, 15 ) < 10 THEN BITAND( :buffer, 15 ) + 48 ELSE BITAND( :buffer, 15 ) + 55 END ) || :hex;
+    binary_number := HEXTOBIN( :hex );
+    buffer := :buffer / 16;
+
+    WHILE LENGTH( :binary_number ) < 4 DO
+        hex := CHAR( CASE WHEN BITAND( :buffer, 15 ) < 10 THEN BITAND( :buffer, 15 ) + 48 ELSE BITAND( :buffer, 15 ) + 55 END );
+        buffer := :buffer / 16;
+        hex := CHAR( CASE WHEN BITAND( :buffer, 15 ) < 10 THEN BITAND( :buffer, 15 ) + 48 ELSE BITAND( :buffer, 15 ) + 55 END ) || :hex;
+        binary_number := :binary_number || HEXTOBIN( :hex );
+        buffer := :buffer / 16;
+    END WHILE;
+END
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.extensions::GenerateCustomAttributeCDS" ( IN audit_id INTEGER, OUT content NCLOB )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER
+    READS SQL DATA AS
+BEGIN
+    DECLARE newline CHAR := CHAR( 10 );
+    DECLARE indent CHAR := CHAR( 9 );
+    DECLARE row_count INTEGER := 0;
+    DECLARE structured_attribute_count INTEGER := 0;
+    DECLARE structured_attributes VARCHAR(255) ARRAY;
+    DECLARE min_audit_id INTEGER := NULL;
+    DECLARE max_audit_id INTEGER := NULL;
+    DECLARE CURSOR filters FOR
+        SELECT
+            "AttributeName"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Filter' AND
+            "DataType" = 'Flag' AND
+            "ArraySize" = 0 AND
+            "AttributeName" <> 'PASS'
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Variant' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_allele_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'VariantAllele' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_multi_value_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Variant' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            ( "ArraySize" IS NULL OR "ArraySize" > 1 )
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR variant_structured_attributes FOR
+        SELECT
+            "StructAttr"."StructuredAttributeName" AS "StructuredAttributeName",
+            "StructAttr"."AttributeName" AS "AttributeName",
+            "StructAttr"."DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" AS "CustAttr"
+        INNER JOIN
+            "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAttributes" AS "StructAttr"
+        ON
+            "CustAttr"."AttributeName" = "StructAttr"."StructuredAttributeName" AND
+            "CustAttr"."Level" = "StructAttr"."Level"
+        WHERE
+            "StructAttr"."Level" = 'Variant' AND
+            "CustAttr"."DataType" = 'Structured' AND
+            "StructAttr"."DataType" IN ( 'Integer', 'Float', 'String', 'Allele' )
+        ORDER BY
+            "StructAttr"."StructuredAttributeName",
+            "StructAttr"."AttributeName";
+    DECLARE CURSOR genotype_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Genotype' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR genotype_allele_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'GenotypeAllele' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            "ArraySize" < 2
+        ORDER BY
+            "AttributeName";
+    DECLARE CURSOR genotype_multi_value_attributes FOR
+        SELECT
+            "AttributeName",
+            "DataType"
+        FROM
+            "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes"
+        WHERE
+            "Level" = 'Genotype' AND
+            "DataType" IN ( 'Flag', 'Integer', 'Float', 'Character', 'String' ) AND
+            ( "ArraySize" IS NULL OR "ArraySize" > 1 )
+        ORDER BY
+            "AttributeName";
+
+    -- write header
+    content := 'namespace hc.hph.genomics.db.models.generated;' || :newline || :newline ||
+        'using hc.hph.genomics.db.models.extensions::Attribute as Attribute;' || :newline || :newline ||
+        '@Schema: ''SAP_HPH''' || :newline || :newline;
+
+    -- write audit log information
+    IF :audit_id IS NOT NULL THEN
+        SELECT MIN( "DWAuditID" ) INTO min_audit_id FROM "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" WHERE "Active" = 0;
+        SELECT MAX( "DWAuditID" ) INTO max_audit_id FROM "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" WHERE "Active" = 0;
+        IF :min_audit_id IS NULL OR :max_audit_id IS NULL THEN
+            content := :content || '// generation triggered automatically by audit id ' || :audit_id || :newline || :newline;
+        ELSEIF :min_audit_id = :max_audit_id THEN
+            content := :content || '// generation triggered automatically by audit id ' || :audit_id || ' due to new attributes introduced in audit id ' || :min_audit_id || :newline || :newline;
+        ELSE
+            content := :content || '// generation triggered automatically by audit id ' || :audit_id || ' due to new attributes introduced between audit ids ' || :min_audit_id || ' and ' || :max_audit_id || :newline || :newline;
+        END IF;
+    ELSE
+        content := :content || '// generation triggered manually' || :newline || :newline;
+    END IF;
+    
+    content := :content || 'context SNV' || :newline ||
+        '{' || :newline || :newline;
+    
+    -- read filters
+    content := :content || :indent || '@GenerateTableType : false' || :newline || :indent || 'type Filters' || :newline || :indent || '{' || :newline || :indent || :indent || '"PASS": Attribute.Type.FlagValue;' || :newline;
+    FOR result_row AS filters DO
+        content := :content || :indent || :indent || '"' || result_row."AttributeName" || '" : Attribute.Type.FlagValue;' || :newline;
+    END FOR;
+
+    -- read variant attributes
+    content := :content || :indent || '};' || :newline || :newline || :indent || '@GenerateTableType : false' || :newline || :indent || 'type VariantAttributes' || :newline || :indent || '{' || :newline;
+    row_count := 0;
+    FOR result_row AS variant_attributes DO
+        content := :content || :indent || :indent || '"' || result_row."AttributeName" || '" : Attribute.Type."' || result_row."DataType" || 'Value";' || :newline;
+        row_count := :row_count + 1;
+    END FOR;
+    IF :row_count = 0 THEN
+        content := :content || :indent || :indent || '"Dummy" : Integer;' || :newline;
+    END IF;
+
+    -- read variant allele attributes
+    content := :content || :indent || '};' || :newline || :newline || :indent || '@GenerateTableType : false' || :newline || :indent || 'type VariantAlleleAttributes' || :newline || :indent || '{' || :newline;
+    row_count := 0;
+    FOR result_row AS variant_allele_attributes DO
+        content := :content || :indent || :indent || '"' || result_row."AttributeName" || '" : Attribute.Type."' || result_row."DataType" || 'Value";' || :newline;
+        row_count := :row_count + 1;
+    END FOR;
+    IF :row_count = 0 THEN
+        content := :content || :indent || :indent || '"Dummy" : Integer;' || :newline;
+    END IF;
+
+    -- read variant multi-value attributes
+    content := :content || :indent || '};' || :newline || :newline || :indent || '@GenerateTableType : false' || :newline || :indent || 'type VariantMultiValueAttributes' || :newline || :indent || '{' || :newline;
+    row_count := 0;
+    FOR result_row AS variant_multi_value_attributes DO
+        content := :content || :indent || :indent || '"' || result_row."AttributeName" || '" : Attribute.Type."' || result_row."DataType" || 'Value";' || :newline;
+        row_count := :row_count + 1;
+    END FOR;
+    IF :row_count = 0 THEN
+        content := :content || :indent || :indent || '"Dummy" : Integer;' || :newline;
+    END IF;
+
+    -- read variant structured attributes
+    content := :content || :indent || '};' || :newline || :newline || :indent || 'context VariantStructuredType' || :newline || :indent || '{' || :newline;
+    FOR result_row AS variant_structured_attributes DO
+        IF :structured_attribute_count = 0 OR :structured_attributes[ CASE WHEN :structured_attribute_count > 0 THEN :structured_attribute_count ELSE 1 END ] <> result_row."StructuredAttributeName" THEN
+            structured_attribute_count := :structured_attribute_count + 1;
+            structured_attributes[ :structured_attribute_count ] := result_row."StructuredAttributeName";
+            IF :structured_attribute_count > 1 THEN
+                content := :content || :indent || :indent || '};' || :newline || :newline;
+            END IF;
+            content := :content || :indent || :indent || '@GenerateTableType : false' || :newline || :indent || :indent || 'type "' || result_row."StructuredAttributeName" || '"' || :newline || :indent || :indent || '{' || :newline;
+        END IF;
+        content := :content || :indent || :indent || :indent || '"' || result_row."AttributeName" || '" : Attribute.Type."' || result_row."DataType" || 'Value";' || :newline;
+    END FOR;
+    IF :structured_attribute_count > 0 THEN
+        content := :content || :indent || :indent || '};' || :newline || :newline;
+    END IF;
+
+    content := :content || :indent || '};' || :newline || :newline || :indent || '@GenerateTableType : false' || :newline || :indent || 'type VariantStructuredAttributes' || :newline || :indent || '{' || :newline;
+    row_count := 0;
+    WHILE :row_count < :structured_attribute_count DO
+        row_count := :row_count + 1;
+        content := :content || :indent || :indent || '"' || :structured_attributes[ :row_count ] || '" : VariantStructuredType."' || :structured_attributes[ :row_count ] || '";' || :newline;
+    END WHILE;
+    IF :row_count = 0 THEN
+        content := :content || :indent || :indent || '"Dummy" : Integer;' || :newline;
+    END IF;
+
+    -- read genotype attributes
+    content := :content || :indent || '};' || :newline || :newline || :indent || '@GenerateTableType : false' || :newline || :indent || 'type GenotypeAttributes' || :newline || :indent || '{' || :newline;
+    row_count := 0;
+    FOR result_row AS genotype_attributes DO
+        content := :content || :indent || :indent || '"' || result_row."AttributeName" || '" : Attribute.Type."' || result_row."DataType" || 'Value";' || :newline;
+        row_count := :row_count + 1;
+    END FOR;
+    IF :row_count = 0 THEN
+        content := :content || :indent || :indent || '"Dummy" : Integer;' || :newline;
+    END IF;
+
+    -- read genotype allele attributes
+    content := :content || :indent || '};' || :newline || :newline || :indent || '@GenerateTableType : false' || :newline || :indent || 'type GenotypeAlleleAttributes' || :newline || :indent || '{' || :newline;
+    row_count := 0;
+    FOR result_row AS genotype_allele_attributes DO
+        content := :content || :indent || :indent || '"' || result_row."AttributeName" || '" : Attribute.Type."' || result_row."DataType" || 'Value";' || :newline;
+        row_count := :row_count + 1;
+    END FOR;
+    IF :row_count = 0 THEN
+        content := :content || :indent || :indent || '"Dummy" : Integer;' || :newline;
+    END IF;
+
+    -- read genotype multi-value attributes
+    content := :content || :indent || '};' || :newline || :newline || :indent || '@GenerateTableType : false' || :newline || :indent || 'type GenotypeMultiValueAttributes' || :newline || :indent || '{' || :newline;
+    row_count := 0;
+    FOR result_row AS genotype_multi_value_attributes DO
+        content := :content || :indent || :indent || '"' || result_row."AttributeName" || '" : Attribute.Type."' || result_row."DataType" || 'Value";' || :newline;
+        row_count := :row_count + 1;
+    END FOR;
+    IF :row_count = 0 THEN
+        content := :content || :indent || :indent || '"Dummy" : Integer;' || :newline;
+    END IF;
+    
+    -- write footer
+    content := :content || :indent || '};' || :newline || :newline || '}' || :newline;
+END
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.extensions::ActivateCustomAttributeCDS" ( IN force_activation TINYINT, IN audit_id INTEGER )
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY DEFINER
+    AS
+BEGIN
+    -- check if activation is required
+    DECLARE requires_activation TINYINT := 0;
+    IF :force_activation = 0 THEN
+        SELECT COUNT(*) INTO requires_activation FROM "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" WHERE "Active" = 0;
+        IF :requires_activation = 0 THEN
+            SELECT COUNT(*) INTO requires_activation FROM "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAttributes" WHERE "Active" = 0;
+        END IF;
+    ELSE
+        requires_activation := 1;
+    END IF;
+    
+    -- activate if necessary
+    IF :requires_activation <> 0 THEN
+        DECLARE header VARBINARY(6) := strtobin( 'repoV2', 'UTF-8' );
+        DECLARE error_code INTEGER := 0;
+        DECLARE activeVersionExists NVARCHAR(5);
+        DECLARE version_number INTEGER := 0;
+        DECLARE repo_result BLOB;
+        DECLARE cds_content NCLOB;
+        DECLARE json VARBINARY(5000);
+        DECLARE json_length_bin VARBINARY(4);
+        DECLARE content_length_bin VARBINARY(4);
+        
+        -- get table lock to ensure there is no parallel attempt to update the data model
+        LOCK TABLE "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" IN EXCLUSIVE MODE;
+        
+        -- get previous version number
+        json := strtobin( '{"action":"exists","what":"object","session":{"sessionType":"1"},"object":{"package":"hc.hph.genomics.db.models.generated","name":"SNV","suffix":"hdbdd"}}', 'UTF-8' );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+        --CALL "SYS"."REPOSITORY_REST" ( :json, repo_result );
+        activeVersionExists := to_nvarchar( substr_before( substr_after( bintostr( to_varbinary( :repo_result ) ), '"exists": "' ), '"' ) );
+        if activeVersionExists <> 'true' THEN
+            version_number := 0;
+        ELSE
+            json := strtobin( '{"action":"read","what":"objectMetadata","session":{"sessionType":"1"},"object":{"package":"hc.hph.genomics.db.models.generated","name":"SNV","suffix":"hdbdd"}}', 'UTF-8' );
+            CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+          --  CALL "SYS"."REPOSITORY_REST" ( :json, repo_result );
+            CALL "hc.hph.core.db.procedures::CheckRepoResult" ( 'inactive version', :repo_result );
+            version_number := to_integer( substr_before( substr_after( bintostr( to_varbinary( :repo_result ) ), '"version_id": "' ), '"' ) );    
+        END IF;
+
+        -- create package if it doesn't exist
+        json := strtobin( '{"action":"create","what":"package","package":"hc.hph.genomics.db.models.generated","description":"","responsible":"","orig_lang":"","structural":"0","delivery_unit":"","du_vendor":"","text_collection":"","text_status":"","text_terminology_domain":"","hints_for_translation":"","texts":[],"inherit":"0"}', 'UTF-8' );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+        --CALL "SYS"."REPOSITORY_REST" ( :json, repo_result );
+
+        -- remove previously written but failed content
+        json := strtobin( '{"action":"delete","what":"revertObjects","session":{"sessionType":"2","owner":"","workspace":"hc.hph.genomics.db.procedures.model::ActivateCustomAttributeCDS"},"objList":[{"package":"hc.hph.genomics.db.models.generated","name":"SNV","suffix":"hdbdd"}]}', 'UTF-8' );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+       -- CALL "SYS"."REPOSITORY_REST" ( :json, repo_result );
+
+        -- generate CDS code
+        CALL "hc.hph.genomics.db.procedures.extensions::GenerateCustomAttributeCDS" ( :audit_id, cds_content );
+        
+        -- write content
+        json := strtobin( '{"action":"write","what":"object","session":{"sessionType":"2","owner":"","workspace":"hc.hph.genomics.db.procedures.model::ActivateCustomAttributeCDS"},"object":{"package":"hc.hph.genomics.db.models.generated","name":"SNV","suffix":"hdbdd"},"metadata":{"version_id":"' || ( :version_number ) || '","activated_at":"' || CURRENT_UTCTIMESTAMP || '","activated_by":"' || USER() || '","type":"1"},"determineReferences":"1","xrefList":[],"texts":[],"content_texts":[]}', 'UTF-8' );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :cds_content ), content_length_bin );
+        --CALL "SYS"."REPOSITORY_REST" ( hextobin( :header || hextobin( '02000000' ) || :json_length_bin || :json || :content_length_bin || strtobin( :cds_content, 'UTF-8' ) || hextobin( '00000000' ) ), repo_result );
+        CALL "hc.hph.core.db.procedures::CheckRepoResult" ( 'write', :repo_result );
+
+        -- activate content
+        json := strtobin( '{"action":"activate","what":"objects","session":{"sessionType":"2","owner":"","workspace":"hc.hph.genomics.db.procedures.model::ActivateCustomAttributeCDS"},"objList":[{"package":"hc.hph.genomics.db.models.generated","name":"SNV","suffix":"hdbdd"}],"activationMode":"0"}', 'UTF-8' );
+        CALL "hc.hph.core.db.procedures::BinaryInteger" ( length( :json ), json_length_bin );
+        --CALL "SYS"."REPOSITORY_REST" ( :json, repo_result );
+        CALL "hc.hph.core.db.procedures::CheckRepoResult" ( 'activate', :repo_result );
+        
+        -- update
+        UPDATE "hc.hph.genomics.db.models.extensions::Attribute.CustomAttributes" SET "Active" = 1 WHERE "Active" = 0;
+        UPDATE "hc.hph.genomics.db.models.extensions::Attribute.StructuredCustomAttributes" SET "Active" = 1 WHERE "Active" = 0;
+    END IF;
+END
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.genetables::GeneAlteration" (
+    IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+    IN variant_grouping "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping",
+    IN annotationGrouping BOOLEAN,
+    IN sortColumn NVARCHAR(255),
+    IN sortType NVARCHAR(10),
+    IN reference NVARCHAR(255),
+     IN guardedPatients "hc.hph.genomics.db.models::General.Patients", -- TODO: change to Patient View
+    OUT output"hc.hph.genomics.db.models::VariantBrowser.GeneAlteration",
+    OUT cohortgroup "hc.hph.genomics.db.models::VariantBrowser.GeneAltCohortGroup")
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   READS SQL DATA AS
+BEGIN
+   DECLARE totalPatients INTEGER;
+
+   SELECT COUNT(DISTINCT S."PatientDWID") INTO totalPatients 
+   FROM 
+    "hc.hph.genomics.db.models::General.SessionSampleGroups"  TT       -- /* temporary temple for getting patients from cohorts*/
+        JOIN "hc.hph.genomics.db.models::General.Samples" AS S
+	           ON TT."SampleIndex" = S."SampleIndex"
+	    INNER JOIN :guardedPatients AS gp
+	        ON S."PatientDWID" = gp."DWID"; 
+
+    cohortgroup = SELECT S."SampleIndex" AS "index",
+                    BINTOHEX(S."InteractionDWID") AS "interactionDWID",
+                    S."SampleClass" AS "class",
+                    BINTOHEX(S."PatientDWID") AS "patientDWID",
+                    S."SampleID" AS "sampleID",
+                    PA."GivenName" AS "firstName",
+                    PA."FamilyName" AS "lastName",
+                    PA."BirthDate" AS "birthDate"
+                    FROM
+                    	:sample_list TT
+                        	JOIN "hc.hph.genomics.db.models::General.Samples" AS S
+	                        	ON TT."SampleIndex" = S."SampleIndex"
+	                        JOIN "hc.hph.cdw.db.models::DWEntities.Patient_Attr" AS PA
+	                        	ON PA."DWID"=S."PatientDWID"
+	                        INNER JOIN :guardedPatients AS gp
+	                            ON S."PatientDWID" = gp."DWID";
+
+   IF annotationGrouping = true
+   THEN
+            geneGroup = SELECT GA."GeneName" AS "Gene name",
+                            ROUND((COUNT(DISTINCT CG."patientDWID") / :totalPatients * 100), 4) AS "Patient fraction"
+                         FROM 
+                            :cohortgroup AS CG
+                                JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS G
+        	                        ON CG."index" = G."SampleIndex" AND G."ReferenceAlleleCount" <> G."CopyNumber"
+        	                    JOIN "hc.hph.genomics.db.models::SNV.Variants" AS UV
+        	                        ON G."DWAuditID" = UV."DWAuditID" AND G."VariantIndex" = UV."VariantIndex"
+        	                    JOIN (SELECT DISTINCT CASE WHEN "FeatureName" IS NULL OR "FeatureName" = '' THEN "FeatureID" ELSE "FeatureName" END AS "GeneName",
+        	                        "ChromosomeIndex","beginregion","endregion" FROM "hc.hph.genomics.db.models::Reference.Features" WHERE "ReferenceID"=:reference AND "Class"='gene') AS GA
+        	                        ON UV."ChromosomeIndex" = GA."ChromosomeIndex" AND UV."Position">= GA."beginregion" AND UV."Position"< GA."endregion"
+        	                    JOIN :variant_grouping
+                                    ON :variant_grouping."DWAuditID" = G."DWAuditID" AND :variant_grouping."VariantIndex" = G."VariantIndex" 
+        	            GROUP BY GA."GeneName"        	           
+            	        ORDER BY 
+                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
+                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
+                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
+                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC
+	                    LIMIT 100;  
+			
+			output = SELECT DISTINCT GA."GeneName" AS "Gene name",
+                    GS."Patient fraction" AS "Patient fraction",
+                    CG."index" AS "index",
+                    CG."interactionDWID" AS "interactionDWID",
+                    CG."class" AS "class",
+                    CG."patientDWID" AS "patientDWID",
+                    CG."sampleID" AS "sampleID",
+                    CG."firstName" AS "firstName",
+                    CG."lastName" AS "lastName",
+                    CG."birthDate" AS "birthDate",
+                    :variant_grouping."Grouping" AS "Grouping"
+                    FROM
+                    	:cohortgroup AS CG
+	                        JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS G
+	                        	ON CG."index" = G."SampleIndex" AND G."ReferenceAlleleCount" <> G."CopyNumber"
+	                        JOIN "hc.hph.genomics.db.models::SNV.Variants" AS UV
+	                           	ON G."DWAuditID" = UV."DWAuditID" AND G."VariantIndex" = UV."VariantIndex"
+	                        JOIN :variant_grouping
+                                ON :variant_grouping."DWAuditID" = G."DWAuditID" AND :variant_grouping."VariantIndex" = G."VariantIndex"
+	                        JOIN (SELECT DISTINCT CASE WHEN "FeatureName" IS NULL OR "FeatureName" = '' THEN "FeatureID" ELSE "FeatureName" END AS "GeneName",
+	                            "ChromosomeIndex","beginregion","endregion" FROM "hc.hph.genomics.db.models::Reference.Features" WHERE "ReferenceID"=:reference AND "Class"='gene') AS GA
+	                        	ON UV."ChromosomeIndex" = GA."ChromosomeIndex" AND UV."Position">= GA."beginregion" AND UV."Position"< GA."endregion"
+	                       JOIN :geneGroup AS GS
+                                ON GA."GeneName"= GS."Gene name"
+					ORDER BY 
+                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
+                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
+                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
+                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC;
+	                    
+	    
+	ELSE
+			geneGroup = SELECT GA."GeneName" AS "Gene name",
+						 ROUND((COUNT(DISTINCT CG."patientDWID") / :totalPatients * 100), 4) AS "Patient fraction"
+						 FROM 
+							:cohortgroup AS CG
+								JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS G
+									ON CG."index" = G."SampleIndex" AND G."ReferenceAlleleCount" <> G."CopyNumber"
+							    JOIN "hc.hph.genomics.db.models::SNV.Variants" AS UV
+									ON G."DWAuditID" = UV."DWAuditID" AND G."VariantIndex" = UV."VariantIndex"
+								JOIN (SELECT DISTINCT CASE WHEN "FeatureName" IS NULL OR "FeatureName" = '' THEN "FeatureID" ELSE "FeatureName" END AS "GeneName",
+	                            "ChromosomeIndex","beginregion","endregion" FROM "hc.hph.genomics.db.models::Reference.Features" WHERE "ReferenceID"=:reference AND "Class"='gene') AS GA
+	                        	ON UV."ChromosomeIndex" = GA."ChromosomeIndex" AND UV."Position">= GA."beginregion" AND UV."Position"< GA."endregion"
+						GROUP BY GA."GeneName"
+						ORDER BY 
+                                CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
+                                CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
+                                CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
+                                CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC
+						LIMIT 100;
+						
+			output = SELECT DISTINCT GA."GeneName" AS "Gene name",
+                    GS."Patient fraction" AS "Patient fraction",
+                    CG."index" AS "index",
+                    CG."interactionDWID" AS "interactionDWID",
+                    CG."class" AS "class",
+                    CG."patientDWID" AS "patientDWID",
+                    CG."sampleID" AS "sampleID",
+                    CG."firstName" AS "firstName",
+                    CG."lastName" AS "lastName",
+                    CG."birthDate" AS "birthDate",
+                    0 as "Grouping"
+                    FROM
+                    	:cohortgroup AS CG
+	                        JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS G
+	                        	ON CG."index" = G."SampleIndex" AND G."ReferenceAlleleCount" <> G."CopyNumber"
+	                        JOIN "hc.hph.genomics.db.models::SNV.Variants" AS UV
+	                           	ON G."DWAuditID" = UV."DWAuditID" AND G."VariantIndex" = UV."VariantIndex"
+	                        JOIN (SELECT DISTINCT CASE WHEN "FeatureName" IS NULL OR "FeatureName" = '' THEN "FeatureID" ELSE "FeatureName" END AS "GeneName",
+	                            "ChromosomeIndex","beginregion","endregion" FROM "hc.hph.genomics.db.models::Reference.Features" WHERE "ReferenceID"=:reference AND "Class"='gene') AS GA
+	                        	ON UV."ChromosomeIndex" = GA."ChromosomeIndex" AND UV."Position">= GA."beginregion" AND UV."Position"< GA."endregion"
+	                       JOIN :geneGroup AS GS
+                                ON GA."GeneName"= GS."Gene name"
+					ORDER BY 
+                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
+                            CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
+                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
+                            CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC;
+	END IF;
+END 
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.genetables::GeneCohortPValue" (
+        IN GenesAffectedinCohort "hc.hph.genomics.db.models::VariantBrowser.GeneAffectedinCohort",
+        OUT PValue "hc.hph.genomics.db.models::VariantBrowser.PValue"
+    ) LANGUAGE SQLSCRIPT SQL SECURITY DEFINER AS BEGIN
+    DECLARE n BIGINT;
+    DECLARE a BIGINT;
+    DECLARE b BIGINT;
+    DECLARE c BIGINT;
+    DECLARE d BIGINT;
+    DECLARE sumab BIGINT;
+    DECLARE sumcd BIGINT;
+    DECLARE sumac BIGINT;
+    DECLARE sumbd BIGINT;
+    DECLARE loga DOUBLE;
+    DECLARE logb DOUBLE;
+    DECLARE logc DOUBLE;
+    DECLARE logd DOUBLE;
+    DECLARE logsumab DOUBLE;
+    DECLARE logsumcd DOUBLE;
+    DECLARE logsumac DOUBLE;
+    DECLARE logsumbd DOUBLE;
+    DECLARE logsum DOUBLE;
+    DECLARE OnePValue DOUBLE;
+    DECLARE CURSOR PVal for
+    select *
+    from :GenesAffectedinCohort;
+    FOR GeneAffectedinCohort AS PVal DO a := GeneAffectedinCohort."Cohort1Affected";
+    b := GeneAffectedinCohort."Cohort2Affected";
+    c := GeneAffectedinCohort."Cohort1Total" - a;
+    d := GeneAffectedinCohort."Cohort2Total" - b;
+    sumab := a + b + 1;
+    sumcd := c + d + 1;
+    sumac := a + c + 1;
+    sumbd := b + d + 1;
+    n := GeneAffectedinCohort."Cohort1Total" + GeneAffectedinCohort."Cohort2Total" + 1;
+    c := c + 1;
+    d := d + 1;
+    a := a + 1;
+    b := b + 1;
+    -- log factorial with Stirlings approximation ==> (x - 0.5)*LN(x) - x + 0.5*LN(2*PI) + 1.0/(12.0*x) 
+    loga := (a - 0.5) * LN(a) - a + 0.5 * LN(2 * 3.14159) + 1.0 /(12.0 * a);
+    logb := (b - 0.5) * LN(b) - b + 0.5 * LN(2 * 3.14159) + 1.0 /(12.0 * b);
+    logc := (c - 0.5) * LN(c) - c + 0.5 * LN(2 * 3.14159) + 1.0 /(12.0 * c);
+    logd := (d - 0.5) * LN(d) - d + 0.5 * LN(2 * 3.14159) + 1.0 /(12.0 * d);
+    logsumab := (sumab - 0.5) * LN(sumab) - sumab + 0.5 * LN(2 * 3.14159) + 1.0 /(12.0 * sumab);
+    logsumcd := (sumcd - 0.5) * LN(sumcd) - sumcd + 0.5 * LN(2 * 3.14159) + 1.0 /(12.0 * sumcd);
+    logsumac := (sumac - 0.5) * LN(sumac) - sumac + 0.5 * LN(2 * 3.14159) + 1.0 /(12.0 * sumac);
+    logsumbd := (sumbd - 0.5) * LN(sumbd) - sumbd + 0.5 * LN(2 * 3.14159) + 1.0 /(12.0 * sumbd);
+    logsum := (n - 0.5) * LN(n) - n + 0.5 * LN(2 * 3.14159) + 1.0 /(12.0 * n);
+    -- Log of PValue ==> [log{(a+b)!} + log{(c+d)!} + log{(a+c)!} + log{(b+d)!}] − [log{N!} + log{a!} + log{b!} + log{c!} + log{d!}] 
+    OnePValue := (logsumab + logsumcd + logsumac + logsumbd) - (logsum + loga + logb + logc + logd);
+    PValue =
+    select GeneAffectedinCohort."GeneName",
+        OnePValue AS "PValue"
+    from "DUMMY"
+    UNION ALL
+    select *
+    from :PValue;
+    END FOR;
+END;
+
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.genetables::GeneCorrelation" (
+	IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+	IN variant_grouping "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping",
+	IN reference NVARCHAR(255),
+	OUT output_table table("GeneName" NVARCHAR(255),
+						   "PatientDWID" NVARCHAR(255),
+						   "TotalPatients" INTEGER)
+	)
+   	LANGUAGE SQLSCRIPT
+   	SQL SECURITY INVOKER
+  	 --DEFAULT SCHEMA <default_schema_name>
+  	 READS SQL DATA AS
+BEGIN
+	DECLARE totalPatients INTEGER;
+   
+   	SELECT COUNT(DISTINCT S."PatientDWID") INTO totalPatients 
+   	FROM 
+   	:sample_list TT
+    	INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS S
+	    	ON TT."SampleIndex" = S."SampleIndex";
+
+	output_table = SELECT DISTINCT
+		F."GeneName" AS "GeneName",
+	 	BINTOHEX(S."PatientDWID") AS "PatientDWID",
+	 	:totalPatients AS "TotalPatients"
+	FROM 
+	:sample_list TT
+    	INNER JOIN "hc.hph.genomics.db.models::General.Samples" AS S
+	    	ON TT."SampleIndex" = S."SampleIndex"
+	    INNER JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS G
+	        ON TT."SampleIndex" = G."SampleIndex" AND G."ReferenceAlleleCount" <> G."CopyNumber"
+	    INNER JOIN "hc.hph.genomics.db.models::SNV.Variants" AS UV
+           	ON G."DWAuditID" = UV."DWAuditID" AND G."VariantIndex" = UV."VariantIndex"
+        INNER JOIN :variant_grouping
+        	ON :variant_grouping."DWAuditID" = UV."DWAuditID" AND :variant_grouping."VariantIndex" = UV."VariantIndex"
+        INNER JOIN (SELECT DISTINCT CASE WHEN "FeatureName" IS NULL OR "FeatureName" = '' THEN "FeatureID" ELSE "FeatureName" END AS "GeneName",
+			  "ChromosomeIndex","beginregion","endregion" 
+    	      FROM "hc.hph.genomics.db.models::Reference.Features" WHERE "ReferenceID"=:reference AND "Class"='gene') AS F
+    	      ON UV."ChromosomeIndex" = F."ChromosomeIndex" AND UV."Position" BETWEEN F."beginregion" AND F."endregion"-1
+    ORDER BY "GeneName";
+      
+END;
+ 
+CREATE OR REPLACE PROCEDURE "hc.hph.genomics.db.procedures.genetables::GeneSummary" (
+    IN sample_list "hc.hph.genomics.db.models::General.SampleList",
+    IN variant_grouping "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping",
+    IN annotationGrouping BOOLEAN,
+    IN sortColumn NVARCHAR(255),
+    IN sortType NVARCHAR(10),
+    IN reference NVARCHAR(255),
+    OUT output_table "hc.hph.genomics.db.models::VariantBrowser.GeneSummary")
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   READS SQL DATA AS
+BEGIN
+   DECLARE totalPatients INTEGER;
+   
+   SELECT COUNT(DISTINCT S."PatientDWID") INTO totalPatients 
+   FROM 
+    :sample_list TT                   /* temporary temple for getting patients from cohorts*/
+        JOIN "hc.hph.genomics.db.models::General.Samples" AS S
+	           ON TT."SampleIndex" = S."SampleIndex";
+	
+	IF annotationGrouping = true
+    THEN  
+        output_table = SELECT GA."GeneName" AS "Gene name",
+        COUNT(DISTINCT S."PatientDWID") AS "Patient count", 
+        ROUND((COUNT(DISTINCT S."PatientDWID") / :totalPatients * 100),4) AS "Patient fraction",
+        COUNT(DISTINCT UV."VariantIndex")AS "Variant count", 
+        :totalPatients AS "Total patients"
+        FROM 
+    	:sample_list TT
+        JOIN "hc.hph.genomics.db.models::General.Samples" AS S
+    	    ON TT."SampleIndex" = S."SampleIndex"
+    	JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS G
+    	    ON TT."SampleIndex" = G."SampleIndex" AND G."ReferenceAlleleCount" <> G."CopyNumber"
+    	JOIN "hc.hph.genomics.db.models::SNV.Variants" AS UV
+    	    ON G."DWAuditID" = UV."DWAuditID" AND G."VariantIndex" = UV."VariantIndex"
+    	JOIN :variant_grouping
+            ON :variant_grouping."DWAuditID" = UV."DWAuditID" AND :variant_grouping."VariantIndex" = UV."VariantIndex"
+    	JOIN (SELECT DISTINCT CASE WHEN "FeatureName" IS NULL OR "FeatureName" = '' THEN "FeatureID" ELSE "FeatureName" END AS "GeneName",
+                "ChromosomeIndex","beginregion","endregion" 
+                FROM "hc.hph.genomics.db.models::Reference.Features" WHERE "ReferenceID"=:reference AND "Class"='gene') AS GA
+    	            ON UV."ChromosomeIndex" = GA."ChromosomeIndex" AND UV."Position">= GA."beginregion" AND UV."Position"< GA."endregion"
+                GROUP BY GA."GeneName"
+                ORDER BY CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
+                         CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
+                         CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
+                         CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC,
+                         CASE WHEN :sortColumn = 'Patient count' AND :sortType = 'ASC' THEN "Patient count" ELSE NULL END ASC,
+                         CASE WHEN :sortColumn = 'Patient count' AND :sortType = 'DESC' THEN "Patient count" ELSE NULL END DESC,
+                         CASE WHEN :sortColumn = 'Variant count' AND :sortType = 'ASC' THEN "Variant count" ELSE NULL END ASC,
+                         CASE WHEN :sortColumn = 'Variant count' AND :sortType = 'DESC' THEN "Variant count" ELSE NULL END DESC
+                LIMIT 100 ;
+            
+    ELSE 
+    output_table = SELECT GA."GeneName" AS "Gene name",
+                    COUNT(DISTINCT S."PatientDWID") AS "Patient count", 
+                    ROUND((COUNT(DISTINCT S."PatientDWID") / :totalPatients * 100),4) AS "Patient fraction",
+                    COUNT(DISTINCT UV."VariantIndex")AS "Variant count", 
+                    :totalPatients AS "Total patients"
+                    FROM 
+	                    :sample_list TT
+                        	JOIN "hc.hph.genomics.db.models::General.Samples" AS S
+	                        	ON TT."SampleIndex" = S."SampleIndex"
+	                        JOIN "hc.hph.genomics.db.models::SNV.Genotypes" AS G
+	                        	ON TT."SampleIndex" = G."SampleIndex" AND G."ReferenceAlleleCount" <> G."CopyNumber"
+	                        JOIN "hc.hph.genomics.db.models::SNV.Variants" AS UV
+	                           	ON G."DWAuditID" = UV."DWAuditID" AND G."VariantIndex" = UV."VariantIndex"
+	                        JOIN (SELECT DISTINCT CASE WHEN "FeatureName" IS NULL OR "FeatureName" = '' THEN "FeatureID" ELSE "FeatureName" END AS "GeneName",
+	                              "ChromosomeIndex","beginregion","endregion" 
+                                  FROM "hc.hph.genomics.db.models::Reference.Features" WHERE "ReferenceID"=:reference AND "Class"='gene') AS GA
+	                        	ON UV."ChromosomeIndex" = GA."ChromosomeIndex" AND UV."Position">= GA."beginregion" AND UV."Position"< GA."endregion"
+                    GROUP BY GA."GeneName"
+                    ORDER BY CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'ASC' THEN "Gene name" ELSE NULL END ASC,
+                             CASE WHEN :sortColumn = 'Gene name' AND :sortType = 'DESC' THEN "Gene name" ELSE NULL END DESC,
+                             CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'ASC' THEN "Patient fraction" ELSE NULL END ASC,
+                             CASE WHEN :sortColumn = 'Patient fraction' AND :sortType = 'DESC' THEN "Patient fraction" ELSE NULL END DESC,
+                             CASE WHEN :sortColumn = 'Patient count' AND :sortType = 'ASC' THEN "Patient count" ELSE NULL END ASC,
+                             CASE WHEN :sortColumn = 'Patient count' AND :sortType = 'DESC' THEN "Patient count" ELSE NULL END DESC,
+                             CASE WHEN :sortColumn = 'Variant count' AND :sortType = 'ASC' THEN "Variant count" ELSE NULL END ASC,
+                             CASE WHEN :sortColumn = 'Variant count' AND :sortType = 'DESC' THEN "Variant count" ELSE NULL END DESC
+                    LIMIT 100;
+        
+    END IF;
+   END
+   
+   
 
