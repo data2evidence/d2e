@@ -1,3 +1,24 @@
+create table "hc.hph.ots.internals::Entities.ConceptTerms" (
+	"ConceptVocabularyID" varchar(100),
+	"ConceptCode" varchar(100),
+	"TermContext" varchar(100),
+	"TermLanguage" varchar(2),
+	"TermText" varchar(5000),
+	"TermType" varchar(100),
+	"TermIsPreferred" Boolean,
+	"Provider" varchar(100),
+	"DWAuditID" Integer
+);
+create view "hc.hph.ots::Views.ConceptTerms" as
+select "ConceptVocabularyID",
+	"ConceptCode",
+	"TermContext",
+	"TermLanguage",
+	"TermText",
+	"TermType",
+	"TermIsPreferred"
+from "hc.hph.ots.internals::Entities.ConceptTerms";
+----------------
 create table "hc.hph.cdw.db.models::DWEntities.Patient_Key" (
 	"DWID" Binary,
 	"DWSource" nvarchar(5) not null,
@@ -24,7 +45,7 @@ create table "hc.hph.cdw.db.models::DWEntities.Patient_Attr" (
 	-- Title.Code      nvarchar(100), -- Administrative title (also called 'form of address')
 	-- Title.CodeSystem      nvarchar(100), -- Administrative title (also called 'form of address')
 	-- Title.CodeSystemVersion      nvarchar(100), -- Administrative title (also called 'form of address')
-	"Gender" nvarchar(100),
+	"Gender.OriginalValue" nvarchar(100),
 	-- Administrative gender
 	"BirthDate" seconddate,
 	-- The date and time of birth for the individual
@@ -98,7 +119,18 @@ create table "hc.hph.cdw.db.models::DWEntities.Interactions_Key" (
 	--Audit_Assoc: association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
 	Join "hc.hph.cdw.db.models::DWEntities.Interactions_Attr" as "Int_Atr_Ass" on "Int_Atr_Ass"."DWID" = "DWID"
 );
-
+create table "hc.hph.cdw.db.models::DWEntitiesEAV.Interaction_Details" (
+	"DWDateFrom" timestamp,
+	"DWID" binary,
+	"DWAuditID" Integer not null,
+	"DWDateTo" timestamp,
+	"Attribute.OriginalValue" varchar(100),
+	"Value.OriginalValue" varchar(5000),
+	"ValueVocabularyID" varchar(100)
+) with associations (
+	--Audit_Assoc: association to DI.AuditLog on Audit_Assoc.AuditLogID = DWAuditID;
+	Join "hc.hph.cdw.db.models::DWEntities.Interactions_Key" as "Interactions_Key_Assoc" on "Interactions_Key_Assoc"."DWID" = "DWID"
+);
 ------------------
 create type "hc.hph.genomics.db.models::General.SampleList" as table ("SampleIndex" integer);
 create type "hc.hph.genomics.db.models::General.SampleNames" as table (
@@ -119,7 +151,6 @@ create table "hc.hph.genomics.db.models::General.Patients" (
 	"Nationality" varchar(100),
 	"Address" varchar(1000) -- TODO       may be a Array is preferred?
 );
-
 create table "hc.hph.genomics.db.models::General.Samples" (
 	"SampleIndex" integer,
 	"DWAuditID" Integer,
@@ -256,8 +287,8 @@ create table "hc.hph.genomics.db.models::Reference.FeaturesAnnotation" (
 	"cdsposition" integer null,
 	"exonrank" integer null,
 	"runauditid" integer default -1,
-	"transcript" varchar(100) null,
-	"genename" varchar(100) null
+	"Transcript" varchar(100) null,
+	"GeneName" varchar(100) null
 ) with associations (
 	JOIN "hc.hph.genomics.db.models::Reference.Chromosomes" as "chromosome" on "ReferenceID" = "chromosome"."ReferenceID"
 	and "ChromosomeIndex" = "chromosome"."ChromosomeIndex"
@@ -270,7 +301,6 @@ create table "hc.hph.genomics.db.models::Reference.Codons" (
 	"AminoAcid" varchar(1),
 	"AminoAcidShort" varchar(10)
 );
-
 --------------------
 create table "hc.hph.genomics.db.models::SNV.Headers" (
 	"DWAuditID" Integer,
@@ -400,17 +430,19 @@ select "DWAuditID",
 		case
 			when "AlleleIndex" = 0 then "AlleleCount"
 			else 0
-		end ) as "ReferenceAlleleCount",
-		sum(
-			case
-				when "AlleleIndex" <> 0 then "AlleleCount"
-				else 0
-			end ) as "AlternativeAlleleCount",
-			sum("AlleleCount") as "Multiplicity"
-			from "hc.hph.genomics.db.models::SNV.GenotypeAlleles"
-			group by "DWAuditID",
-				"VariantIndex",
-				"SampleIndex";
+		end
+	) as "ReferenceAlleleCount",
+	sum(
+		case
+			when "AlleleIndex" <> 0 then "AlleleCount"
+			else 0
+		end
+	) as "AlternativeAlleleCount",
+	sum("AlleleCount") as "Multiplicity"
+from "hc.hph.genomics.db.models::SNV.GenotypeAlleles"
+group by "DWAuditID",
+	"VariantIndex",
+	"SampleIndex";
 create table "hc.hph.genomics.db.models::SNV.GlobalVariantAnnotations" (
 	"ReferenceID" varchar(255),
 	"ChromosomeIndex" Integer,
@@ -484,7 +516,7 @@ create type "hc.hph.genomics.db.models::SNV.VariantAnnotationDetails" as table (
 	"AminoAcid3.Reference" nvarchar(255),
 	"AminoAcid3.Alternative" nvarchar(255)
 );
-create type "hc.hph.genomics.db.models::SNV.DWAuditIDList" as table (DWAuditID Integer);
+create type "hc.hph.genomics.db.models::SNV.DWAuditIDList" as table ("DWAuditID" Integer);
 create type "hc.hph.genomics.db.models::SNV.VariantIDList" as table (
 	"VariantIndex" Integer,
 	"VariantID" varchar(255)
@@ -519,7 +551,7 @@ create table "hc.hph.genomics.db.models::SNV.FlatVariants" (
 );
 create table "hc.hph.genomics.db.models::SV.Regions" (
 	"DWAuditID" Integer,
-	"sampleid" varchar(255) null,
+	"SampleID" varchar(255) null,
 	"ReferenceID" varchar(255),
 	"ChromosomeIndex" integer,
 	"beginregion" integer,
@@ -693,8 +725,8 @@ create type "hc.hph.genomics.db.models::VariantBrowser.VariantAnnotationGrouping
 	"AlleleIndex" Integer,
 	"Grouping" TINYINT
 );
-create type "hc.hph.genomics.db.models::VariantBrowser.MutationDataAnnotation" as table (Grouping TINYINT, Percent real);
-create type "hc.hph.genomics.db.models::VariantBrowser.AffectedSampleAnnotation" as table (Percent real);
+create type "hc.hph.genomics.db.models::VariantBrowser.MutationDataAnnotation" as table ("Grouping" TINYINT, "Percent" real);
+create type "hc.hph.genomics.db.models::VariantBrowser.AffectedSampleAnnotation" as table ("Percent" real);
 create type "hc.hph.genomics.db.models::VariantBrowser.RegionDefinition" as table (
 	"ChromosomeIndex" Integer,
 	"Begin" Integer,
