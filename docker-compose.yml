@@ -227,7 +227,7 @@ x-envs:
   tls: &x-tls
     TLS__INTERNAL__CA_CRT: ${TLS__INTERNAL__CA_CRT}
     TLS__INTERNAL__CRT: ${TLS__INTERNAL__CRT}
-    TLS__INTERNAL__DOMAIN: ${TLS__INTERNAL__DOMAIN:-alp.local}
+    TLS__INTERNAL__DOMAIN: ${TLS__INTERNAL__DOMAIN:-d2e.local}
     TLS__INTERNAL__KEY: ${TLS__INTERNAL__KEY}
 
 services:
