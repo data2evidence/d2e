@@ -42,6 +42,10 @@ export const dataflowRequest = (
         },
         method,
         rejectUnauthorized: hostname === "localhost" ? false : true,
+        ca:
+            hostname === "localhost"
+                ? null
+                : process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
     if (payload) {
         options.headers["Content-Type"] = "application/json";

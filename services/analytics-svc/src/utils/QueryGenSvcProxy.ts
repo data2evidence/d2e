@@ -68,6 +68,10 @@ export async function generateQuery(
             hostname === "localhost" || hostname === "alp-mercury-approuter"
                 ? false
                 : true,
+        ca:
+            hostname === "localhost" || hostname === "alp-mercury-approuter"
+                ? null
+                : process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
 
     return new Promise<QuerySvcResultType>((resolve, reject) => {
