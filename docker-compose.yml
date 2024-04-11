@@ -596,6 +596,16 @@ services:
       alp-query-gen:
         condition: service_started
     image: alpcr.azurecr.io/alp-data-node/analytics-svc:${DOCKER_TAG_NAME:-develop}
+    healthcheck:
+      interval: 20s
+      retries: 20
+      start_period: 120s
+      test:
+        - CMD
+        - wget
+        - -O
+        - liveness
+        - http://0.0.0.0:41102/check-liveness
     logging:
       options:
         tag: *c8
@@ -1402,6 +1412,16 @@ services:
     logging:
       options:
         tag: *c24
+    healthcheck:
+      interval: 20s
+      retries: 20
+      start_period: 120s
+      test:
+        - CMD
+        - wget
+        - -O
+        - liveness
+        - http://0.0.0.0:41109/check-liveness
     networks:
       alp:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
