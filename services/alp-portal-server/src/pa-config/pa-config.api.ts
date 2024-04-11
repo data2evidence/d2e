@@ -37,7 +37,7 @@ export class PaConfigApi {
       this.url = env.PA_CONFIG_API_URL
       this.httpsAgent = new Agent({
         rejectUnauthorized: this.isAuthorized(),
-        ca: this.isAuthorized() ? env.PORTAL_SERVER_CA_CERT : null
+        ca: this.isAuthorized() ? env.PORTAL_SERVER_CA_CERT : undefined
       })
     } else {
       throw new Error('No url is set for PaConfigApi')
