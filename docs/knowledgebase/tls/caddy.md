@@ -1,5 +1,5 @@
 # Caddy validate TLS__INTERNAL__CA_CRT TLS__INTERNAL__CRT TLS__INTERNAL__KEY
-- [gen-tls.sh](../../../scripts/gen-tls.sh) extracts scripts at runtime
+- [gen-tls.sh](../../../scripts/gen-tls.sh) copies certs from Caddy at runtime
 
 - setup
 ```bash
@@ -12,6 +12,7 @@ CONTAINER_CRT_DIR=/data/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
 CONTAINER_CA_DIR=/data/caddy/pki/authorities/$TLS_CA_NAME
 ```
 - copy certs
+ - TLS__INTERNAL__CRT.crt contains CA & CRT => extract only CRT
 ```bash
 docker exec $CONTAINER_NAME cat $CONTAINER_CRT_DIR/wildcard_.${DOMAIN_NAME}.crt | head -n 12 | awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/' > TLS__INTERNAL__CRT.crt
 docker cp $CONTAINER_NAME:$CONTAINER_CRT_DIR/wildcard_.${DOMAIN_NAME}.key TLS__INTERNAL__KEY.key
