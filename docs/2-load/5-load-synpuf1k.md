@@ -136,4 +136,4 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
 > TRUNCATE TABLE
 
 see: 
-- [troubleshooting/load-synpuf1k](../knowledgebase/dbcreds/missing-db-creds.md)
+- [alp-dataflow-gen-agent-1 startup message "No database credential is configured during this deployment"](../knowledgebase/dbcreds/missing-db-creds.md)
