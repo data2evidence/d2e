@@ -257,7 +257,7 @@ services:
     networks:
       alp:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-minerva-bookmark-svc-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
@@ -321,7 +321,7 @@ services:
     volumes:
       - caddy:/data
       - ./deploy/caddy-config:/srv/caddy-config
-    hostname: alp-caddy.${ALP__DOMAIN:-alp.local}
+    hostname: alp-caddy.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       CADDY__BLOCK_LOGTO_ADMIN_CONSOLE: ${CADDY__BLOCK_LOGTO_ADMIN_CONSOLE:-abort} # Values disable: "abort" | enable: ""
@@ -363,7 +363,7 @@ services:
       data:
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-dataflow-gen-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-dataflow-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-converter
@@ -424,7 +424,7 @@ services:
       - ./alp-data-node-override/services/alp-db-svc/db/synpuf1k:/app/synpuf1k
       - ./alp-data-node-override/services/alp-db-svc/db/drivers/hana/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
       - ./alp-data-node-override/services/alp-db-svc/db/drivers/hana/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
-    hostname: alp-dataflow-gen-agent-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-dataflow-gen-agent-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-converter
@@ -469,7 +469,7 @@ services:
     networks:
       alp:
     platform: linux/amd64
-    hostname: alp-dataflow-gen-init-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-dataflow-gen-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-minio
@@ -509,7 +509,7 @@ services:
     networks:
       alp:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-minerva-db-credentials-mgr-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-db-credentials-mgr-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-pg
@@ -534,7 +534,7 @@ services:
     profiles:
       - minerva-ui
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-local-ui-file-server.${ALP__DOMAIN:-alp.local}
+    hostname: alp-local-ui-file-server.${TLS__INTERNAL__DOMAIN:-alp.local}
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -575,7 +575,7 @@ services:
       - sh
       - -c
       - npm run cli db seed -- --swe && npx @logto/cli db alteration deploy 1.14.0 && npm start
-    hostname: alp-logto-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-logto-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
@@ -612,7 +612,7 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - duckdb-data-1:/home/docker/src/alp-data-node/app/duckdb_data
-    hostname: alp-minerva-analytics-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-analytics-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-converter
@@ -676,7 +676,7 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - duckdb-data-1:/home/docker/src/services/app/duckdb_data
-    hostname: alp-minerva-cdw-svc-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-cdw-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-converter
@@ -728,7 +728,7 @@ services:
       alp:
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-minio
@@ -775,7 +775,7 @@ services:
       alp:
       data:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-minerva-gateway-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
@@ -876,7 +876,7 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - meilisearch-minerva-data-1:/meili_data
-    hostname: alp-minerva-meilisearch-svc-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-meilisearch-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
@@ -916,7 +916,7 @@ services:
         tag: *c13
     networks:
       alp:
-    hostname: alp-minerva-pa-config-svc-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-pa-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
@@ -980,7 +980,7 @@ services:
         tag: *c14
     networks:
       alp:
-    hostname: alp-minerva-pg-mgmt-init-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-pg-mgmt-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
@@ -1056,7 +1056,7 @@ services:
       alp:
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-minerva-portal-server-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-minio
@@ -1104,7 +1104,7 @@ services:
     shm_size: 1gb
     volumes:
       - pg-minerva-data-1:/var/lib/postgresql/data
-    hostname: alp-minerva-postgres-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-postgres-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
@@ -1143,7 +1143,7 @@ services:
         tag: *c17
     networks:
       alp:
-    hostname: alp-minerva-ps-config-svc-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-ps-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
@@ -1228,7 +1228,7 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - minio-data-1:/data
-    hostname: alp-minerva-s3.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-s3.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
@@ -1254,7 +1254,7 @@ services:
     networks:
       alp:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-minerva-sqleditor.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-sqleditor.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-converter
@@ -1286,7 +1286,7 @@ services:
       alp:
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-minerva-terminology-svc-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-converter
@@ -1336,7 +1336,7 @@ services:
     networks:
       alp:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-minerva-user-mgmt-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-user-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-pg
@@ -1391,7 +1391,7 @@ services:
       /usr/bin/mc policy download myminio/dataflow-adhoc-flows;
       exit 0;
       "
-    hostname: alp-minio-post-init.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minio-post-init.${TLS__INTERNAL__DOMAIN:-alp.local}
 
   alp-mri-pg-config:
     container_name: &c23 alp-mri-pg-config-${BASE_PORT:-1}
@@ -1406,7 +1406,7 @@ services:
         tag: *c23
     networks:
       alp:
-    hostname: alp-mri-pg-config-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-mri-pg-config-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
@@ -1432,7 +1432,7 @@ services:
     networks:
       alp:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    hostname: alp-minerva-query-gen-svc-${BASE_PORT:-1}.${ALP__DOMAIN:-alp.local}
+    hostname: alp-minerva-query-gen-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-tls
