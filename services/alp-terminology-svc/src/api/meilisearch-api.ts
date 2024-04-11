@@ -333,7 +333,6 @@ export class MeilisearchAPI {
       const filter = exactSearchFilter.concat();
       return {
         indexUid: index,
-        limit: 1,
         filter,
       };
     });
