@@ -14,7 +14,7 @@
 	}
 }
 
-https://*.d2e.local:55555 {
+https://*.alp.local:55555 {
 	tls {
 		issuer internal {
 			ca alp-internal

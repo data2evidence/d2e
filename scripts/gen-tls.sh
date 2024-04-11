@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# get internal wildcard certificate "*.d2e.local" from Caddy
+# get internal wildcard certificate "*.alp.local" from Caddy
 set -o nounset
 set -o errexit
 ENV_TYPE=${env_type:-local}
 TLS_REGENERATE=${TLS_REGENERATE:-false}
 
 CONTAINER_NAME=alp-caddy
-DOMAIN_NAME=d2e.local
+DOMAIN_NAME=alp.local
 DOTENV_FILE=.env.$ENV_TYPE
 TLS_CA_NAME=alp-internal
 VOLUME_NAME=alp_caddy
