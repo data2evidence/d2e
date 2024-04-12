@@ -42,8 +42,8 @@ const Env = z.object({
     .transform(val => val === '1' || /true/i.test(val))
     .optional(),
 
-  SSL_PRIVATE_KEY: z.string(),
-  SSL_PUBLIC_CERT: z.string(),
+  TLS__INTERNAL__KEY: z.string(),
+  TLS__INTERNAL__CRT: z.string(),
 })
 
 const result = Env.safeParse(process.env)

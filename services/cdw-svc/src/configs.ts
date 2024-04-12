@@ -11,8 +11,8 @@ const Env = z.object({
   DUCKDB__DATA_FOLDER: z.string(),
   USE_DUCKDB: z.string(),
   CONFIG_CONNECTION: z.string(),
-  SSL_PRIVATE_KEY: z.string(),
-  SSL_PUBLIC_CERT: z.string(),
+  TLS__INTERNAL__KEY: z.string(),
+  TLS__INTERNAL__CRT: z.string(),
 });
 
 const result = Env.safeParse(process.env);

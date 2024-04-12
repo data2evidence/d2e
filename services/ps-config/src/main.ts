@@ -116,8 +116,8 @@ function initRoutes(conn) {
 
   const server = createServer(
     {
-      key: env.SSL_PRIVATE_KEY,
-      cert: env.SSL_PUBLIC_CERT,
+      key: env.TLS__INTERNAL__KEY,
+      cert: env.TLS__INTERNAL__CRT,
       maxHeaderSize: 8192 * 10,
     },
     app

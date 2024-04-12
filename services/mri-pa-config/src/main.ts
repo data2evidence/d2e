@@ -222,8 +222,8 @@ function initRoutes() {
 
   const server = https.createServer(
     {
-      key: env.SSL_PRIVATE_KEY,
-      cert: env.SSL_PUBLIC_CERT,
+      key: env.TLS__INTERNAL__KEY,
+      cert: env.TLS__INTERNAL__CRT,
     },
     app
   );

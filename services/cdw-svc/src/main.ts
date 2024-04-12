@@ -55,11 +55,13 @@ const main = () => {
     // set default cdw config path
     log.info("TESTSCHEMA :" + configCredentials.schema);
   } else {
-    let cdwService = xsenv.filterServices({ tag: "cdw" }).map(db => db.credentials);
-    if(env.USE_DUCKDB === "true"){
-      cdwService = cdwService.filter((db) => db.dialect == 'postgresql')
-    }else{
-      cdwService = cdwService.filter((db) => db.dialect == 'hana')
+    let cdwService = xsenv
+      .filterServices({ tag: "cdw" })
+      .map((db) => db.credentials);
+    if (env.USE_DUCKDB === "true") {
+      cdwService = cdwService.filter((db) => db.dialect == "postgresql");
+    } else {
+      cdwService = cdwService.filter((db) => db.dialect == "hana");
     }
     analyticsCredential = cdwService[0];
     configCredentials = JSON.parse(env.CONFIG_CONNECTION);
@@ -81,8 +83,8 @@ const main = () => {
 
   const server = https.createServer(
     {
-      key: env.SSL_PRIVATE_KEY,
-      cert: env.SSL_PUBLIC_CERT,
+      key: env.TLS__INTERNAL__KEY,
+      cert: env.TLS__INTERNAL__CRT,
     },
     app
   );
