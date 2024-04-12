@@ -39,5 +39,5 @@ export const env = {
 
   SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
   SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
-  PORTAL_SERVER_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
+  SSL_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
 }

@@ -20,7 +20,7 @@ export class AnalyticsSvcAPI {
       this.url = env.ANALYTICS_SVC_API_URL
       this.httpsAgent = new Agent({
         rejectUnauthorized: this.isAuthorized(),
-        ca: this.isAuthorized() ? env.DATAFLOW_CA_CERT : undefined
+        ca: this.isAuthorized() ? env.SSL_CA_CERT : undefined
       })
     } else {
       throw new Error('No url is set for AnalyticsSvcAPI')

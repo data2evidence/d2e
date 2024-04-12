@@ -17,7 +17,7 @@ if (
   logger.info("rejectUnauthorized is disabled");
 } else {
   const httpsAgent = new https.Agent({
-    ca: getProperties()["db_svc_ca_cert"],
+    ca: getProperties()["ssl_ca_cert"],
   });
   axios.defaults.httpsAgent = httpsAgent;
 }
