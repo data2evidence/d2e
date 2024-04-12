@@ -10,6 +10,7 @@ DOMAIN_NAME=alp.local
 DOTENV_FILE=.env.$ENV_TYPE
 TLS_CA_NAME=alp-internal
 VOLUME_NAME=alp_caddy
+touch ${DOTENV_FILE}
 
 CONTAINER_CRT_DIR=/data/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
 CONTAINER_CA_DIR=/data/caddy/pki/authorities/$TLS_CA_NAME
@@ -29,7 +30,7 @@ if [ "$( docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 2> /dev
 	sleep 3
 fi
 # restart to re-generate certificate
-[ ${TLS_REGENERATE} = true ] && yarn base:minerva --env-file $DOTENV_FILE restart $CONTAINER_NAME 2> /dev/null
+# [ ${TLS_REGENERATE} = true ] && yarn base:minerva --env-file $DOTENV_FILE restart $CONTAINER_NAME 2> /dev/null
 
 # remove existing certs from dotenv
 for VAR_NAME in TLS__INTERNAL__CA_CRT TLS__INTERNAL__CRT TLS__INTERNAL__KEY; do sed -i.bak "/$VAR_NAME=/,/END CERTIFICATE-----'/d" $DOTENV_FILE; done
