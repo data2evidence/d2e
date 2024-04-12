@@ -23,7 +23,7 @@ export abstract class BaseIDPAPI {
 
     this.httpsAgent = new https.Agent({
       rejectUnauthorized: this.issuerUrl.startsWith('https://alp-logto-') ? false : true,
-      ca: this.issuerUrl.startsWith('https://alp-logto-') ? env.USERMGMT_CA_CERT : undefined
+      ca: this.issuerUrl.startsWith('https://alp-logto-') ? env.SSL_CA_CERT : undefined
     })
   }
 
