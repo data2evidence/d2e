@@ -6,11 +6,11 @@
 - yaml anchors and aliases create re-usable blocks for docker-compose
 - to validate merged, expanded, envsubst version:
 ```bash
-bash -c "set -o allexport; source .env.$env; yq eval-all --from-file internal/scripts/expand.yq docker-compose.yml docker-compose-local.yml" | yq -P 'sort_keys(..)' | tee private.yq.yml
+bash -c "set -o allexport; source .env.local; yq eval-all --from-file internal/scripts/expand.yq docker-compose.yml docker-compose-local.yml" | yq -P 'sort_keys(..)' | tee private.yq.yml
 ```
 - docker compose provides shows internal representation. caveat: some sections maybe missing
 ```bash
-docker compose --env-file .env.$env --file docker-compose.yml --file docker-compose-local.yml config | yq -P 'sort_keys(..)' | tee private.dc.yml
+docker compose --env-file .env.local --file docker-compose.yml --file docker-compose-local.yml config | yq -P 'sort_keys(..)' | tee private.dc.yml
 ```
 
 ## grep 
