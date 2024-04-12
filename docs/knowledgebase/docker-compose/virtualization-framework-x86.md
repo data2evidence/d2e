@@ -1,6 +1,5 @@
-# Docker Desktop troubleshooting
-
-## Segmentation fault on x86_64 with MacOS Virtualization Framework enabled #6824
+# Issue: nodejs segmentation fault on MacOS x86_64 with Virtualization Framework enabled
+## Symptoms
 - https://github.com/docker/for-mac/issues/6824
 - affects Docker Desktop v4.19+
 - sample container logs
@@ -13,8 +12,8 @@ Segmentation fault
 error Command failed with exit code 139.
 info Visit https://yarnpkg.com/en/docs/cli/run for 
 ```
-### Workaround 
+## Workaround 
 - Open Settings>General
 - Uncheck **Use Virtualization framework** & select **gRPC FUSE**
 
-> ![Docker-Desktop-disable-Virtualization-framework](../images/docker/disable-Virtualization-framework.png)
+> ![Docker-Desktop-disable-Virtualization-framework](../../images/docker/disable-Virtualization-framework.png)

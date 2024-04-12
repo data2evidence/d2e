@@ -13,8 +13,8 @@ wget https://caruscloud.uniklinikum-dresden.de/index.php/s/Qog8B5WCTHFHmjW/downl
 - Open a terminal in the root of `alp` repo
 - Run the following commands to define directories
 ```bash
-ALP_DN_REPO_DIR=$PWD
-SYNPUF1K_DIR=$ALP_DN_REPO_DIR/alp-data-node-override/services/alp-db-svc/db/synpuf1k
+GIT_BASE_DIR=$(git rev-parse --show-toplevel)
+SYNPUF1K_DIR=$GIT_BASE_DIR/cache/synpuf1k
 ```
 - Create synpuf1k load dir
 ```bash

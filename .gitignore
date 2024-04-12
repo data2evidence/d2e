@@ -30,3 +30,4 @@ alp-data-node-override
 liquibase
 
 **/liveness
+internal/build/ignore/alp-dbcli-v1.0.0.tgz
