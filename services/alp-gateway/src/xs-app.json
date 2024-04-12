@@ -96,6 +96,11 @@
       "targetPath":"/ui-files/starboard-jupyter/"
     },
     {
+      "source":"^/alp-fhir/(.*)",
+      "target": "$1",
+      "targetPath": "/ui-files/alp-fhir/"
+    },
+    {
       "source":"^/starboard-notebook-base/(.*)",
       "target": "$1",
       "targetPath":"/ui-files/starboard-notebook-base/"
