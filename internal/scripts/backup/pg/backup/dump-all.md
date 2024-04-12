@@ -4,7 +4,7 @@
 
 # Backup
 - full backup - includes postgres database
-```
+```bash
 BACKUP_DIR=/backups
 docker exec -it alp-minerva-postgres-1 pg_dumpall -U postgres | gzip > $BACKUP_DIR/$(date +%Y%m%dT%H%M)Z.all.sql.gz
 ```

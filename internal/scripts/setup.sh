@@ -1,6 +1,7 @@
 #!/usr/bin/env bash  
 # initial setup
 set -o pipefail
+
 # inputs
 # expected OP_VAULT_NAME set e.g. in .zshrc
 [ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1
