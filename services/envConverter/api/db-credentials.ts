@@ -31,6 +31,7 @@ export class DbCredentialsApi {
       rejectUnauthorized: this.baseUrl.startsWith("https://alp-minerva-")
         ? false
         : true,
+      ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     });
   }
 
