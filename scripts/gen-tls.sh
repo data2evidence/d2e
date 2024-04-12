@@ -2,9 +2,12 @@
 # get internal wildcard certificate "*.alp.local" from Caddy
 set -o nounset
 set -o errexit
-ENV_TYPE=${env_type:-local}
+
+# inputs
+ENV_TYPE=${ENV_TYPE:-local}
 TLS_REGENERATE=${TLS_REGENERATE:-false}
 
+# vars
 CONTAINER_NAME=alp-caddy
 DOMAIN_NAME=alp.local
 DOTENV_FILE=.env.$ENV_TYPE
@@ -15,6 +18,7 @@ touch ${DOTENV_FILE}
 CONTAINER_CRT_DIR=/data/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
 CONTAINER_CA_DIR=/data/caddy/pki/authorities/$TLS_CA_NAME
 
+# action
 if [ ${TLS_REGENERATE} = true ]; then
 	echo ". TLS_REGENERATE remove existing"
 	docker volume inspect $VOLUME_NAME > /dev/null && docker run --rm -v $VOLUME_NAME:/volume -w /volume busybox rm -rf /volume/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME

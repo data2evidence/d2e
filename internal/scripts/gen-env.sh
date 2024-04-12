@@ -4,14 +4,13 @@ set -o nounset
 set -o errexit
 
 # inputs
-dn_dir=${dn_dir:-.}
-env_base_name=${npm_package_config_env_base_name:-env}
-env_name=${env_name:-local}
-env_type=${env_type:-local}
-private_only=${private_only:-false}
+GIT_BASE_DIR=${GIT_BASE_DIR:-.}
+ENV_NAME=${ENV_NAME:-local}
+ENV_TYPE=${ENV_TYPE:-local}
+PRIVATE_ONLY=${PRIVATE_ONLY:-false}
 
-echo env_name=$env_name 
-echo env_type=$env_type
+echo ENV_NAME=$ENV_NAME 
+echo ENV_TYPE=$ENV_TYPE
 
 # functions
 function merge-yml () { 
@@ -19,29 +18,30 @@ function merge-yml () {
 }
 
 # vars
-dotenv_file=$dn_dir/.$env_base_name.$env_type
+DOTENV_FILE=$GIT_BASE_DIR/.env.$ENV_TYPE
 
 # build array of dotenv
-if [ $private_only = true ]; then
-    env_ymls=($env_base_name.private.yml)
-elif [ $env_type = local ]; then
-    env_ymls=($env_base_name.base-all.yml $env_base_name.base-$env_type.yml $env_base_name.$env_name.yml $env_base_name.private.yml)
-elif [ $env_type = remote ]; then
-    env_ymls=($env_base_name.base-all.yml $env_base_name.base-$env_type.yml $env_base_name.$env_name.yml)
+if [ $PRIVATE_ONLY = true ]; then
+    ENV_YMLS=(env.private.yml)
+elif [ $ENV_TYPE = local ]; then
+    ENV_YMLS=(env.base-all.yml env.base-$ENV_TYPE.yml env.$ENV_NAME.yml env.private.yml)
+elif [ $ENV_TYPE = remote ]; then
+    ENV_YMLS=(env.base-all.yml env.base-$ENV_TYPE.yml env.$ENV_NAME.yml)
 fi
-dotenv_ymls=($(echo ${env_ymls[@]} | sed -e 's/env/.env/g'))
-for file in ${env_ymls[@]} ${dotenv_ymls[@]}; do touch $file; done
+DOTENV_YMLS=($(echo ${ENV_YMLS[@]} | sed -e 's/env/.env/g'))
+for file in ${ENV_YMLS[@]} ${DOTENV_YMLS[@]}; do touch $file; done
 
 # convert maps & arrays to strings
-merge-yml ${env_ymls[@]} ${dotenv_ymls[@]} | yq 'with_entries(select(.value|tag|test("!!map|!!seq"))|.value|=(.|@json))' | sed -e 's/{}//' > .env.tmp.yml
+merge-yml ${ENV_YMLS[@]} ${DOTENV_YMLS[@]} | yq 'with_entries(select(.value|tag|test("!!map|!!seq"))|.value|=(.|@json))' | sed -e 's/{}//' > .env.tmp.yml
 
 # export vars for envsubst
-merge-yml ${env_ymls[@]} ${dotenv_ymls[@]} | yq -o shell > .env.tmp; set -a; source .env.tmp; set +a
+merge-yml ${ENV_YMLS[@]} ${DOTENV_YMLS[@]} | yq -o shell > .env.tmp; set -a; source .env.tmp; set +a
 
-# generate dotenv_file
-echo "# ${dotenv_file##*/} $env_name" > $dotenv_file
-[ ! -z ${GITHUB_REPOSITORY+x} ] && echo "# https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $dotenv_file
-merge-yml ${env_ymls[@]} ${dotenv_ymls[@]} .env.tmp.yml | yq -o sh | envsubst >> $dotenv_file
+# generate DOTENV_FILE
+echo "# ${DOTENV_FILE##*/} $ENV_NAME" > $DOTENV_FILE
+[ ! -z ${GITHUB_REPOSITORY+x} ] && echo "# https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $DOTENV_FILE
+merge-yml ${ENV_YMLS[@]} ${DOTENV_YMLS[@]} .env.tmp.yml | yq -o sh | envsubst >> $DOTENV_FILE
+merge-yml ${ENV_YMLS[@]} ${DOTENV_YMLS[@]} .env.tmp.yml | yq 'keys | .[]' > $DOTENV_FILE.keys
 
-echo "${env_ymls[@]} + ${dotenv_ymls[@]} => $(wc -l $dotenv_file)"
+echo "${ENV_YMLS[@]} + ${DOTENV_YMLS[@]} => $(wc -l $DOTENV_FILE)"
 rm .env.tmp .env.tmp.yml

@@ -4,41 +4,40 @@ set -o nounset
 set -o errexit
 
 # inputs
-env_base_name=${npm_package_config_env_base_name:-env}
-env_name=${env_name:-local}
-op_vault_name=$npm_package_config_op_vault_name
-overwrite=${overwrite:-false}
+ENV_NAME=${ENV_NAME:-local}
+OP_VAULT_NAME=$npm_package_config_op_vault_name
+OVERWRITE=${OVERWRITE:-false}
 
-echo env_name=$env_name
+echo ENV_NAME=$ENV_NAME
 
 # vars
-dotenv_file=.$env_base_name.$env_name.yml
-if [ ! -f $dotenv_file ]; then echo INFO $dotenv_file not found; exit 1; fi
+CACHE_DIR=cache/op
+DOTENV_FILE=.env.$ENV_NAME.yml
+if [ ! -f $DOTENV_FILE ]; then echo INFO $DOTENV_FILE not found; exit 1; fi
 
-dir=private-generated; mkdir -p $dir
-op_dotenv_file=$dir/${dotenv_file/.yml/.generated.yml}
+OP_DOTENV_FILE=$CACHE_DIR/${DOTENV_FILE/.yml/.generated.yml}
 
 # get latest for comparison
-op read op://$op_vault_name/$dotenv_file/notesPlain > $op_dotenv_file
-sed -i.bak -e '$a\' $op_dotenv_file
+op read op://$OP_VAULT_NAME/$DOTENV_FILE/notesPlain > $OP_DOTENV_FILE
+sed -i.bak -e '$a\' $OP_DOTENV_FILE
 
 # vscode diff if changes
 # add newline at end of file, if missing
-sed -i.bak -e '$a\' $dotenv_file; rm $dotenv_file.bak
+sed -i.bak -e '$a\' $DOTENV_FILE; rm $DOTENV_FILE.bak
 set +o errexit
-if diff -q $op_dotenv_file $dotenv_file; then 
+if diff -q $OP_DOTENV_FILE $DOTENV_FILE; then 
     echo INFO: no changes
 else
     # echo INFO: diff
-    diff $op_dotenv_file $dotenv_file
+    diff $OP_DOTENV_FILE $DOTENV_FILE
     echo
-    code --diff $op_dotenv_file $dotenv_file
-    if [ $overwrite != true ]; then
-        read -p "Put $dotenv_file [YyNn]? " -n 1 yn
+    code --diff $OP_DOTENV_FILE $DOTENV_FILE
+    if [ $OVERWRITE != true ]; then
+        read -p "Put $DOTENV_FILE [YyNn]? " -n 1 yn
     fi
     echo
-    if [ $overwrite = true ] || [[ $yn =~ ^[Yy]$ ]]; then 
-        op item edit --format json --vault $op_vault_name ${dotenv_file} "notesPlain[text]=$(cat ${dotenv_file})" | yq '{"reference": .fields[0].reference, "updated_at": .updated_at}'
+    if [ $OVERWRITE = true ] || [[ $yn =~ ^[Yy]$ ]]; then 
+        op item edit --format json --vault $OP_VAULT_NAME ${DOTENV_FILE} "notesPlain[text]=$(cat ${DOTENV_FILE})" | yq '{"reference": .fields[0].reference, "updated_at": .updated_at}'
     else 
         echo INFO skipped
     fi
