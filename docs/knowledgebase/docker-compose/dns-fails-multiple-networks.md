@@ -1,4 +1,4 @@
-# DNS lookup fails with Docker Compose multiple networks
+# Issue: DNS lookup fails with Docker Compose multiple networks
 
 ## Symptoms
 - impacts multiple versions of docker desktop including latest

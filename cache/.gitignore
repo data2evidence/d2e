@@ -1,0 +1,9 @@
+# Ignore everything in this directory
+*
+# Except these files
+!.gitignore
+!drivers
+!pg
+!README.md
+!synpuf1k
+!vocab
