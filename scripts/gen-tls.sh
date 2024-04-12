@@ -19,7 +19,7 @@ CONTAINER_CA_DIR=/data/caddy/pki/authorities/$TLS_CA_NAME
 # start caddy container, if not started
 # docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 
 if [ "$( docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 2> /dev/null )" != "running" ]; then
-	docker compose --env-file $DOTENV_FILE up -d $CONTAINER_NAME 2>&1 | grep -vE "WARN\[0000\]|is not set"
+	yarn base:minerva --env-file $DOTENV_FILE up $CONTAINER_NAME --wait 2>&1 | grep -vE "WARN\[0000\]|is not set"
 	if [ "$( docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 2> /dev/null )" != "running" ]; then
 		echo FATAL: $CONTAINER_NAME failed to start
 		docker container inspect --format json -f '{{.State}}' $CONTAINER_NAME
@@ -29,7 +29,7 @@ if [ "$( docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 2> /dev
 	sleep 3
 fi
 # restart to re-generate certificate
-[ ${TLS_REGENERATE} = true ] && docker compose --env-file $DOTENV_FILE restart $CONTAINER_NAME 2> /dev/null
+[ ${TLS_REGENERATE} = true ] && yarn base:minerva --env-file $DOTENV_FILE restart $CONTAINER_NAME 2> /dev/null
 
 # remove existing certs from dotenv
 for VAR_NAME in TLS__INTERNAL__CA_CRT TLS__INTERNAL__CRT TLS__INTERNAL__KEY; do sed -i.bak "/$VAR_NAME=/,/END CERTIFICATE-----'/d" $DOTENV_FILE; done
