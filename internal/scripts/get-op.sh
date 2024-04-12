@@ -4,39 +4,39 @@ set -o nounset
 set -o errexit
 
 # inputs
-env_base_name=${npm_package_config_env_base_name:-env}
-env_name=${env_name:-local}
-op_vault_name=$npm_package_config_op_vault_name
-overwrite=${overwrite:-false}
+ENV_NAME=${ENV_NAME:-local}
+[ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1
+GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+OVERWRITE=${OVERWRITE:-false}
 
-# echo env_name=$env_name
+# echo ENV_NAME=$ENV_NAME
 
 # vars
-dotenv_file=.$env_base_name.$env_name.yml
-dir=private-generated; mkdir -p $dir
-op_dotenv_file=$dir/$dotenv_file
-echo get $dotenv_file ...
+DOTENV_FILE=.env.$ENV_NAME.yml
+CACHE_DIR=$GIT_BASE_DIR/cache/op; mkdir -p $dir
+OP_DOTENV_FILE=$dir/$DOTENV_FILE
+echo get $DOTENV_FILE ...
 
 # get
-op read op://$op_vault_name/$dotenv_file/notesPlain | sed -e '$a\' > $op_dotenv_file
+op read op://$OP_VAULT_NAME/$DOTENV_FILE/notesPlain | sed -e '$a\' > $OP_DOTENV_FILE
 
-if [ ! -s $op_dotenv_file ]; then 
-    echo ERROR empty/failed $op_dotenv_file
+if [ ! -s $OP_DOTENV_FILE ]; then 
+    echo ERROR empty/failed $OP_DOTENV_FILE
     exit 1
 fi
 
-if [ $overwrite = true ] || [ ! -f $dotenv_file ]; then
-    echo ALERT: overwrite $dotenv_file
-    cp $op_dotenv_file $dotenv_file
+if [ $OVERWRITE = true ] || [ ! -f $DOTENV_FILE ]; then
+    echo ALERT: OVERWRITE $DOTENV_FILE
+    cp $OP_DOTENV_FILE $DOTENV_FILE
     exit 0
 fi
 
 # vscode diff if changes
 set +o errexit
-if diff -q $op_dotenv_file $dotenv_file; then 
+if diff -q $OP_DOTENV_FILE $DOTENV_FILE; then 
     echo INFO: no diff
 else
     echo INFO: diff
-    diff $op_dotenv_file $dotenv_file
-    code --diff $op_dotenv_file $dotenv_file
+    diff $OP_DOTENV_FILE $DOTENV_FILE
+    code --diff $OP_DOTENV_FILE $DOTENV_FILE
 fi

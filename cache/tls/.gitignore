@@ -2,10 +2,4 @@
 *
 # Except these files
 !.gitignore
-!drivers
-!op
-!pg
 !README.md
-!synpuf1k
-!tls
-!vocab

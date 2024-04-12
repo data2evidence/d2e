@@ -71,21 +71,18 @@ jobs:
         DOTENV_YML: .env.${{ env.ENV_NAME }}.yml 
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       run: |
-        dn_dir=$PWD
-        cd alp-data-node-override
         ACTIONS_STEP_DEBUG=false
       
         # get env yml from 1password
-        overwrite=true env_name=$ENV_NAME yarn op:get:$ENV_TYPE
+        OVERWRITE=true ENV_NAME=$ENV_NAME yarn op:get:$ENV_TYPE
 
         # mask sensitive values
-        scripts/gha-mask.sh
+        internal/scripts/gha-mask.sh
 
         # generate dotenv
-        dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
+        ENV_TYPE=$ENV_TYPE ENV_NAME=$ENV_NAME yarn gen:env
 
-        cd $dn_dir
-        env_type=$ENV_TYPE yarn gen:tls
+        ENV_TYPE=$ENV_TYPE yarn gen:tls
         cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 
         echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY

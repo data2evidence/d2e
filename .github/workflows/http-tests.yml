@@ -109,18 +109,13 @@ jobs:
 
       - name: create .env.local for docker-compose in system services
         run: |
-          # cd alp-data-node
-          dn_dir=$PWD
-          # cd alp-data-node-override
           echo "${DOCKER_COMPOSE_DN_BASE_ALL_ENV}" > .env.base-all.yml
           echo "${DOCKER_COMPOSE_DN_BASE_LOCAL_ENV}" > .env.base-local.yml
           echo "${DOCKER_COMPOSE_DN_LOCAL_ENV}" > .env.local.yml
-          # overwrite=true env_name=local yarn op:get:local
           wc -l .env.base-all.yml .env.base-local.yml .env.local.yml
-          dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
-          cd $dn_dir
-          env_type=$ENV_TYPE yarn gen:tls
-
+          ENV_TYPE=$ENV_TYPE ENV_NAME=$ENV_NAME yarn gen:env
+          ENV_TYPE=$ENV_TYPE yarn gen:tls
+          
           sed -i "s/${HANASERVER_REPLACE}/${HANASERVER}/g" .env.local
           sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
           # sed -i "s/HTTPTEST_ADMIN_USER/${HDIUSER}/g" .env.local
