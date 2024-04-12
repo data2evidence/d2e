@@ -1102,6 +1102,8 @@ services:
     shm_size: 1gb
     volumes:
       - pg-minerva-data-1:/var/lib/postgresql/data
+      - ./cache/pg/backup:/backup
+      - ./cache/pg/vocab:/vocab
     hostname: alp-minerva-postgres-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
