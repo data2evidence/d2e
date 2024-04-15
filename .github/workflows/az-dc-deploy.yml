@@ -101,6 +101,7 @@ jobs:
         ref: ${{ steps.override-repo.outputs.OVERRIDE_REPO }} # branch name
 
     - shell: bash
+      name: link files from override
       id: link_files_from_override
       run: |
         pwd
