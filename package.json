@@ -70,7 +70,7 @@
     "op:get:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
     "op:get:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
     "op:get:local": "for ENV_NAME in base-all base-local local; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
-    "op:get:remote": "sh -c 'for ENV_NAME in base-all base-remote ${0}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done'",
+    "op:get:remote": "for ENV_NAME in base-all base-remote $ENV_NAME; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
     "op:get": "internal/scripts/get-op.sh",
     "op:put:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
     "op:put:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
