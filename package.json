@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "ALP Data Node",
   "license": "MIT",
+  "config": {
+    "env_names_all": "local remote base-all base-local base-remote alp-dev-sg-1 alp-dev-sg-2 alp-stg-sg-1 alp-stg-sg-2",
+    "env_names_dev": "local remote base-all base-local base-remote alp-dev-sg-1"
+  },
   "scripts": {
     "gen:dotenv": "scripts/gen-dotenv.sh && yarn gen:tls",
     "gen:tls": "scripts/gen-tls.sh",
@@ -56,7 +60,11 @@
     "inittestdb": "node internal/build/initdb.js test",
     "removetestdb": "node internal/build/initdb.js rmonly",
 
-    "gen:env": "internal/scripts/gen-env.sh",
+    "gen:env": "internal/scripts/gen-env.sh && yarn gen:tls",
+    "load:all": "yarn load:permissions && yarn load:synpuf1k && yarn load:vocab",
+    "load:permissions": "internal/scripts/load-permissions.sh",
+    "load:synpuf1k": "internal/scripts/load-synpuf1k.sh",
+    "load:vocab": "internal/scripts/load-vocab.sh",
     "op:create:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do yarn op:create $ENV_NAME; done",
     "op:create": "internal/scripts/create-op.sh",
     "op:get:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
@@ -67,7 +75,7 @@
     "op:put:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
     "op:put:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
     "op:put": "internal/scripts/put-op.sh",
-    "x:setup": "internal/scripts/setup.sh"
+    "set:cache": "internal/scripts/set-cache.sh"
   },  
   "devDependencies": {
     "@types/node": "^18",

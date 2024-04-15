@@ -9,36 +9,29 @@ set -o pipefail
 [ -z "${GOOGLE_DRIVE_DATA_DIR}" ] && echo "FATAL GOOGLE_DRIVE_DATA_DIR is not set" && exit 1
 
 # vars
+CONTAINER_DIR=/vocab
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
-CACHE_DIR=$GIT_BASE_DIR/cache/synpuf1k
+CACHE_DIR=$GIT_BASE_DIR/cache/vocab
+ZIP_DIR=$GIT_BASE_DIR/cache/zip
 GOOGLE_DRIVE_BASE_DIR=$(ls -d ~/Library/CloudStorage/GoogleDrive* | head -1)
 SRC_DIR="$GOOGLE_DRIVE_BASE_DIR/$GOOGLE_DRIVE_DATA_DIR/Athena_OMOP_Vocabulary"
-ls -1 "${SRC_DIR}"
+ls -1 "${SRC_DIR}" | grep zip
 
 # action
+echo . clear $CACHE_DIR
+cd $CACHE_DIR
+rm -fv *
 echo . get latest Athena_OMOP_Vocabulary zip
 # ls $SRC_DIR
-ZIPFILE_PATH=$(find "$SRC_DIR" -name "*.zip" | tail -n 1)
+ZIPFILE_PATH=$(find "$SRC_DIR" -depth 1 -name "*.zip" | tail -n 1)
 ZIPFILE_NAME="${ZIPFILE_PATH##*/}"
 # echo ZIPFILE_PATH=$ZIPFILE_PATH
 # echo ZIPFILE_NAME=$ZIPFILE_NAME
-mkdir -p $CACHE_DIR
-cp -v "$ZIPFILE_PATH" $CACHE_DIR
-
-WK_DIR=$GIT_BASE_DIR/private-vocab
-mkdir -p $WK_DIR
-
-cd $WK_DIR
-unzip -o $CACHE_DIR/$ZIPFILE_NAME -d . # -n
+cp -v "$ZIPFILE_PATH" $ZIP_DIR
+unzip -o $ZIP_DIR/$ZIPFILE_NAME -d . # -n
 
 echo . wc -l
 wc -l *.csv | sort -nr
-
-echo . Load CSVs to cdmvocab
-for CSV_FILE in *.csv; do 
-	echo $CSV_FILE ...
-	docker exec -it alp-minerva-postgres-1 sh -c "test -f /$CSV_FILE" || docker cp $CSV_FILE alp-minerva-postgres-1:/
-done
 
 echo . Truncate
 docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "truncate cdmvocab.concept, cdmvocab.concept_ancestor, cdmvocab.concept_class, cdmvocab.concept_relationship, cdmvocab.concept_synonym, cdmvocab.domain, cdmvocab.drug_strength, cdmvocab.relationship, cdmvocab.vocabulary;" || true
@@ -48,9 +41,9 @@ for CSV_FILE in *.csv; do
 	echo load $CSV_FILE ...; 
 	TABLE_NAME=${CSV_FILE/.csv/}
 	if [ "$CSV_FILE" = "DRUG_STRENGTH.csv" ]; then 
-		docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "\\copy cdmvocab.${TABLE_NAME} FROM '/${CSV_FILE}' WITH (FORMAT CSV, HEADER, DELIMITER E'\t', FORCE_NULL (amount_value, amount_unit_concept_id, denominator_value, box_size, numerator_value, numerator_unit_concept_id, denominator_unit_concept_id), ENCODING 'UTF8', QUOTE '\"', ESCAPE E'\\\\');"
+		docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "\\copy cdmvocab.${TABLE_NAME} FROM '$CONTAINER_DIR/${CSV_FILE}' WITH (FORMAT CSV, HEADER, DELIMITER E'\t', FORCE_NULL (amount_value, amount_unit_concept_id, denominator_value, box_size, numerator_value, numerator_unit_concept_id, denominator_unit_concept_id), ENCODING 'UTF8', QUOTE '\"', ESCAPE E'\\\\');"
 	else
-		docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "\\copy cdmvocab.${TABLE_NAME} FROM '/${CSV_FILE}' WITH (FORMAT CSV, HEADER, DELIMITER E'\t', ENCODING 'UTF8', QUOTE '\"', ESCAPE E'\\\\');"; 
+		docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "\\copy cdmvocab.${TABLE_NAME} FROM '$CONTAINER_DIR/${CSV_FILE}' WITH (FORMAT CSV, HEADER, DELIMITER E'\t', ENCODING 'UTF8', QUOTE '\"', ESCAPE E'\\\\');"; 
 	fi
 done
 
