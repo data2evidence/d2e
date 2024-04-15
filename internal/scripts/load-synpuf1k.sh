@@ -11,7 +11,6 @@ set -o pipefail
 # vars
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 CACHE_DIR=$GIT_BASE_DIR/cache/synpuf1k
-GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 GOOGLE_DRIVE_BASE_DIR=$(ls -d ~/Library/CloudStorage/GoogleDrive* | head -1)
 SRC_DIR="$GOOGLE_DRIVE_BASE_DIR/$GOOGLE_DRIVE_DATA_DIR/Synpuf1k"
 ls -1 "${SRC_DIR}"
