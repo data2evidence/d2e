@@ -98,23 +98,22 @@ jobs:
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
 
-      - name: Get alp-dbcli from 1password
+      - name: Get drivers from 1password
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         run: |
-          pwd
-          mkdir -p internal/build
-          op read --out-file internal/build/alp-dbcli-private-v1.0.0.tgz "op://${{ vars.OP_VAULT_NAME }}/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
-          ls -l internal/build
+          yarn set:cache
+          ls -l cache/drivers
 
       - name: create .env.local for docker-compose in system services
+        env:
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
           echo "${DOCKER_COMPOSE_DN_BASE_ALL_ENV}" > .env.base-all.yml
           echo "${DOCKER_COMPOSE_DN_BASE_LOCAL_ENV}" > .env.base-local.yml
           echo "${DOCKER_COMPOSE_DN_LOCAL_ENV}" > .env.local.yml
           wc -l .env.base-all.yml .env.base-local.yml .env.local.yml
-          ENV_TYPE=$ENV_TYPE ENV_NAME=$ENV_NAME yarn gen:env
-          ENV_TYPE=$ENV_TYPE yarn gen:tls
+          OP_VAULT_NAME=$OP_VAULT_NAME ENV_TYPE=$ENV_TYPE ENV_NAME=$ENV_NAME OVERWRITE=true yarn gen:env
           
           sed -i "s/${HANASERVER_REPLACE}/${HANASERVER}/g" .env.local
           sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
