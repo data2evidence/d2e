@@ -1,21 +1,23 @@
-import { Connection as connLib } from "@alp/alp-base-utils";
+import { Connection as connLib, User } from "@alp/alp-base-utils";
 import ConnectionInterface = connLib.ConnectionInterface;
 import CallBackInterface = connLib.CallBackInterface;
 import { Settings } from "../settings/Settings";
-import { FfhQeConfig, CONFIG_TYPES, MESSAGES } from "./config";
+import { FfhQeConfig, MESSAGES } from "./config";
 import { DbMeta } from "../settings/DbMeta";
+import { getAnalyticsConnection } from "../../utils/utils";
 
 export class ConfigFacade {
   private settings: Settings;
-  private dbMeta: DbMeta;
+  private userObj: User;
 
   constructor(
     private connection: ConnectionInterface,
     private ffhQeConfig: FfhQeConfig,
+    private user: User,
     testMode?: boolean
   ) {
     this.settings = new Settings();
-    this.dbMeta = new DbMeta(ffhQeConfig.getAnalyticsConnection());
+    this.userObj = this.user;
   }
 
   public getFfhQeConfig() {
@@ -163,7 +165,9 @@ export class ConfigFacade {
         callback(null, this.settings.getDefaultAdvancedSettings());
         break;
       case "getColumns":
-        this.dbMeta.getColumnsForPlaceHolders(
+        let analyticsConnection = getAnalyticsConnection(this.userObj)
+        let dbMeta = new DbMeta(analyticsConnection);
+        dbMeta.getColumnsForPlaceHolders(
           request.dbObjectList,
           (err, result) => {
             if (err) {

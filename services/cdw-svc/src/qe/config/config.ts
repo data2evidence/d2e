@@ -4,7 +4,7 @@
 import * as async from "async";
 import * as cfg from "@alp/alp-config-utils";
 import { CreateLogger } from "../../utils/Logger";
-import { isXS2 } from "../../utils/utils";
+import { getAnalyticsConnection, isXS2 } from "../../utils/utils";
 import { CDWValidator } from "./CDWValidation";
 import * as configDefinitionLib from "./configDefinition";
 import * as configSuggestionLib from "./configSuggestion";
@@ -55,6 +55,7 @@ export class FfhQeConfig {
   private CONFIG_FORMATTER_SETTINGS;
   private PRIVILEGES;
   private ffhConfig: cfg.FFHConfig.FFHConfig;
+  private analyticsConnection: ConnectionInterface; 
   private emptyConfigValidationResult: ConfigValidationResultType = {
     cdmConfigValidationResult: {
       errors: [],
@@ -70,14 +71,12 @@ export class FfhQeConfig {
 
   constructor(
     private conn: ConnectionInterface,
-    private analyticsConnection: ConnectionInterface,
     private assignmentLib: AssignementInterface,
     private settingsObj: Settings,
     private userObj: User,
     private testMode: boolean = false
   ) {
     this.conn = conn;
-    this.analyticsConnection = analyticsConnection;
     this.utilsLib = configTools;
     this.ffhConfig = new FfhConfig(conn, this.userObj);
 
@@ -118,10 +117,6 @@ export class FfhQeConfig {
 
   public getFfhConfigObj() {
     return this.ffhConfig;
-  }
-
-  public getAnalyticsConnection() {
-    return this.analyticsConnection;
   }
 
   public async getAdminConfig(configId, configVersion) {
@@ -218,6 +213,9 @@ export class FfhQeConfig {
     const definition = configDefinitionLib.getDefinition(
       config.advancedSettings.tableMapping
     );
+    if(this.analyticsConnection == null || this.analyticsConnection == ''){
+      this.analyticsConnection = getAnalyticsConnection(this.userObj)
+    }
     const validator = new CDWValidator(this.analyticsConnection, config);
     const tmpValidationResult = validator.validateConfiguration(definition);
     result.cdmConfigValidationResult = {
@@ -234,6 +232,9 @@ export class FfhQeConfig {
     const definition = configDefinitionLib.getDefinition(
       config.advancedSettings
     );
+    if(this.analyticsConnection == null || this.analyticsConnection == ''){
+      this.analyticsConnection = getAnalyticsConnection(this.userObj)
+    }
     const validator = new CDWValidator(this.analyticsConnection, config);
     const preValidation = validator.validateConfiguration(definition);
 
@@ -728,6 +729,9 @@ export class FfhQeConfig {
       };
       const { advancedSettings } = config;
 
+      if(this.analyticsConnection == null || this.analyticsConnection == ''){
+        this.analyticsConnection = getAnalyticsConnection(this.userObj)
+      }
       await new Promise(async (resolve, reject) => {
         settingsLib.validateSettings(
           this.analyticsConnection,

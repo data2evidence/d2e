@@ -20,7 +20,7 @@ import { FfhQeConfig, MESSAGES } from "./qe/config/config";
 import { AssignmentProxy } from "./AssignmentProxy";
 import { Settings } from "./qe/settings/Settings";
 import { ICDWRequest } from "./types";
-import { getDuckdbDBConnection, getFileName } from "./utils/DuckdbConnection";
+import { getAnalyticsConnection } from "./utils/utils";
 
 const log = Logger.CreateLogger("cdw-log");
 
@@ -67,7 +67,7 @@ const main = () => {
 
   log.info(`CDW audit threshold: ${EnvVarUtils.getCDWAuditThreshold()}`);
 
-  initRoutes(app, configCredentials, analyticsCredential, isTestEnvironment);
+  initRoutes(app, configCredentials, isTestEnvironment);
 
   // global error handler
   app.use((err, req, res, next) => {
@@ -88,27 +88,9 @@ const handleStartupError = (err) => {
 };
 
 const getConnections = async ({
-  analyticsCredentials,
   configCredentials,
   userObj,
-}): Promise<{
-  analyticsConnection: Connection.ConnectionInterface;
-  configConnection: Connection.ConnectionInterface;
-}> => {
-  let analyticsConnection;
-  if (env.USE_DUCKDB === "true") {
-    log.info("Use Duckdb")
-    // Use duckdb as analyticsConnection if USE_DUCKDB flag is set to true
-    const { duckdbSchemaFileName, vocabSchemaFileName } = await getFileName(analyticsCredentials.databaseName, analyticsCredentials.schema, analyticsCredentials.vocabSchema)
-    analyticsConnection =  await getDuckdbDBConnection(duckdbSchemaFileName, vocabSchemaFileName)
-} else {
-  analyticsConnection =
-    await dbConnectionUtil.DBConnectionUtil.getDBConnection({
-      credentials: analyticsCredentials,
-      schema: analyticsCredentials.cdwSchema || analyticsCredentials.schema,
-      userObj,
-    });
-  }
+}): Promise<Connection.ConnectionInterface> => {
   const configConnection =
     await dbConnectionUtil.DBConnectionUtil.getDBConnection({
       credentials: configCredentials,
@@ -116,16 +98,12 @@ const getConnections = async ({
       userObj,
     });
 
-  return {
-    analyticsConnection,
-    configConnection,
-  };
+  return configConnection
 };
 
 const initRoutes = (
   app: express.Application,
   configCredentials,
-  analyticsCredentials,
   isTestEnvironment
 ) => {
   app.use(express.json({ strict: false, limit: "50mb" }));
@@ -141,8 +119,7 @@ const initRoutes = (
       }
 
       try {
-        req.dbConnections = await getConnections({
-          analyticsCredentials,
+        req.dbConnections.configConnection = await getConnections({
           configCredentials,
           userObj,
         });
@@ -166,13 +143,12 @@ const initRoutes = (
   });
 
   app.post("/hc/hph/config/services/global.xsjs", (req: ICDWRequest, res) => {
-    const { analyticsConnection, configConnection } = req.dbConnections;
+    const {configConnection } = req.dbConnections;
     const user = getUser(req);
     const assignment = new AssignmentProxy(req.assignment);
-    const facade = new SettingsFacade(analyticsConnection);
+    const facade = new SettingsFacade(user);
     const ffhQeConfig = new FfhQeConfig(
       configConnection,
-      analyticsConnection,
       assignment,
       new Settings(),
       user,
@@ -195,13 +171,12 @@ const initRoutes = (
   app.post(
     "/hc/hph/config/user/global_enduser.xsjs",
     (req: ICDWRequest, res) => {
-      const { analyticsConnection, configConnection } = req.dbConnections;
+      const {configConnection } = req.dbConnections;
       const user = getUser(req);
-      const facade = new SettingsFacade(analyticsConnection);
+      const facade = new SettingsFacade(user);
       const assignment = new AssignmentProxy(req.assignment);
       const ffhQeConfig = new FfhQeConfig(
         configConnection,
-        analyticsConnection,
         assignment,
         new Settings(),
         user,
@@ -261,12 +236,12 @@ const initRoutes = (
           configConnection,
           new FfhQeConfig(
             configConnection,
-            analyticsConnection,
             assignment,
             settings,
             user,
             isTestEnvironment
           ),
+          user,
           isTestEnvironment
         ).invokeService(
           input,
@@ -290,15 +265,15 @@ const initRoutes = (
   app.post(
     "/hc/hph/cdw/services/cdw_services.xsjs",
     (req: ICDWRequest, res) => {
-      const { analyticsConnection, configConnection } = req.dbConnections;
+      const { configConnection } = req.dbConnections;
       const assignment = new AssignmentProxy(req.assignment); //TODO: Send http req instead of getting it from req.
       const user = getUser(req);
       const settings = new Settings();
+      let analyticsConnection = getAnalyticsConnection(user);
       new CDWServicesFacade(
         analyticsConnection,
         new FfhQeConfig(
           configConnection,
-          analyticsConnection,
           assignment,
           settings,
           user,

@@ -8,26 +8,22 @@ import {
   Constants,
   User,
 } from "@alp/alp-base-utils";
-import ConnectionInterface = connLib.ConnectionInterface;
 import CallBackInterface = connLib.CallBackInterface;
-
+import { getAnalyticsConnection } from "../../utils/utils";
 export class SettingsFacade {
   private settings: Settings;
-  private dbMeta: DbMeta;
   private config: FfhQeConfig;
+  private userObj: User;
 
-  constructor(private analyticsConnection: ConnectionInterface) {
+  constructor(private user: User) {
     this.settings = new Settings();
-    this.dbMeta = new DbMeta(this.analyticsConnection);
+    this.userObj = this.user;
   }
   public setFfhQeConfig(config: FfhQeConfig) {
     this.config = config;
   }
   public getSettings() {
     return this.settings;
-  }
-  public getDbMeta() {
-    return this.dbMeta;
   }
   public invokeAdminServices(request: any, callback: CallBackInterface) {
     switch (request.action) {
@@ -46,7 +42,9 @@ export class SettingsFacade {
         callback(null, result);
         break;
       case "getColumns":
-        this.dbMeta.getColumns(request.dbObject, (err, result) => {
+        let analyticsConnection = getAnalyticsConnection(this.userObj)
+        let dbMeta = new DbMeta(analyticsConnection);
+        dbMeta.getColumns(request.dbObject, (err, result) => {
           if (err) {
             callback(err, null);
           } else {
