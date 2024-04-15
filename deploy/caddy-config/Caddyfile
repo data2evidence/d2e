@@ -91,6 +91,41 @@ https://{$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3001 {
 	}
 }
 
+https://host.docker.internal:41130 {
+	log {
+		format console {
+			level_format color
+		}
+	}
+
+	tls internal
+	handle /* {
+		reverse_proxy http://alp-minerva-fhir-fe-server-1:3000 {
+			header_up Host host.docker.internal:3000
+			transport http {
+				read_buffer 8192
+			}
+		}
+	}
+}
+
+https://host.docker.internal:8103 {
+	log {
+		format console {
+			level_format color
+		}
+	}
+	tls internal
+	handle /* {
+		reverse_proxy http://alp-minerva-fhir-server-1:8103 {
+			header_up Host host.docker.internal:8103
+			transport http {
+				read_buffer 8192
+			}
+		}
+	}
+}
+
 https://{$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3002 {
 	log {
 		format console {

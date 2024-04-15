@@ -319,6 +319,7 @@ services:
       - 3002:3002
       - 41101:41101
       - 8103:8103
+      - 41130:41130
     pull_policy: missing
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
