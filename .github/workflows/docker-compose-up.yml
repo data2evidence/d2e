@@ -10,6 +10,8 @@ on:
 
 env:
   DOCKER_TAG_NAME: ${{ github.sha }}
+  ENV_NAME: local
+  ENV_TYPE: local
   GIT_COMMIT_ARG: ${{ github.sha }}
 
 # Run only one job per branch
@@ -71,8 +73,6 @@ jobs:
         env:
           DOTENV_FILE: .env.${{ env.ENV_TYPE }}
           DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
-          ENV_NAME: ${{ github.event.inputs.env }}
-          ENV_TYPE: remote
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
           OVERWRITE: true  
