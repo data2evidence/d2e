@@ -7,6 +7,7 @@ import { IMRIRequest, QuerySvcResultType } from "../types";
 dotenv.config();
 const log = Logger.CreateLogger("analytics-log");
 const envVarUtils = new EnvVarUtils(process.env);
+import { ALP_MINERVA_QUERY_GEN__URL } from "../config";
 
 export async function generateQuery(
     req: IMRIRequest,
@@ -25,8 +26,8 @@ export async function generateQuery(
         urlParams = new URL(`http://localhost:41008`);
         protocolLib = http;
     } else {
-        urlParams = new URL("http://alp-minerva-query-gen-svc-1:41109");
-        protocolLib = http;
+        urlParams = new URL(ALP_MINERVA_QUERY_GEN__URL);
+        protocolLib = https;
     }
     hostname = urlParams.hostname;
     port = urlParams.port;
