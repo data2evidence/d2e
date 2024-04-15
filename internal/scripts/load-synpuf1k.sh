@@ -9,6 +9,7 @@ set -o pipefail
 [ -z "${GOOGLE_DRIVE_DATA_DIR}" ] && echo "FATAL GOOGLE_DRIVE_DATA_DIR is not set" && exit 1
 
 # vars
+GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 CACHE_DIR=$GIT_BASE_DIR/cache/synpuf1k
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 GOOGLE_DRIVE_BASE_DIR=$(ls -d ~/Library/CloudStorage/GoogleDrive* | head -1)
@@ -29,4 +30,4 @@ unzip -o $CACHE_DIR/$ZIPFILE_NAME -d .
 
 echo . seed-postgres-cdm-schemas
 cd $GIT_BASE_DIR
-yarn seed-postgres-cdm-schemas cdmdefault
+yarn seed-postgres-cdm-schemas alpdev_pg cdmdefault
