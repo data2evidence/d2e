@@ -58,8 +58,6 @@ on:
 
 env:
   DOCKER_TAG_NAME: ${{ github.event.inputs.docker-tag-textbox || 'develop' }}
-  ENV_NAME: ${{ github.event.inputs.env }}
-  ENV_TYPE: remote
 
 concurrency:
   group: az-dc-deploy-${{ github.event.inputs.env }}
@@ -139,21 +137,24 @@ jobs:
       env:
         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
         DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
+        ENV_NAME: ${{ github.event.inputs.env }}
+        ENV_TYPE: remote
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+        OVERWRITE: true
       run: |
         ACTIONS_STEP_DEBUG=false
+        export OP_VAULT_NAME ENV_TYPE ENV_NAME OVERWRITE
       
         # get env yml from 1password
-        OVERWRITE=true ENV_NAME=$ENV_NAME yarn op:get:$ENV_TYPE
+        yarn op:get:$ENV_TYPE
 
         # mask sensitive values
         internal/scripts/gha-mask.sh
 
         # generate dotenv
-        ENV_TYPE=$ENV_TYPE ENV_NAME=$ENV_NAME yarn gen:env
+        yarn gen:env
         echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-
-        ENV_TYPE=$ENV_TYPE yarn gen:tls
 
         cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 

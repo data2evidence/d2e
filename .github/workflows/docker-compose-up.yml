@@ -10,8 +10,6 @@ on:
 
 env:
   DOCKER_TAG_NAME: ${{ github.sha }}
-  ENV_NAME: local
-  ENV_TYPE: local
   GIT_COMMIT_ARG: ${{ github.sha }}
 
 # Run only one job per branch
@@ -71,25 +69,27 @@ jobs:
 
       - name: Generate dotenv
         env:
-         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
-         DOTENV_YML: .env.${{ env.ENV_NAME }}.yml 
-         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+          DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
+          ENV_NAME: ${{ github.event.inputs.env }}
+          ENV_TYPE: remote
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+          OVERWRITE: true  
         run: |
           ACTIONS_STEP_DEBUG=false
+          export OP_VAULT_NAME ENV_TYPE ENV_NAME OVERWRITE
         
           # get env yml from 1password
-          OVERWRITE=true ENV_NAME=$ENV_NAME yarn op:get:$ENV_TYPE
+          yarn op:get:$ENV_TYPE
 
           # mask sensitive values
           internal/scripts/gha-mask.sh
 
           # generate dotenv
-          ENV_TYPE=$ENV_TYPE ENV_NAME=$ENV_NAME yarn gen:env
-
-          ENV_TYPE=$ENV_TYPE yarn gen:tls
+          yarn gen:env
 
           echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
-
 
       - uses: docker/setup-buildx-action@v3
         id: builder
