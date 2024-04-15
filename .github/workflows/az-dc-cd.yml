@@ -23,6 +23,7 @@ on:
 env:
   DOCKER_TAG_NAME: ${{ github.event.inputs.docker_tag_name }}
   ENV_NAME: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
+  ENV_TYPE: remote
 
 concurrency: 
   group: az-dc-cd-${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
@@ -68,8 +69,6 @@ jobs:
       env:
         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
         DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
-        ENV_NAME: ${{ github.event.inputs.env }}
-        ENV_TYPE: remote
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         OVERWRITE: true
