@@ -24,4 +24,7 @@ export const DATAFLOW__BASE_URL = process.env.DATAFLOW__BASE_URL;
 export const DUCKDB_DATA_FOLDER = process.env.DUCKDB__DATA_FOLDER;
 export const USE_DUCKDB = process.env.USE_DUCKDB;
 
-export const ALP_MINERVA_PS_CONFIG_SERVER__URL = process.env.ALP_MINERVA_PS_CONFIG_SERVER__URL
+export const ALP_MINERVA_PS_CONFIG_SERVER__URL =
+    process.env.ALP_MINERVA_PS_CONFIG_SERVER__URL;
+export const ALP_MINERVA_QUERY_GEN__URL =
+    process.env.ALP_MINERVA_QUERY_GEN__URL;
