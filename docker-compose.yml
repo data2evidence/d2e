@@ -838,7 +838,7 @@ services:
       LOGTO__CLIENT_SECRET: ${LOGTO__ALP_APP__CLIENT_SECRET}
       LOGTO__ISSUER: https://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}:3001/oidc
       LOGTO__RESOURCE_API: https://alp-default
-      LOGTO__SCOPE: openid offline profile email
+      LOGTO__SCOPE: openid offline_access profile email
       LOGTO__SVC_CLIENT_ID: 6q6a13bg3dw6fncdr2kf6
       LOGTO__SVC_CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
       LOGTO__TOKEN_URL: http://alp-logto-${BASE_PORT}:3001/oidc/token
