@@ -23,9 +23,9 @@ export const terminologyRequest = (
         : req.headers.authorization;
 
     const { hostname, port, protocol } = new URL(
-        "http://alp-minerva-terminology-svc-1:41108"
+        "https://alp-minerva-terminology-svc-1:41108"
     );
-    const protocolLib = http;
+    const protocolLib = https;
     const data = JSON.stringify(payload);
 
     const defaultPath = `/terminology/${path}`;
