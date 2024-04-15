@@ -3,7 +3,7 @@ import * as http from "http";
 import * as qs from "querystring";
 import { URL } from "url";
 import { StudyMriConfigMetaDataType } from "../types";
-
+import * as https from "https";
 const log = Logger.CreateLogger("config-util-log");
 
 export default class MriConfigConnection {
@@ -36,7 +36,7 @@ export default class MriConfigConnection {
                 urlPath = "me";
             }
 
-            const options: http.RequestOptions = {
+            const options: https.RequestOptions = {
               hostname,
               protocol,
               port,
@@ -44,10 +44,12 @@ export default class MriConfigConnection {
               headers: {
                 authorization: authorizationValue, // Replace user JWT (req.headers.authorization) with CCF
                 "user-agent": "ALP Service",
-                "x-source-origin": sourceOrigin,
+                "x-source-origin": sourceOrigin,                
               },
+              "rejectUnauthorized": false,
+              "ca": process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n'),
             };
-            const getReq = http
+            const getReq = https
               .get(options, (response) => {
                 let body = "";
                 response.on("data", (d) => {
