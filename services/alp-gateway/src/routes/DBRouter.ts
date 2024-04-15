@@ -37,7 +37,7 @@ export class DBRouter {
 
         const options = {
           options: {
-            flow_action_type: 'update',
+            flow_action_type: 'update_datamodel',
             database_code: databaseCode,
             data_model: dataModel,
             schema_name: schemaName,
@@ -50,7 +50,7 @@ export class DBRouter {
           options,
           'datamodel',
           dmInfo.flowId,
-          'datamodel-update'
+          `datamodel-update-${schemaName}`
         )
         return res.status(200).json(result)
       } catch (error) {
