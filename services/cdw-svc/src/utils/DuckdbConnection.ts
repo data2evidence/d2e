@@ -5,7 +5,7 @@ import {
     flattenParameter,
     DBValues,
 } from "@alp/alp-base-utils/target/src/Connection";
-import { Connection, Database } from "duckdb-async";
+import { Connection, OPEN_READONLY, Database } from "duckdb-async";
 import { DBError } from "@alp/alp-base-utils/target/src/DBError";
 import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
 import { translateHanaToPostgres } from "@alp/alp-base-utils/target/src/helpers/translateHanaToPostgres";
@@ -56,7 +56,8 @@ export class DuckdbConnection implements ConnectionInterface {
     ) {
         try {
             const duckdDB = await Database.create(
-                `${env.DUCKDB__DATA_FOLDER}/${duckdbSchemaFileName}`
+                `${env.DUCKDB__DATA_FOLDER}/${duckdbSchemaFileName}`,
+                OPEN_READONLY
             );
             const duckdDBconn = await duckdDB.connect();
             // Load vocab schema into duckdb connection
