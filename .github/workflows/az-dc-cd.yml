@@ -25,7 +25,7 @@ env:
   ENV_NAME: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
   ENV_TYPE: remote
 
-concurrency: 
+concurrency:
   group: az-dc-cd-${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
   cancel-in-progress: true
 

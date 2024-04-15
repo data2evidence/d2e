@@ -55,7 +55,7 @@ services:
       - 9229:9229
     environment:
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
-      NODE_ENV: development # production # development
+      NODE_ENV: production # development
 
   alp-local-ui-file-server:
     container_name: alp-local-ui-file-server
