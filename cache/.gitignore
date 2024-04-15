@@ -4,9 +4,10 @@
 !.gitignore
 !drivers
 !op
-!pg
+!pgbackup
 !README.md
 !synpuf1k
 !tls
-!vocab
 !vackup
+!vocab
+!zip
