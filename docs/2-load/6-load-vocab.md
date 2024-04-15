@@ -17,8 +17,9 @@
 - Run the following commands
 ```bash
 GIT_BASE_DIR=$(git rev-parse --show-toplevel)
-WK_DIR=$GIT_BASE_DIR/cache/vocab; mkdir -p $WK_DIR; cd $WK_DIR
+VOCAB_DIR=$GIT_BASE_DIR/cache/vocab
 ZIP_FILE="$(ls -tr ~/Downloads/vocabulary_download_v5*.zip | head -1)"
+cd $VOCAB_DIR
 unzip -o -d . "${ZIP_FILE}"
 ```
 - remove additional file
