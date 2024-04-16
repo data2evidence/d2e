@@ -1,60 +1,60 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Delete } from '@nestjs/common'
 import { AnalysisflowService } from './analysis-flow.service'
-import { AnalysisflowDto, DataflowDuplicateDto } from './dto'
+import { AnalysisflowDto, AnalysisflowDuplicateDto } from './dto'
 
 @Controller('analysisflow')
 export class AnalysisflowController {
-  constructor(private readonly dataflowService: AnalysisflowService) {}
+  constructor(private readonly analysisflowService: AnalysisflowService) {}
 
   @Get('list')
-  getDataflows() {
-    return this.dataflowService.getDataflows()
+  getAnalysisflows() {
+    return this.analysisflowService.getAnalysisflows()
   }
 
   @Get(':id')
-  getDataflow(@Param('id', ParseUUIDPipe) id: string) {
-    return this.dataflowService.getDataflow(id)
+  getAnalysisflow(@Param('id', ParseUUIDPipe) id: string) {
+    return this.analysisflowService.getAnalysisflow(id)
   }
 
   @Get(':id/latest')
-  getDataflowRevision(@Param('id', ParseUUIDPipe) id: string) {
-    return this.dataflowService.getLastDataflowRevision(id)
+  getAnalysisflowRevision(@Param('id', ParseUUIDPipe) id: string) {
+    return this.analysisflowService.getLastAnalysisflowRevision(id)
   }
 
   @Delete(':id')
-  deleteDataflow(@Param('id', ParseUUIDPipe) id: string) {
-    return this.dataflowService.deleteDataflow(id)
+  deleteAnalysisflow(@Param('id', ParseUUIDPipe) id: string) {
+    return this.analysisflowService.deleteAnalysisflow(id)
   }
 
   @Get('task-run-result/:taskRunId')
   getTaskRunResult(@Param('taskRunId', ParseUUIDPipe) taskRunId: string) {
-    return this.dataflowService.getTaskRunResult(taskRunId)
+    return this.analysisflowService.getTaskRunResult(taskRunId)
   }
 
-  @Get('/:dataflowId/flow-run-results')
-  getFlowRunResults(@Param('dataflowId', ParseUUIDPipe) dataflowId: string) {
-    return this.dataflowService.getFlowRunResultsByDataflowId(dataflowId)
+  @Get('/:analysisflowId/flow-run-results')
+  getFlowRunResults(@Param('analysisflowId', ParseUUIDPipe) analysisflowId: string) {
+    return this.analysisflowService.getFlowRunResultsByAnalysisflowId(analysisflowId)
   }
 
   @Post()
-  createDataflow(@Body() dataflowDto: AnalysisflowDto) {
-    return this.dataflowService.createDataflow(dataflowDto)
+  createAnalysisflow(@Body() analysisflowDto: AnalysisflowDto) {
+    return this.analysisflowService.createAnalysisflow(analysisflowDto)
   }
 
   @Post('duplicate/:id/:revisionId')
-  duplicateDataflow(
+  duplicateAnalysisflow(
     @Param('id', ParseUUIDPipe) flowId: string,
     @Param('revisionId', ParseUUIDPipe) revisionId: string,
-    @Body() dataflowDuplicateDto: DataflowDuplicateDto
+    @Body() analysisflowDuplicateDto: AnalysisflowDuplicateDto
   ) {
-    return this.dataflowService.duplicateDataflow(flowId, revisionId, dataflowDuplicateDto)
+    return this.analysisflowService.duplicateAnalysisflow(flowId, revisionId, analysisflowDuplicateDto)
   }
 
   @Delete(':id/:revisionId')
-  deleteDataflowRevision(
+  deleteAnalysisflowRevision(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('revisionId', ParseUUIDPipe) revisionId: string
   ) {
-    return this.dataflowService.deleteDataflowRevision(id, revisionId)
+    return this.analysisflowService.deleteAnalysisflowRevision(id, revisionId)
   }
 }

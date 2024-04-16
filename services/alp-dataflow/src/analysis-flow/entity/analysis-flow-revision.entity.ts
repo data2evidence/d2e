@@ -14,12 +14,12 @@ export class AnalysisflowRevision extends Audit {
   @Column({ nullable: true })
   comment: string
 
-  @Column({ name: 'dataflow_id', type: 'uuid' })
-  dataflowId: string
+  @Column({ name: 'analysisflow_id', type: 'uuid' })
+  analysisflowId: string
 
-  @ManyToOne(() => Analysisflow, dataflow => dataflow.revisions, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'dataflow_id' })
-  dataflow: Analysisflow
+  @ManyToOne(() => Analysisflow, analysisflow => analysisflow.revisions, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'analysisflow_id' })
+  analysisflow: Analysisflow
 
   @Column({ name: 'version', type: 'int', nullable: false })
   version: number

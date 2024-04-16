@@ -8,12 +8,12 @@ export class AnalysisflowRun extends Audit {
   @PrimaryColumn({ name: 'root_flow_run_id', type: 'uuid' })
   rootFlowRunId: string
 
-  @Column({ name: 'dataflow_id', type: 'uuid' })
-  dataflowId: string
+  @Column({ name: 'analysisflow_id', type: 'uuid' })
+  analysisflowId: string
 
-  @ManyToOne(() => Analysisflow, dataflow => dataflow.runs, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'dataflow_id' })
-  dataflow: Analysisflow
+  @ManyToOne(() => Analysisflow, analysisflow => analysisflow.runs, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'analysisflow_id' })
+  analysisflow: Analysisflow
 
   @OneToMany(() => AnalysisflowResult, result => result.flowRun)
   results: AnalysisflowResult[]

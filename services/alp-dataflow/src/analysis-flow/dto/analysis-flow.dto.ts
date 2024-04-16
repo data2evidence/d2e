@@ -2,7 +2,7 @@ import { IsArray, IsNotEmpty, IsNotEmptyObject, IsOptional, IsUUID, Validate, Va
 import { Type } from 'class-transformer'
 import { IDataflowDto, IDataflowDuplicateDto, IDataflowRevisionDto } from '../../types'
 import { EdgeDto, NodeDto } from '../../common/dto'
-import { IsDataflowNameExist, UniqueNodeName } from '../validator'
+import { IsAnalysisflowNameExist, UniqueNodeName } from '../validator'
 
 class AnalysisflowRevisionDto implements IDataflowRevisionDto {
   @IsArray()
@@ -26,7 +26,7 @@ export class AnalysisflowDto implements IDataflowDto {
   id: string
 
   @IsNotEmpty()
-  @IsDataflowNameExist()
+  @IsAnalysisflowNameExist()
   name: string
 
   @IsNotEmptyObject()
@@ -35,7 +35,7 @@ export class AnalysisflowDto implements IDataflowDto {
   dataflow: AnalysisflowRevisionDto
 }
 
-export class DataflowDuplicateDto implements IDataflowDuplicateDto {
+export class AnalysisflowDuplicateDto implements IDataflowDuplicateDto {
   @IsNotEmpty()
   name: string
 }

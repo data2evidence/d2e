@@ -14,9 +14,9 @@ export class Analysisflow extends Audit {
   @Column({ name: 'last_flow_run_id', type: 'uuid', nullable: true })
   lastFlowRunId: string
 
-  @OneToMany(() => AnalysisflowRevision, revision => revision.dataflow)
+  @OneToMany(() => AnalysisflowRevision, revision => revision.analysisflow)
   revisions: AnalysisflowRevision[]
 
-  @OneToMany(() => AnalysisflowRun, dataflowRun => dataflowRun.dataflow)
+  @OneToMany(() => AnalysisflowRun, analysisflowRun => analysisflowRun.analysisflow)
   runs: AnalysisflowRun[]
 }

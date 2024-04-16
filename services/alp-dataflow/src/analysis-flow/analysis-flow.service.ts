@@ -17,22 +17,22 @@ export class AnalysisflowService {
 
   constructor(
     @Inject(REQUEST) request: Request,
-    @InjectRepository(Analysisflow) private readonly dataflowRepo: Repository<Analysisflow>,
-    @InjectRepository(AnalysisflowRevision) private readonly dataflowRevisionRepo: Repository<AnalysisflowRevision>,
-    @InjectRepository(AnalysisflowResult) private readonly dataflowResultRepo: Repository<AnalysisflowResult>,
-    @InjectRepository(AnalysisflowRun) private readonly dataflowRunRepo: Repository<AnalysisflowRun>
+    @InjectRepository(Analysisflow) private readonly analysisflowRepo: Repository<Analysisflow>,
+    @InjectRepository(AnalysisflowRevision) private readonly analysisflowRevisionRepo: Repository<AnalysisflowRevision>,
+    @InjectRepository(AnalysisflowResult) private readonly analysisflowResultRepo: Repository<AnalysisflowResult>,
+    @InjectRepository(AnalysisflowRun) private readonly analysisflowRunRepo: Repository<AnalysisflowRun>
   ) {
     const token = decode(request.headers['authorization'].replace(/bearer /i, '')) as JwtPayload
     this.userId = token.sub
   }
 
-  async getDataflow(id: string) {
-    return await this.dataflowRepo
-      .createQueryBuilder('dataflow')
-      .leftJoin('dataflow.revisions', 'revision')
+  async getAnalysisflow(id: string) {
+    return await this.analysisflowRepo
+      .createQueryBuilder('analysisflow')
+      .leftJoin('analysisflow.revisions', 'revision')
       .select([
-        'dataflow.id',
-        'dataflow.name',
+        'analysisflow.id',
+        'analysisflow.name',
         'revision.id',
         'revision.flow',
         'revision.comment',
@@ -40,19 +40,19 @@ export class AnalysisflowService {
         'revision.createdBy',
         'revision.version'
       ])
-      .where('dataflow.id = :id', { id })
+      .where('analysisflow.id = :id', { id })
       .orderBy('revision.createdDate')
       .getOne()
   }
 
-  async getLastDataflowRevision(id: string) {
-    const revision = await this.dataflowRevisionRepo
+  async getLastAnalysisflowRevision(id: string) {
+    const revision = await this.analysisflowRevisionRepo
       .createQueryBuilder('revision')
-      .leftJoin('revision.dataflow', 'dataflow')
+      .leftJoin('revision.analysisflow', 'analysisflow')
       .select([
-        'dataflow.id',
-        'dataflow.name',
-        'dataflow.lastFlowRunId',
+        'analysisflow.id',
+        'analysisflow.name',
+        'analysisflow.lastFlowRunId',
         'revision.id',
         'revision.flow',
         'revision.comment',
@@ -60,14 +60,14 @@ export class AnalysisflowService {
         'revision.createdBy',
         'revision.version'
       ])
-      .where('dataflow.id = :id', { id })
+      .where('analysisflow.id = :id', { id })
       .orderBy('revision.createdDate', 'DESC')
       .getOne()
     if (revision) {
       return {
-        id: revision.dataflow.id,
-        name: revision.dataflow.name,
-        lastFlowRunId: revision.dataflow.lastFlowRunId,
+        id: revision.analysisflow.id,
+        name: revision.analysisflow.name,
+        lastFlowRunId: revision.analysisflow.lastFlowRunId,
         flow: revision.flow,
         version: revision.version
       }
@@ -76,7 +76,7 @@ export class AnalysisflowService {
   }
 
   async getTaskRunResult(taskRunId: string) {
-    const result = await this.dataflowResultRepo
+    const result = await this.analysisflowResultRepo
       .createQueryBuilder('result')
       .select([
         'result.taskRunId',
@@ -94,12 +94,12 @@ export class AnalysisflowService {
     return null
   }
 
-  async getFlowRunResultsByDataflowId(dataflowId: string) {
-    const latestRun = await this.dataflowRunRepo
+  async getFlowRunResultsByAnalysisflowId(analysisflowId: string) {
+    const latestRun = await this.analysisflowRunRepo
       .createQueryBuilder('run')
       .select('run.rootFlowRunId')
-      .leftJoinAndSelect('run.results', 'dataflowResults')
-      .where('run.dataflowId = :dataflowId', { dataflowId })
+      .leftJoinAndSelect('run.results', 'analysisflowResults')
+      .where('run.analysisflowId = :analysisflowId', { analysisflowId })
       .orderBy('run.createdDate', 'DESC')
       .getOne()
     const results = latestRun?.results
@@ -107,56 +107,56 @@ export class AnalysisflowService {
     return results ? results : []
   }
 
-  async getDataflows() {
-    return await this.dataflowRepo.createQueryBuilder('dataflow').getMany()
+  async getAnalysisflows() {
+    return await this.analysisflowRepo.createQueryBuilder('analysisflow').getMany()
   }
 
-  async createDataflow(dataflowDto: IDataflowDto) {
-    const dataflowEntity = this.dataflowRepo.create({
-      id: dataflowDto.id ? dataflowDto.id : uuidv4(),
-      name: dataflowDto.name
+  async createAnalysisflow(analysisflowDto: IDataflowDto) {
+    const analysisflowEntity = this.analysisflowRepo.create({
+      id: analysisflowDto.id ? analysisflowDto.id : uuidv4(),
+      name: analysisflowDto.name
     })
     let version = 1
-    const { comment, ...flow } = dataflowDto.dataflow
+    const { comment, ...flow } = analysisflowDto.dataflow
 
-    if (dataflowDto.id) {
-      const lastDataflowRevision = await this.getLastDataflowRevision(dataflowDto.id)
+    if (analysisflowDto.id) {
+      const lastDataflowRevision = await this.getLastAnalysisflowRevision(analysisflowDto.id)
       version += lastDataflowRevision.version
-      await this.dataflowRepo.update(dataflowDto.id, this.addOwner(dataflowEntity))
+      await this.analysisflowRepo.update(analysisflowDto.id, this.addOwner(analysisflowEntity))
     } else {
-      await this.dataflowRepo.insert(this.addOwner(dataflowEntity, true))
-      this.logger.info(`Created new dataflow ${dataflowEntity.name} with id ${dataflowEntity.id}`)
+      await this.analysisflowRepo.insert(this.addOwner(analysisflowEntity, true))
+      this.logger.info(`Created new analysisflow ${analysisflowEntity.name} with id ${analysisflowEntity.id}`)
     }
 
-    const revisionEntity = this.dataflowRevisionRepo.create({
+    const revisionEntity = this.analysisflowRevisionRepo.create({
       id: uuidv4(),
-      dataflowId: dataflowEntity.id,
+      analysisflowId: analysisflowEntity.id,
       flow,
       comment,
       version
     })
-    await this.dataflowRevisionRepo.insert(this.addOwner(revisionEntity, true))
-    this.logger.info(`Created new revision for dataflow ${dataflowEntity.name} with id ${revisionEntity.id}`)
+    await this.analysisflowRevisionRepo.insert(this.addOwner(revisionEntity, true))
+    this.logger.info(`Created new revision for analysisflow ${analysisflowEntity.name} with id ${revisionEntity.id}`)
     return {
-      id: dataflowEntity.id,
+      id: analysisflowEntity.id,
       revisionId: revisionEntity.id,
       version: revisionEntity.version
     }
   }
 
-  async deleteDataflow(id: string) {
-    await this.dataflowRepo.delete(id)
+  async deleteAnalysisflow(id: string) {
+    await this.analysisflowRepo.delete(id)
     return { id }
   }
 
-  async createDataflowRun(id, prefectflowRunId) {
-    const dataflowRunEntity = this.dataflowRunRepo.create({
-      dataflowId: id,
+  async createAnalysisflowRun(id, prefectflowRunId) {
+    const analysisflowRunEntity = this.analysisflowRunRepo.create({
+      analysisflowId: id,
       rootFlowRunId: prefectflowRunId
     })
-    await this.dataflowRunRepo.insert(this.addOwner(dataflowRunEntity, true))
-    await this.dataflowRepo.update({ id }, { lastFlowRunId: prefectflowRunId })
-    this.logger.info(`Created dataflow run for dataflow (${id}) and prefect flow run (${prefectflowRunId})`)
+    await this.analysisflowRunRepo.insert(this.addOwner(analysisflowRunEntity, true))
+    await this.analysisflowRepo.update({ id }, { lastFlowRunId: prefectflowRunId })
+    this.logger.info(`Created analysisflow run for analysisflow (${id}) and prefect flow run (${prefectflowRunId})`)
   }
 
   private addOwner<T>(object: T, isNewEntity = false) {
@@ -173,55 +173,57 @@ export class AnalysisflowService {
     }
   }
 
-  async duplicateDataflow(id: string, revisionId: string, dataflowDuplicateDto: IDataflowDuplicateDto) {
-    const flowEntity = await this.getDataflow(id)
+  async duplicateAnalysisflow(id: string, revisionId: string, analysisflowDuplicateDto: IDataflowDuplicateDto) {
+    const flowEntity = await this.getAnalysisflow(id)
     const revisionEntity = flowEntity.revisions.find(r => r.id === revisionId)
 
     if (!revisionEntity) {
-      throw new BadRequestException('Dataflow Revision does not exist')
+      throw new BadRequestException('Analysisflow Revision does not exist')
     }
-    const newDataflowEntity = this.addOwner(
-      this.dataflowRepo.create({
+    const newAnalysisflowEntity = this.addOwner(
+      this.analysisflowRepo.create({
         id: uuidv4(),
-        name: dataflowDuplicateDto.name
+        name: analysisflowDuplicateDto.name
       }),
       true
     )
     const newRevisionEntity = this.addOwner(
-      this.dataflowRevisionRepo.create({
+      this.analysisflowRevisionRepo.create({
         id: uuidv4(),
-        dataflowId: newDataflowEntity.id,
+        analysisflowId: newAnalysisflowEntity.id,
         flow: revisionEntity.flow,
         version: 1
       }),
       true
     )
 
-    await this.dataflowRepo.insert(newDataflowEntity)
-    await this.dataflowRevisionRepo.insert(newRevisionEntity)
-    this.logger.info(`Created new revision for dataflow ${newDataflowEntity.name} with id ${newRevisionEntity.id}`)
+    await this.analysisflowRepo.insert(newAnalysisflowEntity)
+    await this.analysisflowRevisionRepo.insert(newRevisionEntity)
+    this.logger.info(
+      `Created new revision for analysisflow ${newAnalysisflowEntity.name} with id ${newRevisionEntity.id}`
+    )
     return {
-      id: newDataflowEntity.id,
+      id: newAnalysisflowEntity.id,
       revisionId: newRevisionEntity.id,
       version: newRevisionEntity.version
     }
   }
 
-  async deleteDataflowRevision(flowId: string, revisionId: string) {
-    const flowEntity = await this.getDataflow(flowId)
+  async deleteAnalysisflowRevision(flowId: string, revisionId: string) {
+    const flowEntity = await this.getAnalysisflow(flowId)
     if (flowEntity && flowEntity.revisions.find(r => r.id === revisionId)) {
-      await this.dataflowRevisionRepo.delete(revisionId)
-      this.logger.info(`Deleted dataflow revision with id ${revisionId}`)
+      await this.analysisflowRevisionRepo.delete(revisionId)
+      this.logger.info(`Deleted analysisflow revision with id ${revisionId}`)
 
-      const lastRev = await this.getLastDataflowRevision(flowId)
+      const lastRev = await this.getLastAnalysisflowRevision(flowId)
       if (!lastRev) {
-        await this.dataflowRepo.delete(flowId)
+        await this.analysisflowRepo.delete(flowId)
       }
       return {
         revisionId
       }
     }
 
-    throw new BadRequestException('Dataflow and/or dataflow revision do not match')
+    throw new BadRequestException('Analysisflow and/or analysisflow revision do not match')
   }
 }
