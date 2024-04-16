@@ -109,7 +109,7 @@ jobs:
         run: |
           pwd
           mkdir -p internal/build
-          op read --out-file internal/build/alp-dbcli-private-v1.0.0.tgz "op://${{ vars.OP_VAULT_NAME }}/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
+          op read --out-file internal/build/alp-dbcli-private-v1.0.0.tgz "op://${{ secrets.OP_VAULT_NAME }}/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
           ls -l internal/build
 
       - shell: bash
