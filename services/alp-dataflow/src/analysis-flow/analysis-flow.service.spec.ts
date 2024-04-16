@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { REQUEST } from '@nestjs/core'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { DataflowService } from './analysis-flow.service'
+import { AnalysisflowService } from './analysis-flow.service'
 import { Analysisflow, AnalysisflowRevision, AnalysisflowResult, AnalysisflowRun } from './entity'
 import { repositoryMockFactory } from '../../test/repository.mock'
 
@@ -9,8 +9,8 @@ jest.mock('jsonwebtoken', () => ({
   decode: jest.fn().mockReturnValue({ sub: 'mock-sub' })
 }))
 
-describe('DataflowService', () => {
-  let service: DataflowService
+describe('AnalysisflowService', () => {
+  let service: AnalysisflowService
 
   beforeEach(async () => {
     const req = {
@@ -20,7 +20,7 @@ describe('DataflowService', () => {
     }
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        DataflowService,
+        AnalysisflowService,
         { provide: REQUEST, useValue: req },
         { provide: getRepositoryToken(Analysisflow), useFactory: repositoryMockFactory },
         { provide: getRepositoryToken(AnalysisflowRevision), useFactory: repositoryMockFactory },
@@ -29,7 +29,7 @@ describe('DataflowService', () => {
       ]
     }).compile()
 
-    service = await module.resolve<DataflowService>(DataflowService)
+    service = await module.resolve<AnalysisflowService>(AnalysisflowService)
   })
 
   it('should be defined', () => {

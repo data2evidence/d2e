@@ -11,7 +11,7 @@ import { createLogger } from '../logger'
 import { BadRequestException } from '@nestjs/common'
 
 @Injectable({ scope: Scope.REQUEST })
-export class DataflowService {
+export class AnalysisflowService {
   private readonly logger = createLogger(this.constructor.name)
   private readonly userId: string
 

@@ -1,18 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { DataflowController } from './analysis-flow.controller'
-import { dataflowServiceMockFactory } from './analysis-flow.mock'
-import { DataflowService } from './analysis-flow.service'
+import { AnalysisflowController } from './analysis-flow.controller'
+import { analysisflowServiceMockFactory } from './analysis-flow.mock'
+import { AnalysisflowService } from './analysis-flow.service'
 
 describe('AnalysisflowController', () => {
-  let controller: DataflowController
+  let controller: AnalysisflowController
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [DataflowController],
-      providers: [{ provide: DataflowService, useFactory: dataflowServiceMockFactory }]
+      controllers: [AnalysisflowController],
+      providers: [{ provide: AnalysisflowService, useFactory: analysisflowServiceMockFactory }]
     }).compile()
 
-    controller = module.get<DataflowController>(DataflowController)
+    controller = module.get<AnalysisflowController>(AnalysisflowController)
   })
 
   it('should be defined', () => {

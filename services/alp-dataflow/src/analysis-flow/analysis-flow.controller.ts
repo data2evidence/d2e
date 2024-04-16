@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Delete } from '@nestjs/common'
-import { DataflowService } from './analysis-flow.service'
+import { AnalysisflowService } from './analysis-flow.service'
 import { AnalysisflowDto, DataflowDuplicateDto } from './dto'
 
 @Controller('analysisflow')
-export class DataflowController {
-  constructor(private readonly dataflowService: DataflowService) {}
+export class AnalysisflowController {
+  constructor(private readonly dataflowService: AnalysisflowService) {}
 
   @Get('list')
   getDataflows() {
