@@ -1434,7 +1434,7 @@ services:
   alp-fhir-server:
     container_name: &c26 alp-minerva-fhir-server-${BASE_PORT:-1}
     entrypoint: ['./start.sh']
-    image: alpcr.azurecr.io/alp-data-node/alp-fhir-server:develop
+    image: alpcr.azurecr.io/alp-data-node/alp-fhir-server:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c26
