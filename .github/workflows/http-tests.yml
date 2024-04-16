@@ -101,8 +101,9 @@ jobs:
       - name: Get drivers from 1password
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          yarn set:cache
+          OP_VAULT_NAME=$OP_VAULT_NAME OP_SERVICE_ACCOUNT_TOKEN=$OP_SERVICE_ACCOUNT_TOKEN yarn set:cache
           ls -l cache/drivers
 
       - name: create .env.local for docker-compose in system services
