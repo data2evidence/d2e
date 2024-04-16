@@ -71,16 +71,16 @@ jobs:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          DOCKER_COMPOSE_DN_BASE_ALL_ENV: op://${{ vars.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain
-          DOCKER_COMPOSE_DN_BASE_LOCAL_ENV: op://${{ vars.OP_VAULT_NAME }}/.env.base-local.yml/notesPlain
-          DOCKER_COMPOSE_DN_LOCAL_ENV: op://${{ vars.OP_VAULT_NAME }}/.env.http.tests.yml/notesPlain
-          HANASERVER: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DE_FQDN"
-          HANASERVER_REPLACE: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/SG_FQDN"
-          HDIUSER: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin user"
-          HDIPORT: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DB Port"
-          HDIPW: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin password"
-          TESTSYSTEMPW: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin password"
-          TESTPORT: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DB Port"
+          DOCKER_COMPOSE_DN_BASE_ALL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain
+          DOCKER_COMPOSE_DN_BASE_LOCAL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.base-local.yml/notesPlain
+          DOCKER_COMPOSE_DN_LOCAL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.http.tests.yml/notesPlain
+          HANASERVER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DE_FQDN"
+          HANASERVER_REPLACE: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/SG_FQDN"
+          HDIUSER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin user"
+          HDIPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
+          HDIPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
+          TESTSYSTEMPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
+          TESTPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
 
       - name: Print env vars
         run: |
