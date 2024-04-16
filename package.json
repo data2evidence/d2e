@@ -75,7 +75,7 @@
     "op:put:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
     "op:put:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
     "op:put": "internal/scripts/put-op.sh",
-    "set:cache": "internal/scripts/set-cache.sh"
+    "get:drivers": "internal/scripts/get-drivers.sh"
   },
   "devDependencies": {
     "@types/node": "^18",
