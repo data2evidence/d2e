@@ -594,7 +594,7 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
       alp-query-gen:
-        condition: service_started
+        condition: service_healthy
     image: alpcr.azurecr.io/alp-data-node/analytics-svc:${DOCKER_TAG_NAME:-develop}
     healthcheck:
       interval: 20s
