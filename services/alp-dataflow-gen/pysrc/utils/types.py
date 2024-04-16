@@ -3,13 +3,11 @@ from pydantic import BaseModel, Field, UUID4
 from typing import Optional, List, Dict
 
 
-class DBCredentials(BaseModel):
+class DBCredentialsType(BaseModel):
     adminPassword: str
     adminUser: str
-    adminPasswordSalt: str
     readPassword: str
     readUser: str
-    readPasswordSalt: str
     dialect: str
     databaseName: str
     host: str
