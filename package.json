@@ -42,7 +42,7 @@
     "az:start:ui": "yarn base:ui up alp-local-ui-file-server",
     "start:ui": "UI_REPO_RELATIVE_PATH='../d2e-ui' yarn az:start:ui",
     "build:start:ui": "UI_REPO_RELATIVE_PATH='../d2e-ui' && yarn base:ui --file ${UI_REPO_RELATIVE_PATH}/docker-compose-ui.yml up alp-local-ui-file-server",
-    "build:ui": "UI_REPO_RELATIVE_PATH='../d2e-ui' && yarn base:ui --file ${UI_REPO_RELATIVE_PATH}/docker-compose-ui.yml build --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} alp-local-ui-file-server",
+    "build:ui": "UI_REPO_RELATIVE_PATH='../d2e-ui' && yarn base:ui --file ${UI_REPO_RELATIVE_PATH}/docker-compose-ui.yml build alp-local-ui-file-server",
 
     "build:minerva-test": "yarn local:minerva build",
 
