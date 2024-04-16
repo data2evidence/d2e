@@ -624,7 +624,8 @@ services:
       ALP_GATEWAY_OAUTH__URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/oauth/token
       ALP_MINERVA_PORTAL_SERVER__URL: https://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105
       ALP_MINERVA_PS_CONFIG_SERVER__URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41100/ps-config-svc
-      ALP_MINERVA_QUERY_GEN__URL: https://alp-minerva-query-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41109
+      ALP_MINERVA_QUERY_GEN__URL: https://alp-minerva-query-gen-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41109
+      ALP_TERMINOLOGY__URL: https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108
       ALP_MINERVA_BOOKMARKS__URL: https://alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110
       ALP_PORTAL_SCOPE: https://alpsgdev.onmicrosoft.com/alp-portal/.default
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
@@ -1447,6 +1448,7 @@ services:
       <<:
         - *x-tls
       ALP_MINERVA_PORTAL_SERVER__URL: https://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105
+      ALP_MINERVA_BOOKMARKS__URL: https://alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110
       DEV_MODE: ${DEV_MODE:-false}
       LOCAL_DEBUG: "false"
       NODE_ENV: development

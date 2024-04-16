@@ -28,3 +28,4 @@ export const ALP_MINERVA_PS_CONFIG_SERVER__URL =
     process.env.ALP_MINERVA_PS_CONFIG_SERVER__URL;
 export const ALP_MINERVA_QUERY_GEN__URL =
     process.env.ALP_MINERVA_QUERY_GEN__URL;
+export const ALP_TERMINOLOGY__URL = process.env.ALP_TERMINOLOGY__URL;

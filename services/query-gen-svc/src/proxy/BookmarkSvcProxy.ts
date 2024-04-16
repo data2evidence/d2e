@@ -24,7 +24,7 @@ export async function loadBookmarks(
         urlParams = new URL(`https://localhost:41005`);
         protocolLib = https;
     } else {
-        urlParams = new URL("https://alp-minerva-bookmark-svc-1:41110");
+        urlParams = new URL(process.env.ALP_MINERVA_BOOKMARKS__URL);
         protocolLib = https;
     }
 
