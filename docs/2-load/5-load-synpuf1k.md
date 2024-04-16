@@ -135,4 +135,4 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
 > TRUNCATE TABLE
 
 see: 
-- [troubleshooting/load-synpuf1k](../troubleshooting/kb-empty-database-credentials.md)
+- [load-synpuf1k](../knowledgebase/dbcreds/missing-db-creds.md)
