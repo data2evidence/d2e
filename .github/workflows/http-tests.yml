@@ -103,7 +103,8 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          OP_VAULT_NAME=$OP_VAULT_NAME OP_SERVICE_ACCOUNT_TOKEN=$OP_SERVICE_ACCOUNT_TOKEN yarn get:drivers
+          # OP_VAULT_NAME=$OP_VAULT_NAME OP_SERVICE_ACCOUNT_TOKEN=$OP_SERVICE_ACCOUNT_TOKEN yarn get:drivers
+          yarn get:drivers
 
       - name: create .env.local for docker-compose in system services
         env:
