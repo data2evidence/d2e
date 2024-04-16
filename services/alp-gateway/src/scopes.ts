@@ -868,7 +868,6 @@ export const ROLE_SCOPES = {
     'gateway.db.schema.update',
     'gateway.terminology.hybridSearchConfig.read',
     'gateway.terminology.hybridSearchConfig.update',
-    // TODO: clarify why researcher portal need this scope for access
     'dataflowmgmt.analysisflow.read',
     'dataflowmgmt.analysisflow.add',
     'dataflowmgmt.analysisflow.delete',
