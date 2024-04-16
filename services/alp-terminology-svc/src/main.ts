@@ -9,8 +9,8 @@ const logger = createLogger('Terminology');
 import https from 'https';
 
 const httpsOptions = {
-  key: env.SSL_PRIVATE_KEY,
-  cert: env.SSL_PUBLIC_CERT,
+  key: env.TLS__INTERNAL__KEY,
+  cert: env.TLS__INTERNAL__CRT,
 };
 
 async function runNestApp() {

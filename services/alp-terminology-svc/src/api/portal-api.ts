@@ -19,7 +19,7 @@ export class SystemPortalAPI {
       this.url = env.SYSTEM_PORTAL__API_URL;
       this.httpsAgent = new Agent({
         rejectUnauthorized: this.isAuthorized(),
-        ca: this.isAuthorized() ? env.SSL_CA_CERT : undefined,
+        ca: this.isAuthorized() ? env.TLS__INTERNAL__CA_CRT : undefined,
       });
     } else {
       throw new Error('No url is set for PortalAPI');
