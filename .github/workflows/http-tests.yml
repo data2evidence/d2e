@@ -104,7 +104,6 @@ jobs:
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
           OP_VAULT_NAME=$OP_VAULT_NAME OP_SERVICE_ACCOUNT_TOKEN=$OP_SERVICE_ACCOUNT_TOKEN yarn set:cache
-          ls -l cache/drivers
 
       - name: create .env.local for docker-compose in system services
         env:
