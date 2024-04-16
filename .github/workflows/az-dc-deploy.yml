@@ -145,7 +145,7 @@ jobs:
         OVERWRITE: true
       run: |
         ACTIONS_STEP_DEBUG=false
-        export OP_VAULT_NAME ENV_TYPE ENV_NAME OVERWRITE
+        # export OP_VAULT_NAME ENV_TYPE ENV_NAME OVERWRITE
       
         # get env yml from 1password
         yarn op:get:$ENV_TYPE
