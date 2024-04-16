@@ -1,5 +1,5 @@
 #!/usr/bin/env bash  
-# initial setup
+# get drivers
 set -o pipefail
 
 # inputs
