@@ -21,8 +21,8 @@ export async function loadBookmarks(
 
     if (envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun()) {
         // this flow is only for integration test
-        urlParams = new URL(`https://localhost:41005`);
-        protocolLib = https;
+        urlParams = new URL(`http://localhost:41005`);
+        protocolLib = http;
     } else {
         urlParams = new URL(process.env.ALP_MINERVA_BOOKMARKS__URL);
         protocolLib = https;

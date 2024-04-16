@@ -23,8 +23,8 @@ export async function generateQuery(
     let urlParams;
     if (envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun()) {
         // this flow is only for integation test
-        urlParams = new URL(`https://localhost:41008`);
-        protocolLib = https;
+        urlParams = new URL(`http://localhost:41008`);
+        protocolLib = http;
     } else {
         urlParams = new URL(ALP_MINERVA_QUERY_GEN__URL);
         protocolLib = https;
