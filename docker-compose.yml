@@ -1426,6 +1426,11 @@ services:
     logging:
       options:
         tag: *c25
+    healthcheck:
+      interval: 20s
+      retries: 10
+      start_period: 60s
+      test: redis-cli --no-auth-warning -a ${REDIS_PASSWORD} ping | grep PONG
     networks:
       - alp
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
@@ -1440,8 +1445,10 @@ services:
         tag: *c26
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     depends_on:
-      - alp-minerva-postgres
-      - redis
+      alp-minerva-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks: 
     - alp
     environment:
