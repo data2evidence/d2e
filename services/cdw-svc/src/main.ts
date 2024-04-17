@@ -90,7 +90,9 @@ const handleStartupError = (err) => {
 const getConnections = async ({
   configCredentials,
   userObj,
-}): Promise<Connection.ConnectionInterface> => {
+}): Promise<{
+  configConnection: Connection.ConnectionInterface}
+  > => {
   const configConnection =
     await dbConnectionUtil.DBConnectionUtil.getDBConnection({
       credentials: configCredentials,
@@ -98,7 +100,9 @@ const getConnections = async ({
       userObj,
     });
 
-  return configConnection
+  return {
+    configConnection: configConnection
+  }
 };
 
 const initRoutes = (
@@ -119,7 +123,7 @@ const initRoutes = (
       }
 
       try {
-        req.dbConnections.configConnection = await getConnections({
+        req.dbConnections = await getConnections({
           configCredentials,
           userObj,
         });
@@ -143,7 +147,7 @@ const initRoutes = (
   });
 
   app.post("/hc/hph/config/services/global.xsjs", (req: ICDWRequest, res) => {
-    const {configConnection } = req.dbConnections;
+    const { configConnection } = req.dbConnections;
     const user = getUser(req);
     const assignment = new AssignmentProxy(req.assignment);
     const facade = new SettingsFacade(user);
@@ -221,7 +225,7 @@ const initRoutes = (
     "/hc/hph/cdw/config/services/config.xsjs",
     noCache,
     (req: ICDWRequest, res) => {
-      const { analyticsConnection, configConnection } = req.dbConnections;
+      const { configConnection } = req.dbConnections;
       const user = getUser(req);
       const assignment = new AssignmentProxy(req.assignment); //TODO: Send http req instead of getting it from req.
       try {
@@ -264,12 +268,12 @@ const initRoutes = (
 
   app.post(
     "/hc/hph/cdw/services/cdw_services.xsjs",
-    (req: ICDWRequest, res) => {
+    async (req: ICDWRequest, res) => {
       const { configConnection } = req.dbConnections;
       const assignment = new AssignmentProxy(req.assignment); //TODO: Send http req instead of getting it from req.
       const user = getUser(req);
       const settings = new Settings();
-      let analyticsConnection = getAnalyticsConnection(user);
+      let analyticsConnection = await getAnalyticsConnection(user);
       new CDWServicesFacade(
         analyticsConnection,
         new FfhQeConfig(

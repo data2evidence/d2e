@@ -55,7 +55,6 @@ export class FfhQeConfig {
   private CONFIG_FORMATTER_SETTINGS;
   private PRIVILEGES;
   private ffhConfig: cfg.FFHConfig.FFHConfig;
-  private analyticsConnection: ConnectionInterface; 
   private emptyConfigValidationResult: ConfigValidationResultType = {
     cdmConfigValidationResult: {
       errors: [],
@@ -207,16 +206,13 @@ export class FfhQeConfig {
     }
   }
 
-  public validateConfig(config): ConfigValidationResultType {
+  public validateConfig(config, analyticsConnection): ConfigValidationResultType {
     const result = this.emptyConfigValidationResult;
     this.assertPermission(this.PRIVILEGES.VALIDATE);
     const definition = configDefinitionLib.getDefinition(
       config.advancedSettings.tableMapping
     );
-    if(this.analyticsConnection == null || this.analyticsConnection == ''){
-      this.analyticsConnection = getAnalyticsConnection(this.userObj)
-    }
-    const validator = new CDWValidator(this.analyticsConnection, config);
+    const validator = new CDWValidator(analyticsConnection, config);
     const tmpValidationResult = validator.validateConfiguration(definition);
     result.cdmConfigValidationResult = {
       errors: tmpValidationResult.errors,
@@ -226,38 +222,38 @@ export class FfhQeConfig {
     return result;
   }
 
-  // TODO: Should be removed later
-  public async testAttribute(config, callback: CallBackInterface) {
-    this.assertPermission(this.PRIVILEGES.VALIDATE);
-    const definition = configDefinitionLib.getDefinition(
-      config.advancedSettings
-    );
-    if(this.analyticsConnection == null || this.analyticsConnection == ''){
-      this.analyticsConnection = getAnalyticsConnection(this.userObj)
-    }
-    const validator = new CDWValidator(this.analyticsConnection, config);
-    const preValidation = validator.validateConfiguration(definition);
+  // // TODO: Should be removed later
+  // public async testAttribute(config, callback: CallBackInterface) {
+  //   this.assertPermission(this.PRIVILEGES.VALIDATE);
+  //   const definition = configDefinitionLib.getDefinition(
+  //     config.advancedSettings
+  //   );
+  //   if(this.analyticsConnection == null || this.analyticsConnection == ''){
+  //     this.analyticsConnection = await getAnalyticsConnection(this.userObj)
+  //   }
+  //   const validator = new CDWValidator(this.analyticsConnection, config);
+  //   const preValidation = validator.validateConfiguration(definition);
 
-    if (!(preValidation.errors.length === 0)) {
-      return callback(null, {
-        errors: preValidation.errors,
-        warnings: preValidation.warnings,
-        valid: preValidation.errors.length === 0,
-      });
-    }
+  //   if (!(preValidation.errors.length === 0)) {
+  //     return callback(null, {
+  //       errors: preValidation.errors,
+  //       warnings: preValidation.warnings,
+  //       valid: preValidation.errors.length === 0,
+  //     });
+  //   }
 
-    try {
-      const validationResult = await validator.testAllAttributes(definition);
+  //   try {
+  //     const validationResult = await validator.testAllAttributes(definition);
 
-      callback(null, {
-        errors: validationResult.errors,
-        warnings: validationResult.warnings,
-        valid: validationResult.errors.length === 0,
-      });
-    } catch (err) {
-      return callback(err, null);
-    }
-  }
+  //     callback(null, {
+  //       errors: validationResult.errors,
+  //       warnings: validationResult.warnings,
+  //       valid: validationResult.errors.length === 0,
+  //     });
+  //   } catch (err) {
+  //     return callback(err, null);
+  //   }
+  // }
 
   public saveConfig(configId, configName, config, callback) {
     try {
@@ -310,7 +306,7 @@ export class FfhQeConfig {
     }
   }
 
-  public autoSaveConfig(configId, configVersion, configName, config, callback) {
+  public autoSaveConfig(configId, configVersion, configName, config, analyticsConnection, callback) {
     try {
       this.assertPermission(this.PRIVILEGES.SAVE);
       this._saveConfigWithoutValidation(
@@ -319,6 +315,7 @@ export class FfhQeConfig {
         configName,
         formatterLib.STATUS.DRAFT,
         config,
+        analyticsConnection,
         async (err, autoSaveResult) => {
           if (err) {
             callback(err, null);
@@ -350,6 +347,7 @@ export class FfhQeConfig {
     configVersion,
     configName,
     config,
+    analyticsConnection,
     callback
   ) {
     try {
@@ -424,6 +422,7 @@ export class FfhQeConfig {
         if (EnvVarUtils.isCDWValidationEnabled()) {
           this.validateCDMConfigAndTableMappings(
             config,
+            analyticsConnection,
             (err, validationResult) => {
               if (err) {
                 return callback(err, null);
@@ -495,32 +494,33 @@ export class FfhQeConfig {
     }
   }
 
-  public loadFromFile(filePath, configId, configName, fsLib, callback) {
-    this.assertPermission(this.PRIVILEGES.ACTIVATE);
-    const file = this.utilsLib.extractPackageAndFile(filePath);
-    if (file[2] !== "json") {
-      // throw new Error("HPH_CDM_CFG_ERROR_LOAD_FILE_ERROR_INVALID_FILE_EXTENSION");
-      callback(
-        new Error("HPH_CDM_CFG_ERROR_LOAD_FILE_ERROR_INVALID_FILE_EXTENSION"),
-        null
-      );
-      return;
-    }
-    const config = this.utilsLib.loadFile(file[0], file[1], file[2], fsLib);
-    this.activateConfig(
-      configId,
-      null,
-      configName,
-      config,
-      (err, saveResult) => {
-        if (err) {
-          callback(err, null);
-          return;
-        }
-        callback(null, formatterLib.loadFromFileResult(saveResult));
-      }
-    );
-  }
+  // Not being called anywhere
+  // public loadFromFile(filePath, configId, configName, fsLib, callback) {
+  //   this.assertPermission(this.PRIVILEGES.ACTIVATE);
+  //   const file = this.utilsLib.extractPackageAndFile(filePath);
+  //   if (file[2] !== "json") {
+  //     // throw new Error("HPH_CDM_CFG_ERROR_LOAD_FILE_ERROR_INVALID_FILE_EXTENSION");
+  //     callback(
+  //       new Error("HPH_CDM_CFG_ERROR_LOAD_FILE_ERROR_INVALID_FILE_EXTENSION"),
+  //       null
+  //     );
+  //     return;
+  //   }
+  //   const config = this.utilsLib.loadFile(file[0], file[1], file[2], fsLib);
+  //   this.activateConfig(
+  //     configId,
+  //     null,
+  //     configName,
+  //     config,
+  //     (err, saveResult) => {
+  //       if (err) {
+  //         callback(err, null);
+  //         return;
+  //       }
+  //       callback(null, formatterLib.loadFromFileResult(saveResult));
+  //     }
+  //   );
+  // }
 
   public suggestConfig(callback: CallBackInterface) {
     try {
@@ -644,9 +644,10 @@ export class FfhQeConfig {
     configName,
     configStatus,
     config,
+    analyticsConnection,
     callback
   ) {
-    const validationResult = this.validateConfig(config);
+    const validationResult = this.validateConfig(config, analyticsConnection);
     const that = this;
 
     let saveResult: any = {};
@@ -719,6 +720,7 @@ export class FfhQeConfig {
 
   public async validateCDMConfigAndTableMappings(
     config: CDMConfigType,
+    analyticsConnection: ConnectionInterface,
     callback: CallBackInterface
   ) {
     try {
@@ -728,13 +730,9 @@ export class FfhQeConfig {
         advancedConfigValidationResult: {},
       };
       const { advancedSettings } = config;
-
-      if(this.analyticsConnection == null || this.analyticsConnection == ''){
-        this.analyticsConnection = getAnalyticsConnection(this.userObj)
-      }
       await new Promise(async (resolve, reject) => {
         settingsLib.validateSettings(
-          this.analyticsConnection,
+          analyticsConnection,
           advancedSettings,
           (err1, messages: ValidationMessageType[]) => {
             if (err1) {
@@ -755,7 +753,7 @@ export class FfhQeConfig {
         const definition = configDefinitionLib.getDefinition(
           config.advancedSettings.tableMapping
         );
-        const validator = new CDWValidator(this.analyticsConnection, config);
+        const validator = new CDWValidator(analyticsConnection, config);
         const preValidation = validator.validateConfiguration(definition);
 
         if (!(preValidation.errors.length === 0)) {

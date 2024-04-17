@@ -75,8 +75,10 @@ export class ConfigFacade {
         );
         break;
       case "validate":
+        let analyticsConn = await getAnalyticsConnection(this.userObj);
         this.ffhQeConfig.validateCDMConfigAndTableMappings(
           request.config,
+          analyticsConn,
           (err, res) => {
             if (err) {
               return callback(err, null);
@@ -99,11 +101,13 @@ export class ConfigFacade {
         );
         break;
       case "autosave":
+        const analyticsConnn = await getAnalyticsConnection(this.userObj);
         this.ffhQeConfig.autoSaveConfig(
           request.configId,
           request.configVersion,
           request.configName,
           request.config,
+          analyticsConnn,
           (err, result) => {
             if (err) {
               return callback(err, null);
@@ -113,11 +117,13 @@ export class ConfigFacade {
         );
         break;
       case "activate":
+        const connection = await getAnalyticsConnection(this.userObj);
         this.ffhQeConfig.activateConfig(
           request.configId,
           request.configVersion,
           request.configName,
           request.config,
+          connection,
           (err, result) => {
             if (err) {
               return callback(err, null);
@@ -165,8 +171,8 @@ export class ConfigFacade {
         callback(null, this.settings.getDefaultAdvancedSettings());
         break;
       case "getColumns":
-        let analyticsConnection = getAnalyticsConnection(this.userObj)
-        let dbMeta = new DbMeta(analyticsConnection);
+        const conn = await getAnalyticsConnection(this.userObj)
+        let dbMeta = new DbMeta(conn);
         dbMeta.getColumnsForPlaceHolders(
           request.dbObjectList,
           (err, result) => {

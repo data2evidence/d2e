@@ -463,4 +463,5 @@ export async function getAnalyticsConnection(userObj) {
         userObj,
       });
     }
+    return analyticsConnection;
   }

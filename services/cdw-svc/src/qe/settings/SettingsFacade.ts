@@ -25,7 +25,7 @@ export class SettingsFacade {
   public getSettings() {
     return this.settings;
   }
-  public invokeAdminServices(request: any, callback: CallBackInterface) {
+  public async invokeAdminServices(request: any, callback: CallBackInterface) {
     switch (request.action) {
       // TODO: Should load advanced settings from CDM config by passing the confiig id & version
       case "loadGlobalSettings":
@@ -42,7 +42,7 @@ export class SettingsFacade {
         callback(null, result);
         break;
       case "getColumns":
-        let analyticsConnection = getAnalyticsConnection(this.userObj)
+        let analyticsConnection = await getAnalyticsConnection(this.userObj)
         let dbMeta = new DbMeta(analyticsConnection);
         dbMeta.getColumns(request.dbObject, (err, result) => {
           if (err) {
