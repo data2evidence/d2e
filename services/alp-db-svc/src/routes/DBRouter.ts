@@ -352,25 +352,6 @@ export default class DBRouter {
       [this.getVersionInfoForSchemas]
     );
 
-    //GET cdmvocab schema based on cdm schema
-    registerRouterHandler(
-      this.router,
-      HTTP_METHOD.GET,
-      "/database/:tenant/vocabSchema/schema/:schema",
-      [
-        param("tenant")
-          .isIn(config.getTenants(dialect))
-          .notEmpty()
-          .matches(this.dbObjectNameValidationRegExp)
-          .withMessage("Tenant database name is invalid"),
-        param("schema")
-          .notEmpty()
-          .matches(this.schemaNameRegExp)
-          .withMessage("Schema name is invalid"),
-      ],
-      [this.getVocabSchemaFromCDMSchema]
-    );
-
     //Staging Area APIs
     //POST
     //database/:tenant/staging-area/:stagingArea/schema/:schema
@@ -577,33 +558,6 @@ export default class DBRouter {
       [this.getResponsesForQuestionnaire]
     );
   }
-
-  getVocabSchemaFromCDMSchema = async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    const schema = req.params.schema;
-    const tenant = req.params.tenant;
-
-    try {
-      const dbConnection = await this.dbDao.getDBConnectionByTenantPromise(
-        tenant,
-        req,
-        res
-      );
-      const vocabSchema = await this.dbDao.getVocabSchema(dbConnection, schema);
-      res.send(vocabSchema);
-    } catch (err) {
-      const httpResponse = {
-        status: 500,
-        message: "Something went wrong when retrieving Vocab schema",
-        data: [],
-      };
-      res.json(httpResponse);
-      this.logger.error(`Error retrieving Vocab schema: ${err}`);
-    }
-  };
 
   createSchemaTasks = (
     res: express.Response,
