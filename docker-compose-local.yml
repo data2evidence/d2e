@@ -33,6 +33,8 @@ services:
     build:
       context: .
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
+    networks:
+      - alp
     volumes:
       - ./services/alp-dataflow-gen/pysrc:/app/pysrc
     environment:
@@ -164,6 +166,10 @@ services:
       - ./services/alp-gateway/src:/usr/src/app/src
     environment:
       LOCAL_DEBUG: "true"
+
+  alp-minerva-meilisearch-svc:
+    ports:
+      - 41111:41111
 
   alp-minerva-pa-config-svc:
     build:
