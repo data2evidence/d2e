@@ -33,7 +33,7 @@ RUN yarn install
 
 FROM node:18.14.0-slim AS final
 
-RUN apt update && apt install -y openssl zlib1g
+RUN apt update && apt install -y openssl zlib1g wget
 
 RUN rm -rf /usr/local/lib/node_modules/npm
 
