@@ -1,5 +1,6 @@
 // tslint:disable:no-console
 import * as dotenv from 'dotenv'
+import 'reflect-metadata'
 import {
   DBConnectionUtil as dbConnectionUtil,
   getUser,
@@ -15,9 +16,11 @@ import express from 'express'
 import helmet from 'helmet'
 import path from 'path'
 import * as xsenv from '@sap/xsenv'
-import * as swagger from '@alp/swagger-node-runner'
 import noCacheMiddleware from './middleware/NoCache'
 import timerMiddleware from './middleware/Timer'
+import { Container } from 'typedi'
+import { useContainer } from 'class-validator'
+import Routes from './routes'
 
 import { IMRIRequest } from './types'
 
@@ -38,7 +41,6 @@ const initRoutes = async (app: express.Application) => {
   }
 
   configCredentials = xsenv.cfServiceCredentials({ tag: 'config' })
-
   app.use(async (req: IMRIRequest, res, next) => {
     if (!utils.isHealthProbesReq(req)) {
       log.debug(`🚀 ~ file: main.ts ~ line 141 ~ app.use ~ req.headers: ${JSON.stringify(req.headers, null, 2)}`)
@@ -86,26 +88,9 @@ const initRoutes = async (app: express.Application) => {
   Promise.resolve()
 }
 
-const initSwaggerRoutes = async (app: express.Application) => {
-  const config = {
-    appRoot: __dirname, // required config
-    swaggerFile: path.join(`${process.cwd()}`, 'api', 'swagger', 'swagger.yaml'),
-  }
-
-  swagger.create(config, (err, swaggerRunner) => {
-    if (err) {
-      return Promise.reject(err)
-    }
-    try {
-      let swaggerExpress = swaggerRunner.expressMiddleware()
-      swaggerExpress.register(app) // install middleware
-      log.info('Swagger routes Initialized..')
-      Promise.resolve()
-    } catch (err) {
-      log.error('Error initializing swagger routes: ' + err)
-      Promise.reject(err)
-    }
-  })
+const registerRoutes = async (app: express.Application) => {
+  const routes = Container.get(Routes)
+  app.use('/', routes.getRouter())
 }
 
 const main = async () => {
@@ -131,7 +116,7 @@ const main = async () => {
    */
 
   await initRoutes(app)
-  await initSwaggerRoutes(app)
+  await registerRoutes(app)
   utils.setupGlobalErrorHandling(app, log)
 
   app.listen(port)
