@@ -91,19 +91,6 @@ export class AnalyticsSvcAPI {
     }
   }
 
-  async getVocabSchemaFromCdmSchema(dialect: string, databaseCode: string, schema: string) {
-    const errorMessage = 'Error while getting vocab schema from cdm schema'
-    try {
-      const options = await this.createOptions()
-      const url = `${this.url}api/services/alpdb/${dialect}/database/${databaseCode}/vocabSchema/schema/${schema}`
-      const obs = this.httpService.get(url, options)
-      return await firstValueFrom(obs.pipe(map(result => result.data)))
-    } catch (error) {
-      this.logger.error(`${errorMessage}: ${error}`)
-      throw new InternalServerErrorException(errorMessage)
-    }
-  }
-
   private async createOptions(): Promise<AxiosRequestConfig> {
     return {
       headers: {
