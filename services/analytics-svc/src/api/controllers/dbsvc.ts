@@ -65,31 +65,6 @@ export async function checkIfSchemaExists(req, res, next) {
     }
 }
 
-export async function getVocabSchemaFromCDMSchema(req, res, next) {
-    let dialect: string = req.swagger.params.databaseType.value;
-    let tenant: string = req.swagger.params.tenant.value;
-    let schema: string = req.swagger.params.schemaName.value;
-
-    try {
-        let dbDao = new DBDAO(dialect, tenant);
-        const dbConnection = await dbDao.getDBConnectionByTenantPromise(
-            tenant,
-            req,
-            res
-        );
-        const vocabSchema = await dbDao.getVocabSchema(dbConnection, schema);
-        res.status(200).send(vocabSchema);
-    } catch (err) {
-        logger.error(`Error retrieving Vocab schema: ${err}`);
-        const httpResponse = {
-            status: 500,
-            message: "Something went wrong when retrieving Vocab schema",
-            data: [],
-        };
-        res.status(500).json(httpResponse);
-    }
-}
-
 // hana only
 export async function getSnapshotSchemaMetadata(req, res, next) {
     let dialect: string = req.swagger.params.databaseType.value;
