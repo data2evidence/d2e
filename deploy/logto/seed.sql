@@ -2,7 +2,7 @@
 -- Seed Apps
 INSERT INTO public.applications(
 	tenant_id, id, name, secret, description, type, oidc_client_metadata, custom_client_metadata, created_at)
-	VALUES ('default', '1d6wuydanyaiypbkchxzu', 'alp-app', 'yFRvkJg8NKXx3phL27QembSa4ZHzcVD5', 'alp-app', 'Traditional', '{  "redirectUris": [    "https://localhost:41100/portal/login-callback", "https://localhost:4000/portal/login-callback", "https://localhost:8081"  ],  "postLogoutRedirectUris": [    "https://localhost:41100/portal", "https://localhost:4000/portal", "https://localhost:8081"  ] }', '{  "corsAllowedOrigins": [],   "rotateRefreshToken": true,   "refreshTokenTtlInDays": 14,   "alwaysIssueRefreshToken": false }', CURRENT_TIMESTAMP)
+	VALUES ('default', '1d6wuydanyaiypbkchxzu', 'alp-app', 'yFRvkJg8NKXx3phL27QembSa4ZHzcVD5', 'alp-app', 'Traditional', '{  "redirectUris": [    "https://localhost:41100/portal/login-callback", "https://localhost:4000/portal/login-callback", "https://localhost:8081"  ],  "postLogoutRedirectUris": [    "https://localhost:41100/portal", "https://localhost:4000/portal", "https://localhost:8081"  ] }', '{  "corsAllowedOrigins": [],   "rotateRefreshToken": true,   "refreshTokenTtlInDays": 14,   "alwaysIssueRefreshToken": true }', CURRENT_TIMESTAMP)
 	ON CONFLICT(id) DO UPDATE
 	SET secret = EXCLUDED.secret, oidc_client_metadata = EXCLUDED.oidc_client_metadata, custom_client_metadata = EXCLUDED.custom_client_metadata;
 

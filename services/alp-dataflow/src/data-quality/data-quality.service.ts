@@ -26,16 +26,16 @@ export class DataQualityService {
 
     const datasetId = dataQualityFlowRunDto.datasetId
     const comment = dataQualityFlowRunDto.comment
-    let vocabSchemaName = dataQualityFlowRunDto.vocabSchemaName
+    let vocabSchema = dataQualityFlowRunDto.vocabSchemaName
     const releaseId = dataQualityFlowRunDto.releaseId
     const cohortDefinitionId = dataQualityFlowRunDto.cohortDefinitionId
 
-    const { dialect, databaseCode, schemaName } = await this.portalServerApi.getDataset(datasetId)
+    const { dialect, databaseCode, schemaName, vocabSchemaName } = await this.portalServerApi.getDataset(datasetId)
 
     const releaseDate = (await this.getReleaseDate(releaseId)).split('T')[0]
 
-    if (!vocabSchemaName) {
-      vocabSchemaName = await this.analyticsSvcApi.getVocabSchemaFromCdmSchema(dialect, databaseCode, schemaName)
+    if (!vocabSchema) {
+      vocabSchema = vocabSchemaName
     }
 
     const cdmVersionNumber = await this.analyticsSvcApi.getCdmVersion(dialect, databaseCode, schemaName)
@@ -47,7 +47,7 @@ export class DataQualityService {
         databaseCode,
         datasetId,
         cdmVersionNumber,
-        vocabSchemaName,
+        vocabSchema,
         comment,
         cohortDefinitionId,
         releaseId,
