@@ -168,10 +168,10 @@ export const translateHanaToPostgres = (
   temp = temp.replace(/TO_BIGINT(\(\"[\w]*\"\))/gi, "$1::bigint");
   temp = temp.replace(/TO_DOUBLE(\(\"[\w]*\"\))/gi, "$1::double precision");
   temp = temp.replace(/TO_DECIMAL(\([\w]*\))/gi, "$1::decimal");
-  temp =
-    dialect === "POSTGRES"
-      ? temp.replace(/UPPER(\(\"[\w]*\"\.\"[\w]*\"\))/gi, "UPPER($1::varchar)")
-      : temp;
+  temp = temp.replace(
+    /UPPER(\([\"\w.]{2,}\))/gi,
+    "UPPER($1::varchar)",
+  );
   temp = temp.replace(/to_nvarchar/gi, "");
   temp = temp.replace(/nvarchar/gi, "VARCHAR");
   temp = temp.replace(/\(SYSUUID\)/gi, "uuid_generate_v4()");

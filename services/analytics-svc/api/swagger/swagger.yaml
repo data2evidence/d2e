@@ -1187,38 +1187,6 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-  /alpdb/{databaseType}/database/{tenant}/vocabSchema/schema/{schemaName}:
-    x-swagger-router-controller: dbsvc
-    get:
-      description: Get vocab schema used by CDM schema
-      operationId: getVocabSchemaFromCDMSchema
-      produces:
-        - application/json
-      parameters:
-        - name: databaseType
-          in: path
-          description: Dialect of database (Hana or Postgres)
-          required: true
-          type: string
-        - name: tenant
-          in: path
-          description: Tenant database name
-          required: true
-          type: string
-        - name: schemaName
-          in: path
-          description: Name of schema to retrieve vocab schema name for
-          required: true
-          type: string
-      responses:
-        "200":
-          description: success
-          schema:
-            $ref: "#/definitions/VocabSchema"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Error"
   /alpdb/{databaseType}/database/{tenant}/metadata/schemasnapshot/schema/{schemaName}:
     x-swagger-router-controller: dbsvc
     get:
@@ -1435,14 +1403,6 @@ definitions:
   DataModels:
     type: object
     description: Response object of data models
-  VocabSchema:
-    type: string
-    description: Vocab schema name
-  VocabSchemas:
-    type: array
-    description: Array of vocab schemas
-    items:
-      $ref: "#/definitions/VocabSchema"
   CDMVersion:
     type: string
     description: OMOP CDM Version 

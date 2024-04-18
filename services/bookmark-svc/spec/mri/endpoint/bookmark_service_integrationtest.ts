@@ -2,10 +2,9 @@ import { TestEnvironment } from '../../testutils/testenvironment'
 import * as testUtils from '../../testutils/testutils'
 import { DBConnectionUtil as dbConnectionUtil, Constants, EnvVarUtils } from '@alp/alp-base-utils'
 import * as async from 'async'
-import * as bookmarkServiceLib from '../../../src/mri/endpoint/bookmarkservice'
+import * as bookmarkServiceLib from '../../../src/bookmark/bookmarkservice'
 import { testsLogger } from '../../testutils/logger'
 import { DisableLogger } from '../../../src/utils/Logger'
-import * as bookmarkController from '../../../src/api/controllers/bookmark'
 import MockRequest from '../../utils/MockRequest'
 import MockResponse from '../../utils/MockResponse'
 import { IMRIRequest } from '../../../src/types'
@@ -158,7 +157,6 @@ function verifyQueryCalls(shouldHaveBeenCalled) {
 }
 
 describe('TEST SUITE TO DEFINE THE BEHAVIOR OF THE BOOKMARK ENDPOINT', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 600000
   beforeAll(done => {
     testsLogger(
       '\n\n-----------------------------Test class:bookmark_service_integrationtest.ts -----------------------------\n'
@@ -763,193 +761,6 @@ describe('TEST SUITE TO DEFINE THE BEHAVIOR OF THE BOOKMARK ENDPOINT', () => {
           }
         )
       })
-    })
-  })
-
-  describe('bookmark controller', () => {
-    it('GET list', async () => {
-      let req = new MockRequest()
-      let res = new MockResponse()
-      const reqHeaders = {}
-      reqHeaders[`x-language`] = `en`
-      reqHeaders[`x-alp-usersessionclaims`] = req[`x-alp-usersessionclaims`]
-      req[`headers`] = reqHeaders
-      req.setConnections({
-        analyticsConnection: connection,
-        configConnection: connection,
-      })
-
-      req.setSwaggerParams({
-        paConfigId: 'paConfigId',
-      })
-
-      res.status = status => {
-        expect(status).toEqual(200)
-        return res
-      }
-
-      res.json = response => {
-        expect(req.body.cmd).toEqual('loadAll')
-        expect(Array.isArray(response.bookmarks)).toBeTruthy()
-        return response
-      }
-
-      bookmarkController.getBookmarkList(<any>req, res)
-    })
-
-    it('ADD bookmark', async () => {
-      let req = new MockRequest()
-      let res = new MockResponse()
-      const reqHeaders = {}
-      reqHeaders[`x-language`] = `en`
-      reqHeaders[`x-alp-usersessionclaims`] = req[`x-alp-usersessionclaims`]
-      req[`headers`] = reqHeaders
-      let bookmarkname = 'fakebookmark'
-      let bookmark = {
-        value: {
-          user: 'user1',
-          bookmarkname,
-          bookmark: '{stuff: smt1}',
-          shareBookmark: 0,
-        },
-      }
-
-      req.setConnections({
-        analyticsConnection: connection,
-        configConnection: connection,
-      })
-      req.setSwaggerParams({
-        bookmark,
-      })
-
-      res.status = status => {
-        expect(status).toEqual(200)
-        return res
-      }
-
-      res.json = r => {
-        expect(req.body.cmd).toEqual('insert')
-        expect(req.body.bookmark).toEqual(bookmark.value.bookmark)
-        expect(req.body.bookmarkname).toEqual(bookmarkname)
-        expect(r).toEqual('success')
-        return r
-      }
-
-      bookmarkController.addBookmark(req, res)
-    })
-
-    it('DELETE bookmark', async () => {
-      let req = new MockRequest()
-      let res = new MockResponse()
-      const reqHeaders = {}
-      reqHeaders[`x-language`] = `en`
-      reqHeaders[`x-alp-usersessionclaims`] = req[`x-alp-usersessionclaims`]
-      req[`headers`] = reqHeaders
-      let bmkId = '1'
-      req.setConnections({
-        analyticsConnection: connection,
-        configConnection: connection,
-      })
-      req.setSwaggerParams({
-        bookmarkId: { value: bmkId },
-      })
-
-      res.status = status => {
-        expect(status).toEqual(200)
-        return res
-      }
-
-      res.json = r => {
-        expect(req.body.cmd).toEqual('delete')
-        expect(req.body.bmkId).toEqual(bmkId)
-        expect(r).toEqual('success')
-        return r
-      }
-
-      bookmarkController.deleteBookmark(<any>req, res)
-    })
-
-    it('RENAME bookmark', async () => {
-      let req = new MockRequest()
-      let res = new MockResponse()
-      const reqHeaders = {}
-      reqHeaders[`x-language`] = `en`
-      reqHeaders[`x-alp-usersessionclaims`] = req[`x-alp-usersessionclaims`]
-      req[`headers`] = reqHeaders
-      let newName = 'new-bookmark-name'
-      req.setConnections({
-        analyticsConnection: connection,
-        configConnection: connection,
-      })
-      req.setSwaggerParams({
-        bookmarkId: { value: 'fakebmkid' },
-        bookmark: {
-          value: {
-            newName,
-          },
-        },
-      })
-      req.setBody({
-        cmd: 'rename',
-      })
-
-      res.status = status => {
-        expect(status).toEqual(200)
-        return res
-      }
-
-      res.json = r => {
-        expect(req.body.cmd).toEqual('rename')
-        expect(req.body.newName).toEqual(newName)
-        expect(r).toEqual('success')
-        return r
-      }
-
-      bookmarkController.updateBookmark(req, res)
-    })
-
-    it('UPDATE bookmark', async () => {
-      let req = new MockRequest()
-      let res = new MockResponse()
-      const reqHeaders = {}
-      reqHeaders[`x-language`] = `en`
-      reqHeaders[`x-alp-usersessionclaims`] = req[`x-alp-usersessionclaims`]
-      req[`headers`] = reqHeaders
-      let bookmarkToUpdate = {
-        id: 'fakebookmark1',
-        user: 'user1',
-        bookmarkname: 'mybookmark',
-        bookmark: '{stuff: smt1}',
-      }
-      let bookmark = {
-        value: bookmarkToUpdate,
-      }
-      let bookmarkId = { value: bookmarkToUpdate.id }
-      req.setConnections({
-        analyticsConnection: connection,
-        configConnection: connection,
-      })
-      req.setSwaggerParams({
-        bookmarkId,
-        bookmark,
-      })
-      req.setBody({
-        cmd: 'update',
-        shareBookmark: 0,
-      })
-
-      res.status = status => {
-        expect(status).toEqual(200)
-        return res
-      }
-
-      res.json = r => {
-        expect(req.body.cmd).toEqual('update')
-        expect(r).toEqual('success')
-        return r
-      }
-
-      bookmarkController.updateBookmark(req, res)
     })
   })
 })
