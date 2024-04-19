@@ -31,6 +31,7 @@ export class ConfigFacade {
     callback: CallBackInterface,
     userOrgs?
   ) {
+    let analyticsConn;
     switch (request.action) {
       case "getAdminConfig":
         try {
@@ -75,7 +76,7 @@ export class ConfigFacade {
         );
         break;
       case "validate":
-        let analyticsConn = await getAnalyticsConnection(this.userObj);
+        analyticsConn = await getAnalyticsConnection(this.userObj);
         this.ffhQeConfig.validateCDMConfigAndTableMappings(
           request.config,
           analyticsConn,
@@ -101,13 +102,13 @@ export class ConfigFacade {
         );
         break;
       case "autosave":
-        const analyticsConnn = await getAnalyticsConnection(this.userObj);
+        analyticsConn = await getAnalyticsConnection(this.userObj);
         this.ffhQeConfig.autoSaveConfig(
           request.configId,
           request.configVersion,
           request.configName,
           request.config,
-          analyticsConnn,
+          analyticsConn,
           (err, result) => {
             if (err) {
               return callback(err, null);
@@ -117,13 +118,13 @@ export class ConfigFacade {
         );
         break;
       case "activate":
-        const connection = await getAnalyticsConnection(this.userObj);
+        analyticsConn = await getAnalyticsConnection(this.userObj);
         this.ffhQeConfig.activateConfig(
           request.configId,
           request.configVersion,
           request.configName,
           request.config,
-          connection,
+          analyticsConn,
           (err, result) => {
             if (err) {
               return callback(err, null);
@@ -171,8 +172,8 @@ export class ConfigFacade {
         callback(null, this.settings.getDefaultAdvancedSettings());
         break;
       case "getColumns":
-        const conn = await getAnalyticsConnection(this.userObj)
-        let dbMeta = new DbMeta(conn);
+        analyticsConn = await getAnalyticsConnection(this.userObj)
+        let dbMeta = new DbMeta(analyticsConn);
         dbMeta.getColumnsForPlaceHolders(
           request.dbObjectList,
           (err, result) => {
