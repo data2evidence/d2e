@@ -50,6 +50,9 @@ x-envs:
     PG__MAX_POOL: 10
     PG__MIN_POOL: 0
     PG__PORT: ${PG_PORT:-5432}
+  redis: &x-redis
+    REDIS_HOST: ${REDIS_HOST:-alp-minerva-redis-1}
+    REDIS_PORT: ${REDIS_PORT:-6379}
   plugins: &x-plugins |
     {
       "researcher": [
@@ -314,6 +317,7 @@ services:
       - 3001:3001
       - 3002:3002
       - 41101:41101
+      - 8103:8103
     pull_policy: missing
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
@@ -600,8 +604,18 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
       alp-query-gen:
-        condition: service_started
+        condition: service_healthy
     image: alpcr.azurecr.io/alp-data-node/analytics-svc:${DOCKER_TAG_NAME:-develop}
+    healthcheck:
+      interval: 20s
+      retries: 20
+      start_period: 120s
+      test:
+        - CMD
+        - wget
+        - -O
+        - liveness
+        - http://0.0.0.0:41102/check-liveness
     logging:
       options:
         tag: *c8
@@ -1427,6 +1441,16 @@ services:
     logging:
       options:
         tag: *c24
+    healthcheck:
+      interval: 20s
+      retries: 20
+      start_period: 120s
+      test:
+        - CMD
+        - wget
+        - -O
+        - liveness
+        - http://0.0.0.0:41109/check-liveness
     networks:
       alp:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
@@ -1441,3 +1465,42 @@ services:
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
       isTestEnv: ${isTestEnv}
+
+  redis:
+    container_name: &c25 alp-minerva-redis-${BASE_PORT:-1}
+    image: redis:7
+    logging:
+      options:
+        tag: *c25
+    healthcheck:
+      interval: 20s
+      retries: 10
+      start_period: 60s
+      test: redis-cli --no-auth-warning -a ${REDIS_PASSWORD} ping | grep PONG
+    networks:
+      - alp
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+  
+  alp-fhir-server:
+    container_name: &c26 alp-minerva-fhir-server-${BASE_PORT:-1}
+    entrypoint: ['./start.sh']
+    image: alpcr.azurecr.io/alp-data-node/alp-fhir-server:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c26
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    depends_on:
+      alp-minerva-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: 
+    - alp
+    environment:
+      <<:
+        - *x-pg
+        - *x-redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
