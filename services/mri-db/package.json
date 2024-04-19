@@ -2,7 +2,7 @@
   "name": "mri-db",
   "version": "1.0.0",
   "dependencies": {
-    "@alp/alp-dbcli": "file:../../internal/build/alp-dbcli-v1.0.0.tgz",
+    "@alp/alp-dbcli": "file:../../internal/build/alp-dbcli-private-v1.0.0.tgz",
     "hdb": "0.19.3"
   },
   "scripts": {

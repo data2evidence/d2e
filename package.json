@@ -11,9 +11,9 @@
     "start:remote:caddy": "yarn remote:minerva up alp-caddy --wait",
     "logs:caddy": "yarn base:minerva logs alp-caddy -t --until 1s",
 
-    "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml",
-    "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile minerva-s3 --profile cube",
-    "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local --profile minerva-s3",
+    "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml --profile minerva-s3",
+    "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile cube",
+    "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local",
 
     "local:standalone:cube:minerva": "yarn local:minerva --profile cube",
 
@@ -34,11 +34,11 @@
     "ps:minerva": "yarn local:minerva ps",
     "logs:minerva": "yarn base:minerva logs -t --until 1s",
 
-    "base:ui": "DN_REPO_RELATIVE_PATH='.' && GIT_HEAD_COMMIT_ALP_UI_REPO=$(git -C $UI_REPO_RELATIVE_PATH rev-parse HEAD) docker compose --file ${DN_REPO_RELATIVE_PATH}/docker-compose.yml --file ${DN_REPO_RELATIVE_PATH}/docker-compose-local.yml",
+    "base:ui": "DN_REPO_RELATIVE_PATH='.' && GIT_HEAD_COMMIT_ALP_UI_REPO=$(git -C $UI_REPO_RELATIVE_PATH rev-parse HEAD) docker compose --file ${DN_REPO_RELATIVE_PATH}/docker-compose.yml --file ${DN_REPO_RELATIVE_PATH}/docker-compose-local.yml --profile minerva-s3",
     "az:start:ui": "yarn base:ui up alp-local-ui-file-server",
     "start:ui": "UI_REPO_RELATIVE_PATH='../d2e-ui' yarn az:start:ui",
     "build:start:ui": "UI_REPO_RELATIVE_PATH='../d2e-ui' && yarn base:ui --file ${UI_REPO_RELATIVE_PATH}/docker-compose-ui.yml up alp-local-ui-file-server",
-    "build:ui": "UI_REPO_RELATIVE_PATH='../d2e-ui' && yarn base:ui --file ${UI_REPO_RELATIVE_PATH}/docker-compose-ui.yml build --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} alp-local-ui-file-server",
+    "build:ui": "UI_REPO_RELATIVE_PATH='../d2e-ui' && yarn base:ui --file ${UI_REPO_RELATIVE_PATH}/docker-compose-ui.yml build alp-local-ui-file-server",
 
     "build:minerva-test": "yarn local:minerva build",
 
@@ -66,7 +66,8 @@
     "op:get": "internal/scripts/get-op.sh",
     "op:put:all": "for env_name in ${npm_package_config_env_names_all[@]}; do overwrite=$overwrite env_name=$env_name yarn op:put; done",
     "op:put:dev": "for env_name in ${npm_package_config_env_names_dev[@]}; do overwrite=$overwrite env_name=$env_name yarn op:put; done",
-    "op:put": "internal/scripts/put-op.sh"
+    "op:put": "internal/scripts/put-op.sh",
+    "x:setup": "internal/scripts/setup.sh"
   },  
   "devDependencies": {
     "@types/node": "^18",
@@ -74,7 +75,7 @@
     "ts-node": "9.1.1"
   },
   "optionalDependencies": {
-    "@alp/alp-dbcli": "file:internal/build/alp-dbcli-v1.0.0.tgz"
+    "@alp/alp-dbcli": "file:internal/build/alp-dbcli-private-v1.0.0.tgz"
   },
   "private": true,
   "workspaces": {
