@@ -21,9 +21,10 @@ DC_FILE=docker-compose-local.yml
 ```
 - by serviceName
 ```bash
-cat $DC_FILE | yq -r '.services.* | (path | .[-1])'
-cat $DC_FILE | yq -r '.services.* | (path | .[-1]) + " " + (.networks | @yaml | @json)' 
-cat $DC_FILE | yq -r '.services.* | (path | .[-1]) + " " + (.volumes | @yaml | @json)' 
+echo DC_FILE=$DC_FILE; cat $DC_FILE | yq -r '.services.* | (path | .[-1]) + " " + (.networks | @yaml | @json)' 
+echo DC_FILE=$DC_FILE; cat $DC_FILE | yq -r '.services.* | (path | .[-1]) + " " + (.volumes | @yaml | @json)' 
+echo DC_FILE=$DC_FILE; yq '.services | with_entries(select(.key|test("alp-dataflow-gen-agent|alp-dataflow-gen"))) | .* | (path | .[-1]) + " " + (.networks | @yaml | @json)' $DC_FILE
+for DC_FILE in docker-compose.yml docker-compose-local.yml; do echo DC_FILE=$DC_FILE; yq '.services | with_entries(select(.key|test("alp-dataflow-gen-agent|alp-dataflow-gen"))) | .* | (path | .[-1]) + " " + (.networks | @yaml | @json)' $DC_FILE; done
 ```
 - by prop
 ```bash
