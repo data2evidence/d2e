@@ -21,8 +21,6 @@ services:
     build:
       context: .
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
-    networks:
-      - alp
     volumes:
       - ./services/alp-dataflow-gen/pysrc:/app/pysrc
     environment:
