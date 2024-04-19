@@ -10,10 +10,6 @@ export class DataCharacterizationFlowRunDto {
 
   @IsString()
   @IsOptional()
-  vocabSchemaName: string
-
-  @IsString()
-  @IsOptional()
   releaseId: string
 
   @IsString()
