@@ -18,7 +18,6 @@ on:
         description: Select the environment
         required: true
         default: alp-dev-sg-2
-      
 
 env:
   DOCKER_TAG_NAME: ${{ github.event.inputs.docker_tag_name }}
@@ -35,6 +34,11 @@ jobs:
     name: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
     runs-on: [ "${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}", self-hosted, Linux, X64 ]
     steps:
+    - uses: actions/checkout@v4
+      with:
+        clean: false
+        submodules: recursive
+
     - name: Load dotenv from 1password
       uses: 1password/load-secrets-action@v2
       id: op-load-secret
@@ -42,33 +46,15 @@ jobs:
         export-env: true
       env:
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
-    - uses: actions/checkout@v4
-      with:
-        clean: false
-        submodules: recursive
-
-    - uses: actions/checkout@v4
-      with:
-        repository:  ${{ vars.OVERRIDE_REPO }}
-        token: ${{ secrets.CI_PAT }}
-        path: 'tmp'
-        sparse-checkout: 'alp-data-node-override'
-        sparse-checkout-cone-mode: false
-        ref: develop
-
-    - shell: bash
-      id: link_files_from_override
-      run: |
-        ln -s tmp/alp-data-node-override alp-data-node-override
-        chmod 755 -R alp-data-node-override
+        REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+        REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
 
     - name: Login to ACR
       uses: docker/login-action@v3.1.0
       with:
         registry: alpcr.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
 
     - name: Install 1Password CLI
       uses: 1Password/install-cli-action@v1.0.0
@@ -97,7 +83,6 @@ jobs:
         echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
         echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
         echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
-
 
     - shell: bash
       if: github.event_name == 'push'
