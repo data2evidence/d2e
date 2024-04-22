@@ -54,6 +54,7 @@ class DBDAO {
           if (
             schemaObj.hasOwnProperty("schemaName") &&
             schemaObj.hasOwnProperty("dataModel") &&
+            schemaObj.hasOwnProperty("vocabSchemaName") &&
             schemaObj.hasOwnProperty("currentVersionID")
           ) {
             successfulSchemasInfo.push(schemaObj); // return schemaName if its relation error
@@ -70,16 +71,10 @@ class DBDAO {
       // attempt to retrieve undeployed changesets for each schema that was successful in previous step
       for (const schemaObj of successfulSchemasInfo) {
         try {
-          const vocabSchema: any = await this.getVocabSchema(
-            db,
-            schemaObj.schemaName
-          );
-
           const latestAvailableVersionID: string =
             await this.getLatestAvailableVersion(
               tenant,
               schemaObj,
-              vocabSchema,
               pluginChangelogFilepath,
               pluginClasspath
             );
@@ -120,45 +115,9 @@ class DBDAO {
     }
   };
 
-  getVocabSchema = (db: any, schema: string) => {
-    return new Promise((resolve, reject) => {
-      try {
-        db.executeQuery(
-          `SELECT VOCABULARY_SCHEMA AS "VOCABULARY_SCHEMA" FROM ${schema}.CDM_SOURCE`,
-          [],
-          async (err: any, result: any) => {
-            if (err) {
-              if (
-                err.code === "42P01" ||
-                err.code === 260 || // CDM_SOURCE column does not exist
-                err.code === 362 ||
-                err.code === 259
-              ) {
-                this.logger.warn(err);
-                resolve("CDMVOCAB");
-              } else {
-                this.logger.error(err);
-                reject(err);
-              }
-            } else {
-              const { VOCABULARY_SCHEMA } = result[0];
-              resolve(VOCABULARY_SCHEMA);
-            }
-          }
-        );
-      } catch (err) {
-        this.logger.error(
-          `Error while retrieving vocab schema name from schema ${schema}: ${err}`
-        );
-        reject(err);
-      }
-    });
-  };
-
   getLatestAvailableVersion = (
     tenant,
     schemaObj: SchemaVersionInfo,
-    vocabSchema = "CDMVOCAB",
     pluginChangelogFilepath: string | undefined,
     pluginClasspath: string | undefined
   ) => {
@@ -166,7 +125,7 @@ class DBDAO {
       try {
         let liquibaseAction: string = "status"; // status command checks for undeployed changesets
         let liquibaseActionParams: Array<string> = [
-          `-DVOCAB_SCHEMA=${vocabSchema}`,
+          `-DVOCAB_SCHEMA=${schemaObj.vocabSchemaName}`,
           `--verbose`,
         ]; // use ["--verbose"] to see which changesets haven't been deployed
         let liquibase;
@@ -252,6 +211,7 @@ class DBDAO {
 
               resolve({
                 schemaName: datamodelSchemaMapping.schemaName,
+                vocabSchemaName: datamodelSchemaMapping.vocabSchemaName,
                 dataModel: datamodelSchemaMapping.dataModel,
                 currentVersionID: currentVersionID,
                 //lastUpdated: lastUpdated,

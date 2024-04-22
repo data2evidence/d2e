@@ -1871,9 +1871,14 @@ export default class DBRouter {
 
     let portalSchemaList: DataModelSchemaMappingType =
       datasetListFromPortal.map(
-        ({ schema_name: schemaName, data_model: dataModel }) => ({
+        ({
+          schema_name: schemaName,
+          data_model: dataModel,
+          vocab_schema: vocabSchemaName,
+        }) => ({
           schemaName,
           dataModel,
+          vocabSchemaName,
         })
       );
     try {

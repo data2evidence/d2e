@@ -7,6 +7,7 @@ export interface DatasetSchemaMappingType {
 export interface DataModelSchemaMappingType {
   schemaName: string;
   dataModel: string;
+  vocabSchemaName: string;
 }
 
 export interface VersionInfoType {
@@ -171,6 +172,7 @@ export interface ITokenUser {
 
 export interface SchemaVersionInfo {
   schemaName: string;
+  vocabSchemaName: string;
   dataModel?: string;
   currentVersionID?: string;
   latestVersionID?: string;

@@ -5,7 +5,8 @@ from prefect import task
 from prefect_shell import ShellOperation
 from d2e_dbsvc.types import (requestType, createDataModelType, updateDataModelType, internalPluginType,
                              createSnapshotType, createParquetSnapshotType, rollbackTagType,
-                             rollbackCountType, questionniareDefinitionType, questionnaireResponseType)
+                             rollbackCountType, questionnaireDefinitionType, questionnaireResponseType,
+                             dcOptionsType)
 import importlib
 
 
@@ -219,12 +220,7 @@ async def rollback_count(options: rollbackCountType):
 
 
 @task
-async def get_version_info():
-    pass
-
-
-@task
-async def create_questionnaire_definition(options: questionniareDefinitionType):
+async def create_questionnaire_definition(options: questionnaireDefinitionType):
     database_code = options.database_code
     schema_name = options.schema_name
     data_model = options.data_model  # not used but should only work with omop5-4
@@ -285,3 +281,26 @@ def _add_plugin_options(request_body, dialect: str, flow_name: str, changelog_fi
     request_body["customClasspath"] = f'{cwd}/{flow_name}/'
     request_body["customChangelogFilepath"] = f'db/migrations/{dialect}/{changelog_filepath}'
     return request_body
+
+
+async def drop_data_characterization_schema(flow, flow_run, state):
+    options = dcOptionsType(**flow_run.parameters['options'])
+    database_code = options.databaseCode
+    results_schema = options.resultsSchema
+
+    # if flow is run from plugin
+    if options.flow_name:
+        if options.flow_name == internalPluginType.DATAMODEL_PLUGIN:
+            sys.path.append('/app/pysrc')
+            alpconnection_module = importlib.import_module(
+                'alpconnection.dbutils')
+            db_dialect = alpconnection_module.get_db_svc_endpoint_dialect(
+                database_code)
+        else:
+            db_dialect = options.dialect
+
+    request_url = f"/alpdb/{db_dialect}/dataCharacterization/database/{database_code}/schema/{results_schema}"
+    request_type = requestType.DELETE
+    request_body = {}
+
+    await _run_db_svc_shell_command(request_type, request_url, request_body)

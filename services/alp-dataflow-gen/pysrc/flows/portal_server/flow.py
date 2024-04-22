@@ -3,7 +3,7 @@ from utils.types import (
     datasetAttributesType,
     datasetSchemaMappingType,
     portalDatasetType,
-    fetchVersionInfoType,
+    getVersionInfoType,
     versionInfoResponseType,
     schemaVersionInfoType,
     extractDatasetSchemaType,
@@ -11,17 +11,19 @@ from utils.types import (
     HANA_TENANT_USERS
 )
 from dao.DBDao import DBDao
-import json
 from api.PortalServerAPI import PortalServerAPI
 from prefect.artifacts import create_table_artifact
 from typing import List
 from flows.alp_db_svc.flow import run_command
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
+import os
 
 
-def fetch_version_info(options: fetchVersionInfoType):
+def get_version_info(options: getVersionInfoType):
     logger = get_run_logger()
-    token = options.token  # token from portal
+    token = options.token
+    flow_name = options.flow_name
+    changelog_filepath = options.changelog_filepath
 
     logger.info("Fetching datasets from portal...")
     try:
@@ -50,15 +52,19 @@ def fetch_version_info(options: fetchVersionInfoType):
         for _database_code in database_code_list:
             datasets_by_db = list(
                 _dataset for _dataset in dataset_schema_list["datasets_with_schema"] if _dataset["database_code"] == _database_code)
+
             request_body = {
                 "datasetListFromPortal": datasets_by_db, "token": token}
 
             db_dialect = get_db_svc_endpoint_dialect(_database_code)
 
-            # task to fetch version-info
-            # db-svc response sent as parameter of update_dataset_attributes flow run
+            request_body = _add_plugin_options(
+                request_body, db_dialect, flow_name, changelog_filepath
+            )
 
             try:
+                # task to fetch version-info for each db
+                # db-svc response sent as parameter of update_dataset_attributes flow run
                 run_command(
                     "post", f"/alpdb/{db_dialect}/database/{_database_code}/version-info", request_body)
             except Exception as e:
@@ -70,6 +76,13 @@ def fetch_version_info(options: fetchVersionInfoType):
             table=dataset_schema_list["datasets_without_schema"],
             description="Failed to updates attributes for some datasets"
         )
+
+
+def _add_plugin_options(request_body, dialect: str, flow_name: str, changelog_filepath: str):
+    cwd = os.getcwd()
+    request_body["customClasspath"] = f'{cwd}/{flow_name}/'
+    request_body["customChangelogFilepath"] = f'db/migrations/{dialect}/{changelog_filepath}'
+    return request_body
 
 
 @task
@@ -89,7 +102,8 @@ def extract_db_schema(dataset_list: List[portalDatasetType]) -> extractDatasetSc
                 "study_id": _dataset["id"],
                 "database_code": _dataset["databaseCode"],
                 "schema_name": _dataset["schemaName"],
-                "data_model": _dataset["dataModel"]
+                "data_model": _dataset["dataModel"],
+                "vocab_schema": _dataset["vocabSchemaName"]
             })
     return {"datasets_with_schema": datasets_with_schema,
             "datasets_without_schema": datasets_without_schema}
@@ -160,8 +174,7 @@ NON_PERSON_ENTITIES = {
 }
 
 
-OMOP_DATA_MODELS = ["omop", "omop5-4", "custom-omop-ms",
-                    "custom-omop-ms-phi", "omop5-4 [datamodel-plugin]"]
+OMOP_DATA_MODELS = ["omop", "omop5-4", "custom-omop-ms", "custom-omop-ms-phi"]
 
 
 ETL_STATUS_DESC = {
@@ -241,7 +254,7 @@ def get_and_update_attributes(dataset_schema_mapping: datasetSchemaMappingType,
     # return latest schema version or "error"
     latest_schema_version = schema_version_info["latest_schema_version"]
     # return data model or "error"
-    data_model = schema_version_info["data_model"]
+    data_model = schema_version_info["data_model"].split(" ")[0]
 
     # update current schema version with value or error
     try:

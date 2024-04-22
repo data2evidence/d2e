@@ -17,7 +17,7 @@ class internalPluginType(str, Enum):
 class dataModelBase(BaseModel):
     database_code: str = Field(...)
     data_model: str = Field(...)
-    schema_name: str = Field(...)
+    schema_name: str = Optional[str]
     dialect: str = Field(...)
     flow_name: str = Field(...)
     changelog_filepath: Optional[str]
@@ -57,3 +57,13 @@ class questionnaireDefinitionType(dataModelBase):
 
 class questionnaireResponseType(dataModelBase):
     questionnaire_id: str
+
+
+class dcOptionsType(BaseModel):
+    schemaName: str
+    databaseCode: str
+    cdmVersionNumber: str
+    vocabSchemaName: str
+    releaseDate: str
+    resultsSchema: str
+    excludeAnalysisIds: str

@@ -118,8 +118,10 @@ class datasetSchemaMappingType(BaseModel):
     dataset_attribute: Optional[str]
 
 
-class fetchVersionInfoType(BaseModel):
+class getVersionInfoType(BaseModel):
     token: str
+    flow_name: str = Field(...)
+    changelog_filepath: Optional[str]
 
 
 class datasetVersionInfoType(BaseModel):
