@@ -3,12 +3,13 @@ name: Docker compose Build & Up
 on: 
   pull_request:
     types: [opened, ready_for_review, reopened, synchronize]
-  workflow_dispatch:
   push:
     branches:
       - develop
+  workflow_dispatch:
 
 env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
   DOCKER_TAG_NAME: ${{ github.sha }}
   ENV_NAME: local
   ENV_TYPE: local

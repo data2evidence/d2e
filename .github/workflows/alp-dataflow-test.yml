@@ -6,6 +6,10 @@ on:
   push:
     branches:
       - develop
+  workflow_dispatch:
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
   test-alp-dataflow:
@@ -25,12 +29,12 @@ jobs:
 
     - name: Setup node if files have changed
       uses: actions/setup-node@v3
-      if: github.ref_name == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
       with:
         node-version: '18.14.0'
 
     - name: Run unit tests if files have changed
-      if: github.ref_name == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
       run: |
         cd services/alp-dataflow
         yarn --prefer-offline

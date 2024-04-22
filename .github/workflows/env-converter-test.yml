@@ -6,6 +6,11 @@ on:
   push:
     branches:
       - develop
+  workflow_dispatch:
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
 jobs:
   test-env-converter:
     runs-on: ubuntu-latest
@@ -24,13 +29,13 @@ jobs:
 
     - name: Setup node if files have changed
       uses: actions/setup-node@v3
-      if: github.ref_name == 'develop' || steps.check_file_changed.outputs.env_converter_changed == 'True'
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.env_converter_changed == 'True'
       with:
         node-version: '18.14.0'
 
     # Run the step only with "env_converter_changed" equals "True"
     - name: Run unit tests if files have changed
-      if: github.ref_name == 'develop' || steps.check_file_changed.outputs.env_converter_changed == 'True'
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.env_converter_changed == 'True'
       run: |
         rm -rf package.json
         cd services/envConverter

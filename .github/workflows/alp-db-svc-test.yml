@@ -3,15 +3,15 @@ name: ALP DB-Svc integration tests with Azure Hana database and local Postgres d
 on:
   pull_request:
     types: [opened, ready_for_review, reopened, synchronize]
-  workflow_dispatch:
   push:
     branches:
       - develop
+  workflow_dispatch:
 
 # Run only one job per branch
-# concurrency:
-#   group: ${{ github.head_ref || github.ref_name }}-db-svc-tests # Run the latest push
-#   cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}-db-svc-tests # Run the latest push
+  cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
 
 jobs:
   test-alp-db-svc:
