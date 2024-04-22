@@ -27,6 +27,11 @@
       "targetPath":"/ui-files/portal/assets/"
     },
     {
+      "source":"^/portal/translations/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/portal/translations/"
+    },
+    {
       "source":"^/portal",
       "target":"index.html",
       "targetPath":"/ui-files/portal/"
