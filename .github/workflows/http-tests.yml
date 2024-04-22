@@ -110,13 +110,14 @@ jobs:
       - name: create .env.local for docker-compose in system services
         env:
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+          OVERWRITE: true
         run: |
           echo "${DOCKER_COMPOSE_DN_BASE_ALL_ENV}" > .env.base-all.yml
           echo "${DOCKER_COMPOSE_DN_BASE_LOCAL_ENV}" > .env.base-local.yml
           echo "${DOCKER_COMPOSE_DN_LOCAL_ENV}" > .env.local.yml
           wc -l .env.base-all.yml .env.base-local.yml .env.local.yml
-          OP_VAULT_NAME=$OP_VAULT_NAME ENV_TYPE=$ENV_TYPE ENV_NAME=$ENV_NAME OVERWRITE=true yarn gen:env
-          
+          yarn gen:env
+
           sed -i "s/${HANASERVER_REPLACE}/${HANASERVER}/g" .env.local
           sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
           # sed -i "s/HTTPTEST_ADMIN_USER/${HDIUSER}/g" .env.local
