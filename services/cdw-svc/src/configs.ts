@@ -10,7 +10,10 @@ const Env = z.object({
   MRI_USER: z.string().optional(),
   DUCKDB__DATA_FOLDER: z.string(),
   USE_DUCKDB: z.string(),
-  CONFIG_CONNECTION: z.string()
+  CONFIG_CONNECTION: z.string(),
+  DUCKDB_DB_NAME:  z.string(),
+  DUCKDB_SCHEMA:  z.string(),
+  DUCKDB_VOCAB_SCHEMA:  z.string()
 });
 
 const result = Env.safeParse(process.env);

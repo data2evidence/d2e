@@ -109,7 +109,6 @@ export type PostgresConfig = {
   values: PostgresValues;
   analyticsSvcValues?: Partial<PostgresValues>;
   dbSvcValues?: Partial<PostgresValues>;
-  cdwSvcValues?: Partial<PostgresValues>;
 };
 
 export type IntTestValues = {

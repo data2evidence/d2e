@@ -54,12 +54,10 @@ const main = () => {
     log.info("TESTSCHEMA :" + configCredentials.schema);
   } else {
     let cdwService = xsenv.filterServices({ tag: "cdw" }).map(db => db.credentials);
-    if(env.USE_DUCKDB === "true"){
-      cdwService = cdwService.filter((db) => db.dialect == 'postgresql')
-    }else{
+    if(env.USE_DUCKDB !== "true"){
       cdwService = cdwService.filter((db) => db.dialect == 'hana')
+      analyticsCredential = cdwService[0];
     }
-    analyticsCredential = cdwService[0];
     configCredentials = JSON.parse(env.CONFIG_CONNECTION);
   }
 
@@ -99,7 +97,7 @@ const getConnections = async ({
   if (env.USE_DUCKDB === "true") {
     log.info("Use Duckdb")
     // Use duckdb as analyticsConnection if USE_DUCKDB flag is set to true
-    const { duckdbSchemaFileName, vocabSchemaFileName } = await getFileName(analyticsCredentials.databaseName, analyticsCredentials.schema, analyticsCredentials.vocabSchema)
+    const { duckdbSchemaFileName, vocabSchemaFileName } = await getFileName(env.DUCKDB_DB_NAME, env.DUCKDB_SCHEMA, env.DUCKDB_VOCAB_SCHEMA)
     analyticsConnection =  await getDuckdbDBConnection(duckdbSchemaFileName, vocabSchemaFileName)
 } else {
   analyticsConnection =
