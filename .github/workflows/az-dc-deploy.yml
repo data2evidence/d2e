@@ -71,14 +71,6 @@ jobs:
     name: ${{ github.event.inputs.env }}
     runs-on: [ "${{ github.event.inputs.env }}", self-hosted, Linux, X64 ]
     steps:
-    - name: Load dotenv from 1password
-      uses: 1password/load-secrets-action@v2
-      id: op-load-secret
-      with:
-        export-env: true
-      env:
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
     - uses: actions/checkout@v4.1.1
       name: checkout d2e repo
       with:
@@ -87,31 +79,15 @@ jobs:
         repository: ${{ github.event.inputs.repo_full_name }}
         token: ${{ secrets.CI_PAT }}
 
-    - shell: bash
-      id: override-repo
-      name: override-repo
-      run: |
-        OVERRIDE_REPO="${{ github.event.inputs.override-repo-branch-textbox }}"
-        [ ${{ github.event.inputs.override-branch-boolean }} = true ] && OVERRIDE_REPO=${{ github.ref_name }}
-        echo OVERRIDE_REPO=$OVERRIDE_REPO | tee -a "$GITHUB_OUTPUT"
-
-    - uses: actions/checkout@v4.1.1
-      name: checkout override repo
+    - name: Load dotenv from 1password
+      uses: 1password/load-secrets-action@v2
+      id: op-load-secret
       with:
-        repository:  ${{ vars.OVERRIDE_REPO }}
-        token: ${{ secrets.CI_PAT }}
-        path: 'tmp'
-        sparse-checkout: 'alp-data-node-override'
-        sparse-checkout-cone-mode: false
-        ref: ${{ steps.override-repo.outputs.OVERRIDE_REPO }} # branch name
-
-    - shell: bash
-      name: link files from override
-      id: link_files_from_override
-      run: |
-        pwd
-        ln -s tmp/alp-data-node-override alp-data-node-override
-        chmod 755 -R alp-data-node-override
+        export-env: true
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+        REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
 
     - name: Cleanup dangling images and remove created/exited containers
       continue-on-error: true
@@ -138,8 +114,8 @@ jobs:
       uses: docker/login-action@v3.1.0
       with:
         registry: alpcr.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
 
     - name: Generate dotenv
       env:
