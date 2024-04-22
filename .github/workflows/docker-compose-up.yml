@@ -24,14 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
     steps:
-      - name: Load dotenv from 1password
-        uses: 1password/load-secrets-action@v2
-        id: op-load-secret
-        with:
-          export-env: true
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
@@ -67,12 +59,22 @@ jobs:
           ln -s tmp/alp-data-node-override alp-data-node-override
           chmod 755 -R alp-data-node-override
 
+      - name: Load dotenv from 1password
+        uses: 1password/load-secrets-action@v2
+        id: op-load-secret
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+          REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
+
       - name: Login to ACR
         uses: docker/login-action@v3.1.0
         with:
           registry: alpcr.azurecr.io
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_PASSWORD }}
 
       - name: Install 1Password CLI
         uses: 1Password/install-cli-action@v1.0.0
@@ -112,7 +114,7 @@ jobs:
           yarn build:minerva --builder ${{ steps.builder.outputs.name }}
 
       - name: Docker compose up Local Mode without UI Container
-        env:          
+        env:
           PORTAL_NAME: alp-minerva-gateway-1
         run: |
           # Run DataNode services
