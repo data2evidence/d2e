@@ -41,7 +41,6 @@ export class DBRouter {
             database_code: databaseCode,
             data_model: dataModel,
             schema_name: schemaName,
-            cleansed_schema_option: false,
             vocab_schema: vocabSchemaValue
           }
         }
