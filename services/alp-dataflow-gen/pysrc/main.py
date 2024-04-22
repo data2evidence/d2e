@@ -1,5 +1,6 @@
 from prefect import flow
 from prefect.task_runners import SequentialTaskRunner
+from flows.dataflow.flow import exec_flow as execute_dataflow
 from flows.alp_db_svc.flow import run_alp_db_svc, run_seed_postgres
 from flows.meilisearch.flow import execute_add_index_flow
 from flows.strategus.flow import execute_strategus
@@ -9,6 +10,11 @@ from utils.types import (
     meilisearchAddIndexType,
     datasetAttributesType
 )
+
+
+@flow(log_prints=True)
+def execute_dataflow_flow(json_graph, options):
+    execute_dataflow(json_graph, options)
 
 
 @flow(log_prints=True, task_runner=SequentialTaskRunner)
