@@ -117,15 +117,22 @@ export class DatasetRouter {
               const datamodels = await dataflowMgmtAPI.getDatamodels()
               const dmInfo = datamodels.find(model => model.name === dataModelName)
 
-              const options = {options: {
-                flow_action_type: 'create_datamodel',
-                database_code: databaseCode,
-                data_model: dataModel,
-                schema_name: schemaName,
-                cleansed_schema_option: cleansedSchemaOption,
-                vocab_schema: vocabSchema 
-              }}
-              await dataflowMgmtAPI.createFlowRunByMetadata(options, 'datamodel', dmInfo.flowId, `datamodel-create-${schemaName}`)
+              const options = {
+                options: {
+                  flow_action_type: 'create_datamodel',
+                  database_code: databaseCode,
+                  data_model: dataModel,
+                  schema_name: schemaName,
+                  cleansed_schema_option: cleansedSchemaOption,
+                  vocab_schema: vocabSchema
+                }
+              }
+              await dataflowMgmtAPI.createFlowRunByMetadata(
+                options,
+                'datamodel',
+                dmInfo.flowId,
+                `datamodel-create-${schemaName}`
+              )
             } catch (error) {
               this.logger.error(`Error while creating new CDM schema! ${error}`)
               return res.status(500).send('Error while creating CDM schema')
