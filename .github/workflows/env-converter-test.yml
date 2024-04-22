@@ -11,20 +11,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Load dotenv from 1password
+      uses: 1password/load-secrets-action@v2
+      id: op-load-secret
+      with:
+        export-env: true
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
     - uses: actions/checkout@v4
       with:
         submodules: recursive
+
     - uses: dorny/paths-filter@v2
       id: check_file_changed
       with:
         filters: |
           env_converter_changed:
             - 'services/envConverter/**'
+
     - name: Setup node if files have changed
       uses: actions/setup-node@v3
       if: github.ref_name == 'develop' || steps.check_file_changed.outputs.env_converter_changed == 'True'
       with:
         node-version: '18.14.0'
+
     # Run the step only with "env_converter_changed" equals "True"
     - name: Run unit tests if files have changed
       if: github.ref_name == 'develop' || steps.check_file_changed.outputs.env_converter_changed == 'True'

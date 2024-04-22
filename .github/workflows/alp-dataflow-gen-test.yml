@@ -15,9 +15,11 @@ jobs:
     - name: Install dependencies
       # protobuf-compiler required for python build dask-sql
       run: sudo apt-get install protobuf-compiler
+
     - uses: actions/checkout@v4
       with:
         submodules: recursive
+
     - uses: dorny/paths-filter@v2
       id: check_file_changed
       with:

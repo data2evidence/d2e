@@ -56,16 +56,8 @@ jobs:
       DOCKER_TAG_NAME: "local"
       SKIP_AUTH: "TRUE"
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18.14.0'
-      
       - name: Load dotenv from 1password
-        uses: 1password/load-secrets-action@v1
+        uses: 1password/load-secrets-action@v2
         id: op-load-secret
         with:
           export-env: true
@@ -81,6 +73,14 @@ jobs:
           HDIPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
           TESTSYSTEMPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
           TESTPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.14.0'
 
       - name: Print env vars
         run: |
@@ -126,6 +126,7 @@ jobs:
         run: |
             yarn --prefer-offline
             yarn inittestdb
+
       - name: build system services
         run: |
           yarn build:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc

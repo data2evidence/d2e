@@ -12,13 +12,20 @@ concurrency:
   group: ${{ github.head_ref || github.ref_name }}-mri-tests # Run the latest push
   cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
 jobs:
-
   check_file_changes:
       runs-on: ubuntu-latest
       if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
       outputs:
           changes: ${{ steps.file_changes.outputs.src }}
       steps:
+      - name: Load dotenv from 1password
+        uses: 1password/load-secrets-action@v2
+        id: op-load-secret
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -66,7 +73,7 @@ jobs:
           --health-retries 5
     steps:
       - name: Load DB credentials from 1password
-        uses: 1password/load-secrets-action@v1
+        uses: 1password/load-secrets-action@v2
         id: op-load-secret
         with:
           export-env: true

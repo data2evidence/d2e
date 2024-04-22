@@ -57,6 +57,14 @@ jobs:
           --health-retries 5
 
     steps:
+      - name: Load dotenv from 1password
+        uses: 1password/load-secrets-action@v2
+        id: op-load-secret
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive

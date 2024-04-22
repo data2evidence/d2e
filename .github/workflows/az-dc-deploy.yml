@@ -71,8 +71,13 @@ jobs:
     name: ${{ github.event.inputs.env }}
     runs-on: [ "${{ github.event.inputs.env }}", self-hosted, Linux, X64 ]
     steps:
-    - run: |
-        echo REPO=${{ github.event.inputs.repo_full_name }} | tee -a "$GITHUB_OUTPUT"
+    - name: Load dotenv from 1password
+      uses: 1password/load-secrets-action@v2
+      id: op-load-secret
+      with:
+        export-env: true
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
     - uses: actions/checkout@v4.1.1
       name: checkout d2e repo
