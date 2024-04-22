@@ -139,7 +139,7 @@ jobs:
           echo "Files changed: $diff"
           echo "Does db-svc have changes: $hasDiff"
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         # if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
         with:
           node-version: "18.14.0"
@@ -162,8 +162,8 @@ jobs:
         run: |
           # Create cdmvocab and cdmdefault schema for db-svc integration tests
           yarn workspace alp-db-svc cdm-install-script post /alpdb/postgres/database/alp/data-model/omop5-4/schema/cdmvocab "{\"cleansedSchemaOption\": false, \"vocabSchema\": \"${OMOP__VOCAB_SCHEMA}\"}" && yarn workspace alp-db-svc cdm-install-script post /alpdb/postgres/database/alp/data-model/omop5-4/schema/cdmdefault "{\"cleansedSchemaOption\": false, \"vocabSchema\": \"${OMOP__VOCAB_SCHEMA}\"}"
-        # env:
-        #   NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_PKGS_NPM_TOKEN }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_PKGS_NPM_TOKEN }}
 
       - name: Run integration tests for DB-SVC POSTGRES
         working-directory: ./services/alp-db-svc
