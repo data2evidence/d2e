@@ -81,44 +81,44 @@ jobs:
           ls "${HANA__DRIVER_CLASS_PATH}"
           ls "${POSTGRES__DRIVER_CLASS_PATH}"
 
-      # - uses: actions/checkout@v4
-      #   name: sameBranch checkout (OverrideRepo)
-      #   id: sameBranch-checkout
-      #   continue-on-error: true
-      #   with:
-      #     repository:  ${{ vars.OVERRIDE_REPO }}
-      #     token: ${{ secrets.CI_PAT }}
-      #     path: 'tmp'
-      #     sparse-checkout: 'alp-data-node-override'
-      #     sparse-checkout-cone-mode: false
-      #     ref: ${{ env.BRANCH_NAME }}
+      - uses: actions/checkout@v4
+        name: sameBranch checkout (OverrideRepo)
+        id: sameBranch-checkout
+        continue-on-error: true
+        with:
+          repository:  ${{ vars.OVERRIDE_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout-cone-mode: false
+          ref: ${{ env.BRANCH_NAME }}
 
-      # - shell: bash
-      #   name: sameBranch checkout test
-      #   id: sameBranch-checkout-test
-      #   run: |
-      #     ls -lhtr tmp
-      #     [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
+      - shell: bash
+        name: sameBranch checkout test
+        id: sameBranch-checkout-test
+        run: |
+          ls -lhtr tmp
+          [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
 
-      # - uses: actions/checkout@v4
-      #   name: develop branch checkout (sameBranch checkout fails)
-      #   if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
-      #   with:
-      #     repository:  ${{ vars.OVERRIDE_REPO }}
-      #     token: ${{ secrets.CI_PAT }}
-      #     path: 'tmp'
-      #     sparse-checkout: 'alp-data-node-override'
-      #     sparse-checkout-cone-mode: false
-      #     ref: develop
+      - uses: actions/checkout@v4
+        name: develop branch checkout (sameBranch checkout fails)
+        if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
+        with:
+          repository:  ${{ vars.OVERRIDE_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout-cone-mode: false
+          ref: develop
 
-      # - shell: bash
-      #   name: merge files from override
-      #   id: merge_files_from_override
-      #   run: |
-      #     ls -l tmp/alp-data-node-override
-      #     cp -prnl ./tmp/alp-data-node-override/* .
-      #     ls -l ./services/alp-db-svc/db/drivers
-      #     ln -s tmp/alp-data-node-override alp-data-node-override
+      - shell: bash
+        name: merge files from override
+        id: merge_files_from_override
+        run: |
+          ls -l tmp/alp-data-node-override
+          cp -prnl ./tmp/alp-data-node-override/* .
+          ls -l ./services/alp-db-svc/db/drivers
+          ln -s tmp/alp-data-node-override alp-data-node-override
 
       - shell: bash
         # Give an id to the step, so we can reference it later
