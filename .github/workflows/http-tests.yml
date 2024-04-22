@@ -80,6 +80,19 @@ jobs:
           TESTSYSTEMPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
           TESTPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
 
+      # - name: Print env vars
+      #   run: |
+      #     echo "DOCKER_TAG_NAME: ${DOCKER_TAG_NAME}"
+      #     echo "HDIPORT: ${HDIPORT}"
+      #     echo "HDIPW: ${HDIPW}"
+      #     echo "HDIUSER: ${HDIUSER}"
+      #     echo "HANASERVER: ${HANASERVER}"
+      #     echo "HANASERVER_REPLACE: ${HANASERVER_REPLACE}"
+      #     echo "isHttpTestRun: ${isHttpTestRun}"
+      #     echo "isTestEnv: ${isTestEnv:-false}"
+      #     echo "SKIP_AUTH: ${SKIP_AUTH}"
+      #     echo "TESTSCHEMA: ${TESTSCHEMA}"
+
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
 
@@ -93,19 +106,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '18.14.0'
-
-      # - name: Print env vars
-      #   run: |
-      #     echo "DOCKER_TAG_NAME: ${DOCKER_TAG_NAME}"
-      #     echo "HDIPORT: ${HDIPORT}"
-      #     echo "HDIPW: ${HDIPW}"
-      #     echo "HDIUSER: ${HDIUSER}"
-      #     echo "HANASERVER: ${HANASERVER}"
-      #     echo "HANASERVER_REPLACE: ${HANASERVER_REPLACE}"
-      #     echo "isHttpTestRun: ${isHttpTestRun}"
-      #     echo "isTestEnv: ${isTestEnv:-false}"
-      #     echo "SKIP_AUTH: ${SKIP_AUTH}"
-      #     echo "TESTSCHEMA: ${TESTSCHEMA}"
 
       - name: create .env.local for docker-compose in system services
         env:
