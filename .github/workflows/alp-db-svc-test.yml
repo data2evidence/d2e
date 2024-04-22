@@ -9,9 +9,9 @@ on:
       - develop
 
 # Run only one job per branch
-concurrency:
-  group: ${{ github.head_ref || github.ref_name }}-db-svc-tests # Run the latest push
-  cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
+# concurrency:
+#   group: ${{ github.head_ref || github.ref_name }}-db-svc-tests # Run the latest push
+#   cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
 
 jobs:
   test-alp-db-svc:
