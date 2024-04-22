@@ -168,7 +168,7 @@ jobs:
       - name: Run integration tests for DB-SVC POSTGRES
         working-directory: ./services/alp-db-svc
         # run only if files in 'has_dbsvc_changed' is set to 'True'
-        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        # if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
         run: |
           npm run pgtest
 
