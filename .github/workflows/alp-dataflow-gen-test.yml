@@ -33,13 +33,13 @@ jobs:
             
     - name: Setup python if files have changed
       uses: actions/setup-python@v2
-      if: env.BRANCH_NAME || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
       with:
         python-version: 3.11.7
         cache: 'pip'
   
     - name: Install pip packages if files have changed
-      if: env.BRANCH_NAME || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
       working-directory: ./services/alp-dataflow-gen
       run: pip install -r requirements-dev.txt
 
