@@ -56,6 +56,10 @@ jobs:
           --health-retries 5
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
       - name: Load dotenv from 1password
         uses: 1password/load-secrets-action@v2
         id: op-load-secret
@@ -76,10 +80,6 @@ jobs:
           OP_VAULT_NAME=$OP_VAULT_NAME OP_SERVICE_ACCOUNT_TOKEN=$OP_SERVICE_ACCOUNT_TOKEN yarn get:drivers
           ls "${HANA__DRIVER_CLASS_PATH}"
           ls "${POSTGRES__DRIVER_CLASS_PATH}"
-
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - uses: actions/checkout@v4
         name: sameBranch checkout (OverrideRepo)
