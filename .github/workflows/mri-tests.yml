@@ -18,14 +18,6 @@ jobs:
       outputs:
           changes: ${{ steps.file_changes.outputs.src }}
       steps:
-      - name: Load dotenv from 1password
-        uses: 1password/load-secrets-action@v2
-        id: op-load-secret
-        with:
-          export-env: true
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -101,44 +93,44 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: actions/checkout@v4
-        name: sameBranch checkout (OverrideRepo)
-        id: sameBranch-checkout
-        continue-on-error: true
-        with:
-          repository:  ${{ vars.OVERRIDE_REPO }}
-          token: ${{ secrets.CI_PAT }}
-          path: 'tmp'
-          sparse-checkout: 'alp-data-node-override'
-          sparse-checkout-cone-mode: false
-          ref: ${{ github.ref_name }}
+      # - uses: actions/checkout@v4
+      #   name: sameBranch checkout (OverrideRepo)
+      #   id: sameBranch-checkout
+      #   continue-on-error: true
+      #   with:
+      #     repository:  ${{ vars.OVERRIDE_REPO }}
+      #     token: ${{ secrets.CI_PAT }}
+      #     path: 'tmp'
+      #     sparse-checkout: 'alp-data-node-override'
+      #     sparse-checkout-cone-mode: false
+      #     ref: ${{ github.ref_name }}
 
-      - shell: bash
-        name: sameBranch checkout test
-        id: sameBranch-checkout-test
-        run: |
-          ls -lhtr tmp
-          [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
+      # - shell: bash
+      #   name: sameBranch checkout test
+      #   id: sameBranch-checkout-test
+      #   run: |
+      #     ls -lhtr tmp
+      #     [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v4
-        name: develop branch checkout (sameBranch checkout fails)
-        if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
-        with:
-          repository:  ${{ vars.OVERRIDE_REPO }}
-          token: ${{ secrets.CI_PAT }}
-          path: 'tmp'
-          sparse-checkout: 'alp-data-node-override'
-          sparse-checkout-cone-mode: false
-          ref: develop
+      # - uses: actions/checkout@v4
+      #   name: develop branch checkout (sameBranch checkout fails)
+      #   if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
+      #   with:
+      #     repository:  ${{ vars.OVERRIDE_REPO }}
+      #     token: ${{ secrets.CI_PAT }}
+      #     path: 'tmp'
+      #     sparse-checkout: 'alp-data-node-override'
+      #     sparse-checkout-cone-mode: false
+      #     ref: develop
 
-      - shell: bash
-        name: link_files_from_override
-        id: link_files_from_override
-        run: |
-          pwd
-          ln -s tmp/alp-data-node-override alp-data-node-override
-          chmod 755 -R alp-data-node-override
-          ls -l alp-data-node-override/build
+      # - shell: bash
+      #   name: link_files_from_override
+      #   id: link_files_from_override
+      #   run: |
+      #     pwd
+      #     ln -s tmp/alp-data-node-override alp-data-node-override
+      #     chmod 755 -R alp-data-node-override
+      #     ls -l alp-data-node-override/build
 
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
@@ -148,11 +140,12 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          OP_VAULT_NAME=$OP_VAULT_NAME OP_SERVICE_ACCOUNT_TOKEN=$OP_SERVICE_ACCOUNT_TOKEN yarn get:drivers
+          yarn get:drivers
 
       - uses: actions/setup-node@v3
         with:
           node-version: "18.14.0"
+
       - name: check if files changed
         id: check_file_changed
         run: |
@@ -185,12 +178,15 @@ jobs:
         working-directory: ./services/cdw-svc/test-migrations
         env:
           PGPASSWORD: Toor1234
+
       - name: Build Project
         run: |
           yarn
           yarn build --no-ui
+
       - name: Setup Test DB (Hana)
         run: yarn inittestdb
+
       - name: Setup Test DB (postgres)
         env:
           PG_HOST: "localhost"
@@ -206,15 +202,19 @@ jobs:
           PG_DEBUG: 1
           NODE_ENV: "development"
         run: yarn workspace mri-pg-config migrate
+
       - name: echo WS
         run: |
-            echo "WS ${{ github.workspace }}"
-            ls ${{ github.workspace }}
+          echo "WS ${{ github.workspace }}"
+          ls ${{ github.workspace }}
+
       - name: Run query-gen svc
         run: PORT=41008 yarn workspace query-gen run start &
+
       - name: Run query-gen tests
         if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_query_gen_svc_changed == 'True'
         run: yarn workspace query-gen run test
+
       - name: Run bookmark tests
         if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_bookmarks_svc_changed == 'True'  
         run: yarn workspace bookmark run test
@@ -222,11 +222,13 @@ jobs:
       # We should uncomment this when we have tests available.
       # - name: Run assignment-svc tests
       #   run: yarn workspace config-assignment run test
+
       - name: Run Analytics tests
         if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_analytics_svc_changed == 'True' || steps.check_file_changed.outputs.has_query_gen_svc_changed == 'True'
         run: yarn workspace analytics run testci
       # - name: Run cdw-config tests
       #   run: yarn workspace cdw-config run test:ci
+
       - name: Remove Test DB
         if: ${{ always() }}
         run: yarn removetestdb

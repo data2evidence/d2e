@@ -39,6 +39,21 @@ jobs:
         clean: false
         submodules: recursive
 
+    - uses: actions/checkout@v4
+      with:
+        repository:  ${{ vars.OVERRIDE_REPO }}
+        token: ${{ secrets.CI_PAT }}
+        path: 'tmp'
+        sparse-checkout: 'alp-data-node-override'
+        sparse-checkout-cone-mode: false
+        ref: develop
+
+    - shell: bash
+      id: link_files_from_override
+      run: |
+        ln -s tmp/alp-data-node-override alp-data-node-override
+        chmod 755 -R alp-data-node-override
+
     - name: Load dotenv from 1password
       uses: 1password/load-secrets-action@v2
       id: op-load-secret
