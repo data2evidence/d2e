@@ -1,13 +1,21 @@
 export enum PrefectDeploymentName {
+  DQD = 'alp_dqd',
+  DATA_CHARACTERIZATION = 'alp_data_characterization',
+  COHORT = 'cohort_generator',
   DB_SVC = 'alp-db-svc',
   MEILISEARCH_ADD_INDEX = 'add_search_index',
-  DATASET_ATTRIBUTE = 'update-dataset-attributes'
+  DATASET_ATTRIBUTE = 'update-dataset-attributes',
+  FETCH_VERSION_INFO = 'fetch-version-info'
 }
 
 export enum PrefectFlowName {
+  DQD = 'execute-dqd',
+  DATA_CHARACTERIZATION = 'execute-data-characterization',
+  COHORT = 'execute-cohort-generator-flow',
   DB_SVC = 'execute-alp-db-svc-flow',
   MEILISEARCH_ADD_INDEX = 'execute-add-search-index-flow',
-  DATASET_ATTRIBUTE = 'update-dataset-attributes-flow'
+  DATASET_ATTRIBUTE = 'update-dataset-attributes-flow',
+  FETCH_VERSION_INFO = 'fetch-version-info-flow'
 }
 
 export const PrefectTagNames = {
