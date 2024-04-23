@@ -174,7 +174,7 @@ services:
     ports:
       - 9207:9207
     volumes:
-      - ./services/mri-pa-config/src:/home/docker/src/alp-data-node/app/src
+      - ./services/mri-pa-config/src:/home/docker/src/services/app/src
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
