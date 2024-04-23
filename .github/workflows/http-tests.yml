@@ -144,7 +144,7 @@ jobs:
 
       - name: start system services
         run : |
-            yarn start:minerva-test alp-minerva-postgres alp-minerva-gateway alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-analytics-svc alp-minerva-pa-config-svc alp-minerva-cdw-svc
+            yarn start:minerva-test alp-minerva-postgres alp-minerva-gateway alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-analytics-svc alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init
             sleep 120
             # yarn start:minerva-test alp-minerva-analytics-svc
             # cd -
