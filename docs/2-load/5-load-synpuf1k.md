@@ -14,8 +14,8 @@ wget https://caruscloud.uniklinikum-dresden.de/index.php/s/Qog8B5WCTHFHmjW/downl
 - Open a terminal in the root of `d2e` repo
 - Run the following commands to define directories
 ```bash
-ALP_DN_REPO_DIR=$PWD
-SYNPUF1K_DIR=$ALP_DN_REPO_DIR/alp-data-node-override/services/alp-db-svc/db/synpuf1k
+GIT_BASE_DIR=$(git rev-parse --show-toplevel)
+SYNPUF1K_DIR=$GIT_BASE_DIR/cache/synpuf1k
 ```
 - Create synpuf1k load dir
 ```bash
@@ -136,4 +136,4 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
 > TRUNCATE TABLE
 
 see: 
-- [alp-dataflow-gen-agent-1 startup message "No database credential is configured during this deployment"](../knowledgebase/dbcreds/missing-db-creds.md)
+- [load-synpuf1k](../knowledgebase/dbcreds/missing-db-creds.md)
