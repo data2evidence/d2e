@@ -56,13 +56,12 @@ x-envs:
         {
           "enabled": true,
           "featureFlag": "conceptSets",
-          "name": "Concept Sets",
+          "name": "Concepts",
           "pluginPath": "plugins/Researcher/ConceptSets/module",
           "requiredRoles": [
             "RESEARCHER"
           ],
-          "route": "concept-sets",
-          "type": "Concepts"
+          "route": "concepts",
         },
         {
           "enabled": true,
@@ -88,17 +87,6 @@ x-envs:
           ],
           "route": "starboard",
           "subMenus": "true"
-        },
-        {
-          "enabled": true,
-          "featureFlag": "terminology",
-          "name": "Concept Search",
-          "route": "concept-search",
-          "pluginPath": "plugins/SystemAdmin/Terminology/module",
-          "requiredRoles": [
-            "RESEARCHER"
-          ],
-          "type": "Concepts"
         }
       ],
       "setup": [
