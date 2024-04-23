@@ -8,7 +8,7 @@ import {
 import { Connection, Database } from "duckdb-async";
 import { DBError } from "@alp/alp-base-utils/target/src/DBError";
 import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
-import { translateHanaToPostgres } from "@alp/alp-base-utils/target/src/helpers/translateHanaToPostgres";
+import { translateHanaToDuckdb } from "@alp/alp-base-utils/target/src/helpers/hanaTranslation";
 import { env } from "../configs";
 const logger = CreateLogger("Duckdb Connection");
 
@@ -108,8 +108,6 @@ export class DuckdbConnection implements ConnectionInterface {
             );
             let temp = sql;
             temp = this.parseSql(temp);
-            //Temporary fix to support postgress regular expression in duckdb
-            temp = temp.replace('~*', 'SIMILAR TO');
             logger.debug("Duckdb client created");
             const result = await this.conn.all(
                 temp,
@@ -123,7 +121,7 @@ export class DuckdbConnection implements ConnectionInterface {
     }
 
     private parseSql(temp: string): string {
-        return translateHanaToPostgres(temp, this.duckdbSchemaFileName);
+        return translateHanaToDuckdb(temp, this.duckdbSchemaFileName);
     }
 
     public executeQuery(

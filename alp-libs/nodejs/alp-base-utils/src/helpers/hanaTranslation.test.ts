@@ -1,4 +1,4 @@
-import { translateHanaToPostgres } from "./translateHanaToPostgres";
+import { translateHanaToPostgres } from "./hanaTranslation";
 
 describe("translateHanaToPostgres where hana and postgres have same syntax", () => {
   it("should ", () => {
