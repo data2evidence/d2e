@@ -20,7 +20,7 @@ jobs:
       with:
         submodules: recursive
 
-    - uses: dorny/paths-filter@v2
+    - uses: dorny/paths-filter@v3.0.2
       id: check_file_changed
       with:
         filters: |
