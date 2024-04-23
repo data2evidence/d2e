@@ -1,8 +1,5 @@
-<<<<<<<< HEAD:docs/knowledgebase/docker-compose/virtualization-framework-x86-disable.md
-# nodejs segmentation fault on MacOS x86_64 with Virtualization Framework enabled
-========
 # Issue: nodejs segmentation fault on MacOS x86_64 with Virtualization Framework enabled
->>>>>>>> 5a0259a (initial):docs/knowledgebase/docker-compose/virtualization-framework-x86.md
+
 ## Symptoms
 - https://github.com/docker/for-mac/issues/6824
 - affects Docker Desktop v4.19+
