@@ -424,9 +424,9 @@ services:
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
-      - ./alp-data-node-override/services/alp-db-svc/db/synpuf1k:/app/synpuf1k
-      - ./alp-data-node-override/services/alp-db-svc/db/drivers/hana/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
-      - ./alp-data-node-override/services/alp-db-svc/db/drivers/hana/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
+      - ./cache/synpuf1k:/app/synpuf1k
+      - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
+      - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
     hostname: alp-dataflow-gen-agent-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
@@ -1142,6 +1142,8 @@ services:
     shm_size: 1gb
     volumes:
       - pg-minerva-data-1:/var/lib/postgresql/data
+      - ./cache/pgbackup:/backup
+      - ./cache/vocab:/vocab
     hostname: alp-minerva-postgres-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
