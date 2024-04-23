@@ -20,7 +20,7 @@ Untested platforms:
 ## Docker Compose
 - see: https://docs.docker.com/engine/install/
 
-#### ubuntu
+### ubuntu
 - https://snapcraft.io/install/docker/ubuntu
 ```
 sudo snap install docker
