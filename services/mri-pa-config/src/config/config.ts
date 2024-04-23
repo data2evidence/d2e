@@ -536,7 +536,7 @@ export class MRIConfig {
                 });
             }
 
-            if(configId != ""){
+            if(configId){
                 //get config selected for input configId
                 const configVersion = 'A' // get the active config
                 this._getConfigById(configId, configVersion, (err, config) => {
