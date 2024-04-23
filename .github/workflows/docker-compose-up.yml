@@ -3,12 +3,13 @@ name: Docker compose Build & Up
 on: 
   pull_request:
     types: [opened, ready_for_review, reopened, synchronize]
-  workflow_dispatch:
   push:
     branches:
       - develop
+  workflow_dispatch:
 
 env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
   DOCKER_TAG_NAME: ${{ github.sha }}
   ENV_NAME: local
   ENV_TYPE: local
@@ -39,7 +40,7 @@ jobs:
           large-packages: false
           docker-images: false
           swap-storage: true
-      
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -59,40 +60,46 @@ jobs:
           ln -s tmp/alp-data-node-override alp-data-node-override
           chmod 755 -R alp-data-node-override
 
+      - name: Load dotenv from 1password
+        uses: 1password/load-secrets-action@v2
+        id: op-load-secret
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+          REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
+
       - name: Login to ACR
         uses: docker/login-action@v3.1.0
         with:
           registry: alpcr.azurecr.io
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_PASSWORD }}
 
       - name: Install 1Password CLI
         uses: 1Password/install-cli-action@v1.0.0
 
       - name: Generate dotenv
         env:
-         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
-         DOTENV_YML: .env.${{ env.ENV_NAME }}.yml 
-         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+          DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+          OVERWRITE: true  
         run: |
-          dn_dir=$PWD
-          cd alp-data-node-override
           ACTIONS_STEP_DEBUG=false
         
           # get env yml from 1password
-          overwrite=true env_name=$ENV_NAME yarn op:get:$ENV_TYPE
+          yarn op:get:$ENV_TYPE
 
           # mask sensitive values
-          scripts/gha-mask.sh
+          internal/scripts/gha-mask.sh
 
           # generate dotenv
-          dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
-
-          cd $dn_dir
-          env_type=$ENV_TYPE yarn gen:tls
+          yarn gen:env
 
           echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
-
 
       - uses: docker/setup-buildx-action@v3
         id: builder
@@ -108,7 +115,7 @@ jobs:
           yarn build:minerva --builder ${{ steps.builder.outputs.name }}
 
       - name: Docker compose up Local Mode without UI Container
-        env:          
+        env:
           PORTAL_NAME: alp-minerva-gateway-1
         run: |
           # Run DataNode services
