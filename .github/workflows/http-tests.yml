@@ -80,18 +80,18 @@ jobs:
           TESTSYSTEMPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
           TESTPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
 
-      # - name: Print env vars
-      #   run: |
-      #     echo "DOCKER_TAG_NAME: ${DOCKER_TAG_NAME}"
-      #     echo "HDIPORT: ${HDIPORT}"
-      #     echo "HDIPW: ${HDIPW}"
-      #     echo "HDIUSER: ${HDIUSER}"
-      #     echo "HANASERVER: ${HANASERVER}"
-      #     echo "HANASERVER_REPLACE: ${HANASERVER_REPLACE}"
-      #     echo "isHttpTestRun: ${isHttpTestRun}"
-      #     echo "isTestEnv: ${isTestEnv:-false}"
-      #     echo "SKIP_AUTH: ${SKIP_AUTH}"
-      #     echo "TESTSCHEMA: ${TESTSCHEMA}"
+      - name: Print env vars
+        run: |
+          echo "DOCKER_TAG_NAME: ${DOCKER_TAG_NAME}"
+          echo "HDIPORT: ${HDIPORT}"
+          echo "HDIPW: ${HDIPW}"
+          echo "HDIUSER: ${HDIUSER}"
+          echo "HANASERVER: ${HANASERVER}"
+          echo "HANASERVER_REPLACE: ${HANASERVER_REPLACE}"
+          echo "isHttpTestRun: ${isHttpTestRun}"
+          echo "isTestEnv: ${isTestEnv:-false}"
+          echo "SKIP_AUTH: ${SKIP_AUTH}"
+          echo "TESTSCHEMA: ${TESTSCHEMA}"
 
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
@@ -117,7 +117,6 @@ jobs:
           echo "${DOCKER_COMPOSE_DN_LOCAL_ENV}" > .env.local.yml
           wc -l .env.base-all.yml .env.base-local.yml .env.local.yml
           yarn gen:env
-
           sed -i "s/${HANASERVER_REPLACE}/${HANASERVER}/g" .env.local
           sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
           # sed -i "s/HTTPTEST_ADMIN_USER/${HDIUSER}/g" .env.local
@@ -132,7 +131,7 @@ jobs:
 
       - name: build system services
         run: |
-          yarn build:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc
+          yarn build:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init
 
       - name: Manipulate configuration
         run : |
@@ -151,6 +150,7 @@ jobs:
       - name: check status of docker containers
         run : |
             docker ps -a
+
       # - name: Install dependencies in backend integration tests
       #   working-directory: ./tests/backend_integration_tests
       #   run: |
