@@ -348,6 +348,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
+    path: `^/dashboard-gate/register`,
+    scopes: ['gateway.dashboardGate.register'],
+    httpMethods: ['POST']
+  },
+  {
     path: '^/alp-nifi-api/nifi/(.*)',
     scopes: ['nifimgmt.userAdmin']
   },
@@ -858,6 +863,7 @@ export const ROLE_SCOPES = {
     'meilisearchSvc.index.add',
     'meilisearchSvc.index.setting.update',
     'meilisearchSvc.document.add',
+    'gateway.dashboardGate.register',
     'gateway.dataset.dashboards.read',
     'gateway.dataset.cohorts.read',
     'gateway.dataset.create',

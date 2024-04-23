@@ -1,4 +1,5 @@
-# nodejs segmentation fault on MacOS x86_64 with Virtualization Framework enabled
+# Issue: nodejs segmentation fault on MacOS x86_64 with Virtualization Framework enabled
+
 ## Symptoms
 - https://github.com/docker/for-mac/issues/6824
 - affects Docker Desktop v4.19+
