@@ -7,7 +7,6 @@ on:
   push:
       branches:
         - develop
-
   workflow_dispatch:
     inputs:
       repo_full_name:
@@ -161,12 +160,22 @@ jobs:
         repository: ${{ env.REPO_FULL_NAME }}
         token: ${{ secrets.CI_PAT }}
 
+    - name: Load dotenv from 1password
+      uses: 1password/load-secrets-action@v2
+      id: op-load-secret
+      with:
+        export-env: true
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+        REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
+
     - name: Login to ACR
       uses: docker/login-action@v3.1.0
       with:
         registry: alpcr.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
 
     - name: Get docker tag name
       id: docker_tag
