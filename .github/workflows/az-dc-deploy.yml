@@ -71,9 +71,6 @@ jobs:
     name: ${{ github.event.inputs.env }}
     runs-on: [ "${{ github.event.inputs.env }}", self-hosted, Linux, X64 ]
     steps:
-    - run: |
-        echo REPO=${{ github.event.inputs.repo_full_name }} | tee -a "$GITHUB_OUTPUT"
-
     - uses: actions/checkout@v4.1.1
       name: checkout d2e repo
       with:
@@ -81,6 +78,16 @@ jobs:
         ref: ${{ env.DOCKER_TAG_NAME }}
         repository: ${{ github.event.inputs.repo_full_name }}
         token: ${{ secrets.CI_PAT }}
+
+    - name: Load dotenv from 1password
+      uses: 1password/load-secrets-action@v2
+      id: op-load-secret
+      with:
+        export-env: true
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+        REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
 
     - shell: bash
       id: override-repo
@@ -133,8 +140,8 @@ jobs:
       uses: docker/login-action@v3.1.0
       with:
         registry: alpcr.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
 
     - name: Generate dotenv
       env:
