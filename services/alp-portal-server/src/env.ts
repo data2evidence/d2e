@@ -9,6 +9,7 @@ export const env = {
   PORTAL_SERVER_LOG_LEVEL: (process.env.PORTAL_SERVER__LOG_LEVEL as LoggingLevel) || 'info',
   PORTAL_API_URL: process.env.PORTAL__API_URL,
   PA_CONFIG_API_URL: process.env.PA_CONFIG__API_URL,
+  USER_MGMT_API_URL: process.env.USER_MGMT__API_URL,
   APP_DEPLOY_MODE: process.env.APP__DEPLOY_MODE,
 
   MINIO_REGION: process.env.MINIO__REGION,

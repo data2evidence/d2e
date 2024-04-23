@@ -425,9 +425,9 @@ services:
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
-      - ./alp-data-node-override/services/alp-db-svc/db/synpuf1k:/app/synpuf1k
-      - ./alp-data-node-override/services/alp-db-svc/db/drivers/hana/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
-      - ./alp-data-node-override/services/alp-db-svc/db/drivers/hana/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
+      - ./cache/synpuf1k:/app/synpuf1k
+      - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
+      - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
     hostname: alp-dataflow-gen-agent-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
@@ -1117,6 +1117,7 @@ services:
       DATA_CHARACTERIZATION__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/dataflow-mgmt/dqd/data-characterization/
       NODE_ENV: production
       PA_CONFIG__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/pa-config-svc
+      USER_MGMT__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/usermgmt/api
       PG__PORTAL_SERVER__DB_NAME: ${PG_DB_NAME:-alp}
       PG__PORTAL_SERVER__MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
       PG__PORTAL_SERVER__MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
@@ -1151,6 +1152,8 @@ services:
     shm_size: 1gb
     volumes:
       - pg-minerva-data-1:/var/lib/postgresql/data
+      - ./cache/pgbackup:/backup
+      - ./cache/vocab:/vocab
     hostname: alp-minerva-postgres-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:

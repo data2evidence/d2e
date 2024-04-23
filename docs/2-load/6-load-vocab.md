@@ -16,8 +16,10 @@
 - Download ~174Mb zipfile to `Downloads` folder
 - Run the following commands
 ```bash
-WK_DIR=$PWD/private-vocab; mkdir -p $WK_DIR; cd $WK_DIR
+GIT_BASE_DIR=$(git rev-parse --show-toplevel)
+VOCAB_DIR=$GIT_BASE_DIR/cache/vocab
 ZIP_FILE="$(ls -tr ~/Downloads/vocabulary_download_v5*.zip | head -1)"
+cd $VOCAB_DIR
 unzip -o -d . "${ZIP_FILE}"
 ```
 - remove additional file
