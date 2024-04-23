@@ -17,6 +17,7 @@ from typing import List
 from flows.alp_db_svc.flow import run_command
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
 import os
+import importlib
 
 
 def get_version_info(options: getVersionInfoType):
@@ -58,7 +59,8 @@ def get_version_info(options: getVersionInfoType):
 
             db_dialect = get_db_svc_endpoint_dialect(_database_code)
 
-            request_body = _add_plugin_options(
+            dbsvc_module = importlib.import_module('d2e_dbsvc')
+            request_body = dbsvc_module._add_plugin_options(
                 request_body, db_dialect, flow_name, changelog_filepath
             )
 
@@ -76,13 +78,6 @@ def get_version_info(options: getVersionInfoType):
             table=dataset_schema_list["datasets_without_schema"],
             description="Failed to updates attributes for some datasets"
         )
-
-
-def _add_plugin_options(request_body, dialect: str, flow_name: str, changelog_filepath: str):
-    cwd = os.getcwd()
-    request_body["customClasspath"] = f'{cwd}/{flow_name}/'
-    request_body["customChangelogFilepath"] = f'db/migrations/{dialect}/{changelog_filepath}'
-    return request_body
 
 
 @task

@@ -42,6 +42,8 @@ class dqdOptionsType(dqdBaseOptionsType):
 class dcOptionsType(dqdBaseOptionsType):
     resultsSchema: str
     excludeAnalysisIds: str
+    flowName: str
+    changelogFilepath: str
 
 
 class cohortJsonType(BaseModel):

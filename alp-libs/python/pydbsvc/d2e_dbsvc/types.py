@@ -12,6 +12,7 @@ class requestType(str, Enum):
 
 class internalPluginType(str, Enum):
     DATAMODEL_PLUGIN = "data_management_plugin"
+    DATA_CHARACTERIZATION = "data_characterization_plugin"
 
 
 class dataModelBase(BaseModel):
@@ -67,3 +68,5 @@ class dcOptionsType(BaseModel):
     releaseDate: str
     resultsSchema: str
     excludeAnalysisIds: str
+    flowName: str
+    changelogFilepath: str

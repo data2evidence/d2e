@@ -283,14 +283,13 @@ def _add_plugin_options(request_body, dialect: str, flow_name: str, changelog_fi
     return request_body
 
 
-async def drop_data_characterization_schema(flow, flow_run, state):
-    options = dcOptionsType(**flow_run.parameters['options'])
+async def drop_data_characterization_schema(options: dcOptionsType):
     database_code = options.databaseCode
     results_schema = options.resultsSchema
 
     # if flow is run from plugin
-    if options.flow_name:
-        if options.flow_name == internalPluginType.DATAMODEL_PLUGIN:
+    if options.flowName:
+        if options.flowName == internalPluginType.DATA_CHARACTERIZATION:
             sys.path.append('/app/pysrc')
             alpconnection_module = importlib.import_module(
                 'alpconnection.dbutils')
@@ -299,8 +298,8 @@ async def drop_data_characterization_schema(flow, flow_run, state):
         else:
             db_dialect = options.dialect
 
-    request_url = f"/alpdb/{db_dialect}/dataCharacterization/database/{database_code}/schema/{results_schema}"
-    request_type = requestType.DELETE
-    request_body = {}
+        request_url = f"/alpdb/{db_dialect}/dataCharacterization/database/{database_code}/schema/{results_schema}"
+        request_type = requestType.DELETE
+        request_body = {}
 
-    await _run_db_svc_shell_command(request_type, request_url, request_body)
+        await _run_db_svc_shell_command(request_type, request_url, request_body)

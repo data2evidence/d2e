@@ -87,7 +87,9 @@ async def execute_export_to_ares(schemaName: str,
 async def create_data_characterization_schema(
     databaseCode: str,
     resultsSchema: str,
-    vocabSchemaName: str
+    vocabSchemaName: str,
+    flowName: str,
+    changelog_filepath: str
 ):
     logger = get_run_logger()
     try:
@@ -96,6 +98,10 @@ async def create_data_characterization_schema(
         request_body = {"vocabSchema": vocabSchemaName,
                         "cdmSchema": vocabSchemaName}
         dbsvc_module = importlib.import_module('d2e_dbsvc')
+
+        request_body = dbsvc_module._add_plugin_options(
+            request_body, databaseDialect, flowName, changelog_filepath)
+
         await dbsvc_module._run_db_svc_shell_command(
             "post", request_url, request_body)
     except Exception as e:
@@ -104,17 +110,20 @@ async def create_data_characterization_schema(
 
 
 def execute_data_characterization_flow(options: dcOptionsType):
+    logger = get_run_logger()
+
     schemaName = options.schemaName
     databaseCode = options.databaseCode
     cdmVersionNumber = options.cdmVersionNumber
     vocabSchemaName = options.vocabSchemaName
     releaseDate = options.releaseDate
     resultsSchema = options.resultsSchema
+    flowName = options.flowName
+    changelogFilepath = options.changelogFilepath
 
     # comma separated values in a string
     excludeAnalysisIds = options.excludeAnalysisIds
 
-    logger = get_run_logger()
     flow_run_context = FlowRunContext.get().flow_run.dict()
     flow_run_id = str(flow_run_context.get("id"))
     outputFolder = f'/output/{flow_run_id}'
@@ -129,7 +138,9 @@ def execute_data_characterization_flow(options: dcOptionsType):
     create_data_characterization_schema(
         databaseCode,
         resultsSchema,
-        vocabSchemaName
+        vocabSchemaName,
+        flowName,
+        changelogFilepath
     )
 
     execute_data_characterization_wo = execute_data_characterization.with_options(on_failure=[
