@@ -72,12 +72,12 @@ jobs:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          HANASERVER: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DE_FQDN"
-          HDIUSER: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin user"
-          HDIPORT: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DB Port"
-          HDIPW: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin password"
-          TESTSYSTEMPW: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin password"
-          TESTPORT: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DB Port"
+          HANASERVER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DE_FQDN"
+          HDIUSER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin user"
+          HDIPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
+          HDIPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
+          TESTSYSTEMPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
+          TESTPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
           VCAP_SERVICES: '{"mridb":[{"name":"OMOP","credentials":{"host":"${HANASERVER}","port":"${HDIPORT}","databaseName":"ALPDEV","user":"${HDIUSER}","password":"${HDIPW}","validate_certificate":false,"probeSchema":"${TESTSCHEMA}","vocabSchema":"${TESTSCHEMA}","schema":"${TESTSCHEMA}","dialect":"hana","encrypt":false,"pooling":"true"},"tags":["httptest"]}]}'
 
       - name: Print env vars
@@ -136,14 +136,12 @@ jobs:
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
 
-      - name: Get alp-dbcli from 1password
+      - name: Get drivers from 1password
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          pwd
-          mkdir -p internal/build
-          op read --out-file internal/build/alp-dbcli-private-v1.0.0.tgz "op://${{ vars.OP_VAULT_NAME }}/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
-          ls -l internal/build
+          OP_VAULT_NAME=$OP_VAULT_NAME OP_SERVICE_ACCOUNT_TOKEN=$OP_SERVICE_ACCOUNT_TOKEN yarn get:drivers
 
       - uses: actions/setup-node@v3
         with:

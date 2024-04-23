@@ -8,7 +8,7 @@
 name | value | note
 --- | --- | ---
 Dataset name | eg. Demo
-CDM Schema Option | Use existing schema
+CDM Schema Option | select 'Use existing schema' from dropdown
 Schema Name field | e.g. cdmdefault | name of the cdm schema that was used for seeding
 Vocab schema name | e.g. cdmvocab
 Data Model Option | omop5-4 [datamodel-plugin]
@@ -23,5 +23,7 @@ Token dataset code | e.g. DemoDataset
 > ![Datasets](../images/datasets/ConfirmDatasetsPortal.png)
 
 - Expected result as follows
-
+```
+docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "SELECT schema_name FROM information_schema.schemata where schema_name like 'cdm%';"
+```
 > ![Datasets](../images/datasets/ConfirmDatasetsDBeaver.png)

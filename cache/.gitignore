@@ -1,0 +1,13 @@
+# Ignore everything in this directory
+*
+# Except these files
+!.gitignore
+!drivers
+!op
+!pgbackup
+!README.md
+!synpuf1k
+!tls
+!vackup
+!vocab
+!zip
