@@ -11,7 +11,7 @@ import { TransactionRunner } from '../common/data-source/transaction-runner'
 
 @Injectable({ scope: Scope.REQUEST })
 export class FeatureService {
-  private readonly NON_PLUGIN_FEATURES = ['cdmDownload', 'datasetFilter']
+  private readonly NON_PLUGIN_FEATURES = ['datasetFilter']
   private readonly logger = createLogger(this.constructor.name)
   private readonly userId: string
   private readonly enabledFeaturePlugins: IPortalPlugin[]

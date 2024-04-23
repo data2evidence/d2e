@@ -1,44 +1,43 @@
-# Analytics Platform (ALP)
+# Analytics Platform (D2E)
 
 ## Install pre-requisites
-see: [1-install](docs/1-install)
-- docker
-- nodejs
-- yarn
+see: [1-setup](docs/1-setup/README.md)
 
-## Clone this git repository
-- see: [cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
+## Clone repository
+- see: [Cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 
-## Build
-- standard build
-```
-yarn build:minerva
+## Authenticate to private docker registry
+- Request credentials from D2E support
+```bash
+docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 ```
 
 ## Generate dotenv
-- see: [README-vars.md](docs/README-vars.md)
+- see: [environment variables](docs/1-setup/environment-variables.md)
 - auto-generate secrets from [env.example](env.example) template to `.env.local`
-```
+```bash
 yarn gen:dotenv
 ```
 
+## Build
+- standard build
+```bash
+yarn build:minerva
+```
+
 ## Start UI
-- login to private docker registry
-```
-docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
-```
 - start ui
-```
+```bash
 yarn start:ui --wait
 ```
 notes:
 - invokes docker compose up
-- defaults to develop branch image
-- detects branch if ui repo directory is `../d2e-ui`
+- detects `../d2e-ui` branch or defaults to develop branch
 
 ## (Re)Start App
+- requires ui started
 - docker compose up - approx 5 minutes
-```
+```bash
 yarn start:minerva --wait; sleep 60
 ```
 
@@ -48,5 +47,14 @@ yarn start:minerva --wait; sleep 60
 ## Configure
 - see: [3-configure](docs/3-configure)
 
-## Integration Tests
-- see: [4-integration-tests](docs/4-integration-tests.md)
+## Stop
+- stop all containers
+```bash
+yarn stop:minerva
+```
+
+## Clean-up
+- remove all containers & volumes
+```bash
+yarn clean:minerva
+```

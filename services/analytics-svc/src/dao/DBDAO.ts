@@ -61,31 +61,6 @@ export class DBDAO {
         });
     };
 
-    getVocabSchema = (db: any, schema: string) => {
-        return new Promise((resolve, reject) => {
-            try {
-                db.executeQuery(
-                    `SELECT VOCABULARY_SCHEMA AS "VOCABULARY_SCHEMA" FROM ${schema}.CDM_SOURCE`,
-                    [],
-                    async (err: any, result: any) => {
-                        if (err) {
-                            logger.error(err);
-                            reject(err);
-                        } else {
-                            const { VOCABULARY_SCHEMA } = result[0];
-                            resolve(VOCABULARY_SCHEMA);
-                        }
-                    }
-                );
-            } catch (err) {
-                logger.error(
-                    `Error while retrieving vocab schema name from schema ${schema}: ${err}`
-                );
-                reject(err);
-            }
-        });
-    };
-
     // Get snapshot schema metadata
     public getSnapshotSchemaMetadata = (db: any, schema: string) => {
         return new Promise(async (resolve, reject) => {
@@ -228,9 +203,9 @@ export class DBDAO {
                 const dbClient = await this.getDBClientByTenant(this.tenant);
 
                 //const dbClient = await this.getDBClientByTenant(tenant);
-                const dbConnection: DBSvcConnectionInterface = <DBSvcConnectionInterface>(
-                    await dbConnectionUtil.getConnection(this.dialect, dbClient)
-                );
+                const dbConnection: DBSvcConnectionInterface = <
+                    DBSvcConnectionInterface
+                >await dbConnectionUtil.getConnection(this.dialect, dbClient);
                 this.addCloseDBConnectionCallback(res, dbConnection);
                 return dbConnection;
             } catch (err) {
@@ -254,25 +229,32 @@ export class DBDAO {
         req?: any,
         res?: any
     ): Promise<DBSvcConnectionInterface> => {
-        return new Promise<DBSvcConnectionInterface>(async (resolve, reject) => {
-            try {
-                const dbClient = await this.getDBClientByTenant(this.tenant);
-                const dbConnection: DBSvcConnectionInterface = <DBSvcConnectionInterface>(
-                    await dbConnectionUtil.getConnection(this.dialect, dbClient)
-                );
-                if (res != null) {
-                    this.addCloseDBConnectionCallback(res, dbConnection);
+        return new Promise<DBSvcConnectionInterface>(
+            async (resolve, reject) => {
+                try {
+                    const dbClient = await this.getDBClientByTenant(
+                        this.tenant
+                    );
+                    const dbConnection: DBSvcConnectionInterface = <
+                        DBSvcConnectionInterface
+                    >await dbConnectionUtil.getConnection(
+                        this.dialect,
+                        dbClient
+                    );
+                    if (res != null) {
+                        this.addCloseDBConnectionCallback(res, dbConnection);
+                    }
+                    // might not be needed for postgres db connections
+                    if (this.skipAuth) {
+                        resolve(dbConnection);
+                    } else {
+                        resolve(dbConnection);
+                    }
+                } catch (err) {
+                    reject(err);
                 }
-                // might not be needed for postgres db connections
-                if (this.skipAuth) {
-                    resolve(dbConnection);
-                } else {
-                    resolve(dbConnection);
-                }
-            } catch (err) {
-                reject(err);
             }
-        });
+        );
     };
 
     private getDBClientByTenant = (tenant: string, schema?: string) => {

@@ -256,7 +256,7 @@ export function objectEquals(obj1, obj2) {
 }
 
 /**
- * Implementation of custom Jasmine matcher verifying if two arrays contain the
+ * Implementation of custom matcher verifying if two arrays contain the
  * same elements (regardless of order).
  *
  * WARNING! This function alters the second argument!
@@ -297,7 +297,7 @@ export function toContainSameObjectsAsImpl(actualObjectArray, expectedObjectArra
 }
 
 /*
- * Implementation of custom Jasmine matcher verifying if strings contain equivalent
+ * Implementation of custom matcher verifying if strings contain equivalent
  * SQL.
  *
  * @param {string}
@@ -369,7 +369,7 @@ export function hashString(str) {
 }
 
 /**
- * Log (via Jasmine) second passed since a previous time and return current time.
+ * Log second passed since a previous time and return current time.
  *
  * @param {Date} timeThen Time from which to measure time (if null, th logged time will be set to 0.0
  * @param {string} msg Message to display with timestamp (optional)

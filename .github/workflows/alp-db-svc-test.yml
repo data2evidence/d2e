@@ -3,16 +3,15 @@ name: ALP DB-Svc integration tests with Azure Hana database and local Postgres d
 on:
   pull_request:
     types: [opened, ready_for_review, reopened, synchronize]
-  workflow_dispatch:
   push:
     branches:
       - develop
+  workflow_dispatch:
 
 # Run only one job per branch
 concurrency:
   group: ${{ github.head_ref || github.ref_name }}-db-svc-tests # Run the latest push
   cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
-
 
 jobs:
   test-alp-db-svc:
@@ -28,8 +27,8 @@ jobs:
       DB_SVC__PATH: "/alpdb"
       OMOP__VOCAB_SCHEMA: "CDMVOCAB"
       HANA__READ_ROLE: "TENANT_READ_ROLE"
-      HANA__DRIVER_CLASS_PATH: "db/drivers/hana/ngdbc-latest.jar"
-      POSTGRES__DRIVER_CLASS_PATH: "db/drivers/postgres/postgresql-42.3.1.jar"
+      HANA__DRIVER_CLASS_PATH: "${{ github.workspace }}/cache/drivers/ngdbc-latest.jar"
+      POSTGRES__DRIVER_CLASS_PATH: "${{ github.workspace }}/services/alp-db-svc/db/drivers/postgres/postgresql-42.3.1.jar"
       B2C__ALP_APP__CLIENT_ID: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce"
       AD__IDENTITY_METADATA: "https://login.microsoftonline.com/f59c7915-9283-4fb5-b633-435b9145ca00/v2.0/.well-known/openid-configuration"
       AD__AUDIENCE: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce, 3da7b194-8456-4ef1-a790-00ef6360decd"
@@ -37,7 +36,7 @@ jobs:
       DISABLE_SSL: "TRUE"
       ROLLBACK_SCHEMA_CREATION_FOR_LIQUIBASE_SCRIPT_FAILURE: "TRUE"
       HANA__TENANT_CONFIGS: "{}"
-      INTEGRATION_TEST__HANA__TENANT_CONFIGS: ${{ secrets.ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_GERMANY }}
+      # INTEGRATION_TEST__HANA__TENANT_CONFIGS: ${{ secrets.ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_GERMANY }}
       PG__TENANT_CONFIGS: '{"alp":{"host":"localhost","port":"5432","databaseName":"alp","postgresAdminUser":"postgres","postgresAdminPassword":"Toor1234","postgresReadUser":"postgres_tenant_read_user","postgresReadPassword":"Toor1234"}}'
       PG__READ_ROLE: "POSTGRES_TENANT_READ_ROLE"
 
@@ -60,6 +59,27 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Load dotenv from 1password
+        uses: 1password/load-secrets-action@v2
+        id: op-load-secret
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          INTEGRATION_TEST__HANA__TENANT_CONFIGS: "op://${{ secrets.OP_VAULT_NAME }}/Github Actions Secrets/ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_GERMANY"
+
+      - name: Install 1Password CLI
+        uses: 1password/install-cli-action@v1
+
+      - name: Get drivers from 1password
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+        run: |
+          OP_VAULT_NAME=$OP_VAULT_NAME OP_SERVICE_ACCOUNT_TOKEN=$OP_SERVICE_ACCOUNT_TOKEN yarn get:drivers
+          ls "${HANA__DRIVER_CLASS_PATH}"
+          ls "${POSTGRES__DRIVER_CLASS_PATH}"
 
       - uses: actions/checkout@v4
         name: sameBranch checkout (OverrideRepo)
@@ -103,14 +123,12 @@ jobs:
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
 
-      - name: Get alp-dbcli from 1password
+      - name: Get drivers from 1password
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          pwd
-          mkdir -p internal/build
-          op read --out-file internal/build/alp-dbcli-v1.0.0.tgz "op://${{ vars.OP_VAULT_NAME }}/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
-          ls -l internal/build
+          yarn get:drivers
 
       - shell: bash
         # Give an id to the step, so we can reference it later
@@ -131,7 +149,7 @@ jobs:
           echo "Files changed: $diff"
           echo "Does db-svc have changes: $hasDiff"
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
         with:
           node-version: "18.14.0"
@@ -154,8 +172,8 @@ jobs:
         run: |
           # Create cdmvocab and cdmdefault schema for db-svc integration tests
           yarn workspace alp-db-svc cdm-install-script post /alpdb/postgres/database/alp/data-model/omop5-4/schema/cdmvocab "{\"cleansedSchemaOption\": false, \"vocabSchema\": \"${OMOP__VOCAB_SCHEMA}\"}" && yarn workspace alp-db-svc cdm-install-script post /alpdb/postgres/database/alp/data-model/omop5-4/schema/cdmdefault "{\"cleansedSchemaOption\": false, \"vocabSchema\": \"${OMOP__VOCAB_SCHEMA}\"}"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_PKGS_NPM_TOKEN }}
+        # env:
+          # NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_PKGS_NPM_TOKEN }}
 
       - name: Run integration tests for DB-SVC POSTGRES
         working-directory: ./services/alp-db-svc
@@ -163,6 +181,7 @@ jobs:
         if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
         run: |
           npm run pgtest
+
       - name: Run integration tests for DB-SVC HANA
         working-directory: ./services/alp-db-svc
         # run only if files in 'has_dbsvc_changed' is set to 'True'

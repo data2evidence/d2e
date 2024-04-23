@@ -1,7 +1,7 @@
 import express, { NextFunction, Response } from 'express'
 import { Service } from 'typedi'
-import { UserGroupService, UserService } from '../services'
-import { IAppRequest } from '../types'
+import { MemberService, UserGroupService, UserService } from '../services'
+import { IAppRequest, UserDeleteRequest } from '../types'
 import { createLogger } from 'Logger'
 import { LogtoAPI } from 'api'
 
@@ -13,6 +13,7 @@ export class MeRouter {
   constructor(
     private readonly userService: UserService,
     private readonly userGroupService: UserGroupService,
+    private readonly memberService: MemberService,
     private readonly logtoApi: LogtoAPI
   ) {
     this.registerRoutes()
@@ -49,7 +50,8 @@ export class MeRouter {
       this.logger.info(`Delete user ${userId}`)
 
       try {
-        await this.userService.deleteUser(userId)
+        const request: UserDeleteRequest = { userId }
+        await this.memberService.deleteUser(request)
         res.status(200).json({ userId })
       } catch (err) {
         this.logger.error(`Error when deleting user ${userId}: ${JSON.stringify(err)}`)
