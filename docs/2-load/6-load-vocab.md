@@ -16,8 +16,10 @@
 - Download ~174Mb zipfile to `Downloads` folder
 - Run the following commands
 ```bash
-WK_DIR=$PWD/private-vocab; mkdir -p $WK_DIR; cd $WK_DIR
+GIT_BASE_DIR=$(git rev-parse --show-toplevel)
+VOCAB_DIR=$GIT_BASE_DIR/cache/vocab
 ZIP_FILE="$(ls -tr ~/Downloads/vocabulary_download_v5*.zip | head -1)"
+cd $VOCAB_DIR
 unzip -o -d . "${ZIP_FILE}"
 ```
 - remove additional file
@@ -28,20 +30,20 @@ rm CONCEPT_CPT4.csv
 ## Confirm Line Count Before Transformation
 - Run command to output line count for each CSV file 
 ```bash
-wc -l *.csv | sort -nr
+wc -l *.csv | sort
 ```
-- Output is simlar to:
+- Linecounts are similar to:
 ```
- 121669947 total
-  72374968 CONCEPT_ANCESTOR.csv
-  38570317 CONCEPT_RELATIONSHIP.csv
-   6071643 CONCEPT.csv
-   2981808 DRUG_STRENGTH.csv
-   1669979 CONCEPT_SYNONYM.csv
-       697 RELATIONSHIP.csv
-       424 CONCEPT_CLASS.csv
-        60 VOCABULARY.csv
         51 DOMAIN.csv
+        60 VOCABULARY.csv
+       424 CONCEPT_CLASS.csv
+       697 RELATIONSHIP.csv
+   1669979 CONCEPT_SYNONYM.csv
+   2981808 DRUG_STRENGTH.csv
+   6071643 CONCEPT.csv
+  38570317 CONCEPT_RELATIONSHIP.csv
+  72374968 CONCEPT_ANCESTOR.csv
+ 121669947 total
 ```
 - Note that unzipped CSV file from Athena contains an extra new line that is empty.
 
@@ -51,44 +53,20 @@ wc -l *.csv | sort -nr
 - This transformation is done in case there is a literal string character e.g. `\t` or `\n` in the value.
 - Enclosing the values in double quotes would prevent interpretation as a tab or newline.
 - Move files to a folder named `transformed`
+- copy transformed CSVs to container
 ```bash
 mkdir -p transformed
 for CSV_FILE in *.csv; do 
       echo . transform $CSV_FILE; 
       wc -l $CSV_FILE
-      sed "s/\"/\"\"/g;s/\t/\"\t\"/g;s/\(.*\)/\"\1\"/" $CSV_FILE > ./transformed/$CSV_FILE; 
-      wc -l ./transformed/$CSV_FILE
+      CSV_FILE2=./transformed/$CSV_FILE
+      sed "s/\"/\"\"/g;s/\t/\"\t\"/g;s/\(.*\)/\"\1\"/" $CSV_FILE > $CSV_FILE2; 
+      wc -l $CSV_FILE2
+      docker cp $CSV_FILE2 alp-minerva-postgres-1:/
 done
-```
-
-## Confirm Line Count of Transformed CSVs
-- Run command to output line count for each CSV file
-```bash
-wc -l ./transformed/*.csv | sort -nr
-```
-- Expected output similar to:
-```
-  130981848 total
-  72754470 ./transformed/CONCEPT_ANCESTOR.csv
-  47212425 ./transformed/CONCEPT_RELATIONSHIP.csv
-  5975393 ./transformed/CONCEPT.csv
-  2980116 ./transformed/DRUG_STRENGTH.csv
-  2058224 ./transformed/CONCEPT_SYNONYM.csv
-      691 ./transformed/RELATIONSHIP.csv
-      418 ./transformed/CONCEPT_CLASS.csv
-      60 ./transformed/VOCABULARY.csv
-      51 ./transformed/DOMAIN.csv
 ```
 
 ## Load data to cdmvocab
-
-- Run the following commands to copy transformed CSVs to container
-```bash
-for CSV_FILE in ./transformed/*.csv; do 
-      echo $CSV_FILE ...
-      docker cp $CSV_FILE alp-minerva-postgres-1:/
-done
-```
 - Run the following commands to load tables
 ```bash
 for CSV_FILE in ./transformed/*.csv; do
@@ -109,7 +87,7 @@ done
 ```
 docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "SELECT table_name, row_count FROM (SELECT 'concept_relationship' AS table_name, COUNT(*) AS row_count FROM cdmvocab.concept_relationship UNION SELECT 'concept_ancestor' AS table_name, count(*) AS row_count FROM cdmvocab.concept_ancestor UNION SELECT 'concept_relationship' AS table_name, COUNT(*) AS row_count FROM cdmvocab.concept UNION SELECT 'relationship' AS table_name, COUNT(*) AS row_count FROM cdmvocab.relationship UNION SELECT 'concept_synonym' AS table_name, COUNT(*) AS row_count FROM cdmvocab.concept_synonym UNION SELECT 'vocabulary' AS table_name, COUNT(*) AS row_count FROM cdmvocab.vocabulary UNION SELECT 'domain' AS table_name, COUNT(*) AS row_count FROM cdmvocab.domain UNION SELECT 'drug_strength' AS table_name, COUNT(*) AS row_count FROM cdmvocab.drug_strength UNION SELECT 'concept_class' AS table_name, COUNT(*) AS row_count FROM cdmvocab.concept_class) temp ORDER BY row_count DESC;"
 ```
-- Expect output row_coun to be equal or greater than:
+- Expect output row_count similar to:
 ```
       table_name      | row_count 
 ----------------------+-----------

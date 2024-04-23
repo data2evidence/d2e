@@ -13,7 +13,7 @@
     "test:ci": "jest --verbose --runInBand --detectOpenHandles --coverage --forceExit --reporters=\"jest-junit\"",
     "lint": "tslint --config ./tslint.json --project ./tsconfig.json",
     "start": "node target/src/main.js",
-    "start:docker": "yarn convertenv && . ./generated-env.sh && if [ \"$LOCAL_DEBUG\" = \"true\" ] ;  then yarn dev; else yarn start; fi",
+    "start:docker": "yarn convertenv && . ./generated-env.sh && if [ \"$LOCAL_DEBUG\" = \"true\" ] ; then yarn dev; else yarn start; fi",
     "compile": "tsc",
     "localdevjs": "npm run compile && npm start",
     "dev2": "TS_NODE_FILES=true TS_NODE_PROJECT=./tsconfig.json nodemon --watch src --watch src_ui -e js,ts,json --exec \"ts-node src/main.ts\"",

@@ -101,6 +101,7 @@ jobs:
         ref: ${{ steps.override-repo.outputs.OVERRIDE_REPO }} # branch name
 
     - shell: bash
+      name: link files from override
       id: link_files_from_override
       run: |
         pwd
@@ -140,23 +141,20 @@ jobs:
         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
         DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+        OVERWRITE: true
       run: |
-        dn_dir=$PWD
-        cd alp-data-node-override
         ACTIONS_STEP_DEBUG=false
       
         # get env yml from 1password
-        overwrite=true env_name=$ENV_NAME yarn op:get:$ENV_TYPE
+        yarn op:get:$ENV_TYPE
 
         # mask sensitive values
-        dn_dir=$dn_dir scripts/gha-mask.sh
+        internal/scripts/gha-mask.sh
 
         # generate dotenv
-        dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
+        yarn gen:env
         echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-
-        cd $dn_dir
-        env_type=$ENV_TYPE yarn gen:tls
 
         cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 
