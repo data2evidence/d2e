@@ -71,16 +71,16 @@ jobs:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          DOCKER_COMPOSE_DN_BASE_ALL_ENV: op://${{ vars.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain
-          DOCKER_COMPOSE_DN_BASE_LOCAL_ENV: op://${{ vars.OP_VAULT_NAME }}/.env.base-local.yml/notesPlain
-          DOCKER_COMPOSE_DN_LOCAL_ENV: op://${{ vars.OP_VAULT_NAME }}/.env.http.tests.yml/notesPlain
-          HANASERVER: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DE_FQDN"
-          HANASERVER_REPLACE: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/SG_FQDN"
-          HDIUSER: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin user"
-          HDIPORT: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DB Port"
-          HDIPW: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin password"
-          TESTSYSTEMPW: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin password"
-          TESTPORT: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DB Port"
+          DOCKER_COMPOSE_DN_BASE_ALL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain
+          DOCKER_COMPOSE_DN_BASE_LOCAL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.base-local.yml/notesPlain
+          DOCKER_COMPOSE_DN_LOCAL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.http.tests.yml/notesPlain
+          HANASERVER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DE_FQDN"
+          HANASERVER_REPLACE: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/SG_FQDN"
+          HDIUSER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin user"
+          HDIPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
+          HDIPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
+          TESTSYSTEMPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
+          TESTPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
 
       - name: Print env vars
         run: |
@@ -98,29 +98,23 @@ jobs:
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
 
-      - name: Get alp-dbcli from 1password
+      - name: Get drivers from 1password
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          pwd
-          mkdir -p internal/build
-          op read --out-file internal/build/alp-dbcli-private-v1.0.0.tgz "op://${{ vars.OP_VAULT_NAME }}/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
-          ls -l internal/build
+          yarn get:drivers
 
       - name: create .env.local for docker-compose in system services
+        env:
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          # cd alp-data-node
-          dn_dir=$PWD
-          # cd alp-data-node-override
           echo "${DOCKER_COMPOSE_DN_BASE_ALL_ENV}" > .env.base-all.yml
           echo "${DOCKER_COMPOSE_DN_BASE_LOCAL_ENV}" > .env.base-local.yml
           echo "${DOCKER_COMPOSE_DN_LOCAL_ENV}" > .env.local.yml
-          # overwrite=true env_name=local yarn op:get:local
           wc -l .env.base-all.yml .env.base-local.yml .env.local.yml
-          dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
-          cd $dn_dir
-          env_type=$ENV_TYPE yarn gen:tls
-
+          OP_VAULT_NAME=$OP_VAULT_NAME ENV_TYPE=$ENV_TYPE ENV_NAME=$ENV_NAME OVERWRITE=true yarn gen:env
+          
           sed -i "s/${HANASERVER_REPLACE}/${HANASERVER}/g" .env.local
           sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
           # sed -i "s/HTTPTEST_ADMIN_USER/${HDIUSER}/g" .env.local
@@ -134,7 +128,7 @@ jobs:
             yarn inittestdb
       - name: build system services
         run: |
-          yarn build:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc
+          yarn build:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init
 
       - name: Manipulate configuration
         run : |

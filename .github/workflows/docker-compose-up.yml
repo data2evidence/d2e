@@ -71,28 +71,24 @@ jobs:
 
       - name: Generate dotenv
         env:
-         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
-         DOTENV_YML: .env.${{ env.ENV_NAME }}.yml 
-         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+          DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+          OVERWRITE: true  
         run: |
-          dn_dir=$PWD
-          cd alp-data-node-override
           ACTIONS_STEP_DEBUG=false
         
           # get env yml from 1password
-          overwrite=true env_name=$ENV_NAME yarn op:get:$ENV_TYPE
+          yarn op:get:$ENV_TYPE
 
           # mask sensitive values
-          scripts/gha-mask.sh
+          internal/scripts/gha-mask.sh
 
           # generate dotenv
-          dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
-
-          cd $dn_dir
-          env_type=$ENV_TYPE yarn gen:tls
+          yarn gen:env
 
           echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
-
 
       - uses: docker/setup-buildx-action@v3
         id: builder
