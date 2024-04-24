@@ -40,20 +40,20 @@ jobs:
       PG__TENANT_CONFIGS: '{"alp":{"host":"localhost","port":"5432","databaseName":"alp","postgresAdminUser":"postgres","postgresAdminPassword":"Toor1234","postgresReadUser":"postgres_tenant_read_user","postgresReadPassword":"Toor1234"}}'
       PG__READ_ROLE: "POSTGRES_TENANT_READ_ROLE"
 
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: "postgres"
-          POSTGRES_PASSWORD: "Toor1234"
-          POSTGRES_DB: "alp"
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    # services:
+    #   postgres:
+    #     image: postgres:15-alpine
+    #     env:
+    #       POSTGRES_USER: "postgres"
+    #       POSTGRES_PASSWORD: "Toor1234"
+    #       POSTGRES_DB: "alp"
+    #     ports:
+    #       - 5432:5432
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
 
     steps:
       - uses: actions/checkout@v4
@@ -82,6 +82,7 @@ jobs:
           main: |
             echo GITHUB_CONTEXT=$GITHUB_CONTEXT
             echo GITHUB_ACTION=$GITHUB_ACTION
+            set | grep alp-db-svc-test
           # op service-account ratelimit > 
           post: |
             echo post
