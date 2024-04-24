@@ -1,5 +1,6 @@
 import dask_sql
-from prefect import task, flow, get_run_logger
+import os
+from prefect import task, flow
 import dask.dataframe as dd
 from dask.utils import tmpfile
 from nodes.flowutils import *
@@ -10,10 +11,10 @@ from sqlalchemy.sql import select
 from sqlalchemy import MetaData, Table, create_engine
 import pandas as pd
 import json
-import rpy2.robjects as ro
-from rpy2.robjects import conversion, default_converter
+import rpy2.robjects as robjects
+from rpy2.robjects import conversion, default_converter, pandas2ri
+from rpy2.robjects.packages import importr
 import alpconnection.dbutils as dbutils
-from prefect.task_runners import SequentialTaskRunner
 from utils.types import PG_TENANT_USERS
 
 class Flow:
@@ -85,8 +86,8 @@ class RNode:
 
     def test(self, _input, task_run_context):
         with conversion.localconverter(default_converter):
-            r_inst = ro.r(self.r_code)
-            r_test_exec = ro.globalenv['test_exec']
+            r_inst = robjects.r(self.r_code)
+            r_test_exec = robjects.globalenv['test_exec']
             global_params = {"r_test_exec": r_test_exec, "convert_R_to_py": convert_R_to_py,
                              "myinput": convert_py_to_R(_input), "output": {}}
             e = exec(
@@ -97,8 +98,8 @@ class RNode:
     def task(self, _input, task_run_context):
         try:
             with conversion.localconverter(default_converter):
-                r_inst = ro.r(self.r_code)
-                r_exec = ro.globalenv['exec']
+                r_inst = robjects.r(self.r_code)
+                r_exec = robjects.globalenv['exec']
                 global_params = {"r_exec": r_exec, "convert_R_to_py": convert_R_to_py,
                                  "myinput": convert_py_to_R(_input), "output": {}}
                 e = exec(f'output = convert_R_to_py(r_exec(myinput))',
@@ -357,7 +358,145 @@ def generate_node_task(nodename, node, nodetype):
             nodeobj = SqlQueryNode(node)
         case "data_mapping_node":
             nodeobj = DataMappingNode(node)
+        case "time_at_risk_node":
+            nodeobj = TimeAtRiskNode(node)
+        case "cohort_diagnostics_module_spec":
+            nodeobj = CohortDiagnosticsModuleSpecNode(node)
+        case "cohort_generator_node":
+            nodeobj = CohortGeneratorSpecNode(node)
+        case "characterization_node":
+            nodeobj = CharacterizationNode(node)
         case _:
             logging.error("ERR: Unknown Node"+node["type"])
             logging.error(tb.StackSummary())
     return nodeobj
+
+class NegativeControlOutcomeCohort:
+
+    # TODO
+    def __init__():
+        return "negative_control_outcome_cohort_node"
+
+class CharacterizationNode:
+    def __init__(self, _node):
+        self.name = _node["name"]
+        self.description = _node["description"]
+        self.targetIds = _node["targetIds"]
+        self.outcomeIds = _node["outcomeIds"]
+        self.deChallengeStopInterval = _node["deChallengeStopInterval"]
+        self.dechallengeEvaluationWindow = _node["dechallengeEvaluationWindow"]
+        self.minPriorObservation = _node["minPriorObservation"]
+        self.timeAtRisk = {
+            "riskWindowStart": _node["riskWindowStart"],
+            "startAnchor": _node["startAnchor"],
+            "riskWindowEnd": _node["riskWindowEnd"],
+            "endAnchor": _node["endAnchor"],
+        }
+
+    def test(self, task_run_context):
+        # TODO: add implementation
+        return None
+
+    def task(self, task_run_context):
+        rSource = robjects.r['source']
+        pandas2ri.activate()
+        try:
+            rSource("https://raw.githubusercontent.com/OHDSI/CharacterizationModule/v0.5.0/SettingsFunctions.R")
+            rCreateCharacterizationModuleSpecifications = robjects.globalenv['createCharacterizationModuleSpecifications']
+            rFeatureExtraction = importr('FeatureExtraction')
+            rCovariateSettings = rFeatureExtraction.createDefaultCovariateSettings()
+            rCharacterizationSpec = rCreateCharacterizationModuleSpecifications(
+                targetIds = convert_py_to_R(self.targetIds), 
+                outcomeIds = convert_py_to_R(self.outcomeIds), 
+                covariateSettings = rCovariateSettings, 
+                dechallengeStopInterval = self.deChallengeStopInterval, 
+                dechallengeEvaluationWindow = self.dechallengeEvaluationWindow, 
+                timeAtRisk = pandas2ri.py2rpy(pd.DataFrame(self.timeAtRisk)), 
+                minPriorObservation = self.minPriorObservation
+            )
+            return Result(None, rCharacterizationSpec, task_run_context)
+        except Exception as e:
+            return Result(e, tb.format_exc(), task_run_context)
+    
+# class covariate_settings_node:
+#     def __init__():
+#         return "covariate_settings_node"
+    
+class TimeAtRiskNode:
+    # createTimeAtRiskDef(id = 1, startWith = "start", endWith = "end"),
+    # createTimeAtRiskDef(id = 2, startWith = "start", endWith = "start", endOffset = 365)
+
+    def __init__(self, _node):
+        self.id = _node["id"]
+        self.startWith = _node["startWith"]
+        self.endWith = _node["endWith"]
+        self.startOffset = _node["get"]("startOffset", 0)
+        self.endOffset = _node["get"]("endOffset", 0)
+        print("TimeAtRisk Constructor")
+        print(json.dumps(_node))
+
+    def task(self, input, task_run_context):
+        rCohortIncidence = importr('CohortIncidence')
+        try:
+            rTimeAtRisk = rCohortIncidence.createTimeAtRiskDef(
+                id = robjects.IntVector([self.id]),
+                startWith = self["startWith"],
+                endWith = self["endWith"],
+                startOffset = robjects.IntVector([self.startOffset]),
+                endOffset = robjects.IntVector([self.endOffset])
+            )
+            return Result(None, rTimeAtRisk, task_run_context)
+        except Exception as e:
+            return Result(e, tb.format_exc(), task_run_context)
+
+class CohortGeneratorSpecNode:
+    def __init__(self, _node):
+        self.incremental = _node["incremental"] # Ensure boolean
+        self.generate_stats = _node["generateStats"] # Ensure boolean
+
+    def task(self, task_run_context):
+        rSource = robjects.r['source']
+        try: 
+            rSource(os.getenv("OHDSI__R_COHORT_GENERATOR_MODULE_SETTINGS_URL"))
+            rCreateCohortGeneratorModuleSpecifications = robjects.globalenv['createCohortGeneratorModuleSpecifications']
+            rCohortGeneratorModuleSpecifications = rCreateCohortGeneratorModuleSpecifications(convert_py_to_R(self.incremental), convert_py_to_R(self.generate_stats))
+            return Result(None, rCohortGeneratorModuleSpecifications, task_run_context)
+        except Exception as e:
+            return Result(e, tb.format_exc(), task_run_context)
+    
+    def test():
+        return None
+
+class CohortDiagnosticsModuleSpecNode:
+    def __init__(self, _node):
+        self.runInclusionStatistics = _node["runInclusionStatistics"]
+        self.runIncludedSourceConcepts = _node["runIncludedSourceConcepts"]
+        self.runOrphanConcepts = _node["runOrphanConcepts"]
+        self.runTimeSeries = _node["runTimeSeries"]
+        self.runVisitContext = _node["runVisitContext"]
+        self.runBreakdownIndexEvents = _node["runBreakdownIndexEvents"]
+        self.runIncidenceRate = _node["runIncidenceRate"]
+        self.runCohortRelationship = _node["runCohortRelationship"]
+        self.runTemporalCohortCharacterization = _node["runTemporalCohortCharacterization"]
+        self.incremental = _node["incremental"]
+
+    def task(self, task_run_context):
+        rSource = robjects.r['source']
+        try:
+            rSource(os.getenv("OHDSI__R_COHORT_DIAGNOSTICS_MODULE_SETTINGS_URL"))
+            rCreateCohortDiagnosticsModuleSpecifications = robjects.globalenv["createCohortDiagnosticsModuleSpecifications"]
+            rCohortDiagnosticsSpec = rCreateCohortDiagnosticsModuleSpecifications(
+                runInclusionStatistics = convert_py_to_R(self.runInclusionStatistics),
+                runIncludedSourceConcepts = convert_py_to_R(self.runIncludedSourceConcepts),
+                runOrphanConcepts = convert_py_to_R(self.runOrphanConcepts),
+                runTimeSeries = convert_py_to_R(self.runTimeSeries),
+                runVisitContext = convert_py_to_R(self.runVisitContext),
+                runBreakdownIndexEvents = convert_py_to_R(self.runBreakdownIndexEvents),
+                runIncidenceRate = convert_py_to_R(self.runIncidenceRate),
+                runCohortRelationship = convert_py_to_R(self.runCohortRelationship),
+                runTemporalCohortCharacterization = convert_py_to_R(self.runTemporalCohortCharacterization),
+                incremental = convert_py_to_R(self.incremental)
+            )
+            return Result(None, rCohortDiagnosticsSpec, task_run_context)
+        except Exception as e:
+            return Result(e, tb.format_exc(), task_run_context)

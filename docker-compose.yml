@@ -388,6 +388,8 @@ services:
       R_LIBS_USER: /home/docker/plugins/R/site-library
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
+      OHDSI__R_COHORT_DIAGNOSTICS_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortDiagnosticsModule/v0.2.0/SettingsFunctions.R
+      OHDSI__R_COHORT_GENERATOR_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortGeneratorModule/v0.3.0/SettingsFunctions.R
 
   alp-dataflow-gen-agent:
     command:
