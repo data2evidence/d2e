@@ -16,3 +16,5 @@ echo GITHUB_RUN_ID=$GITHUB_RUN_ID
 # op service-account ratelimit > 
 
 # echo $GITHUB_CONTEXT | yq '.job'
+
+exit 0

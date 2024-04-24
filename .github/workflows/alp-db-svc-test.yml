@@ -95,11 +95,11 @@ jobs:
             pwd
             echo post
 
-      - name: Upload math result for job 2
-        uses: actions/upload-artifact@v4
-        with:
-          name: homework_final
-          path: math-homework.txt
+      # - name: Upload math result for job 2
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: homework_final
+      #     path: math-homework.txt
 
       # - name: Get drivers from 1password
       #   env:
