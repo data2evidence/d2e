@@ -46,7 +46,7 @@ export default class MriConfigConnection {
                 "user-agent": "ALP Service",
                 "x-source-origin": sourceOrigin,                
               },
-              "rejectUnauthorized": false,
+              "rejectUnauthorized": true,
               "ca": process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n'),
             };
             const getReq = https
