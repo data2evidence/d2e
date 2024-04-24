@@ -17,11 +17,8 @@ export default class PsConfigServerAPI {
             this.baseUrl = ALP_MINERVA_PS_CONFIG_SERVER__URL;
             this.oauthUrl = ALP_GATEWAY_OAUTH__URL;
             this.httpsAgent = new https.Agent({
-                rejectUnauthorized:
-                    this.baseUrl.startsWith("https://localhost:") ||
-                    this.baseUrl.startsWith("https://alp-minerva-gateway-")
-                        ? false
-                        : true,
+                rejectUnauthorized: true,
+                ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
             });
         }
         if (!this.baseUrl) {
@@ -70,15 +67,19 @@ export default class PsConfigServerAPI {
         return result.data.access_token;
     }
 
-    async getCDWConfig({action, configId, configVersion, lang}, token) {
+    async getCDWConfig({ action, configId, configVersion, lang }, token) {
         const options = await this.getRequestConfig(token);
         const body = {
             action,
             configId,
             configVersion,
             lang,
-        }
-        const result = await axios.post(`${this.baseUrl}/hc/hph/patient/app/services/config.xsjs`, body, options);
+        };
+        const result = await axios.post(
+            `${this.baseUrl}/hc/hph/patient/app/services/config.xsjs`,
+            body,
+            options
+        );
         return result.data;
     }
 }

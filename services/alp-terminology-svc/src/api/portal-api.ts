@@ -18,11 +18,8 @@ export class SystemPortalAPI {
     if (env.SYSTEM_PORTAL__API_URL) {
       this.url = env.SYSTEM_PORTAL__API_URL;
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') ||
-          this.url.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true,
+        rejectUnauthorized: true,
+        ca: env.TLS__INTERNAL__CA_CRT,
       });
     } else {
       throw new Error('No url is set for PortalAPI');
