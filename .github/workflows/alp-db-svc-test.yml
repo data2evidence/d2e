@@ -92,8 +92,7 @@ jobs:
             # set | grep alp-db-svc-test
           # op service-account ratelimit > 
           post: |
-            pwd
-            echo post
+            ./internal/scripts/get-op-ratelimit.sh
 
       # - name: Upload math result for job 2
       #   uses: actions/upload-artifact@v4
