@@ -29,5 +29,8 @@ export const env = {
   IDP_FETCH_USER_INFO_TYPE: process.env.IDP__FETCH_USER_INFO_TYPE,
   IDP_ALP_ADMIN_CLIENT_ID: process.env.IDP__ALP_ADMIN__CLIENT_ID,
   IDP_ALP_ADMIN_CLIENT_SECRET: process.env.IDP__ALP_ADMIN__CLIENT_SECRET,
-  IDP_ALP_ADMIN_RESOURCE: process.env.IDP__ALP_ADMIN__RESOURCE
+  IDP_ALP_ADMIN_RESOURCE: process.env.IDP__ALP_ADMIN__RESOURCE,
+  SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
+  SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
+  SSL_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
 }

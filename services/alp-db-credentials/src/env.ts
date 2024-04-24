@@ -19,5 +19,8 @@ export const env = {
   PG_SSL: process.env.PG__SSL,
   PG_CA_ROOT_CERT: process.env.PG__CA_ROOT_CERT,
   PG_MAX_POOL: Number(process.env.PG__MAX_POOL) || 10,
-  VALID_CLIENT_CREDENTIAL_IDS: process.env.DB_CREDENTIALS_MGR__VALID_CLIENT_CREDENTIAL_IDS || ''
+  VALID_CLIENT_CREDENTIAL_IDS: process.env.DB_CREDENTIALS_MGR__VALID_CLIENT_CREDENTIAL_IDS || '',
+  SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
+  SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
+  SSL_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
 }

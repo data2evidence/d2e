@@ -6,9 +6,16 @@ import { updateDb } from './db/runner';
 
 const logger = createLogger('Terminology');
 
+import https from 'https';
+
+const httpsOptions = {
+  key: env.TLS__INTERNAL__KEY,
+  cert: env.TLS__INTERNAL__CRT,
+};
+
 async function runNestApp() {
   await updateDb();
-  const nestApp = await NestFactory.create(AppModule);
+  const nestApp = await NestFactory.create(AppModule, { httpsOptions });
   await nestApp.listen(env.TERMINOLOGY_SVC__PORT || 41108);
   logger.info(
     `Terminology service started on port ${env.TERMINOLOGY_SVC__PORT || 41108}`,

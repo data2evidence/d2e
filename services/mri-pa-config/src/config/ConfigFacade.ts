@@ -24,7 +24,7 @@ export class ConfigFacade {
         switch (request.action) {
             case "getMyConfig":
                 try {
-                    const result = await this.config.getUserConfig({ lang: request.language, studiesToInclude: request.studiesToInclude });
+                    const result = await this.config.getUserConfig({ lang: request.language, configId: request.configId });
                     callback(null, result);
                 } catch (err) {
                     callback(err, null);
