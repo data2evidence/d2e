@@ -48,7 +48,6 @@ export class SystemPortalAPI {
 
   async getDatasetDetails(datasetId: string) {
     const dataset = await this.getDataset(datasetId);
-    console.log(JSON.stringify(dataset));
     if (!dataset) {
       throw new BadRequestException(
         `Could not find dataset with datasetId: ${datasetId}`,
