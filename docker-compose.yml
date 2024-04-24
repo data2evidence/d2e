@@ -91,17 +91,6 @@ x-envs:
         },
         {
           "enabled": true,
-          "featureFlag": "terminology",
-          "name": "Concept Search",
-          "route": "concept-search",
-          "pluginPath": "plugins/SystemAdmin/Terminology/module",
-          "requiredRoles": [
-            "RESEARCHER"
-          ],
-          "type": "Concepts"
-        },
-        {
-          "enabled": true,
           "featureFlag": "analysisFlow",
           "name": "Analysis",
           "route": "analysis",
