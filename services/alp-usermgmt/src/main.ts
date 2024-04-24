@@ -1,6 +1,6 @@
 import './loadDotEnv'
 import 'reflect-metadata'
-import express, { Request, Response, NextFunction } from 'express'
+import express, { Request, Response, NextFunction, Application } from 'express'
 import compression from 'compression'
 import { Container } from 'typedi'
 import Routes from './routes'
@@ -11,13 +11,14 @@ import { env } from './env'
 import { addUserObjToReq } from 'middlewares/add-user-object-to-req'
 import { CONTAINER_KEY } from 'const'
 import { setupGlobalErrorHandling } from 'error-handler'
+import https from 'https'
 
 const PATH = env.USER_MGMT_PATH
 const PORT = env.USER_MGMT_PORT
 const logger = createLogger()
 
 class Server {
-  private app: express.Express
+  private app: Application
 
   constructor() {
     this.app = express()
@@ -55,9 +56,11 @@ class Server {
   }
 
   public start() {
-    return this.app.listen(PORT)
+    const server = https.createServer({ key: env.SSL_PRIVATE_KEY, cert: env.SSL_PUBLIC_CERT }, this.app)
+    server.listen(PORT, () => {
+      logger.info(`🚀 ALP User Management started successfully!. Server listening on port ${PORT}`)
+    })
   }
 }
 
 new Server().start()
-logger.info(`🚀 ALP User Management started successfully!. Server listening on port ${PORT}`)
