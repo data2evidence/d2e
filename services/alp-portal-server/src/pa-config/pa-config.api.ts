@@ -36,10 +36,8 @@ export class PaConfigApi {
     if (env.PA_CONFIG_API_URL) {
       this.url = env.PA_CONFIG_API_URL
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true
+        rejectUnauthorized: true,
+        ca: env.SSL_CA_CERT
       })
     } else {
       throw new Error('No url is set for PaConfigApi')

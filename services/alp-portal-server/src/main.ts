@@ -6,9 +6,15 @@ import { getLogLevels } from './logger'
 import { env } from './env'
 import { useContainer } from 'class-validator'
 
+const httpsOptions = {
+  key: env.SSL_PRIVATE_KEY,
+  cert: env.SSL_PUBLIC_CERT
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: getLogLevels()
+    logger: getLogLevels(),
+    httpsOptions
   })
   app.useGlobalPipes(new ValidationPipe())
 

@@ -18,10 +18,8 @@ export class DataflowMgmtAPI {
     if (env.DATAFLOW_MGMT_API_BASE_URL) {
       this.baseURL = env.DATAFLOW_MGMT_API_BASE_URL
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.baseURL.startsWith('https://localhost:') || this.baseURL.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true
+        rejectUnauthorized: true,
+        ca: env.GATEWAY_CA_CERT
       })
     } else {
       this.logger.error('No url is set for DataflowMgmtAPI')
