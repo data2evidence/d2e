@@ -18,19 +18,12 @@ export class SystemPortalAPI {
     if (env.SYSTEM_PORTAL__API_URL) {
       this.url = env.SYSTEM_PORTAL__API_URL;
       this.httpsAgent = new Agent({
-        rejectUnauthorized: this.isAuthorized(),
-        ca: this.isAuthorized() ? env.TLS__INTERNAL__CA_CRT : undefined,
+        rejectUnauthorized: true,
+        ca: env.TLS__INTERNAL__CA_CRT,
       });
     } else {
       throw new Error('No url is set for PortalAPI');
     }
-  }
-
-  isAuthorized(): boolean {
-    return this.url.startsWith('https://localhost:') ||
-      this.url.startsWith('https://alp-minerva-gateway-')
-      ? false
-      : true;
   }
 
   async getDataset(

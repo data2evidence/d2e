@@ -22,19 +22,12 @@ export class MeilisearchAPI {
     if (env.MEILISEARCH__API_URL) {
       this.url = env.MEILISEARCH__API_URL;
       this.httpsAgent = new Agent({
-        rejectUnauthorized: this.isAuthorized(),
-        ca: this.isAuthorized() ? env.TLS__INTERNAL__CA_CRT : undefined,
+        rejectUnauthorized: true,
+        ca: env.TLS__INTERNAL__CA_CRT,
       });
     } else {
       throw new Error('No url is set for MeilisearchAPI');
     }
-  }
-
-  isAuthorized(): boolean {
-    return this.url.startsWith('https://localhost:') ||
-      this.url.startsWith('https://alp-minerva-gateway-')
-      ? false
-      : true;
   }
 
   async getConcepts(

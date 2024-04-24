@@ -45,14 +45,8 @@ export async function loadBookmarks(
             "x-source-origin": sourceOrigin,
             "x-alp-usersessionclaims": req.headers["x-alp-usersessionclaims"],
         },
-        rejectUnauthorized:
-            hostname === "localhost" || hostname === "alp-mercury-approuter"
-                ? false
-                : true,
-        ca:
-            hostname === "localhost" || hostname === "alp-mercury-approuter"
-                ? null
-                : process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
+        rejectUnauthorized: true,
+        ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
 
     switch (bookmark_cmd) {

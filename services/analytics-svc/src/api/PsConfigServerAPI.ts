@@ -17,22 +17,13 @@ export default class PsConfigServerAPI {
             this.baseUrl = ALP_MINERVA_PS_CONFIG_SERVER__URL;
             this.oauthUrl = ALP_GATEWAY_OAUTH__URL;
             this.httpsAgent = new https.Agent({
-                rejectUnauthorized: this.isAuthorized(),
-                ca: this.isAuthorized()
-                    ? process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n")
-                    : null,
+                rejectUnauthorized: true,
+                ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
             });
         }
         if (!this.baseUrl) {
             throw new Error("PS Config Server URL is not configured!");
         }
-    }
-
-    private isAuthorized(): boolean {
-        return this.baseUrl.startsWith("https://localhost:") ||
-            this.baseUrl.startsWith("https://alp-minerva-gateway-")
-            ? false
-            : true;
     }
 
     private async getRequestConfig(token: string) {

@@ -41,11 +41,8 @@ export const dataflowRequest = (
             "x-req-correlation-id": reqCorrelationId,
         },
         method,
-        rejectUnauthorized: hostname === "localhost" ? false : true,
-        ca:
-            hostname === "localhost"
-                ? null
-                : process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
+        rejectUnauthorized: true,
+        ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
     if (payload) {
         options.headers["Content-Type"] = "application/json";

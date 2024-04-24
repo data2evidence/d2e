@@ -16,20 +16,12 @@ export class PortalAPI {
     if (env.PORTAL_BASE_URL) {
       this.baseURL = env.PORTAL_BASE_URL
       this.httpsAgent = new https.Agent({
-        rejectUnauthorized: this.isAuthorized(),
-        ca: this.isAuthorized() ? env.SSL_CA_CERT : undefined
+        rejectUnauthorized: true,
+        ca: env.SSL_CA_CERT
       })
     } else {
       throw new Error('No url is set for PortalAPI')
     }
-  }
-
-  private isAuthorized(): boolean {
-    return this.baseURL.startsWith('https://localhost:') ||
-      this.baseURL.startsWith('https://alp-minerva-gateway-') ||
-      this.baseURL.startsWith('https://alp-mercury-approuter:')
-      ? false
-      : true
   }
 
   private async getRequestConfig() {

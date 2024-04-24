@@ -44,14 +44,8 @@ export const terminologyRequest = (
             "x-req-correlation-id": reqCorrelationId,
         },
         method,
-        rejectUnauthorized:
-            hostname === "localhost" || hostname === "alp-mercury-approuter"
-                ? false
-                : true,
-        ca:
-            hostname === "localhost" || hostname === "alp-mercury-approuter"
-                ? null
-                : process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
+        rejectUnauthorized: true,
+        ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
     if (payload) {
         options.headers["Content-Type"] = "application/json";

@@ -22,18 +22,12 @@ export class SharedPortalApi {
     if (env.PORTAL_API_URL) {
       this.url = env.PORTAL_API_URL
       this.httpsAgent = new Agent({
-        rejectUnauthorized: this.isAuthorized(),
-        ca: this.isAuthorized() ? env.SSL_CA_CERT : undefined
+        rejectUnauthorized: true,
+        ca: env.SSL_CA_CERT
       })
     } else {
       throw new Error('No url is set for PortalAPI')
     }
-  }
-
-  isAuthorized(): boolean {
-    return this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
-      ? false
-      : true
   }
 
   async getStudy(id: string) {

@@ -26,18 +26,12 @@ export class PrefectAPI {
     if (env.PREFECT_API_URL) {
       this.url = env.PREFECT_API_URL
       this.httpsAgent = new Agent({
-        rejectUnauthorized: this.isAuthorized(),
-        ca: this.isAuthorized() ? env.SSL_CA_CERT : undefined
+        rejectUnauthorized: true,
+        ca: env.SSL_CA_CERT
       })
     } else {
       throw new Error('No url is set for PrefectAPI')
     }
-  }
-
-  isAuthorized(): boolean {
-    return this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
-      ? false
-      : true
   }
 
   async getDeploymentByFlowId(id: string) {
