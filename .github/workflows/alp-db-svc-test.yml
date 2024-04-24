@@ -78,6 +78,8 @@ jobs:
         name: op ratelimit
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          GITHUB_JOB: ${{ env.GITHUB_JOB }}
+          GITHUB_RUN_ID: ${{ env.GITHUB_RUN_ID }}
         with:
           main: |
             pwd
