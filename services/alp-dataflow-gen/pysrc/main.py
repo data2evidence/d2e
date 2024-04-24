@@ -11,15 +11,15 @@ from flows.meilisearch.flow import execute_add_index_flow
 from flows.strategus.flow import execute_strategus
 from flows.portal_server.flow import update_dataset_attributes, fetch_version_info
 from utils.types import (
-    dqdOptionsType, 
-    dcOptionsType, 
+    dqdOptionsType,
+    dcOptionsType,
     cohortGeneratorOptionsType,
-    omopCDMOptionsType, 
-    AlpDBSvcOptionsType, 
-    meilisearchAddIndexType, 
+    omopCDMOptionsType,
+    AlpDBSvcOptionsType,
     datasetAttributesType,
     fetchVersionInfoType
 )
+
 
 @flow(
     log_prints=True,
@@ -73,12 +73,9 @@ def execute_seed_postgres_data_flow(database_code, vocab_schema_name, cdm_schema
 
 
 @flow(log_prints=True, task_runner=SequentialTaskRunner)
-def execute_meilisearch_add_index_flow(options: meilisearchAddIndexType):
-    execute_add_index_flow(options)
-
-@flow(log_prints=True, task_runner=SequentialTaskRunner)
 def execute_strategus_flow(analysis_spec, options):
     execute_strategus(analysis_spec, options)
+
 
 @flow(log_prints=True, task_runner=SequentialTaskRunner)
 def fetch_version_info_flow(options: fetchVersionInfoType):

@@ -83,6 +83,8 @@ class meilisearchAddIndexType(BaseModel):
     databaseCode: str
     vocabSchemaName: str
     tableName: str
+    chunk_size: int
+    meilisearch_index_config: Dict
 
 
 class portalDatasetType(BaseModel):
