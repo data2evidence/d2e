@@ -82,8 +82,8 @@ jobs:
           # GITHUB_RUN_ID: ${{ env.GITHUB_RUN_ID }}
         with:
           main: |
-            echo GITHUB_JOB=$GITHUB_JOB
-            export GITHUB_JOB
+            # echo GITHUB_JOB=$GITHUB_JOB
+            # export GITHUB_JOB
             ./internal/scripts/get-op-ratelimit.sh
             # echo GITHUB_CONTEXT=$GITHUB_CONTEXT
             # echo GITHUB_ACTION=$GITHUB_ACTION
