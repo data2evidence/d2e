@@ -80,7 +80,8 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         with:
           main: |
-            echo $GITHUB_CONTEXT | yq '.job'
+            echo GITHUB_CONTEXT=$GITHUB_CONTEXT
+            echo GITHUB_ACTION=$GITHUB_ACTION
           # op service-account ratelimit > 
           post: |
             echo post
