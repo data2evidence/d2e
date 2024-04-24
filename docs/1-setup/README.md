@@ -26,10 +26,11 @@ Untested platforms:
 sudo snap install docker
 ```
 
-### macos & ubuntu
-- [Add host.docker.internal to /etc/hosts](../knowledgebase//docker-compose/host.docker.internal.md)
-### macos
-- [Disable Virtualization framework](../knowledgebase/docker-compose/virtualization-framework-x86-disable.md)
+#### macos
+knowledgebase articles:
+- [host.docker.internal](../knowledgebase/docker-compose/host.docker.internal.md)
+- [dns fails multiple networks](../knowledgebase/docker-compose/dns-fails-multiple-networks.md)
+- [disable virtualization framework on x86](../knowledgebase/docker-compose/virtualization-framework-x86.md)
 
 ## nodejs 
 - https://nodejs.org/en/download/package-manager

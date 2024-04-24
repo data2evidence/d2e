@@ -10,6 +10,7 @@ import { Notebook } from '../notebook/entity'
 import { env } from '../env'
 import { TenantModule } from '../tenant/tenant.module'
 import { AnalyticsModule } from '../analytics/analytics.module'
+import { UserMgmtModule } from '../user-mgmt/user-mgmt.module'
 import {
   DatasetDetailRepository,
   DatasetDashboardRepository,
@@ -26,6 +27,7 @@ const isProxy = env.APP_DEPLOY_MODE === 'proxy'
 const imports: Array<Type<any> | DynamicModule> = [
   TenantModule,
   AnalyticsModule,
+  UserMgmtModule,
   TypeOrmModule.forFeature([
     Dataset,
     DatasetDashboard,

@@ -1,10 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
+import { REQUEST } from '@nestjs/core'
+import { JwtPayload, decode } from 'jsonwebtoken'
 import { IDataset, IDatasetResponseDto, IDatasetQueryDto, IDatasetSearchDto, ITenant } from '../../types'
 import { DatasetFilterService } from '../dataset-filter.service'
 import { TenantService } from '../../tenant/tenant.service'
 import { DatasetRepository, DatasetReleaseRepository, DatasetDashboardRepository } from '../repository'
 import { createLogger } from '../../logger'
 import { Dataset } from '../entity'
+import { UserMgmtService } from '../../user-mgmt/user-mgmt.service'
 
 const SWAP_TO = {
   STUDY: ['dataset', 'study'],
@@ -13,14 +16,21 @@ const SWAP_TO = {
 
 @Injectable()
 export class DatasetQueryService {
+  private readonly userId: string
   private readonly logger = createLogger(this.constructor.name)
+
   constructor(
+    @Inject(REQUEST) request: Request,
     private readonly tenantService: TenantService,
     private readonly datasetRepo: DatasetRepository,
     private readonly releaseRepo: DatasetReleaseRepository,
     private readonly dashboardRepo: DatasetDashboardRepository,
-    private readonly datasetFilterService: DatasetFilterService
-  ) {}
+    private readonly datasetFilterService: DatasetFilterService,
+    private readonly userMgmtService: UserMgmtService
+  ) {
+    const token = decode(request.headers['authorization'].replace(/bearer /i, '')) as JwtPayload
+    this.userId = token.sub
+  }
 
   async hasDataset(searchParams: IDatasetSearchDto) {
     return await this.datasetRepo.findOne({
@@ -62,7 +72,7 @@ export class DatasetQueryService {
       throw new BadRequestException('Invalid request')
     }
 
-    const datasets = await this.datasetRepo
+    const query = this.datasetRepo
       .createQueryBuilder('dataset')
       .leftJoin('dataset.datasetDetail', 'datasetDetail')
       .leftJoin('dataset.dashboards', 'dashboard')
@@ -70,8 +80,16 @@ export class DatasetQueryService {
       .leftJoin('dataset.attributes', 'attribute')
       .leftJoin('attribute.attributeConfig', 'attributeConfig')
       .select(this.getDatasetsColumns(role))
-      .getMany()
 
+    if (isResearcher) {
+      const datasetIds = await this.userMgmtService.getResearcherDatasetIds(this.userId)
+      query.where(
+        'dataset.visibility_status = :hidden AND dataset.id = ANY(:datasetIds) OR dataset.visibility_status != :hidden',
+        { hidden: 'HIDDEN', datasetIds }
+      )
+    }
+
+    const datasets = await query.getMany()
     const tenant = this.tenantService.getTenant()
 
     let dbFilterResults

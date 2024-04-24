@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { getLogger } from "../utils/config";
+import { getLogger, getProperties } from "../utils/config";
 import https from "https";
 
 const logger = getLogger();
@@ -15,6 +15,11 @@ if (
   });
   axios.defaults.httpsAgent = httpsAgent;
   logger.info("rejectUnauthorized is disabled");
+} else {
+  const httpsAgent = new https.Agent({
+    ca: getProperties()["ssl_ca_cert"],
+  });
+  axios.defaults.httpsAgent = httpsAgent;
 }
 
 axios.interceptors.response.use(

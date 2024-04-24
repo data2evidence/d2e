@@ -21,11 +21,11 @@ const facade = new ConfigFacade(
   fakeConnection,
   new FfhQeConfig(
     fakeConnection as ConnectionInterface,
-    fakeConnection as ConnectionInterface,
     new AssignmentProxy([]),
     new Settings(),
     new User("TEST_USER")
-  )
+  ),
+  new User("TEST_USER")
 );
 const ffhQeConfig = facade.getFfhQeConfig();
 describe("Testing ConfigFacade,", () => {
