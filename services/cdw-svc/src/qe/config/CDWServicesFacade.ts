@@ -49,7 +49,7 @@ export class CDWServicesFacade {
     let validationRes: ConfigValidationResultType;
     switch (action) {
       case "attribute_infos_service":
-        validationRes = this.ffhQeConfig.validateConfig(body.config);
+        validationRes = this.ffhQeConfig.validateConfig(body.config, this.connection);
         if (!validationRes.cdmConfigValidationResult.valid) {
           return callback(new Error("HPH_CDM_CFG_VALIDITY_ERROR"), null);
         }
@@ -76,7 +76,7 @@ export class CDWServicesFacade {
 
         break;
       case "domain_values_service":
-        validationRes = this.ffhQeConfig.validateConfig(body.config);
+        validationRes = this.ffhQeConfig.validateConfig(body.config, this.connection);
         if (!validationRes.cdmConfigValidationResult.valid) {
           const err = new Error("HPH_CDM_CFG_VALIDITY_ERROR");
           callback(err, null);
