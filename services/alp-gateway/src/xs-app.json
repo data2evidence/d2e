@@ -37,6 +37,11 @@
       "targetPath":"/ui-files/flow/"
     },
     {
+      "source":"^/analysis/(.*)$",
+      "target": "$1",
+      "targetPath":"/ui-files/analysis/"
+    },
+    {
       "source":"^/portalsvc",
       "destination":"portal-svc"
     },

@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { dataSourceOptions } from './common/data-source/data-source'
 import { DataflowModule } from './dataflow/dataflow.module'
+import { AnalysisflowModule } from './analysis-flow/analysis-flow.module'
 import { HealthModule } from './health-check/health.module'
 import { PrefectModule } from './prefect/prefect.module'
 import { DataQualityModule } from './data-quality/data-quality.module'
@@ -65,6 +66,7 @@ const meilisearchRoutes = {
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions),
     DataflowModule,
+    AnalysisflowModule,
     HealthModule,
     PrefectModule,
     CohortModule,
