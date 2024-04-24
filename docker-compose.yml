@@ -87,7 +87,8 @@ x-envs:
             "RESEARCHER"
           ],
           "route": "starboard",
-          "subMenus": "true"
+          "subMenus": "true",
+          "type": "Analysis"
         },
         {
           "enabled": true,
@@ -99,6 +100,20 @@ x-envs:
             "RESEARCHER"
           ],
           "type": "Concepts"
+        },
+        {
+          "enabled": true,
+          "featureFlag": "analysisFlow",
+          "name": "Analysis",
+          "route": "analysis",
+          "data": {
+            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
+          },
+          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
+          "requiredRoles": [
+            "RESEARCHER"
+          ],
+          "type": "Analysis"
         }
       ],
       "setup": [
