@@ -11,6 +11,7 @@ from flows.alp_data_characterization.hooks import persist_data_characterization,
 from utils.types import dcOptionsType
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
 import importlib
+from flows.alp_db_svc.flow import _run_db_svc_shell_command, _add_plugin_options
 
 
 @task
@@ -97,12 +98,11 @@ async def create_data_characterization_schema(
         request_url = f"/alpdb/{databaseDialect}/dataCharacterization/database/{databaseCode}/schema/{resultsSchema}"
         request_body = {"vocabSchema": vocabSchemaName,
                         "cdmSchema": vocabSchemaName}
-        dbsvc_module = importlib.import_module('d2e_dbsvc')
 
-        request_body = dbsvc_module._add_plugin_options(
+        request_body = _add_plugin_options(
             request_body, databaseDialect, flowName, changelog_filepath)
 
-        await dbsvc_module._run_db_svc_shell_command(
+        await _run_db_svc_shell_command(
             "post", request_url, request_body)
     except Exception as e:
         logger.error(e)

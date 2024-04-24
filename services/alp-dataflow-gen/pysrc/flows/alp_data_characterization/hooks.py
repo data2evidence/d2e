@@ -5,18 +5,20 @@ from utils.databaseConnectionUtils import insert_to_dqd_result_table
 from utils.types import dcOptionsType
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
 import importlib
+from flows.alp_db_svc.flow import _run_db_svc_shell_command, _get_db_dialect
 
 
-async def drop_data_characterization_schema(flow, flow_run, state):
-    options = dcOptionsType(**flow_run.parameters['options'])
-    databaseCode = options.databaseCode
-    resultsSchema = options.resultsSchema
+async def drop_data_characterization_schema(options: dcOptionsType):
+    database_code = options.databaseCode
+    results_schema = options.resultsSchema
+
+    request_type = requestType.DELETE
+    request_body = {}
 
     try:
-        databaseDialect = get_db_svc_endpoint_dialect(databaseCode)
-        request_url = f"/alpdb/{databaseDialect}/dataCharacterization/database/{databaseCode}/schema/{resultsSchema}"
-        dbsvc_module = importlib.import_module('d2e_dbsvc')
-        await dbsvc_module._run_db_svc_shell_command("delete", request_url, {})
+        db_dialect = _get_db_dialect(options)
+        request_url = f"/alpdb/{db_dialect}/dataCharacterization/database/{database_code}/schema/{results_schema}"
+        await _run_db_svc_shell_command(request_type, request_url, request_body)
     except Exception as e:
         raise e
 
