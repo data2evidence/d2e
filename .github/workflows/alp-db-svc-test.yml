@@ -80,14 +80,23 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         with:
           main: |
-            echo GITHUB_CONTEXT=$GITHUB_CONTEXT
-            echo GITHUB_ACTION=$GITHUB_ACTION
-            echo GITHUB_JOB=$GITHUB_JOB
-            echo GITHUB_RUN_ID=$GITHUB_RUN_ID
-            set | grep alp-db-svc-test
+            pwd
+            ./internal/scripts/get-op-ratelimit.sh
+            # echo GITHUB_CONTEXT=$GITHUB_CONTEXT
+            # echo GITHUB_ACTION=$GITHUB_ACTION
+            # echo GITHUB_JOB=$GITHUB_JOB
+            # echo GITHUB_RUN_ID=$GITHUB_RUN_ID
+            # set | grep alp-db-svc-test
           # op service-account ratelimit > 
           post: |
+            pwd
             echo post
+
+      - name: Upload math result for job 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: homework_final
+          path: math-homework.txt
 
       # - name: Get drivers from 1password
       #   env:
