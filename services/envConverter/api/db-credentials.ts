@@ -28,9 +28,8 @@ export class DbCredentialsApi {
     }
     this.baseUrl = process.env.DB_CREDENTIALS_MGR__API_URL;
     this.httpsAgent = new Agent({
-      rejectUnauthorized: this.baseUrl.startsWith("https://alp-minerva-")
-        ? false
-        : true,
+      rejectUnauthorized: true,
+      ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     });
   }
 
