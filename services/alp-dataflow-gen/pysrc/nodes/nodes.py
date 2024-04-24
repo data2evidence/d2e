@@ -341,6 +341,7 @@ def generate_nodes_flow(graph, sorted_nodes):
 @task(task_run_name="generate-node-taskrun-{nodename}", log_prints=True)
 def generate_node_task(nodename, node, nodetype):
     nodeobj = None
+    # TODO: nodetype to make global variable
     match nodetype:
         case "csv_node":
             nodeobj = CsvNode(node)
