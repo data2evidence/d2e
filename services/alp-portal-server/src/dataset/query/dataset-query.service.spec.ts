@@ -1,3 +1,4 @@
+import { REQUEST } from '@nestjs/core'
 import { Test, TestingModule } from '@nestjs/testing'
 import { v4 as uuidv4 } from 'uuid'
 import { DatasetQueryService } from './dataset-query.service'
@@ -13,6 +14,12 @@ import {
 } from '../repository'
 import { datasetFilterServiceMockFactory } from '../dataset.mock'
 import { DatasetFilterService } from '../dataset-filter.service'
+import { UserMgmtService } from '../../user-mgmt/user-mgmt.service'
+import { userMgmtServiceMockFactory } from '../../user-mgmt/user-mgmt.mock'
+
+jest.mock('jsonwebtoken', () => ({
+  decode: jest.fn().mockReturnValue({ sub: 'mock-sub' })
+}))
 
 describe('DatasetQueryService', () => {
   let service: DatasetQueryService
@@ -21,15 +28,22 @@ describe('DatasetQueryService', () => {
   let mockAttributeRepository: MockType<DatasetAttributeRepository>
 
   beforeEach(async () => {
+    const req = {
+      headers: {
+        authorization: 'Bearer token'
+      }
+    }
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DatasetQueryService,
+        { provide: REQUEST, useValue: req },
         { provide: DatasetRepository, useFactory: repositoryMockFactory },
         { provide: DatasetAttributeRepository, useFactory: datasetAttributeRepositoryMockFactory },
         { provide: TenantService, useFactory: tenantServiceMockFactory },
         { provide: DatasetFilterService, useFactory: datasetFilterServiceMockFactory },
         { provide: DatasetReleaseRepository, useFactory: repositoryMockFactory },
-        { provide: DatasetDashboardRepository, useFactory: repositoryMockFactory }
+        { provide: DatasetDashboardRepository, useFactory: repositoryMockFactory },
+        { provide: UserMgmtService, useFactory: userMgmtServiceMockFactory }
       ]
     }).compile()
 
