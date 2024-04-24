@@ -642,7 +642,8 @@ services:
         - wget
         - -O
         - liveness
-        - http://0.0.0.0:41102/check-liveness
+        - --no-check-certificate
+        - https://0.0.0.0:41102/check-liveness
     image: alpcr.azurecr.io/alp-data-node/analytics-svc:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
@@ -1486,7 +1487,8 @@ services:
         - wget
         - -O
         - liveness
-        - http://0.0.0.0:41109/check-liveness
+        - --no-check-certificate
+        - https://0.0.0.0:41109/check-liveness
     image: alpcr.azurecr.io/alp-data-node/query-gen-svc:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
