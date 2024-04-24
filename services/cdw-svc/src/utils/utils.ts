@@ -5,8 +5,12 @@
  *
  */
 import { env } from "../configs";
+import { getDuckdbDBConnection, getFileName } from "./DuckdbConnection";
 export import textLib = require("./text");
-
+import * as xsenv from "@sap/xsenv";
+import {
+  DBConnectionUtil as dbConnectionUtil
+} from "@alp/alp-base-utils";
 /**
  * Escapes a string to be used in a regex
  *
@@ -439,3 +443,25 @@ export function getUsername() {
     //TODO: return $.session.getUsername();
   }
 }
+
+export async function getAnalyticsConnection(userObj) {
+  let analyticsCredentials;
+  let analyticsConnection;
+  let cdwService = xsenv.filterServices({ tag: "cdw" }).map(db => db.credentials);
+  if(env.USE_DUCKDB === "true"){
+    cdwService = cdwService.filter((db) => db.dialect == 'postgresql')
+    analyticsCredentials = cdwService[0];
+    const { duckdbSchemaFileName, vocabSchemaFileName } = getFileName(analyticsCredentials.databaseName, analyticsCredentials.schema, analyticsCredentials.vocabSchema)
+    analyticsConnection =  await getDuckdbDBConnection(duckdbSchemaFileName, vocabSchemaFileName)
+  }else{
+    cdwService = cdwService.filter((db) => db.dialect == 'hana')
+    analyticsCredentials = cdwService[0];
+    analyticsConnection =
+      await dbConnectionUtil.DBConnectionUtil.getDBConnection({
+        credentials: analyticsCredentials,
+        schema: analyticsCredentials.cdwSchema || analyticsCredentials.schema,
+        userObj,
+      });
+    }
+    return analyticsConnection;
+  }
