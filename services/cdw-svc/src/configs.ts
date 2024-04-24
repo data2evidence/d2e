@@ -13,7 +13,9 @@ const Env = z.object({
   CONFIG_CONNECTION: z.string(),
   DUCKDB_DB_NAME:  z.string(),
   DUCKDB_SCHEMA:  z.string(),
-  DUCKDB_VOCAB_SCHEMA:  z.string()
+  DUCKDB_VOCAB_SCHEMA:  z.string(),
+  TLS__INTERNAL__KEY: z.string(),
+  TLS__INTERNAL__CRT: z.string(),
 });
 
 const result = Env.safeParse(process.env);

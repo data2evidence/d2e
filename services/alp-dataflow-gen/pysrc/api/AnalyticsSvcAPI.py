@@ -7,9 +7,12 @@ class AnalyticsSvcAPI:
     def __init__(self, token):
         if os.getenv('ANALYTICS_SVC__API_BASE_URL') is None:
             raise ValueError("ANALYTICS_SVC__API_BASE_URL is undefined")
+        if os.getenv("PYTHON_VERIFY_SSL") == 'true' and os.getenv('TLS__INTERNAL__CA_CRT') is None:
+            raise ValueError("TLS__INTERNAL__CA_CRT is undefined")
         self.url = os.getenv('ANALYTICS_SVC__API_BASE_URL')
         self.token = token
-        self.verifySsl = False if os.getenv("PYTHON_VERIFY_SSL") == 'false' else True
+        self.verifySsl = False if os.getenv(
+            "PYTHON_VERIFY_SSL") == 'false' else os.getenv('TLS__INTERNAL__CA_CRT')
 
     def getOptions(self):
         return {

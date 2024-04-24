@@ -22,11 +22,8 @@ export class MeilisearchAPI {
     if (env.MEILISEARCH__API_URL) {
       this.url = env.MEILISEARCH__API_URL;
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') ||
-          this.url.startsWith('https://alp-minerva-meilisearch-')
-            ? false
-            : true,
+        rejectUnauthorized: true,
+        ca: env.TLS__INTERNAL__CA_CRT,
       });
     } else {
       throw new Error('No url is set for MeilisearchAPI');

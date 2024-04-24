@@ -1,4 +1,4 @@
-# Add host.docker.internal to /etc/hosts
+# Issue: Add host.docker.internal to /etc/hosts
 
 ## Symptoms
 - DNS lookup of https://host.docker.internal fails during authentication to Identity Provider

@@ -437,7 +437,7 @@ export class MRIConfig {
         this.ffhConfig.getDefault(this.oUser.getUser(), this.CONFIG_TYPE, callback);
     }
 
-    public async getUserConfig({ lang = 'en', studiesToInclude }:{lang: string, studiesToInclude?: string[]}) {
+    public async getUserConfig({ lang = 'en', configId }:{lang: string, configId: string}) {
         return new Promise<any[]>((resolve, reject) => {
 
             const buildSingleFrontEndConfig = (configs: AssignedConfigType[]) => {
@@ -507,32 +507,49 @@ export class MRIConfig {
                 });
             };
 
-            // return the list of assigned configs
-            this.ffhConfig.getAssignedConfigs(this.CONFIG_TYPE, this.oUser, (err, configs: AssignedConfigType[]) => {
-                if (err) {
-                    return reject(err);
-                }
-                checkDefaultConfig(configs, () => {
-                    if (configs.length === 1) {
-                        // if the user only got one config assigned, add the actual config to reduce the number of requests
-                        buildSingleFrontEndConfig(configs);
-                    } else if (configs.length > 1) {
-                        resolve(this.formatter.formatUserList(configs));
-                    } else {
-                        // get default config Assignment
-                        this.ffhConfig.getDefaultConfigAssignment(this.CONFIG_TYPE, (err, defaultConfigs: AssignedConfigType[]) => {
-                            if (err) {
-                                return reject(err);
-                            } else if (defaultConfigs && defaultConfigs.length > 0) {
-                                buildSingleFrontEndConfig([...defaultConfigs]);
-                            } else {
-                                // no assigned config
-                                resolve(configs);
-                            }
-                        });
+            const getAssignedConfig = () =>{
+                // return the list of assigned configs
+                this.ffhConfig.getAssignedConfigs(this.CONFIG_TYPE, this.oUser, (err, configs: AssignedConfigType[]) => {
+                    if (err) {
+                        return reject(err);
                     }
+                    checkDefaultConfig(configs, () => {
+                        if (configs.length === 1) {
+                            // if the user only got one config assigned, add the actual config to reduce the number of requests
+                            buildSingleFrontEndConfig(configs);
+                        } else if (configs.length > 1) {
+                            resolve(this.formatter.formatUserList(configs));
+                        } else {
+                            // get default config Assignment
+                            this.ffhConfig.getDefaultConfigAssignment(this.CONFIG_TYPE, (err, defaultConfigs: AssignedConfigType[]) => {
+                                if (err) {
+                                    return reject(err);
+                                } else if (defaultConfigs && defaultConfigs.length > 0) {
+                                    buildSingleFrontEndConfig([...defaultConfigs]);
+                                } else {
+                                    // no assigned config
+                                    resolve(configs);
+                                }
+                            });
+                        }
+                    });
                 });
-            }, { studiesToInclude });
+            }
+
+            if(configId){
+                //get config selected for input configId
+                const configVersion = 'A' // get the active config
+                this._getConfigById(configId, configVersion, (err, config) => {
+                   config.dependentConfig = {
+                        configId: config.meta.dependentConfig.configId,
+                        configVersion: config.meta.dependentConfig.configVersion,
+                    },
+                    buildSingleFrontEndConfig([config]);
+                })
+            }else{
+                // return the list of assigned configs
+                getAssignedConfig()
+            }
         });
     }
 
@@ -698,7 +715,7 @@ export class MRIConfig {
 
             if (!noAssignmentCheck) {
                 try {
-                    await this.assertConfigAssignment(configId, configVersion);
+                    //await this.assertConfigAssignment(configId, configVersion);
                     postExecute();
                 } catch (err) {
                     return reject(err);
@@ -763,4 +780,16 @@ export class MRIConfig {
         const defaultValues = configTools.loadFile(file[0], file[1], file[2], this.fs);
         return defaultValues;
     }
+
+    private async _getConfigById(configId, configVersion, callback) {
+    try {
+      const result = await this.ffhConfig.getConfig({
+        configId,
+        configVersion: configVersion || undefined,
+      });
+      callback(null, result);
+    } catch (err) {
+      callback(err, null);
+    }
+  }
 }

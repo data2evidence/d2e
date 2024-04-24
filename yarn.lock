@@ -5886,9 +5886,9 @@ hdb@^0.19.3:
   dependencies:
     iconv-lite "^0.4.18"
 
-"@alp/alp-dbcli@file:internal/build/alp-dbcli-private-v1.0.0.tgz":
+"@alp/alp-dbcli@file:cache/drivers/alp-dbcli-v1.0.0.tgz":
   version "1.0.0"
-  resolved "file:internal/build/alp-dbcli-private-v1.0.0.tgz#c56b16e698d35beaee8b108ef1c1f2220998e98c"
+  resolved "file:cache/drivers/alp-dbcli-v1.0.0.tgz#c56b16e698d35beaee8b108ef1c1f2220998e98c"
   dependencies:
     "@sap/hdi-deploy" "3.7.0"
     async "2.6.1"

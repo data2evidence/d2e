@@ -13,7 +13,7 @@ volumes:
 
 x-envs:
   db-svc: &x-dbsvc
-    DATAFLOW_GATEWAY__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/dataflow-mgmt
+    DATAFLOW_GATEWAY__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/dataflow-mgmt
     DB_SVC__DEBUG: "false"
     DB_SVC__IDP_SUBJECT_PROP: sub
     DB_SVC__LOG_LEVEL: info
@@ -26,9 +26,9 @@ x-envs:
     OMOP__VOCAB_SCHEMA: ${OMOP__VOCAB_SCHEMA:-cdmvocab}
     PG__READ_ROLE: postgres_tenant_read_role
     ROLLBACK_SCHEMA_CREATION_FOR_LIQUIBASE_SCRIPT_FAILURE: "TRUE"
-    USER_MGMT__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/usermgmt/api/
+    USER_MGMT__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/usermgmt/api/
   env_converter: &x-converter
-    DB_CREDENTIALS_MGR__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/db-credentials/db/
+    DB_CREDENTIALS_MGR__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/db-credentials/db/
     DB_CREDENTIALS__PRIVATE_KEY: ${DB_CREDENTIALS__INTERNAL__PRIVATE_KEY}
     DB_CREDENTIALS__PRIVATE_KEY_PASSPHRASE: ${DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE}
     IDP__ALP_SVC__CLIENT_ID: 6q6a13bg3dw6fncdr2kf6
@@ -87,7 +87,8 @@ x-envs:
             "RESEARCHER"
           ],
           "route": "starboard",
-          "subMenus": "true"
+          "subMenus": "true",
+          "type": "Analysis"
         },
         {
           "enabled": true,
@@ -99,6 +100,20 @@ x-envs:
             "RESEARCHER"
           ],
           "type": "Concepts"
+        },
+        {
+          "enabled": true,
+          "featureFlag": "analysisFlow",
+          "name": "Analysis",
+          "route": "analysis",
+          "data": {
+            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
+          },
+          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
+          "requiredRoles": [
+            "RESEARCHER"
+          ],
+          "type": "Analysis"
         }
       ],
       "setup": [
@@ -250,7 +265,8 @@ services:
         - wget
         - -O
         - liveness
-        - http://0.0.0.0:41110/check-liveness
+        - --no-check-certificate
+        - https://0.0.0.0:41110/check-liveness
       timeout: 10s
     image: alpcr.azurecr.io/alp-data-node/bookmark-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -424,9 +440,9 @@ services:
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
-      - ./alp-data-node-override/services/alp-db-svc/db/synpuf1k:/app/synpuf1k
-      - ./alp-data-node-override/services/alp-db-svc/db/drivers/hana/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
-      - ./alp-data-node-override/services/alp-db-svc/db/drivers/hana/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
+      - ./cache/synpuf1k:/app/synpuf1k
+      - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
+      - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
     hostname: alp-dataflow-gen-agent-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
@@ -501,9 +517,10 @@ services:
       test:
         - CMD
         - wget
+        - --no-check-certificate
         - -O
         - liveness
-        - http://0.0.0.0:41112/check-liveness
+        - https://0.0.0.0:41112/check-liveness
       timeout: 180s
     image: alpcr.azurecr.io/alp-data-node/alp-db-credentials:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -640,7 +657,8 @@ services:
         - wget
         - -O
         - liveness
-        - http://0.0.0.0:41102/check-liveness
+        - --no-check-certificate
+        - https://0.0.0.0:41102/check-liveness
     image: alpcr.azurecr.io/alp-data-node/analytics-svc:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
@@ -657,16 +675,19 @@ services:
         - *x-dbsvc
         - *x-minio
         - *x-tls
-      ALP_GATEWAY_OAUTH__URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/oauth/token
-      ALP_MINERVA_PORTAL_SERVER__URL: http://alp-minerva-portal-server-${BASE_PORT:-1}:41105
-      ALP_MINERVA_PS_CONFIG_SERVER__URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41100/ps-config-svc
+      ALP_GATEWAY_OAUTH__URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/oauth/token
+      ALP_MINERVA_PORTAL_SERVER__URL: https://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105
+      ALP_MINERVA_PS_CONFIG_SERVER__URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41100/ps-config-svc
+      ALP_MINERVA_QUERY_GEN__URL: https://alp-minerva-query-gen-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41109
+      ALP_TERMINOLOGY__URL: https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108
+      ALP_MINERVA_BOOKMARKS__URL: https://alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110
       ALP_PORTAL_SCOPE: https://alpsgdev.onmicrosoft.com/alp-portal/.default
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
       ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT
       ANALYTICS_SVC__PORT: 41${BASE_PORT:-1}02
       ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS: 600
       B2C_TENANT_ID: f59c7915-9283-4fb5-b633-435b9145ca00
-      DATAFLOW__BASE_URL: http://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}:41107
+      DATAFLOW__BASE_URL: https://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107
       DEV_MODE: ${DEV_MODE:-false}
       DUCKDB__DATA_FOLDER: /home/docker/src/alp-data-node/app/duckdb_data
       IDP__ALP_SVC__CLIENT_ID: 6q6a13bg3dw6fncdr2kf6
@@ -700,9 +721,10 @@ services:
       test:
         - CMD
         - wget
+        - --no-check-certificate
         - -O
         - liveness
-        - http://0.0.0.0:41114/check-liveness
+        - https://0.0.0.0:41114/check-liveness
       timeout: 10s
     image: alpcr.azurecr.io/alp-data-node/mri-cdw-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -757,9 +779,10 @@ services:
       test:
         - CMD
         - wget
+        - --no-check-certificate
         - -O
         - liveness
-        - http://0.0.0.0:41107/check-liveness
+        - https://0.0.0.0:41107/check-liveness
       timeout: 10s
     image: alpcr.azurecr.io/alp-data-node/alp-dataflow:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -775,7 +798,7 @@ services:
         - *x-minio
         - *x-pg
         - *x-tls
-      ANALYTICS_SVC__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
+      ANALYTICS_SVC__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/analytics-svc/
       DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_SB_NAME: dataflow-adhoc-flows-sb
       DATAFLOW_MGMT__LOG_LEVEL: info
       DATAFLOW_MGMT__PORT: 41${BASE_PORT:-1}07
@@ -788,7 +811,7 @@ services:
       PG__DATAFLOW_MGMT__PASSWORD: ${PG_WRITE_PASSWORD}
       PG__DATAFLOW_MGMT__SCHEMA: dataflow
       PG__DATAFLOW_MGMT__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      PORTAL_SERVER__API_URL: http://alp-minerva-portal-server-${BASE_PORT}:41${BASE_PORT}05/
+      PORTAL_SERVER__API_URL: https://alp-minerva-portal-server-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT}05/
       PREFECT__API_URL: http://alp-dataflow-gen-${BASE_PORT}:41${BASE_PORT}20/api/
 
   alp-minerva-gateway:
@@ -823,23 +846,23 @@ services:
       ALP_RELEASE: ${ALP_RELEASE:-v1alpha1}
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
       ALP__UI_URL: http://alp-local-ui-file-server:3000/
-      ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
+      ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/analytics-svc/
       APPROUTER__BASE_URL: https://alp-mercury-approuter:41000/
       APP__DEPLOY_MODE: standalone
       CADDY__LOGTO_IDP__PUBLIC_FQDN: ${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}
-      DATAFLOW_MGMT__API_BASE_URL: http://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}:41${BASE_PORT:-1}07/
+      DATAFLOW_MGMT__API_BASE_URL: https://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}:41${BASE_PORT:-1}07/
       DATA_NODE__DOCKER_ADDRESSES_JSON: |-
         {
-         "analyticsSvc": "http://alp-minerva-analytics-${BASE_PORT}:41102",
-         "bookmarkSvc": "http://alp-minerva-bookmark-svc-${BASE_PORT}:41110",
-         "cdwSvc": "http://alp-minerva-cdw-svc-${BASE_PORT}:41114",
-         "dataflowMgmt": "http://alp-minerva-dataflow-mgmt-${BASE_PORT}:41107",
-         "dbCredentialsMgr": "http://alp-minerva-db-credentials-mgr-${BASE_PORT}:41112",
-         "meilisearchSvc": "http://alp-minerva-meilisearch-svc-${BASE_PORT}:41111",
-         "paConfig": "http://alp-minerva-pa-config-svc-${BASE_PORT}:41113",
-         "portalServer": "http://alp-minerva-portal-server-${BASE_PORT}:41105",
-         "psConfig": "http://alp-minerva-ps-config-svc-${BASE_PORT}:41115",
-         "usermgmt": "http://alp-minerva-user-mgmt-${BASE_PORT}:41104"
+         "analyticsSvc": "https://alp-minerva-analytics-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41102",
+         "bookmarkSvc": "https://alp-minerva-bookmark-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110",
+         "cdwSvc": "https://alp-minerva-cdw-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41114",
+         "dataflowMgmt": "https://alp-minerva-dataflow-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
+         "dbCredentialsMgr": "https://alp-minerva-db-credentials-mgr-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41112",
+         "meilisearchSvc": "http://alp-minerva-meilisearch-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
+         "paConfig": "https://alp-minerva-pa-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41113",
+         "portalServer": "https://alp-minerva-portal-server-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105",
+         "psConfig": "https://alp-minerva-ps-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41115",
+         "usermgmt": "https://alp-minerva-user-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41104"
         }
       DB_CREDENTIALS__PUBLIC_KEYS: |-
         {
@@ -848,7 +871,7 @@ services:
         }
       GATEWAY__API_ALLOWED_DOMAINS: |-
         http://alp-minerva-sqleditor:8888/
-        http://alp-minerva-user-mgmt-${BASE_PORT:-1}:41${BASE_PORT:-1}04/
+        https://alp-minerva-user-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}04/
         http://localhost:8080
         https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
         https://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}:3001
@@ -856,7 +879,7 @@ services:
         https://*.azure.com
         https://*.b2clogin.com
         https://alp-mercury-approuter:41000/
-        https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00
+        https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00
         https://cdn.jsdelivr.net
         https://localhost:4000
         https://localhost:4100
@@ -887,11 +910,11 @@ services:
       NIFI_MGMT_SVC__BASE_URL: http://alp-minerva-nifi-mgmt-svc-${BASE_PORT:-1}:4444/
       NODE_ENV: development
       PLUGINS__JSON: *x-plugins
-      PORTAL__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
+      PORTAL__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/system-portal/
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SQLEDITOR__BASE_URL: http://alp-minerva-sqleditor:8888/
-      TERMINOLOGY_SVC__BASE_URL: http://alp-minerva-terminology-svc-${BASE_PORT:-1}:41108/
-      USER_MGMT__BASE_URL: http://alp-minerva-user-mgmt-${BASE_PORT:-1}:41${BASE_PORT:-1}04/usermgmt/api/
+      TERMINOLOGY_SVC__BASE_URL: https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108/
+      USER_MGMT__BASE_URL: https://alp-minerva-user-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}04/usermgmt/api/
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
 
@@ -949,7 +972,8 @@ services:
         - wget
         - -O
         - liveness
-        - http://0.0.0.0:41113/check-liveness
+        - --no-check-certificate
+        - https://0.0.0.0:41113/check-liveness
       timeout: 10s
     image: alpcr.azurecr.io/alp-data-node/mri-pa-config:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1085,9 +1109,10 @@ services:
       test:
         - CMD
         - wget
+        - --no-check-certificate
         - -O
         - liveness
-        - http://0.0.0.0:41105/check-liveness
+        - https://0.0.0.0:41105/check-liveness
       timeout: 10s
     image: alpcr.azurecr.io/alp-data-node/alp-portal-server:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1104,13 +1129,14 @@ services:
         - *x-pg
         - *x-tls
       ALP__SYSTEM_NAME: ${ALP__SYSTEM_NAME:-Research System}
-      ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
+      ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/analytics-svc/
       APP__DEPLOY_MODE: standalone
       APP__TENANT_ID: ${APP__TENANT_ID:-e0348e4d-2e17-43f2-a3c6-efd752d17c23}
       APP__TENANT_NAME: ${APP__TENANT_NAME:-Tenant}
-      DATA_CHARACTERIZATION__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/dataflow-mgmt/dqd/data-characterization/
+      DATA_CHARACTERIZATION__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/dataflow-mgmt/dqd/data-characterization/
       NODE_ENV: production
-      PA_CONFIG__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/pa-config-svc
+      PA_CONFIG__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/pa-config-svc
+      USER_MGMT__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/usermgmt/api
       PG__PORTAL_SERVER__DB_NAME: ${PG_DB_NAME:-alp}
       PG__PORTAL_SERVER__MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
       PG__PORTAL_SERVER__MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
@@ -1120,7 +1146,7 @@ services:
       PLUGINS__JSON: *x-plugins
       PORTAL_SERVER__LOG_LEVEL: info
       PORTAL_SERVER__PORT: 41${BASE_PORT:-1}05
-      PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
+      PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/portalsvc/graphql
 
   alp-minerva-postgres:
     container_name: &c17 alp-minerva-postgres-${BASE_PORT:-1}
@@ -1145,6 +1171,8 @@ services:
     shm_size: 1gb
     volumes:
       - pg-minerva-data-1:/var/lib/postgresql/data
+      - ./cache/pgbackup:/backup
+      - ./cache/vocab:/vocab
     hostname: alp-minerva-postgres-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
@@ -1176,7 +1204,8 @@ services:
         - wget
         - -O
         - liveness
-        - http://0.0.0.0:41115/check-liveness
+        - --no-check-certificate
+        - https://0.0.0.0:41115/check-liveness
       timeout: 10s
     image: alpcr.azurecr.io/alp-data-node/mri-ps-config:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1347,7 +1376,7 @@ services:
       PG_PORT: ${PG_PORT:-5432}
       PG_SCHEMA: terminology
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
+      SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/system-portal/
       TERMINOLOGY_SVC__LOG_LEVEL: info
       TERMINOLOGY_SVC__PATH: terminology
       TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
@@ -1366,9 +1395,10 @@ services:
       test:
         - CMD
         - wget
+        - --no-check-certificate
         - -O
         - liveness
-        - http://0.0.0.0:41104/check-liveness
+        - https://0.0.0.0:41104/check-liveness
       timeout: 10s
     image: alpcr.azurecr.io/alp-data-node/alp-usermgmt:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1408,7 +1438,7 @@ services:
       ## Postgres user name
       PG__USER_MGMT__USER: ${PG_WRITE_USER:-alp_pg_write_user}
       PORTAL_UI__BASE_URL: https://localhost:41100/portal/
-      PORTAL__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
+      PORTAL__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/system-portal/
       # IDP subject property
       USER_MGMT__IDP_SUBJECT_PROP: sub
       USER_MGMT__LOG_LEVEL: info
@@ -1475,7 +1505,8 @@ services:
         - wget
         - -O
         - liveness
-        - http://0.0.0.0:41109/check-liveness
+        - --no-check-certificate
+        - https://0.0.0.0:41109/check-liveness
     image: alpcr.azurecr.io/alp-data-node/query-gen-svc:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
@@ -1487,7 +1518,8 @@ services:
     environment:
       <<:
         - *x-tls
-      ALP_MINERVA_PORTAL_SERVER__URL: http://alp-minerva-portal-server-${BASE_PORT:-1}:41105
+      ALP_MINERVA_PORTAL_SERVER__URL: https://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105
+      ALP_MINERVA_BOOKMARKS__URL: https://alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110
       DEV_MODE: ${DEV_MODE:-false}
       LOCAL_DEBUG: "false"
       NODE_ENV: development

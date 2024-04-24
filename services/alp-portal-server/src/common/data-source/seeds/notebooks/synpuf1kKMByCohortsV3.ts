@@ -239,5 +239,4 @@ co_group_df_top10.plot(kind='pie', y = 'count', ax=ax1, autopct='%1.1f%%',
 
 plt.title('Diabetes & Other Comorbidities', fontdict={'fontsize':20})
 plt.axis('off')
-plt.show()
-`
+plt.show()`

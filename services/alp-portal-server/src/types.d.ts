@@ -266,3 +266,8 @@ export interface IFeatureDto {
 export interface IFeatureUpdateDto {
   features: IFeatureDto[]
 }
+
+export interface UserGroup {
+  userId: string
+  alp_role_study_researcher: string[]
+}
