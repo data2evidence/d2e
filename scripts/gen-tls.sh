@@ -2,49 +2,67 @@
 # get internal wildcard certificate "*.alp.local" from Caddy
 set -o nounset
 set -o errexit
-ENV_TYPE=${env_type:-local}
+
+# inputs
+ENV_TYPE=${ENV_TYPE:-local}
 TLS_REGENERATE=${TLS_REGENERATE:-false}
 
+# vars
+GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+CACHE_DIR=$GIT_BASE_DIR/cache/tls
 CONTAINER_NAME=alp-caddy
 DOMAIN_NAME=alp.local
 DOTENV_FILE=.env.$ENV_TYPE
 TLS_CA_NAME=alp-internal
 VOLUME_NAME=alp_caddy
+touch ${DOTENV_FILE}
 
 CONTAINER_CRT_DIR=/data/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
 CONTAINER_CA_DIR=/data/caddy/pki/authorities/$TLS_CA_NAME
 
-# remove existing certificates
-[ ${TLS_REGENERATE} = true ] && docker volume inspect $VOLUME_NAME > /dev/null && docker run --rm -v $VOLUME_NAME:/volume -w /volume busybox rm -rf /volume/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
-# start caddy container, if not started
-# docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 
+# action
+if [ ${TLS_REGENERATE} = true ]; then
+	echo ". TLS_REGENERATE remove existing"
+	docker volume inspect $VOLUME_NAME > /dev/null && docker run --rm -v $VOLUME_NAME:/volume -w /volume busybox rm -rf /volume/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
+fi
+
+# start if not already started
 if [ "$( docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 2> /dev/null )" != "running" ]; then
-	docker compose --env-file $DOTENV_FILE up -d $CONTAINER_NAME 2>&1 | grep -vE "WARN\[0000\]|is not set"
+	yarn base:minerva --env-file $DOTENV_FILE up $CONTAINER_NAME --wait 2>&1 | grep -vE 'WARN[0000]|is not set'
 	if [ "$( docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 2> /dev/null )" != "running" ]; then
 		echo FATAL: $CONTAINER_NAME failed to start
 		docker container inspect --format json -f '{{.State}}' $CONTAINER_NAME
 		docker container inspect -o json 
 		exit 1
 	fi
-	sleep 3
+# restart if TLS_REGENERATE
+elif [ ${TLS_REGENERATE} = true ]; then
+	yarn base:minerva --env-file $DOTENV_FILE restart $CONTAINER_NAME 2>&1 | grep -vE 'WARN[0000]|is not set'
 fi
-# restart to re-generate certificate
-[ ${TLS_REGENERATE} = true ] && docker compose --env-file $DOTENV_FILE restart $CONTAINER_NAME 2> /dev/null
 
 # remove existing certs from dotenv
 for VAR_NAME in TLS__INTERNAL__CA_CRT TLS__INTERNAL__CRT TLS__INTERNAL__KEY; do sed -i.bak "/$VAR_NAME=/,/END CERTIFICATE-----'/d" $DOTENV_FILE; done
 
 # add existing certs to dotenv
-TLS__INTERNAL__CRT="$(docker exec $CONTAINER_NAME cat $CONTAINER_CRT_DIR/wildcard_.${DOMAIN_NAME}.crt | head -n 12 | awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/')"
-[ -z "${TLS__INTERNAL__CRT}" ] && { echo "FATAL TLS__INTERNAL__CRT not populated"; exit 1; }
+TLS__INTERNAL__CRT_FILE=tls__internal.crt
+TLS__INTERNAL__CRT_PATH=$CACHE_DIR/$TLS__INTERNAL__CRT_FILE
+docker exec $CONTAINER_NAME cat $CONTAINER_CRT_DIR/wildcard_.${DOMAIN_NAME}.crt | head -n 12 | awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/' > $TLS__INTERNAL__CRT_PATH
+[ ! -s "${TLS__INTERNAL__CRT_PATH}" ] && echo "FATAL TLS__INTERNAL__CRT not populated" && exit 1
+TLS__INTERNAL__CRT=$(cat $TLS__INTERNAL__CRT_PATH)
 echo TLS__INTERNAL__CRT=\'"${TLS__INTERNAL__CRT}"\' >> $DOTENV_FILE
 
-TLS__INTERNAL__KEY="$(docker exec $CONTAINER_NAME cat $CONTAINER_CRT_DIR/wildcard_.${DOMAIN_NAME}.key)"
-[ -z "${TLS__INTERNAL__KEY}" ] && { echo "FATAL TLS__INTERNAL__KEY not populated"; exit 1; }
+TLS__INTERNAL__KEY_FILE=tls__internal.key
+TLS__INTERNAL__KEY_PATH=$CACHE_DIR/$TLS__INTERNAL__KEY_FILE
+docker exec $CONTAINER_NAME cat $CONTAINER_CRT_DIR/wildcard_.${DOMAIN_NAME}.key > $TLS__INTERNAL__KEY_PATH
+[ ! -s "${TLS__INTERNAL__KEY_PATH}" ] && echo "FATAL TLS__INTERNAL__KEY not populated" && exit 1
+TLS__INTERNAL__KEY=$(cat $TLS__INTERNAL__KEY_PATH)
 echo TLS__INTERNAL__KEY=\'"${TLS__INTERNAL__KEY}"\' >> $DOTENV_FILE
 
-TLS__INTERNAL__CA_CRT="$(docker exec $CONTAINER_NAME cat $CONTAINER_CA_DIR/root.crt)"
-[ -z "${TLS__INTERNAL__CA_CRT}" ] && { echo "FATAL TLS__INTERNAL__CA_CRT not populated"; exit 1; }
+TLS__INTERNAL__CA_CRT_FILE=tls__internal__ca.crt
+TLS__INTERNAL__CA_CRT_PATH=$CACHE_DIR/$TLS__INTERNAL__CA_CRT_FILE
+docker exec $CONTAINER_NAME cat $CONTAINER_CA_DIR/root.crt > $TLS__INTERNAL__CA_CRT_PATH
+[ ! -s "${TLS__INTERNAL__CA_CRT_PATH}" ] && echo "FATAL TLS__INTERNAL__CA_CRT not populated" && exit 1
+TLS__INTERNAL__CA_CRT=$(cat $TLS__INTERNAL__CA_CRT_PATH)
 echo TLS__INTERNAL__CA_CRT=\'"${TLS__INTERNAL__CA_CRT}"\' >> $DOTENV_FILE
 
 [ $(grep TLS__INTERNAL $DOTENV_FILE | grep -c -- '---') = 3 ] || { echo "FATAL 3xTLS__INTERNAL not populated"; exit 1; }
