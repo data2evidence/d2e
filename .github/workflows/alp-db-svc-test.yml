@@ -82,6 +82,8 @@ jobs:
           main: |
             echo GITHUB_CONTEXT=$GITHUB_CONTEXT
             echo GITHUB_ACTION=$GITHUB_ACTION
+            echo GITHUB_JOB=$GITHUB_JOB
+            echo GITHUB_RUN_ID=$GITHUB_RUN_ID
             set | grep alp-db-svc-test
           # op service-account ratelimit > 
           post: |
