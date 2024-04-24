@@ -353,7 +353,10 @@ async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
                 Authorization: token,
             },
             timeout: AXIOS_TIMEOUT,
-            httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: true,
+                ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
+            }),
         };
 
         // Send request to analytics-svc for patient list and extract patient ids

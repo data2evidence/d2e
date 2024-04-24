@@ -9,6 +9,7 @@ export const env = {
   PORTAL_SERVER_LOG_LEVEL: (process.env.PORTAL_SERVER__LOG_LEVEL as LoggingLevel) || 'info',
   PORTAL_API_URL: process.env.PORTAL__API_URL,
   PA_CONFIG_API_URL: process.env.PA_CONFIG__API_URL,
+  USER_MGMT_API_URL: process.env.USER_MGMT__API_URL,
   APP_DEPLOY_MODE: process.env.APP__DEPLOY_MODE,
 
   MINIO_REGION: process.env.MINIO__REGION,
@@ -35,5 +36,9 @@ export const env = {
   SYSTEM_NAME: process.env.ALP__SYSTEM_NAME,
   PORTAL_PLUGINS: process.env.PLUGINS__JSON,
 
-  ANALYTICS_SVC_API_BASE_URL: process.env.ANALYTICS_SVC__API_BASE_URL
+  ANALYTICS_SVC_API_BASE_URL: process.env.ANALYTICS_SVC__API_BASE_URL,
+
+  SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
+  SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
+  SSL_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
 }

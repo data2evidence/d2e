@@ -1,4 +1,5 @@
 import { env, envVarUtils } from "./configs";
+import https from "https";
 import * as xsenv from "@sap/xsenv";
 import {
   getUser,
@@ -34,7 +35,8 @@ const noCache = (req, res, next) => {
 const main = () => {
   const app = express();
   app.use("/check-liveness", healthCheckMiddleware);
-  const mountPath = env.NODE_ENV === "production" ? env.ENV_MOUNT_PATH : "../../";
+  const mountPath =
+    env.NODE_ENV === "production" ? env.ENV_MOUNT_PATH : "../../";
   const envFile = `${mountPath}default-env.json`;
   xsenv.loadEnv(envVarUtils.getEnvFile(envFile));
 
@@ -53,11 +55,13 @@ const main = () => {
     // set default cdw config path
     log.info("TESTSCHEMA :" + configCredentials.schema);
   } else {
-    let cdwService = xsenv.filterServices({ tag: "cdw" }).map(db => db.credentials);
-    if(env.USE_DUCKDB === "true"){
-      cdwService = cdwService.filter((db) => db.dialect == 'postgresql')
-    }else{
-      cdwService = cdwService.filter((db) => db.dialect == 'hana')
+    let cdwService = xsenv
+      .filterServices({ tag: "cdw" })
+      .map((db) => db.credentials);
+    if (env.USE_DUCKDB === "true") {
+      cdwService = cdwService.filter((db) => db.dialect == "postgresql");
+    } else {
+      cdwService = cdwService.filter((db) => db.dialect == "hana");
     }
     analyticsCredential = cdwService[0];
     configCredentials = JSON.parse(env.CONFIG_CONNECTION);
@@ -76,7 +80,16 @@ const main = () => {
     }
     next(err);
   });
-  const server = app.listen(port);
+
+  const server = https.createServer(
+    {
+      key: env.TLS__INTERNAL__KEY,
+      cert: env.TLS__INTERNAL__CRT,
+    },
+    app
+  );
+
+  server.listen(port);
   log.info(
     `🚀 CDW Config Application started successfully!. Server listening on port ${port}`
   );
