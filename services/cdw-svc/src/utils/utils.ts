@@ -449,9 +449,7 @@ export async function getAnalyticsConnection(userObj) {
   let analyticsConnection;
   let cdwService = xsenv.filterServices({ tag: "cdw" }).map(db => db.credentials);
   if(env.USE_DUCKDB === "true"){
-    cdwService = cdwService.filter((db) => db.dialect == 'postgresql')
-    analyticsCredentials = cdwService[0];
-    const { duckdbSchemaFileName, vocabSchemaFileName } = getFileName(analyticsCredentials.databaseName, analyticsCredentials.schema, analyticsCredentials.vocabSchema)
+    const { duckdbSchemaFileName, vocabSchemaFileName } = getFileName(env.DUCKDB_DB_NAME, env.DUCKDB_SCHEMA, env.DUCKDB_VOCAB_SCHEMA)
     analyticsConnection =  await getDuckdbDBConnection(duckdbSchemaFileName, vocabSchemaFileName)
   }else{
     cdwService = cdwService.filter((db) => db.dialect == 'hana')
