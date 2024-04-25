@@ -257,6 +257,7 @@ x-envs:
          "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
          "paConfig": "https://alp-minerva-pa-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41113",
          "portalServer": "https://alp-minerva-portal-server-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105",
+         "systemPortal": "https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/system-portal",
          "psConfig": "https://alp-minerva-ps-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41115",
          "usermgmt": "https://alp-minerva-user-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41104",
          "terminology": "https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
@@ -979,7 +980,6 @@ services:
     environment:
       <<:
         - *x-tls
-      ALP_PORTAL_GRAPHQL_ENDPOINT: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41113
@@ -1211,7 +1211,6 @@ services:
     environment:
       <<:
         - *x-tls
-      ALP_PORTAL_GRAPHQL_ENDPOINT: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41115
@@ -1355,10 +1354,9 @@ services:
       <<:
         - *x-converter
         - *x-tls
-      AI__API_URL: https://alp-minerva-gateway-1:41100/alp-ai/
+        - *x-routes
       FHIR_TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}11
       LOCAL_DEBUG: "false"
-      MEILISEARCH__API_URL: http://alp-minerva-meilisearch-svc-1:41${BASE_PORT:-1}11/
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
       NODE_ENV: development
       PG_DATABASE: ${PG_DB_NAME:-alp}
@@ -1370,7 +1368,6 @@ services:
       PG_PORT: ${PG_PORT:-5432}
       PG_SCHEMA: terminology
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/system-portal/
       TERMINOLOGY_SVC__LOG_LEVEL: info
       TERMINOLOGY_SVC__PATH: terminology
       TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
