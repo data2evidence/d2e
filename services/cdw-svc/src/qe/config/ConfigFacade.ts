@@ -1,21 +1,23 @@
-import { Connection as connLib } from "@alp/alp-base-utils";
+import { Connection as connLib, User } from "@alp/alp-base-utils";
 import ConnectionInterface = connLib.ConnectionInterface;
 import CallBackInterface = connLib.CallBackInterface;
 import { Settings } from "../settings/Settings";
-import { FfhQeConfig, CONFIG_TYPES, MESSAGES } from "./config";
+import { FfhQeConfig, MESSAGES } from "./config";
 import { DbMeta } from "../settings/DbMeta";
+import { getAnalyticsConnection } from "../../utils/utils";
 
 export class ConfigFacade {
   private settings: Settings;
-  private dbMeta: DbMeta;
+  private userObj: User;
 
   constructor(
     private connection: ConnectionInterface,
     private ffhQeConfig: FfhQeConfig,
+    private user: User,
     testMode?: boolean
   ) {
     this.settings = new Settings();
-    this.dbMeta = new DbMeta(ffhQeConfig.getAnalyticsConnection());
+    this.userObj = this.user;
   }
 
   public getFfhQeConfig() {
@@ -29,6 +31,7 @@ export class ConfigFacade {
     callback: CallBackInterface,
     userOrgs?
   ) {
+    let analyticsConn;
     switch (request.action) {
       case "getAdminConfig":
         try {
@@ -73,8 +76,10 @@ export class ConfigFacade {
         );
         break;
       case "validate":
+        analyticsConn = await getAnalyticsConnection(this.userObj);
         this.ffhQeConfig.validateCDMConfigAndTableMappings(
           request.config,
+          analyticsConn,
           (err, res) => {
             if (err) {
               return callback(err, null);
@@ -97,11 +102,13 @@ export class ConfigFacade {
         );
         break;
       case "autosave":
+        analyticsConn = await getAnalyticsConnection(this.userObj);
         this.ffhQeConfig.autoSaveConfig(
           request.configId,
           request.configVersion,
           request.configName,
           request.config,
+          analyticsConn,
           (err, result) => {
             if (err) {
               return callback(err, null);
@@ -111,11 +118,13 @@ export class ConfigFacade {
         );
         break;
       case "activate":
+        analyticsConn = await getAnalyticsConnection(this.userObj);
         this.ffhQeConfig.activateConfig(
           request.configId,
           request.configVersion,
           request.configName,
           request.config,
+          analyticsConn,
           (err, result) => {
             if (err) {
               return callback(err, null);
@@ -163,7 +172,9 @@ export class ConfigFacade {
         callback(null, this.settings.getDefaultAdvancedSettings());
         break;
       case "getColumns":
-        this.dbMeta.getColumnsForPlaceHolders(
+        analyticsConn = await getAnalyticsConnection(this.userObj)
+        let dbMeta = new DbMeta(analyticsConn);
+        dbMeta.getColumnsForPlaceHolders(
           request.dbObjectList,
           (err, result) => {
             if (err) {
