@@ -27,6 +27,10 @@ const Env = z.object({
     .string()
     .refine((val) => !isNaN(parseInt(val)))
     .transform(Number),
+
+  TLS__INTERNAL__KEY: z.string(),
+  TLS__INTERNAL__CRT: z.string(),
+  TLS__INTERNAL__CA_CRT: z.string(),
 });
 
 const result = Env.safeParse(process.env);
