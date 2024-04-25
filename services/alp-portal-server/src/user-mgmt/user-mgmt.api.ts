@@ -19,10 +19,8 @@ export class UserMgmtApi {
     if (env.USER_MGMT_API_URL) {
       this.url = env.USER_MGMT_API_URL
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true
+        rejectUnauthorized: true,
+        ca: env.SSL_CA_CERT
       })
     } else {
       throw new Error('No url is set for UserMgmtApi')

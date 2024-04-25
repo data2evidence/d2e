@@ -18,6 +18,7 @@ export const configureStandalone = (app: Express) => {
   app.get('/portal/env.js', (req: Request, res: Response) => {
     const clientEnv = {
       PUBLIC_URL: '/portal',
+      REACT_APP_LOCALE: env.APP_LOCALE,
       GIT_COMMIT: process.env.GIT_COMMIT,
       REACT_APP_IDP_RELYING_PARTY: env.IDP_RELYING_PARTY,
       REACT_APP_DN_BASE_URL: `https://${GATEWAY_WO_PROTOCOL_FQDN}/`,

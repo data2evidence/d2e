@@ -274,3 +274,8 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+  
+  alp-fhir-server:
+    build:
+      context: ./services/alp-fhir
+      dockerfile: Dockerfile
