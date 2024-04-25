@@ -50,9 +50,6 @@ x-envs:
     PG__MAX_POOL: 10
     PG__MIN_POOL: 0
     PG__PORT: ${PG_PORT:-5432}
-  redis: &x-redis
-    REDIS_HOST: ${REDIS_HOST:-alp-minerva-redis-1}
-    REDIS_PORT: ${REDIS_PORT:-6379}
   plugins: &x-plugins |
     {
       "researcher": [
@@ -241,6 +238,9 @@ x-envs:
       ]
     }
 
+  redis: &x-redis
+    REDIS_HOST: ${REDIS_HOST:-alp-minerva-redis-1}
+    REDIS_PORT: ${REDIS_PORT:-6379}
   tls: &x-tls
     TLS__INTERNAL__CA_CRT: ${TLS__INTERNAL__CA_CRT}
     TLS__INTERNAL__CRT: ${TLS__INTERNAL__CRT}
