@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddConceptSetUser1714020535462 implements MigrationInterface {
-    name = 'AddConceptSetUser1714020535462'
+export class AddConceptSetUser1714022585960 implements MigrationInterface {
+    name = 'AddConceptSetUser1714022585960'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE "terminology"."concept_set" ADD "user_id" uuid`);
+        await queryRunner.query(`ALTER TABLE "terminology"."concept_set" ADD "user_id" character varying`);
         await queryRunner.query(`ALTER TABLE "terminology"."concept_set" ADD "shared" boolean DEFAULT false`);
     }
 
