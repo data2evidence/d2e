@@ -258,7 +258,11 @@ x-envs:
          "paConfig": "https://alp-minerva-pa-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41113",
          "portalServer": "https://alp-minerva-portal-server-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105",
          "psConfig": "https://alp-minerva-ps-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41115",
-         "usermgmt": "https://alp-minerva-user-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41104"
+         "usermgmt": "https://alp-minerva-user-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41104",
+         "terminology": "https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
+         "sqlEditor" : "http://alp-minerva-sqleditor:8888",
+         "appRouter": "https://alp-mercury-approuter:41000",
+         "ui": "http://alp-local-ui-file-server:3000"
         }
 
 services:
@@ -857,12 +861,8 @@ services:
         - *x-routes
       ALP_RELEASE: ${ALP_RELEASE:-v1alpha1}
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
-      ALP__UI_URL: http://alp-local-ui-file-server:3000/
-      ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/analytics-svc/
-      APPROUTER__BASE_URL: https://alp-mercury-approuter:41000/
       APP__DEPLOY_MODE: standalone
       CADDY__LOGTO_IDP__PUBLIC_FQDN: ${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}
-      DATAFLOW_MGMT__API_BASE_URL: https://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}:41${BASE_PORT:-1}07/
       DB_CREDENTIALS__PUBLIC_KEYS: |-
         {
          "DataPlatform": "",
@@ -906,14 +906,9 @@ services:
       LOGTO__SVC_CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
       LOGTO__TOKEN_URL: http://alp-logto-${BASE_PORT}:3001/oidc/token
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-      NIFI_MGMT_SVC__BASE_URL: http://alp-minerva-nifi-mgmt-svc-${BASE_PORT:-1}:4444/
       NODE_ENV: development
       PLUGINS__JSON: *x-plugins
-      PORTAL__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/system-portal/
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
-      SQLEDITOR__BASE_URL: http://alp-minerva-sqleditor:8888/
-      TERMINOLOGY_SVC__BASE_URL: https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108/
-      USER_MGMT__BASE_URL: https://alp-minerva-user-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}04/usermgmt/api/
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
 

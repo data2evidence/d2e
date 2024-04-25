@@ -1,13 +1,14 @@
 import { AxiosRequestConfig } from 'axios'
 import { post } from './request-util'
-import { env } from '../env'
+import { env, services } from '../env'
 
 export class UserMgmtAPI {
   private readonly baseURL: string
+  private readonly endpoint: string = '/usermgmt/api/'
 
   constructor() {
-    if (env.USER_MGMT_BASE_URL) {
-      this.baseURL = env.USER_MGMT_BASE_URL
+    if (services.usermgmt) {
+      this.baseURL = services.usermgmt + this.endpoint
     } else {
       throw new Error('No url is set for UserMgmtAPI')
     }

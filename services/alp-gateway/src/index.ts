@@ -30,9 +30,6 @@ const PORT = env.GATEWAY_PORT
 const logger = createLogger('gateway')
 const userMgmtApi = new UserMgmtAPI()
 const isDev = process.env.NODE_ENV === 'development'
-const appRouterUrl = env.APPROUTER_BASE_URL
-const terminologySvcUrl = env.TERMINOLOGY_SVC_BASE_URL
-const nifiMgmtSvcUrl = env.NIFI_MGMT_SVC_BASE_URL
 const alp_version = process.env.ALP_RELEASE || 'local'
 const authType = env.GATEWAY_IDP_AUTH_TYPE as AuthcType
 
@@ -256,7 +253,8 @@ app.post('/oauth/token', async (req, res) => {
 routes.forEach((route: IRouteProp) => {
   try {
     const changeOriginForAppRouter: boolean =
-      appRouterUrl.startsWith('https://localhost:') || appRouterUrl.startsWith('https://alp-mercury-approuter:')
+      services.appRouter.startsWith('https://localhost:') ||
+      services.appRouter.startsWith('https://alp-mercury-approuter:')
         ? false
         : true
 
@@ -279,7 +277,7 @@ routes.forEach((route: IRouteProp) => {
       app.get(
         `${source}/*`,
         createProxyMiddleware({
-          target: env.ALP_UI_URL,
+          target: services.ui,
           changeOrigin: true,
           pathRewrite: path => {
             let targetPath = route.targetPath
@@ -327,7 +325,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             addSqleditorHeaders,
             createProxyMiddleware({
-              target: env.SQLEDITOR__BASE_URL,
+              target: services.sqlEditor,
               pathRewrite: { '^/alp-sqleditor': '' },
               changeOrigin: true,
               onProxyReq
@@ -362,7 +360,7 @@ routes.forEach((route: IRouteProp) => {
           app.use(
             source,
             createProxyMiddleware({
-              target: appRouterUrl,
+              target: services.appRouter,
               secure: changeOriginForAppRouter,
               proxyTimeout: 100000,
               changeOrigin: changeOriginForAppRouter
@@ -423,28 +421,6 @@ routes.forEach((route: IRouteProp) => {
             })
           )
           break
-        case 'nifimgmt':
-          app.use(
-            source,
-            ensureAuthenticated,
-            checkScopes,
-            createProxyMiddleware({
-              target: {
-                protocol: nifiMgmtSvcUrl.split('/')[0],
-                host: nifiMgmtSvcUrl.split('/')[2].split(':')[0],
-                port: nifiMgmtSvcUrl.split('/')[2].split(':')[1],
-                ...(nifiMgmtSvcUrl.includes('localhost:')
-                  ? undefined
-                  : {
-                      ca: env.GATEWAY_CA_CERT
-                    })
-              },
-              secure: nifiMgmtSvcUrl.includes('localhost:') ? false : true,
-              proxyTimeout: 300000,
-              changeOrigin: nifiMgmtSvcUrl.includes('localhost:') ? false : true
-            })
-          )
-          break
         case 'bookmark-svc':
           app.use(
             source,
@@ -459,7 +435,7 @@ routes.forEach((route: IRouteProp) => {
             source,
             ensureAuthenticated,
             checkScopes,
-            createProxyMiddleware(getCreateMiddlewareOptions(terminologySvcUrl))
+            createProxyMiddleware(getCreateMiddlewareOptions(services.terminology))
           )
           break
         case 'pa-config':
