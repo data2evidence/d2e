@@ -20,10 +20,11 @@ export class ConceptController {
     const domainId = filters.domainId || [];
     const vocabularyId = filters.vocabularyId || [];
     const standardConcept = filters.standardConcept || [];
+    const validity = filters.validity || [];
     return await this.appService.getConceptFilterOptions(
       datasetId,
       searchText,
-      { conceptClassId, domainId, vocabularyId, standardConcept },
+      { conceptClassId, domainId, vocabularyId, standardConcept, validity },
     );
   }
 

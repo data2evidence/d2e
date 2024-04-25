@@ -17,11 +17,8 @@ export default class PortalServerAPI {
             this.baseUrl = ALP_MINERVA_PORTAL_SERVER__URL;
             this.oauthUrl = ALP_GATEWAY_OAUTH__URL;
             this.httpsAgent = new https.Agent({
-                rejectUnauthorized:
-                    this.baseUrl.startsWith("https://localhost:") ||
-                    this.baseUrl.startsWith("https://alp-minerva-gateway-")
-                        ? false
-                        : true,
+                rejectUnauthorized: true,
+                ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
             });
         }
         if (!this.baseUrl) {

@@ -4,6 +4,7 @@ on:
   push:
   pull_request:
     types: [opened, ready_for_review, reopened, synchronize]
+  workflow_dispatch:
 
 jobs:
   Explore-GitHub-Actions:

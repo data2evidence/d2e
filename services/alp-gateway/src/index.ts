@@ -188,6 +188,24 @@ function addCorrelationIDToHeader(req: Request, res: Response, next: NextFunctio
   return next()
 }
 
+function getCreateMiddlewareOptions(serviceUrl: string) {
+  return {
+    target: {
+      protocol: serviceUrl.split('/')[0],
+      host: serviceUrl.split('/')[2].split(':')[0],
+      port: serviceUrl.split('/')[2].split(':')[1],
+      ...(services.dbCredentialsMgr.includes('localhost:')
+        ? undefined
+        : {
+            ca: env.GATEWAY_CA_CERT
+          })
+    },
+    secure: serviceUrl.includes('localhost:') ? false : true,
+    proxyTimeout: 300000,
+    changeOrigin: serviceUrl.includes('localhost:') ? false : true
+  }
+}
+
 const routes = xsapp.routes as IRouteProp[]
 if (plugins && Object.keys(plugins).length > 0) {
   Object.keys(plugins).forEach((type: keyof IPlugin) => {
@@ -335,8 +353,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthorized,
             buildEncodedHeaders,
             createProxyMiddleware({
-              target: services.analyticsSvc,
-              proxyTimeout: 300000,
+              ...getCreateMiddlewareOptions(services.analyticsSvc),
               logLevel: 'debug',
               headers: { Connection: 'keep-alive' }
             })
@@ -358,7 +375,7 @@ routes.forEach((route: IRouteProp) => {
             source,
             ensureAuthenticated,
             checkScopes,
-            createProxyMiddleware({ target: services.usermgmt, proxyTimeout: 300000 })
+            createProxyMiddleware(getCreateMiddlewareOptions(services.usermgmt))
           )
           break
         case 'db-credentials-mgr':
@@ -367,8 +384,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             checkScopes,
             createProxyMiddleware({
-              target: services.dbCredentialsMgr,
-              proxyTimeout: 300000,
+              ...getCreateMiddlewareOptions(services.dbCredentialsMgr),
               pathRewrite: path => path.replace('/db-credentials', '')
             })
           )
@@ -379,8 +395,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             checkScopes,
             createProxyMiddleware({
-              target: services.portalServer,
-              proxyTimeout: 300000,
+              ...getCreateMiddlewareOptions(services.portalServer),
               pathRewrite: path => path.replace('/system-portal', '')
             })
           )
@@ -391,8 +406,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             checkScopes,
             createProxyMiddleware({
-              target: services.dataflowMgmt,
-              proxyTimeout: 300000,
+              ...getCreateMiddlewareOptions(services.dataflowMgmt),
               pathRewrite: path => path.replace('/dataflow-mgmt', '')
             })
           )
@@ -438,7 +452,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             ensureAuthorized,
             buildEncodedHeaders,
-            createProxyMiddleware({ target: services.bookmarkSvc, proxyTimeout: 300000 })
+            createProxyMiddleware(getCreateMiddlewareOptions(services.bookmarkSvc))
           )
           break
         case 'alp-terminology-svc':
@@ -446,21 +460,7 @@ routes.forEach((route: IRouteProp) => {
             source,
             ensureAuthenticated,
             checkScopes,
-            createProxyMiddleware({
-              target: {
-                protocol: terminologySvcUrl.split('/')[0],
-                host: terminologySvcUrl.split('/')[2].split(':')[0],
-                port: terminologySvcUrl.split('/')[2].split(':')[1],
-                ...(terminologySvcUrl.includes('localhost:')
-                  ? undefined
-                  : {
-                      ca: env.GATEWAY_CA_CERT
-                    })
-              },
-              secure: terminologySvcUrl.includes('localhost:') ? false : true,
-              proxyTimeout: 300000,
-              changeOrigin: terminologySvcUrl.includes('localhost:') ? false : true
-            })
+            createProxyMiddleware(getCreateMiddlewareOptions(terminologySvcUrl))
           )
           break
         case 'pa-config':
@@ -471,8 +471,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthorized,
             buildEncodedHeaders,
             createProxyMiddleware({
-              target: services.paConfig,
-              proxyTimeout: 300000,
+              ...getCreateMiddlewareOptions(services.paConfig),
               headers: { Connection: 'keep-alive' }
             })
           )
@@ -485,8 +484,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthorized,
             buildEncodedHeaders,
             createProxyMiddleware({
-              target: services.cdwSvc,
-              proxyTimeout: 300000,
+              ...getCreateMiddlewareOptions(services.cdwSvc),
               headers: { Connection: 'keep-alive' }
             })
           )
@@ -498,8 +496,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthorized,
             buildEncodedHeaders,
             createProxyMiddleware({
-              target: services.psConfig,
-              proxyTimeout: 300000,
+              ...getCreateMiddlewareOptions(services.psConfig),
               headers: { Connection: 'keep-alive' }
             })
           )

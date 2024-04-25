@@ -4,39 +4,41 @@ set -o nounset
 set -o errexit
 
 # inputs
-env_base_name=${npm_package_config_env_base_name:-env}
-env_name=${env_name:-local}
-op_vault_name=$npm_package_config_op_vault_name
-overwrite=${overwrite:-false}
+[ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1
+ENV_NAME=${ENV_NAME:-local}
+OVERWRITE=${OVERWRITE:-false}
 
-# echo env_name=$env_name
+# echo ENV_NAME=$ENV_NAME
 
 # vars
-dotenv_file=.$env_base_name.$env_name.yml
-dir=private-generated; mkdir -p $dir
-op_dotenv_file=$dir/$dotenv_file
-echo get $dotenv_file ...
+GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+DOTENV_NAME=.env.$ENV_NAME.yml
+DOTENV_PATH=$GIT_BASE_DIR/$DOTENV_NAME
+CACHE_PATH=$GIT_BASE_DIR/cache/op
+CACHE_DOTENV_PATH=$CACHE_PATH/$DOTENV_NAME
 
-# get
-op read op://$op_vault_name/$dotenv_file/notesPlain | sed -e '$a\' > $op_dotenv_file
+# get latest for comparison
+op read --no-newline op://$OP_VAULT_NAME/$DOTENV_NAME/notesPlain --out-file $CACHE_DOTENV_PATH --force | sed -e "s#$GIT_BASE_DIR/##g"
 
-if [ ! -s $op_dotenv_file ]; then 
-    echo ERROR empty/failed $op_dotenv_file
+if [ ! -s $CACHE_DOTENV_PATH ]; then 
+    echo ERROR empty/failed $CACHE_DOTENV_PATH
     exit 1
 fi
 
-if [ $overwrite = true ] || [ ! -f $dotenv_file ]; then
-    echo ALERT: overwrite $dotenv_file
-    cp $op_dotenv_file $dotenv_file
+if [ $OVERWRITE = true ] || [ ! -f $DOTENV_PATH ]; then
+    echo ALERT: OVERWRITE $DOTENV_NAME
+    cp $CACHE_DOTENV_PATH $DOTENV_PATH
     exit 0
 fi
 
-# vscode diff if changes
+# accept non successful exit code where files differ
 set +o errexit
-if diff -q $op_dotenv_file $dotenv_file; then 
+
+if diff -q --ignore-space-change --ignore-blank-lines --ignore-all-space $CACHE_DOTENV_PATH $DOTENV_PATH > /dev/null; then 
     echo INFO: no diff
 else
     echo INFO: diff
-    diff $op_dotenv_file $dotenv_file
-    code --diff $op_dotenv_file $dotenv_file
+    diff -q --ignore-space-change --ignore-blank-lines --ignore-all-space $CACHE_DOTENV_PATH $DOTENV_PATH | sed -e "s#$GIT_BASE_DIR/##g"
+    diff $CACHE_DOTENV_PATH $DOTENV_PATH
+    code --diff $CACHE_DOTENV_PATH $DOTENV_PATH
 fi

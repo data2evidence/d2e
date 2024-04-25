@@ -19,10 +19,8 @@ export class AnalyticsSvcAPI {
     if (env.ANALYTICS_SVC_API_URL) {
       this.url = env.ANALYTICS_SVC_API_URL
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true
+        rejectUnauthorized: true,
+        ca: env.SSL_CA_CERT
       })
     } else {
       throw new Error('No url is set for AnalyticsSvcAPI')
@@ -79,19 +77,6 @@ export class AnalyticsSvcAPI {
     try {
       const options = await this.createOptions()
       const url = `${this.url}api/services/alpdb/${dialect}/database/${databaseCode}/cdmversion/schema/${schema}`
-      const obs = this.httpService.get(url, options)
-      return await firstValueFrom(obs.pipe(map(result => result.data)))
-    } catch (error) {
-      this.logger.error(`${errorMessage}: ${error}`)
-      throw new InternalServerErrorException(errorMessage)
-    }
-  }
-
-  async getVocabSchemaFromCdmSchema(dialect: string, databaseCode: string, schema: string) {
-    const errorMessage = 'Error while getting vocab schema from cdm schema'
-    try {
-      const options = await this.createOptions()
-      const url = `${this.url}api/services/alpdb/${dialect}/database/${databaseCode}/vocabSchema/schema/${schema}`
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
