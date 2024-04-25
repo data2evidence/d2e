@@ -1,8 +1,5 @@
-export const translateHanaToPostgres = (
-  temp: string,
-  schema: string,
-  dialect = "POSTGRES",
-): string => {
+// Translation function containing regex that are shared between DUCKDB and POSTGRES dialects
+const hanaCommonTranslation = (temp: string): string => {
   // The first few queries to replace are very specific query which does not require further string replacements
   // subsequent lines, hence early return is used.
   const regex1 =
@@ -52,13 +49,6 @@ export const translateHanaToPostgres = (
         ORDER BY ordinal_position`;
   }
 
-  temp =
-    dialect === "POSTGRES"
-      ? temp.replace(/\$\$SCHEMA\$\$./g, `${schema}.`)
-      : temp;
-
-  // Replacements for concept name matching. hana and postgres regex search use different syntax
-  temp = temp.replace(/LIKE_REGEXPR/gi, "~*"); // ~* short for regex, case insensitive matching
   temp = temp.replace(/FLAG 'i'/gi, "");
 
   temp = temp.replace(
@@ -168,21 +158,11 @@ export const translateHanaToPostgres = (
   temp = temp.replace(/TO_BIGINT(\(\"[\w]*\"\))/gi, "$1::bigint");
   temp = temp.replace(/TO_DOUBLE(\(\"[\w]*\"\))/gi, "$1::double precision");
   temp = temp.replace(/TO_DECIMAL(\([\w]*\))/gi, "$1::decimal");
-  temp = temp.replace(
-    /UPPER(\([\"\w.]{2,}\))/gi,
-    "UPPER($1::varchar)",
-  );
+  temp = temp.replace(/UPPER(\([\"\w.]{2,}\))/gi, "UPPER($1::varchar)");
   temp = temp.replace(/to_nvarchar/gi, "");
   temp = temp.replace(/nvarchar/gi, "VARCHAR");
   temp = temp.replace(/\(SYSUUID\)/gi, "uuid_generate_v4()");
   temp = temp.replace(/IFNULL/gi, "COALESCE");
-  temp =
-    dialect === "DUCKDB"
-      ? temp.replace(/DAYS_BETWEEN \(/gi, `date_diff ('day', `)
-      : temp.replace(
-          /DAYS_BETWEEN \(\(\(("[\w]*"."[\w]*")\)\),\(\(("[\w]*"."[\w]*")\)\)\)/gi,
-          `($2::date - $1::date)`,
-        );
 
   // Replace %s or `?` with $n
   let n = 0;
@@ -190,8 +170,28 @@ export const translateHanaToPostgres = (
     return "$" + ++n;
   });
 
-  // console.debug(`dialect ${dialect}`);
-  // console.debug(`PGSQL ${temp}`);
+  return temp;
+};
+
+export const translateHanaToPostgres = (temp: string, schema: string) => {
+  temp = hanaCommonTranslation(temp);
+  temp = temp.replace(/\$\$SCHEMA\$\$./g, `${schema}.`);
+
+  temp = temp.replace(
+    /DAYS_BETWEEN \(\(\(("[\w]*"."[\w]*")\)\),\(\(("[\w]*"."[\w]*")\)\)\)/gi,
+    `($2::date - $1::date)`,
+  );
+  // Replacements for concept name matching. hana and postgres regex search use different syntax
+  temp = temp.replace(/LIKE_REGEXPR/gi, "~*"); // ~* short for regex, case insensitive matching
+
+  return temp;
+};
+
+export const translateHanaToDuckdb = (temp: string, schema: string): string => {
+  temp = hanaCommonTranslation(temp);
+
+  temp = temp.replace(/DAYS_BETWEEN \(/gi, `date_diff ('day', `);
+  temp = temp.replace(/LIKE_REGEXPR/gi, "SIMILAR TO");
 
   return temp;
 };
