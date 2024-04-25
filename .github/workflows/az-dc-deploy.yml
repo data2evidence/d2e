@@ -71,9 +71,6 @@ jobs:
     name: ${{ github.event.inputs.env }}
     runs-on: [ "${{ github.event.inputs.env }}", self-hosted, Linux, X64 ]
     steps:
-    - run: |
-        echo REPO=${{ github.event.inputs.repo_full_name }} | tee -a "$GITHUB_OUTPUT"
-
     - uses: actions/checkout@v4.1.1
       name: checkout d2e repo
       with:
@@ -81,6 +78,16 @@ jobs:
         ref: ${{ env.DOCKER_TAG_NAME }}
         repository: ${{ github.event.inputs.repo_full_name }}
         token: ${{ secrets.CI_PAT }}
+
+    - name: Load dotenv from 1password
+      uses: 1password/load-secrets-action@v2
+      id: op-load-secret
+      with:
+        export-env: true
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+        REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
 
     - shell: bash
       id: override-repo
@@ -101,6 +108,7 @@ jobs:
         ref: ${{ steps.override-repo.outputs.OVERRIDE_REPO }} # branch name
 
     - shell: bash
+      name: link files from override
       id: link_files_from_override
       run: |
         pwd
@@ -132,31 +140,28 @@ jobs:
       uses: docker/login-action@v3.1.0
       with:
         registry: alpcr.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
 
     - name: Generate dotenv
       env:
         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
         DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+        OVERWRITE: true
       run: |
-        dn_dir=$PWD
-        cd alp-data-node-override
         ACTIONS_STEP_DEBUG=false
       
         # get env yml from 1password
-        overwrite=true env_name=$ENV_NAME yarn op:get:$ENV_TYPE
+        yarn op:get:$ENV_TYPE
 
         # mask sensitive values
-        dn_dir=$dn_dir scripts/gha-mask.sh
+        internal/scripts/gha-mask.sh
 
         # generate dotenv
-        dn_dir=$dn_dir env_type=$ENV_TYPE env_name=$ENV_NAME yarn gen:env
+        yarn gen:env
         echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-
-        cd $dn_dir
-        env_type=$ENV_TYPE yarn gen:tls
 
         cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 

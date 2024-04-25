@@ -20,32 +20,17 @@ Untested platforms:
 ## Docker Compose
 - see: https://docs.docker.com/engine/install/
 
-#### ubuntu
+### ubuntu
 - https://snapcraft.io/install/docker/ubuntu
 ```
 sudo snap install docker
 ```
 
 #### macos
-- For background on issues see: [Docker Desktop troubleshooting](../troubleshooting/docker-desktop.md)
-
-#### Install Docker Desktop 4.19.0 (2023-04)
-- This is a workaround for Docker Compose with multiple networks DNS looks issue in latest version 
-- Download AMD/ARM installer from https://docs.docker.com/desktop/release-notes/
-
-#### Disable Virtualization framework
-- This is a workaround for Segmentation fault on x86_64 with MacOS Virtualization Framework enabled
-- Open Docker>Settings>General
-- Uncheck **Use Virtualization framework** & select **gRPC FUSE**
-> ![Docker-Desktop-disable-Virtualization-framework](../images/docker/disable-Virtualization-framework.png)
-
-##### Add host.docker.internal to /etc/hosts
-- This is a temporary workaround for Identity Provider on https://localhost fails
-- Run the following commands to add `host.docker.internal` to /etc/hosts
-```bash
-echo "127.0.0.1 host.docker.internal" | sudo tee -a /etc/hosts
-cat /etc/hosts
-```
+knowledgebase articles:
+- [host.docker.internal](../knowledgebase/docker-compose/host.docker.internal.md)
+- [dns fails multiple networks](../knowledgebase/docker-compose/dns-fails-multiple-networks.md)
+- [disable virtualization framework on x86](../knowledgebase/docker-compose/virtualization-framework-x86.md)
 
 ## nodejs 
 - https://nodejs.org/en/download/package-manager

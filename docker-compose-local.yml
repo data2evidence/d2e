@@ -21,8 +21,6 @@ services:
     build:
       context: .
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
-    networks:
-      - alp
     volumes:
       - ./services/alp-dataflow-gen/pysrc:/app/pysrc
     environment:
@@ -165,6 +163,10 @@ services:
     environment:
       LOCAL_DEBUG: "true"
 
+  alp-minerva-meilisearch-svc:
+    ports:
+      - 41111:41111
+
   alp-minerva-pa-config-svc:
     build:
       context: .
@@ -272,6 +274,11 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+
+  alp-fhir-server:
+    build:
+      context: ./services/alp-fhir
+      dockerfile: Dockerfile
 
   alp-fhir-fe-server:
     # build:

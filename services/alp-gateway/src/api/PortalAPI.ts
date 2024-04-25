@@ -3,6 +3,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 import { createLogger } from '../Logger'
 import https from 'https'
 import { env } from '../env'
+import { Dataset } from '../types'
 
 interface CreateDatasetInput {
   id: string
@@ -53,12 +54,8 @@ export class PortalAPI {
     if (env.PORTAL_BASE_URL) {
       this.baseURL = env.PORTAL_BASE_URL
       this.httpsAgent = new https.Agent({
-        rejectUnauthorized:
-          this.baseURL.startsWith('https://localhost:') ||
-          this.baseURL.startsWith('https://alp-minerva-gateway-') ||
-          this.baseURL.startsWith('https://alp-mercury-approuter:')
-            ? false
-            : true
+        rejectUnauthorized: true,
+        ca: env.GATEWAY_CA_CERT
       })
     } else {
       throw new Error('No url is set for PortalAPI')
@@ -90,7 +87,7 @@ export class PortalAPI {
     }
   }
 
-  async getDatasets() {
+  async getDatasets(): Promise<Dataset[]> {
     try {
       const options = await this.getRequestConfig()
       const url = `${this.baseURL}dataset/list`
@@ -102,7 +99,7 @@ export class PortalAPI {
     }
   }
 
-  async getDataset(id: string) {
+  async getDataset(id: string): Promise<Dataset> {
     try {
       const options = await this.getRequestConfig()
       const url = `${this.baseURL}dataset/${id}`
@@ -111,18 +108,6 @@ export class PortalAPI {
     } catch (error) {
       this.logger.error(`Error while getting dataset ${id}`)
       throw new Error(`Error while getting dataset ${id}`)
-    }
-  }
-
-  async getDatasetDashboard(id: string) {
-    try {
-      const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset/dashboard/${id}`
-      const result = await axios.get(url, options)
-      return result.data
-    } catch (error) {
-      this.logger.error(`Error while getting dataset dashboard ${id}`)
-      throw new Error(`Error while getting dataset dashboard ${id}`)
     }
   }
 
