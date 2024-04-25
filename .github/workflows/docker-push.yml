@@ -7,7 +7,6 @@ on:
   push:
       branches:
         - develop
-        - di-40_fhir-server
   workflow_dispatch:
     inputs:
       repo_full_name:

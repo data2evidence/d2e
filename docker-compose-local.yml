@@ -281,8 +281,8 @@ services:
       dockerfile: Dockerfile
 
   alp-fhir-fe-server:
-    # build:
-    #   context: ./services/alp-fhir/
-    #   dockerfile: Dockerfile.frontend
+    build:
+      context: ./services/alp-fhir/
+      dockerfile: Dockerfile.frontend
     volumes:
     - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
