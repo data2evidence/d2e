@@ -78,6 +78,7 @@ jobs:
         name: op ratelimit
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         with:
           main: |
             ./internal/scripts/get-op-ratelimit.sh
