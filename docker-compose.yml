@@ -1406,6 +1406,7 @@ services:
       <<:
         - *x-pg
         - *x-tls
+        - *x-routes
       ALP__SYSTEM_NAME: ${ALP__SYSTEM_NAME:-Research System}
       APP__TENANT_ID: ${APP__TENANT_ID:-e0348e4d-2e17-43f2-a3c6-efd752d17c23}
       IDP__ALP_ADMIN__CLIENT_ID: a560o8tqw79hy2cpn8x1q
@@ -1431,8 +1432,6 @@ services:
       PG__USER_MGMT__SCHEMA: usermgmt
       ## Postgres user name
       PG__USER_MGMT__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      PORTAL_UI__BASE_URL: https://localhost:41100/portal/
-      PORTAL__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/system-portal/
       # IDP subject property
       USER_MGMT__IDP_SUBJECT_PROP: sub
       USER_MGMT__LOG_LEVEL: info
@@ -1512,10 +1511,11 @@ services:
     environment:
       <<:
         - *x-tls
+        - *x-routes
       ALP_MINERVA_PORTAL_SERVER__URL: https://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105
       ALP_MINERVA_BOOKMARKS__URL: https://alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110
       DEV_MODE: ${DEV_MODE:-false}
-      LOCAL_DEBUG: "false"
+      LOCAL_DEBUG: "true"
       NODE_ENV: development
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
