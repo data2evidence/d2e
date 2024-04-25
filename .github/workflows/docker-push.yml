@@ -153,6 +153,10 @@ jobs:
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile
+          - name: alp-data-node/alp-fhir-fe-server
+            directory: ./services/alp-fhir
+            context: ./services/alp-fhir
+            fileName: Dockerfile.frontend
 
     steps:
     - uses: actions/checkout@v4
