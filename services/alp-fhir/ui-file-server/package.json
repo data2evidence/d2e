@@ -1,5 +1,5 @@
 {
-  "name": "local-ui-file-server",
+  "name": "alp-fhir-fe-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

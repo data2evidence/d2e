@@ -41,15 +41,6 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle /alp-fhir/* {
-		uri strip_prefix /alp-fhir
-		reverse_proxy http://alp-minerva-fhir-fe-server-1:3000 {
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-
 	redir / /portal
 	handle /* {
 		reverse_proxy https://alp-minerva-gateway-1:41100 {
@@ -91,7 +82,7 @@ https://{$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3001 {
 	}
 }
 
-https://host.docker.internal:41130 {
+https://${CADDY__ALP__INTERNAL_FQDN:localhost}:41130 https://host.docker.internal:41130 {
 	log {
 		format console {
 			level_format color
@@ -109,7 +100,7 @@ https://host.docker.internal:41130 {
 	}
 }
 
-https://host.docker.internal:8103 {
+https://${CADDY__ALP__INTERNAL_FQDN:localhost}:8103 https://host.docker.internal:8103 {
 	log {
 		format console {
 			level_format color
