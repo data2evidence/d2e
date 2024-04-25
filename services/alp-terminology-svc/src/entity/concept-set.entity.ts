@@ -9,9 +9,6 @@ export class ConceptSet {
   @Column({ unique: true })
   name: string;
 
-  @Column({ name: 'user_id', nullable: true })
-  userId: string;
-
   @Column({ nullable: true, default: false })
   shared: boolean;
 
