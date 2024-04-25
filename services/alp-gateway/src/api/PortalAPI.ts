@@ -51,8 +51,8 @@ export class PortalAPI {
     if (!token) {
       throw new Error('No token passed for Portal API!')
     }
-    if (services.portalServer) {
-      this.baseURL = services.portalServer
+    if (services.systemPortal) {
+      this.baseURL = services.systemPortal
       this.httpsAgent = new https.Agent({
         rejectUnauthorized: true,
         ca: env.GATEWAY_CA_CERT
