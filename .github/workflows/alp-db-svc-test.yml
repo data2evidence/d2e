@@ -88,8 +88,7 @@ jobs:
 
             # action
             op read --out-file $DRIVERS_DIR/alp-dbcli-v1.0.0.tgz "op://${OP_VAULT_NAME}/cache-alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz" --force
-            op read --out-file $DRIVERS_DIR/ngdbc-latest.jar "op://${OP_VAULT_NAME}/cache-ngdbc-latest/ngdbc-latest.jar" --force
-          # op service-account ratelimit > 
+            # op read --out-file $DRIVERS_DIR/ngdbc-latest.jar "op://${OP_VAULT_NAME}/cache-ngdbc-latest/ngdbc-latest.jar" --force
           post: |
             ./internal/scripts/get-op-ratelimit.sh
 
