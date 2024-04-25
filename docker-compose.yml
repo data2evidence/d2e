@@ -246,6 +246,20 @@ x-envs:
     TLS__INTERNAL__CRT: ${TLS__INTERNAL__CRT}
     TLS__INTERNAL__DOMAIN: ${TLS__INTERNAL__DOMAIN:-alp.local}
     TLS__INTERNAL__KEY: ${TLS__INTERNAL__KEY}
+  service: &x-routes
+    SERVICE_ROUTES: |-
+        {
+         "analytics": "https://alp-minerva-analytics-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41102",
+         "bookmark": "https://alp-minerva-bookmark-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110",
+         "cdw": "https://alp-minerva-cdw-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41114",
+         "dataflowMgmt": "https://alp-minerva-dataflow-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
+         "dbCredentialsMgr": "https://alp-minerva-db-credentials-mgr-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41112",
+         "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
+         "paConfig": "https://alp-minerva-pa-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41113",
+         "portalServer": "https://alp-minerva-portal-server-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105",
+         "psConfig": "https://alp-minerva-ps-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41115",
+         "usermgmt": "https://alp-minerva-user-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41104"
+        }
 
 services:
 
