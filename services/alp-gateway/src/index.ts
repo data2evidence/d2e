@@ -15,7 +15,7 @@ import { checkScopes } from './middlewares/scope-check'
 import https from 'https'
 import querystring from 'query-string'
 import { IPlugin, IRouteProp } from './types'
-import { env } from './env'
+import { env, services } from './env'
 import { Container } from 'typedi'
 import Routes, { DashboardGateRouter } from './routes'
 import { addSubToRequestUserMiddleware } from './middlewares/AddSubToRequestUserMiddleware'
@@ -35,7 +35,6 @@ const terminologySvcUrl = env.TERMINOLOGY_SVC_BASE_URL
 const nifiMgmtSvcUrl = env.NIFI_MGMT_SVC_BASE_URL
 const alp_version = process.env.ALP_RELEASE || 'local'
 const authType = env.GATEWAY_IDP_AUTH_TYPE as AuthcType
-const services = JSON.parse(env.DATA_NODE_DOCKER_ADDRESSES_JSON)
 
 let plugins: IPlugin = {
   researcher: [],
@@ -340,7 +339,7 @@ routes.forEach((route: IRouteProp) => {
             source,
             buildEncodedHeaders,
             createProxyMiddleware({
-              target: services.analyticsSvc,
+              target: services.analytics,
               proxyTimeout: 300000
             })
           )
@@ -353,7 +352,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthorized,
             buildEncodedHeaders,
             createProxyMiddleware({
-              ...getCreateMiddlewareOptions(services.analyticsSvc),
+              ...getCreateMiddlewareOptions(services.analytics),
               logLevel: 'debug',
               headers: { Connection: 'keep-alive' }
             })
@@ -418,7 +417,7 @@ routes.forEach((route: IRouteProp) => {
             checkScopes,
             addMeilisearchHeaders,
             createProxyMiddleware({
-              target: services.meilisearchSvc,
+              target: services.meilisearch,
               proxyTimeout: 300000,
               pathRewrite: path => path.replace('/meilisearch-svc', '')
             })
@@ -452,7 +451,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             ensureAuthorized,
             buildEncodedHeaders,
-            createProxyMiddleware(getCreateMiddlewareOptions(services.bookmarkSvc))
+            createProxyMiddleware(getCreateMiddlewareOptions(services.bookmark))
           )
           break
         case 'alp-terminology-svc':
@@ -484,7 +483,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthorized,
             buildEncodedHeaders,
             createProxyMiddleware({
-              ...getCreateMiddlewareOptions(services.cdwSvc),
+              ...getCreateMiddlewareOptions(services.cdw),
               headers: { Connection: 'keep-alive' }
             })
           )

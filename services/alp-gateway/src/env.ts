@@ -39,7 +39,9 @@ export const env = {
   SQLEDITOR__TECHNICAL_USER_PASSWD: process.env.SQLEDITOR__TECHNICAL_USER_PASSWD! || 'demo',
   PLUGINS_JSON: process.env.PLUGINS__JSON || '{}',
   DB_CREDENTIALS_PUBLIC_KEYS: process.env.DB_CREDENTIALS__PUBLIC_KEYS,
-  DATA_NODE_DOCKER_ADDRESSES_JSON: process.env.DATA_NODE__DOCKER_ADDRESSES_JSON || '{}',
+  SERVICE_ROUTES: process.env.SERVICE_ROUTES || '{}',
   MEILI_MASTER_KEY: process.env.MEILI_MASTER_KEY,
   APP_LOCALE: process.env.APP_LOCALE
 }
+
+export const services = JSON.parse(env.SERVICE_ROUTES)
