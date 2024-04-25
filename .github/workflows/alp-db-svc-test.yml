@@ -78,18 +78,16 @@ jobs:
         name: op ratelimit
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          # GITHUB_JOB: ${{ env.GITHUB_JOB }}
-          # GITHUB_RUN_ID: ${{ env.GITHUB_RUN_ID }}
         with:
           main: |
-            # echo GITHUB_JOB=$GITHUB_JOB
-            # export GITHUB_JOB
             ./internal/scripts/get-op-ratelimit.sh
-            # echo GITHUB_CONTEXT=$GITHUB_CONTEXT
-            # echo GITHUB_ACTION=$GITHUB_ACTION
-            # echo GITHUB_JOB=$GITHUB_JOB
-            # echo GITHUB_RUN_ID=$GITHUB_RUN_ID
-            # set | grep alp-db-svc-test
+            # vars
+            GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+            DRIVERS_DIR=$GIT_BASE_DIR/cache/drivers
+
+            # action
+            op read --out-file $DRIVERS_DIR/alp-dbcli-v1.0.0.tgz "op://${OP_VAULT_NAME}/cache-alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz" --force
+            op read --out-file $DRIVERS_DIR/ngdbc-latest.jar "op://${OP_VAULT_NAME}/cache-ngdbc-latest/ngdbc-latest.jar" --force
           # op service-account ratelimit > 
           post: |
             ./internal/scripts/get-op-ratelimit.sh
