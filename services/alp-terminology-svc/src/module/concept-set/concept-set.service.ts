@@ -15,6 +15,7 @@ import { Request } from 'express';
 import { ConceptService } from '../concept/concept.service';
 import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { SystemPortalAPI } from 'src/api/portal-api';
+import { Brackets } from 'typeorm';
 
 @Injectable()
 export class ConceptSetService {
@@ -91,6 +92,8 @@ export class ConceptSetService {
     const conceptSets = await dataSource
       .getRepository(ConceptSet)
       .createQueryBuilder()
+      .where({ createdBy: this.userId })
+      .orWhere({ shared: true })
       .orderBy('name')
       .getMany();
 
@@ -125,8 +128,15 @@ export class ConceptSetService {
     const dataSource = await this.getDataSource();
     const conceptSet = await dataSource
       .getRepository(ConceptSet)
-      .createQueryBuilder()
-      .where({ id: conceptSetId })
+      .createQueryBuilder('conceptSet')
+      .where('conceptSet.id = :id', { id: conceptSetId })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('conceptSet.createdBy = :createdBy', {
+            createdBy: this.userId,
+          }).orWhere('conceptSet.shared = :shared', { shared: true });
+        }),
+      )
       .getOne();
     const conceptIds = conceptSet.concepts.map((c) => c.id);
     const conceptService = new ConceptService(this.request);
@@ -161,6 +171,7 @@ export class ConceptSetService {
       .update(ConceptSet)
       .set(conceptSetData)
       .where({ id: conceptSetId })
+      .andWhere({ createdBy: this.userId })
       .execute();
     return conceptSetId;
   }
@@ -172,6 +183,7 @@ export class ConceptSetService {
       .delete()
       .from(ConceptSet)
       .where({ id: conceptSetId })
+      .andWhere({ createdBy: this.userId })
       .execute();
     return conceptSetId;
   }
