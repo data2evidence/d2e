@@ -272,3 +272,10 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+
+  alp-fhir-fe-server:
+    # build:
+    #   context: ./services/alp-fhir/
+    #   dockerfile: Dockerfile.frontend
+    volumes:
+    - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js

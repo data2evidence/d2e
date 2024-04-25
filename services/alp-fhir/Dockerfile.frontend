@@ -10,8 +10,7 @@ USER docker
 
 WORKDIR /home/docker
 
-COPY --chown=docker:alp ./ui-file-server/package.json .
-COPY --chown=docker:alp ./ui-file-server/src/ ./src
+COPY --chown=docker:alp ./ui-file-server/* .
 COPY --chown=docker:alp dist.zip dist.zip
 
 RUN yarn install && cd -
