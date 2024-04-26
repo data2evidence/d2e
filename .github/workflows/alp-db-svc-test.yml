@@ -85,7 +85,6 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          op service-account ratelimit > private.op-ratelimit-start.json
           yarn get:drivers
           ls "${HANA__DRIVER_CLASS_PATH}"
           ls "${POSTGRES__DRIVER_CLASS_PATH}"
@@ -105,7 +104,8 @@ jobs:
         run: |
           ./internal/scripts/get-op-ratelimit.sh
 
-      - name: Upload op-ratelimit
+      # download with gh run download -n stats
+      - name: Upload job yml
         uses: actions/upload-artifact@v4
         if: always()
         with:
