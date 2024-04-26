@@ -675,7 +675,6 @@ services:
       ALP_GATEWAY_OAUTH__URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/oauth/token
       ALP_MINERVA_PORTAL_SERVER__URL: http://alp-minerva-portal-server-${BASE_PORT:-1}:41105
       ALP_MINERVA_PS_CONFIG_SERVER__URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41100/ps-config-svc
-      ALP_PORTAL_SCOPE: https://alpsgdev.onmicrosoft.com/alp-portal/.default
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
       ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT
       ANALYTICS_SVC__PORT: 41${BASE_PORT:-1}02
