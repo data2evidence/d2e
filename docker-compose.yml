@@ -694,7 +694,7 @@ services:
       IDP__ALP_SVC__CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
       LOCAL_DEBUG: "false"
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
-      USE_DUCKDB: ${USE_DUCKDB:-false}
+      USE_DUCKDB: ${USE_DUCKDB:-true}
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
       local: ${local}
