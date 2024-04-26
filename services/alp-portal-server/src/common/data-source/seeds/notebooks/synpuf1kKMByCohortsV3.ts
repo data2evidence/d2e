@@ -239,9 +239,4 @@ co_group_df_top10.plot(kind='pie', y = 'count', ax=ax1, autopct='%1.1f%%',
 
 plt.title('Diabetes & Other Comorbidities', fontdict={'fontsize':20})
 plt.axis('off')
-<<<<<<< HEAD
 plt.show()`
-=======
-plt.show()
-`
->>>>>>> a6c6301 (Add new notebooks related to Kaplan Meier)
