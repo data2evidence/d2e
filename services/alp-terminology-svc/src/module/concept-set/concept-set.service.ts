@@ -1,13 +1,7 @@
-import {
-  Inject,
-  Injectable,
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { JwtPayload, decode } from 'jsonwebtoken';
 import { createLogger } from '../../logger';
-import { QueryObject as qo } from '@alp/alp-base-utils';
 import dataSource from '../../db/data-source';
 import { ConceptSet } from '../../entity';
 import { randomUUID } from 'crypto';
@@ -21,7 +15,6 @@ import { Brackets } from 'typeorm';
 export class ConceptSetService {
   private readonly userId: string;
   private readonly logger = createLogger(this.constructor.name);
-  private queryObject = qo.QueryObject;
   private token: string;
   private request: Request;
 
@@ -45,33 +38,6 @@ export class ConceptSetService {
     return {
       ...object,
       modifiedBy: this.userId,
-    };
-  }
-
-  private async getDatasetDetails(datasetId: string, token: string) {
-    const systemPortalApi = new SystemPortalAPI(token);
-    const dataset = await systemPortalApi.getDataset(datasetId);
-    if (!dataset) {
-      throw new BadRequestException(
-        `Could not find dataset with datasetId: ${datasetId}`,
-      );
-    }
-
-    if (!dataset.databaseCode) {
-      throw new InternalServerErrorException(
-        `Database code does not exist for datasetId: ${datasetId}`,
-      );
-    }
-
-    if (!dataset.vocabSchemaName) {
-      throw new InternalServerErrorException(
-        `vocabSchemaName does not exist for datasetId: ${datasetId}`,
-      );
-    }
-
-    return {
-      databaseName: dataset.databaseCode,
-      vocabSchemaName: dataset.vocabSchemaName,
     };
   }
 
@@ -195,15 +161,14 @@ export class ConceptSetService {
     try {
       const { conceptSetIds, datasetId } = body;
 
-      const { databaseName, vocabSchemaName } = await this.getDatasetDetails(
-        datasetId,
-        this.token,
-      );
+      const systemPortalApi = new SystemPortalAPI(this.token);
+      const { databaseCode, vocabSchemaName } =
+        await systemPortalApi.getDatasetDetails(datasetId);
 
       const meilisearchApi = new MeilisearchAPI();
-      const conceptIndex = `${databaseName}_${vocabSchemaName}_concept`;
-      const conceptAncestorIndex = `${databaseName}_${vocabSchemaName}_concept_ancestor`;
-      const conceptRelationshipIndex = `${databaseName}_${vocabSchemaName}_concept_relationship`;
+      const conceptIndex = `${databaseCode}_${vocabSchemaName}_concept`;
+      const conceptAncestorIndex = `${databaseCode}_${vocabSchemaName}_concept_ancestor`;
+      const conceptRelationshipIndex = `${databaseCode}_${vocabSchemaName}_concept_relationship`;
       const promises = conceptSetIds.map((conceptSetId) =>
         this.getConceptSet(conceptSetId, datasetId),
       );
