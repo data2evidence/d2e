@@ -31,9 +31,6 @@ else
 	yq -i '.token_reset_mins = (load(env(END_YML)).[1].reset / 60)' $STATS_YML
 	yq -i '.account_rw_delta = load(env(END_YML)).[2].used - load(env(START_YML)).[2].used' $STATS_YML
 	yq -i '.account_reset_mins = (load(env(END_YML)).[2].reset / 60)' $STATS_YML
-	cat $STATS_YML
-	FILE=$STATS_YML
+	export WORKFLOW_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+	yq -i '.workflow_url = env(WORKFLOW_URL)' $STATS_YML
 fi
-
-# echo $GITHUB_CONTEXT | yq '.job'
-exit 0
