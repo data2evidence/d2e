@@ -9,18 +9,13 @@ import { Connection, Database } from "duckdb-async";
 import { DBError } from "@alp/alp-base-utils/target/src/DBError";
 import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
 import { translateHanaToDuckdb } from "@alp/alp-base-utils/target/src/helpers/hanaTranslation";
-import { env } from "../configs";
+
 const logger = CreateLogger("Duckdb Connection");
 
 // Helper function similar to getDBConnection implementation in alp-base-utils DBConnectionUtil.ts
-export const getDuckdbDBConnection = (
-    duckdbSchemaFileName: string,
-    duckdbVocabSchemaFileName: string = "alpdev_pg_cdmvocab"
-) => {
+export const getDuckdbDBConnection = () => {
     return new Promise<ConnectionInterface>(async (resolve, reject) => {
         DuckdbConnection.createConnection(
-            duckdbSchemaFileName,
-            duckdbVocabSchemaFileName,
             async (err, connection: ConnectionInterface) => {
                 if (err) {
                     logger.error(err);
@@ -35,12 +30,6 @@ export const getDuckdbDBConnection = (
 export const getDefaultSchemaName = () => {
     return 'main';
 }
-export const getFileName = (databaseName: string, schema: string, vocabSchema: string) => {
-    return {
-        duckdbSchemaFileName: `${databaseName}_${schema}`.toLowerCase(),
-        vocabSchemaFileName: `${databaseName}_${vocabSchema}`.toLowerCase()
-    }
-}
 export class DuckdbConnection implements ConnectionInterface {
     private constructor(
         public database: Database,
@@ -50,20 +39,18 @@ export class DuckdbConnection implements ConnectionInterface {
     ) {}
 
     public static async createConnection(
-        duckdbSchemaFileName: string,
-        duckdbVocabSchemaFileName: string,
         callback
     ) {
         try {
             const duckdDB = await Database.create(
-                `${env.DUCKDB__DATA_FOLDER}/${duckdbSchemaFileName}`
+                `../duckdb/alpdev_pg_cdmdefault`
             );
             const duckdDBconn = await duckdDB.connect();
             // Load vocab schema into duckdb connection
             await duckdDB.all(
-                `ATTACH '${env.DUCKDB__DATA_FOLDER}/${duckdbVocabSchemaFileName}' (READ_ONLY);`
+                `ATTACH '../duckdb/alpdev_pg_cdmvocab' (READ_ONLY);`
             );
-            const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, duckdbSchemaFileName);
+            const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, 'alpdev_pg_cdmdefault');
             callback(null, conn);
         } catch (err) {
             callback(err, null);
