@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from prefect.server.schemas.states import StateType
 from utils.databaseConnectionUtils import insert_to_dqd_result_table
-from utils.types import dcOptionsType
+from utils.types import requestType, dcOptionsType
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
 import importlib
 from flows.alp_db_svc.flow import _run_db_svc_shell_command, _get_db_dialect
