@@ -15,8 +15,8 @@ export class SystemPortalAPI {
     if (!jwt) {
       throw new Error('No token passed for Portal API!');
     }
-    if (env.SERVICE_ROUTES.systemPortal) {
-      this.url = env.SERVICE_ROUTES.systemPortal;
+    if (env.SERVICE_ROUTES.portalServer) {
+      this.url = env.SERVICE_ROUTES.portalServer;
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.TLS__INTERNAL__CA_CRT,

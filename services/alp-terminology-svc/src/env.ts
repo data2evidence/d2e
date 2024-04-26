@@ -6,7 +6,6 @@ const Env = z.object({
   FHIR_TERMINOLOGY_SVC__PORT: z.string(),
   NODE_ENV: z.string(),
   LOCAL_DEBUG: z.string(),
-  MEILISEARCH__API_URL: z.string(),
   MEILI_MASTER_KEY: z.string(),
 
   PG_HOST: z.string(),
