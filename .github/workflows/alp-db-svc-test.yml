@@ -82,15 +82,15 @@ jobs:
         with:
           main: |
             ./internal/scripts/get-op-ratelimit.sh
-            # vars
-            GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
-            DRIVERS_DIR=$GIT_BASE_DIR/cache/drivers
-
-            # action
-            op read --out-file $DRIVERS_DIR/alp-dbcli-v1.0.0.tgz "op://${OP_VAULT_NAME}/cache-alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz" --force
-            # op read --out-file $DRIVERS_DIR/ngdbc-latest.jar "op://${OP_VAULT_NAME}/cache-ngdbc-latest/ngdbc-latest.jar" --force
           post: |
             ./internal/scripts/get-op-ratelimit.sh
+
+      - name: Upload op-ratelimit
+        uses: actions/upload-artifact@v4
+        with:
+          name: stats
+          path: |
+            ${{ github.job }}*.yml
 
       # - name: Upload math result for job 2
       #   uses: actions/upload-artifact@v4
