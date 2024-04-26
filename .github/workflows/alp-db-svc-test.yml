@@ -74,48 +74,52 @@ jobs:
       #       ls -la /tmp \
       #         /bin /opt
 
-      - uses: pyTooling/Actions/with-post-step@v1.0.3
-        name: op ratelimit
+      - name: get op-ratelimit start
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+        run: |
+          ./internal/scripts/get-op-ratelimit.sh
+
+      - uses: pyTooling/Actions/with-post-step@v1.0.3
+        name: op ratelimit
         with:
           main: |
             ./internal/scripts/get-op-ratelimit.sh
           post: |
             ./internal/scripts/get-op-ratelimit.sh
 
+      - name: Get drivers from 1password
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+        run: |
+          op service-account ratelimit > private.op-ratelimit-start.json
+          yarn get:drivers
+          ls "${HANA__DRIVER_CLASS_PATH}"
+          ls "${POSTGRES__DRIVER_CLASS_PATH}"
+
+      - name: Load dotenv from 1password
+        uses: 1password/load-secrets-action@v2
+        id: op-load-secret
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          INTEGRATION_TEST__HANA__TENANT_CONFIGS: "op://${{ secrets.OP_VAULT_NAME }}/Github Actions Secrets/ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_GERMANY"
+
+      - name: get op-ratelimit start
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        run: |
+          ./internal/scripts/get-op-ratelimit.sh
+
       - name: Upload op-ratelimit
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: stats
           path: |
             ${{ github.job }}*.yml
-
-      # - name: Upload math result for job 2
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: homework_final
-      #     path: math-homework.txt
-
-      # - name: Get drivers from 1password
-      #   env:
-      #     OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-      #     OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
-      #   run: |
-      #     op service-account ratelimit > private.op-ratelimit-start.json
-      #     yarn get:drivers
-      #     ls "${HANA__DRIVER_CLASS_PATH}"
-      #     ls "${POSTGRES__DRIVER_CLASS_PATH}"
-
-      # - name: Load dotenv from 1password
-      #   uses: 1password/load-secrets-action@v2
-      #   id: op-load-secret
-      #   with:
-      #     export-env: true
-      #   env:
-      #     OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-      #     INTEGRATION_TEST__HANA__TENANT_CONFIGS: "op://${{ secrets.OP_VAULT_NAME }}/Github Actions Secrets/ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_GERMANY"
 
       # - uses: actions/checkout@v4
       #   name: sameBranch checkout (OverrideRepo)
