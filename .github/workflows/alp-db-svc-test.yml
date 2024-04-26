@@ -80,14 +80,6 @@ jobs:
         run: |
           ./internal/scripts/get-op-ratelimit.sh
 
-      - uses: pyTooling/Actions/with-post-step@v1.0.3
-        name: op ratelimit
-        with:
-          main: |
-            ./internal/scripts/get-op-ratelimit.sh
-          post: |
-            ./internal/scripts/get-op-ratelimit.sh
-
       - name: Get drivers from 1password
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
