@@ -40,20 +40,20 @@ jobs:
       PG__TENANT_CONFIGS: '{"alp":{"host":"localhost","port":"5432","databaseName":"alp","postgresAdminUser":"postgres","postgresAdminPassword":"Toor1234","postgresReadUser":"postgres_tenant_read_user","postgresReadPassword":"Toor1234"}}'
       PG__READ_ROLE: "POSTGRES_TENANT_READ_ROLE"
 
-    # services:
-    #   postgres:
-    #     image: postgres:15-alpine
-    #     env:
-    #       POSTGRES_USER: "postgres"
-    #       POSTGRES_PASSWORD: "Toor1234"
-    #       POSTGRES_DB: "alp"
-    #     ports:
-    #       - 5432:5432
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "Toor1234"
+          POSTGRES_DB: "alp"
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v4
@@ -63,33 +63,13 @@ jobs:
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
 
-      # - name: Run this action
-      #   uses: gacts/run-and-post-run@v1.4.0
-      #   with:
-      #     run: echo "First"
-      #         "(can be multiline)"
-      #     post: |
-      #       echo "First post"
-      #       echo "(can run multiply commands)"
-      #       ls -la /tmp \
-      #         /bin /opt
-
       - name: get op-ratelimit start
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         run: |
           ./internal/scripts/get-op-ratelimit.sh
 
-      - name: Get drivers from 1password
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
-        run: |
-          yarn get:drivers
-          ls "${HANA__DRIVER_CLASS_PATH}"
-          ls "${POSTGRES__DRIVER_CLASS_PATH}"
-
-      - name: Load dotenv from 1password
+      - name: 1password env-var
         uses: 1password/load-secrets-action@v2
         id: op-load-secret
         with:
@@ -98,125 +78,134 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           INTEGRATION_TEST__HANA__TENANT_CONFIGS: "op://${{ secrets.OP_VAULT_NAME }}/Github Actions Secrets/ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_GERMANY"
 
-      - name: get op-ratelimit start
+      - name: 1password files
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+        run: |
+          yarn get:drivers
+          ls "${HANA__DRIVER_CLASS_PATH}"
+          ls "${POSTGRES__DRIVER_CLASS_PATH}"
+
+      - name: 1password ratelimit
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         run: |
           ./internal/scripts/get-op-ratelimit.sh
 
-      # download with gh run download -n stats
       - name: Upload job yml
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: stats
+          retention-days: 5
           path: |
             ${{ github.job }}*.yml
 
-      # - uses: actions/checkout@v4
-      #   name: sameBranch checkout (OverrideRepo)
-      #   id: sameBranch-checkout
-      #   continue-on-error: true
-      #   with:
-      #     repository:  ${{ vars.OVERRIDE_REPO }}
-      #     token: ${{ secrets.CI_PAT }}
-      #     path: 'tmp'
-      #     sparse-checkout: 'alp-data-node-override'
-      #     sparse-checkout-cone-mode: false
-      #     ref: ${{ env.BRANCH_NAME }}
+      - uses: actions/checkout@v4
+        name: sameBranch checkout (OverrideRepo)
+        id: sameBranch-checkout
+        continue-on-error: true
+        with:
+          repository:  ${{ vars.OVERRIDE_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout-cone-mode: false
+          ref: ${{ env.BRANCH_NAME }}
 
-      # - shell: bash
-      #   name: sameBranch checkout test
-      #   id: sameBranch-checkout-test
-      #   run: |
-      #     ls -lhtr tmp
-      #     [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
+      - shell: bash
+        name: sameBranch checkout test
+        id: sameBranch-checkout-test
+        run: |
+          ls -lhtr tmp
+          [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
 
-      # - uses: actions/checkout@v4
-      #   name: develop branch checkout (sameBranch checkout fails)
-      #   if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
-      #   with:
-      #     repository:  ${{ vars.OVERRIDE_REPO }}
-      #     token: ${{ secrets.CI_PAT }}
-      #     path: 'tmp'
-      #     sparse-checkout: 'alp-data-node-override'
-      #     sparse-checkout-cone-mode: false
-      #     ref: develop
+      - uses: actions/checkout@v4
+        name: develop branch checkout (sameBranch checkout fails)
+        if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
+        with:
+          repository:  ${{ vars.OVERRIDE_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout-cone-mode: false
+          ref: develop
 
-      # - shell: bash
-      #   name: merge files from override
-      #   id: merge_files_from_override
-      #   run: |
-      #     ls -l tmp/alp-data-node-override
-      #     cp -prnl ./tmp/alp-data-node-override/* .
-      #     ls -l ./services/alp-db-svc/db/drivers
-      #     ln -s tmp/alp-data-node-override alp-data-node-override
+      - shell: bash
+        name: merge files from override
+        id: merge_files_from_override
+        run: |
+          ls -l tmp/alp-data-node-override
+          cp -prnl ./tmp/alp-data-node-override/* .
+          ls -l ./services/alp-db-svc/db/drivers
+          ln -s tmp/alp-data-node-override alp-data-node-override
 
-      # - name: Install 1Password CLI
-      #   uses: 1password/install-cli-action@v1
+      - name: Install 1Password CLI
+        uses: 1password/install-cli-action@v1
 
-      # - name: Get drivers from 1password
-      #   env:
-      #     OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-      #     OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
-      #   run: |
-      #     yarn get:drivers
+      - name: Get drivers from 1password
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+        run: |
+          yarn get:drivers
 
-      # - shell: bash
-      #   # Give an id to the step, so we can reference it later
-      #   name: check if files changed
-      #   id: check_file_changed
-      #   run: |
-      #     # Fetch develop & get file changes from feature branch
-      #     git fetch origin develop
+      - shell: bash
+        # Give an id to the step, so we can reference it later
+        name: check if files changed
+        id: check_file_changed
+        run: |
+          # Fetch develop & get file changes from feature branch
+          git fetch origin develop
 
-      #     # Diff HEAD with the last commit of develop & filter for 'services/alp-db-svc/**'
-      #     diff=$(git diff --name-only origin/develop HEAD | grep '^services/alp-db-svc/**' || :)
+          # Diff HEAD with the last commit of develop & filter for 'services/alp-db-svc/**'
+          diff=$(git diff --name-only origin/develop HEAD | grep '^services/alp-db-svc/**' || :)
 
-      #     # Check if a file under services/alp-db-svc/** has changed (added, modified, deleted)
-      #     hasDiff=$(if [ ${#diff} -gt 0 ] ; then echo "True" ; else echo "False"; fi)
+          # Check if a file under services/alp-db-svc/** has changed (added, modified, deleted)
+          hasDiff=$(if [ ${#diff} -gt 0 ] ; then echo "True" ; else echo "False"; fi)
 
-      #     # Set the output named "has_dbsvc_changed"
-      #     echo "has_dbsvc_changed=$hasDiff" >> $GITHUB_OUTPUT
-      #     echo "Files changed: $diff"
-      #     echo "Does db-svc have changes: $hasDiff"
+          # Set the output named "has_dbsvc_changed"
+          echo "has_dbsvc_changed=$hasDiff" >> $GITHUB_OUTPUT
+          echo "Files changed: $diff"
+          echo "Does db-svc have changes: $hasDiff"
 
-      # - uses: actions/setup-node@v4
-      #   if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
-      #   with:
-      #     node-version: "18.14.0"
+      - uses: actions/setup-node@v4
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        with:
+          node-version: "18.14.0"
 
-      # - name: Build Project (DB-SVC)
-      #   if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
-      #   run: |
-      #     # Build alp-libs dependencies for alp-db-svc
-      #     yarn install --frozen-lockfile
-      #     yarn workspace @alp/alp-base-utils run compile
+      - name: Build Project (DB-SVC)
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        run: |
+          # Build alp-libs dependencies for alp-db-svc
+          yarn install --frozen-lockfile
+          yarn workspace @alp/alp-base-utils run compile
 
-      #     # Build alp-db-svc
-      #     cd services/alp-db-svc
-      #     yarn
-      #     yarn compile
+          # Build alp-db-svc
+          cd services/alp-db-svc
+          yarn
+          yarn compile
 
-      # - name: Setup Test DB (postgres)
-      #   if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
-      #   working-directory: ./services/alp-db-svc
-      #   run: |
-      #     # Create cdmvocab and cdmdefault schema for db-svc integration tests
-      #     yarn workspace alp-db-svc cdm-install-script post /alpdb/postgres/database/alp/data-model/omop5-4/schema/cdmvocab "{\"cleansedSchemaOption\": false, \"vocabSchema\": \"${OMOP__VOCAB_SCHEMA}\"}" && yarn workspace alp-db-svc cdm-install-script post /alpdb/postgres/database/alp/data-model/omop5-4/schema/cdmdefault "{\"cleansedSchemaOption\": false, \"vocabSchema\": \"${OMOP__VOCAB_SCHEMA}\"}"
-      #   # env:
-      #     # NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_PKGS_NPM_TOKEN }}
+      - name: Setup Test DB (postgres)
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        working-directory: ./services/alp-db-svc
+        run: |
+          # Create cdmvocab and cdmdefault schema for db-svc integration tests
+          yarn workspace alp-db-svc cdm-install-script post /alpdb/postgres/database/alp/data-model/omop5-4/schema/cdmvocab "{\"cleansedSchemaOption\": false, \"vocabSchema\": \"${OMOP__VOCAB_SCHEMA}\"}" && yarn workspace alp-db-svc cdm-install-script post /alpdb/postgres/database/alp/data-model/omop5-4/schema/cdmdefault "{\"cleansedSchemaOption\": false, \"vocabSchema\": \"${OMOP__VOCAB_SCHEMA}\"}"
+        # env:
+          # NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_PKGS_NPM_TOKEN }}
 
-      # - name: Run integration tests for DB-SVC POSTGRES
-      #   working-directory: ./services/alp-db-svc
-      #   # run only if files in 'has_dbsvc_changed' is set to 'True'
-      #   if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
-      #   run: |
-      #     npm run pgtest
+      - name: Run integration tests for DB-SVC POSTGRES
+        working-directory: ./services/alp-db-svc
+        # run only if files in 'has_dbsvc_changed' is set to 'True'
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        run: |
+          npm run pgtest
 
-      # - name: Run integration tests for DB-SVC HANA
-      #   working-directory: ./services/alp-db-svc
-      #   # run only if files in 'has_dbsvc_changed' is set to 'True'
-      #   if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
-      #   run: |
-      #     npm run test
+      - name: Run integration tests for DB-SVC HANA
+        working-directory: ./services/alp-db-svc
+        # run only if files in 'has_dbsvc_changed' is set to 'True'
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        run: |
+          npm run test

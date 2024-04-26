@@ -27,10 +27,14 @@ else
 	echo . set $END_YML
 	op --format json service-account ratelimit | yq -P | tee $END_YML
 	export START_YML END_YML
-	yq -i '.token_rd_delta = load(env(END_YML)).[1].used - load(env(START_YML)).[1].used' $STATS_YML
-	yq -i '.token_reset_mins = (load(env(END_YML)).[1].reset / 60)' $STATS_YML
-	yq -i '.account_rw_delta = load(env(END_YML)).[2].used - load(env(START_YML)).[2].used' $STATS_YML
-	yq -i '.account_reset_mins = (load(env(END_YML)).[2].reset / 60)' $STATS_YML
 	export WORKFLOW_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+	# yq '[.[] | with_entries(.key |= "start_" + .)]' $START_YML
+	yq -i '.account_reset_mins = (load(env(END_YML)).[2].reset / 60)' $STATS_YML
+	yq -i '.account_rw_delta = load(env(END_YML)).[2].used - load(env(START_YML)).[2].used' $STATS_YML
+	yq -i '.account_rw_remaining = load(env(END_YML)).[2].remaining' $STATS_YML
+	yq -i '.token_rd_delta = load(env(END_YML)).[1].used - load(env(START_YML)).[1].used' $STATS_YML
+	yq -i '.token_rd_remaining = load(env(END_YML)).[1].remaining' $STATS_YML
+	yq -i '.token_reset_mins = (load(env(END_YML)).[1].reset / 60)' $STATS_YML
+	yq -i '.updated = now' $STATS_YML
 	yq -i '.workflow_url = env(WORKFLOW_URL)' $STATS_YML
 fi
