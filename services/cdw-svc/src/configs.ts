@@ -11,7 +11,7 @@ const Env = z.object({
   DUCKDB__DATA_FOLDER: z.string(),
   USE_DUCKDB: z.string(),
   CONFIG_CONNECTION: z.string(),
-  DUCKDB_DB_NAME:  z.string(),
+  DUCKDB_DB_CODE:  z.string(),
   DUCKDB_SCHEMA:  z.string(),
   DUCKDB_VOCAB_SCHEMA:  z.string(),
   TLS__INTERNAL__KEY: z.string(),
