@@ -72,7 +72,8 @@ jobs:
     steps:
     - name: Decode credentials as environment variables
       run: |
-        echo ${{ needs.setup.outputs.REGISTRY_USERNAME }} | base64 -di | base64 -di
+        echo $REGISTRY_USERNAME_BASE64
+        # ${{ needs.setup.outputs.REGISTRY_USERNAME }} | base64 -di | base64 -di
         # REGISTRY_USERNAME=$(echo $REGISTRY_USERNAME_BASE64 | base64 -di | base64 -di)
         # echo REGISTRY_USERNAME=$REGISTRY_USERNAME >> $GITHUB_ENV
         # # echo ::add-mask::${REGISTRY_USERNAME}
@@ -82,9 +83,9 @@ jobs:
         # echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD >> $GITHUB_ENV
         # echo ::add-mask::${REGISTRY_PASSWORD}
         # echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD
-      # env:
-        # REGISTRY_PASSWORD_BASE64: ${{ needs.setup.outputs.REGISTRY_PASSWORD }}
-        # REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
+      env:
+        REGISTRY_PASSWORD_BASE64: ${{ needs.setup.outputs.REGISTRY_PASSWORD }}
+        REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
 
     # - name: Login to ACR
     #   uses: docker/login-action@v3.1.0
