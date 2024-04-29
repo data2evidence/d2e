@@ -61,7 +61,7 @@ jobs:
           echo REPO_FULL_NAME="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
           # echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
-          echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username) | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
+          echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
           # echo "test=hello" >> "$GITHUB_OUTPUT"
 
     outputs:
