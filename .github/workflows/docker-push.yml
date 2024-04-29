@@ -78,34 +78,30 @@ jobs:
     steps:
     - name: Decode credentials as environment variables
       run: |
-        REGISTRY_USERNAME=$(echo ${REGISTRY_USERNAME_BASE64} | base64 -di)
+        REGISTRY_USERNAME=$(echo ${REGISTRY_USERNAME_BASE64} | base64 -di | base64 -di)
+        echo ::add-mask::${REGISTRY_USERNAME_BASE64}
         echo ::add-mask::${REGISTRY_USERNAME}
         echo REGISTRY_USERNAME_BASE64=$REGISTRY_USERNAME_BASE64
         echo REGISTRY_USERNAME_BASE=$REGISTRY_USERNAME
 
-        # REGISTRY_USERNAME=$(echo ${REGISTRY_USERNAME_BASE64} | base64 -di | base64 -di)
-        # echo ::add-mask::${REGISTRY_USERNAME}
-        # echo REGISTRY_USERNAME_BASE64=$REGISTRY_USERNAME_BASE64
-        # echo REGISTRY_USERNAME_BASE=$REGISTRY_USERNAME
-
-        # REGISTRY_PASSWORD=$(echo $REGISTRY_PASSWORD_BASE64 | base64 -di | base64 -di)
-        # echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD >> $GITHUB_ENV
-        # echo ::add-mask::${REGISTRY_PASSWORD}
-        # echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD
+        REGISTRY_PASSWORD=$(echo $REGISTRY_PASSWORD_BASE64 | base64 -di | base64 -di)
+        echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD >> $GITHUB_ENV
+        echo ::add-mask::${REGISTRY_PASSWORD}
+        echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD
       env:
         REGISTRY_PASSWORD_BASE64: ${{ needs.setup.outputs.REGISTRY_PASSWORD }}
         REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
 
-    # - name: Login to ACR
-    #   uses: docker/login-action@v3.1.0
-    #   with:
-    #     registry: alpcr.azurecr.io
-    #     username: ${{ env.REGISTRY_USERNAME }}
-    #     password: ${{ env.REGISTRY_PASSWORD }}
+    - name: Login to ACR
+      uses: docker/login-action@v3.1.0
+      with:
+        registry: alpcr.azurecr.io
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
 
-    # - name: test ACR login
-    #   run: |
-    #     docker pull alpcr.azurecr.io/alp-data-node/alp-logto:develop
+    - name: test ACR login
+      run: |
+        docker pull alpcr.azurecr.io/alp-data-node/alp-logto:develop
 
   #   outputs:
   #     tag_name: ${{ steps.docker_tag.outputs.tag_name }}
