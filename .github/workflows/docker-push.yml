@@ -65,7 +65,6 @@ jobs:
       REGISTRY_PASSWORD: ${{ steps.setup.outputs.REGISTRY_PASSWORD }}
       REGISTRY_USERNAME: ${{ steps.setup.outputs.REGISTRY_USERNAME }}
 
-
   run:
   #   if: (needs.setup.outputs.BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.BRANCH_NAME) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
     needs: setup
@@ -73,11 +72,15 @@ jobs:
     steps:
     - name: Decode credentials as environment variables
       run: |
-        for i in REGISTRY_USERNAME REGISTRY_PASSWORD; do
-          i=$(echo $i | sed 's/=.*//g')=$(echo ${i#*=} | base64 -di | base64 -di)
-          echo ::add-mask::${i#*=}
-          printf '%s\n' "$i" >> $GITHUB_ENV
-        done
+        REGISTRY_USERNAME=$(echo $REGISTRY_USERNAME | base64 -di | base64 -di)
+        echo REGISTRY_USERNAME=$REGISTRY_USERNAME >> $GITHUB_ENV
+        echo ::add-mask::${REGISTRY_USERNAME}
+        REGISTRY_PASSWORD=$(echo $REGISTRY_PASSWORD_BASE64 | base64 -di | base64 -di)
+        echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD >> $GITHUB_ENV
+        echo ::add-mask::${REGISTRY_PASSWORD}
+      env:
+        REGISTRY_PASSWORD_BASE64: ${{ needs.setup.outputs.REGISTRY_PASSWORD }}
+        REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
 
     - name: Login to ACR
       uses: docker/login-action@v3.1.0
