@@ -59,9 +59,9 @@ jobs:
       run: |
           echo BRANCH_NAME="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo REPO_FULL_NAME="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-          # echo REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
+          echo REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
           # echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
-          echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username)" >> $GITHUB_OUTPUT
+          echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username) | base64 -w0 | base64 -w0" >> $GITHUB_OUTPUT
           # echo "test=hello" >> "$GITHUB_OUTPUT"
 
     outputs:
@@ -92,7 +92,7 @@ jobs:
         # echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD
       env:
         # BRANCH_NAME: needs.setup.outputs.BRANCH_NAME
-        # REGISTRY_PASSWORD_BASE64: needs.setup.outputs.REGISTRY_PASSWORD
+        REGISTRY_PASSWORD_BASE64: needs.setup.outputs.REGISTRY_PASSWORD
         # TEST: ${{ needs.setup.outputs.TEST }}
         REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
 
