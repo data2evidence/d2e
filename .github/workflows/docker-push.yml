@@ -51,6 +51,7 @@ jobs:
     steps:
     - name: Install 1Password CLI
       uses: 1password/install-cli-action@v1
+
     - id: setup
       env:
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
@@ -61,11 +62,10 @@ jobs:
           # echo REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
           # echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
           echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username)" >> $GITHUB_OUTPUT
-          op read op://${OP_VAULT_NAME}/az-alpCR/username
-          echo "test=hello" >> "$GITHUB_OUTPUT"
+          # echo "test=hello" >> "$GITHUB_OUTPUT"
 
     outputs:
-      TEST: ${{ steps.setup.outputs.test }}
+      # TEST: ${{ steps.setup.outputs.test }}
       BRANCH_NAME: ${{ steps.setup.outputs.BRANCH_NAME }}
       REPO_FULL_NAME: ${{ steps.setup.outputs.REPO_FULL_NAME }}
       REGISTRY_PASSWORD: ${{ steps.setup.outputs.REGISTRY_PASSWORD }}
@@ -78,8 +78,8 @@ jobs:
     steps:
     - name: Decode credentials as environment variables
       run: |
-        echo TEST=$TEST
-        # echo REGISTRY_USERNAME_BASE64=$REGISTRY_USERNAME_BASE64
+        # echo TEST=$TEST
+        echo REGISTRY_USERNAME_BASE64=$REGISTRY_USERNAME_BASE64
         # ${{ needs.setup.outputs.REGISTRY_USERNAME }} | base64 -di | base64 -di
         # REGISTRY_USERNAME=$(echo $REGISTRY_USERNAME_BASE64 | base64 -di | base64 -di)
         # echo REGISTRY_USERNAME=$REGISTRY_USERNAME >> $GITHUB_ENV
@@ -93,7 +93,7 @@ jobs:
       env:
         # BRANCH_NAME: needs.setup.outputs.BRANCH_NAME
         # REGISTRY_PASSWORD_BASE64: needs.setup.outputs.REGISTRY_PASSWORD
-        TEST: ${{ needs.setup.outputs.TEST }}
+        # TEST: ${{ needs.setup.outputs.TEST }}
         REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
 
     # - name: Login to ACR
