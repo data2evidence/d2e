@@ -87,7 +87,7 @@ jobs:
       env:
         BRANCH_NAME: needs.setup.outputs.BRANCH_NAME
         # REGISTRY_PASSWORD_BASE64: needs.setup.outputs.REGISTRY_PASSWORD
-        REGISTRY_USERNAME_BASE64: needs.setup.outputs.REGISTRY_USERNAME
+        REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
 
     # - name: Login to ACR
     #   uses: docker/login-action@v3.1.0
