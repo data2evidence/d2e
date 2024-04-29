@@ -1,5 +1,5 @@
 name: Docker Build & Push
-run-name: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
+run-name: ${{ github.event.inputs.BRANCH_NAME || github.head_ref || github.ref_name }}
 
 on: 
   pull_request:
@@ -9,7 +9,7 @@ on:
         - develop
   workflow_dispatch:
     inputs:
-      repo_full_name:
+      REPO_FULL_NAME:
         description: Select RepoName
         required: false
         type: choice
@@ -31,56 +31,42 @@ on:
           - alp-os/d2e-dev-santan
           - alp-os/d2e-dev-satish
           - alp-os/d2e-dev-suwarno
-      branch_name:
+      BRANCH_NAME:
         default: develop
         description: Enter BranchName / Release Tag Name
         required: true
         type: string
 
 concurrency: 
-  group: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build
+  group: ${{ github.event.inputs.BRANCH_NAME || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build
   cancel-in-progress: true
 
 env:
-  BRANCH_NAME: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
-  REPO_FULL_NAME: ${{ github.event.inputs.repo_full_name || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
+  BRANCH_NAME: ${{ github.event.inputs.BRANCH_NAME || github.head_ref || github.ref_name }}
+  REPO_FULL_NAME: ${{ github.event.inputs.REPO_FULL_NAME || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
 
 jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
     - id: setup
-      run: |
-        echo repo_full_name="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-        echo branch_name="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-
-    # - name: Dump GitHub context
-    #   env:
-    #     GITHUB_CONTEXT: ${{ toJson(github) }}
-    #   run: echo "$GITHUB_CONTEXT"
-
-    # - uses: actions/checkout@v4
-    #   with:
-    #     ref: ${{ env.BRANCH_NAME }}
-    #     repository: ${{ env.REPO_FULL_NAME }}
-    #     token: ${{ secrets.CI_PAT }}
-
-    - name: Load dotenv from 1password
-      uses: 1password/load-secrets-action@v2
-      id: op-load-secret
-      with:
-        export-env: true
       env:
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
-        REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
+        OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+      run: |
+          echo BRANCH_NAME="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
+          echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
+          echo REPO_FULL_NAME="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
 
     outputs:
-      branch_name: ${{ steps.setup.outputs.branch_name }}
-      repo_full_name: ${{ steps.setup.outputs.repo_full_name }}
+      BRANCH_NAME: ${{ steps.setup.outputs.BRANCH_NAME }}
+      REPO_FULL_NAME: ${{ steps.setup.outputs.REPO_FULL_NAME }}
+      REGISTRY_PASSWORD: ${{ steps.setup.outputs.REGISTRY_PASSWORD }}
+      REGISTRY_USERNAME: ${{ steps.setup.outputs.REGISTRY_USERNAME }}
 
   # run:
-  #   if: (needs.setup.outputs.branch_name == 'develop' ||  contains('release', needs.setup.outputs.branch_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
+  #   if: (needs.setup.outputs.BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.BRANCH_NAME) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
   #   needs: setup
   #   runs-on: ubuntu-latest
   #   outputs:
@@ -172,6 +158,12 @@ jobs:
   #           fileName: Dockerfile
 
   #   steps:
+    # - uses: actions/checkout@v4
+    #   with:
+    #     ref: ${{ env.BRANCH_NAME }}
+    #     repository: ${{ env.REPO_FULL_NAME }}
+    #     token: ${{ secrets.CI_PAT }}
+
   #   - name: Login to ACR
   #     uses: docker/login-action@v3.1.0
   #     with:
