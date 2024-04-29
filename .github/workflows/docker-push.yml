@@ -10,7 +10,6 @@ on:
   workflow_dispatch:
     inputs:
       repo_full_name:
-        default: d2e
         description: Select RepoName
         required: false
         type: choice
