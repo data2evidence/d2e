@@ -22,7 +22,7 @@ import {
     USE_EXTENSION_FOR_COHORT_CREATION,
 } from "../../config";
 import { dataflowRequest } from "../../utils/DataflowMgmtProxy";
-import { getDuckdbDirectPostgresConnection } from "../../utils/DuckdbConnection";
+import { getDuckdbDirectPostgresWriteConnection } from "../../utils/DuckdbConnection";
 import { DB } from "../../utils/DBSvcConfig";
 
 const language = "en";
@@ -39,7 +39,7 @@ export async function getCohortAnalyticsConnection(req: IMRIRequest) {
         schema: studyAnalyticsCredential.schema,
     };
     if (USE_DUCKDB === "true" && studyAnalyticsCredential.dialect !== DB.HANA) {
-        return await getDuckdbDirectPostgresConnection(credentials);
+        return await getDuckdbDirectPostgresWriteConnection(credentials);
     }
     // Get connection to db using study analytics credentials
     return await dbConnectionUtil.DBConnectionUtil.getDBConnection(credentials);

@@ -33,7 +33,7 @@ export const getDuckdbDBConnection = (
         );
     });
 };
-export const getDuckdbDirectPostgresConnection = ({
+export const getDuckdbDirectPostgresWriteConnection = ({
     credentials,
     schema,
 }: {
@@ -41,7 +41,7 @@ export const getDuckdbDirectPostgresConnection = ({
     schema: string;
 }) => {
     return new Promise<ConnectionInterface>(async (resolve, reject) => {
-        DuckdbConnection.createDirectPostgresConnection(
+        DuckdbConnection.createDirectPostgresWriteConnection(
             credentials,
             schema,
             async (err, connection: ConnectionInterface) => {
@@ -92,7 +92,7 @@ export class DuckdbConnection implements ConnectionInterface {
         }
     }
 
-    public static async createDirectPostgresConnection(
+    public static async createDirectPostgresWriteConnection(
         credentials: StudyAnalyticsCredential,
         schema: string,
         callback
