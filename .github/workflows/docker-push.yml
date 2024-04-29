@@ -59,12 +59,14 @@ jobs:
       run: |
           echo BRANCH_NAME="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo REPO_FULL_NAME="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-          REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)"
-          echo REGISTRY_PASSWORD="${REGISTRY_PASSWORD}" >> $GITHUB_OUTPUT
+          
           REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)"
           echo REGISTRY_USERNAME="${REGISTRY_USERNAME}" >> $GITHUB_OUTPUT
-          echo ::add-mask::${REGISTRY_PASSWORD}
-          echo ::add-mask::${REGISTRY_USERNAME}
+          # echo ::add-mask::${REGISTRY_USERNAME}
+          
+          # REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)"
+          # echo REGISTRY_PASSWORD="${REGISTRY_PASSWORD}" >> $GITHUB_OUTPUT
+          # echo ::add-mask::${REGISTRY_PASSWORD}
 
     outputs:
       BRANCH_NAME: ${{ steps.setup.outputs.BRANCH_NAME }}
