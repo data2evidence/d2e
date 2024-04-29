@@ -59,17 +59,20 @@ jobs:
       run: |
           echo BRANCH_NAME="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo REPO_FULL_NAME="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-          echo REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
-          echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
+          REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)"
+          echo REGISTRY_PASSWORD="${REGISTRY_PASSWORD}" >> $GITHUB_OUTPUT
+          REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)"
+          echo REGISTRY_USERNAME="${REGISTRY_USERNAME}" >> $GITHUB_OUTPUT
+          echo ::add-mask::${REGISTRY_PASSWORD}
+          echo ::add-mask::${REGISTRY_USERNAME}
 
     outputs:
-      # TEST: ${{ steps.setup.outputs.test }}
       BRANCH_NAME: ${{ steps.setup.outputs.BRANCH_NAME }}
       REPO_FULL_NAME: ${{ steps.setup.outputs.REPO_FULL_NAME }}
       REGISTRY_PASSWORD: ${{ steps.setup.outputs.REGISTRY_PASSWORD }}
       REGISTRY_USERNAME: ${{ steps.setup.outputs.REGISTRY_USERNAME }}
 
-  run:
+  build:
   #   if: (needs.setup.outputs.BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.BRANCH_NAME) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
     needs: setup
     runs-on: ubuntu-latest
@@ -182,43 +185,43 @@ jobs:
         username: ${{ env.REGISTRY_USERNAME }}
         password: ${{ env.REGISTRY_PASSWORD }}
         
-    - uses: actions/checkout@v4
-      with:
-        ref: ${{ env.BRANCH_NAME }}
-        repository: ${{ env.REPO_FULL_NAME }}
-        token: ${{ secrets.CI_PAT }}
+    # - uses: actions/checkout@v4
+    #   with:
+    #     ref: ${{ env.BRANCH_NAME }}
+    #     repository: ${{ env.REPO_FULL_NAME }}
+    #     token: ${{ secrets.CI_PAT }}
 
-    - name: Get docker tag name
-      id: docker_tag
-      shell: bash
-      run: |
-          if [ $BRANCH_NAME == "develop" ]; then
-            echo "tag_name=develop" | tee -a $GITHUB_OUTPUT
-            echo "is_push=true" | tee -a $GITHUB_OUTPUT
-          elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
-              echo "tag_name=$BRANCH_NAME" | tee -a $GITHUB_OUTPUT
-              echo "is_push=true" | tee -a $GITHUB_OUTPUT
-          else
-              echo "is_push=false" | tee -a $GITHUB_OUTPUT
-              echo "tag_name=$(echo ${{ github.sha }} | cut -c1-8)" | tee -a $GITHUB_OUTPUT
-          fi
+    # - name: Get docker tag name
+    #   id: docker_tag
+    #   shell: bash
+    #   run: |
+    #       if [ $BRANCH_NAME == "develop" ]; then
+    #         echo "tag_name=develop" | tee -a $GITHUB_OUTPUT
+    #         echo "is_push=true" | tee -a $GITHUB_OUTPUT
+    #       elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
+    #           echo "tag_name=$BRANCH_NAME" | tee -a $GITHUB_OUTPUT
+    #           echo "is_push=true" | tee -a $GITHUB_OUTPUT
+    #       else
+    #           echo "is_push=false" | tee -a $GITHUB_OUTPUT
+    #           echo "tag_name=$(echo ${{ github.sha }} | cut -c1-8)" | tee -a $GITHUB_OUTPUT
+    #       fi
           
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+    # - name: Set up QEMU
+    #   uses: docker/setup-qemu-action@v3
   
-    - uses: docker/setup-buildx-action@v3.2.0
-      id: builder
+    # - uses: docker/setup-buildx-action@v3.2.0
+    #   id: builder
 
-    - name: Build and push
-      uses: docker/build-push-action@v5.3.0
-      with:
-        builder: ${{ steps.builder.outputs.name }}
-        platforms: 'linux/amd64'
-        context: ${{ matrix.context }}
-        pull: ${{ matrix.pull || false }}
-        file:  ${{ matrix.directory }}/${{ matrix.fileName }}
-        push: ${{ steps.docker_tag.outputs.is_push }}
-        tags: alpcr.azurecr.io/${{ matrix.name }}:${{ steps.docker_tag.outputs.tag_name }}
-        build-args: |
-          docker_image_prefix=alpcr.azurecr.io
-          GIT_COMMIT_ARG=${{ github.sha }}
+    # - name: Build and push
+    #   uses: docker/build-push-action@v5.3.0
+    #   with:
+    #     builder: ${{ steps.builder.outputs.name }}
+    #     platforms: 'linux/amd64'
+    #     context: ${{ matrix.context }}
+    #     pull: ${{ matrix.pull || false }}
+    #     file:  ${{ matrix.directory }}/${{ matrix.fileName }}
+    #     push: ${{ steps.docker_tag.outputs.is_push }}
+    #     tags: alpcr.azurecr.io/${{ matrix.name }}:${{ steps.docker_tag.outputs.tag_name }}
+    #     build-args: |
+    #       docker_image_prefix=alpcr.azurecr.io
+    #       GIT_COMMIT_ARG=${{ github.sha }}
