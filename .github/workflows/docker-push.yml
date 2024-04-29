@@ -55,9 +55,9 @@ jobs:
         OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
       run: |
           echo BRANCH_NAME="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo REPO_FULL_NAME="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
           echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
-          echo REPO_FULL_NAME="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
 
     outputs:
       BRANCH_NAME: ${{ steps.setup.outputs.BRANCH_NAME }}
@@ -65,10 +65,31 @@ jobs:
       REGISTRY_PASSWORD: ${{ steps.setup.outputs.REGISTRY_PASSWORD }}
       REGISTRY_USERNAME: ${{ steps.setup.outputs.REGISTRY_USERNAME }}
 
-  # run:
+
+  run:
   #   if: (needs.setup.outputs.BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.BRANCH_NAME) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
-  #   needs: setup
-  #   runs-on: ubuntu-latest
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+    - name: Decode credentials as environment variables
+      run: |
+        for i in REGISTRY_USERNAME REGISTRY_PASSWORD; do
+          i=$(echo $i | sed 's/=.*//g')=$(echo ${i#*=} | base64 -di | base64 -di)
+          echo ::add-mask::${i#*=}
+          printf '%s\n' "$i" >> $GITHUB_ENV
+        done
+
+    - name: Login to ACR
+      uses: docker/login-action@v3.1.0
+      with:
+        registry: alpcr.azurecr.io
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
+
+    - name: test ACR login
+      run: |
+        docker pull alpcr.azurecr.io/alp-data-node/alp-logto:develop
+
   #   outputs:
   #     tag_name: ${{ steps.docker_tag.outputs.tag_name }}
   #   strategy:
@@ -156,20 +177,13 @@ jobs:
   #           directory: ./services/alp-fhir
   #           context: ./services/alp-fhir
   #           fileName: Dockerfile
-
+  
   #   steps:
     # - uses: actions/checkout@v4
     #   with:
     #     ref: ${{ env.BRANCH_NAME }}
     #     repository: ${{ env.REPO_FULL_NAME }}
     #     token: ${{ secrets.CI_PAT }}
-
-  #   - name: Login to ACR
-  #     uses: docker/login-action@v3.1.0
-  #     with:
-  #       registry: alpcr.azurecr.io
-  #       username: ${{ env.REGISTRY_USERNAME }}
-  #       password: ${{ env.REGISTRY_PASSWORD }}
 
   #   - name: Get docker tag name
   #     id: docker_tag
