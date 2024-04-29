@@ -167,23 +167,25 @@ jobs:
     steps:
     - name: ACR creds decode
       run: |
-        REGISTRY_USERNAME=$(echo ${REGISTRY_USERNAME_BASE64} | base64 -di | base64 -di)
-        echo REGISTRY_USERNAME=$REGISTRY_USERNAME >> $GITHUB_ENV
-        echo ::add-mask::${REGISTRY_USERNAME}
+        echo ${{ needs.setup.outputs.REGISTRY_USERNAME }} | base64 -di | base64 -di
 
-        REGISTRY_PASSWORD=$(echo $REGISTRY_PASSWORD_BASE64 | base64 -di | base64 -di)
-        echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD >> $GITHUB_ENV
-        echo ::add-mask::${REGISTRY_PASSWORD}
-      env:
-        REGISTRY_PASSWORD_BASE64: ${{ needs.setup.outputs.REGISTRY_PASSWORD }}
-        REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
+        # REGISTRY_USERNAME=$(echo ${REGISTRY_USERNAME_BASE64} | base64 -di | base64 -di)
+        # echo REGISTRY_USERNAME=$REGISTRY_USERNAME >> $GITHUB_ENV
+        # echo ::add-mask::${REGISTRY_USERNAME}
 
-    - name: ACR login
-      uses: docker/login-action@v3.1.0
-      with:
-        registry: alpcr.azurecr.io
-        username: ${{ env.REGISTRY_USERNAME }}
-        password: ${{ env.REGISTRY_PASSWORD }}
+        # REGISTRY_PASSWORD=$(echo $REGISTRY_PASSWORD_BASE64 | base64 -di | base64 -di)
+        # echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD >> $GITHUB_ENV
+        # echo ::add-mask::${REGISTRY_PASSWORD}
+      # env:
+      #   REGISTRY_PASSWORD_BASE64: ${{ needs.setup.outputs.REGISTRY_PASSWORD }}
+      #   REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
+
+    # - name: ACR login
+    #   uses: docker/login-action@v3.1.0
+    #   with:
+    #     registry: alpcr.azurecr.io
+    #     username: ${{ env.REGISTRY_USERNAME }}
+    #     password: ${{ env.REGISTRY_PASSWORD }}
         
     # - uses: actions/checkout@v4
     #   with:
