@@ -77,15 +77,12 @@ jobs:
     - name: Decode credentials as environment variables
       run: |
         REGISTRY_USERNAME=$(echo ${REGISTRY_USERNAME_BASE64} | base64 -di | base64 -di)
-        echo ::add-mask::${REGISTRY_USERNAME_BASE64}
+        echo REGISTRY_USERNAME=$REGISTRY_USERNAME >> $GITHUB_ENV
         echo ::add-mask::${REGISTRY_USERNAME}
-        echo REGISTRY_USERNAME_BASE64=$REGISTRY_USERNAME_BASE64
-        echo REGISTRY_USERNAME_BASE=$REGISTRY_USERNAME
 
         REGISTRY_PASSWORD=$(echo $REGISTRY_PASSWORD_BASE64 | base64 -di | base64 -di)
         echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD >> $GITHUB_ENV
         echo ::add-mask::${REGISTRY_PASSWORD}
-        echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD
       env:
         REGISTRY_PASSWORD_BASE64: ${{ needs.setup.outputs.REGISTRY_PASSWORD }}
         REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
