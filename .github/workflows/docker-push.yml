@@ -59,6 +59,7 @@ jobs:
           # echo REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
           # echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
           echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username)" >> $GITHUB_OUTPUT
+          op read op://${OP_VAULT_NAME}/az-alpCR/username
           echo "test=hello" >> "$GITHUB_OUTPUT"
 
     outputs:
