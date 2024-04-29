@@ -82,9 +82,10 @@ jobs:
         echo REGISTRY_USERNAME_BASE64=${REGISTRY_USERNAME_BASE64}
         REGISTRY_USERNAME=$(echo ${REGISTRY_USERNAME_BASE64} | base64 -di | base64 -di)
         echo REGISTRY_USERNAME_BASE64=$REGISTRY_USERNAME_BASE64
+        echo ::add-mask::${REGISTRY_USERNAME}
+        echo REGISTRY_USERNAME_BASE64=$REGISTRY_USERNAME_BASE64
         # ${{ needs.setup.outputs.REGISTRY_USERNAME }} | base64 -di | base64 -di
         # echo REGISTRY_USERNAME=$REGISTRY_USERNAME >> $GITHUB_ENV
-        # # echo ::add-mask::${REGISTRY_USERNAME}
         # echo REGISTRY_USERNAME=$REGISTRY_USERNAME
 
         # REGISTRY_PASSWORD=$(echo $REGISTRY_PASSWORD_BASE64 | base64 -di | base64 -di)
