@@ -367,6 +367,10 @@ def generate_node_task(nodename, node, nodetype):
             nodeobj = CohortGeneratorSpecNode(node)
         case "characterization_node":
             nodeobj = CharacterizationNode(node)
+        case "negative_control_outcome_cohort_node":
+            nodeobj = NegativeControlOutcomeCohort(node)
+        # TODO: TargetComparatorNode, CohortMethodModuleSpec, CohortMethodAnalysisNode, 
+        # CalendarCovariateSettingsNode, SeasonalityCovariateSettingsNode
         case _:
             logging.error("ERR: Unknown Node"+node["type"])
             logging.error(tb.StackSummary())
@@ -374,9 +378,35 @@ def generate_node_task(nodename, node, nodetype):
 
 class NegativeControlOutcomeCohort:
 
-    # TODO
-    def __init__():
-        return "negative_control_outcome_cohort_node"
+    def __init__(self, _node):
+        self.occurrenceType = _node["occurrenceType"]
+        self.detectOnDescendants = _node["detectOnDescendants"]
+
+    def test(self, task_run_context):
+        # TODO: add implementation
+        return None
+    
+    def task(self, _input, task_run_context):
+        rSource = robjects.r['source']
+        rSource("https://raw.githubusercontent.com/OHDSI/CohortGeneratorModule/v0.3.0/SettingsFunctions.R")
+        # TODO: use _input for ncoCohortSet initialization
+        ncoCohortSet = convert_py_to_R(pd.DataFrame({
+            # cohort_id,cohort_name,outcome_concept_id
+            # columns must be in camelcase
+            "cohortId": [],
+            "cohortName": [],
+            "outcomeConceptId": []
+        }))
+        try:
+            rCreateNegativeControlOutcomeCohortSharedResourceSpecifications = robjects.globalenv['createNegativeControlOutcomeCohortSharedResourceSpecifications']
+            rNegativeCoSharedResource = rCreateNegativeControlOutcomeCohortSharedResourceSpecifications(
+                negativeControlOutcomeCohortSet = ncoCohortSet, # use _input
+                occurrenceType = convert_py_to_R(self.occurenceType),
+                detectOnDescendants = convert_py_to_R(self.detectOnDescendants)
+            )
+            return rNegativeCoSharedResource
+        except Exception as e:
+            return Result(e, tb.format_exc(), task_run_context)
 
 class CharacterizationNode:
     def __init__(self, _node):
@@ -423,6 +453,32 @@ class CharacterizationNode:
 #     def __init__():
 #         return "covariate_settings_node"
     
+class TargetComparatorOutcomes:
+
+    def __init__(self, _node):
+        self.targetId = _node['targetId']
+        self.comparatorId = _node['comparatorId']
+        self.includedCovariateConceptIds = _node['includedCovariateConceptIds']
+        self.excludedCovariateConceptIds = _node['excludedCovariateConceptIds']
+
+    def test(self):
+        return None
+
+    def task(self, _input, task_run_context):
+        rOutcomes = _input['outcomes']
+        try:
+            rCohortMethod = importr('CohortMethod')
+            rCreateTargetComparatorOutcomes = rCohortMethod.createTargetComparatorOutcomes(
+                targetId = convert_py_to_R(self.targetId),
+                comparatorId = convert_py_to_R(self.comparatorId),
+                outcomes = rOutcomes,
+                excludedCovariateConceptIds = convert_py_to_R(self.excludedCovariateConceptIds),
+                includedCovariateConceptIds = convert_py_to_R(self.includedCovariateConceptIds)
+            )
+            return rCreateTargetComparatorOutcomes
+        except Exception as e:
+            return Result(e, tb.format_exc(), task_run_context)
+
 class TimeAtRiskNode:
     # createTimeAtRiskDef(id = 1, startWith = "start", endWith = "end"),
     # createTimeAtRiskDef(id = 2, startWith = "start", endWith = "start", endOffset = 365)
@@ -499,5 +555,117 @@ class CohortDiagnosticsModuleSpecNode:
                 incremental = convert_py_to_R(self.incremental)
             )
             return Result(None, rCohortDiagnosticsSpec, task_run_context)
+        except Exception as e:
+            return Result(e, tb.format_exc(), task_run_context)
+
+class CohortMethodModuleSpecNode:
+
+    def __init__(self, _node):
+        # TODO: ensure analysisId and targetId are vectors
+        self.analysesToExclude = {
+            'analysisId': _node['analysisId'],
+            'targetId': _node['targetId']
+        }
+
+    def task(self, _input, task_run_context):
+        rCreateCohortMethodModuleSpecifications = robjects.globalenv["createCohortMethodModuleSpecifications"]
+        # TODO: ensure _input.rCmAnalysisList and _input.rTargetComparatorOutcomesList exist
+        try:
+            rCohortMethodSpec = rCreateCohortMethodModuleSpecifications(
+                cmAnalysisList = _input['rCmAnalysisList'],
+                targetComparatorOutcomesList = _input['rTargetComparatorOutcomesList'],
+                analysesToExclude = convert_py_to_R(pd.DataFrame(self.analysesToExclude))
+            )
+            return rCohortMethodSpec
+        except Exception as e:
+            return Result(e, tb.format_exc(), task_run_context)
+    
+    def test(self):
+        return None
+
+class CohortMethodAnalysisNode:
+
+    # TODO: all other parameters are args
+    def __init__(self, _node):
+        self.analysisId = _node['analysisId']
+        self.description = _node['description']
+        # self.
+
+class EraCovariateSettings:
+
+    def __init__(self, _node):
+        self.label = _node.label
+        self.includeEraIds = _node.includeEraIds
+        self.excludeEraIds = _node.excludeEraIds
+        self.firstOccurrenceOnly = _node.firstOccurrenceOnly
+        self.allowRegularization = _node.allowRegularization
+        self.stratifyById = _node.stratifyById
+        self.start = _node.start
+        self.end = _node.end
+        self.startAnchor = _node.startAnchor
+        self.endAnchor = _node.endAnchor
+        self.profileLikelihood = _node.profileLikelihood
+        self.exposureOfInterest = _node.exposureOfInterest
+
+    def task(self, _input, task_run_context):
+        try:
+            rSelfControlledCaseSeries = importr('SelfControlledCaseSeries')
+            rCreateEraCovariateSettings = rSelfControlledCaseSeries.createEraCovariateSettings
+            rCovarPreExp = rCreateEraCovariateSettings(
+                label = convert_py_to_R(self.label),
+                includeEraIds = convert_py_to_R(self.includeEraIds),
+                excludeEraIds = convert_py_to_R(self.excludeEraIds),
+                start = convert_py_to_R(self.start) ,
+                end = convert_py_to_R(self.end),
+                startAnchor = convert_py_to_R(self.startAnchor) ,
+                endAnchor = convert_py_to_R(self.endAnchor),
+                firstOccurrenceOnly = convert_py_to_R(self.firstOccurrenceOnly),
+                allowRegularization = convert_py_to_R(self.allowRegularization),
+                stratifyById = convert_py_to_R(self.stratifyById),
+                profileLikelihood = convert_py_to_R(self.profileLikelihood),
+                exposureOfInterest = convert_py_to_R(self.exposureOfInterest)
+            )
+            return rCovarPreExp
+        except Exception as e:
+            return Result(e, tb.format_exc(), task_run_context)
+
+class CalendarCovariateSettingsNode:
+
+    def __init__(self, _node):
+        self.calendarTimeKnots = _node['calendarTimeKnots']
+        self.allowRegularization = _node['allowRegularization']
+        self.computeConfidenceIntervals = _node['computeConfidenceIntervals']
+
+    def task(self, task_run_context):
+        try:
+            rSelfControlledCaseSeries = importr('SelfControlledCaseSeries')
+            rCreateCalendarTimeCovariateSettings = rSelfControlledCaseSeries.createCalendarTimeCovariateSettings
+            rCalendarTimeSettings = rCreateCalendarTimeCovariateSettings(
+                calendarTimeKnots = convert_py_to_R(self.calendarTimeKnots),
+                allowRegularization = convert_py_to_R(self.allowRegularization),
+                computeConfidenceIntervals = convert_py_to_R(self.computeConfidenceIntervals)
+            )
+            return rCalendarTimeSettings
+        except Exception as e:
+            return Result(e, tb.format_exc(), task_run_context)
+
+
+class SeasonalityCovariateSettingsNode:
+    
+    def __init__(self, _node):
+        self.seasonKnots = _node['seasonKnots']
+        self.allowRegularization = _node['allowRegularization']
+        self.computeConfidenceIntervals = _node['computeConfidenceIntervals']
+
+    def task(self, task_run_context):
+        try:
+            rSelfControlledCaseSeries = importr('SelfControlledCaseSeries')
+            rCreateSeasonalityCovariateSettings = rSelfControlledCaseSeries.createSeasonalityCovariateSettings
+            rSeasonalitySettings = rCreateSeasonalityCovariateSettings(
+                seasonKnots = convert_py_to_R(self.seasonKnots),
+                allowRegularization = convert_py_to_R(self.allowRegularization),
+                computeConfidenceIntervals = convert_py_to_R(self.computeConfidenceIntervals)
+            )
+            return rSeasonalitySettings
         except Exception as e:
             return Result(e, tb.format_exc(), task_run_context)
