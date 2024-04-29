@@ -60,8 +60,8 @@ jobs:
           echo BRANCH_NAME="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo REPO_FULL_NAME="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo REGISTRY_PASSWORD="$(op read op://${OP_VAULT_NAME}/az-alpCR/password | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
-          # echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
           echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
+          echo REGISTRY_USERNAME="$(op read op://${OP_VAULT_NAME}/az-alpCR/username | base64 -w0)" >> $GITHUB_OUTPUT
           # echo "test=hello" >> "$GITHUB_OUTPUT"
 
     outputs:
@@ -78,15 +78,20 @@ jobs:
     steps:
     - name: Decode credentials as environment variables
       run: |
-        REGISTRY_USERNAME=$(echo ${REGISTRY_USERNAME_BASE64} | base64 -di | base64 -di)
+        REGISTRY_USERNAME=$(echo ${REGISTRY_USERNAME_BASE64} | base64 -di)
         echo ::add-mask::${REGISTRY_USERNAME}
         echo REGISTRY_USERNAME_BASE64=$REGISTRY_USERNAME_BASE64
         echo REGISTRY_USERNAME_BASE=$REGISTRY_USERNAME
 
-        REGISTRY_PASSWORD=$(echo $REGISTRY_PASSWORD_BASE64 | base64 -di | base64 -di)
-        echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD >> $GITHUB_ENV
-        echo ::add-mask::${REGISTRY_PASSWORD}
-        echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD
+        # REGISTRY_USERNAME=$(echo ${REGISTRY_USERNAME_BASE64} | base64 -di | base64 -di)
+        # echo ::add-mask::${REGISTRY_USERNAME}
+        # echo REGISTRY_USERNAME_BASE64=$REGISTRY_USERNAME_BASE64
+        # echo REGISTRY_USERNAME_BASE=$REGISTRY_USERNAME
+
+        # REGISTRY_PASSWORD=$(echo $REGISTRY_PASSWORD_BASE64 | base64 -di | base64 -di)
+        # echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD >> $GITHUB_ENV
+        # echo ::add-mask::${REGISTRY_PASSWORD}
+        # echo REGISTRY_PASSWORD=$REGISTRY_PASSWORD
       env:
         REGISTRY_PASSWORD_BASE64: ${{ needs.setup.outputs.REGISTRY_PASSWORD }}
         REGISTRY_USERNAME_BASE64: ${{ needs.setup.outputs.REGISTRY_USERNAME }}
