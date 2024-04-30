@@ -20,7 +20,10 @@ export class DbService {
   async list() {
     const { grantType } = getReqContext()
     const isClientCredentials = grantType === 'client_credentials'
-    const query = this.dbRepo.createQueryBuilder('db').leftJoinAndSelect('db.credentials', 'dbCredential')
+    const query = this.dbRepo
+      .createQueryBuilder('db')
+      .leftJoinAndSelect('db.credentials', 'dbCredential')
+      .leftJoinAndSelect('db.vocabSchemas', 'dbVocabSchema')
 
     if (isClientCredentials) {
       query
@@ -32,10 +35,11 @@ export class DbService {
 
     const result = await query.select(this.getDbColumns(isClientCredentials)).getMany()
     return result.map(r => {
-      const { extra, ...entity } = r
+      const { extra, vocabSchemas, ...entity } = r
       return {
         ...entity,
-        extra: extra && extra[0].value
+        extra: extra && extra[0].value,
+        vocabSchemas: vocabSchemas.map(vocabSchema => vocabSchema.name)
       }
     })
   }
@@ -167,7 +171,8 @@ export class DbService {
       'db.dialect',
       'dbCredential.username',
       'dbCredential.userScope',
-      'dbCredential.serviceScope'
+      'dbCredential.serviceScope',
+      'dbVocabSchema.name'
     ]
     if (hasSecret) {
       return [...baseColumns, 'dbExtra.serviceScope', 'dbExtra.value', 'dbCredential.password', 'dbCredential.salt']

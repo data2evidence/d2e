@@ -105,10 +105,10 @@ export const processForComposeAnalytics = (
 
 export const processForComposeCdwSvc = (
   databaseValues: CombinedEnv
-): (HanaConfig | PostgresConfig)[] => {
-  let values:  (HanaConfig | PostgresConfig)[] = [];
+): HanaConfig [] => {
+  let values: HanaConfig[] = [];
   for (const value of databaseValues) {
-    if (value.type === "HANA" || value.type === "POSTGRES") {
+    if (value.type === "HANA") {
       value.values = _.merge(value.values, value.cdwSvcValues);
       cleanupOverwriteValues(value);
       values.push(value);
