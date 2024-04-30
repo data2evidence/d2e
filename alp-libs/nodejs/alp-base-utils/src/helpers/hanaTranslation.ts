@@ -189,7 +189,7 @@ export const translateHanaToPostgres = (temp: string, schema: string) => {
 
 export const translateHanaToDuckdb = (temp: string, schema: string): string => {
   temp = hanaCommonTranslation(temp);
-
+  temp = temp.replace(/\$\$SCHEMA\$\$./g, `${schema}.`);
   temp = temp.replace(/DAYS_BETWEEN \(/gi, `date_diff ('day', `);
   temp = temp.replace(/LIKE_REGEXPR/gi, "SIMILAR TO");
 
