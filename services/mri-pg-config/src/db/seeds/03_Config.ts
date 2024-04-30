@@ -25230,6 +25230,7 @@ const cdwConfigDuckdb = {
       '@TEXT.VALUE': 'CONCEPT_NAME',
       '@COHORT': '$$SCHEMA$$.cohort',
       '@COHORT.PATIENT_ID': 'subject_id',
+      '@COHORT.INTERACTION_TYPE': 'cohort_definition_id'
     },
     guardedTableMapping: {
       '@PATIENT': '$$SCHEMA$$."person"',
