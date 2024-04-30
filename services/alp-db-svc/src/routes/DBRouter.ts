@@ -1875,10 +1875,12 @@ export default class DBRouter {
           schema_name: schemaName,
           data_model: dataModel,
           vocab_schema: vocabSchemaName,
+          changelog_filepath: changelogFilepath,
         }) => ({
           schemaName,
           dataModel,
           vocabSchemaName,
+          changelogFilepath,
         })
       );
     try {
