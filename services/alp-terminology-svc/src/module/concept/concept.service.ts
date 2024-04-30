@@ -1,9 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { createLogger } from '../../logger';
 import { groupBy } from 'src/utils/helperUtil';
@@ -20,10 +15,9 @@ import {
   IConcept,
   Filters,
 } from '../../utils/types';
-import { SystemPortalAPI } from '../../api/portal-api';
 import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { Request } from 'express';
-import * as datefns from 'date-fns';
+import { SystemPortalAPI } from 'src/api/portal-api';
 
 // Placed outside as FHIR server is unable to access
 const logger = createLogger('ConceptService');
@@ -56,10 +50,9 @@ export class ConceptService {
       validity: filters?.validity ?? [],
     };
     const pageNumber = Math.floor(offset / rowsPerPage);
-    const { databaseName, vocabSchemaName } = await this.getDatasetDetails(
-      datasetId,
-      this.token,
-    );
+    const systemPortalApi = new SystemPortalAPI(this.token);
+    const { databaseCode, vocabSchemaName } =
+      await systemPortalApi.getDatasetDetails(datasetId);
     try {
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
@@ -67,7 +60,7 @@ export class ConceptService {
         pageNumber,
         Number(rowsPerPage),
         searchText,
-        `${databaseName}_${vocabSchemaName}_concept`,
+        `${databaseCode}_${vocabSchemaName}_concept`,
         completeFilters,
       );
       return this.meilisearchResultMapping(meilisearchResult);
@@ -82,16 +75,15 @@ export class ConceptService {
     searchTexts: number[],
   ): Promise<FhirValueSetExpansionContainsWithExt[]> {
     logger.info('Get list of concepts');
-    const { databaseName, vocabSchemaName } = await this.getDatasetDetails(
-      datasetId,
-      this.token,
-    );
+    const systemPortalApi = new SystemPortalAPI(this.token);
+    const { databaseCode, vocabSchemaName } =
+      await systemPortalApi.getDatasetDetails(datasetId);
     try {
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResult = await meilisearchApi.getMultipleExactConcepts(
         searchTexts,
-        `${databaseName}_${vocabSchemaName}_concept`,
+        `${databaseCode}_${vocabSchemaName}_concept`,
       );
       return meilisearchResult.map(
         (result) => this.meilisearchResultMapping(result).expansion.contains[0],
@@ -108,17 +100,16 @@ export class ConceptService {
   ) {
     logger.info('Get list of concept details and connections');
     try {
-      const { databaseName, vocabSchemaName } = await this.getDatasetDetails(
-        datasetId,
-        this.token,
-      );
+      const systemPortalApi = new SystemPortalAPI(this.token);
+      const { databaseCode, vocabSchemaName } =
+        await systemPortalApi.getDatasetDetails(datasetId);
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
       const searchConcepts1: number[] = [conceptId];
       const meilisearchResultConcept1 =
         await meilisearchApi.getMultipleExactConcepts(
           searchConcepts1,
-          `${databaseName}_${vocabSchemaName}_concept`,
+          `${databaseCode}_${vocabSchemaName}_concept`,
           true,
         );
       const conceptC1: FhirValueSet[] = meilisearchResultConcept1.map(
@@ -133,12 +124,12 @@ export class ConceptService {
 
         const conceptRelations = await meilisearchApi.getConceptRelationships(
           detailsC1.conceptId,
-          `${databaseName}_${vocabSchemaName}_concept_relationship`,
+          `${databaseCode}_${vocabSchemaName}_concept_relationship`,
         );
         for (let i = 0; i < conceptRelations.hits.length; i++) {
           const relationships = await meilisearchApi.getRelationships(
             conceptRelations.hits[i].relationship_id,
-            `${databaseName}_${vocabSchemaName}_relationship`,
+            `${databaseCode}_${vocabSchemaName}_relationship`,
           );
           const searchConcepts2: number[] = [
             conceptRelations.hits[i].concept_id_2,
@@ -146,7 +137,7 @@ export class ConceptService {
           const meilisearchResultConcept2 =
             await meilisearchApi.getMultipleExactConcepts(
               searchConcepts2,
-              `${databaseName}_${vocabSchemaName}_concept`,
+              `${databaseCode}_${vocabSchemaName}_concept`,
               true,
             );
           const conceptC2: FhirValueSet[] = meilisearchResultConcept2.map(
@@ -163,7 +154,7 @@ export class ConceptService {
           const meilisearchResultConcept3 =
             await meilisearchApi.getMultipleExactConcepts(
               searchConcepts3,
-              `${databaseName}_${vocabSchemaName}_concept`,
+              `${databaseCode}_${vocabSchemaName}_concept`,
               true,
             );
           const conceptC3: FhirValueSet[] = meilisearchResultConcept3.map(
@@ -214,15 +205,14 @@ export class ConceptService {
 
   async getRecommendedConcepts(conceptIds: number[], datasetId: string) {
     try {
-      const { databaseName, vocabSchemaName } = await this.getDatasetDetails(
-        datasetId,
-        this.token,
-      );
+      const systemPortalApi = new SystemPortalAPI(this.token);
+      const { databaseCode, vocabSchemaName } =
+        await systemPortalApi.getDatasetDetails(datasetId);
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResultCR = await meilisearchApi.getRecommendedConcepts(
         conceptIds,
-        `${databaseName}_${vocabSchemaName}_concept_recommended`,
+        `${databaseCode}_${vocabSchemaName}_concept_recommended`,
       );
 
       const mappedConceptIds: number[] = [];
@@ -235,7 +225,7 @@ export class ConceptService {
 
       const meilisearchResult = await meilisearchApi.getMultipleExactConcepts(
         mappedConceptIds,
-        `${databaseName}_${vocabSchemaName}_concept`,
+        `${databaseCode}_${vocabSchemaName}_concept`,
         false,
       );
       return meilisearchResult
@@ -258,14 +248,13 @@ export class ConceptService {
     datasetId: string;
   }) {
     try {
-      const { databaseName, vocabSchemaName } = await this.getDatasetDetails(
-        datasetId,
-        this.token,
-      );
+      const systemPortalApi = new SystemPortalAPI(this.token);
+      const { databaseCode, vocabSchemaName } =
+        await systemPortalApi.getDatasetDetails(datasetId);
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResult = await meilisearchApi.getConceptByName(
         conceptName,
-        `${databaseName}_${vocabSchemaName}_concept`,
+        `${databaseCode}_${vocabSchemaName}_concept`,
       );
       const fhirValueSet = this.meilisearchResultMapping(meilisearchResult);
       const concepts = fhirValueSet.expansion.contains.map((fhirconcept) => {
@@ -295,12 +284,11 @@ export class ConceptService {
     filters: Filters,
   ) {
     try {
-      const { databaseName, vocabSchemaName } = await this.getDatasetDetails(
-        datasetId,
-        this.token,
-      );
+      const systemPortalApi = new SystemPortalAPI(this.token);
+      const { databaseCode, vocabSchemaName } =
+        await systemPortalApi.getDatasetDetails(datasetId);
       const meilisearchApi = new MeilisearchAPI();
-      const meiliIndex = `${databaseName}_${vocabSchemaName}_concept`;
+      const meiliIndex = `${databaseCode}_${vocabSchemaName}_concept`;
       const conceptClassIdFacets =
         await meilisearchApi.getConceptFilterOptionsFaceted(
           meiliIndex,
@@ -388,6 +376,7 @@ export class ConceptService {
     };
     return details;
   }
+
   private meilisearchResultMapping(
     meilisearchResult: IMeilisearchConcept,
   ): FhirValueSet {
@@ -407,32 +396,5 @@ export class ConceptService {
       expansion: valueSetExpansion,
     };
     return result;
-  }
-
-  private async getDatasetDetails(datasetId: string, token: string) {
-    const systemPortalApi = new SystemPortalAPI(token);
-    const dataset = await systemPortalApi.getDataset(datasetId);
-    if (!dataset) {
-      throw new BadRequestException(
-        `Could not find dataset with datasetId: ${datasetId}`,
-      );
-    }
-
-    if (!dataset.databaseCode) {
-      throw new InternalServerErrorException(
-        `Database code does not exist for datasetId: ${datasetId}`,
-      );
-    }
-
-    if (!dataset.vocabSchemaName) {
-      throw new InternalServerErrorException(
-        `vocabSchemaName does not exist for datasetId: ${datasetId}`,
-      );
-    }
-
-    return {
-      databaseName: dataset.databaseCode,
-      vocabSchemaName: dataset.vocabSchemaName,
-    };
   }
 }
