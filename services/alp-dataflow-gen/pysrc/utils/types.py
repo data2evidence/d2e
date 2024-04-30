@@ -124,6 +124,7 @@ class getVersionInfoType(BaseModel):
     token: str
     flow_name: str = Field(...)
     changelog_filepath: Optional[str]
+    changelog_filepath_list: Dict
 
 
 class datasetVersionInfoType(BaseModel):

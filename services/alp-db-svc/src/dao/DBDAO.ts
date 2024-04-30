@@ -55,6 +55,7 @@ class DBDAO {
             schemaObj.hasOwnProperty("schemaName") &&
             schemaObj.hasOwnProperty("dataModel") &&
             schemaObj.hasOwnProperty("vocabSchemaName") &&
+            schemaObj.hasOwnProperty("changelogFilepath") &&
             schemaObj.hasOwnProperty("currentVersionID")
           ) {
             successfulSchemasInfo.push(schemaObj); // return schemaName if its relation error
@@ -75,7 +76,6 @@ class DBDAO {
             await this.getLatestAvailableVersion(
               tenant,
               schemaObj,
-              pluginChangelogFilepath,
               pluginClasspath
             );
           schemaObj["latestVersionID"] =
@@ -118,7 +118,6 @@ class DBDAO {
   getLatestAvailableVersion = (
     tenant,
     schemaObj: SchemaVersionInfo,
-    pluginChangelogFilepath: string | undefined,
     pluginClasspath: string | undefined
   ) => {
     return new Promise<string>((resolve, reject) => {
@@ -136,7 +135,7 @@ class DBDAO {
             tenant,
             schemaObj.schemaName,
             schemaObj.dataModel!,
-            pluginChangelogFilepath,
+            schemaObj.changelogFilepath!,
             pluginClasspath
           )
         );
@@ -213,6 +212,7 @@ class DBDAO {
                 schemaName: datamodelSchemaMapping.schemaName,
                 vocabSchemaName: datamodelSchemaMapping.vocabSchemaName,
                 dataModel: datamodelSchemaMapping.dataModel,
+                changelogFilepath: datamodelSchemaMapping.changelogFilepath,
                 currentVersionID: currentVersionID,
                 //lastUpdated: lastUpdated,
               });

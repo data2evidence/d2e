@@ -42,7 +42,7 @@ def run_seed_postgres(database_code: str, vocab_schema_name: str, cdm_schema_nam
 async def run_command(request_type: str, request_url: str, request_body):
     logger = get_run_logger()
     try:
-        _run_db_svc_shell_command(request_type, request_url, request_body)
+        await _run_db_svc_shell_command(request_type, request_url, request_body)
     except Exception as e:
         logger.error(e)
         raise e
@@ -106,7 +106,7 @@ async def _run_db_svc_shell_command(request_type: str, request_url: str, request
         commands=[
             "cd /app/libs",
             ". generated-env.sh",
-            f"cd {MODULE_DIR}/d2e_dbsvc//nodejs/dbsvc_files",
+            f"cd {MODULE_DIR}/d2e_dbsvc/nodejs/dbsvc_files",
             command]).run()
 
 

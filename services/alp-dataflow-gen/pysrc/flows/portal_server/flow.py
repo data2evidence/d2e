@@ -23,6 +23,7 @@ def get_version_info(options: getVersionInfoType):
     token = options.token
     flow_name = options.flow_name
     changelog_filepath = options.changelog_filepath
+    changelog_filepath_list = options.changelog_filepath_list
 
     logger.info("Fetching datasets from portal...")
     try:
@@ -60,6 +61,11 @@ def get_version_info(options: getVersionInfoType):
             request_body = _add_plugin_options(
                 request_body, db_dialect, flow_name, changelog_filepath
             )
+
+            for dataset in request_body["datasetListFromPortal"]:
+                data_model_changelog_filepath = changelog_filepath_list.get(
+                    dataset["data_model"].split(" ")[0].replace("_", "-"), "")
+                dataset["changelog_filepath"] = f'db/migrations/{db_dialect}/{data_model_changelog_filepath}'
 
             try:
                 # task to fetch version-info for each db
