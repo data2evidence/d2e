@@ -925,7 +925,14 @@ export const ROLE_SCOPES = {
   ],
   ALP_SHARED: ['usermgmt.group.read', 'usermgmt.group.add', 'usermgmt.group.delete'],
   USER_MGMT_GROUP_DELETE: ['usermgmt.group.delete'],
-  [`${env.IDP_ALP_SVC_CLIENT_ID}`]: ['dbCredentials.db.list', 'portal.dataset.read'],
+  [`${env.IDP_ALP_SVC_CLIENT_ID}`]: [
+    'dbCredentials.db.list',
+    'portal.dataset.read',
+    'meilisearchSvc.index.add',
+    'meilisearchSvc.index.setting.update',
+    'meilisearchSvc.document.add',
+    'meilisearchSvc.document.add'
+  ],
   [`${env.IDP_ALP_DATA_CLIENT_ID}`]: [
     'portal.dataset.read',
     'dbSvc.schema.create',
