@@ -61,7 +61,7 @@ x-envs:
           "requiredRoles": [
             "RESEARCHER"
           ],
-          "route": "concepts",
+          "route": "concepts"
         },
         {
           "enabled": true,
