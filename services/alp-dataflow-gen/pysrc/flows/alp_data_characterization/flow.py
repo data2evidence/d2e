@@ -13,6 +13,8 @@ from alpconnection.dbutils import get_db_svc_endpoint_dialect
 import importlib
 from flows.alp_db_svc.flow import _run_db_svc_shell_command, _add_plugin_options
 
+r_libs_user_directory = os.getenv("R_LIBS_USER")
+
 
 @task
 async def execute_data_characterization(schemaName: str,
@@ -31,8 +33,11 @@ async def execute_data_characterization(schemaName: str,
             databaseCode, releaseDate, PG_TENANT_USERS.ADMIN_USER)
 
         logger.info('Running achilles')
+
         with conversion.localconverter(default_converter):
             robjects.r(f'''
+                    .libPaths(c('{r_libs_user_directory}',.libPaths()))
+                    library('Achilles', lib.loc = '{r_libs_user_directory}')
                     {setDBDriverEnvString}
                     {connectionDetailsString}
                     cdmVersion <- '{cdmVersionNumber}'
@@ -65,6 +70,8 @@ async def execute_export_to_ares(schemaName: str,
         logger.info('Running exportToAres')
         with conversion.localconverter(default_converter):
             robjects.r(f'''
+                    .libPaths(c('{r_libs_user_directory}',.libPaths()))
+                    library('Achilles', lib.loc = '{r_libs_user_directory}')
                     {setDBDriverEnvString}
                     {connectionDetailsString}
                     cdmDatabaseSchema <- '{schemaName}'
