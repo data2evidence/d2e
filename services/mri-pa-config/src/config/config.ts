@@ -540,11 +540,9 @@ export class MRIConfig {
                 //get config selected for input configId
                 const configVersion = 'A' // get the active config
                 this._getConfigById(configId, configVersion, (err, config) => {
-                   config.dependentConfig = {
-                        configId: config.meta.dependentConfig.configId,
-                        configVersion: config.meta.dependentConfig.configVersion,
-                    },
-                    buildSingleFrontEndConfig([config]);
+                    const returnConfig = config.meta;
+                    returnConfig.config = config.config
+                    buildSingleFrontEndConfig([returnConfig]);
                 })
             }else{
                 // return the list of assigned configs
