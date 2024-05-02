@@ -14,10 +14,10 @@ import {
 } from "@alp/alp-base-utils";
 
 import express from "express";
-import http from "http";
+import https from "https";
 import helmet from "helmet";
 import path from "path";
-import { access, constants } from 'node:fs/promises';
+import { access, constants } from "node:fs/promises";
 import * as mri2 from "./mri/endpoint/analytics";
 import * as xsenv from "@sap/xsenv";
 import { AuditLogger } from "./utils/AuditLogger";
@@ -518,16 +518,15 @@ const getDBConnections = async ({
     analyticsConnection: Connection.ConnectionInterface;
     vocabConnection: Connection.ConnectionInterface;
 }> => {
-
     // Define defaults for both analytics & Vocab connections
     let analyticsConnectionPromise;
 
     const vocabConnectionPromise =
-    dbConnectionUtil.DBConnectionUtil.getDBConnection({
-        credentials: vocabCredentials,
-        schema: vocabCredentials.vocabSchema,
-        userObj,
-    });
+        dbConnectionUtil.DBConnectionUtil.getDBConnection({
+            credentials: vocabCredentials,
+            schema: vocabCredentials.vocabSchema,
+            userObj,
+        });
 
     if (USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
         // Use duckdb as analyticsConnection if USE_DUCKDB flag is set to true
@@ -536,9 +535,23 @@ const getDBConnections = async ({
 
         try {
             // Check duckdb dataset access
-            await access(path.join(DUCKDB_DATA_FOLDER, duckdbSchemaFileName), constants.R_OK);
-            await access(path.join(DUCKDB_DATA_FOLDER, duckdbVocabSchemaFileName), constants.R_OK);
-            log.debug(`Duckdb accessible at paths ${path.join(DUCKDB_DATA_FOLDER, duckdbSchemaFileName)} AND ${path.join(DUCKDB_DATA_FOLDER, duckdbVocabSchemaFileName)}`)
+            await access(
+                path.join(DUCKDB_DATA_FOLDER, duckdbSchemaFileName),
+                constants.R_OK
+            );
+            await access(
+                path.join(DUCKDB_DATA_FOLDER, duckdbVocabSchemaFileName),
+                constants.R_OK
+            );
+            log.debug(
+                `Duckdb accessible at paths ${path.join(
+                    DUCKDB_DATA_FOLDER,
+                    duckdbSchemaFileName
+                )} AND ${path.join(
+                    DUCKDB_DATA_FOLDER,
+                    duckdbVocabSchemaFileName
+                )}`
+            );
 
             // resolve error from getDuckdbDBConnection so that PA screen continues to load and user is able to select other datasets.
             analyticsConnectionPromise = new Promise(
@@ -546,7 +559,7 @@ const getDBConnections = async ({
                     try {
                         const conn = await getDuckdbDBConnection(
                             duckdbSchemaFileName,
-                            duckdbVocabSchemaFileName,
+                            duckdbVocabSchemaFileName
                         );
                         resolve(conn);
                     } catch (err) {
@@ -554,18 +567,28 @@ const getDBConnections = async ({
                     }
                 }
             );
-          } catch (e) {
+        } catch (e) {
             log.error(e);
-            log.warn(`Duckdb Inaccessible at following paths ${path.join(DUCKDB_DATA_FOLDER, duckdbSchemaFileName)} OR ${path.join(DUCKDB_DATA_FOLDER, duckdbVocabSchemaFileName)}. Hence fallback to Postgres dialect connection`)
-          }
+            log.warn(
+                `Duckdb Inaccessible at following paths ${path.join(
+                    DUCKDB_DATA_FOLDER,
+                    duckdbSchemaFileName
+                )} OR ${path.join(
+                    DUCKDB_DATA_FOLDER,
+                    duckdbVocabSchemaFileName
+                )}. Hence fallback to Postgres dialect connection`
+            );
+        }
     }
 
-    if(!analyticsConnectionPromise) { //Initialize if not yet until this point
-        analyticsConnectionPromise = dbConnectionUtil.DBConnectionUtil.getDBConnection({
-            credentials: analyticsCredentials,
-            schema: analyticsCredentials.schema,
-            userObj,
-        });
+    if (!analyticsConnectionPromise) {
+        //Initialize if not yet until this point
+        analyticsConnectionPromise =
+            dbConnectionUtil.DBConnectionUtil.getDBConnection({
+                credentials: analyticsCredentials,
+                schema: analyticsCredentials.schema,
+                userObj,
+            });
     }
 
     const [analyticsConnection, vocabConnection] = await Promise.all([
@@ -610,8 +633,10 @@ const main = async () => {
     await initSwaggerRoutes(app);
     utils.setupGlobalErrorHandling(app, log);
 
-    const server = http.createServer(
+    const server = https.createServer(
         {
+            key: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, "\n"),
+            cert: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, "\n"),
             maxHeaderSize: 8192 * 10,
         },
         app

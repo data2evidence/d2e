@@ -8,10 +8,12 @@ class MeilisearchSvcAPI:
     def __init__(self, token):
         if os.getenv('MEILISEARCH_SVC__API_BASE_URL') is None:
             raise ValueError("MEILISEARCH_SVC__API_BASE_URL is undefined")
+        if os.getenv("PYTHON_VERIFY_SSL") == 'true' and os.getenv('TLS__INTERNAL__CA_CRT') is None:
+            raise ValueError("TLS__INTERNAL__CA_CRT is undefined")
         self.url = os.getenv('MEILISEARCH_SVC__API_BASE_URL')
         self.token = token
         self.verifySsl = False if os.getenv(
-            "PYTHON_VERIFY_SSL") == 'false' else True
+            "PYTHON_VERIFY_SSL") == 'false' else os.getenv('TLS__INTERNAL__CA_CRT')
 
     def getOptions(self):
         return {
@@ -69,7 +71,7 @@ class MeilisearchSvcAPI:
 
     def update_synonym_index(self, index_name: str, documents):
         url = f"{self.url}indexes/{index_name}/settings/synonyms"
-        
+
         headers = self.getOptions()
         result = requests.put(
             url,

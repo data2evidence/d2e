@@ -24,8 +24,8 @@ export async function loadBookmarks(
         urlParams = new URL(`http://localhost:41005`);
         protocolLib = http;
     } else {
-        urlParams = new URL("http://alp-minerva-bookmark-svc-1:41110");
-        protocolLib = http;
+        urlParams = new URL(process.env.ALP_MINERVA_BOOKMARKS__URL);
+        protocolLib = https;
     }
 
     hostname = urlParams.hostname;
@@ -45,10 +45,8 @@ export async function loadBookmarks(
             "x-source-origin": sourceOrigin,
             "x-alp-usersessionclaims": req.headers["x-alp-usersessionclaims"],
         },
-        rejectUnauthorized:
-            hostname === "localhost" || hostname === "alp-mercury-approuter"
-                ? false
-                : true,
+        rejectUnauthorized: true,
+        ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
 
     switch (bookmark_cmd) {

@@ -31,5 +31,9 @@ export const env = {
   PG_MANAGE_PASSWORD: process.env.PG__DATAFLOW_MGMT__MANAGE_PASSWORD,
   PG_SSL: process.env.PG__SSL,
   PG_CA_ROOT_CERT: process.env.PG__CA_ROOT_CERT,
-  PG_MAX_POOL: parseInt(process.env.PG__MAX_POOL) || 10
+  PG_MAX_POOL: parseInt(process.env.PG__MAX_POOL) || 10,
+
+  SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
+  SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
+  SSL_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
 }

@@ -1,9 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Agent } from 'https';
 import { env } from '../env';
 import { createLogger } from '../logger';
-
 export class SystemPortalAPI {
   private readonly jwt: string;
   private readonly url: string;
@@ -18,18 +20,15 @@ export class SystemPortalAPI {
     if (env.SYSTEM_PORTAL__API_URL) {
       this.url = env.SYSTEM_PORTAL__API_URL;
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') ||
-          this.url.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true,
+        rejectUnauthorized: true,
+        ca: env.TLS__INTERNAL__CA_CRT,
       });
     } else {
       throw new Error('No url is set for PortalAPI');
     }
   }
 
-  async getDataset(
+  private async getDataset(
     datasetId: string,
   ): Promise<{ vocabSchemaName: string; databaseCode: string }> {
     this.logger.info(
@@ -40,12 +39,37 @@ export class SystemPortalAPI {
       const options = await this.createOptions();
       const url = `${this.url}dataset/${datasetId}`;
       const result = await axios.get(url, options);
-      //this.logger.info(JSON.stringify(result));
       return result.data;
     } catch (error) {
       this.logger.error(`${errorMessage}: ${error}`);
       throw new InternalServerErrorException(errorMessage);
     }
+  }
+
+  async getDatasetDetails(datasetId: string) {
+    const dataset = await this.getDataset(datasetId);
+    if (!dataset) {
+      throw new BadRequestException(
+        `Could not find dataset with datasetId: ${datasetId}`,
+      );
+    }
+
+    if (!dataset.databaseCode) {
+      throw new InternalServerErrorException(
+        `Database code does not exist for datasetId: ${datasetId}`,
+      );
+    }
+
+    if (!dataset.vocabSchemaName) {
+      throw new InternalServerErrorException(
+        `vocabSchemaName does not exist for datasetId: ${datasetId}`,
+      );
+    }
+
+    return {
+      databaseCode: dataset.databaseCode,
+      vocabSchemaName: dataset.vocabSchemaName,
+    };
   }
 
   private async createOptions() {
