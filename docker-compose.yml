@@ -1337,6 +1337,17 @@ services:
       alp-minerva-postgres:
         condition: service_healthy
     image: alpcr.azurecr.io/alp-data-node/alp-terminology-svc:${DOCKER_TAG_NAME:-develop}
+    healthcheck:
+      interval: 20s
+      retries: 10
+      start_period: 60s
+      test:
+        - CMD
+        - wget
+        - --no-check-certificate
+        - -O
+        - liveness
+        - https://0.0.0.0:41108/check-liveness
     logging:
       options:
         tag: *c21
