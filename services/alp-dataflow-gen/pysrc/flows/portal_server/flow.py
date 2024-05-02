@@ -360,10 +360,7 @@ def get_total_entity_count(entity_count_distribution) -> str:
             if entity_count == "error":
                 continue
             else:
-                try:
-                    total_entity_count += int(entity_count)
-                except ValueError:
-                    continue
+                total_entity_count += int(entity_count)
     except Exception as e:
         get_run_logger().error(f"Error retrieving total entity count: {e}")
         total_entity_count = "error"
