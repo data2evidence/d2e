@@ -162,13 +162,18 @@ export class ConceptSetService {
       const { conceptSetIds, datasetId } = body;
 
       const systemPortalApi = new SystemPortalAPI(this.token);
-      const { databaseCode, vocabSchemaName } =
+      const { databaseCode, vocabSchemaName, dialect } =
         await systemPortalApi.getDatasetDetails(datasetId);
 
       const meilisearchApi = new MeilisearchAPI();
-      const conceptIndex = `${databaseCode}_${vocabSchemaName}_concept`;
-      const conceptAncestorIndex = `${databaseCode}_${vocabSchemaName}_concept_ancestor`;
-      const conceptRelationshipIndex = `${databaseCode}_${vocabSchemaName}_concept_relationship`;
+      const conceptName = dialect === 'hana' ? 'CONCEPT' : 'concept';
+      const conceptAncestorName =
+        dialect === 'hana' ? 'CONCEPT_ANCESTOR' : 'concept_ancestor';
+      const conceptRelationshipName =
+        dialect === 'hana' ? 'CONCEPT_RELATIONSHIP' : 'concept_relationship';
+      const conceptIndex = `${databaseCode}_${vocabSchemaName}_${conceptName}`;
+      const conceptAncestorIndex = `${databaseCode}_${vocabSchemaName}_${conceptAncestorName}`;
+      const conceptRelationshipIndex = `${databaseCode}_${vocabSchemaName}_${conceptRelationshipName}`;
       const promises = conceptSetIds.map((conceptSetId) =>
         this.getConceptSet(conceptSetId, datasetId),
       );
