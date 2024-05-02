@@ -669,6 +669,7 @@ services:
       ALP_MINERVA_QUERY_GEN__URL: https://alp-minerva-query-gen-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41109
       ALP_TERMINOLOGY__URL: https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108
       ALP_MINERVA_BOOKMARKS__URL: https://alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110
+      ALP_PORTAL_MRI_ENDPOINT: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/analytics-svc/api/services
       ALP_PORTAL_SCOPE: https://alpsgdev.onmicrosoft.com/alp-portal/.default
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
       ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT
