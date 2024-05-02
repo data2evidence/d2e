@@ -51,7 +51,7 @@ export class ConceptService {
     };
     const pageNumber = Math.floor(offset / rowsPerPage);
     const systemPortalApi = new SystemPortalAPI(this.token);
-    const { databaseCode, vocabSchemaName } =
+    const { databaseCode, vocabSchemaName, dialect } =
       await systemPortalApi.getDatasetDetails(datasetId);
     try {
       logger.info('Searching with Meilisearch');
@@ -60,7 +60,9 @@ export class ConceptService {
         pageNumber,
         Number(rowsPerPage),
         searchText,
-        `${databaseCode}_${vocabSchemaName}_concept`,
+        `${databaseCode}_${vocabSchemaName}_${
+          dialect === 'hana' ? 'CONCEPT' : 'concept'
+        }`,
         completeFilters,
       );
       return this.meilisearchResultMapping(meilisearchResult);
@@ -76,14 +78,16 @@ export class ConceptService {
   ): Promise<FhirValueSetExpansionContainsWithExt[]> {
     logger.info('Get list of concepts');
     const systemPortalApi = new SystemPortalAPI(this.token);
-    const { databaseCode, vocabSchemaName } =
+    const { databaseCode, vocabSchemaName, dialect } =
       await systemPortalApi.getDatasetDetails(datasetId);
     try {
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResult = await meilisearchApi.getMultipleExactConcepts(
         searchTexts,
-        `${databaseCode}_${vocabSchemaName}_concept`,
+        `${databaseCode}_${vocabSchemaName}_${
+          dialect === 'hana' ? 'CONCEPT' : 'concept'
+        }`,
       );
       return meilisearchResult.map(
         (result) => this.meilisearchResultMapping(result).expansion.contains[0],
@@ -101,7 +105,7 @@ export class ConceptService {
     logger.info('Get list of concept details and connections');
     try {
       const systemPortalApi = new SystemPortalAPI(this.token);
-      const { databaseCode, vocabSchemaName } =
+      const { databaseCode, vocabSchemaName, dialect } =
         await systemPortalApi.getDatasetDetails(datasetId);
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
@@ -109,7 +113,9 @@ export class ConceptService {
       const meilisearchResultConcept1 =
         await meilisearchApi.getMultipleExactConcepts(
           searchConcepts1,
-          `${databaseCode}_${vocabSchemaName}_concept`,
+          `${databaseCode}_${vocabSchemaName}_${
+            dialect === 'hana' ? 'CONCEPT' : 'concept'
+          }`,
           true,
         );
       const conceptC1: FhirValueSet[] = meilisearchResultConcept1.map(
@@ -124,12 +130,16 @@ export class ConceptService {
 
         const conceptRelations = await meilisearchApi.getConceptRelationships(
           detailsC1.conceptId,
-          `${databaseCode}_${vocabSchemaName}_concept_relationship`,
+          `${databaseCode}_${vocabSchemaName}_${
+            dialect === 'hana' ? 'CONCEPT_RELATIONSHIP' : 'concept_relationship'
+          }`,
         );
         for (let i = 0; i < conceptRelations.hits.length; i++) {
           const relationships = await meilisearchApi.getRelationships(
             conceptRelations.hits[i].relationship_id,
-            `${databaseCode}_${vocabSchemaName}_relationship`,
+            `${databaseCode}_${vocabSchemaName}_${
+              dialect === 'hana' ? 'RELATIONSHIP' : 'relationship'
+            }`,
           );
           const searchConcepts2: number[] = [
             conceptRelations.hits[i].concept_id_2,
@@ -137,7 +147,9 @@ export class ConceptService {
           const meilisearchResultConcept2 =
             await meilisearchApi.getMultipleExactConcepts(
               searchConcepts2,
-              `${databaseCode}_${vocabSchemaName}_concept`,
+              `${databaseCode}_${vocabSchemaName}_${
+                dialect === 'hana' ? 'CONCEPT' : 'concept'
+              }`,
               true,
             );
           const conceptC2: FhirValueSet[] = meilisearchResultConcept2.map(
@@ -154,7 +166,9 @@ export class ConceptService {
           const meilisearchResultConcept3 =
             await meilisearchApi.getMultipleExactConcepts(
               searchConcepts3,
-              `${databaseCode}_${vocabSchemaName}_concept`,
+              `${databaseCode}_${vocabSchemaName}_${
+                dialect === 'hana' ? 'CONCEPT' : 'concept'
+              }`,
               true,
             );
           const conceptC3: FhirValueSet[] = meilisearchResultConcept3.map(
@@ -206,13 +220,15 @@ export class ConceptService {
   async getRecommendedConcepts(conceptIds: number[], datasetId: string) {
     try {
       const systemPortalApi = new SystemPortalAPI(this.token);
-      const { databaseCode, vocabSchemaName } =
+      const { databaseCode, vocabSchemaName, dialect } =
         await systemPortalApi.getDatasetDetails(datasetId);
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResultCR = await meilisearchApi.getRecommendedConcepts(
         conceptIds,
-        `${databaseCode}_${vocabSchemaName}_concept_recommended`,
+        `${databaseCode}_${vocabSchemaName}_${vocabSchemaName}_${
+          dialect === 'hana' ? 'CONCEPT_RECOMMENDED' : 'concept_recommended'
+        }`,
       );
 
       const mappedConceptIds: number[] = [];
@@ -225,7 +241,9 @@ export class ConceptService {
 
       const meilisearchResult = await meilisearchApi.getMultipleExactConcepts(
         mappedConceptIds,
-        `${databaseCode}_${vocabSchemaName}_concept`,
+        `${databaseCode}_${vocabSchemaName}_${
+          dialect === 'hana' ? 'CONCEPT' : 'concept'
+        }`,
         false,
       );
       return meilisearchResult
@@ -249,12 +267,14 @@ export class ConceptService {
   }) {
     try {
       const systemPortalApi = new SystemPortalAPI(this.token);
-      const { databaseCode, vocabSchemaName } =
+      const { databaseCode, vocabSchemaName, dialect } =
         await systemPortalApi.getDatasetDetails(datasetId);
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResult = await meilisearchApi.getConceptByName(
         conceptName,
-        `${databaseCode}_${vocabSchemaName}_concept`,
+        `${databaseCode}_${vocabSchemaName}_${
+          dialect === 'hana' ? 'CONCEPT' : 'concept'
+        }`,
       );
       const fhirValueSet = this.meilisearchResultMapping(meilisearchResult);
       const concepts = fhirValueSet.expansion.contains.map((fhirconcept) => {
@@ -285,10 +305,12 @@ export class ConceptService {
   ) {
     try {
       const systemPortalApi = new SystemPortalAPI(this.token);
-      const { databaseCode, vocabSchemaName } =
+      const { databaseCode, vocabSchemaName, dialect } =
         await systemPortalApi.getDatasetDetails(datasetId);
       const meilisearchApi = new MeilisearchAPI();
-      const meiliIndex = `${databaseCode}_${vocabSchemaName}_concept`;
+      const meiliIndex = `${databaseCode}_${vocabSchemaName}_${
+        dialect === 'hana' ? 'CONCEPT' : 'concept'
+      }`;
       const conceptClassIdFacets =
         await meilisearchApi.getConceptFilterOptionsFaceted(
           meiliIndex,
