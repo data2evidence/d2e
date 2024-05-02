@@ -731,11 +731,6 @@ function _getValidDefinition(cdwConfig) {
                 type: "boolean",
                 strict: false,
             },
-            {
-                name: "nonInteractiveMode",
-                type: "boolean",
-                strict: false,
-            },
             // deprecated
             {
                 name: "afp",
