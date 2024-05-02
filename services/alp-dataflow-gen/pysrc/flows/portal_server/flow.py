@@ -221,12 +221,12 @@ def get_and_update_attributes(dataset_schema_mapping: datasetSchemaMappingType,
         # handle case where schema does not exist in db
         schema_exists = dataset_dao.check_schema_exists()
         if schema_exists == False:
-            logger.error(
-                f"Schema does not exist in db for dataset {dataset_id}")
+            error_msg = f"Schema does not exist in db for dataset {dataset_id}"
+            logger.error(error_msg)
             update_dataset_attributes_table(
-                dataset_id, "schema_version", "error", token)
+                dataset_id, "schema_version", error_msg, token)
             update_dataset_attributes_table(
-                dataset_id, "latest_schema_version", "error", token)
+                dataset_id, "latest_schema_version", error_msg, token)
             failed_record = ETLStatus(2, dataset_schema_mapping)
             etl_error_list.append(failed_record)
             return etl_error_list
@@ -348,8 +348,9 @@ def get_patient_count(dao_obj: DBDao, is_lower_case: bool) -> str:
             patient_count = dao_obj.get_distinct_count("PERSON", "PERSON_ID")
         return str(patient_count)
     except Exception as e:
-        get_run_logger().error(f"Error retrieving patient count: {e}")
-        return "error"
+        error_msg = f"Error retrieving patient count: {e}"
+        get_run_logger().error(error_msg)
+        return error_msg
 
 
 def get_total_entity_count(entity_count_distribution) -> str:
@@ -362,8 +363,9 @@ def get_total_entity_count(entity_count_distribution) -> str:
             else:
                 total_entity_count += int(entity_count)
     except Exception as e:
-        get_run_logger().error(f"Error retrieving total entity count: {e}")
-        total_entity_count = "error"
+        error_msg = f"Error retrieving entity count: {e}"
+        get_run_logger().error(error_msg)
+        total_entity_count = error_msg
     return str(total_entity_count)
 
 
@@ -386,7 +388,6 @@ def get_entity_count_distribution(dao_obj: DBDao, is_lower_case: bool) -> entity
     return entity_count_distribution
 
 
-
 def check_table_case(dao_obj: DBDao) -> bool:
     # works only for omop, omop5-4 data models
     table_names = dao_obj.get_table_names()
@@ -403,8 +404,9 @@ def get_cdm_version(dao_obj: DBDao, is_lower_case: bool) -> str:
         else:
             cdm_version = dao_obj.get_cdm_version("CDM_SOURCE", "CDM_VERSION")
     except Exception as e:
-        get_run_logger().error(f"Error retrieving cdm version: {e}")
-        cdm_version = "error"
+        error_msg = f"Error retrieving cdm version: {e}"
+        get_run_logger().error(error_msg)
+        raise Exception(error_msg) 
     return cdm_version
 
 
@@ -421,8 +423,8 @@ def extract_version_info(schema_name: str, version_info_response: versionInfoRes
     for _schema_response in combined_list:
         if schema_name == _schema_response["schemaName"]:
             mapped_version_info = {
-                "current_schema_version": _schema_response.get("currentVersionID", "error"),
-                "latest_schema_version":  _schema_response.get("latestVersionID", "error"),
-                "data_model":  _schema_response.get("dataModel", "error")
+                "current_schema_version": _schema_response.get("currentVersionID", "Error: currentVersionID not present in version info response."),
+                "latest_schema_version":  _schema_response.get("latestVersionID", "Error: latestVersionID not present in version info response."),
+                "data_model":  _schema_response.get("dataModel", "Error: dataModel not present in version info response.")
             }
     return mapped_version_info
