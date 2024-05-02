@@ -37,10 +37,8 @@ def execute_add_index_flow(options: meilisearchAddIndexType):
     # logger.info(f"Getting stream connection")
     conn = vocab_dao.get_stream_connection(yield_per=CHUNK_SIZE)
     try:
-        if table_name == 'concept_synonym':
-
-            stream_result_set = vocab_dao.get_stream_result_set_concept_synonym(
-                conn, vocab_schema_name)
+        if table_name.lower() == 'concept_synonym':
+            stream_result_set = vocab_dao.get_stream_result_set_concept_synonym(conn, vocab_schema_name)
             res_dict = dict(stream_result_set)
             for key, value in res_dict.items():
                 res_dict[key] = list(set(value.split(',')))
@@ -50,8 +48,10 @@ def execute_add_index_flow(options: meilisearchAddIndexType):
                 for i in range(0, len(data), CHUNK_SIZE):
                     yield dict(islice(it, CHUNK_SIZE))
 
+            concept_table_name = "CONCEPT" if table_name.isupper() else "concept"        
+
             # Update concept name with synonyms
-            index_name = f"{database_code}_{vocab_schema_name}_concept"
+            index_name = f"{database_code}_{vocab_schema_name}_{concept_table_name}"
             for item in chunks(res_dict):
                 logger.info(
                     f"Put concept name with synonyms in meilisearch in chunks of {CHUNK_SIZE}...")
