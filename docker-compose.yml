@@ -4,8 +4,6 @@ networks:
   alp:
   data:
 
-version: "3.8"
-
 volumes:
   caddy:
   duckdb-data-1:
