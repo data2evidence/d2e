@@ -722,8 +722,6 @@ services:
       alp:
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    # volumes:
-    #   - duckdb-data-1:/home/docker/src/services/app/duckdb_data
     hostname: alp-minerva-cdw-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
