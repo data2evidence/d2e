@@ -12,8 +12,8 @@
     "logs:caddy": "yarn base:minerva logs alp-caddy -t --until 1s",
 
     "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml",
-    "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile minerva-s3 --profile cube",
-    "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local --profile minerva-s3",
+    "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile cube",
+    "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local",
 
     "local:standalone:cube:minerva": "yarn local:minerva --profile cube",
 
