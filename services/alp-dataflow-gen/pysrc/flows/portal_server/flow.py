@@ -355,14 +355,15 @@ def get_patient_count(dao_obj: DBDao, is_lower_case: bool) -> str:
 def get_total_entity_count(entity_count_distribution) -> str:
     try:
         total_entity_count = 0
-        for entity in entity_count_distribution.values():
-            try:
-                # value could be str(int) or error
-                entity_count = int(entity)
-                total_entity_count += entity_count
-            except ValueError:
-                # skip if value is error
-                pass
+        for entity, entity_count in entity_count_distribution.items():
+            # value could be str(int) or "error"
+            if entity_count == "error":
+                continue
+            else:
+                try:
+                    total_entity_count += int(entity_count)
+                except ValueError:
+                    continue
     except Exception as e:
         get_run_logger().error(f"Error retrieving total entity count: {e}")
         total_entity_count = "error"
