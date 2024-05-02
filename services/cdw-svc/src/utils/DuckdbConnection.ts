@@ -28,7 +28,7 @@ export const getDuckdbDBConnection = () => {
 };
 
 export const getDefaultSchemaName = () => {
-    return 'main';
+    return `alpdev_pg_cdmvocab`;
 }
 export class DuckdbConnection implements ConnectionInterface {
     private constructor(
@@ -42,16 +42,18 @@ export class DuckdbConnection implements ConnectionInterface {
         callback
     ) {
         try {
-            const duckdDB = await Database.create(
-                `../duckdb/alpdev_pg_cdmdefault`
-            );
-            const duckdDBconn = await duckdDB.connect();
-            // Load vocab schema into duckdb connection
-            await duckdDB.all(
-                `ATTACH '../duckdb/alpdev_pg_cdmvocab' (READ_ONLY);`
-            );
-            const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, 'alpdev_pg_cdmdefault');
-            callback(null, conn);
+            let dbPathString = '/home/docker/src/services/app/src/duckdb'
+            if(fs.existsSync(dbPathString))
+            {
+                const duckdDB = await Database.create(
+                    `${dbPathString}/alpdev_pg_cdmvocab`,
+                    OPEN_READONLY
+                );
+                const duckdDBconn = await duckdDB.connect();
+                const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, 'alpdev_pg_cdmvocab');
+                callback(null, conn);
+            }
+            
         } catch (err) {
             callback(err, null);
         }
@@ -87,7 +89,6 @@ export class DuckdbConnection implements ConnectionInterface {
         parameters: ParameterInterface[],
         callback: CallBackInterface
     ) {
-        let client;
         try {
             logger.debug(`Sql: ${sql}`);
             logger.debug(

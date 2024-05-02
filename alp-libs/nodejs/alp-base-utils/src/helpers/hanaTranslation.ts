@@ -189,9 +189,21 @@ export const translateHanaToPostgres = (temp: string, schema: string) => {
 
 export const translateHanaToDuckdb = (temp: string, schema: string): string => {
   temp = hanaCommonTranslation(temp);
-  temp = temp.replace(/\$\$SCHEMA\$\$./g, `${schema}.`);
+  temp = temp.replace(/\$\$SCHEMA\$\$./g, `"${schema}".`);
   temp = temp.replace(/DAYS_BETWEEN \(/gi, `date_diff ('day', `);
   temp = temp.replace(/LIKE_REGEXPR/gi, "SIMILAR TO");
+  temp = temp.replace(
+    /select count\(\*\) as \"TABLECOUNT\" from pg_tables where schemaname=(\%s|\?|\$[0-9]) and tablename=(\%s|\?|\$[0-9])/gi,
+    `select count(*) AS tableCount from information_schema.tables where table_catalog=%s and table_name=%s`,
+  )
+  temp = temp.replace(
+    /select count\(\*\) as \"TABLECOUNT\" from pg_views where schemaname=(\%s|\?|\$[0-9]) and viewname=(\%s|\?|\$[0-9])/gi,
+    `select count(*) AS tableCount from duckdb_views where database_name=%s and view_name=%s`,
+  )
+  let n = 0;
+  temp = temp.replace(/\%[s]{1}(?![a-zA-Z0-9%])|%UNSAFE|\?/g, () => {
+    return "$" + ++n;
+  });
 
   return temp;
 };
