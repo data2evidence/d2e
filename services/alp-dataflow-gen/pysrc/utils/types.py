@@ -164,3 +164,18 @@ class StrategusOptionsType(BaseModel):
 class DATABASE_DIALECTS(Enum):
     HANA = "hana"
     POSTGRES = "postgres"
+
+class entityCountDistributionType(BaseModel):
+    OBSERVATION_PERIOD: str
+    DEATH: str
+    VISIT_OCCURRENCE: str
+    VISIT_DETAIL: str
+    CONDITION_OCCURRENCE: str
+    DRUG_EXPOSURE: str
+    PROCEDURE_OCCURRENCE: str
+    DEVICE_EXPOSURE: str
+    MEASUREMENT: str
+    OBSERVATION: str
+    NOTE: str
+    EPISODE: str
+    SPECIMEN: str
