@@ -140,6 +140,15 @@ export default class DatasetAttributeConfigSeeder implements Seeder {
         isDisplayed: false,
         createdBy: 'system',
         modifiedBy: 'system'
+      },
+      {
+        id: 'entity_count',
+        name: 'Entity Count',
+        category: ATTRIBUTE_CONFIG_CATEGORIES.DATASET,
+        dataType: ATTRIBUTE_CONFIG_DATA_TYPES.JSON,
+        isDisplayed: false,
+        createdBy: 'system',
+        modifiedBy: 'system'
       }
     ])
     await repository.save(entities)
