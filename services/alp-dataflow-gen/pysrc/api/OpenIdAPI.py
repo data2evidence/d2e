@@ -9,22 +9,18 @@ class OpenIdAPI:
         if os.getenv('IDP__ISSUER_URL') is None:
             raise ValueError("IDP__ISSUER_URL is undefined")
 
-        if os.getenv('IDP__ALP_SVC__CLIENT_ID') is None:
-            raise ValueError("IDP__ALP_SVC__CLIENT_ID is undefined")
+        if os.getenv('IDP__ALP_DATA__CLIENT_ID') is None:
+            raise ValueError("IDP__ALP_DATA__CLIENT_ID is undefined")
 
-        if os.getenv('IDP__ALP_SVC__CLIENT_SECRET') is None:
-            raise ValueError("IDP__ALP_SVC__CLIENT_SECRET is undefined")
-
-        if os.getenv('IDP__SCOPE') is None:
-            raise ValueError("IDP__SCOPE is undefined")
+        if os.getenv('IDP__ALP_DATA__CLIENT_SECRET') is None:
+            raise ValueError("IDP__ALP_DATA__CLIENT_SECRET is undefined")
 
         if os.getenv("PYTHON_VERIFY_SSL") == 'true' and os.getenv('TLS__INTERNAL__CA_CRT') is None:
             raise ValueError("TLS__INTERNAL__CA_CRT is undefined")
 
         self.url = os.getenv('IDP__ISSUER_URL')
-        self.clientId = os.getenv('IDP__ALP_SVC__CLIENT_ID')
-        self.clientSecret = os.getenv('IDP__ALP_SVC__CLIENT_SECRET')
-        self.scope = os.getenv('IDP__SCOPE')
+        self.clientId = os.getenv('IDP__ALP_DATA__CLIENT_ID')
+        self.clientSecret = os.getenv('IDP__ALP_DATA__CLIENT_SECRET')
         self.verifySsl = False if os.getenv(
             "PYTHON_VERIFY_SSL") == 'false' else os.getenv('TLS__INTERNAL__CA_CRT')
 
@@ -38,7 +34,6 @@ class OpenIdAPI:
             'grant_type': "client_credentials",
             'client_id': self.clientId,
             'client_secret': self.clientSecret,
-            'scope': self.scope,
         }
 
         result = requests.post(
