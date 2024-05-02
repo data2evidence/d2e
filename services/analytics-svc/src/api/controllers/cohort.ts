@@ -9,7 +9,6 @@ import { Logger, getUser } from "@alp/alp-base-utils";
 import CreateLogger = Logger.CreateLogger;
 let logger = CreateLogger("analytics-log");
 import axios, { AxiosRequestConfig } from "axios";
-import { DBConnectionUtil as dbConnectionUtil } from "@alp/alp-base-utils";
 import { CohortEndpoint } from "../../mri/endpoint/CohortEndpoint";
 import { generateQuery } from "../../utils/QueryGenSvcProxy";
 import { createEndpointFromRequest } from "../../mri/endpoint/CreatePluginEndpoint";
@@ -18,12 +17,10 @@ import https from "https";
 import { convertIFRToExtCohort } from "../../ifr-to-extcohort/main";
 import {
     ALP_MINERVA_PORTAL_SERVER__URL,
-    USE_DUCKDB,
     USE_EXTENSION_FOR_COHORT_CREATION,
 } from "../../config";
 import { dataflowRequest } from "../../utils/DataflowMgmtProxy";
 import { getDuckdbDirectPostgresWriteConnection } from "../../utils/DuckdbConnection";
-import { DB } from "../../utils/DBSvcConfig";
 
 const language = "en";
 
@@ -32,17 +29,18 @@ const mriConfigConnection = new MriConfigConnection(
 );
 
 export async function getCohortAnalyticsConnection(req: IMRIRequest) {
-    // Get study analytics credentials
-    const { studyAnalyticsCredential } = req.dbCredentials;
-    const credentials = {
-        credentials: studyAnalyticsCredential,
-        schema: studyAnalyticsCredential.schema,
-    };
-    if (USE_DUCKDB === "true" && studyAnalyticsCredential.dialect !== DB.HANA) {
+    const { analyticsConnection } = req.dbConnections;
+    // If dialect is DUCKDB, get direct postgres write connection instead
+    if (analyticsConnection.dialect === "DUCKDB") {
+        const { studyAnalyticsCredential } = req.dbCredentials;
+        const credentials = {
+            credentials: studyAnalyticsCredential,
+            schema: studyAnalyticsCredential.schema,
+        };
         return await getDuckdbDirectPostgresWriteConnection(credentials);
     }
-    // Get connection to db using study analytics credentials
-    return await dbConnectionUtil.DBConnectionUtil.getDBConnection(credentials);
+
+    return analyticsConnection;
 }
 
 async function getStudyDetails(
