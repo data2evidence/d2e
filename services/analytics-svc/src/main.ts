@@ -28,17 +28,15 @@ import noCacheMiddleware from "./middleware/NoCache";
 import timerMiddleware from "./middleware/Timer";
 import studyDbCredentialMiddleware from "./middleware/StudyDbCredential";
 import { MriConfigConnection } from "@alp/alp-config-utils";
-import { ALP_MINERVA_PORTAL_SERVER__URL } from "./config";
 import { StudiesDbMetadata, StudyDbMetadata, IMRIRequest } from "./types";
 import PortalServerAPI from "./api/PortalServerAPI";
 import { getDuckdbDBConnection } from "./utils/DuckdbConnection";
 import { DB } from "./utils/DBSvcConfig";
-import { USE_DUCKDB, DUCKDB_DATA_FOLDER } from "./config";
-
+import { env } from "./env";
 dotenv.config();
 const log = Logger.CreateLogger("analytics-log");
 const mriConfigConnection = new MriConfigConnection(
-    ALP_MINERVA_PORTAL_SERVER__URL
+    env.SERVICE_ROUTES.portalServer
 );
 const envVarUtils = new EnvVarUtils(process.env);
 /**
@@ -73,7 +71,7 @@ const initRoutes = async (app: express.Application) => {
         log.info(`TESTSCHEMA: ${analyticsCredentials.schema}`);
     } else {
         alpPortalStudiesDbMetadataCacheTTLSeconds =
-            +process.env.ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS || 600;
+            +env.ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS || 600;
 
         analyticsCredentials = xsenv
             .filterServices({ tag: "analytics" })
@@ -528,7 +526,7 @@ const getDBConnections = async ({
             userObj,
         });
 
-    if (USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
+    if (env.USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
         // Use duckdb as analyticsConnection if USE_DUCKDB flag is set to true
         const duckdbSchemaFileName = `${analyticsCredentials.code}_${analyticsCredentials.schema}`;
         const duckdbVocabSchemaFileName = `${vocabCredentials.code}_${vocabCredentials.vocabSchema}`;
@@ -536,19 +534,19 @@ const getDBConnections = async ({
         try {
             // Check duckdb dataset access
             await access(
-                path.join(DUCKDB_DATA_FOLDER, duckdbSchemaFileName),
+                path.join(env.DUCKDB__DATA_FOLDER, duckdbSchemaFileName),
                 constants.R_OK
             );
             await access(
-                path.join(DUCKDB_DATA_FOLDER, duckdbVocabSchemaFileName),
+                path.join(env.DUCKDB__DATA_FOLDER, duckdbVocabSchemaFileName),
                 constants.R_OK
             );
             log.debug(
                 `Duckdb accessible at paths ${path.join(
-                    DUCKDB_DATA_FOLDER,
+                    env.DUCKDB__DATA_FOLDER,
                     duckdbSchemaFileName
                 )} AND ${path.join(
-                    DUCKDB_DATA_FOLDER,
+                    env.DUCKDB__DATA_FOLDER,
                     duckdbVocabSchemaFileName
                 )}`
             );
@@ -571,10 +569,10 @@ const getDBConnections = async ({
             log.error(e);
             log.warn(
                 `Duckdb Inaccessible at following paths ${path.join(
-                    DUCKDB_DATA_FOLDER,
+                    env.DUCKDB__DATA_FOLDER,
                     duckdbSchemaFileName
                 )} OR ${path.join(
-                    DUCKDB_DATA_FOLDER,
+                    env.DUCKDB__DATA_FOLDER,
                     duckdbVocabSchemaFileName
                 )}. Hence fallback to Postgres dialect connection`
             );
@@ -635,8 +633,8 @@ const main = async () => {
 
     const server = https.createServer(
         {
-            key: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, "\n"),
-            cert: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, "\n"),
+            key: env.TLS__INTERNAL__KEY?.replace(/\\n/g, "\n"),
+            cert: env.TLS__INTERNAL__CRT?.replace(/\\n/g, "\n"),
             maxHeaderSize: 8192 * 10,
         },
         app
