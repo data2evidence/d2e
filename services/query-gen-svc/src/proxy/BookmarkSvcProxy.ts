@@ -44,7 +44,6 @@ export async function loadBookmarks(
             "authorization": req.headers.authorization,
             "user-agent": "ALP Service",
             "x-source-origin": sourceOrigin,
-            "x-alp-usersessionclaims": req.headers["x-alp-usersessionclaims"],
         },
         rejectUnauthorized: true,
         ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),

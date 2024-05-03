@@ -62,7 +62,6 @@ export async function generateQuery(
             "user-agent": "ALP Service",
             "x-source-origin": sourceOrigin,
             "x-req-correlation-id": reqCorrelationId,
-            "x-alp-usersessionclaims": req.headers["x-alp-usersessionclaims"],
         },
         method: "POST",
         rejectUnauthorized: true,

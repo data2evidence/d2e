@@ -49,12 +49,12 @@ export interface IUser {
   userId: string;
   name?: string;
   email?: string;
-  mriRoles: string[];
-  mriScopes: string[];
-  alpRoleMap: AlpTenantUserRoleMapType;
-  roles: string[];
-  tenantId: string[];
-  groups: string[];
+  mriRoles?: string[];
+  mriScopes?: string[];
+  alpRoleMap?: AlpTenantUserRoleMapType;
+  roles?: string[];
+  tenantId?: string[];
+  groups?: string[];
 }
 
 export type IAppTokenPayload = ITokenPayload & {
