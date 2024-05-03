@@ -4,8 +4,8 @@ dotenv.config()
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import express, { Request, Response, NextFunction } from 'express'
 import { UserMgmtAPI } from './api'
-import { ROLES, SESSION_CLAIMS_PROP } from './const'
-import { SAMPLE_USER_JWT, PUBLIC_USER_JWT, MriUser, isClientCredToken } from './mri/MriUser'
+import { ROLES } from './const'
+import { MriUser, isClientCredToken } from './mri/MriUser'
 import { createLogger } from './Logger'
 import * as xsapp from './xs-app.json'
 import { app, authc } from './configure/app'
@@ -86,9 +86,6 @@ async function ensureAuthorized(req, res, next) {
       }
     }
 
-    // only allow MRI study roles
-    req.user.userMgmtGroups.alpRoleMap = mriUserObj.alpRoleMap
-
     const { scopes } = match
     // the allowed scopes for a url should be found in the user's assigned scopes
     if (scopes.some(i => mriUserObj.mriScopes.includes(i))) {
@@ -125,44 +122,6 @@ async function ensureAlpSysAdminAuthorized(req, res, next) {
   }
   logger.error('User has no ALP System Admin role')
   return res.status(403).send('User has no ALP System Admin role')
-}
-
-function encode(string: string) {
-  return Buffer.from(string).toString('base64')
-}
-
-function buildEncodedHeaders(req, res, next) {
-  if (!auth) {
-    // Dummy user ALICE
-    const encodedAlice = encode(JSON.stringify(SAMPLE_USER_JWT))
-    req.headers[SESSION_CLAIMS_PROP] = encodedAlice
-    req.headers.authorization = 'Bearer DUMMY_TOKEN'
-    return next()
-  }
-
-  if (req.originalUrl.startsWith('/analytics-svc/api/services/public/population')) {
-    const encodedPublicUser = encode(JSON.stringify(PUBLIC_USER_JWT))
-    req.headers[SESSION_CLAIMS_PROP] = encodedPublicUser
-    return next()
-  }
-
-  if (req.user) {
-    if (
-      req.user.roles &&
-      [ROLES.ADMIN_DATA_READER_ROLE, ROLES.VALIDATE_TOKEN_ROLE, ROLES.BI_DATA_READER_ROLE].some(role =>
-        req.user.roles.includes(role)
-      )
-    ) {
-      return next()
-    }
-    const encodedUserClaims = encode(JSON.stringify(req.user))
-    req.headers[SESSION_CLAIMS_PROP] = encodedUserClaims
-    if (isDev) {
-      logger.info(`🚀 inside buildEncodedHeaders, req.headers: ${JSON.stringify(req.headers)}`)
-    }
-  }
-
-  return next()
 }
 
 function addOriginHeader(req: Request, res: Response, next: NextFunction) {
@@ -335,7 +294,6 @@ routes.forEach((route: IRouteProp) => {
         case 'public-analytics-svc':
           app.use(
             source,
-            buildEncodedHeaders,
             createProxyMiddleware({
               target: services.analytics,
               proxyTimeout: 300000
@@ -348,7 +306,6 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             addSubToRequestUserMiddleware,
             ensureAuthorized,
-            buildEncodedHeaders,
             createProxyMiddleware({
               ...getCreateMiddlewareOptions(services.analytics),
               logLevel: 'debug',
@@ -426,7 +383,6 @@ routes.forEach((route: IRouteProp) => {
             source,
             ensureAuthenticated,
             ensureAuthorized,
-            buildEncodedHeaders,
             createProxyMiddleware(getCreateMiddlewareOptions(services.bookmark))
           )
           break
@@ -444,7 +400,6 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             addSubToRequestUserMiddleware,
             ensureAuthorized,
-            buildEncodedHeaders,
             createProxyMiddleware({
               ...getCreateMiddlewareOptions(services.paConfig),
               headers: { Connection: 'keep-alive' }
@@ -457,7 +412,6 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             addSubToRequestUserMiddleware,
             ensureAuthorized,
-            buildEncodedHeaders,
             createProxyMiddleware({
               ...getCreateMiddlewareOptions(services.cdw),
               headers: { Connection: 'keep-alive' }
@@ -469,7 +423,6 @@ routes.forEach((route: IRouteProp) => {
             source,
             ensureAuthenticated,
             ensureAuthorized,
-            buildEncodedHeaders,
             createProxyMiddleware({
               ...getCreateMiddlewareOptions(services.psConfig),
               headers: { Connection: 'keep-alive' }
