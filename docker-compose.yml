@@ -240,14 +240,14 @@ x-envs:
          "analytics": "https://alp-minerva-analytics-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41102",
          "bookmark": "https://alp-minerva-bookmark-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110",
          "cdw": "https://alp-minerva-cdw-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41114",
+         "paConfig": "https://alp-minerva-pa-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41113/pa-config-svc",
+         "psConfig": "https://alp-minerva-ps-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41115/ps-config-svc",
+         "queryGen": "https://alp-minerva-query-gen-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41109",
          "dataflowMgmt": "https://alp-minerva-dataflow-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
          "dbCredentialsMgr": "https://alp-minerva-db-credentials-mgr-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41112",
          "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
-         "paConfig": "https://alp-minerva-pa-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41113",
          "portalServer": "https://alp-minerva-portal-server-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105",
-         "systemPortal": "https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/system-portal",
-         "psConfig": "https://alp-minerva-ps-config-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41115",
-         "usermgmt": "https://alp-minerva-user-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41104",
+         "usermgmt": "https://alp-minerva-user-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41104/usermgmt/api",
          "terminology": "https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
          "sqlEditor" : "http://alp-minerva-sqleditor:8888",
          "appRouter": "https://alp-mercury-approuter:41000",
@@ -682,24 +682,18 @@ services:
         - *x-dbsvc
         - *x-minio
         - *x-tls
+        - *x-routes
       ALP_GATEWAY_OAUTH__URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/oauth/token
-      ALP_MINERVA_PORTAL_SERVER__URL: https://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105
-      ALP_MINERVA_PS_CONFIG_SERVER__URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41100/ps-config-svc
-      ALP_MINERVA_QUERY_GEN__URL: https://alp-minerva-query-gen-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41109
-      ALP_TERMINOLOGY__URL: https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108
-      ALP_MINERVA_BOOKMARKS__URL: https://alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110
-      ALP_PORTAL_SCOPE: https://alpsgdev.onmicrosoft.com/alp-portal/.default
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
       ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT
       ANALYTICS_SVC__PORT: 41${BASE_PORT:-1}02
       ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS: 600
-      B2C_TENANT_ID: f59c7915-9283-4fb5-b633-435b9145ca00
-      DATAFLOW__BASE_URL: https://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107
       DEV_MODE: ${DEV_MODE:-false}
       DUCKDB__DATA_FOLDER: /home/docker/src/alp-data-node/app/duckdb_data
       IDP__ALP_SVC__CLIENT_ID: 6q6a13bg3dw6fncdr2kf6
       IDP__ALP_SVC__CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
       LOCAL_DEBUG: "false"
+      USE_EXTENSION_FOR_COHORT_CREATION: "false"
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       USE_DUCKDB: ${USE_DUCKDB:-true}
       isHttpTestRun: ${isHttpTestRun}
@@ -1113,15 +1107,12 @@ services:
         - *x-minio
         - *x-pg
         - *x-tls
+        - *x-routes
       ALP__SYSTEM_NAME: ${ALP__SYSTEM_NAME:-Research System}
-      ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/analytics-svc/
       APP__DEPLOY_MODE: standalone
       APP__TENANT_ID: ${APP__TENANT_ID:-e0348e4d-2e17-43f2-a3c6-efd752d17c23}
       APP__TENANT_NAME: ${APP__TENANT_NAME:-Tenant}
-      DATA_CHARACTERIZATION__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/dataflow-mgmt/dqd/data-characterization/
       NODE_ENV: production
-      PA_CONFIG__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/pa-config-svc
-      USER_MGMT__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/usermgmt/api
       PG__PORTAL_SERVER__DB_NAME: ${PG_DB_NAME:-alp}
       PG__PORTAL_SERVER__MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
       PG__PORTAL_SERVER__MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
@@ -1131,7 +1122,6 @@ services:
       PLUGINS__JSON: *x-plugins
       PORTAL_SERVER__LOG_LEVEL: info
       PORTAL_SERVER__PORT: 41${BASE_PORT:-1}05
-      PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/portalsvc/graphql
 
   alp-minerva-postgres:
     container_name: &c17 alp-minerva-postgres-${BASE_PORT:-1}
@@ -1500,8 +1490,6 @@ services:
       <<:
         - *x-tls
         - *x-routes
-      ALP_MINERVA_PORTAL_SERVER__URL: https://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105
-      ALP_MINERVA_BOOKMARKS__URL: https://alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41110
       DEV_MODE: ${DEV_MODE:-false}
       LOCAL_DEBUG: "true"
       NODE_ENV: development
