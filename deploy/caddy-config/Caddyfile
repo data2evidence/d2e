@@ -9,12 +9,11 @@
 		ca alp-internal {
 			name "ALP Internal CA"
 			root_cn "ALP Internal CA - 2024 ECC Root"
-			intermediate_cn "ALP Internal CA - ECC Intermediate"
 		}
 	}
 }
 
-https://*.alp.local:55555 {
+https://*.alp.local {
 	tls {
 		issuer internal {
 			ca alp-internal
@@ -53,6 +52,7 @@ https://*.alp.local:55555 {
 	}
 }
 
+# https using static consistent FQDN & local ca - feature currently not in use
 https://${CADDY__ALP__INTERNAL_FQDN:localhost}:41101 https://host.docker.internal:41101 {
 	tls internal
 	import portal
