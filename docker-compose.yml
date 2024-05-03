@@ -249,6 +249,7 @@ x-envs:
          "portalServer": "https://alp-minerva-portal-server-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105",
          "usermgmt": "https://alp-minerva-user-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41104/usermgmt/api",
          "terminology": "https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
+         "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
          "sqlEditor" : "http://alp-minerva-sqleditor:8888",
          "appRouter": "https://alp-mercury-approuter:41000",
          "ui": "http://alp-local-ui-file-server:3000"
@@ -799,7 +800,7 @@ services:
         - *x-minio
         - *x-pg
         - *x-tls
-      ANALYTICS_SVC__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/analytics-svc/
+        - *x-routes
       DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_SB_NAME: dataflow-adhoc-flows-sb
       DATAFLOW_MGMT__LOG_LEVEL: info
       DATAFLOW_MGMT__PORT: 41${BASE_PORT:-1}07
@@ -812,8 +813,6 @@ services:
       PG__DATAFLOW_MGMT__PASSWORD: ${PG_WRITE_PASSWORD}
       PG__DATAFLOW_MGMT__SCHEMA: dataflow
       PG__DATAFLOW_MGMT__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      PORTAL_SERVER__API_URL: https://alp-minerva-portal-server-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT}05/
-      PREFECT__API_URL: http://alp-dataflow-gen-${BASE_PORT}:41${BASE_PORT}20/api/
 
   alp-minerva-gateway:
     container_name: &c12 alp-minerva-gateway-${BASE_PORT:-1}
