@@ -9,6 +9,9 @@ export class ConceptSet {
   @Column({ unique: true })
   name: string;
 
+  @Column({ nullable: true, default: false })
+  shared: boolean;
+
   @Column({ type: 'jsonb', array: false })
   concepts: ConceptSetConcept[];
 

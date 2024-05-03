@@ -28,9 +28,11 @@ export class SystemPortalAPI {
     }
   }
 
-  private async getDataset(
-    datasetId: string,
-  ): Promise<{ vocabSchemaName: string; databaseCode: string }> {
+  private async getDataset(datasetId: string): Promise<{
+    databaseCode: string;
+    dialect: string;
+    vocabSchemaName: string;
+  }> {
     this.logger.info(
       `Portal request to get dataset info for id : ${datasetId}`,
     );
@@ -69,6 +71,7 @@ export class SystemPortalAPI {
     return {
       databaseCode: dataset.databaseCode,
       vocabSchemaName: dataset.vocabSchemaName,
+      dialect: dataset.dialect,
     };
   }
 
