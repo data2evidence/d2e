@@ -2553,8 +2553,7 @@
     "addToCohorts": true,
     "domainValuesLimit": 50,
     "calcViewAccessPoint": true,
-    "externalAccessPoints": true,
-    "nonInteractiveMode": false
+    "externalAccessPoints": true
   },
   "configInformations": {
     "note": "This is a demo configuration for Patient Analytics, and should be replaced with a proper configuration."

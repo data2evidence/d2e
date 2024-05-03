@@ -17086,8 +17086,7 @@ const paConfig = {
     addToCohorts: true,
     domainValuesLimit: 200,
     calcViewAccessPoint: true,
-    externalAccessPoints: true,
-    nonInteractiveMode: false,
+    externalAccessPoints: true
   },
 };
 
@@ -29306,7 +29305,6 @@ const paConfigDuckdb = {
     addToCohorts: true,
     domainValuesLimit: 200,
     calcViewAccessPoint: true,
-    externalAccessPoints: true,
-    nonInteractiveMode: false,
+    externalAccessPoints: true
   },
 };
