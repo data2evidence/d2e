@@ -126,8 +126,7 @@ export class Formatter {
             addToCohorts: mriConfig.panelOptions.addToCohorts,
             domainValuesLimit: mriConfig.panelOptions.domainValuesLimit,
             calcViewAccessPoint: mriConfig.panelOptions.calcViewAccessPoint,
-            externalAccessPoints: mriConfig.panelOptions.externalAccessPoints,
-            nonInteractiveMode: mriConfig.panelOptions.nonInteractiveMode,
+            externalAccessPoints: mriConfig.panelOptions.externalAccessPoints
         };
 
         return config;
