@@ -38,7 +38,7 @@ describe("TEST SUITE TO DEFINE THE BEHAVIOR OF THE GLOBAL SETTINGS VALIDATION", 
       createConnection((err, connection) => {
         analyticsConnectionObj = connection;
         callback(null);
-      }, "hana");
+      }, "duckdb");
     };
     const setupConfigFacade = (callback) => {
       const ffhQeConfig = new FfhQeConfig(

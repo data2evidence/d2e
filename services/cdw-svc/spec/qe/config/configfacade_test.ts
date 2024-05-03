@@ -1,34 +1,31 @@
 import { User } from "@alp/alp-base-utils";
 import { ConfigFacade } from "../../../src/qe/config/ConfigFacade";
-import { MockHdb } from "../../testutils/testenv/mockHdb";
 import { FfhQeConfig } from "../../../src/qe/config/config";
 import { Settings } from "../../../src/qe/settings/Settings";
 import { AssignmentProxy } from "../../../src/AssignmentProxy";
 import { Connection as connLib } from "@alp/alp-base-utils";
 import ConnectionInterface = connLib.ConnectionInterface;
+import { createConnection } from "../../testutils/connection";
 
-const globalSetting = {
-  Id: "GlobalSettings",
-  Version: "A",
-  Status: "A",
-  Name: "GLOBAL",
-  Type: "HC/HPH/GLOBAL",
-  // tslint:disable-next-line:max-line-length
-  Data: `{"tableMapping":{"@INTERACTION":"CDMDEFAULT.\"legacy.cdw.db.models::DWViews.Interactions\"", "@OBS":"CDMDEFAULT.\"legacy.cdw.db.models::DWViews.Observations\"", "@CODE":"CDMDEFAULT.\"legacy.cdw.db.models::DWViewsEAV.Interaction_Details\"", "@MEASURE":"CDMDEFAULT.\"legacy.cdw.db.models::DWViewsEAV.Interaction_Measures\"", "@REF":"CDMDEFAULT.\"legacy.ots::Views.ConceptPreferredTerms\"", "@PATIENT":"CDMDEFAULT.\"legacy.cdw.db.models::DWViews.Patient\"", "@TEXT":"CDMDEFAULT.\"legacy.cdw.db.models::DWViewsEAV.Interaction_Text\""},"guardedTableMapping":{ "@PATIENT":"\"CDMDEFAULT\".\"legacy.cdw.db.models::DWViews.V_GuardedPatient\"" },"language":["en", "de", "fr"], "settings":{ "fuzziness":0.7, "maxResultSize":5000, "sqlReturnOn":true, "errorDetailsReturnOn":true, "errorStackTraceReturnOn":true, "hhpSchemaName":"CDMDEFAULT", "refSchemaName":"CDMDEFAULT", "kaplanMeierTable":"CDMDEFAULT.\"pa.db::MRIEntities.KaplanMeierInput\"", "medexSchemaName":"CDMDEFAULT", "vbEnabled":true },"columnMap":{ "CONDITION_ID":"\"ConditionID\"", "INTERACTION_ID":"\"InteractionID\"", "PARENT_INTERACT_ID":"PARENT_INTERACT_ID", "PATIENT_ID":"\"PatientID\"" }}`,
-};
-const fakeConnection = MockHdb.getConnection([globalSetting]);
-const facade = new ConfigFacade(
-  fakeConnection,
-  new FfhQeConfig(
-    fakeConnection as ConnectionInterface,
-    new AssignmentProxy([]),
-    new Settings(),
-    new User("TEST_USER")
-  ),
-  new User("TEST_USER")
-);
-const ffhQeConfig = facade.getFfhQeConfig();
+let facade, ffhQeConfig, fakeConnection;
 describe("Testing ConfigFacade,", () => {
+  beforeAll(async () => {
+    fakeConnection = await createConnection("duckdb");
+    facade = new ConfigFacade(
+      fakeConnection,
+      new FfhQeConfig(
+        fakeConnection as ConnectionInterface,
+        new AssignmentProxy([]),
+        new Settings(),
+        new User("TEST_USER")
+      ),
+      new User("TEST_USER")
+    );
+    ffhQeConfig = facade.getFfhQeConfig();
+  });
+  afterAll(function () {
+    fakeConnection.close();
+  });
   /* it("request.action=\"getFrontendConfig\" should call FfhQeConfig.getFrontendConfig()", function () {
          spyOn(facade, "invokeService").and.callThrough();
          spyOn(ffhQeConfig, "getFrontendConfig");

@@ -95,10 +95,9 @@ describe("Attributes infos service integration test", () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 600000;
   beforeAll(async () => {
     connection = await createConnection("postgresql");
-    analyticsConnection = await createConnection("hana");
+    analyticsConnection = await createConnection("duckdb");
     const ffhQeConfig = new FfhQeConfig(
       connection,
-      analyticsConnection,
       new AssignmentProxy([]),
       new Settings(),
       new User("TEST_USER")
