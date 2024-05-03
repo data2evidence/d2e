@@ -56,13 +56,12 @@ x-envs:
         {
           "enabled": true,
           "featureFlag": "conceptSets",
-          "name": "Concept Sets",
+          "name": "Concepts",
           "pluginPath": "plugins/Researcher/ConceptSets/module",
           "requiredRoles": [
             "RESEARCHER"
           ],
-          "route": "concept-sets",
-          "type": "Concepts"
+          "route": "concepts"
         },
         {
           "enabled": true,
@@ -89,17 +88,6 @@ x-envs:
           "route": "starboard",
           "subMenus": "true",
           "type": "Analysis"
-        },
-        {
-          "enabled": true,
-          "featureFlag": "terminology",
-          "name": "Concept Search",
-          "route": "concept-search",
-          "pluginPath": "plugins/SystemAdmin/Terminology/module",
-          "requiredRoles": [
-            "RESEARCHER"
-          ],
-          "type": "Concepts"
         },
         {
           "enabled": true,
@@ -694,7 +682,7 @@ services:
       IDP__ALP_SVC__CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
       LOCAL_DEBUG: "false"
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
-      USE_DUCKDB: ${USE_DUCKDB:-false}
+      USE_DUCKDB: ${USE_DUCKDB:-true}
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
       local: ${local}
@@ -759,6 +747,9 @@ services:
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
       isTestEnv: ${isTestEnv}
+      DUCKDB_DB_CODE: ${DUCKDB_DB_CODE:-alpdev_pg}
+      DUCKDB_SCHEMA: ${DUCKDB_SCHEMA:-cdmdefault}
+      DUCKDB_VOCAB_SCHEMA: ${DUCKDB_VOCAB_SCHEMA:-cdmvocab}
 
   alp-minerva-dataflow-mgmt:
     container_name: &c11 alp-minerva-dataflow-mgmt-${BASE_PORT:-1}

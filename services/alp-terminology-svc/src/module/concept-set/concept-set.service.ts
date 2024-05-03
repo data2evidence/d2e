@@ -1,13 +1,7 @@
-import {
-  Inject,
-  Injectable,
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { JwtPayload, decode } from 'jsonwebtoken';
 import { createLogger } from '../../logger';
-import { QueryObject as qo } from '@alp/alp-base-utils';
 import dataSource from '../../db/data-source';
 import { ConceptSet } from '../../entity';
 import { randomUUID } from 'crypto';
@@ -15,12 +9,12 @@ import { Request } from 'express';
 import { ConceptService } from '../concept/concept.service';
 import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { SystemPortalAPI } from 'src/api/portal-api';
+import { Brackets } from 'typeorm';
 
 @Injectable()
 export class ConceptSetService {
   private readonly userId: string;
   private readonly logger = createLogger(this.constructor.name);
-  private queryObject = qo.QueryObject;
   private token: string;
   private request: Request;
 
@@ -47,33 +41,6 @@ export class ConceptSetService {
     };
   }
 
-  private async getDatasetDetails(datasetId: string, token: string) {
-    const systemPortalApi = new SystemPortalAPI(token);
-    const dataset = await systemPortalApi.getDataset(datasetId);
-    if (!dataset) {
-      throw new BadRequestException(
-        `Could not find dataset with datasetId: ${datasetId}`,
-      );
-    }
-
-    if (!dataset.databaseCode) {
-      throw new InternalServerErrorException(
-        `Database code does not exist for datasetId: ${datasetId}`,
-      );
-    }
-
-    if (!dataset.vocabSchemaName) {
-      throw new InternalServerErrorException(
-        `vocabSchemaName does not exist for datasetId: ${datasetId}`,
-      );
-    }
-
-    return {
-      databaseName: dataset.databaseCode,
-      vocabSchemaName: dataset.vocabSchemaName,
-    };
-  }
-
   async getDataSource() {
     if (!dataSource.isInitialized) {
       try {
@@ -91,6 +58,8 @@ export class ConceptSetService {
     const conceptSets = await dataSource
       .getRepository(ConceptSet)
       .createQueryBuilder()
+      .where({ createdBy: this.userId })
+      .orWhere({ shared: true })
       .orderBy('name')
       .getMany();
 
@@ -125,8 +94,15 @@ export class ConceptSetService {
     const dataSource = await this.getDataSource();
     const conceptSet = await dataSource
       .getRepository(ConceptSet)
-      .createQueryBuilder()
-      .where({ id: conceptSetId })
+      .createQueryBuilder('conceptSet')
+      .where('conceptSet.id = :id', { id: conceptSetId })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('conceptSet.createdBy = :createdBy', {
+            createdBy: this.userId,
+          }).orWhere('conceptSet.shared = :shared', { shared: true });
+        }),
+      )
       .getOne();
     const conceptIds = conceptSet.concepts.map((c) => c.id);
     const conceptService = new ConceptService(this.request);
@@ -161,6 +137,7 @@ export class ConceptSetService {
       .update(ConceptSet)
       .set(conceptSetData)
       .where({ id: conceptSetId })
+      .andWhere({ createdBy: this.userId })
       .execute();
     return conceptSetId;
   }
@@ -172,6 +149,7 @@ export class ConceptSetService {
       .delete()
       .from(ConceptSet)
       .where({ id: conceptSetId })
+      .andWhere({ createdBy: this.userId })
       .execute();
     return conceptSetId;
   }
@@ -183,15 +161,19 @@ export class ConceptSetService {
     try {
       const { conceptSetIds, datasetId } = body;
 
-      const { databaseName, vocabSchemaName } = await this.getDatasetDetails(
-        datasetId,
-        this.token,
-      );
+      const systemPortalApi = new SystemPortalAPI(this.token);
+      const { databaseCode, vocabSchemaName, dialect } =
+        await systemPortalApi.getDatasetDetails(datasetId);
 
       const meilisearchApi = new MeilisearchAPI();
-      const conceptIndex = `${databaseName}_${vocabSchemaName}_concept`;
-      const conceptAncestorIndex = `${databaseName}_${vocabSchemaName}_concept_ancestor`;
-      const conceptRelationshipIndex = `${databaseName}_${vocabSchemaName}_concept_relationship`;
+      const conceptName = dialect === 'hana' ? 'CONCEPT' : 'concept';
+      const conceptAncestorName =
+        dialect === 'hana' ? 'CONCEPT_ANCESTOR' : 'concept_ancestor';
+      const conceptRelationshipName =
+        dialect === 'hana' ? 'CONCEPT_RELATIONSHIP' : 'concept_relationship';
+      const conceptIndex = `${databaseCode}_${vocabSchemaName}_${conceptName}`;
+      const conceptAncestorIndex = `${databaseCode}_${vocabSchemaName}_${conceptAncestorName}`;
+      const conceptRelationshipIndex = `${databaseCode}_${vocabSchemaName}_${conceptRelationshipName}`;
       const promises = conceptSetIds.map((conceptSetId) =>
         this.getConceptSet(conceptSetId, datasetId),
       );

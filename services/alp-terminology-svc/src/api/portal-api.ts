@@ -1,9 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Agent } from 'https';
 import { env } from '../env';
 import { createLogger } from '../logger';
-
 export class SystemPortalAPI {
   private readonly jwt: string;
   private readonly url: string;
@@ -26,9 +28,11 @@ export class SystemPortalAPI {
     }
   }
 
-  async getDataset(
-    datasetId: string,
-  ): Promise<{ vocabSchemaName: string; databaseCode: string }> {
+  private async getDataset(datasetId: string): Promise<{
+    databaseCode: string;
+    dialect: string;
+    vocabSchemaName: string;
+  }> {
     this.logger.info(
       `Portal request to get dataset info for id : ${datasetId}`,
     );
@@ -37,12 +41,38 @@ export class SystemPortalAPI {
       const options = await this.createOptions();
       const url = `${this.url}dataset/${datasetId}`;
       const result = await axios.get(url, options);
-      //this.logger.info(JSON.stringify(result));
       return result.data;
     } catch (error) {
       this.logger.error(`${errorMessage}: ${error}`);
       throw new InternalServerErrorException(errorMessage);
     }
+  }
+
+  async getDatasetDetails(datasetId: string) {
+    const dataset = await this.getDataset(datasetId);
+    if (!dataset) {
+      throw new BadRequestException(
+        `Could not find dataset with datasetId: ${datasetId}`,
+      );
+    }
+
+    if (!dataset.databaseCode) {
+      throw new InternalServerErrorException(
+        `Database code does not exist for datasetId: ${datasetId}`,
+      );
+    }
+
+    if (!dataset.vocabSchemaName) {
+      throw new InternalServerErrorException(
+        `vocabSchemaName does not exist for datasetId: ${datasetId}`,
+      );
+    }
+
+    return {
+      databaseCode: dataset.databaseCode,
+      vocabSchemaName: dataset.vocabSchemaName,
+      dialect: dataset.dialect,
+    };
   }
 
   private async createOptions() {
