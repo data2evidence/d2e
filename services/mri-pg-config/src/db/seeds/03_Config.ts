@@ -25229,8 +25229,13 @@ const cdwConfigDuckdb = {
       '@TEXT.INTERACTION_TEXT_ID': 'CONCEPT_ID',
       '@TEXT.VALUE': 'CONCEPT_NAME',
       '@COHORT': '$$SCHEMA$$.cohort',
-      '@COHORT.PATIENT_ID': 'subject_id',
-      '@COHORT.INTERACTION_TYPE': 'cohort_definition_id'
+      '@COHORT.PATIENT_ID': '"subject_id"',
+      '@COHORT.INTERACTION_TYPE': '"cohort_definition_id"',
+      "@COHORT.INTERACTION_ID": '"cohort_definition_id"',
+      "@COHORT.CONDITION_ID": '"cohort_definition_id"',
+      "@COHORT.PARENT_INTERACT_ID": '"subject_id"',
+      "@COHORT.START": '"cohort_start_date"',
+      "@COHORT.END": '"cohort_end_date"',
     },
     guardedTableMapping: {
       '@PATIENT': '$$SCHEMA$$."person"',

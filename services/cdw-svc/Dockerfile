@@ -53,9 +53,6 @@ ENV GIT_COMMIT=$GIT_COMMIT_ARG
 
 WORKDIR src/services/app
 
-# RUN mkdir ./duckdb_data
-# RUN chown docker:alp ./duckdb_data
-
 ENTRYPOINT ["yarn", "start:docker"]
 #CMD ["tail", "-f", "/dev/null"]
 

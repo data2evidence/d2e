@@ -5,11 +5,11 @@ import {
     flattenParameter,
     DBValues,
 } from "@alp/alp-base-utils/target/src/Connection";
-import { Connection, Database } from "duckdb-async";
+import { Connection, Database, OPEN_READONLY } from "duckdb-async";
 import { DBError } from "@alp/alp-base-utils/target/src/DBError";
 import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
 import { translateHanaToDuckdb } from "@alp/alp-base-utils/target/src/helpers/hanaTranslation";
-
+import fs from 'fs';
 const logger = CreateLogger("Duckdb Connection");
 
 // Helper function similar to getDBConnection implementation in alp-base-utils DBConnectionUtil.ts
