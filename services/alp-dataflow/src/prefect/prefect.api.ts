@@ -59,7 +59,7 @@ export class PrefectAPI {
     const errorMessage = 'Error while getting prefect deployment'
     try {
       const options = await this.createOptions()
-      const url = `${this.url/}deployments/name/${flowName}/${deploymentName}`
+      const url = `${this.url}/deployments/name/${flowName}/${deploymentName}`
       const obs = this.httpService.get(url, options)
       const result = await firstValueFrom(obs.pipe(map(result => result.data)))
       return {
