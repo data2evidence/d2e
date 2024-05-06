@@ -566,6 +566,7 @@ services:
       - sh
       - -c
       - npm run cli db seed -- --swe && npx @logto/cli db alteration deploy 1.14.0 && npm start
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
         - *x-tls
@@ -898,6 +899,7 @@ services:
         tag: *c13
     networks:
       alp:
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
         - *x-tls
@@ -1121,6 +1123,7 @@ services:
         tag: *c17
     networks:
       alp:
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
         - *x-tls
