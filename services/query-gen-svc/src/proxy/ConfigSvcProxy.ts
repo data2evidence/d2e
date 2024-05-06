@@ -4,7 +4,7 @@ import { StudyMriConfigMetaDataType } from "../types";
 import * as testConfigs from "./test-data/test_configs";
 import { env } from "../env";
 const mriConfigConnection = new MriConfigConnection(
-    env.SERVICE_ROUTES.portalServer
+    env.SERVICE_ROUTES?.portalServer
 );
 const envVarUtils = new EnvVarUtils(process.env);
 

@@ -36,7 +36,7 @@ import { env } from "./env";
 dotenv.config();
 const log = Logger.CreateLogger("analytics-log");
 const mriConfigConnection = new MriConfigConnection(
-    env.SERVICE_ROUTES.portalServer
+    env.SERVICE_ROUTES?.portalServer
 );
 const envVarUtils = new EnvVarUtils(process.env);
 /**
