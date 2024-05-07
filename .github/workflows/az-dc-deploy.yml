@@ -55,6 +55,10 @@ on:
         type: string
         required: false
         default: develop
+      dotenv-boolean:
+        description: boolean:dotenv
+        type: boolean
+        default: true
 
 env:
   DOCKER_TAG_NAME: ${{ github.event.inputs.docker-tag-textbox || 'develop' }}
@@ -91,7 +95,11 @@ jobs:
         ./internal/scripts/get-op-ratelimit.sh
       
         # get env yml from 1password
-        yarn op:get:$ENV_TYPE
+        if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
+          yarn op:get:$ENV_TYPE
+        else
+          echo dotenv-boolean=false  | tee -a $GITHUB_STEP_SUMMARY
+        fi
 
         # mask sensitive values
         internal/scripts/gha-mask.sh
