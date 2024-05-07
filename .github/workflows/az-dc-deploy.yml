@@ -98,7 +98,7 @@ jobs:
         if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
           yarn op:get:$ENV_TYPE
         else
-          echo dotenv-boolean=false  | tee -a $GITHUB_STEP_SUMMARY
+          echo dotenv-boolean=false | tee -a $GITHUB_STEP_SUMMARY
         fi
 
         # mask sensitive values
