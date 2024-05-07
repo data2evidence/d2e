@@ -71,11 +71,7 @@ x-envs:
           "requiredRoles": [
             "RESEARCHER"
           ],
-          "route": "cohort",
-          "menus": [
-            "Cohorts Overview",
-            "Create Cohort"
-          ]
+          "route": "cohort"
         },
         {
           "enabled": true,
@@ -86,8 +82,7 @@ x-envs:
             "RESEARCHER"
           ],
           "route": "starboard",
-          "subMenus": "true",
-          "type": "Analysis"
+          "subMenus": "true"
         },
         {
           "enabled": true,
@@ -100,8 +95,7 @@ x-envs:
           "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
           "requiredRoles": [
             "RESEARCHER"
-          ],
-          "type": "Analysis"
+          ]
         }
       ],
       "setup": [
