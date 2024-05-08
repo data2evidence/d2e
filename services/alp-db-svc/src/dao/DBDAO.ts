@@ -34,8 +34,8 @@ class DBDAO {
   getVersionInfoForSchemas = async (
     db: any,
     tenant,
-    pluginChangelogFilepath: string | undefined,
-    pluginClasspath: string | undefined,
+    changelogFilepath: string | undefined,
+    classpath: string | undefined,
     datamodelSchemaMappingList: DataModelSchemaMappingType[]
   ) => {
     try {
@@ -73,11 +73,7 @@ class DBDAO {
       for (const schemaObj of successfulSchemasInfo) {
         try {
           const latestAvailableVersionID: string =
-            await this.getLatestAvailableVersion(
-              tenant,
-              schemaObj,
-              pluginClasspath
-            );
+            await this.getLatestAvailableVersion(tenant, schemaObj, classpath);
           schemaObj["latestVersionID"] =
             latestAvailableVersionID === "up to date"
               ? schemaObj.currentVersionID
@@ -118,7 +114,7 @@ class DBDAO {
   getLatestAvailableVersion = (
     tenant,
     schemaObj: SchemaVersionInfo,
-    pluginClasspath: string | undefined
+    classpath: string | undefined
   ) => {
     return new Promise<string>((resolve, reject) => {
       try {
@@ -136,7 +132,7 @@ class DBDAO {
             schemaObj.schemaName,
             schemaObj.dataModel!,
             schemaObj.changelogFilepath!,
-            pluginClasspath
+            classpath
           )
         );
 
@@ -289,8 +285,8 @@ class DBDAO {
     dataModel: string,
     schemas: string[],
     rollbackCount: number,
-    pluginChangelogFilepath: string | undefined,
-    pluginClasspath: string | undefined,
+    changelogFilepath: string | undefined,
+    classpath: string | undefined,
     callback: (err: any, result: any) => any
   ) => {
     const tasks = (<string[]>schemas).map((schema) => {
@@ -311,8 +307,8 @@ class DBDAO {
             tenant,
             schema,
             dataModel,
-            pluginChangelogFilepath,
-            pluginClasspath
+            changelogFilepath,
+            classpath
           )
         );
         liquibase
@@ -364,8 +360,8 @@ class DBDAO {
     dataModel: string,
     schemas: string[],
     rollbackTag: string,
-    pluginChangelogFilepath: string | undefined,
-    pluginClasspath: string | undefined,
+    changelogFilepath: string | undefined,
+    classpath: string | undefined,
     callback: (err: any, result: any) => any
   ) => {
     const tasks = (<string[]>schemas).map((schema) => {
@@ -384,8 +380,8 @@ class DBDAO {
             tenant,
             schema,
             dataModel,
-            pluginChangelogFilepath,
-            pluginClasspath
+            changelogFilepath,
+            classpath
           )
         );
 

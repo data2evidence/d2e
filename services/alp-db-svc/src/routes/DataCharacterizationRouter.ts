@@ -91,8 +91,8 @@ export default class DataCharacterizationRouter {
       req.params.dialect,
       req.body.vocabSchema
     );
-    const pluginChangelogFilepath = req.body.customChangelogFilepath;
-    const pluginClasspath = req.body.customClasspath;
+    const changelogFilepath = req.body.customChangelogFilepath;
+    const classpath = req.body.customClasspath;
 
     try {
       const dbConnection = await this.dbDao.getDBConnectionByTenantPromise(
@@ -107,8 +107,8 @@ export default class DataCharacterizationRouter {
         { tenantConfig, tenant },
         dbConnection,
         vocabSchema,
-        pluginChangelogFilepath,
-        pluginClasspath
+        changelogFilepath,
+        classpath
       );
 
       res.json(result);
@@ -123,8 +123,8 @@ export default class DataCharacterizationRouter {
     { tenant, tenantConfig }: { tenant: string; tenantConfig: any },
     dbConnection: ConnectionInterface,
     vocabSchema: string,
-    pluginChangelogFilepath: string | undefined,
-    pluginClasspath: string | undefined
+    changelogFilepath: string | undefined,
+    classpath: string | undefined
   ) => {
     return new Promise(async (resolve, reject) => {
       // Create new schema
@@ -155,8 +155,8 @@ export default class DataCharacterizationRouter {
             tenant,
             schema,
             config.CDM.CHARACTERIZATION,
-            pluginChangelogFilepath,
-            pluginClasspath
+            changelogFilepath,
+            classpath
           )
         );
 
