@@ -384,7 +384,9 @@ def get_entity_count_distribution(dao_obj: DBDao, is_lower_case: bool) -> entity
             get_run_logger().error(
                 f"Error retrieving entity count for {table}: {e}")
             entity_count = "error"
-        entity_count_distribution[table.upper() + "_COUNT"] = str(entity_count)
+        entity_count_key = table.replace("_", " ").title() + " Count"
+        if entity_count != "error":
+            entity_count_distribution[entity_count_key] = str(entity_count)
     return entity_count_distribution
 
 
