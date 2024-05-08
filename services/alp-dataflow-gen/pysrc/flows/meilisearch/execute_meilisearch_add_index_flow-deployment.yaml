@@ -55,9 +55,6 @@ parameter_openapi_schema:
       title: meilisearchAddIndexType
       type: object
       properties:
-        token:
-          title: Token
-          type: string
         databaseCode:
           title: Databasecode
           type: string
