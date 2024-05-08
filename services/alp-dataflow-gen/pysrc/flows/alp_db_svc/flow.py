@@ -110,7 +110,7 @@ async def _run_db_svc_shell_command(request_type: str, request_url: str, request
             command]).run()
 
 
-def _add_plugin_options(request_body, dialect: str, flow_name: str, changelog_filepath: str):  # move to utils?
+def _db_svc_flowrun_params(request_body, dialect: str, flow_name: str, changelog_filepath: str):  # move to utils?
     cwd = os.getcwd()
     request_body["customClasspath"] = f'{cwd}/{flow_name}/'
     request_body["customChangelogFilepath"] = f'db/migrations/{dialect}/{changelog_filepath}'
@@ -139,7 +139,7 @@ async def create_datamodel(options: createDataModelType):
     try:
         db_dialect = _get_db_dialect(options)
 
-        request_body = _add_plugin_options(
+        request_body = _db_svc_flowrun_params(
             request_body, db_dialect, options.flow_name, options.changelog_filepath)
 
         if update_count == 0:
@@ -164,7 +164,7 @@ async def update_datamodel(options: updateDataModelType):
     try:
         db_dialect = _get_db_dialect(options)
 
-        request_body = _add_plugin_options(
+        request_body = _db_svc_flowrun_params(
             request_body, db_dialect, options.flow_name, options.changelog_filepath)
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}?schema={schema_name}"
@@ -187,7 +187,7 @@ async def create_snapshot(options: createSnapshotType):
     try:
         db_dialect = _get_db_dialect(options)
 
-        request_body = _add_plugin_options(
+        request_body = _db_svc_flowrun_params(
             request_body, db_dialect, options.flow_name, options.changelog_filepath)
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schemasnapshot/{schema_name}?source_schema={source_schema}"
@@ -211,7 +211,7 @@ async def create_parquet_snapshot(options: createParquetSnapshotType):
     try:
         db_dialect = _get_db_dialect(options)
 
-        request_body = _add_plugin_options(
+        request_body = _db_svc_flowrun_params(
             request_body, db_dialect, options.flow_name, options.changelog_filepath)
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schemasnapshotparquet/{schema_name}?sourceschema={source_schema}"
@@ -235,7 +235,7 @@ async def rollback_tag(options: rollbackTagType):
     try:
         db_dialect = _get_db_dialect(options)
 
-        request_body = _add_plugin_options(
+        request_body = _db_svc_flowrun_params(
             request_body, db_dialect, options.flow_name, options.changelog_filepath)
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/tag/{rollback_tag}?schema={schema_name}"
@@ -258,7 +258,7 @@ async def rollback_count(options: rollbackCountType):
     try:
         db_dialect = _get_db_dialect(options)
 
-        request_body = _add_plugin_options(
+        request_body = _db_svc_flowrun_params(
             request_body, db_dialect, options.flow_name, options.changelog_filepath)
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/count/{rollback_count}/?schema={schema_name}"
@@ -280,7 +280,7 @@ async def create_questionnaire_definition(options: questionnaireDefinitionType):
     try:
         db_dialect = _get_db_dialect(options)
 
-        request_body = _add_plugin_options(
+        request_body = _db_svc_flowrun_params(
             request_body, db_dialect, options.flow_name, options.changelog_filepath)
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/schema/{schema_name}"
@@ -302,7 +302,7 @@ async def get_questionnaire_response(options: questionnaireResponseType):
     try:
         db_dialect = _get_db_dialect(options)
 
-        request_body = _add_plugin_options(
+        request_body = _db_svc_flowrun_params(
             request_body, db_dialect, options.flow_name, options.changelog_filepath)
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/schema/{schema_name}/questionnaire/{questionnaire_id}"

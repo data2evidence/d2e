@@ -14,7 +14,7 @@ from dao.DBDao import DBDao
 from api.PortalServerAPI import PortalServerAPI
 from prefect.artifacts import create_table_artifact
 from typing import List
-from flows.alp_db_svc.flow import run_command, _add_plugin_options
+from flows.alp_db_svc.flow import run_command, _db_svc_flowrun_params
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
 
 
@@ -58,7 +58,7 @@ def get_version_info(options: getVersionInfoType):
 
             db_dialect = get_db_svc_endpoint_dialect(_database_code)
 
-            request_body = _add_plugin_options(
+            request_body = _db_svc_flowrun_params(
                 request_body, db_dialect, flow_name, changelog_filepath
             )
 

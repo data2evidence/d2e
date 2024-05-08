@@ -11,7 +11,7 @@ from flows.alp_data_characterization.hooks import persist_data_characterization,
 from utils.types import dcOptionsType
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
 import importlib
-from flows.alp_db_svc.flow import _run_db_svc_shell_command, _add_plugin_options
+from flows.alp_db_svc.flow import _run_db_svc_shell_command, _db_svc_flowrun_params
 
 r_libs_user_directory = os.getenv("R_LIBS_USER")
 
@@ -106,7 +106,7 @@ async def create_data_characterization_schema(
         request_body = {"vocabSchema": vocabSchemaName,
                         "cdmSchema": vocabSchemaName}
 
-        request_body = _add_plugin_options(
+        request_body = _db_svc_flowrun_params(
             request_body, databaseDialect, flowName, changelog_filepath)
 
         await _run_db_svc_shell_command(
