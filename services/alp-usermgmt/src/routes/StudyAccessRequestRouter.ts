@@ -3,6 +3,7 @@ import { Service } from 'typedi'
 import { B2cGroupService, StudyAccessRequestService } from '../services'
 import { AccessRequestAction, IAppRequest } from '../types'
 import { createLogger } from 'Logger'
+import { env } from 'env'
 
 @Service()
 export class StudyAccessRequestRouter {
@@ -34,7 +35,8 @@ export class StudyAccessRequestRouter {
     })
 
     this.router.post('/', async (req: IAppRequest, res: Response, next: NextFunction) => {
-      const { userId, tenantId, studyId, role } = req.body || {}
+      const tenantId = env.APP_TENANT_ID
+      const { userId, studyId, role } = req.body || {}
 
       if (!userId) {
         this.logger.warn(`Param 'userId' is required`)
