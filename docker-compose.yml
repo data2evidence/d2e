@@ -71,11 +71,7 @@ x-envs:
           "requiredRoles": [
             "RESEARCHER"
           ],
-          "route": "cohort",
-          "menus": [
-            "Cohorts Overview",
-            "Create Cohort"
-          ]
+          "route": "cohort"
         },
         {
           "enabled": true,
@@ -86,8 +82,7 @@ x-envs:
             "RESEARCHER"
           ],
           "route": "starboard",
-          "subMenus": "true",
-          "type": "Analysis"
+          "subMenus": "true"
         },
         {
           "enabled": true,
@@ -100,8 +95,7 @@ x-envs:
           "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
           "requiredRoles": [
             "RESEARCHER"
-          ],
-          "type": "Analysis"
+          ]
         }
       ],
       "setup": [
@@ -456,6 +450,8 @@ services:
       R_LIBS_USER: /home/docker/plugins/R/site-library
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
+      IDP__ALP_DATA__CLIENT_ID: t5vwuno8ckh5hmqozjqyj
+      IDP__ALP_DATA__CLIENT_SECRET: ${LOGTO__ALP_DATA__CLIENT_SECRET}
 
   alp-dataflow-gen-init:
     command:
@@ -1337,6 +1333,17 @@ services:
       alp-minerva-postgres:
         condition: service_healthy
     image: alpcr.azurecr.io/alp-data-node/alp-terminology-svc:${DOCKER_TAG_NAME:-develop}
+    healthcheck:
+      interval: 20s
+      retries: 10
+      start_period: 60s
+      test:
+        - CMD
+        - wget
+        - --no-check-certificate
+        - -O
+        - liveness
+        - https://0.0.0.0:41108/check-liveness
     logging:
       options:
         tag: *c21
