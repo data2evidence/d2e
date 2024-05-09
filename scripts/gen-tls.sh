@@ -27,7 +27,7 @@ if [ ${TLS_REGENERATE} = true ]; then
 fi
 
 # start if not already started
-if [ "$( docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 2> /dev/null )" != "running" ]; then
+if docker ps --format '{{.Names}}' | grep -q "^alp-caddy"; then
 	yarn base:minerva --env-file $DOTENV_FILE up $CONTAINER_NAME --wait 2>&1 | grep -vE 'WARN[0000]|is not set'
 	if [ "$( docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 2> /dev/null )" != "running" ]; then
 		echo FATAL: $CONTAINER_NAME failed to start
