@@ -33,7 +33,6 @@ x-envs:
     DB_CREDENTIALS__PRIVATE_KEY_PASSPHRASE: ${DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE}
     IDP__ALP_SVC__CLIENT_ID: 6q6a13bg3dw6fncdr2kf6
     IDP__ALP_SVC__CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
-    IDP__ISSUER_URL: http://alp-logto-${BASE_PORT}:3001/oidc
     IDP__SCOPE: https://alp-default
   minio: &x-minio
     MINIO__ACCESS_KEY: ${MINIO__ACCESS_KEY:-root}
@@ -246,7 +245,9 @@ x-envs:
          "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
          "sqlEditor" : "http://alp-minerva-sqleditor:8888",
          "appRouter": "https://alp-mercury-approuter:41000",
-         "ui": "http://alp-local-ui-file-server:3000"
+         "ui": "http://alp-local-ui-file-server:3000",
+         "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
+         "minio": ""
         }
 
 services:
@@ -497,10 +498,6 @@ services:
         - *x-tls
       DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_SB_NAME: dataflow-adhoc-flows-sb
       DATAFLOW_MGMT__ADHOC_FLOWS__S3_DIR_PATH: s3://dataflow-adhoc-flows/flows
-      MINIO__ACCESS_KEY: ${MINIO__ACCESS_KEY:-root}
-      MINIO__ENDPOINT: ${MINIO__ENDPOINT:-alp-minerva-s3}
-      MINIO__PORT: ${MINIO__PORT:-9000}
-      MINIO__SECRET_KEY: ${MINIO__SECRET_KEY}
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       R_LIBS_USER: /home/docker/plugins/R/site-library
@@ -1398,7 +1395,6 @@ services:
       IDP__FETCH_USER_INFO_TYPE: logto
       IDP__INITIAL_USER__NAME: ${IDP__INITIAL_USER__NAME:-admin}
       IDP__INITIAL_USER__UUID: a6660e40-261e-4782-873e-f76b4328aecf
-      IDP__ISSUER_URL: http://alp-logto-${BASE_PORT}:3001/oidc
       IDP__RELYING_PARTY: ${IDP__RELYING_PARTY}
       LOCAL_DEBUG: "false"
       NIFI_MGMT__BASE_URL: http://alp-minerva-nifi-mgmt-svc-${BASE_PORT:-1}:4444/alp-nifi-api/
