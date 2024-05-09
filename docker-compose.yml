@@ -470,6 +470,8 @@ services:
       R_LIBS_USER: /home/docker/plugins/R/site-library
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
+      IDP__ALP_DATA__CLIENT_ID: t5vwuno8ckh5hmqozjqyj
+      IDP__ALP_DATA__CLIENT_SECRET: ${LOGTO__ALP_DATA__CLIENT_SECRET}
 
   alp-dataflow-gen-init:
     command:
