@@ -22,7 +22,6 @@ export const env = {
   ALP_SYSTEM_NAME: process.env.ALP__SYSTEM_NAME,
   APP_TENANT_ID: process.env.APP__TENANT_ID,
   IDP_BASE_URL: process.env.IDP__BASE_URL,
-  IDP_ISSUER_URL: process.env.IDP__ISSUER_URL,
   IDP_RELYING_PARTY: process.env.IDP__RELYING_PARTY,
   IDP_FETCH_USER_INFO_TYPE: process.env.IDP__FETCH_USER_INFO_TYPE,
   IDP_ALP_ADMIN_CLIENT_ID: process.env.IDP__ALP_ADMIN__CLIENT_ID,
