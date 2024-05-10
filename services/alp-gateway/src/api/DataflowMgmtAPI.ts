@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios'
 import { get, post, put } from './request-util'
-import { env } from '../env'
+import { env, services } from '../env'
 import { createLogger } from '../Logger'
 import { Agent } from 'https'
 
@@ -15,8 +15,8 @@ export class DataflowMgmtAPI {
     if (!token) {
       throw new Error('No token passed for DataflowMgmtAPI')
     }
-    if (env.DATAFLOW_MGMT_API_BASE_URL) {
-      this.baseURL = env.DATAFLOW_MGMT_API_BASE_URL
+    if (services.dataflowMgmt) {
+      this.baseURL = services.dataflowMgmt
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.GATEWAY_CA_CERT
@@ -43,7 +43,7 @@ export class DataflowMgmtAPI {
   async getSchemasVersionInformation(): Promise<any> {
     this.logger.info(`Getting schemas version information`)
     const options = await this.getRequestConfig()
-    const url = `${this.baseURL}db-svc/fetch-version-info`
+    const url = `${this.baseURL}/db-svc/fetch-version-info`
     const result = await post(url, options)
     if (result.data) {
       return result.data
@@ -63,7 +63,7 @@ export class DataflowMgmtAPI {
       `Create CDM schema ${schemaName} in ${databaseCode} with cleansed schema option set to ${cleansedSchemaOption}`
     )
     const options = await this.getRequestConfig()
-    const url = `${this.baseURL}db-svc/run`
+    const url = `${this.baseURL}/db-svc/run`
     const body = {
       dbSvcOperation: 'createCDMSchema',
       requestType: 'post',
@@ -91,7 +91,7 @@ export class DataflowMgmtAPI {
     }
     this.logger.info(`Copy CDM schema (${JSON.stringify(data)})`)
     const options = await this.getRequestConfig()
-    const url = `${this.baseURL}db-svc/run`
+    const url = `${this.baseURL}/db-svc/run`
     const body = {
       dbSvcOperation: 'copyCDMSchema',
       requestType: 'post',
@@ -119,7 +119,7 @@ export class DataflowMgmtAPI {
     }
     this.logger.info(`Copy CDM schema (${JSON.stringify(data)}) into parquet file`)
     const options = await this.getRequestConfig()
-    const url = `${this.baseURL}db-svc/run`
+    const url = `${this.baseURL}/db-svc/run`
     const body = {
       dbSvcOperation: 'copyCDMSchemaParquet',
       requestType: 'post',
@@ -142,7 +142,7 @@ export class DataflowMgmtAPI {
   ): Promise<any> {
     this.logger.info(`Updating schema for ${schemaName}`)
     const options = await this.getRequestConfig()
-    const url = `${this.baseURL}db-svc/run`
+    const url = `${this.baseURL}/db-svc/run`
     const body = {
       dbSvcOperation: 'updateSchema',
       requestType: 'put',
@@ -159,7 +159,7 @@ export class DataflowMgmtAPI {
   async createFlowRunByMetadata(options: object, type: string, flowId?: string, flowRunName?: string): Promise<any> {
     this.logger.info(`Running flow by metadata type ${type}`)
     const postOptions = await this.getRequestConfig()
-    const url = `${this.baseURL}prefect/flow-run/metadata`
+    const url = `${this.baseURL}/prefect/flow-run/metadata`
     const body = {
       type,
       flowId,
@@ -177,7 +177,7 @@ export class DataflowMgmtAPI {
   async getDatamodels(): Promise<any> {
     this.logger.info(`Getting datamodels`)
     const options = await this.getRequestConfig()
-    const url = `${this.baseURL}prefect/flow/datamodels/list`
+    const url = `${this.baseURL}/prefect/flow/datamodels/list`
     const result = await get(url, options)
     if (result.data) {
       return result.data
