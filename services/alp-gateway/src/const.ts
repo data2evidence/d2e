@@ -15,8 +15,6 @@ export const ROLES: AlpRoleType = {
   ALP_OWNER: 'ALP_OWNER'
 }
 
-export const SESSION_CLAIMS_PROP = 'x-alp-usersessionclaims'
-
 export const CDMSchemaTypes = {
   CreateCDM: 'create_cdm',
   NoCDM: 'no_cdm',

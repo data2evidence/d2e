@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { object, z } from 'zod';
 
 const Env = z.object({
   TERMINOLOGY_SVC__LOG_LEVEL: z.string(),
@@ -6,9 +6,6 @@ const Env = z.object({
   FHIR_TERMINOLOGY_SVC__PORT: z.string(),
   NODE_ENV: z.string(),
   LOCAL_DEBUG: z.string(),
-  SYSTEM_PORTAL__API_URL: z.string(),
-  AI__API_URL: z.string(),
-  MEILISEARCH__API_URL: z.string(),
   MEILI_MASTER_KEY: z.string(),
 
   PG_HOST: z.string(),
@@ -31,6 +28,17 @@ const Env = z.object({
   TLS__INTERNAL__KEY: z.string(),
   TLS__INTERNAL__CRT: z.string(),
   TLS__INTERNAL__CA_CRT: z.string(),
+
+  SERVICE_ROUTES: z
+    .string()
+    .transform((str, ctx): z.infer<ReturnType<typeof object>> => {
+      try {
+        return JSON.parse(str);
+      } catch (e) {
+        ctx.addIssue({ code: 'custom', message: 'Invalid JSON' });
+        return z.never();
+      }
+    }),
 });
 
 const result = Env.safeParse(process.env);
