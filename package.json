@@ -26,7 +26,6 @@
     "start:nest-prod:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc --wait --force-recreate --no-deps",
 
     "start:logto": "yarn local:minerva up alp-caddy alp-logto alp-minerva-postgres alp-logto-post-init --renew-anon-volumes",
-
     
     "build:minerva": "yarn local:minerva build --build-arg GIT_COMMIT_ARG=$(git rev-parse HEAD)",
     "build:nest-dev:minerva": "ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn build:minerva alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc",
