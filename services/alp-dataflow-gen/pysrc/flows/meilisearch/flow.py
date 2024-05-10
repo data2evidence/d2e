@@ -10,7 +10,6 @@ from itertools import islice
 
 def execute_add_index_flow(options: meilisearchAddIndexType):
     logger = get_run_logger()
-    token = options.token
     database_code = options.databaseCode
     vocab_schema_name = options.vocabSchemaName
     table_name = options.tableName
@@ -32,7 +31,7 @@ def execute_add_index_flow(options: meilisearchAddIndexType):
 
     index_name = f"{database_code}_{vocab_schema_name}_{table_name}"
     # Initialize helper classes
-    meilisearch_svc_api = MeilisearchSvcAPI(token)
+    meilisearch_svc_api = MeilisearchSvcAPI()
     vocab_dao = VocabDao(database_code, vocab_schema_name)
     # logger.info(f"Getting stream connection")
     conn = vocab_dao.get_stream_connection(yield_per=CHUNK_SIZE)
@@ -124,7 +123,6 @@ def execute_add_index_flow(options: meilisearchAddIndexType):
         raise err
     finally:
         conn.close()
-
 
 def parseDates(row):
     result = []
