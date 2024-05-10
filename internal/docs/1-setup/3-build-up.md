@@ -1,5 +1,5 @@
 ## Build & Docker Up
-see: https://github.com/alp-os/d2e/blob/develop/README.md
+see: main [README.md](../../../README.md)
 
 # Build
 ```bash

@@ -1,7 +1,6 @@
 # docker-compose dotenv config yml merge
 - 1password dotenv contains `DATABASE_CREDENTIALS` dbcreds seed & other development related env-vars
-- recommend source shared [zshrc](../../2-configure/zshrc) see: [initial](../../2-configure/1-initial.md#zshrc)
-  - otherwise `OP_VAULT_NAME` & `GOOGLE_DRIVE_DATA_DIR` must be set explicitly
+- recommend source shared `zshrc` - otherwise `OP_VAULT_NAME` & `GOOGLE_DRIVE_DATA_DIR` must be set explicitly
 - certificates expected with linebreaks in .env.yml
 - code must handle env-var with linebreaks or literal '\n'
 
