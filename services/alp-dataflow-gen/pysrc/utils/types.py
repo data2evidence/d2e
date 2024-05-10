@@ -79,7 +79,6 @@ class AlpDBSvcOptionsType(BaseModel):
 
 
 class meilisearchAddIndexType(BaseModel):
-    token: str
     databaseCode: str
     vocabSchemaName: str
     tableName: str
