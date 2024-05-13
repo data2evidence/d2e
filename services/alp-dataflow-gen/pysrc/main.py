@@ -7,7 +7,7 @@ from flows.cohort_generator.flow import execute_cohort_generator
 from flows.omop_cdm.flow import create_omop_cdm
 from flows.alp_data_characterization.hooks import drop_data_characterization_schema
 from flows.alp_db_svc.flow import run_alp_db_svc, run_seed_postgres
-from flows.meilisearch.flow import execute_add_index_flow
+from flows.meilisearch.flow import execute_add_index_flow, execute_add_embedder_to_index_settings
 from flows.strategus.flow import execute_strategus
 from flows.portal_server.flow import update_dataset_attributes, fetch_version_info
 from utils.types import (
@@ -88,3 +88,7 @@ def fetch_version_info_flow(options: fetchVersionInfoType):
 @flow(log_prints=True, task_runner=SequentialTaskRunner)
 def update_dataset_attributes_flow(options: datasetAttributesType):
     update_dataset_attributes(options)
+
+@flow(log_prints=True, task_runner=SequentialTaskRunner)
+def execute_meilisearch_add_embedder_to_index(options: meilisearchAddIndexType):
+    execute_add_embedder_to_index_settings(options)

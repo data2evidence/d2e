@@ -1,6 +1,7 @@
 import { Controller, Get, Query, Post, Body } from '@nestjs/common';
 import { ConceptService } from './concept.service';
 import { ConceptFilterOptionsDto } from './dto/concept.dto';
+import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 
 @Controller()
 export class ConceptController {

@@ -5,6 +5,7 @@ import { env } from '../env';
 import { createLogger } from '../logger';
 import {
   Filters,
+  HybridSearchConfig,
   IMeilisearchConcept,
   IMeilisearchGetConceptRecommended,
   IMeilisearchGetDescendants,
@@ -12,13 +13,11 @@ import {
   IMeilisearchRelationship,
 } from '../utils/types';
 import { INDEX_ATTRIBUTES } from '../utils/constants';
-import { HybridSearchConfigService } from '../module/hybrid-search-config/hybrid-search-config.service';
 
 export class MeilisearchAPI {
   private readonly url: string;
   private readonly httpsAgent: Agent;
   private readonly logger = createLogger(this.constructor.name);
-  private readonly hybridSearchConfigService: HybridSearchConfigService;
 
   constructor() {
     if (env.SERVICE_ROUTES.meilisearch) {
@@ -27,14 +26,9 @@ export class MeilisearchAPI {
         rejectUnauthorized: true,
         ca: env.TLS__INTERNAL__CA_CRT,
       });
-      this.hybridSearchConfigService = new HybridSearchConfigService();
     } else {
       throw new Error('No url is set for MeilisearchAPI');
     }
-  }
-
-  async getHybridSearchConfig() {
-    return await this.hybridSearchConfigService.getHybridSearchConfig();
   }
 
   async hybridSearch(
@@ -68,15 +62,14 @@ export class MeilisearchAPI {
     searchText = '',
     index: string,
     filters: Filters,
+    hybridSearchConfig: HybridSearchConfig,
   ): Promise<IMeilisearchConcept> {
     const errorMessage = 'Error while getting concepts';
     try {
-      const { isEnabled, semanticRatio, source, model } =
-        await this.getHybridSearchConfig();
-      const hybridSearchName = `_${source.replace('/', '')}_${model.replace(
+      const hybridSearchName = `_${hybridSearchConfig.source.replace(
         '/',
         '',
-      )}`;
+      )}_${hybridSearchConfig.model.replace('/', '')}`;
       const data = {
         q: searchText,
         page: pageNumber + 1,
@@ -90,31 +83,24 @@ export class MeilisearchAPI {
         ],
         filter: this.generateMeiliFilter(filters),
       };
-      if (!isEnabled) {
-        const hybridSearchSettingsUrl = `${this.url}indexes/${index}${hybridSearchName}/settings/embedders`;
-        const settingsData = { default: { source: 'huggingFace' } };
+      if (!hybridSearchConfig.isEnabled) {
+        const result = await this.hybridSearch(
+          index,
+          data,
+          hybridSearchName,
+          hybridSearchConfig.semanticRatio,
+        );
+        return result.data;
+      } else {
         const options = await this.createOptions();
-        const summarizedTaskObj = await axios.post<any>(
-          hybridSearchSettingsUrl,
-          settingsData,
+        const url = `${this.url}/indexes/${index}/search`;
+        const result = await axios.post<IMeilisearchConcept>(
+          url,
+          data,
           options,
         );
+        return result.data;
       }
-      const result = await this.hybridSearch(
-        index,
-        data,
-        hybridSearchName,
-        semanticRatio,
-      );
-      return result.data;
-      // const options = await this.createOptions();
-      // const url = `${this.url}/indexes/${index}/search`;
-      // const result = await axios.post<IMeilisearchConcept>(
-      //   url,
-      //   data,
-      //   options,
-      // );
-      // return result.data;
     } catch (error) {
       this.logger.error(`${errorMessage}: ${error}`);
       throw new InternalServerErrorException(errorMessage);

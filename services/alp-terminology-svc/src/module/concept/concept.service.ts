@@ -14,10 +14,12 @@ import {
   FhirConceptMapElementTarget,
   IConcept,
   Filters,
+  HybridSearchConfig,
 } from '../../utils/types';
 import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { Request } from 'express';
 import { SystemPortalAPI } from 'src/api/portal-api';
+import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 
 // Placed outside as FHIR server is unable to access
 const logger = createLogger('ConceptService');
@@ -39,6 +41,7 @@ export class ConceptService {
     rowsPerPage: number,
     datasetId: string,
     searchText: string,
+    hybridSearchConfigService: HybridSearchConfigService,
     filters?: Filters,
   ) {
     logger.info('Get list of concepts');
@@ -56,6 +59,8 @@ export class ConceptService {
     try {
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
+      const hybridSearchConfig: HybridSearchConfig =
+        await hybridSearchConfigService.getHybridSearchConfig();
       const meilisearchResult = await meilisearchApi.getConcepts(
         pageNumber,
         Number(rowsPerPage),
@@ -64,6 +69,7 @@ export class ConceptService {
           dialect === 'hana' ? 'CONCEPT' : 'concept'
         }`,
         completeFilters,
+        hybridSearchConfig,
       );
       return this.meilisearchResultMapping(meilisearchResult);
     } catch (err) {
