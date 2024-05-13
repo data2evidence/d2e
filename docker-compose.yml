@@ -1498,6 +1498,7 @@ services:
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
       isTestEnv: ${isTestEnv}
+  
   redis:
     command: redis-server --requirepass ${REDIS_PASSWORD}
     container_name: &c26 alp-minerva-redis-${BASE_PORT:-1}
@@ -1514,3 +1515,33 @@ services:
       - alp
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     hostname: alp-minerva-redis-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+
+  alp-meilisearch-post-init:
+    container_name: &c27 alp-meilisearch-post-init
+    depends_on:
+      alp-minerva-meilisearch-svc:
+        condition: service_healthy
+    image: getmeili/meilisearch:v1.6
+    logging:
+      options:
+        tag: *c27
+    entrypoint:
+      - curl
+      - -X
+      - PATCH
+      - 'http://alp-minerva-meilisearch-svc-1:41${BASE_PORT:-1}11/experimental-features/'
+      - -H
+      - 'Content-Type: application/json'
+      - -H
+      - 'Authorization: Bearer ${MEILI_MASTER_KEY}'
+      - --data-binary
+      - '{ "vectorStore": true }'
+    networks:
+      - alp
+    hostname: alp-meilisearch-post-init.${TLS__INTERNAL__DOMAIN:-alp.local}
+    environment:
+      <<:
+        - *x-tls
+      MEILI_HTTP_ADDR: 0.0.0.0:41${BASE_PORT:-1}11
+      MEILI_LOG_LEVEL: INFO
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
