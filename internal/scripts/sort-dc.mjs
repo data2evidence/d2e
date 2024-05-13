@@ -5,9 +5,8 @@
 // https://www.npmjs.com/package/yaml
 // https://eemeli.org/yaml/#createnode-options
 // Usage:
-// 0. alias sort-dc=PATH_TO_THIS_FILE
-// 1. sort-dc --backup --force # backup docker-compose to *private*
-// 2. sort-dc --update # update docker-compose files
+// 1. internal/scripts/sort-dc.mjs/sort-dc.mjs --backup --force # copy docker-compose* to file with private in name
+// 2. internal/scripts/sort-dc.mjs/sort-dc.mjs --update # update docker-compose files
 
 $.verbose = false;
 // $.verbose = true;
