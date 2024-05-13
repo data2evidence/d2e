@@ -5,9 +5,11 @@ from rpy2 import robjects
 from rpy2.robjects import conversion, default_converter
 from prefect import task, get_run_logger
 from prefect.context import FlowRunContext
+from prefect.filesystems import S3
+from prefect.serializers import JSONSerializer
 from utils.types import PG_TENANT_USERS
 from utils.databaseConnectionUtils import getSetDBDriverEnvString, getDatabaseConnectorConnectionDetailsString
-from flows.alp_data_characterization.hooks import persist_data_characterization, persist_export_to_ares
+from flows.alp_data_characterization.hooks import persist_data_characterization, persist_export_to_ares, get_export_to_ares_results_from_file
 from utils.types import dcOptionsType
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
 import importlib
@@ -49,7 +51,9 @@ async def execute_data_characterization(schemaName: str,
         raise e
 
 
-@task
+@task(result_storage=S3(bucket_path="dataflow-results/data-characterization"), 
+      result_storage_key="{flow_run.id}_export_to_ares.json",
+      result_serializer=JSONSerializer())
 async def execute_export_to_ares(schemaName: str,
                                  databaseCode: str,
                                  vocabSchemaName: str,
@@ -79,6 +83,7 @@ async def execute_export_to_ares(schemaName: str,
                         reports = c()
                     )
             ''')
+            return get_export_to_ares_results_from_file(outputFolder, schemaName)
     except Exception as e:
         raise e
 
