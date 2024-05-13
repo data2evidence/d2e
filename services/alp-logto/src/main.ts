@@ -118,29 +118,30 @@ async function main() {
   let logtoAdminUser = await callback("users", headers, user);
 
   let logtoScopes: Array<LogtoScope> = [];
-  scopes.forEach(async (s) => {
+  scopes.forEach(async (s) => {});
+  for (const s of scopes) {
     let logtoScope = await callback(
       `resources/${resourceId}/scopes`,
       headers,
       s
     );
     logtoScopes.push(logtoScope);
-  });
+  }
 
   let logtoRoles: Array<LogtoScope> = [];
-  roles.forEach(async (r) => {
+  for (const r of roles) {
     let logtoRole = await callback("roles", headers, r);
     logtoRoles.push(logtoRole);
-  });
+  }
 
   let roleScopes: Array<{ roleId: string; scopeId: string }> = logtoRoles.map(
     (r, indx) => ({ roleId: r.id, scopeId: logtoScopes[indx]["id"] })
   );
-  roleScopes.forEach(async (rs) => {
+  for (const rs of roleScopes) {
     let response = await callback(`roles/${rs.roleId}/scopes`, headers, {
       scopeIds: [rs.scopeId],
     });
-  });
+  }
 
   let userRoles: Array<{ userId: string; roleIds: Array<string> }> = [
     {
@@ -148,11 +149,11 @@ async function main() {
       roleIds: logtoRoles.map((r) => r["id"]),
     },
   ];
-  userRoles.forEach(async (ur) => {
+  for (const ur of userRoles) {
     let response = await callback(`users/${ur.userId}/roles`, headers, {
       roleIds: ur.roleIds,
     });
-  });
+  }
 
   let signinExperience = {
     branding: {
@@ -195,8 +196,8 @@ async function main() {
     );
     let userRows = await getPgRows(
       client,
-      "select * from public.users where username = $1",
-      ["admin"]
+      "select * from public.users where username = $1 and tenant_id = $2",
+      ["admin", "default"]
     );
     let scopeRows = await getPgRows(
       client,
