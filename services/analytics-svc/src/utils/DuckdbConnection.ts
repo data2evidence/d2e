@@ -11,7 +11,7 @@ import { DBError } from "@alp/alp-base-utils/target/src/DBError";
 import { StudyAnalyticsCredential } from "../types";
 import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
 import { translateHanaToDuckdb } from "@alp/alp-base-utils/target/src/helpers/hanaTranslation";
-import { DUCKDB_DATA_FOLDER } from "../config";
+import { env } from "../env";
 const logger = CreateLogger("Duckdb Connection");
 
 // Helper function similar to getDBConnection implementation in alp-base-utils DBConnectionUtil.ts
@@ -71,13 +71,13 @@ export class DuckdbConnection implements ConnectionInterface {
     ) {
         try {
             const duckdDB = await Database.create(
-                `${DUCKDB_DATA_FOLDER}/${duckdbSchemaFileName}`,
+                `${env.DUCKDB__DATA_FOLDER}/${duckdbSchemaFileName}`,
                 OPEN_READONLY
             );
             const duckdDBconn = await duckdDB.connect();
             // Load vocab schema into duckdb connection
             await duckdDBconn.all(
-                `ATTACH '${DUCKDB_DATA_FOLDER}/${duckdbVocabSchemaFileName}' (READ_ONLY);`
+                `ATTACH '${env.DUCKDB__DATA_FOLDER}/${duckdbVocabSchemaFileName}' (READ_ONLY);`
             );
             const conn: DuckdbConnection = new DuckdbConnection(
                 duckdDBconn,

@@ -15,17 +15,14 @@ import { createEndpointFromRequest } from "../../mri/endpoint/CreatePluginEndpoi
 import PortalServerAPI from "../PortalServerAPI";
 import https from "https";
 import { convertIFRToExtCohort } from "../../ifr-to-extcohort/main";
-import {
-    ALP_MINERVA_PORTAL_SERVER__URL,
-    USE_EXTENSION_FOR_COHORT_CREATION,
-} from "../../config";
 import { dataflowRequest } from "../../utils/DataflowMgmtProxy";
 import { getDuckdbDirectPostgresWriteConnection } from "../../utils/DuckdbConnection";
 
+import { env } from "../../env";
 const language = "en";
 
 const mriConfigConnection = new MriConfigConnection(
-    ALP_MINERVA_PORTAL_SERVER__URL
+    env.SERVICE_ROUTES?.portalServer
 );
 
 export async function getCohortAnalyticsConnection(req: IMRIRequest) {
@@ -158,7 +155,7 @@ export async function createCohort(req: IMRIRequest, res, next) {
         };
         const { cohortDefinition } = await createEndpointFromRequest(req);
 
-        if (USE_EXTENSION_FOR_COHORT_CREATION === "true") {
+        if (env.USE_EXTENSION_FOR_COHORT_CREATION === "true") {
             const mriConfig = await mriConfigConnection.getStudyConfig(
                 {
                     req,
@@ -351,7 +348,7 @@ async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
             timeout: AXIOS_TIMEOUT,
             httpsAgent: new https.Agent({
                 rejectUnauthorized: true,
-                ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
+                ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
             }),
         };
 

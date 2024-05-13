@@ -19,8 +19,8 @@ export class MeilisearchAPI {
   private readonly logger = createLogger(this.constructor.name);
 
   constructor() {
-    if (env.MEILISEARCH__API_URL) {
-      this.url = env.MEILISEARCH__API_URL;
+    if (env.SERVICE_ROUTES.meilisearch) {
+      this.url = env.SERVICE_ROUTES.meilisearch;
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.TLS__INTERNAL__CA_CRT,
@@ -40,7 +40,7 @@ export class MeilisearchAPI {
     const errorMessage = 'Error while getting concepts';
     try {
       const options = await this.createOptions();
-      const url = `${this.url}indexes/${index}/search`;
+      const url = `${this.url}/indexes/${index}/search`;
       const data = {
         q: searchText,
         page: pageNumber + 1,
@@ -69,7 +69,7 @@ export class MeilisearchAPI {
   ): Promise<IMeilisearchConcept[]> {
     try {
       const options = await this.createOptions();
-      const url = `${this.url}multi-search`;
+      const url = `${this.url}/multi-search`;
       const invalidFilter = includeInvalid
         ? []
         : [
@@ -109,7 +109,7 @@ export class MeilisearchAPI {
   ): Promise<IMeilisearchGetDescendants[]> {
     try {
       const options = await this.createOptions();
-      const url = `${this.url}multi-search`;
+      const url = `${this.url}/multi-search`;
       const queries = searchTexts.map((searchText) => {
         return {
           indexUid: index,
@@ -138,7 +138,7 @@ export class MeilisearchAPI {
   ): Promise<IMeilisearchGetMapped[]> {
     try {
       const options = await this.createOptions();
-      const url = `${this.url}multi-search`;
+      const url = `${this.url}/multi-search`;
       const queries = searchTexts.map((searchText) => {
         return {
           indexUid: index,
@@ -178,7 +178,7 @@ export class MeilisearchAPI {
     // https://www.meilisearch.com/docs/learn/advanced/known_limitations#facet-search-limitation
 
     const options = await this.createOptions();
-    const url = `${this.url}indexes/${index}/search`;
+    const url = `${this.url}/indexes/${index}/search`;
     const data = {
       q: searchText,
       facets: ['*'],
@@ -203,7 +203,7 @@ export class MeilisearchAPI {
     // https://www.meilisearch.com/docs/learn/advanced/known_limitations#facet-search-limitation
 
     const options = await this.createOptions();
-    const url = `${this.url}indexes/${index}/search`;
+    const url = `${this.url}/indexes/${index}/search`;
     const resultAll = await axios.post<IMeilisearchConcept>(
       url,
       {
@@ -286,7 +286,7 @@ export class MeilisearchAPI {
     index: string,
   ): Promise<IMeilisearchGetMapped> {
     const options = await this.createOptions();
-    const url = `${this.url}indexes/${index}/search`;
+    const url = `${this.url}/indexes/${index}/search`;
     const data = {
       q: `${conceptId}`,
       attributesToSearchOn: [INDEX_ATTRIBUTES.concept_relationship.conceptId1],
@@ -300,7 +300,7 @@ export class MeilisearchAPI {
     index: string,
   ): Promise<IMeilisearchRelationship> {
     const options = await this.createOptions();
-    const url = `${this.url}indexes/${index}/search`;
+    const url = `${this.url}/indexes/${index}/search`;
     const data = {
       filter: [
         [
@@ -321,7 +321,7 @@ export class MeilisearchAPI {
     index: string,
   ): Promise<IMeilisearchGetConceptRecommended[]> {
     const options = await this.createOptions();
-    const url = `${this.url}multi-search`;
+    const url = `${this.url}/multi-search`;
     const queries = searchConceptIds.map((conceptId) => {
       const exactSearchFilter = [
         `${INDEX_ATTRIBUTES.concept_recommended.conceptId1} = '${conceptId}'`,
@@ -346,7 +346,7 @@ export class MeilisearchAPI {
     const errorMessage = 'Error while getting concepts';
     try {
       const options = await this.createOptions();
-      const url = `${this.url}indexes/${index}/search`;
+      const url = `${this.url}/indexes/${index}/search`;
       const data = {
         filter: [
           [`${INDEX_ATTRIBUTES.concept.conceptName} = '${conceptName}'`],
