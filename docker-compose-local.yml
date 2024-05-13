@@ -279,3 +279,14 @@ services:
     build:
       context: ./services/alp-fhir
       dockerfile: Dockerfile
+
+  alp-logto-post-init-2:
+    image: node:18.20.2-slim
+    networks:
+      - alp
+    volumes:
+      - ./deploy/logto:/logto
+      - ./services/alp-logto:/home/docker
+    # entrypoint: sh /logto/init.sh
+    entrypoint: tail -f /dev/null
+  
