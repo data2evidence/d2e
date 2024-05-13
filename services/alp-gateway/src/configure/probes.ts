@@ -1,10 +1,9 @@
 import { healthCheckMiddleware } from '../middlewares/HealthCheckMiddleware'
-import { env } from '../env'
+import { env, services } from '../env'
 import { createLogger } from '../Logger'
 import http from 'http'
 
 const logger = createLogger('HealthCheck')
-const services = JSON.parse(env.DATA_NODE_DOCKER_ADDRESSES_JSON)
 
 const livenessCheck = url =>
   new Promise((resolve, reject) => {
