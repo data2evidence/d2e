@@ -738,6 +738,7 @@ services:
     environment:
       <<:
         - *x-converter
+        - *x-routes
         - *x-tls
       CONFIG_CONNECTION: |-
         {
