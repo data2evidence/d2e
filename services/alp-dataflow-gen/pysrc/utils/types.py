@@ -163,11 +163,3 @@ class StrategusOptionsType(BaseModel):
 class DATABASE_DIALECTS(Enum):
     HANA = "hana"
     POSTGRES = "postgres"
-
-class Terminology_HybridSearchConfig(BaseModel):
-    id: int
-    isEnabled: bool
-    semanticRatio: int
-    source: str
-    model: str
-    

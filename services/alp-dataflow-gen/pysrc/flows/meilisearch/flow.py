@@ -3,11 +3,10 @@ from prefect import get_run_logger
 from datetime import date, datetime
 import re
 from api.MeilisearchSvcAPI import MeilisearchSvcAPI
-from utils.types import Terminology_HybridSearchConfig, meilisearchAddIndexType
+from utils.types import meilisearchAddIndexType
 from dao.VocabDao import VocabDao
 from flows.meilisearch.config import CHUNK_SIZE, MEILISEARCH_INDEX_CONFIG
 from itertools import islice
-from api.TerminologySvcAPI import TerminologySvcAPI
 
 def execute_add_index_flow(options: meilisearchAddIndexType):
     logger = get_run_logger()
@@ -119,7 +118,6 @@ def execute_add_index_flow(options: meilisearchAddIndexType):
     finally:
         conn.close()
 
- 
 def parseDates(row):
     result = []
     for element in row:

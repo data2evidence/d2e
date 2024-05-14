@@ -1,15 +1,15 @@
 ###
-### A complete description of a Prefect Deployment for flow 'execute-meilisearch-add-embedder-to-index'
+### A complete description of a Prefect Deployment for flow 'execute-add-search-index-flow'
 ###
-name: add_embedder_to_index
+name: add_search_index
 description: null
-version: 9fb30e076dfe2d9b3c0a4bd373ec8599
+version: f4e994fc65e2f1158ca55c950ff40022
 # The work queue that will handle this deployment's runs
 work_queue_name: default
 work_pool_name: null
-tags: ["add_embedder_to_index"]
-parameters: 
-{
+tags: ["add_search_index"]
+parameters:
+  {
     options: {
       "token": "${BEARER TOKEN}",
       "databaseCode": "alpdev_pg",
@@ -34,11 +34,11 @@ infrastructure:
 ###
 ### DO NOT EDIT BELOW THIS LINE
 ###
-flow_name: execute-meilisearch-add-embedder-to-index
+flow_name: execute-add-search-index-flow
 manifest_path: null
 storage: null
 path: /app/pysrc
-entrypoint: main.py:execute_meilisearch_add_embedder_to_index
+entrypoint: main.py:execute_meilisearch_add_index_flow
 parameter_openapi_schema:
   title: Parameters
   type: object
@@ -69,6 +69,6 @@ parameter_openapi_schema:
       - databaseCode
       - vocabSchemaName
       - tableName
-timestamp: '2024-05-14T03:28:20.874279+00:00'
+timestamp: '2023-12-29T09:30:13.875758+00:00'
 triggers: []
 enforce_parameter_schema: null
