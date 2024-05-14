@@ -42,8 +42,6 @@ jobs:
           swap-storage: true
 
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Install 1Password CLI
         uses: 1Password/install-cli-action@v1.0.0
