@@ -66,7 +66,6 @@ jobs:
         echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
         echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
         echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
-        ./internal/scripts/get-op-ratelimit.sh
 
     - name: Load dotenv from 1password
       uses: 1password/load-secrets-action@v2
