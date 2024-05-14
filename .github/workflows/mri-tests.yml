@@ -47,8 +47,8 @@ jobs:
 
 
   test-mri:
-    needs: [check_file_changes]
-    if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    # needs: [check_file_changes]
+    # if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
     runs-on: ubuntu-latest
     env:
       isTestEnv: "true"
