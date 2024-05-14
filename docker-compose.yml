@@ -1452,6 +1452,7 @@ services:
     entrypoint: |
       /bin/sh -c " /usr/bin/mc config host add myminio http://alp-minerva-s3:9000 ${MINIO__ACCESS_KEY:-root} ${MINIO__SECRET_KEY};
       /usr/bin/mc mb -p myminio/dataflow-adhoc-flows;
+      /usr/bin/mc mb -p myminio/dataflow-results;
       /usr/bin/mc policy download myminio/dataflow-adhoc-flows;
       exit 0;
       "
