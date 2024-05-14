@@ -1,5 +1,5 @@
 // Translation function containing regex that are shared between DUCKDB and POSTGRES dialects
-const hanaCommonTranslation = (temp: string): string => {
+const hanaCommonTranslation = (temp: string, schema: string): string => {
   // The first few queries to replace are very specific query which does not require further string replacements
   // subsequent lines, hence early return is used.
   const regex1 =
@@ -164,6 +164,7 @@ const hanaCommonTranslation = (temp: string): string => {
   temp = temp.replace(/\(SYSUUID\)/gi, "uuid_generate_v4()");
   temp = temp.replace(/IFNULL/gi, "COALESCE");
 
+  temp = temp.replace(/\$\$SCHEMA\$\$./g, `"${schema}".`);
   // Replace %s or `?` with $n
   let n = 0;
   temp = temp.replace(/\%[s]{1}(?![a-zA-Z0-9%])|%UNSAFE|\?/g, () => {
@@ -174,9 +175,7 @@ const hanaCommonTranslation = (temp: string): string => {
 };
 
 export const translateHanaToPostgres = (temp: string, schema: string) => {
-  temp = hanaCommonTranslation(temp);
-  temp = temp.replace(/\$\$SCHEMA\$\$./g, `${schema}.`);
-
+  temp = hanaCommonTranslation(temp, schema);
   temp = temp.replace(
     /DAYS_BETWEEN \(\(\(("[\w]*"."[\w]*")\)\),\(\(("[\w]*"."[\w]*")\)\)\)/gi,
     `($2::date - $1::date)`,
@@ -188,8 +187,7 @@ export const translateHanaToPostgres = (temp: string, schema: string) => {
 };
 
 export const translateHanaToDuckdb = (temp: string, schema: string): string => {
-  temp = hanaCommonTranslation(temp);
-  temp = temp.replace(/\$\$SCHEMA\$\$./g, `"${schema}".`);
+  temp = hanaCommonTranslation(temp, schema);
   temp = temp.replace(/DAYS_BETWEEN \(/gi, `date_diff ('day', `);
   temp = temp.replace(/LIKE_REGEXPR/gi, "SIMILAR TO");
   temp = temp.replace(
