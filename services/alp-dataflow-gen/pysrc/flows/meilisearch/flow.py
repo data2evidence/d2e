@@ -7,6 +7,8 @@ from utils.types import meilisearchAddIndexType
 from dao.VocabDao import VocabDao
 from flows.meilisearch.config import CHUNK_SIZE, MEILISEARCH_INDEX_CONFIG
 from itertools import islice
+from transformers import AutoTokenizer, AutoModel
+import torch
 
 def execute_add_index_flow(options: meilisearchAddIndexType):
     logger = get_run_logger()
@@ -118,6 +120,33 @@ def execute_add_index_flow(options: meilisearchAddIndexType):
     finally:
         conn.close()
 
+def execute_calculate_embedders_flow():
+    # Mean Pooling - Take attention mask into account for correct averaging
+    def meanpooling(output, mask):
+        embeddings = output[0] # First element of model_output contains all token embeddings
+        mask = mask.unsqueeze(-1).expand(embeddings.size()).float()
+        return torch.sum(embeddings * mask, 1) / torch.clamp(mask.sum(1), min=1e-9)
+
+    # Sentences we want sentence embeddings for
+    sentences = ['This is an example sentence', 'Each sentence is converted']
+
+    # Load model from HuggingFace Hub
+    tokenizer = AutoTokenizer.from_pretrained("neuml/pubmedbert-base-embeddings")
+    model = AutoModel.from_pretrained("neuml/pubmedbert-base-embeddings")
+
+    # Tokenize sentences
+    inputs = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
+
+    # Compute token embeddings
+    with torch.no_grad():
+        output = model(**inputs)
+
+    # Perform pooling. In this case, mean pooling.
+    embeddings = meanpooling(output, inputs['attention_mask'])
+
+    print("Sentence embeddings:")
+    print(embeddings)
+    
 def parseDates(row):
     result = []
     for element in row:
