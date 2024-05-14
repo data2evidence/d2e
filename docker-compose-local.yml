@@ -55,7 +55,7 @@ services:
       - 9229:9229
     environment:
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
-      NODE_ENV: production # development
+      NODE_ENV: production # start without DATABASE_CREDENTIALS set; exits with NODE_ENV: development
 
   alp-fhir-server:
     build:
