@@ -143,10 +143,7 @@ def execute_add_embedder_to_index_settings(options: meilisearchAddIndexType):
         terminology_svc_api = TerminologySvcAPI()
         
         config: Terminology_HybridSearchConfig = terminology_svc_api.get_hybridSearchConfig()
-        hybridSearchName = f"{config.source.replace(
-        '/',
-        '',
-        )}_{config.model.replace('/', '')}";
+        hybridSearchName = f"{config.source.replace('/', '')}_{config.model.replace('/', '')}";
         index_name = f"{database_code}_{vocab_schema_name}_{table_name}_{hybridSearchName}"
         settings = {
             "embedders": {
