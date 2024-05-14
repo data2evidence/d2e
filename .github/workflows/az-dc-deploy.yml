@@ -152,32 +152,6 @@ jobs:
         username: ${{ env.REGISTRY_USERNAME }}
         password: ${{ env.REGISTRY_PASSWORD }}
 
-    # - shell: bash
-    #   id: override-repo
-    #   name: override-repo
-    #   run: |
-    #     OVERRIDE_REPO="${{ github.event.inputs.override-repo-branch-textbox }}"
-    #     [ ${{ github.event.inputs.override-branch-boolean }} = true ] && OVERRIDE_REPO=${{ github.ref_name }}
-    #     echo OVERRIDE_REPO=$OVERRIDE_REPO | tee -a "$GITHUB_OUTPUT"
-
-    # - uses: actions/checkout@v4.1.1
-    #   name: checkout override repo
-    #   with:
-    #     repository:  ${{ vars.OVERRIDE_REPO }}
-    #     token: ${{ secrets.CI_PAT }}
-    #     path: 'tmp'
-    #     sparse-checkout: 'alp-data-node-override'
-    #     sparse-checkout-cone-mode: false
-    #     ref: ${{ steps.override-repo.outputs.OVERRIDE_REPO }} # branch name
-
-    # - shell: bash
-    #   name: link files from override
-    #   id: link_files_from_override
-    #   run: |
-    #     pwd
-    #     ln -s tmp/alp-data-node-override alp-data-node-override
-    #     chmod 755 -R alp-data-node-override
-
     - name: Cleanup dangling images and remove created/exited containers
       continue-on-error: true
       run: |
