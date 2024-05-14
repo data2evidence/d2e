@@ -62,3 +62,6 @@ POSTGRES_TENANT_ADMIN_PASSWORD:
 POSTGRES_TENANT_READ_PASSWORD:
   comment: set in admin>setup>databases>configure but not in env.example
   type: password
+REDIS_PASSWORD:
+  comment: redis password
+  type: password
