@@ -154,7 +154,6 @@ jobs:
           hasDiff=$(if [ ${#diff} -gt 0 ] ; then echo "True" ; else echo "False"; fi)
 
           # Set the output named "has_dbsvc_changed"
-          hasDiff=True # temporary
           echo "has_dbsvc_changed=$hasDiff" >> $GITHUB_OUTPUT
           echo "Files changed: $diff"
           echo "Does db-svc have changes: $hasDiff"
