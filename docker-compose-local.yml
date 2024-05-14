@@ -58,6 +58,11 @@ services:
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
       NODE_ENV: production # development
 
+  alp-fhir-server:
+    build:
+      context: ./services/alp-fhir
+      dockerfile: Dockerfile
+
   alp-local-ui-file-server:
     container_name: alp-local-ui-file-server
     image: alpcr.azurecr.io/alp-data-node/alp-local-ui-file-server:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop} # Take local head commit and will pull from Azure Container registry
@@ -275,8 +280,3 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
-  
-  alp-fhir-server:
-    build:
-      context: ./services/alp-fhir
-      dockerfile: Dockerfile
