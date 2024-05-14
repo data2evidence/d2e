@@ -59,24 +59,7 @@
     "inittestdb": "node internal/build/initdb.js test",
     "removetestdb": "node internal/build/initdb.js rmonly",
 
-    "gen:env": "internal/scripts/gen-env.sh && yarn gen:tls",
-    "load:all": "yarn load:permissions && yarn load:synpuf1k && yarn load:vocab",
-    "load:permissions": "internal/scripts/load-permissions.sh",
-    "load:synpuf1k": "internal/scripts/load-synpuf1k.sh",
-    "load:vocab": "internal/scripts/load-vocab.sh",
-    "op:create:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do yarn op:create $ENV_NAME; done",
-    "op:create": "internal/scripts/create-op.sh",
-    "op:get:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
-    "op:get:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
-    "op:get:local": "for ENV_NAME in base-all base-local local; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
-    "op:get:remote": "for ENV_NAME in base-all base-remote $ENV_NAME; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
-    "op:get": "internal/scripts/get-op.sh",
-    "op:put:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
-    "op:put:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
-    "op:put": "internal/scripts/put-op.sh",
-    "get:drivers": "internal/scripts/get-drivers.sh",
-    "sort:dc1": "internal/scripts/sort-dc.mjs --backup --force",
-    "sort:dc2": "internal/scripts/sort-dc.mjs --update"
+    "internal": "npm run-script --prefix internal"
   },
   "devDependencies": {
     "@types/node": "^18",
