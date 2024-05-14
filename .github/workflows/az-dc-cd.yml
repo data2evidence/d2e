@@ -100,7 +100,7 @@ jobs:
       run: |
         ./internal/scripts/get-op-ratelimit.sh
 
-    - name: Upload job yml
+    - name: Upload stats.yml artifact
       uses: actions/upload-artifact@v4
       if: always()
       with:
