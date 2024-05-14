@@ -9,7 +9,6 @@ import { Logger, getUser } from "@alp/alp-base-utils";
 import CreateLogger = Logger.CreateLogger;
 let logger = CreateLogger("analytics-log");
 import axios, { AxiosRequestConfig } from "axios";
-import { DBConnectionUtil as dbConnectionUtil } from "@alp/alp-base-utils";
 import { CohortEndpoint } from "../../mri/endpoint/CohortEndpoint";
 import { generateQuery } from "../../utils/QueryGenSvcProxy";
 import { createEndpointFromRequest } from "../../mri/endpoint/CreatePluginEndpoint";
@@ -17,6 +16,8 @@ import PortalServerAPI from "../PortalServerAPI";
 import https from "https";
 import { convertIFRToExtCohort } from "../../ifr-to-extcohort/main";
 import { dataflowRequest } from "../../utils/DataflowMgmtProxy";
+import { getDuckdbDirectPostgresWriteConnection } from "../../utils/DuckdbConnection";
+
 import { env } from "../../env";
 const language = "en";
 
@@ -25,13 +26,18 @@ const mriConfigConnection = new MriConfigConnection(
 );
 
 export async function getCohortAnalyticsConnection(req: IMRIRequest) {
-    // Get study analytics credentials
-    const { studyAnalyticsCredential } = req.dbCredentials;
-    // Get connection to db using study analytics credentials
-    return await dbConnectionUtil.DBConnectionUtil.getDBConnection({
-        credentials: studyAnalyticsCredential,
-        schema: studyAnalyticsCredential.schema,
-    });
+    const { analyticsConnection } = req.dbConnections;
+    // If dialect is DUCKDB, get direct postgres write connection instead
+    if (analyticsConnection.dialect === "DUCKDB") {
+        const { studyAnalyticsCredential } = req.dbCredentials;
+        const credentials = {
+            credentials: studyAnalyticsCredential,
+            schema: studyAnalyticsCredential.schema,
+        };
+        return await getDuckdbDirectPostgresWriteConnection(credentials);
+    }
+
+    return analyticsConnection;
 }
 
 async function getStudyDetails(
@@ -71,13 +77,9 @@ async function getStudyDetails(
 export async function getAllCohorts(req: IMRIRequest, res, next) {
     try {
         const analyticsConnection = await getCohortAnalyticsConnection(req);
-        let { schemaName } = await getStudyDetails(
-            req.swagger.params.studyId.value,
-            res
-        );
         let cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
-            schemaName
+            analyticsConnection.schemaName
         );
 
         const offset = req.swagger.params.offset.value;
@@ -238,7 +240,7 @@ export async function createCohort(req: IMRIRequest, res, next) {
         const cohort = await getCohortFromMriQuery(req);
         const cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
-            schemaName
+            analyticsConnection.schemaName
         );
         let cohortDefinitionResult =
             await cohortEndpoint.saveCohortDefinitionToDb(cohort);
@@ -246,9 +248,12 @@ export async function createCohort(req: IMRIRequest, res, next) {
             cohort,
             queryResponse.queryObject
         );
-
         res.status(200).send(
-            `Inserted ${cohortDefinitionResult.data} rows to COHORT_DEFINITION and ${cohortRowCount} rows to COHORT
+            `Inserted ${JSON.stringify(
+                cohortDefinitionResult.data
+            )} rows to COHORT_DEFINITION and ${JSON.stringify(
+                cohortRowCount.data
+            )} rows to COHORT
             `
         );
     } catch (err) {
@@ -261,13 +266,9 @@ export async function createCohortDefinition(req: IMRIRequest, res, next) {
     try {
         const analyticsConnection = await getCohortAnalyticsConnection(req);
 
-        let { schemaName } = await getStudyDetails(
-            req.swagger.params.cohortDefinition.value.studyId,
-            res
-        );
         let cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
-            schemaName
+            analyticsConnection.schemaName
         );
 
         const cohortDefiniton = <CohortDefinitionTableType>{
@@ -305,13 +306,9 @@ export async function deleteCohort(req: IMRIRequest, res, next) {
         const cohortId = req.swagger.params.cohortId.value;
         const analyticsConnection = await getCohortAnalyticsConnection(req);
 
-        let { schemaName } = await getStudyDetails(
-            req.swagger.params.studyId.value,
-            res
-        );
         let cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
-            schemaName
+            analyticsConnection.schemaName
         );
 
         // Delete cohort definition from database
