@@ -83,7 +83,7 @@ export class MeilisearchAPI {
         ],
         filter: this.generateMeiliFilter(filters),
       };
-      if (!hybridSearchConfig.isEnabled) {
+      if (hybridSearchConfig.isEnabled) {
         const result = await this.hybridSearch(
           index,
           data,
