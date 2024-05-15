@@ -755,6 +755,7 @@ services:
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
       isTestEnv: ${isTestEnv}
+      DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
 
   alp-minerva-dataflow-mgmt:
     container_name: &c11 alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
