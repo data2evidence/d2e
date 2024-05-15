@@ -18,13 +18,10 @@ export const env = {
   PG_MAX_POOL: Number(process.env.PG__MAX_POOL) || 10,
   PG_DEBUG: Boolean(Number(process.env.PG_DEBUG)) || false,
   PG_IDLE_TIMEOUT_IN_MS: Number(process.env.PG__IDLE_TIMEOUT_IN_MS) || 30000,
-  PORTAL_BASE_URL: process.env.PORTAL__BASE_URL,
-  PORTAL_UI_BASE_URL: process.env.PORTAL_UI__BASE_URL!,
   NIFI_MGMT_BASE_URL: process.env.NIFI_MGMT__BASE_URL,
   ALP_SYSTEM_NAME: process.env.ALP__SYSTEM_NAME,
   APP_TENANT_ID: process.env.APP__TENANT_ID,
   IDP_BASE_URL: process.env.IDP__BASE_URL,
-  IDP_ISSUER_URL: process.env.IDP__ISSUER_URL,
   IDP_RELYING_PARTY: process.env.IDP__RELYING_PARTY,
   IDP_FETCH_USER_INFO_TYPE: process.env.IDP__FETCH_USER_INFO_TYPE,
   IDP_ALP_ADMIN_CLIENT_ID: process.env.IDP__ALP_ADMIN__CLIENT_ID,
@@ -32,5 +29,8 @@ export const env = {
   IDP_ALP_ADMIN_RESOURCE: process.env.IDP__ALP_ADMIN__RESOURCE,
   SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
   SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
-  SSL_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
+  SSL_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n'),
+  SERVICE_ROUTES: process.env.SERVICE_ROUTES || '{}'
 }
+
+export const services = JSON.parse(env.SERVICE_ROUTES)

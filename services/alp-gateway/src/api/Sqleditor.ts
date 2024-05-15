@@ -1,4 +1,4 @@
-import { env } from '../env'
+import { env, services } from '../env'
 import { AxiosRequestConfig } from 'axios'
 import { createLogger } from '../Logger'
 import axios from 'axios'
@@ -15,8 +15,8 @@ export class SqleditorAPI {
   private token: SqleditorToken
 
   constructor() {
-    if (env.SQLEDITOR__BASE_URL) {
-      this.baseURL = env.SQLEDITOR__BASE_URL
+    if (services.sqlEditor) {
+      this.baseURL = services.sqlEditor
     } else {
       throw new Error('No url is set for SqleditorAPI')
     }
@@ -39,7 +39,7 @@ export class SqleditorAPI {
       username: env.SQLEDITOR__TECHNICAL_USERNAME,
       password: env.SQLEDITOR__TECHNICAL_USER_PASSWD
     }
-    const url = `${this.baseURL}api/token/auth/`
+    const url = `${this.baseURL}/api/token/auth/`
     const result = await axios.post(url, data, this.getRequestConfig() as AxiosRequestConfig)
     return result.data
   }
@@ -53,7 +53,7 @@ export class SqleditorAPI {
     const data = {
       refresh: token
     }
-    const url = `${this.baseURL}api/token/refresh/`
+    const url = `${this.baseURL}/api/token/refresh/`
     const options = await this.getRequestConfig()
     const result = await axios.post(url, data, options)
     return result.data.access

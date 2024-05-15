@@ -1,6 +1,6 @@
 import { Database } from "duckdb-async";
 import { getDBConfigByTenant, DB } from "../utils/DBSvcConfig";
-import { DUCKDB_DATA_FOLDER } from "../config";
+import { env } from "../env";
 import { duckdbViewCreationSql } from "./duckdbViewSql";
 
 async function createDuckdbDatabaseFromPostgres() {
@@ -14,7 +14,7 @@ async function createDuckdbDatabaseFromPostgres() {
     const dbConfig = getDBConfigByTenant(DB.POSTGRES, databaseName);
 
     const db = await Database.create(
-        `${DUCKDB_DATA_FOLDER}/${duckdbDatabaseName}`
+        `${env.DUCKDB__DATA_FOLDER}/${duckdbDatabaseName}`
     );
     const tables = [
         "attribute_definition",
@@ -95,7 +95,7 @@ async function createDuckdbDatabaseFromPostgres() {
     // Attach vocab schema to duckdb db object
     try {
         await db.all(
-            `ATTACH '${DUCKDB_DATA_FOLDER}/${duckdbVocabDatabaseName}' (READ_ONLY);`
+            `ATTACH '${env.DUCKDB__DATA_FOLDER}/${duckdbVocabDatabaseName}' (READ_ONLY);`
         );
     } catch (err) {
         // Dont throw error,
