@@ -20,13 +20,13 @@ yarn gen:dotenv
 ```
 
 ## Build
-- standard build
+- Standard build
 ```bash
 yarn build:minerva
 ```
 
 ## Start UI
-- start ui
+- Start ui
 ```bash
 yarn start:ui --wait
 ```
@@ -35,8 +35,7 @@ notes:
 - detects `../d2e-ui` branch or defaults to develop branch
 
 ## (Re)Start App
-- requires ui started
-- docker compose up - approx 5 minutes
+- Docker compose up - approx 5 minutes
 ```bash
 yarn start:minerva --wait; sleep 60
 ```
@@ -48,13 +47,13 @@ yarn start:minerva --wait; sleep 60
 - see: [3-configure](docs/3-configure)
 
 ## Stop
-- stop all containers
+- Stop all containers
 ```bash
 yarn stop:minerva
 ```
 
 ## Clean-up
-- remove all containers & volumes
+- **caution**: removes all containers & volumes
 ```bash
 yarn clean:minerva
 ```
