@@ -149,33 +149,6 @@ function initRoutes() {
       action = body.action;
     }
 
-    if (!utils.isClientCredReq(req) && req.method === "GET") {
-      const roles = [
-        ...new Set([
-          ...(user.userObject.alpRoleMap.STUDY_RESEARCHER_ROLE
-            ? user.userObject.alpRoleMap.STUDY_RESEARCHER_ROLE
-            : []),
-          ...(user.userObject.alpRoleMap.STUDY_MANAGER_ROLE
-            ? user.userObject.alpRoleMap.STUDY_MANAGER_ROLE
-            : []),
-        ]),
-      ];
-
-      if (roles.length > 0 && body.selectedStudyEntityValue) {
-        if (roles.indexOf(body.selectedStudyEntityValue) === -1) {
-          const err = `[Unauthorised] User does not have permission to the selected study, ${body.selectedStudyEntityValue}.`;
-          log.error(
-            `${err} Detected unauthorised access for: ${user.userObject}`
-          );
-          return res.status(403).json({ error: err });
-        }
-
-        user.userObject.alpRoleMap.STUDY_RESEARCHER_ROLE = roles.filter(
-          (role) => role === body.selectedStudyEntityValue
-        );
-      }
-    }
-
     const mriConfig = new MRIConfig(
       req.dbConnections.db,
       user,

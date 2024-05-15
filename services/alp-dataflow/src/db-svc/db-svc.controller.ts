@@ -11,11 +11,6 @@ export class DBSvcController {
     return this.dbSvcService.createDbSvcFlowRun(dbSvcFlowRunDto)
   }
 
-  @Post('fetch-version-info')
-  createFetchVersionInfoFlowRun() {
-    return this.dbSvcService.fetchVersionInfo()
-  }
-
   @Post('dataset-attributes')
   createDatasetAttributesFlowRun(@Body() datasetAttributesDto: DatasetAttributesFlowRunDto) {
     return this.dbSvcService.updateDatasetAttributes(datasetAttributesDto)
