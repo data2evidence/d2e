@@ -64,9 +64,6 @@ COPY --chown=docker:docker ./services/alp-dataflow-gen/startprefectagent.sh .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/startprefectserver.sh  .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/postgresql-42.3.1.jar ./inst/drivers/
 
-# Install CommonDataModel without upgrading DatabaseConnector
-RUN Rscript -e 'devtools::install_github("OHDSI/CommonDataModel@v5.4.1", upgrade = "never")'
-
 COPY --chown=docker:docker ./services/envConverter ./libs/envConverter
 WORKDIR /app/libs/envConverter
 RUN yarn install
