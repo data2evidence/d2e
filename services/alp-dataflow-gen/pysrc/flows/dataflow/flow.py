@@ -75,7 +75,12 @@ def execute_nodes_flow(graph, sorted_nodes, test):
                 "time_at_risk_node",
                 "cohort_generator_node",
                 "cohort_diagnostics_module_spec",
-                "characterization_node"
+                "characterization_node", 
+                "negative_control_outcome_cohort_node",
+                "target_comparator_outcomes_node",
+                "cohort_method_analysis_node",
+                "covariate_settings_node",
+                "study_population_settings_node"
             ]:
                 get_run_logger().error("gen.py: execute_nodes: Node Type not known")
             else: 
@@ -106,9 +111,8 @@ def execute_node_task(nodename, node_type, node, input, test):
         result = _node.test(task_run_context)
     else:
         match node_type:
-            case 'db_reader_node' | 'csv_node' | 'time_at_risk_node' | 'cohort_diagnostics_module_spec':
-                result = _node.task(task_run_context)
-            case 'cohort_generator_node' | 'time_at_risk_node' | 'characterization_node': 
+            case ('db_reader_node' | 'csv_node' | 'time_at_risk_node' | 'cohort_diagnostics_module_spec' | 
+                'cohort_generator_node' | 'time_at_risk_node' | 'characterization_node' | 'covariate_settings_node' | 'study_population_settings_node'):
                 result = _node.task(task_run_context)
             case _:
                 result = _node.task(input, task_run_context)
