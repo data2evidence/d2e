@@ -8,12 +8,11 @@ import MRIEndpointErrorHandler from "../../utils/MRIEndpointErrorHandler";
 import { Logger, getUser } from "@alp/alp-base-utils";
 import CreateLogger = Logger.CreateLogger;
 let logger = CreateLogger("analytics-log");
-import axios, { AxiosRequestConfig } from "axios";
 import { CohortEndpoint } from "../../mri/endpoint/CohortEndpoint";
 import { generateQuery } from "../../utils/QueryGenSvcProxy";
 import { createEndpointFromRequest } from "../../mri/endpoint/CreatePluginEndpoint";
+import { PluginEndpointResultType } from "../../types";
 import PortalServerAPI from "../PortalServerAPI";
-import https from "https";
 import { convertIFRToExtCohort } from "../../ifr-to-extcohort/main";
 import { dataflowRequest } from "../../utils/DataflowMgmtProxy";
 import { getDuckdbDirectPostgresWriteConnection } from "../../utils/DuckdbConnection";
@@ -326,37 +325,27 @@ export async function deleteCohort(req: IMRIRequest, res, next) {
     }
 }
 
-// Takes in req object to send get request to get patient list, extract patient ids then build and return cohort object
+// Takes in req object to use pluginEndpoint get patient list, extract patient ids then build and return cohort object
 async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
     try {
-        // Extract mriquery and send request to analytics-svc to get patient list
+        // Extract mriquery and use pluginEndpoint.retrieveData to get patient list
         let mriquery = req.swagger.params.cohort.value.mriquery;
-        let token = req.headers.authorization;
-
-        let ALP_GATEWAY_ENDPOINT =
-            process.env.ALP_PORTAL_MRI_ENDPOINT ||
-            "https://alp-minerva-gateway-1:41100/analytics-svc/api/services";
-        let AXIOS_TIMEOUT = 100000;
-
-        const url = `${ALP_GATEWAY_ENDPOINT}/patient?mriquery=${encodeURIComponent(
-            mriquery
-        )}`;
-        const options: AxiosRequestConfig = {
-            headers: {
-                Authorization: token,
-            },
-            timeout: AXIOS_TIMEOUT,
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: true,
-                ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
-            }),
-        };
-
-        // Send request to analytics-svc for patient list and extract patient ids
-        const result = await axios.get(url, options);
+        const { cohortDefinition, studyId, pluginEndpoint } =
+            await createEndpointFromRequest(req);
+        pluginEndpoint.setRequest(req);
+        const pluginResult = (await pluginEndpoint.retrieveData({
+            cohortDefinition,
+            studyId,
+            language,
+            dataFormat: "json",
+            requestQuery: mriquery,
+            patientId: null,
+            auditLogChannelName:
+                req.usage === "EXPORT" ? "MRI Pt. List Exp" : "MRI Pt. List",
+        })) as PluginEndpointResultType;
 
         // Extract patient id from patient list
-        let patientIds = result.data.data[0].data.map(
+        let patientIds = pluginResult.data[0].data.map(
             (obj) => obj["patient.attributes.pid"]
         );
 
