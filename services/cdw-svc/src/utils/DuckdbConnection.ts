@@ -10,6 +10,7 @@ import { DBError } from "@alp/alp-base-utils/target/src/DBError";
 import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
 import { translateHanaToDuckdb } from "@alp/alp-base-utils/target/src/helpers/hanaTranslation";
 import fs from 'fs';
+import { env } from "../configs";
 const logger = CreateLogger("Duckdb Connection");
 
 // Helper function similar to getDBConnection implementation in alp-base-utils DBConnectionUtil.ts
@@ -42,15 +43,15 @@ export class DuckdbConnection implements ConnectionInterface {
         callback
     ) {
         try {
-            let dbPathString = '/home/docker/src/services/app/src/duckdb'
+            let dbPathString = env.DUCKDB_PATH
             if(fs.existsSync(dbPathString))
             {
                 const duckdDB = await Database.create(
-                    `${dbPathString}/alpdev_pg_cdmvocab`,
+                    `${dbPathString}/${getDefaultSchemaName()}`,
                     OPEN_READONLY
                 );
                 const duckdDBconn = await duckdDB.connect();
-                const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, 'alpdev_pg_cdmvocab');
+                const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, getDefaultSchemaName());
                 callback(null, conn);
             }
             
