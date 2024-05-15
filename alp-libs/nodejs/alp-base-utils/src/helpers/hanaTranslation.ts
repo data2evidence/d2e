@@ -167,12 +167,7 @@ const hanaCommonTranslation = (temp: string, schema: string): string => {
   temp = temp.replace(/IFNULL/gi, "COALESCE");
 
   temp = temp.replace(/\$\$SCHEMA\$\$./g, `"${schema}".`);
-  // Replace %s or `?` with $n
-  let n = 0;
-  temp = temp.replace(/\%[s]{1}(?![a-zA-Z0-9%])|%UNSAFE|\?/g, () => {
-    return "$" + ++n;
-  });
-
+  
   return temp;
 };
 
@@ -184,6 +179,12 @@ export const translateHanaToPostgres = (temp: string, schema: string) => {
   );
   // Replacements for concept name matching. hana and postgres regex search use different syntax
   temp = temp.replace(/LIKE_REGEXPR/gi, "~*"); // ~* short for regex, case insensitive matching
+
+  // Replace %s or `?` with $n
+  let n = 0;
+  temp = temp.replace(/\%[s]{1}(?![a-zA-Z0-9%])|%UNSAFE|\?/g, () => {
+    return "$" + ++n;
+  });
 
   return temp;
 };
@@ -200,6 +201,8 @@ export const translateHanaToDuckdb = (temp: string, schema: string): string => {
     /select count\(\*\) as \"TABLECOUNT\" from pg_views where schemaname=(\%s|\?|\$[0-9]) and viewname=(\%s|\?|\$[0-9])/gi,
     `select count(*) AS tableCount from duckdb_views where database_name=%s and view_name=%s`,
   )
+
+  // Replace %s or `?` with $n
   let n = 0;
   temp = temp.replace(/\%[s]{1}(?![a-zA-Z0-9%])|%UNSAFE|\?/g, () => {
     return "$" + ++n;
