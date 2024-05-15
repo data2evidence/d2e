@@ -42,7 +42,8 @@ https://*.alp.local:55555 {
 	}
 
 	redir / /portal
-	handle /* {
+
+	handle /portal/env.js {
 		reverse_proxy https://alp-minerva-gateway-1:41100 {
 			transport http {
 				tls
@@ -51,6 +52,60 @@ https://*.alp.local:55555 {
 			}
 		}
 	}
+
+	handle_path /portal {
+		uri strip_prefix /portal
+		root * /home/docker/ui-files/portal/index.html
+		file_server
+	}
+
+	handle_path /portal/login-callback* {
+		uri strip_prefix /portal
+		root * /home/docker/ui-files/portal/index.html
+		file_server
+	}
+
+	handle_path /portal/static/css/* {
+        root  * /home/docker/ui-files/portal/static/css/
+        file_server
+    }
+
+    handle_path /portal/static/js/* {
+        root  * /home/docker/ui-files/portal/static/js/
+        file_server
+    }
+
+    handle_path /portal/static/media/* {
+        root  * /home/docker/ui-files/portal/static/media/
+        file_server
+    }
+
+    handle_path /portal/icons/* {
+        root  * /home/docker/ui-files/portal/icons/
+        file_server
+    }
+
+    handle_path /portal/assets/* {
+        root  * /home/docker/ui-files/portal/assets/
+        file_server
+    }
+
+    handle_path /portal/translations/* {
+        root  * /home/docker/ui-files/portal/translations/
+        file_server
+    }
+
+	## calls gateway if there are no matched files
+	handle {
+		reverse_proxy https://alp-minerva-gateway-1:41100 {
+			transport http {
+				tls
+				tls_insecure_skip_verify
+				read_buffer 8192
+			}
+		}
+	}
+
 }
 
 https://${CADDY__ALP__INTERNAL_FQDN:localhost}:41101 https://host.docker.internal:41101 {
