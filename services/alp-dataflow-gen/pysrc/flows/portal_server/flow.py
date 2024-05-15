@@ -7,6 +7,7 @@ from utils.types import (
     versionInfoResponseType,
     schemaVersionInfoType,
     extractDatasetSchemaType,
+    entityCountDistributionType,
     PG_TENANT_USERS,
     HANA_TENANT_USERS
 )
@@ -16,7 +17,7 @@ from prefect.artifacts import create_table_artifact
 from typing import List
 from flows.alp_db_svc.flow import run_command, _db_svc_flowrun_params
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
-
+import json
 
 def get_version_info(options: getVersionInfoType):
     logger = get_run_logger()
@@ -165,10 +166,7 @@ NON_PERSON_ENTITIES = {
     "observation": "observation_id",
     "note": "note_id",
     "episode": "episode_id",
-    "specimen": "specimen_id",
-    "drug_era": "drug_era_id",
-    "dose_era": "dose_era_id",
-    "condition_era": "condition_era_id"
+    "specimen": "specimen_id"
 }
 
 
@@ -301,12 +299,27 @@ def get_and_update_attributes(dataset_schema_mapping: datasetSchemaMappingType,
         else:
             logger.info(
                 f"Updated patient count for dataset {dataset_id} with value {patient_count}")
-
-        # update entity count with value or error
+            
+        # update entity distribution count
+        try:
+            entity_count_distribution = get_entity_count_distribution(
+                dataset_dao, is_lower_case)
+            update_dataset_attributes_table(
+                dataset_id, "entity_count_distribution", json.dumps(entity_count_distribution), token)
+        except Exception as e:
+            logger.error(
+                f"Failed updating entity_count_distribution for dataset {dataset_id}: {e}")
+            failed_record = ETLStatus(
+                4, dataset_schema_mapping, "entity_count_distribution")
+            etl_error_list.append(failed_record)
+        else:
+            logger.info(
+                f"Updated entity_count_distribution for dataset {dataset_id} with value {entity_count_distribution}")
+        
+        # update total entity count with value or error
         try:
             # return entity count or error
-            total_entity_count = get_total_entity_count(
-                dataset_dao, is_lower_case)
+            total_entity_count = get_total_entity_count(entity_count_distribution)
             update_dataset_attributes_table(
                 dataset_id, "entity_count", total_entity_count, token)
         except Exception as e:
@@ -351,23 +364,41 @@ def get_patient_count(dao_obj: DBDao, is_lower_case: bool) -> str:
         return error_msg
 
 
-def get_total_entity_count(dao_obj: DBDao, is_lower_case: bool) -> str:
+def get_total_entity_count(entity_count_distribution) -> str:
     try:
         total_entity_count = 0
-        # retrieve count for each entity table
-        for table, unique_id_column in NON_PERSON_ENTITIES.items():
+        for entity, entity_count in entity_count_distribution.items():
+            # value could be str(int) or "error"
+            if entity_count == "error":
+                continue
+            else:
+                total_entity_count += int(entity_count)
+    except Exception as e:
+        error_msg = f"Error retrieving entity count: {e}"
+        get_run_logger().error(error_msg)
+        total_entity_count = error_msg
+    return str(total_entity_count)
+
+
+def get_entity_count_distribution(dao_obj: DBDao, is_lower_case: bool) -> entityCountDistributionType:
+    entity_count_distribution = {}
+    # retrieve count for each entity table
+    for table, unique_id_column in NON_PERSON_ENTITIES.items():
+        try:
             if is_lower_case:
                 entity_count = dao_obj.get_distinct_count(
                     table, unique_id_column)
             else:
                 entity_count = dao_obj.get_distinct_count(
                     table.upper(), unique_id_column.upper())
-            total_entity_count += entity_count
-    except Exception as e:
-        error_msg = f"Error retrieving entity count: {e}"
-        get_run_logger().error(error_msg)
-        total_entity_count = error_msg
-    return str(total_entity_count)
+        except Exception as e:
+            get_run_logger().error(
+                f"Error retrieving entity count for {table}: {e}")
+            entity_count = "error"
+        entity_count_key = table.replace("_", " ").title() + " Count"
+        if entity_count != "error":
+            entity_count_distribution[entity_count_key] = str(entity_count)
+    return entity_count_distribution
 
 
 def check_table_case(dao_obj: DBDao) -> bool:
