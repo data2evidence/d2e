@@ -46,16 +46,4 @@ export class DBSvcService {
     }
     return this.prefectApi.createFlowRun('update_dataset_attributes', deploymentName, flowName, parameters)
   }
-
-  async fetchVersionInfo() {
-    const flowName = PrefectFlowName.FETCH_VERSION_INFO
-    const deploymentName = PrefectDeploymentName.FETCH_VERSION_INFO
-    const token = this.jwt
-    const parameters = {
-      options: {
-        token
-      }
-    }
-    return this.prefectApi.createFlowRun('fetch_version_info', deploymentName, flowName, parameters)
-  }
 }
