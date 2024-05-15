@@ -3,25 +3,28 @@ from utils.types import (
     datasetAttributesType,
     datasetSchemaMappingType,
     portalDatasetType,
-    fetchVersionInfoType,
+    getVersionInfoType,
     versionInfoResponseType,
     schemaVersionInfoType,
     extractDatasetSchemaType,
+    entityCountDistributionType,
     PG_TENANT_USERS,
     HANA_TENANT_USERS
 )
 from dao.DBDao import DBDao
-import json
 from api.PortalServerAPI import PortalServerAPI
 from prefect.artifacts import create_table_artifact
 from typing import List
-from flows.alp_db_svc.flow import run_command
+from flows.alp_db_svc.flow import run_command, _db_svc_flowrun_params
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
+import json
 
-
-def fetch_version_info(options: fetchVersionInfoType):
+def get_version_info(options: getVersionInfoType):
     logger = get_run_logger()
-    token = options.token  # token from portal
+    token = options.token
+    flow_name = options.flow_name
+    changelog_filepath = options.changelog_filepath
+    changelog_filepath_list = options.changelog_filepath_list
 
     logger.info("Fetching datasets from portal...")
     try:
@@ -50,15 +53,24 @@ def fetch_version_info(options: fetchVersionInfoType):
         for _database_code in database_code_list:
             datasets_by_db = list(
                 _dataset for _dataset in dataset_schema_list["datasets_with_schema"] if _dataset["database_code"] == _database_code)
+
             request_body = {
                 "datasetListFromPortal": datasets_by_db, "token": token}
 
             db_dialect = get_db_svc_endpoint_dialect(_database_code)
 
-            # task to fetch version-info
-            # db-svc response sent as parameter of update_dataset_attributes flow run
+            request_body = _db_svc_flowrun_params(
+                request_body, db_dialect, flow_name, changelog_filepath
+            )
+
+            for dataset in request_body["datasetListFromPortal"]:
+                data_model_changelog_filepath = changelog_filepath_list.get(
+                    dataset["data_model"].split(" ")[0].replace("_", "-"), "")
+                dataset["changelog_filepath"] = f'db/migrations/{db_dialect}/{data_model_changelog_filepath}'
 
             try:
+                # task to fetch version-info for each db
+                # db-svc response sent as parameter of update_dataset_attributes flow run
                 run_command(
                     "post", f"/alpdb/{db_dialect}/database/{_database_code}/version-info", request_body)
             except Exception as e:
@@ -89,7 +101,8 @@ def extract_db_schema(dataset_list: List[portalDatasetType]) -> extractDatasetSc
                 "study_id": _dataset["id"],
                 "database_code": _dataset["databaseCode"],
                 "schema_name": _dataset["schemaName"],
-                "data_model": _dataset["dataModel"]
+                "data_model": _dataset["dataModel"],
+                "vocab_schema": _dataset["vocabSchemaName"]
             })
     return {"datasets_with_schema": datasets_with_schema,
             "datasets_without_schema": datasets_without_schema}
@@ -153,15 +166,11 @@ NON_PERSON_ENTITIES = {
     "observation": "observation_id",
     "note": "note_id",
     "episode": "episode_id",
-    "specimen": "specimen_id",
-    "drug_era": "drug_era_id",
-    "dose_era": "dose_era_id",
-    "condition_era": "condition_era_id"
+    "specimen": "specimen_id"
 }
 
 
-OMOP_DATA_MODELS = ["omop", "omop5-4", "custom-omop-ms",
-                    "custom-omop-ms-phi", "omop5-4 [datamodel-plugin]"]
+OMOP_DATA_MODELS = ["omop", "omop5-4", "custom-omop-ms", "custom-omop-ms-phi"]
 
 
 ETL_STATUS_DESC = {
@@ -241,7 +250,7 @@ def get_and_update_attributes(dataset_schema_mapping: datasetSchemaMappingType,
     # return latest schema version or "error"
     latest_schema_version = schema_version_info["latest_schema_version"]
     # return data model or "error"
-    data_model = schema_version_info["data_model"]
+    data_model = schema_version_info["data_model"].split(" ")[0]
 
     # update current schema version with value or error
     try:
@@ -290,12 +299,27 @@ def get_and_update_attributes(dataset_schema_mapping: datasetSchemaMappingType,
         else:
             logger.info(
                 f"Updated patient count for dataset {dataset_id} with value {patient_count}")
-
-        # update entity count with value or error
+            
+        # update entity distribution count
+        try:
+            entity_count_distribution = get_entity_count_distribution(
+                dataset_dao, is_lower_case)
+            update_dataset_attributes_table(
+                dataset_id, "entity_count_distribution", json.dumps(entity_count_distribution), token)
+        except Exception as e:
+            logger.error(
+                f"Failed updating entity_count_distribution for dataset {dataset_id}: {e}")
+            failed_record = ETLStatus(
+                4, dataset_schema_mapping, "entity_count_distribution")
+            etl_error_list.append(failed_record)
+        else:
+            logger.info(
+                f"Updated entity_count_distribution for dataset {dataset_id} with value {entity_count_distribution}")
+        
+        # update total entity count with value or error
         try:
             # return entity count or error
-            total_entity_count = get_total_entity_count(
-                dataset_dao, is_lower_case)
+            total_entity_count = get_total_entity_count(entity_count_distribution)
             update_dataset_attributes_table(
                 dataset_id, "entity_count", total_entity_count, token)
         except Exception as e:
@@ -340,23 +364,41 @@ def get_patient_count(dao_obj: DBDao, is_lower_case: bool) -> str:
         return error_msg
 
 
-def get_total_entity_count(dao_obj: DBDao, is_lower_case: bool) -> str:
+def get_total_entity_count(entity_count_distribution) -> str:
     try:
         total_entity_count = 0
-        # retrieve count for each entity table
-        for table, unique_id_column in NON_PERSON_ENTITIES.items():
+        for entity, entity_count in entity_count_distribution.items():
+            # value could be str(int) or "error"
+            if entity_count == "error":
+                continue
+            else:
+                total_entity_count += int(entity_count)
+    except Exception as e:
+        error_msg = f"Error retrieving entity count: {e}"
+        get_run_logger().error(error_msg)
+        total_entity_count = error_msg
+    return str(total_entity_count)
+
+
+def get_entity_count_distribution(dao_obj: DBDao, is_lower_case: bool) -> entityCountDistributionType:
+    entity_count_distribution = {}
+    # retrieve count for each entity table
+    for table, unique_id_column in NON_PERSON_ENTITIES.items():
+        try:
             if is_lower_case:
                 entity_count = dao_obj.get_distinct_count(
                     table, unique_id_column)
             else:
                 entity_count = dao_obj.get_distinct_count(
                     table.upper(), unique_id_column.upper())
-            total_entity_count += entity_count
-    except Exception as e:
-        error_msg = f"Error retrieving entity count: {e}"
-        get_run_logger().error(error_msg)
-        total_entity_count = error_msg
-    return str(total_entity_count)
+        except Exception as e:
+            get_run_logger().error(
+                f"Error retrieving entity count for {table}: {e}")
+            entity_count = "error"
+        entity_count_key = table.replace("_", " ").title() + " Count"
+        if entity_count != "error":
+            entity_count_distribution[entity_count_key] = str(entity_count)
+    return entity_count_distribution
 
 
 def check_table_case(dao_obj: DBDao) -> bool:
