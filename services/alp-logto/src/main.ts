@@ -1,79 +1,6 @@
 import * as logto from "./middleware/logto";
 import * as pg from "pg";
 
-let apps: Array<Object> = [
-  {
-    name: "alp-svc",
-    description: "alp-svc",
-    type: "MachineToMachine",
-  },
-  {
-    name: "alp-data",
-    description: "alp-data",
-    type: "MachineToMachine",
-  },
-  {
-    name: "alp-app",
-    description: "alp-app",
-    type: "Traditional",
-    oidcClientMetadata: {
-      redirectUris: [
-        "https://localhost:41100/portal/login-callback",
-        "https://localhost:4000/portal/login-callback",
-        "https://localhost:8081",
-      ],
-      postLogoutRedirectUris: [
-        "https://localhost:41100/portal",
-        "https://localhost:4000/portal",
-        "https://localhost:8081",
-      ],
-    },
-    customClientMetadata: {
-      corsAllowedOrigins: [],
-      refreshTokenTtlInDays: 14,
-      alwaysIssueRefreshToken: true,
-      rotateRefreshToken: true,
-    },
-  },
-];
-
-let resource: Object = {
-  name: "alp-default",
-  indicator: "https://alp-default",
-  accessTokenTtl: 3600,
-};
-
-let user: Object = {
-  username: "admin",
-  password:
-    "$argon2i$v=19$m=4096,t=256,p=1$gFXKgnc0tFywI7DcRVN+Tg$c0TeMUiDq6PMCLyJmR/V/sb1MV8MpMBeRy24+ZsZgeY",
-  passwordAlgorithm: "Argon2i",
-};
-
-let scopes: Array<Object> = [
-  { name: "role.systemadmin", description: "ALP System admin" },
-  { name: "role.useradmin", description: "ALP User admin" },
-  { name: "role.tenantviewer", description: "ALP Tenant viewer" },
-];
-
-let roles: Array<Object> = [
-  {
-    name: "role.systemadmin",
-    description: "ALP System admin",
-    type: "User",
-  },
-  {
-    name: "role.useradmin",
-    description: "ALP User admin",
-    type: "User",
-  },
-  {
-    name: "role.tenantviewer",
-    description: "ALP Tenant viewer",
-    type: "User",
-  },
-];
-
 async function callback(path: string, headers: object, data: object) {
   try {
     console.log(`Requesting ${path}`);
@@ -103,22 +30,52 @@ async function getPgRows(
 }
 
 async function main() {
+  let apps: Array<Object> = JSON.parse(process.env.LOGTO__CLIENT_APPS) || [];
+
+  let resource: Object = JSON.parse(process.env.LOGTO__RESOURCE) || {
+    name: "alp-default",
+    indicator: "https://alp-default",
+    accessTokenTtl: 3600,
+  };
+
+  let user: Object = JSON.parse(process.env.LOGTO__USER) || {
+    username: "admin",
+    password:
+      "$argon2i$v=19$m=4096,t=256,p=1$gFXKgnc0tFywI7DcRVN+Tg$c0TeMUiDq6PMCLyJmR/V/sb1MV8MpMBeRy24+ZsZgeY",
+    passwordAlgorithm: "Argon2i",
+  };
+
+  let scopes: Array<Object> = JSON.parse(process.env.LOGTO__SCOPES) || [];
+
+  let roles: Array<Object> = JSON.parse(process.env.LOGTO__ROLES) || [];
+
   let jwt = await logto.fetchToken();
   let accessToken: string = jwt.access_token;
   const headers = {
     Authorization: `Bearer ${accessToken}`,
   };
 
-  apps.forEach(async (a) => {
-    let response = await callback("applications", headers, a);
-  });
+  console.log(
+    "*********************************************************************************"
+  );
+  for (const a of apps) {
+    await callback("applications", headers, a);
+  }
 
+  console.log(
+    "*********************************************************************************"
+  );
   let { id: resourceId } = await callback("resources", headers, resource);
 
+  console.log(
+    "*********************************************************************************"
+  );
   let logtoAdminUser = await callback("users", headers, user);
 
+  console.log(
+    "*********************************************************************************"
+  );
   let logtoScopes: Array<LogtoScope> = [];
-  scopes.forEach(async (s) => {});
   for (const s of scopes) {
     let logtoScope = await callback(
       `resources/${resourceId}/scopes`,
@@ -128,21 +85,30 @@ async function main() {
     logtoScopes.push(logtoScope);
   }
 
+  console.log(
+    "*********************************************************************************"
+  );
   let logtoRoles: Array<LogtoScope> = [];
   for (const r of roles) {
     let logtoRole = await callback("roles", headers, r);
     logtoRoles.push(logtoRole);
   }
 
+  console.log(
+    "*********************************************************************************"
+  );
   let roleScopes: Array<{ roleId: string; scopeId: string }> = logtoRoles.map(
     (r, indx) => ({ roleId: r.id, scopeId: logtoScopes[indx]["id"] })
   );
   for (const rs of roleScopes) {
-    let response = await callback(`roles/${rs.roleId}/scopes`, headers, {
+    await callback(`roles/${rs.roleId}/scopes`, headers, {
       scopeIds: [rs.scopeId],
     });
   }
 
+  console.log(
+    "*********************************************************************************"
+  );
   let userRoles: Array<{ userId: string; roleIds: Array<string> }> = [
     {
       userId: logtoAdminUser["id"],
@@ -150,11 +116,14 @@ async function main() {
     },
   ];
   for (const ur of userRoles) {
-    let response = await callback(`users/${ur.userId}/roles`, headers, {
+    await callback(`users/${ur.userId}/roles`, headers, {
       roleIds: ur.roleIds,
     });
   }
 
+  console.log(
+    "*********************************************************************************"
+  );
   let signinExperience = {
     branding: {
       favicon: "https://localhost:41100/portal/assets/favicon.ico",
@@ -171,7 +140,7 @@ async function main() {
       verify: false,
     },
   };
-  let response = await logto.patch("sign-in-exp", headers, signinExperience);
+  await logto.patch("sign-in-exp", headers, signinExperience);
 
   setTimeout(async () => {
     let client = new pg.Client({

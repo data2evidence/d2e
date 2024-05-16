@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "seed": "node ./dist/main.js",
+    "build-and-seed": "npm run build && npm run seed",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
