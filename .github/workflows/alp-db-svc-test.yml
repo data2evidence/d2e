@@ -110,7 +110,7 @@ jobs:
           path: 'tmp'
           sparse-checkout: 'alp-data-node-override'
           sparse-checkout-cone-mode: false
-          ref: ${{ env.BRANCH_NAME }}
+          ref: 426_tidy # ${{ env.BRANCH_NAME }}
 
       - shell: bash
         name: sameBranch checkout test
