@@ -10,8 +10,6 @@ from itertools import islice
 from transformers import AutoTokenizer, AutoModel
 import torch
 from api.TerminologySvcAPI import TerminologySvcAPI
-from transformers import AutoTokenizer, AutoModel
-import torch
 
 def execute_add_index_flow(options: meilisearchAddIndexType):
     logger = get_run_logger()
@@ -123,7 +121,7 @@ def execute_add_index_flow(options: meilisearchAddIndexType):
     finally:
         conn.close()
 
-def execute_calculate_embedders_flow(options: meilisearchAddIndexType):
+def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
     logger = get_run_logger()
     database_code = options.databaseCode
     vocab_schema_name = options.vocabSchemaName
@@ -163,6 +161,12 @@ def execute_calculate_embedders_flow(options: meilisearchAddIndexType):
 
         # Add table column names to meilisearch settings as searchableAttributes
         index_settings["searchableAttributes"] = column_names
+        index_settings["embedders"] = {
+                "default": {
+                    "source": f"{config.source}",
+                    "model": f"{config.model}"
+                }
+            }
 
         # Create meilisearch index
         logger.info(f"Creating meilisearch index with name: {index_name}")
@@ -252,49 +256,7 @@ def calculate_embeddings(rows:list[list]):
         row.append(embeddings.tolist()[0]) # Append calculated embeddings
 
     return rows
-
-def execute_add_embedder_to_index_settings(options: meilisearchAddIndexType):
-    logger = get_run_logger()
-    database_code = options.databaseCode
-    vocab_schema_name = options.vocabSchemaName
-    table_name = options.tableName
     
-     # Check if options.vocabSchemaName is valid
-    if not re.match(r"^\w+$", vocab_schema_name):
-        error_message = "VocabSchemaName is invalid"
-        logger.error(error_message)
-        raise ValueError(error_message)
-
-    # Check if table_name is supported for adding as meilisearch index
-    # Case insensitive search on MEILISEARCH_INDEX_CONFIG.keys()
-    if table_name.lower() not in MEILISEARCH_INDEX_CONFIG.keys():
-        errorMessage = f"table_name:{table_name.lower()} has not been configured for adding as a meilisearch index"
-        logger.error(errorMessage)
-        raise ValueError(errorMessage)
-    try:
-        # Initialize helper classes
-        meilisearch_svc_api = MeilisearchSvcAPI()
-        terminology_svc_api = TerminologySvcAPI()
-        
-        config: Terminology_HybridSearchConfig = terminology_svc_api.get_hybridSearchConfig()
-        hybridSearchName = f"{config.source.replace('/', '')}_{config.model.replace('/', '')}";
-        index_name = f"{database_code}_{vocab_schema_name}_{table_name}_{hybridSearchName}"
-        settings = {
-            "embedders": {
-                "default": {
-                    "source": f"{config.source}",
-                    "model": f"{config.model}"
-                }
-            }
-        }
-        meilisearch_svc_api.update_index_settings(index_name=index_name, settings=settings)
-        logger.info(
-                    f"Successfully initiated updating embedders for index {index_name}")
-        return True     
-    except Exception as err:
-        logger.error(err)
-        raise err
-      
 def parseDates(row):
     result = []
     for element in row:
