@@ -53,10 +53,10 @@ FROM dbsvc-build AS final-build
 
 WORKDIR /app
 
-COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/pysrc pysrc
 COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/requirements.txt .
-
 RUN pip install -r requirements.txt
+
+COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/pysrc pysrc
 
 COPY --chown=docker:docker ./services/alp-dataflow-gen/init.py .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/init.sh .
@@ -79,6 +79,10 @@ RUN mkdir -p /home/docker/plugins/R/site-library
 RUN chown -R docker:docker /home/docker/plugins/R/site-library
 
 WORKDIR /app
+
+# Create folder for duckdb database files
+RUN mkdir ./duckdb_data
+RUN chown docker:alp ./duckdb_data
 
 # Create folder to store synpuf1k csv
 RUN mkdir -p /app/synpuf1k
