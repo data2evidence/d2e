@@ -37,7 +37,6 @@ services:
       ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
-      TERMINOLOGY_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/terminology/
 
   alp-dataflow-gen-init:
     build:
