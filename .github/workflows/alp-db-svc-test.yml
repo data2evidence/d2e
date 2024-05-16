@@ -110,7 +110,7 @@ jobs:
           path: 'tmp'
           sparse-checkout: 'alp-data-node-override'
           sparse-checkout-cone-mode: false
-          ref: 426_tidy # ${{ env.BRANCH_NAME }}
+          ref: ${{ env.BRANCH_NAME }}
 
       - shell: bash
         name: sameBranch checkout test
@@ -159,12 +159,12 @@ jobs:
           echo "Does db-svc have changes: $hasDiff"
 
       - uses: actions/setup-node@v4
-        # if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
         with:
           node-version: "18.14.0"
 
       - name: Build Project (DB-SVC)
-        # if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
         run: |
           # Build alp-libs dependencies for alp-db-svc
           yarn install --frozen-lockfile
@@ -176,7 +176,7 @@ jobs:
           yarn compile
 
       - name: Setup Test DB (postgres)
-        # if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
         working-directory: ./services/alp-db-svc
         run: |
           # Create cdmvocab and cdmdefault schema for db-svc integration tests
@@ -187,13 +187,13 @@ jobs:
       - name: Run integration tests for DB-SVC POSTGRES
         working-directory: ./services/alp-db-svc
         # run only if files in 'has_dbsvc_changed' is set to 'True'
-        # if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
         run: |
           npm run pgtest
 
       - name: Run integration tests for DB-SVC HANA
         working-directory: ./services/alp-db-svc
         # run only if files in 'has_dbsvc_changed' is set to 'True'
-        # if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_dbsvc_changed == 'True'
         run: |
           npm run test
