@@ -43,7 +43,7 @@ https://*.alp.local:55555 {
 
 	redir / /portal
 
-	handle_path /portal/* {
+	handle_path /portal* {
 		handle_path /static/css/* {
 			root * /home/docker/ui-files/portal/static/css/
 			file_server
