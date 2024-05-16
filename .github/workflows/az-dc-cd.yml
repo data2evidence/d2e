@@ -53,7 +53,7 @@ jobs:
         ACTIONS_STEP_DEBUG=false
       
         # get env yml from 1password
-        yarn op:get:$ENV_TYPE
+        yarn --cwd internal op:get:$ENV_TYPE
 
         # mask sensitive values
         internal/scripts/gha-mask.sh

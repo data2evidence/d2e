@@ -81,7 +81,7 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          yarn get:drivers
+          yarn --cwd internal get:drivers
           ls "${HANA__DRIVER_CLASS_PATH}"
           ls "${POSTGRES__DRIVER_CLASS_PATH}"
 

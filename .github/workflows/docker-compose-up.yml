@@ -58,7 +58,7 @@ jobs:
           ./internal/scripts/get-op-ratelimit.sh
         
           # get env yml from 1password
-          yarn op:get:$ENV_TYPE
+          yarn --cwd internal op:get:$ENV_TYPE
 
           # mask sensitive values
           internal/scripts/gha-mask.sh
