@@ -42,23 +42,6 @@ jobs:
           swap-storage: true
 
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - uses: actions/checkout@v4
-        with:
-          repository:  ${{ vars.OVERRIDE_REPO }}
-          token: ${{ secrets.CI_PAT }}
-          path: 'tmp'
-          sparse-checkout: 'alp-data-node-override'
-          sparse-checkout-cone-mode: false
-          ref: develop
-
-      - shell: bash
-        id: link_files_from_override
-        run: |
-          ln -s tmp/alp-data-node-override alp-data-node-override
-          chmod 755 -R alp-data-node-override
 
       - name: Install 1Password CLI
         uses: 1Password/install-cli-action@v1.0.0
@@ -75,7 +58,7 @@ jobs:
           ./internal/scripts/get-op-ratelimit.sh
         
           # get env yml from 1password
-          yarn op:get:$ENV_TYPE
+          yarn --cwd internal op:get:$ENV_TYPE
 
           # mask sensitive values
           internal/scripts/gha-mask.sh

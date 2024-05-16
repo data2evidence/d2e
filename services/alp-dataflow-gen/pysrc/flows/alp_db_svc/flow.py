@@ -99,7 +99,7 @@ async def _run_db_svc_shell_command(request_type: str, request_url: str, request
     command = f"npm run cdm-install-script -- {request_type} {request_url} {json.dumps(json.dumps(request_body))}"
 
     # Temporarily use as default class path for dbsvc endpoints not using plugin
-    os.environ["DEFAULT_MIGRATION_SCRIPTS_PATH"] = f"{MODULE_DIR}/nodejs/dbsvc_files/migration_scripts/"
+    os.environ["DEFAULT_MIGRATION_SCRIPTS_PATH"] = f"{MODULE_DIR}/d2e_dbsvc/nodejs/dbsvc_files/migration_scripts/"
 
     print(f"Running DBSvc Command: {command}")
     await ShellOperation(
