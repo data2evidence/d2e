@@ -57,8 +57,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
@@ -78,12 +76,12 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           INTEGRATION_TEST__HANA__TENANT_CONFIGS: "op://${{ secrets.OP_VAULT_NAME }}/Github Actions Secrets/ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_GERMANY"
 
-      - name: 1password files
+      - name: Get 1password files
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          yarn get:drivers
+          yarn --cwd internal get:drivers
           ls "${HANA__DRIVER_CLASS_PATH}"
           ls "${POSTGRES__DRIVER_CLASS_PATH}"
 
@@ -140,16 +138,6 @@ jobs:
           cp -prnl ./tmp/alp-data-node-override/* .
           ls -l ./services/alp-db-svc/db/drivers
           ln -s tmp/alp-data-node-override alp-data-node-override
-
-      - name: Install 1Password CLI
-        uses: 1password/install-cli-action@v1
-
-      - name: Get drivers from 1password
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
-        run: |
-          yarn get:drivers
 
       - shell: bash
         # Give an id to the step, so we can reference it later
