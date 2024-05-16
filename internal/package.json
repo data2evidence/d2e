@@ -8,7 +8,7 @@
     "env_names_dev": "local remote base-all base-local base-remote alp-dev-sg-1"
   },
   "scripts": {
-    "gen:env": "scripts/gen-env.sh && yarn gen:tls",
+    "gen:env": "scripts/gen-env.sh",
     "load:all": "yarn load:permissions && yarn load:synpuf1k && yarn load:vocab",
     "load:permissions": "scripts/load-permissions.sh",
     "load:synpuf1k": "scripts/load-synpuf1k.sh",
