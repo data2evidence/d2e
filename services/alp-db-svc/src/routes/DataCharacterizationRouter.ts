@@ -44,6 +44,8 @@ export default class DataCharacterizationRouter {
           .matches(this.dataCharacterizationSchemaNameRegExp)
           .withMessage("DataCharacterization results schema name is invalid"),
         body("cdmSchema").notEmpty().withMessage("CDM Schema name is empty"),
+        body("customChangelogFilepath").optional(),
+        body("customClasspath").optional(),
         body("vocabSchema").custom((vocabSchema, { req }) => {
           return (
             config
@@ -70,6 +72,8 @@ export default class DataCharacterizationRouter {
           .notEmpty()
           .matches(this.dataCharacterizationSchemaNameRegExp)
           .withMessage("DataCharacterization results schema name is invalid"),
+        body("customChangelogFilepath").optional(),
+        body("customClasspath").optional(),
       ],
       [this.dropDataCharacterizationResultsSchema]
     );
@@ -87,6 +91,8 @@ export default class DataCharacterizationRouter {
       req.params.dialect,
       req.body.vocabSchema
     );
+    const changelogFilepath = req.body.customChangelogFilepath;
+    const classpath = req.body.customClasspath;
 
     try {
       const dbConnection = await this.dbDao.getDBConnectionByTenantPromise(
@@ -100,7 +106,9 @@ export default class DataCharacterizationRouter {
         schema,
         { tenantConfig, tenant },
         dbConnection,
-        vocabSchema
+        vocabSchema,
+        changelogFilepath,
+        classpath
       );
 
       res.json(result);
@@ -114,7 +122,9 @@ export default class DataCharacterizationRouter {
     schema: string,
     { tenant, tenantConfig }: { tenant: string; tenantConfig: any },
     dbConnection: ConnectionInterface,
-    vocabSchema: string
+    vocabSchema: string,
+    changelogFilepath: string | undefined,
+    classpath: string | undefined
   ) => {
     return new Promise(async (resolve, reject) => {
       // Create new schema
@@ -144,7 +154,9 @@ export default class DataCharacterizationRouter {
             this.dialect,
             tenant,
             schema,
-            config.CDM.CHARACTERIZATION
+            config.CDM.CHARACTERIZATION,
+            changelogFilepath,
+            classpath
           )
         );
 
