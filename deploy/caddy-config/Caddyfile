@@ -41,6 +41,15 @@ https://*.alp.local:55555 {
 		}
 	}
 
+	handle /dicom/* {
+		uri strip_prefix /dicom
+		reverse_proxy http://alp-dicom-server:8042 {
+			transport http {
+				read_buffer 8192
+			}
+		}
+	}
+
 	redir / /portal
 	handle /* {
 		reverse_proxy https://alp-minerva-gateway-1:41100 {
