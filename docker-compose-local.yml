@@ -299,3 +299,5 @@ services:
       LOGTO__USER: '{"username":"admin","password":"$argon2i$v=19$m=4096,t=256,p=1$gFXKgnc0tFywI7DcRVN+Tg$c0TeMUiDq6PMCLyJmR/V/sb1MV8MpMBeRy24+ZsZgeY","passwordAlgorithm":"Argon2i"}'
       LOGTO__ROLES: '[{"name":"role.systemadmin","description":"ALP System admin","type":"User"},{"name":"role.useradmin","description":"ALP User admin","type":"User"},{"name":"role.tenantviewer","description":"ALP Tenant viewer","type":"User"}]'
       LOGTO__SCOPES: '[{"name":"role.systemadmin","description":"ALP System admin"},{"name":"role.useradmin","description":"ALP User admin"},{"name":"role.tenantviewer","description":"ALP Tenant viewer"}]'
+      LOGTO__ADMIN_SERVER__FQDN_URL: "http://alp-logto-1:3002"
+      LOGTO__CLIENTID_PASSWORD__BASIC_AUTH: "YTU2MG84dHF3NzloeTJjcG44eDFxOnhrOEhQNFZEenFKY25YQ1RwZGFRTTZVdDJTd3JHMzd1"

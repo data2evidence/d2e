@@ -1,5 +1,7 @@
-let LOGTO__ADMIN_SERVER__FQDN_URL = "http://alp-logto-1:3002";
+let LOGTO__ADMIN_SERVER__FQDN_URL =
+  process.env.LOGTO__ADMIN_SERVER__FQDN_URL || "http://alp-logto-1:3002";
 let LOGTO__CLIENTID_PASSWORD__BASIC_AUTH =
+  process.env.LOGTO__CLIENTID_PASSWORD__BASIC_AUTH ||
   "YTU2MG84dHF3NzloeTJjcG44eDFxOnhrOEhQNFZEenFKY25YQ1RwZGFRTTZVdDJTd3JHMzd1";
 
 // TODO: remove any type
