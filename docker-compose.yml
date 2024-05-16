@@ -240,7 +240,6 @@ x-envs:
        "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
        "sqlEditor" : "http://alp-minerva-sqleditor:8888",
        "appRouter": "https://alp-mercury-approuter:41000",
-       "ui": "http://alp-local-ui-file-server:3000",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
        "minio": ""
       }
