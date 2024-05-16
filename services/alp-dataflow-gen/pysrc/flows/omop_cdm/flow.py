@@ -5,6 +5,7 @@ from utils.types import PG_TENANT_USERS, omopCDMOptionsType
 from utils.databaseConnectionUtils import getDatabaseConnectorConnectionDetailsString
 from dao.DBDao import DBDao
 from alpconnection.dbutils import *
+import os
 
 
 def create_omop_cdm(options: omopCDMOptionsType):
@@ -52,6 +53,7 @@ def create_schema(omop_cdm_dao):
 @task
 def create_cdm_tables(databaseCode, schema_name, cdm_version):
     # currently only supports pg dialect
+    r_libs_user_directory = os.getenv("R_LIBS_USER")
     connectionDetailsString = getDatabaseConnectorConnectionDetailsString(
         databaseCode,
         None,
@@ -59,6 +61,8 @@ def create_cdm_tables(databaseCode, schema_name, cdm_version):
     )
     with conversion.localconverter(default_converter):
         robjects.r(f'''
+            .libPaths(c('{r_libs_user_directory}',.libPaths()))
+            library('CommonDataModel', lib.loc = '{r_libs_user_directory}')
             {connectionDetailsString}
             cdm_version <- "{cdm_version}"
             schema_name <- "{schema_name}"

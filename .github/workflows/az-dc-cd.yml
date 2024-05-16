@@ -54,23 +54,6 @@ jobs:
         ln -s tmp/alp-data-node-override alp-data-node-override
         chmod 755 -R alp-data-node-override
 
-    - name: Load dotenv from 1password
-      uses: 1password/load-secrets-action@v2
-      id: op-load-secret
-      with:
-        export-env: true
-      env:
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
-        REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
-
-    - name: Login to ACR
-      uses: docker/login-action@v3.1.0
-      with:
-        registry: alpcr.azurecr.io
-        username: ${{ env.REGISTRY_USERNAME }}
-        password: ${{ env.REGISTRY_PASSWORD }}
-
     - name: Install 1Password CLI
       uses: 1Password/install-cli-action@v1.0.0
 
@@ -82,6 +65,7 @@ jobs:
         OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         OVERWRITE: true
       run: |
+        ./internal/scripts/get-op-ratelimit.sh
         ACTIONS_STEP_DEBUG=false
       
         # get env yml from 1password
@@ -98,6 +82,39 @@ jobs:
         echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
         echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
         echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
+        ./internal/scripts/get-op-ratelimit.sh
+
+    - name: Load dotenv from 1password
+      uses: 1password/load-secrets-action@v2
+      id: op-load-secret
+      with:
+        export-env: true
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+        REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
+
+    - name: 1password ratelimit end
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      run: |
+        ./internal/scripts/get-op-ratelimit.sh
+
+    - name: Upload stats.yml artifact
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: stats
+        retention-days: 30
+        path: |
+          ${{ github.job }}*.yml
+
+    - name: Login to ACR
+      uses: docker/login-action@v3.1.0
+      with:
+        registry: alpcr.azurecr.io
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
 
     - shell: bash
       if: github.event_name == 'push'

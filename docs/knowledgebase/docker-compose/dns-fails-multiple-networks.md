@@ -1,7 +1,7 @@
 # Issue: DNS lookup fails with Docker Compose multiple networks
 
 ## Symptoms
-- impacts multiple versions of docker desktop including latest
+- impacts versions of docker desktop before v2.26.1
 - dataflowgen-agent is on a separate network named `data` for security
 - sample error message
 > alp-dataflow-gen-agent-1 | Failed to get databases: Error: getaddrinfo ENOTFOUND alp-minerva-gateway-1
