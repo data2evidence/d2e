@@ -10,7 +10,7 @@ volumes:
   meilisearch-minerva-data-1:
   minio-data-1:
   pg-minerva-data-1:
-  orthanc-sqlite-storage:
+  dicom-sqlite-storage:
 
 x-envs:
   db-svc: &x-dbsvc
@@ -1549,4 +1549,4 @@ services:
       retries: 20
       timeout: 60s
     volumes:
-      - orthanc-sqlite-storage:/var/lib/orthanc/db
+      - dicom-sqlite-storage:/var/lib/orthanc/db
