@@ -17,7 +17,7 @@ class TerminologySvcAPI:
             "Authorization": self.token
         }
 
-    def get_hybridSearchConfig(self) -> int:
+    def get_hybridSearchConfig(self):
         url = f"{self.url}hybrid-search-config"
         headers = self.getOptions()
         result = requests.get(

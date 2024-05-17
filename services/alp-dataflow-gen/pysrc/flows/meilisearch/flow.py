@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import json
 from prefect import get_run_logger
 from datetime import date, datetime
 import re
@@ -126,6 +127,7 @@ def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
     database_code = options.databaseCode
     vocab_schema_name = options.vocabSchemaName
     table_name = options.tableName
+    token = options.token
 
     # Check if options.vocabSchemaName is valid
     if not re.match(r"^\w+$", vocab_schema_name):
@@ -142,11 +144,11 @@ def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
 
     # Initialize helper classes
     meilisearch_svc_api = MeilisearchSvcAPI()
-    terminology_svc_api = TerminologySvcAPI()
+    terminology_svc_api = TerminologySvcAPI(token)
 
-    config: Terminology_HybridSearchConfig = terminology_svc_api.get_hybridSearchConfig()
+    config = terminology_svc_api.get_hybridSearchConfig()
     
-    hybridSearchName = f"{config.source.replace('/', '')}_{config.model.replace('/', '')}";
+    hybridSearchName = f"{config['source'].replace('/', '')}_{config['model'].replace('/', '')}";
     index_name = f"{database_code}_{vocab_schema_name}_{table_name}_{hybridSearchName}"
     
     vocab_dao = VocabDao(database_code, vocab_schema_name)
@@ -165,20 +167,17 @@ def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
         # Add embedders settings to enable hybrid search
         index_settings["embedders"] = {
                 "default": {
-                    "source": f"{config.source}",
-                    "model": f"{config.model}"
+                    "source": f"{config['source']}",
+                    "model": f"{config['model']}"
                 }
             }
-
+        
         # Create meilisearch index
         logger.info(f"Creating meilisearch index with name: {index_name}")
-        meilisearch_svc_api.create_index(
-            index_name, meilisearch_primary_key)
+        meilisearch_svc_api.create_index(index_name, meilisearch_primary_key)
 
         logger.info(f"Updating settings for index with name: {index_name}")
-        meilisearch_svc_api.update_index_settings(
-            index_name, index_settings)
-
+        meilisearch_svc_api.update_index_settings(index_name, index_settings)
         # Check if meilisearch_primary_key defined in config is in table column_names
         is_meilisearch_primary_key_in_table = meilisearch_primary_key in column_names
 
@@ -188,8 +187,6 @@ def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
         
         #Add _vectors in the list of column_names to store embeddings
         column_names.append("_vectors")
-        
-        print(column_names)
         
         stream_result_set = vocab_dao.get_stream_result_set(conn, table_name)
         chunk_iteration = 0
@@ -210,7 +207,7 @@ def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
             data = [parseDates(row) for row in data]
 
             # Calculate embeddings and append them to the row
-            data = calculate_embeddings(data)
+            data = calculate_embeddings(data, config=config, logger=logger)
             
             # Map column names to data for insertion into meilisearch index
             mappedData = [dict(zip(column_names, row))
@@ -227,12 +224,11 @@ def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
     finally:
         conn.close()
 
-def calculate_embeddings(rows:list[list]):
+def calculate_embeddings(rows:list[list], config, logger):
     
     # Sentences we want sentence embeddings for
     for row in rows:
         sentence = " ".join(str(r) for r in row);
-        print(sentence)
         row.append(sentence)
         
     # Mean Pooling - Take attention mask into account for correct averaging
@@ -241,13 +237,9 @@ def calculate_embeddings(rows:list[list]):
         mask = mask.unsqueeze(-1).expand(embeddings.size()).float()
         return torch.sum(embeddings * mask, 1) / torch.clamp(mask.sum(1), min=1e-9)
 
-    # Get configured hyrbid search model
-    terminology_svc_api = TerminologySvcAPI()
-    config: Terminology_HybridSearchConfig = terminology_svc_api.get_hybridSearchConfig()
-   
     # Load model from HuggingFace Hub
-    tokenizer = AutoTokenizer.from_pretrained(config.model)
-    model = AutoModel.from_pretrained(config.model)
+    tokenizer = AutoTokenizer.from_pretrained(config['model'])
+    model = AutoModel.from_pretrained(config['model'])
 
     for row in rows:
         inputs = tokenizer(row[len(row)-1], padding=True, truncation=True, return_tensors='pt')
@@ -259,7 +251,7 @@ def calculate_embeddings(rows:list[list]):
         embeddings = meanpooling(output, inputs['attention_mask'])
         row.pop() # Remove sentences
         row.append(embeddings.tolist()[0]) # Append calculated embeddings
-
+     
     return rows
     
 def parseDates(row):

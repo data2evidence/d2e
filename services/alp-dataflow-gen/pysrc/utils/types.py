@@ -84,6 +84,7 @@ class meilisearchAddIndexType(BaseModel):
     databaseCode: str
     vocabSchemaName: str
     tableName: str
+    token: str
 
 
 class portalDatasetType(BaseModel):
