@@ -8,12 +8,11 @@ from alpconnection.dbutils import get_db_svc_endpoint_dialect
 from utils.types import (PG_TENANT_USERS, AlpDBSvcOptionsType,
                          requestType, internalPluginType,
                          createDataModelType, updateDataModelType,
-                         createSnapshotType, createParquetSnapshotType,
+                         createSnapshotType,
                          rollbackTagType, rollbackCountType,
-                         questionnaireDefinitionType, questionnaireResponseType,
-                         dcOptionsType)
-
-
+                         questionnaireDefinitionType, questionnaireResponseType, DATABASE_DIALECTS)
+from flows.alp_db_svc.datamart.main import create_datamart
+from flows.alp_db_svc.datamart.types import DATAMART_ACTIONS, CreateDatamartType, TempCreateDataModelType
 MODULE_DIR = site.getsitepackages()[0]
 
 
@@ -111,10 +110,19 @@ async def _run_db_svc_shell_command(request_type: str, request_url: str, request
 
 
 def _db_svc_flowrun_params(request_body, dialect: str, flow_name: str, changelog_filepath: str):  # move to utils?
-    cwd = os.getcwd()
-    request_body["customClasspath"] = f'{cwd}/{flow_name}/'
-    request_body["customChangelogFilepath"] = f'db/migrations/{dialect}/{changelog_filepath}'
+    request_body["customClasspath"] = _get_custom_classpath(flow_name)
+    request_body["customChangelogFilepath"] = _get_custom_changelog_filepath(
+        dialect, changelog_filepath)
     return request_body
+
+
+def _get_custom_classpath(flow_name: str) -> str:
+    cwd = os.getcwd()
+    return f'{cwd}/{flow_name}/'
+
+
+def _get_custom_changelog_filepath(dialect: str, changelog_filepath: str) -> str:
+    return f'db/migrations/{dialect}/{changelog_filepath}'
 
 
 def _get_db_dialect(options):
@@ -174,50 +182,101 @@ async def update_datamodel(options: updateDataModelType):
         raise e
 
 
+def _parse_create_datamart_options(options: createSnapshotType, datamart_action_type: str) -> CreateDatamartType:
+    return CreateDatamartType.parse_obj({
+        "target_schema": options.schema_name,
+        "source_schema": options.source_schema,
+        "data_model": options.data_model,
+        "database_code": options.database_code,
+        "snapshot_copy_config": options.snapshot_copy_config,
+        "plugin_changelog_filepath": _get_custom_changelog_filepath(options.db_dialect, options.changelog_filepath),
+        "plugin_classpath": _get_custom_classpath(options.flow_name),
+        "datamart_action": datamart_action_type
+    })
+
+
+def _parse_temp_create_datamodel_options(options: createSnapshotType) -> TempCreateDataModelType:
+    return TempCreateDataModelType.parse_obj({
+        "dialect": options.db_dialect,
+        "changelog_filepath": options.changelog_filepath,
+        "flow_name": options.flow_name,
+        "vocab_schema": options.vocab_schema,
+    })
+
+
 @task
 async def create_snapshot(options: createSnapshotType):
     database_code = options.database_code
     data_model = options.data_model
     schema_name = options.schema_name
     source_schema = options.source_schema
+    vocab_schema = options.vocab_schema
+    snapshot_copy_config = options.snapshot_copy_config
+    changelog_filepath = options.changelog_filepath
+    flow_name = options.flow_name
 
     request_type = requestType.POST
-    request_body = {"snapshotCopyConfig": options.snapshot_copy_config}
+    request_body = {"snapshotCopyConfig": snapshot_copy_config}
 
     try:
         db_dialect = _get_db_dialect(options)
 
         request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
+            request_body, db_dialect, flow_name, changelog_filepath)
 
-        request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schemasnapshot/{schema_name}?source_schema={source_schema}"
+        request_url = f"""/alpdb/{db_dialect}/database/{database_code}/data-model/{
+            data_model}/schemasnapshot/{schema_name}?source_schema={source_schema}"""
 
-        if db_dialect == "hana":
+        if db_dialect == DATABASE_DIALECTS.HANA:
             await _run_db_svc_shell_command(request_type, request_url, request_body)
+        elif db_dialect == DATABASE_DIALECTS.POSTGRES:
+            create_datamart_options = _parse_create_datamart_options(
+                options, DATAMART_ACTIONS.COPY_TO_DB)
+            temp_create_data_model_options = _parse_temp_create_datamodel_options(
+                options)
+            create_datamart(options=create_datamart_options,
+                            temp_create_data_model_options=temp_create_data_model_options)
+        else:
+            raise Exception(
+                f"Input dialect: {db_dialect} is not supported")
     except Exception as e:
         raise e
 
 
 @task
-async def create_parquet_snapshot(options: createParquetSnapshotType):
+async def create_parquet_snapshot(options: createSnapshotType):
     database_code = options.database_code
     data_model = options.data_model
     schema_name = options.schema_name
     source_schema = options.source_schema
+    vocab_schema = options.vocab_schema
+    snapshot_copy_config = options.snapshot_copy_config
+    changelog_filepath = options.changelog_filepath
+    flow_name = options.flow_name
 
     request_type = requestType.POST
-    request_body = {"snapshotCopyConfig": options.snapshot_copy_config}
+    request_body = {"snapshotCopyConfig": snapshot_copy_config}
 
     try:
         db_dialect = _get_db_dialect(options)
 
         request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
+            request_body, db_dialect, flow_name, changelog_filepath)
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schemasnapshotparquet/{schema_name}?sourceschema={source_schema}"
 
-        if db_dialect == "hana":
+        if db_dialect == DATABASE_DIALECTS.HANA:
             await _run_db_svc_shell_command(request_type, request_url, request_body)
+        elif db_dialect == DATABASE_DIALECTS.POSTGRES:
+            create_datamart_options = _parse_create_datamart_options(
+                options, DATAMART_ACTIONS.DATAMART_ACTIONS.PARQUET)
+            temp_create_data_model_options = _parse_temp_create_datamodel_options(
+                options)
+            create_datamart(options=create_datamart_options,
+                            temp_create_data_model_options=temp_create_data_model_options)
+        else:
+            raise Exception(
+                f"Input dialect: {db_dialect} is not supported")
     except Exception as e:
         raise e
 
