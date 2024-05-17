@@ -220,3 +220,11 @@ export type Filters = {
   vocabularyId: string[];
   validity: ('Valid' | 'Invalid')[];
 };
+
+export type HybridSearchConfig = {
+  id: number;
+  isEnabled: boolean;
+  semanticRatio: number;
+  source: string;
+  model: string;
+};
