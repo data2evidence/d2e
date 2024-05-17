@@ -125,8 +125,7 @@ def datamart_copy_schema(
                     targetSchema} for table: {datamart_base_config['tableName']}""")
                 successful_tables.append(datamart_base_config["tableName"])
         else:
-            error_message = f"Datamart action: {
-                datamart_action} is not supported"
+            error_message = f"Datamart action: {datamart_action} is not supported"
             get_run_logger().error(error_message)
             raise ValueError(error_message)
 
