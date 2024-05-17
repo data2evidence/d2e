@@ -5,7 +5,7 @@
  *
  */
 import { env } from "../configs";
-import { getDuckdbDBConnection, getFileName } from "./DuckdbConnection";
+import { getDuckdbDBConnection } from "./DuckdbConnection";
 export import textLib = require("./text");
 import * as xsenv from "@sap/xsenv";
 import {
@@ -449,8 +449,7 @@ export async function getAnalyticsConnection(userObj) {
   let analyticsConnection;
   let cdwService = xsenv.filterServices({ tag: "cdw" }).map(db => db.credentials);
   if(env.USE_DUCKDB === "true"){
-    const { duckdbSchemaFileName, vocabSchemaFileName } = getFileName(env.DUCKDB_DB_CODE, env.DUCKDB_SCHEMA, env.DUCKDB_VOCAB_SCHEMA)
-    analyticsConnection =  await getDuckdbDBConnection(duckdbSchemaFileName, vocabSchemaFileName)
+    analyticsConnection =  await getDuckdbDBConnection()
   }else{
     cdwService = cdwService.filter((db) => db.dialect == 'hana')
     analyticsCredentials = cdwService[0];

@@ -724,7 +724,6 @@ services:
         - liveness
         - https://0.0.0.0:41114/check-liveness
       timeout: 10s
-    hostname: alp-minerva-cdw-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/mri-cdw-svc:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
@@ -733,8 +732,7 @@ services:
       alp:
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    volumes:
-      - duckdb-data-1:/home/docker/src/services/app/duckdb_data
+    hostname: alp-minerva-cdw-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
         - *x-converter
@@ -752,15 +750,12 @@ services:
          "schema": "cdw_config",
          "user": "${PG_WRITE_USER:-alp_pg_write_user}"
         }
-      DUCKDB_DB_CODE: ${DUCKDB_DB_CODE:-alpdev_pg}
-      DUCKDB_SCHEMA: ${DUCKDB_SCHEMA:-cdmdefault}
-      DUCKDB_VOCAB_SCHEMA: ${DUCKDB_VOCAB_SCHEMA:-cdmvocab}
-      DUCKDB__DATA_FOLDER: /home/docker/src/services/app/duckdb_data
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
       isTestEnv: ${isTestEnv}
+      DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
 
   alp-minerva-dataflow-mgmt:
     container_name: &c11 alp-minerva-dataflow-mgmt-${BASE_PORT:-1}

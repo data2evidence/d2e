@@ -24,11 +24,11 @@ export class DbMeta {
         schema = getDefaultSchemaName()
         query =  `SELECT COLUMN_NAME AS \"COLUMN_NAME\" 
         from information_schema.columns 
-        where table_schema = ?::text AND TABLE_NAME = ?::text 
+        where table_catalog = ?::text AND TABLE_NAME = ?::text 
         UNION 
         SELECT column_name as \"COLUMN_NAME\" 
         from duckdb_columns() 
-        WHERE schema_name = ?::text and table_name = ?::text
+        WHERE database_name = ?::text and table_name = ?::text
         ORDER BY \"column_name\"`
       }else{
         query = `SELECT COLUMN_NAME 
