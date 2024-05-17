@@ -11,5 +11,8 @@ export class HybridSearchConfigDto {
   semanticRatio: number;
 
   @IsString()
+  source: string;
+
+  @IsString()
   model: string;
 }
