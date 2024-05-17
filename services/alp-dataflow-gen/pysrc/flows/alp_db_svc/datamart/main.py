@@ -33,15 +33,9 @@ def create_datamart(options: CreateDatamartType, temp_create_data_model_options:
     # check if schema exist
     schema_exists = db_dao.check_schema_exists()
     if not schema_exists:
-        error_message = "Create snapshot failure. Source schema not found."
+        error_message = f"Create snapshot failure. Source schema: {source_schema} not found."
         logger.error(error_message)
-        httpResponse = {
-            "message": error_message,
-            "successfulSchemas": [],
-            "failedSchemas": [source_schema],
-            "errorOccurred": True,
-        }
-        raise Exception(httpResponse)
+        raise Exception(error_message)
 
     # create cdm schema
     if datamart_action == DATAMART_ACTIONS.COPY_AS_DB_SCHEMA:
@@ -68,26 +62,13 @@ def create_datamart(options: CreateDatamartType, temp_create_data_model_options:
             datamart_action
         )
         if len(failed_tables) > 0:
-            raise Exception(
-                f"The following tables has failed datamart creation: {failed_tables}")
+            error_message = f"The following tables has failed datamart creation: {failed_tables}"
+            logger.error(error_message)
+            raise Exception(error_message)
     except Exception as err:
-        logger.error(err)
-        httpResponse = {
-            "message": "Schema creation successful, but failed to load data!",
-            "successfulSchemas": [],
-            "failedSchemas": [target_schema],
-            "errorOccurred": True,
-        }
-        raise Exception(httpResponse)
+        error_message = f"Schema: {target_schema} created successful, but failed to load data with Error: {err}"
+        logger.error(error_message)
+        raise Exception(error_message)
     else:
-        httpResponse = {
-            "message": "Schema snapshot successfully created!",
-            "successfulSchemas": [target_schema],
-            "failedSchemas": [],
-            "errorOccurred": False,
-        }
-        logger.info(f"New {target_schema} schema created & loaded successfully", {
-            "schema": target_schema,
-            "op": f"""{target_schema} schema created and loaded with configuration {snapshot_copy_config}"""
-        })
-        return httpResponse
+        logger.info(
+            f"{target_schema} schema created and loaded from source schema: {source_schema} with configuration {snapshot_copy_config}")
