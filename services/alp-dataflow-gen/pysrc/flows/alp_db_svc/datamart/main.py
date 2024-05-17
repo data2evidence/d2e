@@ -1,11 +1,10 @@
 from prefect_shell import ShellOperation
 from prefect import get_run_logger
 from dao.DBDao import DBDao
-from utils.types import PG_TENANT_USERS
+from utils.types import PG_TENANT_USERS, createDataModelType
 from flows.alp_db_svc.datamart.datamart import datamart_copy_schema
 from flows.alp_db_svc.datamart.types import DATAMART_ACTIONS, CreateDatamartType, TempCreateDataModelType
-from d2e_dbsvc import create_data_model
-from d2e_dbsvc.types import createdata_modelType
+from flows.alp_db_svc.flow import create_datamodel
 
 
 def create_datamart(options: CreateDatamartType, temp_create_data_model_options: TempCreateDataModelType):
@@ -47,8 +46,8 @@ def create_datamart(options: CreateDatamartType, temp_create_data_model_options:
     # create cdm schema
     if datamart_action == DATAMART_ACTIONS.COPY_AS_DB_SCHEMA:
         # TODO: To be updated when create_data_model is implemented in native python in task #592
-        create_data_model(
-            createdata_modelType(
+        create_datamodel(
+            createDataModelType(
                 database_code=database_code,
                 data_model=data_model,
                 schema_name=target_schema,
