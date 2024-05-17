@@ -4,7 +4,7 @@ set -o nounset
 set -o errexit
 
 # inputs
-GIT_BASE_DIR=${GIT_BASE_DIR:-.}
+GIT_BASE_DIR=$(git rev-parse --show-toplevel)
 ENV_NAME=${ENV_NAME:-local}
 ENV_TYPE=${ENV_TYPE:-local}
 PRIVATE_ONLY=${PRIVATE_ONLY:-false}
@@ -12,13 +12,15 @@ PRIVATE_ONLY=${PRIVATE_ONLY:-false}
 echo ENV_NAME=$ENV_NAME 
 echo ENV_TYPE=$ENV_TYPE
 
+# vars
+DOTENV_FILE=$GIT_BASE_DIR/.env.$ENV_TYPE
+
+cd $GIT_BASE_DIR
+
 # functions
 function merge-yml () { 
     yq eval-all '. as $item ireduce ({}; . * $item ) | sort_keys(..)' ${@} 
 }
-
-# vars
-DOTENV_FILE=$GIT_BASE_DIR/.env.$ENV_TYPE
 
 # build array of dotenv
 if [ $PRIVATE_ONLY = true ]; then
@@ -44,3 +46,5 @@ merge-yml ${DOTENV_YMLS[@]} .env.tmp.yml | yq 'keys | .[]' > $DOTENV_FILE.keys
 
 echo "${DOTENV_YMLS[@]} => $(wc -l $DOTENV_FILE)"
 rm .env.tmp .env.tmp.yml
+
+$GIT_BASE_DIR/scripts/gen-tls.sh

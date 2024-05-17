@@ -8,14 +8,11 @@ const Env = z.object({
   ENV_MOUNT_PATH: z.string().optional(),
   PORT: z.string(),
   MRI_USER: z.string().optional(),
-  DUCKDB__DATA_FOLDER: z.string(),
   USE_DUCKDB: z.string(),
   CONFIG_CONNECTION: z.string(),
-  DUCKDB_DB_CODE:  z.string(),
-  DUCKDB_SCHEMA:  z.string(),
-  DUCKDB_VOCAB_SCHEMA:  z.string(),
   TLS__INTERNAL__KEY: z.string(),
   TLS__INTERNAL__CRT: z.string(),
+  DUCKDB_PATH: z.string()
 });
 
 const result = Env.safeParse(process.env);
