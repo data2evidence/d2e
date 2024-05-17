@@ -161,6 +161,8 @@ def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
 
         # Add table column names to meilisearch settings as searchableAttributes
         index_settings["searchableAttributes"] = column_names
+        
+        # Add embedders settings to enable hybrid search
         index_settings["embedders"] = {
                 "default": {
                     "source": f"{config.source}",
@@ -186,6 +188,8 @@ def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
         
         #Add _vectors in the list of column_names to store embeddings
         column_names.append("_vectors")
+        
+        print(column_names)
         
         stream_result_set = vocab_dao.get_stream_result_set(conn, table_name)
         chunk_iteration = 0
@@ -228,6 +232,7 @@ def calculate_embeddings(rows:list[list]):
     # Sentences we want sentence embeddings for
     for row in rows:
         sentence = " ".join(str(r) for r in row);
+        print(sentence)
         row.append(sentence)
         
     # Mean Pooling - Take attention mask into account for correct averaging

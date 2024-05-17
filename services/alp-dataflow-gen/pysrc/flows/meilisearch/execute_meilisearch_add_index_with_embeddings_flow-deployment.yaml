@@ -1,0 +1,74 @@
+###
+### A complete description of a Prefect Deployment for flow 'execute-meilisearch-add-index-with-embeddings-flow'
+###
+name: add_search_index_with_embeddings
+description: null
+version: dbb2695fba9e02491a43b9917f49c1c7
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: null
+tags: ["add_search_index_with_embeddings"]
+parameters: 
+ {
+    options: {
+      "token": "${BEARER TOKEN}",
+      "databaseCode": "alpdev_pg",
+      "vocabSchemaName": "cdmvocab",
+      "tableName": "concept",
+    }
+  }
+schedule: null
+is_schedule_active: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: null
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: execute-meilisearch-add-index-with-embeddings-flow
+manifest_path: null
+storage: null
+path: /app/pysrc
+entrypoint: main.py:execute_meilisearch_add_index_with_embeddings_flow
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    options:
+      title: options
+      position: 0
+      allOf:
+      - $ref: '#/definitions/meilisearchAddIndexType'
+  required:
+  - options
+  definitions:
+    meilisearchAddIndexType:
+      title: meilisearchAddIndexType
+      type: object
+      properties:
+        databaseCode:
+          title: Databasecode
+          type: string
+        vocabSchemaName:
+          title: Vocabschemaname
+          type: string
+        tableName:
+          title: Tablename
+          type: string
+      required:
+      - token
+      - databaseCode
+      - vocabSchemaName
+      - tableName
+timestamp: '2024-05-17T03:28:05.826514+00:00'
+triggers: []
+enforce_parameter_schema: null
