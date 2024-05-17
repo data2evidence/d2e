@@ -4,8 +4,8 @@ dotenv.config()
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import express, { Request, Response, NextFunction } from 'express'
 import { UserMgmtAPI } from './api'
-import { ROLES, SESSION_CLAIMS_PROP } from './const'
-import { SAMPLE_USER_JWT, PUBLIC_USER_JWT, MriUser, isClientCredToken } from './mri/MriUser'
+import { ROLES } from './const'
+import { MriUser, isClientCredToken } from './mri/MriUser'
 import { createLogger } from './Logger'
 import * as xsapp from './xs-app.json'
 import { app, authc } from './configure/app'
@@ -15,7 +15,7 @@ import { checkScopes } from './middlewares/scope-check'
 import https from 'https'
 import querystring from 'query-string'
 import { IPlugin, IRouteProp } from './types'
-import { env } from './env'
+import { env, services } from './env'
 import { Container } from 'typedi'
 import Routes, { DashboardGateRouter } from './routes'
 import { addSubToRequestUserMiddleware } from './middlewares/AddSubToRequestUserMiddleware'
@@ -30,12 +30,8 @@ const PORT = env.GATEWAY_PORT
 const logger = createLogger('gateway')
 const userMgmtApi = new UserMgmtAPI()
 const isDev = process.env.NODE_ENV === 'development'
-const appRouterUrl = env.APPROUTER_BASE_URL
-const terminologySvcUrl = env.TERMINOLOGY_SVC_BASE_URL
-const nifiMgmtSvcUrl = env.NIFI_MGMT_SVC_BASE_URL
 const alp_version = process.env.ALP_RELEASE || 'local'
 const authType = env.GATEWAY_IDP_AUTH_TYPE as AuthcType
-const services = JSON.parse(env.DATA_NODE_DOCKER_ADDRESSES_JSON)
 
 let plugins: IPlugin = {
   researcher: [],
@@ -90,9 +86,6 @@ async function ensureAuthorized(req, res, next) {
       }
     }
 
-    // only allow MRI study roles
-    req.user.userMgmtGroups.alpRoleMap = mriUserObj.alpRoleMap
-
     const { scopes } = match
     // the allowed scopes for a url should be found in the user's assigned scopes
     if (scopes.some(i => mriUserObj.mriScopes.includes(i))) {
@@ -129,44 +122,6 @@ async function ensureAlpSysAdminAuthorized(req, res, next) {
   }
   logger.error('User has no ALP System Admin role')
   return res.status(403).send('User has no ALP System Admin role')
-}
-
-function encode(string: string) {
-  return Buffer.from(string).toString('base64')
-}
-
-function buildEncodedHeaders(req, res, next) {
-  if (!auth) {
-    // Dummy user ALICE
-    const encodedAlice = encode(JSON.stringify(SAMPLE_USER_JWT))
-    req.headers[SESSION_CLAIMS_PROP] = encodedAlice
-    req.headers.authorization = 'Bearer DUMMY_TOKEN'
-    return next()
-  }
-
-  if (req.originalUrl.startsWith('/analytics-svc/api/services/public/population')) {
-    const encodedPublicUser = encode(JSON.stringify(PUBLIC_USER_JWT))
-    req.headers[SESSION_CLAIMS_PROP] = encodedPublicUser
-    return next()
-  }
-
-  if (req.user) {
-    if (
-      req.user.roles &&
-      [ROLES.ADMIN_DATA_READER_ROLE, ROLES.VALIDATE_TOKEN_ROLE, ROLES.BI_DATA_READER_ROLE].some(role =>
-        req.user.roles.includes(role)
-      )
-    ) {
-      return next()
-    }
-    const encodedUserClaims = encode(JSON.stringify(req.user))
-    req.headers[SESSION_CLAIMS_PROP] = encodedUserClaims
-    if (isDev) {
-      logger.info(`🚀 inside buildEncodedHeaders, req.headers: ${JSON.stringify(req.headers)}`)
-    }
-  }
-
-  return next()
 }
 
 function addOriginHeader(req: Request, res: Response, next: NextFunction) {
@@ -257,7 +212,8 @@ app.post('/oauth/token', async (req, res) => {
 routes.forEach((route: IRouteProp) => {
   try {
     const changeOriginForAppRouter: boolean =
-      appRouterUrl.startsWith('https://localhost:') || appRouterUrl.startsWith('https://alp-mercury-approuter:')
+      services.appRouter.startsWith('https://localhost:') ||
+      services.appRouter.startsWith('https://alp-mercury-approuter:')
         ? false
         : true
 
@@ -280,7 +236,7 @@ routes.forEach((route: IRouteProp) => {
       app.get(
         `${source}/*`,
         createProxyMiddleware({
-          target: env.ALP_UI_URL,
+          target: services.ui,
           changeOrigin: true,
           pathRewrite: path => {
             let targetPath = route.targetPath
@@ -328,7 +284,7 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             addSqleditorHeaders,
             createProxyMiddleware({
-              target: env.SQLEDITOR__BASE_URL,
+              target: services.sqlEditor,
               pathRewrite: { '^/alp-sqleditor': '' },
               changeOrigin: true,
               onProxyReq
@@ -338,9 +294,8 @@ routes.forEach((route: IRouteProp) => {
         case 'public-analytics-svc':
           app.use(
             source,
-            buildEncodedHeaders,
             createProxyMiddleware({
-              target: services.analyticsSvc,
+              target: services.analytics,
               proxyTimeout: 300000
             })
           )
@@ -351,9 +306,8 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             addSubToRequestUserMiddleware,
             ensureAuthorized,
-            buildEncodedHeaders,
             createProxyMiddleware({
-              ...getCreateMiddlewareOptions(services.analyticsSvc),
+              ...getCreateMiddlewareOptions(services.analytics),
               logLevel: 'debug',
               headers: { Connection: 'keep-alive' }
             })
@@ -363,7 +317,7 @@ routes.forEach((route: IRouteProp) => {
           app.use(
             source,
             createProxyMiddleware({
-              target: appRouterUrl,
+              target: services.appRouter,
               secure: changeOriginForAppRouter,
               proxyTimeout: 100000,
               changeOrigin: changeOriginForAppRouter
@@ -418,31 +372,9 @@ routes.forEach((route: IRouteProp) => {
             checkScopes,
             addMeilisearchHeaders,
             createProxyMiddleware({
-              target: services.meilisearchSvc,
+              target: services.meilisearch,
               proxyTimeout: 300000,
               pathRewrite: path => path.replace('/meilisearch-svc', '')
-            })
-          )
-          break
-        case 'nifimgmt':
-          app.use(
-            source,
-            ensureAuthenticated,
-            checkScopes,
-            createProxyMiddleware({
-              target: {
-                protocol: nifiMgmtSvcUrl.split('/')[0],
-                host: nifiMgmtSvcUrl.split('/')[2].split(':')[0],
-                port: nifiMgmtSvcUrl.split('/')[2].split(':')[1],
-                ...(nifiMgmtSvcUrl.includes('localhost:')
-                  ? undefined
-                  : {
-                      ca: env.GATEWAY_CA_CERT
-                    })
-              },
-              secure: nifiMgmtSvcUrl.includes('localhost:') ? false : true,
-              proxyTimeout: 300000,
-              changeOrigin: nifiMgmtSvcUrl.includes('localhost:') ? false : true
             })
           )
           break
@@ -451,8 +383,7 @@ routes.forEach((route: IRouteProp) => {
             source,
             ensureAuthenticated,
             ensureAuthorized,
-            buildEncodedHeaders,
-            createProxyMiddleware(getCreateMiddlewareOptions(services.bookmarkSvc))
+            createProxyMiddleware(getCreateMiddlewareOptions(services.bookmark))
           )
           break
         case 'alp-terminology-svc':
@@ -460,7 +391,7 @@ routes.forEach((route: IRouteProp) => {
             source,
             ensureAuthenticated,
             checkScopes,
-            createProxyMiddleware(getCreateMiddlewareOptions(terminologySvcUrl))
+            createProxyMiddleware(getCreateMiddlewareOptions(services.terminology))
           )
           break
         case 'pa-config':
@@ -469,7 +400,6 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             addSubToRequestUserMiddleware,
             ensureAuthorized,
-            buildEncodedHeaders,
             createProxyMiddleware({
               ...getCreateMiddlewareOptions(services.paConfig),
               headers: { Connection: 'keep-alive' }
@@ -482,9 +412,8 @@ routes.forEach((route: IRouteProp) => {
             ensureAuthenticated,
             addSubToRequestUserMiddleware,
             ensureAuthorized,
-            buildEncodedHeaders,
             createProxyMiddleware({
-              ...getCreateMiddlewareOptions(services.cdwSvc),
+              ...getCreateMiddlewareOptions(services.cdw),
               headers: { Connection: 'keep-alive' }
             })
           )
@@ -494,7 +423,6 @@ routes.forEach((route: IRouteProp) => {
             source,
             ensureAuthenticated,
             ensureAuthorized,
-            buildEncodedHeaders,
             createProxyMiddleware({
               ...getCreateMiddlewareOptions(services.psConfig),
               headers: { Connection: 'keep-alive' }

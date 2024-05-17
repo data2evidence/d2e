@@ -5,7 +5,7 @@ import { REQUEST } from '@nestjs/core'
 import { Request } from 'express'
 import { firstValueFrom, map } from 'rxjs'
 import { Agent } from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
 import { IDatasetFilterScopesResult, IDatabaseSchemaFilterResult } from '../types'
 
 @Injectable({ scope: Scope.REQUEST })
@@ -16,8 +16,8 @@ export class AnalyticsApi {
 
   constructor(@Inject(REQUEST) request: Request, private readonly httpService: HttpService) {
     this.jwt = request.headers['authorization']
-    if (env.ANALYTICS_SVC_API_BASE_URL) {
-      this.url = env.ANALYTICS_SVC_API_BASE_URL
+    if (services.analytics) {
+      this.url = services.analytics
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.SSL_CA_CERT
@@ -29,7 +29,7 @@ export class AnalyticsApi {
 
   async getFilterScopes(datasetsWithSchema: string): Promise<IDatasetFilterScopesResult> {
     const requestConfig = await this.createRequestConfig()
-    const url = `${this.url}api/services/dataset-filter/filter-scopes`
+    const url = `${this.url}/api/services/dataset-filter/filter-scopes`
     const obs = this.httpService.get(url, {
       ...requestConfig,
       params: { datasetsWithSchema }
@@ -39,7 +39,7 @@ export class AnalyticsApi {
 
   async getDatabaseSchemaFilter(datasetsWithSchema: string, filterParams): Promise<IDatabaseSchemaFilterResult> {
     const requestConfig = await this.createRequestConfig()
-    const url = `${this.url}api/services/dataset-filter/database-schema-filter`
+    const url = `${this.url}/api/services/dataset-filter/database-schema-filter`
     const obs = this.httpService.get(url, {
       ...requestConfig,
       params: {

@@ -150,7 +150,9 @@ const hanaCommonTranslation = (temp: string): string => {
 
   // Replace
   temp = temp.replace(/TO_NCLOB/gi, "");
-  temp = temp.replace("TO_TIMESTAMP(TO_VARCHAR", "TO_TIMESTAMP(TO_CHAR");
+  temp = temp.replace(/TO_TIMESTAMP\(TO_VARCHAR\(([\w_]*)(.*?\)){2}/gi, "$1::varchar::timestamp");
+  temp = temp.replace(/TO_TIMESTAMP\(([\w$_%?]*)(.*?\))/gi, "$1::timestamp");
+  temp = temp.replace(/TO_DATE\(([\w$_%?]*)(.*?\))/gi, "$1::date");
   temp = temp.replace(/TO_VARCHAR(\(\"[\w]*\"\))/gi, "$1::varchar"); // Only for TO_VARCHAR that uses one parameter
   temp = temp.replace(/TO_VARCHAR/gi, "");
   // temp = temp.replace(/TO_INTEGER\(([^\*]*)\)\ \*/ig, "($1)::integer *");

@@ -33,7 +33,8 @@ export const DEFAULT_ERROR_MESSAGE = 'Error occurred. Please contact we@data4lif
 export enum ATTRIBUTE_CONFIG_DATA_TYPES {
   STRING = 'STRING',
   TIMESTAMP = 'TIMESTAMP',
-  NUMBER = 'NUMBER'
+  NUMBER = 'NUMBER',
+  JSON = 'JSON'
 }
 export enum ATTRIBUTE_CONFIG_CATEGORIES {
   DATASET = 'DATASET',

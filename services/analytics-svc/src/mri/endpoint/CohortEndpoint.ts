@@ -157,7 +157,6 @@ export class CohortEndpoint {
     ) {
         let queryString = `
         INSERT INTO ${this.schemaName}.COHORT_DEFINITION (
-            COHORT_DEFINITION_ID,
             COHORT_DEFINITION_NAME,
             COHORT_DEFINITION_DESCRIPTION,
             COHORT_INITIATION_DATE,
@@ -166,7 +165,7 @@ export class CohortEndpoint {
             COHORT_DEFINITION_SYNTAX,
             SUBJECT_CONCEPT_ID
             )
-        VALUES (${this.schemaName}.COHORT_DEFINITION_ID_SEQ.nextval, %s, %s, %s, %s, %s, %s, %s)`;
+        VALUES (%s, %s, %s, %s, %s, %s, %s)`;
 
         try {
             const query = QueryObject.format(

@@ -5,7 +5,7 @@ import { HttpService } from '@nestjs/axios'
 import { REQUEST } from '@nestjs/core'
 import { firstValueFrom, map } from 'rxjs'
 import { Agent } from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
 import { UserGroup } from '../types'
 
 @Injectable({ scope: Scope.REQUEST })
@@ -16,8 +16,8 @@ export class UserMgmtApi {
 
   constructor(@Inject(REQUEST) request: Request, protected readonly httpService: HttpService) {
     this.jwt = request.headers['authorization']
-    if (env.USER_MGMT_API_URL) {
-      this.url = env.USER_MGMT_API_URL
+    if (services.usermgmt) {
+      this.url = services.usermgmt
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.SSL_CA_CERT
