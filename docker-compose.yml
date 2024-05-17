@@ -325,7 +325,7 @@ services:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile
     container_name: &c1 alp-caddy
     hostname: alp-caddy.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image:  alpcr.azurecr.io/alp-data-node/alp-caddy:${DOCKER_TAG_NAME:-develop}
+    image:  alpcr.azurecr.io/alp-data-node/alp-caddy:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop}
     logging:
       options:
         tag: *c1
