@@ -12,11 +12,13 @@ export class HybridSearchConfigService {
   private readonly logger = createLogger(this.constructor.name);
   private readonly userId: string;
 
-  constructor(@Inject(REQUEST) request: Request) {
-    const decodedToken = decode(
-      request.headers['authorization'].replace(/bearer /i, ''),
-    ) as JwtPayload;
-    this.userId = decodedToken.sub;
+  constructor(@Inject(REQUEST) request?: Request) {
+    if (request) {
+      const decodedToken = decode(
+        request.headers['authorization'].replace(/bearer /i, ''),
+      ) as JwtPayload;
+      this.userId = decodedToken.sub;
+    }
   }
 
   private addModifier<T>(object: T) {

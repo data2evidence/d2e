@@ -1,12 +1,14 @@
 import requests
 import os
 import jwt
+import json
 
 
 class OpenIdAPI:
     def __init__(self):
-        if os.getenv('IDP__ISSUER_URL') is None:
-            raise ValueError("IDP__ISSUER_URL is undefined")
+
+        if os.getenv('SERVICE_ROUTES') is None:
+            raise ValueError("SERVICE_ROUTES is undefined")
 
         if os.getenv('IDP__ALP_DATA__CLIENT_ID') is None:
             raise ValueError("IDP__ALP_DATA__CLIENT_ID is undefined")
@@ -20,7 +22,8 @@ class OpenIdAPI:
         if os.getenv("PYTHON_VERIFY_SSL") == 'true' and os.getenv('TLS__INTERNAL__CA_CRT') is None:
             raise ValueError("TLS__INTERNAL__CA_CRT is undefined")
 
-        self.url = os.getenv('IDP__ISSUER_URL')
+        # Parse SERVICE_ROUTES and get idIssuerUrl
+        self.url = json.loads(os.getenv('SERVICE_ROUTES'))["idIssuerUrl"]
         self.clientId = os.getenv('IDP__ALP_DATA__CLIENT_ID')
         self.clientSecret = os.getenv('IDP__ALP_DATA__CLIENT_SECRET')
         self.scope = os.getenv('IDP__SCOPE')
