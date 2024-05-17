@@ -26,8 +26,7 @@ jobs:
         changes: ${{ steps.file_changes.outputs.src }}
       steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+
       - uses: dorny/paths-filter@v3.0.2
         id: file_changes
         with:
@@ -59,8 +58,6 @@ jobs:
       SKIP_AUTH: "TRUE"
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Load dotenv from 1password
         uses: 1password/load-secrets-action@v2
@@ -101,7 +98,7 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          yarn get:drivers
+          yarn --cwd internal get:drivers
 
       - uses: actions/setup-node@v4
         with:

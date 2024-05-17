@@ -20,6 +20,8 @@ touch ${DOTENV_FILE}
 CONTAINER_CRT_DIR=/data/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
 CONTAINER_CA_DIR=/data/caddy/pki/authorities/$TLS_CA_NAME
 
+cd $GIT_BASE_DIR
+
 # action
 if [ ${TLS_REGENERATE} = true ]; then
 	echo ". TLS_REGENERATE remove existing"

@@ -37,7 +37,7 @@ rm README.md
 ```
 - Copy headers files
 ```bash
-cp $ALP_DN_REPO_DIR/docs/2-load/headers-synpuf1k/*.csv .
+cp $GIT_BASE_DIR/docs/2-load/headers-synpuf1k/*.csv .
 ```
 - Confirm with linecounts
 ```bash
@@ -84,7 +84,7 @@ wc -l *
 
 - Navigate back to root folder `d2e` and Run the following command to seed postgres cdm schemas with synpuf-1k
 ```bash
-cd $ALP_DN_REPO_DIR
+cd $GIT_BASE_DIR
 yarn seed-postgres-cdm-schemas alpdev_pg cdmdefault
 ```
 - where `cdmdefault` is the default cdm schema name
