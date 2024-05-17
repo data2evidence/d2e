@@ -1531,7 +1531,6 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     networks:
       alp:
-      data:
     environment:
       VERBOSE_ENABLED: true
       VERBOSE_STARTUP: true
@@ -1543,7 +1542,7 @@ services:
       ORTHANC__AWS_S3_STORAGE__REGION: ${MINIO__REGION:-ap-southeast-1}
       ORTHANC__AUTHENTICATION_ENABLED: false
     healthcheck:
-      test: ["CMD-SHELL", "/probes/test-aliveness.py --user=healthcheck --pwd=GASKEajSaz5f6j"]
+      test: ["CMD-SHELL", "/probes/test-aliveness.py --user=healthcheck --pwd=${DICOM__HEALTH_CHECK_PASSWORD}"]
       start_period: 10s
       interval: 20s
       retries: 20
