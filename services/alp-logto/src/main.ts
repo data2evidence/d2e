@@ -194,14 +194,45 @@ async function main() {
 
     client.end();
 
-    // return resourcesRows.rowCount == 1 && appRows.rowCount == 3 && userRows.rowCount == 1;
-    console.log(`Applications created: ${appRows.rowCount}`);
-    console.log(`Resources created: ${resourcesRows.rowCount}`);
-    console.log(`Users created: ${userRows.rowCount}`);
-    console.log(`Scopes created: ${scopeRows.rowCount}`);
-    console.log(`Roles created: ${roleRows.rowCount}`);
-    console.log(`Roles-Scopes created: ${roleScopeRows.rowCount}`);
-    console.log(`Users-Roles created: ${userRoleRows.rowCount}`);
+    console.log(
+      `Applications created: ${
+        appRows.rowCount
+      } \n Applications creation successful: ${appRows.rowCount == apps.length}`
+    );
+    console.log(
+      `Resources created: ${
+        resourcesRows.rowCount
+      } \n Resources creation successful: ${resourcesRows.rowCount == 1}`
+    );
+    console.log(
+      `Users created: ${userRows.rowCount} \n Users creation successful: ${
+        userRows.rowCount == 1
+      }`
+    );
+    console.log(
+      `Scopes created: ${scopeRows.rowCount} \n Scopes creation successful: ${
+        scopeRows.rowCount == scopes.length
+      }`
+    );
+    console.log(
+      `Roles created: ${roleRows.rowCount} \n Roles creation successful: ${
+        roleRows.rowCount == roles.length
+      }`
+    );
+    console.log(
+      `Roles-Scopes created: ${
+        roleScopeRows.rowCount
+      } \n RoleScopes creation successful: ${
+        roleScopeRows.rowCount == roleScopes.length
+      }`
+    );
+    console.log(
+      `Users-Roles created: ${
+        userRoleRows.rowCount
+      } \n UserRoles creation successful: ${
+        userRoleRows.rowCount == userRoles.length
+      }`
+    );
   }, 3000);
 }
 
