@@ -4,7 +4,7 @@ import { HttpService } from '@nestjs/axios'
 import { REQUEST } from '@nestjs/core'
 import { firstValueFrom, map } from 'rxjs'
 import { Agent } from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
 import { createLogger } from '../logger'
 
 @Injectable({ scope: Scope.REQUEST })
@@ -16,8 +16,8 @@ export class PortalServerAPI {
 
   constructor(@Inject(REQUEST) request: Request, private readonly httpService: HttpService) {
     this.jwt = request.headers['authorization']
-    if (env.PORTAL_SERVER_API_URL) {
-      this.url = env.PORTAL_SERVER_API_URL
+    if (services.portalServer) {
+      this.url = services.portalServer
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.SSL_CA_CERT
@@ -37,7 +37,7 @@ export class PortalServerAPI {
     const errorMessage = 'Error while getting dataset release by id'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}dataset/release/${releaseId}`
+      const url = `${this.url}/dataset/release/${releaseId}`
       const obs = this.httpService.get(url, options)
       return firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
@@ -50,7 +50,7 @@ export class PortalServerAPI {
     const errorMessage = 'Error while getting dataset by datasetId'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}dataset/${datasetId}`
+      const url = `${this.url}/dataset/${datasetId}`
       const obs = this.httpService.get(url, options)
       return firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {

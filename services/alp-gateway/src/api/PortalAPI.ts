@@ -2,7 +2,7 @@ import { Service } from 'typedi'
 import axios, { AxiosRequestConfig } from 'axios'
 import { createLogger } from '../Logger'
 import https from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
 import { Dataset } from '../types'
 
 interface CreateDatasetInput {
@@ -51,8 +51,8 @@ export class PortalAPI {
     if (!token) {
       throw new Error('No token passed for Portal API!')
     }
-    if (env.PORTAL_BASE_URL) {
-      this.baseURL = env.PORTAL_BASE_URL
+    if (services.portalServer) {
+      this.baseURL = services.portalServer
       this.httpsAgent = new https.Agent({
         rejectUnauthorized: true,
         ca: env.GATEWAY_CA_CERT
@@ -78,7 +78,7 @@ export class PortalAPI {
   async getTenants() {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}tenant/list`
+      const url = `${this.baseURL}/tenant/list`
       const result = await axios.get(url, options)
       return result.data
     } catch (error) {
@@ -90,7 +90,7 @@ export class PortalAPI {
   async getDatasets(): Promise<Dataset[]> {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset/list`
+      const url = `${this.baseURL}/dataset/list`
       const result = await axios.get(url, options)
       return result.data
     } catch (error) {
@@ -102,7 +102,7 @@ export class PortalAPI {
   async getDataset(id: string): Promise<Dataset> {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset/${id}`
+      const url = `${this.baseURL}/dataset/${id}`
       const result = await axios.get(url, options)
       return result.data
     } catch (error) {
@@ -114,7 +114,7 @@ export class PortalAPI {
   async getStudiesAsSystemAdmin() {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset/list?role=systemAdmin`
+      const url = `${this.baseURL}/dataset/list?role=systemAdmin`
       const result = await axios.get(url, options)
       return result.data
     } catch (error) {
@@ -127,7 +127,7 @@ export class PortalAPI {
     try {
       const options = await this.getRequestConfig()
       options.params = { tokenDatasetCode }
-      const url = `${this.baseURL}dataset`
+      const url = `${this.baseURL}/dataset`
       const result = await axios.head(url, options)
       return result.status === 200
     } catch (error) {
@@ -140,7 +140,7 @@ export class PortalAPI {
   async createDataset(input: CreateDatasetInput) {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset`
+      const url = `${this.baseURL}/dataset`
       const result = await axios.post(url, input, options)
       return result.data
     } catch (error) {
@@ -152,7 +152,7 @@ export class PortalAPI {
   async copyDataset(input: CopyDatasetInput) {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset/snapshot`
+      const url = `${this.baseURL}/dataset/snapshot`
       const result = await axios.post(url, input, options)
       return result.data
     } catch (error) {

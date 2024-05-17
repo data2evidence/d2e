@@ -55,6 +55,10 @@ on:
         type: string
         required: false
         default: develop
+      dotenv-boolean:
+        description: boolean:dotenv
+        type: boolean
+        default: true
 
 env:
   DOCKER_TAG_NAME: ${{ github.event.inputs.docker-tag-textbox || 'develop' }}
@@ -79,6 +83,43 @@ jobs:
         repository: ${{ github.event.inputs.repo_full_name }}
         token: ${{ secrets.CI_PAT }}
 
+    - name: Generate dotenv
+      env:
+        DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+        DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+        OVERWRITE: true
+      run: |
+        ACTIONS_STEP_DEBUG=false
+        ./internal/scripts/get-op-ratelimit.sh
+      
+        # get env yml from 1password
+        if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
+          yarn --cwd internal op:get:$ENV_TYPE
+        else
+          echo dotenv-boolean=false | tee -a $GITHUB_STEP_SUMMARY
+        fi
+
+        # mask sensitive values
+        internal/scripts/gha-mask.sh
+
+        # generate dotenv
+        yarn gen:env
+        echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+
+        cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
+
+        [ "${{ github.event.inputs.docker-tag-develop }}" = true ] && DOCKER_TAG_NAME=develop
+        UI_DOCKER_TAG_NAME=$DOCKER_TAG_NAME
+        [ "${{ github.event.inputs.ui-docker-tag-develop }}" = true ] && UI_DOCKER_TAG_NAME=develop
+        [ "${{ github.event.inputs.ui-docker-tag-textbox }}" != '' ] && UI_DOCKER_TAG_NAME=${{ github.event.inputs.ui-docker-tag-textbox }}
+
+        echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+        echo UI_DOCKER_TAG_NAME=$UI_DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+        echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
+        echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
+
     - name: Load dotenv from 1password
       uses: 1password/load-secrets-action@v2
       id: op-load-secret
@@ -89,31 +130,27 @@ jobs:
         REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
         REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
 
-    - shell: bash
-      id: override-repo
-      name: override-repo
+    - name: 1password ratelimit end
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       run: |
-        OVERRIDE_REPO="${{ github.event.inputs.override-repo-branch-textbox }}"
-        [ ${{ github.event.inputs.override-branch-boolean }} = true ] && OVERRIDE_REPO=${{ github.ref_name }}
-        echo OVERRIDE_REPO=$OVERRIDE_REPO | tee -a "$GITHUB_OUTPUT"
+        ./internal/scripts/get-op-ratelimit.sh
 
-    - uses: actions/checkout@v4.1.1
-      name: checkout override repo
+    - name: Upload stats.yml artifact
+      uses: actions/upload-artifact@v4
+      if: always()
       with:
-        repository:  ${{ vars.OVERRIDE_REPO }}
-        token: ${{ secrets.CI_PAT }}
-        path: 'tmp'
-        sparse-checkout: 'alp-data-node-override'
-        sparse-checkout-cone-mode: false
-        ref: ${{ steps.override-repo.outputs.OVERRIDE_REPO }} # branch name
+        name: stats
+        retention-days: 30
+        path: |
+          ${{ github.job }}*.yml
 
-    - shell: bash
-      name: link files from override
-      id: link_files_from_override
-      run: |
-        pwd
-        ln -s tmp/alp-data-node-override alp-data-node-override
-        chmod 755 -R alp-data-node-override
+    - name: Login to ACR
+      uses: docker/login-action@v3.1.0
+      with:
+        registry: alpcr.azurecr.io
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
 
     - name: Cleanup dangling images and remove created/exited containers
       continue-on-error: true
@@ -135,45 +172,6 @@ jobs:
         sleep 5
     
         # docker image prune -af
-
-    - name: Login to ACR
-      uses: docker/login-action@v3.1.0
-      with:
-        registry: alpcr.azurecr.io
-        username: ${{ env.REGISTRY_USERNAME }}
-        password: ${{ env.REGISTRY_PASSWORD }}
-
-    - name: Generate dotenv
-      env:
-        DOTENV_FILE: .env.${{ env.ENV_TYPE }}
-        DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
-        OVERWRITE: true
-      run: |
-        ACTIONS_STEP_DEBUG=false
-      
-        # get env yml from 1password
-        yarn op:get:$ENV_TYPE
-
-        # mask sensitive values
-        internal/scripts/gha-mask.sh
-
-        # generate dotenv
-        yarn gen:env
-        echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-
-        cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
-
-        [ "${{ github.event.inputs.docker-tag-develop }}" = true ] && DOCKER_TAG_NAME=develop
-        UI_DOCKER_TAG_NAME=$DOCKER_TAG_NAME
-        [ "${{ github.event.inputs.ui-docker-tag-develop }}" = true ] && UI_DOCKER_TAG_NAME=develop
-        [ "${{ github.event.inputs.ui-docker-tag-textbox }}" != '' ] && UI_DOCKER_TAG_NAME=${{ github.event.inputs.ui-docker-tag-textbox }}
-
-        echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-        echo UI_DOCKER_TAG_NAME=$UI_DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-        echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
-        echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
 
     - name: docker compose up
       env:

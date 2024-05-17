@@ -89,6 +89,8 @@ export function loadLocalDatabaseCredentials(logger: Logger) {
       })
     })
   } else {
-    throw new Error('Database credentials environment variable is missing')
+    logger.warn(
+      'Database credentials environment variable is missing. Unable to load database credentials from environment variable'
+    )
   }
 }

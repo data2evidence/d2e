@@ -55,7 +55,12 @@ services:
       - 9229:9229
     environment:
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
-      NODE_ENV: production # development
+      NODE_ENV: development
+
+  alp-fhir-server:
+    build:
+      context: ./services/alp-fhir
+      dockerfile: Dockerfile
 
   alp-local-ui-file-server:
     container_name: alp-local-ui-file-server
@@ -274,12 +279,7 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
-  
-  alp-fhir-server:
-    build:
-      context: ./services/alp-fhir
-      dockerfile: Dockerfile
-
+      
   alp-logto-post-init-2:
     image: node:18.20.2-slim
     networks:
