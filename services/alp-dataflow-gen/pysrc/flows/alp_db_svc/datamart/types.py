@@ -21,8 +21,8 @@ class DatamartBaseConfig(BaseModel):
 
 
 class DATAMART_ACTIONS(Enum):
-    COPY_TO_DB = "Copy to db"  # Copy to db
-    PARQUET = "Parquet"  # Save as parquet file
+    COPY_AS_DB_SCHEMA = "Copy as db schema"  # Copy as a new db schema
+    COPY_AS_PARQUET_FILE = "Copy as parquet file"  # Copy as parquet file
 
 
 class CreateDatamartType(BaseModel):

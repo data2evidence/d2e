@@ -97,7 +97,7 @@ def datamart_copy_schema(
         else:
             columns_to_be_copied = ["*"]
 
-        if datamart_action == DATAMART_ACTIONS.COPY_TO_DB:
+        if datamart_action == DATAMART_ACTIONS.COPY_AS_DB_SCHEMA:
             try:
                 rows_inserted = db.datamart_copy_table(
                     datamart_base_config, targetSchema, columns_to_be_copied, date_filter, patients_to_be_copied)
@@ -110,7 +110,7 @@ def datamart_copy_schema(
                     sourceSchema} to {targetSchema} for table: {datamart_base_config['tableName']}""")
                 successful_tables.append(datamart_base_config["tableName"])
 
-        elif datamart_action == DATAMART_ACTIONS.PARQUET:
+        elif datamart_action == DATAMART_ACTIONS.COPY_AS_PARQUET_FILE:
             try:
                 df = db.datamart_get_copy_as_dataframe(
                     datamart_base_config, columns_to_be_copied, date_filter, patients_to_be_copied)

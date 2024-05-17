@@ -45,7 +45,7 @@ def create_datamart(options: CreateDatamartType, temp_create_data_model_options:
         raise Exception(httpResponse)
 
     # create cdm schema
-    if datamart_action == DATAMART_ACTIONS.COPY_TO_DB:
+    if datamart_action == DATAMART_ACTIONS.COPY_AS_DB_SCHEMA:
         # TODO: To be updated when create_data_model is implemented in native python in task #592
         create_data_model(
             createdata_modelType(

@@ -231,7 +231,7 @@ async def create_snapshot(options: createSnapshotType):
             await _run_db_svc_shell_command(request_type, request_url, request_body)
         elif db_dialect == DATABASE_DIALECTS.POSTGRES:
             create_datamart_options = _parse_create_datamart_options(
-                options, DATAMART_ACTIONS.COPY_TO_DB)
+                options, DATAMART_ACTIONS.COPY_AS_DB_SCHEMA)
             temp_create_data_model_options = _parse_temp_create_datamodel_options(
                 options)
             create_datamart(options=create_datamart_options,
@@ -269,7 +269,7 @@ async def create_parquet_snapshot(options: createSnapshotType):
             await _run_db_svc_shell_command(request_type, request_url, request_body)
         elif db_dialect == DATABASE_DIALECTS.POSTGRES:
             create_datamart_options = _parse_create_datamart_options(
-                options, DATAMART_ACTIONS.DATAMART_ACTIONS.PARQUET)
+                options, DATAMART_ACTIONS.DATAMART_ACTIONS.COPY_AS_PARQUET_FILE)
             temp_create_data_model_options = _parse_temp_create_datamodel_options(
                 options)
             create_datamart(options=create_datamart_options,
