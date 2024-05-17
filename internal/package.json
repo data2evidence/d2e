@@ -1,0 +1,30 @@
+{
+  "name": "d2e",
+  "version": "1.0.0",
+  "description": "Data2Evidence",
+  "license": "MIT",
+  "config": {
+    "env_names_all": "local remote base-all base-local base-remote alp-dev-sg-1 alp-dev-sg-2 alp-stg-de-1 alp-stg-sg-1 alp-stg-sg-2",
+    "env_names_dev": "local remote base-all base-local base-remote alp-dev-sg-1"
+  },
+  "scripts": {
+    "gen:env": "scripts/gen-env.sh",
+    "load:all": "yarn load:permissions && yarn load:synpuf1k && yarn load:vocab",
+    "load:permissions": "scripts/load-permissions.sh",
+    "load:synpuf1k": "scripts/load-synpuf1k.sh",
+    "load:vocab": "scripts/load-vocab.sh",
+    "op:create:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do yarn op:create $ENV_NAME; done",
+    "op:create": "scripts/create-op.sh",
+    "op:get:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
+    "op:get:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
+    "op:get:local": "for ENV_NAME in base-all base-local local; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
+    "op:get:remote": "for ENV_NAME in base-all base-remote $ENV_NAME; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:get; done",
+    "op:get": "scripts/get-op.sh",
+    "op:put:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
+    "op:put:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
+    "op:put": "scripts/put-op.sh",
+    "get:drivers": "scripts/get-drivers.sh",
+    "sort:dc1": "scripts/sort-dc.mjs --backup --force",
+    "sort:dc2": "scripts/sort-dc.mjs --update"
+  }
+}
