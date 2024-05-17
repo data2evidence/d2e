@@ -1,10 +1,14 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ConceptService } from './concept.service';
 import { SupportedFhirVersion } from '../../utils/types';
+import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 
 @Controller()
 export class FhirController {
-  constructor(private readonly appService: ConceptService) {}
+  constructor(
+    private readonly appService: ConceptService,
+    private readonly hybridSearchConfigService: HybridSearchConfigService,
+  ) {}
 
   @Get(`${SupportedFhirVersion}/valueset/\\$expand`)
   async getConcepts(
@@ -19,6 +23,7 @@ export class FhirController {
       count,
       datasetId,
       code,
+      this.hybridSearchConfigService,
       JSON.parse(filter),
     );
   }

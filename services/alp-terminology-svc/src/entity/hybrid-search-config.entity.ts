@@ -17,6 +17,9 @@ export class HybridSearchConfig {
   @Column('real', { name: 'semantic_ratio' })
   semanticRatio: number;
 
+  @Column({ name: 'source' })
+  source: string;
+
   @Column({ name: 'model' })
   model: string;
 
