@@ -183,25 +183,26 @@ async def update_datamodel(options: updateDataModelType):
 
 
 def _parse_create_datamart_options(options: createSnapshotType, datamart_action_type: str) -> CreateDatamartType:
-    return CreateDatamartType.parse_obj({
-        "target_schema": options.schema_name,
-        "source_schema": options.source_schema,
-        "data_model": options.data_model,
-        "database_code": options.database_code,
-        "snapshot_copy_config": options.snapshot_copy_config,
-        "plugin_changelog_filepath": _get_custom_changelog_filepath(options.db_dialect, options.changelog_filepath),
-        "plugin_classpath": _get_custom_classpath(options.flow_name),
-        "datamart_action": datamart_action_type
-    })
+    return CreateDatamartType(
+        target_schema=options.schema_name,
+        source_schema=options.source_schema,
+        data_model=options.data_model,
+        database_code=options.database_code,
+        snapshot_copy_config=options.snapshot_copy_config,
+        plugin_changelog_filepath=_get_custom_changelog_filepath(
+            options.dialect, options.changelog_filepath),
+        plugin_classpath=_get_custom_classpath(options.flow_name),
+        datamart_action=datamart_action_type
+    )
 
 
 def _parse_temp_create_datamodel_options(options: createSnapshotType) -> TempCreateDataModelType:
-    return TempCreateDataModelType.parse_obj({
-        "dialect": options.db_dialect,
-        "changelog_filepath": options.changelog_filepath,
-        "flow_name": options.flow_name,
-        "vocab_schema": options.vocab_schema,
-    })
+    return TempCreateDataModelType(
+        dialect=options.dialect,
+        changelog_filepath=options.changelog_filepath,
+        flow_name=options.flow_name,
+        vocab_schema=options.vocab_schema,
+    )
 
 
 @task
@@ -224,8 +225,7 @@ async def create_snapshot(options: createSnapshotType):
         request_body = _db_svc_flowrun_params(
             request_body, db_dialect, flow_name, changelog_filepath)
 
-        request_url = f"""/alpdb/{db_dialect}/database/{database_code}/data-model/{
-            data_model}/schemasnapshot/{schema_name}?source_schema={source_schema}"""
+        request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schemasnapshot/{schema_name}?source_schema={source_schema}"
 
         if db_dialect == DATABASE_DIALECTS.HANA:
             await _run_db_svc_shell_command(request_type, request_url, request_body)
