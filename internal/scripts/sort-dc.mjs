@@ -10,7 +10,12 @@
 
 $.verbose = false;
 // $.verbose = true;
+
 const domain = "${TLS__INTERNAL__DOMAIN:-alp.local}";
+
+let git_base_dir=(await $`git rev-parse --show-toplevel`).stdout.trim()
+cd(git_base_dir)
+
 let dcFiles = await glob(["docker-compose*.yml"], { ignore: ["**/*private*"] });
 // dcFiles= ["docker-compose.yml"]
 if (argv.files) {
