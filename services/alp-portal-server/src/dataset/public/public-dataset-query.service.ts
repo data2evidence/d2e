@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { IDatasetResponseDto } from '../../types'
+import { Brackets } from 'typeorm'
+import { IDatasetResponseDto, IDatasetSearchFilterDto } from '../../types'
 import { TenantService } from '../../tenant/tenant.service'
 import { DatasetRepository } from '../repository'
 
@@ -12,14 +13,16 @@ const SWAP_TO = {
 export class PublicDatasetQueryService {
   constructor(private readonly tenantService: TenantService, private readonly datasetRepo: DatasetRepository) {}
 
-  async getDatasets() {
-    const datasets = await this.datasetRepo
+  async getDatasets(queryParams?: IDatasetSearchFilterDto) {
+    const { searchText } = queryParams
+
+    const query = this.datasetRepo
       .createQueryBuilder('dataset')
       .leftJoin('dataset.datasetDetail', 'datasetDetail')
       .leftJoin('dataset.tags', 'tag')
       .leftJoin('dataset.attributes', 'attribute')
       .leftJoin('attribute.attributeConfig', 'attributeConfig')
-      .where('dataset.visibilityStatus = :visibilityStatus', { visibilityStatus: 'PUBLIC' })
+      .andWhere('dataset.visibilityStatus = :visibilityStatus', { visibilityStatus: 'PUBLIC' })
       .select([
         'dataset.id',
         'dataset.tokenDatasetCode',
@@ -38,7 +41,24 @@ export class PublicDatasetQueryService {
         'attributeConfig.dataType',
         'attributeConfig.isDisplayed'
       ])
-      .getMany()
+
+    if (searchText) {
+      const tsQuery = this.convertToTsqueryFormat(this.sanitizeTsQueryInput(searchText))
+      if (tsQuery) {
+        query
+          .setParameter('searchText', tsQuery)
+          .andWhere(
+            new Brackets(qb => {
+              qb.where('"datasetDetail"."search_tsv" @@ to_tsquery(\'english\', :searchText)').orWhere(
+                '"attribute"."search_tsv" @@ to_tsquery(\'english\', :searchText)'
+              )
+            })
+          )
+          .orderBy('ts_rank("datasetDetail"."search_tsv", to_tsquery(\'english\', :searchText))', 'DESC')
+      }
+    }
+
+    const datasets = await query.getMany()
 
     const tenant = this.tenantService.getTenant()
 
@@ -75,5 +95,15 @@ export class PublicDatasetQueryService {
       }
     }
     return <T>object
+  }
+
+  private sanitizeTsQueryInput(input: string) {
+    return input.replace(/[^a-zA-Z0-9\s]/g, '').trim()
+  }
+
+  private convertToTsqueryFormat(input: string) {
+    const normalizedInput = input.replace(/\s+/g, ' ')
+    const terms = normalizedInput.split(' ').filter(term => term.length > 0)
+    return terms.join(' | ')
   }
 }

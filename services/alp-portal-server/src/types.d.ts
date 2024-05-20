@@ -165,6 +165,8 @@ export interface IDatasetSearchDto {
   tokenDatasetCode: string
 }
 
+export interface IPublicDatasetQueryDto extends IDatasetSearchFilterDto {}
+
 export type DatasetQueryRole = (typeof DATASET_QUERY_ROLES)[number]
 
 export interface IDatasetQueryDto extends IDatasetSearchFilterDto, IDatasetFilterParamsDto {
