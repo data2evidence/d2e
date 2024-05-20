@@ -516,6 +516,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
+    path: '^/dataflow-mgmt/prefect/analysis-run/(.*)',
+    scopes: ['dataflowmgmt.prefect.flowRun.add'],
+    httpMethods: ['POST']
+  },
+  {
     path: '^/dataflow-mgmt/prefect/task-run/(.*)',
     scopes: ['dataflowmgmt.prefect.taskRun.read'],
     httpMethods: ['GET']
