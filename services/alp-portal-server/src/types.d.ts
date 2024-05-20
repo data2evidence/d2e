@@ -167,11 +167,11 @@ export interface IDatasetSearchDto {
 
 export type DatasetQueryRole = (typeof DATASET_QUERY_ROLES)[number]
 
-export interface IDatasetQueryDto extends IDatasetTenantFilterDto, IDatasetFilterParamsDto {
+export interface IDatasetQueryDto extends IDatasetSearchFilterDto, IDatasetFilterParamsDto {
   role?: DatasetQueryRole
 }
-export interface IDatasetTenantFilterDto {
-  tenants?: string[]
+export interface IDatasetSearchFilterDto {
+  searchText?: string
 }
 export interface IDatasetFilterParamsDto {
   age?: {
