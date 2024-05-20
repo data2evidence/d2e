@@ -1,13 +1,12 @@
+import importlib
 from prefect_shell import ShellOperation
 from prefect import get_run_logger
 from dao.DBDao import DBDao
 from utils.types import PG_TENANT_USERS, createDataModelType
 from flows.alp_db_svc.datamart.datamart import datamart_copy_schema
 from flows.alp_db_svc.datamart.types import DATAMART_ACTIONS, CreateDatamartType, TempCreateDataModelType
-from flows.alp_db_svc.flow import create_datamodel
 
-
-def create_datamart(options: CreateDatamartType, temp_create_data_model_options: TempCreateDataModelType):
+async def create_datamart(options: CreateDatamartType, temp_create_data_model_options: TempCreateDataModelType):
     logger = get_run_logger()
     target_schema = options.target_schema
     source_schema = options.source_schema
@@ -36,11 +35,12 @@ def create_datamart(options: CreateDatamartType, temp_create_data_model_options:
         error_message = f"Create snapshot failure. Source schema: {source_schema} not found."
         logger.error(error_message)
         raise Exception(error_message)
-
+        
     # create cdm schema
     if datamart_action == DATAMART_ACTIONS.COPY_AS_DB_SCHEMA:
+        dbsvc_flow_module = importlib.import_module('flows.alp_db_svc.flow')
         # TODO: To be updated when create_data_model is implemented in native python in task #592
-        create_datamodel(
+        await dbsvc_flow_module.create_datamodel.fn(
             createDataModelType(
                 database_code=database_code,
                 data_model=data_model,

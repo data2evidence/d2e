@@ -1,6 +1,6 @@
 import os
 from time import time
-from prefect import flow, task, get_run_logger
+from prefect import get_run_logger
 import pandas as pd
 from typing import List
 from flows.alp_db_svc.datamart.types import SnapshotCopyTableConfig, SnapshotCopyConfig, DatamartBaseConfig, DATAMART_ACTIONS
@@ -67,7 +67,6 @@ def _upload_dataframe_as_parquet_to_object_store(target_schema: str, table_name:
             bucket_name}/{file_name}""")
 
 
-@task
 def datamart_copy_schema(
     db: DBDao,
     sourceSchema,

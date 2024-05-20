@@ -4,7 +4,7 @@ from prefect_shell import ShellOperation
 import json
 import os
 import site
-from alpconnection.dbutils import get_db_svc_endpoint_dialect
+from alpconnection.dbutils import get_db_svc_endpoint_dialect, POSTGRES_DIALECT_OPTIONS
 from utils.types import (PG_TENANT_USERS, AlpDBSvcOptionsType,
                          requestType, internalPluginType,
                          createDataModelType, updateDataModelType,
@@ -182,7 +182,7 @@ async def update_datamodel(options: updateDataModelType):
         raise e
 
 
-def _parse_create_datamart_options(options: createSnapshotType, datamart_action_type: str) -> CreateDatamartType:
+def _parse_create_datamart_options(options: createSnapshotType, dialect : str, datamart_action_type: str, ) -> CreateDatamartType:
     return CreateDatamartType(
         target_schema=options.schema_name,
         source_schema=options.source_schema,
@@ -190,15 +190,15 @@ def _parse_create_datamart_options(options: createSnapshotType, datamart_action_
         database_code=options.database_code,
         snapshot_copy_config=options.snapshot_copy_config,
         plugin_changelog_filepath=_get_custom_changelog_filepath(
-            options.dialect, options.changelog_filepath),
+            dialect, options.changelog_filepath),
         plugin_classpath=_get_custom_classpath(options.flow_name),
         datamart_action=datamart_action_type
     )
 
 
-def _parse_temp_create_datamodel_options(options: createSnapshotType) -> TempCreateDataModelType:
+def _parse_temp_create_datamodel_options(options: createSnapshotType, dialect : str) -> TempCreateDataModelType:
     return TempCreateDataModelType(
-        dialect=options.dialect,
+        dialect=dialect,
         changelog_filepath=options.changelog_filepath,
         flow_name=options.flow_name,
         vocab_schema=options.vocab_schema,
@@ -229,12 +229,14 @@ async def create_snapshot(options: createSnapshotType):
 
         if db_dialect == DATABASE_DIALECTS.HANA:
             await _run_db_svc_shell_command(request_type, request_url, request_body)
-        elif db_dialect == DATABASE_DIALECTS.POSTGRES:
+        # TODO: After unifying envConverter postgres dialect value, to use DATABASE_DIALECTS.POSTGRES instead of POSTGRES_DIALECT_OPTIONS
+        # elif db_dialect == DATABASE_DIALECTS.POSTGRES:
+        elif db_dialect in POSTGRES_DIALECT_OPTIONS:
             create_datamart_options = _parse_create_datamart_options(
-                options, DATAMART_ACTIONS.COPY_AS_DB_SCHEMA)
+                options, db_dialect, DATAMART_ACTIONS.COPY_AS_DB_SCHEMA)
             temp_create_data_model_options = _parse_temp_create_datamodel_options(
-                options)
-            create_datamart(options=create_datamart_options,
+                options, db_dialect)
+            await create_datamart(options=create_datamart_options,
                             temp_create_data_model_options=temp_create_data_model_options)
         else:
             raise Exception(
@@ -267,12 +269,14 @@ async def create_parquet_snapshot(options: createSnapshotType):
 
         if db_dialect == DATABASE_DIALECTS.HANA:
             await _run_db_svc_shell_command(request_type, request_url, request_body)
-        elif db_dialect == DATABASE_DIALECTS.POSTGRES:
+        # TODO: After unifying envConverter postgres dialect value, to use DATABASE_DIALECTS.POSTGRES instead of POSTGRES_DIALECT_OPTIONS
+        # elif db_dialect == DATABASE_DIALECTS.POSTGRES:
+        elif db_dialect in POSTGRES_DIALECT_OPTIONS:
             create_datamart_options = _parse_create_datamart_options(
-                options, DATAMART_ACTIONS.DATAMART_ACTIONS.COPY_AS_PARQUET_FILE)
+                options, db_dialect, DATAMART_ACTIONS.COPY_AS_PARQUET_FILE)
             temp_create_data_model_options = _parse_temp_create_datamodel_options(
-                options)
-            create_datamart(options=create_datamart_options,
+                options, db_dialect)
+            await create_datamart(options=create_datamart_options,
                             temp_create_data_model_options=temp_create_data_model_options)
         else:
             raise Exception(

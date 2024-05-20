@@ -24,16 +24,15 @@ class DATAMART_ACTIONS(Enum):
     COPY_AS_DB_SCHEMA = "Copy as db schema"  # Copy as a new db schema
     COPY_AS_PARQUET_FILE = "Copy as parquet file"  # Copy as parquet file
 
-
 class CreateDatamartType(BaseModel):
     target_schema: str
     source_schema: str
     data_model: str
     database_code: str
-    snapshot_copy_config: SnapshotCopyConfig
+    snapshot_copy_config: Optional[SnapshotCopyConfig]
     plugin_changelog_filepath: str
     plugin_classpath: str
-    datamart_action: str
+    datamart_action: DATAMART_ACTIONS
 
 
 class TempCreateDataModelType(BaseModel):
