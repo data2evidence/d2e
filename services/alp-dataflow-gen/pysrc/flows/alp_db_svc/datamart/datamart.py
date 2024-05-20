@@ -16,20 +16,9 @@ def _parse_snapshot_copy_config(snapshotCopyConfig: SnapshotCopyConfig | None) -
         table_config = []
         patients_to_be_copied = []
     else:
-        if "timestamp" in snapshotCopyConfig:
-            date_filter = snapshotCopyConfig["timestamp"]
-        else:
-            date_filter = ""
-
-        if "tableConfig" in snapshotCopyConfig:
-            table_config = snapshotCopyConfig["tableConfig"]
-        else:
-            table_config = []
-
-        if "patientsToBeCopied" in snapshotCopyConfig:
-            patients_to_be_copied = snapshotCopyConfig["patientsToBeCopied"]
-        else:
-            patients_to_be_copied = []
+        date_filter = "" if snapshotCopyConfig.timestamp is None else snapshotCopyConfig.timestamp 
+        table_config = [] if snapshotCopyConfig.tableConfig is None else snapshotCopyConfig.tableConfig 
+        patients_to_be_copied = [] if snapshotCopyConfig.patientsToBeCopied is None else snapshotCopyConfig.patientsToBeCopied 
 
     return date_filter, table_config, patients_to_be_copied
 
