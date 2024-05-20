@@ -24,14 +24,10 @@ export class DbService {
       .createQueryBuilder('db')
       .leftJoinAndSelect('db.credentials', 'dbCredential')
       .leftJoinAndSelect('db.vocabSchemas', 'dbVocabSchema')
-
-    if (isClientCredentials) {
-      query
-        .leftJoinAndSelect('db.extra', 'dbExtra')
-        .where('dbCredential.serviceScope = :serviceScope AND dbExtra.serviceScope = :serviceScope', {
-          serviceScope: SERVICE_SCOPE.INTERNAL
-        })
-    }
+      .leftJoinAndSelect('db.extra', 'dbExtra')
+      .where('dbCredential.serviceScope = :serviceScope AND dbExtra.serviceScope = :serviceScope', {
+        serviceScope: SERVICE_SCOPE.INTERNAL
+      })
 
     const result = await query.select(this.getDbColumns(isClientCredentials)).getMany()
     return result.map(r => {
@@ -172,10 +168,11 @@ export class DbService {
       'dbCredential.username',
       'dbCredential.userScope',
       'dbCredential.serviceScope',
-      'dbVocabSchema.name'
+      'dbVocabSchema.name',
+      'dbExtra.value'
     ]
     if (hasSecret) {
-      return [...baseColumns, 'dbExtra.serviceScope', 'dbExtra.value', 'dbCredential.password', 'dbCredential.salt']
+      return [...baseColumns, 'dbExtra.serviceScope', 'dbCredential.password', 'dbCredential.salt']
     }
     return baseColumns
   }
