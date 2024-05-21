@@ -22,7 +22,7 @@ export class PublicDatasetQueryService {
       .leftJoin('dataset.tags', 'tag')
       .leftJoin('dataset.attributes', 'attribute')
       .leftJoin('attribute.attributeConfig', 'attributeConfig')
-      .andWhere('dataset.visibilityStatus = :visibilityStatus', { visibilityStatus: 'PUBLIC' })
+      .where('dataset.visibilityStatus = :visibilityStatus', { visibilityStatus: 'PUBLIC' })
       .select([
         'dataset.id',
         'dataset.tokenDatasetCode',
