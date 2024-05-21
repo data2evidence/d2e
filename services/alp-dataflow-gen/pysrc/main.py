@@ -7,7 +7,6 @@ from flows.strategus.flow import execute_strategus
 from flows.portal_server.flow import update_dataset_attributes
 from utils.types import (
     AlpDBSvcOptionsType,
-    meilisearchAddIndexType,
     datasetAttributesType
 )
 
@@ -35,7 +34,3 @@ def execute_strategus_flow(analysis_spec, options):
 @flow(log_prints=True, task_runner=SequentialTaskRunner)
 def update_dataset_attributes_flow(options: datasetAttributesType):
     update_dataset_attributes(options)
-    
-@flow(log_prints=True, task_runner=SequentialTaskRunner)
-def execute_meilisearch_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
-    execute_add_index_with_embeddings_flow(options)

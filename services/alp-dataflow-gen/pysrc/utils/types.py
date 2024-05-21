@@ -84,6 +84,13 @@ class meilisearchAddIndexType(BaseModel):
     databaseCode: str
     vocabSchemaName: str
     tableName: str
+    chunk_size: int
+    meilisearch_index_config: Dict
+    
+class meilisearchAddIndexWithEmbeddingsType(BaseModel):
+    databaseCode: str
+    vocabSchemaName: str
+    tableName: str
     token: str
     chunk_size: int
     meilisearch_index_config: Dict

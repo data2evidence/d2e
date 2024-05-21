@@ -4,7 +4,7 @@ from prefect import get_run_logger
 from datetime import date, datetime
 import re
 from api.MeilisearchSvcAPI import MeilisearchSvcAPI
-from utils.types import meilisearchAddIndexType
+from utils.types import meilisearchAddIndexType, meilisearchAddIndexWithEmbeddingsType
 from dao.VocabDao import VocabDao
 from itertools import islice
 from transformers import AutoTokenizer, AutoModel
@@ -128,12 +128,14 @@ def execute_add_index_flow(options: meilisearchAddIndexType):
     finally:
         conn.close()
 
-def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexType):
+def execute_add_index_with_embeddings_flow(options: meilisearchAddIndexWithEmbeddingsType):
     logger = get_run_logger()
     database_code = options.databaseCode
     vocab_schema_name = options.vocabSchemaName
     table_name = options.tableName
     token = options.token
+    CHUNK_SIZE = options.chunk_size
+    MEILISEARCH_INDEX_CONFIG = options.meilisearch_index_config
 
     # Check if options.vocabSchemaName is valid
     if not re.match(r"^\w+$", vocab_schema_name):
