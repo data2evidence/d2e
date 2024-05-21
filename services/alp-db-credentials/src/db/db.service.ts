@@ -25,9 +25,14 @@ export class DbService {
       .leftJoinAndSelect('db.credentials', 'dbCredential')
       .leftJoinAndSelect('db.vocabSchemas', 'dbVocabSchema')
       .leftJoinAndSelect('db.extra', 'dbExtra')
-      .where('dbCredential.serviceScope = :serviceScope AND dbExtra.serviceScope = :serviceScope', {
-        serviceScope: SERVICE_SCOPE.INTERNAL
-      })
+      .where(
+        `dbCredential.serviceScope = :serviceScope ${
+          isClientCredentials ? ' AND dbExtra.serviceScope = :serviceScope' : ''
+        }`,
+        {
+          serviceScope: SERVICE_SCOPE.INTERNAL
+        }
+      )
 
     const result = await query.select(this.getDbColumns(isClientCredentials)).getMany()
     return result.map(r => {
@@ -43,14 +48,20 @@ export class DbService {
   async get(id: string, serviceScope: string) {
     const maskedValue = '*******'
     const { grantType } = getReqContext()
+    const isClientCredentials = grantType === 'client_credentials'
     const db = await this.dbRepo
       .createQueryBuilder('db')
       .leftJoinAndSelect('db.credentials', 'dbCredential')
       .leftJoinAndSelect('db.extra', 'dbExtra')
-      .where('db.id = :id AND dbCredential.serviceScope = :serviceScope AND dbExtra.serviceScope = :serviceScope', {
-        id,
-        serviceScope
-      })
+      .where(
+        `db.id = :id AND dbCredential.serviceScope = :serviceScope ${
+          isClientCredentials ? ' AND dbExtra.serviceScope = :serviceScope' : ''
+        }`,
+        {
+          id,
+          serviceScope
+        }
+      )
       .select(this.getDbColumns(true))
       .getOne()
 
@@ -58,7 +69,7 @@ export class DbService {
       return null
     }
 
-    if (grantType !== 'client_credentials') {
+    if (!isClientCredentials) {
       db.credentials.forEach(c => {
         c.password = maskedValue
         delete c.salt
