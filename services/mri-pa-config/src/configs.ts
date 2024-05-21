@@ -18,6 +18,7 @@ const Env = z.object({
   __MRI_SAC_EXTENSION: z.string().optional(),
   TLS__INTERNAL__KEY: z.string(),
   TLS__INTERNAL__CRT: z.string(),
+  PG__CREDENTIALS: z.string()
 });
 
 const result = Env.safeParse(process.env);

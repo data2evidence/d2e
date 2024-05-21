@@ -60,7 +60,8 @@ const main = () => {
       cdwService = cdwService.filter((db) => db.dialect == 'hana')
       analyticsCredential = cdwService[0];
     }
-    configCredentials = JSON.parse(env.CONFIG_CONNECTION);
+    
+    configCredentials = JSON.parse(env.PG__CREDENTIALS);
   }
 
   EnvVarUtils.loadDevSettings();

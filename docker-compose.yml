@@ -49,6 +49,8 @@ x-envs:
     PG__MAX_POOL: 10
     PG__MIN_POOL: 0
     PG__PORT: ${PG_PORT:-5432}
+    PG__IDLE_TIMEOUT_IN_MS: 300000
+    PG__DIALECT: postgresql
   plugins: &x-plugins |
     {
       "researcher": [
@@ -282,43 +284,27 @@ services:
     environment:
       <<:
         - *x-tls
+        - *x-pg
+      PG__CREDENTIALS: |-
+        {
+          "database": "${PG__DB_NAME}",
+          "dialect": "${PG__DIALECT}",
+          "host": "${PG__HOST}",
+          "idleTimeoutMillis": {PG__IDLE_TIMEOUT_IN_MS},
+          "max": {PG__MAX_POOL},
+          "port": "${PG__PORT}",
+          "schema": "${PG_SCHEMA}",
+          "user": "${PG_USER}",
+          "password": "${PG_PASSWORD}"
+        }
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PG_ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
       PG_ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG_DB_NAME: ${PG_DB_NAME:-alp}
-      PG_DEBUG: false
-      PG_HOST: ${PG_HOST:-alp-minerva-postgres-1}
-      PG_IDLE_TIMEOUT_IN_MS: 30000
-      PG_MAX_POOL: 5
-      PG_MIN_POOL: 1
       PG_PASSWORD: ${PG_WRITE_PASSWORD}
-      PG_PORT: ${PG_PORT:-5432}
       PG_SCHEMA: qe_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       PORT: 41110
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "database": "${PG_DB_NAME:-alp}",
-            "dialect": "postgresql",
-            "host": "${PG_HOST:-alp-minerva-postgres-1}",
-            "idleTimeoutMillis": 300000,
-            "max": 50,
-            "password": "${PG_WRITE_PASSWORD}",
-            "port": "${PG_PORT:-5432}",
-            "schema": "qe_config",
-            "user": "${PG_WRITE_USER:-alp_pg_write_user}"
-           },
-           "name": "postgres-mridb",
-           "tags": [
-            "config"
-           ]
-          }
-         ]
-        }
       isTestEnv: ${isTestEnv}
       sqlOnly: false
 
@@ -738,18 +724,22 @@ services:
         - *x-converter
         - *x-routes
         - *x-tls
-      CONFIG_CONNECTION: |-
+        - *x-pg
+      PG__CREDENTIALS: |-
         {
-         "database": "${PG_DB_NAME:-alp}",
-         "dialect": "postgresql",
-         "host": "${PG_HOST:-alp-minerva-postgres-1}",
-         "idleTimeoutMillis": 300000,
-         "max": 50,
-         "password": "${PG_WRITE_PASSWORD}",
-         "port": "${PG_PORT:-5432}",
-         "schema": "cdw_config",
-         "user": "${PG_WRITE_USER:-alp_pg_write_user}"
+          "database": "${PG__DB_NAME}",
+          "dialect": "${PG__DIALECT}",
+          "host": "${PG__HOST}",
+          "idleTimeoutMillis": {PG__IDLE_TIMEOUT_IN_MS},
+          "max": {PG__MAX_POOL},
+          "port": "${PG__PORT}",
+          "schema": "${PG_SCHEMA}",
+          "user": "${PG_USER}",
+          "password": "${PG_PASSWORD}"
         }
+      PG_PASSWORD: ${PG_WRITE_PASSWORD}
+      PG_SCHEMA: cdw_config
+      PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41114
@@ -956,51 +946,25 @@ services:
     environment:
       <<:
         - *x-tls
+        - *x-pg
+      PG__CREDENTIALS: |-
+        {
+          "database": "${PG__DB_NAME}",
+          "dialect": "${PG__DIALECT}",
+          "host": "${PG__HOST}",
+          "idleTimeoutMillis": {PG__IDLE_TIMEOUT_IN_MS},
+          "max": {PG__MAX_POOL},
+          "port": "${PG__PORT}",
+          "schema": "${PG_SCHEMA}",
+          "user": "${PG_USER}",
+          "password": "${PG_PASSWORD}"
+        }
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41113
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "database": "${PG_DB_NAME:-alp}",
-            "dialect": "postgresql",
-            "host": "${PG_HOST:-alp-minerva-postgres-1}",
-            "idleTimeoutMillis": 300000,
-            "max": 50,
-            "password": "${PG_WRITE_PASSWORD}",
-            "port": "${PG_PORT:-5432}",
-            "schema": "cdw_config",
-            "user": "${PG_WRITE_USER:-alp_pg_write_user}"
-           },
-           "name": "postgres-mridb",
-           "tags": [
-            "config"
-           ]
-          },
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest"
-           ]
-          }
-         ]
-        }
+      PG_PASSWORD: ${PG_WRITE_PASSWORD}
+      PG_SCHEMA: cdw_config
+      PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       __MRI_SAC_EXTENSION: ENABLED
       isTestEnv: ${isTestEnv}
 
@@ -1145,7 +1109,8 @@ services:
     environment:
       <<:
         - *x-tls
-      POSTGRES_DB: ${PG_DB_NAME:-alp}
+        - *x-pg
+      POSTGRES_DB: ${PG__DB_NAME}
       POSTGRES_PASSWORD: ${PG_SUPER_PASSWORD}
 
   alp-minerva-ps-config-svc:
@@ -1185,51 +1150,25 @@ services:
     environment:
       <<:
         - *x-tls
+        - *x-pg
+      PG__CREDENTIALS: |-
+        {
+          "database": "${PG__DB_NAME}",
+          "dialect": "${PG__DIALECT}",
+          "host": "${PG__HOST}",
+          "idleTimeoutMillis": {PG__IDLE_TIMEOUT_IN_MS},
+          "max": {PG__MAX_POOL},
+          "port": "${PG__PORT}",
+          "schema": "${PG_SCHEMA}",
+          "user": "${PG_USER}",
+          "password": "${PG_PASSWORD}"
+        }
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41115
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "database": "${PG_DB_NAME:-alp}",
-            "dialect": "postgresql",
-            "host": "${PG_HOST:-alp-minerva-postgres-1}",
-            "idleTimeoutMillis": 300000,
-            "max": 50,
-            "password": "${PG_WRITE_PASSWORD}",
-            "port": "${PG_PORT:-5432}",
-            "schema": "cdw_config",
-            "user": "${PG_WRITE_USER:-alp_pg_write_user}"
-           },
-           "name": "postgres-mridb",
-           "tags": [
-            "config"
-           ]
-          },
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest"
-           ]
-          }
-         ]
-        }
+      PG_PASSWORD: ${PG_WRITE_PASSWORD}
+      PG_SCHEMA: cdw_config
+      PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       __MRI_SAC_EXTENSION: ENABLED
       isTestEnv: false
 
@@ -1340,17 +1279,14 @@ services:
         - *x-converter
         - *x-tls
         - *x-routes
+        - *x-pg
       FHIR_TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}11
       LOCAL_DEBUG: "false"
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
       NODE_ENV: development
-      PG_DATABASE: ${PG_DB_NAME:-alp}
-      PG_HOST: ${PG_HOST:-alp-minerva-postgres-1}
       PG_MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
       PG_MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG_MAX_POOL: "10"
       PG_PASSWORD: ${PG_WRITE_PASSWORD}
-      PG_PORT: ${PG_PORT:-5432}
       PG_SCHEMA: terminology
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       TERMINOLOGY_SVC__LOG_LEVEL: info
@@ -1455,16 +1391,23 @@ services:
     environment:
       <<:
         - *x-tls
+        - *x-pg
+      PG__CREDENTIALS: |-
+        {
+          "database": "${PG__DB_NAME}",
+          "dialect": "${PG__DIALECT}",
+          "host": "${PG__HOST}",
+          "idleTimeoutMillis": {PG__IDLE_TIMEOUT_IN_MS},
+          "max": {PG__MAX_POOL},
+          "port": "${PG__PORT}",
+          "schema": "${PG_SCHEMA}",
+          "user": "${PG_USER}",
+          "password": "${PG_PASSWORD}"
+        }
       NODE_ENV: development
       PG_ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
       PG_ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG_DATABASE: ${PG_DB_NAME:-alp}
-      PG_DEBUG: ${PG_DEBUG:-1}
-      PG_HOST: ${PG_HOST:-alp-minerva-postgres-1}
-      PG_MAX_POOL: 5
-      PG_MIN_POOL: 1
       PG_PASSWORD: ${PG_WRITE_PASSWORD}
-      PG_PORT: ${PG_PORT:-5432}
       PG_SCHEMA: cdw_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
 

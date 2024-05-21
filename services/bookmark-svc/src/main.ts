@@ -5,7 +5,6 @@ import {
   DBConnectionUtil as dbConnectionUtil,
   getUser,
   Logger,
-  QueryObject,
   EnvVarUtils,
   healthCheckMiddleware,
   Constants,
@@ -15,12 +14,9 @@ import {
 import express from 'express'
 import https from 'https'
 import helmet from 'helmet'
-import path from 'path'
-import * as xsenv from '@sap/xsenv'
 import noCacheMiddleware from './middleware/NoCache'
 import timerMiddleware from './middleware/Timer'
 import { Container } from 'typedi'
-import { useContainer } from 'class-validator'
 import Routes from './routes'
 
 import { IMRIRequest } from './types'
@@ -42,7 +38,7 @@ const initRoutes = async (app: express.Application) => {
     app.use(timerMiddleware())
   }
 
-  configCredentials = xsenv.cfServiceCredentials({ tag: 'config' })
+  configCredentials = JSON.parse(env.PG__CREDENTIALS)
   app.use(async (req: IMRIRequest, res, next) => {
     if (!utils.isHealthProbesReq(req)) {
       log.debug(`🚀 ~ file: main.ts ~ line 141 ~ app.use ~ req.headers: ${JSON.stringify(req.headers, null, 2)}`)
