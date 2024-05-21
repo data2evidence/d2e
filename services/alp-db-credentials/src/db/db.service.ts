@@ -34,7 +34,7 @@ export class DbService {
       const { extra, vocabSchemas, ...entity } = r
       return {
         ...entity,
-        extra: extra && extra[0].value,
+        extra,
         vocabSchemas: vocabSchemas.map(vocabSchema => vocabSchema.name)
       }
     })
@@ -169,10 +169,11 @@ export class DbService {
       'dbCredential.userScope',
       'dbCredential.serviceScope',
       'dbVocabSchema.name',
-      'dbExtra.value'
+      'dbExtra.value',
+      'dbExtra.serviceScope'
     ]
     if (hasSecret) {
-      return [...baseColumns, 'dbExtra.serviceScope', 'dbCredential.password', 'dbCredential.salt']
+      return [...baseColumns, , 'dbCredential.password', 'dbCredential.salt']
     }
     return baseColumns
   }
