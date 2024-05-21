@@ -170,13 +170,6 @@ class DATABASE_DIALECTS(Enum):
     HANA = "hana"
     POSTGRES = "postgres"
 
-class Terminology_HybridSearchConfig(BaseModel):
-    id: int
-    isEnabled: bool
-    semanticRatio: int
-    source: str
-    model: str
-
 class entityCountDistributionType(BaseModel):
     OBSERVATION_PERIOD_COUNT: str
     DEATH_COUNT: str

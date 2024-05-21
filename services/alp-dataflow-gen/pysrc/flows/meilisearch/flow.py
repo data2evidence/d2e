@@ -4,7 +4,7 @@ from prefect import get_run_logger
 from datetime import date, datetime
 import re
 from api.MeilisearchSvcAPI import MeilisearchSvcAPI
-from utils.types import Terminology_HybridSearchConfig, meilisearchAddIndexType
+from utils.types import meilisearchAddIndexType
 from dao.VocabDao import VocabDao
 from flows.meilisearch.config import CHUNK_SIZE, MEILISEARCH_INDEX_CONFIG
 from itertools import islice
