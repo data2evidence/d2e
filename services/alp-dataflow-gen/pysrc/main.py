@@ -28,11 +28,6 @@ def execute_seed_postgres_data_flow(database_code, vocab_schema_name, cdm_schema
 
 
 @flow(log_prints=True, task_runner=SequentialTaskRunner)
-def execute_meilisearch_add_index_flow(options: meilisearchAddIndexType):
-    execute_add_index_flow(options)
-
-
-@flow(log_prints=True, task_runner=SequentialTaskRunner)
 def execute_strategus_flow(analysis_spec, options):
     execute_strategus(analysis_spec, options)
 
