@@ -18,7 +18,8 @@ export interface IDbDto {
 
 export interface IDbUpdateDto {
   id: string
-  vocabSchemas: string[]
+  vocabSchemas?: string[]
+  extra?: IDbExtraDto
 }
 
 export interface IDbCredentialUpdateDto {
