@@ -43,7 +43,6 @@ export class DbService {
   async get(id: string, serviceScope: string) {
     const maskedValue = '*******'
     const { grantType } = getReqContext()
-    const isClientCredentials = grantType === 'client_credentials'
     const db = await this.dbRepo
       .createQueryBuilder('db')
       .leftJoinAndSelect('db.credentials', 'dbCredential')
@@ -58,8 +57,7 @@ export class DbService {
     if (!db) {
       return null
     }
-
-    if (!isClientCredentials) {
+    if (grantType !== 'client_credentials') {
       db.credentials.forEach(c => {
         c.password = maskedValue
         delete c.salt
