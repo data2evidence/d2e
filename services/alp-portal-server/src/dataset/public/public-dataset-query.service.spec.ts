@@ -65,7 +65,7 @@ describe('PublicDatasetQueryService', () => {
     jest.spyOn(mockTenantService, 'getTenant').mockImplementation(() => mockTenant)
 
     // When
-    const datasets = await service.getDatasets()
+    const datasets = await service.getDatasets({})
 
     // Then
     expect(datasets.length).toEqual(1)
