@@ -13,7 +13,7 @@ const SWAP_TO = {
 export class PublicDatasetQueryService {
   constructor(private readonly tenantService: TenantService, private readonly datasetRepo: DatasetRepository) {}
 
-  async getDatasets(queryParams?: IDatasetSearchFilterDto) {
+  async getDatasets(queryParams: IDatasetSearchFilterDto) {
     const { searchText } = queryParams
 
     const query = this.datasetRepo
