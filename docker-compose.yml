@@ -448,6 +448,7 @@ services:
       - ./cache/synpuf1k:/app/synpuf1k
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
+      - duckdb-data-1:/app/duckdb_data
     environment:
       <<:
         - *x-converter
@@ -461,6 +462,7 @@ services:
       ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
       DOCKER_HOST: unix://var/run/docker.sock
       DQD_THREAD_COUNT: 1
+      DUCKDB__DATA_FOLDER: /app/duckdb_data
       IDP__ALP_DATA__CLIENT_ID: t5vwuno8ckh5hmqozjqyj
       IDP__ALP_DATA__CLIENT_SECRET: ${LOGTO__ALP_DATA__CLIENT_SECRET}
       LOCAL_DEBUG: "false"
