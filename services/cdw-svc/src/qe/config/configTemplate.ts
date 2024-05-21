@@ -66,5 +66,9 @@ export function getAttributeTypes() {
     key: "datetime",
     text_key: "HPH_CDM_CFG_DATA_TYPE_DATETIME",
   });
+  values.push({
+    key: "conceptSet",
+    text_key: "HPH_CDM_CFG_DATA_TYPE_CONCEPTSET",
+  });
   return values;
 }
