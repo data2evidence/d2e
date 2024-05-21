@@ -117,11 +117,6 @@ https://*.alp.local:55555 {
 		file_server
 	}
 
-	handle_path /starboard-notebook-base/* {
-		root * /home/docker/ui-files/starboard-notebook-base/
-		file_server
-	}
-
 	handle_path /mri/* {
 		root * /home/docker/ui-files/mri/
 		file_server
