@@ -80,6 +80,15 @@ def execute_nodes_flow(graph, sorted_nodes, test):
                 "target_comparator_outcomes_node",
                 "cohort_method_analysis_node",
                 "covariate_settings_node",
+                "study_population_settings_node",
+                "cohort_incidence_target_cohorts_node"
+                "cohort_incidence_node",
+                "cohort_definition_set_node",
+                "outcomes_node",
+                "cohort_method_node",
+                "era_covariate_settings_node",
+                "seasonality_covariate_settings_node",
+                "calendar_time_covariate_settings_node",
                 "study_population_settings_node"
             ]:
                 get_run_logger().error("gen.py: execute_nodes: Node Type not known")
@@ -111,8 +120,10 @@ def execute_node_task(nodename, node_type, node, input, test):
         result = _node.test(task_run_context)
     else:
         match node_type:
-            case ('db_reader_node' | 'csv_node' | 'time_at_risk_node' | 'cohort_diagnostics_module_spec' | 
-                'cohort_generator_node' | 'time_at_risk_node' | 'characterization_node' | 'covariate_settings_node' | 'study_population_settings_node'):
+            case ('db_reader_node' | 'csv_node' | 'cohort_diagnostics_module_spec' | 'calendar_time_covariate_settings_node' |
+                'cohort_generator_node' | 'time_at_risk_node' | 'characterization_node' | 'covariate_settings_node' | 
+                'study_population_settings_node' | 'cohort_incidence_target_cohorts_node' | 'cohort_definition_set_node' | 
+                'era_covariate_settings_node' | 'seanseasonality_covariate_settings_node' | 'study_population_settings_node'):
                 result = _node.task(task_run_context)
             case _:
                 result = _node.task(input, task_run_context)

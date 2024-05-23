@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import rpy2.robjects as ro
 from rpy2.robjects import pandas2ri
+from typing import List, Dict
+from nodes import Result, Node
 
 def get_node_list(graph):
     nodes = {}
@@ -117,3 +119,6 @@ def get_scheduler_address(graph):
         return "https://" + scheduler_host + ":" + scheduler_port
     else:
         return "http://" + scheduler_host + ":" + scheduler_port
+    
+def get_results_by_class_type(results: Dict[str, Result], nodeType: Node):
+    return [results[o].data for o in results if not results[o].error and isinstance(results[o].node, nodeType)]
