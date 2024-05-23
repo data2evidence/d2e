@@ -1072,8 +1072,8 @@ services:
         condition: service_completed_successfully
       alp-minerva-postgres:
         condition: service_healthy
-        # alp-minio-post-init:
-        #   condition: service_completed_successfully
+      alp-minio-post-init:
+          condition: service_completed_successfully
     healthcheck:
       interval: 20s
       retries: 10
@@ -1315,6 +1315,8 @@ services:
         condition: service_completed_successfully
       alp-minerva-postgres:
         condition: service_healthy
+      alp-meilisearch-post-init:
+        condition: service_completed_successfully
     healthcheck:
       interval: 20s
       retries: 10
