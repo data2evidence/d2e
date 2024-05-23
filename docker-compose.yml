@@ -1072,8 +1072,8 @@ services:
         condition: service_completed_successfully
       alp-minerva-postgres:
         condition: service_healthy
-        # alp-minio-post-init:
-        #   condition: service_completed_successfully
+      alp-minio-post-init:
+        condition: service_completed_successfully
     healthcheck:
       interval: 20s
       retries: 10
@@ -1263,8 +1263,6 @@ services:
     ports:
       # - 9000:9000 #Port for API connectivity, internal communication is good enough. Needs to be uncommented only when testing from outside the alp docker network
       - 9090:9090
-    profiles:
-      - minerva-s3
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - minio-data-1:/data
@@ -1317,6 +1315,8 @@ services:
         condition: service_completed_successfully
       alp-minerva-postgres:
         condition: service_healthy
+      alp-meilisearch-post-init:
+        condition: service_completed_successfully
     healthcheck:
       interval: 20s
       retries: 10
