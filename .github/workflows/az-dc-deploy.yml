@@ -31,6 +31,10 @@ on:
         description: Select the environment
         required: true
         type: environment
+      force-cleanup-containers:
+          description: Check if env generation fails
+          type: boolean
+          default: false
       docker-tag-develop:
         description: tag:*:develop
         type: boolean
@@ -74,6 +78,10 @@ jobs:
         repository: ${{ github.event.inputs.repo_full_name }}
         token: ${{ secrets.CI_PAT }}
 
+    - name: Force cleanup containers
+      if: github.event.inputs.force-cleanup-containers
+      run: docker rm -v -f $(docker ps -qa)
+
     - name: Generate dotenv
       env:
         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
@@ -95,9 +103,6 @@ jobs:
 
         # mask sensitive values
         internal/scripts/gha-mask.sh
-
-        # Stop all containers before generating env
-        yarn remote:minerva stop
 
         # generate dotenv
         yarn --cwd internal gen:env

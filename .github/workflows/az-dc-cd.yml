@@ -18,6 +18,10 @@ on:
         description: Select the environment
         required: true
         default: alp-dev-sg-2
+      force-cleanup-containers:
+        description: Check if env generation fails
+        type: boolean
+        default: false
 
 env:
   DOCKER_TAG_NAME: ${{ github.event.inputs.docker_tag_name }}
@@ -41,6 +45,10 @@ jobs:
     - name: Install 1Password CLI
       uses: 1Password/install-cli-action@v1.0.0
 
+    - name: Force cleanup containers
+      if: github.event.inputs.force-cleanup-containers
+      run: docker rm -v -f $(docker ps -qa)
+
     - name: Generate dotenv
       env:
         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
@@ -57,9 +65,6 @@ jobs:
 
         # mask sensitive values
         internal/scripts/gha-mask.sh
-
-        # Stop all containers before generating env
-        yarn remote:minerva stop
 
         # generate dotenv
         yarn --cwd internal gen:env
