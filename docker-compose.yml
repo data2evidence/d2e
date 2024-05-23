@@ -1073,7 +1073,7 @@ services:
       alp-minerva-postgres:
         condition: service_healthy
       alp-minio-post-init:
-          condition: service_completed_successfully
+        condition: service_completed_successfully
     healthcheck:
       interval: 20s
       retries: 10
