@@ -447,6 +447,7 @@ services:
       - ./cache/synpuf1k:/app/synpuf1k
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
+      - duckdb-data-1:/app/duckdb_data
     environment:
       <<:
         - *x-converter
@@ -460,6 +461,7 @@ services:
       ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
       DOCKER_HOST: unix://var/run/docker.sock
       DQD_THREAD_COUNT: 1
+      DUCKDB__DATA_FOLDER: /app/duckdb_data
       IDP__ALP_DATA__CLIENT_ID: t5vwuno8ckh5hmqozjqyj
       IDP__ALP_DATA__CLIENT_SECRET: ${LOGTO__ALP_DATA__CLIENT_SECRET}
       LOCAL_DEBUG: "false"
@@ -474,6 +476,7 @@ services:
       R_LIBS_USER: /home/docker/plugins/R/site-library
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
+      TERMINOLOGY_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/terminology/
 
   alp-dataflow-gen-init:
     command:
@@ -1484,6 +1487,7 @@ services:
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
       isTestEnv: ${isTestEnv}
+  
   redis:
     command: redis-server --requirepass ${REDIS_PASSWORD}
     container_name: &c26 alp-minerva-redis-${BASE_PORT:-1}
@@ -1500,3 +1504,33 @@ services:
     networks:
       - alp
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+
+  alp-meilisearch-post-init:
+    container_name: &c27 alp-meilisearch-post-init
+    depends_on:
+      alp-minerva-meilisearch-svc:
+        condition: service_healthy
+    image: getmeili/meilisearch:v1.6
+    logging:
+      options:
+        tag: *c27
+    entrypoint:
+      - curl
+      - -X
+      - PATCH
+      - 'http://alp-minerva-meilisearch-svc-1:41${BASE_PORT:-1}11/experimental-features/'
+      - -H
+      - 'Content-Type: application/json'
+      - -H
+      - 'Authorization: Bearer ${MEILI_MASTER_KEY}'
+      - --data-binary
+      - '{ "vectorStore": true }'
+    networks:
+      - alp
+    hostname: alp-meilisearch-post-init.${TLS__INTERNAL__DOMAIN:-alp.local}
+    environment:
+      <<:
+        - *x-tls
+      MEILI_HTTP_ADDR: 0.0.0.0:41${BASE_PORT:-1}11
+      MEILI_LOG_LEVEL: INFO
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
