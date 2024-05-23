@@ -221,15 +221,20 @@ export class PrefectService {
     }
   }
 
-  async createFlowRunByMetadata(metadata: IPrefectFlowRunByMetadataDto) {
+  async createFlowRunByMetadata(metadata: IPrefectFlowRunByMetadataDto, token: string) {
     let currentFlow
     const flowMetadata = await this.prefectFlowService.getFlowMetadataByType(metadata.type)
-    if (!flowMetadata) {
+
+    if (flowMetadata.length === 0) {
       throw new BadRequestException(`Flow does not exist for ${metadata.type}!`)
     }
     if (metadata.type === FLOW_METADATA.datamodel) {
-      const flow = flowMetadata.find(flow => flow.flowId === metadata?.flowId)
-      currentFlow = flow
+      if (!metadata?.flowId && flowMetadata.length === 1) {
+        currentFlow = flowMetadata[0]
+      } else {
+        const flow = flowMetadata.find(flow => flow.flowId === metadata?.flowId)
+        currentFlow = flow
+      }
     } else {
       currentFlow = flowMetadata[0]
     }
@@ -242,6 +247,10 @@ export class PrefectService {
     if (metadata.type === FLOW_METADATA.dqd) {
       const dqOptions = { ...metadata.options, deploymentName: deployment.name, flowName: currentFlow.name }
       return this.dataQualityService.createDataQualityFlowRun(dqOptions as DataQualityFlowRunDto)
+    }
+
+    if (metadata.options['options']) {
+      metadata.options['options']['token'] = token
     }
 
     return await this.prefectApi.createFlowRun(

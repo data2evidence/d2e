@@ -9,7 +9,8 @@ import {
   UseInterceptors,
   BadRequestException,
   ParseFilePipeBuilder,
-  Req
+  Req,
+  Headers
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { JwtPayload, decode } from 'jsonwebtoken'
@@ -36,8 +37,8 @@ export class PrefectController {
   }
 
   @Post('flow-run/metadata')
-  createFlowRunByMetadata(@Body() metadata: PrefectFlowRunByMetadataDto) {
-    return this.prefectService.createFlowRunByMetadata(metadata)
+  createFlowRunByMetadata(@Body() metadata: PrefectFlowRunByMetadataDto, @Headers('Authorization') token: string) {
+    return this.prefectService.createFlowRunByMetadata(metadata, token)
   }
 
   @Post('flow-run/deployment')
