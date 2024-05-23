@@ -70,7 +70,7 @@ jobs:
       name: checkout d2e repo
       with:
         clean: false
-        ref: test-cd
+        ref: ${{ env.DOCKER_TAG_NAME }}
         repository: ${{ github.event.inputs.repo_full_name }}
         token: ${{ secrets.CI_PAT }}
 
