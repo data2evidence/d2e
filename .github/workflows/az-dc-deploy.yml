@@ -79,7 +79,7 @@ jobs:
       name: checkout d2e repo
       with:
         clean: false
-        ref: fix-cd-test-23052024 # ${{ env.DOCKER_TAG_NAME }}
+        ref: ${{ env.DOCKER_TAG_NAME }}
         repository: ${{ github.event.inputs.repo_full_name }}
         token: ${{ secrets.CI_PAT }}
 
