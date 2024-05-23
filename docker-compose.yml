@@ -1263,8 +1263,6 @@ services:
     ports:
       # - 9000:9000 #Port for API connectivity, internal communication is good enough. Needs to be uncommented only when testing from outside the alp docker network
       - 9090:9090
-    profiles:
-      - minerva-s3
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - minio-data-1:/data
