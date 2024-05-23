@@ -340,6 +340,19 @@ export class PrefectAPI {
     }
   }
 
+  async getRunsForFlowRun(id: string) {
+    const errorMessage = `Error while getting prefect runs for flow run ${id}`
+    try {
+      const options = await this.createOptions()
+      const url = `${this.url}/flow_runs/${id}/graph-v2`
+      const obs = this.httpService.get(url, options)
+      return await firstValueFrom(obs.pipe(map(result => result.data)))
+    } catch (error) {
+      this.logger.info(`${errorMessage}: ${error}`)
+      throw new InternalServerErrorException(errorMessage)
+    }
+  }
+
   private async createOptions(): Promise<AxiosRequestConfig> {
     return {
       httpsAgent: this.httpsAgent
