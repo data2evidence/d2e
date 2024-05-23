@@ -15,11 +15,9 @@
     "start:remote:caddy": "yarn remote:minerva up alp-caddy --wait",
     "logs:caddy": "yarn base:minerva logs alp-caddy -t --until 1s",
 
-    "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml --profile minerva-s3",
-    "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile cube",
+    "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml",
+    "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui",
     "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local",
-
-    "local:standalone:cube:minerva": "yarn local:minerva --profile cube",
 
     "start:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes",
     "start:nest-dev:minerva": "yarn build:nest-dev:minerva && ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc --wait --force-recreate --no-deps",
@@ -44,13 +42,7 @@
     "build:ui": "UI_REPO_RELATIVE_PATH='../d2e-ui' && yarn base:ui --file ${UI_REPO_RELATIVE_PATH}/docker-compose-ui.yml build alp-caddy",
 
     "build:minerva-test": "yarn local:minerva build",
-
     "start:minerva-test": "yarn local:minerva start",
-
-
-    "local:cube:minerva": "yarn local:minerva --profile cube",
-    "build:cube:minerva": "yarn local:cube:minerva build --build-arg GIT_COMMIT_ARG=$(git rev-parse HEAD)",
-    "start:cube:minerva": "yarn local:standalone:cube:minerva up --renew-anon-volumes",
 
     "seed-postgres-cdm-schemas": "sh -c 'docker exec -it alp-dataflow-gen-agent-1 prefect deployment run execute-seed-postgres-data-flow/alp-db-svc-seed --param database_code=${0} --param vocab_schema_name=cdmvocab --param cdm_schema_name=${1}'",
 
