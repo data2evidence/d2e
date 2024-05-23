@@ -1,15 +1,13 @@
 # Load Dataflow Plugins
 
 The following plugins are currently available:
-- [DQD](https://github.com/alp-os/dqd-plugin)
-- [Datamodel](https://github.com/alp-os/datamodel-plugin)
+- [D2E-Plugins](https://github.com/alp-os/d2e-plugins)
 
 ## Upload from zipfile
 ### Create Plugin zipfile
 - If needed, clone git repositories
 ```bash
-git clone https://github.com/alp-os/dqd-plugin
-git clone https://github.com/alp-os/datamodel-plugin
+git clone https://github.com/alp-os/d2e-plugins
 ```
 - Create zipfiles
 ```bash
@@ -47,9 +45,9 @@ cd $BASE_DIR
 
 ## Upload from git url
 - **n.b.: git repository must be public accessible**
-- Enter git url (e.g. https://github.com/alp-os/dqd-plugin.git)
+- Enter git url (e.g. https://github.com/alp-os/d2e-plugins)
 
-- Optionally specify branch (e.g. https://github.com/alp-os/dqd-plugin.git@branch-name)
+- Optionally specify branch (e.g. https://github.com/alp-os/d2e-plugins@branch-name)
 > ![](../images/dataflow/AddFlowURL.png)
 
 - Subsequent Jobs updates by simply clicking **Update deployment** button on the Jobs page.
