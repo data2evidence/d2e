@@ -322,13 +322,14 @@ export class QueryObject {
 
       const _process = resultData => {
         const result: any = { data: resultData };
-
         if (this.devMode.toLowerCase() === "true") {
-          result.sql = preparedQuery.sql;
+          result.sql = connection.getTranslatedSql
+            ? connection.getTranslatedSql(preparedQuery.sql)
+            : preparedQuery.sql;
           result.sqlParameters = preparedQuery.placeholders.map(p => p.value);
           logger.debug(`
-            ${result.sql}
-            ${result.sqlParameters}
+          ${result.sql}
+          ${result.sqlParameters}
           `);
         }
         return result;

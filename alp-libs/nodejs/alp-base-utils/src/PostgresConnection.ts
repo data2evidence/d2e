@@ -116,6 +116,10 @@ export class PostgresConnection implements ConnectionInterface {
     return translateHanaToPostgres(temp, this.schemaName);
   }
 
+  public getTranslatedSql(sql: string): string {
+    return this.parseSql(sql);
+  }
+
   public executeQuery(
     sql,
     parameters: ParameterInterface[],

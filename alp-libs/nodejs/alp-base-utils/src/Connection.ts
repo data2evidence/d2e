@@ -38,6 +38,7 @@ export interface ConnectionInterface {
     setAutoCommitToFalse(callback?: CallBackInterface): void;
     activate_nativedb_communication?(credentials: any): void;
     deactivate_nativedb_communication?(dbName: any): void;
+    getTranslatedSql?(sql: string, schemaName?: string): string;
 }
 
 /**
