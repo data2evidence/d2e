@@ -172,15 +172,6 @@ if (plugins && Object.keys(plugins).length > 0) {
   })
 }
 
-//This should be the first item in the array
-if (env.APP_DEPLOY_MODE !== 'standalone') {
-  // Route to app-router
-  routes.unshift({
-    source: '^/portal/env.js',
-    destination: 'portal-ui'
-  })
-}
-
 // attach origin in all requests
 app.use(addOriginHeader)
 
@@ -274,17 +265,6 @@ routes.forEach((route: IRouteProp) => {
             ...getCreateMiddlewareOptions(services.analytics),
             logLevel: 'debug',
             headers: { Connection: 'keep-alive' }
-          })
-        )
-        break
-      case 'portal-ui':
-        app.use(
-          source,
-          createProxyMiddleware({
-            target: services.appRouter,
-            secure: changeOriginForAppRouter,
-            proxyTimeout: 100000,
-            changeOrigin: changeOriginForAppRouter
           })
         )
         break
