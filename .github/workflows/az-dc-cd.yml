@@ -19,7 +19,7 @@ on:
         required: true
         default: alp-dev-sg-2
       force-cleanup-containers:
-        description: Check if env generation fails
+        description: Force cleanup all containers
         type: boolean
         default: false
 

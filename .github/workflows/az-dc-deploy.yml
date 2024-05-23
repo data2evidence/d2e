@@ -32,7 +32,7 @@ on:
         required: true
         type: environment
       force-cleanup-containers:
-          description: Check if env generation fails
+          description: Force cleanup all containers
           type: boolean
           default: false
       docker-tag-develop:
