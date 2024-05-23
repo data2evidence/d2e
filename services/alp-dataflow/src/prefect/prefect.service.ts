@@ -23,6 +23,8 @@ import {
 import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
 import { DataQualityService } from '../data-quality/data-quality.service'
 import { DataQualityFlowRunDto } from '../data-quality/dto'
+import { DataCharacterizationService } from '../data-characterization/data-characterization.service'
+import { DataCharacterizationFlowRunDto } from 'src/data-characterization/dto'
 
 @Injectable()
 export class PrefectService {
@@ -34,7 +36,8 @@ export class PrefectService {
     private readonly prefectParamsTransformer: PrefectParamsTransformer,
     private readonly prefectExecutionClient: PrefectExecutionClient,
     private readonly prefectFlowService: PrefectFlowService,
-    private readonly dataQualityService: DataQualityService
+    private readonly dataQualityService: DataQualityService,
+    private readonly dataCharacterizationService: DataCharacterizationService
   ) {}
 
   async getFlowRun(id: string) {
@@ -242,6 +245,13 @@ export class PrefectService {
     if (metadata.type === FLOW_METADATA.dqd) {
       const dqOptions = { ...metadata.options, deploymentName: deployment.name, flowName: currentFlow.name }
       return this.dataQualityService.createDataQualityFlowRun(dqOptions as DataQualityFlowRunDto)
+    }
+
+    if (metadata.type === FLOW_METADATA.data_characterization) {
+      const dcOptions = { ...metadata.options, deploymentName: deployment.name }
+      return this.dataCharacterizationService.createDataCharacterizationFlowRun(
+        dcOptions as DataCharacterizationFlowRunDto
+      )
     }
 
     return await this.prefectApi.createFlowRun(
