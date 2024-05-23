@@ -54,3 +54,7 @@ cd $BASE_DIR
 
 - Subsequent Jobs updates by simply clicking **Update deployment** button on the Jobs page.
 > ![](../images/dataflow/JobsPageURL.png)
+
+- If repo is private
+- Enter git url `https://<access_token>@github.com/<username>/<repository>.git`
+- If it has subdirectories: `https://<access_token>@github.com/<username>/<repository>.git#subdirectory=<subdir>`
