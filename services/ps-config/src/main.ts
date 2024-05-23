@@ -57,7 +57,7 @@ let initSettingsFromEnvVars = () => {
     credentials = xsenv.cfServiceCredentials("httptest");
     console.log("TESTSCHEMA :" + credentials.schema);
   } else {
-    credentials = JSON.parse(env.PG__CREDENTIALS);
+    credentials = xsenv.cfServiceCredentials({ tag: "config" });
   }
 
   if (!envVarUtils.isStageLocalDev()) {

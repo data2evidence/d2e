@@ -220,7 +220,7 @@ try {
     isTestEnvironment = true;
     log.info("TESTSCHEMA :" + credentials.schema);
   } else {
-    credentials = JSON.parse(env.PG__CREDENTIALS)
+    credentials = xsenv.cfServiceCredentials({ tag: "config" });
   }
 
   initRoutes();

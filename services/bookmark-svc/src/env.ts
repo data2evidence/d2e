@@ -11,7 +11,7 @@ const Env = z.object({
   PG_USER: z.string(),
   PG_PASSWORD: z.string(),
   PG_SCHEMA: z.string(),
-
+  PG__DIALECT: z.string(),
   NODE_ENV: z.string().optional(),
   PG_CA_ROOT_CERT: z.string().optional(),
   PG_ADMIN_USER: z.string().optional(),
@@ -44,7 +44,6 @@ const Env = z.object({
 
   TLS__INTERNAL__KEY: z.string(),
   TLS__INTERNAL__CRT: z.string(),
-  PG__CREDENTIALS: z.string()
 })
 
 const result = Env.safeParse(process.env)
