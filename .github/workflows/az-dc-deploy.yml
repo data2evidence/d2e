@@ -181,8 +181,8 @@ jobs:
         echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
 
         # customize dc.yml
-        yq -i '.services.alp-local-ui-file-server.image="alpcr.azurecr.io/alp-data-node/alp-local-ui-file-server:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
         yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
+        yq -i '.services.alp-caddy.image="alpcr.azurecr.io/alp-data-node/alp-caddy:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
 
         # Run ALP services
         yarn remote:minerva up --remove-orphans --force-recreate --wait --pull always

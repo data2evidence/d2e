@@ -240,7 +240,6 @@ x-envs:
        "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
        "sqlEditor" : "http://alp-minerva-sqleditor:8888",
        "appRouter": "https://alp-mercury-approuter:41000",
-       "ui": "http://alp-local-ui-file-server:3000",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
        "minio": ""
       }
@@ -326,12 +325,13 @@ services:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile
     container_name: &c1 alp-caddy
     hostname: alp-caddy.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: caddy:alpine
+    image:  alpcr.azurecr.io/alp-data-node/alp-caddy:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c1
     networks:
       alp:
+    platform: linux/amd64
     ports:
       - 80:80
       - 443:443
@@ -339,7 +339,6 @@ services:
       - 3002:3002
       - 41101:41101
       - 8103:8103
-    pull_policy: missing
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - caddy:/data
@@ -573,19 +572,6 @@ services:
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
 
-  alp-local-ui-file-server:
-    container_name: &c7 alp-local-ui-file-server
-    hostname: alp-local-ui-file-server.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-local-ui-file-server:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c7
-    networks:
-      alp:
-    platform: linux/amd64
-    profiles:
-      - minerva-ui
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
