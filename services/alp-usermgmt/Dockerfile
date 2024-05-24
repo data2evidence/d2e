@@ -48,7 +48,7 @@ RUN rm -rf /usr/local/lib/node_modules/npm
 
 RUN addgroup -S alp -g 3000 && adduser --uid 3000 -S docker -G alp
 
-RUN chown -R docker:alp /usr/src/app
+RUN mkdir -p /usr/src/app && chown -R docker:alp /usr/src/app
 
 USER docker
 
