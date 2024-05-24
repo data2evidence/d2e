@@ -69,3 +69,24 @@ export const ensureDataflowMgmtDatasetAuthorized = async (req, res: Response, ne
   }
   return next()
 }
+
+export const ensureTerminologyDatasetAuthorized = async (req, res: Response, next: NextFunction) => {
+  const allowedDatasets = req.user.userMgmtGroups.alp_role_study_researcher
+
+  let dataset
+  switch (req.method) {
+    case 'GET':
+      if (req.query && req.query.datasetId) {
+        dataset = req.query.datasetId
+      }
+    case 'POST':
+      const { datasetId } = req.body
+      dataset = datasetId
+  }
+
+  if (dataset && !allowedDatasets.includes(dataset)) {
+    logger.info(`inside ensureDatasetAuthorized: User does not have access to dataset`)
+    return res.sendStatus(403)
+  }
+  return next()
+}

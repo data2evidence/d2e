@@ -26,7 +26,8 @@ import { addSqleditorHeaders } from './middlewares/SqleditorMiddleware'
 import { addMeilisearchHeaders } from './middlewares/MeilisearchMiddleware'
 import {
   ensureAnalyticsDatasetAuthorized,
-  ensureDataflowMgmtDatasetAuthorized
+  ensureDataflowMgmtDatasetAuthorized,
+  ensureTerminologyDatasetAuthorized
 } from './middlewares/ensureDatasetAuthorizedMiddleware'
 import { setupGlobalErrorHandling } from './error-handler'
 
@@ -344,6 +345,8 @@ routes.forEach((route: IRouteProp) => {
         app.use(
           source,
           ensureAuthenticated,
+          ensureAuthorized,
+          ensureTerminologyDatasetAuthorized,
           checkScopes,
           createProxyMiddleware(getCreateMiddlewareOptions(services.terminology))
         )
