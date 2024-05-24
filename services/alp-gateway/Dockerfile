@@ -11,6 +11,8 @@ RUN yarn install --network-timeout 1000000
 
 COPY --chown=node:node --chmod=711 . .
 
+RUN chown -R node:node /usr/src/app
+
 USER node
 
 FROM $IMAGE AS build
@@ -39,6 +41,8 @@ RUN apk add --upgrade openssl
 RUN rm -rf /usr/local/lib/node_modules/npm
 
 RUN addgroup -S alp -g 3000 && adduser --uid 3000 -S docker -G alp
+
+RUN chown -R docker:alp /usr/src/app
 
 USER docker
 
