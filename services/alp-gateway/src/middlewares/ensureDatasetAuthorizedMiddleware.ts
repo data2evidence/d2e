@@ -23,7 +23,7 @@ function convertZlibBase64ToJson(base64String: string) {
 export const ensureAnalyticsDatasetAuthorized = async (req, res: Response, next: NextFunction) => {
   const allowedDatasets = req.user.userMgmtGroups.alp_role_study_researcher
   let dataset
-  console.log('hi')
+
   switch (req.method) {
     case 'GET':
       if (req.query && req.query.mriquery) {
@@ -40,6 +40,27 @@ export const ensureAnalyticsDatasetAuthorized = async (req, res: Response, next:
         let dataset = convertZlibBase64ToJson(req.body.mriquery).selectedStudyEntityValue
         console.log(dataset)
       }
+  }
+
+  if (dataset && !allowedDatasets.includes(dataset)) {
+    logger.info(`inside ensureDatasetAuthorized: User does not have access to dataset`)
+    return res.sendStatus(403)
+  }
+  return next()
+}
+
+export const ensureDataflowMgmtDatasetAuthorized = async (req, res: Response, next: NextFunction) => {
+  const allowedDatasets = req.user.userMgmtGroups.alp_role_study_researcher
+  let dataset
+
+  switch (req.method) {
+    case 'GET':
+      if (req.params && req.params.datasetId) {
+        dataset = req.params.datasetId
+      }
+    case 'POST':
+      const { options } = req.body
+      dataset = options?.datasetId
   }
 
   if (dataset && !allowedDatasets.includes(dataset)) {
