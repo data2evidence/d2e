@@ -23,8 +23,6 @@ jobs:
           changes: ${{ steps.file_changes.outputs.src }}
       steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - uses: dorny/paths-filter@v3.0.2
         id: file_changes
@@ -47,8 +45,8 @@ jobs:
 
 
   test-mri:
-    needs: [check_file_changes]
-    if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    # needs: [check_file_changes]
+    # if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
     runs-on: ubuntu-latest
     env:
       isTestEnv: "true"
@@ -94,47 +92,6 @@ jobs:
           echo "isTestEnv: ${isTestEnv:-false}"
 
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      # - uses: actions/checkout@v4
-      #   name: sameBranch checkout (OverrideRepo)
-      #   id: sameBranch-checkout
-      #   continue-on-error: true
-      #   with:
-      #     repository:  ${{ vars.OVERRIDE_REPO }}
-      #     token: ${{ secrets.CI_PAT }}
-      #     path: 'tmp'
-      #     sparse-checkout: 'alp-data-node-override'
-      #     sparse-checkout-cone-mode: false
-      #     ref: ${{ github.ref_name }}
-
-      # - shell: bash
-      #   name: sameBranch checkout test
-      #   id: sameBranch-checkout-test
-      #   run: |
-      #     ls -lhtr tmp
-      #     [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
-
-      # - uses: actions/checkout@v4
-      #   name: develop branch checkout (sameBranch checkout fails)
-      #   if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
-      #   with:
-      #     repository:  ${{ vars.OVERRIDE_REPO }}
-      #     token: ${{ secrets.CI_PAT }}
-      #     path: 'tmp'
-      #     sparse-checkout: 'alp-data-node-override'
-      #     sparse-checkout-cone-mode: false
-      #     ref: develop
-
-      # - shell: bash
-      #   name: link_files_from_override
-      #   id: link_files_from_override
-      #   run: |
-      #     pwd
-      #     ln -s tmp/alp-data-node-override alp-data-node-override
-      #     chmod 755 -R alp-data-node-override
-      #     ls -l alp-data-node-override/build
 
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
@@ -144,7 +101,7 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          yarn get:drivers
+          yarn --cwd internal get:drivers
 
       - uses: actions/setup-node@v4
         with:
@@ -220,7 +177,7 @@ jobs:
         run: yarn workspace query-gen run test
 
       - name: Run bookmark tests
-        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_bookmarks_svc_changed == 'True'  
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_bookmarks_svc_changed == 'True'
         run: yarn workspace bookmark run test
       # Existing tests for assignment service uses opaTest and not compatible with current set up
       # We should uncomment this when we have tests available.

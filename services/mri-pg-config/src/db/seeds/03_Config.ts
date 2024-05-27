@@ -10236,7 +10236,7 @@ const cdwConfig = {
               },
             ],
             type: 'num',
-            expression: '@COHORT."cohort_definition_id"',
+            expression: '@COHORT.cohort_definition_id',
             order: 0,
             useRefValue: true,
             useRefText: true,
@@ -10276,8 +10276,84 @@ const cdwConfig = {
               },
             ],
             type: 'text',
-            expression: 'CAST (@COHORT."subject_id" AS VARCHAR)',
+            expression: 'CAST (@COHORT.subject_id AS VARCHAR)',
             order: 1,
+          },
+          enddate: {
+            name: 'End Date',
+            disabledLangName: [
+              {
+                lang: 'en',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'de',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'fr',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'es',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'pt',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'zh',
+                value: '',
+                visible: true,
+              },
+            ],
+            type: 'time',
+            expression: '@COHORT.cohort_end_date',
+            order: 2,
+          },
+          startdate: {
+            name: 'Start Date',
+            disabledLangName: [
+              {
+                lang: 'en',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'de',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'fr',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'es',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'pt',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'zh',
+                value: '',
+                visible: true,
+              },
+            ],
+            type: 'time',
+            expression: '@COHORT.cohort_start_date',
+            order: 3,
           },
         },
       },
@@ -11382,7 +11458,12 @@ const cdwConfig = {
       '@TEXT.VALUE': 'CONCEPT_NAME',
       '@COHORT': '$$SCHEMA$$.cohort',
       '@COHORT.PATIENT_ID': 'subject_id',
-      '@COHORT.INTERACTION_TYPE': 'cohort_definition_id'
+      '@COHORT.INTERACTION_TYPE': 'cohort_definition_id',
+      "@COHORT.INTERACTION_ID": 'cohort_definition_id',
+      "@COHORT.CONDITION_ID": 'cohort_definition_id',
+      "@COHORT.PARENT_INTERACT_ID": 'subject_id',
+      "@COHORT.START": 'cohort_start_date',
+      "@COHORT.END": 'cohort_end_date',
     },
     guardedTableMapping: {
       '@PATIENT': '$$SCHEMA$$."VIEW::OMOP.GDM.PATIENT"',
@@ -17086,8 +17167,7 @@ const paConfig = {
     addToCohorts: true,
     domainValuesLimit: 200,
     calcViewAccessPoint: true,
-    externalAccessPoints: true,
-    nonInteractiveMode: false,
+    externalAccessPoints: true
   },
 };
 
@@ -24515,6 +24595,82 @@ const cdwConfigDuckdb = {
             expression: 'CAST (@COHORT."subject_id" AS VARCHAR)',
             order: 1,
           },
+          enddate: {
+            name: 'End Date',
+            disabledLangName: [
+              {
+                lang: 'en',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'de',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'fr',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'es',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'pt',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'zh',
+                value: '',
+                visible: true,
+              },
+            ],
+            type: 'time',
+            expression: '@COHORT."cohort_end_date"',
+            order: 2,
+          },
+          startdate: {
+            name: 'Start Date',
+            disabledLangName: [
+              {
+                lang: 'en',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'de',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'fr',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'es',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'pt',
+                value: '',
+                visible: true,
+              },
+              {
+                lang: 'zh',
+                value: '',
+                visible: true,
+              },
+            ],
+            type: 'time',
+            expression: '@COHORT."cohort_start_date"',
+            order: 3,
+          },
         },
       },
     },
@@ -25229,7 +25385,13 @@ const cdwConfigDuckdb = {
       '@TEXT.INTERACTION_TEXT_ID': 'CONCEPT_ID',
       '@TEXT.VALUE': 'CONCEPT_NAME',
       '@COHORT': '$$SCHEMA$$.cohort',
-      '@COHORT.PATIENT_ID': 'subject_id',
+      '@COHORT.PATIENT_ID': '"subject_id"',
+      '@COHORT.INTERACTION_TYPE': '"cohort_definition_id"',
+      "@COHORT.INTERACTION_ID": '"cohort_definition_id"',
+      "@COHORT.CONDITION_ID": '"cohort_definition_id"',
+      "@COHORT.PARENT_INTERACT_ID": '"subject_id"',
+      "@COHORT.START": '"cohort_start_date"',
+      "@COHORT.END": '"cohort_end_date"',
     },
     guardedTableMapping: {
       '@PATIENT': '$$SCHEMA$$."person"',
@@ -29306,7 +29468,6 @@ const paConfigDuckdb = {
     addToCohorts: true,
     domainValuesLimit: 200,
     calcViewAccessPoint: true,
-    externalAccessPoints: true,
-    nonInteractiveMode: false,
+    externalAccessPoints: true
   },
 };

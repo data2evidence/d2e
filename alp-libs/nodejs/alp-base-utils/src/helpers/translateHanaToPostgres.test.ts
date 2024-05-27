@@ -1,4 +1,4 @@
-import { translateHanaToPostgres } from "./translateHanaToPostgres";
+import { translateHanaToPostgres } from "./hanaTranslation";
 
 describe("translateHanaToPostgres where hana and postgres have same syntax", () => {
   it("should ", () => {
@@ -65,6 +65,11 @@ describe("translateHanaToPostgres where hana and postgres have different syntax"
   it("should have correct syntax for to_decimal(50)", () => {
     const input = `select to_decimal(50);`;
     const expected = `select (50)::decimal;`;
+    expect(translateHanaToPostgres(input, "schema")).toBe(expected);
+  });
+  it("should have correct syntax for DAYS_BETWEEN", () => {
+    const input = `TO_INTEGER(DAYS_BETWEEN ((("PATIENT"."DOB")),(("INTERACTION"."END"))) / 365)`;
+    const expected = `TO_INTEGER(("INTERACTION"."END"::date - "PATIENT"."DOB"::date) / 365)`;
     expect(translateHanaToPostgres(input, "schema")).toBe(expected);
   });
 });
