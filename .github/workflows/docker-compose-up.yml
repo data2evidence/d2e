@@ -64,7 +64,7 @@ jobs:
           internal/scripts/gha-mask.sh
 
           # generate dotenv
-          yarn gen:env
+          yarn --cwd internal gen:env
 
           echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
 

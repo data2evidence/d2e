@@ -1,6 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel, Field, UUID4
 from typing import Optional, List, Dict
+from flows.alp_db_svc.datamart.types import SnapshotCopyConfig
 
 
 class DBCredentialsType(BaseModel):
@@ -84,6 +85,8 @@ class meilisearchAddIndexType(BaseModel):
     databaseCode: str
     vocabSchemaName: str
     tableName: str
+    chunk_size: int
+    meilisearch_index_config: Dict
 
 
 class portalDatasetType(BaseModel):
@@ -227,12 +230,8 @@ class rollbackTagType(dataModelBase):
 
 class createSnapshotType(dataModelBase):
     source_schema: str
-    snapshot_copy_config: Dict
-
-
-class createParquetSnapshotType(dataModelBase):
-    source_schema: str
-    snapshot_copy_config: Dict
+    vocab_schema: str
+    snapshot_copy_config: SnapshotCopyConfig
 
 
 class questionnaireDefinitionType(dataModelBase):
