@@ -144,18 +144,6 @@ services:
       - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
       - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
       - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
-    healthcheck:
-      interval: 30s
-      retries: 10
-      start_period: 120s
-      test:
-        - CMD
-        - wget
-        - -O
-        - src/liveness
-        - --no-check-certificate
-        - https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/check-liveness
-      timeout: 180s
     ports:
       - 9220:9220
     volumes:
@@ -238,17 +226,6 @@ services:
     command:
       - sh
       - start.sh
-    healthcheck:
-      interval: 20s
-      retries: 10
-      start_period: 60s
-      test:
-        - CMD
-        - wget
-        - -O
-        - src/liveness
-        - http://0.0.0.0:41104/check-liveness
-      timeout: 10s
     ports:
       - 9224:9224
     volumes:
