@@ -5,7 +5,7 @@ import { PrefectExecutionClient } from './prefect-execution.client'
 import { MockType } from 'test/type.mock'
 
 export const prefectServiceMockFactory: () => MockType<PrefectService> = jest.fn(() => ({
-  createFlowRun: jest.fn()
+  createDataflowFlowRun: jest.fn()
 }))
 
 export const prefectApiMockFactory: () => MockType<PrefectAPI> = jest.fn(() => ({

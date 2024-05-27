@@ -56,19 +56,15 @@ export class PrefectService {
     return this.prefectApi.getTaskRunLogs(id)
   }
 
-  async createFlowRun(id: string) {
+  async createDataflowFlowRun(id: string) {
     const revision = await this.dataflowService.getLastDataflowRevision(id)
     const prefectParams = this.prefectParamsTransformer.transform(revision.flow)
 
-    const prefectDeploymentName = env.PREFECT_DEPLOYMENT_NAME
-    const prefectFlowName = env.PREFECT_FLOW_NAME
-
-    const flowRunId = await this.prefectApi.createFlowRun(
-      revision.name,
-      prefectDeploymentName,
-      prefectFlowName,
-      prefectParams
-    )
+    const flowRunId = await this.createFlowRunByMetadata({
+      type: FLOW_METADATA.dataflow_ui,
+      flowRunName: revision.name,
+      options: prefectParams
+    })
     await this.dataflowService.createDataflowRun(id, flowRunId)
     return flowRunId
   }
@@ -82,7 +78,11 @@ export class PrefectService {
 
   async createTestRun(testFlow: ITestDataflowDto) {
     const prefectParams = this.prefectParamsTransformer.transform(testFlow.dataflow, true)
-    return this.prefectApi.createTestRun(prefectParams)
+    return await this.createFlowRunByMetadata({
+      type: FLOW_METADATA.dataflow_ui,
+      flowRunName: 'Test-run',
+      options: prefectParams
+    })
   }
 
   async getFlowMetadata() {
