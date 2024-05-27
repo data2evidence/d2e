@@ -39,7 +39,6 @@ export const ensureAnalyticsDatasetAuthorized = async (req, res: Response, next:
     case 'POST':
       if (req.body.mriquery) {
         let dataset = convertZlibBase64ToJson(req.body.mriquery).selectedStudyEntityValue
-        console.log(dataset)
       }
       break
   }
