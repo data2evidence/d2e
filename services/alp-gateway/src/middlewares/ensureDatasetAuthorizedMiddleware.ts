@@ -34,12 +34,14 @@ export const ensureAnalyticsDatasetAuthorized = async (req, res: Response, next:
           .toString()
         dataset = req.query[datasetKey]
       }
+      break
 
     case 'POST':
       if (req.body.mriquery) {
         let dataset = convertZlibBase64ToJson(req.body.mriquery).selectedStudyEntityValue
         console.log(dataset)
       }
+      break
   }
 
   if (dataset && !allowedDatasets.includes(dataset)) {
@@ -58,9 +60,12 @@ export const ensureDataflowMgmtDatasetAuthorized = async (req, res: Response, ne
       if (req.params && req.params.datasetId) {
         dataset = req.params.datasetId
       }
+      break
+
     case 'POST':
       const { options } = req.body
       dataset = options?.datasetId
+      break
   }
 
   if (dataset && !allowedDatasets.includes(dataset)) {
@@ -72,16 +77,19 @@ export const ensureDataflowMgmtDatasetAuthorized = async (req, res: Response, ne
 
 export const ensureTerminologyDatasetAuthorized = async (req, res: Response, next: NextFunction) => {
   const allowedDatasets = req.user.userMgmtGroups.alp_role_study_researcher
-
   let dataset
+
   switch (req.method) {
     case 'GET':
       if (req.query && req.query.datasetId) {
         dataset = req.query.datasetId
       }
+      break
+
     case 'POST':
       const { datasetId } = req.body
       dataset = datasetId
+      break
   }
 
   if (dataset && !allowedDatasets.includes(dataset)) {
