@@ -279,3 +279,8 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+
+  alp-dicom-server:
+    # uses 8042 port on the container
+    ports:
+      - 8042:8042
