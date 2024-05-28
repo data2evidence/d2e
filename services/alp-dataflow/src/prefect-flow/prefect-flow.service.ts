@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { PrefectFlowDto } from './dto'
 import { PrefectAPI } from '../prefect/prefect.api'
+import { PortalServerAPI } from '../portal-server/portal-server.api'
 import { InjectRepository } from '@nestjs/typeorm'
 import { FlowMetadata } from './entity'
 import { Repository } from 'typeorm'
@@ -8,6 +9,7 @@ import { createLogger } from '../logger'
 import { IFlowMetadataDto } from '../types'
 import { FLOW_METADATA } from '../common/const'
 import { REQUEST } from '@nestjs/core'
+import { join } from 'path'
 import { JwtPayload, decode } from 'jsonwebtoken'
 
 @Injectable()
@@ -19,7 +21,8 @@ export class PrefectFlowService {
     @Inject(REQUEST) request: Request,
     @InjectRepository(FlowMetadata)
     private readonly flowMetadataRepo: Repository<FlowMetadata>,
-    private readonly prefectApi: PrefectAPI
+    private readonly prefectApi: PrefectAPI,
+    private readonly portalServerApi: PortalServerAPI
   ) {
     const token = decode(request.headers['authorization'].replace(/bearer /i, '')) as JwtPayload
     this.userId = token.sub
@@ -38,7 +41,7 @@ export class PrefectFlowService {
   }
 
   async deleteFlow(id: string) {
-    await this.deleteFlowMetadata(id)
+    await this.deleteFlowDeployment(id)
     return this.prefectApi.deleteFlow(id)
   }
 
@@ -107,6 +110,24 @@ export class PrefectFlowService {
       this.logger.info(`Flow metadata for ${flowMetadataDto.name}of type ${flowMetadataDto.type} deleted!}`)
       return await this.createNewFlowMetadata(flowMetadataDto)
     }
+  }
+
+  private async deleteFlowDeployment(flowId: string) {
+    const metadata = await this.getFlowMetadataById(flowId)
+    if (metadata) {
+      try {
+        // const deploymentPath = `${metadata.createdBy}%${metadata.name.replace(/[.-]/g, '_')}`
+        const deploymentPath = join(metadata.createdBy, metadata.name.replace(/[.-]/g, '_'))
+        await this.portalServerApi.deleteDeploymentFiles(deploymentPath)
+        await this.deleteFlowMetadata(flowId)
+        return flowId
+      } catch (err) {
+        this.logger.error(`Error deleting flow deployment files for ${flowId}: ${err}`)
+        return
+      }
+    }
+    this.logger.info(`No flow deployment files found for ${flowId}`)
+    return
   }
 
   private addOwner<T>(object: T, isNewEntity = false) {

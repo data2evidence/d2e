@@ -7,6 +7,7 @@ import { env } from '../env'
 export class MinioClient {
   private readonly logger = createLogger(this.constructor.name)
   private readonly client: Minio.Client
+  private static readonly FLOW_DEPLOYMENT_FOLDER = 'dataflow-adhoc-flows'
 
   constructor() {
     this.client = new Minio.Client({
@@ -107,6 +108,27 @@ export class MinioClient {
     } catch (e) {
       this.logger.error(`${e}`)
       throw new InternalServerErrorException(`Error occurred in MinIO S3 object deletion: ${fileName}`)
+    }
+  }
+
+  async deleteDeployment(deploymentPath: string) {
+    const bucketName = MinioClient.FLOW_DEPLOYMENT_FOLDER
+    try {
+      const objectsStream = this.client.listObjectsV2(bucketName, deploymentPath, true)
+      const objectsToDelete: string[] = []
+
+      for await (const obj of objectsStream) {
+        objectsToDelete.push(obj.name)
+      }
+
+      await this.client.removeObjects(bucketName, objectsToDelete)
+      console.log(`Deleted ${objectsToDelete.length} objects.`)
+
+      // Delete the folder itself
+      await this.client.removeObject(bucketName, deploymentPath)
+      console.log(`Deleted folder: ${deploymentPath}`)
+    } catch (error) {
+      throw new InternalServerErrorException(`Error occurred in MinIO S3 object deletion: ${deploymentPath}`)
     }
   }
 
