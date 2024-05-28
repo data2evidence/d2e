@@ -18,6 +18,10 @@ on:
         description: Select the environment
         required: true
         default: alp-dev-sg-2
+      force-cleanup-containers:
+        description: Force cleanup all containers
+        type: boolean
+        default: false
 
 env:
   DOCKER_TAG_NAME: ${{ github.event.inputs.docker_tag_name }}
@@ -37,25 +41,14 @@ jobs:
     - uses: actions/checkout@v4
       with:
         clean: false
-        submodules: recursive
-
-    - uses: actions/checkout@v4
-      with:
-        repository:  ${{ vars.OVERRIDE_REPO }}
-        token: ${{ secrets.CI_PAT }}
-        path: 'tmp'
-        sparse-checkout: 'alp-data-node-override'
-        sparse-checkout-cone-mode: false
-        ref: develop
-
-    - shell: bash
-      id: link_files_from_override
-      run: |
-        ln -s tmp/alp-data-node-override alp-data-node-override
-        chmod 755 -R alp-data-node-override
 
     - name: Install 1Password CLI
       uses: 1Password/install-cli-action@v1.0.0
+
+    - name: Force cleanup containers
+      if: github.event.inputs.force-cleanup-containers
+      continue-on-error: true
+      run: docker rm -v -f $(docker ps -qa)
 
     - name: Generate dotenv
       env:
@@ -69,20 +62,19 @@ jobs:
         ACTIONS_STEP_DEBUG=false
       
         # get env yml from 1password
-        yarn op:get:$ENV_TYPE
+        yarn --cwd internal op:get:$ENV_TYPE
 
         # mask sensitive values
         internal/scripts/gha-mask.sh
 
         # generate dotenv
-        yarn gen:env
+        yarn --cwd internal gen:env
 
         cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 
         echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
         echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
         echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
-        ./internal/scripts/get-op-ratelimit.sh
 
     - name: Load dotenv from 1password
       uses: 1password/load-secrets-action@v2

@@ -12,8 +12,7 @@
         "start:dev": "tsnd --inspect=0.0.0.0:9222 --respawn ./src/main.ts",
         "start:docker": "yarn convertenv && . ./generated-env.sh && if [ \"$LOCAL_DEBUG\" = \"true\" ] ; then yarn start:dev; else yarn start; fi",
         "buildvue": "grunt css && cd ../vue && npm run build",
-        "convertenv": "cd envConverter && yarn generate:envs -s alp-minerva-analytics-svc",
-        "createDuckdbDatabase": ". ./generated-env.sh && node target/src/duckdb/createDuckdbDatabase.js"
+        "convertenv": "cd envConverter && yarn generate:envs -s alp-minerva-analytics-svc"
     },
     "keywords": [],
     "author": "",

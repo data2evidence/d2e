@@ -31,6 +31,10 @@ on:
         description: Select the environment
         required: true
         type: environment
+      force-cleanup-containers:
+          description: Force cleanup all containers
+          type: boolean
+          default: false
       docker-tag-develop:
         description: tag:*:develop
         type: boolean
@@ -46,15 +50,6 @@ on:
         description: tag:ui:fromTextbox (precedence)
         type: string
         required: false
-      override-branch-boolean:
-        description: override:branch:sameAsDn
-        type: boolean
-        default: false
-      override-repo-branch-textbox:
-        description: override:branch:fromTextbox (precedence)
-        type: string
-        required: false
-        default: develop
       dotenv-boolean:
         description: boolean:dotenv
         type: boolean
@@ -83,6 +78,11 @@ jobs:
         repository: ${{ github.event.inputs.repo_full_name }}
         token: ${{ secrets.CI_PAT }}
 
+    - name: Force cleanup containers
+      if: github.event.inputs.force-cleanup-containers
+      continue-on-error: true
+      run: docker rm -v -f $(docker ps -qa)
+
     - name: Generate dotenv
       env:
         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
@@ -96,7 +96,8 @@ jobs:
       
         # get env yml from 1password
         if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
-          yarn op:get:$ENV_TYPE
+        then
+          yarn --cwd internal op:get:$ENV_TYPE
         else
           echo dotenv-boolean=false | tee -a $GITHUB_STEP_SUMMARY
         fi
@@ -105,7 +106,7 @@ jobs:
         internal/scripts/gha-mask.sh
 
         # generate dotenv
-        yarn gen:env
+        yarn --cwd internal gen:env
         echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
 
         cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
@@ -152,32 +153,6 @@ jobs:
         username: ${{ env.REGISTRY_USERNAME }}
         password: ${{ env.REGISTRY_PASSWORD }}
 
-    - shell: bash
-      id: override-repo
-      name: override-repo
-      run: |
-        OVERRIDE_REPO="${{ github.event.inputs.override-repo-branch-textbox }}"
-        [ ${{ github.event.inputs.override-branch-boolean }} = true ] && OVERRIDE_REPO=${{ github.ref_name }}
-        echo OVERRIDE_REPO=$OVERRIDE_REPO | tee -a "$GITHUB_OUTPUT"
-
-    - uses: actions/checkout@v4.1.1
-      name: checkout override repo
-      with:
-        repository:  ${{ vars.OVERRIDE_REPO }}
-        token: ${{ secrets.CI_PAT }}
-        path: 'tmp'
-        sparse-checkout: 'alp-data-node-override'
-        sparse-checkout-cone-mode: false
-        ref: ${{ steps.override-repo.outputs.OVERRIDE_REPO }} # branch name
-
-    - shell: bash
-      name: link files from override
-      id: link_files_from_override
-      run: |
-        pwd
-        ln -s tmp/alp-data-node-override alp-data-node-override
-        chmod 755 -R alp-data-node-override
-
     - name: Cleanup dangling images and remove created/exited containers
       continue-on-error: true
       run: |
@@ -206,8 +181,8 @@ jobs:
         echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
 
         # customize dc.yml
-        yq -i '.services.alp-local-ui-file-server.image="alpcr.azurecr.io/alp-data-node/alp-local-ui-file-server:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
         yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
+        yq -i '.services.alp-caddy.image="alpcr.azurecr.io/alp-data-node/alp-caddy:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
 
         # Run ALP services
         yarn remote:minerva up --remove-orphans --force-recreate --wait --pull always
