@@ -178,7 +178,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
-    path: '^/system-portal/dataset/list\\?(.*)role=researcher$',
+    path: '^/system-portal/dataset/list\\?(.*)role=researcher(&.*)?$',
     scopes: ['portal.dataset.read'],
     httpMethods: ['GET']
   },
