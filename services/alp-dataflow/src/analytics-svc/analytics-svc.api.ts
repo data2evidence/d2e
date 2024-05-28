@@ -17,7 +17,7 @@ export class AnalyticsSvcAPI {
   constructor(@Inject(REQUEST) request: Request, private readonly httpService: HttpService) {
     this.jwt = request.headers['authorization']
     if (services.analytics) {
-      this.url = services.analytics
+      this.url = `${services.analytics}/analytics-svc/api/services`
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.SSL_CA_CERT
@@ -41,7 +41,7 @@ export class AnalyticsSvcAPI {
       //add studyid
       const url = `${
         this.url
-      }/api/services/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?studyId=${datasetId}`
+      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?studyId=${datasetId}`
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
@@ -63,7 +63,7 @@ export class AnalyticsSvcAPI {
       const options = await this.createOptions()
       const url = `${
         this.url
-      }/api/services/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}/${conceptId}?studyId=${datasetId}`
+      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}/${conceptId}?studyId=${datasetId}`
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
@@ -76,7 +76,8 @@ export class AnalyticsSvcAPI {
     const errorMessage = 'Error while getting cdm version'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}/api/services/alpdb/${dialect}/database/${databaseCode}/cdmversion/schema/${schema}`
+      const url = `${this.url}/alpdb/${dialect}/database/${databaseCode}/cdmversion/schema/${schema}`
+      console.log('findme, url', url)
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
