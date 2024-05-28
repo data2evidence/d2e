@@ -30,6 +30,10 @@ const Env = z.object({
     .string()
     .refine(val => !isNaN(parseInt(val)))
     .transform(Number),
+  PG__MIN_POOL: z
+    .string()
+    .refine(val => !isNaN(parseInt(val)))
+    .transform(Number),
   PG__IDLE_TIMEOUT_IN_MS: z
     .string()
     .refine(val => !isNaN(parseInt(val)))
