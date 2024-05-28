@@ -324,7 +324,7 @@ export class QueryObject {
         if (this.sqlReturnOn) {
           result.sql = connection.getTranslatedSql(
             preparedQuery.sql,
-            schemaName,
+            schemaName || connection.schemaName,
           );
           result.sqlParameters = preparedQuery.placeholders.map(p => p.value);
           logger.debug(`
