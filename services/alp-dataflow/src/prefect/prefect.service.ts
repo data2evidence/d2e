@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common'
 import { join } from 'path'
 import { mkdirSync, readFileSync, rmdirSync, writeFileSync } from 'fs'
 import { PrefectAPI } from './prefect.api'
@@ -23,19 +23,25 @@ import {
 import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
 import { DataQualityService } from '../data-quality/data-quality.service'
 import { DataQualityFlowRunDto } from '../data-quality/dto'
+import { REQUEST } from '@nestjs/core'
 
 @Injectable()
 export class PrefectService {
   private readonly logger = createLogger(this.constructor.name)
+  private readonly jwt: string
+
 
   constructor(
+    @Inject(REQUEST) request: Request, 
     private readonly dataflowService: DataflowService,
     private readonly prefectApi: PrefectAPI,
     private readonly prefectParamsTransformer: PrefectParamsTransformer,
     private readonly prefectExecutionClient: PrefectExecutionClient,
     private readonly prefectFlowService: PrefectFlowService,
     private readonly dataQualityService: DataQualityService
-  ) {}
+  ) {
+    this.jwt = request.headers['authorization']
+  }
 
   async getFlowRun(id: string) {
     return this.prefectApi.getFlowRun(id)
@@ -221,7 +227,7 @@ export class PrefectService {
     }
   }
 
-  async createFlowRunByMetadata(metadata: IPrefectFlowRunByMetadataDto, token: string) {
+  async createFlowRunByMetadata(metadata: IPrefectFlowRunByMetadataDto) {
     let currentFlow
     const flowMetadata = await this.prefectFlowService.getFlowMetadataByType(metadata.type)
 
@@ -250,7 +256,7 @@ export class PrefectService {
     }
 
     if (metadata.options['options']) {
-      metadata.options['options']['token'] = token
+      metadata.options['options']['token'] = this.jwt
     }
 
     return await this.prefectApi.createFlowRun(

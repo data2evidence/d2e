@@ -37,8 +37,8 @@ export class PrefectController {
   }
 
   @Post('flow-run/metadata')
-  createFlowRunByMetadata(@Body() metadata: PrefectFlowRunByMetadataDto, @Headers('Authorization') token: string) {
-    return this.prefectService.createFlowRunByMetadata(metadata, token)
+  createFlowRunByMetadata(@Body() metadata: PrefectFlowRunByMetadataDto) {
+    return this.prefectService.createFlowRunByMetadata(metadata)
   }
 
   @Post('flow-run/deployment')
