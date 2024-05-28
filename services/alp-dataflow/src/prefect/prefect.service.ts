@@ -30,9 +30,8 @@ export class PrefectService {
   private readonly logger = createLogger(this.constructor.name)
   private readonly jwt: string
 
-
   constructor(
-    @Inject(REQUEST) request: Request, 
+    @Inject(REQUEST) request: Request,
     private readonly dataflowService: DataflowService,
     private readonly prefectApi: PrefectAPI,
     private readonly prefectParamsTransformer: PrefectParamsTransformer,
