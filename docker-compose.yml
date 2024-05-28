@@ -4,12 +4,14 @@ networks:
   alp:
   data:
 
+
 volumes:
   caddy:
   duckdb-data-1:
   meilisearch-minerva-data-1:
   minio-data-1:
   pg-minerva-data-1:
+
 
 x-envs:
   db-svc: &x-dbsvc
@@ -240,7 +242,6 @@ x-envs:
        "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
        "sqlEditor" : "http://alp-minerva-sqleditor:8888",
        "appRouter": "https://alp-mercury-approuter:41000",
-       "ui": "http://alp-local-ui-file-server:3000",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
        "minio": ""
       }
@@ -261,7 +262,7 @@ services:
         condition: service_healthy
     healthcheck:
       interval: 20s
-      retries: 10
+      retries: 20
       start_period: 60s
       test:
         - CMD
@@ -270,7 +271,7 @@ services:
         - liveness
         - --no-check-certificate
         - https://0.0.0.0:41110/check-liveness
-      timeout: 10s
+      timeout: 30s
     hostname: alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/bookmark-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -326,12 +327,13 @@ services:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile
     container_name: &c1 alp-caddy
     hostname: alp-caddy.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: caddy:alpine
+    image:  alpcr.azurecr.io/alp-data-node/alp-caddy:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c1
     networks:
       alp:
+    platform: linux/amd64
     ports:
       - 80:80
       - 443:443
@@ -339,7 +341,6 @@ services:
       - 3002:3002
       - 41101:41101
       - 8103:8103
-    pull_policy: missing
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - caddy:/data
@@ -368,14 +369,14 @@ services:
         condition: service_completed_successfully
     healthcheck:
       interval: 20s
-      retries: 20
-      start_period: 50s
+      retries: 30
+      start_period: 120s
       test:
         - CMD
         - curl
         - -f
         - http://0.0.0.0:41120
-      timeout: 60s
+      timeout: 30s
     hostname: alp-dataflow-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -426,15 +427,15 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
     healthcheck:
-      interval: 10s
-      retries: 20
-      start_period: 5s
+      interval: 20s
+      retries: 30
+      start_period: 60s
       test:
         - CMD
         - curl
         - -f
         - http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
-      timeout: 60s
+      timeout: 30s
     hostname: alp-dataflow-gen-agent-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -448,6 +449,7 @@ services:
       - ./cache/synpuf1k:/app/synpuf1k
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
+      - duckdb-data-1:/app/duckdb_data
     environment:
       <<:
         - *x-converter
@@ -461,6 +463,7 @@ services:
       ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
       DOCKER_HOST: unix://var/run/docker.sock
       DQD_THREAD_COUNT: 1
+      DUCKDB__DATA_FOLDER: /app/duckdb_data
       IDP__ALP_DATA__CLIENT_ID: t5vwuno8ckh5hmqozjqyj
       IDP__ALP_DATA__CLIENT_SECRET: ${LOGTO__ALP_DATA__CLIENT_SECRET}
       LOCAL_DEBUG: "false"
@@ -516,7 +519,7 @@ services:
         condition: service_healthy
     healthcheck:
       interval: 20s
-      retries: 10
+      retries: 30
       start_period: 60s
       test:
         - CMD
@@ -525,7 +528,7 @@ services:
         - -O
         - liveness
         - https://0.0.0.0:41112/check-liveness
-      timeout: 180s
+      timeout: 30s
     hostname: alp-minerva-db-credentials-mgr-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-db-credentials:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -571,19 +574,6 @@ services:
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
 
-  alp-local-ui-file-server:
-    container_name: &c7 alp-local-ui-file-server
-    hostname: alp-local-ui-file-server.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-local-ui-file-server:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c7
-    networks:
-      alp:
-    platform: linux/amd64
-    profiles:
-      - minerva-ui
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -605,7 +595,7 @@ services:
         condition: service_healthy
     healthcheck:
       interval: 20s
-      retries: 20
+      retries: 30
       start_period: 120s
       test:
         - CMD
@@ -648,14 +638,12 @@ services:
         condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
-      alp-minio-post-init:
-        condition: service_completed_successfully
       alp-query-gen:
         condition: service_healthy
     healthcheck:
       interval: 20s
-      retries: 20
-      start_period: 120s
+      retries: 30
+      start_period: 60s
       test:
         - CMD
         - wget
@@ -685,7 +673,7 @@ services:
       ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT
       ANALYTICS_SVC__PORT: 41${BASE_PORT:-1}02
       ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS: 600
-      DEV_MODE: ${DEV_MODE:-false}
+      SQL_RETURN_ON: ${SQL_RETURN_ON:-false}
       DUCKDB__DATA_FOLDER: /home/docker/src/alp-data-node/app/duckdb_data
       IDP__ALP_SVC__CLIENT_ID: 6q6a13bg3dw6fncdr2kf6
       IDP__ALP_SVC__CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
@@ -714,7 +702,7 @@ services:
         condition: service_started
     healthcheck:
       interval: 20s
-      retries: 10
+      retries: 30
       start_period: 60s
       test:
         - CMD
@@ -723,7 +711,7 @@ services:
         - -O
         - liveness
         - https://0.0.0.0:41114/check-liveness
-      timeout: 10s
+      timeout: 30s
     image: alpcr.azurecr.io/alp-data-node/mri-cdw-svc:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
@@ -766,9 +754,11 @@ services:
         condition: service_healthy
       alp-minio-post-init:
         condition: service_completed_successfully
+      alp-dataflow-gen-init:
+        condition: service_completed_successfully
     healthcheck:
       interval: 20s
-      retries: 10
+      retries: 30
       start_period: 60s
       test:
         - CMD
@@ -777,7 +767,7 @@ services:
         - -O
         - liveness
         - https://0.0.0.0:41107/check-liveness
-      timeout: 10s
+      timeout: 30s
     hostname: alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-dataflow:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -811,9 +801,11 @@ services:
     depends_on:
       alp-logto:
         condition: service_healthy
+      alp-minerva-portal-server:
+        condition: service_healthy
     healthcheck:
-      interval: 30s
-      retries: 10
+      interval: 20s
+      retries: 30
       start_period: 120s
       test:
         - CMD
@@ -822,7 +814,7 @@ services:
         - liveness
         - --no-check-certificate
         - https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/check-liveness
-      timeout: 180s
+      timeout: 30s
     hostname: alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-gateway:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -895,9 +887,10 @@ services:
       alp-minerva-postgres:
         condition: service_healthy
     healthcheck:
-      interval: 1m30s
-      retries: 5
+      interval: 20s
+      retries: 30
       start_period: 60s
+      timeout: 30s
       test:
         - CMD
         - curl
@@ -937,7 +930,7 @@ services:
     healthcheck:
       interval: 20s
       retries: 10
-      start_period: 120s
+      start_period: 60s
       test:
         - CMD
         - wget
@@ -945,7 +938,7 @@ services:
         - liveness
         - --no-check-certificate
         - https://0.0.0.0:41113/check-liveness
-      timeout: 10s
+      timeout: 30s
     hostname: alp-minerva-pa-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/mri-pa-config:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1070,11 +1063,11 @@ services:
         condition: service_completed_successfully
       alp-minerva-postgres:
         condition: service_healthy
-        # alp-minio-post-init:
-        #   condition: service_completed_successfully
+      alp-minio-post-init:
+        condition: service_completed_successfully
     healthcheck:
       interval: 20s
-      retries: 10
+      retries: 30
       start_period: 60s
       test:
         - CMD
@@ -1083,7 +1076,7 @@ services:
         - -O
         - liveness
         - https://0.0.0.0:41105/check-liveness
-      timeout: 10s
+      timeout: 30s
     hostname: alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-portal-server:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1117,15 +1110,15 @@ services:
   alp-minerva-postgres:
     container_name: &c17 alp-minerva-postgres-${BASE_PORT:-1}
     healthcheck:
-      interval: 30s
-      retries: 10
+      interval: 20s
+      retries: 30
       start_period: 60s
       test:
         - CMD-SHELL
         - pg_isready
         - -d
         - ${POSTGRES_DB}
-      timeout: 180s
+      timeout: 30s
     hostname: alp-minerva-postgres-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: postgres:15-alpine
     logging:
@@ -1165,7 +1158,7 @@ services:
         condition: service_started
     healthcheck:
       interval: 20s
-      retries: 10
+      retries: 20
       start_period: 60s
       test:
         - CMD
@@ -1174,7 +1167,7 @@ services:
         - liveness
         - --no-check-certificate
         - https://0.0.0.0:41115/check-liveness
-      timeout: 10s
+      timeout: 30s
     hostname: alp-minerva-ps-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/mri-ps-config:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1241,15 +1234,15 @@ services:
       - :9090
     container_name: &c19 alp-minerva-s3
     healthcheck:
-      interval: 1m30s
-      retries: 5
+      interval: 20s
+      retries: 30
       start_period: 60s
       test:
         - CMD
         - curl
         - -I
         - http://alp-minerva-s3:9000/minio/health/live
-      timeout: 180s
+      timeout: 30s
     hostname: alp-minerva-s3.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: minio/minio:RELEASE.2023-10-25T06-33-25Z
     logging:
@@ -1261,8 +1254,6 @@ services:
     ports:
       # - 9000:9000 #Port for API connectivity, internal communication is good enough. Needs to be uncommented only when testing from outside the alp docker network
       - 9090:9090
-    profiles:
-      - minerva-s3
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - minio-data-1:/data
@@ -1315,10 +1306,13 @@ services:
         condition: service_completed_successfully
       alp-minerva-postgres:
         condition: service_healthy
+      alp-meilisearch-post-init:
+        condition: service_completed_successfully
     healthcheck:
       interval: 20s
-      retries: 10
+      retries: 30
       start_period: 60s
+      timeout: 30s
       test:
         - CMD
         - wget
@@ -1366,7 +1360,7 @@ services:
         condition: service_healthy
     healthcheck:
       interval: 20s
-      retries: 10
+      retries: 30
       start_period: 60s
       test:
         - CMD
@@ -1375,7 +1369,7 @@ services:
         - -O
         - liveness
         - https://0.0.0.0:41104/check-liveness
-      timeout: 10s
+      timeout: 30s
     hostname: alp-minerva-user-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-usermgmt:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1473,7 +1467,8 @@ services:
     healthcheck:
       interval: 20s
       retries: 20
-      start_period: 120s
+      start_period: 60s
+      timeout: 30s
       test:
         - CMD
         - wget
@@ -1493,13 +1488,13 @@ services:
       <<:
         - *x-tls
         - *x-routes
-      DEV_MODE: ${DEV_MODE:-false}
+      SQL_RETURN_ON: ${SQL_RETURN_ON:-false}
       LOCAL_DEBUG: "true"
       NODE_ENV: development
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
       isTestEnv: ${isTestEnv}
-  
+
   redis:
     command: redis-server --requirepass ${REDIS_PASSWORD}
     container_name: &c26 alp-minerva-redis-${BASE_PORT:-1}
@@ -1507,6 +1502,7 @@ services:
       interval: 20s
       retries: 10
       start_period: 60s
+      timeout: 30s
       test: redis-cli --no-auth-warning -a ${REDIS_PASSWORD} ping | grep PONG
     hostname: alp-minerva-redis-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: redis:7

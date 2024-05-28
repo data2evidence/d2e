@@ -300,7 +300,8 @@ export function getDefinition(tableMapping: any) {
             name: "type",
             type: "string",
             mandatory: true,
-            regex: "^(num)$|^(text)$|^(time)$|^(freetext)$|^(datetime)$",
+            regex:
+              "^(num)$|^(text)$|^(time)$|^(freetext)$|^(datetime)|^(conceptSet)$",
           },
           {
             name: "referenceFilter",
