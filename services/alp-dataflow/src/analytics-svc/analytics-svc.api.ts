@@ -77,7 +77,6 @@ export class AnalyticsSvcAPI {
     try {
       const options = await this.createOptions()
       const url = `${this.url}/alpdb/${dialect}/database/${databaseCode}/cdmversion/schema/${schema}`
-      console.log('findme, url', url)
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
