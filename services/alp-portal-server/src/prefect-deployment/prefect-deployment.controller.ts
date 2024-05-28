@@ -1,14 +1,9 @@
-import { Controller, Get, Delete, Query } from '@nestjs/common'
+import { Controller, Delete, Query } from '@nestjs/common'
 import { PrefectDeploymentService } from './prefect-deployment.service'
 
 @Controller()
 export class PrefectDeploymentController {
   constructor(private readonly prefectDeploymentService: PrefectDeploymentService) {}
-
-  @Get('list')
-  async getResources() {
-    return 0
-  }
 
   @Delete()
   async deleteDeployment(@Query('filePath') filePath: string) {
