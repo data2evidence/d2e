@@ -29,6 +29,14 @@ export class DatasetRouter {
     }
   }
 
+  private flowSnapshotType(snapshotLocation: string) {
+    if (snapshotLocation === 'DB') {
+      return 'create_snapshot'
+    } else {
+      return 'create_parquet_snapshot'
+    }
+  }
+
   private registerRoutes() {
     this.router.get('/:sourceDatasetId/cdm-schema/snapshot/metadata', async (req, res) => {
       const token = req.headers.authorization!
@@ -135,7 +143,6 @@ export class DatasetRouter {
                 dmInfo.flowId,
                 `datamodel-create-${schemaName}`
               )
-
             } catch (error) {
               this.logger.error(`Error while creating new CDM schema! ${error}`)
               return res.status(500).send('Error while creating CDM schema')
@@ -178,12 +185,16 @@ export class DatasetRouter {
       const portalAPI = new PortalAPI(token)
       const dataflowMgmtAPI = new DataflowMgmtAPI(token)
 
-      const { sourceStudyId, newStudyName, snapshotLocation, snapshotCopyConfig } = req.body
+      const { sourceStudyId, newStudyName, snapshotLocation, snapshotCopyConfig, dataModel: dataModelName } = req.body
       const { dialect, databaseCode, schemaName } = await portalAPI.getDataset(sourceStudyId)
 
       const sourceHasSchema = schemaName.trim() !== ''
       const id = uuidv4()
       const newSchemaName = sourceHasSchema ? `CDM${id}`.replace(/-/g, '') : ''
+
+      const dataModel = dataModelName.split(' ')[0]
+      const datamodels = await dataflowMgmtAPI.getDatamodels()
+      const dataModelInfo = datamodels.find(model => model.name === dataModelName)
 
       try {
         const snapshotRequest = {
@@ -201,24 +212,25 @@ export class DatasetRouter {
               snapshotCopyConfig
             )})`
           )
+
           try {
-            if (snapshotLocation === 'DB') {
-              await dataflowMgmtAPI.copyCDMSchema(
-                databaseCode,
-                this.schemaCase(schemaName, dialect as DbDialect),
-                this.schemaCase(newSchemaName, dialect as DbDialect),
-                dialect,
-                snapshotCopyConfig
-              )
-            } else {
-              await dataflowMgmtAPI.copyCDMSchemaParquet(
-                databaseCode,
-                this.schemaCase(schemaName, dialect as DbDialect),
-                this.schemaCase(newSchemaName, dialect as DbDialect),
-                dialect,
-                snapshotCopyConfig
-              )
+            const options = {
+              options: {
+                flow_action_type: this.flowSnapshotType(snapshotLocation),
+                database_code: databaseCode,
+                data_model: dataModel,
+                schema_name: this.schemaCase(newSchemaName, dialect as DbDialect),
+                source_schema: this.schemaCase(schemaName, dialect as DbDialect),
+                dialect: dialect
+              }
             }
+
+            await dataflowMgmtAPI.createFlowRunByMetadata(
+              options,
+              'datamodel',
+              dataModelInfo.flowId,
+              `datamodel-snapshot-${schemaName}`
+            )
           } catch (error) {
             this.logger.error(`Error copying CDM schema! ${error}`)
             throw new Error(`Error copying CDM schema! ${error}`)
