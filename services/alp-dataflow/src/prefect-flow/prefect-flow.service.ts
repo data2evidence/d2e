@@ -116,7 +116,6 @@ export class PrefectFlowService {
     const metadata = await this.getFlowMetadataById(flowId)
     if (metadata) {
       try {
-        // const deploymentPath = `${metadata.createdBy}%${metadata.name.replace(/[.-]/g, '_')}`
         const deploymentPath = join(metadata.createdBy, metadata.name.replace(/[.-]/g, '_'))
         await this.portalServerApi.deleteDeploymentFiles(deploymentPath)
         await this.deleteFlowMetadata(flowId)
