@@ -9,8 +9,7 @@ import {
   UseInterceptors,
   BadRequestException,
   ParseFilePipeBuilder,
-  Req,
-  Headers
+  Req
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { JwtPayload, decode } from 'jsonwebtoken'
