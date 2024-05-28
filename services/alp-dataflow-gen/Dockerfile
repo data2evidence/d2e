@@ -53,10 +53,10 @@ FROM dbsvc-build AS final-build
 
 WORKDIR /app
 
-COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/pysrc pysrc
 COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/requirements.txt .
-
 RUN pip install -r requirements.txt
+
+COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/pysrc pysrc
 
 COPY --chown=docker:docker ./services/alp-dataflow-gen/init.py .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/init.sh .
@@ -85,6 +85,10 @@ RUN wget http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-b
     && rm apache-ant-${ANT_VERSION}-bin.tar.gz
 
 WORKDIR /app
+
+# Create folder for duckdb database files
+RUN mkdir ./duckdb_data
+RUN chown docker:alp ./duckdb_data
 
 # Create folder to store synpuf1k csv
 RUN mkdir -p /app/synpuf1k
