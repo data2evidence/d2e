@@ -11,8 +11,7 @@ const observation_id = `"OBS_ID"`;
 // List of all languages supported by the system for configurations
 const defaultSupportedLanguages: string[] = ["en", "de", "fr"];
 
-const defaultInterfaceViewsGuardedPholderTable =
-    '$$SCHEMA$$."VIEW::OMOP.GDM.PATIENT"';
+const defaultInterfaceViewsGuardedPholderTable = "$$SCHEMA$$.person";
 
 // Default placeholder-to-table mapping without restricting access
 // Using InterfaceViews
@@ -25,7 +24,7 @@ const defaultInterfaceViewsPholderTableMap: PholderTableMapType = {
     "@COND.START": "condition_start_date",
     "@COND.END": "condition_end_date",
     "@COND.INTERACTION_TYPE": "condition_type_concept_id",
-    "@VISIT": '$$SCHEMA$$."visit_occurrence"',
+    "@VISIT": "$$SCHEMA$$.visit_occurrence",
     "@VISIT.PATIENT_ID": person_id,
     "@VISIT.INTERACTION_ID": "visit_occurrence_id",
     "@VISIT.CONDITION_ID": "visit_occurrence_id",
@@ -333,7 +332,7 @@ const defaultSettings: GlobalSettingsType = {
     timeFormat: "HH:mm:ss",
 };
 
-const defaultGuardedPholderTable = '$$SCHEMA$$."VIEW::OMOP.GDM.PATIENT"';
+const defaultGuardedPholderTable = "$$SCHEMA$$.person";
 
 export type PholderTableMapType = object;
 
