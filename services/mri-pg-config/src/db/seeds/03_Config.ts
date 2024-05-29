@@ -21768,7 +21768,7 @@ const cdwConfigDuckdb = {
         parentInteractionLabel: 'parent',
         attributes: {
           procdatetime: {
-            name: 'Procedure Start Datetime',
+            name: 'Procedure Datetime',
             disabledLangName: [
               {
                 lang: 'en',
@@ -21802,7 +21802,7 @@ const cdwConfigDuckdb = {
               },
             ],
             type: 'datetime',
-            expression: '@PROC."PROCEDURE_START_DATETIME"',
+            expression: '@PROC."PROCEDURE_DATETIME"',
             order: 0,
           },
           procconceptid: {
@@ -21882,7 +21882,7 @@ const cdwConfigDuckdb = {
             order: 2,
           },
           procdate: {
-            name: 'Procedure Start Date',
+            name: 'Procedure Date',
             disabledLangName: [
               {
                 lang: 'en',
@@ -21916,7 +21916,7 @@ const cdwConfigDuckdb = {
               },
             ],
             type: 'time',
-            expression: '@PROC."PROCEDURE_START_DATE"',
+            expression: '@PROC."PROCEDURE_DATE"',
             order: 3,
           },
           qty: {
@@ -24752,7 +24752,7 @@ const cdwConfigDuckdb = {
         ],
         type: 'text',
         expression: '@PATIENT."gender_concept_id"',
-        referenceFilter: '@REF.DOMAIN_ID = \'Gender\' AND @REF.STANDARD_CONCEPT = \'S\' AND (@REF.CONCEPT_NAME) LIKE_REGEXPR \'@SEARCH_QUERY\' FLAG \'i\'',
+        referenceFilter: '@REF.DOMAIN_ID = \'Gender\' AND @REF.STANDARD_CONCEPT = \'S\' AND (@REF.CONCEPT_NAME) SIMILAR TO \'@SEARCH_QUERY\'',
         referenceExpression: '@REF.CONCEPT_NAME',
         order: 7,
         useRefValue: true,
@@ -24955,7 +24955,7 @@ const cdwConfigDuckdb = {
           },
         ],
         type: 'text',
-        expression: '@PATIENT."ethnicity_source"',
+        expression: '@PATIENT."ethnicity_source_value"',
         referenceFilter: '@REF.DOMAIN_ID = \'Ethnicity\' AND @REF.STANDARD_CONCEPT = \'S\' AND (@REF.CONCEPT_CODE) SIMILAR TO \'@SEARCH_QUERY\'',
         referenceExpression: '@REF.CONCEPT_CODE',
         order: 13,
@@ -25376,14 +25376,14 @@ const cdwConfigDuckdb = {
       '@PATIENT.PATIENT_ID': '"person_id"',
       '@PATIENT.DOD': '"BIRTH_DATE"',
       '@PATIENT.DOB': '"BIRTH_DATE"',
-      '@REF': 'CDMVOCAB.CONCEPT',
-      '@REF.VOCABULARY_ID': '"VOCABULARY_ID"',
-      '@REF.CODE': 'CONCEPT_ID',
-      '@REF.TEXT': 'CONCEPT_NAME',
-      '@TEXT': '"CDMVOCAB"."CONCEPT"',
-      '@TEXT.INTERACTION_ID': 'CONCEPT_ID',
-      '@TEXT.INTERACTION_TEXT_ID': 'CONCEPT_ID',
-      '@TEXT.VALUE': 'CONCEPT_NAME',
+      '@REF': '"concept"',
+      '@REF.VOCABULARY_ID': '"vocabulary_id"',
+      '@REF.CODE': '"concept_code"',
+      '@REF.TEXT': '"concept_name"',
+      '@TEXT': '"concept"',
+      '@TEXT.INTERACTION_ID': '"concept_id"',
+      '@TEXT.INTERACTION_TEXT_ID': '"concept_id"',
+      '@TEXT.VALUE': '"concept_name"',
       '@COHORT': '$$SCHEMA$$.cohort',
       '@COHORT.PATIENT_ID': '"subject_id"',
       '@COHORT.INTERACTION_TYPE': '"cohort_definition_id"',
@@ -25429,7 +25429,7 @@ const cdwConfigDuckdb = {
       dateFormat: 'YYYY-MM-dd',
       timeFormat: 'HH:mm:ss',
       otsTableMap: {
-        '@CODE': '"CDMVOCAB"."CONCEPT"',
+        '@CODE': '"concept"',
       },
     },
     shared: {},
