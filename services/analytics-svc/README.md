@@ -1,3 +1,6 @@
+### To use postgres connection instead of duckdb
+Update `USE_DUCKDB` environment variable for  `alp-minerva-analytics-svc` to `false`
+
 # Prepare the test schema
 
 For easiness use the Az HANA instance, which doesn't have the SSL enabled.
@@ -5,30 +8,6 @@ For easiness use the Az HANA instance, which doesn't have the SSL enabled.
 - Login to Az HANA using DBeaver
 
 - Run the script at `services/analytics-svc/spec/ddl-scripts/hana/mri-hana-dll.sql` to create an empty test schema
-
-
-# Using duckdb instead of postgres connection in PA (POC)
-### Creating duckdb database file (currently only supports postgres)
-CAVEAT: vocab schema duckdb database file has to be created first as `VIEW::OMOP.CONCEPT` requires a reference to a vocab schema duckdb database file
-
-Format of command: `yarn createDuckdbDatabase <database_name> <schema_name> <vocab_schema_name>`
-1. Create create duckdb database file for vocab schema with database `alpdev_pg` and vocab schema `cdmvocab` database run the following command
-```
-yarn createDuckdbDatabase alpdev_pg cdmvocab cdmvocab
-```
-2. Create create duckdb database file for cdm schema with database `alpdev_pg` and cdm schema `cdmdefault` with vocab schema `cdmvocab` database run the following command
-```
-yarn createDuckdbDatabase alpdev_pg cdmdefault cdmvocab
-```
-
-### To use duckdb instead of postgres connection
-Update `USE_DUCKDB` environment variable for  `alp-minerva-analytics-svc` to `true`
-
-### Extras
-For development, to create duckdb database file without compiling createDuckdbDatabase.js file, run command directly on createDuckdbDatabase.ts file, e.g
-```
-. ./generated-env.sh && yarn ts-node-dev ./src/duckdb/createDuckdbDatabase.ts <database_name> <schema_name> <vocab_schema_name>
-```
 
 # Run analytics-svc integration tests locally
 

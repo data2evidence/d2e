@@ -18,6 +18,10 @@ on:
         description: Select the environment
         required: true
         default: alp-dev-sg-2
+      force-cleanup-containers:
+        description: Force cleanup all containers
+        type: boolean
+        default: false
 
 env:
   DOCKER_TAG_NAME: ${{ github.event.inputs.docker_tag_name }}
@@ -40,6 +44,11 @@ jobs:
 
     - name: Install 1Password CLI
       uses: 1Password/install-cli-action@v1.0.0
+
+    - name: Force cleanup containers
+      if: github.event.inputs.force-cleanup-containers
+      continue-on-error: true
+      run: docker rm -v -f $(docker ps -qa)
 
     - name: Generate dotenv
       env:
@@ -127,3 +136,8 @@ jobs:
       if: success() || failure()
       run: |  
         yarn logs:minerva
+
+    - name: Post cleanup
+      if: always()
+      run: |
+        docker rm -f alp-caddy-certs-mgmt || true # Cleanup cert mgmt container if job aborted
