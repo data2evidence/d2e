@@ -4,6 +4,7 @@ dotenv.config()
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import express, { Request, Response, NextFunction } from 'express'
 import { UserMgmtAPI } from './api'
+import bodyParser from 'body-parser'
 import { ROLES } from './const'
 import { MriUser, isClientCredToken } from './mri/MriUser'
 import { createLogger } from './Logger'
@@ -23,6 +24,11 @@ import { AuthcType, exchangeToken, publicURLs } from './authentication'
 import { v4 as uuidv4 } from 'uuid'
 import { addSqleditorHeaders } from './middlewares/SqleditorMiddleware'
 import { addMeilisearchHeaders } from './middlewares/MeilisearchMiddleware'
+import {
+  ensureAnalyticsDatasetAuthorized,
+  ensureDataflowMgmtDatasetAuthorized,
+  ensureTerminologyDatasetAuthorized
+} from './middlewares/ensureDatasetAuthorizedMiddleware'
 import { setupGlobalErrorHandling } from './error-handler'
 
 const auth = process.env.SKIP_AUTH === 'TRUE' ? false : true
@@ -261,6 +267,8 @@ routes.forEach((route: IRouteProp) => {
           ensureAuthenticated,
           addSubToRequestUserMiddleware,
           ensureAuthorized,
+          bodyParser.json(),
+          ensureAnalyticsDatasetAuthorized,
           createProxyMiddleware({
             ...getCreateMiddlewareOptions(services.analytics),
             logLevel: 'debug',
@@ -302,7 +310,10 @@ routes.forEach((route: IRouteProp) => {
         app.use(
           source,
           ensureAuthenticated,
+          ensureAuthorized,
           checkScopes,
+          bodyParser.json(),
+          ensureDataflowMgmtDatasetAuthorized,
           createProxyMiddleware({
             ...getCreateMiddlewareOptions(services.dataflowMgmt),
             pathRewrite: path => path.replace('/dataflow-mgmt', '')
@@ -334,6 +345,8 @@ routes.forEach((route: IRouteProp) => {
         app.use(
           source,
           ensureAuthenticated,
+          ensureAuthorized,
+          ensureTerminologyDatasetAuthorized,
           checkScopes,
           createProxyMiddleware(getCreateMiddlewareOptions(services.terminology))
         )
