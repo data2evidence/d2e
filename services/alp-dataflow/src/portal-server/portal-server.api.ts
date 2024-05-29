@@ -63,7 +63,7 @@ export class PortalServerAPI {
     const errorMessage = 'Error while deleting deployment files'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}/prefect-deployment?filePath=${deploymentFolderPath}`
+      const url = `${this.url}/prefect-deployment?filePath=${deploymentFolderPath}&bucketName=${env.ADHOC_DEPLOYMENT_FLOWS_BUCKET_NAME}`
       this.logger.info(url)
       const obs = this.httpService.delete(url, options)
       return firstValueFrom(obs.pipe(map(result => result.data)))

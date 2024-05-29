@@ -7,7 +7,6 @@ import { env } from '../env'
 export class MinioClient {
   private readonly logger = createLogger(this.constructor.name)
   private readonly client: Minio.Client
-  private static readonly FLOW_DEPLOYMENT_FOLDER = 'dataflow-adhoc-flows'
 
   constructor() {
     this.client = new Minio.Client({
@@ -111,8 +110,7 @@ export class MinioClient {
     }
   }
 
-  async deleteDeployment(deploymentPath: string) {
-    const bucketName = MinioClient.FLOW_DEPLOYMENT_FOLDER
+  async deleteDeployment(deploymentPath: string, bucketName: string) {
     try {
       const objectsStream = this.client.listObjectsV2(bucketName, deploymentPath, true)
       const objectsToDelete: string[] = []
