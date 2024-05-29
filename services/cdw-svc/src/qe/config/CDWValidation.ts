@@ -296,21 +296,23 @@ export class CDWValidator {
   public isValidExpression(str: string) {
     return /^\s*<EXP>\s*$/.test(str);
   }
+
   public isValidCondition(str: string) {
-    //Temporarily disable this check
-    //Need the validation to work for postgres query
-    // if(env.USE_DUCKDB){
-    //   /**
-    //        * `@REF."DOMAIN_ID" = 'Condition' AND @REF.STANDARD_CONCEPT = 'S' AND regexp_matches(@REF."CONCEPT_CODE" || ' - ' || @REF."CONCEPT_NAME", '@SEARCH_QUERY')`
-    //        */
-    //   return /^\s*<COND>\s*AND REGEXP_MATCHES\(<EXP>, <EXP>\)\s*$/.test(str);
-    // }else{
+    if(env.USE_DUCKDB){
+      /**
+       *  Special syntax "SIMILIAR TO" is used when using LIKE_REGEXPR in duckdb
+       * `@REF."DOMAIN_ID" = 'Condition' AND @REF.STANDARD_CONCEPT = 'S' AND (@REF."CONCEPT_CODE" || ' - ' || @REF."CONCEPT_NAME") SIMILIAR TO '@SEARCH_QUERY'`
+       */
+      //const regex1 = /^\s*<COND>\s*AND\s*<EXP>\s*SIMILAR TO\s*<EXP>\s*$/
+      const regex = /^\s*<COND>s*$/
+      return regex.test(str)
+    }else{
         /**
        *  Special syntax "FLAG <EXP>" is used when using LIKE_REGEXPR in Hana
        * `@REF."DOMAIN_ID" = 'Condition' AND @REF.STANDARD_CONCEPT = 'S' AND (@REF."CONCEPT_CODE" || ' - ' || @REF."CONCEPT_NAME") LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'`
        */
         return /^\s*<COND>\s*(FLAG <EXP>)?\s*$/.test(str);
-    //}
+    }
   }
   public isValidAggregation(str: string) {
     return /^\s*<AGGR>\s*$/.test(str);

@@ -403,6 +403,26 @@ export function getDefinition(tableMapping: any) {
             mandatory: false,
             type: "string",
           },
+          {
+            name: "domainFilter",
+            mandatory: false,
+            type: "string",
+          },
+          {
+            name: "standardConceptCodeFilter",
+            mandatory: false,
+            type: "string",
+          },
+          {
+            name: "useRefValue",
+            mandatory: false,
+            type: "boolean",
+          },
+          {
+            name: "useRefText",
+            mandatory: false,
+            type: "boolean",
+          }
         ],
       },
     ],
