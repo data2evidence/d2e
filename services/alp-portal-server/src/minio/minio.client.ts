@@ -120,13 +120,14 @@ export class MinioClient {
       }
 
       await this.client.removeObjects(bucketName, objectsToDelete)
-      console.log(`Deleted ${objectsToDelete.length} objects.`)
+      this.logger.info(`Deleted ${objectsToDelete.length} objects`)
 
       // Delete the folder itself
       await this.client.removeObject(bucketName, deploymentPath)
-      console.log(`Deleted folder: ${deploymentPath}`)
+      this.logger.info(`Deleted folder: ${deploymentPath}`)
     } catch (error) {
-      throw new InternalServerErrorException(`Error occurred in MinIO S3 object deletion: ${deploymentPath}`)
+      this.logger.error(`${error}`)
+      throw new InternalServerErrorException(`Error occurred in MinIO S3 object deletion: ${deploymentPath}: ${error}`)
     }
   }
 
