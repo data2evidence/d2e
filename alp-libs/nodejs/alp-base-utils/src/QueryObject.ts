@@ -149,16 +149,15 @@ export class QueryObject {
   constructor(
     public queryString?: string,
     public parameterPlaceholders?: any,
-    public sqlReturnOn?: any,
-    private devMode: string = process.env.DEV_MODE ?? "false",
+    public sqlReturnOn?: boolean,
   ) {
     this.queryString = queryString || "";
     this.parameterPlaceholders = parameterPlaceholders || [];
 
     // implements priority of passed value over global settings value over default value, similar to
     // "this.sqlReturnOn = sqlReturnOn || settings.sqlReturnOn || false" which fails in cases where variables eval to false
-    this.sqlReturnOn = false;
-    this.devMode = devMode;
+    this.sqlReturnOn =
+      sqlReturnOn || (process.env.SQL_RETURN_ON === "true" ? true : false);
   }
 
   public shortId(): string {
@@ -322,13 +321,15 @@ export class QueryObject {
 
       const _process = resultData => {
         const result: any = { data: resultData };
-
-        if (this.devMode.toLowerCase() === "true") {
-          result.sql = preparedQuery.sql;
+        if (this.sqlReturnOn) {
+          result.sql = connection.getTranslatedSql(
+            preparedQuery.sql,
+            schemaName || connection.schemaName,
+          );
           result.sqlParameters = preparedQuery.placeholders.map(p => p.value);
           logger.debug(`
-            ${result.sql}
-            ${result.sqlParameters}
+          ${result.sql}
+          ${result.sqlParameters}
           `);
         }
         return result;

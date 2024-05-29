@@ -9,10 +9,9 @@ import { DBError as dbe } from "@alp/alp-base-utils";
 import DBError = dbe.DBError;
 import MRIEndpointErrorHandler from "../../utils/MRIEndpointErrorHandler";
 import { convertZlibBase64ToJson } from "@alp/alp-base-utils";
+import { env } from "../../env";
 
-const SQL_RETURN_ON: boolean = process.env.advanced_sqlReturnOn
-    ? process.env.advanced_sqlReturnOn.toLowerCase() === "true"
-    : new Settings().getSettings().sqlReturnOn;
+const sqlReturnOn: boolean = env.SQL_RETURN_ON === "true" ? true : false;
 
 let _stripDbgInfo = (result) => {
     if (typeof result === "string") {
@@ -23,7 +22,7 @@ let _stripDbgInfo = (result) => {
     return result;
 };
 let _processResult = (result) =>
-    result && !SQL_RETURN_ON ? _stripDbgInfo(result) : result;
+    result && !sqlReturnOn ? _stripDbgInfo(result) : result;
 /**
  * Retrieves list of patient count for each study
  * @param req
@@ -76,14 +75,12 @@ export async function populationStudyQuery(req: IMRIRequest, res, next) {
                             const studyIds = body.studies;
                             function _sendResult(err, result) {
                                 if (err) {
-                                    return res
-                                        .status(500)
-                                        .send(
-                                            MRIEndpointErrorHandler({
-                                                err,
-                                                language,
-                                            })
-                                        );
+                                    return res.status(500).send(
+                                        MRIEndpointErrorHandler({
+                                            err,
+                                            language,
+                                        })
+                                    );
                                 }
                                 res.status(200).send(result);
                             }
@@ -192,14 +189,12 @@ export async function populationQuery(req: IMRIRequest, res, next) {
                                 "MRI_CSV_" + new Date().toISOString() + ".csv";
                             function _sendResult(err, result) {
                                 if (err) {
-                                    return res
-                                        .status(500)
-                                        .send(
-                                            MRIEndpointErrorHandler({
-                                                err,
-                                                language,
-                                            })
-                                        );
+                                    return res.status(500).send(
+                                        MRIEndpointErrorHandler({
+                                            err,
+                                            language,
+                                        })
+                                    );
                                 }
                                 res.status(200).send(result);
                             }
