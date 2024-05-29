@@ -159,12 +159,12 @@ const onProxyReq = (proxyReq, req) => {
 
     if (contentType === 'application/json') {
       writeBody(JSON.stringify(req.body))
-      logger.debug(`JSON body is written for Sqleditor proxy at url: ${req.originalUrl}`)
+      logger.debug(`JSON body is written for proxy at url: ${req.originalUrl}`)
     }
 
     if (contentType === 'application/x-www-form-urlencoded') {
       writeBody(querystring.stringify(req.body))
-      logger.debug(`Form body is written for Sqleditor proxy at url: ${req.originalUrl}`)
+      logger.debug(`Form body is written for proxy at url: ${req.originalUrl}`)
     }
   }
 }
