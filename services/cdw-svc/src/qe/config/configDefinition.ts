@@ -422,6 +422,11 @@ export function getDefinition(tableMapping: any) {
             name: "useRefText",
             mandatory: false,
             type: "boolean",
+          },
+          {
+            name: "conceptSetType",
+            mandatory: false,
+            type: "string",
           }
         ],
       },
