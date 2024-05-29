@@ -1,5 +1,4 @@
 name: alp
-
 networks:
   alp:
   data:
@@ -220,7 +219,6 @@ x-envs:
         }
       ]
     }
-
   redis: &x-redis
     REDIS_HOST: ${REDIS_HOST:-alp-minerva-redis-1}
     REDIS_PORT: ${REDIS_PORT:-6379}
@@ -250,9 +248,7 @@ x-envs:
     TLS__INTERNAL__CRT: ${TLS__INTERNAL__CRT}
     TLS__INTERNAL__DOMAIN: ${TLS__INTERNAL__DOMAIN:-alp.local}
     TLS__INTERNAL__KEY: ${TLS__INTERNAL__KEY}
-
 services:
-
   alp-bookmark:
     container_name: &c0 alp-minerva-bookmark-svc-${BASE_PORT:-1}
     depends_on:
@@ -279,6 +275,7 @@ services:
         tag: *c0
     networks:
       alp:
+        priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
@@ -294,7 +291,6 @@ services:
       PORT: 41110
       isTestEnv: ${isTestEnv}
       sqlOnly: false
-
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile
     container_name: &c1 alp-caddy
@@ -305,6 +301,7 @@ services:
         tag: *c1
     networks:
       alp:
+        priority: 20
     platform: linux/amd64
     ports:
       - 80:80
@@ -322,7 +319,6 @@ services:
       CADDY__BLOCK_LOGTO_ADMIN_CONSOLE: ${CADDY__BLOCK_LOGTO_ADMIN_CONSOLE:-abort} # Values disable: "abort" | enable: ""
       CADDY__LOGTO_IDP__PUBLIC_FQDN: ${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
-
   alp-dataflow-gen:
     command:
       - sh
@@ -356,7 +352,9 @@ services:
         tag: *c2
     networks:
       alp:
+        priority: 20
       data:
+        priority: 10
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
@@ -387,7 +385,6 @@ services:
       R_LIBS_USER: /home/docker/plugins/R/site-library
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
-
   alp-dataflow-gen-agent:
     command:
       - sh
@@ -415,6 +412,7 @@ services:
         tag: *c3
     networks:
       data:
+        priority: 10
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
@@ -451,7 +449,6 @@ services:
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
       TERMINOLOGY_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/terminology/
-
   alp-dataflow-gen-init:
     command:
       - sh
@@ -471,6 +468,7 @@ services:
         tag: *c4
     networks:
       alp:
+        priority: 20
     platform: linux/amd64
     environment:
       <<:
@@ -481,7 +479,6 @@ services:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       R_LIBS_USER: /home/docker/plugins/R/site-library
-
   alp-db-credentials-mgr:
     container_name: &c5 alp-minerva-db-credentials-mgr-${BASE_PORT:-1}
     depends_on:
@@ -508,6 +505,7 @@ services:
         tag: *c5
     networks:
       alp:
+        priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
@@ -520,7 +518,6 @@ services:
       PG__DB_CREDENTIALS_MGR__PASSWORD: ${PG_WRITE_PASSWORD}
       PG__DB_CREDENTIALS_MGR__SCHEMA: db_credentials_mgr
       PG__DB_CREDENTIALS_MGR__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-
   alp-fhir-server:
     container_name: &c6 alp-minerva-fhir-server-${BASE_PORT:-1}
     depends_on:
@@ -534,7 +531,8 @@ services:
       options:
         tag: *c6
     networks:
-      - alp
+      alp:
+        priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     entrypoint:
       - ./start.sh
@@ -545,7 +543,6 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -558,7 +555,6 @@ services:
   #     DB_URL: postgres://${PG_SUPER_USER:-postgres}:${PG_SUPER_PASSWORD}@alp-minerva-postgres-1:${PG_PORT:-5432}/${PG_DB_NAME:-postgres}
   #   networks:
   #     - alp
-
 
   alp-logto:
     container_name: &c8 alp-logto-${BASE_PORT:-1}
@@ -582,7 +578,9 @@ services:
         tag: *c8
     networks:
       alp:
+        priority: 20
       data:
+        priority: 10
     entrypoint:
       - sh
       - -c
@@ -598,7 +596,6 @@ services:
       LOGTO_ROLES_AZ_GROUPS_MAPPING: ${LOGTO_ROLES_AZ_GROUPS_MAPPING:-{"role.systemadmin":"37b5364a-348c-494f-b67f-a59a40e52ab7","role.useradmin":"90597adc-92af-4649-8151-68c3b7feb66c","role.tenantviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5"}}
       NODE_ENV: test
       TRUST_PROXY_HEADER: true
-
   alp-minerva-analytics-svc:
     container_name: &c9 alp-minerva-analytics-${BASE_PORT:-1}
     depends_on:
@@ -630,6 +627,7 @@ services:
         tag: *c9
     networks:
       alp:
+        priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - duckdb-data-1:/home/docker/src/alp-data-node/app/duckdb_data
@@ -645,7 +643,7 @@ services:
       ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT
       ANALYTICS_SVC__PORT: 41${BASE_PORT:-1}02
       ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS: 600
-      DEV_MODE: ${DEV_MODE:-false}
+      SQL_RETURN_ON: ${SQL_RETURN_ON:-false}
       DUCKDB__DATA_FOLDER: /home/docker/src/alp-data-node/app/duckdb_data
       IDP__ALP_SVC__CLIENT_ID: 6q6a13bg3dw6fncdr2kf6
       IDP__ALP_SVC__CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
@@ -656,7 +654,6 @@ services:
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
       local: ${local}
-
   alp-minerva-cdw-svc:
     container_name: &c10 alp-minerva-cdw-svc-${BASE_PORT:-1}
     depends_on:
@@ -690,6 +687,7 @@ services:
         tag: *c10
     networks:
       alp:
+        priority: 20
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     hostname: alp-minerva-cdw-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
@@ -708,7 +706,6 @@ services:
       USE_DUCKDB: ${USE_DUCKDB:-true}
       isTestEnv: ${isTestEnv}
       DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
-
   alp-minerva-dataflow-mgmt:
     container_name: &c11 alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
     depends_on:
@@ -739,6 +736,7 @@ services:
         tag: *c11
     networks:
       alp:
+        priority: 20
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
@@ -759,7 +757,6 @@ services:
       PG__DATAFLOW_MGMT__PASSWORD: ${PG_WRITE_PASSWORD}
       PG__DATAFLOW_MGMT__SCHEMA: dataflow
       PG__DATAFLOW_MGMT__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-
   alp-minerva-gateway:
     container_name: &c12 alp-minerva-gateway-${BASE_PORT:-1}
     depends_on:
@@ -786,7 +783,9 @@ services:
         tag: *c12
     networks:
       alp:
+        priority: 20
       data:
+        priority: 10
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
@@ -844,7 +843,6 @@ services:
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
-
   alp-minerva-meilisearch-svc:
     container_name: &c13 alp-minerva-meilisearch-svc-${BASE_PORT:-1}
     depends_on:
@@ -866,6 +864,7 @@ services:
         tag: *c13
     networks:
       alp:
+        priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - meilisearch-minerva-data-1:/meili_data
@@ -910,6 +909,7 @@ services:
         tag: *c14
     networks:
       alp:
+        priority: 20
     environment:
       <<:
         - *x-tls
@@ -960,6 +960,7 @@ services:
         tag: *c15
     networks:
       alp:
+        priority: 20
     environment:
       <<:
         - *x-tls
@@ -1019,7 +1020,7 @@ services:
     healthcheck:
       interval: 20s
       retries: 30
-      start_period: 60s
+      start_period: 120s
       test:
         - CMD
         - wget
@@ -1035,6 +1036,7 @@ services:
         tag: *c16
     networks:
       alp:
+        priority: 20
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
@@ -1077,7 +1079,9 @@ services:
         tag: *c17
     networks:
       alp:
+        priority: 20
       data:
+        priority: 10
     ports:
       - 41190:5432
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
@@ -1126,6 +1130,7 @@ services:
         tag: *c18
     networks:
       alp:
+        priority: 20
     environment:
       <<:
         - *x-tls
@@ -1188,7 +1193,9 @@ services:
         tag: *c19
     networks:
       alp:
+        priority: 20
       data:
+        priority: 10
     ports:
       # - 9000:9000 #Port for API connectivity, internal communication is good enough. Needs to be uncommented only when testing from outside the alp docker network
       - 9090:9090
@@ -1220,6 +1227,7 @@ services:
         tag: *c20
     networks:
       alp:
+        priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
@@ -1265,6 +1273,7 @@ services:
         tag: *c21
     networks:
       alp:
+        priority: 20
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
@@ -1312,6 +1321,7 @@ services:
         tag: *c22
     networks:
       alp:
+        priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
@@ -1360,6 +1370,7 @@ services:
         tag: *c23
     networks:
       alp:
+        priority: 20
     entrypoint: |
       /bin/sh -c " /usr/bin/mc config host add myminio http://alp-minerva-s3:9000 ${MINIO__ACCESS_KEY:-root} ${MINIO__SECRET_KEY};
       /usr/bin/mc mb -p myminio/dataflow-adhoc-flows;
@@ -1381,6 +1392,7 @@ services:
         tag: *c24
     networks:
       alp:
+        priority: 20
     environment:
       <<:
         - *x-tls
@@ -1413,18 +1425,19 @@ services:
         tag: *c25
     networks:
       alp:
+        priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
         - *x-tls
         - *x-routes
-      DEV_MODE: ${DEV_MODE:-false}
+      SQL_RETURN_ON: ${SQL_RETURN_ON:-false}
       LOCAL_DEBUG: "true"
       NODE_ENV: development
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
       isTestEnv: ${isTestEnv}
-  
+
   redis:
     command: redis-server --requirepass ${REDIS_PASSWORD}
     container_name: &c26 alp-minerva-redis-${BASE_PORT:-1}
@@ -1440,7 +1453,8 @@ services:
       options:
         tag: *c26
     networks:
-      - alp
+      alp:
+        priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
 
   alp-meilisearch-post-init:
@@ -1464,7 +1478,8 @@ services:
       - --data-binary
       - '{ "vectorStore": true }'
     networks:
-      - alp
+      alp:
+        priority: 20
     hostname: alp-meilisearch-post-init.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       <<:
