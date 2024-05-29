@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common'
 import { PrefectFlowDto } from './dto'
 import { PrefectAPI } from '../prefect/prefect.api'
 import { PortalServerAPI } from '../portal-server/portal-server.api'
@@ -116,17 +116,18 @@ export class PrefectFlowService {
     const metadata = await this.getFlowMetadataById(flowId)
     if (metadata) {
       try {
+        // flow deployment path is specified as userId/modifiedFileStem
         const deploymentPath = join(metadata.createdBy, metadata.name.replace(/[.-]/g, '_'))
         await this.portalServerApi.deleteDeploymentFiles(deploymentPath)
         await this.deleteFlowMetadata(flowId)
         return flowId
       } catch (err) {
         this.logger.error(`Error deleting flow deployment files for ${flowId}: ${err}`)
-        return
+        throw new InternalServerErrorException(`Error deleting flow deployment files for ${flowId}: ${err}`)
       }
     }
     this.logger.info(`No flow deployment files found for ${flowId}`)
-    return
+    return flowId
   }
 
   private addOwner<T>(object: T, isNewEntity = false) {
