@@ -4,7 +4,6 @@ dotenv.config()
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import express, { Request, Response, NextFunction } from 'express'
 import { UserMgmtAPI } from './api'
-import bodyParser from 'body-parser'
 import { ROLES } from './const'
 import { MriUser, isClientCredToken } from './mri/MriUser'
 import { createLogger } from './Logger'
@@ -149,6 +148,27 @@ function addCorrelationIDToHeader(req: Request, res: Response, next: NextFunctio
   return next()
 }
 
+const onProxyReq = (proxyReq, req) => {
+  if (req.body) {
+    const contentType = proxyReq.getHeader('Content-Type')
+
+    const writeBody = (bodyData: string) => {
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
+      proxyReq.write(bodyData)
+    }
+
+    if (contentType === 'application/json') {
+      writeBody(JSON.stringify(req.body))
+      logger.debug(`JSON body is written for Sqleditor proxy at url: ${req.originalUrl}`)
+    }
+
+    if (contentType === 'application/x-www-form-urlencoded') {
+      writeBody(querystring.stringify(req.body))
+      logger.debug(`Form body is written for Sqleditor proxy at url: ${req.originalUrl}`)
+    }
+  }
+}
+
 function getCreateMiddlewareOptions(serviceUrl: string) {
   return {
     target: {
@@ -223,23 +243,6 @@ routes.forEach((route: IRouteProp) => {
 
     switch (route.destination) {
       case 'sqleditor':
-        const onProxyReq = (proxyReq, req) => {
-          const contentType = proxyReq.getHeader('Content-Type')
-          const writeBody = (bodyData: string) => {
-            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
-            proxyReq.write(bodyData)
-          }
-
-          if (contentType === 'application/json') {
-            writeBody(JSON.stringify(req.body))
-            logger.debug(`JSON body is written for Sqleditor proxy at url: ${req.originalUrl}`)
-          }
-
-          if (contentType === 'application/x-www-form-urlencoded') {
-            writeBody(querystring.stringify(req.body))
-            logger.debug(`Form body is written for Sqleditor proxy at url: ${req.originalUrl}`)
-          }
-        }
         app.use(
           source,
           ensureAuthenticated,
@@ -267,12 +270,13 @@ routes.forEach((route: IRouteProp) => {
           ensureAuthenticated,
           addSubToRequestUserMiddleware,
           ensureAuthorized,
-          bodyParser.json(),
+          express.json(),
           ensureAnalyticsDatasetAuthorized,
           createProxyMiddleware({
             ...getCreateMiddlewareOptions(services.analytics),
             logLevel: 'debug',
-            headers: { Connection: 'keep-alive' }
+            headers: { Connection: 'keep-alive' },
+            onProxyReq: onProxyReq
           })
         )
         break
@@ -312,11 +316,12 @@ routes.forEach((route: IRouteProp) => {
           ensureAuthenticated,
           ensureAuthorized,
           checkScopes,
-          bodyParser.json(),
+          express.json(),
           ensureDataflowMgmtDatasetAuthorized,
           createProxyMiddleware({
             ...getCreateMiddlewareOptions(services.dataflowMgmt),
-            pathRewrite: path => path.replace('/dataflow-mgmt', '')
+            pathRewrite: path => path.replace('/dataflow-mgmt', ''),
+            onProxyReq: onProxyReq
           })
         )
         break
@@ -348,7 +353,7 @@ routes.forEach((route: IRouteProp) => {
           ensureAuthorized,
           ensureTerminologyDatasetAuthorized,
           checkScopes,
-          createProxyMiddleware(getCreateMiddlewareOptions(services.terminology))
+          createProxyMiddleware({ ...getCreateMiddlewareOptions(services.terminology), onProxyReq: onProxyReq })
         )
         break
       case 'pa-config':
