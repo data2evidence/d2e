@@ -9,6 +9,7 @@ import { setupReqContext, healthCheck } from './common/middleware'
 import { runMigrations } from './common/data-source/db-migration'
 import dataSource from './common/data-source/data-source'
 import { loadLocalDatabaseCredentials } from './local-setup'
+import https from 'https'
 
 const PORT = env.PORT || 8000
 const logger = createLogger()
@@ -62,7 +63,16 @@ class App {
 
   start() {
     runMigrations().then(() => {
-      this.app.listen(PORT)
+      const server = https.createServer(
+        {
+          key: env.SSL_PRIVATE_KEY,
+          cert: env.SSL_PUBLIC_CERT,
+          maxHeaderSize: 8192 * 10
+        },
+        this.app
+      )
+
+      server.listen(PORT)
       logger.info(`🚀 ALP DB Credentials Manager started successfully!. Server listening on port ${PORT}`)
     })
   }

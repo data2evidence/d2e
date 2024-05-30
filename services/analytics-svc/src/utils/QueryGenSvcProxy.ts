@@ -7,6 +7,7 @@ import { IMRIRequest, QuerySvcResultType } from "../types";
 dotenv.config();
 const log = Logger.CreateLogger("analytics-log");
 const envVarUtils = new EnvVarUtils(process.env);
+import { env } from "../env";
 
 export async function generateQuery(
     req: IMRIRequest,
@@ -25,8 +26,8 @@ export async function generateQuery(
         urlParams = new URL(`http://localhost:41008`);
         protocolLib = http;
     } else {
-        urlParams = new URL("http://alp-minerva-query-gen-svc-1:41109");
-        protocolLib = http;
+        urlParams = new URL(env.SERVICE_ROUTES.queryGen);
+        protocolLib = https;
     }
     hostname = urlParams.hostname;
     port = urlParams.port;
@@ -61,13 +62,10 @@ export async function generateQuery(
             "user-agent": "ALP Service",
             "x-source-origin": sourceOrigin,
             "x-req-correlation-id": reqCorrelationId,
-            "x-alp-usersessionclaims": req.headers["x-alp-usersessionclaims"],
         },
         method: "POST",
-        rejectUnauthorized:
-            hostname === "localhost" || hostname === "alp-mercury-approuter"
-                ? false
-                : true,
+        rejectUnauthorized: true,
+        ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
 
     return new Promise<QuerySvcResultType>((resolve, reject) => {

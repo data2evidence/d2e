@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
 import { get } from '../api/request-util'
 import { createLogger } from '../Logger'
+import { services } from '../env'
 const alp_version = process.env.ALP_RELEASE || 'local'
 
 const logger = createLogger('VersionCheck')
-const url: string = process.env.APPROUTER__BASE_URL + 'appversion'
+const url: string = services.appRouter + '/appversion'
 let approuterVersionCache
 
 const isCacheExpired = ({ cachedAt }) => {

@@ -8,9 +8,33 @@ const Env = z.object({
   ENV_MOUNT_PATH: z.string().optional(),
   PORT: z.string(),
   MRI_USER: z.string().optional(),
-  DUCKDB__DATA_FOLDER: z.string(),
   USE_DUCKDB: z.string(),
-  CONFIG_CONNECTION: z.string()
+  TLS__INTERNAL__KEY: z.string(),
+  TLS__INTERNAL__CRT: z.string(),
+  DUCKDB_PATH: z.string(),
+  
+  PG__HOST: z.string(),
+  PG__DB_NAME: z.string(),
+  PG_USER: z.string(),
+  PG_PASSWORD: z.string(),
+  PG_SCHEMA: z.string(),
+  PG__DIALECT: z.string(),
+  PG__PORT: z
+    .string()
+    .refine(val => !isNaN(parseInt(val)))
+    .transform(Number),
+  PG__MIN_POOL: z
+    .string()
+    .refine(val => !isNaN(parseInt(val)))
+    .transform(Number),
+  PG__MAX_POOL: z
+    .string()
+    .refine(val => !isNaN(parseInt(val)))
+    .transform(Number),
+  PG__IDLE_TIMEOUT_IN_MS: z
+    .string()
+    .refine(val => !isNaN(parseInt(val)))
+    .transform(Number),
 });
 
 const result = Env.safeParse(process.env);

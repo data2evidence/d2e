@@ -9,7 +9,7 @@ import { Pool } from "pg";
 import { DBError } from "./DBError";
 import { CreateLogger } from "./Logger";
 import QueryStream from "pg-query-stream";
-import { translateHanaToPostgres } from "./helpers/translateHanaToPostgres";
+import { translateHanaToPostgres } from "./helpers/hanaTranslation";
 const logger = CreateLogger("Postgres Connection");
 
 function _getRows(result) {
@@ -113,7 +113,11 @@ export class PostgresConnection implements ConnectionInterface {
   }
 
   private parseSql(temp: string): string {
-    return translateHanaToPostgres(temp, this.schemaName, this.dialect);
+    return translateHanaToPostgres(temp, this.schemaName);
+  }
+
+  public getTranslatedSql(sql: string): string {
+    return this.parseSql(sql);
   }
 
   public executeQuery(
@@ -299,5 +303,4 @@ export class PostgresConnection implements ConnectionInterface {
     const replacement = schemaName === "" ? "" : `${schemaName}.`;
     return sql.replace(/\$\$SCHEMA\$\$./g, replacement);
   }
-
 }

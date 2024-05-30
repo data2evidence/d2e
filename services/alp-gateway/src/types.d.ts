@@ -61,9 +61,7 @@ export interface IPlugin {
 
 export interface IRouteProp {
   source: string
-  target?: string
   destination: string
-  targetPath?: string
 }
 
 export interface IALPUser {
@@ -88,3 +86,17 @@ export interface IToken {
 }
 
 export type LoggingLevel = 'info' | 'warn' | 'error'
+
+export interface DatasetDashboard {
+  id: string
+  name: string
+  url: string
+  basePath: string
+}
+
+export interface Dataset {
+  dialect: string
+  databaseCode: string
+  schemaName: string
+  dashboards: DatasetDashboard[]
+}

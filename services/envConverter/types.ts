@@ -68,6 +68,7 @@ export type HanaConfig = {
   values: HanaValues;
   analyticsSvcValues?: Partial<HanaValues>;
   dbSvcValues?: Partial<HanaValues>;
+  cdwSvcValues?: Partial<HanaValues>;
 };
 
 export type PostgresValues = {
@@ -108,7 +109,6 @@ export type PostgresConfig = {
   values: PostgresValues;
   analyticsSvcValues?: Partial<PostgresValues>;
   dbSvcValues?: Partial<PostgresValues>;
-  cdwSvcValues?: Partial<PostgresValues>;
 };
 
 export type IntTestValues = {

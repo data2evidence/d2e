@@ -28,9 +28,8 @@ export class DbCredentialsApi {
     }
     this.baseUrl = process.env.DB_CREDENTIALS_MGR__API_URL;
     this.httpsAgent = new Agent({
-      rejectUnauthorized: this.baseUrl.startsWith("https://alp-minerva-")
-        ? false
-        : true,
+      rejectUnauthorized: true,
+      ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     });
   }
 
@@ -63,7 +62,9 @@ export class DbCredentialsApi {
   }
 
   private async getToken(scope: string) {
-    const issuerUrl = process.env.IDP__ISSUER_URL;
+    const SERVICE_ROUTES = process.env.SERVICE_ROUTES || "{}";
+    const issuerUrl = JSON.parse(SERVICE_ROUTES).idIssuerUrl;
+
     if (!issuerUrl) {
       console.error("IDP issuer url is not defined");
       throw new Error("IDP issuer url is not defined");

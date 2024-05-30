@@ -4,7 +4,7 @@ import * as http from "http";
 import * as dotenv from "dotenv";
 import { URL } from "url";
 import { IMRIRequest, QuerySvcResultType } from "../types";
-import { DATAFLOW__BASE_URL } from "../config";
+import { env } from "../env";
 dotenv.config();
 const log = Logger.CreateLogger("analytics-log");
 const envVarUtils = new EnvVarUtils(process.env);
@@ -23,7 +23,9 @@ export const dataflowRequest = (
         ? "Bearer DUMMY_TOKEN"
         : req.headers.authorization;
 
-    const { hostname, port, protocol } = new URL(DATAFLOW__BASE_URL);
+    const { hostname, port, protocol } = new URL(
+        env.SERVICE_ROUTES.dataflowMgmt
+    );
     const protocolLib = http;
     const data = JSON.stringify(payload);
 
@@ -41,7 +43,8 @@ export const dataflowRequest = (
             "x-req-correlation-id": reqCorrelationId,
         },
         method,
-        rejectUnauthorized: hostname === "localhost" ? false : true,
+        rejectUnauthorized: true,
+        ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
     if (payload) {
         options.headers["Content-Type"] = "application/json";

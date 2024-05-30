@@ -352,25 +352,6 @@ export default class DBRouter {
       [this.getVersionInfoForSchemas]
     );
 
-    //GET cdmvocab schema based on cdm schema
-    registerRouterHandler(
-      this.router,
-      HTTP_METHOD.GET,
-      "/database/:tenant/vocabSchema/schema/:schema",
-      [
-        param("tenant")
-          .isIn(config.getTenants(dialect))
-          .notEmpty()
-          .matches(this.dbObjectNameValidationRegExp)
-          .withMessage("Tenant database name is invalid"),
-        param("schema")
-          .notEmpty()
-          .matches(this.schemaNameRegExp)
-          .withMessage("Schema name is invalid"),
-      ],
-      [this.getVocabSchemaFromCDMSchema]
-    );
-
     //Staging Area APIs
     //POST
     //database/:tenant/staging-area/:stagingArea/schema/:schema
@@ -578,33 +559,6 @@ export default class DBRouter {
     );
   }
 
-  getVocabSchemaFromCDMSchema = async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    const schema = req.params.schema;
-    const tenant = req.params.tenant;
-
-    try {
-      const dbConnection = await this.dbDao.getDBConnectionByTenantPromise(
-        tenant,
-        req,
-        res
-      );
-      const vocabSchema = await this.dbDao.getVocabSchema(dbConnection, schema);
-      res.send(vocabSchema);
-    } catch (err) {
-      const httpResponse = {
-        status: 500,
-        message: "Something went wrong when retrieving Vocab schema",
-        data: [],
-      };
-      res.json(httpResponse);
-      this.logger.error(`Error retrieving Vocab schema: ${err}`);
-    }
-  };
-
   createSchemaTasks = (
     res: express.Response,
     dataModel: string,
@@ -613,8 +567,8 @@ export default class DBRouter {
     count: number,
     dbConnection: ConnectionInterface,
     vocabSchema: string,
-    pluginChangelogFilepath: string | undefined,
-    pluginClasspath: string | undefined
+    changelogFilepath: string | undefined,
+    classpath: string | undefined
   ) => {
     return [
       (callback: any) => {
@@ -649,8 +603,8 @@ export default class DBRouter {
             tenant,
             schema,
             dataModel,
-            pluginChangelogFilepath,
-            pluginClasspath
+            changelogFilepath,
+            classpath
           )
         );
 
@@ -833,8 +787,8 @@ export default class DBRouter {
     const tenant = req.params.tenant;
     const snapshotCopyConfig = req.body.snapshotCopyConfig;
     const tenantConfig = this.tenantConfigs[tenant];
-    const pluginChangelogFilepath = req.body.customChangelogFilepath;
-    const pluginClasspath = req.body.customClasspath;
+    const changelogFilepath = req.body.customChangelogFilepath;
+    const classpath = req.body.customClasspath;
 
     this.dbDao.getDBConnectionByTenant(
       tenant,
@@ -861,8 +815,8 @@ export default class DBRouter {
                 NaN,
                 dbConnection,
                 this.properties["omop_vocab_schema"][0],
-                pluginChangelogFilepath,
-                pluginClasspath
+                changelogFilepath,
+                classpath
               );
               async.series(tasks, (err, results: any) => {
                 if (err) {
@@ -1044,8 +998,8 @@ export default class DBRouter {
     const count = Number(req.params.count);
     const tenantConfig = this.tenantConfigs[tenant];
     const cleansedSchema = this.getCleansedSchemaName(schema);
-    const pluginChangelogFilepath = req.body.customChangelogFilepath;
-    const pluginClasspath = req.body.customClasspath;
+    const changelogFilepath = req.body.customChangelogFilepath;
+    const classpath = req.body.customClasspath;
     const vocabSchema = req.body.vocabSchema;
 
     this.dbDao.getDBConnectionByTenant(
@@ -1066,8 +1020,8 @@ export default class DBRouter {
           count,
           dbConnection,
           vocabSchema,
-          pluginChangelogFilepath,
-          pluginClasspath
+          changelogFilepath,
+          classpath
         );
 
         const createCleansedSchemaTasks = this.createCleansedSchemaTasks(
@@ -1077,8 +1031,8 @@ export default class DBRouter {
           count,
           dbConnection,
           vocabSchema,
-          pluginChangelogFilepath,
-          pluginClasspath
+          changelogFilepath,
+          classpath
         );
 
         if (cleansedSchemaOption == true) {
@@ -1724,8 +1678,8 @@ export default class DBRouter {
     count: number,
     dbConnection: ConnectionInterface,
     vocabSchema: string,
-    pluginChangelogFilepath: string | undefined,
-    pluginClasspath: string | undefined
+    changelogFilepath: string | undefined,
+    classpath: string | undefined
   ) => {
     const tenantConfig = this.tenantConfigs[tenant];
 
@@ -1762,8 +1716,8 @@ export default class DBRouter {
             tenant,
             cleansedSchema,
             dataModel,
-            pluginChangelogFilepath,
-            pluginClasspath
+            changelogFilepath,
+            classpath
           )
         );
 
@@ -1857,16 +1811,16 @@ export default class DBRouter {
       typeof req.query.schema === "string"
         ? [req.query.schema]
         : req.query.schema;
-    const pluginChangelogFilepath = req.body.customChangelogFilepath;
-    const pluginClasspath = req.body.customClasspath;
+    const changelogFilepath = req.body.customChangelogFilepath;
+    const classpath = req.body.customClasspath;
 
     this.dbDao.rollbackCount(
       <string>tenant,
       <string>dataModel,
       <string[]>schemas,
       Number(req.params.rollbackCount),
-      pluginChangelogFilepath,
-      pluginClasspath,
+      changelogFilepath,
+      classpath,
       utils.asyncRouterCallback(
         `All schemas rollbacked successfully for count ${req.params.rollbackCount}!`,
         "Rollback for certain schemas Failed!",
@@ -1887,15 +1841,15 @@ export default class DBRouter {
       typeof req.query.schema === "string"
         ? [req.query.schema]
         : req.query.schema;
-    const pluginChangelogFilepath = req.body.customChangelogFilepath;
-    const pluginClasspath = req.body.customClasspath;
+    const changelogFilepath = req.body.customChangelogFilepath;
+    const classpath = req.body.customClasspath;
     this.dbDao.rollbackTag(
       <string>tenant,
       <string>dataModel,
       <string[]>schemas,
       req.params.rollbackTag,
-      pluginChangelogFilepath,
-      pluginClasspath,
+      changelogFilepath,
+      classpath,
       utils.asyncRouterCallback(
         `All schemas rollbacked successfully Until Tag ${req.params.rollbackTag}!`,
         "Rollback for certain schemas Failed!",
@@ -1912,14 +1866,21 @@ export default class DBRouter {
   ) => {
     const tenant = req.params.tenant;
     const datasetListFromPortal = req.body.datasetListFromPortal;
-    const pluginChangelogFilepath = req.body.customChangelogFilepath;
-    const pluginClasspath = req.body.customClasspath;
+    const changelogFilepath = req.body.customChangelogFilepath;
+    const classpath = req.body.customClasspath;
 
     let portalSchemaList: DataModelSchemaMappingType =
       datasetListFromPortal.map(
-        ({ schema_name: schemaName, data_model: dataModel }) => ({
+        ({
+          schema_name: schemaName,
+          data_model: dataModel,
+          vocab_schema: vocabSchemaName,
+          changelog_filepath: changelogFilepath,
+        }) => ({
           schemaName,
           dataModel,
+          vocabSchemaName,
+          changelogFilepath,
         })
       );
     try {
@@ -1932,8 +1893,8 @@ export default class DBRouter {
       const results = await this.dbDao.getVersionInfoForSchemas(
         dbConnection,
         tenant,
-        pluginChangelogFilepath,
-        pluginClasspath,
+        changelogFilepath,
+        classpath,
         portalSchemaList
       );
       res.json(results);

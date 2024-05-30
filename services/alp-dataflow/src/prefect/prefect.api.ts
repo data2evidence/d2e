@@ -3,7 +3,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
 import { firstValueFrom, map } from 'rxjs'
 import { Agent } from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
 import { createLogger } from '../logger'
 import { PrefectFlowDto } from '../prefect-flow/dto'
 import { IPrefectFlowRunDto } from '../types'
@@ -23,13 +23,11 @@ export class PrefectAPI {
   private readonly logger = createLogger(this.constructor.name)
 
   constructor(private readonly httpService: HttpService) {
-    if (env.PREFECT_API_URL) {
-      this.url = env.PREFECT_API_URL
+    if (services.prefect) {
+      this.url = services.prefect
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true
+        rejectUnauthorized: true,
+        ca: env.SSL_CA_CERT
       })
     } else {
       throw new Error('No url is set for PrefectAPI')
@@ -40,7 +38,7 @@ export class PrefectAPI {
     const errorMessage = 'Error while getting prefect deployment by flow ID'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}deployments/filter`
+      const url = `${this.url}/deployments/filter`
       const data = {
         flows: {
           id: {
@@ -61,7 +59,7 @@ export class PrefectAPI {
     const errorMessage = 'Error while getting prefect deployment'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}deployments/name/${flowName}/${deploymentName}`
+      const url = `${this.url}/deployments/name/${flowName}/${deploymentName}`
       const obs = this.httpService.get(url, options)
       const result = await firstValueFrom(obs.pipe(map(result => result.data)))
       return {
@@ -80,7 +78,7 @@ export class PrefectAPI {
     try {
       const options = await this.createOptions()
 
-      const url = `${this.url}flow_runs/filter`
+      const url = `${this.url}/flow_runs/filter`
 
       const data = {
         sort: 'START_TIME_DESC'
@@ -98,7 +96,7 @@ export class PrefectAPI {
     try {
       const options = await this.createOptions()
 
-      const url = `${this.url}flow_runs/filter`
+      const url = `${this.url}/flow_runs/filter`
 
       const data = {
         sort: 'START_TIME_DESC',
@@ -117,7 +115,7 @@ export class PrefectAPI {
     try {
       const options = await this.createOptions()
 
-      const url = `${this.url}flow_runs/filter`
+      const url = `${this.url}/flow_runs/filter`
 
       const data = {
         sort: 'START_TIME_DESC',
@@ -140,7 +138,7 @@ export class PrefectAPI {
     try {
       const options = await this.createOptions()
 
-      const url = `${this.url}flow_runs/filter`
+      const url = `${this.url}/flow_runs/filter`
 
       const data = {
         flow_runs: {
@@ -163,7 +161,7 @@ export class PrefectAPI {
     try {
       const options = await this.createOptions()
 
-      const url = `${this.url}logs/filter`
+      const url = `${this.url}/logs/filter`
 
       const data = {
         offset: 0,
@@ -188,7 +186,7 @@ export class PrefectAPI {
     try {
       const options = await this.createOptions()
 
-      const url = `${this.url}task_runs/filter`
+      const url = `${this.url}/task_runs/filter`
 
       const data = {
         flow_runs: {
@@ -212,7 +210,7 @@ export class PrefectAPI {
     try {
       const options = await this.createOptions()
 
-      const url = `${this.url}logs/filter`
+      const url = `${this.url}/logs/filter`
 
       const data = {
         offset: 0,
@@ -254,7 +252,7 @@ export class PrefectAPI {
     const errorMessage = `Error while cancelling flow run with id: ${id}`
     try {
       const options = await this.createOptions()
-      const url = `${this.url}flow_runs/${id}/set_state`
+      const url = `${this.url}/flow_runs/${id}/set_state`
       const data = { state: { type: 'CANCELLED' } }
       const obs = this.httpService.post(url, data, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
@@ -267,7 +265,7 @@ export class PrefectAPI {
   private async executeFlowRun({ name, message, deploymentName, flowName, parameters }: FlowRunParams) {
     const options = await this.createOptions()
     const { deploymentId, infrastructureDocId } = await this.getDeployment(deploymentName, flowName)
-    const url = `${this.url}deployments/${deploymentId}/create_flow_run`
+    const url = `${this.url}/deployments/${deploymentId}/create_flow_run`
     const data = {
       state: {
         type: 'SCHEDULED',
@@ -291,7 +289,7 @@ export class PrefectAPI {
     const errorMessage = 'Error while getting prefect flows'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}flows/filter`
+      const url = `${this.url}/flows/filter`
       const data = { sort: 'CREATED_DESC' }
       const obs = this.httpService.post(url, data, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
@@ -305,7 +303,7 @@ export class PrefectAPI {
     const name = prefectFlowDto.name
     try {
       const options = await this.createOptions()
-      const url = `${this.url}flows`
+      const url = `${this.url}/flows`
       const obs = this.httpService.post(url, prefectFlowDto, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
@@ -319,7 +317,7 @@ export class PrefectAPI {
     const errorMessage = `Error while deleting flow ${id}`
     try {
       const options = await this.createOptions()
-      const url = `${this.url}flows/${id}`
+      const url = `${this.url}/flows/${id}`
       const obs = this.httpService.delete(url, options)
       await firstValueFrom(obs.pipe(map(result => result.data)))
       return { id }
@@ -333,7 +331,7 @@ export class PrefectAPI {
     const errorMessage = 'Error while getting prefect flow run states by id'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}flow_runs/${id}`
+      const url = `${this.url}/flow_runs/${id}`
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {

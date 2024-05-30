@@ -43,12 +43,11 @@ describe("TEST SUITE TO DEFINE THE BEHAVIOR OF THE GLOBAL SETTINGS VALIDATION", 
     const setupConfigFacade = (callback) => {
       const ffhQeConfig = new FfhQeConfig(
         connectionObj,
-        analyticsConnectionObj,
         new AssignmentProxy([]),
         new Settings(),
         new User("TEST_USER")
       );
-      configFacade = new ConfigFacade(connectionObj, ffhQeConfig);
+      configFacade = new ConfigFacade(connectionObj, ffhQeConfig, new User("TEST_USER"));
       callback(null);
     };
 

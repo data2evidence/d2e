@@ -93,7 +93,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
             COHORT_START_DATE)
         WITH cohortdata AS (
             SELECT 
-            "pTable"."PATIENT_ID" AS SUBJECT_ID,
+            "pTable".${placeholderMap["@PATIENT.PATIENT_ID"]} AS SUBJECT_ID,
             %(cohortDefinitionId)f AS COHORT_DEFINITION_ID,
             TO_DATE(%(cohortStartDateString)s, 'YYYY-MM-DD HH24:MI:SS') AS COHORT_START_DATE
         ${queryResponse.queryObject.queryString})

@@ -9,11 +9,13 @@ import {
 } from "@alp/alp-base-utils";
 import * as xsenv from "@sap/xsenv";
 import * as express from "express";
+import { createServer } from "https";
 import bodyParser = require("body-parser");
 import appConfigEndpoint from "./psconfig/configAppEndpoint";
 import configEndpoint from "./psconfig/configEndpoint";
 import * as auth from "./authentication";
 import { GetUser } from "@alp/alp-config-utils";
+import { IDBCredentialsType } from "./types";
 const User = GetUser.User;
 const SecurityUtils = securityLib.SecurityUtils;
 const securityUtils = new SecurityUtils();
@@ -56,7 +58,18 @@ let initSettingsFromEnvVars = () => {
     credentials = xsenv.cfServiceCredentials("httptest");
     console.log("TESTSCHEMA :" + credentials.schema);
   } else {
-    credentials = xsenv.cfServiceCredentials({ tag: "config" });
+    credentials = {
+      database: env.PG__DB_NAME,
+      schema: env.PG_SCHEMA,
+      dialect: env.PG__DIALECT,
+      host: env.PG__HOST,
+      port: env.PG__PORT,
+      user: env.PG_USER,
+      password: env.PG_PASSWORD,
+      max: env.PG__MAX_POOL,
+      min: env.PG__MIN_POOL,
+      idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
+    } as IDBCredentialsType
   }
 
   if (!envVarUtils.isStageLocalDev()) {
@@ -113,7 +126,16 @@ function initRoutes(conn) {
 
   app.use("/check-readiness", healthCheckMiddleware);
 
-  app.listen(port);
+  const server = createServer(
+    {
+      key: env.TLS__INTERNAL__KEY,
+      cert: env.TLS__INTERNAL__CRT,
+      maxHeaderSize: 8192 * 10,
+    },
+    app
+  );
+
+  server.listen(port);
   console.log("====================================================");
   console.log("PS Config started on port " + port);
   console.log("====================================================");

@@ -16,7 +16,7 @@ name | value | note
 Host | alp-minerva-postgres-1 | PostgreSQL container name /or/ external database FQDN
 Database code | alpdev_pg | display name
 Database name | alpdev_pg | actual name
-Vocab schemas | cmdvocab | `*`
+Vocab schemas | cmdvocab | select from dropdown. `*`
 Extra | {"max": 50, "schema": "cdmdefault", "queryTimeout": 60000, "statementTimeout": 60000, "idleTimeoutMillis": 300000, "connectionTimeoutMillis": 60000, "idleInTransactionSessionTimeout": 300000}
 Admin username | postgres_tenant_admin_user | `*`
 Read username | postgres_tenant_read_user | `*`
@@ -26,7 +26,7 @@ Read password | ********* | `@`
 notes:
 - `*` - schema/usernames are the values expected for sample data load steps - do not change 
 - `@` - create a random password
-- make a secure note of these secrets as they are required for the sample data load steps
+- make a secure note of these passwords as they are required for the sample data load steps
   - [load-synpuf1k](5-load-synpuf1k.md)
   - [load-vocabd](6-load-vocab.md)
 

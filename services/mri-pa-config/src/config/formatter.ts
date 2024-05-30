@@ -126,8 +126,7 @@ export class Formatter {
             addToCohorts: mriConfig.panelOptions.addToCohorts,
             domainValuesLimit: mriConfig.panelOptions.domainValuesLimit,
             calcViewAccessPoint: mriConfig.panelOptions.calcViewAccessPoint,
-            externalAccessPoints: mriConfig.panelOptions.externalAccessPoints,
-            nonInteractiveMode: mriConfig.panelOptions.nonInteractiveMode,
+            externalAccessPoints: mriConfig.panelOptions.externalAccessPoints
         };
 
         return config;
@@ -300,6 +299,8 @@ export class Formatter {
             const attributeObj: any = {
                 name: cdwConfigAttributeObj.name, // TODO: translate
                 type: cdwConfigAttributeObj.type,
+                domainFilter: cdwConfigAttributeObj.domainFilter,
+                standardConceptCodeFilter: cdwConfigAttributeObj.standardConceptCodeFilter,
                 category: attribute.category,
                 measure: attribute.measure,
                 aggregated: Boolean(cdwConfigAttributeObj.measureExpression),

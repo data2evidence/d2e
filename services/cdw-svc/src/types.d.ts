@@ -387,7 +387,6 @@ declare global {
 
   export interface ICDWRequest extends Request {
     dbConnections: {
-      analyticsConnection: ConnectionInterface;
       configConnection: ConnectionInterface;
     };
     dbCredentials: {
@@ -399,4 +398,17 @@ declare global {
       action: string;
     };
   }
+}
+
+export interface IDBCredentialsType {
+  database: string;
+  schema?: string;
+  dialect: string;
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  max?: number | undefined;
+  min?: number | undefined;
+  idleTimeoutMillis?: number | undefined;
 }

@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios'
 import { get } from './request-util'
-import { env } from '../env'
+import { env, services } from '../env'
 import { createLogger } from '../Logger'
 import https from 'https'
 
@@ -9,19 +9,17 @@ export class AnalyticsSvcAPI {
   private readonly httpsAgent: any
   private readonly logger = createLogger(this.constructor.name)
   private readonly token: string
-
+  private readonly endpoint: string = '/analytics-svc/'
   constructor(token: string) {
     this.token = token
     if (!token) {
       throw new Error('No token passed for Analytics API!')
     }
-    if (env.ANALYTICS_SVC_API_BASE_URL) {
-      this.baseURL = env.ANALYTICS_SVC_API_BASE_URL
+    if (services.analytics) {
+      this.baseURL = services.analytics + this.endpoint
       this.httpsAgent = new https.Agent({
-        rejectUnauthorized:
-          this.baseURL.startsWith('https://localhost:') || this.baseURL.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true
+        rejectUnauthorized: true,
+        ca: env.GATEWAY_CA_CERT
       })
     } else {
       this.logger.error('No url is set for AnalyticsSvcAPI')

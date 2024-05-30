@@ -5,6 +5,7 @@ import * as http from "http";
 import * as dotenv from "dotenv";
 import { URL } from "url";
 import { IMRIRequest, BookmarkCMDType } from "../types";
+import { env } from "../env";
 dotenv.config();
 const log = Logger.CreateLogger();
 
@@ -24,8 +25,8 @@ export async function loadBookmarks(
         urlParams = new URL(`http://localhost:41005`);
         protocolLib = http;
     } else {
-        urlParams = new URL("http://alp-minerva-bookmark-svc-1:41110");
-        protocolLib = http;
+        urlParams = new URL(env.SERVICE_ROUTES.bookmark);
+        protocolLib = https;
     }
 
     hostname = urlParams.hostname;
@@ -43,12 +44,9 @@ export async function loadBookmarks(
             "authorization": req.headers.authorization,
             "user-agent": "ALP Service",
             "x-source-origin": sourceOrigin,
-            "x-alp-usersessionclaims": req.headers["x-alp-usersessionclaims"],
         },
-        rejectUnauthorized:
-            hostname === "localhost" || hostname === "alp-mercury-approuter"
-                ? false
-                : true,
+        rejectUnauthorized: true,
+        ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
 
     switch (bookmark_cmd) {

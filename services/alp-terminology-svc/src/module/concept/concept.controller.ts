@@ -1,7 +1,6 @@
 import { Controller, Get, Query, Post, Body } from '@nestjs/common';
 import { ConceptService } from './concept.service';
 import { ConceptFilterOptionsDto } from './dto/concept.dto';
-
 @Controller()
 export class ConceptController {
   constructor(private readonly appService: ConceptService) {}
@@ -20,10 +19,11 @@ export class ConceptController {
     const domainId = filters.domainId || [];
     const vocabularyId = filters.vocabularyId || [];
     const standardConcept = filters.standardConcept || [];
+    const validity = filters.validity || [];
     return await this.appService.getConceptFilterOptions(
       datasetId,
       searchText,
-      { conceptClassId, domainId, vocabularyId, standardConcept },
+      { conceptClassId, domainId, vocabularyId, standardConcept, validity },
     );
   }
 

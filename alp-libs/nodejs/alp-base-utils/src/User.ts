@@ -38,97 +38,12 @@ export const SAMPLE_USER_JWT: IAppTokenPayload = {
 };
 
 const buildUserFromToken = (token: IAppTokenPayload): IUser => {
-  const { name, sub, email, userMgmtGroups, groups: adGroups } = token;
-  const {
-    alp_tenant_id,
-    alp_role_study_researcher,
-    alp_role_study_mgr,
-    alp_role_study_admin,
-    alp_role_tenant_admin,
-    alp_role_tenant_viewer,
-    alp_role_admin,
-    alp_role_owner,
-    groups,
-  } = userMgmtGroups;
-
-  if (typeof alp_tenant_id === "undefined" || alp_tenant_id.length === 0) {
-    console.error(
-      `SECURITY INCIDENT: User does not belong to a tenant ${JSON.stringify(
-        token,
-      )}`,
-    );
-    throw new Error("User does not belong to a tenant");
-  }
-
-  const roles = [];
-  const mriRoles = [];
-  let mriScopes = [];
-  const { ALP_ROLES, MRI_ROLE_ASSIGNMENTS } = Constants;
-
-  if (typeof alp_role_admin !== "undefined" && alp_role_admin) {
-    roles.push(ALP_ROLES.ALP_ADMIN_ROLE as string);
-    mriRoles.push(ALP_ROLES.ALP_ADMIN_ROLE);
-    mriScopes.push(...MRI_ROLE_ASSIGNMENTS.ALP_ADMIN_ROLE);
-  }
-
-  if (typeof alp_role_owner !== "undefined" && alp_role_owner) {
-    mriRoles.push(ALP_ROLES.ALP_OWNER_ROLE);
-    mriScopes.push(...MRI_ROLE_ASSIGNMENTS.ALP_OWNER_ROLE);
-  }
-
-  if (alp_role_tenant_admin && alp_role_tenant_admin.length > 0) {
-    roles.push(ALP_ROLES.TENANT_ADMIN_ROLE);
-  }
-
-  if (alp_role_tenant_viewer && alp_role_tenant_viewer.length > 0) {
-    roles.push(ALP_ROLES.TENANT_VIEWER_ROLE);
-    mriScopes.push(MRI_ROLE_ASSIGNMENTS.STUDY_VIEWER_ROLE);
-  }
-
-  if (alp_role_study_admin && alp_role_study_admin.length > 0) {
-    roles.push(ALP_ROLES.STUDY_ADMIN_ROLE);
-  }
-
-  if (alp_role_study_mgr && alp_role_study_mgr.length > 0) {
-    roles.push(ALP_ROLES.STUDY_MANAGER_ROLE);
-  }
-
-  if (alp_role_study_researcher && alp_role_study_researcher.length > 0) {
-    roles.push(ALP_ROLES.STUDY_RESEARCHER_ROLE);
-    mriRoles.push(ALP_ROLES.STUDY_RESEARCHER_ROLE);
-    mriScopes.push(...MRI_ROLE_ASSIGNMENTS.STUDY_RESEARCHER_ROLE);
-  }
-
-  mriScopes = (typeof groups === "string" ? [] : groups).reduce(
-    (accumulator, group) => {
-      if (MRI_ROLE_ASSIGNMENTS[group]) {
-        mriRoles.push(group);
-        accumulator = accumulator.concat(MRI_ROLE_ASSIGNMENTS[group]);
-      }
-
-      return accumulator;
-    },
-    mriScopes,
-  );
+  const { name, sub, email } = token;
 
   const user: IUser = {
     userId: sub,
     name,
     email,
-    tenantId: alp_tenant_id,
-    mriRoles,
-    mriScopes,
-    alpRoleMap: {
-      ALP_ADMIN_ROLE: alp_role_admin,
-      ALP_OWNER_ROLE: alp_role_owner,
-      TENANT_ADMIN_ROLE: alp_role_tenant_admin,
-      TENANT_VIEWER_ROLE: alp_role_tenant_viewer,
-      STUDY_ADMIN_ROLE: alp_role_study_admin,
-      STUDY_MANAGER_ROLE: alp_role_study_mgr,
-      STUDY_RESEARCHER_ROLE: alp_role_study_researcher,
-    },
-    roles,
-    groups: typeof groups === "string" ? [groups] : groups,
   };
 
   return user;
@@ -153,12 +68,10 @@ export class User {
       return;
     }
 
-    const { sub, userMgmtGroups } = token;
+    const { sub } = token;
 
     if (!sub) {
       throw new Error("token has no sub");
-    } else if (!userMgmtGroups) {
-      throw new Error("token has no userMgmtGroups");
     }
 
     this.userLang = userLang.split("-")[0];

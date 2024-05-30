@@ -3,7 +3,7 @@ import json
 from sqlalchemy import create_engine, text
 import datetime
 from uuid import UUID
-from utils.types import DBCredentials, HANA_TENANT_USERS, PG_TENANT_USERS
+from utils.types import DBCredentialsType, HANA_TENANT_USERS, PG_TENANT_USERS
 
 # TODO: Remove after envConverter returns postgres
 # catches possible pg dialect values from envConverter
@@ -11,41 +11,41 @@ POSTGRES_DIALECT_OPTIONS = ['postgres', 'postgresql', 'pg']
 
 
 def GetDBConnection(database_code: str, user_type: str):
-    conn_details = extract_db_credentials(database_code)
+    try:
+        conn_details = extract_db_credentials(database_code)
+    except Exception as e:
+        raise e
+    else:
+        database_name = conn_details["databaseName"]
+        if conn_details["dialect"] == "hana":
+            dialect_driver = "hana+hdbcli"
+            encrypt = conn_details["encrypt"]
+            validateCertificate = conn_details["validateCertificate"]
+            db = database_name + \
+                f"?encrypt={encrypt}?validateCertificate={validateCertificate}"
+        elif conn_details['dialect'] in POSTGRES_DIALECT_OPTIONS:
+            dialect_driver = "postgresql+psycopg2"
+            db = database_name
+        match user_type:
+            case HANA_TENANT_USERS.READ_USER:
+                databaseUser = conn_details["readUser"]
+                databasePassword = conn_details["readPassword"]
+            case HANA_TENANT_USERS.ADMIN_USER:
+                databaseUser = conn_details["adminUser"]
+                databasePassword = conn_details["adminPassword"]
+            case PG_TENANT_USERS.ADMIN_USER:
+                databaseUser = conn_details["adminUser"]
+                databasePassword = conn_details["adminPassword"]
+            case PG_TENANT_USERS.READ_USER:
+                databaseUser = conn_details["readUser"]
+                databasePassword = conn_details["readPassword"]
 
-    if conn_details == {}:
-        raise Exception("No DB Credentials found!")
-    database_name = conn_details["databaseName"]
-    if conn_details["dialect"] == "hana":
-        dialect_driver = "hana+hdbcli"
-        encrypt = conn_details["encrypt"]
-        validateCertificate = conn_details["validateCertificate"]
-        db = database_name + \
-            f"?encrypt={encrypt}?validateCertificate={validateCertificate}"
-    elif conn_details['dialect'] in POSTGRES_DIALECT_OPTIONS:
-        dialect_driver = "postgresql+psycopg2"
-        db = database_name
-
-    match user_type:
-        case HANA_TENANT_USERS.READ_USER:
-            databaseUser = conn_details["readUser"]
-            databasePassword = conn_details["readPassword"]
-        case HANA_TENANT_USERS.ADMIN_USER:
-            databaseUser = conn_details["adminUser"]
-            databasePassword = conn_details["adminPassword"]
-        case PG_TENANT_USERS.ADMIN_USER:
-            databaseUser = conn_details["adminUser"]
-            databasePassword = conn_details["adminPassword"]
-        case PG_TENANT_USERS.READ_USER:
-            databaseUser = conn_details["readUser"]
-            databasePassword = conn_details["readPassword"]
-
-    host = conn_details["host"]
-    port = conn_details["port"]
-    conn_string = _CreateConnectionString(
-        dialect_driver, databaseUser, databasePassword, host, port, db)
-    engine = create_engine(conn_string)
-    return engine
+        host = conn_details["host"]
+        port = conn_details["port"]
+        conn_string = _CreateConnectionString(
+            dialect_driver, databaseUser, databasePassword, host, port, db)
+        engine = create_engine(conn_string)
+        return engine
 
 
 def GetConfigDBConnection():  # Single pre-configured postgres database
@@ -123,11 +123,19 @@ def db_svc_dialect_mapper(dialect: str) -> str:
 
 def extract_db_credentials(database_code: str):
     dbs = json.loads(os.environ["DATABASE_CREDENTIALS"])
-    for _db in dbs:
-        database_credential = DatabaseCredentials(_db)
-        if "alp-dataflow-gen" in database_credential.tags:
-            if database_credential.get_database_code() == database_code:
-                return database_credential.get_values()
+
+    if dbs == []:
+        raise Exception(
+            f"Database credentials environment variable is missing")
+    else:
+        _db = next(filter(lambda x: x["values"]
+                   ["code"] == database_code and "alp-dataflow-gen" in x["tags"], dbs), None)
+        if not _db:
+            raise Exception(
+                f"Database code {database_code} not found in database credentials")
+        else:
+            database_credential = DatabaseCredentials(_db)
+            return database_credential.get_values()
 
 
 class DatabaseCredentials:
@@ -151,7 +159,7 @@ class DatabaseCredentials:
         else:
             return False
 
-    def get_values(self) -> DBCredentials:
+    def get_values(self) -> DBCredentialsType:
         values = self.values["credentials"]
         values["databaseName"] = self.values["databaseName"]
         values["dialect"] = self.values["dialect"]
@@ -159,4 +167,10 @@ class DatabaseCredentials:
         values["port"] = self.values["port"]
         values["encrypt"] = self.get_encrypt()
         values["validateCertificate"] = self.get_validate_certificate()
+        try:
+            # validate
+            DBCredentialsType(**values)
+        except Exception as e:
+            raise Exception(
+                f"Failed validating database credentials values: {e}")
         return values

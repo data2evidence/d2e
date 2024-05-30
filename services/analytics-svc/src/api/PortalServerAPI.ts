@@ -1,27 +1,18 @@
 import axios, { AxiosRequestConfig } from "axios";
 import https from "https";
-import {
-    ALP_MINERVA_PORTAL_SERVER__URL,
-    ALP_GATEWAY_OAUTH__URL,
-    IDP_ALP_SVC_CLIENT_ID,
-    IDP_ALP_SVC_CLIENT_SECRET,
-} from "../config";
-
+import { env } from "../env";
 export default class PortalServerAPI {
     private readonly baseUrl: string;
     private readonly oauthUrl: string;
     private readonly httpsAgent: any;
 
     constructor() {
-        if (ALP_MINERVA_PORTAL_SERVER__URL) {
-            this.baseUrl = ALP_MINERVA_PORTAL_SERVER__URL;
-            this.oauthUrl = ALP_GATEWAY_OAUTH__URL;
+        if (env.SERVICE_ROUTES.portalServer) {
+            this.baseUrl = env.SERVICE_ROUTES.portalServer;
+            this.oauthUrl = env.ALP_GATEWAY_OAUTH__URL;
             this.httpsAgent = new https.Agent({
-                rejectUnauthorized:
-                    this.baseUrl.startsWith("https://localhost:") ||
-                    this.baseUrl.startsWith("https://alp-minerva-gateway-")
-                        ? false
-                        : true,
+                rejectUnauthorized: true,
+                ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
             });
         }
         if (!this.baseUrl) {
@@ -45,8 +36,8 @@ export default class PortalServerAPI {
     async getClientCredentialsToken() {
         const params = {
             grant_type: "client_credentials",
-            client_id: IDP_ALP_SVC_CLIENT_ID,
-            client_secret: IDP_ALP_SVC_CLIENT_SECRET,
+            client_id: env.IDP__ALP_SVC__CLIENT_ID,
+            client_secret: env.IDP__ALP_SVC__CLIENT_SECRET,
         };
 
         const options: AxiosRequestConfig = {

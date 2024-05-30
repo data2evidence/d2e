@@ -7,6 +7,7 @@ import { IMRIRequest, QuerySvcResultType } from "../types";
 dotenv.config();
 const log = Logger.CreateLogger("analytics-log");
 const envVarUtils = new EnvVarUtils(process.env);
+import { env } from "../env";
 
 export const terminologyRequest = (
     req: IMRIRequest,
@@ -23,9 +24,10 @@ export const terminologyRequest = (
         : req.headers.authorization;
 
     const { hostname, port, protocol } = new URL(
-        "http://alp-minerva-terminology-svc-1:41108"
+        env.SERVICE_ROUTES.terminology
     );
-    const protocolLib = http;
+
+    const protocolLib = https;
     const data = JSON.stringify(payload);
 
     const defaultPath = `/terminology/${path}`;
@@ -44,7 +46,8 @@ export const terminologyRequest = (
             "x-req-correlation-id": reqCorrelationId,
         },
         method,
-        rejectUnauthorized: hostname === "localhost" ? false : true,
+        rejectUnauthorized: true,
+        ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
     if (payload) {
         options.headers["Content-Type"] = "application/json";

@@ -13,6 +13,7 @@ services:
 
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile --watch
+    image:  alpcr.azurecr.io/alp-data-node/alp-caddy:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop}
     ports:
       - 41100:41100
       - 41000:41000
@@ -21,10 +22,6 @@ services:
     build:
       context: .
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
-    ports:
-      - 9222:9222
-    networks:
-      - alp
     volumes:
       - ./services/alp-dataflow-gen/pysrc:/app/pysrc
     environment:
@@ -59,13 +56,12 @@ services:
       - 9229:9229
     environment:
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
-      NODE_ENV: production # development
+      NODE_ENV: development
 
-  alp-local-ui-file-server:
-    container_name: alp-local-ui-file-server
-    image: alpcr.azurecr.io/alp-data-node/alp-local-ui-file-server:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop} # Take local head commit and will pull from Azure Container registry
-    networks:
-      - alp
+  alp-fhir-server:
+    build:
+      context: ./services/alp-fhir
+      dockerfile: Dockerfile
 
   alp-logto:
     build:
@@ -148,24 +144,16 @@ services:
       - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
       - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
       - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
-    healthcheck:
-      interval: 30s
-      retries: 10
-      start_period: 120s
-      test:
-        - CMD
-        - wget
-        - -O
-        - src/liveness
-        - --no-check-certificate
-        - https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/check-liveness
-      timeout: 180s
     ports:
       - 9220:9220
     volumes:
       - ./services/alp-gateway/src:/usr/src/app/src
     environment:
       LOCAL_DEBUG: "true"
+
+  alp-minerva-meilisearch-svc:
+    ports:
+      - 41111:41111
 
   alp-minerva-pa-config-svc:
     build:
@@ -174,7 +162,7 @@ services:
     ports:
       - 9207:9207
     volumes:
-      - ./services/mri-pa-config/src:/home/docker/src/alp-data-node/app/src
+      - ./services/mri-pa-config/src:/home/docker/src/services/app/src
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
@@ -238,17 +226,6 @@ services:
     command:
       - sh
       - start.sh
-    healthcheck:
-      interval: 20s
-      retries: 10
-      start_period: 60s
-      test:
-        - CMD
-        - wget
-        - -O
-        - src/liveness
-        - http://0.0.0.0:41104/check-liveness
-      timeout: 10s
     ports:
       - 9224:9224
     volumes:
