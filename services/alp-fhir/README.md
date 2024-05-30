@@ -5,7 +5,7 @@
 `dist.zip` is the frontend distributable source code of alp-fhir app, built off `v3.1.2`. It has been generated with the below `.env` variables 
 
 ```
-MEDPLUM_BASE_URL=https://host.docker.internal:8103/
+MEDPLUM_BASE_URL=https://localhost:41100/alp-fhir/
 MEDPLUM_CLIENT_ID=
 GOOGLE_CLIENT_ID=
 RECAPTCHA_SITE_KEY=<refer to the config.json>
