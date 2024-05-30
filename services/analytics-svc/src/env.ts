@@ -26,7 +26,7 @@ const Env = z.object({
 
     SKIP_AUTH: z.string(),
     LOCAL_DEBUG: z.string(),
-    DEV_MODE: z.string(),
+    SQL_RETURN_ON: z.string(),
     isHttpTestRun: z.string(),
     isTestEnv: z.string(),
     local: z.string(),

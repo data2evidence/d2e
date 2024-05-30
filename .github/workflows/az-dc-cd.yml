@@ -136,3 +136,8 @@ jobs:
       if: success() || failure()
       run: |  
         yarn logs:minerva
+
+    - name: Post cleanup
+      if: always()
+      run: |
+        docker rm -f alp-caddy-certs-mgmt || true # Cleanup cert mgmt container if job aborted
