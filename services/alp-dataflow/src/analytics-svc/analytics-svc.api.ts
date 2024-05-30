@@ -4,7 +4,7 @@ import { HttpService } from '@nestjs/axios'
 import { REQUEST } from '@nestjs/core'
 import { firstValueFrom, map } from 'rxjs'
 import { Agent } from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
 import { createLogger } from '../logger'
 
 @Injectable({ scope: Scope.REQUEST })
@@ -16,8 +16,8 @@ export class AnalyticsSvcAPI {
 
   constructor(@Inject(REQUEST) request: Request, private readonly httpService: HttpService) {
     this.jwt = request.headers['authorization']
-    if (env.ANALYTICS_SVC_API_URL) {
-      this.url = env.ANALYTICS_SVC_API_URL
+    if (services.analytics) {
+      this.url = services.analytics
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.SSL_CA_CERT
@@ -41,7 +41,7 @@ export class AnalyticsSvcAPI {
       //add studyid
       const url = `${
         this.url
-      }api/services/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?studyId=${datasetId}`
+      }/api/services/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?studyId=${datasetId}`
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
@@ -63,7 +63,7 @@ export class AnalyticsSvcAPI {
       const options = await this.createOptions()
       const url = `${
         this.url
-      }api/services/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}/${conceptId}?studyId=${datasetId}`
+      }/api/services/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}/${conceptId}?studyId=${datasetId}`
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
@@ -76,7 +76,7 @@ export class AnalyticsSvcAPI {
     const errorMessage = 'Error while getting cdm version'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}api/services/alpdb/${dialect}/database/${databaseCode}/cdmversion/schema/${schema}`
+      const url = `${this.url}/api/services/alpdb/${dialect}/database/${databaseCode}/cdmversion/schema/${schema}`
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {

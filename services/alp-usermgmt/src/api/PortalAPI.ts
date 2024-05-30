@@ -3,9 +3,8 @@ import axios, { AxiosRequestConfig } from 'axios'
 import { createLogger } from 'Logger'
 import { CONTAINER_KEY } from 'const'
 import https from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
 import { ITenant, ITenantFeature } from 'types'
-
 @Service()
 export class PortalAPI {
   private readonly baseURL: string
@@ -13,8 +12,8 @@ export class PortalAPI {
   private readonly logger = createLogger(this.constructor.name)
 
   constructor() {
-    if (env.PORTAL_BASE_URL) {
-      this.baseURL = env.PORTAL_BASE_URL
+    if (services.portalServer) {
+      this.baseURL = services.portalServer
       this.httpsAgent = new https.Agent({
         rejectUnauthorized: true,
         ca: env.SSL_CA_CERT
@@ -43,7 +42,7 @@ export class PortalAPI {
   async getMyTenants(): Promise<ITenant[]> {
     try {
       const options = await this.getRequestConfig()
-      const result = await axios.get(`${this.baseURL}tenant/list/me`, options)
+      const result = await axios.get(`${this.baseURL}/tenant/list/me`, options)
       return result.data
     } catch (error) {
       this.logger.error(`Error when get my tenant: ${JSON.stringify(error?.response?.data || error?.code)}`)
@@ -54,7 +53,7 @@ export class PortalAPI {
   async getDataset(id: string) {
     try {
       const options = await this.getRequestConfig()
-      const result = await axios.get(`${this.baseURL}dataset/${id}`, options)
+      const result = await axios.get(`${this.baseURL}/dataset/${id}`, options)
       return result.data
     } catch (error) {
       this.logger.error(`Error when get study ${id}: ${JSON.stringify(error?.response?.data || error?.code)}`)
@@ -65,7 +64,7 @@ export class PortalAPI {
   async getDatasets() {
     try {
       const options = await this.getRequestConfig()
-      const result = await axios.get(`${this.baseURL}dataset/list?role=systemAdmin`, options)
+      const result = await axios.get(`${this.baseURL}/dataset/list?role=systemAdmin`, options)
       return result.data
     } catch (error) {
       this.logger.error('Error getting studies', error?.response?.data || error?.code)
@@ -76,7 +75,7 @@ export class PortalAPI {
   async getTenants(): Promise<ITenant[]> {
     try {
       const options = await this.getRequestConfig()
-      const result = await axios.get(`${this.baseURL}tenant/list`, options)
+      const result = await axios.get(`${this.baseURL}/tenant/list`, options)
       return result.data
     } catch (error) {
       this.logger.error('Error getting tenants', error?.response?.data || error?.code)
@@ -88,7 +87,7 @@ export class PortalAPI {
     try {
       const options = await this.getRequestConfig()
       options.params = { tenantIds: tenantIds.join(',') }
-      const result = await axios.get(`${this.baseURL}tenant/feature/list`, options)
+      const result = await axios.get(`${this.baseURL}/tenant/feature/list`, options)
       return result.data
     } catch (error) {
       this.logger.error(`Error getting tenant features for ${tenantIds}`, error?.response?.data || error?.code)
@@ -99,7 +98,7 @@ export class PortalAPI {
   async getPublicDatasets() {
     try {
       const options = await this.getRequestConfig()
-      const result = await axios.get(`${this.baseURL}dataset/public/list`, options)
+      const result = await axios.get(`${this.baseURL}/dataset/public/list`, options)
       return result.data
     } catch (error) {
       this.logger.error('Error getting datasets', error?.response?.data || error?.code)

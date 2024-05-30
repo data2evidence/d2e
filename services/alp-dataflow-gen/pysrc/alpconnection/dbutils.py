@@ -171,5 +171,6 @@ class DatabaseCredentials:
             # validate
             DBCredentialsType(**values)
         except Exception as e:
-            raise Exception(f"Failed validating database credentials values: {e}")
+            raise Exception(
+                f"Failed validating database credentials values: {e}")
         return values

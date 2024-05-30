@@ -15,14 +15,11 @@ class NumberFilterDto {
 export class DatasetQueryDto implements IDatasetQueryDto {
   @IsOptional()
   @IsNotEmpty()
-  @IsArray()
-  @Transform(({ value }) => value.split(','))
-  tenants: string[]
-
-  @IsOptional()
-  @IsNotEmpty()
   @IsIn(DATASET_QUERY_ROLES)
   role?: DatasetQueryRole
+
+  @IsOptional()
+  searchText?: string
 
   @ValidateIf(o => o.role === 'researcher')
   @ValidateNested()
