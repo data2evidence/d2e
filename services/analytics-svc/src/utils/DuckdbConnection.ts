@@ -8,20 +8,42 @@ import {
 import { Database, OPEN_READONLY, Connection } from "duckdb-async";
 import crypto from "crypto";
 import { DBError } from "@alp/alp-base-utils/target/src/DBError";
+import { StudyAnalyticsCredential } from "../types";
 import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
-import { translateHanaToPostgres } from "@alp/alp-base-utils/target/src/helpers/translateHanaToPostgres";
-import { DUCKDB_DATA_FOLDER } from "../config";
+import { translateHanaToDuckdb } from "@alp/alp-base-utils/target/src/helpers/hanaTranslation";
+import { env } from "../env";
 const logger = CreateLogger("Duckdb Connection");
 
 // Helper function similar to getDBConnection implementation in alp-base-utils DBConnectionUtil.ts
 export const getDuckdbDBConnection = (
     duckdbSchemaFileName: string,
-    duckdbVocabSchemaFileName: string,
+    duckdbVocabSchemaFileName: string
 ) => {
     return new Promise<ConnectionInterface>(async (resolve, reject) => {
         DuckdbConnection.createConnection(
             duckdbSchemaFileName,
             duckdbVocabSchemaFileName,
+            async (err, connection: ConnectionInterface) => {
+                if (err) {
+                    logger.error(err);
+                    reject(err);
+                }
+                resolve(connection);
+            }
+        );
+    });
+};
+export const getDuckdbDirectPostgresWriteConnection = ({
+    credentials,
+    schema,
+}: {
+    credentials: StudyAnalyticsCredential;
+    schema: string;
+}) => {
+    return new Promise<ConnectionInterface>(async (resolve, reject) => {
+        DuckdbConnection.createDirectPostgresWriteConnection(
+            credentials,
+            schema,
             async (err, connection: ConnectionInterface) => {
                 if (err) {
                     logger.error(err);
@@ -49,15 +71,51 @@ export class DuckdbConnection implements ConnectionInterface {
     ) {
         try {
             const duckdDB = await Database.create(
-                `${DUCKDB_DATA_FOLDER}/${duckdbSchemaFileName}`,
+                `${env.DUCKDB__DATA_FOLDER}/${duckdbSchemaFileName}`,
                 OPEN_READONLY
             );
             const duckdDBconn = await duckdDB.connect();
             // Load vocab schema into duckdb connection
             await duckdDBconn.all(
-                `ATTACH '${DUCKDB_DATA_FOLDER}/${duckdbVocabSchemaFileName}' (READ_ONLY);`
+                `ATTACH '${env.DUCKDB__DATA_FOLDER}/${duckdbVocabSchemaFileName}' (READ_ONLY);`
             );
-            const conn: DuckdbConnection = new DuckdbConnection(duckdDBconn, duckdDB, duckdbSchemaFileName, duckdbSchemaFileName);
+            const conn: DuckdbConnection = new DuckdbConnection(
+                duckdDBconn,
+                duckdDB,
+                duckdbSchemaFileName,
+                duckdbSchemaFileName
+            );
+
+            callback(null, conn);
+        } catch (err) {
+            callback(err, null);
+        }
+    }
+
+    public static async createDirectPostgresWriteConnection(
+        credentials: StudyAnalyticsCredential,
+        schema: string,
+        callback
+    ) {
+        try {
+            const randomDBName = `${credentials.databaseName}_write_${crypto
+                .randomBytes(16)
+                .toString("hex")}`;
+            const duckdDB = await Database.create(":memory:");
+            await duckdDB.all("INSTALL postgres");
+            await duckdDB.all("LOAD postgres");
+            const duckdDBconn = await duckdDB.connect();
+
+            // Attach postgres as direct connection
+            await duckdDBconn.all(
+                `ATTACH 'host=${credentials.host} port=${credentials.port} dbname=${credentials.databaseName} user=${credentials.user} password=${credentials.password}' AS ${randomDBName} (TYPE postgres)`
+            );
+            const conn: DuckdbConnection = new DuckdbConnection(
+                duckdDBconn,
+                duckdDB,
+                `${randomDBName}.${schema}`,
+                `${randomDBName}.${schema}`
+            );
 
             callback(null, conn);
         } catch (err) {
@@ -116,7 +174,11 @@ export class DuckdbConnection implements ConnectionInterface {
 
     private parseSql(temp: string): string {
         temp = this.getSqlStatementWithSchemaName(this.schemaName, temp);
-        return translateHanaToPostgres(temp, this.schemaName, this.dialect);
+        return translateHanaToDuckdb(temp, this.schemaName);
+    }
+
+    public getTranslatedSql(sql: string): string {
+        return this.parseSql(sql);
     }
 
     public executeQuery(
@@ -143,19 +205,22 @@ export class DuckdbConnection implements ConnectionInterface {
         sql,
         parameters: ParameterInterface[],
         callback: CallBackInterface,
-        schemaName: string = "",
-      ) {
+        schemaName: string = ""
+    ) {
         try {
-          sql = this.parseSql(sql);
-          const stream = this.conn.stream(sql, ...flattenParameter(parameters));
-          callback(null, stream);
+            sql = this.parseSql(sql);
+            const stream = this.conn.stream(
+                sql,
+                ...flattenParameter(parameters)
+            );
+            callback(null, stream);
         } catch (err) {
-          logger.error(`Execute error: ${JSON.stringify(err)}
+            logger.error(`Execute error: ${JSON.stringify(err)}
           =>sql: ${sql}
           =>parameters: ${JSON.stringify(parameters)}`);
-          callback(new DBError(logger.error(err), err.message), null);
+            callback(new DBError(logger.error(err), err.message), null);
         }
-      }
+    }
 
     public executeUpdate(
         sql: string,
@@ -215,11 +280,17 @@ export class DuckdbConnection implements ConnectionInterface {
     }
 
     // This is temporary workaround to enable communication with Postgres since cohort tables are only populated in postgres and not in duckdb yet. Once we enable the write mode on duckdb for cohort tables, then this can be removed.
-    public async activate_nativedb_communication(credentials): Promise<string> {
-        const randomDBName = `${credentials.databaseName}_${crypto.randomBytes(16).toString("hex")}`
+    public async activate_nativedb_communication(
+        credentials: StudyAnalyticsCredential
+    ): Promise<string> {
+        const randomDBName = `${credentials.databaseName}_read_${crypto
+            .randomBytes(16)
+            .toString("hex")}`;
         await this.database.all("INSTALL postgres");
         await this.database.all("LOAD postgres");
-        await this.database.all(`ATTACH 'host=${credentials.host} port=${credentials.port} dbname=${credentials.databaseName} user=${credentials.user} password=${credentials.password}' AS ${randomDBName} (TYPE postgres, READ_ONLY)`);
+        await this.database.all(
+            `ATTACH 'host=${credentials.host} port=${credentials.port} dbname=${credentials.databaseName} user=${credentials.user} password=${credentials.password}' AS ${randomDBName} (TYPE postgres, READ_ONLY)`
+        );
         return randomDBName;
     }
 
@@ -228,7 +299,7 @@ export class DuckdbConnection implements ConnectionInterface {
             await this.database.all(`DETACH ${dbName}`);
         } catch (e) {
             // Ignore the error because the connection might have been closed already
-            logger.warn(e)
+            logger.warn(e);
         }
     }
 
@@ -288,14 +359,16 @@ export class DuckdbConnection implements ConnectionInterface {
 
     private getSqlStatementWithSchemaName(
         schemaName: string,
-        sql: string,
-      ): string {
-
+        sql: string
+    ): string {
         //If inner join is happening between duckdb and native database for ex: postgres, then the replaced example would be <ALIAS_NATIVE_DBNAME>.<SCHEMANAME>.COHORT
-        if(this.conn["duckdbNativeDBName"]) {
-            sql = sql.replace(/\$\$SCHEMA\$\$.COHORT/g, `${this.conn["duckdbNativeDBName"]}.${this.conn["studyAnalyticsCredential"].schema}.COHORT`)
+        if (this.conn["duckdbNativeDBName"]) {
+            sql = sql.replace(
+                /\$\$SCHEMA\$\$.COHORT/g,
+                `${this.conn["duckdbNativeDBName"]}.${this.conn["studyAnalyticsCredential"].schema}.COHORT`
+            );
         }
         const replacement = schemaName === "" ? "" : `${schemaName}.`;
         return sql.replace(/\$\$SCHEMA\$\$./g, replacement);
-      }
+    }
 }

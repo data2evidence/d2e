@@ -6,28 +6,33 @@ on:
   push:
     branches:
       - develop
+  workflow_dispatch:
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
 jobs:
   test-alp-dataflow:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        submodules: recursive
-    - uses: dorny/paths-filter@v2
+
+    - uses: dorny/paths-filter@v3.0.2
       id: check_file_changed
       with:
         filters: |
           dataflow_changed:
             - 'services/alp-dataflow/**'
+
     - name: Setup node if files have changed
-      uses: actions/setup-node@v3
-      if: github.ref_name == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
+      uses: actions/setup-node@v4
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
       with:
         node-version: '18.14.0'
-    # Run the step only with "dataflow_changed" equals "True"
+
     - name: Run unit tests if files have changed
-      if: github.ref_name == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
       run: |
         cd services/alp-dataflow
         yarn --prefer-offline

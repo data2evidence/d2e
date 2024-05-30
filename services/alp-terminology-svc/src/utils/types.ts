@@ -12,8 +12,8 @@ export interface IConcept {
   standard_concept: string;
   concept_code: string;
   invalid_reason: string;
-  valid_start_date?: string;
-  valid_end_date?: string;
+  valid_start_date?: number;
+  valid_end_date?: number;
 }
 export interface IMeilisearchConcept {
   hits: IConcept[];
@@ -78,8 +78,8 @@ export interface IConceptRelationship {
   concept_id_1: number;
   concept_id_2: number;
   relationship_id: string;
-  valid_start_date: string;
-  valid_end_date: string;
+  valid_start_date: number;
+  valid_end_date: number;
   invalid_reason: string;
 }
 export interface IMeilisearchGetMapped {
@@ -211,4 +211,20 @@ export type FhirConceptMapGroup = {
 export type FhirConceptMap = {
   resourceType: string;
   group: FhirConceptMapGroup[];
+};
+
+export type Filters = {
+  conceptClassId: string[];
+  domainId: string[];
+  standardConcept: string[];
+  vocabularyId: string[];
+  validity: ('Valid' | 'Invalid')[];
+};
+
+export type HybridSearchConfig = {
+  id: number;
+  isEnabled: boolean;
+  semanticRatio: number;
+  source: string;
+  model: string;
 };

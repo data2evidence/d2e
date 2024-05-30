@@ -2,11 +2,10 @@ import { EnvVarUtils } from "@alp/alp-base-utils";
 import { MriConfigConnection } from "@alp/alp-config-utils";
 import { StudyMriConfigMetaDataType } from "../types";
 import * as testConfigs from "./test-data/test_configs";
-
+import { env } from "../env";
 const mriConfigConnection = new MriConfigConnection(
-    process.env.ALP_MINERVA_PORTAL_SERVER__URL
+    env.SERVICE_ROUTES?.portalServer
 );
-
 const envVarUtils = new EnvVarUtils(process.env);
 
 export async function callStudyMRIConfig(

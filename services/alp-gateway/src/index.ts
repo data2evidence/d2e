@@ -4,8 +4,8 @@ dotenv.config()
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import express, { Request, Response, NextFunction } from 'express'
 import { UserMgmtAPI } from './api'
-import { ROLES, SESSION_CLAIMS_PROP } from './const'
-import { SAMPLE_USER_JWT, PUBLIC_USER_JWT, MriUser, isClientCredToken } from './mri/MriUser'
+import { ROLES } from './const'
+import { MriUser, isClientCredToken } from './mri/MriUser'
 import { createLogger } from './Logger'
 import * as xsapp from './xs-app.json'
 import { app, authc } from './configure/app'
@@ -15,7 +15,7 @@ import { checkScopes } from './middlewares/scope-check'
 import https from 'https'
 import querystring from 'query-string'
 import { IPlugin, IRouteProp } from './types'
-import { env } from './env'
+import { env, services } from './env'
 import { Container } from 'typedi'
 import Routes, { DashboardGateRouter } from './routes'
 import { addSubToRequestUserMiddleware } from './middlewares/AddSubToRequestUserMiddleware'
@@ -23,6 +23,11 @@ import { AuthcType, exchangeToken, publicURLs } from './authentication'
 import { v4 as uuidv4 } from 'uuid'
 import { addSqleditorHeaders } from './middlewares/SqleditorMiddleware'
 import { addMeilisearchHeaders } from './middlewares/MeilisearchMiddleware'
+import {
+  ensureAnalyticsDatasetAuthorized,
+  ensureDataflowMgmtDatasetAuthorized,
+  ensureTerminologyDatasetAuthorized
+} from './middlewares/ensureDatasetAuthorizedMiddleware'
 import { setupGlobalErrorHandling } from './error-handler'
 
 const auth = process.env.SKIP_AUTH === 'TRUE' ? false : true
@@ -30,12 +35,8 @@ const PORT = env.GATEWAY_PORT
 const logger = createLogger('gateway')
 const userMgmtApi = new UserMgmtAPI()
 const isDev = process.env.NODE_ENV === 'development'
-const appRouterUrl = env.APPROUTER_BASE_URL
-const terminologySvcUrl = env.TERMINOLOGY_SVC_BASE_URL
-const nifiMgmtSvcUrl = env.NIFI_MGMT_SVC_BASE_URL
 const alp_version = process.env.ALP_RELEASE || 'local'
 const authType = env.GATEWAY_IDP_AUTH_TYPE as AuthcType
-const services = JSON.parse(env.DATA_NODE_DOCKER_ADDRESSES_JSON)
 
 let plugins: IPlugin = {
   researcher: [],
@@ -90,9 +91,6 @@ async function ensureAuthorized(req, res, next) {
       }
     }
 
-    // only allow MRI study roles
-    req.user.userMgmtGroups.alpRoleMap = mriUserObj.alpRoleMap
-
     const { scopes } = match
     // the allowed scopes for a url should be found in the user's assigned scopes
     if (scopes.some(i => mriUserObj.mriScopes.includes(i))) {
@@ -131,44 +129,6 @@ async function ensureAlpSysAdminAuthorized(req, res, next) {
   return res.status(403).send('User has no ALP System Admin role')
 }
 
-function encode(string: string) {
-  return Buffer.from(string).toString('base64')
-}
-
-function buildEncodedHeaders(req, res, next) {
-  if (!auth) {
-    // Dummy user ALICE
-    const encodedAlice = encode(JSON.stringify(SAMPLE_USER_JWT))
-    req.headers[SESSION_CLAIMS_PROP] = encodedAlice
-    req.headers.authorization = 'Bearer DUMMY_TOKEN'
-    return next()
-  }
-
-  if (req.originalUrl.startsWith('/analytics-svc/api/services/public/population')) {
-    const encodedPublicUser = encode(JSON.stringify(PUBLIC_USER_JWT))
-    req.headers[SESSION_CLAIMS_PROP] = encodedPublicUser
-    return next()
-  }
-
-  if (req.user) {
-    if (
-      req.user.roles &&
-      [ROLES.ADMIN_DATA_READER_ROLE, ROLES.VALIDATE_TOKEN_ROLE, ROLES.BI_DATA_READER_ROLE].some(role =>
-        req.user.roles.includes(role)
-      )
-    ) {
-      return next()
-    }
-    const encodedUserClaims = encode(JSON.stringify(req.user))
-    req.headers[SESSION_CLAIMS_PROP] = encodedUserClaims
-    if (isDev) {
-      logger.info(`🚀 inside buildEncodedHeaders, req.headers: ${JSON.stringify(req.headers)}`)
-    }
-  }
-
-  return next()
-}
-
 function addOriginHeader(req: Request, res: Response, next: NextFunction) {
   if (req.headers.host) {
     if (isDev) {
@@ -188,6 +148,45 @@ function addCorrelationIDToHeader(req: Request, res: Response, next: NextFunctio
   return next()
 }
 
+const onProxyReq = (proxyReq, req) => {
+  if (req.body) {
+    const contentType = proxyReq.getHeader('Content-Type')
+
+    const writeBody = (bodyData: string) => {
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
+      proxyReq.write(bodyData)
+    }
+
+    if (contentType === 'application/json') {
+      writeBody(JSON.stringify(req.body))
+      logger.debug(`JSON body is written for proxy at url: ${req.originalUrl}`)
+    }
+
+    if (contentType === 'application/x-www-form-urlencoded') {
+      writeBody(querystring.stringify(req.body))
+      logger.debug(`Form body is written for proxy at url: ${req.originalUrl}`)
+    }
+  }
+}
+
+function getCreateMiddlewareOptions(serviceUrl: string) {
+  return {
+    target: {
+      protocol: serviceUrl.split('/')[0],
+      host: serviceUrl.split('/')[2].split(':')[0],
+      port: serviceUrl.split('/')[2].split(':')[1],
+      ...(services.dbCredentialsMgr.includes('localhost:')
+        ? undefined
+        : {
+            ca: env.GATEWAY_CA_CERT
+          })
+    },
+    secure: serviceUrl.includes('localhost:') ? false : true,
+    proxyTimeout: 300000,
+    changeOrigin: serviceUrl.includes('localhost:') ? false : true
+  }
+}
+
 const routes = xsapp.routes as IRouteProp[]
 if (plugins && Object.keys(plugins).length > 0) {
   Object.keys(plugins).forEach((type: keyof IPlugin) => {
@@ -196,15 +195,6 @@ if (plugins && Object.keys(plugins).length > 0) {
         routes.push({ source: p.proxySource, destination: p.proxyDestination })
       }
     })
-  })
-}
-
-//This should be the first item in the array
-if (env.APP_DEPLOY_MODE !== 'standalone') {
-  // Route to app-router
-  routes.unshift({
-    source: '^/portal/env.js',
-    destination: 'portal-ui'
   })
 }
 
@@ -239,7 +229,8 @@ app.post('/oauth/token', async (req, res) => {
 routes.forEach((route: IRouteProp) => {
   try {
     const changeOriginForAppRouter: boolean =
-      appRouterUrl.startsWith('https://localhost:') || appRouterUrl.startsWith('https://alp-mercury-approuter:')
+      services.appRouter.startsWith('https://localhost:') ||
+      services.appRouter.startsWith('https://alp-mercury-approuter:')
         ? false
         : true
 
@@ -250,281 +241,176 @@ routes.forEach((route: IRouteProp) => {
       .replace('(.*)', '')
       .replace('^', '')
 
-    if (route.hasOwnProperty('targetPath')) {
-      app.get(source, (req, res, next) => {
-        const hasTrailingSlash = /(\/(\?|#|$))+/.test(req.url)
-        if (!hasTrailingSlash) {
-          res.redirect(301, req.url.replace(/\/?(\?|#|$)/, '/$1'))
-        }
-        next()
-      })
-
-      app.get(
-        `${source}/*`,
-        createProxyMiddleware({
-          target: env.ALP_UI_URL,
-          changeOrigin: true,
-          pathRewrite: path => {
-            let targetPath = route.targetPath
-            let targetFile = route.target
-
-            if (route.hasOwnProperty('target')) {
-              if (route.target === '$1') {
-                targetFile = path.replace(source, '')
-
-                // remove slash in the beginning
-                if (targetFile.startsWith('/')) {
-                  targetFile = targetFile.substr(1, targetFile.length)
-                }
+    switch (route.destination) {
+      case 'sqleditor':
+        app.use(
+          source,
+          ensureAuthenticated,
+          addSqleditorHeaders,
+          createProxyMiddleware({
+            target: services.sqlEditor,
+            pathRewrite: { '^/alp-sqleditor': '' },
+            changeOrigin: true,
+            onProxyReq
+          })
+        )
+        break
+      case 'public-analytics-svc':
+        app.use(
+          source,
+          createProxyMiddleware({
+            target: services.analytics,
+            proxyTimeout: 300000
+          })
+        )
+        break
+      case 'analytics-svc':
+        app.use(
+          source,
+          ensureAuthenticated,
+          addSubToRequestUserMiddleware,
+          ensureAuthorized,
+          express.json(),
+          ensureAnalyticsDatasetAuthorized,
+          createProxyMiddleware({
+            ...getCreateMiddlewareOptions(services.analytics),
+            logLevel: 'debug',
+            headers: { Connection: 'keep-alive' },
+            onProxyReq: onProxyReq
+          })
+        )
+        break
+      case 'usermgmt':
+        app.use(
+          source,
+          ensureAuthenticated,
+          checkScopes,
+          createProxyMiddleware(getCreateMiddlewareOptions(services.usermgmt))
+        )
+        break
+      case 'db-credentials-mgr':
+        app.use(
+          source,
+          ensureAuthenticated,
+          checkScopes,
+          createProxyMiddleware({
+            ...getCreateMiddlewareOptions(services.dbCredentialsMgr),
+            pathRewrite: path => path.replace('/db-credentials', '')
+          })
+        )
+        break
+      case 'system-portal':
+        app.use(
+          source,
+          ensureAuthenticated,
+          checkScopes,
+          createProxyMiddleware({
+            ...getCreateMiddlewareOptions(services.portalServer),
+            pathRewrite: path => path.replace('/system-portal', '')
+          })
+        )
+        break
+      case 'dataflow-mgmt':
+        app.use(
+          source,
+          ensureAuthenticated,
+          ensureAuthorized,
+          checkScopes,
+          express.json(),
+          ensureDataflowMgmtDatasetAuthorized,
+          createProxyMiddleware({
+            ...getCreateMiddlewareOptions(services.dataflowMgmt),
+            pathRewrite: path => path.replace('/dataflow-mgmt', ''),
+            onProxyReq: onProxyReq
+          })
+        )
+        break
+      case 'meilisearch-svc':
+        app.use(
+          source,
+          ensureAuthenticated,
+          checkScopes,
+          addMeilisearchHeaders,
+          createProxyMiddleware({
+            target: services.meilisearch,
+            proxyTimeout: 300000,
+            pathRewrite: path => path.replace('/meilisearch-svc', '')
+          })
+        )
+        break
+      case 'bookmark-svc':
+        app.use(
+          source,
+          ensureAuthenticated,
+          ensureAuthorized,
+          createProxyMiddleware(getCreateMiddlewareOptions(services.bookmark))
+        )
+        break
+      case 'alp-terminology-svc':
+        app.use(
+          source,
+          ensureAuthenticated,
+          ensureAuthorized,
+          ensureTerminologyDatasetAuthorized,
+          checkScopes,
+          createProxyMiddleware({ ...getCreateMiddlewareOptions(services.terminology), onProxyReq: onProxyReq })
+        )
+        break
+      case 'pa-config':
+        app.use(
+          source,
+          ensureAuthenticated,
+          addSubToRequestUserMiddleware,
+          ensureAuthorized,
+          createProxyMiddleware({
+            ...getCreateMiddlewareOptions(services.paConfig),
+            headers: { Connection: 'keep-alive' }
+          })
+        )
+        break
+      case 'cdw':
+        app.use(
+          source,
+          ensureAuthenticated,
+          addSubToRequestUserMiddleware,
+          ensureAuthorized,
+          createProxyMiddleware({
+            ...getCreateMiddlewareOptions(services.cdw),
+            headers: { Connection: 'keep-alive' }
+          })
+        )
+        break
+      case 'ps-config':
+        app.use(
+          source,
+          ensureAuthenticated,
+          ensureAuthorized,
+          createProxyMiddleware({
+            ...getCreateMiddlewareOptions(services.psConfig),
+            headers: { Connection: 'keep-alive' }
+          })
+        )
+        break
+      default:
+        if (plugins && Object.keys(plugins).length > 0) {
+          Object.keys(plugins).forEach((type: keyof IPlugin) => {
+            plugins[type].forEach(p => {
+              if (route.destination === p.proxyDestination) {
+                app.use(
+                  source,
+                  createProxyMiddleware({
+                    target: p.proxyTarget,
+                    proxyTimeout: p.proxyTimeout,
+                    changeOrigin: true
+                  })
+                )
               }
-
-              targetPath = `${targetPath}${targetFile}`
-            }
-
-            return targetPath || ''
-          }
-        })
-      )
-    } else {
-      switch (route.destination) {
-        case 'sqleditor':
-          const onProxyReq = (proxyReq, req) => {
-            const contentType = proxyReq.getHeader('Content-Type')
-            const writeBody = (bodyData: string) => {
-              proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
-              proxyReq.write(bodyData)
-            }
-
-            if (contentType === 'application/json') {
-              writeBody(JSON.stringify(req.body))
-              logger.debug(`JSON body is written for Sqleditor proxy at url: ${req.originalUrl}`)
-            }
-
-            if (contentType === 'application/x-www-form-urlencoded') {
-              writeBody(querystring.stringify(req.body))
-              logger.debug(`Form body is written for Sqleditor proxy at url: ${req.originalUrl}`)
-            }
-          }
-          app.use(
-            source,
-            ensureAuthenticated,
-            addSqleditorHeaders,
-            createProxyMiddleware({
-              target: env.SQLEDITOR__BASE_URL,
-              pathRewrite: { '^/alp-sqleditor': '' },
-              changeOrigin: true,
-              onProxyReq
             })
-          )
-          break
-        case 'public-analytics-svc':
-          app.use(
-            source,
-            buildEncodedHeaders,
-            createProxyMiddleware({
-              target: services.analyticsSvc,
-              proxyTimeout: 300000
-            })
-          )
-          break
-        case 'analytics-svc':
-          app.use(
-            source,
-            ensureAuthenticated,
-            addSubToRequestUserMiddleware,
-            ensureAuthorized,
-            buildEncodedHeaders,
-            createProxyMiddleware({
-              target: services.analyticsSvc,
-              proxyTimeout: 300000,
-              logLevel: 'debug',
-              headers: { Connection: 'keep-alive' }
-            })
-          )
-          break
-        case 'portal-ui':
-          app.use(
-            source,
-            createProxyMiddleware({
-              target: appRouterUrl,
-              secure: changeOriginForAppRouter,
-              proxyTimeout: 100000,
-              changeOrigin: changeOriginForAppRouter
-            })
-          )
-          break
-        case 'usermgmt':
-          app.use(
-            source,
-            ensureAuthenticated,
-            checkScopes,
-            createProxyMiddleware({ target: services.usermgmt, proxyTimeout: 300000 })
-          )
-          break
-        case 'db-credentials-mgr':
-          app.use(
-            source,
-            ensureAuthenticated,
-            checkScopes,
-            createProxyMiddleware({
-              target: services.dbCredentialsMgr,
-              proxyTimeout: 300000,
-              pathRewrite: path => path.replace('/db-credentials', '')
-            })
-          )
-          break
-        case 'system-portal':
-          app.use(
-            source,
-            ensureAuthenticated,
-            checkScopes,
-            createProxyMiddleware({
-              target: services.portalServer,
-              proxyTimeout: 300000,
-              pathRewrite: path => path.replace('/system-portal', '')
-            })
-          )
-          break
-        case 'dataflow-mgmt':
-          app.use(
-            source,
-            ensureAuthenticated,
-            checkScopes,
-            createProxyMiddleware({
-              target: services.dataflowMgmt,
-              proxyTimeout: 300000,
-              pathRewrite: path => path.replace('/dataflow-mgmt', '')
-            })
-          )
-          break
-        case 'meilisearch-svc':
-          app.use(
-            source,
-            ensureAuthenticated,
-            checkScopes,
-            addMeilisearchHeaders,
-            createProxyMiddleware({
-              target: services.meilisearchSvc,
-              proxyTimeout: 300000,
-              pathRewrite: path => path.replace('/meilisearch-svc', '')
-            })
-          )
-          break
-        case 'nifimgmt':
-          app.use(
-            source,
-            ensureAuthenticated,
-            checkScopes,
-            createProxyMiddleware({
-              target: {
-                protocol: nifiMgmtSvcUrl.split('/')[0],
-                host: nifiMgmtSvcUrl.split('/')[2].split(':')[0],
-                port: nifiMgmtSvcUrl.split('/')[2].split(':')[1],
-                ...(nifiMgmtSvcUrl.includes('localhost:')
-                  ? undefined
-                  : {
-                      ca: env.GATEWAY_CA_CERT
-                    })
-              },
-              secure: nifiMgmtSvcUrl.includes('localhost:') ? false : true,
-              proxyTimeout: 300000,
-              changeOrigin: nifiMgmtSvcUrl.includes('localhost:') ? false : true
-            })
-          )
-          break
-        case 'bookmark-svc':
-          app.use(
-            source,
-            ensureAuthenticated,
-            ensureAuthorized,
-            buildEncodedHeaders,
-            createProxyMiddleware({ target: services.bookmarkSvc, proxyTimeout: 300000 })
-          )
-          break
-        case 'alp-terminology-svc':
-          app.use(
-            source,
-            ensureAuthenticated,
-            checkScopes,
-            createProxyMiddleware({
-              target: {
-                protocol: terminologySvcUrl.split('/')[0],
-                host: terminologySvcUrl.split('/')[2].split(':')[0],
-                port: terminologySvcUrl.split('/')[2].split(':')[1],
-                ...(terminologySvcUrl.includes('localhost:')
-                  ? undefined
-                  : {
-                      ca: env.GATEWAY_CA_CERT
-                    })
-              },
-              secure: terminologySvcUrl.includes('localhost:') ? false : true,
-              proxyTimeout: 300000,
-              changeOrigin: terminologySvcUrl.includes('localhost:') ? false : true
-            })
-          )
-          break
-        case 'pa-config':
-          app.use(
-            source,
-            ensureAuthenticated,
-            addSubToRequestUserMiddleware,
-            ensureAuthorized,
-            buildEncodedHeaders,
-            createProxyMiddleware({
-              target: services.paConfig,
-              proxyTimeout: 300000,
-              headers: { Connection: 'keep-alive' }
-            })
-          )
-          break
-        case 'cdw':
-          app.use(
-            source,
-            ensureAuthenticated,
-            addSubToRequestUserMiddleware,
-            ensureAuthorized,
-            buildEncodedHeaders,
-            createProxyMiddleware({
-              target: services.cdwSvc,
-              proxyTimeout: 300000,
-              headers: { Connection: 'keep-alive' }
-            })
-          )
-          break
-        case 'ps-config':
-          app.use(
-            source,
-            ensureAuthenticated,
-            ensureAuthorized,
-            buildEncodedHeaders,
-            createProxyMiddleware({
-              target: services.psConfig,
-              proxyTimeout: 300000,
-              headers: { Connection: 'keep-alive' }
-            })
-          )
-          break
-        default:
-          if (plugins && Object.keys(plugins).length > 0) {
-            Object.keys(plugins).forEach((type: keyof IPlugin) => {
-              plugins[type].forEach(p => {
-                if (route.destination === p.proxyDestination) {
-                  app.use(
-                    source,
-                    createProxyMiddleware({
-                      target: p.proxyTarget,
-                      proxyTimeout: p.proxyTimeout,
-                      changeOrigin: true
-                    })
-                  )
-                }
-              })
-            })
-          } else {
-            logger.info('ERROR: unknown destination')
-          }
-          break
-      }
+          })
+        } else {
+          logger.info('ERROR: unknown destination')
+        }
+        break
     }
   } catch (e) {
     logger.error(`Error: ${e}, route @ ${route.source}`)

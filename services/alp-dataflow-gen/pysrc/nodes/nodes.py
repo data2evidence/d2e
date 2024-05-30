@@ -16,6 +16,9 @@ from rpy2.robjects import conversion, default_converter, pandas2ri
 from rpy2.robjects.packages import importr
 import alpconnection.dbutils as dbutils
 from utils.types import PG_TENANT_USERS
+from flows.dataflow.hooks import *
+from functools import partial
+
 
 class Node:
     def __init__(self, node):
@@ -155,7 +158,8 @@ class DbWriter(Node):
     def __init__(self, _node):
         super().__init__(_node)
         self.tablename = _node["dbtablename"]
-        self.dbconn = dbutils.GetDBConnection(_node["database"], PG_TENANT_USERS.ADMIN_USER)
+        self.dbconn = dbutils.GetDBConnection(
+            _node["database"], PG_TENANT_USERS.ADMIN_USER)
         self.dataframe = _node["dataframe"]
 
     def test(self, _input: Dict[str, Result], task_run_context):
@@ -177,7 +181,8 @@ class DbQueryReader(Node):
     def __init__(self, _node):
         super().__init__(_node)
         self.sqlquery = _node["sqlquery"]
-        self.dbconn = dbutils.GetDBConnection(_node["database"], PG_TENANT_USERS.READ_USER)
+        self.dbconn = dbutils.GetDBConnection(
+            _node["database"], PG_TENANT_USERS.READ_USER)
         self.testdata = {
             "columns": _node["columns"], "data": _node["testdata"]}
 
@@ -206,7 +211,8 @@ class SqlQueryNode(Node):
         self._is_select = _node["is_select"]
         if "params" in _node:
             self.params = _node["params"]
-        self.dbconn = dbutils.GetDBConnection(_node["database"], PG_TENANT_USERS.ADMIN_USER)
+        self.dbconn = dbutils.GetDBConnection(
+            _node["database"], PG_TENANT_USERS.ADMIN_USER)
 
     def _map_input(self, _input):
         _params = {}
@@ -328,7 +334,9 @@ class DataMappingNode(Node):
             return Result(None, result_df, self, task_run_context)
 
 
-@flow(name="generate-nodes", flow_run_name="generate-nodes-flowrun", log_prints=True)
+@flow(name="generate-nodes",
+      flow_run_name="generate-nodes-flowrun",
+      log_prints=True)
 def generate_nodes_flow(graph, sorted_nodes):
     for nodename in sorted_nodes:
         node = graph["nodes"][nodename]
@@ -346,13 +354,22 @@ def generate_nodes_flow(graph, sorted_nodes):
                     subflow_nodename, subflow_nodegraph, subflow_nodetype)
                 graph["nodes"][nodename]["graph"]["nodes"][subflow_nodename]["nodeobj"] = subflow_node_obj
         else:
-            # directly create task run to generate node obj
-            nodeobj = generate_node_task(nodename, node, nodetype)
+            node_task_generation_wo = generate_node_task.with_options(
+                on_completion=[partial(
+                    node_task_generation_hook, **dict(nodename=nodename, nodetype=nodetype))],
+                on_failure=[partial(node_task_generation_hook,
+                                    **dict(nodename=nodename, nodetype=nodetype))]
+            )
+
+            nodeobj = node_task_generation_wo(nodename, node, nodetype)
+
             graph["nodes"][nodename]["nodeobj"] = nodeobj
     return graph
 
 
-@task(task_run_name="generate-node-taskrun-{nodename}", log_prints=True)
+@task(task_run_name="generate-node-taskrun-{nodename}",
+      log_prints=True
+      )
 def generate_node_task(nodename, node, nodetype):
     nodeobj = None
     # TODO: nodetype to make global variable

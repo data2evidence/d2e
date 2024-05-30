@@ -178,7 +178,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
-    path: '^/system-portal/dataset/list\\?(.*)role=researcher$',
+    path: '^/system-portal/dataset/list\\?(.*)role=researcher(&.*)?$',
     scopes: ['portal.dataset.read'],
     httpMethods: ['GET']
   },
@@ -348,6 +348,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
+    path: `^/dashboard-gate/register`,
+    scopes: ['gateway.dashboardGate.register'],
+    httpMethods: ['POST']
+  },
+  {
     path: '^/alp-nifi-api/nifi/(.*)',
     scopes: ['nifimgmt.userAdmin']
   },
@@ -423,6 +428,26 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
   {
     path: '^/dataflow-mgmt/dataflow/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
     scopes: ['dataflowmgmt.dataflow.revision.delete'],
+    httpMethods: ['DELETE']
+  },
+  {
+    path: '^/dataflow-mgmt/analysisflow/(.*)',
+    scopes: ['dataflowmgmt.analysisflow.read'],
+    httpMethods: ['GET']
+  },
+  {
+    path: '^/dataflow-mgmt/analysisflow(.*)',
+    scopes: ['dataflowmgmt.analysisflow.add'],
+    httpMethods: ['POST']
+  },
+  {
+    path: `^/dataflow-mgmt/analysisflow/${UUID}`,
+    scopes: ['dataflowmgmt.analysisflow.delete'],
+    httpMethods: ['DELETE']
+  },
+  {
+    path: '^/dataflow-mgmt/analysisflow/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    scopes: ['dataflowmgmt.analysisflow.revision.delete'],
     httpMethods: ['DELETE']
   },
   {
@@ -838,6 +863,7 @@ export const ROLE_SCOPES = {
     'meilisearchSvc.index.add',
     'meilisearchSvc.index.setting.update',
     'meilisearchSvc.document.add',
+    'gateway.dashboardGate.register',
     'gateway.dataset.dashboards.read',
     'gateway.dataset.cohorts.read',
     'gateway.dataset.create',
@@ -847,7 +873,11 @@ export const ROLE_SCOPES = {
     'gateway.db.dataset.versionInfo.read',
     'gateway.db.schema.update',
     'gateway.terminology.hybridSearchConfig.read',
-    'gateway.terminology.hybridSearchConfig.update'
+    'gateway.terminology.hybridSearchConfig.update',
+    'dataflowmgmt.analysisflow.read',
+    'dataflowmgmt.analysisflow.add',
+    'dataflowmgmt.analysisflow.delete',
+    'dataflowmgmt.analysisflow.revision.delete'
   ],
   ALP_DASHBOARD_VIEWER: ['gateway.dashboardGate.content'],
   TENANT_VIEWER: [
@@ -887,28 +917,19 @@ export const ROLE_SCOPES = {
     'gateway.terminology.concept.filterOptions.read',
     'gateway.terminology.concept.recommended.read',
     'gateway.terminology.fhir.read',
-    'gateway.terminology.hybridSearchConfig.read'
+    'gateway.terminology.hybridSearchConfig.read',
+    'dataflowmgmt.analysisflow.read',
+    'dataflowmgmt.analysisflow.add',
+    'dataflowmgmt.analysisflow.delete',
+    'dataflowmgmt.analysisflow.revision.delete'
   ],
   ALP_SHARED: ['usermgmt.group.read', 'usermgmt.group.add', 'usermgmt.group.delete'],
   USER_MGMT_GROUP_DELETE: ['usermgmt.group.delete'],
   [`${env.IDP_ALP_SVC_CLIENT_ID}`]: ['dbCredentials.db.list', 'portal.dataset.read'],
   [`${env.IDP_ALP_DATA_CLIENT_ID}`]: [
     'portal.dataset.read',
-    'dbSvc.schema.create',
-    'dbSvc.snapshot.create',
-    'dbSvc.schema.update',
-    'dbSvc.maintenance.update',
-    'dbSvc.schema.versionInfo.read',
-    'dbSvc.datamodels.read',
-    'dbSvc.schema.cdmVersion.read',
-    'dbSvc.schema.vocabSchema.read',
-    'dbSvc.schema.snapshot.metadata.read',
-    'dbSvc.stagingArea.create',
-    'dbSvc.stagingArea.update',
-    'dbSvc.snapshot.parquet.create',
-    'dbSvc.schema.delete.rollbackCount',
-    'dbSvc.schema.delete.rollbackTag',
-    'dbSvc.questionnaire.create',
-    'dbSvc.questionnaire.responses.read'
+    'meilisearchSvc.index.add',
+    'meilisearchSvc.index.setting.update',
+    'meilisearchSvc.document.add'
   ]
 }

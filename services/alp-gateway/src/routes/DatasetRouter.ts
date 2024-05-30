@@ -117,15 +117,25 @@ export class DatasetRouter {
               const datamodels = await dataflowMgmtAPI.getDatamodels()
               const dmInfo = datamodels.find(model => model.name === dataModelName)
 
-              const options = {options: {
-                flow_action_type: 'create',
-                database_code: databaseCode,
-                data_model: dataModel,
-                schema_name: schemaName,
-                cleansed_schema_option: cleansedSchemaOption,
-                vocab_schema: vocabSchema 
-              }}
-              await dataflowMgmtAPI.createFlowRunByMetadata(options, 'datamodel', dmInfo.flowId, 'datamodel-create')
+              const options = {
+                options: {
+                  flow_action_type: 'create_datamodel',
+
+                  database_code: databaseCode,
+                  data_model: dataModel,
+                  schema_name: schemaName,
+                  cleansed_schema_option: cleansedSchemaOption,
+                  vocab_schema: vocabSchema
+                }
+              }
+
+              await dataflowMgmtAPI.createFlowRunByMetadata(
+                options,
+                'datamodel',
+                dmInfo.flowId,
+                `datamodel-create-${schemaName}`
+              )
+
             } catch (error) {
               this.logger.error(`Error while creating new CDM schema! ${error}`)
               return res.status(500).send('Error while creating CDM schema')
@@ -195,16 +205,16 @@ export class DatasetRouter {
             if (snapshotLocation === 'DB') {
               await dataflowMgmtAPI.copyCDMSchema(
                 databaseCode,
-                this.schemaCase(schemaName, dialect),
-                this.schemaCase(newSchemaName, dialect),
+                this.schemaCase(schemaName, dialect as DbDialect),
+                this.schemaCase(newSchemaName, dialect as DbDialect),
                 dialect,
                 snapshotCopyConfig
               )
             } else {
               await dataflowMgmtAPI.copyCDMSchemaParquet(
                 databaseCode,
-                this.schemaCase(schemaName, dialect),
-                this.schemaCase(newSchemaName, dialect),
+                this.schemaCase(schemaName, dialect as DbDialect),
+                this.schemaCase(newSchemaName, dialect as DbDialect),
                 dialect,
                 snapshotCopyConfig
               )

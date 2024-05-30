@@ -5,7 +5,7 @@ import { HttpService } from '@nestjs/axios'
 import { REQUEST } from '@nestjs/core'
 import { firstValueFrom, map } from 'rxjs'
 import { Agent } from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
 import { PaConfig, PaConfigType } from '../types'
 import { PA_CONFIG_TYPE } from '../common/const'
 
@@ -33,13 +33,11 @@ export class PaConfigApi {
 
   constructor(@Inject(REQUEST) request: Request, protected readonly httpService: HttpService) {
     this.jwt = request.headers['authorization']
-    if (env.PA_CONFIG_API_URL) {
-      this.url = env.PA_CONFIG_API_URL
+    if (services.paConfig) {
+      this.url = services.paConfig
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') || this.url.startsWith('https://alp-minerva-gateway-')
-            ? false
-            : true
+        rejectUnauthorized: true,
+        ca: env.SSL_CA_CERT
       })
     } else {
       throw new Error('No url is set for PaConfigApi')

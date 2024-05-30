@@ -53,19 +53,16 @@ FROM dbsvc-build AS final-build
 
 WORKDIR /app
 
-COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/pysrc pysrc
 COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/requirements.txt .
-
 RUN pip install -r requirements.txt
+
+COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/pysrc pysrc
 
 COPY --chown=docker:docker ./services/alp-dataflow-gen/init.py .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/init.sh .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/startprefectagent.sh .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/startprefectserver.sh  .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/postgresql-42.3.1.jar ./inst/drivers/
-
-# Install CommonDataModel without upgrading DatabaseConnector
-RUN Rscript -e 'devtools::install_github("OHDSI/CommonDataModel@v5.4.1", upgrade = "never")'
 
 COPY --chown=docker:docker ./services/envConverter ./libs/envConverter
 WORKDIR /app/libs/envConverter
@@ -78,7 +75,20 @@ RUN chown -R docker:docker /output
 RUN mkdir -p /home/docker/plugins/R/site-library
 RUN chown -R docker:docker /home/docker/plugins/R/site-library
 
+# Add Apache Ant for i2b2 data model creation
+ENV ANT_VERSION=1.9.6
+RUN wget http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz \
+    && tar xvfvz apache-ant-${ANT_VERSION}-bin.tar.gz -C /opt \
+    && ln -sfn /opt/apache-ant-${ANT_VERSION} /opt/ant \
+    && sh -c 'echo ANT_HOME=/opt/ant >> /etc/environment' \
+    && ln -sfn /opt/ant/bin/ant /usr/bin/ant \
+    && rm apache-ant-${ANT_VERSION}-bin.tar.gz
+
 WORKDIR /app
+
+# Create folder for duckdb database files
+RUN mkdir ./duckdb_data
+RUN chown docker:alp ./duckdb_data
 
 # Create folder to store synpuf1k csv
 RUN mkdir -p /app/synpuf1k

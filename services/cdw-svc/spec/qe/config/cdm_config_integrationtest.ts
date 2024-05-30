@@ -40,15 +40,14 @@ describe("CDM Configuration tests,", () => {
         connection = connectionInstance;
         ffhQeConfig = new FfhQeConfig(
           connectionInstance,
-          connectionInstance,
           new AssignmentProxy([]),
           fakeSettings,
           new User("TEST_USER"),
           true
         );
         ffhConfig = ffhQeConfig.getFfhConfigObj();
-        facade = new ConfigFacade(connectionInstance, ffhQeConfig, true);
-        settingsFacade = new SettingsFacade(connectionInstance);
+        facade = new ConfigFacade(connectionInstance, ffhQeConfig, new User("TEST_USER"), true);
+        settingsFacade = new SettingsFacade(new User("TEST_USER"));
         settingsFacade.setFfhQeConfig(ffhQeConfig);
         done();
       })

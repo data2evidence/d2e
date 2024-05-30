@@ -2,21 +2,29 @@ import requests
 import os
 import json
 from typing import Union
+from api.OpenIdAPI import OpenIdAPI
 
 
 class MeilisearchSvcAPI:
-    def __init__(self, token):
+    def __init__(self):
         if os.getenv('MEILISEARCH_SVC__API_BASE_URL') is None:
             raise ValueError("MEILISEARCH_SVC__API_BASE_URL is undefined")
+        if os.getenv("PYTHON_VERIFY_SSL") == 'true' and os.getenv('TLS__INTERNAL__CA_CRT') is None:
+            raise ValueError("TLS__INTERNAL__CA_CRT is undefined")
         self.url = os.getenv('MEILISEARCH_SVC__API_BASE_URL')
-        self.token = token
+        self.openIdAPI = OpenIdAPI()
+        self.token = None
         self.verifySsl = False if os.getenv(
-            "PYTHON_VERIFY_SSL") == 'false' else True
+            "PYTHON_VERIFY_SSL") == 'false' else os.getenv('TLS__INTERNAL__CA_CRT')
 
     def getOptions(self):
+        # Get new client credential token if it is empty or has expired
+        if self.openIdAPI.isTokenExpiredOrEmpty(self.token):
+            self.token = self.openIdAPI.getClientCredentialToken()
+
         return {
             "Content-Type": "application/json",
-            "Authorization": self.token
+            "Authorization": f"Bearer {self.token}"
         }
 
     def create_index(self, index_name: str, primary_key: str):
@@ -69,7 +77,7 @@ class MeilisearchSvcAPI:
 
     def update_synonym_index(self, index_name: str, documents):
         url = f"{self.url}indexes/{index_name}/settings/synonyms"
-        
+
         headers = self.getOptions()
         result = requests.put(
             url,
@@ -80,5 +88,3 @@ class MeilisearchSvcAPI:
         if ((result.status_code >= 400) and (result.status_code < 600)):
             raise Exception(
                 f"MeilisearchAPI Failed to update concept table index:{index_name} with synonyms. {result.content}")
-
-        return result

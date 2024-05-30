@@ -4,41 +4,43 @@ set -o nounset
 set -o errexit
 
 # inputs
-env_base_name=${npm_package_config_env_base_name:-env}
-env_name=${env_name:-local}
-op_vault_name=$npm_package_config_op_vault_name
-overwrite=${overwrite:-false}
+[ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1
+ENV_NAME=${ENV_NAME:-local}
+OVERWRITE=${OVERWRITE:-false}
 
-echo env_name=$env_name
+# echo ENV_NAME=$ENV_NAME
 
 # vars
-dotenv_file=.$env_base_name.$env_name.yml
-if [ ! -f $dotenv_file ]; then echo INFO $dotenv_file not found; exit 1; fi
-
-dir=private-generated; mkdir -p $dir
-op_dotenv_file=$dir/${dotenv_file/.yml/.generated.yml}
+GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+CACHE_DIR=$GIT_BASE_DIR/cache/op
+DOTENV_NAME=.env.$ENV_NAME.yml
+DOTENV_PATH=$GIT_BASE_DIR/$DOTENV_NAME
+if [ ! -f $DOTENV_PATH ]; then echo FATAL $DOTENV_PATH not found; exit 1; fi
+CACHE_DOTENV_PATH=$CACHE_DIR/$DOTENV_NAME
 
 # get latest for comparison
-op read op://$op_vault_name/$dotenv_file/notesPlain > $op_dotenv_file
-sed -i.bak -e '$a\' $op_dotenv_file
+# op item get --vault $OP_VAULT_NAME $DOTENV_NAME --format json > $CACHE_DOTENV_PATH.json
+op read --no-newline op://$OP_VAULT_NAME/$DOTENV_NAME/notesPlain --out-file $CACHE_DOTENV_PATH --force | sed -e "s#$GIT_BASE_DIR/##g"
 
-# vscode diff if changes
-# add newline at end of file, if missing
-sed -i.bak -e '$a\' $dotenv_file; rm $dotenv_file.bak
+# accept non successful exit code where files differ
 set +o errexit
-if diff -q $op_dotenv_file $dotenv_file; then 
+
+if diff -q --ignore-space-change --ignore-blank-lines --ignore-all-space $CACHE_DOTENV_PATH $DOTENV_PATH > /dev/null; then 
     echo INFO: no changes
 else
-    # echo INFO: diff
-    diff $op_dotenv_file $dotenv_file
+    echo INFO: diff
+    diff -q --ignore-space-change --ignore-blank-lines --ignore-all-space $CACHE_DOTENV_PATH $DOTENV_PATH | sed -e "s#$GIT_BASE_DIR/##g"
+    diff $CACHE_DOTENV_PATH $DOTENV_PATH
     echo
-    code --diff $op_dotenv_file $dotenv_file
-    if [ $overwrite != true ]; then
-        read -p "Put $dotenv_file [YyNn]? " -n 1 yn
+    code --diff $CACHE_DOTENV_PATH $DOTENV_PATH
+    if [ $OVERWRITE != true ]; then
+        read -p "Put $DOTENV_NAME [YyNn]? " -n 1 yn
     fi
     echo
-    if [ $overwrite = true ] || [[ $yn =~ ^[Yy]$ ]]; then 
-        op item edit --format json --vault $op_vault_name ${dotenv_file} "notesPlain[text]=$(cat ${dotenv_file})" | yq '{"reference": .fields[0].reference, "updated_at": .updated_at}'
+    if [ $OVERWRITE = true ] || [[ $yn =~ ^[Yy]$ ]]; then
+        yq 'sort_keys(..)' $DOTENV_PATH > $CACHE_DOTENV_PATH
+        # op item edit --format json --vault $OP_VAULT_NAME ${DOTENV_NAME} --template=$CACHE_DOTENV_PATH.json
+        op item edit --format json --vault $OP_VAULT_NAME ${DOTENV_NAME} "notesPlain[text]=$(cat $CACHE_DOTENV_PATH)" | yq '{"reference": .fields[0].reference, "updated_at": .updated_at}'
     else 
         echo INFO skipped
     fi

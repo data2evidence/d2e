@@ -1,9 +1,6 @@
 import { Constants, SAMPLE_USER_JWT } from '@alp/alp-base-utils'
 import { IMRIRequest } from '../../src/types'
 export default class MockRequest implements Partial<IMRIRequest> {
-  public swagger = {
-    params: {},
-  }
   public body: any = {}
   public dbConnections = {
     configConnection: null,
@@ -17,10 +14,6 @@ export default class MockRequest implements Partial<IMRIRequest> {
 
   public encode(string: string) {
     return Buffer.from(string).toString('base64')
-  }
-
-  public setSwaggerParams(params) {
-    this.swagger.params = { ...params }
   }
 
   public setBody(body) {

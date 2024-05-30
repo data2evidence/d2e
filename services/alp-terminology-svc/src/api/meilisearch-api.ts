@@ -4,6 +4,8 @@ import { Agent } from 'https';
 import { env } from '../env';
 import { createLogger } from '../logger';
 import {
+  Filters,
+  HybridSearchConfig,
   IMeilisearchConcept,
   IMeilisearchGetConceptRecommended,
   IMeilisearchGetDescendants,
@@ -18,18 +20,40 @@ export class MeilisearchAPI {
   private readonly logger = createLogger(this.constructor.name);
 
   constructor() {
-    if (env.MEILISEARCH__API_URL) {
-      this.url = env.MEILISEARCH__API_URL;
+    if (env.SERVICE_ROUTES.meilisearch) {
+      this.url = env.SERVICE_ROUTES.meilisearch;
       this.httpsAgent = new Agent({
-        rejectUnauthorized:
-          this.url.startsWith('https://localhost:') ||
-          this.url.startsWith('https://alp-minerva-meilisearch-')
-            ? false
-            : true,
+        rejectUnauthorized: true,
+        ca: env.TLS__INTERNAL__CA_CRT,
       });
     } else {
       throw new Error('No url is set for MeilisearchAPI');
     }
+  }
+
+  async hybridSearch(
+    index: string,
+    data: any,
+    hybridSearchName: string,
+    semanticRatio: any,
+  ) {
+    const options = await this.createOptions();
+
+    // Append source and model to index name (Naming convention must be standardised)
+    const hybridSearchUrl = `${this.url}indexes/${index}${hybridSearchName}/search`;
+    const hybridSearchData = {
+      ...data,
+      hybrid: {
+        semanticRatio: semanticRatio,
+        embedder: 'default',
+        // vector: [0, 1, 2] if we are calculating local embeddings
+      },
+    };
+    return await axios.post<IMeilisearchConcept>(
+      hybridSearchUrl,
+      hybridSearchData,
+      options,
+    );
   }
 
   async getConcepts(
@@ -37,17 +61,15 @@ export class MeilisearchAPI {
     rowsPerPage: number,
     searchText = '',
     index: string,
-    filters: {
-      conceptClassId: string[];
-      domainId: string[];
-      standardConcept: string[];
-      vocabularyId: string[];
-    },
+    filters: Filters,
+    hybridSearchConfig: HybridSearchConfig,
   ): Promise<IMeilisearchConcept> {
     const errorMessage = 'Error while getting concepts';
     try {
-      const options = await this.createOptions();
-      const url = `${this.url}indexes/${index}/search`;
+      const hybridSearchName = `_${hybridSearchConfig.source.replace(
+        '/',
+        '',
+      )}_${hybridSearchConfig.model.replace('/', '')}`;
       const data = {
         q: searchText,
         page: pageNumber + 1,
@@ -61,8 +83,24 @@ export class MeilisearchAPI {
         ],
         filter: this.generateMeiliFilter(filters),
       };
-      const result = await axios.post<IMeilisearchConcept>(url, data, options);
-      return result.data;
+      if (hybridSearchConfig.isEnabled) {
+        const result = await this.hybridSearch(
+          index,
+          data,
+          hybridSearchName,
+          hybridSearchConfig.semanticRatio,
+        );
+        return result.data;
+      } else {
+        const options = await this.createOptions();
+        const url = `${this.url}/indexes/${index}/search`;
+        const result = await axios.post<IMeilisearchConcept>(
+          url,
+          data,
+          options,
+        );
+        return result.data;
+      }
     } catch (error) {
       this.logger.error(`${errorMessage}: ${error}`);
       throw new InternalServerErrorException(errorMessage);
@@ -76,7 +114,7 @@ export class MeilisearchAPI {
   ): Promise<IMeilisearchConcept[]> {
     try {
       const options = await this.createOptions();
-      const url = `${this.url}multi-search`;
+      const url = `${this.url}/multi-search`;
       const invalidFilter = includeInvalid
         ? []
         : [
@@ -116,7 +154,7 @@ export class MeilisearchAPI {
   ): Promise<IMeilisearchGetDescendants[]> {
     try {
       const options = await this.createOptions();
-      const url = `${this.url}multi-search`;
+      const url = `${this.url}/multi-search`;
       const queries = searchTexts.map((searchText) => {
         return {
           indexUid: index,
@@ -145,7 +183,7 @@ export class MeilisearchAPI {
   ): Promise<IMeilisearchGetMapped[]> {
     try {
       const options = await this.createOptions();
-      const url = `${this.url}multi-search`;
+      const url = `${this.url}/multi-search`;
       const queries = searchTexts.map((searchText) => {
         return {
           indexUid: index,
@@ -175,33 +213,72 @@ export class MeilisearchAPI {
     }
   }
 
-  async getConceptFilterOptions(
+  async getConceptFilterOptionsFaceted(
     index: string,
     searchText: string,
-    filters: {
-      conceptClassId: string[];
-      domainId: string[];
-      standardConcept: string[];
-      vocabularyId: string[];
-    },
+    filters: Filters,
   ): Promise<IMeilisearchConcept> {
     // Facet search has a 100 result limit, which is not affected by maxValuesPerFacet setting.
     // Hence using normal search as workaround to get all facets
     // https://www.meilisearch.com/docs/learn/advanced/known_limitations#facet-search-limitation
 
     const options = await this.createOptions();
-    const url = `${this.url}indexes/${index}/search`;
+    const url = `${this.url}/indexes/${index}/search`;
     const data = {
       q: searchText,
       facets: ['*'],
       filter: this.generateMeiliFilter(filters),
       // Since we do not need the search results, just getting 1 value
-      // using page and hitsPerPage instead of limit to get access to totalHits
-      page: 1,
-      hitsPerPage: 1,
+      // using page and hitsPerPage instead of limit param to get access to totalHits
+      // limit param will return estimatedTotalHits instead
+      hitsPerPage: 0,
     };
     const result = await axios.post<IMeilisearchConcept>(url, data, options);
-    return result.data;
+    const facetedOptions = result.data;
+    return facetedOptions;
+  }
+
+  async getConceptFilterOptionsValidity(
+    index: string,
+    searchText: string,
+    filters: Filters,
+  ): Promise<{ Valid: number; Invalid: number }> {
+    // Facet search has a 100 result limit, which is not affected by maxValuesPerFacet setting.
+    // Hence using normal search as workaround to get all facets
+    // https://www.meilisearch.com/docs/learn/advanced/known_limitations#facet-search-limitation
+
+    const options = await this.createOptions();
+    const url = `${this.url}/indexes/${index}/search`;
+    const resultAll = await axios.post<IMeilisearchConcept>(
+      url,
+      {
+        q: searchText,
+        filter: this.generateMeiliFilter({ ...filters, validity: [] }),
+        // Since we do not need the search results, just getting 1 value
+        // using page and hitsPerPage instead of limit param to get access to totalHits
+        // limit param will return estimatedTotalHits instead
+        hitsPerPage: 0,
+      },
+      options,
+    );
+    const resultValid = await axios.post<IMeilisearchConcept>(
+      url,
+      {
+        q: searchText,
+        filter: this.generateMeiliFilter({ ...filters, validity: ['Valid'] }),
+        // Since we do not need the search results, just getting 1 value
+        // using page and hitsPerPage instead of limit param to get access to totalHits
+        // limit param will return estimatedTotalHits instead
+        hitsPerPage: 0,
+      },
+      options,
+    );
+    const totalDocuments = resultAll.data.totalHits;
+    const totalValid = resultValid.data.totalHits;
+    return {
+      Valid: totalValid,
+      Invalid: totalDocuments - totalValid,
+    };
   }
 
   private async createOptions(): Promise<AxiosRequestConfig> {
@@ -213,12 +290,7 @@ export class MeilisearchAPI {
     };
   }
 
-  private generateMeiliFilter(filters: {
-    conceptClassId: string[];
-    domainId: string[];
-    standardConcept: string[];
-    vocabularyId: string[];
-  }): string[][] {
+  private generateMeiliFilter(filters: Filters): string[][] {
     // Filter is an array of array which is needed for OR and AND logic
     // https://www.meilisearch.com/docs/learn/fine_tuning_results/filtering#creating-filter-expressions-with-arrays
     const conceptClassIdFilter = filters.conceptClassId.map((filterValue) => {
@@ -235,11 +307,22 @@ export class MeilisearchAPI {
     const vocabularyIdFilter = filters.vocabularyId.map((filterValue) => {
       return `${INDEX_ATTRIBUTES.concept.vocabularyId} = '${filterValue}'`;
     });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todaySeconds = Math.floor(Number(today) / 1000);
+    const validityFilter = filters.validity.map((filterValue) => {
+      if (filterValue === 'Valid') {
+        return `${INDEX_ATTRIBUTES.concept.validEndDate} >= ${todaySeconds}`;
+      } else {
+        return `${INDEX_ATTRIBUTES.concept.validEndDate} < ${todaySeconds}`;
+      }
+    });
     return [
       conceptClassIdFilter,
       domainIdFilter,
       standardConceptFilter,
       vocabularyIdFilter,
+      validityFilter,
     ];
   }
 
@@ -248,7 +331,7 @@ export class MeilisearchAPI {
     index: string,
   ): Promise<IMeilisearchGetMapped> {
     const options = await this.createOptions();
-    const url = `${this.url}indexes/${index}/search`;
+    const url = `${this.url}/indexes/${index}/search`;
     const data = {
       q: `${conceptId}`,
       attributesToSearchOn: [INDEX_ATTRIBUTES.concept_relationship.conceptId1],
@@ -262,7 +345,7 @@ export class MeilisearchAPI {
     index: string,
   ): Promise<IMeilisearchRelationship> {
     const options = await this.createOptions();
-    const url = `${this.url}indexes/${index}/search`;
+    const url = `${this.url}/indexes/${index}/search`;
     const data = {
       filter: [
         [
@@ -283,7 +366,7 @@ export class MeilisearchAPI {
     index: string,
   ): Promise<IMeilisearchGetConceptRecommended[]> {
     const options = await this.createOptions();
-    const url = `${this.url}multi-search`;
+    const url = `${this.url}/multi-search`;
     const queries = searchConceptIds.map((conceptId) => {
       const exactSearchFilter = [
         `${INDEX_ATTRIBUTES.concept_recommended.conceptId1} = '${conceptId}'`,
@@ -292,15 +375,12 @@ export class MeilisearchAPI {
       const filter = exactSearchFilter.concat();
       return {
         indexUid: index,
-        limit: 1,
         filter,
       };
     });
-    const result = await axios.post<{ results: IMeilisearchGetConceptRecommended[] }>(
-      url,
-      { queries },
-      options,
-    );
+    const result = await axios.post<{
+      results: IMeilisearchGetConceptRecommended[];
+    }>(url, { queries }, options);
     return result.data.results;
   }
 
@@ -311,7 +391,7 @@ export class MeilisearchAPI {
     const errorMessage = 'Error while getting concepts';
     try {
       const options = await this.createOptions();
-      const url = `${this.url}indexes/${index}/search`;
+      const url = `${this.url}/indexes/${index}/search`;
       const data = {
         filter: [
           [`${INDEX_ATTRIBUTES.concept.conceptName} = '${conceptName}'`],

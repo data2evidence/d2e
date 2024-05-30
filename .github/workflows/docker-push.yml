@@ -7,10 +7,10 @@ on:
   push:
       branches:
         - develop
+
   workflow_dispatch:
     inputs:
       repo_full_name:
-        default: d2e
         description: Select RepoName
         required: false
         type: choice
@@ -147,6 +147,10 @@ jobs:
           - name: alp-data-node/alp-logto
             directory: ./services/alp-logto
             context: ./services/alp-logto
+            fileName: Dockerfile
+          - name: alp-data-node/alp-fhir-server
+            directory: ./services/alp-fhir
+            context: ./services/alp-fhir
             fileName: Dockerfile
 
     steps:

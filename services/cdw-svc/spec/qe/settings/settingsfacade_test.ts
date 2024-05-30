@@ -1,8 +1,11 @@
 "use strict";
 
+import { DbMeta } from "../../../src/qe";
 import { SettingsFacade } from "../../../src/qe/settings/SettingsFacade";
 import { MockConnection as MockConnection } from "../../testutils/testenv/MockConnection";
 import { MockHdb } from "../../testutils/testenv/mockHdb";
+import { User } from "@alp/alp-base-utils";
+
 let conn = new MockConnection();
 let globalSetting = {
   Id: "GlobalSettings",
@@ -15,9 +18,9 @@ let globalSetting = {
 };
 
 let fakeConnection = MockHdb.getConnection([globalSetting]);
-let facade = new SettingsFacade(fakeConnection);
+let facade = new SettingsFacade(new User("TEST_USER"));
 let settings = facade.getSettings();
-let dbMeta = facade.getDbMeta();
+let dbMeta = new DbMeta(fakeConnection)
 const actionKey = "action";
 
 describe("Testing SettingsFacade,", () => {

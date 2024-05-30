@@ -6,13 +6,16 @@ on:
   push:
     branches:
       - develop
+  workflow_dispatch:
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 # Run only one job per branch
 concurrency:
   group: ${{ github.head_ref || github.ref_name }}-mri-tests # Run the latest push
   cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
 jobs:
-
   check_file_changes:
       runs-on: ubuntu-latest
       if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
@@ -20,10 +23,8 @@ jobs:
           changes: ${{ steps.file_changes.outputs.src }}
       steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3.0.2
         id: file_changes
         with:
           initial-fetch-depth: 1
@@ -44,8 +45,8 @@ jobs:
 
 
   test-mri:
-    needs: [check_file_changes]
-    if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    # needs: [check_file_changes]
+    # if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
     runs-on: ubuntu-latest
     env:
       isTestEnv: "true"
@@ -66,18 +67,18 @@ jobs:
           --health-retries 5
     steps:
       - name: Load DB credentials from 1password
-        uses: 1password/load-secrets-action@v1
+        uses: 1password/load-secrets-action@v2
         id: op-load-secret
         with:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          HANASERVER: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DE_FQDN"
-          HDIUSER: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin user"
-          HDIPORT: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DB Port"
-          HDIPW: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin password"
-          TESTSYSTEMPW: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/Admin password"
-          TESTPORT: "op://${{ vars.OP_VAULT_NAME }}/az-hn-db/DB Port"
+          HANASERVER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DE_FQDN"
+          HDIUSER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin user"
+          HDIPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
+          HDIPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
+          TESTSYSTEMPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
+          TESTPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
           VCAP_SERVICES: '{"mridb":[{"name":"OMOP","credentials":{"host":"${HANASERVER}","port":"${HDIPORT}","databaseName":"ALPDEV","user":"${HDIUSER}","password":"${HDIPW}","validate_certificate":false,"probeSchema":"${TESTSCHEMA}","vocabSchema":"${TESTSCHEMA}","schema":"${TESTSCHEMA}","dialect":"hana","encrypt":false,"pooling":"true"},"tags":["httptest"]}]}'
 
       - name: Print env vars
@@ -91,63 +92,21 @@ jobs:
           echo "isTestEnv: ${isTestEnv:-false}"
 
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - uses: actions/checkout@v4
-        name: sameBranch checkout (OverrideRepo)
-        id: sameBranch-checkout
-        continue-on-error: true
-        with:
-          repository:  ${{ vars.OVERRIDE_REPO }}
-          token: ${{ secrets.CI_PAT }}
-          path: 'tmp'
-          sparse-checkout: 'alp-data-node-override'
-          sparse-checkout-cone-mode: false
-          ref: ${{ github.ref_name }}
-
-      - shell: bash
-        name: sameBranch checkout test
-        id: sameBranch-checkout-test
-        run: |
-          ls -lhtr tmp
-          [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
-
-      - uses: actions/checkout@v4
-        name: develop branch checkout (sameBranch checkout fails)
-        if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
-        with:
-          repository:  ${{ vars.OVERRIDE_REPO }}
-          token: ${{ secrets.CI_PAT }}
-          path: 'tmp'
-          sparse-checkout: 'alp-data-node-override'
-          sparse-checkout-cone-mode: false
-          ref: develop
-
-      - shell: bash
-        name: link_files_from_override
-        id: link_files_from_override
-        run: |
-          pwd
-          ln -s tmp/alp-data-node-override alp-data-node-override
-          chmod 755 -R alp-data-node-override
-          ls -l alp-data-node-override/build
 
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
 
-      - name: Get alp-dbcli from 1password
+      - name: Get drivers from 1password
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          pwd
-          mkdir -p internal/build
-          op read --out-file internal/build/alp-dbcli-v1.0.0.tgz "op://${{ vars.OP_VAULT_NAME }}/alp-dbcli-v1.0.0.tgz/alp-dbcli-v1.0.0.tgz"
-          ls -l internal/build
+          yarn --cwd internal get:drivers
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "18.14.0"
+
       - name: check if files changed
         id: check_file_changed
         run: |
@@ -180,12 +139,15 @@ jobs:
         working-directory: ./services/cdw-svc/test-migrations
         env:
           PGPASSWORD: Toor1234
+
       - name: Build Project
         run: |
           yarn
           yarn build --no-ui
+
       - name: Setup Test DB (Hana)
         run: yarn inittestdb
+
       - name: Setup Test DB (postgres)
         env:
           PG_HOST: "localhost"
@@ -201,27 +163,33 @@ jobs:
           PG_DEBUG: 1
           NODE_ENV: "development"
         run: yarn workspace mri-pg-config migrate
+
       - name: echo WS
         run: |
-            echo "WS ${{ github.workspace }}"
-            ls ${{ github.workspace }}
+          echo "WS ${{ github.workspace }}"
+          ls ${{ github.workspace }}
+
       - name: Run query-gen svc
         run: PORT=41008 yarn workspace query-gen run start &
+
       - name: Run query-gen tests
         if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_query_gen_svc_changed == 'True'
         run: yarn workspace query-gen run test
+
       - name: Run bookmark tests
-        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_bookmarks_svc_changed == 'True'  
+        if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_bookmarks_svc_changed == 'True'
         run: yarn workspace bookmark run test
       # Existing tests for assignment service uses opaTest and not compatible with current set up
       # We should uncomment this when we have tests available.
       # - name: Run assignment-svc tests
       #   run: yarn workspace config-assignment run test
+
       - name: Run Analytics tests
         if: github.ref_name == 'develop' || steps.check_file_changed.outputs.has_analytics_svc_changed == 'True' || steps.check_file_changed.outputs.has_query_gen_svc_changed == 'True'
         run: yarn workspace analytics run testci
       # - name: Run cdw-config tests
       #   run: yarn workspace cdw-config run test:ci
+
       - name: Remove Test DB
         if: ${{ always() }}
         run: yarn removetestdb

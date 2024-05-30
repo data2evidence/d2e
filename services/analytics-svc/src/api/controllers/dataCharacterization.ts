@@ -8,8 +8,6 @@ import CreateLogger = Logger.CreateLogger;
 import { DataCharacterizationEndpoint } from "../../mri/endpoint/DataCharacterizationEndpoint";
 import * as DC_RESULTS_CONFIG from "../../const/dcResultsSqlConfig";
 import * as DC_RESULTS_DRILLDOWN_CONFIG from "../../const/dcResultsDrilldownSqlConfig";
-import { DB } from "../../utils/DBSvcConfig";
-import { USE_DUCKDB } from "../../config";
 
 let logger = CreateLogger("analytics-log");
 const language = "en";

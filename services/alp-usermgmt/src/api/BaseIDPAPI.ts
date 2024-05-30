@@ -2,7 +2,7 @@ import { AxiosRequestConfig } from 'axios'
 import { Service } from 'typedi'
 import https from 'https'
 import { createLogger } from 'Logger'
-import { env } from '../env'
+import { env, services } from '../env'
 import { IClientCredentials, OpenIDAPI } from './OpenIDAPI'
 import { Logger } from 'winston'
 
@@ -18,11 +18,12 @@ export abstract class BaseIDPAPI {
 
   constructor() {
     this.baseUrl = env.IDP_BASE_URL!
-    this.issuerUrl = env.IDP_ISSUER_URL!
+    this.issuerUrl = services.idIssuerUrl!
     this.logger = createLogger(this.constructor.name)
 
     this.httpsAgent = new https.Agent({
-      rejectUnauthorized: this.issuerUrl.startsWith('https://alp-logto-') ? false : true
+      rejectUnauthorized: this.issuerUrl.startsWith('https://alp-logto-') ? false : true,
+      ca: this.issuerUrl.startsWith('https://alp-logto-') ? env.SSL_CA_CERT : undefined
     })
   }
 

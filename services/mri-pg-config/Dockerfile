@@ -8,12 +8,13 @@ USER docker
 
 WORKDIR /home/docker
 
-COPY --chown=docker:alp ./src src/
 COPY --chown=docker:alp ./package.json ./tsconfig.json ./yarn.lock ./
-COPY --chown=docker:alp ./start.sh ./local-postgres.sh ./
 
 RUN yarn install --network-timeout 1000000 \
     && yarn cache clean
+
+COPY --chown=docker:alp ./src src/
+COPY --chown=docker:alp ./start.sh ./local-postgres.sh ./
 
 USER root
 RUN rm -rf /usr/local/lib/node_modules/npm

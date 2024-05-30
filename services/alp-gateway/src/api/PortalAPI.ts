@@ -2,7 +2,8 @@ import { Service } from 'typedi'
 import axios, { AxiosRequestConfig } from 'axios'
 import { createLogger } from '../Logger'
 import https from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
+import { Dataset } from '../types'
 
 interface CreateDatasetInput {
   id: string
@@ -50,15 +51,11 @@ export class PortalAPI {
     if (!token) {
       throw new Error('No token passed for Portal API!')
     }
-    if (env.PORTAL_BASE_URL) {
-      this.baseURL = env.PORTAL_BASE_URL
+    if (services.portalServer) {
+      this.baseURL = services.portalServer
       this.httpsAgent = new https.Agent({
-        rejectUnauthorized:
-          this.baseURL.startsWith('https://localhost:') ||
-          this.baseURL.startsWith('https://alp-minerva-gateway-') ||
-          this.baseURL.startsWith('https://alp-mercury-approuter:')
-            ? false
-            : true
+        rejectUnauthorized: true,
+        ca: env.GATEWAY_CA_CERT
       })
     } else {
       throw new Error('No url is set for PortalAPI')
@@ -81,7 +78,7 @@ export class PortalAPI {
   async getTenants() {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}tenant/list`
+      const url = `${this.baseURL}/tenant/list`
       const result = await axios.get(url, options)
       return result.data
     } catch (error) {
@@ -90,10 +87,10 @@ export class PortalAPI {
     }
   }
 
-  async getDatasets() {
+  async getDatasets(): Promise<Dataset[]> {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset/list`
+      const url = `${this.baseURL}/dataset/list`
       const result = await axios.get(url, options)
       return result.data
     } catch (error) {
@@ -102,10 +99,10 @@ export class PortalAPI {
     }
   }
 
-  async getDataset(id: string) {
+  async getDataset(id: string): Promise<Dataset> {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset/${id}`
+      const url = `${this.baseURL}/dataset/${id}`
       const result = await axios.get(url, options)
       return result.data
     } catch (error) {
@@ -114,22 +111,10 @@ export class PortalAPI {
     }
   }
 
-  async getDatasetDashboard(id: string) {
-    try {
-      const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset/dashboard/${id}`
-      const result = await axios.get(url, options)
-      return result.data
-    } catch (error) {
-      this.logger.error(`Error while getting dataset dashboard ${id}`)
-      throw new Error(`Error while getting dataset dashboard ${id}`)
-    }
-  }
-
   async getStudiesAsSystemAdmin() {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset/list?role=systemAdmin`
+      const url = `${this.baseURL}/dataset/list?role=systemAdmin`
       const result = await axios.get(url, options)
       return result.data
     } catch (error) {
@@ -142,7 +127,7 @@ export class PortalAPI {
     try {
       const options = await this.getRequestConfig()
       options.params = { tokenDatasetCode }
-      const url = `${this.baseURL}dataset`
+      const url = `${this.baseURL}/dataset`
       const result = await axios.head(url, options)
       return result.status === 200
     } catch (error) {
@@ -155,7 +140,7 @@ export class PortalAPI {
   async createDataset(input: CreateDatasetInput) {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset`
+      const url = `${this.baseURL}/dataset`
       const result = await axios.post(url, input, options)
       return result.data
     } catch (error) {
@@ -167,7 +152,7 @@ export class PortalAPI {
   async copyDataset(input: CopyDatasetInput) {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}dataset/snapshot`
+      const url = `${this.baseURL}/dataset/snapshot`
       const result = await axios.post(url, input, options)
       return result.data
     } catch (error) {

@@ -61,6 +61,9 @@ export const getProperties = (): any => {
         : process.env.TLS__INTERNAL__KEY
         ? process.env.TLS__INTERNAL__KEY.replace(/\\n/g, "\n")
         : null,
+      ssl_ca_cert: isProd
+        ? process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n")
+        : null,
       minio_region: isProd
         ? readFileSync(`${k8sPathPrefix}/MINIO__REGION`, "utf-8")
         : process.env.MINIO__REGION,
@@ -276,11 +279,11 @@ export function getMigrationToolConfig(
   tenant: string,
   schema: string,
   dataModel: string,
-  pluginChangelogFilepath?: string | undefined,
-  pluginClasspath?: string | undefined
+  changelogFilepath?: string | undefined,
+  classpath?: string | undefined
 ): any {
-  let changeLogFile = pluginChangelogFilepath
-    ? pluginChangelogFilepath
+  let changeLogFile = changelogFilepath
+    ? changelogFilepath
     : getChangeLogFile(dialect, dataModel);
 
   // Set during prefect task run
@@ -302,8 +305,8 @@ export function getMigrationToolConfig(
     const hanaDriverPath =
       process.env.HANA__DRIVER_CLASS_PATH ??
       "/app/inst/drivers/ngdbc-latest.jar";
-    let hanaClasspath = pluginClasspath
-      ? `${hanaDriverPath}:${pluginClasspath}`
+    let hanaClasspath = classpath
+      ? `${hanaDriverPath}:${classpath}`
       : `${hanaDriverPath}${modulePath}`;
 
     logger.info(`hanaClasspath is ${hanaClasspath}`);
@@ -345,8 +348,8 @@ export function getMigrationToolConfig(
       process.env.POSTGRES__DRIVER_CLASS_PATH ??
       "/app/inst/drivers/postgresql-42.3.1.jar";
 
-    let postgresClasspath = pluginClasspath
-      ? `${postgresDriverPath}:${pluginClasspath}`
+    let postgresClasspath = classpath
+      ? `${postgresDriverPath}:${classpath}`
       : `${postgresDriverPath}${modulePath}`;
 
     logger.info(`postgresClasspath is ${postgresClasspath}`);

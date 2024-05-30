@@ -3,9 +3,9 @@ import { env } from '../env'
 
 config.connection = async () => {
   return {
-    host: env.PG_HOST,
-    port: env.PG_PORT,
-    database: env.PG_DB_NAME,
+    host: env.PG__HOST,
+    port: env.PG__PORT,
+    database: env.PG__DB_NAME,
     user: env.PG_ADMIN_USER!,
     password: env.PG_ADMIN_PASSWORD!,
     ssl:
