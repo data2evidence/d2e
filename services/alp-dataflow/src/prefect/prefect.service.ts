@@ -79,18 +79,17 @@ export class PrefectService {
     const revision = await this.analysisflowService.getLastAnalysisflowRevision(id)
     const prefectParams = this.prefectAnalysisParamsTransformer.transform(revision.flow)
 
-    // const prefectDeploymentName = env.PREFECT_DEPLOYMENT_NAME
-    // const prefectFlowName = env.PREFECT_FLOW_NAME
+    const prefectDeploymentName = env.PREFECT_DEPLOYMENT_NAME
+    const prefectFlowName = env.PREFECT_FLOW_NAME
 
-    // const flowRunId = await this.prefectApi.createFlowRun(
-    //   revision.name,
-    //   prefectDeploymentName,
-    //   prefectFlowName,
-    //   prefectParams
-    // )
-    // await this.analysisflowService.createAnalysisflowRun(id, flowRunId)
-    // return flowRunId
-    return prefectParams
+    const flowRunId = await this.prefectApi.createFlowRun(
+      revision.name,
+      prefectDeploymentName,
+      prefectFlowName,
+      prefectParams
+    )
+    await this.analysisflowService.createAnalysisflowRun(id, flowRunId)
+    return flowRunId
   }
 
   async createFlowRunByDeployment(flowRun: IPrefectFlowRunByDeploymentDto) {
