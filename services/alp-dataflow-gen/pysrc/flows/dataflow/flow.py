@@ -128,7 +128,7 @@ def execute_node_task(nodename, node_type, node, input, test):
             case ('db_reader_node' | 'csv_node' | 'cohort_diagnostic_node' | 'calendar_time_covariate_settings_node' |
                 'cohort_generator_node' | 'time_at_risk_node' | 'default_covariate_settings_node' | 
                 'study_population_settings_node' | 'cohort_incidence_target_cohorts_node' | 'cohort_definition_set_node' | 
-                'era_covariate_settings_node' | 'seasonality_covariate_settings_node' | 'nco_cohort_set_node' | 'exposure_node'):
+                'era_covariate_settings_node' | 'seasonality_covariate_settings_node' | 'nco_cohort_set_node'):
                 result = _node.task(task_run_context)
             case _:
                 result = _node.task(input, task_run_context)
