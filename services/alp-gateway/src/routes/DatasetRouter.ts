@@ -186,7 +186,7 @@ export class DatasetRouter {
       const dataflowMgmtAPI = new DataflowMgmtAPI(token)
 
       const { sourceStudyId, newStudyName, snapshotLocation, snapshotCopyConfig, dataModel: dataModelName } = req.body
-      const { dialect, databaseCode, schemaName } = await portalAPI.getDataset(sourceStudyId)
+      const { dialect, databaseCode, schemaName, vocabSchemaName } = await portalAPI.getDataset(sourceStudyId)
 
       const sourceHasSchema = schemaName.trim() !== ''
       const id = uuidv4()
@@ -221,7 +221,8 @@ export class DatasetRouter {
                 data_model: dataModel,
                 schema_name: this.schemaCase(newSchemaName, dialect as DbDialect),
                 source_schema: this.schemaCase(schemaName, dialect as DbDialect),
-                dialect: dialect
+                dialect: dialect,
+                vocab_schema: vocabSchemaName
               }
             }
 

@@ -99,4 +99,5 @@ export interface Dataset {
   databaseCode: string
   schemaName: string
   dashboards: DatasetDashboard[]
+  vocabSchemaName: string
 }
