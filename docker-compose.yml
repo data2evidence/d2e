@@ -71,6 +71,16 @@ x-envs:
           ],
           "route": "cohort"
         },
+        { 
+          "enabled": false,
+          "featureFlag": "cohorts",
+          "name": "Cohorts", 
+          "pluginPath": "plugins/Researcher/Cohort/module",
+          "requiredRoles": [ 
+            "RESEARCHER" 
+          ] 
+          "route": "cohorts",
+        },
         {
           "enabled": true,
           "featureFlag": "starboard",
