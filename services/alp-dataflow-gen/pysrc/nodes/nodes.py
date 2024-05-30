@@ -33,7 +33,7 @@ class Flow(Node):
 
 
 class Result:
-    def __init__(self, error, data, node, task_run_context) -> None:
+    def __init__(self, error, data, node, task_run_context):
         self.error = error
         self.node = node
         self.data = data
@@ -375,19 +375,19 @@ def generate_node_task(nodename, node, nodetype):
             nodeobj = DataMappingNode(node)
         case "time_at_risk_node":
             nodeobj = TimeAtRiskNode(node)
-        case "cohort_diagnostics_module_spec":
+        case "cohort_diagnostic_node":
             nodeobj = CohortDiagnosticsModuleSpecNode(node)
         case "cohort_generator_node":
             nodeobj = CohortGeneratorSpecNode(node)
         case "characterization_node":
-            nodeobj = CharacterizationNode(node)
+            nodeobj = CharacterizationModuleSpecNode(node)
         case "negative_control_outcome_cohort_node":
-            nodeobj = NegativeControlOutcomeCohort(node)
+            nodeobj = NegativeControlOutcomeCohortSharedResource(node)
         case "target_comparator_outcomes_node":
             nodeobj = TargetComparatorOutcomes(node)
         case "cohort_method_analysis_node":
             nodeobj = CohortMethodAnalysis(node)
-        case "covariate_settings_node":
+        case "default_covariate_settings_node":
             nodeobj = DefaultCovariateSettingsNode(node)
         case "study_population_settings_node":
             nodeobj = StudyPopulationArgs(node)
@@ -407,8 +407,16 @@ def generate_node_task(nodename, node, nodetype):
             nodeobj = SeasonalityCovariateSettingsNode(node)
         case "calendar_time_covariate_settings_node":
             nodeobj = CalendarCovariateSettingsNode(node)
-        case "study_population_settings_node":
-            nodeobj = StudyPopulationArgs(node)
+        case "nco_cohort_set_node":
+            nodeobj = NegativeControlCohortSet(node)
+        case "self_controlled_case_series_analysis_node":
+            nodeobj = SCCSAnalysis(node)
+        case "self_controlled_case_series_node": 
+            nodeobj = SCCSModuleSpec(node)
+        case "patient_level_prediction_node":
+            nodeobj = PLPModuleSpec(node)
+        case "exposure_node":
+            nodeobj = Exposure(node)
         case _:
             logging.error("ERR: Unknown Node "+node["type"])
             logging.error(tb.StackSummary())
@@ -424,9 +432,9 @@ def generate_node_task(nodename, node, nodetype):
 class OutcomeDef(Node):
     def __init__(self, node):
         super().__init__(node)
-        self.defId = node["defId"]
+        self.defId = int(node["defId"])
         self.defName = node["defName"]
-        self.cohortId = node["cohortId"]
+        self.cohortId = int(node["cohortId"])
         self.cleanWindow = node["cleanWindow"]
     
     def task(self, task_run_context):
@@ -446,11 +454,11 @@ class OutcomeDef(Node):
 class TimeAtRiskNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
-        self.id = _node["id"]
+        self.id = int(_node["id"])
         self.startWith = _node["startWith"]
         self.endWith = _node["endWith"]
-        self.startOffset = _node["get"]("startOffset", 0)
-        self.endOffset = _node["get"]("endOffset", 0)
+        self.startOffset = _node.get("startOffset", 0)
+        self.endOffset = _node.get("endOffset", 0)
 
     def task(self, task_run_context):
         rCohortIncidence = importr('CohortIncidence')
@@ -470,9 +478,9 @@ class TimeAtRiskNode(Node):
 class CohortIncidenceModuleSpec(Node):
     def __init__(self, _node):
         super().__init__(_node)
-        self.name = _node['name']
         self.cohortRefs = _node['cohortRefs']
-        self.outcomeDef = { "id": 1, "name": "GI bleed", "cohortId": 3, "cleanWindow": 9999 } # convert to list
+        # remove, values are part of `input` object
+        # self.outcomeDef = { "id": 1, "name": "GI bleed", "cohortId": 3, "cleanWindow": 9999 } # convert to list
         self.strataSettings = _node["strataSettings"]
         self.incidenceAnalysis = _node["incidenceAnalysis"]
 
@@ -490,9 +498,9 @@ class CohortIncidenceModuleSpec(Node):
                 byGender = convert_py_to_R(self.strataSettings["byGender"])
             )
             rAnalysis1 = rCohortIncidence.createIncidenceAnalysis(
-                targets = convert_py_to_R(self.incidenceAnalysis["targets"]), 
-                outcomes = convert_py_to_R(self.incidenceAnalysis["outcomes"]), 
-                tars = convert_py_to_R(self.incidenceAnalysis["tars"])
+                targets = convert_py_to_R([int(i) for i in self.incidenceAnalysis["targets"]]), 
+                outcomes = convert_py_to_R([int(i) for i in self.incidenceAnalysis["outcomes"]]), 
+                tars = convert_py_to_R([int(i) for i in self.incidenceAnalysis["tars"]])
             )
             rOutcomes = [], rTars = []
             rOutcomes = get_results_by_class_type(input, OutcomeDef)
@@ -514,27 +522,21 @@ class CohortIncidenceModuleSpec(Node):
         return None
 
 # DONE
-class CharacterizationNode(Node):
+class CharacterizationModuleSpecNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
-        self.targetIds = _node["targetIds"]
-        self.outcomeIds = _node["outcomeIds"]
-        self.dechallengeStopInterval = _node["dechallengeStopInterval"]
-        self.dechallengeEvaluationWindow = _node["dechallengeEvaluationWindow"]
+        self.targetIds = [int(i) for i in _node["targetIds"]]
+        self.outcomeIds = [int(i) for i in _node["outcomeIds"]]
+        self.dechallengeStopInterval = int(_node["dechallengeStopInterval"])
+        self.dechallengeEvaluationWindow = int(_node["dechallengeEvaluationWindow"])
         self.minPriorObservation = _node["minPriorObservation"]
-        self.timeAtRisk = {
-            "riskWindowStart": _node["riskWindowStart"],
-            "startAnchor": _node["startAnchor"],
-            "riskWindowEnd": _node["riskWindowEnd"],
-            "endAnchor": _node["endAnchor"],
-        }
+        self.timeAtRisk = _node["timeAtRiskConfigs"]
 
     def test(self, task_run_context):
         return None
 
     def task(self, input: Dict[str, Result], task_run_context):
         rSource = robjects.r['source']
-        pandas2ri.activate()
         try:
             rSource("https://raw.githubusercontent.com/OHDSI/CharacterizationModule/v0.5.0/SettingsFunctions.R")
             rCreateCharacterizationModuleSpecifications = robjects.globalenv['createCharacterizationModuleSpecifications']
@@ -546,7 +548,7 @@ class CharacterizationNode(Node):
                 covariateSettings = rCovariateSettings[0], 
                 dechallengeStopInterval = self.dechallengeStopInterval, 
                 dechallengeEvaluationWindow = self.dechallengeEvaluationWindow, 
-                timeAtRisk = pandas2ri.py2rpy(pd.DataFrame(self.timeAtRisk)), 
+                timeAtRisk = convert_py_to_R(pd.DataFrame(self.timeAtRisk)), 
                 minPriorObservation = self.minPriorObservation
             )
             return Result(None, rCharacterizationSpec, self, task_run_context)
@@ -558,7 +560,6 @@ class DefaultCovariateSettingsNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
         print('DefaultCovariateSettings node created')
-        pass
     
     def test():
         return None
@@ -580,7 +581,7 @@ class CohortDefinitionSharedResource(Node):
     def task(self, task_run_context):
         return None
 
-class NegativeControlOutcomeCohort(Node):
+class NegativeControlOutcomeCohortSharedResource(Node):
     
     def __init__(self, _node):
         super().__init__(_node)
@@ -640,7 +641,7 @@ class CohortDiagnosticsModuleSpecNode(Node):
         self.runIncludedSourceConcepts = _node["runIncludedSourceConcepts"]
         self.runOrphanConcepts = _node["runOrphanConcepts"]
         self.runTimeSeries = _node["runTimeSeries"]
-        self.runVisitContext = _node["runVisitContext"]
+        self.runVisitContext = _node["runVisistContext"] # TODO: typo runVisistContext, change to runVisitContext
         self.runBreakdownIndexEvents = _node["runBreakdownIndexEvents"]
         self.runIncidenceRate = _node["runIncidenceRate"]
         self.runCohortRelationship = _node["runCohortRelationship"]
@@ -672,9 +673,9 @@ class CohortDiagnosticsModuleSpecNode(Node):
 class CMOutcomes(Node):
     def __init__(self, node):
         super().__init__(node)
-        self.ncoCohortSetIds = node['ncoCohortSetIds']
+        self.ncoCohortSetIds = [int(i) for i in node['ncoCohortSetIds']]
         self.config = {
-            "trueEffectSize": node["trueEffectSize"],
+            "trueEffectSize": node["TrueEffectSize"], # TODO: typo TrueEffectSize to trueEffectSize
             "outcomeOfInterest": node["outcomeOfInterest"],
             "priorOutcomeLookback": node["priorOutcomeLookback"]
         }
@@ -684,7 +685,7 @@ class CMOutcomes(Node):
         try:
             rCohortMethod = importr('CohortMethod')
             rlapply = robjects.r['lapply']
-            kwargs = {k: v for k, v in self.config if (v is not "" or v is False)}
+            kwargs = {i[0]: i[1] for i in self.config.items() if (i[1] != "" or i[1] is False)}
             rOutcome = rlapply(
                 X = convert_py_to_R(self.ncoCohortSetIds),
                 FUN = rCohortMethod.createOutcome,
@@ -699,24 +700,25 @@ class TargetComparatorOutcomes(Node):
     
     def __init__(self, _node):
         super().__init__(_node)
-        self.targetId = _node['targetId']
-        self.comparatorId = _node['comparatorId']
-        self.includedCovariateConceptIds = _node['includedCovariateConceptIds']
-        self.excludedCovariateConceptIds = _node['excludedCovariateConceptIds']
+        self.targetId = int(_node['targetId'])
+        self.comparatorId = int(_node['comparatorId'])
+        self.includedCovariateConceptIds = [int(i) for i in _node['includedCovariateConceptIds']]
+        self.excludedCovariateConceptIds = [int(i) for i in _node['excludedCovariateConceptIds']]
 
     def test(self):
         return None
 
     def task(self, _input: Dict[str, Result], task_run_context):
         try:
+            rappend = robjects.r['append']
             rCohortMethod = importr('CohortMethod')
             rOutcomes = get_results_by_class_type(_input, CMOutcomes)
             rCreateTargetComparatorOutcomes = rCohortMethod.createTargetComparatorOutcomes(
                 targetId = convert_py_to_R(self.targetId),
                 comparatorId = convert_py_to_R(self.comparatorId),
-                outcomes = rOutcomes,
-                excludedCovariateConceptIds = convert_py_to_R(self.excludedCovariateConceptIds),
-                includedCovariateConceptIds = convert_py_to_R(self.includedCovariateConceptIds)
+                outcomes = rappend(*rOutcomes), # append all outcomes as one list
+                excludedCovariateConceptIds = convert_py_to_R(self.excludedCovariateConceptIds if len(self.excludedCovariateConceptIds) else None), # if excludedCovariateConceptIds is empty list, use None
+                includedCovariateConceptIds = convert_py_to_R(self.includedCovariateConceptIds if len(self.includedCovariateConceptIds) else None) # if includedCovariateConceptIds is empty list, use None
             )
             return Result(None, rCreateTargetComparatorOutcomes, self, task_run_context)
         except Exception as e:
@@ -726,7 +728,7 @@ class TargetComparatorOutcomes(Node):
 class CohortMethodAnalysis(Node):
     def __init__(self, node):
         super().__init__(node)
-        self.analysisId = node["analysisId"]
+        self.analysisId = int(node["analysisId"])
         self.dbCohortMethodDataArgs = node["dbCohortMethodDataArgs"]
         self.fitOutcomeModelArgs = node["fitOutcomeModelArgs"]
         self.psArgs = node["psArgs"]
@@ -748,7 +750,7 @@ class CohortMethodAnalysis(Node):
             rFitOutcomeModelArgs = rCohortMethod.createFitOutcomeModelArgs(modelType = convert_py_to_R(self.fitOutcomeModelArgs["modelType"]))
             studyPopulationResults = get_results_by_class_type(input, StudyPopulationArgs)
             # TODO: ensure rCreateStudyPopArgs length is at least 1
-            rCreateStudyPopArgs = [r["cohortMethodArgs"] for r in studyPopulationResults if r["cohortMethodArgs"] is not None]
+            rCreateStudyPopArgs = [r["cohortMethodArgs"] for r in studyPopulationResults if r["cohortMethodArgs"] != None]
             # TODO: below version of createCmAnalysis method call does not include below parameters
             # createPsArgs = createPsArgs,
             # matchOnPsArgs = matchOnPsArgs,
@@ -771,14 +773,13 @@ class CohortMethodModuleSpecNode(Node):
 
     def __init__(self, _node):
         super().__init__(_node)
-        self.trueEffectSize = _node["trueEffectSize"]
+        self.trueEffectSize = _node["TrueEffectSize"] # TODO: typo TrueEffectSize to trueEffectSize
         self.priorOutcomeLookback = _node["priorOutcomeLookback"]
-        self.analysesToExclude = {
-            'analysisId': [v["analysisId"] for v in _node["cohortMethodConfigs"]],
-            'targetId': [v["targetId"] for v in _node["cohortMethodConfigs"]]
-        }
+        self.analysesToExclude = _node["cohortMethodConfigs"]
 
     def task(self, _input: Dict[str, Result], task_run_context):
+        rSource = robjects.r['source']
+        rSource('https://raw.githubusercontent.com/OHDSI/CohortMethodModule/v0.3.0/SettingsFunctions.R')
         rCreateCohortMethodModuleSpecifications = robjects.globalenv["createCohortMethodModuleSpecifications"]
         # TODO: ensure rCmAnalysisList and rTargetComparatorOutcomesList are at least of length 1
         rCmAnalysisList = get_results_by_class_type(_input, CohortMethodAnalysis)
@@ -802,15 +803,15 @@ class EraCovariateSettings(Node):
     def __init__(self, _node):
         super().__init__(_node)
         self.label = _node["label"]
-        self.includeEraIds = _node["includeEraIds"]
-        self.excludeEraIds = _node["excludeEraIds"]
-        self.firstOccurrenceOnly = _node["firstOccurrenceOnly"]
+        self.includeEraIds = _node["includedEraIds"]
+        self.excludeEraIds = _node["excludedEraIds"]
+        self.firstOccurrenceOnly = _node["firstOccurenceOnly"]
         self.allowRegularization = _node["allowRegularization"]
         self.stratifyById = _node["stratifyById"]
-        self.start = _node["start"]
-        self.end = _node["end"]
-        self.startAnchor = _node["startAnchor"]
-        self.endAnchor = _node["endAnchor"]
+        self.start = int(_node["start"])
+        self.end = int(_node["end"])
+        self.startAnchor = _node.get("startAnchor", "era start") # default in the R lib is "era start"
+        self.endAnchor = _node.get("endAnchor", "era end") # default in the R lib is "era end"
         self.profileLikelihood = _node["profileLikelihood"]
         self.exposureOfInterest = _node["exposureOfInterest"]
 
@@ -820,8 +821,8 @@ class EraCovariateSettings(Node):
             rCreateEraCovariateSettings = rSelfControlledCaseSeries.createEraCovariateSettings
             rCovarPreExp = rCreateEraCovariateSettings(
                 label = convert_py_to_R(self.label),
-                includeEraIds = convert_py_to_R(self.includeEraIds),
-                excludeEraIds = convert_py_to_R(self.excludeEraIds),
+                includeEraIds = convert_py_to_R(self.includeEraIds if len(self.includeEraIds) else None),
+                excludeEraIds = convert_py_to_R(self.excludeEraIds if len(self.excludeEraIds) else None),
                 start = convert_py_to_R(self.start) ,
                 end = convert_py_to_R(self.end),
                 startAnchor = convert_py_to_R(self.startAnchor) ,
@@ -841,7 +842,7 @@ class CalendarCovariateSettingsNode(Node):
 
     def __init__(self, _node):
         super().__init__(_node)
-        self.calendarTimeKnots = _node['calendarTimeKnots']
+        self.calendarTimeKnots = _node['caldendarTimeKnots'] # TODO: typo caldendarTimeKnots to calendarTimeKnots
         self.allowRegularization = _node['allowRegularization']
         self.computeConfidenceIntervals = _node['computeConfidenceIntervals']
 
@@ -863,7 +864,7 @@ class SeasonalityCovariateSettingsNode(Node):
     
     def __init__(self, _node):
         super().__init__(_node)
-        self.seasonKnots = _node['seasonKnots']
+        self.seasonKnots = _node['seasonalityKnots'] # TODO: a typo seasonalityKnots to seasonKnots? 
         self.allowRegularization = _node['allowRegularization']
         self.computeConfidenceIntervals = _node['computeConfidenceIntervals']
 
@@ -937,30 +938,75 @@ class StudyPopulationArgs(Node):
 class StrategusNode(Node):
     def __init__(self, node):
         super().__init__(node)
-        # TODO: add types
-        self.sharedResourcesTypes = []
-        self.moduleSpecTypes = []
-        pass
+        self.sharedResourcesTypes = [CohortDefinitionSharedResource, NegativeControlOutcomeCohortSharedResource] 
+        self.moduleSpecTypes = [CohortGeneratorSpecNode, CohortDiagnosticsModuleSpecNode, CohortIncidenceModuleSpec, CharacterizationModuleSpecNode, CohortMethodModuleSpecNode]
 
     def task(self, _input: Dict[str, Result], task_run_context):
         try:
             rStrategus = importr('Strategus')
             rSpec = rStrategus.createEmptyAnalysisSpecifications()
-            # TODO: segregate sharedResource and moduleSpec
-# TODO: modify o.data to use the method get_results_by_class_type
-            inputs = [v.data for k, v in _input.items()]
-            for i in range(len(inputs)):
-                o = inputs[i]
-                if (o.type in self.sharedResourceTypes):
-                    rSpec.addSharedResources(o.rNode)
-                else:
-                    rSpec.addModuleSpecifications(o.rNode)
+            for sharedResourceType in self.sharedResourcesTypes:
+                # ensure the length of sharedResourceResults is at least 1
+                sharedResourceResults = get_results_by_class_type(_input, sharedResourceType)
+                # TODO: how to handle when there are, for example, more than 1 CohortDefinitionSharedResource
+                rSpec.addSharedResources(sharedResourceResults[0])
+
+            for moduleSpecType in self.moduleSpecTypes:
+                # ensure the length of moduleSpecResults is at least 1
+                moduleSpecResults = get_results_by_class_type(_input, moduleSpecType)
+                # TODO: how to handle when there are, for example, more than 1 CohortGeneratorSpecNode
+                rSpec.addModuleSpecifications(moduleSpecResults[0])
+            print(rSpec.r_repr())
+
             # TODO: 
-            rExecutionSettings = rStrategus.createCdmExecutionSettings(
-                connectionDetailsReference = "eunomia",
-                workDatabaseSchema = "main",
-                cdmDatabaseSchema = "main"
-            )
-            rStrategus.execute(analysisSpecifications = rSpec, executionSettings = rExecutionSettings)
+            # rExecutionSettings = rStrategus.createCdmExecutionSettings(
+            #     connectionDetailsReference = "eunomia",
+            #     workDatabaseSchema = "main",
+            #     cdmDatabaseSchema = "main"
+            # )
+            # rStrategus.execute(analysisSpecifications = rSpec, executionSettings = rExecutionSettings)
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
+
+class NegativeControlCohortSet(Node):
+    def __init__(self, node):
+        super().__init__(node)
+
+    def task(self, task_run_context):
+        # TODO
+        return Result(None, {}, self, task_run_context)
+    
+class SCCSAnalysis(Node):
+    def __init__(self, node):
+        super().__init__(node)
+
+    def task(self, input: Dict[str, Result], task_run_context):
+        # TODO
+        return Result(None, {}, self, task_run_context)
+
+class SCCSModuleSpec(Node):
+    def __init__(self, node):
+        super().__init__(node)
+
+    def task(self, input: Dict[str, Result], task_run_context):
+        # TODO
+        return Result(None, {}, self, task_run_context)
+
+class PLPModuleSpec(Node):
+    def __init__(self, node):
+        super().__init__(node)
+
+    def task(self, input: Dict[str, Result], task_run_context):
+        # TODO
+        return Result(None, {}, self, task_run_context)
+
+class Exposure(Node):
+    def __init__(self, node):
+        super().__init__(node)
+
+    def task(self, task_run_context):
+        # TODO
+        return Result(None, {}, self, task_run_context)
+
+def get_results_by_class_type(results: Dict[str, Result], nodeType: Node):
+    return [results[o].data for o in results if not results[o].error and isinstance(results[o].node, nodeType)]
