@@ -153,27 +153,6 @@ jobs:
         username: ${{ env.REGISTRY_USERNAME }}
         password: ${{ env.REGISTRY_PASSWORD }}
 
-    - name: Cleanup dangling images and remove created/exited containers
-      continue-on-error: true
-      run: |
-        if [[ $(docker ps -aq -f status=exited) ]]; then
-          docker rm $(docker ps -aq -f status=exited)
-          echo "Exited containers removed"
-          else
-          echo "No exited containers"
-        fi
-    
-        if [[ $(docker ps -aq -f status=created) ]]; then
-          docker rm $(docker ps -aq -f status=created)
-          echo "Created status containers removed"
-        else
-          echo "No created status containers"
-        fi
-    
-        sleep 5
-    
-        # docker image prune -af
-
     - name: docker compose up
       env:
         GATEWAY_NAME: alp-minerva-gateway-1
@@ -205,3 +184,8 @@ jobs:
       if: success() || failure()
       run: |
         yarn logs:minerva
+
+    - name: Post cleanup
+      if: always()
+      run: |
+        docker rm -f alp-caddy-certs-mgmt || true # Cleanup cert mgmt container if job aborted

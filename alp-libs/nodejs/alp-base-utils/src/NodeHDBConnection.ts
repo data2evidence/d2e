@@ -70,6 +70,10 @@ export class NodeHDBConnection implements ConnectionInterface {
     }
   }
 
+  public getTranslatedSql(sql: string, schemaName: string = ""): string {
+    return this.getSqlStatementWithSchemaName(schemaName, sql);
+  }
+
   private prepareStatementAndExecute(
     sql,
     parameters: ParameterInterface[],
@@ -418,5 +422,4 @@ export class NodeHDBConnection implements ConnectionInterface {
     const replacement = schemaName === "" ? "" : `${schemaName}.`;
     return sql.replace(/\$\$SCHEMA\$\$./g, replacement);
   }
-
 }

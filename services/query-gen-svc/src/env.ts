@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 import { object, z } from "zod";
 
 const Env = z.object({
-    DEV_MODE: z.string(),
+    SQL_RETURN_ON: z.string(),
     LOCAL_DEBUG: z.string(),
     NODE_ENV: z.string().optional(),
     PORT: z
