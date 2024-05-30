@@ -345,7 +345,9 @@ export class QueryGenSvc {
             ? ``
             : insertIntoTempTable
             ? `INSERT INTO ${this.uniquePatientTempTableName} SELECT "pTable".*`
-            : `SELECT "pTable".PATIENT_ID`;
+            : `SELECT "pTable".${confHelper.getColumn(
+                  this.settings.getFactTablePlaceholder() + ".PATIENT_ID"
+              )}`;
 
         const sql = `${startOfQuery}
                         FROM (
