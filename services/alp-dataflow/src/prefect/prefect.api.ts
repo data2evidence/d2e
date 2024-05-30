@@ -181,6 +181,19 @@ export class PrefectAPI {
     }
   }
 
+  async getTaskRunState(id: string) {
+    const errorMessage = 'Error while getting prefect task run states by id'
+    try {
+      const options = await this.createOptions()
+      const url = `${this.url}/task_runs/${id}`
+      const obs = this.httpService.get(url, options)
+      return await firstValueFrom(obs.pipe(map(result => result.data)))
+    } catch (error) {
+      this.logger.info(`${errorMessage}: ${error}`)
+      throw new InternalServerErrorException(errorMessage)
+    }
+  }
+
   async getTaskRuns(id: string) {
     const errorMessage = 'Error while getting prefect task runs by flow run id'
     try {
