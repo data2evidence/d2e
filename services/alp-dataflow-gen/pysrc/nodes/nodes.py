@@ -417,6 +417,8 @@ def generate_node_task(nodename, node, nodetype):
             nodeobj = PLPModuleSpec(node)
         case "exposure_node":
             nodeobj = ExposuresOutcome(node)
+        case "strategus_node":
+            nodeobj = StrategusNode(node)
         case _:
             logging.error("ERR: Unknown Node "+node["type"])
             logging.error(tb.StackSummary())
