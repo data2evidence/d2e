@@ -78,8 +78,8 @@ x-envs:
           "pluginPath": "plugins/Researcher/Cohort/module",
           "requiredRoles": [ 
             "RESEARCHER" 
-          ] 
-          "route": "cohorts",
+          ], 
+          "route": "cohorts"
         },
         {
           "enabled": true,
