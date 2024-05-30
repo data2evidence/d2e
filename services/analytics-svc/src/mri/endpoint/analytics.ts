@@ -6,12 +6,12 @@ import { Settings } from "../../qe/settings/Settings";
 import { Connection as connLib, DBError as dbe } from "@alp/alp-base-utils";
 import DBError = dbe.DBError;
 import * as domainValuesService from "./domain_values_service";
+import { env } from "../../env";
 
 import ConnectionInterface = connLib.ConnectionInterface;
 import CallBackInterface = connLib.CallBackInterface;
-const SQL_RETURN_ON: boolean = process.env.advanced_sqlReturnOn
-    ? process.env.advanced_sqlReturnOn.toLowerCase() === "true"
-    : new Settings().getSettings().sqlReturnOn;
+
+const sqlReturnOn: boolean = env.SQL_RETURN_ON === "true" ? true : false;
 
 let _stripDbgInfo = (result) => {
     if (typeof result === "string") {
@@ -22,7 +22,7 @@ let _stripDbgInfo = (result) => {
     return result;
 };
 let _processResult = (result) =>
-    result && !SQL_RETURN_ON ? _stripDbgInfo(result) : result;
+    result && !sqlReturnOn ? _stripDbgInfo(result) : result;
 
 export async function processRequest(
     action,

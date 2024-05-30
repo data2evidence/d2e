@@ -13,6 +13,7 @@ import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { FlowMetadata } from '../prefect-flow/entity'
 import { DataQualityModule } from '../data-quality/data-quality.module'
+import { PortalServerModule } from '../portal-server/portal-server.module'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DataQualityModule } from '../data-quality/data-quality.module'
     DataflowModule,
     AnalysisflowModule,
     DataQualityModule,
+    PortalServerModule,
     TypeOrmModule.forFeature([FlowMetadata])
   ],
   controllers: [PrefectController],
