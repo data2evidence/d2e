@@ -72,7 +72,7 @@ x-envs:
           "route": "cohort"
         },
         { 
-          "enabled": false,
+          "enabled": true,
           "featureFlag": "cohorts",
           "name": "Cohorts", 
           "pluginPath": "plugins/Researcher/Cohort/module",
