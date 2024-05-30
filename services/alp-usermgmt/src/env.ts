@@ -17,7 +17,7 @@ export const env = {
   PG_MIN_POOL: Number(process.env.PG__MIN_POOL) || 2,
   PG_MAX_POOL: Number(process.env.PG__MAX_POOL) || 10,
   PG_DEBUG: Boolean(Number(process.env.PG_DEBUG)) || false,
-  PG_IDLE_TIMEOUT_IN_MS: Number(process.env.PG__IDLE_TIMEOUT_IN_MS) || 30000,
+  PG__IDLE_TIMEOUT_IN_MS: Number(process.env.PG__IDLE_TIMEOUT_IN_MS) || 30000,
   NIFI_MGMT_BASE_URL: process.env.NIFI_MGMT__BASE_URL,
   ALP_SYSTEM_NAME: process.env.ALP__SYSTEM_NAME,
   APP_TENANT_ID: process.env.APP__TENANT_ID,

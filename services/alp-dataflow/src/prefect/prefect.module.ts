@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { FlowMetadata } from '../prefect-flow/entity'
 import { DataQualityModule } from '../data-quality/data-quality.module'
 import { DataCharacterizationModule } from '../data-characterization/data-characterization.module'
+import { PortalServerModule } from '../portal-server/portal-server.module'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { DataCharacterizationModule } from '../data-characterization/data-charac
     DataflowModule,
     DataQualityModule,
     DataCharacterizationModule,
+    PortalServerModule,
     TypeOrmModule.forFeature([FlowMetadata])
   ],
   controllers: [PrefectController],
