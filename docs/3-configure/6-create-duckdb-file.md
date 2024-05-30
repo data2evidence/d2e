@@ -36,14 +36,14 @@ Follow one of the methods below to create duckdb database file
 
 <h1 id="prog">Creating programatically</h1>
 
-  Advanced users can use the following commands to create the search indexes programatically.
+  Advanced users can use the following commands to create the duckdb files programatically.
 
   Before running, replace ${BEARER_TOKEN} with user jwt token with admin role
   ```
   docker exec alp-minerva-gateway-1 wget --header="accept: application/json, text/plain, */*" \
     --header="authorization: ${BEARER_TOKEN}" \
     --header="content-type: application/json" \
-    --post-data='{"flowRunName":"Search index creation for concept","flowName":"create-duckdb-file-plugin","deploymentName":"create-duckdb-file-plugin_deployment","params":{"options":{"schemaName":"cdmdefault","databaseCode":"alpdev_pg"}}}' \
+    --post-data='{"flowRunName":"duckdb file for cdmdefault","flowName":"create-duckdb-file-plugin","deploymentName":"create-duckdb-file-plugin_deployment","params":{"options":{"schemaName":"cdmdefault","databaseCode":"alpdev_pg"}}}' \
     --no-check-certificate \
     --output-document - \
     https://alp-minerva-dataflow-mgmt-1.alp.local:41107/prefect/flow-run/deployment
@@ -51,7 +51,7 @@ Follow one of the methods below to create duckdb database file
   docker exec alp-minerva-gateway-1 wget --header="accept: application/json, text/plain, */*" \
     --header="authorization: ${BEARER_TOKEN}" \
     --header="content-type: application/json" \
-    --post-data='{"flowRunName":"Search index creation for concept","flowName":"create-duckdb-file-plugin","deploymentName":"create-duckdb-file-plugin_deployment","params":{"options":{"schemaName":"cdmvocab","databaseCode":"alpdev_pg"}}}' \
+    --post-data='{"flowRunName":"duckdb file for cdmvocab","flowName":"create-duckdb-file-plugin","deploymentName":"create-duckdb-file-plugin_deployment","params":{"options":{"schemaName":"cdmvocab","databaseCode":"alpdev_pg"}}}' \
     --no-check-certificate \
     --output-document - \
     https://alp-minerva-dataflow-mgmt-1.alp.local:41107/prefect/flow-run/deployment
