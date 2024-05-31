@@ -232,6 +232,7 @@ export class PrefectService {
   async createFlowRunByMetadata(metadata: IPrefectFlowRunByMetadataDto) {
     let currentFlow
     const flowMetadata = await this.prefectFlowService.getFlowMetadataByType(metadata.type)
+
     if (flowMetadata.length === 0) {
       throw new BadRequestException(`Flow does not exist for ${metadata.type}!`)
     }
