@@ -60,7 +60,7 @@ export class PrefectService {
     return this.prefectApi.getTaskRunLogs(id)
   }
 
-  async createDataflowFlowRun(id: string) {
+  async createDataflowUIFlowRun(id: string) {
     const revision = await this.dataflowService.getLastDataflowRevision(id)
     const prefectParams = this.prefectParamsTransformer.transform(revision.flow)
 
