@@ -1,0 +1,197 @@
+services:
+
+  alp-bookmark:
+    build:
+      context: .
+      dockerfile: ./services/bookmark-svc/Dockerfile
+    ports:
+      - 9205:9205
+    volumes:
+      - ./services/bookmark-svc/src:/home/docker/src/alp-data-node/app/src
+    environment:
+      LOCAL_DEBUG: "true"
+
+  alp-caddy:
+    command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile --watch
+    ports:
+      - 41100:41100
+      - 41000:41000
+
+  alp-db-credentials-mgr:
+    extends:
+      file: ./services/alp-db-credentials/docker-compose.yml
+      service: db-credentials-mgr
+    ports:
+      - 9229:9229
+    environment:
+      DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
+      NODE_ENV: production # development
+
+  alp-logto:
+    build:
+      context: ./services/alp-logto
+      dockerfile: Dockerfile
+
+  alp-logto-post-init:
+    container_name: alp-logto-post-init
+    depends_on:
+      alp-logto:
+        condition: service_healthy
+      alp-minerva-postgres:
+        condition: service_healthy
+    image: postgres:15-alpine
+    networks:
+      - alp
+    volumes:
+      - ./deploy/logto:/logto
+    entrypoint: sh logto/init.sh
+    environment:
+      PG__DB_NAME: logto
+      PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
+      PG__PASSWORD: ${PG_SUPER_PASSWORD}
+      PG__PORT: ${PG_PORT:-5432}
+      PG__USER: ${PG_SUPER_USER:-postgres}
+
+  alp-minerva-analytics-svc:
+    build:
+      context: .
+      dockerfile: ./services/analytics-svc/Dockerfile
+    external_links:
+      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
+      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
+      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
+    ports:
+      - 9222:9222
+    volumes:
+      - ./services/analytics-svc/target:/home/docker/src/alp-data-node/app/dist
+      - ./services/analytics-svc/src:/home/docker/src/alp-data-node/app/src
+      - ./services/analytics-svc/api:/home/docker/src/alp-data-node/app/api
+    environment:
+      INSIGHTS__LOG_LEVEL: info
+      LOCAL_DEBUG: "true"
+      MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
+      MINIO__SSL: false
+      USE_EXTENSION_FOR_COHORT_CREATION: "false"
+
+  alp-minerva-cdw-svc:
+    build:
+      context: .
+      dockerfile: ./services/cdw-svc/Dockerfile
+    ports:
+      - 9206:9206
+    volumes:
+      - ./services/cdw-svc/src:/home/docker/src/services/app/src
+    environment:
+      LOCAL_DEBUG: "true"
+      NODE_ENV: development
+
+  alp-minerva-gateway:
+    build:
+      context: ./services/alp-gateway
+      dockerfile: Dockerfile
+      target: development
+    command: yarn dev
+    depends_on:
+      alp-logto-post-init:
+        condition: service_completed_successfully
+    external_links:
+      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
+      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
+      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
+    healthcheck:
+      interval: 30s
+      retries: 10
+      start_period: 120s
+      test:
+        - CMD
+        - wget
+        - -O
+        - src/liveness
+        - --no-check-certificate
+        - https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/check-liveness
+      timeout: 180s
+    ports:
+      - 9220:9220
+    volumes:
+      - ./services/alp-gateway/src:/usr/src/app/src
+    environment:
+      LOCAL_DEBUG: "true"
+
+  alp-minerva-pa-config-svc:
+    build:
+      context: .
+      dockerfile: services/mri-pa-config/Dockerfile
+    ports:
+      - 9207:9207
+    volumes:
+      - ./services/mri-pa-config/src:/home/docker/src/services/app/src
+    environment:
+      LOCAL_DEBUG: "true"
+      NODE_ENV: development
+
+  alp-minerva-pg-mgmt-init:
+    build:
+      context: services/alp-pg-management
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/alp-pg-management/app:/home/docker/app
+    environment:
+      LOCAL_DEBUG: "true"
+
+  alp-minerva-portal-server:
+    build:
+      context: ./services/alp-portal-server
+      dockerfile: Dockerfile
+    container_name: alp-minerva-portal-server-nest-prod-${BASE_PORT:-1}
+    environment:
+      MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
+      MINIO__SSL: false
+      NODE_ENV: development
+
+  alp-minerva-postgres:
+    ports:
+      - 41190:5432
+
+  alp-minerva-user-mgmt:
+    build:
+      context: ./services/alp-usermgmt
+      target: development
+    command:
+      - sh
+      - start.sh
+    healthcheck:
+      interval: 20s
+      retries: 10
+      start_period: 60s
+      test:
+        - CMD
+        - wget
+        - -O
+        - src/liveness
+        - http://0.0.0.0:41104/check-liveness
+      timeout: 10s
+    ports:
+      - 9224:9224
+    volumes:
+      - ./services/alp-usermgmt/src:/usr/src/app/src
+    environment:
+      LOCAL_DEBUG: "true"
+      NODE_ENV: development
+
+  alp-mri-pg-config:
+    build: ./services/mri-pg-config
+
+  alp-query-gen:
+    build:
+      context: .
+      dockerfile: services/query-gen-svc/Dockerfile
+    external_links:
+      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
+      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
+    ports:
+      - 9208:9208
+    volumes:
+      - ./services/query-gen-svc/src:/home/docker/src/alp-data-node/app/src
+    environment:
+      LOCAL_DEBUG: "true"
+      NODE_ENV: development
