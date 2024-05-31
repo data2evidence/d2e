@@ -13,7 +13,7 @@ import * as xsenv from "@sap/xsenv";
 import express from "express";
 import { MRIConfig } from "./config/config";
 import { ConfigFacade as MriConfigFacade } from "./config/ConfigFacade";
-import { IRequest } from "./types";
+import { IRequest, IDBCredentialsType } from "./types";
 import https from "https";
 const log = Logger.CreateLogger("mri-config-log");
 
@@ -220,7 +220,18 @@ try {
     isTestEnvironment = true;
     log.info("TESTSCHEMA :" + credentials.schema);
   } else {
-    credentials = xsenv.cfServiceCredentials({ tag: "config" });
+    credentials = {
+      database: env.PG__DB_NAME,
+      schema: env.PG_SCHEMA,
+      dialect: env.PG__DIALECT,
+      host: env.PG__HOST,
+      port: env.PG__PORT,
+      user: env.PG_USER,
+      password: env.PG_PASSWORD,
+      max: env.PG__MAX_POOL,
+      min: env.PG__MIN_POOL,
+      idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
+    } as IDBCredentialsType
   }
 
   initRoutes();
