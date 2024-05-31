@@ -391,6 +391,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
+    path: '^/terminology/concept/hierarchy(.*)',
+    scopes: ['gateway.terminology.concept.hierarchy.read'],
+    httpMethods: ['GET']
+  },
+  {
     path: '^/terminology/concept/recommended/list$',
     scopes: ['gateway.terminology.concept.recommended.read'],
     httpMethods: ['POST']
@@ -916,6 +921,7 @@ export const ROLE_SCOPES = {
     'gateway.terminology.conceptSet.delete',
     'gateway.terminology.concept.filterOptions.read',
     'gateway.terminology.concept.recommended.read',
+    'gateway.terminology.concept.hierarchy.read',
     'gateway.terminology.fhir.read',
     'gateway.terminology.hybridSearchConfig.read',
     'dataflowmgmt.analysisflow.read',
