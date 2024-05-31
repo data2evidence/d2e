@@ -4,9 +4,9 @@ import { Knex } from 'knex'
 const config: Knex.Config = {
   client: 'pg',
   connection: {
-    host: process.env.PG_HOST!,
-    port: Number(process.env.PG_PORT),
-    database: process.env.PG_DATABASE!,
+    host: process.env.PG__HOST!,
+    port: Number(process.env.PG__PORT),
+    database: process.env.PG__DB_NAME!,
     user: process.env.PG_USER!,
     password: process.env.PG_PASSWORD!,
     ssl:
@@ -19,11 +19,11 @@ const config: Knex.Config = {
   },
   searchPath: [process.env.PG_SCHEMA!],
   pool: {
-    min: Number(process.env.PG_MIN_POOL),
-    max: Number(process.env.PG_MAX_POOL),
-    idleTimeoutMillis: Number(process.env.PG_IDLE_TIMEOUT_IN_MS) || 30000
+    min: Number(process.env.PG__MIN_POOL),
+    max: Number(process.env.PG__MAX_POOL),
+    idleTimeoutMillis: Number(process.env.PG__IDLE_TIMEOUT_IN_MS) || 30000
   },
-  debug: Boolean(Number(process.env.PG_DEBUG)),
+  debug: Boolean(Number(process.env.PG__DEBUG)),
   migrations: {
     schemaName: process.env.PG_SCHEMA, // schema used for storing the migrations. use test_schema first. switch to qe_config later
     tableName: 'knex_migrations', // table name used for storing the migration state

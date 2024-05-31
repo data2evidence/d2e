@@ -186,3 +186,16 @@ declare global {
         }
     }
 }
+
+export interface IDBCredentialsType {
+    database: string;
+    schema?: string;
+    dialect: string;
+    host: string;
+    port: number;
+    user: string;
+    password: string;
+    max?: number | undefined;
+    min?: number | undefined;
+    idleTimeoutMillis?: number | undefined;
+  }
