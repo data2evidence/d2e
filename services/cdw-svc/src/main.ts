@@ -20,7 +20,7 @@ import { CDWServicesFacade } from "./qe/config/CDWServicesFacade";
 import { FfhQeConfig, MESSAGES } from "./qe/config/config";
 import { AssignmentProxy } from "./AssignmentProxy";
 import { Settings } from "./qe/settings/Settings";
-import { ICDWRequest } from "./types";
+import { ICDWRequest, IDBCredentialsType } from "./types";
 import { getAnalyticsConnection } from "./utils/utils";
 
 const log = Logger.CreateLogger("cdw-log");
@@ -60,7 +60,18 @@ const main = () => {
       cdwService = cdwService.filter((db) => db.dialect == 'hana')
       analyticsCredential = cdwService[0];
     }
-    configCredentials = JSON.parse(env.CONFIG_CONNECTION);
+    configCredentials =  {
+      database: env.PG__DB_NAME,
+      schema: env.PG_SCHEMA,
+      dialect: env.PG__DIALECT,
+      host: env.PG__HOST,
+      port: env.PG__PORT,
+      user: env.PG_USER,
+      password: env.PG_PASSWORD,
+      max: env.PG__MAX_POOL,
+      min: env.PG__MIN_POOL,
+      idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
+    } as IDBCredentialsType
   }
 
   EnvVarUtils.loadDevSettings();

@@ -178,7 +178,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
-    path: '^/system-portal/dataset/list\\?(.*)role=researcher$',
+    path: '^/system-portal/dataset/list\\?(.*)role=researcher(&.*)?$',
     scopes: ['portal.dataset.read'],
     httpMethods: ['GET']
   },
@@ -928,21 +928,8 @@ export const ROLE_SCOPES = {
   [`${env.IDP_ALP_SVC_CLIENT_ID}`]: ['dbCredentials.db.list', 'portal.dataset.read'],
   [`${env.IDP_ALP_DATA_CLIENT_ID}`]: [
     'portal.dataset.read',
-    'dbSvc.schema.create',
-    'dbSvc.snapshot.create',
-    'dbSvc.schema.update',
-    'dbSvc.maintenance.update',
-    'dbSvc.schema.versionInfo.read',
-    'dbSvc.datamodels.read',
-    'dbSvc.schema.cdmVersion.read',
-    'dbSvc.schema.vocabSchema.read',
-    'dbSvc.schema.snapshot.metadata.read',
-    'dbSvc.stagingArea.create',
-    'dbSvc.stagingArea.update',
-    'dbSvc.snapshot.parquet.create',
-    'dbSvc.schema.delete.rollbackCount',
-    'dbSvc.schema.delete.rollbackTag',
-    'dbSvc.questionnaire.create',
-    'dbSvc.questionnaire.responses.read'
+    'meilisearchSvc.index.add',
+    'meilisearchSvc.index.setting.update',
+    'meilisearchSvc.document.add'
   ]
 }

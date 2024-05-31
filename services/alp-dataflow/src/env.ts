@@ -8,10 +8,8 @@ export const env = {
   PORT: parseInt(process.env.DATAFLOW_MGMT__PORT) || 3000,
   APP_LOG_LEVEL: (process.env.DATAFLOW_MGMT__LOG_LEVEL as LoggingLevel) || 'info',
   ADHOC_FLOWS_SB: process.env.DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_SB_NAME || 'dataflow-adhoc-flows-sb',
-
-  PREFECT_API_URL: process.env.PREFECT__API_URL,
-  PORTAL_SERVER_API_URL: process.env.PORTAL_SERVER__API_URL,
-  ANALYTICS_SVC_API_URL: process.env.ANALYTICS_SVC__API_URL,
+  ADHOC_DEPLOYMENT_FLOWS_BUCKET_NAME:
+    process.env.DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_S3_BUCKET_NAME || 'dataflow-adhoc-flows',
 
   MINIO_ENDPOINT: process.env.MINIO__ENDPOINT,
   MINIO_PORT: parseInt(process.env.MINIO__PORT),
@@ -35,5 +33,9 @@ export const env = {
 
   SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
   SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
-  SSL_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
+  SSL_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n'),
+
+  SERVICE_ROUTES: process.env.SERVICE_ROUTES || '{}'
 }
+
+export const services = JSON.parse(env.SERVICE_ROUTES)

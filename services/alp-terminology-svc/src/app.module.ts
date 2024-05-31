@@ -6,6 +6,7 @@ import { RouterModule, Routes } from '@nestjs/core';
 import { env } from './env';
 import { SeedService } from './db/seeds/seed.service';
 import { FhirModule } from './module/concept/fhir.module';
+import { HealthModule } from './health-check/health.module';
 
 const routes: Routes = [
   {
@@ -37,6 +38,7 @@ const routes: Routes = [
     FhirModule,
     ConceptSetModule,
     HybridSearchConfigModule,
+    HealthModule,
     RouterModule.register(routes),
   ],
   providers: [SeedService],

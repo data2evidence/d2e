@@ -65,16 +65,12 @@ export async function checkIfSchemaExists(req, res, next) {
     }
 }
 
-// hana only
 export async function getSnapshotSchemaMetadata(req, res, next) {
     let dialect: string = req.swagger.params.databaseType.value;
     let tenant: string = req.swagger.params.tenant.value;
     let schema = req.swagger.params.schemaName.value;
 
     try {
-        if (dialect === config.DB.POSTGRES) {
-            throw new Error("Route is not supported for this dialect!");
-        }
 
         let dbDao = new DBDAO(dialect, tenant);
         const dbConnection = await dbDao.getDBConnectionByTenantPromise(
