@@ -104,30 +104,11 @@ ConfigSetupManager.prototype.setupConfiguration = function (testSchemaName, minC
         that.log('Adding MRI configuration with ID ' + that.MRI_CONFIG_ID);
         that.mriUplink.addMriConfiguration(mriConfig, that.MRI_CONFIG_ID, 'auto_mri_config_' + that.MRI_CONFIG_ID, that.CDW_CONFIG_ID, cb);
     };
-    var addMriTestConfigAssignmentToAliceTask = function (cb) {
-        that.log('Assigning MRI config with ID ' + that.MRI_CONFIG_ID + ' to user ' + aliceUser);
-        that.hphUplink.addMriConfigurationAssignment(aliceUser, that.MRI_CONFIG_ID, function (err, body) {
-            that.mriAssignmentId = body;
-            cb(err);
-        });
-    };
-    var addPatientTestConfigTask = function (cb) {
-        that.log('Adding Patient Summary configuration with ID ' + that.PATIENT_CONFIG_ID);
-        that.hphUplink.addPatientConfiguration(patientConfig, that.PATIENT_CONFIG_ID, 'auto_patient_config_' + that.PATIENT_CONFIG_ID, that.CDW_CONFIG_ID, cb);
-    };
-    var addPatientTestConfigAssignmentToAliceTask = function (cb) {
-        that.log('Assigning Patient Sumamry config with ID ' + that.PATIENT_CONFIG_ID + ' to user ' + aliceUser);
-        that.hphUplink.addPatientConfigurationAssignment(aliceUser, that.PATIENT_CONFIG_ID, function (err, body) {
-            that.patientAssignmentId = body;
-            cb(err);
-        });
-    };
 
     // Do the actual work here
     async.series([
         addCdwTestConfigTask,
-        addMriTestConfigTask,
-        addMriTestConfigAssignmentToAliceTask
+        addMriTestConfigTask
     ], callback);
 };
 
@@ -157,41 +138,16 @@ ConfigSetupManager.prototype.adaptMriConfiguration = function (mriConfigFragment
 ConfigSetupManager.prototype.teardownConfiguration = function (callback) {
     // Define async tasks to be carried out
     var that = this;
-    var removeMriTestConfigAssignmentToAliceTask = function (cb) {
-        that.log('Removing config assignment');
-        if (typeof that.mriAssignmentId !== 'undefined' && that.mriAssignmentId !== null) {
-            that.hphUplink.removeMriConfigurationAssignment(that.mriAssignmentId, cb);
-        } else {
-            process.nextTick(cb);
-        }
-    };
     var removeMriTestConfigTask = function (cb) {
         that.log('Removing MRI config');
         that.mriUplink.removeMriConfiguration(that.MRI_CONFIG_ID, cb);
-    };
-    var removePatientTestConfigAssignmentToAliceTask = function (cb) {
-        that.log('Removing config assignment');
-        if (typeof that.patientAssignmentId !== 'undefined' && that.patientAssignmentId !== null) {
-            that.hphUplink.removePatientConfigurationAssignment(that.patientAssignmentId, cb);
-        } else {
-            process.nextTick(cb);
-        }
-    };
-    var removePatientTestConfigTask = function (cb) {
-        that.log('Removing Patient config');
-        that.hphUplink.removePatientConfiguration(that.PATIENT_CONFIG_ID, cb);
     };
     var removeCdwTestConfigTask = function (cb) {
         that.log('Removing CDW config');
         that.hphUplink.removeCdwConfiguration(that.CDW_CONFIG_ID, cb);
     };
-    var redirectQueriesBackTask = function (cb) {
-        that.log('Redirecting queries back to normal schema');
-        that.hphUplink.redirectQueriesBackToStandardSchema(cb);
-    };
     // Do the actual work here
     async.series([
-        removeMriTestConfigAssignmentToAliceTask,
         removeMriTestConfigTask,
         removeCdwTestConfigTask
     ], callback);
