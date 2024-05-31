@@ -31,7 +31,7 @@ const config: Knex.Config = {
   pool: {
     min: env.PG_MIN_POOL,
     max: env.PG_MAX_POOL,
-    idleTimeoutMillis: env.PG_IDLE_TIMEOUT_IN_MS
+    idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
   },
   debug: env.PG_DEBUG,
   migrations: {
