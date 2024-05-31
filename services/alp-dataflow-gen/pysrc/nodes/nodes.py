@@ -1149,7 +1149,7 @@ class StrategusNode(Node):
                     rSpec.addSharedResources(moduleSpec)
 
                 rSpec.addModuleSpecifications(moduleSpecResults[0])
-            print(rSpec.r_repr())
+            get_run_logger().log(rSpec.r_repr())
 
             # TODO: 
             # rExecutionSettings = rStrategus.createCdmExecutionSettings(
