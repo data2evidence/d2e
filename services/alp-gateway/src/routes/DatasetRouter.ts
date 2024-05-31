@@ -122,8 +122,8 @@ export class DatasetRouter {
                 `Create CDM schema ${schemaName} with ${dataModel} on ${databaseCode} with cleansed schema option set to ${cleansedSchemaOption}`
               )
 
-              const datamodels = await dataflowMgmtAPI.getDatamodels()
-              const dmInfo = datamodels.find(model => model.name === dataModelName)
+              const dataModels = await dataflowMgmtAPI.getDatamodels()
+              const dataModelInfo = dataModels.find(model => model.name === dataModelName)
 
               const options = {
                 options: {
@@ -140,7 +140,7 @@ export class DatasetRouter {
               await dataflowMgmtAPI.createFlowRunByMetadata(
                 options,
                 'datamodel',
-                dmInfo.flowId,
+                dataModelInfo.flowId,
                 `datamodel-create-${schemaName}`
               )
             } catch (error) {
@@ -193,8 +193,8 @@ export class DatasetRouter {
       const newSchemaName = sourceHasSchema ? `CDM${id}`.replace(/-/g, '') : ''
 
       const dataModel = dataModelName.split(' ')[0]
-      const datamodels = await dataflowMgmtAPI.getDatamodels()
-      const dataModelInfo = datamodels.find(model => model.name === dataModelName)
+      const dataModels = await dataflowMgmtAPI.getDatamodels()
+      const dataModelInfo = dataModels.find(model => model.name === dataModelName)
 
       try {
         const snapshotRequest = {
