@@ -105,11 +105,14 @@ ConfigSetupManager.prototype.setupConfiguration = function (testSchemaName, minC
         that.mriUplink.addMriConfiguration(mriConfig, that.MRI_CONFIG_ID, 'auto_mri_config_' + that.MRI_CONFIG_ID, that.CDW_CONFIG_ID, cb);
     };
 
-    // Do the actual work here
-    async.series([
-        addCdwTestConfigTask,
-        addMriTestConfigTask
-    ], callback);
+    // TODO: temporarily commenting accessing CDW & MRI services, because the currrent test code doesn't need that
+    // // Do the actual work here
+    // async.series([
+    //     addCdwTestConfigTask,
+    //     addMriTestConfigTask
+    // ], callback);
+    callback(null);
+
 };
 
 
@@ -127,7 +130,8 @@ ConfigSetupManager.prototype.adaptMriConfiguration = function (mriConfigFragment
     var mriConfigFilePath = path.join(__dirname, '..', this.integrationTestFolder, this.mriConfigName);
     var mriConfig = JSON.parse(fs.readFileSync(mriConfigFilePath));
     var newMriConfig = utils.merge(mriConfig, mriConfigFragment);
-    this.mriUplink.addMriConfiguration(newMriConfig, this.MRI_CONFIG_ID, 'auto_mri_config_' + this.MRI_CONFIG_ID, this.CDW_CONFIG_ID, callback);
+    // this.mriUplink.addMriConfiguration(newMriConfig, this.MRI_CONFIG_ID, 'auto_mri_config_' + this.MRI_CONFIG_ID, this.CDW_CONFIG_ID, callback);
+    callback(null);
 };
 
 /**
@@ -146,11 +150,14 @@ ConfigSetupManager.prototype.teardownConfiguration = function (callback) {
         that.log('Removing CDW config');
         that.hphUplink.removeCdwConfiguration(that.CDW_CONFIG_ID, cb);
     };
-    // Do the actual work here
-    async.series([
-        removeMriTestConfigTask,
-        removeCdwTestConfigTask
-    ], callback);
+    
+    // TODO: temporarily commenting accessing CDW & MRI services, because the currrent test code doesn't need that
+    // // Do the actual work here
+    // async.series([
+    //     removeMriTestConfigTask,
+    //     removeCdwTestConfigTask
+    // ], callback);
+    callback(null);
 };
 
 
