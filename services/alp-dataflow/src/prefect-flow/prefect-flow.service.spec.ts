@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { PrefectFlowService } from './prefect-flow.service'
 import { PrefectAPI } from '../prefect/prefect.api'
 import { prefectApiMockFactory } from '../prefect/prefect.mock'
+import { PortalServerAPI } from '../portal-server/portal-server.api'
+import { portalApiMockFactory } from '../portal-server/portal-server.mock'
 import { REQUEST } from '@nestjs/core'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { FlowMetadata } from './entity'
@@ -24,6 +26,7 @@ describe('PrefectFlowService', () => {
       providers: [
         PrefectFlowService,
         { provide: PrefectAPI, useFactory: prefectApiMockFactory },
+        { provide: PortalServerAPI, useFactory: portalApiMockFactory },
         { provide: REQUEST, useValue: req },
         { provide: getRepositoryToken(FlowMetadata), useFactory: repositoryMockFactory }
       ]

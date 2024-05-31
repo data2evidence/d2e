@@ -110,6 +110,27 @@ export class MinioClient {
     }
   }
 
+  async deleteDeployment(deploymentPath: string, bucketName: string) {
+    try {
+      const objectsStream = this.client.listObjectsV2(bucketName, deploymentPath, true)
+      const objectsToDelete: string[] = []
+
+      for await (const obj of objectsStream) {
+        objectsToDelete.push(obj.name)
+      }
+
+      await this.client.removeObjects(bucketName, objectsToDelete)
+      this.logger.info(`Deleted ${objectsToDelete.length} objects`)
+
+      // Delete the folder itself
+      await this.client.removeObject(bucketName, deploymentPath)
+      this.logger.info(`Deleted folder: ${deploymentPath}`)
+    } catch (error) {
+      this.logger.error(`${error}`)
+      throw new InternalServerErrorException(`Error occurred in MinIO S3 object deletion: ${deploymentPath}: ${error}`)
+    }
+  }
+
   private getBucketName(datasetId: string) {
     return `portal-dataset-${datasetId}`
   }
