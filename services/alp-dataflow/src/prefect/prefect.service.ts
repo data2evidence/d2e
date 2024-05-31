@@ -43,7 +43,10 @@ export class PrefectService {
   }
 
   async getFlowRun(id: string) {
-    return this.prefectApi.getFlowRun(id)
+    const flowRun = await this.prefectApi.getFlowRun(id)
+    // Redact sensitive input parameters for all flow runs
+    flowRun.parameters = this.redactSensitivePrefectParameters(flowRun.parameters)
+    return flowRun
   }
 
   async getFlowRunLogs(id: string) {
@@ -229,7 +232,6 @@ export class PrefectService {
   async createFlowRunByMetadata(metadata: IPrefectFlowRunByMetadataDto) {
     let currentFlow
     const flowMetadata = await this.prefectFlowService.getFlowMetadataByType(metadata.type)
-
     if (flowMetadata.length === 0) {
       throw new BadRequestException(`Flow does not exist for ${metadata.type}!`)
     }
@@ -299,5 +301,22 @@ export class PrefectService {
   private async deleteDeploymentFolder(deploymentFolderPath: string) {
     rmdirSync(deploymentFolderPath, { recursive: true })
     this.logger.info(`Deleted adhoc prefect deployment folder: ${deploymentFolderPath}`)
+  }
+
+  private redactSensitivePrefectParameters(flowRunParameters: any) {
+    const sensitivePrefectParameterKeys = ['token']
+
+    if (!flowRunParameters.options) {
+      return flowRunParameters
+    }
+
+    // Redact any values that have the keys found in redactSensitivePrefectParameters
+    for (const sensitiveKey in sensitivePrefectParameterKeys) {
+      if (sensitiveKey in flowRunParameters.options) {
+        flowRunParameters.options['sensitiveKey'] = '<REDACTED>'
+      }
+    }
+
+    return flowRunParameters
   }
 }
