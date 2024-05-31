@@ -312,9 +312,9 @@ export class PrefectService {
     }
 
     // Redact any values that have the keys found in redactSensitivePrefectParameters
-    for (const sensitiveKey in sensitivePrefectParameterKeys) {
+    for (const sensitiveKey of sensitivePrefectParameterKeys) {
       if (sensitiveKey in flowRunParameters.options) {
-        flowRunParameters.options['sensitiveKey'] = '<REDACTED>'
+        flowRunParameters.options[sensitiveKey] = '<REDACTED>'
       }
     }
 
