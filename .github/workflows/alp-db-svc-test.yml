@@ -100,8 +100,48 @@ jobs:
           path: |
             ${{ github.job }}*.yml
 
+      # Get and merge d2e-plugins migration scripts
       - uses: actions/checkout@v4
-        name: sameBranch checkout (ms-datamodel-plugin)
+        name: sameBranch checkout (d2e-plugin)
+        id: sameBranch-checkout
+        continue-on-error: true
+        with:
+          repository:  ${{ vars.D2E_PLUGIN_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'data-management'
+          sparse-checkout-cone-mode: false
+          ref: ${{ env.BRANCH_NAME }}
+
+      - shell: bash
+        name: sameBranch checkout test
+        id: sameBranch-checkout-test
+        run: |
+          ls -lhtr tmp
+          [ -d tmp/data-management ] || echo D2E_PLUGIN_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        name: develop branch checkout (sameBranch checkout fails)
+        if: steps.sameBranch-checkout-test.outputs.D2E_PLUGIN_DEVELOP_BRANCH == 'True' 
+        with:
+          repository:  ${{ vars.D2E_PLUGIN_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'data-management'
+          sparse-checkout-cone-mode: false
+          ref: develop
+
+      - shell: bash
+        name: merge files from d2e-plugin repo
+        id: merge_files_from_data-management
+        run: |
+          ls -l tmp/data-management/data_management_plugin
+          cp -prnl ./tmp/data-management/data_management_plugin/* ./services/alp-db-svc
+          ls -l ./services/alp-db-svc/db/drivers
+
+      # Get and merge ms-datamodel-plugin migration scripts
+      - uses: actions/checkout@v4
+        name: sameBranch checkout (d2e-plugin)
         id: sameBranch-checkout
         continue-on-error: true
         with:
@@ -117,11 +157,11 @@ jobs:
         id: sameBranch-checkout-test
         run: |
           ls -lhtr tmp
-          [ -d tmp/ms_datamodel_plugin ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
+          [ -d tmp/ms_datamodel_plugin ] || echo MS_DATAMODEL_PLUGIN_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
         name: develop branch checkout (sameBranch checkout fails)
-        if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
+        if: steps.sameBranch-checkout-test.outputs.MS_DATAMODEL_PLUGIN_DEVELOP_BRANCH == 'True' 
         with:
           repository:  ${{ vars.MS_DATAMODEL_PLUGIN_REPO }}
           token: ${{ secrets.CI_PAT }}
@@ -131,8 +171,8 @@ jobs:
           ref: develop
 
       - shell: bash
-        name: merge files from override
-        id: merge_files_from_override
+        name: merge files from ms-datamodel-plugin repo
+        id: merge_files_from_ms_datamodel_plugin
         run: |
           ls -l tmp/ms_datamodel_plugin
           cp -prnl ./tmp/ms_datamodel_plugin/* ./services/alp-db-svc
