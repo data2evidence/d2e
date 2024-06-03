@@ -101,14 +101,14 @@ jobs:
             ${{ github.job }}*.yml
 
       - uses: actions/checkout@v4
-        name: sameBranch checkout (OverrideRepo)
+        name: sameBranch checkout (ms-datamodel-plugin)
         id: sameBranch-checkout
         continue-on-error: true
         with:
-          repository:  ${{ vars.OVERRIDE_REPO }}
+          repository:  ${{ vars.MS_DATAMODEL_PLUGIN_REPO }}
           token: ${{ secrets.CI_PAT }}
           path: 'tmp'
-          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout: 'ms_datamodel_plugin'
           sparse-checkout-cone-mode: false
           ref: ${{ env.BRANCH_NAME }}
 
@@ -117,7 +117,7 @@ jobs:
         id: sameBranch-checkout-test
         run: |
           ls -lhtr tmp
-          [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
+          [ -d tmp/ms_datamodel_plugin ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
         name: develop branch checkout (sameBranch checkout fails)
@@ -126,7 +126,7 @@ jobs:
           repository:  ${{ vars.OVERRIDE_REPO }}
           token: ${{ secrets.CI_PAT }}
           path: 'tmp'
-          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout: 'ms_datamodel_plugin'
           sparse-checkout-cone-mode: false
           ref: develop
 
@@ -134,10 +134,9 @@ jobs:
         name: merge files from override
         id: merge_files_from_override
         run: |
-          ls -l tmp/alp-data-node-override
-          cp -prnl ./tmp/alp-data-node-override/* .
+          ls -l tmp/ms_datamodel_plugin
+          cp -prnl ./tmp/ms_datamodel_plugin/* ./services/alp-db-svc
           ls -l ./services/alp-db-svc/db/drivers
-          ln -s tmp/alp-data-node-override alp-data-node-override
 
       - shell: bash
         # Give an id to the step, so we can reference it later
