@@ -121,7 +121,7 @@ jobs:
           [ -d tmp/data-management ] || echo D2E_PLUGIN_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
-        name: develop branch checkout (sameBranch checkout fails)
+        name: develop branch checkout (sameBranch checkout fails) (d2e-plugin)
         id: develop-branch-checkout-d2e-plugin
         if: steps.sameBranch-checkout-test-d2e-plugin.outputs.D2E_PLUGIN_DEVELOP_BRANCH == 'True' 
         with:
@@ -161,7 +161,7 @@ jobs:
           [ -d tmp/ms_datamodel_plugin ] || echo MS_DATAMODEL_PLUGIN_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
-        name: develop branch checkout (sameBranch checkout fails)
+        name: develop branch checkout (sameBranch checkout fails) (ms-datamodel-plugin)
         id: develop-branch-checkout-ms-datamodel-plugin
         if: steps.sameBranch-checkout-test-ms-datamodel-plugin.outputs.MS_DATAMODEL_PLUGIN_DEVELOP_BRANCH == 'True' 
         with:
