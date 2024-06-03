@@ -14,9 +14,6 @@ RUN apk add --no-cache python3 make g++ rsync py3-setuptools git
 ## Git clone
 RUN git clone --branch v1.14.0 https://github.com/logto-io/logto.git /etc/logto
 
-## Copy modified files as needed
-COPY ./to-replace/SignIn/Main.tsx /etc/logto/packages/experience/src/pages/SignIn/Main.tsx
-
 ### Install dependencies and build ###
 RUN node .scripts/update-parcelrc.js
 RUN pnpm i
@@ -27,6 +24,10 @@ ENV DEV_FEATURES_ENABLED=${dev_features_enabled}
 
 ARG applicationinsights_connection_string
 ENV APPLICATIONINSIGHTS_CONNECTION_STRING=${applicationinsights_connection_string}
+
+## Copy modified files as needed
+COPY ./to-replace/SignIn/Main.tsx /etc/logto/packages/experience/src/pages/SignIn/Main.tsx
+
 RUN pnpm -r build
 
 ### Add official connectors ###
