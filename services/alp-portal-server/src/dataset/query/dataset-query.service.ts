@@ -1,5 +1,6 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { REQUEST } from '@nestjs/core'
+import { Brackets } from 'typeorm'
 import { JwtPayload, decode } from 'jsonwebtoken'
 import { IDataset, IDatasetResponseDto, IDatasetQueryDto, IDatasetSearchDto, ITenant } from '../../types'
 import { DatasetFilterService } from '../dataset-filter.service'
@@ -64,7 +65,7 @@ export class DatasetQueryService {
   }
 
   async getDatasets(queryParams?: IDatasetQueryDto) {
-    const { role, tenants: _tenants, ...filterParams } = queryParams
+    const { role, searchText, ...filterParams } = queryParams
     const isResearcher = role === 'researcher'
     const hasFilterParams = Object.keys(filterParams).length > 0
     if (!isResearcher && hasFilterParams) {
@@ -81,10 +82,26 @@ export class DatasetQueryService {
       .leftJoin('attribute.attributeConfig', 'attributeConfig')
       .select(this.getDatasetsColumns(role))
 
+    if (searchText) {
+      const tsQuery = this.convertToTsqueryFormat(this.sanitizeTsQueryInput(searchText))
+      if (tsQuery) {
+        query
+          .setParameter('searchText', tsQuery)
+          .andWhere(
+            new Brackets(qb => {
+              qb.where('"datasetDetail"."search_tsv" @@ to_tsquery(\'english\', :searchText)').orWhere(
+                '"attribute"."search_tsv" @@ to_tsquery(\'english\', :searchText)'
+              )
+            })
+          )
+          .orderBy('ts_rank("datasetDetail"."search_tsv", to_tsquery(\'english\', :searchText))', 'DESC')
+      }
+    }
+
     if (isResearcher) {
       const datasetIds = await this.userMgmtService.getResearcherDatasetIds(this.userId)
-      query.where(
-        'dataset.visibility_status = :hidden AND dataset.id = ANY(:datasetIds) OR dataset.visibility_status != :hidden',
+      query.andWhere(
+        '(dataset.visibility_status = :hidden AND dataset.id = ANY(:datasetIds) OR dataset.visibility_status != :hidden)',
         { hidden: 'HIDDEN', datasetIds }
       )
     }
@@ -222,5 +239,15 @@ export class DatasetQueryService {
       }
     }
     return <T>object
+  }
+
+  private sanitizeTsQueryInput(input: string) {
+    return input.replace(/[^a-zA-Z0-9\s]/g, '').trim()
+  }
+
+  private convertToTsqueryFormat(input: string) {
+    const normalizedInput = input.replace(/\s+/g, ' ')
+    const terms = normalizedInput.split(' ').filter(term => term.length > 0)
+    return terms.join(' | ')
   }
 }

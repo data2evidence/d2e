@@ -10,7 +10,7 @@ TLS_REGENERATE=${TLS_REGENERATE:-false}
 # vars
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 CACHE_DIR=$GIT_BASE_DIR/cache/tls
-CONTAINER_NAME=alp-caddy
+CONTAINER_NAME=alp-caddy-certs-mgmt
 DOMAIN_NAME=alp.local
 DOTENV_FILE=.env.$ENV_TYPE
 TLS_CA_NAME=alp-internal
@@ -20,25 +20,18 @@ touch ${DOTENV_FILE}
 CONTAINER_CRT_DIR=/data/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
 CONTAINER_CA_DIR=/data/caddy/pki/authorities/$TLS_CA_NAME
 
+cd $GIT_BASE_DIR
+
 # action
 if [ ${TLS_REGENERATE} = true ]; then
 	echo ". TLS_REGENERATE remove existing"
 	docker volume inspect $VOLUME_NAME > /dev/null && docker run --rm -v $VOLUME_NAME:/volume -w /volume busybox rm -rf /volume/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
 fi
 
-# start if not already started
-if ! docker ps --format '{{.Names}}' | grep -q "^alp-caddy"; then
-	yarn base:minerva --env-file $DOTENV_FILE up $CONTAINER_NAME --wait 2>&1 | grep -vE 'WARN[0000]|is not set'
-	if [ "$( docker container inspect -f '{{.State.Status}}' $CONTAINER_NAME 2> /dev/null )" != "running" ]; then
-		echo FATAL: $CONTAINER_NAME failed to start
-		docker container inspect --format json -f '{{.State}}' $CONTAINER_NAME
-		docker container inspect -o json 
-		exit 1
-	fi
-# restart if TLS_REGENERATE
-elif [ ${TLS_REGENERATE} = true ]; then
-	yarn base:minerva --env-file $DOTENV_FILE restart $CONTAINER_NAME 2>&1 | grep -vE 'WARN[0000]|is not set'
-fi
+docker run -d -v $VOLUME_NAME:/data -v ./deploy/caddy-config:/srv/caddy-config --name $CONTAINER_NAME caddy:2.8-alpine caddy run --config /srv/caddy-config/Caddyfile --adapter caddyfile
+
+# Allow time for caddy to generate certs
+sleep 5
 
 # remove existing certs from dotenv
 for VAR_NAME in TLS__INTERNAL__CA_CRT TLS__INTERNAL__CRT TLS__INTERNAL__KEY; do sed -i.bak "/$VAR_NAME=/,/END CERTIFICATE-----'/d" $DOTENV_FILE; done
@@ -64,3 +57,5 @@ echo TLS__INTERNAL__KEY=\'"$(cat $TLS__INTERNAL__KEY_PATH)"\' >> $DOTENV_FILE
 [ $(grep TLS__INTERNAL $DOTENV_FILE | grep -c -- '---') = 3 ] || { echo "FATAL 3xTLS__INTERNAL not populated"; exit 1; }
 
 echo added $(grep TLS__INTERNAL $DOTENV_FILE | grep -c -- '---')xTLS__INTERNAL to $DOTENV_FILE
+
+docker rm -f $CONTAINER_NAME

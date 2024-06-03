@@ -10,12 +10,12 @@ import { IToken } from '../types'
 const logger = createLogger('ScopeCheck')
 const userMgmtApi = new UserMgmtAPI()
 const subProp = env.GATEWAY_IDP_SUBJECT_PROP
-const PUBLIC_API_PATHS = ['/system-portal/dataset/public/list']
+const PUBLIC_API_PATHS = ['^/system-portal/dataset/public/list(.*)']
 
 export const checkScopes = async (req: Request, res: Response, next: NextFunction) => {
   const bearerToken = req.headers.authorization
   const { originalUrl, method } = req
-  if (PUBLIC_API_PATHS.some(path => originalUrl.endsWith(path))) {
+  if (PUBLIC_API_PATHS.some(path => new RegExp(path).test(originalUrl))) {
     return next()
   } else if (!bearerToken) {
     logger.error(`No bearer token is found for url: ${originalUrl}`)
@@ -48,7 +48,7 @@ export const checkScopes = async (req: Request, res: Response, next: NextFunctio
 export const checkScopesByQueryString = async (req: Request, res: Response, next: NextFunction) => {
   const bearerToken = req.query.token as string
   const { originalUrl, method } = req
-  if (PUBLIC_API_PATHS.some(path => originalUrl.endsWith(path))) {
+  if (PUBLIC_API_PATHS.some(path => new RegExp(path).test(originalUrl))) {
     return next()
   } else if (!bearerToken) {
     logger.error(`No bearer token is found for url: ${originalUrl}`)

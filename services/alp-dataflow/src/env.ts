@@ -8,6 +8,8 @@ export const env = {
   PORT: parseInt(process.env.DATAFLOW_MGMT__PORT) || 3000,
   APP_LOG_LEVEL: (process.env.DATAFLOW_MGMT__LOG_LEVEL as LoggingLevel) || 'info',
   ADHOC_FLOWS_SB: process.env.DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_SB_NAME || 'dataflow-adhoc-flows-sb',
+  ADHOC_DEPLOYMENT_FLOWS_BUCKET_NAME:
+    process.env.DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_S3_BUCKET_NAME || 'dataflow-adhoc-flows',
 
   MINIO_ENDPOINT: process.env.MINIO__ENDPOINT,
   MINIO_PORT: parseInt(process.env.MINIO__PORT),
