@@ -1,3 +1,4 @@
+import { PluginUploadStatus } from './common/const'
 export interface ITestDataflowDto {
   dataflow: IReactFlow
 }
@@ -210,3 +211,5 @@ export interface IFlowMetadataDto {
   datamodels?: string[]
   others?: JSON
 }
+
+export type PluginUploadStatus = (typeof PluginUploadStatus)[number]

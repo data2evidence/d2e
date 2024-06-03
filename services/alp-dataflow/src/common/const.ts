@@ -70,3 +70,7 @@ export const PrefectDeploymentPythonFiles = {
   PIP_INSTALL: 'pip_install.py',
   DEPLOYMENT: 'deployment.py'
 }
+
+export const PluginUploadStatus = ['success', 'fail', 'inprogress']
+
+export const DEFAULT_ERROR_MESSAGE = 'Error occurred. Please contact we@data4life.help for further support.'
