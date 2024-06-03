@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   test-alp-db-svc:
-    if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    # if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
     runs-on: ubuntu-latest
     env:
       # DB-SVC ENV
