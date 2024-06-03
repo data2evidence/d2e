@@ -123,7 +123,7 @@ jobs:
         name: develop branch checkout (sameBranch checkout fails)
         if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
         with:
-          repository:  ${{ vars.OVERRIDE_REPO }}
+          repository:  ${{ vars.MS_DATAMODEL_PLUGIN_REPO }}
           token: ${{ secrets.CI_PAT }}
           path: 'tmp'
           sparse-checkout: 'ms_datamodel_plugin'
