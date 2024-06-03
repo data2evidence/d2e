@@ -276,6 +276,9 @@ export class PrefectAPI {
     const { deploymentId, infrastructureDocId } = await this.getDeployment(deploymentName, flowName)
     const url = `${this.url}/deployments/${deploymentId}/create_flow_run`
 
+    if (schedule && !dayjs(schedule).isValid()) {
+      throw new BadRequestException(`Invalid schedule time`)
+    }
     if (schedule && dayjs(schedule).isBefore(dayjs())) {
       throw new BadRequestException('Schedule time must be in the future')
     }
