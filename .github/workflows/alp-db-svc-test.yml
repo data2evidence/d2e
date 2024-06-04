@@ -136,12 +136,12 @@ jobs:
         name: merge files from d2e-plugin repo
         id: merge_files_from_data-management
         run: |
-          ls -l ./services/alp-db-svc/db/hana
-          ls -l ./services/alp-db-svc/db/postgres
+          ls -l ./services/alp-db-svc/db/migrations/hana
+          ls -l ./services/alp-db-svc/db/migrations/postgres
           cp -prnl ./tmp/data-management/data_management_plugin/db/* ./services/alp-db-svc/db
           ls -l ./services/alp-db-svc/db/drivers
-          ls -l ./services/alp-db-svc/db/hana
-          ls -l ./services/alp-db-svc/db/postgres
+          ls -l ./services/alp-db-svc/db/migrations/hana
+          ls -l ./services/alp-db-svc/db/migrations/postgres
 
       # Get and merge ms-datamodel-plugin migration scripts
       - uses: actions/checkout@v4
