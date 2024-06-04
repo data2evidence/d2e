@@ -310,7 +310,6 @@ services:
       - 3001:3001
       - 3002:3002
       - 41101:41101
-      - 8103:8103
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - caddy:/data
@@ -1491,7 +1490,18 @@ services:
       timeout: 60s
     volumes:
       - dicom-sqlite-storage:/var/lib/orthanc/db
-      
+
+  alp-fhir-fe-server:
+    container_name: &c27 alp-minerva-fhir-fe-server-${BASE_PORT:-1}
+    image: alpcr.azurecr.io/alp-data-node/alp-fhir-fe-server:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c27
+    depends_on:
+    - alp-fhir-server
+    networks: 
+      alp:
+
   alp-meilisearch-post-init:
     container_name: &c27 alp-meilisearch-post-init
     depends_on:
