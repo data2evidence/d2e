@@ -40,7 +40,7 @@ export class MeilisearchAPI {
     const options = await this.createOptions();
 
     // Append source and model to index name (Naming convention must be standardised)
-    const hybridSearchUrl = `${this.url}indexes/${index}${hybridSearchName}/search`;
+    const hybridSearchUrl = `${this.url}/indexes/${index}${hybridSearchName}/search`;
     const hybridSearchData = {
       ...data,
       hybrid: {
@@ -66,10 +66,6 @@ export class MeilisearchAPI {
   ): Promise<IMeilisearchConcept> {
     const errorMessage = 'Error while getting concepts';
     try {
-      const hybridSearchName = `_${hybridSearchConfig.source.replace(
-        '/',
-        '',
-      )}_${hybridSearchConfig.model.replace('/', '')}`;
       const data = {
         q: searchText,
         page: pageNumber + 1,
@@ -84,6 +80,10 @@ export class MeilisearchAPI {
         filter: this.generateMeiliFilter(filters),
       };
       if (hybridSearchConfig.isEnabled) {
+        const hybridSearchName = `_${hybridSearchConfig.source.replace(
+          '/',
+          '',
+        )}_${hybridSearchConfig.model.replace('/', '')}`;
         const result = await this.hybridSearch(
           index,
           data,
