@@ -192,7 +192,7 @@ jobs:
         run: | 
           wget https://github.com/liquibase/liquibase/releases/download/v4.5.0/liquibase-4.5.0.tar.gz -P /tmp/drivers/
           ls -l /tmp/drivers/
-          RUN tar xvf /tmp/drivers/liquibase-4.5.0.tar.gz -C ./services/alp-db-svc/db/migrations/liquibase/
+          tar xvf /tmp/drivers/liquibase-4.5.0.tar.gz -C ./services/alp-db-svc/db/migrations/liquibase/
           ls -l ./services/alp-db-svc/db/migrations/liquibase/
 
       - shell: bash
