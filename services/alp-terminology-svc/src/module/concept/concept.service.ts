@@ -456,7 +456,6 @@ export class ConceptService {
       Array.from(conceptIds),
     );
     const nodes = nodeLevels.reduce((acc: any, current: any) => {
-      console.log(current);
       const conceptNode = concepts.find(
         (concept) => concept.conceptId == current.conceptId,
       );
