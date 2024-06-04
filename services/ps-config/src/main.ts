@@ -15,6 +15,7 @@ import appConfigEndpoint from "./psconfig/configAppEndpoint";
 import configEndpoint from "./psconfig/configEndpoint";
 import * as auth from "./authentication";
 import { GetUser } from "@alp/alp-config-utils";
+import { IDBCredentialsType } from "./types";
 const User = GetUser.User;
 const SecurityUtils = securityLib.SecurityUtils;
 const securityUtils = new SecurityUtils();
@@ -57,7 +58,18 @@ let initSettingsFromEnvVars = () => {
     credentials = xsenv.cfServiceCredentials("httptest");
     console.log("TESTSCHEMA :" + credentials.schema);
   } else {
-    credentials = xsenv.cfServiceCredentials({ tag: "config" });
+    credentials = {
+      database: env.PG__DB_NAME,
+      schema: env.PG_SCHEMA,
+      dialect: env.PG__DIALECT,
+      host: env.PG__HOST,
+      port: env.PG__PORT,
+      user: env.PG_USER,
+      password: env.PG_PASSWORD,
+      max: env.PG__MAX_POOL,
+      min: env.PG__MIN_POOL,
+      idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
+    } as IDBCredentialsType
   }
 
   if (!envVarUtils.isStageLocalDev()) {
