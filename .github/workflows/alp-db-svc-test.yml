@@ -81,9 +81,16 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
+          # Get drivers
           yarn --cwd internal get:drivers
           ls "${HANA__DRIVER_CLASS_PATH}"
           ls "${POSTGRES__DRIVER_CLASS_PATH}"
+
+          # Get synpuf1k
+          yarn --cwd internal get:op:synpuf1k
+          ls -l "${{ github.workspace }}/cache/synpuf1k"
+          cp -prnl "${{ github.workspace }}/cache/synpuf1k" ./services/alp-db-svc/db/
+          ls -l ./services/alp-db-svc/db/synpuf1k
 
       - name: 1password ratelimit end
         env:
