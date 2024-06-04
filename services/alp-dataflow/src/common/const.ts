@@ -71,8 +71,6 @@ export const PrefectDeploymentPythonFiles = {
   DEPLOYMENT: 'deployment.py'
 }
 
-// export const PluginUploadStatus = ['pending', 'complete', 'failed', 'installing']
-
 export enum PluginUploadStatus {
   PENDING = 'pending',
   COMPLETE = 'complete',

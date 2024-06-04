@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator'
+import { IsOptional, IsString } from 'class-validator'
 import { IPrefectAdhocFlowDto } from '../../types'
 
 export class PrefectAdhocFlowDto implements IPrefectAdhocFlowDto {
@@ -6,9 +6,7 @@ export class PrefectAdhocFlowDto implements IPrefectAdhocFlowDto {
   @IsString()
   url: string
 
-  @IsBoolean()
-  fromDefaultPlugin: boolean
-
+  @IsOptional()
   @IsString()
   defaultPluginId: string
 }

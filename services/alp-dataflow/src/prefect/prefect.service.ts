@@ -100,16 +100,21 @@ export class PrefectService {
     return this.prefectFlowService.getDefaultPluginById(pluginId)
   }
 
+  async getDefaultPlugins() {
+    return this.prefectFlowService.getDefaultPlugins()
+  }
+
+  // TODO: confirm if we want to deprecate and replace with polling
   async createFlowFileDeployment(userId: string, file: Express.Multer.File, adhocFlowDto: IPrefectAdhocFlowDto) {
-    const { url, fromDefaultPlugin, defaultPluginId } = adhocFlowDto
-    if (!file && !url && !fromDefaultPlugin) {
-      const errorMessage = `pip file not uploaded or git url not provided`
+    const { url, defaultPluginId } = adhocFlowDto
+    if (!file && !url && !defaultPluginId) {
+      const errorMessage = `pip file not uploaded or git url not provided or plugin id not provided`
       this.logger.error(`${errorMessage}`)
       throw new InternalServerErrorException(errorMessage)
     }
 
     let defaultDeploymentInfo
-    if (fromDefaultPlugin && defaultPluginId) {
+    if (defaultPluginId) {
       defaultDeploymentInfo = await this.prefectFlowService.getDefaultPluginById(defaultPluginId)
       if (!defaultDeploymentInfo) {
         const errorMessage = `default plugin with id ${defaultPluginId} not found`
@@ -129,7 +134,7 @@ export class PrefectService {
     let flowMetadataInput
     let newFlowMetadata
     try {
-      if (fromDefaultPlugin && defaultPluginId) {
+      if (defaultPluginId) {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.INSTALLING)
       }
       // create python virtual environment with exisiting dependencies
@@ -173,7 +178,7 @@ export class PrefectService {
       this.deleteDeploymentFolder(deploymentFolderPath)
       const errorMessage = `Error installing pip package, check if package is valid`
       this.logger.error(`${errorMessage}: ${err}`)
-      if (fromDefaultPlugin && defaultPluginId) {
+      if (defaultPluginId) {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
       }
       throw new InternalServerErrorException(errorMessage)
@@ -192,7 +197,7 @@ export class PrefectService {
         )
       )
       await this.prefectExecutionClient.executePythonPrefectModule(userId, modifiedFileStem)
-      if (fromDefaultPlugin && defaultPluginId) {
+      if (defaultPluginId) {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.COMPLETE)
       }
     } catch (err) {
@@ -200,7 +205,144 @@ export class PrefectService {
       await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
       const errorMessage = `Error creating flow with file ${fileStem}${fileType}`
       this.logger.error(`${errorMessage}: ${err}`)
-      if (fromDefaultPlugin && defaultPluginId) {
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
+      }
+      throw new InternalServerErrorException(errorMessage)
+    } finally {
+      this.deleteDeploymentFolder(deploymentFolderPath)
+    }
+  }
+
+  async triggerDefaultDeploymentsRun(userId: string) {
+    const plugins = await this.prefectFlowService.getDefaultPlugins()
+    for (const plugin of plugins) {
+      await this.triggerDeploymentRun(userId, null, { defaultPluginId: plugin.pluginId })
+    }
+  }
+  async triggerDeploymentRun(userId: string, file: Express.Multer.File, adhocFlowDto: IPrefectAdhocFlowDto) {
+    const { url, defaultPluginId } = adhocFlowDto
+    if (!file && !url && !defaultPluginId) {
+      const errorMessage = `pip file not uploaded or git url not provided or plugin id is not provided`
+      this.logger.error(`${errorMessage}`)
+      throw new InternalServerErrorException(errorMessage)
+    }
+
+    let defaultDeploymentInfo
+    if (defaultPluginId) {
+      defaultDeploymentInfo = await this.prefectFlowService.getDefaultPluginById(defaultPluginId)
+      if (!defaultDeploymentInfo) {
+        const errorMessage = `default plugin with id ${defaultPluginId} not found`
+        this.logger.error(`${errorMessage}`)
+        throw new InternalServerErrorException(errorMessage)
+      }
+      await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.PENDING)
+    }
+
+    const { deploymentFolderPath } = file
+      ? await this.processPipPackage(userId, { fileName: file.originalname })
+      : url
+      ? await this.processPipPackage(userId, { url: url })
+      : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
+    this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
+
+    // start upload asychronously
+    this.startUpload(userId, file, url, defaultDeploymentInfo, defaultPluginId)
+
+    this.logger.info(`Plugin ${defaultPluginId} upload triggered successfully`)
+    return defaultPluginId
+  }
+
+  private async startUpload(
+    userId: string,
+    file: Express.Multer.File,
+    url: string,
+    defaultDeploymentInfo,
+    defaultPluginId: string
+  ) {
+    const { deploymentFolderPath, fileStem, modifiedFileStem, fileType } = file
+      ? await this.processPipPackage(userId, { fileName: file.originalname })
+      : url
+      ? await this.processPipPackage(userId, { url: url })
+      : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
+    this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
+
+    let flowMetadataInput
+    let newFlowMetadata
+    try {
+      defaultDeploymentInfo.defaultPluginId
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.INSTALLING)
+      }
+      // create python virtual environment with exisiting dependencies
+      const dependencyScriptPath = join(deploymentFolderPath, PrefectDeploymentPythonFiles['SCRIPT'])
+      writeFileSync(dependencyScriptPath, this.prefectExecutionClient.createInstallDependenciesScript())
+      await this.prefectExecutionClient.executeCreateVirtualEnvironment(userId, modifiedFileStem)
+
+      // install pip package
+      const pipInstallPath = join(deploymentFolderPath, PrefectDeploymentPythonFiles['PIP_INSTALL'])
+      if (url) {
+        writeFileSync(pipInstallPath, this.prefectExecutionClient.createPipInstallScript(fileStem, fileType, url))
+      } else if (defaultDeploymentInfo && defaultDeploymentInfo.url) {
+        writeFileSync(
+          pipInstallPath,
+          this.prefectExecutionClient.createPipInstallScript(fileStem, fileType, defaultDeploymentInfo.url)
+        )
+      } else {
+        writeFileSync(pipInstallPath, this.prefectExecutionClient.createPipInstallScript(fileStem, fileType))
+      }
+
+      await this.prefectExecutionClient.executePipInstall(userId, modifiedFileStem)
+
+      // prepare metadata input
+      if (defaultDeploymentInfo && defaultDeploymentInfo.url) {
+        flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, defaultDeploymentInfo.url)
+      } else {
+        flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, url)
+      }
+
+      // if metadata with same flowId exists
+      const existFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+      if (existFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(existFlowMetadata.flowId)
+      }
+      newFlowMetadata = await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
+    } catch (err) {
+      if (newFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+      }
+      await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
+      this.deleteDeploymentFolder(deploymentFolderPath)
+      const errorMessage = `Error installing pip package, check if package is valid`
+      this.logger.error(`${errorMessage}: ${err}`)
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
+      }
+      throw new InternalServerErrorException(errorMessage)
+    }
+
+    try {
+      const deploymentPath = join(deploymentFolderPath, PrefectDeploymentPythonFiles['DEPLOYMENT'])
+      writeFileSync(
+        deploymentPath,
+        this.prefectExecutionClient.createDeploymentTemplate(
+          userId,
+          modifiedFileStem,
+          flowMetadataInput.name,
+          flowMetadataInput.entrypoint.replace(/\//g, '.').replace(/\.py$/, ''),
+          ...(flowMetadataInput.others.tags ? [flowMetadataInput.others.tags] : [])
+        )
+      )
+      await this.prefectExecutionClient.executePythonPrefectModule(userId, modifiedFileStem)
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.COMPLETE)
+      }
+    } catch (err) {
+      await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
+      await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+      const errorMessage = `Error creating flow with file ${fileStem}${fileType}`
+      this.logger.error(`${errorMessage}: ${err}`)
+      if (defaultPluginId) {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
       }
       throw new InternalServerErrorException(errorMessage)

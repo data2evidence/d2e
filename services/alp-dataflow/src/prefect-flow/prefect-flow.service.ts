@@ -102,6 +102,10 @@ export class PrefectFlowService {
       .getOne()
   }
 
+  async getDefaultPlugins() {
+    return await this.defaultPluginsRepo.createQueryBuilder('default_plugins').getMany()
+  }
+
   async updateDefaultPluginStatus(pluginId: string, status: string) {
     return await this.defaultPluginsRepo.update({ pluginId }, { status })
   }

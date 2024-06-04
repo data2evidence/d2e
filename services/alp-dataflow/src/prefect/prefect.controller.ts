@@ -138,12 +138,10 @@ export class PrefectController {
     return this.prefectService.createFlowFileDeployment(userId, null, adhocFlowDto)
   }
 
-  // @Post('trigger-default-deployment')
-  // triggerDeployment(@Body() adhocFlowDto: PrefectAdhocFlowDto) {
-  //   const { fromDefaultPlugin, defaultPluginId } = adhocFlowDto
-  //   try {
-  //     const defaultDeploymentInfo = await this.prefectService.getDefaultPluginById(defaultPluginId)
-
-  //   }
-  // }
+  @Post('flow/default-deployment')
+  triggerDeployment(@Req() request) {
+    const token = decode(request.headers.authorization.replace(/bearer /i, '')) as JwtPayload
+    const userId = token.sub
+    return this.prefectService.triggerDefaultDeploymentsRun(userId)
+  }
 }
