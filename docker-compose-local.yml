@@ -17,6 +17,9 @@ services:
     ports:
       - 41100:41100
       - 41000:41000
+      - 41130:41130
+    environment:
+      CADDY__FHIR_SERVER__PUBLIC_FQDN: ${CADDY__FHIR_SERVER__PUBLIC_FQDN:-localhost}
 
   alp-dataflow-gen:
     build:
@@ -57,11 +60,6 @@ services:
     environment:
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
       NODE_ENV: development
-
-  alp-fhir-server:
-    build:
-      context: ./services/alp-fhir
-      dockerfile: Dockerfile
 
   alp-logto:
     build:
@@ -251,3 +249,15 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+
+  alp-fhir-server:
+    build:
+      context: ./services/alp-fhir
+      dockerfile: Dockerfile
+
+  alp-fhir-fe-server:
+    build:
+      context: ./services/alp-fhir/
+      dockerfile: Dockerfile.frontend
+    volumes:
+    - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
