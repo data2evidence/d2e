@@ -691,49 +691,49 @@ describe("POST & PUT [MS] - API successful scenario integration test", () => {
     }
   }, 300000);
 
-  test("[Success] Create new Reporting BI schema without cleansed schema", async (done) => {
-    const msReportingBISchema = "CDMMSREPORTINGBI" + rand;
+  test("[Success] Create new APPKPI schema without cleansed schema", async (done) => {
+    const msAPPKPISchema = "CDMMSAPPKPI" + rand;
     try {
       const deleteSchemaResult =
         await helper.deleteDatabaseSchemaAndAuditPolicyPromise(tenantDatabase, [
-          msReportingBISchema,
+          msAPPKPISchema,
         ]);
       expect(deleteSchemaResult).toBe(true);
 
-      const createReportingBISchemaResponse = await api
+      const createAPPKPISchemaResponse = await api
         .post(
-          `/alpdb/hana/database/${tenantDatabase}/data-model/radiology/schema/${msReportingBISchema}/update-count/1`
+          `/alpdb/hana/database/${tenantDatabase}/data-model/radiology/schema/${msAPPKPISchema}/update-count/1`
         )
         .send({
           cleansedSchemaOption: false,
           vocabSchema: process.env.OMOP__VOCAB_SCHEMA,
         });
 
-      expect(createReportingBISchemaResponse.body).toEqual({
+      expect(createAPPKPISchemaResponse.body).toEqual({
         message: "Schema successfully created and privileges assigned!",
-        successfulSchemas: [msReportingBISchema],
+        successfulSchemas: [msAPPKPISchema],
         failedSchemas: [],
         errorOccurred: false,
       });
 
-      const updateReportingBISchemaResponse = await api
+      const updateAPPKPISchemaResponse = await api
         .put(
-          `/alpdb/hana/database/${tenantDatabase}/data-model/radiology?schema=${msReportingBISchema}`
+          `/alpdb/hana/database/${tenantDatabase}/data-model/radiology?schema=${msAPPKPISchema}`
         )
         .send({
           vocabSchema: process.env.OMOP__VOCAB_SCHEMA,
         });
 
-      expect(updateReportingBISchemaResponse.body).toEqual({
+      expect(updateAPPKPISchemaResponse.body).toEqual({
         message: "All schemas updated successfully!",
-        successfulSchemas: [`${msReportingBISchema}`],
+        successfulSchemas: [`${msAPPKPISchema}`],
         failedSchemas: [],
         errorOccurred: false,
       });
 
       helper.deleteDatabaseSchemaAndAuditPolicy(
         tenantDatabase,
-        [msReportingBISchema],
+        [msAPPKPISchema],
         (result: boolean) => {
           expect(result).toBe(true);
           done();

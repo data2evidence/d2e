@@ -41,6 +41,15 @@ https://*.alp.local:55555 {
 		}
 	}
 
+	handle /alp-fhir/* {
+		uri strip_prefix /alp-fhir
+		reverse_proxy http://alp-minerva-fhir-server-1:8103 {
+			transport http {
+				read_buffer 8192
+			}
+		}
+	}
+
 	redir / /portal
 
 	handle_path /portal* {
@@ -231,6 +240,24 @@ https://{$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3001 {
 	handle /* {
 		reverse_proxy http://alp-logto-1:3001 {
 			header_up Host {$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3001
+			transport http {
+				read_buffer 8192
+			}
+		}
+	}
+}
+
+https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
+	log {
+		format console {
+			level_format color
+		}
+	}
+
+	tls internal
+	handle /* {
+		reverse_proxy http://alp-minerva-fhir-fe-server-1:3000 {
+			header_up Host {$CADDY__FHIR_SERVER__PUBLIC_FQDN}:3000
 			transport http {
 				read_buffer 8192
 			}
