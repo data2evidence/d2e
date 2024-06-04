@@ -1,4 +1,5 @@
 import { IsOptional, IsUUID, IsString, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class ConceptFilterOptionsDto {
   @IsUUID()
@@ -17,8 +18,10 @@ export class ConceptHierarchyDto {
   datasetId: string;
 
   @IsNumber()
+  @Type(() => Number)
   conceptId: number;
 
   @IsNumber()
+  @Type(() => Number)
   depth: number;
 }
