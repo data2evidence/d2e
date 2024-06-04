@@ -34,6 +34,86 @@ export default class DefaultPluginsSeeder implements Seeder {
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
+      },
+      {
+        pluginId: uuidv4(),
+        name: 'data-management',
+        type: 'default',
+        url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=data-management',
+        status: 'pending',
+        others: {},
+        createdBy: 'system',
+        modifiedBy: 'system'
+      },
+      {
+        pluginId: uuidv4(),
+        name: 'data-quality',
+        type: 'default',
+        url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=data-quality',
+        status: 'pending',
+        others: {},
+        createdBy: 'system',
+        modifiedBy: 'system'
+      },
+      {
+        pluginId: uuidv4(),
+        name: 'dataflow-ui',
+        type: 'default',
+        url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=dataflow-ui',
+        status: 'pending',
+        others: {},
+        createdBy: 'system',
+        modifiedBy: 'system'
+      },
+      {
+        pluginId: uuidv4(),
+        name: 'duckdb',
+        type: 'default',
+        url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=duckdb',
+        status: 'pending',
+        others: {},
+        createdBy: 'system',
+        modifiedBy: 'system'
+      },
+      {
+        pluginId: uuidv4(),
+        name: 'i2b2',
+        type: 'default',
+        url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=i2b2',
+        status: 'pending',
+        others: {},
+        createdBy: 'system',
+        modifiedBy: 'system'
+      },
+      {
+        pluginId: uuidv4(),
+        name: 'meilisearch-embeddings',
+        type: 'default',
+        url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=meilisearch-embeddings',
+        status: 'pending',
+        others: {},
+        createdBy: 'system',
+        modifiedBy: 'system'
+      },
+      {
+        pluginId: uuidv4(),
+        name: 'meilisearch',
+        type: 'default',
+        url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=meilisearch',
+        status: 'pending',
+        others: {},
+        createdBy: 'system',
+        modifiedBy: 'system'
+      },
+      {
+        pluginId: uuidv4(),
+        name: 'r-cdm',
+        type: 'default',
+        url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=r-cdm',
+        status: 'pending',
+        others: {},
+        createdBy: 'system',
+        modifiedBy: 'system'
       }
     ])
     await repository.save(entities)
