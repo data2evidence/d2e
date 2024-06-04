@@ -95,6 +95,8 @@ export interface IPrefectTaskResult {
 export interface IPrefectAdhocFlowDto {
   flowName?: string
   url?: string
+  fromDefaultPlugin?: boolean
+  defaultPluginId?: string
 }
 
 export interface IPrefectFlowRunByDeploymentDto {
@@ -212,4 +214,6 @@ export interface IFlowMetadataDto {
   others?: JSON
 }
 
-export type PluginUploadStatus = (typeof PluginUploadStatus)[number]
+// export type PluginUploadStatus = (typeof PluginUploadStatus)[number]
+
+export type PluginUploadStatus = keyof typeof PluginUploadStatus

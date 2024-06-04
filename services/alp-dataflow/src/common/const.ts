@@ -71,6 +71,13 @@ export const PrefectDeploymentPythonFiles = {
   DEPLOYMENT: 'deployment.py'
 }
 
-export const PluginUploadStatus = ['success', 'fail', 'inprogress']
+// export const PluginUploadStatus = ['pending', 'complete', 'failed', 'installing']
+
+export enum PluginUploadStatus {
+  PENDING = 'pending',
+  COMPLETE = 'complete',
+  FAILED = 'failed',
+  INSTALLING = 'installing'
+}
 
 export const DEFAULT_ERROR_MESSAGE = 'Error occurred. Please contact we@data4life.help for further support.'

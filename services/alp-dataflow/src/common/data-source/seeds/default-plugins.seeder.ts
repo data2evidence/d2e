@@ -20,7 +20,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'cohort-generator',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=cohort-generator',
-        status: 'uninstalled',
+        status: 'pending',
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
@@ -30,7 +30,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'data-characterization',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=data-characterization',
-        status: 'uninstalled',
+        status: 'pending',
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
