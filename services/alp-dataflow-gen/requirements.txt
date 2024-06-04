@@ -5,4 +5,6 @@ prefect-shell==0.2.1
 pytest==7.4.4
 minio==7.2.5
 duckdb==0.10.2
+transformers>=4.34.0,<5.0.0
+torch==1.13.1
 libs/pydbsvc/dist/d2e_dbsvc-0.0.1-py3-none-any.whl

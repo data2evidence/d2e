@@ -139,7 +139,7 @@ from prefect.deployments import Deployment, run_deployment
 from prefect.filesystems import RemoteFileSystem as RFS
 
 user_block = RFS(
-  basepath="s3://dataflow-adhoc-flows/${s3Path}",
+  basepath="s3://${env.ADHOC_DEPLOYMENT_FLOWS_BUCKET_NAME}/${s3Path}",
   settings={
       "key": "${env.MINIO_ACCESS_KEY}",
       "secret": "${env.MINIO_SECRET_KEY}",
