@@ -9,7 +9,7 @@ ENV PUPPETEER_SKIP_DOWNLOAD=true
 ### Install toolchain ###
 RUN npm add --location=global pnpm@^8.0.0
 # https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md#node-gyp-alpine
-RUN apk add --no-cache python3 make g++ rsync py3-setuptools git
+RUN apk add --no-cache python3=3.12.3-r1 make g++ rsync py3-setuptools git
 
 ## Git clone
 RUN git clone --branch v1.14.0 https://github.com/logto-io/logto.git /etc/logto
