@@ -61,6 +61,10 @@ export class PrefectService {
     return this.prefectApi.getTaskRunLogs(id)
   }
 
+  async getTaskRunState(id: string) {
+    return this.prefectApi.getTaskRunState(id)
+  }
+
   async createFlowRun(id: string) {
     const revision = await this.dataflowService.getLastDataflowRevision(id)
     const prefectParams = this.prefectParamsTransformer.transform(revision.flow)
@@ -221,12 +225,13 @@ export class PrefectService {
   }
 
   async getFlowRunState(id: string) {
-    const flowRun = await this.prefectApi.getFlowRun(id)
-    return {
-      id,
-      type: flowRun.state.type,
-      message: flowRun.state.message
-    }
+    const flowRunState = await this.prefectApi.getFlowRunState(id)
+    return flowRunState
+  }
+
+  async getRunsForFlowRun(id: string) {
+    const runs = await this.prefectApi.getRunsForFlowRun(id)
+    return runs
   }
 
   async createFlowRunByMetadata(metadata: IPrefectFlowRunByMetadataDto) {
