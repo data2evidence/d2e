@@ -179,9 +179,12 @@ jobs:
         name: merge files from ms-datamodel-plugin repo
         id: merge_files_from_ms_datamodel_plugin
         run: |
-          ls -l tmp/ms_datamodel_plugin
-          cp -prnl ./tmp/ms_datamodel_plugin/* ./services/alp-db-svc
+          ls -l ./services/alp-db-svc/db/migrations/hana
+          ls -l ./services/alp-db-svc/db/migrations/postgres
+          cp -prnl ./tmp/ms_datamodel_plugin/db/* ./services/alp-db-svc/db
           ls -l ./services/alp-db-svc/db/drivers
+          ls -l ./services/alp-db-svc/db/migrations/hana
+          ls -l ./services/alp-db-svc/db/migrations/postgres
 
       - shell: bash
         # Give an id to the step, so we can reference it later
