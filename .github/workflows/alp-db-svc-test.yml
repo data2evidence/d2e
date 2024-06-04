@@ -88,7 +88,6 @@ jobs:
 
           # Get synpuf1k
           yarn --cwd internal get:op:synpuf1k
-          ls -l "${{ github.workspace }}/cache/synpuf1k"
           cp -prnl "${{ github.workspace }}/cache/synpuf1k" ./services/alp-db-svc/db/
           ls -l ./services/alp-db-svc/db/synpuf1k
 
