@@ -108,7 +108,7 @@ export class PrefectService {
 
   async getDefaultPluginsStatus() {
     const plugins = await this.prefectFlowService.getDefaultPlugins()
-    let statusDetails: IPluginUploadStatusDetail[] = []
+    const statusDetails: IPluginUploadStatusDetail[] = []
     let noActiveInstallations = true
     for (const plugin of plugins) {
       if (plugin.status === PluginUploadStatus.INSTALLING) {
