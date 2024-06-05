@@ -110,6 +110,10 @@ jobs:
             # Build DataNode services and pull dataflow-gen from cache
             yarn build:minerva alp-dataflow-gen alp-dataflow-gen-agent alp-dataflow-gen-init alp-minerva-analytics-svc alp-minerva-sqleditor alp-query-gen alp-fhir-server alp-fhir-fe-server  --builder ${{ steps.builder1.outputs.name }}
 
+      - name: Builder cache cleanup
+        run: |  
+          docker builder prune -af
+
       - uses: docker/setup-buildx-action@v3
         id: builder2
         with:
