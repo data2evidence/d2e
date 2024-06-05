@@ -50,6 +50,22 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: false
+        
+        # all of these default to true, but feel free to set to
+        # "false" if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: false
+        docker-images: false
+        swap-storage: true
+
     - id: setup
       run: |
         echo repo_full_name="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
@@ -83,10 +99,6 @@ jobs:
             directory: ./services/bookmark-svc
             context: .
             fileName: Dockerfile
-          - name: alp-data-node/alp-db-svc
-            directory: ./services/alp-db-svc
-            context: .
-            fileName: Dockerfile
           - name: alp-data-node/alp-usermgmt
             directory: ./services/alp-usermgmt
             context: ./services/alp-usermgmt
@@ -99,12 +111,10 @@ jobs:
             directory: ./services/alp-portal-server
             context: ./services/alp-portal-server
             fileName: Dockerfile
-            platforms: linux/amd64
           - name: alp-data-node/alp-dataflow
             directory: ./services/alp-dataflow
             context: ./services/alp-dataflow
             fileName: Dockerfile
-            platforms: linux/amd64
           - name: alp-data-node/alp-pg-mgmt-init
             directory: ./services/alp-pg-management
             context: ./services/alp-pg-management
@@ -117,12 +127,10 @@ jobs:
             directory: ./services/alp-terminology-svc
             context: .
             fileName: Dockerfile
-            platforms: linux/amd64
           - name: alp-data-node/alp-dataflow-gen
             directory: ./services/alp-dataflow-gen
             context: .
             fileName: Dockerfile
-            platforms: linux/amd64
             pull: true
           - name: alp-data-node/alp-sqleditor
             directory: ./services/alp-sqleditor
@@ -185,15 +193,13 @@ jobs:
               echo "is_push=false" | tee -a $GITHUB_OUTPUT
               echo "tag_name=$(echo ${{ github.sha }} | cut -c1-8)" | tee -a $GITHUB_OUTPUT
           fi
-          
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+
   
-    - uses: docker/setup-buildx-action@v3.2.0
+    - uses: docker/setup-buildx-action@v3
       id: builder
 
     - name: Build and push
-      uses: docker/build-push-action@v5.3.0
+      uses: docker/build-push-action@v5
       with:
         builder: ${{ steps.builder.outputs.name }}
         platforms: 'linux/amd64'
