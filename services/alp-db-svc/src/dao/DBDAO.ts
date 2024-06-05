@@ -195,14 +195,18 @@ class DBDAO {
                 `Successfully retrieved list of changelog filepaths from ${datamodelSchemaMapping.schemaName} schema`
               );
 
-              let latestChangelogFilepath =
-                this.dialect === config.DB.HANA
-                  ? result[0].FILENAME
-                  : result[0].filename;
+              let currentVersionID: string;
+              if (result.length === 0) {
+                // If there are no records in databasechangelog table, set current version as Not Available
+                currentVersionID = "Not Available";
+              } else {
+                const latestChangelogFilepath =
+                  this.dialect === config.DB.HANA
+                    ? result[0].FILENAME
+                    : result[0].filename;
 
-              let currentVersionID: string = config.getVersionID(
-                latestChangelogFilepath
-              );
+                currentVersionID = config.getVersionID(latestChangelogFilepath);
+              }
 
               resolve({
                 schemaName: datamodelSchemaMapping.schemaName,
