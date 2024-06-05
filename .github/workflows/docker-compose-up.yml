@@ -103,10 +103,10 @@ jobs:
       - uses: docker/setup-buildx-action@v3
         id: builder
 
-      - name: Docker compose build minerva dataflow-gen
-        run: |
-          # Build DataNode dataflow-gen
-          yarn build:minerva alp-dataflow-gen alp-dataflow-gen-init alp-dataflow-gen-agent --builder ${{ steps.builder.outputs.name }}
+      # - name: Docker compose build minerva dataflow-gen
+      #   run: |
+      #     # Build DataNode dataflow-gen
+      #     yarn build:minerva alp-dataflow-gen alp-dataflow-gen-init alp-dataflow-gen-agent --builder ${{ steps.builder.outputs.name }}
 
       - name: Docker compose build minerva
         run: |
