@@ -2,12 +2,10 @@ from prefect import flow
 from prefect.task_runners import SequentialTaskRunner
 from flows.dataflow.flow import exec_flow as execute_dataflow
 from flows.alp_db_svc.flow import run_alp_db_svc, run_seed_postgres
-from flows.meilisearch.flow import execute_add_index_flow
 from flows.strategus.flow import execute_strategus
 from flows.portal_server.flow import update_dataset_attributes
 from utils.types import (
     AlpDBSvcOptionsType,
-    meilisearchAddIndexType,
     datasetAttributesType
 )
 
