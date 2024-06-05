@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   test-alp-db-svc:
-    # if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
     runs-on: ubuntu-latest
     env:
       # DB-SVC ENV
@@ -142,8 +142,6 @@ jobs:
         name: merge files from d2e-plugin repo
         id: merge_files_from_data-management
         run: |
-          ls -l ./services/alp-db-svc/db/migrations/hana
-          ls -l ./services/alp-db-svc/db/migrations/postgres
           cp -prnl ./tmp/data-management/data_management_plugin/db/* ./services/alp-db-svc/db
           ls -l ./services/alp-db-svc/db/drivers
           ls -l ./services/alp-db-svc/db/migrations/hana
@@ -185,14 +183,10 @@ jobs:
         name: merge files from ms-datamodel-plugin repo
         id: merge_files_from_ms_datamodel_plugin
         run: |
-          ls -l ./services/alp-db-svc/db/migrations/hana
-          ls -l ./services/alp-db-svc/db/migrations/postgres
           cp -prnl ./tmp/ms_datamodel_plugin/db/* ./services/alp-db-svc/db
           ls -l ./services/alp-db-svc/db/drivers
           ls -l ./services/alp-db-svc/db/migrations/hana
           ls -l ./services/alp-db-svc/db/migrations/postgres
-
-          ls -l ./services/alp-db-svc/db/migrations/hana/changesets/omop
 
       # Download liquibase driver
       - shell: bash
