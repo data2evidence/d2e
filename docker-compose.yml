@@ -9,6 +9,7 @@ volumes:
   meilisearch-minerva-data-1:
   minio-data-1:
   pg-minerva-data-1:
+  dicom-sqlite-storage:
 
 x-envs:
   db-svc: &x-dbsvc
@@ -48,6 +49,8 @@ x-envs:
     PG__MAX_POOL: 10
     PG__MIN_POOL: 0
     PG__PORT: ${PG_PORT:-5432}
+    PG__IDLE_TIMEOUT_IN_MS: 300000
+    PG__DIALECT: postgresql
   plugins: &x-plugins |
     {
       "researcher": [
@@ -70,6 +73,16 @@ x-envs:
             "RESEARCHER"
           ],
           "route": "cohort"
+        },
+        { 
+          "enabled": true,
+          "featureFlag": "cohorts",
+          "name": "Cohorts", 
+          "pluginPath": "plugins/Researcher/Cohort/module",
+          "requiredRoles": [ 
+            "RESEARCHER" 
+          ], 
+          "route": "cohorts"
         },
         {
           "enabled": true,
@@ -278,43 +291,15 @@ services:
     environment:
       <<:
         - *x-tls
+        - *x-pg
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PG_ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
       PG_ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG_DB_NAME: ${PG_DB_NAME:-alp}
-      PG_DEBUG: false
-      PG_HOST: ${PG_HOST:-alp-minerva-postgres-1}
-      PG_IDLE_TIMEOUT_IN_MS: 30000
-      PG_MAX_POOL: 5
-      PG_MIN_POOL: 1
       PG_PASSWORD: ${PG_WRITE_PASSWORD}
-      PG_PORT: ${PG_PORT:-5432}
       PG_SCHEMA: qe_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       PORT: 41110
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "database": "${PG_DB_NAME:-alp}",
-            "dialect": "postgresql",
-            "host": "${PG_HOST:-alp-minerva-postgres-1}",
-            "idleTimeoutMillis": 300000,
-            "max": 50,
-            "password": "${PG_WRITE_PASSWORD}",
-            "port": "${PG_PORT:-5432}",
-            "schema": "qe_config",
-            "user": "${PG_WRITE_USER:-alp_pg_write_user}"
-           },
-           "name": "postgres-mridb",
-           "tags": [
-            "config"
-           ]
-          }
-         ]
-        }
       isTestEnv: ${isTestEnv}
       sqlOnly: false
   alp-caddy:
@@ -335,7 +320,6 @@ services:
       - 3001:3001
       - 3002:3002
       - 41101:41101
-      - 8103:8103
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - caddy:/data
@@ -350,6 +334,8 @@ services:
       - sh
       - ./startprefectserver.sh
     container_name: &c2 alp-dataflow-gen-${BASE_PORT:-1}
+    ports:
+      - 41${BASE_PORT:-1}20:41${BASE_PORT:-1}20
     depends_on:
       alp-db-credentials-mgr:
         condition: service_healthy
@@ -722,18 +708,10 @@ services:
         - *x-converter
         - *x-routes
         - *x-tls
-      CONFIG_CONNECTION: |-
-        {
-         "database": "${PG_DB_NAME:-alp}",
-         "dialect": "postgresql",
-         "host": "${PG_HOST:-alp-minerva-postgres-1}",
-         "idleTimeoutMillis": 300000,
-         "max": 50,
-         "password": "${PG_WRITE_PASSWORD}",
-         "port": "${PG_PORT:-5432}",
-         "schema": "cdw_config",
-         "user": "${PG_WRITE_USER:-alp_pg_write_user}"
-        }
+        - *x-pg
+      PG_PASSWORD: ${PG_WRITE_PASSWORD}
+      PG_SCHEMA: cdw_config
+      PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41114
@@ -947,29 +925,10 @@ services:
     environment:
       <<:
         - *x-tls
-      LOCAL_DEBUG: "false"
-      NODE_ENV: development
-      PORT: 41113
+        - *x-pg
       VCAP_SERVICES: |-
         {
          "mridb": [
-          {
-           "credentials": {
-            "database": "${PG_DB_NAME:-alp}",
-            "dialect": "postgresql",
-            "host": "${PG_HOST:-alp-minerva-postgres-1}",
-            "idleTimeoutMillis": 300000,
-            "max": 50,
-            "password": "${PG_WRITE_PASSWORD}",
-            "port": "${PG_PORT:-5432}",
-            "schema": "cdw_config",
-            "user": "${PG_WRITE_USER:-alp_pg_write_user}"
-           },
-           "name": "postgres-mridb",
-           "tags": [
-            "config"
-           ]
-          },
           {
            "credentials": {
             "databaseName": "ALPDEV",
@@ -992,6 +951,12 @@ services:
           }
          ]
         }
+      LOCAL_DEBUG: "false"
+      NODE_ENV: development
+      PORT: 41113
+      PG_PASSWORD: ${PG_WRITE_PASSWORD}
+      PG_SCHEMA: cdw_config
+      PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       __MRI_SAC_EXTENSION: ENABLED
       isTestEnv: ${isTestEnv}
 
@@ -1181,29 +1146,10 @@ services:
     environment:
       <<:
         - *x-tls
-      LOCAL_DEBUG: "false"
-      NODE_ENV: development
-      PORT: 41115
+        - *x-pg
       VCAP_SERVICES: |-
         {
          "mridb": [
-          {
-           "credentials": {
-            "database": "${PG_DB_NAME:-alp}",
-            "dialect": "postgresql",
-            "host": "${PG_HOST:-alp-minerva-postgres-1}",
-            "idleTimeoutMillis": 300000,
-            "max": 50,
-            "password": "${PG_WRITE_PASSWORD}",
-            "port": "${PG_PORT:-5432}",
-            "schema": "cdw_config",
-            "user": "${PG_WRITE_USER:-alp_pg_write_user}"
-           },
-           "name": "postgres-mridb",
-           "tags": [
-            "config"
-           ]
-          },
           {
            "credentials": {
             "databaseName": "ALPDEV",
@@ -1226,6 +1172,12 @@ services:
           }
          ]
         }
+      LOCAL_DEBUG: "false"
+      NODE_ENV: development
+      PORT: 41115
+      PG_PASSWORD: ${PG_WRITE_PASSWORD}
+      PG_SCHEMA: cdw_config
+      PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       __MRI_SAC_EXTENSION: ENABLED
       isTestEnv: false
 
@@ -1341,17 +1293,14 @@ services:
         - *x-converter
         - *x-tls
         - *x-routes
+        - *x-pg
       FHIR_TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}11
       LOCAL_DEBUG: "false"
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
       NODE_ENV: development
-      PG_DATABASE: ${PG_DB_NAME:-alp}
-      PG_HOST: ${PG_HOST:-alp-minerva-postgres-1}
       PG_MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
       PG_MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG_MAX_POOL: "10"
       PG_PASSWORD: ${PG_WRITE_PASSWORD}
-      PG_PORT: ${PG_PORT:-5432}
       PG_SCHEMA: terminology
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       TERMINOLOGY_SVC__LOG_LEVEL: info
@@ -1437,6 +1386,7 @@ services:
     entrypoint: |
       /bin/sh -c " /usr/bin/mc config host add myminio http://alp-minerva-s3:9000 ${MINIO__ACCESS_KEY:-root} ${MINIO__SECRET_KEY};
       /usr/bin/mc mb -p myminio/dataflow-adhoc-flows;
+      /usr/bin/mc mb -p myminio/dicom-images;
       /usr/bin/mc policy download myminio/dataflow-adhoc-flows;
       exit 0;
       "
@@ -1459,16 +1409,11 @@ services:
     environment:
       <<:
         - *x-tls
+        - *x-pg
       NODE_ENV: development
       PG_ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
       PG_ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG_DATABASE: ${PG_DB_NAME:-alp}
-      PG_DEBUG: ${PG_DEBUG:-1}
-      PG_HOST: ${PG_HOST:-alp-minerva-postgres-1}
-      PG_MAX_POOL: 5
-      PG_MIN_POOL: 1
       PG_PASSWORD: ${PG_WRITE_PASSWORD}
-      PG_PORT: ${PG_PORT:-5432}
       PG_SCHEMA: cdw_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
 
@@ -1524,16 +1469,59 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+  alp-dicom-server:
+    # uses 8042 port on the container
+    image: orthancteam/orthanc
+    container_name: &c27 alp-dicom-server-${BASE_PORT:-1}
+    depends_on:
+      alp-minio-post-init:
+        condition: service_completed_successfully
+    logging:
+      options:
+        tag: *c27
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    networks:
+      alp:
+    environment:
+      VERBOSE_ENABLED: true
+      VERBOSE_STARTUP: true
+      ORTHANC__NAME: D2E Dicom Service
+      ORTHANC__AWS_S3_STORAGE__BUCKET_NAME: dicom-images
+      ORTHANC__AWS_S3_STORAGE__ENDPOINT: http://${MINIO__ENDPOINT:-alp-minerva-s3}:${MINIO__PORT:-9000}
+      ORTHANC__AWS_S3_STORAGE__ACCESS_KEY: ${MINIO__ACCESS_KEY:-root}
+      ORTHANC__AWS_S3_STORAGE__SECRET_KEY: ${MINIO__SECRET_KEY}
+      ORTHANC__AWS_S3_STORAGE__VIRTUAL_ADDRESSING: false
+      ORTHANC__AWS_S3_STORAGE__REGION: ${MINIO__REGION:-ap-southeast-1}
+      ORTHANC__AUTHENTICATION_ENABLED: false
+    healthcheck:
+      test: ["CMD-SHELL", "/probes/test-aliveness.py --user=healthcheck --pwd=${DICOM__HEALTH_CHECK_PASSWORD}"]
+      start_period: 10s
+      interval: 20s
+      retries: 20
+      timeout: 60s
+    volumes:
+      - dicom-sqlite-storage:/var/lib/orthanc/db
+
+  alp-fhir-fe-server:
+    container_name: &c28 alp-minerva-fhir-fe-server-${BASE_PORT:-1}
+    image: alpcr.azurecr.io/alp-data-node/alp-fhir-fe-server:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c28
+    depends_on:
+    - alp-fhir-server
+    networks: 
+      alp:
 
   alp-meilisearch-post-init:
-    container_name: &c27 alp-meilisearch-post-init
+    container_name: &c29 alp-meilisearch-post-init
     depends_on:
       alp-minerva-meilisearch-svc:
         condition: service_healthy
     image: getmeili/meilisearch:v1.6
     logging:
       options:
-        tag: *c27
+        tag: *c29
     entrypoint:
       - curl
       - -X
