@@ -41,6 +41,16 @@ https://*.alp.local:55555 {
 		}
 	}
 
+	handle /dicom/* {
+		uri strip_prefix /dicom
+		reverse_proxy http://alp-dicom-server:8042 {
+			transport http {
+				read_buffer 8192
+			}
+		}
+	}
+
+
 	handle /alp-fhir/* {
 		uri strip_prefix /alp-fhir
 		reverse_proxy http://alp-minerva-fhir-server-1:8103 {
