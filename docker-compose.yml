@@ -9,6 +9,7 @@ volumes:
   meilisearch-minerva-data-1:
   minio-data-1:
   pg-minerva-data-1:
+  dicom-sqlite-storage:
 
 x-envs:
   db-svc: &x-dbsvc
@@ -72,6 +73,16 @@ x-envs:
             "RESEARCHER"
           ],
           "route": "cohort"
+        },
+        { 
+          "enabled": true,
+          "featureFlag": "cohorts",
+          "name": "Cohorts", 
+          "pluginPath": "plugins/Researcher/Cohort/module",
+          "requiredRoles": [ 
+            "RESEARCHER" 
+          ], 
+          "route": "cohorts"
         },
         {
           "enabled": true,
@@ -1373,6 +1384,7 @@ services:
     entrypoint: |
       /bin/sh -c " /usr/bin/mc config host add myminio http://alp-minerva-s3:9000 ${MINIO__ACCESS_KEY:-root} ${MINIO__SECRET_KEY};
       /usr/bin/mc mb -p myminio/dataflow-adhoc-flows;
+      /usr/bin/mc mb -p myminio/dicom-images;
       /usr/bin/mc policy download myminio/dataflow-adhoc-flows;
       exit 0;
       "
@@ -1455,6 +1467,39 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+
+ alp-dicom-server:
+    # uses 8042 port on the container
+    image: orthancteam/orthanc
+    container_name: &c27 alp-dicom-server-${BASE_PORT:-1}
+    depends_on:
+      alp-minio-post-init:
+        condition: service_completed_successfully
+    logging:
+      options:
+        tag: *c27
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    networks:
+      alp:
+    environment:
+      VERBOSE_ENABLED: true
+      VERBOSE_STARTUP: true
+      ORTHANC__NAME: D2E Dicom Service
+      ORTHANC__AWS_S3_STORAGE__BUCKET_NAME: dicom-images
+      ORTHANC__AWS_S3_STORAGE__ENDPOINT: http://${MINIO__ENDPOINT:-alp-minerva-s3}:${MINIO__PORT:-9000}
+      ORTHANC__AWS_S3_STORAGE__ACCESS_KEY: ${MINIO__ACCESS_KEY:-root}
+      ORTHANC__AWS_S3_STORAGE__SECRET_KEY: ${MINIO__SECRET_KEY}
+      ORTHANC__AWS_S3_STORAGE__VIRTUAL_ADDRESSING: false
+      ORTHANC__AWS_S3_STORAGE__REGION: ${MINIO__REGION:-ap-southeast-1}
+      ORTHANC__AUTHENTICATION_ENABLED: false
+    healthcheck:
+      test: ["CMD-SHELL", "/probes/test-aliveness.py --user=healthcheck --pwd=${DICOM__HEALTH_CHECK_PASSWORD}"]
+      start_period: 10s
+      interval: 20s
+      retries: 20
+      timeout: 60s
+    volumes:
+      - dicom-sqlite-storage:/var/lib/orthanc/db
 
   alp-fhir-fe-server:
     container_name: &c27 alp-minerva-fhir-fe-server-${BASE_PORT:-1}
