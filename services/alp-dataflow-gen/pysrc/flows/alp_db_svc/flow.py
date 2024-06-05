@@ -1,18 +1,24 @@
 from prefect import flow, task, get_run_logger
-from dao.DBDao import DBDao
 from prefect_shell import ShellOperation
 import json
 import os
 import site
-from alpconnection.dbutils import get_db_svc_endpoint_dialect, POSTGRES_DIALECT_OPTIONS
+
+from dao.DBDao import DBDao
+from dao.UserDao import UserDao
+
+from alpconnection.dbutils import get_db_svc_endpoint_dialect, POSTGRES_DIALECT_OPTIONS, extract_db_credentials
 from utils.types import (PG_TENANT_USERS, AlpDBSvcOptionsType,
-                         requestType, internalPluginType,
-                         createDataModelType, updateDataModelType,
-                         createSnapshotType,
-                         rollbackTagType, rollbackCountType,
-                         questionnaireDefinitionType, questionnaireResponseType, DATABASE_DIALECTS)
+                         requestType, internalPluginType, DatabaseDialects)
+
 from flows.alp_db_svc.datamart.main import create_datamart
 from flows.alp_db_svc.datamart.types import DATAMART_ACTIONS, CreateDatamartType, TempCreateDataModelType
+
+from flows.alp_db_svc.types import (
+    CreateDataModelType, UpdateDataModelType,
+    createSnapshotType, questionnaireDefinitionType, questionnaireResponseType
+)
+
 MODULE_DIR = site.getsitepackages()[0]
 
 
@@ -133,7 +139,7 @@ def _get_db_dialect(options):
 
 
 @task
-async def create_datamodel(options: createDataModelType):
+async def create_datamodel(options: CreateDataModelType):
     database_code = options.database_code
     data_model = options.data_model
     schema_name = options.schema_name
@@ -144,11 +150,17 @@ async def create_datamodel(options: createDataModelType):
         "cleansedSchemaOption": options.cleansed_schema_option,
         "vocabSchema": options.vocab_schema}
 
+    changelog_filepath = options.changelog_filepath_list.get(
+        data_model, "")
+
     try:
         db_dialect = _get_db_dialect(options)
 
+        # request_body = _db_svc_flowrun_params(
+        #    request_body, db_dialect, options.flow_name, options.changelog_filepath)
+
         request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
+            request_body, db_dialect, options.flow_name, changelog_filepath)
 
         if update_count == 0:
             request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schema/{schema_name}"
@@ -161,7 +173,7 @@ async def create_datamodel(options: createDataModelType):
 
 
 @task
-async def update_datamodel(options: updateDataModelType):
+async def update_datamodel(options: UpdateDataModelType):
     database_code = options.database_code
     data_model = options.data_model
     schema_name = options.schema_name
@@ -169,11 +181,14 @@ async def update_datamodel(options: updateDataModelType):
     request_type = requestType.PUT
     request_body = {"vocabSchema": options.vocab_schema}
 
+    changelog_filepath = options.changelog_filepath_list.get(
+        data_model, "")
+
     try:
         db_dialect = _get_db_dialect(options)
 
         request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
+            request_body, db_dialect, options.flow_name, changelog_filepath)
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}?schema={schema_name}"
 
@@ -182,7 +197,7 @@ async def update_datamodel(options: updateDataModelType):
         raise e
 
 
-def _parse_create_datamart_options(options: createSnapshotType, dialect : str, datamart_action_type: str, ) -> CreateDatamartType:
+def _parse_create_datamart_options(options: createSnapshotType, dialect: str, datamart_action_type: str, ) -> CreateDatamartType:
     return CreateDatamartType(
         target_schema=options.schema_name,
         source_schema=options.source_schema,
@@ -196,7 +211,7 @@ def _parse_create_datamart_options(options: createSnapshotType, dialect : str, d
     )
 
 
-def _parse_temp_create_datamodel_options(options: createSnapshotType, dialect : str) -> TempCreateDataModelType:
+def _parse_temp_create_datamodel_options(options: createSnapshotType, dialect: str) -> TempCreateDataModelType:
     return TempCreateDataModelType(
         dialect=dialect,
         changelog_filepath=options.changelog_filepath,
@@ -227,9 +242,9 @@ async def create_snapshot(options: createSnapshotType):
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schemasnapshot/{schema_name}?source_schema={source_schema}"
 
-        if db_dialect == DATABASE_DIALECTS.HANA:
+        if db_dialect == DatabaseDialects.HANA:
             await _run_db_svc_shell_command(request_type, request_url, request_body)
-        # TODO: After unifying envConverter postgres dialect value, to use DATABASE_DIALECTS.POSTGRES instead of POSTGRES_DIALECT_OPTIONS
+        # TODO: After unifying envConverter postgres dialect value, to use DatabaseDialects.POSTGRES instead of POSTGRES_DIALECT_OPTIONS
         # elif db_dialect == DATABASE_DIALECTS.POSTGRES:
         elif db_dialect in POSTGRES_DIALECT_OPTIONS:
             create_datamart_options = _parse_create_datamart_options(
@@ -237,7 +252,7 @@ async def create_snapshot(options: createSnapshotType):
             temp_create_data_model_options = _parse_temp_create_datamodel_options(
                 options, db_dialect)
             await create_datamart(options=create_datamart_options,
-                            temp_create_data_model_options=temp_create_data_model_options)
+                                  temp_create_data_model_options=temp_create_data_model_options)
         else:
             raise Exception(
                 f"Input dialect: {db_dialect} is not supported")
@@ -267,9 +282,9 @@ async def create_parquet_snapshot(options: createSnapshotType):
 
         request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schemasnapshotparquet/{schema_name}?sourceschema={source_schema}"
 
-        if db_dialect == DATABASE_DIALECTS.HANA:
+        if db_dialect == DatabaseDialects.HANA:
             await _run_db_svc_shell_command(request_type, request_url, request_body)
-        # TODO: After unifying envConverter postgres dialect value, to use DATABASE_DIALECTS.POSTGRES instead of POSTGRES_DIALECT_OPTIONS
+        # TODO: After unifying envConverter postgres dialect value, to use DatabaseDialects.POSTGRES instead of POSTGRES_DIALECT_OPTIONS
         # elif db_dialect == DATABASE_DIALECTS.POSTGRES:
         elif db_dialect in POSTGRES_DIALECT_OPTIONS:
             create_datamart_options = _parse_create_datamart_options(
@@ -277,56 +292,10 @@ async def create_parquet_snapshot(options: createSnapshotType):
             temp_create_data_model_options = _parse_temp_create_datamodel_options(
                 options, db_dialect)
             await create_datamart(options=create_datamart_options,
-                            temp_create_data_model_options=temp_create_data_model_options)
+                                  temp_create_data_model_options=temp_create_data_model_options)
         else:
             raise Exception(
                 f"Input dialect: {db_dialect} is not supported")
-    except Exception as e:
-        raise e
-
-
-@task
-async def rollback_tag(options: rollbackTagType):
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    rollback_tag = options.rollback_tag
-
-    request_type = requestType.DELETE
-    request_body = {}
-
-    try:
-        db_dialect = _get_db_dialect(options)
-
-        request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
-
-        request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/tag/{rollback_tag}?schema={schema_name}"
-
-        await _run_db_svc_shell_command(request_type, request_url, request_body)
-    except Exception as e:
-        raise e
-
-
-@task
-async def rollback_count(options: rollbackCountType):
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    rollback_count = options.rollback_count
-
-    request_type = requestType.DELETE
-    request_body = {}
-
-    try:
-        db_dialect = _get_db_dialect(options)
-
-        request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
-
-        request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/count/{rollback_count}/?schema={schema_name}"
-
-        await _run_db_svc_shell_command(request_type, request_url, request_body)
     except Exception as e:
         raise e
 

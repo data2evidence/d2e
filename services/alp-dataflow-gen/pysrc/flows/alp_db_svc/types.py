@@ -1,0 +1,110 @@
+from pydantic import BaseModel, Field, UUID4
+from typing import List, Dict, Optional
+from enum import Enum
+
+from flows.alp_db_svc.datamart.types import SnapshotCopyConfig
+
+
+class LiquibaseAction(str, Enum):
+    UPDATE = "update"  # Create and update schema
+    UPDATECOUNT = "updateCount"  # Create schema with count
+    STATUS = "status"  # Get Version Info
+    ROLLBACK_COUNT = "rollbackCount"  # Rollback on n changesets
+    ROLLBACK_TAG = "rollback"  # Rollback on tag
+
+
+class DataModelBase(BaseModel):
+    database_code: str = Field(...)
+    data_model: str = Field(...)
+    schema_name: str = Optional[str]
+    dialect: str = Field(...)
+    flow_name: str = Field(...)
+    changelog_filepath: Optional[str]
+    changelog_filepath_list: Dict
+
+
+class CreateUpdateDataModelType(DataModelBase):
+    cleansed_schema_option: bool = Field(default=False)
+    vocab_schema: str = Field(...)
+    update_count: int = Field(default=0)
+
+
+class CreateDataModelType(DataModelBase):
+    cleansed_schema_option: bool = Field(default=False)
+    vocab_schema: str = Field(...)
+    update_count: int = Field(default=0)
+
+
+class UpdateDataModelType(DataModelBase):
+    vocab_schema: str = Field(...)
+
+
+class RollbackCountType(DataModelBase):
+    vocab_schema: str = Field(...)
+    rollback_count: int = Field(...)
+
+
+class RollbackTagType(DataModelBase):
+    vocab_schema: str = Field(...)
+    rollback_tag: str = Field(...)
+
+
+class createSnapshotType(DataModelBase):
+    source_schema: str
+    vocab_schema: str
+    snapshot_copy_config: SnapshotCopyConfig
+
+
+class questionnaireDefinitionType(DataModelBase):
+    questionnaire_definition: Dict
+
+
+class questionnaireResponseType(DataModelBase):
+    questionnaire_id: str
+
+
+class GetVersionInfoType(BaseModel):
+    token: str
+    flow_name: str = Field(...)
+    changelog_filepath: Optional[str]
+    changelog_filepath_list: Dict
+
+
+class EntityCountDistributionType(BaseModel):
+    OBSERVATION_PERIOD_COUNT: str
+    DEATH_COUNT: str
+    VISIT_OCCURRENCE_COUNT: str
+    VISIT_DETAIL_COUNT: str
+    CONDITION_OCCURRENCE_COUNT: str
+    DRUG_EXPOSURE_COUNT: str
+    PROCEDURE_OCCURRENCE_COUNT: str
+    DEVICE_EXPOSURE_COUNT: str
+    MEASUREMENT_COUNT: str
+    OBSERVATION_COUNT: str
+    NOTE_COUNT: str
+    EPISODE_COUNT: str
+    SPECIMEN_COUNT: str
+
+
+class PortalDatasetType(BaseModel):
+    id: UUID4 = Field(...)
+    databaseName: str = Field(...)
+    databaseCode: str = Field(...)
+    schemaName: str = Field(...)
+    visibilityStatus: Optional[str]
+    vocabSchemaName: Optional[str]
+    dialect: Optional[str]
+    type: Optional[str]
+    dataModel: Optional[str]
+    paConfigId: Optional[UUID4]
+    dashboards: Optional[List]
+    tags: Optional[List]
+    attributes: Optional[List]
+    tenant: Optional[Dict]
+    tokenStudyCode: Optional[str]
+    studyDetail: Optional[Dict]
+
+
+class ExtractDatasetSchemaType(BaseModel):
+    datasets_with_schema: List[PortalDatasetType]
+    datasets_without_schema: List[PortalDatasetType]

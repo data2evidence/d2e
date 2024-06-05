@@ -39,7 +39,6 @@ def GetDBConnection(database_code: str, user_type: str):
             case PG_TENANT_USERS.READ_USER:
                 databaseUser = conn_details["readUser"]
                 databasePassword = conn_details["readPassword"]
-
         host = conn_details["host"]
         port = conn_details["port"]
         conn_string = _CreateConnectionString(
@@ -166,7 +165,19 @@ class DatabaseCredentials:
         values["host"] = self.values["host"]
         values["port"] = self.values["port"]
         values["encrypt"] = self.get_encrypt()
-        values["validateCertificate"] = self.get_validate_certificate()
+        values["validateCertificate"] = self.values.get(
+            "validateCertificate", False)
+        values["sslTrustStore"] = self.values.get("sslTrustStore", "")
+        values["hostnameInCertificate"] = self.values.get(
+            "hostnameInCertificate", "")
+        values["enableAuditPolicies"] = self.values.get(
+            "enableAuditPolicies", False)
+        match db_svc_dialect_mapper(self.values["dialect"]):
+            case "hana":
+                values["readRole"] = os.environ["HANA__READ_ROLE"]
+            case "postgres":
+                values["readRole"] = os.environ["PG__READ_ROLE"]
+
         try:
             # validate
             DBCredentialsType(**values)
