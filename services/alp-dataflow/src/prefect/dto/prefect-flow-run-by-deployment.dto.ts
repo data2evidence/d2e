@@ -16,4 +16,6 @@ export class PrefectFlowRunByDeploymentDto implements IPrefectFlowRunByDeploymen
 
   @IsObject()
   params: object
+
+  schedule: string | null
 }
