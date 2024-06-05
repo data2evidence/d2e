@@ -448,3 +448,12 @@ Steps
   - Input file: corresponding file from `vocab.zip`
     - also on the bottow section "Importer Settings", click on the Value column for "Column delimeter" and change it from `,` to `\t`
   - Go to "Confirm" and click "Proceed"
+
+## Running tests locally
+
+- Setup steps required
+  1. Download file `cache-synpuf1k.zip` from one password to get synpuf1k folder and place folder into `d2e/services/alp-db-svc/db` folder
+  2. Download file `cache-ngdbc-latest` from one password to get hana driver and place file into `d2e/services/alp-db-svc/db/drivers/hana` folder
+  3. Download liquibase driver from `https://github.com/liquibase/liquibase/releases/download/v4.5.0/liquibase-4.5.0.tar.gz` and unpack folder into `d2e/services/alp-db-svc/db/migrations/liquibase`
+  4. Get migration scripts from [d2e-plugins](https://github.com/alp-os/d2e-plugins/tree/main/data-management) repo and place into `d2e/services/alp-db-svc/db/migrations`
+  5. Get migration scripts from [ms-datamodel-plugin](https://github.com/alp-os/ms-datamodel-plugin/) repo and place into `d2e/services/alp-db-svc/db/migrations`
