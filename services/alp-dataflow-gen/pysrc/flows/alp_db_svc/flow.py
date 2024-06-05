@@ -4,7 +4,7 @@ from prefect_shell import ShellOperation
 import json
 import os
 import site
-from alpconnection.dbutils import get_db_svc_endpoint_dialect, POSTGRES_DIALECT_OPTIONS
+from alpconnection.dbutils import get_db_svc_endpoint_dialect
 from utils.types import (PG_TENANT_USERS, AlpDBSvcOptionsType,
                          requestType, internalPluginType,
                          createDataModelType, updateDataModelType,
@@ -229,9 +229,7 @@ async def create_snapshot(options: createSnapshotType):
 
         if db_dialect == DATABASE_DIALECTS.HANA:
             await _run_db_svc_shell_command(request_type, request_url, request_body)
-        # TODO: After unifying envConverter postgres dialect value, to use DATABASE_DIALECTS.POSTGRES instead of POSTGRES_DIALECT_OPTIONS
-        # elif db_dialect == DATABASE_DIALECTS.POSTGRES:
-        elif db_dialect in POSTGRES_DIALECT_OPTIONS:
+        elif db_dialect == DATABASE_DIALECTS.POSTGRE:
             create_datamart_options = _parse_create_datamart_options(
                 options, db_dialect, DATAMART_ACTIONS.COPY_AS_DB_SCHEMA)
             temp_create_data_model_options = _parse_temp_create_datamodel_options(
@@ -269,9 +267,7 @@ async def create_parquet_snapshot(options: createSnapshotType):
 
         if db_dialect == DATABASE_DIALECTS.HANA:
             await _run_db_svc_shell_command(request_type, request_url, request_body)
-        # TODO: After unifying envConverter postgres dialect value, to use DATABASE_DIALECTS.POSTGRES instead of POSTGRES_DIALECT_OPTIONS
-        # elif db_dialect == DATABASE_DIALECTS.POSTGRES:
-        elif db_dialect in POSTGRES_DIALECT_OPTIONS:
+        elif db_dialect == DATABASE_DIALECTS.POSTGRES:
             create_datamart_options = _parse_create_datamart_options(
                 options, db_dialect, DATAMART_ACTIONS.COPY_AS_PARQUET_FILE)
             temp_create_data_model_options = _parse_temp_create_datamodel_options(
