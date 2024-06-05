@@ -87,6 +87,14 @@ class meilisearchAddIndexType(BaseModel):
     tableName: str
     chunk_size: int
     meilisearch_index_config: Dict
+    
+class meilisearchAddIndexWithEmbeddingsType(BaseModel):
+    databaseCode: str
+    vocabSchemaName: str
+    tableName: str
+    token: str
+    chunk_size: int
+    meilisearch_index_config: Dict
 
 
 class portalDatasetType(BaseModel):
@@ -171,7 +179,6 @@ class StrategusOptionsType(BaseModel):
 class DATABASE_DIALECTS(str, Enum):
     HANA = "hana"
     POSTGRES = "postgres"
-
 
 class entityCountDistributionType(BaseModel):
     OBSERVATION_PERIOD_COUNT: str

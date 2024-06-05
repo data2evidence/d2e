@@ -24,21 +24,17 @@ export class DbService {
       .createQueryBuilder('db')
       .leftJoinAndSelect('db.credentials', 'dbCredential')
       .leftJoinAndSelect('db.vocabSchemas', 'dbVocabSchema')
-
-    if (isClientCredentials) {
-      query
-        .leftJoinAndSelect('db.extra', 'dbExtra')
-        .where('dbCredential.serviceScope = :serviceScope AND dbExtra.serviceScope = :serviceScope', {
-          serviceScope: SERVICE_SCOPE.INTERNAL
-        })
-    }
+      .leftJoinAndSelect('db.extra', 'dbExtra')
+      .where('dbCredential.serviceScope = :serviceScope', {
+        serviceScope: SERVICE_SCOPE.INTERNAL
+      })
 
     const result = await query.select(this.getDbColumns(isClientCredentials)).getMany()
     return result.map(r => {
       const { extra, vocabSchemas, ...entity } = r
       return {
         ...entity,
-        extra: extra && extra[0].value,
+        extra,
         vocabSchemas: vocabSchemas.map(vocabSchema => vocabSchema.name)
       }
     })
@@ -51,7 +47,7 @@ export class DbService {
       .createQueryBuilder('db')
       .leftJoinAndSelect('db.credentials', 'dbCredential')
       .leftJoinAndSelect('db.extra', 'dbExtra')
-      .where('db.id = :id AND dbCredential.serviceScope = :serviceScope AND dbExtra.serviceScope = :serviceScope', {
+      .where('db.id = :id AND dbCredential.serviceScope = :serviceScope', {
         id,
         serviceScope
       })
@@ -61,7 +57,6 @@ export class DbService {
     if (!db) {
       return null
     }
-
     if (grantType !== 'client_credentials') {
       db.credentials.forEach(c => {
         c.password = maskedValue
@@ -107,14 +102,15 @@ export class DbService {
   }
 
   async update(dbDto: IDbUpdateDto) {
-    const { id, vocabSchemas } = dbDto
+    const { id, vocabSchemas, extra } = dbDto
     const existingDb = await this.dbRepo
       .createQueryBuilder('db')
       .leftJoinAndSelect('db.vocabSchemas', 'vocabSchema')
+      .leftJoinAndSelect('db.extra', 'dbExtra')
       .where('db.id = :id', { id })
       .getOne()
 
-    const { vocabSchemas: existingVocabSchemaEntities } = existingDb
+    const { vocabSchemas: existingVocabSchemaEntities, extra: existingExtraEntities } = existingDb
     if (vocabSchemas) {
       const vocabSchemaEntities = this.mapVocabSchemasToEntity(vocabSchemas, dbDto.id)
       await this.vocabSchemaRepo.upsert(vocabSchemaEntities, ['name', 'dbId'])
@@ -125,6 +121,18 @@ export class DbService {
         })
     } else {
       await this.vocabSchemaRepo.delete({ dbId: id })
+    }
+
+    if (extra) {
+      const extraEntities = this.mapExtraToEntity(extra, dbDto.id)
+      await this.dbExtraRepo.upsert(extraEntities, ['serviceScope', 'dbId'])
+      existingExtraEntities
+        ?.filter(o => !extraEntities.find(n => o.serviceScope === n.serviceScope && o.dbId === n.dbId))
+        .forEach(async existingExtra => {
+          await this.dbExtraRepo.delete({ serviceScope: existingExtra.serviceScope, dbId: id })
+        })
+    } else {
+      await this.dbExtraRepo.delete({ dbId: id })
     }
 
     this.logger.debug(`Updated db: ${JSON.stringify(dbDto)}`)
@@ -172,10 +180,12 @@ export class DbService {
       'dbCredential.username',
       'dbCredential.userScope',
       'dbCredential.serviceScope',
-      'dbVocabSchema.name'
+      'dbVocabSchema.name',
+      'dbExtra.value',
+      'dbExtra.serviceScope'
     ]
     if (hasSecret) {
-      return [...baseColumns, 'dbExtra.serviceScope', 'dbExtra.value', 'dbCredential.password', 'dbCredential.salt']
+      return [...baseColumns, 'dbCredential.password', 'dbCredential.salt']
     }
     return baseColumns
   }

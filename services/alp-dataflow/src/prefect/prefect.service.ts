@@ -45,7 +45,10 @@ export class PrefectService {
   }
 
   async getFlowRun(id: string) {
-    return this.prefectApi.getFlowRun(id)
+    const flowRun = await this.prefectApi.getFlowRun(id)
+    // Redact sensitive input parameters for all flow runs
+    flowRun.parameters = this.redactSensitivePrefectParameters(flowRun.parameters)
+    return flowRun
   }
 
   async getFlowRunLogs(id: string) {
@@ -58,6 +61,10 @@ export class PrefectService {
 
   async getTaskRunLogs(id: string) {
     return this.prefectApi.getTaskRunLogs(id)
+  }
+
+  async getTaskRunState(id: string) {
+    return this.prefectApi.getTaskRunState(id)
   }
 
   async createDataflowUIFlowRun(id: string) {
@@ -220,12 +227,13 @@ export class PrefectService {
   }
 
   async getFlowRunState(id: string) {
-    const flowRun = await this.prefectApi.getFlowRun(id)
-    return {
-      id,
-      type: flowRun.state.type,
-      message: flowRun.state.message
-    }
+    const flowRunState = await this.prefectApi.getFlowRunState(id)
+    return flowRunState
+  }
+
+  async getRunsForFlowRun(id: string) {
+    const runs = await this.prefectApi.getRunsForFlowRun(id)
+    return runs
   }
 
   async createFlowRunByMetadata(metadata: IPrefectFlowRunByMetadataDto) {
@@ -308,5 +316,22 @@ export class PrefectService {
   private async deleteDeploymentFolder(deploymentFolderPath: string) {
     rmdirSync(deploymentFolderPath, { recursive: true })
     this.logger.info(`Deleted adhoc prefect deployment folder: ${deploymentFolderPath}`)
+  }
+
+  private redactSensitivePrefectParameters(flowRunParameters: any) {
+    const sensitivePrefectParameterKeys = ['token']
+
+    if (!flowRunParameters.options) {
+      return flowRunParameters
+    }
+
+    // Redact any values that have the keys found in redactSensitivePrefectParameters
+    for (const sensitiveKey of sensitivePrefectParameterKeys) {
+      if (sensitiveKey in flowRunParameters.options) {
+        flowRunParameters.options[sensitiveKey] = '<REDACTED>'
+      }
+    }
+
+    return flowRunParameters
   }
 }

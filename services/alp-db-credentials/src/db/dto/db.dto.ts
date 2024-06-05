@@ -76,6 +76,11 @@ export class DbUpdateDto implements IDbUpdateDto {
   @ArrayMinSize(1)
   @IsValidSchemaUpdate({ each: true })
   vocabSchemas: string[]
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => DbExtraDto)
+  extra: DbExtraDto
 }
 
 export class DbCredentialUpdateDto implements IDbCredentialUpdateDto {
