@@ -3,10 +3,8 @@ from prefect.task_runners import SequentialTaskRunner
 from flows.dataflow.flow import exec_flow as execute_dataflow
 from flows.alp_db_svc.flow import run_alp_db_svc, run_seed_postgres
 from flows.strategus.flow import execute_strategus
-from flows.portal_server.flow import update_dataset_attributes
 from utils.types import (
-    AlpDBSvcOptionsType,
-    datasetAttributesType
+    AlpDBSvcOptionsType
 )
 
 
@@ -28,8 +26,3 @@ def execute_seed_postgres_data_flow(database_code, vocab_schema_name, cdm_schema
 @flow(log_prints=True, task_runner=SequentialTaskRunner)
 def execute_strategus_flow(analysis_spec, options):
     execute_strategus(analysis_spec, options)
-
-
-@flow(log_prints=True, task_runner=SequentialTaskRunner)
-def update_dataset_attributes_flow(options: datasetAttributesType):
-    update_dataset_attributes(options)
