@@ -112,12 +112,12 @@ jobs:
         id: sameBranch-checkout-d2e-plugin
         continue-on-error: true
         with:
-          repository:  alp-os/d2e-dev-brandan
+          repository:  ${{ vars.D2E_PLUGIN_REPO }}
           token: ${{ secrets.CI_PAT }}
           path: 'tmp'
           sparse-checkout: 'data-management'
           sparse-checkout-cone-mode: false
-          ref: TEST_d2e_plugin
+          ref: ${{ env.BRANCH_NAME }}
 
       - shell: bash
         name: sameBranch checkout test (d2e-plugin)
@@ -131,12 +131,12 @@ jobs:
         id: develop-branch-checkout-d2e-plugin
         if: steps.sameBranch-checkout-test-d2e-plugin.outputs.D2E_PLUGIN_DEVELOP_BRANCH == 'True' 
         with:
-          repository:  alp-os/d2e-dev-brandan
+          repository:  ${{ vars.D2E_PLUGIN_REPO }}
           token: ${{ secrets.CI_PAT }}
           path: 'tmp'
           sparse-checkout: 'data-management'
           sparse-checkout-cone-mode: false
-          ref: TEST_d2e_plugin
+          ref: develop
 
       - shell: bash
         name: merge files from d2e-plugin repo
@@ -155,12 +155,12 @@ jobs:
         id: sameBranch-checkout-ms-datamodel-plugin
         continue-on-error: true
         with:
-          repository:  alp-os/d2e-dev-brandan
+          repository:  ${{ vars.MS_DATAMODEL_PLUGIN_REPO }}
           token: ${{ secrets.CI_PAT }}
           path: 'tmp'
           sparse-checkout: 'ms_datamodel_plugin'
           sparse-checkout-cone-mode: false
-          ref: TEST_ms_datamodel_plugin
+          ref: ${{ env.BRANCH_NAME }}
 
       - shell: bash
         name: sameBranch checkout test (ms-datamodel-plugin)
@@ -174,12 +174,12 @@ jobs:
         id: develop-branch-checkout-ms-datamodel-plugin
         if: steps.sameBranch-checkout-test-ms-datamodel-plugin.outputs.MS_DATAMODEL_PLUGIN_DEVELOP_BRANCH == 'True' 
         with:
-          repository:  alp-os/d2e-dev-brandan
+          repository:  ${{ vars.MS_DATAMODEL_PLUGIN_REPO }}
           token: ${{ secrets.CI_PAT }}
           path: 'tmp'
           sparse-checkout: 'ms_datamodel_plugin'
           sparse-checkout-cone-mode: false
-          ref: TEST_ms_datamodel_plugin
+          ref: develop
 
       - shell: bash
         name: merge files from ms-datamodel-plugin repo
