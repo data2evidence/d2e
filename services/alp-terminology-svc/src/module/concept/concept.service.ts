@@ -488,11 +488,12 @@ export class ConceptService {
           ? 'Non-standard'
           : 'Standard',
       code: item.concept_code,
+      // The date is stored as seconds from epoch, but new Date() expects ms
       validStartDate: item.valid_start_date
-        ? new Date(item.valid_start_date).toISOString()
-        : '',
+        ? new Date(item.valid_start_date * 1000).toISOString()
+        : new Date(0).toISOString(),
       validEndDate: item.valid_end_date
-        ? new Date(item.valid_end_date).toISOString()
+        ? new Date(item.valid_end_date * 1000).toISOString()
         : '',
       validity,
     };
