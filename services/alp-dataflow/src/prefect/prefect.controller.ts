@@ -144,4 +144,9 @@ export class PrefectController {
     const userId = token.sub
     return this.prefectService.triggerDefaultDeploymentsRun(userId)
   }
+
+  @Get('flow/default-deployment')
+  getDefaultDeploymentStatus() {
+    return this.prefectService.getDefaultPluginsStatus()
+  }
 }

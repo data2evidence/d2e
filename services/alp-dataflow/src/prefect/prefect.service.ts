@@ -8,7 +8,9 @@ import {
   IPrefectAdhocFlowDto,
   IPrefectFlowRunByDeploymentDto,
   ITestDataflowDto,
-  IPrefectFlowRunByMetadataDto
+  IPrefectFlowRunByMetadataDto,
+  IPluginUploadStatusDetail,
+  IPluginUploadStatusDto
 } from '../types'
 import { PrefectExecutionClient } from './prefect-execution.client'
 import { env } from '../env'
@@ -102,6 +104,27 @@ export class PrefectService {
 
   async getDefaultPlugins() {
     return this.prefectFlowService.getDefaultPlugins()
+  }
+
+  async getDefaultPluginsStatus() {
+    const plugins = await this.prefectFlowService.getDefaultPlugins()
+    let statusDetails: IPluginUploadStatusDetail[] = []
+    let noActiveInstallations = true
+    for (const plugin of plugins) {
+      if (plugin.status === PluginUploadStatus.INSTALLING) {
+        noActiveInstallations = false
+      }
+      statusDetails.push({
+        pluginId: plugin.pluginId,
+        name: plugin.name,
+        status: plugin.status,
+        createdAt: plugin.createdDate.toString(),
+        modifiedAt: plugin.modifiedDate.toString(),
+        type: plugin.type
+      })
+    }
+    const result: IPluginUploadStatusDto = { statusDetails, noActiveInstallations }
+    return result
   }
 
   // TODO: confirm if we want to deprecate and replace with polling

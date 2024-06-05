@@ -214,6 +214,17 @@ export interface IFlowMetadataDto {
   others?: JSON
 }
 
-// export type PluginUploadStatus = (typeof PluginUploadStatus)[number]
-
 export type PluginUploadStatus = keyof typeof PluginUploadStatus
+
+export interface IPluginUploadStatusDetail {
+  pluginId: string
+  name: string
+  status: string
+  createdAt: string
+  modifiedAt: string
+  type: string
+}
+export interface IPluginUploadStatusDto {
+  statusDetails: IPluginUploadStatusDetail[]
+  noActiveInstallations: boolean
+}

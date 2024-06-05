@@ -493,7 +493,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
   {
     path: '^/dataflow-mgmt/prefect/flow/default-deployment$',
     scopes: ['dataflowmgmt.prefect.flow.fileDeployment.add'],
-    httpMethods: ['POST']
+    httpMethods: ['POST', 'GET']
   },
   {
     path: '^/dataflow-mgmt/prefect/flow/(.*)',
