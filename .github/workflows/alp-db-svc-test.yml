@@ -192,7 +192,7 @@ jobs:
           ls -l ./services/alp-db-svc/db/migrations/hana
           ls -l ./services/alp-db-svc/db/migrations/postgres
 
-          ls -l ./services/alp-db-svc/db/migrations/hana/omop
+          ls -l ./services/alp-db-svc/db/migrations/hana/changesets/omop
 
       # Download liquibase driver
       - shell: bash
