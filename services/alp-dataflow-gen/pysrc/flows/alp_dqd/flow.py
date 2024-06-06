@@ -24,6 +24,7 @@ def execute_dqd(
     logger = get_run_logger()
 
     threads = os.getenv('DQD_THREAD_COUNT')
+    r_libs_user_directory = os.getenv("R_LIBS_USER")
 
     setDBDriverEnvString = getSetDBDriverEnvString()
     connectionDetailsString = getDatabaseConnectorConnectionDetailsString(
@@ -58,6 +59,11 @@ def execute_dqd(
                 checkNames <- {checkNames}
                 cohortDefinitionId <- {cohortDefinitionId}
                 cdmVersion <- '{cdmVersionNumber}'
+
+                # Set r_libs_user_directory to be the priority for packages to be loaded
+                .libPaths('{r_libs_user_directory}')
+
+                # Run executeDqChecks
                 DataQualityDashboard::executeDqChecks(connectionDetails = connectionDetails,cdmDatabaseSchema = cdmDatabaseSchema,resultsDatabaseSchema = resultsDatabaseSchema,cdmSourceName = cdmSourceName,numThreads = numThreads,sqlOnly = sqlOnly,outputFolder = outputFolder,outputFile = outputFile,verboseMode = verboseMode,writeToTable = writeToTable,checkLevels = checkLevels,checkNames = checkNames,cdmVersion = cdmVersion, cohortDefinitionId = cohortDefinitionId)
         ''')
 

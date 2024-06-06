@@ -58,7 +58,7 @@ export interface IPrefectParameters {
     edges: IPrefectEdge
     nodes: object
   }
-  options: IPrefectOptions
+  options?: IPrefectOptions
 }
 
 interface IPrefectOptions {
@@ -101,6 +101,7 @@ export interface IPrefectFlowRunByDeploymentDto {
   flowName: string
   deploymentName: string
   params: object
+  schedule: string | null
 }
 
 export interface IPrefectFlowRunByMetadataDto {

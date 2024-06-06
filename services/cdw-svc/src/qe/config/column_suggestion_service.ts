@@ -39,11 +39,12 @@ function getColumnsForTable(
       schema = getDefaultSchemaName()
       query = `SELECT column_name as "value" 
       from information_schema.columns 
-      WHERE table_schema = %s and table_name = %s
-      UNION 
-      SELECT attname as "value" 
-      from pg_attribute
-      WHERE  attrelid = concat(%s::text, '."', %s::text, '"')`
+      where table_catalog = %s AND TABLE_NAME = %s 
+      UNION
+      SELECT column_name as "value" 
+      from duckdb_columns() 
+      WHERE database_name = %s and table_name = %s
+      ORDER BY \"column_name\"`
     } else{
       query = `SELECT COLUMN_NAME as "value"
       FROM  VIEW_COLUMNS WHERE SCHEMA_NAME = %s AND VIEW_NAME = %s
