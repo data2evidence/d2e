@@ -1,7 +1,6 @@
 import { Controller, Get, Query, Post, Body } from '@nestjs/common';
 import { ConceptService } from './concept.service';
 import { ConceptFilterOptionsDto } from './dto/concept.dto';
-
 @Controller()
 export class ConceptController {
   constructor(private readonly appService: ConceptService) {}

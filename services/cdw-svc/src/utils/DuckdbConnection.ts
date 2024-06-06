@@ -5,22 +5,18 @@ import {
     flattenParameter,
     DBValues,
 } from "@alp/alp-base-utils/target/src/Connection";
-import { Connection, Database } from "duckdb-async";
+import { Connection, Database, OPEN_READONLY } from "duckdb-async";
 import { DBError } from "@alp/alp-base-utils/target/src/DBError";
 import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
 import { translateHanaToDuckdb } from "@alp/alp-base-utils/target/src/helpers/hanaTranslation";
+import fs from 'fs';
 import { env } from "../configs";
 const logger = CreateLogger("Duckdb Connection");
 
 // Helper function similar to getDBConnection implementation in alp-base-utils DBConnectionUtil.ts
-export const getDuckdbDBConnection = (
-    duckdbSchemaFileName: string,
-    duckdbVocabSchemaFileName: string = "alpdev_pg_cdmvocab"
-) => {
+export const getDuckdbDBConnection = () => {
     return new Promise<ConnectionInterface>(async (resolve, reject) => {
         DuckdbConnection.createConnection(
-            duckdbSchemaFileName,
-            duckdbVocabSchemaFileName,
             async (err, connection: ConnectionInterface) => {
                 if (err) {
                     logger.error(err);
@@ -33,13 +29,7 @@ export const getDuckdbDBConnection = (
 };
 
 export const getDefaultSchemaName = () => {
-    return 'main';
-}
-export const getFileName = (databaseName: string, schema: string, vocabSchema: string) => {
-    return {
-        duckdbSchemaFileName: `${databaseName}_${schema}`.toLowerCase(),
-        vocabSchemaFileName: `${databaseName}_${vocabSchema}`.toLowerCase()
-    }
+    return `alpdev_pg_cdmvocab`;
 }
 export class DuckdbConnection implements ConnectionInterface {
     private constructor(
@@ -50,21 +40,21 @@ export class DuckdbConnection implements ConnectionInterface {
     ) {}
 
     public static async createConnection(
-        duckdbSchemaFileName: string,
-        duckdbVocabSchemaFileName: string,
         callback
     ) {
         try {
-            const duckdDB = await Database.create(
-                `${env.DUCKDB__DATA_FOLDER}/${duckdbSchemaFileName}`
-            );
-            const duckdDBconn = await duckdDB.connect();
-            // Load vocab schema into duckdb connection
-            await duckdDB.all(
-                `ATTACH '${env.DUCKDB__DATA_FOLDER}/${duckdbVocabSchemaFileName}' (READ_ONLY);`
-            );
-            const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, duckdbSchemaFileName);
-            callback(null, conn);
+            let dbPathString = env.DUCKDB_PATH
+            if(fs.existsSync(dbPathString))
+            {
+                const duckdDB = await Database.create(
+                    `${dbPathString}/${getDefaultSchemaName()}`,
+                    OPEN_READONLY
+                );
+                const duckdDBconn = await duckdDB.connect();
+                const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, getDefaultSchemaName());
+                callback(null, conn);
+            }
+            
         } catch (err) {
             callback(err, null);
         }
@@ -100,7 +90,6 @@ export class DuckdbConnection implements ConnectionInterface {
         parameters: ParameterInterface[],
         callback: CallBackInterface
     ) {
-        let client;
         try {
             logger.debug(`Sql: ${sql}`);
             logger.debug(
@@ -122,6 +111,10 @@ export class DuckdbConnection implements ConnectionInterface {
 
     private parseSql(temp: string): string {
         return translateHanaToDuckdb(temp, this.duckdbSchemaFileName);
+    }
+
+    public getTranslatedSql(sql: string): string {
+        return this.parseSql(sql);
     }
 
     public executeQuery(

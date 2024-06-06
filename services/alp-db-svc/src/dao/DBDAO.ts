@@ -34,8 +34,8 @@ class DBDAO {
   getVersionInfoForSchemas = async (
     db: any,
     tenant,
-    pluginChangelogFilepath: string | undefined,
-    pluginClasspath: string | undefined,
+    changelogFilepath: string | undefined,
+    classpath: string | undefined,
     datamodelSchemaMappingList: DataModelSchemaMappingType[]
   ) => {
     try {
@@ -54,6 +54,8 @@ class DBDAO {
           if (
             schemaObj.hasOwnProperty("schemaName") &&
             schemaObj.hasOwnProperty("dataModel") &&
+            schemaObj.hasOwnProperty("vocabSchemaName") &&
+            schemaObj.hasOwnProperty("changelogFilepath") &&
             schemaObj.hasOwnProperty("currentVersionID")
           ) {
             successfulSchemasInfo.push(schemaObj); // return schemaName if its relation error
@@ -70,19 +72,8 @@ class DBDAO {
       // attempt to retrieve undeployed changesets for each schema that was successful in previous step
       for (const schemaObj of successfulSchemasInfo) {
         try {
-          const vocabSchema: any = await this.getVocabSchema(
-            db,
-            schemaObj.schemaName
-          );
-
           const latestAvailableVersionID: string =
-            await this.getLatestAvailableVersion(
-              tenant,
-              schemaObj,
-              vocabSchema,
-              pluginChangelogFilepath,
-              pluginClasspath
-            );
+            await this.getLatestAvailableVersion(tenant, schemaObj, classpath);
           schemaObj["latestVersionID"] =
             latestAvailableVersionID === "up to date"
               ? schemaObj.currentVersionID
@@ -120,53 +111,16 @@ class DBDAO {
     }
   };
 
-  getVocabSchema = (db: any, schema: string) => {
-    return new Promise((resolve, reject) => {
-      try {
-        db.executeQuery(
-          `SELECT VOCABULARY_SCHEMA AS "VOCABULARY_SCHEMA" FROM ${schema}.CDM_SOURCE`,
-          [],
-          async (err: any, result: any) => {
-            if (err) {
-              if (
-                err.code === "42P01" ||
-                err.code === 260 || // CDM_SOURCE column does not exist
-                err.code === 362 ||
-                err.code === 259
-              ) {
-                this.logger.warn(err);
-                resolve("CDMVOCAB");
-              } else {
-                this.logger.error(err);
-                reject(err);
-              }
-            } else {
-              const { VOCABULARY_SCHEMA } = result[0];
-              resolve(VOCABULARY_SCHEMA);
-            }
-          }
-        );
-      } catch (err) {
-        this.logger.error(
-          `Error while retrieving vocab schema name from schema ${schema}: ${err}`
-        );
-        reject(err);
-      }
-    });
-  };
-
   getLatestAvailableVersion = (
     tenant,
     schemaObj: SchemaVersionInfo,
-    vocabSchema = "CDMVOCAB",
-    pluginChangelogFilepath: string | undefined,
-    pluginClasspath: string | undefined
+    classpath: string | undefined
   ) => {
     return new Promise<string>((resolve, reject) => {
       try {
         let liquibaseAction: string = "status"; // status command checks for undeployed changesets
         let liquibaseActionParams: Array<string> = [
-          `-DVOCAB_SCHEMA=${vocabSchema}`,
+          `-DVOCAB_SCHEMA=${schemaObj.vocabSchemaName}`,
           `--verbose`,
         ]; // use ["--verbose"] to see which changesets haven't been deployed
         let liquibase;
@@ -177,8 +131,8 @@ class DBDAO {
             tenant,
             schemaObj.schemaName,
             schemaObj.dataModel!,
-            pluginChangelogFilepath,
-            pluginClasspath
+            schemaObj.changelogFilepath!,
+            classpath
           )
         );
 
@@ -241,18 +195,24 @@ class DBDAO {
                 `Successfully retrieved list of changelog filepaths from ${datamodelSchemaMapping.schemaName} schema`
               );
 
-              let latestChangelogFilepath =
-                this.dialect === config.DB.HANA
-                  ? result[0].FILENAME
-                  : result[0].filename;
+              let currentVersionID: string;
+              if (result.length === 0) {
+                // If there are no records in databasechangelog table, set current version as Not Available
+                currentVersionID = "Not Available";
+              } else {
+                const latestChangelogFilepath =
+                  this.dialect === config.DB.HANA
+                    ? result[0].FILENAME
+                    : result[0].filename;
 
-              let currentVersionID: string = config.getVersionID(
-                latestChangelogFilepath
-              );
+                currentVersionID = config.getVersionID(latestChangelogFilepath);
+              }
 
               resolve({
                 schemaName: datamodelSchemaMapping.schemaName,
+                vocabSchemaName: datamodelSchemaMapping.vocabSchemaName,
                 dataModel: datamodelSchemaMapping.dataModel,
+                changelogFilepath: datamodelSchemaMapping.changelogFilepath,
                 currentVersionID: currentVersionID,
                 //lastUpdated: lastUpdated,
               });
@@ -329,8 +289,8 @@ class DBDAO {
     dataModel: string,
     schemas: string[],
     rollbackCount: number,
-    pluginChangelogFilepath: string | undefined,
-    pluginClasspath: string | undefined,
+    changelogFilepath: string | undefined,
+    classpath: string | undefined,
     callback: (err: any, result: any) => any
   ) => {
     const tasks = (<string[]>schemas).map((schema) => {
@@ -351,8 +311,8 @@ class DBDAO {
             tenant,
             schema,
             dataModel,
-            pluginChangelogFilepath,
-            pluginClasspath
+            changelogFilepath,
+            classpath
           )
         );
         liquibase
@@ -404,8 +364,8 @@ class DBDAO {
     dataModel: string,
     schemas: string[],
     rollbackTag: string,
-    pluginChangelogFilepath: string | undefined,
-    pluginClasspath: string | undefined,
+    changelogFilepath: string | undefined,
+    classpath: string | undefined,
     callback: (err: any, result: any) => any
   ) => {
     const tasks = (<string[]>schemas).map((schema) => {
@@ -424,8 +384,8 @@ class DBDAO {
             tenant,
             schema,
             dataModel,
-            pluginChangelogFilepath,
-            pluginClasspath
+            changelogFilepath,
+            classpath
           )
         );
 

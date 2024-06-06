@@ -21,6 +21,8 @@ COPY --chown=node:node --chmod=711 . .
 
 RUN yarn compile:local
 
+RUN chown -R node:node /usr/src/app
+
 USER node
 
 FROM $IMAGE AS build
@@ -45,6 +47,9 @@ FROM $IMAGE AS production
 RUN rm -rf /usr/local/lib/node_modules/npm
 
 RUN addgroup -S alp -g 3000 && adduser --uid 3000 -S docker -G alp
+
+RUN mkdir -p /usr/src/app && chown -R docker:alp /usr/src/app
+
 USER docker
 
 WORKDIR /usr/src/app

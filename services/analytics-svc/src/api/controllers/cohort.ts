@@ -8,34 +8,35 @@ import MRIEndpointErrorHandler from "../../utils/MRIEndpointErrorHandler";
 import { Logger, getUser } from "@alp/alp-base-utils";
 import CreateLogger = Logger.CreateLogger;
 let logger = CreateLogger("analytics-log");
-import axios, { AxiosRequestConfig } from "axios";
-import { DBConnectionUtil as dbConnectionUtil } from "@alp/alp-base-utils";
 import { CohortEndpoint } from "../../mri/endpoint/CohortEndpoint";
 import { generateQuery } from "../../utils/QueryGenSvcProxy";
 import { createEndpointFromRequest } from "../../mri/endpoint/CreatePluginEndpoint";
+import { PluginEndpointResultType } from "../../types";
 import PortalServerAPI from "../PortalServerAPI";
-import https from "https";
 import { convertIFRToExtCohort } from "../../ifr-to-extcohort/main";
-import {
-    ALP_MINERVA_PORTAL_SERVER__URL,
-    USE_EXTENSION_FOR_COHORT_CREATION,
-} from "../../config";
 import { dataflowRequest } from "../../utils/DataflowMgmtProxy";
+import { getDuckdbDirectPostgresWriteConnection } from "../../utils/DuckdbConnection";
 
+import { env } from "../../env";
 const language = "en";
 
 const mriConfigConnection = new MriConfigConnection(
-    ALP_MINERVA_PORTAL_SERVER__URL
+    env.SERVICE_ROUTES?.portalServer
 );
 
 export async function getCohortAnalyticsConnection(req: IMRIRequest) {
-    // Get study analytics credentials
-    const { studyAnalyticsCredential } = req.dbCredentials;
-    // Get connection to db using study analytics credentials
-    return await dbConnectionUtil.DBConnectionUtil.getDBConnection({
-        credentials: studyAnalyticsCredential,
-        schema: studyAnalyticsCredential.schema,
-    });
+    const { analyticsConnection } = req.dbConnections;
+    // If dialect is DUCKDB, get direct postgres write connection instead
+    if (analyticsConnection.dialect === "DUCKDB") {
+        const { studyAnalyticsCredential } = req.dbCredentials;
+        const credentials = {
+            credentials: studyAnalyticsCredential,
+            schema: studyAnalyticsCredential.schema,
+        };
+        return await getDuckdbDirectPostgresWriteConnection(credentials);
+    }
+
+    return analyticsConnection;
 }
 
 async function getStudyDetails(
@@ -75,13 +76,9 @@ async function getStudyDetails(
 export async function getAllCohorts(req: IMRIRequest, res, next) {
     try {
         const analyticsConnection = await getCohortAnalyticsConnection(req);
-        let { schemaName } = await getStudyDetails(
-            req.swagger.params.studyId.value,
-            res
-        );
         let cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
-            schemaName
+            analyticsConnection.schemaName
         );
 
         const offset = req.swagger.params.offset.value;
@@ -157,7 +154,7 @@ export async function createCohort(req: IMRIRequest, res, next) {
         };
         const { cohortDefinition } = await createEndpointFromRequest(req);
 
-        if (USE_EXTENSION_FOR_COHORT_CREATION === "true") {
+        if (env.USE_EXTENSION_FOR_COHORT_CREATION === "true") {
             const mriConfig = await mriConfigConnection.getStudyConfig(
                 {
                     req,
@@ -242,7 +239,7 @@ export async function createCohort(req: IMRIRequest, res, next) {
         const cohort = await getCohortFromMriQuery(req);
         const cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
-            schemaName
+            analyticsConnection.schemaName
         );
         let cohortDefinitionResult =
             await cohortEndpoint.saveCohortDefinitionToDb(cohort);
@@ -250,9 +247,12 @@ export async function createCohort(req: IMRIRequest, res, next) {
             cohort,
             queryResponse.queryObject
         );
-
         res.status(200).send(
-            `Inserted ${cohortDefinitionResult.data} rows to COHORT_DEFINITION and ${cohortRowCount} rows to COHORT
+            `Inserted ${JSON.stringify(
+                cohortDefinitionResult.data
+            )} rows to COHORT_DEFINITION and ${JSON.stringify(
+                cohortRowCount.data
+            )} rows to COHORT
             `
         );
     } catch (err) {
@@ -265,13 +265,9 @@ export async function createCohortDefinition(req: IMRIRequest, res, next) {
     try {
         const analyticsConnection = await getCohortAnalyticsConnection(req);
 
-        let { schemaName } = await getStudyDetails(
-            req.swagger.params.cohortDefinition.value.studyId,
-            res
-        );
         let cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
-            schemaName
+            analyticsConnection.schemaName
         );
 
         const cohortDefiniton = <CohortDefinitionTableType>{
@@ -309,13 +305,9 @@ export async function deleteCohort(req: IMRIRequest, res, next) {
         const cohortId = req.swagger.params.cohortId.value;
         const analyticsConnection = await getCohortAnalyticsConnection(req);
 
-        let { schemaName } = await getStudyDetails(
-            req.swagger.params.studyId.value,
-            res
-        );
         let cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
-            schemaName
+            analyticsConnection.schemaName
         );
 
         // Delete cohort definition from database
@@ -333,37 +325,27 @@ export async function deleteCohort(req: IMRIRequest, res, next) {
     }
 }
 
-// Takes in req object to send get request to get patient list, extract patient ids then build and return cohort object
+// Takes in req object to use pluginEndpoint get patient list, extract patient ids then build and return cohort object
 async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
     try {
-        // Extract mriquery and send request to analytics-svc to get patient list
+        // Extract mriquery and use pluginEndpoint.retrieveData to get patient list
         let mriquery = req.swagger.params.cohort.value.mriquery;
-        let token = req.headers.authorization;
-
-        let ALP_GATEWAY_ENDPOINT =
-            process.env.ALP_PORTAL_MRI_ENDPOINT ||
-            "https://alp-minerva-gateway-1:41100/analytics-svc/api/services";
-        let AXIOS_TIMEOUT = 100000;
-
-        const url = `${ALP_GATEWAY_ENDPOINT}/patient?mriquery=${encodeURIComponent(
-            mriquery
-        )}`;
-        const options: AxiosRequestConfig = {
-            headers: {
-                Authorization: token,
-            },
-            timeout: AXIOS_TIMEOUT,
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: true,
-                ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
-            }),
-        };
-
-        // Send request to analytics-svc for patient list and extract patient ids
-        const result = await axios.get(url, options);
+        const { cohortDefinition, studyId, pluginEndpoint } =
+            await createEndpointFromRequest(req);
+        pluginEndpoint.setRequest(req);
+        const pluginResult = (await pluginEndpoint.retrieveData({
+            cohortDefinition,
+            studyId,
+            language,
+            dataFormat: "json",
+            requestQuery: mriquery,
+            patientId: null,
+            auditLogChannelName:
+                req.usage === "EXPORT" ? "MRI Pt. List Exp" : "MRI Pt. List",
+        })) as PluginEndpointResultType;
 
         // Extract patient id from patient list
-        let patientIds = result.data.data[0].data.map(
+        let patientIds = pluginResult.data[0].data.map(
             (obj) => obj["patient.attributes.pid"]
         );
 

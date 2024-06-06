@@ -10,9 +10,9 @@ config.connection = async () => {
     await sleep(30000)
   }
   return {
-    host: process.env.PG_HOST!,
-    port: Number(process.env.PG_PORT),
-    database: process.env.PG_DATABASE!,
+    host: process.env.PG__HOST!,
+    port: Number(process.env.PG__PORT),
+    database: process.env.PG__DB_NAME!,
     user: process.env.PG_ADMIN_USER!,
     password: process.env.PG_ADMIN_PASSWORD!,
     ssl:

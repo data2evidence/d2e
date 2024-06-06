@@ -16,10 +16,10 @@ import { Connection as connLib } from "@alp/alp-base-utils";
 import ConnectionInterface = connLib.ConnectionInterface;
 import * as utilsLib from "@alp/alp-base-utils";
 import { generateQuery } from "../../utils/QueryGenSvcProxy";
-import { ALP_MINERVA_PORTAL_SERVER__URL } from "../../config";
+import { env } from "../../env";
 const log = Logger.CreateLogger("analytics-log");
 const mriConfigConnection = new MriConfigConnection(
-    ALP_MINERVA_PORTAL_SERVER__URL
+    env.SERVICE_ROUTES?.portalServer
 );
 
 export class PatientCountEndpoint extends BaseQueryEngineEndpoint {

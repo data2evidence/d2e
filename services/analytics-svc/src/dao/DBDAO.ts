@@ -87,15 +87,6 @@ export class DBDAO {
                         );
                     })
                 );
-
-                // for (const table of tables) {
-                //   const tableMetadata = await this.getSnapshotSchemaTableMetadata(
-                //     db,
-                //     schema,
-                //     table
-                //   );
-                //   snapshotSchemaMetadata.push(tableMetadata);
-                // }
                 resolve(snapshotSchemaMetadata);
             } catch (err) {
                 reject(err);
@@ -135,14 +126,7 @@ export class DBDAO {
     ) => {
         return new Promise<SnapshotTableMetadata>((resolve, reject) => {
             db.executeQuery(
-                `
-        SELECT tc.SCHEMA_NAME, tc.TABLE_NAME, tc.COLUMN_NAME, tc.IS_NULLABLE, c.IS_PRIMARY_KEY, rc.COLUMN_NAME AS IS_FOREIGN_KEY
-        FROM SYS.TABLE_COLUMNS AS tc
-          LEFT JOIN SYS."CONSTRAINTS" AS c ON (tc.TABLE_NAME=c.TABLE_NAME AND tc.SCHEMA_NAME=c.SCHEMA_NAME AND tc.COLUMN_NAME=c.COLUMN_NAME)
-          LEFT JOIN SYS."REFERENTIAL_CONSTRAINTS" AS rc ON (tc.TABLE_NAME=rc.TABLE_NAME AND tc.SCHEMA_NAME=rc.SCHEMA_NAME AND tc.COLUMN_NAME=rc.COLUMN_NAME)
-        WHERE tc.SCHEMA_NAME = ?
-        AND tc.TABLE_NAME = ?;
-        `,
+                `SELECT tc.SCHEMA_NAME, tc.TABLE_NAME, tc.COLUMN_NAME, tc.IS_NULLABLE, c.IS_PRIMARY_KEY, rc.COLUMN_NAME AS IS_FOREIGN_KEY FROM SYS.TABLE_COLUMNS AS tc LEFT JOIN SYS."CONSTRAINTS" AS c ON (tc.TABLE_NAME=c.TABLE_NAME AND tc.SCHEMA_NAME=c.SCHEMA_NAME AND tc.COLUMN_NAME=c.COLUMN_NAME) LEFT JOIN SYS."REFERENTIAL_CONSTRAINTS" AS rc ON (tc.TABLE_NAME=rc.TABLE_NAME AND tc.SCHEMA_NAME=rc.SCHEMA_NAME AND tc.COLUMN_NAME=rc.COLUMN_NAME) WHERE tc.SCHEMA_NAME = ? AND tc.TABLE_NAME = ?;`,
                 [{ value: schema }, { value: table }],
                 (err: any, result: any) => {
                     if (err) {

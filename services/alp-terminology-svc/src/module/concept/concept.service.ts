@@ -14,10 +14,12 @@ import {
   FhirConceptMapElementTarget,
   IConcept,
   Filters,
+  HybridSearchConfig,
 } from '../../utils/types';
 import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { Request } from 'express';
 import { SystemPortalAPI } from 'src/api/portal-api';
+import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 
 // Placed outside as FHIR server is unable to access
 const logger = createLogger('ConceptService');
@@ -39,6 +41,7 @@ export class ConceptService {
     rowsPerPage: number,
     datasetId: string,
     searchText: string,
+    hybridSearchConfigService: HybridSearchConfigService,
     filters?: Filters,
   ) {
     logger.info('Get list of concepts');
@@ -56,6 +59,8 @@ export class ConceptService {
     try {
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
+      const hybridSearchConfig: HybridSearchConfig =
+        await hybridSearchConfigService.getHybridSearchConfig();
       const meilisearchResult = await meilisearchApi.getConcepts(
         pageNumber,
         Number(rowsPerPage),
@@ -64,6 +69,7 @@ export class ConceptService {
           dialect === 'hana' ? 'CONCEPT' : 'concept'
         }`,
         completeFilters,
+        hybridSearchConfig,
       );
       return this.meilisearchResultMapping(meilisearchResult);
     } catch (err) {
@@ -388,11 +394,12 @@ export class ConceptService {
           ? 'Non-standard'
           : 'Standard',
       code: item.concept_code,
+      // The date is stored as seconds from epoch, but new Date() expects ms
       validStartDate: item.valid_start_date
-        ? new Date(item.valid_start_date).toISOString()
-        : '',
+        ? new Date(item.valid_start_date * 1000).toISOString()
+        : new Date(0).toISOString(),
       validEndDate: item.valid_end_date
-        ? new Date(item.valid_end_date).toISOString()
+        ? new Date(item.valid_end_date * 1000).toISOString()
         : '',
       validity,
     };

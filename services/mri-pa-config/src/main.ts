@@ -13,7 +13,7 @@ import * as xsenv from "@sap/xsenv";
 import express from "express";
 import { MRIConfig } from "./config/config";
 import { ConfigFacade as MriConfigFacade } from "./config/ConfigFacade";
-import { IRequest } from "./types";
+import { IRequest, IDBCredentialsType } from "./types";
 import https from "https";
 const log = Logger.CreateLogger("mri-config-log");
 
@@ -149,33 +149,6 @@ function initRoutes() {
       action = body.action;
     }
 
-    if (!utils.isClientCredReq(req) && req.method === "GET") {
-      const roles = [
-        ...new Set([
-          ...(user.userObject.alpRoleMap.STUDY_RESEARCHER_ROLE
-            ? user.userObject.alpRoleMap.STUDY_RESEARCHER_ROLE
-            : []),
-          ...(user.userObject.alpRoleMap.STUDY_MANAGER_ROLE
-            ? user.userObject.alpRoleMap.STUDY_MANAGER_ROLE
-            : []),
-        ]),
-      ];
-
-      if (roles.length > 0 && body.selectedStudyEntityValue) {
-        if (roles.indexOf(body.selectedStudyEntityValue) === -1) {
-          const err = `[Unauthorised] User does not have permission to the selected study, ${body.selectedStudyEntityValue}.`;
-          log.error(
-            `${err} Detected unauthorised access for: ${user.userObject}`
-          );
-          return res.status(403).json({ error: err });
-        }
-
-        user.userObject.alpRoleMap.STUDY_RESEARCHER_ROLE = roles.filter(
-          (role) => role === body.selectedStudyEntityValue
-        );
-      }
-    }
-
     const mriConfig = new MRIConfig(
       req.dbConnections.db,
       user,
@@ -247,7 +220,18 @@ try {
     isTestEnvironment = true;
     log.info("TESTSCHEMA :" + credentials.schema);
   } else {
-    credentials = xsenv.cfServiceCredentials({ tag: "config" });
+    credentials = {
+      database: env.PG__DB_NAME,
+      schema: env.PG_SCHEMA,
+      dialect: env.PG__DIALECT,
+      host: env.PG__HOST,
+      port: env.PG__PORT,
+      user: env.PG_USER,
+      password: env.PG_PASSWORD,
+      max: env.PG__MAX_POOL,
+      min: env.PG__MIN_POOL,
+      idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
+    } as IDBCredentialsType
   }
 
   initRoutes();
