@@ -106,47 +106,6 @@ jobs:
           path: |
             ${{ github.job }}*.yml
 
-      # Get and merge d2e-plugins migration scripts
-      - uses: actions/checkout@v4
-        name: sameBranch checkout (d2e-plugin)
-        id: sameBranch-checkout-d2e-plugin
-        continue-on-error: true
-        with:
-          repository:  ${{ vars.D2E_PLUGIN_REPO }}
-          token: ${{ secrets.CI_PAT }}
-          path: 'tmp'
-          sparse-checkout: 'data-management'
-          sparse-checkout-cone-mode: false
-          ref: ${{ env.BRANCH_NAME }}
-
-      - shell: bash
-        name: sameBranch checkout test (d2e-plugin)
-        id: sameBranch-checkout-test-d2e-plugin
-        run: |
-          ls -lhtr tmp
-          [ -d tmp/data-management ] || echo D2E_PLUGIN_MAIN_BRANCH=true | tee -a "$GITHUB_OUTPUT"
-
-      - uses: actions/checkout@v4
-        name: main branch checkout (sameBranch checkout fails) (d2e-plugin)
-        id: main-branch-checkout-d2e-plugin
-        if: steps.sameBranch-checkout-test-d2e-plugin.outputs.D2E_PLUGIN_MAIN_BRANCH == 'True' 
-        with:
-          repository:  ${{ vars.D2E_PLUGIN_REPO }}
-          token: ${{ secrets.CI_PAT }}
-          path: 'tmp'
-          sparse-checkout: 'data-management'
-          sparse-checkout-cone-mode: false
-          ref: main
-
-      - shell: bash
-        name: merge files from d2e-plugin repo
-        id: merge_files_from_data-management
-        run: |
-          cp -prnl ./tmp/data-management/data_management_plugin/db/* ./services/alp-db-svc/db
-          ls -l ./services/alp-db-svc/db/drivers
-          ls -l ./services/alp-db-svc/db/migrations/hana
-          ls -l ./services/alp-db-svc/db/migrations/postgres
-
       # Get and merge ms-datamodel-plugin migration scripts
       - uses: actions/checkout@v4
         name: sameBranch checkout (ms-datamodel-plugin)
@@ -184,6 +143,47 @@ jobs:
         id: merge_files_from_ms_datamodel_plugin
         run: |
           cp -prnl ./tmp/ms_datamodel_plugin/db/* ./services/alp-db-svc/db
+          ls -l ./services/alp-db-svc/db/drivers
+          ls -l ./services/alp-db-svc/db/migrations/hana
+          ls -l ./services/alp-db-svc/db/migrations/postgres
+
+      # Get and merge d2e-plugins migration scripts
+      - uses: actions/checkout@v4
+        name: sameBranch checkout (d2e-plugin)
+        id: sameBranch-checkout-d2e-plugin
+        continue-on-error: true
+        with:
+          repository:  ${{ vars.D2E_PLUGIN_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'data-management'
+          sparse-checkout-cone-mode: false
+          ref: ${{ env.BRANCH_NAME }}
+
+      - shell: bash
+        name: sameBranch checkout test (d2e-plugin)
+        id: sameBranch-checkout-test-d2e-plugin
+        run: |
+          ls -lhtr tmp
+          [ -d tmp/data-management ] || echo D2E_PLUGIN_MAIN_BRANCH=true | tee -a "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        name: main branch checkout (sameBranch checkout fails) (d2e-plugin)
+        id: main-branch-checkout-d2e-plugin
+        if: steps.sameBranch-checkout-test-d2e-plugin.outputs.D2E_PLUGIN_MAIN_BRANCH == 'True' 
+        with:
+          repository:  ${{ vars.D2E_PLUGIN_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'data-management'
+          sparse-checkout-cone-mode: false
+          ref: main
+
+      - shell: bash
+        name: merge files from d2e-plugin repo
+        id: merge_files_from_data-management
+        run: |
+          cp -prnl ./tmp/data-management/data_management_plugin/db/* ./services/alp-db-svc/db
           ls -l ./services/alp-db-svc/db/drivers
           ls -l ./services/alp-db-svc/db/migrations/hana
           ls -l ./services/alp-db-svc/db/migrations/postgres
