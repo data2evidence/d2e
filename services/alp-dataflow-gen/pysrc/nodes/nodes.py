@@ -441,7 +441,7 @@ def generate_node_task(nodename, node, nodetype):
             logging.error(tb.StackSummary())
     return nodeobj
 
-# DONE
+
 class OutcomeDef(Node):
     def __init__(self, node):
         super().__init__(node)
@@ -463,7 +463,7 @@ class OutcomeDef(Node):
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
 
-# DONE
+
 class TimeAtRiskNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
@@ -487,7 +487,7 @@ class TimeAtRiskNode(Node):
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
 
-# DONE
+
 class CohortIncidenceModuleSpec(Node):
     def __init__(self, _node):
         super().__init__(_node)
@@ -534,7 +534,7 @@ class CohortIncidenceModuleSpec(Node):
     def test(self):
         return None
 
-# DONE
+
 class CharacterizationModuleSpecNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
@@ -568,7 +568,7 @@ class CharacterizationModuleSpecNode(Node):
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
 
-# DONE
+
 class DefaultCovariateSettingsNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
@@ -633,7 +633,7 @@ class NegativeControlOutcomeCohortSharedResource(Node):
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
 
-# DONE
+
 class CohortGeneratorSpecNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
@@ -653,7 +653,7 @@ class CohortGeneratorSpecNode(Node):
     def test():
         return None
 
-# DONE
+
 class CohortDiagnosticsModuleSpecNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
@@ -689,7 +689,7 @@ class CohortDiagnosticsModuleSpecNode(Node):
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
 
-# DONE
+
 class CMOutcomes(Node):
     def __init__(self, node):
         super().__init__(node)
@@ -715,7 +715,7 @@ class CMOutcomes(Node):
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
 
-# DONE
+
 class TargetComparatorOutcomes(Node):
     
     def __init__(self, _node):
@@ -786,7 +786,7 @@ class CohortMethodAnalysis(Node):
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
 
-# DONE
+
 class CohortMethodModuleSpecNode(Node):
 
     def __init__(self, _node):
@@ -815,7 +815,7 @@ class CohortMethodModuleSpecNode(Node):
     def test(self):
         return None
 
-# DONE
+
 class EraCovariateSettings(Node):
 
     def __init__(self, _node):
@@ -855,7 +855,7 @@ class EraCovariateSettings(Node):
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
 
-# DONE
+
 class CalendarCovariateSettingsNode(Node):
 
     def __init__(self, _node):
@@ -877,7 +877,7 @@ class CalendarCovariateSettingsNode(Node):
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
 
-# DONE
+
 class SeasonalityCovariateSettingsNode(Node):
     
     def __init__(self, _node):
@@ -899,7 +899,7 @@ class SeasonalityCovariateSettingsNode(Node):
         except Exception as e:
             return Result(e, tb.format_exc(), self, task_run_context)
 
-# DONE
+
 class StudyPopulationArgs(Node):
     def __init__(self, _node):
         super().__init__(_node)
