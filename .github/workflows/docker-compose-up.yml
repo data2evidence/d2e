@@ -139,6 +139,9 @@ jobs:
       - name: Builder cache cleanup
         run: |  
           docker builder prune -af
+          docker buildx prune -af
+          docker buildx --builder ${{ steps.builder1.outputs.name }} prune -af
+
 
       - name: Docker compose build data 2 services
         run: |
@@ -149,6 +152,9 @@ jobs:
       - name: Builder cache cleanup
         run: |  
           docker builder prune -af
+          docker buildx prune -af
+          docker buildx --builder ${{ steps.builder1.outputs.name }} prune -af
+
 
       - name: Docker compose build core services
         run: |
@@ -158,6 +164,9 @@ jobs:
       - name: Builder cache cleanup
         run: |  
           docker builder prune -af
+          docker buildx prune -af
+          docker buildx --builder ${{ steps.builder1.outputs.name }} prune -af
+
 
       # - name: Docker load dataflow-gen
       #   run: |
