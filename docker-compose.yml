@@ -74,6 +74,16 @@ x-envs:
           ],
           "route": "cohort"
         },
+        { 
+          "enabled": true,
+          "featureFlag": "cohorts",
+          "name": "Cohorts", 
+          "pluginPath": "plugins/Researcher/Cohort/module",
+          "requiredRoles": [ 
+            "RESEARCHER" 
+          ], 
+          "route": "cohorts"
+        },
         {
           "enabled": true,
           "featureFlag": "starboard",
@@ -324,6 +334,8 @@ services:
       - sh
       - ./startprefectserver.sh
     container_name: &c2 alp-dataflow-gen-${BASE_PORT:-1}
+    ports:
+      - 41${BASE_PORT:-1}20:41${BASE_PORT:-1}20
     depends_on:
       alp-db-credentials-mgr:
         condition: service_healthy
@@ -1455,8 +1467,7 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-
- alp-dicom-server:
+  alp-dicom-server:
     # uses 8042 port on the container
     image: orthancteam/orthanc
     container_name: &c27 alp-dicom-server-${BASE_PORT:-1}
@@ -1490,25 +1501,25 @@ services:
       - dicom-sqlite-storage:/var/lib/orthanc/db
 
   alp-fhir-fe-server:
-    container_name: &c27 alp-minerva-fhir-fe-server-${BASE_PORT:-1}
+    container_name: &c28 alp-minerva-fhir-fe-server-${BASE_PORT:-1}
     image: alpcr.azurecr.io/alp-data-node/alp-fhir-fe-server:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
-        tag: *c27
+        tag: *c28
     depends_on:
     - alp-fhir-server
     networks: 
       alp:
 
   alp-meilisearch-post-init:
-    container_name: &c27 alp-meilisearch-post-init
+    container_name: &c29 alp-meilisearch-post-init
     depends_on:
       alp-minerva-meilisearch-svc:
         condition: service_healthy
     image: getmeili/meilisearch:v1.6
     logging:
       options:
-        tag: *c27
+        tag: *c29
     entrypoint:
       - curl
       - -X
