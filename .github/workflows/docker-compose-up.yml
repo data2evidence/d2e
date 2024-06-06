@@ -135,10 +135,20 @@ jobs:
       #     docker save alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:local | gzip > alp-dataflow-gen.tar.gz
       #     docker image prune -af
 
+
+      - name: Builder cache cleanup
+        run: |  
+          docker builder prune -af
+
       - name: Docker compose build data 2 services
         run: |
           # Build DataNode services and pull dataflow-gen from cache
           yarn build:minerva alp-minerva-analytics-svc alp-minerva-sqleditor alp-query-gen alp-fhir-server alp-fhir-fe-server  --builder ${{ steps.builder1.outputs.name }}
+
+
+      - name: Builder cache cleanup
+        run: |  
+          docker builder prune -af
 
       - name: Docker compose build core services
         run: |
