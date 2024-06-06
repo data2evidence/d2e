@@ -10,10 +10,7 @@ import {
   processForComposeAnalytics,
   processForComposeDbSvc,
 } from "./processForCompose";
-import {
-  dbSvcConverter,
-  vcapSvcConverter,
-} from "./envConverter";
+import { dbSvcConverter, vcapSvcConverter } from "./envConverter";
 import { appendFileSync } from "fs";
 import { DbCredentialsApi } from "./api";
 import dbCredentialsTemplate from "./db-credentials-template";
@@ -35,8 +32,8 @@ api
   .getDatabases()
   .then((encryptedDatabases) => {
     const databaseCredentials = encryptedDatabases.map((db) => {
-      const { credentials, extra, dialect, name, port, ...rest } = db;
-
+      const { credentials, extra: extraArr, dialect, name, port, ...rest } = db;
+      const extra = extraArr?.[0]?.value || {};
       const decryptedCreds = credentials.reduce<{ [key: string]: string }>(
         (acc, c) => {
           const { username, password: encryptedPassword, salt, userScope } = c;

@@ -101,6 +101,7 @@ export interface IPrefectFlowRunByDeploymentDto {
   flowName: string
   deploymentName: string
   params: object
+  schedule: string | null
 }
 
 export interface IPrefectFlowRunByMetadataDto {

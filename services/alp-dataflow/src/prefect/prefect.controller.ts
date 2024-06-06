@@ -71,6 +71,16 @@ export class PrefectController {
     return this.prefectService.getFlowRunState(id)
   }
 
+  @Get('flow-run/:id/runs')
+  getRunsForFlowRun(@Param('id', ParseUUIDPipe) id: string) {
+    return this.prefectService.getRunsForFlowRun(id)
+  }
+
+  @Get('task-run/:id')
+  getTaskRunState(@Param('id', ParseUUIDPipe) id: string) {
+    return this.prefectService.getTaskRunState(id)
+  }
+
   @Get('task-run/:id/logs')
   getTaskRunLogs(@Param('id', ParseUUIDPipe) id: string) {
     return this.prefectService.getTaskRunLogs(id)
