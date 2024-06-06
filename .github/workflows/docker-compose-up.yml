@@ -125,33 +125,16 @@ jobs:
       #       # Build DataNode services and pull dataflow-gen from cache
       #       yarn build:minerva alp-dataflow-gen alp-dataflow-gen-agent alp-dataflow-gen-init  --builder ${{ steps.builder1.outputs.name }}
 
-      - name: Builder cache cleanup
+      - name: Docker
         run: |  
-          docker builder prune -af
-
-      - name: Load dataflow-gen
-        uses: docker/build-push-action@v5
-        with:
-          builder: ${{ steps.builder1.outputs.name }}
-          platforms: 'linux/amd64'
-          load: true
-          context: .
-          pull: false
-          file: ./services/alp-dataflow-gen/Dockerfile
-          push: false
-          tags: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:local
-          build-args: |
-            docker_image_prefix=alpcr.azurecr.io
-            GIT_COMMIT_ARG=${{ github.sha }}
+          docker image ls
+          docker save alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:local | gzip > alp-dataflow-gen.tar.gz
+          docker image prune -af
 
       - name: Docker compose build data 2 services
         run: |
           # Build DataNode services and pull dataflow-gen from cache
           yarn build:minerva alp-minerva-analytics-svc alp-minerva-sqleditor alp-query-gen alp-fhir-server alp-fhir-fe-server  --builder ${{ steps.builder1.outputs.name }}
-
-      - name: Builder cache cleanup
-        run: |  
-          docker builder prune -af
 
       - name: Docker compose build core services
         run: |
@@ -161,6 +144,10 @@ jobs:
       - name: Builder cache cleanup
         run: |  
           docker builder prune -af
+
+      - name: Docker load dataflow-gen
+        run: |
+          docker load < alp-dataflow-gen.tar.gz
 
       - name: Docker compose up Local Mode without UI Container
         env:
@@ -187,3 +174,4 @@ jobs:
         run: |  
           # Clean DataNode services
           yarn clean:minerva
+          docker system prune -af
