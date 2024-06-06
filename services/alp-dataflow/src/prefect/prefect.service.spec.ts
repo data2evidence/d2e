@@ -14,6 +14,8 @@ import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
 import { prefectFlowServiceMockFactory } from '../prefect-flow/prefect-flow.mock'
 import { dataQualityServiceMockFactory } from '../data-quality/data-quality.mock'
 import { DataQualityService } from '../data-quality/data-quality.service'
+import { dataCharacterizationServiceMockFactory } from '../data-characterization/data-characterization.mock'
+import { DataCharacterizationService } from '../data-characterization/data-characterization.service'
 
 describe('PrefectService', () => {
   let service: PrefectService
@@ -27,7 +29,8 @@ describe('PrefectService', () => {
         { provide: PrefectParamsTransformer, useFactory: prefectParamsTransformerMockFactory },
         { provide: PrefectExecutionClient, useFactory: prefectExecutionClientMockFactory },
         { provide: PrefectFlowService, useFactory: prefectFlowServiceMockFactory },
-        { provide: DataQualityService, useFactory: dataQualityServiceMockFactory }
+        { provide: DataQualityService, useFactory: dataQualityServiceMockFactory },
+        { provide: DataCharacterizationService, useFactory: dataCharacterizationServiceMockFactory }
       ]
     }).compile()
 
