@@ -103,7 +103,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
                 COALESCE(op.${placeholderMap["@OBSPER.END"]}, '2099-12-31') AS COHORT_END_DATE,
                 op.${placeholderMap["@OBSPER.PATIENT_ID"]} AS PATIENT_ID
             FROM
-                $$SCHEMA$$."VIEW::OMOP.OBS_PER" op
+                ${placeholderMap["@OBSPER"]} op
         )
 		SELECT
             COHORT_DEFINITION_ID,
