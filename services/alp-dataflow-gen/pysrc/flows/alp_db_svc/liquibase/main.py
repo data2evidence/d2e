@@ -4,7 +4,7 @@ from typing import List
 import os
 from flows.alp_db_svc.types import LiquibaseAction
 from flows.alp_db_svc.const import OMOP_DATA_MODELS
-from utils.types import DBCredentialsType
+from utils.types import DBCredentialsType, DatabaseDialects
 
 
 passwordReplacementRegex = compile(r"password=\S+")
@@ -39,24 +39,31 @@ class Liquibase:
         self.rollback_tag = rollback_tag
 
     def create_params(self) -> List:
-        print("inside create_params")
-        print(f"self.dialect is {self.dialect}")
-        print(f"self.dialect is {self.changelog_file}")
-
-        liquibase_path = "/app/liquibase/liquibase"
         changeLogFile = f"db/migrations/{self.dialect}/{self.changelog_file}"
 
+        host = self.tenant_configs.get("host")
+        port = self.tenant_configs.get("port")
+        database_name = self.tenant_configs.get("databaseName")
+        ssl_trust_store = self.tenant_configs.get("sslTrustStore")
+        host_name_in_cert = self.tenant_configs.get("hostnameInCertificate")
+        admin_user = self.tenant_configs.get("adminUser")
+        admin_password = self.tenant_configs.get("adminPassword")
+
+        liquibase_path = os.environ["LIQUIBASE_PATH"]
+        hana_driver_class_path = os.environ["HANA__DRIVER_CLASS_PATH"]
+        postgres_driver_class_path = os.environ["POSTGRES__DRIVER_CLASS_PATH"]
+
         match self.dialect:
-            case "hana":
-                classpath = f"/app/inst/drivers/ngdbc-latest.jar:{self.plugin_classpath}"
+            case DatabaseDialects.HANA:
+                classpath = f"{hana_driver_class_path}:{self.plugin_classpath}"
                 driver = "com.sap.db.jdbc.Driver"
-                connection_base_url = f'jdbc:sap://{self.tenant_configs["host"]}:{self.tenant_configs["port"]}?'
-                connection_properties = f'databaseName={self.tenant_configs["databaseName"]}&validateCertificate=false&encrypt=true&sslTrustStore={self.tenant_configs["sslTrustStore"]}&hostNameInCertificate={self.tenant_configs["hostnameInCertificate"]}&currentSchema={self.schema_name}'
-            case "postgres":
-                classpath = f"/app/inst/drivers/postgresql-42.3.1.jar:{self.plugin_classpath}"
+                connection_base_url = f'jdbc:sap://{host}:{port}?'
+                connection_properties = f'databaseName={database_name}&validateCertificate=false&encrypt=true&sslTrustStore={ssl_trust_store}&hostNameInCertificate={host_name_in_cert}&currentSchema={self.schema_name}'
+            case DatabaseDialects.POSTGRES:
+                classpath = f"{postgres_driver_class_path}:{self.plugin_classpath}"
                 driver = "org.postgresql.Driver"
-                connection_base_url = f'jdbc:postgresql://{self.tenant_configs["host"]}:{self.tenant_configs["port"]}/{self.tenant_configs["databaseName"]}?'
-                connection_properties = f'user={self.tenant_configs["adminUser"]}&password={self.tenant_configs["adminPassword"]}&currentSchema="{self.schema_name}"'
+                connection_base_url = f'jdbc:postgresql://{host}:{port}/{database_name}?'
+                connection_properties = f'user={admin_user}&password={admin_password}&currentSchema="{self.schema_name}"'
 
         params = [
             liquibase_path,
@@ -64,6 +71,8 @@ class Liquibase:
             f"--changeLogFile={changeLogFile}",
             f"--url={connection_base_url}{connection_properties}",
             f"--classpath={classpath}",
+            f"--username={admin_user}",
+            f"--password={admin_password}",
             f"--driver={driver}",
             f"--logLevel={os.environ['LB__LOG_LEVEL']}",
             f"--defaultSchemaName={self.schema_name}",

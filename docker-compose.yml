@@ -23,6 +23,9 @@ x-envs:
     HANA__READ_ROLE: TENANT_READ_ROLE
     JAVA_OPTS: -Xmx2g
     LB__LOG_LEVEL: debug
+    LIQUIBASE_PATH: "/app/liquibase/liquibase"
+    HANA__DRIVER_CLASS_PATH: "/app/inst/drivers/ngdbc-latest.jar"
+    POSTGRES__DRIVER_CLASS_PATH: "/app/inst/drivers/postgresql-42.3.1.jar"
     OMOP__VOCAB_SCHEMA: ${OMOP__VOCAB_SCHEMA:-cdmvocab}
     PG__READ_ROLE: postgres_tenant_read_role
     ROLLBACK_SCHEMA_CREATION_FOR_LIQUIBASE_SCRIPT_FAILURE: "TRUE"
