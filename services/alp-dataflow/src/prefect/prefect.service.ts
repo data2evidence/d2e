@@ -355,7 +355,6 @@ export class PrefectService {
       if (defaultPluginId) {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
       }
-      throw new InternalServerErrorException(errorMessage)
     }
 
     try {
@@ -382,7 +381,6 @@ export class PrefectService {
       if (defaultPluginId) {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
       }
-      throw new InternalServerErrorException(errorMessage)
     } finally {
       this.deleteDeploymentFolder(deploymentFolderPath)
     }
