@@ -110,7 +110,7 @@ jobs:
         with:
           builder: ${{ steps.builder1.outputs.name }}
           platforms: 'linux/amd64'
-          load: true
+          load: false
           context: .
           pull: true
           file: ./services/alp-dataflow-gen/Dockerfile
@@ -128,6 +128,21 @@ jobs:
       - name: Builder cache cleanup
         run: |  
           docker builder prune -af
+
+      - name: Load dataflow-gen
+        uses: docker/build-push-action@v5
+        with:
+          builder: ${{ steps.builder1.outputs.name }}
+          platforms: 'linux/amd64'
+          load: true
+          context: .
+          pull: false
+          file: ./services/alp-dataflow-gen/Dockerfile
+          push: false
+          tags: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:local
+          build-args: |
+            docker_image_prefix=alpcr.azurecr.io
+            GIT_COMMIT_ARG=${{ github.sha }}
 
       - name: Docker compose build data 2 services
         run: |
