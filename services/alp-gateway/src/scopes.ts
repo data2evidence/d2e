@@ -759,6 +759,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     path: '^/gateway/api/db/schema$',
     scopes: ['gateway.db.schema.update'],
     httpMethods: ['PUT']
+  },
+  {
+    path: '^/gateway/api/fhir',
+    scopes: ['gateway.fhir.create'],
+    httpMethods: ['POST']
   }
 ]
 export const ROLE_SCOPES = {
@@ -877,7 +882,8 @@ export const ROLE_SCOPES = {
     'dataflowmgmt.analysisflow.read',
     'dataflowmgmt.analysisflow.add',
     'dataflowmgmt.analysisflow.delete',
-    'dataflowmgmt.analysisflow.revision.delete'
+    'dataflowmgmt.analysisflow.revision.delete',
+    'gateway.fhir.create'
   ],
   ALP_DASHBOARD_VIEWER: ['gateway.dashboardGate.content'],
   TENANT_VIEWER: [
