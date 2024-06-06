@@ -99,8 +99,8 @@ export async function generateQuery(req: IMRIRequest, res, next) {
         ${queryResponse.queryObject.queryString}
         ), obsdata AS (
             SELECT
-                COALESCE(op.${placeholderMap["@OBSPER.START"]}, CURRENT_DATE) AS COHORT_START_DATE,
-                COALESCE(op.${placeholderMap["@OBSPER.END"]}, CURRENT_DATE) AS COHORT_END_DATE,
+                COALESCE(op.${placeholderMap["@OBSPER.START"]}, '1970-01-01') AS COHORT_START_DATE,
+                COALESCE(op.${placeholderMap["@OBSPER.END"]}, '2099-12-31') AS COHORT_END_DATE,
                 op.${placeholderMap["@OBSPER.PATIENT_ID"]} AS PATIENT_ID
             FROM
                 $$SCHEMA$$."VIEW::OMOP.OBS_PER" op
