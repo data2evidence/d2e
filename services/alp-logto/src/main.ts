@@ -21,7 +21,7 @@ async function callback(path: string, headers: object, data: object) {
   }
 }
 
-async function getPgRows(
+async function queryPostgres(
   client: pg.Client,
   query: string,
   values: Array<string | number>
@@ -153,40 +153,40 @@ async function main() {
 
     await client.connect();
 
-    let appRows = await getPgRows(
+    let appRows = await queryPostgres(
       client,
       "select * from public.applications where name in ($1, $2, $3)",
       ["alp-app", "alp-svc", "alp-data"]
     );
-    let resourcesRows = await getPgRows(
+    let resourcesRows = await queryPostgres(
       client,
       "select * from public.resources where name = $1",
       ["alp-default"]
     );
-    let userRows = await getPgRows(
+    let userRows = await queryPostgres(
       client,
       "select * from public.users where username = $1 and tenant_id = $2",
       ["admin", "default"]
     );
-    let scopeRows = await getPgRows(
+    let scopeRows = await queryPostgres(
       client,
       "select * from public.scopes where name in ($1, $2, $3)",
       ["role.systemadmin", "role.useradmin", "role.tenantviewer"]
     );
 
-    let roleRows = await getPgRows(
+    let roleRows = await queryPostgres(
       client,
       "select * from public.roles where name in ($1, $2, $3)",
       ["role.systemadmin", "role.useradmin", "role.tenantviewer"]
     );
 
-    let roleScopeRows = await getPgRows(
+    let roleScopeRows = await queryPostgres(
       client,
       "select * from public.roles_scopes rs join public.roles r on rs.role_id = r.id where r.name in ($1, $2, $3)",
       ["role.systemadmin", "role.useradmin", "role.tenantviewer"]
     );
 
-    let userRoleRows = await getPgRows(
+    let userRoleRows = await queryPostgres(
       client,
       "select * from public.users_roles ur join public.roles r on ur.role_id = r.id where r.name in ($1, $2, $3)",
       ["role.systemadmin", "role.useradmin", "role.tenantviewer"]
@@ -236,4 +236,111 @@ async function main() {
   }, 3000);
 }
 
+async function seeding_alp_admin() {
+  let logtoAdminApp = JSON.parse(process.env.LOGTO__ALP_ADMIN_APP) || {
+    application: {},
+    role: {},
+  };
+  let alpAdminApp: {
+    name: string;
+    description: string;
+    secret: string;
+  } = logtoAdminApp.application;
+  let alpAdminRole = logtoAdminApp.role;
+
+  let client = new pg.Client({
+    user: process.env.PG__USER,
+    password: process.env.PG__PASSWORD,
+    host: process.env.PG__HOST,
+    port: parseInt(process.env.PG__PORT),
+    database: process.env.PG__DB_NAME,
+  });
+  await client.connect();
+
+  let LOGTO__ADMIN_ROLE__ID = "api-access";
+  let LOGTO__ADMIN_APP__ID = "alp-admin";
+  let LOGTO__ADMIN_APP_ROLE__ID = "alp-admin";
+  let LOGTO__ADMIN_ROLE_SCOPE__ID = "alp-admin";
+  let LOGTO__TENANT_ID = "default";
+
+  console.log(
+    "*********************************************************************************"
+  );
+  console.log(
+    `Inserting ${alpAdminApp.name} application to applications table`
+  );
+  await queryPostgres(
+    client,
+    "INSERT INTO public.applications(tenant_id, id, name, secret, description, type, oidc_client_metadata) \
+    VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT(id) \
+    DO UPDATE SET secret = EXCLUDED.secret, oidc_client_metadata = EXCLUDED.oidc_client_metadata, custom_client_metadata = EXCLUDED.custom_client_metadata",
+    [
+      LOGTO__TENANT_ID,
+      LOGTO__ADMIN_APP__ID,
+      `${alpAdminApp.name}`,
+      `${alpAdminApp.secret}`,
+      `${alpAdminApp.description}`,
+      "MachineToMachine",
+      '{  "redirectUris": [],  "postLogoutRedirectUris": [] }',
+    ]
+  );
+
+  console.log(
+    "*********************************************************************************"
+  );
+  console.log(`Inserting ${alpAdminRole.name} role to roles table`);
+  await queryPostgres(
+    client,
+    "INSERT INTO public.roles(tenant_id, id, name, description, type) \
+    VALUES ($1, $2, $3, $4, $5) ON CONFLICT(id) \
+    DO NOTHING;",
+    [
+      LOGTO__TENANT_ID,
+      LOGTO__ADMIN_ROLE__ID,
+      `${alpAdminRole.name}`,
+      `${alpAdminRole.description}`,
+      "MachineToMachine",
+    ]
+  );
+
+  console.log(
+    "*********************************************************************************"
+  );
+  console.log(
+    `Adding role ${alpAdminRole.name} to application ${alpAdminApp.name}`
+  );
+  await queryPostgres(
+    client,
+    "INSERT INTO public.applications_roles(tenant_id, id, application_id, role_id) \
+    VALUES ($1, $2, $3, $4) ON CONFLICT(id) \
+    DO NOTHING;",
+    [
+      LOGTO__TENANT_ID,
+      LOGTO__ADMIN_APP_ROLE__ID,
+      LOGTO__ADMIN_APP__ID,
+      LOGTO__ADMIN_ROLE__ID,
+    ]
+  );
+
+  console.log(
+    "*********************************************************************************"
+  );
+  console.log(`Adding scope "management-api-all" to role ${alpAdminRole.name}`);
+  await queryPostgres(
+    client,
+    "INSERT INTO public.roles_scopes(tenant_id, id, role_id, scope_id) \
+    VALUES ($1, $2, $3, $4) ON CONFLICT(id) \
+    DO NOTHING;",
+    [
+      LOGTO__TENANT_ID,
+      LOGTO__ADMIN_ROLE_SCOPE__ID,
+      LOGTO__ADMIN_ROLE__ID,
+      "management-api-all",
+    ]
+  );
+
+  client.end();
+}
+
+seeding_alp_admin();
 main();

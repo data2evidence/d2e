@@ -73,26 +73,6 @@ services:
       context: ./services/alp-logto
       dockerfile: Dockerfile
 
-  alp-logto-post-init:
-    container_name: alp-logto-post-init
-    depends_on:
-      alp-logto:
-        condition: service_healthy
-      alp-minerva-postgres:
-        condition: service_healthy
-    image: postgres:15-alpine
-    networks:
-      - alp
-    volumes:
-      - ./deploy/logto:/logto
-    entrypoint: sh logto/init.sh
-    environment:
-      PG__DB_NAME: logto
-      PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
-      PG__PASSWORD: ${PG_SUPER_PASSWORD}
-      PG__PORT: ${PG_PORT:-5432}
-      PG__USER: ${PG_SUPER_USER:-postgres}
-
   alp-minerva-analytics-svc:
     build:
       context: .
@@ -280,13 +260,19 @@ services:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
       
-  alp-logto-post-init-2:
+  alp-logto-post-init:
+    container_name: alp-logto-post-init
     image: node:18.20.2-slim
     networks:
       - alp
     volumes:
       - ./deploy/logto:/logto
       - ./services/alp-logto:/home/docker
+    depends_on:
+      alp-logto:
+        condition: service_healthy
+      alp-minerva-postgres:
+        condition: service_healthy
     entrypoint: cd /home/docker && npm run build-and-seed
     environment:
       PG__DB_NAME: logto
@@ -301,3 +287,4 @@ services:
       LOGTO__SCOPES: '[{"name":"role.systemadmin","description":"ALP System admin"},{"name":"role.useradmin","description":"ALP User admin"},{"name":"role.tenantviewer","description":"ALP Tenant viewer"}]'
       LOGTO__ADMIN_SERVER__FQDN_URL: "http://alp-logto-1:3002"
       LOGTO__CLIENTID_PASSWORD__BASIC_AUTH: ${LOGTO__CLIENTID_PASSWORD__BASIC_AUTH:-YTU2MG84dHF3NzloeTJjcG44eDFxOnhrOEhQNFZEenFKY25YQ1RwZGFRTTZVdDJTd3JHMzd1}
+      LOGTO__ALP_ADMIN_APP: '{"application": {"name":"alp-admin","description":"alp-admin", "secret": ${LOGTO__ALP_ADMIN_APP__SECRET:-"Toor12345678"}}, "role": { "name":"api-access","description":"Logto API access"}}'
