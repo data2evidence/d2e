@@ -38,7 +38,7 @@ jobs:
           dotnet: true
           haskell: true
           large-packages: false
-          docker-images: false
+          docker-images: true
           swap-storage: true
 
       - uses: actions/checkout@v4
@@ -111,25 +111,25 @@ jobs:
           docker builder prune -af
           docker buildx prune -af
 
-      - name: Build dataflow-gen
-        uses: docker/build-push-action@v5
-        with:
-          builder: ${{ steps.builder1.outputs.name }}
-          platforms: 'linux/amd64'
-          load: true
-          context: .
-          pull: true
-          file: ./services/alp-dataflow-gen/Dockerfile
-          push: false
-          tags: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:local
-          build-args: |
-            docker_image_prefix=alpcr.azurecr.io
-            GIT_COMMIT_ARG=${{ github.sha }}
+      # - name: Build dataflow-gen
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     builder: ${{ steps.builder1.outputs.name }}
+      #     platforms: 'linux/amd64'
+      #     load: true
+      #     context: .
+      #     pull: true
+      #     file: ./services/alp-dataflow-gen/Dockerfile
+      #     push: false
+      #     tags: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:local
+      #     build-args: |
+      #       docker_image_prefix=alpcr.azurecr.io
+      #       GIT_COMMIT_ARG=${{ github.sha }}
 
-      # - name: Docker compose build data 1 services
-      #   run: |
-      #       # Build DataNode services and pull dataflow-gen from cache
-      #       yarn build:minerva alp-dataflow-gen alp-dataflow-gen-agent alp-dataflow-gen-init  --builder ${{ steps.builder1.outputs.name }}
+      - name: Docker compose build data 1 services
+        run: |
+            # Build DataNode services and pull dataflow-gen from cache
+            yarn build:minerva alp-dataflow-gen alp-dataflow-gen-agent alp-dataflow-gen-init  --builder ${{ steps.builder1.outputs.name }}
 
       # - name: Docker
       #   run: |  
@@ -154,7 +154,7 @@ jobs:
       - name: Docker compose build core services
         run: |
           # Build DataNode services and pull dataflow-gen from cache
-          yarn build:minerva alp-bookmark alp-caddy alp-db-credentials-mgr alp-logto alp-minerva-cdw-svc alp-minerva-dataflow-mgmt alp-minerva-gateway alp-minerva-pa-config-svc alp-minerva-pg-mgmt-init alp-minerva-portal-server alp-minerva-ps-config-svc alp-minerva-terminology-svc alp-minerva-user-mgmt alp-mri-pg-config  --builder ${{ steps.builder1.outputs.name }}
+          yarn build:minerva alp-bookmark alp-caddy alp-db-credentials-mgr alp-logto alp-minerva-cdw-svc alp-minerva-dataflow-mgmt alp-minerva-gateway alp-minerva-pa-config-svc alp-minerva-pg-mgmt-init alp-minerva-portal-server alp-minerva-ps-config-svc alp-minerva-terminology-svc alp-minerva-user-mgmt alp-mri-pg-config alp-dataflow  --builder ${{ steps.builder1.outputs.name }}
 
       - name: Builder cache cleanup
         run: |  
@@ -169,7 +169,7 @@ jobs:
           PORTAL_NAME: alp-minerva-gateway-1
         run: |
           # Run DataNode services
-          yarn start:minerva --force-recreate --wait
+          yarn start:minerva --wait
           EXIT_CODE=$?
 
           docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
