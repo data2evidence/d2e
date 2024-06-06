@@ -83,8 +83,8 @@ export class PrefectService {
   }
 
   async createFlowRunByDeployment(flowRun: IPrefectFlowRunByDeploymentDto) {
-    const { flowRunName, flowName, deploymentName, params } = flowRun
-    const flowRunId = await this.prefectApi.createFlowRun(flowRunName, deploymentName, flowName, params)
+    const { flowRunName, flowName, deploymentName, params, schedule } = flowRun
+    const flowRunId = await this.prefectApi.createFlowRun(flowRunName, deploymentName, flowName, params, schedule)
 
     return flowRunId
   }
@@ -158,7 +158,6 @@ export class PrefectService {
         deploymentPath,
         this.prefectExecutionClient.createDeploymentTemplate(
           userId,
-          modifiedFileStem,
           flowMetadataInput.name,
           flowMetadataInput.entrypoint.replace(/\//g, '.').replace(/\.py$/, ''),
           ...(flowMetadataInput.others.tags ? [flowMetadataInput.others.tags] : [])
