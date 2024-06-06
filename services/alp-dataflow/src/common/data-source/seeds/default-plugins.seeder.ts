@@ -1,8 +1,8 @@
 import { Seeder } from 'typeorm-extension'
 import { DataSource } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
-
-import { DefaultPlugins } from 'src/prefect-flow/entity'
+import { PluginUploadStatus } from '../../../common/const'
+import { DefaultPlugins } from '../../../prefect-flow/entity'
 
 export default class DefaultPluginsSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {
@@ -20,7 +20,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'cohort-generator',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=cohort-generator',
-        status: 'pending',
+        status: PluginUploadStatus.PENDING,
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
@@ -30,7 +30,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'data-characterization',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=data-characterization',
-        status: 'pending',
+        status: PluginUploadStatus.PENDING,
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
@@ -40,7 +40,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'data-management',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=data-management',
-        status: 'pending',
+        status: PluginUploadStatus.PENDING,
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
@@ -50,7 +50,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'data-quality',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=data-quality',
-        status: 'pending',
+        status: PluginUploadStatus.PENDING,
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
@@ -60,7 +60,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'dataflow-ui',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=dataflow-ui',
-        status: 'pending',
+        status: PluginUploadStatus.PENDING,
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
@@ -70,7 +70,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'duckdb',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=duckdb',
-        status: 'pending',
+        status: PluginUploadStatus.PENDING,
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
@@ -80,7 +80,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'i2b2',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=i2b2',
-        status: 'pending',
+        status: PluginUploadStatus.PENDING,
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
@@ -90,7 +90,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'meilisearch-embeddings',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=meilisearch-embeddings',
-        status: 'pending',
+        status: PluginUploadStatus.PENDING,
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
@@ -100,7 +100,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'meilisearch',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=meilisearch',
-        status: 'pending',
+        status: PluginUploadStatus.PENDING,
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'
@@ -110,7 +110,7 @@ export default class DefaultPluginsSeeder implements Seeder {
         name: 'r-cdm',
         type: 'default',
         url: 'https://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@github.com/alp-os/d2e-plugins.git@main#subdirectory=r-cdm',
-        status: 'pending',
+        status: PluginUploadStatus.PENDING,
         others: {},
         createdBy: 'system',
         modifiedBy: 'system'

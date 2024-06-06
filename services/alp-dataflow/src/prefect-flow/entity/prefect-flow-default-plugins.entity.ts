@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm'
 import { Audit } from '../../common/entity/audit.entity'
+import { PluginUploadStatus } from '../../common/const'
 
 @Entity('default_plugins')
 export class DefaultPlugins extends Audit {
@@ -16,7 +17,7 @@ export class DefaultPlugins extends Audit {
   url: string
 
   @Column()
-  status: string
+  status: PluginUploadStatus
 
   @Column({ type: 'simple-json', nullable: true })
   others: any

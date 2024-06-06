@@ -8,7 +8,7 @@ import { DefaultPlugins } from './entity'
 import { Repository } from 'typeorm'
 import { createLogger } from '../logger'
 import { IFlowMetadataDto } from '../types'
-import { FLOW_METADATA } from '../common/const'
+import { FLOW_METADATA, PluginUploadStatus } from '../common/const'
 import { REQUEST } from '@nestjs/core'
 import { join } from 'path'
 import { JwtPayload, decode } from 'jsonwebtoken'
@@ -106,7 +106,7 @@ export class PrefectFlowService {
     return await this.defaultPluginsRepo.createQueryBuilder('default_plugins').getMany()
   }
 
-  async updateDefaultPluginStatus(pluginId: string, status: string) {
+  async updateDefaultPluginStatus(pluginId: string, status: PluginUploadStatus) {
     return await this.defaultPluginsRepo.update({ pluginId }, { status })
   }
 
