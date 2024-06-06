@@ -3,7 +3,7 @@ import json
 from sqlalchemy import create_engine, text
 import datetime
 from uuid import UUID
-from utils.types import DBCredentialsType, HANA_TENANT_USERS, PG_TENANT_USERS
+from utils.types import DBCredentialsType, HANA_TENANT_USERS, PG_TENANT_USERS, DatabaseDialects
 
 # TODO: Remove after envConverter returns postgres
 # catches possible pg dialect values from envConverter
@@ -39,6 +39,7 @@ def GetDBConnection(database_code: str, user_type: str):
             case PG_TENANT_USERS.READ_USER:
                 databaseUser = conn_details["readUser"]
                 databasePassword = conn_details["readPassword"]
+
         host = conn_details["host"]
         port = conn_details["port"]
         conn_string = _CreateConnectionString(
@@ -172,10 +173,11 @@ class DatabaseCredentials:
             "hostnameInCertificate", "")
         values["enableAuditPolicies"] = self.values.get(
             "enableAuditPolicies", False)
+
         match db_svc_dialect_mapper(self.values["dialect"]):
-            case "hana":
+            case DatabaseDialects.HANA:
                 values["readRole"] = os.environ["HANA__READ_ROLE"]
-            case "postgres":
+            case DatabaseDialects.POSTGRES:
                 values["readRole"] = os.environ["PG__READ_ROLE"]
 
         try:
