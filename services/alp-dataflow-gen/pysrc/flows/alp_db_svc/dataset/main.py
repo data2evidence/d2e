@@ -61,7 +61,7 @@ def create_schema_tasks(dialect: str,
                         vocab_schema: str,
                         tenant_configs: DBCredentialsType,
                         plugin_classpath: str,
-                        count: int):
+                        count: int) -> bool:
 
     match dialect:
         case DatabaseDialects.HANA:
@@ -132,7 +132,9 @@ def create_schema_tasks(dialect: str,
                                        **dict(db=database_code, schema=schema_name))],
                 on_failure=[partial(update_cdm_version_hook,
                                     **dict(db=database_code, schema=schema_name))])
+
             insert_cdm_version_wo(schema_dao, cdm_version)
+        return True
 
 
 def update_datamodel(options: UpdateDataModelType):
@@ -181,6 +183,7 @@ def update_datamodel(options: UpdateDataModelType):
                     on_failure=[partial(update_cdm_version_hook,
                                         **dict(db=database_code, schema=schema_name))])
                 update_cdm_version_wo(schema_dao, cdm_version)
+
     except Exception as e:
         logger.error(e)
         raise e
@@ -317,8 +320,7 @@ def run_liquibase(**kwargs) -> str:
     liquibase = Liquibase(**kwargs)
     return_code = liquibase.update_schema()
     if return_code != 0:
-        raise Exception(
-            "Liquibase failed to complete operation with non-0 return code")
+        raise Exception("Failed to run liquibase")
     else:
         return return_code
 

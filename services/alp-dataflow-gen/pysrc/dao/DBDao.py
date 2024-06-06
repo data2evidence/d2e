@@ -5,6 +5,7 @@ from sqlalchemy.sql.selectable import Select
 import pandas as pd
 from typing import List
 from datetime import datetime
+from utils.types import DatabaseDialects
 
 
 class DBDao:
@@ -18,10 +19,10 @@ class DBDao:
     def check_schema_exists(self):
         db_dialect = get_db_svc_endpoint_dialect(self.database_code)
         match db_dialect:
-            case 'postgres':
+            case DatabaseDialects.POSTGRES:
                 sql_query = text(
                     "select * from information_schema.schemata where schema_name = :x;")
-            case 'hana':
+            case DatabaseDialects.HANA:
                 sql_query = text(
                     "select * from SYS.SCHEMAS where SCHEMA_NAME = :x;")
         with self.engine.connect() as connection:
