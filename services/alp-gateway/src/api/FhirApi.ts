@@ -36,7 +36,7 @@ export class FhirAPI {
     try {
       const res = await this.medplumClient.startClientLogin(this.clientId, this.clientSecret)
     } catch (error) {
-      this.logger.error('Error client credentials authentication', error)
+      this.logger.error('Error performing client credentials authentication', error)
     }
   }
 
