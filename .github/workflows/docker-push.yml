@@ -63,7 +63,7 @@ jobs:
         dotnet: true
         haskell: true
         large-packages: false
-        docker-images: false
+        docker-images: true
         swap-storage: true
 
     - id: setup
