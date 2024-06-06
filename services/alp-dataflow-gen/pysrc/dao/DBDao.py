@@ -50,7 +50,7 @@ class DBDao:
 
     def drop_schema(self):
         with self.engine.connect() as connection:
-            connection.execute(DropSchema(self.schema_name, cacade=True))
+            connection.execute(DropSchema(self.schema_name, cascade=True))
             connection.commit()
 
     def get_distinct_count(self, table_name: str, column_name: str) -> int:
@@ -92,7 +92,7 @@ class DBDao:
             connection.commit()
             return res.rowcount
 
-    def update_cdm_version(self, cdm_version: str) -> int:
+    def update_cdm_version(self, cdm_version: str):
         with self.engine.connect() as connection:
             table = Table("cdm_source".casefold(), self.metadata,
                           autoload_with=connection)
