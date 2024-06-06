@@ -21,6 +21,7 @@ import {
   FLOW_METADATA_JSON_FILENAME,
   PREFECT_ADHOC_FLOW_FOLDER_PATH,
   PluginUploadStatus,
+  PluginUploadStatusText,
   PrefectDeploymentPythonFiles
 } from '../common/const'
 import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
@@ -125,16 +126,16 @@ export class PrefectService {
       })
     }
     if (statusDetails.every(s => s.status === PluginUploadStatus.PENDING)) {
-      installationStatus = 'Plugins not initialized'
+      installationStatus = PluginUploadStatusText.PENDING
     }
     if (statusDetails.some(s => s.status === PluginUploadStatus.FAILED) && noActiveInstallations) {
-      installationStatus = 'One or more plugin(s) upload is failed'
+      installationStatus = PluginUploadStatusText.FAILED
     }
     if (statusDetails.every(s => s.status === PluginUploadStatus.COMPLETE)) {
-      installationStatus = 'All plugins upload is successful'
+      installationStatus = PluginUploadStatusText.COMPLETE
     }
     if (statusDetails.some(s => s.status === PluginUploadStatus.INSTALLING)) {
-      installationStatus = 'Intallations in progress'
+      installationStatus = PluginUploadStatusText.INSTALLING
     }
     const result: IPluginUploadStatusDto = { statusDetails, noActiveInstallations, installationStatus }
     return result

@@ -78,4 +78,11 @@ export enum PluginUploadStatus {
   INSTALLING = 'installing'
 }
 
+export enum PluginUploadStatusText {
+  PENDING = 'Plugins not initialized',
+  COMPLETE = 'All plugins upload is successful',
+  FAILED = 'One or more plugin(s) upload is failed',
+  INSTALLING = 'Intallations in progress'
+}
+
 export const DEFAULT_ERROR_MESSAGE = 'Error occurred. Please contact we@data4life.help for further support.'
