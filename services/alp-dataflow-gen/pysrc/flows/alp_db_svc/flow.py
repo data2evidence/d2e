@@ -85,7 +85,7 @@ def run_seed_postgres(options: seedVocabType):
         options.vocab_schema=None
         run_seed_postgres(options)
 
-@task
+@flow
 def load_data_flow(database_code: str, schema_name: str):
     try:
         run_command(request_type="put",
