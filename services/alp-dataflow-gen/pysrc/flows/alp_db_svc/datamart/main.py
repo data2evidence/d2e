@@ -2,7 +2,8 @@ import importlib
 from prefect_shell import ShellOperation
 from prefect import get_run_logger
 from dao.DBDao import DBDao
-from utils.types import PG_TENANT_USERS, CreateDataModelType
+from utils.types import PG_TENANT_USERS
+from flows.alp_db_svc.types import CreateDataModelType
 from flows.alp_db_svc.datamart.datamart import datamart_copy_schema
 from flows.alp_db_svc.datamart.types import DATAMART_ACTIONS, CreateDatamartType, TempCreateDataModelType
 
