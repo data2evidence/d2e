@@ -105,12 +105,16 @@ jobs:
         with:
           config: .github/buildkitd.toml
 
+      - name: Docker
+        run: |  
+          docker image prune -af
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           builder: ${{ steps.builder1.outputs.name }}
           platforms: 'linux/amd64'
-          load: false
+          load: true
           context: .
           pull: true
           file: ./services/alp-dataflow-gen/Dockerfile
@@ -125,11 +129,11 @@ jobs:
       #       # Build DataNode services and pull dataflow-gen from cache
       #       yarn build:minerva alp-dataflow-gen alp-dataflow-gen-agent alp-dataflow-gen-init  --builder ${{ steps.builder1.outputs.name }}
 
-      - name: Docker
-        run: |  
-          docker image ls
-          docker save alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:local | gzip > alp-dataflow-gen.tar.gz
-          docker image prune -af
+      # - name: Docker
+      #   run: |  
+      #     docker image ls
+      #     docker save alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:local | gzip > alp-dataflow-gen.tar.gz
+      #     docker image prune -af
 
       - name: Docker compose build data 2 services
         run: |
@@ -145,9 +149,9 @@ jobs:
         run: |  
           docker builder prune -af
 
-      - name: Docker load dataflow-gen
-        run: |
-          docker load < alp-dataflow-gen.tar.gz
+      # - name: Docker load dataflow-gen
+      #   run: |
+      #     docker load < alp-dataflow-gen.tar.gz
 
       - name: Docker compose up Local Mode without UI Container
         env:
