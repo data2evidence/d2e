@@ -31,6 +31,10 @@ on:
         description: Select the environment
         required: true
         type: environment
+      force-cleanup-containers:
+          description: Force cleanup all containers
+          type: boolean
+          default: false
       docker-tag-develop:
         description: tag:*:develop
         type: boolean
@@ -46,15 +50,6 @@ on:
         description: tag:ui:fromTextbox (precedence)
         type: string
         required: false
-      override-branch-boolean:
-        description: override:branch:sameAsDn
-        type: boolean
-        default: false
-      override-repo-branch-textbox:
-        description: override:branch:fromTextbox (precedence)
-        type: string
-        required: false
-        default: develop
       dotenv-boolean:
         description: boolean:dotenv
         type: boolean
@@ -83,6 +78,11 @@ jobs:
         repository: ${{ github.event.inputs.repo_full_name }}
         token: ${{ secrets.CI_PAT }}
 
+    - name: Force cleanup containers
+      if: github.event.inputs.force-cleanup-containers
+      continue-on-error: true
+      run: docker rm -v -f $(docker ps -qa)
+
     - name: Generate dotenv
       env:
         DOTENV_FILE: .env.${{ env.ENV_TYPE }}
@@ -96,6 +96,7 @@ jobs:
       
         # get env yml from 1password
         if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
+        then
           yarn --cwd internal op:get:$ENV_TYPE
         else
           echo dotenv-boolean=false | tee -a $GITHUB_STEP_SUMMARY
@@ -105,7 +106,7 @@ jobs:
         internal/scripts/gha-mask.sh
 
         # generate dotenv
-        yarn gen:env
+        yarn --cwd internal gen:env
         echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
 
         cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
@@ -152,27 +153,6 @@ jobs:
         username: ${{ env.REGISTRY_USERNAME }}
         password: ${{ env.REGISTRY_PASSWORD }}
 
-    - name: Cleanup dangling images and remove created/exited containers
-      continue-on-error: true
-      run: |
-        if [[ $(docker ps -aq -f status=exited) ]]; then
-          docker rm $(docker ps -aq -f status=exited)
-          echo "Exited containers removed"
-          else
-          echo "No exited containers"
-        fi
-    
-        if [[ $(docker ps -aq -f status=created) ]]; then
-          docker rm $(docker ps -aq -f status=created)
-          echo "Created status containers removed"
-        else
-          echo "No created status containers"
-        fi
-    
-        sleep 5
-    
-        # docker image prune -af
-
     - name: docker compose up
       env:
         GATEWAY_NAME: alp-minerva-gateway-1
@@ -180,8 +160,8 @@ jobs:
         echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
 
         # customize dc.yml
-        yq -i '.services.alp-local-ui-file-server.image="alpcr.azurecr.io/alp-data-node/alp-local-ui-file-server:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
         yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
+        yq -i '.services.alp-caddy.image="alpcr.azurecr.io/alp-data-node/alp-caddy:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
 
         # Run ALP services
         yarn remote:minerva up --remove-orphans --force-recreate --wait --pull always
@@ -204,3 +184,8 @@ jobs:
       if: success() || failure()
       run: |
         yarn logs:minerva
+
+    - name: Post cleanup
+      if: always()
+      run: |
+        docker rm -f alp-caddy-certs-mgmt || true # Cleanup cert mgmt container if job aborted

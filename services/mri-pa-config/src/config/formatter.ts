@@ -299,6 +299,8 @@ export class Formatter {
             const attributeObj: any = {
                 name: cdwConfigAttributeObj.name, // TODO: translate
                 type: cdwConfigAttributeObj.type,
+                domainFilter: cdwConfigAttributeObj.domainFilter,
+                standardConceptCodeFilter: cdwConfigAttributeObj.standardConceptCodeFilter,
                 category: attribute.category,
                 measure: attribute.measure,
                 aggregated: Boolean(cdwConfigAttributeObj.measureExpression),

@@ -300,7 +300,8 @@ export function getDefinition(tableMapping: any) {
             name: "type",
             type: "string",
             mandatory: true,
-            regex: "^(num)$|^(text)$|^(time)$|^(freetext)$|^(datetime)$",
+            regex:
+              "^(num)$|^(text)$|^(time)$|^(freetext)$|^(datetime)|^(conceptSet)$",
           },
           {
             name: "referenceFilter",
@@ -402,6 +403,31 @@ export function getDefinition(tableMapping: any) {
             mandatory: false,
             type: "string",
           },
+          {
+            name: "domainFilter",
+            mandatory: false,
+            type: "string",
+          },
+          {
+            name: "standardConceptCodeFilter",
+            mandatory: false,
+            type: "string",
+          },
+          {
+            name: "useRefValue",
+            mandatory: false,
+            type: "boolean",
+          },
+          {
+            name: "useRefText",
+            mandatory: false,
+            type: "boolean",
+          },
+          {
+            name: "conceptSetType",
+            mandatory: false,
+            type: "string",
+          }
         ],
       },
     ],

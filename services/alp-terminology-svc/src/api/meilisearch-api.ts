@@ -5,6 +5,7 @@ import { env } from '../env';
 import { createLogger } from '../logger';
 import {
   Filters,
+  HybridSearchConfig,
   IMeilisearchConcept,
   IMeilisearchGetConceptRecommended,
   IMeilisearchGetDescendants,
@@ -30,17 +31,41 @@ export class MeilisearchAPI {
     }
   }
 
+  async hybridSearch(
+    index: string,
+    data: any,
+    hybridSearchName: string,
+    semanticRatio: any,
+  ) {
+    const options = await this.createOptions();
+
+    // Append source and model to index name (Naming convention must be standardised)
+    const hybridSearchUrl = `${this.url}/indexes/${index}${hybridSearchName}/search`;
+    const hybridSearchData = {
+      ...data,
+      hybrid: {
+        semanticRatio: semanticRatio,
+        embedder: 'default',
+        // vector: [0, 1, 2] if we are calculating local embeddings
+      },
+    };
+    return await axios.post<IMeilisearchConcept>(
+      hybridSearchUrl,
+      hybridSearchData,
+      options,
+    );
+  }
+
   async getConcepts(
     pageNumber = 0,
     rowsPerPage: number,
     searchText = '',
     index: string,
     filters: Filters,
+    hybridSearchConfig: HybridSearchConfig,
   ): Promise<IMeilisearchConcept> {
     const errorMessage = 'Error while getting concepts';
     try {
-      const options = await this.createOptions();
-      const url = `${this.url}/indexes/${index}/search`;
       const data = {
         q: searchText,
         page: pageNumber + 1,
@@ -54,8 +79,28 @@ export class MeilisearchAPI {
         ],
         filter: this.generateMeiliFilter(filters),
       };
-      const result = await axios.post<IMeilisearchConcept>(url, data, options);
-      return result.data;
+      if (hybridSearchConfig.isEnabled) {
+        const hybridSearchName = `_${hybridSearchConfig.source.replace(
+          '/',
+          '',
+        )}_${hybridSearchConfig.model.replace('/', '')}`;
+        const result = await this.hybridSearch(
+          index,
+          data,
+          hybridSearchName,
+          hybridSearchConfig.semanticRatio,
+        );
+        return result.data;
+      } else {
+        const options = await this.createOptions();
+        const url = `${this.url}/indexes/${index}/search`;
+        const result = await axios.post<IMeilisearchConcept>(
+          url,
+          data,
+          options,
+        );
+        return result.data;
+      }
     } catch (error) {
       this.logger.error(`${errorMessage}: ${error}`);
       throw new InternalServerErrorException(errorMessage);

@@ -47,7 +47,7 @@ export class DataQualityService {
         databaseCode,
         datasetId,
         cdmVersionNumber,
-        vocabSchema,
+        vocabSchemaName: vocabSchema,
         comment,
         cohortDefinitionId,
         releaseId,

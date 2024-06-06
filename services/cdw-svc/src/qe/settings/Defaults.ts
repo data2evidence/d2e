@@ -16,10 +16,7 @@ export const QUERY = {
         where "Type"='HC/HPH/GLOBAL'`,
     SET_GLOBAL_SETTINGS: `update "ConfigDbModels_Config" set "Modifier"=?,
          "Modified"=CURRENT_UTCTIMESTAMP, "Data"=? where "Type"='HC/HPH/GLOBAL'`,
-    CHECK_TABLE: env.USE_DUCKDB === "true"?
-    `SELECT COUNT(*) AS tableCount from system.information_schema.tables where table_schema=? and table_name=? 
-    UNION SELECT COUNT(*) AS tableCount from pg_attribute WHERE  attrelid = concat(?::text, '."', ?::text, '"')`
-    : `SELECT COUNT(*) AS tableCount from tables where schema_name=? and table_name=?
+    CHECK_TABLE: `SELECT COUNT(*) AS tableCount from tables where schema_name=? and table_name=?
     UNION SELECT COUNT(*) AS tableCount from views where schema_name=? and view_name=?`
 };
 export const placeholder: any = {
@@ -426,3 +423,5 @@ export const defaultTableTypePlaceholderMap: TableTypePlaceholderMapType = {
         // { placeholder: "@CHEMO", hierarchy: false, time: false, oneToN: true, attributeTables: [{ placeholder: "@CHEMO_ATTR", oneToN: true }] },
     ],
 };
+
+export const DUCKDB_FILE_NAME = "alpdev_pg_cdmvocab"

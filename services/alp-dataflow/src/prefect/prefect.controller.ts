@@ -50,6 +50,12 @@ export class PrefectController {
     return this.prefectService.createFlowRun(id)
   }
 
+  // create analysis flow run
+  @Post('analysis-run/:id')
+  createAnalysisRun(@Param('id', ParseUUIDPipe) id: string) {
+    return this.prefectService.createAnalysisFlowRun(id)
+  }
+
   @Post('flow-run/:id/cancellation')
   cancelFlowRun(@Param('id', ParseUUIDPipe) id: string) {
     return this.prefectService.cancelFlowRun(id)
@@ -63,6 +69,16 @@ export class PrefectController {
   @Get('flow-run/:id/state')
   getFlowRunState(@Param('id', ParseUUIDPipe) id: string) {
     return this.prefectService.getFlowRunState(id)
+  }
+
+  @Get('flow-run/:id/runs')
+  getRunsForFlowRun(@Param('id', ParseUUIDPipe) id: string) {
+    return this.prefectService.getRunsForFlowRun(id)
+  }
+
+  @Get('task-run/:id')
+  getTaskRunState(@Param('id', ParseUUIDPipe) id: string) {
+    return this.prefectService.getTaskRunState(id)
   }
 
   @Get('task-run/:id/logs')

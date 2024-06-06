@@ -1,6 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel, Field, UUID4
 from typing import Optional, List, Dict
+from flows.alp_db_svc.datamart.types import SnapshotCopyConfig
 
 
 class DBCredentialsType(BaseModel):
@@ -16,12 +17,12 @@ class DBCredentialsType(BaseModel):
     validateCertificate: bool
 
 
-class HANA_TENANT_USERS(Enum):
+class HANA_TENANT_USERS(str, Enum):
     ADMIN_USER = "TENANT_ADMIN_USER",
     READ_USER = "TENANT_READ_USER",
 
 
-class PG_TENANT_USERS(Enum):
+class PG_TENANT_USERS(str, Enum):
     ADMIN_USER = "postgres_tenant_admin_user",
     READ_USER = "postgres_tenant_read_user",
 
@@ -84,6 +85,16 @@ class meilisearchAddIndexType(BaseModel):
     databaseCode: str
     vocabSchemaName: str
     tableName: str
+    chunk_size: int
+    meilisearch_index_config: Dict
+    
+class meilisearchAddIndexWithEmbeddingsType(BaseModel):
+    databaseCode: str
+    vocabSchemaName: str
+    tableName: str
+    token: str
+    chunk_size: int
+    meilisearch_index_config: Dict
 
 
 class portalDatasetType(BaseModel):
@@ -165,10 +176,9 @@ class StrategusOptionsType(BaseModel):
     vocabSchemaName: str
 
 
-class DATABASE_DIALECTS(Enum):
+class DATABASE_DIALECTS(str, Enum):
     HANA = "hana"
     POSTGRES = "postgres"
-
 
 class entityCountDistributionType(BaseModel):
     OBSERVATION_PERIOD_COUNT: str
@@ -227,12 +237,8 @@ class rollbackTagType(dataModelBase):
 
 class createSnapshotType(dataModelBase):
     source_schema: str
-    snapshot_copy_config: Dict
-
-
-class createParquetSnapshotType(dataModelBase):
-    source_schema: str
-    snapshot_copy_config: Dict
+    vocab_schema: str
+    snapshot_copy_config: SnapshotCopyConfig
 
 
 class questionnaireDefinitionType(dataModelBase):
