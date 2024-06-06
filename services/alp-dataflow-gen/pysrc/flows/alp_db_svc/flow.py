@@ -7,7 +7,7 @@ import site
 from alpconnection.dbutils import get_db_svc_endpoint_dialect, POSTGRES_DIALECT_OPTIONS
 from utils.types import (PG_TENANT_USERS, AlpDBSvcOptionsType,
                          requestType, internalPluginType,
-                         createDataModelType, updateDataModelType,
+                         createDataModelType, seedVocabType, updateDataModelType,
                          createSnapshotType,
                          rollbackTagType, rollbackCountType,
                          questionnaireDefinitionType, questionnaireResponseType, DATABASE_DIALECTS)
@@ -25,18 +25,6 @@ def run_alp_db_svc(options: AlpDBSvcOptionsType):
     except Exception as e:
         get_run_logger().error(f"{e}")
 
-
-def run_seed_postgres(database_code: str, vocab_schema_name: str, cdm_schema_name: str):
-    vocab_schema_exists = create_schema_flow(
-        database_code, vocab_schema_name, vocab_schema_name)
-    if vocab_schema_exists:
-        cdmdefault_schema_exists = create_schema_flow(
-            database_code, cdm_schema_name, vocab_schema_name)
-        if cdmdefault_schema_exists:
-            load_data_flow(database_code, cdm_schema_name)
-    create_schema_flow(database_code, 'fhir_data', vocab_schema=None)
-
-
 @task
 async def run_command(request_type: str, request_url: str, request_body):
     logger = get_run_logger()
@@ -46,35 +34,56 @@ async def run_command(request_type: str, request_url: str, request_body):
         logger.error(e)
         raise e
 
-
-@flow
-def create_schema_flow(database_code: str, schema_name: str, vocab_schema: str = None):
-    schema_obj = DBDao(database_code, schema_name, PG_TENANT_USERS.ADMIN_USER)
+def run_seed_postgres(options: seedVocabType):
+    #Begin by checking if the vocab schema exists or not
+    schema_obj = DBDao(options.database_code, options.vocab_schema, PG_TENANT_USERS.ADMIN_USER)
     schema_exists = check_seed_schema_exists(schema_obj)
+    
+    db_dialect = _get_db_dialect(options)
+    request_body = {}
+    request_body = _db_svc_flowrun_params(request_body, db_dialect, options.flow_name, options.changelog_filepath)
+    
     if (schema_exists == False):
         try:
-            if schema_name == 'fhir_data':
+            if options.schema_name == 'fhir_data':
                 run_command(
                     request_type="post",
-                    request_url=f"/alpdb/postgres/database/{database_code}/staging-area/fhir_data/schema/{schema_name}",
-                    request_body={}
+                    request_url=f"/alpdb/postgres/database/{options.database_code}/staging-area/fhir_data/schema/{options.schema_name}",
+                    request_body=request_body
                 )
             else:
+                request_body["cleansedSchemaOption"] = False
+                request_body["vocabSchema"] = options.vocab_schema
                 run_command(
                     request_type="post",
-                    request_url=f"/alpdb/postgres/database/{database_code}/data-model/omop5-4/schema/{schema_name}",
-                    request_body={"cleansedSchemaOption": False,
-                                  "vocabSchema": vocab_schema}
+                    request_url=f"/alpdb/postgres/database/{options.database_code}/data-model/omop5-4/schema/{options.vocab_schema}",
+                    request_body=request_body
                 )
         except Exception as e:
             get_run_logger().error(
-                f"Failed to create schema {schema_name} in db with code:{database_code}: {e}")
+                f"Failed to create schema {options.vocab_schema} in db with code:{options.database_code}: {e}")
             return False
-        else:
-            return True
-    else:
-        return True
-
+        
+    if(options.schema_name != 'fhir_data'):
+        if(options.schema_name != options.vocab_schema):
+            #Check if the incoming schema_name exists or not
+            schema_obj = DBDao(options.database_code, options.schema_name, PG_TENANT_USERS.ADMIN_USER)
+            schema_exists = check_seed_schema_exists(schema_obj)
+            if (schema_exists == False):
+                try:
+                    run_command(
+                        request_type="post",
+                        request_url=f"/alpdb/postgres/database/{options.database_code}/data-model/omop5-4/schema/{options.schema_name}",
+                        request_body=request_body
+                    )
+                except Exception as e:
+                    get_run_logger().error(
+                        f"Failed to create schema {options.schema_name} in db with code:{options.database_code}: {e}")
+                    return False
+        load_data_flow(options.database_code, options.schema_name)
+        options.schema_name='fhir_data'
+        options.vocab_schema=None
+        run_seed_postgres(options)
 
 @flow
 def load_data_flow(database_code: str, schema_name: str):
