@@ -121,18 +121,12 @@ subprocess.run(install_cmd)
     `
   }
 
-  createDeploymentTemplate = (
-    userId: string,
-    modifiedFileStem: string,
-    flowName: string,
-    flowModulePath: string,
-    tags: string[] = []
-  ) => {
-    this.logger.info(`modifiedFileStem: ${modifiedFileStem}`)
-    const s3Path = join(userId, modifiedFileStem)
-    const blockName = this.createValidBlockName(`${userId}-${modifiedFileStem}`)
-    const formattedTags = tags.length > 0 ? `tags=[${tags.map(tag => `'${tag}'`).join(',')}]` : 'tags=[]'
+  createDeploymentTemplate = (userId: string, flowName: string, flowModulePath: string, tags: string[] = []) => {
     const formattedFlowName = flowName.replace(/-/g, '_')
+    this.logger.info(`formatedFlowName: ${formattedFlowName}`)
+    const s3Path = join(userId, formattedFlowName)
+    const blockName = this.createValidBlockName(`${userId}-${formattedFlowName}`)
+    const formattedTags = tags.length > 0 ? `tags=[${tags.map(tag => `'${tag}'`).join(',')}]` : 'tags=[]'
 
     return `from ${flowModulePath} import ${formattedFlowName}  
 from prefect.deployments import Deployment, run_deployment
