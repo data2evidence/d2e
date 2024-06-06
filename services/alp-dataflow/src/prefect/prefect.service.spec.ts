@@ -4,7 +4,8 @@ import { PrefectAPI } from './prefect.api'
 import {
   prefectApiMockFactory,
   prefectExecutionClientMockFactory,
-  prefectParamsTransformerMockFactory
+  prefectParamsTransformerMockFactory,
+  prefectAnalysisParamsTransformerMockFactory
 } from './prefect.mock'
 import { DataflowService } from '../dataflow/dataflow.service'
 import { dataflowServiceMockFactory } from '../dataflow/dataflow.mock'
@@ -14,6 +15,9 @@ import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
 import { prefectFlowServiceMockFactory } from '../prefect-flow/prefect-flow.mock'
 import { dataQualityServiceMockFactory } from '../data-quality/data-quality.mock'
 import { DataQualityService } from '../data-quality/data-quality.service'
+import { AnalysisflowService } from '../analysis-flow/analysis-flow.service'
+import { analysisflowServiceMockFactory } from '../analysis-flow/analysis-flow.mock'
+import { PrefectAnalysisParamsTransformer } from './prefect-analysis-params.transformer'
 
 describe('PrefectService', () => {
   let service: PrefectService
@@ -27,7 +31,9 @@ describe('PrefectService', () => {
         { provide: PrefectParamsTransformer, useFactory: prefectParamsTransformerMockFactory },
         { provide: PrefectExecutionClient, useFactory: prefectExecutionClientMockFactory },
         { provide: PrefectFlowService, useFactory: prefectFlowServiceMockFactory },
-        { provide: DataQualityService, useFactory: dataQualityServiceMockFactory }
+        { provide: DataQualityService, useFactory: dataQualityServiceMockFactory },
+        { provide: AnalysisflowService, useFactory: analysisflowServiceMockFactory },
+        { provide: PrefectAnalysisParamsTransformer, useFactory: prefectAnalysisParamsTransformerMockFactory }
       ]
     }).compile()
 

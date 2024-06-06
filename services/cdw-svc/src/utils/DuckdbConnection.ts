@@ -97,7 +97,6 @@ export class DuckdbConnection implements ConnectionInterface {
             );
             let temp = sql;
             temp = this.parseSql(temp);
-            logger.debug("Duckdb client created");
             const result = await this.conn.all(
                 temp,
                 ...flattenParameter(parameters)
