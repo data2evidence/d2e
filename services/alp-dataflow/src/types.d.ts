@@ -227,4 +227,5 @@ export interface IPluginUploadStatusDetail {
 export interface IPluginUploadStatusDto {
   statusDetails: IPluginUploadStatusDetail[]
   noActiveInstallations: boolean
+  installationStatus: string
 }
