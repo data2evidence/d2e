@@ -423,3 +423,5 @@ export const defaultTableTypePlaceholderMap: TableTypePlaceholderMapType = {
         // { placeholder: "@CHEMO", hierarchy: false, time: false, oneToN: true, attributeTables: [{ placeholder: "@CHEMO_ATTR", oneToN: true }] },
     ],
 };
+
+export const DUCKDB_FILE_NAME = "alpdev_pg_cdmvocab"
