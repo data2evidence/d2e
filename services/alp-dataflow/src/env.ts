@@ -16,6 +16,9 @@ export const env = {
   MINIO_ACCESS_KEY: process.env.MINIO__ACCESS_KEY,
   MINIO_SECRET_KEY: process.env.MINIO__SECRET_KEY,
 
+  PREFECT_DEPLOYMENT_NAME: process.env.DATAFLOW_MGMT__PREFECT__DEPLOYMENT_NAME,
+  PREFECT_FLOW_NAME: process.env.DATAFLOW_MGMT__PREFECT__FLOW_NAME,
+
   PG_HOST: process.env.PG__HOST,
   PG_PORT: parseInt(process.env.PG__PORT),
   PG_DATABASE: process.env.PG__DATAFLOW_MGMT__DB_NAME,
