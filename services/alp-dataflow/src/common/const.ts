@@ -62,7 +62,9 @@ export enum FLOW_METADATA {
   'datamodels' = 'datamodels',
   'entrypoint' = 'entrypoint',
   'dqd' = 'dqd',
-  'name' = 'name'
+  'name' = 'name',
+  'data_characterization' = 'data_characterization',
+  'dataflow_ui' = 'dataflow_ui'
 }
 
 export const PrefectDeploymentPythonFiles = {
@@ -70,3 +72,19 @@ export const PrefectDeploymentPythonFiles = {
   PIP_INSTALL: 'pip_install.py',
   DEPLOYMENT: 'deployment.py'
 }
+
+export enum PluginUploadStatus {
+  PENDING = 'pending',
+  COMPLETE = 'complete',
+  FAILED = 'failed',
+  INSTALLING = 'installing'
+}
+
+export enum PluginUploadStatusText {
+  PENDING = 'Plugins not initialized',
+  COMPLETE = 'All plugins upload is successful',
+  FAILED = 'One or more plugin(s) upload is failed',
+  INSTALLING = 'Intallations in progress'
+}
+
+export const DEFAULT_ERROR_MESSAGE = 'Error occurred. Please contact we@data4life.help for further support.'

@@ -7,6 +7,7 @@ import { portalApiMockFactory } from '../portal-server/portal-server.mock'
 import { REQUEST } from '@nestjs/core'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { FlowMetadata } from './entity'
+import { DefaultPlugins } from './entity'
 import { repositoryMockFactory } from '../../test/repository.mock'
 
 jest.mock('jsonwebtoken', () => ({
@@ -28,7 +29,8 @@ describe('PrefectFlowService', () => {
         { provide: PrefectAPI, useFactory: prefectApiMockFactory },
         { provide: PortalServerAPI, useFactory: portalApiMockFactory },
         { provide: REQUEST, useValue: req },
-        { provide: getRepositoryToken(FlowMetadata), useFactory: repositoryMockFactory }
+        { provide: getRepositoryToken(FlowMetadata), useFactory: repositoryMockFactory },
+        { provide: getRepositoryToken(DefaultPlugins), useFactory: repositoryMockFactory }
       ]
     }).compile()
 

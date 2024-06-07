@@ -5,4 +5,8 @@ export class PrefectAdhocFlowDto implements IPrefectAdhocFlowDto {
   @IsOptional()
   @IsString()
   url: string
+
+  @IsOptional()
+  @IsString()
+  defaultPluginId: string
 }

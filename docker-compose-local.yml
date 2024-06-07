@@ -27,6 +27,8 @@ services:
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
     volumes:
       - ./services/alp-dataflow-gen/pysrc:/app/pysrc
+    ports:
+      - 41${BASE_PORT:-1}20:41${BASE_PORT:-1}20
     environment:
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
