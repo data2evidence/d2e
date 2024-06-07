@@ -250,19 +250,6 @@ export class PrefectAPI {
     return this.executeFlowRun({ name, message, deploymentName, flowName, parameters, schedule })
   }
 
-  async createTestRun(parameters) {
-    const deploymentName = env.PREFECT_DEPLOYMENT_NAME
-    const flowName = env.PREFECT_FLOW_NAME
-    this.logger.info('Executing test run...')
-    return this.executeFlowRun({
-      name: 'Test-run',
-      message: 'Test run has started from alp-dataflow',
-      deploymentName,
-      flowName,
-      parameters
-    })
-  }
-
   async cancelFlowRun(id: string) {
     const errorMessage = `Error while cancelling flow run with id: ${id}`
     try {

@@ -58,7 +58,7 @@ export interface IPrefectParameters {
     edges: IPrefectEdge
     nodes: object
   }
-  options: IPrefectOptions
+  options?: IPrefectOptions
 }
 
 interface IPrefectOptions {

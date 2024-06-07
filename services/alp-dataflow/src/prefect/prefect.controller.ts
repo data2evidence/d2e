@@ -46,8 +46,14 @@ export class PrefectController {
   }
 
   @Post('flow-run/:id')
-  createFlowRun(@Param('id', ParseUUIDPipe) id: string) {
-    return this.prefectService.createFlowRun(id)
+  createDataflowUIFlowRun(@Param('id', ParseUUIDPipe) id: string) {
+    return this.prefectService.createDataflowUIFlowRun(id)
+  }
+
+  // create analysis flow run
+  @Post('analysis-run/:id')
+  createAnalysisRun(@Param('id', ParseUUIDPipe) id: string) {
+    return this.prefectService.createAnalysisFlowRun(id)
   }
 
   @Post('flow-run/:id/cancellation')
