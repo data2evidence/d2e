@@ -230,3 +230,18 @@ export interface IPluginUploadStatusDto {
   noActiveInstallations: boolean
   installationStatus: string
 }
+
+export interface IFlowRunQueryDto {
+  startDate?: Date
+  endDate?: Date
+  states?: FlowRunState[]
+  tags?: string[]
+  flowIds?: string[]
+  deploymentIds?: string[]
+  deploymentNames?: string[]
+  workPools?: string[]
+}
+
+export interface IJobHistoryQueryDto extends IFlowRunQueryDto {
+  filter: 'dqd' | 'all'
+}
