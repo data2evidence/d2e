@@ -22,6 +22,9 @@ COPY --chown=docker:docker ./alp-libs/nodejs/package.json ./libs/pydbsvc/d2e_dbs
 
 # Copy alp-db-svc files into python package
 
+# Copy existing migration scripts into separate folder so changelog filepath does not clash with plugin
+COPY --chown=docker:docker ./services/alp-db-svc/db ./libs/pydbsvc/d2e_dbsvc/nodejs/dbsvc_files/migration_scripts/db
+
 COPY --chown=docker:docker ./services/alp-db-svc/package.json ./libs/pydbsvc/d2e_dbsvc/nodejs/dbsvc_files/
 COPY --chown=docker:docker ./services/alp-db-svc/tsconfig.json ./libs/pydbsvc/d2e_dbsvc/nodejs/dbsvc_files/
 COPY --chown=docker:docker ./services/alp-db-svc/src ./libs/pydbsvc/d2e_dbsvc/nodejs/dbsvc_files/src
@@ -37,8 +40,6 @@ RUN yarn compile
 RUN yarn cache clean
 
 # Add liquibase
-RUN mkdir /db
-RUN mkdir /migrations
 ADD https://github.com/liquibase/liquibase/releases/download/v4.5.0/liquibase-4.5.0.tar.gz ./db/migrations/
 RUN mkdir -p ./db/migrations/liquibase/
 RUN tar xvf ./db/migrations/liquibase-4.5.0.tar.gz -C ./db/migrations/liquibase/
