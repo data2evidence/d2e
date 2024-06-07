@@ -1,3 +1,4 @@
+import { PluginUploadStatus } from './common/const'
 export interface ITestDataflowDto {
   dataflow: IReactFlow
 }
@@ -94,6 +95,8 @@ export interface IPrefectTaskResult {
 export interface IPrefectAdhocFlowDto {
   flowName?: string
   url?: string
+  fromDefaultPlugin?: boolean
+  defaultPluginId?: string
 }
 
 export interface IPrefectFlowRunByDeploymentDto {
@@ -210,4 +213,20 @@ export interface IFlowMetadataDto {
   url?: string
   datamodels?: string[]
   others?: JSON
+}
+
+export type PluginUploadStatus = keyof typeof PluginUploadStatus
+
+export interface IPluginUploadStatusDetail {
+  pluginId: string
+  name: string
+  status: string
+  createdAt: string
+  modifiedAt: string
+  type: string
+}
+export interface IPluginUploadStatusDto {
+  statusDetails: IPluginUploadStatusDetail[]
+  noActiveInstallations: boolean
+  installationStatus: string
 }
