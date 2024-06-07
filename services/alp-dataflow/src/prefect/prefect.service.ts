@@ -261,7 +261,7 @@ export class PrefectService {
           userId,
           flowMetadataInput.name,
           flowMetadataInput.entrypoint.replace(/\//g, '.').replace(/\.py$/, ''),
-          ...(flowMetadataInput.others.tags ? [flowMetadataInput.others.tags] : [])
+          flowMetadataInput.others.tags || []
         )
       )
       await this.prefectExecutionClient.executePythonPrefectModule(userId, modifiedFileStem)
@@ -397,7 +397,7 @@ export class PrefectService {
           modifiedFileStem,
           flowMetadataInput.name,
           flowMetadataInput.entrypoint.replace(/\//g, '.').replace(/\.py$/, ''),
-          ...(flowMetadataInput.others.tags ? [flowMetadataInput.others.tags] : [])
+          flowMetadataInput.others.tags || []
         )
       )
       await this.prefectExecutionClient.executePythonPrefectModule(userId, modifiedFileStem)
