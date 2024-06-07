@@ -394,7 +394,6 @@ export class PrefectService {
         deploymentPath,
         this.prefectExecutionClient.createDeploymentTemplate(
           userId,
-          modifiedFileStem,
           flowMetadataInput.name,
           flowMetadataInput.entrypoint.replace(/\//g, '.').replace(/\.py$/, ''),
           flowMetadataInput.others.tags || []
