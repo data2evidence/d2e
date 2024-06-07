@@ -3,7 +3,9 @@ import { join } from 'path'
 import { mkdirSync, readFileSync, rmdirSync, writeFileSync } from 'fs'
 import { PrefectAPI } from './prefect.api'
 import { DataflowService } from '../dataflow/dataflow.service'
+import { AnalysisflowService } from '../analysis-flow/analysis-flow.service'
 import { PrefectParamsTransformer } from './prefect-params.transformer'
+import { PrefectAnalysisParamsTransformer } from './prefect-analysis-params.transformer'
 import {
   IPrefectAdhocFlowDto,
   IPrefectFlowRunByDeploymentDto,
@@ -23,6 +25,8 @@ import {
 import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
 import { DataQualityService } from '../data-quality/data-quality.service'
 import { DataQualityFlowRunDto } from '../data-quality/dto'
+import { DataCharacterizationService } from '../data-characterization/data-characterization.service'
+import { DataCharacterizationFlowRunDto } from 'src/data-characterization/dto'
 import { REQUEST } from '@nestjs/core'
 
 @Injectable()
@@ -33,11 +37,14 @@ export class PrefectService {
   constructor(
     @Inject(REQUEST) request: Request,
     private readonly dataflowService: DataflowService,
+    private readonly analysisflowService: AnalysisflowService,
     private readonly prefectApi: PrefectAPI,
     private readonly prefectParamsTransformer: PrefectParamsTransformer,
+    private readonly prefectAnalysisParamsTransformer: PrefectAnalysisParamsTransformer,
     private readonly prefectExecutionClient: PrefectExecutionClient,
     private readonly prefectFlowService: PrefectFlowService,
-    private readonly dataQualityService: DataQualityService
+    private readonly dataQualityService: DataQualityService,
+    private readonly dataCharacterizationService: DataCharacterizationService
   ) {
     this.jwt = request.headers['authorization']
   }
@@ -65,9 +72,23 @@ export class PrefectService {
     return this.prefectApi.getTaskRunState(id)
   }
 
-  async createFlowRun(id: string) {
+  async createDataflowUIFlowRun(id: string) {
     const revision = await this.dataflowService.getLastDataflowRevision(id)
     const prefectParams = this.prefectParamsTransformer.transform(revision.flow)
+
+    const flowRunId = await this.createFlowRunByMetadata({
+      type: FLOW_METADATA.dataflow_ui,
+      flowRunName: revision.name,
+      options: prefectParams
+    })
+    await this.dataflowService.createDataflowRun(id, flowRunId)
+    return flowRunId
+  }
+
+  // create analysis-flow-run
+  async createAnalysisFlowRun(id: string) {
+    const revision = await this.analysisflowService.getLastAnalysisflowRevision(id)
+    const prefectParams = this.prefectAnalysisParamsTransformer.transform(revision.flow)
 
     const prefectDeploymentName = env.PREFECT_DEPLOYMENT_NAME
     const prefectFlowName = env.PREFECT_FLOW_NAME
@@ -78,20 +99,24 @@ export class PrefectService {
       prefectFlowName,
       prefectParams
     )
-    await this.dataflowService.createDataflowRun(id, flowRunId)
+    await this.analysisflowService.createAnalysisflowRun(id, flowRunId)
     return flowRunId
   }
 
   async createFlowRunByDeployment(flowRun: IPrefectFlowRunByDeploymentDto) {
-    const { flowRunName, flowName, deploymentName, params } = flowRun
-    const flowRunId = await this.prefectApi.createFlowRun(flowRunName, deploymentName, flowName, params)
+    const { flowRunName, flowName, deploymentName, params, schedule } = flowRun
+    const flowRunId = await this.prefectApi.createFlowRun(flowRunName, deploymentName, flowName, params, schedule)
 
     return flowRunId
   }
 
   async createTestRun(testFlow: ITestDataflowDto) {
     const prefectParams = this.prefectParamsTransformer.transform(testFlow.dataflow, true)
-    return this.prefectApi.createTestRun(prefectParams)
+    return await this.createFlowRunByMetadata({
+      type: FLOW_METADATA.dataflow_ui,
+      flowRunName: 'Test-run',
+      options: prefectParams
+    })
   }
 
   async getFlowMetadata() {
@@ -158,7 +183,6 @@ export class PrefectService {
         deploymentPath,
         this.prefectExecutionClient.createDeploymentTemplate(
           userId,
-          modifiedFileStem,
           flowMetadataInput.name,
           flowMetadataInput.entrypoint.replace(/\//g, '.').replace(/\.py$/, ''),
           ...(flowMetadataInput.others.tags ? [flowMetadataInput.others.tags] : [])
@@ -260,6 +284,13 @@ export class PrefectService {
     if (metadata.type === FLOW_METADATA.dqd) {
       const dqOptions = { ...metadata.options, deploymentName: deployment.name, flowName: currentFlow.name }
       return this.dataQualityService.createDataQualityFlowRun(dqOptions as DataQualityFlowRunDto)
+    }
+
+    if (metadata.type === FLOW_METADATA.data_characterization) {
+      const dcOptions = { ...metadata.options, deploymentName: deployment.name }
+      return this.dataCharacterizationService.createDataCharacterizationFlowRun(
+        dcOptions as DataCharacterizationFlowRunDto
+      )
     }
 
     if (metadata.options['options']) {
