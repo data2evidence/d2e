@@ -3,7 +3,9 @@ import { join } from 'path'
 import { mkdirSync, readFileSync, rmdirSync, writeFileSync } from 'fs'
 import { PrefectAPI } from './prefect.api'
 import { DataflowService } from '../dataflow/dataflow.service'
+import { AnalysisflowService } from '../analysis-flow/analysis-flow.service'
 import { PrefectParamsTransformer } from './prefect-params.transformer'
+import { PrefectAnalysisParamsTransformer } from './prefect-analysis-params.transformer'
 import {
   IPrefectAdhocFlowDto,
   IPrefectFlowRunByDeploymentDto,
@@ -33,8 +35,10 @@ export class PrefectService {
   constructor(
     @Inject(REQUEST) request: Request,
     private readonly dataflowService: DataflowService,
+    private readonly analysisflowService: AnalysisflowService,
     private readonly prefectApi: PrefectAPI,
     private readonly prefectParamsTransformer: PrefectParamsTransformer,
+    private readonly prefectAnalysisParamsTransformer: PrefectAnalysisParamsTransformer,
     private readonly prefectExecutionClient: PrefectExecutionClient,
     private readonly prefectFlowService: PrefectFlowService,
     private readonly dataQualityService: DataQualityService
@@ -79,6 +83,24 @@ export class PrefectService {
       prefectParams
     )
     await this.dataflowService.createDataflowRun(id, flowRunId)
+    return flowRunId
+  }
+
+  // create analysis-flow-run
+  async createAnalysisFlowRun(id: string) {
+    const revision = await this.analysisflowService.getLastAnalysisflowRevision(id)
+    const prefectParams = this.prefectAnalysisParamsTransformer.transform(revision.flow)
+
+    const prefectDeploymentName = env.PREFECT_DEPLOYMENT_NAME
+    const prefectFlowName = env.PREFECT_FLOW_NAME
+
+    const flowRunId = await this.prefectApi.createFlowRun(
+      revision.name,
+      prefectDeploymentName,
+      prefectFlowName,
+      prefectParams
+    )
+    await this.analysisflowService.createAnalysisflowRun(id, flowRunId)
     return flowRunId
   }
 
