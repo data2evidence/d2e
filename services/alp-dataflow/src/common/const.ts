@@ -88,3 +88,20 @@ export enum PluginUploadStatusText {
 }
 
 export const DEFAULT_ERROR_MESSAGE = 'Error occurred. Please contact we@data4life.help for further support.'
+
+export enum FlowRunState {
+  SCHEDULED = 'Scheduled',
+  LATE = 'Late',
+  RESUMING = 'Resuming',
+  AWAITING_RETRY = 'AwaitingRetry',
+  PENDING = 'Pending',
+  PAUSED = 'Paused',
+  RUNNING = 'Running',
+  RETRYING = 'Retrying',
+  COMPLETED = 'Completed',
+  CANCELLED = 'Cancelled',
+  CANCELLING = 'Cancelling',
+  CRASHED = 'Crashed',
+  FAILED = 'Failed',
+  TIMED_OUT = 'TimedOut'
+}
