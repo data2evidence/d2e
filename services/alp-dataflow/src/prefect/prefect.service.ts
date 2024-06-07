@@ -25,6 +25,8 @@ import {
 import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
 import { DataQualityService } from '../data-quality/data-quality.service'
 import { DataQualityFlowRunDto } from '../data-quality/dto'
+import { DataCharacterizationService } from '../data-characterization/data-characterization.service'
+import { DataCharacterizationFlowRunDto } from 'src/data-characterization/dto'
 import { REQUEST } from '@nestjs/core'
 
 @Injectable()
@@ -41,7 +43,8 @@ export class PrefectService {
     private readonly prefectAnalysisParamsTransformer: PrefectAnalysisParamsTransformer,
     private readonly prefectExecutionClient: PrefectExecutionClient,
     private readonly prefectFlowService: PrefectFlowService,
-    private readonly dataQualityService: DataQualityService
+    private readonly dataQualityService: DataQualityService,
+    private readonly dataCharacterizationService: DataCharacterizationService
   ) {
     this.jwt = request.headers['authorization']
   }
@@ -69,19 +72,15 @@ export class PrefectService {
     return this.prefectApi.getTaskRunState(id)
   }
 
-  async createFlowRun(id: string) {
+  async createDataflowUIFlowRun(id: string) {
     const revision = await this.dataflowService.getLastDataflowRevision(id)
     const prefectParams = this.prefectParamsTransformer.transform(revision.flow)
 
-    const prefectDeploymentName = env.PREFECT_DEPLOYMENT_NAME
-    const prefectFlowName = env.PREFECT_FLOW_NAME
-
-    const flowRunId = await this.prefectApi.createFlowRun(
-      revision.name,
-      prefectDeploymentName,
-      prefectFlowName,
-      prefectParams
-    )
+    const flowRunId = await this.createFlowRunByMetadata({
+      type: FLOW_METADATA.dataflow_ui,
+      flowRunName: revision.name,
+      options: prefectParams
+    })
     await this.dataflowService.createDataflowRun(id, flowRunId)
     return flowRunId
   }
@@ -113,7 +112,11 @@ export class PrefectService {
 
   async createTestRun(testFlow: ITestDataflowDto) {
     const prefectParams = this.prefectParamsTransformer.transform(testFlow.dataflow, true)
-    return this.prefectApi.createTestRun(prefectParams)
+    return await this.createFlowRunByMetadata({
+      type: FLOW_METADATA.dataflow_ui,
+      flowRunName: 'Test-run',
+      options: prefectParams
+    })
   }
 
   async getFlowMetadata() {
@@ -281,6 +284,13 @@ export class PrefectService {
     if (metadata.type === FLOW_METADATA.dqd) {
       const dqOptions = { ...metadata.options, deploymentName: deployment.name, flowName: currentFlow.name }
       return this.dataQualityService.createDataQualityFlowRun(dqOptions as DataQualityFlowRunDto)
+    }
+
+    if (metadata.type === FLOW_METADATA.data_characterization) {
+      const dcOptions = { ...metadata.options, deploymentName: deployment.name }
+      return this.dataCharacterizationService.createDataCharacterizationFlowRun(
+        dcOptions as DataCharacterizationFlowRunDto
+      )
     }
 
     if (metadata.options['options']) {
