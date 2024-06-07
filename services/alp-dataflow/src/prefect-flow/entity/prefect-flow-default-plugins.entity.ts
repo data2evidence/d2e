@@ -18,7 +18,4 @@ export class DefaultPlugins extends Audit {
 
   @Column()
   status: PluginUploadStatus
-
-  @Column({ type: 'simple-json', nullable: true })
-  others: any
 }
