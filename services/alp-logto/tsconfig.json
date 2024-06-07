@@ -7,5 +7,5 @@
       "target": "es2019",
       "lib": ["ES2019", "DOM", "ES5"]
     },
-    "exclude": ["connector-alp-azuread"]
+    "exclude": ["connector-alp-azuread", "to-replace"]
   }

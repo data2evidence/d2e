@@ -263,7 +263,7 @@ services:
         condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
-    entrypoint: cd /home/docker && npm run build-and-seed
+    entrypoint: ["sh", "-c", "cd /home/docker && npm run build-and-seed"] 
     environment:
       PG__DB_NAME: logto
       PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
@@ -277,4 +277,4 @@ services:
       LOGTO__SCOPES: '[{"name":"role.systemadmin","description":"ALP System admin"},{"name":"role.useradmin","description":"ALP User admin"},{"name":"role.tenantviewer","description":"ALP Tenant viewer"}]'
       LOGTO__ADMIN_SERVER__FQDN_URL: "http://alp-logto-1:3002"
       LOGTO__CLIENTID_PASSWORD__BASIC_AUTH: ${LOGTO__CLIENTID_PASSWORD__BASIC_AUTH:-YTU2MG84dHF3NzloeTJjcG44eDFxOnhrOEhQNFZEenFKY25YQ1RwZGFRTTZVdDJTd3JHMzd1}
-      LOGTO__ALP_ADMIN_APP: '{"application": {"name":"alp-admin","description":"alp-admin", "secret": ${LOGTO__ALP_ADMIN_APP__SECRET:-"Toor12345678"}}, "role": { "name":"api-access","description":"Logto API access"}}'
+      LOGTO__ALP_ADMIN_APP: '{"application": {"id": "${LOGTO_API_M2M_CLIENT_ID}", "name":"alp-admin","description":"alp-admin", "secret": "${LOGTO_API_M2M_CLIENT_SECRET}"}, "role": { "name":"api-access","description":"Logto API access"}}'

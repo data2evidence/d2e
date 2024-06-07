@@ -242,6 +242,7 @@ async function seeding_alp_admin() {
     role: {},
   };
   let alpAdminApp: {
+    id: string;
     name: string;
     description: string;
     secret: string;
@@ -258,7 +259,7 @@ async function seeding_alp_admin() {
   await client.connect();
 
   let LOGTO__ADMIN_ROLE__ID = "api-access";
-  let LOGTO__ADMIN_APP__ID = "alp-admin";
+  let LOGTO__ADMIN_APP__ID = alpAdminApp.id;
   let LOGTO__ADMIN_APP_ROLE__ID = "alp-admin";
   let LOGTO__ADMIN_ROLE_SCOPE__ID = "alp-admin";
   let LOGTO__TENANT_ID = "default";
