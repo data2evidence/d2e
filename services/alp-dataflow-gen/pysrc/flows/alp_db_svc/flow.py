@@ -45,45 +45,34 @@ def run_seed_postgres(options: seedVocabType):
     
     if (schema_exists == False):
         try:
-            if options.schema_name == 'fhir_data':
-                run_command(
-                    request_type="post",
-                    request_url=f"/alpdb/postgres/database/{options.database_code}/staging-area/fhir_data/schema/{options.schema_name}",
-                    request_body=request_body
-                )
-            else:
-                request_body["cleansedSchemaOption"] = False
-                request_body["vocabSchema"] = options.vocab_schema
-                run_command(
-                    request_type="post",
-                    request_url=f"/alpdb/postgres/database/{options.database_code}/data-model/omop5-4/schema/{options.vocab_schema}",
-                    request_body=request_body
-                )
+            request_body["cleansedSchemaOption"] = False
+            request_body["vocabSchema"] = options.vocab_schema
+            run_command(
+                request_type="post",
+                request_url=f"/alpdb/postgres/database/{options.database_code}/data-model/omop5-4/schema/{options.vocab_schema}",
+                request_body=request_body
+            )
         except Exception as e:
             get_run_logger().error(
                 f"Failed to create schema {options.vocab_schema} in db with code:{options.database_code}: {e}")
             return False
         
-    if(options.schema_name != 'fhir_data'):
-        if(options.schema_name != options.vocab_schema):
-            #Check if the incoming schema_name exists or not
-            schema_obj = DBDao(options.database_code, options.schema_name, PG_TENANT_USERS.ADMIN_USER)
-            schema_exists = check_seed_schema_exists(schema_obj)
-            if (schema_exists == False):
-                try:
-                    run_command(
-                        request_type="post",
-                        request_url=f"/alpdb/postgres/database/{options.database_code}/data-model/omop5-4/schema/{options.schema_name}",
-                        request_body=request_body
-                    )
-                except Exception as e:
-                    get_run_logger().error(
-                        f"Failed to create schema {options.schema_name} in db with code:{options.database_code}: {e}")
-                    return False
-        load_data_flow(options.database_code, options.schema_name)
-        options.schema_name='fhir_data'
-        options.vocab_schema=None
-        run_seed_postgres(options)
+    if(options.schema_name != options.vocab_schema):
+        #Check if the incoming schema_name exists or not
+        schema_obj = DBDao(options.database_code, options.schema_name, PG_TENANT_USERS.ADMIN_USER)
+        schema_exists = check_seed_schema_exists(schema_obj)
+        if (schema_exists == False):
+            try:
+                run_command(
+                    request_type="post",
+                    request_url=f"/alpdb/postgres/database/{options.database_code}/data-model/omop5-4/schema/{options.schema_name}",
+                    request_body=request_body
+                )
+            except Exception as e:
+                get_run_logger().error(
+                    f"Failed to create schema {options.schema_name} in db with code:{options.database_code}: {e}")
+                return False
+    load_data_flow(options.database_code, options.schema_name)
 
 @flow
 def load_data_flow(database_code: str, schema_name: str):
