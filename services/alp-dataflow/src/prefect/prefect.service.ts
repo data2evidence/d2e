@@ -13,6 +13,7 @@ import {
   IPrefectFlowRunByMetadataDto
 } from '../types'
 import { PrefectExecutionClient } from './prefect-execution.client'
+import { env } from '../env'
 import { createLogger } from '../logger'
 import {
   FLOW_METADATA,
