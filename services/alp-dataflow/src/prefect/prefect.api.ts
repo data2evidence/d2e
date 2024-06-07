@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios'
-import { Injectable, InternalServerErrorException } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, BadRequestException } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
 import { firstValueFrom, map } from 'rxjs'
 import { Agent } from 'https'
@@ -7,6 +7,7 @@ import { env, services } from '../env'
 import { createLogger } from '../logger'
 import { PrefectFlowDto } from '../prefect-flow/dto'
 import { IPrefectFlowRunDto } from '../types'
+import * as dayjs from 'dayjs'
 
 interface FlowRunParams {
   name: string
@@ -14,6 +15,7 @@ interface FlowRunParams {
   deploymentName: string
   flowName: string
   parameters: object
+  schedule?: string | null
 }
 
 @Injectable()
@@ -181,6 +183,19 @@ export class PrefectAPI {
     }
   }
 
+  async getTaskRunState(id: string) {
+    const errorMessage = 'Error while getting prefect task run states by id'
+    try {
+      const options = await this.createOptions()
+      const url = `${this.url}/task_runs/${id}`
+      const obs = this.httpService.get(url, options)
+      return await firstValueFrom(obs.pipe(map(result => result.data)))
+    } catch (error) {
+      this.logger.info(`${errorMessage}: ${error}`)
+      throw new InternalServerErrorException(errorMessage)
+    }
+  }
+
   async getTaskRuns(id: string) {
     const errorMessage = 'Error while getting prefect task runs by flow run id'
     try {
@@ -229,23 +244,10 @@ export class PrefectAPI {
     }
   }
 
-  async createFlowRun(name, deploymentName, flowName, parameters) {
+  async createFlowRun(name, deploymentName, flowName, parameters, schedule = null) {
     this.logger.info(`Executing flow run ${name}...`)
     const message = `Flow run '${name}' has started from alp-dataflow`
-    return this.executeFlowRun({ name, message, deploymentName, flowName, parameters })
-  }
-
-  async createTestRun(parameters) {
-    const deploymentName = env.PREFECT_DEPLOYMENT_NAME
-    const flowName = env.PREFECT_FLOW_NAME
-    this.logger.info('Executing test run...')
-    return this.executeFlowRun({
-      name: 'Test-run',
-      message: 'Test run has started from alp-dataflow',
-      deploymentName,
-      flowName,
-      parameters
-    })
+    return this.executeFlowRun({ name, message, deploymentName, flowName, parameters, schedule })
   }
 
   async cancelFlowRun(id: string) {
@@ -262,14 +264,29 @@ export class PrefectAPI {
     }
   }
 
-  private async executeFlowRun({ name, message, deploymentName, flowName, parameters }: FlowRunParams) {
+  private async executeFlowRun({
+    name,
+    message,
+    deploymentName,
+    flowName,
+    parameters,
+    schedule = null
+  }: FlowRunParams) {
     const options = await this.createOptions()
     const { deploymentId, infrastructureDocId } = await this.getDeployment(deploymentName, flowName)
     const url = `${this.url}/deployments/${deploymentId}/create_flow_run`
+
+    if (schedule && !dayjs(schedule).isValid()) {
+      throw new BadRequestException(`Invalid schedule time`)
+    }
+    if (schedule && dayjs(schedule).isBefore(dayjs())) {
+      throw new BadRequestException('Schedule time must be in the future')
+    }
     const data = {
       state: {
         type: 'SCHEDULED',
-        message
+        message,
+        ...(schedule ? { state_details: { scheduled_time: schedule } } : {})
       },
       name,
       parameters,
@@ -332,6 +349,19 @@ export class PrefectAPI {
     try {
       const options = await this.createOptions()
       const url = `${this.url}/flow_runs/${id}`
+      const obs = this.httpService.get(url, options)
+      return await firstValueFrom(obs.pipe(map(result => result.data)))
+    } catch (error) {
+      this.logger.info(`${errorMessage}: ${error}`)
+      throw new InternalServerErrorException(errorMessage)
+    }
+  }
+
+  async getRunsForFlowRun(id: string) {
+    const errorMessage = `Error while getting prefect runs for flow run ${id}`
+    try {
+      const options = await this.createOptions()
+      const url = `${this.url}/flow_runs/${id}/graph-v2`
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {

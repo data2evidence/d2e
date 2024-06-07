@@ -62,7 +62,9 @@ export enum FLOW_METADATA {
   'datamodels' = 'datamodels',
   'entrypoint' = 'entrypoint',
   'dqd' = 'dqd',
-  'name' = 'name'
+  'name' = 'name',
+  'data_characterization' = 'data_characterization',
+  'dataflow_ui' = 'dataflow_ui'
 }
 
 export const PrefectDeploymentPythonFiles = {

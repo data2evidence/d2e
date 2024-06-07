@@ -195,9 +195,6 @@ export class CohortEndpoint {
         // Get cohort definition id from cohort object
         const cohortDefinitionId = await this.queryCohortDefinitionId(cohort);
         const paramDict = {
-            cohortStartDateString: this.parseDateToString(
-                cohort.creationTimestamp
-            ),
             cohortDefinitionId,
         };
         try {
