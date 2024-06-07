@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer'
 import { IsArray, IsDate, IsEnum, IsIn, IsOptional, IsString } from 'class-validator'
 import { IJobHistoryQueryDto } from '../../types'
-import { FlowRunState } from 'src/common/const'
+import { FlowRunState } from '../../common/const'
 
 export class JobHistoryQueryDto implements IJobHistoryQueryDto {
   @IsString()
