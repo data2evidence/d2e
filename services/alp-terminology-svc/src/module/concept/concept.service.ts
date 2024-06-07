@@ -15,6 +15,9 @@ import {
   IConcept,
   Filters,
   HybridSearchConfig,
+  ConceptHierarchyEdge,
+  ConceptHierarchyNodeLevel,
+  ConceptHierarchyNode,
 } from '../../utils/types';
 import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { Request } from 'express';
@@ -381,9 +384,9 @@ export class ConceptService {
     conceptId: number,
     depth: number,
   ) {
-    let edges: any = [];
-    let nodeLevels: any = [];
-    let conceptIds: any = new Set().add(conceptId);
+    let edges: ConceptHierarchyEdge[] = [];
+    let nodeLevels: ConceptHierarchyNodeLevel[] = [];
+    let conceptIds: Set<number> = new Set<number>().add(conceptId);
     nodeLevels.push({ conceptId: conceptId, level: 0 });
 
     const systemPortalApi = new SystemPortalAPI(this.token);
@@ -455,17 +458,21 @@ export class ConceptService {
       datasetId,
       Array.from(conceptIds),
     );
-    const nodes = nodeLevels.reduce((acc: any, current: any) => {
-      const conceptNode = concepts.find(
-        (concept) => concept.conceptId == current.conceptId,
-      );
-      acc.push({
-        conceptId: current.conceptId,
-        display: conceptNode?.display,
-        level: current.level,
-      });
-      return acc;
-    }, []);
+
+    const nodes: ConceptHierarchyNode[] = nodeLevels.reduce(
+      (acc: ConceptHierarchyNode[], current: ConceptHierarchyNodeLevel) => {
+        const conceptNode = concepts.find(
+          (concept) => concept.conceptId === current.conceptId,
+        );
+        acc.push({
+          conceptId: current.conceptId,
+          display: conceptNode?.display,
+          level: current.level,
+        });
+        return acc;
+      },
+      [],
+    );
 
     return { edges, nodes };
   }
