@@ -3,9 +3,9 @@ import { HttpService } from '@nestjs/axios'
 import { Test, TestingModule } from '@nestjs/testing'
 import { httpServiceMockFactory } from '../../test/http-service.mock'
 import { PaConfigApi } from './pa-config.api'
-import { env } from '../env'
+import { services } from '../env'
 
-env.PA_CONFIG_API_URL = 'pa-config-url'
+services.paConfig = 'pa-config-url'
 
 describe('PaConfigApi', () => {
   let api: PaConfigApi

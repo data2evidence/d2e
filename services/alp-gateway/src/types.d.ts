@@ -61,9 +61,7 @@ export interface IPlugin {
 
 export interface IRouteProp {
   source: string
-  target?: string
   destination: string
-  targetPath?: string
 }
 
 export interface IALPUser {
@@ -101,4 +99,5 @@ export interface Dataset {
   databaseCode: string
   schemaName: string
   dashboards: DatasetDashboard[]
+  vocabSchemaName: string
 }

@@ -27,14 +27,14 @@ export const getLogLevels = (): LogLevel[] => {
 
 export const dataSourceOptions: DataSourceOptions & SeederOptions = {
   type: 'postgres',
-  host: env.PG_HOST,
-  port: env.PG_PORT,
+  host: env.PG__HOST,
+  port: env.PG__PORT,
   username: env.PG_USER,
   password: env.PG_PASSWORD,
-  database: env.PG_DATABASE,
+  database: env.PG__DB_NAME,
   schema: env.PG_SCHEMA,
   ssl: getSsl(),
-  poolSize: env.PG_MAX_POOL,
+  poolSize: env.PG__MAX_POOL,
   logging: getLogLevels(),
   entities: ['dist/**/*.entity.{ts,js}'],
   seeds: ['dist/**/db/seeds/*.seeder.{ts,js}'],

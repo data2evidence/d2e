@@ -61,8 +61,11 @@ def create_cohort(databaseCode: str, schemaName: str, cohortDefinitionId: int, c
     setDBDriverEnvString = getSetDBDriverEnvString()
     connectionDetailsString = getDatabaseConnectorConnectionDetailsString(
         databaseCode, None, PG_TENANT_USERS.ADMIN_USER)
+    r_libs_user_directory = os.getenv("R_LIBS_USER")
     with conversion.localconverter(default_converter):
         robjects.r(f'''
+                .libPaths(c('{r_libs_user_directory}',.libPaths()))
+                library('CohortGenerator', lib.loc = '{r_libs_user_directory}')
                 {setDBDriverEnvString}
                 {connectionDetailsString}
                 cohortJson <- '{cohortJsonExpression}'

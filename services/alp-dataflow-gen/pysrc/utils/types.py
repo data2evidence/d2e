@@ -1,6 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel, Field, UUID4
 from typing import Optional, List, Dict
+from flows.alp_db_svc.datamart.types import SnapshotCopyConfig
 
 
 class DBCredentialsType(BaseModel):
@@ -16,12 +17,12 @@ class DBCredentialsType(BaseModel):
     validateCertificate: bool
 
 
-class HANA_TENANT_USERS(Enum):
+class HANA_TENANT_USERS(str, Enum):
     ADMIN_USER = "TENANT_ADMIN_USER",
     READ_USER = "TENANT_READ_USER",
 
 
-class PG_TENANT_USERS(Enum):
+class PG_TENANT_USERS(str, Enum):
     ADMIN_USER = "postgres_tenant_admin_user",
     READ_USER = "postgres_tenant_read_user",
 
@@ -42,6 +43,8 @@ class dqdOptionsType(dqdBaseOptionsType):
 class dcOptionsType(dqdBaseOptionsType):
     resultsSchema: str
     excludeAnalysisIds: str
+    flowName: str
+    changelogFilepath: str
 
 
 class cohortJsonType(BaseModel):
@@ -79,10 +82,19 @@ class AlpDBSvcOptionsType(BaseModel):
 
 
 class meilisearchAddIndexType(BaseModel):
-    token: str
     databaseCode: str
     vocabSchemaName: str
     tableName: str
+    chunk_size: int
+    meilisearch_index_config: Dict
+    
+class meilisearchAddIndexWithEmbeddingsType(BaseModel):
+    databaseCode: str
+    vocabSchemaName: str
+    tableName: str
+    token: str
+    chunk_size: int
+    meilisearch_index_config: Dict
 
 
 class portalDatasetType(BaseModel):
@@ -118,8 +130,11 @@ class datasetSchemaMappingType(BaseModel):
     dataset_attribute: Optional[str]
 
 
-class fetchVersionInfoType(BaseModel):
+class getVersionInfoType(BaseModel):
     token: str
+    flow_name: str = Field(...)
+    changelog_filepath: Optional[str]
+    changelog_filepath_list: Dict
 
 
 class datasetVersionInfoType(BaseModel):
@@ -161,6 +176,74 @@ class StrategusOptionsType(BaseModel):
     vocabSchemaName: str
 
 
-class DATABASE_DIALECTS(Enum):
+class DATABASE_DIALECTS(str, Enum):
     HANA = "hana"
     POSTGRES = "postgres"
+
+class entityCountDistributionType(BaseModel):
+    OBSERVATION_PERIOD_COUNT: str
+    DEATH_COUNT: str
+    VISIT_OCCURRENCE_COUNT: str
+    VISIT_DETAIL_COUNT: str
+    CONDITION_OCCURRENCE_COUNT: str
+    DRUG_EXPOSURE_COUNT: str
+    PROCEDURE_OCCURRENCE_COUNT: str
+    DEVICE_EXPOSURE_COUNT: str
+    MEASUREMENT_COUNT: str
+    OBSERVATION_COUNT: str
+    NOTE_COUNT: str
+    EPISODE_COUNT: str
+    SPECIMEN_COUNT: str
+
+
+class requestType(str, Enum):
+    GET = "get"
+    POST = "post"
+    PUT = "put"
+    DELETE = "delete"
+
+
+class internalPluginType(str, Enum):
+    DATAMODEL_PLUGIN = "data_management_plugin"
+    DATA_CHARACTERIZATION = "data_characterization_plugin"
+
+
+class dataModelBase(BaseModel):
+    database_code: str = Field(...)
+    data_model: str = Field(...)
+    schema_name: str = Optional[str]
+    dialect: str = Field(...)
+    flow_name: str = Field(...)
+    changelog_filepath: Optional[str]
+
+
+class createDataModelType(dataModelBase):
+    cleansed_schema_option: bool = Field(default=False)
+    vocab_schema: str = Field(...)
+    update_count: int = Field(default=0)
+
+
+class updateDataModelType(dataModelBase):
+    vocab_schema: str = Field(...)
+
+
+class rollbackCountType(dataModelBase):
+    rollback_count: int = Field(...)
+
+
+class rollbackTagType(dataModelBase):
+    rollback_tag: str = Field(...)
+
+
+class createSnapshotType(dataModelBase):
+    source_schema: str
+    vocab_schema: str
+    snapshot_copy_config: SnapshotCopyConfig
+
+
+class questionnaireDefinitionType(dataModelBase):
+    questionnaire_definition: Dict
+
+
+class questionnaireResponseType(dataModelBase):
+    questionnaire_id: str

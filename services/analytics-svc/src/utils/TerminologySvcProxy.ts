@@ -7,7 +7,7 @@ import { IMRIRequest, QuerySvcResultType } from "../types";
 dotenv.config();
 const log = Logger.CreateLogger("analytics-log");
 const envVarUtils = new EnvVarUtils(process.env);
-import { ALP_TERMINOLOGY__URL } from "../config";
+import { env } from "../env";
 
 export const terminologyRequest = (
     req: IMRIRequest,
@@ -23,7 +23,9 @@ export const terminologyRequest = (
         ? "Bearer DUMMY_TOKEN"
         : req.headers.authorization;
 
-    const { hostname, port, protocol } = new URL(ALP_TERMINOLOGY__URL);
+    const { hostname, port, protocol } = new URL(
+        env.SERVICE_ROUTES.terminology
+    );
 
     const protocolLib = https;
     const data = JSON.stringify(payload);
@@ -45,7 +47,7 @@ export const terminologyRequest = (
         },
         method,
         rejectUnauthorized: true,
-        ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
+        ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
     if (payload) {
         options.headers["Content-Type"] = "application/json";

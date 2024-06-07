@@ -13,6 +13,9 @@ from flows.alp_data_characterization.hooks import persist_data_characterization,
 from utils.types import dcOptionsType
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
 import importlib
+from flows.alp_db_svc.flow import _run_db_svc_shell_command, _db_svc_flowrun_params
+
+r_libs_user_directory = os.getenv("R_LIBS_USER")
 
 
 @task
@@ -32,8 +35,11 @@ async def execute_data_characterization(schemaName: str,
             databaseCode, releaseDate, PG_TENANT_USERS.ADMIN_USER)
 
         logger.info('Running achilles')
+
         with conversion.localconverter(default_converter):
             robjects.r(f'''
+                    .libPaths(c('{r_libs_user_directory}',.libPaths()))
+                    library('Achilles', lib.loc = '{r_libs_user_directory}')
                     {setDBDriverEnvString}
                     {connectionDetailsString}
                     cdmVersion <- '{cdmVersionNumber}'
@@ -68,6 +74,8 @@ async def execute_export_to_ares(schemaName: str,
         logger.info('Running exportToAres')
         with conversion.localconverter(default_converter):
             robjects.r(f'''
+                    .libPaths(c('{r_libs_user_directory}',.libPaths()))
+                    library('Achilles', lib.loc = '{r_libs_user_directory}')
                     {setDBDriverEnvString}
                     {connectionDetailsString}
                     cdmDatabaseSchema <- '{schemaName}'
@@ -92,7 +100,9 @@ async def execute_export_to_ares(schemaName: str,
 async def create_data_characterization_schema(
     databaseCode: str,
     resultsSchema: str,
-    vocabSchemaName: str
+    vocabSchemaName: str,
+    flowName: str,
+    changelog_filepath: str
 ):
     logger = get_run_logger()
     try:
@@ -100,8 +110,11 @@ async def create_data_characterization_schema(
         request_url = f"/alpdb/{databaseDialect}/dataCharacterization/database/{databaseCode}/schema/{resultsSchema}"
         request_body = {"vocabSchema": vocabSchemaName,
                         "cdmSchema": vocabSchemaName}
-        dbsvc_module = importlib.import_module('d2e_dbsvc')
-        await dbsvc_module._run_db_svc_shell_command(
+
+        request_body = _db_svc_flowrun_params(
+            request_body, databaseDialect, flowName, changelog_filepath)
+
+        await _run_db_svc_shell_command(
             "post", request_url, request_body)
     except Exception as e:
         logger.error(e)
@@ -109,17 +122,20 @@ async def create_data_characterization_schema(
 
 
 def execute_data_characterization_flow(options: dcOptionsType):
+    logger = get_run_logger()
+
     schemaName = options.schemaName
     databaseCode = options.databaseCode
     cdmVersionNumber = options.cdmVersionNumber
     vocabSchemaName = options.vocabSchemaName
     releaseDate = options.releaseDate
     resultsSchema = options.resultsSchema
+    flowName = options.flowName
+    changelogFilepath = options.changelogFilepath
 
     # comma separated values in a string
     excludeAnalysisIds = options.excludeAnalysisIds
 
-    logger = get_run_logger()
     flow_run_context = FlowRunContext.get().flow_run.dict()
     flow_run_id = str(flow_run_context.get("id"))
     outputFolder = f'/output/{flow_run_id}'
@@ -134,7 +150,9 @@ def execute_data_characterization_flow(options: dcOptionsType):
     create_data_characterization_schema(
         databaseCode,
         resultsSchema,
-        vocabSchemaName
+        vocabSchemaName,
+        flowName,
+        changelogFilepath
     )
 
     execute_data_characterization_wo = execute_data_characterization.with_options(on_failure=[

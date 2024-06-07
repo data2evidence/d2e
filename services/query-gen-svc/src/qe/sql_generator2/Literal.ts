@@ -7,6 +7,10 @@ export class Literal extends AstElement {
         super(node, path, name, parent);
     }
 
+    private _isValidDateString = function (value: string) {
+        return !isNaN(Date.parse(value));
+    };
+
     getSQLNoCase() {
         if (typeof this.node.value === "string") {
             return QueryObject.format("%s", this.node.value);
@@ -25,6 +29,8 @@ export class Literal extends AstElement {
                 this.node.valueType === "SQLFunction"
             ) {
                 return QueryObject.format("%UNSAFE", this.node.value);
+            } else if (this._isValidDateString(this.node.value)) {
+                return QueryObject.format("%t", this.node.value);
             } else {
                 return QueryObject.format("UPPER(%s)", this.node.value);
             }

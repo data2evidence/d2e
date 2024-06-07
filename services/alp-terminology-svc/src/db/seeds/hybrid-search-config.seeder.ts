@@ -18,6 +18,7 @@ export default class HybridSearchConfigSeeder implements Seeder {
         isEnabled: false,
         semanticRatio: 0.5,
         model: 'neuml/pubmedbert-base-embeddings',
+        source: 'huggingFace',
         createdBy: 'system',
         modifiedBy: 'system',
       },

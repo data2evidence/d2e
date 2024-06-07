@@ -13,9 +13,13 @@ services:
 
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile --watch
+    image:  alpcr.azurecr.io/alp-data-node/alp-caddy:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop}
     ports:
       - 41100:41100
       - 41000:41000
+      - 41130:41130
+    environment:
+      CADDY__FHIR_SERVER__PUBLIC_FQDN: ${CADDY__FHIR_SERVER__PUBLIC_FQDN:-localhost}
 
   alp-dataflow-gen:
     build:
@@ -23,6 +27,8 @@ services:
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
     volumes:
       - ./services/alp-dataflow-gen/pysrc:/app/pysrc
+    ports:
+      - 41${BASE_PORT:-1}20:41${BASE_PORT:-1}20
     environment:
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
@@ -55,13 +61,7 @@ services:
       - 9229:9229
     environment:
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
-      NODE_ENV: production # development
-
-  alp-local-ui-file-server:
-    container_name: alp-local-ui-file-server
-    image: alpcr.azurecr.io/alp-data-node/alp-local-ui-file-server:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop} # Take local head commit and will pull from Azure Container registry
-    networks:
-      - alp
+      NODE_ENV: development
 
   alp-logto:
     build:
@@ -144,18 +144,6 @@ services:
       - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
       - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
       - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
-    healthcheck:
-      interval: 30s
-      retries: 10
-      start_period: 120s
-      test:
-        - CMD
-        - wget
-        - -O
-        - src/liveness
-        - --no-check-certificate
-        - https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/check-liveness
-      timeout: 180s
     ports:
       - 9220:9220
     volumes:
@@ -238,17 +226,6 @@ services:
     command:
       - sh
       - start.sh
-    healthcheck:
-      interval: 20s
-      retries: 10
-      start_period: 60s
-      test:
-        - CMD
-        - wget
-        - -O
-        - src/liveness
-        - http://0.0.0.0:41104/check-liveness
-      timeout: 10s
     ports:
       - 9224:9224
     volumes:
@@ -274,8 +251,20 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
-  
+
+  alp-dicom-server:
+    # uses 8042 port on the container
+    ports:
+      - 8042:8042
+
   alp-fhir-server:
     build:
       context: ./services/alp-fhir
       dockerfile: Dockerfile
+
+  alp-fhir-fe-server:
+    build:
+      context: ./services/alp-fhir/
+      dockerfile: Dockerfile.frontend
+    volumes:
+    - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js

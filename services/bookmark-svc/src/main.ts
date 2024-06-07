@@ -5,7 +5,6 @@ import {
   DBConnectionUtil as dbConnectionUtil,
   getUser,
   Logger,
-  QueryObject,
   EnvVarUtils,
   healthCheckMiddleware,
   Constants,
@@ -15,15 +14,11 @@ import {
 import express from 'express'
 import https from 'https'
 import helmet from 'helmet'
-import path from 'path'
-import * as xsenv from '@sap/xsenv'
 import noCacheMiddleware from './middleware/NoCache'
 import timerMiddleware from './middleware/Timer'
 import { Container } from 'typedi'
-import { useContainer } from 'class-validator'
 import Routes from './routes'
-
-import { IMRIRequest } from './types'
+import { IMRIRequest, IDBCredentialsType } from './types'
 import { env } from './env'
 
 dotenv.config()
@@ -36,13 +31,24 @@ const initRoutes = async (app: express.Application) => {
   app.use(express.urlencoded({ extended: true, limit: '50mb' }))
   app.use(noCacheMiddleware)
 
-  let configCredentials
+  let configCredentials: IDBCredentialsType
 
   if (envVarUtils.isStageLocalDev()) {
     app.use(timerMiddleware())
   }
 
-  configCredentials = xsenv.cfServiceCredentials({ tag: 'config' })
+  configCredentials = {
+    database: env.PG__DB_NAME,
+    schema: env.PG_SCHEMA,
+    dialect: env.PG__DIALECT,
+    host: env.PG__HOST,
+    port: env.PG__PORT,
+    user: env.PG_USER,
+    password: env.PG_PASSWORD,
+    max: env.PG__MAX_POOL,
+    min: env.PG__MIN_POOL,
+    idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
+  } 
   app.use(async (req: IMRIRequest, res, next) => {
     if (!utils.isHealthProbesReq(req)) {
       log.debug(`🚀 ~ file: main.ts ~ line 141 ~ app.use ~ req.headers: ${JSON.stringify(req.headers, null, 2)}`)
@@ -60,7 +66,7 @@ const initRoutes = async (app: express.Application) => {
 
         const configConnection = await dbConnectionUtil.DBConnectionUtil.getDBConnection({
           credentials: configCredentials,
-          schema: configCredentials.configSchema || configCredentials.schema,
+          schema: configCredentials.schema,
           userObj,
         })
 
