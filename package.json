@@ -44,7 +44,7 @@
     "build:minerva-test": "yarn local:minerva build",
     "start:minerva-test": "yarn local:minerva start",
 
-    "seed-postgres-cdm-schemas": "db_code=${0} && schema_name=${1} && sh -c \"docker exec -it alp-dataflow-gen-agent-1 prefect deployment run data-management-plugin/data-management-plugin_deployment --param options='{\"data_model\":\"omop5-4\",\"schema_name\":\"$schema_name\",\"vocab_schema\":\"cdmvocab\",\"database_code\":\"$db_code\",\"flow_action_type\":\"seed_cdmvocab\"}'\"",
+    "seed-postgres-cdm-schemas": "scripts/trigger-seed-cdm-schema.sh",
     "build": "ts-node internal/build/buildservices.ts build",
     "tsc": "ts-node internal/build/buildservices.ts build --only-tsc",
     "inittestdb": "node internal/build/initdb.js test",
