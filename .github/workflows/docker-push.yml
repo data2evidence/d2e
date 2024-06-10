@@ -198,6 +198,12 @@ jobs:
     - uses: docker/setup-buildx-action@v3
       id: builder
 
+    - name: Purge docker images and cache
+      run: |
+        docker image prune -af
+        docker builder prune -af
+        docker buildx prune -af
+
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
@@ -206,8 +212,13 @@ jobs:
         context: ${{ matrix.context }}
         pull: ${{ matrix.pull || false }}
         file:  ${{ matrix.directory }}/${{ matrix.fileName }}
-        push: ${{ steps.docker_tag.outputs.is_push }}
+        push: true # ${{ steps.docker_tag.outputs.is_push }}
         tags: alpcr.azurecr.io/${{ matrix.name }}:${{ steps.docker_tag.outputs.tag_name }}
         build-args: |
           docker_image_prefix=alpcr.azurecr.io
           GIT_COMMIT_ARG=${{ github.sha }}
+
+    - name: Post purge
+      if: always()
+      run: |  
+        docker system prune -af
