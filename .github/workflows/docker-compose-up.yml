@@ -158,7 +158,7 @@ jobs:
           PORTAL_NAME: alp-minerva-gateway-1
         run: |
           # Run DataNode services
-          ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local up --wait
+          ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml --env-file .env.local up --wait
           EXIT_CODE=$?
 
           docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
