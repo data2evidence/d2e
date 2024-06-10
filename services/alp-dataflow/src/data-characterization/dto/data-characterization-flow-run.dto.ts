@@ -5,6 +5,9 @@ export class DataCharacterizationFlowRunDto {
   datasetId: string
 
   @IsString()
+  deploymentName: string
+
+  @IsString()
   @IsOptional()
   comment: string
 
