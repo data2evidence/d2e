@@ -203,6 +203,16 @@ export class PrefectService {
     let flowMetadataInput
     let existingFlowMetadata
     try {
+      // prepare metadata input
+      if (defaultDeploymentInfo && defaultDeploymentInfo.url) {
+        flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, defaultDeploymentInfo.url)
+      } else {
+        flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, url)
+      }
+
+      // if metadata with same flowId exists
+      existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+
       if (defaultPluginId) {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.INSTALLING)
       }
@@ -225,21 +235,6 @@ export class PrefectService {
       }
 
       await this.prefectExecutionClient.executePipInstall(userId, modifiedFileStem)
-
-      // prepare metadata input
-      if (defaultDeploymentInfo && defaultDeploymentInfo.url) {
-        flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, defaultDeploymentInfo.url)
-      } else {
-        flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, url)
-      }
-
-      // if metadata with same flowId exists
-      existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
-      if (existingFlowMetadata) {
-        await this.prefectFlowService.deleteFlowMetadata(existingFlowMetadata.flowId)
-      }
-      // create new flow metadata
-      await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
     } catch (err) {
       if (!existingFlowMetadata) {
         await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
@@ -252,6 +247,11 @@ export class PrefectService {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
       }
       throw new InternalServerErrorException(errorMessage)
+    } finally {
+      if (existingFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(existingFlowMetadata.flowId)
+      }
+      await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
     }
 
     try {
