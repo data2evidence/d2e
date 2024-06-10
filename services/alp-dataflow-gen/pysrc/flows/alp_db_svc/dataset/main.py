@@ -1,34 +1,32 @@
 from prefect import get_run_logger, task
 from functools import partial
-from alpconnection.dbutils import extract_db_credentials, get_db_svc_endpoint_dialect
+from alpconnection.dbutils import extract_db_credentials
 from utils.types import DBCredentialsType, DatabaseDialects, HANA_TENANT_USERS, PG_TENANT_USERS
 
 from dao.DBDao import DBDao
 from dao.UserDao import UserDao
 
 from flows.alp_db_svc.liquibase.main import Liquibase
-from flows.alp_db_svc.types import LiquibaseAction, CreateDataModelType, UpdateDataModelType, RollbackTagType, RollbackCountType
-from flows.alp_db_svc.const import get_plugin_classpath, DATAMODEL_CDM_VERSION, OMOP_DATA_MODELS
+from flows.alp_db_svc.types import LiquibaseAction
+from flows.alp_db_svc.const import DATAMODEL_CDM_VERSION, OMOP_DATA_MODELS
 from flows.alp_db_svc.hooks import *
 
 
-def create_datamodel(options: CreateDataModelType):
-    logger = get_run_logger()
+def create_datamodel(database_code: str,
+                          data_model: str,
+                          schema_name: str,
+                          vocab_schema: str,
+                          changelog_file: str,
+                          count: int,
+                          cleansed_schema_option: bool,
+                          plugin_classpath: str,
+                          dialect: str):
 
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    vocab_schema = options.vocab_schema
-    flow_name = options.flow_name
-    changelog_file = options.changelog_filepath_list.get(data_model)
-    count = options.update_count
-    cleansed_schema_option = options.cleansed_schema_option
-    plugin_classpath = get_plugin_classpath(flow_name)
+
     tenant_configs = extract_db_credentials(database_code)
-    db_dialect = get_db_svc_endpoint_dialect(database_code)
 
     task_status = create_schema_tasks(
-        dialect=db_dialect,
+        dialect=dialect,
         database_code=database_code,
         data_model=data_model,
         changelog_file=changelog_file,
@@ -42,7 +40,7 @@ def create_datamodel(options: CreateDataModelType):
     if task_status and cleansed_schema_option:
         cleansed_schema_name = schema_name + "_cleansed"
         cleansed_task_status = create_schema_tasks(
-            dialect=db_dialect,
+            dialect=dialect,
             data_model=data_model,
             changelog_file=changelog_file,
             schema_name=cleansed_schema_name,
@@ -137,17 +135,17 @@ def create_schema_tasks(dialect: str,
         return True
 
 
-def update_datamodel(options: UpdateDataModelType):
+def update_datamodel(database_code: str,
+                    data_model: str,
+                    schema_name: str,
+                    vocab_schema: str,
+                    changelog_file: str,
+                    plugin_classpath: str,
+                    dialect: str):
+
     logger = get_run_logger()
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    vocab_schema = options.vocab_schema
-    flow_name = options.flow_name
-    changelog_file = options.changelog_filepath_list.get(data_model)
-    plugin_classpath = get_plugin_classpath(flow_name)
+    
     tenant_configs = extract_db_credentials(database_code)
-    dialect = get_db_svc_endpoint_dialect(database_code)
 
     match dialect:
         case DatabaseDialects.HANA:
@@ -189,17 +187,16 @@ def update_datamodel(options: UpdateDataModelType):
         raise e
 
 
-def rollback_count(options: RollbackCountType):
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    vocab_schema = options.vocab_schema
-    rollback_count = options.rollback_count
-    flow_name = options.flow_name
-    changelog_file = options.changelog_filepath_list.get(data_model)
-    plugin_classpath = get_plugin_classpath(flow_name)
+def rollback_count_task(database_code: str,
+                    data_model: str,
+                    schema_name: str,
+                    vocab_schema: str,
+                    changelog_file: str,
+                    plugin_classpath: str,
+                    dialect: str,
+                    rollback_count: int):
+
     tenant_configs = extract_db_credentials(database_code)
-    dialect = get_db_svc_endpoint_dialect(database_code)
 
     try:
         rollback_count_wo = run_liquibase.with_options(
@@ -226,17 +223,17 @@ def rollback_count(options: RollbackCountType):
         return return_code
 
 
-def rollback_tag(options: RollbackTagType):
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    vocab_schema = options.vocab_schema
-    rollback_tag = options.tag
-    flow_name = options.flow_name
-    changelog_file = options.changelog_filepath_list.get(data_model)
-    plugin_classpath = get_plugin_classpath(flow_name)
+def rollback_tag(database_code: str,
+                data_model: str,
+                schema_name: str,
+                vocab_schema: str,
+                changelog_file: str,
+                plugin_classpath: str,
+                dialect: str,
+                rollback_tag: str):
+
     tenant_configs = extract_db_credentials(database_code)
-    dialect = get_db_svc_endpoint_dialect(database_code)
+
 
     try:
         rollback_tag_wo = run_liquibase.with_options(
