@@ -1,6 +1,6 @@
 import os
 from time import time
-from prefect import get_run_logger
+from prefect import task, get_run_logger
 import pandas as pd
 from typing import List
 from flows.alp_db_svc.datamart.types import SnapshotCopyTableConfig, SnapshotCopyConfig, DatamartBaseConfig, DATAMART_ACTIONS
@@ -55,7 +55,7 @@ def _upload_dataframe_as_parquet_to_object_store(target_schema: str, table_name:
         get_run_logger().info(f"""Succesfully uploaded parquet file at {
             bucket_name}/{file_name}""")
 
-
+@task(log_prints=True)
 def datamart_copy_schema(
     db: DBDao,
     sourceSchema,
