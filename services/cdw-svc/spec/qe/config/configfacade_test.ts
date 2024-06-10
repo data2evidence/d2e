@@ -3,25 +3,25 @@ import { ConfigFacade } from "../../../src/qe/config/ConfigFacade";
 import { FfhQeConfig } from "../../../src/qe/config/config";
 import { Settings } from "../../../src/qe/settings/Settings";
 import { AssignmentProxy } from "../../../src/AssignmentProxy";
-import { Connection as connLib } from "@alp/alp-base-utils";
-import ConnectionInterface = connLib.ConnectionInterface;
-import { createConnection } from "../../testutils/connection";
+import { createConnection as createConfigConnection} from "../settings/utils/connection";
 
 let facade, ffhQeConfig, fakeConnection;
 describe("Testing ConfigFacade,", () => {
   beforeAll(async () => {
-    fakeConnection = await createConnection("duckdb");
-    facade = new ConfigFacade(
-      fakeConnection,
-      new FfhQeConfig(
-        fakeConnection as ConnectionInterface,
-        new AssignmentProxy([]),
-        new Settings(),
+    createConfigConnection(async (err, configConnection) => {
+      fakeConnection = configConnection;
+      facade = new ConfigFacade(
+        configConnection,
+        new FfhQeConfig(
+          configConnection,
+          new AssignmentProxy([]),
+          new Settings(),
+          new User("TEST_USER")
+        ),
         new User("TEST_USER")
-      ),
-      new User("TEST_USER")
-    );
-    ffhQeConfig = facade.getFfhQeConfig();
+      );
+      ffhQeConfig = facade.getFfhQeConfig();
+    })
   });
   afterAll(function () {
     fakeConnection.close();

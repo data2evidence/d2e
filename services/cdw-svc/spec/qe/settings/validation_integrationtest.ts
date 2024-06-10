@@ -3,7 +3,8 @@ import { User } from "@alp/alp-base-utils";
 import { CDW as cdwConfig } from "../../data/cdw/configs";
 import * as testedLib from "../../../src/qe/settings/OldSettings";
 import { Settings } from "../../../src/qe/settings/Settings";
-import { createAnalyticsConnection, createConnection } from "./utils/connection";
+import { createConnection } from "./utils/connection";
+import { createConnection as  createAnalyticsConnection} from "../../testutils/connection";
 import { ConfigFacade } from "../../../src/qe/config/ConfigFacade";
 import { FfhQeConfig } from "../../../src/qe/config/config";
 import { AssignmentProxy } from "../../../src/AssignmentProxy";
@@ -34,12 +35,11 @@ describe("TEST SUITE TO DEFINE THE BEHAVIOR OF THE GLOBAL SETTINGS VALIDATION", 
         callback(null);
       });
     };
-    const initAnalyticsConnection = (callback) => {
-      createAnalyticsConnection((err, connection) => {
-        analyticsConnectionObj = connection;
-        callback(null);
-      }, "duckdb");
+    const initAnalyticsConnection = async (callback) => {
+      analyticsConnectionObj = await createAnalyticsConnection("duckdb")
+      callback(null)
     };
+    
     const setupConfigFacade = (callback) => {
       const ffhQeConfig = new FfhQeConfig(
         connectionObj,

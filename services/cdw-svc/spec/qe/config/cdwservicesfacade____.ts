@@ -3,8 +3,8 @@ import { CDWServicesFacade } from "../../../src/qe/config/CDWServicesFacade";
 import { FfhQeConfig } from "../../../src/qe/config/config";
 import { AssignmentProxy } from "../../../src/AssignmentProxy";
 import { Settings } from "../../../src/qe/settings/Settings";
-import { ConnectionInterface } from "@alp/alp-base-utils/target/src/Connection";
-import { createConnection } from "../../testutils/connection";
+import { createConnection as createAnalyticsConnection} from "../../testutils/connection";
+import { createConnection as createConfigConnection } from "../settings/utils/connection";
 import * as attribute_infos_service from "../../../src/qe/config/attribute_infos_service";
 import * as column_suggestion_service from "../../../src/qe/config/column_suggestion_service";
 import * as domain_values_service from "../../../src/qe/config/domain_values_service";
@@ -19,17 +19,19 @@ let facade, ffhQeConfig, fakeConnection;
 
 describe("Testing CDWServicesFacade,", () => {
     beforeAll(async () => {
-        fakeConnection = await createConnection("duckdb");
-        facade = new CDWServicesFacade(
-        fakeConnection,
-        new FfhQeConfig(
-            fakeConnection as ConnectionInterface,
-            new AssignmentProxy([]),
-            new Settings(),
-            new User("TEST_USER")
-        )
-        );
-        ffhQeConfig = facade.getFfhQeConfig();
+        createConfigConnection(async (err, configConnection) => {
+            fakeConnection = await createAnalyticsConnection("duckdb");
+            facade = new CDWServicesFacade(
+            fakeConnection,
+            new FfhQeConfig(
+                configConnection,
+                new AssignmentProxy([]),
+                new Settings(),
+                new User("TEST_USER")
+            )
+            );
+            ffhQeConfig = facade.getFfhQeConfig();
+        })
     });
     afterAll(function () {
         fakeConnection.close();
