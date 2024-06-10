@@ -49,21 +49,22 @@ class Liquibase:
         admin_user = self.tenant_configs.get("adminUser")
         admin_password = self.tenant_configs.get("adminPassword")
 
-        liquibase_path = os.environ["LIQUIBASE_PATH"]
-        hana_driver_class_path = os.environ["HANA__DRIVER_CLASS_PATH"]
-        postgres_driver_class_path = os.environ["POSTGRES__DRIVER_CLASS_PATH"]
+
+        liquibase_path = os.environ.get("LIQUIBASE_PATH", "/app/liquibase/liquibase")
+        hana_driver_class_path = os.environ.get("HANA__DRIVER_CLASS_PATH", "/app/inst/drivers/ngdbc-latest.jar")
+        postgres_driver_class_path = os.environ.get("POSTGRES__DRIVER_CLASS_PATH", "/app/inst/drivers/postgresql-42.3.1.jar")
 
         match self.dialect:
             case DatabaseDialects.HANA:
                 classpath = f"{hana_driver_class_path}:{self.plugin_classpath}"
                 driver = "com.sap.db.jdbc.Driver"
                 connection_base_url = f'jdbc:sap://{host}:{port}?'
-                connection_properties = f'databaseName={database_name}&validateCertificate=false&encrypt=true&sslTrustStore={ssl_trust_store}&hostNameInCertificate={host_name_in_cert}&currentSchema={self.schema_name}'
+                connection_properties = f'databaseName={database_name}&validateCertificate=false&encrypt=true&sslTrustStore={ssl_trust_store}&hostNameInCertificate={host_name_in_cert}&currentSchema={self.schema_name.upper()}'
             case DatabaseDialects.POSTGRES:
                 classpath = f"{postgres_driver_class_path}:{self.plugin_classpath}"
                 driver = "org.postgresql.Driver"
                 connection_base_url = f'jdbc:postgresql://{host}:{port}/{database_name}?'
-                connection_properties = f'user={admin_user}&password={admin_password}&currentSchema="{self.schema_name}"'
+                connection_properties = f'user={admin_user}&password={admin_password}&currentSchema="{self.schema_name.lower()}"'
 
         params = [
             liquibase_path,
@@ -74,7 +75,7 @@ class Liquibase:
             f"--username={admin_user}",
             f"--password={admin_password}",
             f"--driver={driver}",
-            f"--logLevel={os.environ['LB__LOG_LEVEL']}",
+            f"--logLevel={os.environ.get('LB__LOG_LEVEL', INFO)}",
             f"--defaultSchemaName={self.schema_name}",
             f"--liquibaseSchemaName={self.schema_name}"
         ]
