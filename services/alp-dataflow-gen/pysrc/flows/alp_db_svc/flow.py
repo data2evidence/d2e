@@ -88,7 +88,7 @@ def update_datamodel_flow(options: UpdateDataModelType):
         raise e
 
 
-def get_version_flow(options: GetVersionInfoType):
+def get_version_info_flow(options: GetVersionInfoType):
     get_version_info_task(
         changelog_file=options.changelog_filepath_list.get(
             options.data_model),
