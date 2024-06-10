@@ -215,7 +215,8 @@ class DBDao:
     def _system_columns(self, column):
         return column.lower() not in ["system_valid_until", "system_valid_from"]
 
-    def insert_values_into_table(self, table_name: str, column_value_mapping: Dict):
+    def insert_values_into_table(self, table_name: str, column_value_mapping: dict):
+        # currently only suuports one row inserts
         with self.engine.connect() as connection:
             table = Table(table_name.casefold(), self.metadata,
                           autoload_with=connection)
