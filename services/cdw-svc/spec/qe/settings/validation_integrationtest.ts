@@ -4,6 +4,7 @@ import { CDW as cdwConfig } from "../../data/cdw/configs";
 import * as testedLib from "../../../src/qe/settings/OldSettings";
 import { Settings } from "../../../src/qe/settings/Settings";
 import { createConnection } from "./utils/connection";
+import { createConnection as  createAnalyticsConnection} from "../../testutils/connection";
 import { ConfigFacade } from "../../../src/qe/config/ConfigFacade";
 import { FfhQeConfig } from "../../../src/qe/config/config";
 import { AssignmentProxy } from "../../../src/AssignmentProxy";
@@ -34,12 +35,11 @@ describe("TEST SUITE TO DEFINE THE BEHAVIOR OF THE GLOBAL SETTINGS VALIDATION", 
         callback(null);
       });
     };
-    const initAnalyticsConnection = (callback) => {
-      createConnection((err, connection) => {
-        analyticsConnectionObj = connection;
-        callback(null);
-      }, "hana");
+    const initAnalyticsConnection = async (callback) => {
+      analyticsConnectionObj = await createAnalyticsConnection("duckdb")
+      callback(null)
     };
+    
     const setupConfigFacade = (callback) => {
       const ffhQeConfig = new FfhQeConfig(
         connectionObj,
@@ -71,7 +71,7 @@ describe("TEST SUITE TO DEFINE THE BEHAVIOR OF THE GLOBAL SETTINGS VALIDATION", 
     it("should detect invalid SQL Table Name", async (done) => {
       const invalidTableName = `invalid()`;
       const fromName = invalidTableName;
-      const result = await testedLib.validateDBTable(connectionObj, fromName);
+      const result = await testedLib.validateDBTable(analyticsConnectionObj, fromName);
       expect(result.valid).toBe(false);
       expect(result.message).toBe("HPH_CFG_GLOBAL_DB_OBJECT_INCORRECT_FORMAT");
       done();
@@ -80,7 +80,7 @@ describe("TEST SUITE TO DEFINE THE BEHAVIOR OF THE GLOBAL SETTINGS VALIDATION", 
     it("should detect SQL Table Name that does not exist", async (done) => {
       const noSuchTableName = `does_not_exist`;
       const fromName = noSuchTableName;
-      const result = await testedLib.validateDBTable(connectionObj, fromName);
+      const result = await testedLib.validateDBTable(analyticsConnectionObj, fromName);
       expect(result.valid).toBe(false);
       expect(result.message).toBe("HPH_CFG_GLOBAL_DB_OBJECT_NOT_FOUND");
       done();

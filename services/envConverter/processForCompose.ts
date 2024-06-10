@@ -28,6 +28,9 @@ export const processForComposeDbSvc = (
   let values: (HanaConfig | PostgresConfig)[] = [];
   for (const value of databaseValues) {
     if (value.type === "HANA" || value.type === "POSTGRES") {
+      if (value.type === "POSTGRES") {
+        value.values.dialect = "postgres";
+      }
       value.values = _.merge(value.values, value.dbSvcValues);
       cleanupOverwriteValues(value);
       values.push(value);
