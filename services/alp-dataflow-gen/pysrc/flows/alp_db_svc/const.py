@@ -1,4 +1,6 @@
 from os import getcwd
+from utils.types import internalPluginType
+from alpconnection.dbutils import get_db_svc_endpoint_dialect
 
 OMOP_DATA_MODELS = ["omop", "omop5-4", "custom-omop-ms", "custom-omop-ms-phi"]
 
@@ -29,3 +31,14 @@ DATAMODEL_CDM_VERSION = {
 
 def get_plugin_classpath(flow_name: str) -> str:
     return f'{getcwd()}/{flow_name}/'
+
+
+def hana_to_postgres(table_name: str) -> str:
+    return table_name.lower().replace(".", "_")
+
+
+def get_db_dialect(options):
+    if options.flow_name in internalPluginType.values():
+        return get_db_svc_endpoint_dialect(options.database_code)
+    else:
+        return options.dialect
