@@ -85,7 +85,7 @@ wc -l *
 - Navigate back to root folder `d2e` and Run the following command to seed postgres cdm schemas with synpuf-1k
 ```bash
 cd $GIT_BASE_DIR
-yarn seed-postgres-cdm-schemas alpdev_pg cdmdefault
+yarn seed-postgres-cdm-schemas alpdev_pg cdmdefault cdmvocab
 ```
 - where `cdmdefault` is the default cdm schema name
 - Wait ~2 minutes
