@@ -172,6 +172,14 @@ jobs:
         repository: ${{ env.REPO_FULL_NAME }}
         token: ${{ secrets.CI_PAT }}
 
+
+    - name: Login to ACR
+      uses: docker/login-action@v3
+      with:
+        registry: alpcr.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
     - name: Get docker tag name
       id: docker_tag
       shell: bash
@@ -195,13 +203,6 @@ jobs:
     #     docker image prune -af
     #     docker builder prune -af
     #     docker buildx prune -af
-
-    - name: Login to ACR
-      uses: docker/login-action@v3.1.0
-      with:
-        registry: alpcr.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
 
     - name: Build and push
       uses: docker/build-push-action@v5
