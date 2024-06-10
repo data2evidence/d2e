@@ -1,5 +1,6 @@
 import { join } from 'path'
 import { DataSource, DataSourceOptions, LogLevel } from 'typeorm'
+import { SeederOptions } from 'typeorm-extension'
 import { TlsOptions } from 'tls'
 import { createLogger } from '../../logger'
 import { env } from '../../env'
@@ -26,7 +27,7 @@ export const getLogLevels = (): LogLevel[] => {
   return ['log', 'info', 'warn', 'error', 'migration', 'query', 'schema']
 }
 
-export const dataSourceOptions: DataSourceOptions = {
+export const dataSourceOptions: DataSourceOptions & SeederOptions = {
   type: 'postgres',
   host: env.PG_HOST,
   port: env.PG_PORT,
@@ -37,7 +38,8 @@ export const dataSourceOptions: DataSourceOptions = {
   ssl: getSsl(),
   poolSize: env.PG_MAX_POOL,
   logging: getLogLevels(),
-  entities: [join(baseDir, '**/*.entity.{ts,js}')]
+  entities: [join(baseDir, '**/*.entity.{ts,js}')],
+  seeds: ['dist/**/data-source/seeds/*.seeder.{ts,js}']
 }
 
 const dataSource = new DataSource(dataSourceOptions)
