@@ -125,7 +125,7 @@ class InternalPluginType(str, Enum):
     DUCK_DB = "create_duckdb_file_plugin"
     DATAFLOW_UI = "dataflow_ui_plugin"
     MEILISEARCH = "add_search_index_plugin"
-    MEILISEARCH = "add_search_index_with_embeddings_plugin"
+    MEILISEARCH_EMBEDDINGS = "add_search_index_with_embeddings_plugin"
     R_CDM = "r_cdm_plugin"
 
     @staticmethod
