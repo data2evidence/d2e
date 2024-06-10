@@ -12,6 +12,48 @@ from flows.alp_db_svc.types import (CreateDataModelType,
                                     RollbackTagType,
                                     QuestionnaireDefinitionType)
 
+
+def run_seed_postgres(options: seedVocabType):
+    #Begin by checking if the vocab schema exists or not
+    schema_obj = DBDao(options.database_code, options.vocab_schema, PG_TENANT_USERS.ADMIN_USER)
+    schema_exists = check_seed_schema_exists(schema_obj)
+    
+    db_dialect = _get_db_dialect(options)
+    request_body = {}
+    request_body = _db_svc_flowrun_params(request_body, db_dialect, options.flow_name, options.changelog_filepath)
+    
+    if (schema_exists == False):
+        try:
+            request_body["cleansedSchemaOption"] = False
+            request_body["vocabSchema"] = options.vocab_schema
+            run_command(
+                request_type="post",
+                request_url=f"/alpdb/postgres/database/{options.database_code}/data-model/omop5-4/schema/{options.vocab_schema}",
+                request_body=request_body
+            )
+        except Exception as e:
+            get_run_logger().error(
+                f"Failed to create schema {options.vocab_schema} in db with code:{options.database_code}: {e}")
+            return False
+        
+    if(options.schema_name != options.vocab_schema):
+        #Check if the incoming schema_name exists or not
+        schema_obj = DBDao(options.database_code, options.schema_name, PG_TENANT_USERS.ADMIN_USER)
+        schema_exists = check_seed_schema_exists(schema_obj)
+        if (schema_exists == False):
+            try:
+                run_command(
+                    request_type="post",
+                    request_url=f"/alpdb/postgres/database/{options.database_code}/data-model/omop5-4/schema/{options.schema_name}",
+                    request_body=request_body
+                )
+            except Exception as e:
+                get_run_logger().error(
+                    f"Failed to create schema {options.schema_name} in db with code:{options.database_code}: {e}")
+                return False
+    load_data_flow(options.database_code, options.schema_name)
+
+
 def create_datamodel_flow(options: CreateDataModelType):
     try:
         create_datamodel(
@@ -29,7 +71,7 @@ def create_datamodel_flow(options: CreateDataModelType):
     except Exception as e:
         raise e
 
-
+    
 def update_datamodel_flow(options: UpdateDataModelType):
     try:
         update_datamodel(

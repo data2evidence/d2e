@@ -4,7 +4,7 @@ import { SettingsFacade } from "../../../src/qe/settings/SettingsFacade";
 import { AssignmentProxy } from "../../../src/AssignmentProxy";
 import { FfhQeConfig } from "../../../src/qe/config/config";
 import { MESSAGES } from "../../../src/qe/config/config";
-import { createConnection } from "../../testutils/connection";
+import { createConnection as createConfigConnection } from "../settings/utils/connection";
 import {
   cloneJson,
   createConfig,
@@ -17,10 +17,8 @@ import { CDW, OLD_CDW, OLD_GLOBAL_SETTINGS } from "../../data/cdw/configs";
 import { DisableLogger } from "../../../src/utils/Logger";
 import async = require("async");
 import { QueryObject as qo, User } from "@alp/alp-base-utils";
-import QueryObject = qo.QueryObject;
 import * as cfg_utils from "@alp/alp-config-utils";
 import FfhConfig = cfg_utils.FFHConfig.FFHConfig;
-import { testsLogger } from "../../testutils/logger";
 import * as auth from "../../../src/authentication";
 DisableLogger();
 let facade: ConfigFacade;
@@ -34,26 +32,20 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 80000; // 10 second timeout
 describe("CDM Configuration tests,", () => {
   beforeAll((done) => {
     fakeSettings = new Settings();
-
-    createConnection()
-      .then((connectionInstance) => {
-        connection = connectionInstance;
-        ffhQeConfig = new FfhQeConfig(
-          connectionInstance,
-          new AssignmentProxy([]),
-          fakeSettings,
-          new User("TEST_USER"),
-          true
-        );
-        ffhConfig = ffhQeConfig.getFfhConfigObj();
-        facade = new ConfigFacade(connectionInstance, ffhQeConfig, new User("TEST_USER"), true);
-        settingsFacade = new SettingsFacade(new User("TEST_USER"));
-        settingsFacade.setFfhQeConfig(ffhQeConfig);
-        done();
-      })
-      .catch((err) => {
-        throw new Error("Failed to create connection");
-      });
+    createConfigConnection((err, configConnection) =>{
+      ffhQeConfig = new FfhQeConfig(
+        configConnection,
+        new AssignmentProxy([]),
+        fakeSettings,
+        new User("TEST_USER"),
+        true
+      );
+      ffhConfig = ffhQeConfig.getFfhConfigObj();
+      facade = new ConfigFacade(configConnection, ffhQeConfig, new User("TEST_USER"), true);
+      settingsFacade = new SettingsFacade(new User("TEST_USER"));
+      settingsFacade.setFfhQeConfig(ffhQeConfig);
+      done();
+    })
   });
 
   afterAll((done) => {

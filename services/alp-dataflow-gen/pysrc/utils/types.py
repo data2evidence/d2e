@@ -131,3 +131,8 @@ class InternalPluginType(str, Enum):
     @staticmethod
     def values():
         return InternalPluginType._value2member_map_
+
+
+class seedVocabType(dataModelBase):
+    vocab_schema: str
+
