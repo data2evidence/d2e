@@ -4,10 +4,10 @@ import { PrefectFlowService } from './prefect-flow.service'
 import { PrefectModule } from '../prefect/prefect.module'
 import { PortalServerModule } from '../portal-server/portal-server.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { FlowMetadata } from './entity'
+import { FlowMetadata, DefaultPlugins } from './entity'
 
 @Module({
-  imports: [PrefectModule, PortalServerModule, TypeOrmModule.forFeature([FlowMetadata])],
+  imports: [PrefectModule, PortalServerModule, TypeOrmModule.forFeature([FlowMetadata, DefaultPlugins])],
   controllers: [PrefectFlowController],
   providers: [PrefectFlowService]
 })
