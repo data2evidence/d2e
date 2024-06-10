@@ -116,6 +116,18 @@ class requestType(str, Enum):
     DELETE = "delete"
 
 
-class internalPluginType(str, Enum):
-    DATAMODEL_PLUGIN = "data_management_plugin"
+class InternalPluginType(str, Enum):
+    DATA_MANAGEMENT = "data_management_plugin"
     DATA_CHARACTERIZATION = "data_characterization_plugin"
+    DATA_QUALITY = "dqd_plugin"
+    COHORT_GENERATOR = "cohort_generator_plugin"
+    I2B2 = "i2b2_plugin"
+    DUCK_DB = "create_duckdb_file_plugin"
+    DATAFLOW_UI = "dataflow_ui_plugin"
+    MEILISEARCH = "add_search_index_plugin"
+    MEILISEARCH = "add_search_index_with_embeddings_plugin"
+    R_CDM = "r_cdm_plugin"
+
+    @staticmethod
+    def values():
+        return InternalPluginType._value2member_map_
