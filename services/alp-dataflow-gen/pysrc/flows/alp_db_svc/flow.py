@@ -129,7 +129,6 @@ async def create_snapshot_flow(options: CreateSnapshotType):
                 create_datamart_options = _parse_create_datamart_options(
                     options, db_dialect, DATAMART_ACTIONS.COPY_AS_PARQUET_FILE)
         await create_datamart(options=create_datamart_options)
-
     except Exception as e:
         raise e
 
