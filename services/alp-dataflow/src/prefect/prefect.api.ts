@@ -6,7 +6,7 @@ import { Agent } from 'https'
 import { env, services } from '../env'
 import { createLogger } from '../logger'
 import { PrefectFlowDto } from '../prefect-flow/dto'
-import { IPrefectFlowRunDto } from '../types'
+import { IFlowRunQueryDto, IPrefectFlowRunDto } from '../types'
 import * as dayjs from 'dayjs'
 
 interface FlowRunParams {
@@ -74,7 +74,7 @@ export class PrefectAPI {
     }
   }
 
-  async getAllFlowRuns() {
+  async getAllFlowRuns(filter?: IFlowRunQueryDto) {
     const errorMessage = 'Error while getting all prefect flow runs'
 
     try {
@@ -82,9 +82,11 @@ export class PrefectAPI {
 
       const url = `${this.url}/flow_runs/filter`
 
-      const data = {
-        sort: 'START_TIME_DESC'
+      const data: Record<string, string | object> = {
+        sort: 'START_TIME_DESC',
+        ...this.getFilters(filter)
       }
+
       const obs = this.httpService.post(url, data, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
@@ -93,17 +95,18 @@ export class PrefectAPI {
     }
   }
 
-  async getFlowRunsByDeploymentNames(deploymentNames: string[]) {
+  async getFlowRunsByDeploymentNames(deploymentNames: string[], extraFilter?: IFlowRunQueryDto) {
     const errorMessage = 'Error while getting prefect flow runs by deployment names'
     try {
       const options = await this.createOptions()
 
       const url = `${this.url}/flow_runs/filter`
 
-      const data = {
+      const data: Record<string, string | object> = {
         sort: 'START_TIME_DESC',
-        deployments: { name: { any_: deploymentNames } }
+        ...this.getFilters({ ...extraFilter, deploymentNames })
       }
+
       const obs = this.httpService.post(url, data, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
@@ -250,19 +253,6 @@ export class PrefectAPI {
     return this.executeFlowRun({ name, message, deploymentName, flowName, parameters, schedule })
   }
 
-  async createTestRun(parameters) {
-    const deploymentName = env.PREFECT_DEPLOYMENT_NAME
-    const flowName = env.PREFECT_FLOW_NAME
-    this.logger.info('Executing test run...')
-    return this.executeFlowRun({
-      name: 'Test-run',
-      message: 'Test run has started from alp-dataflow',
-      deploymentName,
-      flowName,
-      parameters
-    })
-  }
-
   async cancelFlowRun(id: string) {
     const errorMessage = `Error while cancelling flow run with id: ${id}`
     try {
@@ -380,6 +370,72 @@ export class PrefectAPI {
     } catch (error) {
       this.logger.info(`${errorMessage}: ${error}`)
       throw new InternalServerErrorException(errorMessage)
+    }
+  }
+
+  private getFilters(filter?: IFlowRunQueryDto) {
+    if (filter == null) {
+      return {}
+    }
+
+    const flowRuns: Record<string, string | object> = {}
+
+    if (filter.startDate || filter.endDate) {
+      flowRuns['expected_start_time'] = {
+        after_: filter.startDate,
+        before_: filter.endDate
+      }
+    }
+
+    if (filter.states) {
+      flowRuns['state'] = {
+        name: {
+          any_: filter.states
+        }
+      }
+    }
+
+    if (filter.tags) {
+      flowRuns['tags'] = {
+        all_: filter.tags
+      }
+    }
+
+    const flows: Record<string, string | object> = {}
+
+    if (filter.flowIds) {
+      flows['id'] = {
+        any_: filter.flowIds
+      }
+    }
+
+    const deployments: Record<string, string | object> = {}
+
+    if (filter.deploymentIds) {
+      deployments['id'] = {
+        any_: filter.deploymentIds
+      }
+    }
+
+    if (filter.deploymentNames) {
+      deployments['name'] = {
+        any_: filter.deploymentNames
+      }
+    }
+
+    const workPools: Record<string, string | object> = {}
+
+    if (filter.workPools) {
+      workPools['name'] = {
+        any_: filter.workPools
+      }
+    }
+
+    return {
+      flows,
+      flow_runs: flowRuns,
+      deployments,
+      work_pools: workPools
     }
   }
 
