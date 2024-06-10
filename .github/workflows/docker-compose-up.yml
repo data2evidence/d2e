@@ -126,26 +126,19 @@ jobs:
       #       docker_image_prefix=alpcr.azurecr.io
       #       GIT_COMMIT_ARG=${{ github.sha }}
 
-      - name: Docker compose build data 1 services
+      - name: Docker compose build data-flow-gen services
         run: |
             # Build DataNode services and pull dataflow-gen from cache
             yarn build:minerva alp-dataflow-gen alp-dataflow-gen-agent alp-dataflow-gen-init  --builder ${{ steps.builder1.outputs.name }}
-
-      # - name: Docker
-      #   run: |  
-      #     docker image ls
-      #     docker save alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:local | gzip > alp-dataflow-gen.tar.gz
-      #     docker image prune -af
-
 
       - name: Builder cache cleanup
         run: |  
           docker buildx prune -af
 
-      - name: Docker compose build data 2 services
+      - name: Docker compose build data 2 services excluding alp-sqleditor
         run: |
           # Build DataNode services and pull dataflow-gen from cache
-          yarn build:minerva alp-minerva-analytics-svc alp-minerva-sqleditor alp-query-gen alp-fhir-server alp-fhir-fe-server  --builder ${{ steps.builder1.outputs.name }}
+          yarn build:minerva alp-minerva-analytics-svc alp-query-gen alp-fhir-server alp-fhir-fe-server  --builder ${{ steps.builder1.outputs.name }}
 
       - name: Builder cache cleanup
         run: |  
@@ -154,22 +147,18 @@ jobs:
       - name: Docker compose build core services
         run: |
           # Build DataNode services and pull dataflow-gen from cache
-          yarn build:minerva alp-bookmark alp-caddy alp-db-credentials-mgr alp-logto alp-minerva-cdw-svc alp-minerva-dataflow-mgmt alp-minerva-gateway alp-minerva-pa-config-svc alp-minerva-pg-mgmt-init alp-minerva-portal-server alp-minerva-ps-config-svc alp-minerva-terminology-svc alp-minerva-user-mgmt alp-mri-pg-config alp-dataflow  --builder ${{ steps.builder1.outputs.name }}
+          yarn build:minerva alp-bookmark alp-caddy alp-db-credentials-mgr alp-logto alp-minerva-cdw-svc alp-minerva-dataflow-mgmt alp-minerva-gateway alp-minerva-pa-config-svc alp-minerva-pg-mgmt-init alp-minerva-portal-server alp-minerva-ps-config-svc alp-minerva-terminology-svc alp-minerva-user-mgmt alp-mri-pg-config alp-dataflow --builder ${{ steps.builder1.outputs.name }}
 
       - name: Builder cache cleanup
         run: |  
           docker buildx prune -af
-
-      # - name: Docker load dataflow-gen
-      #   run: |
-      #     docker load < alp-dataflow-gen.tar.gz
 
       - name: Docker compose up Local Mode without UI Container
         env:
           PORTAL_NAME: alp-minerva-gateway-1
         run: |
           # Run DataNode services
-          yarn start:minerva --wait
+          ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local up --wait
           EXIT_CODE=$?
 
           docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
