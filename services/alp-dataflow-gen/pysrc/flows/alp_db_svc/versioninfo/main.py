@@ -3,7 +3,8 @@ from typing import List, Dict
 from prefect import task, get_run_logger
 from utils.types import (
     PG_TENANT_USERS,
-    HANA_TENANT_USERS
+    HANA_TENANT_USERS,
+    DatabaseDialects
 )
 from alpconnection.dbutils import get_db_svc_endpoint_dialect, extract_db_credentials
 from flows.alp_db_svc.liquibase.main import Liquibase
@@ -52,6 +53,7 @@ def extract_db_schema(dataset_list: List[PortalDatasetType]) -> ExtractDatasetSc
             PortalDatasetType(**_dataset)
         except Exception as e:
             # dataset has no db_name and study name
+            get_run_logger().error(e)
             datasets_without_schema.append(_dataset)
         else:
             datasets_with_schema.append(_dataset)
@@ -84,9 +86,9 @@ def get_and_update_attributes(dataset: PortalDatasetType,
         # handle case of wrong db credentials
         db_dialect = get_db_svc_endpoint_dialect(database_code)
 
-        if db_dialect == "hana":
+        if db_dialect == DatabaseDialects.HANA:
             db_read_user = HANA_TENANT_USERS.ADMIN_USER
-        elif db_dialect == "postgres":
+        elif db_dialect == DatabaseDialects.POSTGRES:
             db_read_user = PG_TENANT_USERS.ADMIN_USER
         dataset_dao = DBDao(database_code, schema_name, db_read_user)
     except Exception as e:
