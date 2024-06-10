@@ -1,6 +1,10 @@
 import { Controller, Get, Query, Post, Body } from '@nestjs/common';
 import { ConceptService } from './concept.service';
-import { ConceptFilterOptionsDto } from './dto/concept.dto';
+import { transformPipe } from '../../utils/TransformPipe';
+import {
+  ConceptFilterOptionsDto,
+  ConceptHierarchyDto,
+} from './dto/concept.dto';
 @Controller()
 export class ConceptController {
   constructor(private readonly appService: ConceptService) {}
@@ -44,5 +48,16 @@ export class ConceptController {
     { conceptIds, datasetId }: { conceptIds: number[]; datasetId: string },
   ): Promise<any> {
     return await this.appService.getRecommendedConcepts(conceptIds, datasetId);
+  }
+
+  @Get('hierarchy')
+  async getConceptHierarchy(
+    @Query(transformPipe) conceptHierarchyDto: ConceptHierarchyDto,
+  ): Promise<any> {
+    return await this.appService.getConceptHierarchy(
+      conceptHierarchyDto.datasetId,
+      conceptHierarchyDto.conceptId,
+      conceptHierarchyDto.depth,
+    );
   }
 }
