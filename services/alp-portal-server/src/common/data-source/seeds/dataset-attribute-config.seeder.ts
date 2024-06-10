@@ -145,7 +145,7 @@ export default class DatasetAttributeConfigSeeder implements Seeder {
         id: 'entity_count_distribution',
         name: 'Entity Count Distribution',
         category: ATTRIBUTE_CONFIG_CATEGORIES.DATASET,
-        dataType: ATTRIBUTE_CONFIG_DATA_TYPES.JSON,
+        dataType: ATTRIBUTE_CONFIG_DATA_TYPES.STRING,
         isDisplayed: false,
         createdBy: 'system',
         modifiedBy: 'system'

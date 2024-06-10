@@ -16,6 +16,7 @@ import { PrefectFlowModule } from './prefect-flow/prefect-flow.module'
 import { CohortModule } from './cohort/cohort.module'
 import { JobHistoryModule } from './job-history/job-history.module'
 import { MeilisearchModule } from './meilisearch/meilisearch.module'
+import { SeedService } from './common/data-source/seeds/seed.service'
 
 const dqdRoutes = {
   path: 'dqd',
@@ -80,6 +81,7 @@ const meilisearchRoutes = {
     JobHistoryModule,
     MeilisearchModule,
     RouterModule.register([prefectRoutes, dqdRoutes, cohortRoutes, dbSvcRoutes, jobHistoryRoutes, meilisearchRoutes])
-  ]
+  ],
+  providers: [SeedService]
 })
 export class AppModule {}
