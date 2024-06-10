@@ -213,7 +213,7 @@ jobs:
         pull: ${{ matrix.pull || false }}
         file:  ${{ matrix.directory }}/${{ matrix.fileName }}
         push: true # ${{ steps.docker_tag.outputs.is_push }}
-        tags: alpcr.azurecr.io/${{ matrix.name }}:${{ steps.docker_tag.outputs.tag_name }}
+        tags: optimize-build #alpcr.azurecr.io/${{ matrix.name }}:${{ steps.docker_tag.outputs.tag_name }}
         build-args: |
           docker_image_prefix=alpcr.azurecr.io
           GIT_COMMIT_ARG=${{ github.sha }}
