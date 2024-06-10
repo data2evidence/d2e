@@ -71,27 +71,6 @@ class DBDao:
             cdm_version = connection.execute(stmt).scalar()
             return cdm_version
 
-    def insert_cdm_version(self,
-                           cdm_version: str) -> int:
-
-        values_to_insert = {
-            "cdm_source_name": self.schema_name,
-            "cdm_source_abbreviation": self.schema_name[0:25],
-            "cdm_holder": "D4L",
-            "source_release_date": datetime.now(),
-            "cdm_release_date": datetime.now(),
-            "cdm_version": cdm_version
-        }
-
-        with self.engine.connect() as connection:
-            table = Table("cdm_source".casefold(), self.metadata,
-                          autoload_with=connection)
-            insert_stmt = table.insert().values(values_to_insert)
-            print(
-                f"Inserting cdm version {cdm_version} for schema {self.schema_name}")
-            res = connection.execute(insert_stmt)
-            connection.commit()
-            return res.rowcount
 
     def update_cdm_version(self, cdm_version: str):
         with self.engine.connect() as connection:
@@ -134,6 +113,9 @@ class DBDao:
                 columns_to_be_copied = [
                     column.key for column in source_table.c]
 
+            columns_to_be_copied = list(
+                filter(self._system_columns, columns_to_be_copied))
+
             select_stmt = select(
                 *map(lambda x: getattr(source_table.c, x), columns_to_be_copied))
 
@@ -151,8 +133,6 @@ class DBDao:
 
     def datamart_copy_table(self, datamart_table_config, target_schema: str, columns_to_be_copied: List[str], date_filter: str = "", patients_to_be_copied: List[str] = []) -> int:
         table_name = datamart_table_config['tableName'].casefold()
-        select_stmt = self.__get_datamart_select_statement(
-            datamart_table_config, columns_to_be_copied, date_filter, patients_to_be_copied)
 
         with self.engine.connect() as connection:
             target_table = Table(table_name, MetaData(
@@ -164,8 +144,15 @@ class DBDao:
                 columns_to_be_copied = [
                     column.key for column in source_table.c]
 
+            columns_to_be_copied = list(
+                filter(self._system_columns, columns_to_be_copied))
+
+            select_stmt = self.__get_datamart_select_statement(
+                datamart_table_config, columns_to_be_copied, date_filter, patients_to_be_copied)
+
             insert_stmt = insert(target_table).from_select(
                 columns_to_be_copied, select_stmt)
+
             res = connection.execute(insert_stmt)
             connection.commit()
             return res.rowcount
@@ -224,3 +211,19 @@ class DBDao:
             connection.commit()
             print(
                 f"New audit policy for {self.schema_name} created & enabled successfully")
+
+    def _system_columns(self, column):
+        return column.lower() not in ["system_valid_until", "system_valid_from"]
+
+    def insert_values_into_table(self, table_name: str, column_value_mapping: Dict):
+        with self.engine.connect() as connection:
+            table = Table(table_name.casefold(), self.metadata,
+                          autoload_with=connection)
+            insert_stmt = table.insert().values(column_value_mapping)
+
+            print(
+                f"Inserting into table {table_name} columns {list(column_value_mapping.keys())}")
+            res = connection.execute(insert_stmt)
+            connection.commit()
+            print(
+                f"Successfully inserted into table {table_name} columns {list(column_value_mapping.keys())}")
