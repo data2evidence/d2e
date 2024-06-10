@@ -4,10 +4,11 @@ import { PrefectAPI } from '../prefect/prefect.api'
 import { PortalServerAPI } from '../portal-server/portal-server.api'
 import { InjectRepository } from '@nestjs/typeorm'
 import { FlowMetadata } from './entity'
+import { DefaultPlugins } from './entity'
 import { Repository } from 'typeorm'
 import { createLogger } from '../logger'
 import { IFlowMetadataDto } from '../types'
-import { FLOW_METADATA } from '../common/const'
+import { FLOW_METADATA, PluginUploadStatus } from '../common/const'
 import { REQUEST } from '@nestjs/core'
 import { join } from 'path'
 import { JwtPayload, decode } from 'jsonwebtoken'
@@ -21,6 +22,8 @@ export class PrefectFlowService {
     @Inject(REQUEST) request: Request,
     @InjectRepository(FlowMetadata)
     private readonly flowMetadataRepo: Repository<FlowMetadata>,
+    @InjectRepository(DefaultPlugins)
+    private readonly defaultPluginsRepo: Repository<DefaultPlugins>,
     private readonly prefectApi: PrefectAPI,
     private readonly portalServerApi: PortalServerAPI
   ) {
@@ -92,6 +95,21 @@ export class PrefectFlowService {
     }
   }
 
+  async getDefaultPluginById(pluginId: string) {
+    return await this.defaultPluginsRepo
+      .createQueryBuilder('default_plugins')
+      .where('default_plugins.pluginId = :pluginId', { pluginId })
+      .getOne()
+  }
+
+  async getDefaultPlugins() {
+    return await this.defaultPluginsRepo.createQueryBuilder('default_plugins').getMany()
+  }
+
+  async updateDefaultPluginStatus(pluginId: string, status: PluginUploadStatus) {
+    return await this.defaultPluginsRepo.update({ pluginId }, { status })
+  }
+
   private async createNewFlowMetadata(flowMetadataDto: IFlowMetadataDto) {
     this.logger.info(`Creating new flow metadata for ${flowMetadataDto.name} of type ${flowMetadataDto.type}`)
     const flowMetadataEntity = await this.flowMetadataRepo.create(flowMetadataDto)
@@ -116,7 +134,7 @@ export class PrefectFlowService {
     const metadata = await this.getFlowMetadataById(flowId)
     if (metadata) {
       try {
-        // flow deployment path is specified as userId/modifiedFileStem
+        // flow deployment path is specified as userId/flow-name
         const deploymentPath = join(metadata.createdBy, metadata.name.replace(/[.-]/g, '_'))
         await this.portalServerApi.deleteDeploymentFiles(deploymentPath)
         await this.deleteFlowMetadata(flowId)

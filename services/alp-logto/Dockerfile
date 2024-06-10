@@ -1,4 +1,19 @@
+###### [STAGE] Build ######
+FROM node:20-alpine as builder
+
+WORKDIR /etc/logto/packages
+
+RUN apk add unzip
+COPY experience.zip .
+RUN unzip experience.zip
+
+###### [STAGE] Seal ######
 FROM ghcr.io/logto-io/logto:1.14
+
+WORKDIR /etc/logto
+
+RUN rm -rf packages/experience
+COPY --from=builder /etc/logto/packages/experience packages/experience
 
 COPY ./connector-alp-azuread /etc/logto/packages/connectors/connector-alp-azuread
 
@@ -10,5 +25,3 @@ RUN yarn build
 WORKDIR /etc/logto/
 
 RUN npx @logto/cli connector link
-
-RUN ls -l /etc/logto/packages/core/connectors/

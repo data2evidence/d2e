@@ -491,6 +491,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
+    path: '^/dataflow-mgmt/prefect/flow/default-deployment$',
+    scopes: ['dataflowmgmt.prefect.flow.fileDeployment.add'],
+    httpMethods: ['POST', 'GET']
+  },
+  {
     path: '^/dataflow-mgmt/prefect/flow/(.*)',
     scopes: ['dataflowmgmt.prefect.flow.delete'],
     httpMethods: ['DELETE']
@@ -512,6 +517,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
   },
   {
     path: '^/dataflow-mgmt/prefect/flow-run/(.*)',
+    scopes: ['dataflowmgmt.prefect.flowRun.add'],
+    httpMethods: ['POST']
+  },
+  {
+    path: '^/dataflow-mgmt/prefect/analysis-run/(.*)',
     scopes: ['dataflowmgmt.prefect.flowRun.add'],
     httpMethods: ['POST']
   },
@@ -701,17 +711,17 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
-    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_]+/settings(.*)',
+    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_\-]+/settings(.*)',
     scopes: ['meilisearchSvc.index.setting.update'],
     httpMethods: ['PATCH']
   },
   {
-    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_]+/documents(.*)',
+    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_\-]+/documents(.*)',
     scopes: ['meilisearchSvc.document.add'],
     httpMethods: ['POST', 'PUT']
   },
   {
-    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_]+/settings/synonyms',
+    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_\-]+/settings/synonyms',
     scopes: ['meilisearchSvc.document.add'],
     httpMethods: ['PUT']
   },

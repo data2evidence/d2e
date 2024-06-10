@@ -173,7 +173,7 @@ export class DatasetCommandService {
         databaseCode,
         schemaName,
         vocabSchemaName,
-        tokenDatasetCode: `${tokenDatasetCode}_copy`,
+        tokenDatasetCode: `${tokenDatasetCode}_copy_${newDatasetName.trim()}`,
         paConfigId,
         dataModel,
         sourceDatasetId

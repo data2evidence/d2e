@@ -9,7 +9,9 @@ type Database = {
   name: string;
   code: string;
   dialect: string;
-  extra: object;
+  extra: {
+    value: object;
+  }[];
   credentials: {
     username: string;
     password: string;
@@ -37,7 +39,7 @@ export class DbCredentialsApi {
     const options = await this.getRequestConfig();
     try {
       const url = `${this.baseUrl}list`;
-      const response = await get(url, options);
+      const response = await get<Database[]>(url, options);
       return response.data;
     } catch (error) {
       const errorMessage = "Failed to get databases";
