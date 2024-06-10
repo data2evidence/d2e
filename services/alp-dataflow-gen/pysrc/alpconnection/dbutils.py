@@ -112,7 +112,7 @@ def get_db_svc_endpoint_dialect(database_code: str) -> str:
 
 
 def db_svc_dialect_mapper(dialect: str) -> str:
-    if dialect == 'hana':
+    if dialect == DatabaseDialects.HANA:
         return dialect
     elif dialect in POSTGRES_DIALECT_OPTIONS:
         return 'postgres'
