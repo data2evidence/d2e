@@ -2,28 +2,22 @@
 
 import { DbMeta } from "../../../src/qe";
 import { SettingsFacade } from "../../../src/qe/settings/SettingsFacade";
-import { MockConnection as MockConnection } from "../../testutils/testenv/MockConnection";
-import { MockHdb } from "../../testutils/testenv/mockHdb";
 import { User } from "@alp/alp-base-utils";
+import { createConnection } from "../../testutils/connection";
 
-let conn = new MockConnection();
-let globalSetting = {
-  Id: "GlobalSettings",
-  Version: "A",
-  Status: "A",
-  Name: "GLOBAL",
-  Type: "HC/HPH/GLOBAL",
-  // tslint:disable-next-line: max-line-length
-  Data: `{"tableMapping":{"@INTERACTION":"CDMDEFAULT.\"legacy.cdw.db.models::DWViews.Interactions\"", "@OBS":"CDMDEFAULT.\"legacy.cdw.db.models::DWViews.Observations\"", "@CODE":"CDMDEFAULT.\"legacy.cdw.db.models::DWViewsEAV.Interaction_Details\"", "@MEASURE":"CDMDEFAULT.\"legacy.cdw.db.models::DWViewsEAV.Interaction_Measures\"", "@REF":"CDMDEFAULT.\"legacy.ots::Views.ConceptPreferredTerms\"", "@PATIENT":"CDMDEFAULT.\"legacy.cdw.db.models::DWViews.Patient\"", "@TEXT":"CDMDEFAULT.\"legacy.cdw.db.models::DWViewsEAV.Interaction_Text\""},"guardedTableMapping":{ "@PATIENT":"\"CDMDEFAULT\".\"legacy.cdw.db.models::DWViews.V_GuardedPatient\"" },"language":["en", "de", "fr"], "settings":{ "fuzziness":0.7, "maxResultSize":5000, "sqlReturnOn":true, "errorDetailsReturnOn":true, "errorStackTraceReturnOn":true, "hhpSchemaName":"CDMDEFAULT", "refSchemaName":"CDMDEFAULT", "kaplanMeierTable":"CDMDEFAULT.\"pa.db::MRIEntities.KaplanMeierInput\"", "medexSchemaName":"CDMDEFAULT", "vbEnabled":true},"columnMap":{ "CONDITION_ID":"\"ConditionID\"", "INTERACTION_ID":"\"InteractionID\"", "PARENT_INTERACT_ID":"PARENT_INTERACT_ID", "PATIENT_ID":"\"PatientID\"" }}`,
-};
-
-let fakeConnection = MockHdb.getConnection([globalSetting]);
-let facade = new SettingsFacade(new User("TEST_USER"));
-let settings = facade.getSettings();
-let dbMeta = new DbMeta(fakeConnection)
+let facade, settings, dbMeta, fakeConnection
 const actionKey = "action";
 
 describe("Testing SettingsFacade,", () => {
+  beforeAll(async () => {
+    facade = new SettingsFacade(new User("TEST_USER"));
+    settings = facade.getSettings();
+    fakeConnection = await createConnection("duckdb");
+    dbMeta = new DbMeta(fakeConnection)
+  })
+  afterAll(function () {
+    fakeConnection.close();
+  });
   it('request.action="getDefaultSettings" should call Settings.getDefaultGlobalSettings()', () => {
     spyOn(facade, "invokeAdminServices").and.callThrough();
     spyOn(settings, "getDefaultAdvancedSettings");

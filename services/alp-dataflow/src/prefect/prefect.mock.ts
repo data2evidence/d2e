@@ -6,7 +6,7 @@ import { MockType } from 'test/type.mock'
 import { PrefectAnalysisParamsTransformer } from './prefect-analysis-params.transformer'
 
 export const prefectServiceMockFactory: () => MockType<PrefectService> = jest.fn(() => ({
-  createFlowRun: jest.fn()
+  createDataflowUIFlowRun: jest.fn()
 }))
 
 export const prefectApiMockFactory: () => MockType<PrefectAPI> = jest.fn(() => ({

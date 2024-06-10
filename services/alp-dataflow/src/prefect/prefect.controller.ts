@@ -46,8 +46,8 @@ export class PrefectController {
   }
 
   @Post('flow-run/:id')
-  createFlowRun(@Param('id', ParseUUIDPipe) id: string) {
-    return this.prefectService.createFlowRun(id)
+  createDataflowUIFlowRun(@Param('id', ParseUUIDPipe) id: string) {
+    return this.prefectService.createDataflowUIFlowRun(id)
   }
 
   // create analysis flow run
@@ -152,5 +152,17 @@ export class PrefectController {
     const token = decode(request.headers.authorization.replace(/bearer /i, '')) as JwtPayload
     const userId = token.sub
     return this.prefectService.createFlowFileDeployment(userId, null, adhocFlowDto)
+  }
+
+  @Post('flow/default-deployment')
+  triggerDeployment(@Req() request) {
+    const token = decode(request.headers.authorization.replace(/bearer /i, '')) as JwtPayload
+    const userId = token.sub
+    return this.prefectService.triggerDefaultDeploymentsRun(userId)
+  }
+
+  @Get('flow/default-deployment')
+  getDefaultDeploymentStatus() {
+    return this.prefectService.getDefaultPluginsStatus()
   }
 }
