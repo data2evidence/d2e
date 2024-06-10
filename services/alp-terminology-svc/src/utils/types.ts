@@ -228,3 +228,17 @@ export type HybridSearchConfig = {
   source: string;
   model: string;
 };
+
+export type ConceptHierarchyEdge = {
+  source: number;
+  target: number;
+};
+
+export type ConceptHierarchyNodeLevel = {
+  conceptId: number;
+  level: number;
+};
+
+export type ConceptHierarchyNode = ConceptHierarchyNodeLevel & {
+  display: string;
+};
