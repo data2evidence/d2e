@@ -3,15 +3,16 @@ import { Connection as connLib } from "@alp/alp-base-utils";
 import ConnectionInterface = connLib.ConnectionInterface;
 import { getDuckdbDBConnection } from "../../src/utils/DuckdbConnection";
 
+const hanaSchemaName = process.env.TESTSCHEMA;
+
 export const credentialsMap = {
-  postgresql: {
-    host: "localhost",
-    port: "35432",
-    user: "postgres",
-    password: "Toor1234",
-    schema: "cdw_test_schema",
-    dialect: "postgresql",
-    database: "alp",
+  hana: {
+    host: process.env.HANASERVER,
+    port: process.env.TESTPORT,
+    user: process.env.HDIUSER ? process.env.HDIUSER : "SYSTEM",
+    password: process.env.TESTSYSTEMPW,
+    schema: hanaSchemaName,
+    dialect: "hana",
   }
 };
 
@@ -21,11 +22,11 @@ export const credentialsMap = {
  * @returns {Promise}
  */
 export function createConnection(
-  dialect: "postgresql" | "duckdb" = "postgresql"
+  dialect: "duckdb" | "hana"
 ): Promise<ConnectionInterface> {
   return new Promise<ConnectionInterface>(async (resolve, reject) => {
     if(dialect == 'duckdb'){
-      let analyticsConnection = await getDuckdbDBConnection('alpdev_pg_cdmvocab', 'alpdev_pg_cdmvocab')
+      let analyticsConnection = await getDuckdbDBConnection()
       resolve(analyticsConnection)
     }else{
       const credentials = credentialsMap[dialect];
