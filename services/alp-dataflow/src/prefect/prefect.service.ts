@@ -201,7 +201,7 @@ export class PrefectService {
     this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
 
     let flowMetadataInput
-    let newFlowMetadata
+    let existingFlowMetadata
     try {
       if (defaultPluginId) {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.INSTALLING)
@@ -234,16 +234,17 @@ export class PrefectService {
       }
 
       // if metadata with same flowId exists
-      const existFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
-      if (existFlowMetadata) {
-        await this.prefectFlowService.deleteFlowMetadata(existFlowMetadata.flowId)
+      existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+      if (existingFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(existingFlowMetadata.flowId)
       }
-      newFlowMetadata = await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
+      // create new flow metadata
+      await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
     } catch (err) {
-      if (newFlowMetadata) {
+      if (!existingFlowMetadata) {
         await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+        await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
       }
-      await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
       this.deleteDeploymentFolder(deploymentFolderPath)
       const errorMessage = `Error installing pip package, check if package is valid`
       this.logger.error(`${errorMessage}: ${err}`)
@@ -269,8 +270,10 @@ export class PrefectService {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.COMPLETE)
       }
     } catch (err) {
-      await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
-      await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+      if (!existingFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+        await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
+      }
       const errorMessage = `Error creating flow with file ${fileStem}${fileType}`
       this.logger.error(`${errorMessage}: ${err}`)
       if (defaultPluginId) {
