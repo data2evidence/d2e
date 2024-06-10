@@ -13,14 +13,14 @@ from flows.alp_db_svc.hooks import *
 
 
 def create_datamodel(database_code: str,
-                          data_model: str,
-                          schema_name: str,
-                          vocab_schema: str,
-                          changelog_file: str,
-                          count: int,
-                          cleansed_schema_option: bool,
-                          plugin_classpath: str,
-                          dialect: str):
+                    data_model: str,
+                    schema_name: str,
+                    vocab_schema: str,
+                    changelog_file: str,
+                    count: int,
+                    cleansed_schema_option: bool,
+                    plugin_classpath: str,
+                    dialect: str):
 
 
     tenant_configs = extract_db_credentials(database_code)

@@ -7,8 +7,8 @@ from utils.types import (
 )
 from alpconnection.dbutils import get_db_svc_endpoint_dialect, extract_db_credentials
 from flows.alp_db_svc.liquibase.main import Liquibase
-from flows.alp_db_svc.const import OMOP_DATA_MODELS, NON_PERSON_ENTITIES, get_plugin_classpath
-from flows.alp_db_svc.types import (LiquibaseAction, GetVersionInfoType,
+from flows.alp_db_svc.const import OMOP_DATA_MODELS, NON_PERSON_ENTITIES
+from flows.alp_db_svc.types import (LiquibaseAction,
                                     PortalDatasetType, ExtractDatasetSchemaType,
                                     EntityCountDistributionType)
 
@@ -17,11 +17,10 @@ from dao.DBDao import DBDao
 from api.PortalServerAPI import PortalServerAPI
 
 
-def get_version_info(options: GetVersionInfoType):
+def get_version_info_task(changelog_file: str,
+                          plugin_classpath: str,
+                          token: str):
     logger = get_run_logger()
-    token = options.token
-    flow_name = options.flow_name
-    changelog_filepath_list = options.changelog_filepath_list
 
     logger.info("Fetching datasets from portal...")
     try:
@@ -40,7 +39,7 @@ def get_version_info(options: GetVersionInfoType):
 
         for dataset in dataset_schema_list["datasets_with_schema"]:
             get_and_update_attributes(
-                dataset, token, flow_name, changelog_filepath_list)
+                dataset, token, changelog_file, plugin_classpath)
 
 
 @task
@@ -70,8 +69,8 @@ def get_datasets_from_portal(token: str) -> List[PortalDatasetType]:
 @task
 def get_and_update_attributes(dataset: PortalDatasetType,
                               token: str,
-                              flow_name: str,
-                              changelog_filepath_list: Dict
+                              changelog_file: str,
+                              plugin_classpath: str
                               ):
     logger = get_run_logger()
 
@@ -173,8 +172,6 @@ def get_and_update_attributes(dataset: PortalDatasetType,
 
     try:
         # update with latest version or error msg
-        plugin_classpath = get_plugin_classpath(flow_name)
-        changelog_file = changelog_filepath_list.get(data_model)
         tenant_configs = extract_db_credentials(database_code)
 
         latest_available_schema_version = get_latest_available_version(dialect=db_dialect,
