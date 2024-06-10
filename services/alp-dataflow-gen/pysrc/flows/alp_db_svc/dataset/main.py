@@ -82,7 +82,7 @@ def create_schema_tasks(dialect: str,
     elif count > 0:
         action = LiquibaseAction.UPDATECOUNT
 
-    create_tables_wo = run_liquibase.with_options(
+    create_tables_wo = run_liquibase_update_task.with_options(
         on_completion=[partial(create_tables_hook,
                                **dict(schema_dao=schema_dao))],
         on_failure=[partial(create_tables_hook,
@@ -156,7 +156,7 @@ def update_datamodel(database_code: str,
     schema_dao = DBDao(database_code, schema_name, admin_user)
 
     try:
-        update_schema_wo = run_liquibase.with_options(
+        update_schema_wo = run_liquibase_update_task.with_options(
             on_completion=[partial(update_schema_hook,
                                    **dict(db=database_code, schema=schema_name))],
             on_failure=[partial(update_schema_hook,
@@ -199,7 +199,7 @@ def rollback_count_task(database_code: str,
     tenant_configs = extract_db_credentials(database_code)
 
     try:
-        rollback_count_wo = run_liquibase.with_options(
+        rollback_count_wo = run_liquibase_update_task.with_options(
             on_completion=[partial(rollback_count_hook,
                                    **dict(db=database_code, schema=schema_name))],
             on_failure=[partial(rollback_count_hook,
@@ -236,7 +236,7 @@ def rollback_tag(database_code: str,
 
 
     try:
-        rollback_tag_wo = run_liquibase.with_options(
+        rollback_tag_wo = run_liquibase_update_task.with_options(
             on_completion=[partial(rollback_tag_hook,
                                    **dict(db=database_code, schema=schema_name))],
             on_failure=[partial(rollback_tag_hook,
@@ -313,11 +313,15 @@ def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType)
 
 
 @task(log_prints=True)
-def run_liquibase(**kwargs) -> str:
-    liquibase = Liquibase(**kwargs)
-    return_code = liquibase.update_schema()
-    if return_code != 0:
-        raise Exception("Failed to run liquibase")
+def run_liquibase_update_task(**kwargs) -> str:
+    try:
+        liquibase = Liquibase(**kwargs)
+        return_code = liquibase.update_schema()
+        if return_code != 0:
+            raise Exception(f"Liquibase returned non-0 code: {return_code}")
+    except Exception as e:
+        get_run_logger().error(e)
+        raise e
     else:
         return return_code
 
