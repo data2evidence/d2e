@@ -7,6 +7,14 @@ export class MockConnection implements ConnectionInterface {
   public conn: any;
   public schemaName: string;
   constructor() {}
+  dialect: string;
+  
+  activate_nativedb_communication?(credentials: any): void {
+    throw new Error("Method not implemented.");
+  }
+  deactivate_nativedb_communication?(dbName: any): void {
+    throw new Error("Method not implemented.");
+  }
 
   setCurrentUserToDbSession() {}
 

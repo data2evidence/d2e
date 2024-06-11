@@ -70,7 +70,7 @@
       "code": "alp",
       "databaseName": "alp",
       "database": "alp",
-      "dialect": "postgresql",
+      "dialect": "postgres",
       "schema": "cdmdefault",
       "connectionTimeoutMillis": 60000,
       "idleInTransactionSessionTimeout": 60000,
