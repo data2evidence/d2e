@@ -10,12 +10,14 @@ export const bookmarkIdSchema = z.object({
   query: z.object({
     paConfigId: z.string(),
     r: z.string(),
+    username: z.string(),
   }),
 })
 
 export const bookmarkIdsSchema = z.object({
   query: z.object({
     ids: z.string(),
+    username: z.string(),
   }),
 })
 
@@ -28,6 +30,7 @@ export const createBookmarkSchema = z.object({
     cdmConfigVersion: z.string(),
     shareBookmark: z.boolean(),
     cmd: z.string(),
+    username: z.string(),
   }),
 })
 
@@ -41,6 +44,7 @@ export const updateBookmarkSchema = z.object({
     paConfigId: z.string(),
     cdmConfigId: z.string(),
     cdmConfigVersion: z.string(),
+    username: z.string(),
   }),
 })
 
@@ -53,6 +57,7 @@ export const deleteBookmarkSchema = z.object({
     paConfigId: z.string(),
     cdmConfigId: z.string(),
     cdmConfigVersion: z.string(),
+    username: z.string(),
   }),
 })
 
@@ -99,14 +104,14 @@ export interface IBookmark {
 }
 
 export interface IDBCredentialsType {
-  database: string;
-  schema?: string;
-  dialect: string;
-  host: string;
-  port: number;
-  user: string;
-  password: string;
-  max?: number | undefined;
-  min?: number | undefined;
-  idleTimeoutMillis?: number | undefined;
+  database: string
+  schema?: string
+  dialect: string
+  host: string
+  port: number
+  user: string
+  password: string
+  max?: number | undefined
+  min?: number | undefined
+  idleTimeoutMillis?: number | undefined
 }

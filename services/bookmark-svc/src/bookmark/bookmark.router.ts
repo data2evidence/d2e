@@ -33,7 +33,7 @@ export class BookmarkRouter {
       try {
         const { configConnection } = req.dbConnections
         const user = getUser(req)
-        const userId = user.getUser()
+        const userId = req.query.username
         const language = user.lang
 
         req.body.cmd = 'loadAll'
@@ -67,7 +67,7 @@ export class BookmarkRouter {
           const { configConnection } = req.dbConnections
           const user = getUser(req)
           const language = user.lang
-          const userId = user.getUser()
+          const userId = req.body.username
 
           queryBookmarks(req.body, userId, EnvVarUtils.getBookmarksTable(), configConnection, (err, data) => {
             if (err) {
@@ -91,7 +91,7 @@ export class BookmarkRouter {
           const { configConnection } = req.dbConnections
           const user = getUser(req)
           const language = user.lang
-          const userId = user.getUser()
+          const userId = req.body.username
 
           const { bookmarkId } = req.params
 
@@ -120,8 +120,7 @@ export class BookmarkRouter {
           const { configConnection } = req.dbConnections
           const user = getUser(req)
           const language = user.lang
-          const userId = user.getUser()
-
+          const userId = req.body.username
           const { bookmarkId } = req.params
 
           req.body.cmd = 'delete'
@@ -150,7 +149,7 @@ export class BookmarkRouter {
           const { configConnection } = req.dbConnections
           const user = getUser(req)
           const language = user.lang
-          const userId = user.getUser()
+          const userId = req.query.username
 
           req.body.cmd = 'loadByIDs'
           req.body.bmkIds = (req.query.ids as string).split(',')
