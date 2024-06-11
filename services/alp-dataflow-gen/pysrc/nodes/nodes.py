@@ -11,6 +11,7 @@ from sqlalchemy.sql import select
 from sqlalchemy import MetaData, Table, create_engine
 import pandas as pd
 import json
+from typing import List, Dict
 import rpy2.robjects as robjects
 from rpy2.robjects import conversion, default_converter, pandas2ri
 from rpy2.robjects.packages import importr
@@ -474,14 +475,15 @@ class TimeAtRiskNode(Node):
         self.endOffset = _node.get("endOffset", 0)
 
     def task(self, task_run_context):
+        conversion.set_conversion(default_converter)
         rCohortIncidence = importr('CohortIncidence')
         try:
             rTimeAtRisk = rCohortIncidence.createTimeAtRiskDef(
-                id = robjects.IntVector([self.id]),
+                id = convert_py_to_R(self.id),
                 startWith = self["startWith"],
                 endWith = self["endWith"],
-                startOffset = robjects.IntVector([self.startOffset]),
-                endOffset = robjects.IntVector([self.endOffset])
+                startOffset = convert_py_to_R(self.startOffset),
+                endOffset = convert_py_to_R(self.endOffset)
             )
             return Result(None, rTimeAtRisk, self, task_run_context)
         except Exception as e:
@@ -505,7 +507,7 @@ class CohortIncidenceModuleSpec(Node):
             rCohortIncidence = importr('CohortIncidence')
             rTargets = []
             for o in self.cohortRefs:
-                rTargets.append(rCohortIncidence.createCohortRef(id = robjects.IntVector([o['id']]), name = o['name']))
+                rTargets.append(rCohortIncidence.createCohortRef(id = convert_py_to_R(o['id']), name = o['name']))
             rStrataSettings = rCohortIncidence.createStrataSettings(
                 byYear = convert_py_to_R(self.strataSettings["byYear"]), 
                 byGender = convert_py_to_R(self.strataSettings["byGender"])
