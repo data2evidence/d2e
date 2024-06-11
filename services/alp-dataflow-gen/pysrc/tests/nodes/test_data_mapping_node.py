@@ -10,9 +10,9 @@ def test_data_mapping_node_task(helpers, mock_ddf_person, mock_ddf_death, mock_d
 
     _input = {
         'person_sql_node': nodes.Result(
-            None, mock_ddf_person, mock_task_run_context),
+            None, mock_ddf_person, data_mapping_node, mock_task_run_context),
         'death_sql_node': nodes.Result(
-            None, mock_ddf_death, mock_task_run_context)
+            None, mock_ddf_death, data_mapping_node, mock_task_run_context)
     }
     result = data_mapping_node.task(_input, mock_task_run_context)
 
@@ -28,9 +28,9 @@ def test_data_mapping_node_task_error_with_wrong_input(helpers, mock_ddf_person,
 
     _input = {
         'incorrect_input_node': nodes.Result(
-            None, mock_ddf_person, mock_task_run_context),
+            None, mock_ddf_person, data_mapping_node, mock_task_run_context),
         'death_sql_node': nodes.Result(
-            None, mock_ddf_death, mock_task_run_context)
+            None, mock_ddf_death, data_mapping_node, mock_task_run_context)
     }
     result = data_mapping_node.task(_input, mock_task_run_context)
 

@@ -13,9 +13,9 @@ def test_get_node_list(mock_dataflow):
 
 
 @pytest.mark.parametrize("node_name, expected_data", [
-    ('death_sql_node', {'death_csv_node': {'file': './tests/data/death.csv', 'type': 'csv_node', 'columns': [
+    ('death_sql_node', {'death_csv_node': {"id": "3", 'file': './tests/data/death.csv', 'type': 'csv_node', 'columns': [
      'person_id', 'death_date', 'death_datetime', 'death_type_concept_id', 'cause_concept_id', 'cause_source_value', 'cause_source_concept_id'], 'hasheader': True, 'name': 'death_csv', 'datatypes': {}, 'delimiter': ','}}),
-    ("sqlquery", {'py_node': {'type': 'python_node',
+    ("sqlquery", {'py_node': {"id":"7" , 'type': 'python_node',
      'python_code': 'import sqlalchemy as asql\nimport pandas as pd\nimport dask.dataframe as dd\ndef exec(myinput):\n myinput["dbrjson"] = myinput["dbread"].data.compute().to_json(orient="records")\n myinput["Hello"] = "hello world!"\n return myinput\ndef test_exec(myinput):\n return exec(myinput)'}}), ("multiplybyten", {})
 ])
 def test_get_incoming_edges(node_name, expected_data, mock_dataflow):
