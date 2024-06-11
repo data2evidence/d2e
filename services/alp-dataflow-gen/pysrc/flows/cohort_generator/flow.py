@@ -43,7 +43,8 @@ def execute_cohort_generator(
 
 
 @task(result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")), 
-      result_storage_key="{flow_run.id}_cohort_definition.txt")
+      result_storage_key="{flow_run.id}_cohort_definition.txt",
+      persist_result=True)
 def create_cohort_definition(token: str, datasetId: str, description: str, owner: str, cohortJsonExpression: str, cohortName: str):
     anaylticsSvcApi = AnalyticsSvcAPI(token)
     result = anaylticsSvcApi.create_cohort_definition(

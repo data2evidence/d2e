@@ -59,7 +59,8 @@ async def execute_data_characterization(schemaName: str,
 
 @task(result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")), 
       result_storage_key="{flow_run.id}_export_to_ares.json",
-      result_serializer=JSONSerializer())
+      result_serializer=JSONSerializer(),
+      persist_result=True)
 async def execute_export_to_ares(schemaName: str,
                                  databaseCode: str,
                                  vocabSchemaName: str,

@@ -138,7 +138,8 @@ def execute_nodes_flow(graph, sorted_nodes, test):
 @task(task_run_name="execute-nodes-taskrun-{nodename}",
       result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")), 
       result_storage_key="{flow_run.id}_{parameters[nodename]}.json",
-      result_serializer=JSONSerializer(), log_prints=True)
+      result_serializer=JSONSerializer(), log_prints=True,
+      persist_result=True)
 def execute_node_task(nodename, node_type, node, input, test):
     # Get task run context
     task_run_context = TaskRunContext.get().task_run.dict()

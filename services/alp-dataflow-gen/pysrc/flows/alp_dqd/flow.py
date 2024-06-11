@@ -15,7 +15,8 @@ from flows.alp_dqd.hooks import persist_dqd
 
 @task(result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")), 
       result_storage_key="{flow_run.id}_dqd.json",
-      result_serializer=JSONSerializer())
+      result_serializer=JSONSerializer(),
+      persist_result=True)
 def execute_dqd(
     schemaName: str,
     databaseCode: str,
