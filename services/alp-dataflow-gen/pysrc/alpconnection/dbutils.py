@@ -133,7 +133,6 @@ class DatabaseCredentials:
 
     def get_values(self) -> DBCredentialsType:
         values = self.values["credentials"]
-        # values = {}
         values["databaseName"] = self.values["databaseName"]
         values["dialect"] = self.values["dialect"]
         values["host"] = self.values["host"]
