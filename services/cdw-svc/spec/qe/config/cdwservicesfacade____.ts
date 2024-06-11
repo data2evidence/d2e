@@ -2,39 +2,40 @@ import { User } from "@alp/alp-base-utils";
 import { CDWServicesFacade } from "../../../src/qe/config/CDWServicesFacade";
 import { FfhQeConfig } from "../../../src/qe/config/config";
 import { AssignmentProxy } from "../../../src/AssignmentProxy";
-
 import { Settings } from "../../../src/qe/settings/Settings";
-import { MockHdb } from "../../testutils/testenv/mockHdb";
-/*
-let attributeInfosServiceLib = qe.attribute_infos_service;
-let columnSuggestionServiceLib = qe.column_suggestion_service;
-let domainValuesServiceLib = qe.domain_values_service;
-let tableSuggestionServiceLib = qe.table_suggestion_service;
-*/
-const globalSetting = {
-  Id: "GlobalSettings",
-  Version: "A",
-  Status: "A",
-  Name: "GLOBAL",
-  Type: "HC/HPH/GLOBAL",
-  // tslint:disable-next-line:max-line-length
-  Data: `{"tableMapping":{"@INTERACTION":"CDMDEFAULT.\"legacy.cdw.db.models::DWViews.Interactions\"", "@OBS":"CDMDEFAULT.\"legacy.cdw.db.models::DWViews.Observations\"", "@CODE":"CDMDEFAULT.\"legacy.cdw.db.models::DWViewsEAV.Interaction_Details\"", "@MEASURE":"CDMDEFAULT.\"legacy.cdw.db.models::DWViewsEAV.Interaction_Measures\"", "@REF":"CDMDEFAULT.\"legacy.ots::Views.ConceptPreferredTerms\"", "@PATIENT":"CDMDEFAULT.\"legacy.cdw.db.models::DWViews.Patient\"", "@TEXT":"CDMDEFAULT.\"legacy.cdw.db.models::DWViewsEAV.Interaction_Text\""},"guardedTableMapping":{ "@PATIENT":"\"CDMDEFAULT\".\"legacy.cdw.db.models::DWViews.V_GuardedPatient\"" },"language":["en", "de", "fr"], "settings":{ "fuzziness":0.7, "maxResultSize":5000, "sqlReturnOn":true, "errorDetailsReturnOn":true, "errorStackTraceReturnOn":true, "hhpSchemaName":"CDMDEFAULT", "refSchemaName":"CDMDEFAULT", "kaplanMeierTable":"CDMDEFAULT.\"pa.db::MRIEntities.KaplanMeierInput\"", "medexSchemaName":"CDMDEFAULT", "vbEnabled":true },"columnMap":{ "CONDITION_ID":"\"ConditionID\"", "INTERACTION_ID":"\"InteractionID\"", "PARENT_INTERACT_ID":"PARENT_INTERACT_ID", "PATIENT_ID":"\"PatientID\"" }}`,
-};
-const fakeConnection = MockHdb.getConnection([globalSetting]);
-const facade = new CDWServicesFacade(
-  fakeConnection,
-  new FfhQeConfig(
-    fakeConnection,
-    fakeConnection,
-    new AssignmentProxy([]),
-    new Settings(),
-    new User("TEST_USER")
-  )
-);
+import { createConnection as createAnalyticsConnection} from "../../testutils/connection";
+import { createConnection as createConfigConnection } from "../settings/utils/connection";
+import * as attribute_infos_service from "../../../src/qe/config/attribute_infos_service";
+import * as column_suggestion_service from "../../../src/qe/config/column_suggestion_service";
+import * as domain_values_service from "../../../src/qe/config/domain_values_service";
+import * as table_suggestion_service from "../../../src/qe/config/table_suggestion_service";
 
-/*
-TODOTODOTODO TODO: reenable
-describe("Testing CDWServicesFacade,", function () {
+let attributeInfosServiceLib = attribute_infos_service;
+let columnSuggestionServiceLib = column_suggestion_service;
+let domainValuesServiceLib = domain_values_service;
+let tableSuggestionServiceLib = table_suggestion_service;
+
+let facade, ffhQeConfig, fakeConnection;
+
+describe("Testing CDWServicesFacade,", () => {
+    beforeAll(async () => {
+        createConfigConnection(async (err, configConnection) => {
+            fakeConnection = await createAnalyticsConnection("duckdb");
+            facade = new CDWServicesFacade(
+            fakeConnection,
+            new FfhQeConfig(
+                configConnection,
+                new AssignmentProxy([]),
+                new Settings(),
+                new User("TEST_USER")
+            )
+            );
+            ffhQeConfig = facade.getFfhQeConfig();
+        })
+    });
+    afterAll(function () {
+        fakeConnection.close();
+      });
     it("request.action=\"attribute_infos_service\" should call attribute_infos_service.processRequest()", function () {
         spyOn(facade, "invokeService").and.callThrough();
         spyOn(ffhQeConfig, "validateConfig").and.callFake(function () {
@@ -119,4 +120,4 @@ describe("Testing CDWServicesFacade,", function () {
             expect(err.message).toEqual("CDW_SERVICES_ERROR_ACTION_NOT_SUPPORTED");
         });
     });
-});*/
+});
