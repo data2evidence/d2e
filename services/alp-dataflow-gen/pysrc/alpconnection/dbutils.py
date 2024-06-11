@@ -5,10 +5,6 @@ import datetime
 from uuid import UUID
 from utils.types import DBCredentialsType, HANA_TENANT_USERS, PG_TENANT_USERS
 
-# TODO: Remove after envConverter returns postgres
-# catches possible pg dialect values from envConverter
-POSTGRES_DIALECT_OPTIONS = ['postgres', 'postgresql', 'pg']
-
 
 def GetDBConnection(database_code: str, user_type: str):
     try:
@@ -23,7 +19,7 @@ def GetDBConnection(database_code: str, user_type: str):
             validateCertificate = conn_details["validateCertificate"]
             db = database_name + \
                 f"?encrypt={encrypt}?validateCertificate={validateCertificate}"
-        elif conn_details['dialect'] in POSTGRES_DIALECT_OPTIONS:
+        elif conn_details['dialect'] == "postgres":
             dialect_driver = "postgresql+psycopg2"
             db = database_name
         match user_type:
@@ -102,23 +98,10 @@ def to_json(result):
 def get_db_svc_endpoint_dialect(database_code: str) -> str:
     db_credentials = extract_db_credentials(database_code)
     if db_credentials:
-        return db_svc_dialect_mapper(db_credentials["dialect"])
-    else:
-        raise Exception(
-            f"No database credentials found for database code:{database_code}")
+        return db_credentials["dialect"]
 
 # TODO: Remove after envConverter returns postgres
 # Maps dialect configured in database_credentials to db-svc endpoint dialect route parameter
-
-
-def db_svc_dialect_mapper(dialect: str) -> str:
-    if dialect == 'hana':
-        return dialect
-    elif dialect in POSTGRES_DIALECT_OPTIONS:
-        return 'postgres'
-    else:
-        raise Exception(
-            f"Dialect:{dialect} could not be mapped to db_svc endpoint dialect")
 
 
 def extract_db_credentials(database_code: str):

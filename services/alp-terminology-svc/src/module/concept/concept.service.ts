@@ -15,6 +15,9 @@ import {
   IConcept,
   Filters,
   HybridSearchConfig,
+  ConceptHierarchyEdge,
+  ConceptHierarchyNodeLevel,
+  ConceptHierarchyNode,
 } from '../../utils/types';
 import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { Request } from 'express';
@@ -376,6 +379,104 @@ export class ConceptService {
     }
   }
 
+  async getConceptHierarchy(
+    datasetId: string,
+    conceptId: number,
+    depth: number,
+  ) {
+    let edges: ConceptHierarchyEdge[] = [];
+    let nodeLevels: ConceptHierarchyNodeLevel[] = [];
+    let conceptIds: Set<number> = new Set<number>().add(conceptId);
+    nodeLevels.push({ conceptId: conceptId, level: 0 });
+
+    const systemPortalApi = new SystemPortalAPI(this.token);
+    const { databaseCode, vocabSchemaName, dialect } =
+      await systemPortalApi.getDatasetDetails(datasetId);
+    const meilisearchApi = new MeilisearchAPI();
+    const conceptAncestorName =
+      dialect === 'hana' ? 'CONCEPT_ANCESTOR' : 'concept_ancestor';
+
+    const conceptAncestorIndex = `${databaseCode}_${vocabSchemaName}_${conceptAncestorName}`;
+
+    const conceptDescendants = await meilisearchApi.getDescendants(
+      [conceptId],
+      conceptAncestorIndex,
+    );
+
+    conceptDescendants.forEach((concept) => {
+      concept.hits.forEach((hit) => {
+        if (hit.descendant_concept_id !== conceptId) {
+          edges.push({
+            source: conceptId,
+            target: hit.descendant_concept_id,
+          });
+          conceptIds.add(hit.descendant_concept_id);
+          nodeLevels.push({
+            conceptId: hit.descendant_concept_id,
+            level: -1,
+          });
+        }
+      });
+    });
+
+    // recursively get the ancestors of the specified conceptId
+    const getAllAncestors = async (
+      conceptId: number,
+      depth: number,
+      maxDepth: number,
+    ) => {
+      const conceptAncestors = await meilisearchApi.getAncestors(
+        [conceptId],
+        conceptAncestorIndex,
+        1,
+      );
+
+      if (conceptAncestors.length == 0 || depth <= 0) {
+        return;
+      }
+      conceptAncestors.forEach((concept) => {
+        concept.hits.forEach((hit) => {
+          if (hit.ancestor_concept_id !== conceptId) {
+            edges.push({
+              source: hit.ancestor_concept_id,
+              target: conceptId,
+            });
+            conceptIds.add(hit.ancestor_concept_id);
+            nodeLevels.push({
+              conceptId: hit.ancestor_concept_id,
+              level: maxDepth - depth + 1,
+            });
+            getAllAncestors(hit.ancestor_concept_id, depth - 1, maxDepth);
+          }
+        });
+      });
+    };
+
+    await getAllAncestors(conceptId, depth, depth);
+
+    const concepts = await this.getConceptsByIds(
+      datasetId,
+      Array.from(conceptIds),
+    );
+
+    const nodes: ConceptHierarchyNode[] = nodeLevels.reduce(
+      (acc: ConceptHierarchyNode[], current: ConceptHierarchyNodeLevel) => {
+        const conceptNode = concepts.find(
+          (concept) => concept.conceptId === current.conceptId,
+        );
+        acc.push({
+          conceptId: current.conceptId,
+          display: conceptNode?.display,
+          level: current.level,
+        });
+        return acc;
+      },
+      [],
+    );
+
+    return { edges, nodes };
+  }
+
   private mapConceptWithFhirValueSetExpansionContains(item: IConcept) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -394,11 +495,12 @@ export class ConceptService {
           ? 'Non-standard'
           : 'Standard',
       code: item.concept_code,
+      // The date is stored as seconds from epoch, but new Date() expects ms
       validStartDate: item.valid_start_date
-        ? new Date(item.valid_start_date).toISOString()
-        : '',
+        ? new Date(item.valid_start_date * 1000).toISOString()
+        : new Date(0).toISOString(),
       validEndDate: item.valid_end_date
-        ? new Date(item.valid_end_date).toISOString()
+        ? new Date(item.valid_end_date * 1000).toISOString()
         : '',
       validity,
     };

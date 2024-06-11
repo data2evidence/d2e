@@ -40,7 +40,7 @@ export class MeilisearchAPI {
     const options = await this.createOptions();
 
     // Append source and model to index name (Naming convention must be standardised)
-    const hybridSearchUrl = `${this.url}indexes/${index}${hybridSearchName}/search`;
+    const hybridSearchUrl = `${this.url}/indexes/${index}${hybridSearchName}/search`;
     const hybridSearchData = {
       ...data,
       hybrid: {
@@ -66,10 +66,6 @@ export class MeilisearchAPI {
   ): Promise<IMeilisearchConcept> {
     const errorMessage = 'Error while getting concepts';
     try {
-      const hybridSearchName = `_${hybridSearchConfig.source.replace(
-        '/',
-        '',
-      )}_${hybridSearchConfig.model.replace('/', '')}`;
       const data = {
         q: searchText,
         page: pageNumber + 1,
@@ -84,6 +80,10 @@ export class MeilisearchAPI {
         filter: this.generateMeiliFilter(filters),
       };
       if (hybridSearchConfig.isEnabled) {
+        const hybridSearchName = `_${hybridSearchConfig.source.replace(
+          '/',
+          '',
+        )}_${hybridSearchConfig.model.replace('/', '')}`;
         const result = await this.hybridSearch(
           index,
           data,
@@ -148,6 +148,42 @@ export class MeilisearchAPI {
     }
   }
 
+  async getAncestors(
+    searchTexts: number[],
+    index: string,
+    level: number,
+  ): Promise<IMeilisearchGetDescendants[]> {
+    try {
+      const options = await this.createOptions();
+      const url = `${this.url}/multi-search`;
+
+      const queries = searchTexts.map((searchText) => {
+        return {
+          indexUid: index,
+          limit: 9999999,
+          filter: [
+            [
+              `${INDEX_ATTRIBUTES.concept_ancestor.descendantConceptId} = '${searchText}'`,
+            ],
+            [
+              `${INDEX_ATTRIBUTES.concept_ancestor.minLevelsOfSeparation} = ${level}`,
+            ],
+          ],
+        };
+      });
+
+      const result = await axios.post<{
+        results: IMeilisearchGetDescendants[];
+      }>(url, { queries }, options);
+
+      return result.data.results;
+    } catch (error) {
+      const errorMessage = `Error while getting ancestor values from index: ${index} and searchText: ${searchTexts}`;
+      this.logger.error(`${errorMessage}: ${error}`);
+      throw new InternalServerErrorException(errorMessage);
+    }
+  }
+
   async getDescendants(
     searchTexts: number[],
     index: string,
@@ -166,6 +202,7 @@ export class MeilisearchAPI {
           ],
         };
       });
+
       const result = await axios.post<{
         results: IMeilisearchGetDescendants[];
       }>(url, { queries }, options);
