@@ -45,14 +45,6 @@ tryCatch(
                 as.Date("2021-06-01"),
                 as.Date("2021-08-01"),
                 as.Date("2021-09-01")
-            ),
-            observation_period_id = c(1, 2, 3, 4, 5, 6),
-            period_type_concept_id = c(rep(0, 6)),
-            observation_period_start_date = c(
-                rep(as.Date("1980-07-20"), 6)
-            ),
-            observation_period_end_date = c(
-                rep(as.Date("2023-05-20"), 6)
             )
         )
 
@@ -72,15 +64,15 @@ tryCatch(
         )
 
         observation_period <- dplyr::tibble(
-            observation_period_id = c(1, 2, 3, 4, 5, 6),
-            person_id = c(1, 2, 3, 4, 5, 6),
+            observation_period_id = c(1, 2, 3, 4, 5, 6, 7),
+            person_id = c(1, 2, 3, 4, 5, 6, 7),
             observation_period_start_date = c(
-                rep(as.Date("1980-07-20"), 6)
+                rep(as.Date("1980-07-20"), 7)
             ),
             observation_period_end_date = c(
-                rep(as.Date("2023-05-20"), 6)
+                rep(as.Date("2023-05-20"), 7)
             ),
-            period_type_concept_id = c(rep(0, 6))
+            period_type_concept_id = c(rep(0, 7))
         )
 
         person <- dplyr::tibble(
