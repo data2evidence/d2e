@@ -251,3 +251,6 @@ class questionnaireDefinitionType(dataModelBase):
 
 class questionnaireResponseType(dataModelBase):
     questionnaire_id: str
+
+class seedVocabType(dataModelBase):
+    vocab_schema: str

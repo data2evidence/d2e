@@ -3,12 +3,16 @@ import { join } from 'path'
 import { mkdirSync, readFileSync, rmdirSync, writeFileSync } from 'fs'
 import { PrefectAPI } from './prefect.api'
 import { DataflowService } from '../dataflow/dataflow.service'
+import { AnalysisflowService } from '../analysis-flow/analysis-flow.service'
 import { PrefectParamsTransformer } from './prefect-params.transformer'
+import { PrefectAnalysisParamsTransformer } from './prefect-analysis-params.transformer'
 import {
   IPrefectAdhocFlowDto,
   IPrefectFlowRunByDeploymentDto,
   ITestDataflowDto,
-  IPrefectFlowRunByMetadataDto
+  IPrefectFlowRunByMetadataDto,
+  IPluginUploadStatusDetail,
+  IPluginUploadStatusDto
 } from '../types'
 import { PrefectExecutionClient } from './prefect-execution.client'
 import { env } from '../env'
@@ -18,11 +22,15 @@ import {
   FLOW_METADATA_FOLDER_PATH,
   FLOW_METADATA_JSON_FILENAME,
   PREFECT_ADHOC_FLOW_FOLDER_PATH,
+  PluginUploadStatus,
+  PluginUploadStatusText,
   PrefectDeploymentPythonFiles
 } from '../common/const'
 import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
 import { DataQualityService } from '../data-quality/data-quality.service'
 import { DataQualityFlowRunDto } from '../data-quality/dto'
+import { DataCharacterizationService } from '../data-characterization/data-characterization.service'
+import { DataCharacterizationFlowRunDto } from 'src/data-characterization/dto'
 import { REQUEST } from '@nestjs/core'
 
 @Injectable()
@@ -33,11 +41,14 @@ export class PrefectService {
   constructor(
     @Inject(REQUEST) request: Request,
     private readonly dataflowService: DataflowService,
+    private readonly analysisflowService: AnalysisflowService,
     private readonly prefectApi: PrefectAPI,
     private readonly prefectParamsTransformer: PrefectParamsTransformer,
+    private readonly prefectAnalysisParamsTransformer: PrefectAnalysisParamsTransformer,
     private readonly prefectExecutionClient: PrefectExecutionClient,
     private readonly prefectFlowService: PrefectFlowService,
-    private readonly dataQualityService: DataQualityService
+    private readonly dataQualityService: DataQualityService,
+    private readonly dataCharacterizationService: DataCharacterizationService
   ) {
     this.jwt = request.headers['authorization']
   }
@@ -65,9 +76,23 @@ export class PrefectService {
     return this.prefectApi.getTaskRunState(id)
   }
 
-  async createFlowRun(id: string) {
+  async createDataflowUIFlowRun(id: string) {
     const revision = await this.dataflowService.getLastDataflowRevision(id)
     const prefectParams = this.prefectParamsTransformer.transform(revision.flow)
+
+    const flowRunId = await this.createFlowRunByMetadata({
+      type: FLOW_METADATA.dataflow_ui,
+      flowRunName: revision.name,
+      options: prefectParams
+    })
+    await this.dataflowService.createDataflowRun(id, flowRunId)
+    return flowRunId
+  }
+
+  // create analysis-flow-run
+  async createAnalysisFlowRun(id: string) {
+    const revision = await this.analysisflowService.getLastAnalysisflowRevision(id)
+    const prefectParams = this.prefectAnalysisParamsTransformer.transform(revision.flow)
 
     const prefectDeploymentName = env.PREFECT_DEPLOYMENT_NAME
     const prefectFlowName = env.PREFECT_FLOW_NAME
@@ -78,20 +103,24 @@ export class PrefectService {
       prefectFlowName,
       prefectParams
     )
-    await this.dataflowService.createDataflowRun(id, flowRunId)
+    await this.analysisflowService.createAnalysisflowRun(id, flowRunId)
     return flowRunId
   }
 
   async createFlowRunByDeployment(flowRun: IPrefectFlowRunByDeploymentDto) {
-    const { flowRunName, flowName, deploymentName, params } = flowRun
-    const flowRunId = await this.prefectApi.createFlowRun(flowRunName, deploymentName, flowName, params)
+    const { flowRunName, flowName, deploymentName, params, schedule } = flowRun
+    const flowRunId = await this.prefectApi.createFlowRun(flowRunName, deploymentName, flowName, params, schedule)
 
     return flowRunId
   }
 
   async createTestRun(testFlow: ITestDataflowDto) {
     const prefectParams = this.prefectParamsTransformer.transform(testFlow.dataflow, true)
-    return this.prefectApi.createTestRun(prefectParams)
+    return await this.createFlowRunByMetadata({
+      type: FLOW_METADATA.dataflow_ui,
+      flowRunName: 'Test-run',
+      options: prefectParams
+    })
   }
 
   async getFlowMetadata() {
@@ -102,21 +131,91 @@ export class PrefectService {
     return this.prefectFlowService.getDataModels()
   }
 
+  async getDefaultPluginById(pluginId: string) {
+    return this.prefectFlowService.getDefaultPluginById(pluginId)
+  }
+
+  async getDefaultPlugins() {
+    return this.prefectFlowService.getDefaultPlugins()
+  }
+
+  async getDefaultPluginsStatus() {
+    const plugins = await this.prefectFlowService.getDefaultPlugins()
+    const statusDetails: IPluginUploadStatusDetail[] = []
+    let noActiveInstallations = true
+    let installationStatus: string
+    for (const plugin of plugins) {
+      if (plugin.status === PluginUploadStatus.INSTALLING) {
+        noActiveInstallations = false
+      }
+      statusDetails.push({
+        pluginId: plugin.pluginId,
+        name: plugin.name,
+        status: plugin.status,
+        createdAt: plugin.createdDate.toString(),
+        modifiedAt: plugin.modifiedDate.toString(),
+        type: plugin.type
+      })
+    }
+    if (statusDetails.every(s => s.status === PluginUploadStatus.PENDING)) {
+      installationStatus = PluginUploadStatusText.PENDING
+    }
+    if (statusDetails.some(s => s.status === PluginUploadStatus.FAILED) && noActiveInstallations) {
+      installationStatus = PluginUploadStatusText.FAILED
+    }
+    if (statusDetails.every(s => s.status === PluginUploadStatus.COMPLETE)) {
+      installationStatus = PluginUploadStatusText.COMPLETE
+    }
+    if (statusDetails.some(s => s.status === PluginUploadStatus.INSTALLING)) {
+      installationStatus = PluginUploadStatusText.INSTALLING
+    }
+    const result: IPluginUploadStatusDto = { statusDetails, noActiveInstallations, installationStatus }
+    return result
+  }
+
+  // TODO: confirm if we want to deprecate and replace with polling
   async createFlowFileDeployment(userId: string, file: Express.Multer.File, adhocFlowDto: IPrefectAdhocFlowDto) {
-    const { url } = adhocFlowDto
-    if (!file && !url) {
-      const errorMessage = `pip file not uploaded or git url not provided`
+    const { url, defaultPluginId } = adhocFlowDto
+    if (!file && !url && !defaultPluginId) {
+      const errorMessage = `pip file not uploaded or git url not provided or plugin id not provided`
       this.logger.error(`${errorMessage}`)
       throw new InternalServerErrorException(errorMessage)
     }
+
+    let defaultDeploymentInfo
+    if (defaultPluginId) {
+      defaultDeploymentInfo = await this.prefectFlowService.getDefaultPluginById(defaultPluginId)
+      if (!defaultDeploymentInfo) {
+        const errorMessage = `default plugin with id ${defaultPluginId} not found`
+        this.logger.error(`${errorMessage}`)
+        throw new InternalServerErrorException(errorMessage)
+      }
+      await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.PENDING)
+    }
+
     const { deploymentFolderPath, fileStem, modifiedFileStem, fileType } = file
       ? await this.processPipPackage(userId, { fileName: file.originalname })
-      : await this.processPipPackage(userId, { url: url })
+      : url
+      ? await this.processPipPackage(userId, { url: url })
+      : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
     this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
 
     let flowMetadataInput
-    let newFlowMetadata
+    let existingFlowMetadata
     try {
+      // prepare metadata input
+      if (defaultDeploymentInfo && defaultDeploymentInfo.url) {
+        flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, defaultDeploymentInfo.url)
+      } else {
+        flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, url)
+      }
+
+      // if metadata with same flowId exists
+      existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.INSTALLING)
+      }
       // create python virtual environment with exisiting dependencies
       const dependencyScriptPath = join(deploymentFolderPath, PrefectDeploymentPythonFiles['SCRIPT'])
       writeFileSync(dependencyScriptPath, this.prefectExecutionClient.createInstallDependenciesScript())
@@ -126,29 +225,31 @@ export class PrefectService {
       const pipInstallPath = join(deploymentFolderPath, PrefectDeploymentPythonFiles['PIP_INSTALL'])
       if (url) {
         writeFileSync(pipInstallPath, this.prefectExecutionClient.createPipInstallScript(fileStem, fileType, url))
+      } else if (defaultDeploymentInfo && defaultDeploymentInfo.url) {
+        writeFileSync(
+          pipInstallPath,
+          this.prefectExecutionClient.createPipInstallScript(fileStem, fileType, defaultDeploymentInfo.url)
+        )
       } else {
         writeFileSync(pipInstallPath, this.prefectExecutionClient.createPipInstallScript(fileStem, fileType))
       }
 
       await this.prefectExecutionClient.executePipInstall(userId, modifiedFileStem)
-
-      // prepare metadata input
-      flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, url)
-
-      // if metadata with same flowId exists
-      const existFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
-      if (existFlowMetadata) {
-        await this.prefectFlowService.deleteFlowMetadata(existFlowMetadata.flowId)
+      if (existingFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(existingFlowMetadata.flowId)
       }
-      newFlowMetadata = await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
+      await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
     } catch (err) {
-      if (newFlowMetadata) {
+      if (!existingFlowMetadata) {
         await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+        await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
       }
-      await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
       this.deleteDeploymentFolder(deploymentFolderPath)
       const errorMessage = `Error installing pip package, check if package is valid`
       this.logger.error(`${errorMessage}: ${err}`)
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
+      }
       throw new InternalServerErrorException(errorMessage)
     }
 
@@ -158,19 +259,161 @@ export class PrefectService {
         deploymentPath,
         this.prefectExecutionClient.createDeploymentTemplate(
           userId,
-          modifiedFileStem,
           flowMetadataInput.name,
           flowMetadataInput.entrypoint.replace(/\//g, '.').replace(/\.py$/, ''),
-          ...(flowMetadataInput.others.tags ? [flowMetadataInput.others.tags] : [])
+          flowMetadataInput.others.tags || []
         )
       )
       await this.prefectExecutionClient.executePythonPrefectModule(userId, modifiedFileStem)
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.COMPLETE)
+      }
     } catch (err) {
-      await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
-      await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+      if (!existingFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+        await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
+      }
       const errorMessage = `Error creating flow with file ${fileStem}${fileType}`
       this.logger.error(`${errorMessage}: ${err}`)
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
+      }
       throw new InternalServerErrorException(errorMessage)
+    } finally {
+      this.deleteDeploymentFolder(deploymentFolderPath)
+    }
+  }
+
+  async triggerDefaultDeploymentsRun(userId: string) {
+    const plugins = await this.prefectFlowService.getDefaultPlugins()
+    for (const plugin of plugins) {
+      await this.triggerDeploymentRun(userId, null, { defaultPluginId: plugin.pluginId })
+    }
+  }
+  async triggerDeploymentRun(userId: string, file: Express.Multer.File, adhocFlowDto: IPrefectAdhocFlowDto) {
+    const { url, defaultPluginId } = adhocFlowDto
+    if (!file && !url && !defaultPluginId) {
+      const errorMessage = `pip file not uploaded or git url not provided or plugin id is not provided`
+      this.logger.error(`${errorMessage}`)
+      throw new InternalServerErrorException(errorMessage)
+    }
+
+    let defaultDeploymentInfo
+    if (defaultPluginId) {
+      defaultDeploymentInfo = await this.prefectFlowService.getDefaultPluginById(defaultPluginId)
+      if (!defaultDeploymentInfo) {
+        const errorMessage = `default plugin with id ${defaultPluginId} not found`
+        this.logger.error(`${errorMessage}`)
+        throw new InternalServerErrorException(errorMessage)
+      }
+      await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.PENDING)
+    }
+
+    const { deploymentFolderPath } = file
+      ? await this.processPipPackage(userId, { fileName: file.originalname })
+      : url
+      ? await this.processPipPackage(userId, { url: url })
+      : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
+    this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
+
+    // start upload asychronously
+    this.startUpload(userId, file, url, defaultDeploymentInfo, defaultPluginId)
+
+    this.logger.info(`Plugin ${defaultPluginId} upload triggered successfully`)
+    return defaultPluginId
+  }
+
+  private async startUpload(
+    userId: string,
+    file: Express.Multer.File,
+    url: string,
+    defaultDeploymentInfo,
+    defaultPluginId: string
+  ) {
+    const { deploymentFolderPath, fileStem, modifiedFileStem, fileType } = file
+      ? await this.processPipPackage(userId, { fileName: file.originalname })
+      : url
+      ? await this.processPipPackage(userId, { url: url })
+      : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
+    this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
+
+    let flowMetadataInput
+    let existingFlowMetadata
+    try {
+      // prepare metadata input
+      if (defaultDeploymentInfo && defaultDeploymentInfo.url) {
+        flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, defaultDeploymentInfo.url)
+      } else {
+        flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, url)
+      }
+
+      // if metadata with same flowId exists
+      existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+
+      defaultDeploymentInfo.defaultPluginId
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.INSTALLING)
+      }
+      // create python virtual environment with exisiting dependencies
+      const dependencyScriptPath = join(deploymentFolderPath, PrefectDeploymentPythonFiles['SCRIPT'])
+      writeFileSync(dependencyScriptPath, this.prefectExecutionClient.createInstallDependenciesScript())
+      await this.prefectExecutionClient.executeCreateVirtualEnvironment(userId, modifiedFileStem)
+
+      // install pip package
+      const pipInstallPath = join(deploymentFolderPath, PrefectDeploymentPythonFiles['PIP_INSTALL'])
+      if (url) {
+        writeFileSync(pipInstallPath, this.prefectExecutionClient.createPipInstallScript(fileStem, fileType, url))
+      } else if (defaultDeploymentInfo && defaultDeploymentInfo.url) {
+        writeFileSync(
+          pipInstallPath,
+          this.prefectExecutionClient.createPipInstallScript(fileStem, fileType, defaultDeploymentInfo.url)
+        )
+      } else {
+        writeFileSync(pipInstallPath, this.prefectExecutionClient.createPipInstallScript(fileStem, fileType))
+      }
+
+      await this.prefectExecutionClient.executePipInstall(userId, modifiedFileStem)
+      if (existingFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(existingFlowMetadata.flowId)
+      }
+    } catch (err) {
+      if (!existingFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+        await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
+      }
+      this.deleteDeploymentFolder(deploymentFolderPath)
+      const errorMessage = `Error installing pip package, check if package is valid`
+      this.logger.error(`${errorMessage}: ${err}`)
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
+      }
+    }
+
+    try {
+      const deploymentPath = join(deploymentFolderPath, PrefectDeploymentPythonFiles['DEPLOYMENT'])
+      writeFileSync(
+        deploymentPath,
+        this.prefectExecutionClient.createDeploymentTemplate(
+          userId,
+          flowMetadataInput.name,
+          flowMetadataInput.entrypoint.replace(/\//g, '.').replace(/\.py$/, ''),
+          flowMetadataInput.others.tags || []
+        )
+      )
+      await this.prefectExecutionClient.executePythonPrefectModule(userId, modifiedFileStem)
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.COMPLETE)
+      }
+    } catch (err) {
+      if (!existingFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+        await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
+      }
+      const errorMessage = `Error creating flow with file ${fileStem}${fileType}`
+      this.logger.error(`${errorMessage}: ${err}`)
+      if (defaultPluginId) {
+        await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.FAILED)
+      }
     } finally {
       this.deleteDeploymentFolder(deploymentFolderPath)
     }
@@ -199,6 +442,7 @@ export class PrefectService {
     } catch (error) {
       const errorMessage = `Metadata file not found / has missing fields!`
       this.logger.error(`${errorMessage}: ${error}`)
+      this.deleteDeploymentFolder(deploymentFolderPath)
       throw new InternalServerErrorException(errorMessage)
     }
   }
@@ -260,6 +504,13 @@ export class PrefectService {
     if (metadata.type === FLOW_METADATA.dqd) {
       const dqOptions = { ...metadata.options, deploymentName: deployment.name, flowName: currentFlow.name }
       return this.dataQualityService.createDataQualityFlowRun(dqOptions as DataQualityFlowRunDto)
+    }
+
+    if (metadata.type === FLOW_METADATA.data_characterization) {
+      const dcOptions = { ...metadata.options, deploymentName: deployment.name }
+      return this.dataCharacterizationService.createDataCharacterizationFlowRun(
+        dcOptions as DataCharacterizationFlowRunDto
+      )
     }
 
     if (metadata.options['options']) {

@@ -1,3 +1,4 @@
+import { PluginUploadStatus } from './common/const'
 export interface ITestDataflowDto {
   dataflow: IReactFlow
 }
@@ -58,7 +59,7 @@ export interface IPrefectParameters {
     edges: IPrefectEdge
     nodes: object
   }
-  options: IPrefectOptions
+  options?: IPrefectOptions
 }
 
 interface IPrefectOptions {
@@ -94,6 +95,8 @@ export interface IPrefectTaskResult {
 export interface IPrefectAdhocFlowDto {
   flowName?: string
   url?: string
+  fromDefaultPlugin?: boolean
+  defaultPluginId?: string
 }
 
 export interface IPrefectFlowRunByDeploymentDto {
@@ -101,6 +104,7 @@ export interface IPrefectFlowRunByDeploymentDto {
   flowName: string
   deploymentName: string
   params: object
+  schedule: string | null
 }
 
 export interface IPrefectFlowRunByMetadataDto {
@@ -209,4 +213,35 @@ export interface IFlowMetadataDto {
   url?: string
   datamodels?: string[]
   others?: JSON
+}
+
+export type PluginUploadStatus = keyof typeof PluginUploadStatus
+
+export interface IPluginUploadStatusDetail {
+  pluginId: string
+  name: string
+  status: string
+  createdAt: string
+  modifiedAt: string
+  type: string
+}
+export interface IPluginUploadStatusDto {
+  statusDetails: IPluginUploadStatusDetail[]
+  noActiveInstallations: boolean
+  installationStatus: string
+}
+
+export interface IFlowRunQueryDto {
+  startDate?: Date
+  endDate?: Date
+  states?: FlowRunState[]
+  tags?: string[]
+  flowIds?: string[]
+  deploymentIds?: string[]
+  deploymentNames?: string[]
+  workPools?: string[]
+}
+
+export interface IJobHistoryQueryDto extends IFlowRunQueryDto {
+  filter: 'dqd' | 'all'
 }

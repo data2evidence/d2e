@@ -391,6 +391,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
+    path: '^/terminology/concept/hierarchy(.*)',
+    scopes: ['gateway.terminology.concept.hierarchy.read'],
+    httpMethods: ['GET']
+  },
+  {
     path: '^/terminology/concept/recommended/list$',
     scopes: ['gateway.terminology.concept.recommended.read'],
     httpMethods: ['POST']
@@ -491,6 +496,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
+    path: '^/dataflow-mgmt/prefect/flow/default-deployment$',
+    scopes: ['dataflowmgmt.prefect.flow.fileDeployment.add'],
+    httpMethods: ['POST', 'GET']
+  },
+  {
     path: '^/dataflow-mgmt/prefect/flow/(.*)',
     scopes: ['dataflowmgmt.prefect.flow.delete'],
     httpMethods: ['DELETE']
@@ -512,6 +522,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
   },
   {
     path: '^/dataflow-mgmt/prefect/flow-run/(.*)',
+    scopes: ['dataflowmgmt.prefect.flowRun.add'],
+    httpMethods: ['POST']
+  },
+  {
+    path: '^/dataflow-mgmt/prefect/analysis-run/(.*)',
     scopes: ['dataflowmgmt.prefect.flowRun.add'],
     httpMethods: ['POST']
   },
@@ -916,6 +931,7 @@ export const ROLE_SCOPES = {
     'gateway.terminology.conceptSet.delete',
     'gateway.terminology.concept.filterOptions.read',
     'gateway.terminology.concept.recommended.read',
+    'gateway.terminology.concept.hierarchy.read',
     'gateway.terminology.fhir.read',
     'gateway.terminology.hybridSearchConfig.read',
     'dataflowmgmt.analysisflow.read',
