@@ -448,6 +448,7 @@ services:
       DOCKER_HOST: unix://var/run/docker.sock
       DQD_THREAD_COUNT: 1
       DUCKDB__DATA_FOLDER: /app/duckdb_data
+      DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME: flow-results
       IDP__ALP_DATA__CLIENT_ID: t5vwuno8ckh5hmqozjqyj
       IDP__ALP_DATA__CLIENT_SECRET: ${LOGTO__ALP_DATA__CLIENT_SECRET}
       LOCAL_DEBUG: "false"
@@ -1396,7 +1397,7 @@ services:
     entrypoint: |
       /bin/sh -c " /usr/bin/mc config host add myminio http://alp-minerva-s3:9000 ${MINIO__ACCESS_KEY:-root} ${MINIO__SECRET_KEY};
       /usr/bin/mc mb -p myminio/dataflow-adhoc-flows;
-      /usr/bin/mc mb -p myminio/dataflow-results;
+      /usr/bin/mc mb -p myminio/flows/results;
       /usr/bin/mc mb -p myminio/dicom-images;
       /usr/bin/mc policy download myminio/dataflow-adhoc-flows;
       exit 0;

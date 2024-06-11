@@ -1,6 +1,6 @@
 from prefect.context import TaskRunContext, FlowRunContext
 from prefect import flow, task, get_run_logger
-from prefect.filesystems import S3
+from prefect.filesystems import RemoteFileSystem as RFS
 from prefect.serializers import JSONSerializer
 import json
 from nodes.flowutils import *
@@ -136,7 +136,7 @@ def execute_nodes_flow(graph, sorted_nodes, test):
 
 
 @task(task_run_name="execute-nodes-taskrun-{nodename}",
-      result_storage=S3(bucket_path="dataflow-results/dataflow"), 
+      result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")), 
       result_storage_key="{flow_run.id}_{parameters[nodename]}.json",
       result_serializer=JSONSerializer(), log_prints=True)
 def execute_node_task(nodename, node_type, node, input, test):

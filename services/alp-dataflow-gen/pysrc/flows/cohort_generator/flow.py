@@ -5,7 +5,7 @@ import json
 from rpy2 import robjects
 from rpy2.robjects import conversion, default_converter
 from prefect import task, get_run_logger
-from prefect.filesystems import S3
+from prefect.filesystems import RemoteFileSystem as RFS
 from utils.types import PG_TENANT_USERS, cohortGeneratorOptionsType
 from utils.databaseConnectionUtils import getSetDBDriverEnvString, getDatabaseConnectorConnectionDetailsString
 from api.AnalyticsSvcAPI import AnalyticsSvcAPI
@@ -42,7 +42,7 @@ def execute_cohort_generator(
                   cohortName, vocabSchemaName)
 
 
-@task(result_storage=S3(bucket_path="dataflow-results/cohort-generator"), 
+@task(result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")), 
       result_storage_key="{flow_run.id}_cohort_definition.txt")
 def create_cohort_definition(token: str, datasetId: str, description: str, owner: str, cohortJsonExpression: str, cohortName: str):
     anaylticsSvcApi = AnalyticsSvcAPI(token)

@@ -6,14 +6,14 @@ from rpy2 import robjects
 from rpy2.robjects import conversion, default_converter
 from prefect import task, get_run_logger
 from prefect.context import FlowRunContext
-from prefect.filesystems import S3
+from prefect.filesystems import RemoteFileSystem as RFS
 from prefect.serializers import JSONSerializer
 from utils.types import PG_TENANT_USERS, dqdOptionsType
 from utils.databaseConnectionUtils import getSetDBDriverEnvString, getDatabaseConnectorConnectionDetailsString
 from flows.alp_dqd.hooks import persist_dqd
 
 
-@task(result_storage=S3(bucket_path="dataflow-results/dqd"), 
+@task(result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")), 
       result_storage_key="{flow_run.id}_dqd.json",
       result_serializer=JSONSerializer())
 def execute_dqd(
