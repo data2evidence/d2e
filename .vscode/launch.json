@@ -211,6 +211,21 @@
         "${workspaceFolder}/**",
         "!**/node_modules/**"
       ]
+    },
+    {
+      "name": "alp-dataflow-gen-local",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 9234,  
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/services/alp-dataflow-gen/pysrc",
+          "remoteRoot": "./pysrc" 
+        }
+      ]
     }
   ]
 }
