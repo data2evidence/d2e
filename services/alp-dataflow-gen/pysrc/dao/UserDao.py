@@ -41,7 +41,6 @@ class UserDao():
         with self.engine.connect() as connection:
             print(f"Executing check role exists statement..")
             res = connection.execute(select_stmt, {"x": role_name}).fetchall()
-            print(f'res is {res}')
             if res == []:
                 return False
             else:

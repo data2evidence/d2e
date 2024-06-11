@@ -49,10 +49,12 @@ class Liquibase:
         admin_user = self.tenant_configs.get("adminUser")
         admin_password = self.tenant_configs.get("adminPassword")
 
-
-        liquibase_path = os.environ.get("LIQUIBASE_PATH", "/app/liquibase/liquibase")
-        hana_driver_class_path = os.environ.get("HANA__DRIVER_CLASS_PATH", "/app/inst/drivers/ngdbc-latest.jar")
-        postgres_driver_class_path = os.environ.get("POSTGRES__DRIVER_CLASS_PATH", "/app/inst/drivers/postgresql-42.3.1.jar")
+        liquibase_path = os.environ.get(
+            "LIQUIBASE_PATH", "/app/liquibase/liquibase")
+        hana_driver_class_path = os.environ.get(
+            "HANA__DRIVER_CLASS_PATH", "/app/inst/drivers/ngdbc-latest.jar")
+        postgres_driver_class_path = os.environ.get(
+            "POSTGRES__DRIVER_CLASS_PATH", "/app/inst/drivers/postgresql-42.3.1.jar")
 
         match self.dialect:
             case DatabaseDialects.HANA:
@@ -75,7 +77,7 @@ class Liquibase:
             f"--username={admin_user}",
             f"--password={admin_password}",
             f"--driver={driver}",
-            f"--logLevel={os.environ.get('LB__LOG_LEVEL', INFO)}",
+            f"--logLevel={os.environ.get('LB__LOG_LEVEL', 'INFO')}",
             f"--defaultSchemaName={self.schema_name}",
             f"--liquibaseSchemaName={self.schema_name}"
         ]

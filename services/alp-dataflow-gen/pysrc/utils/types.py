@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel, Field, UUID4
+from pydantic import BaseModel
 from typing import Optional, List, Dict
 
 
@@ -78,12 +78,6 @@ class omopCDMOptionsType(BaseModel):
     cdmVersion: str
 
 
-class AlpDBSvcOptionsType(BaseModel):
-    requestType: str
-    requestUrl: str
-    requestBody: Optional[Dict]
-
-
 class meilisearchAddIndexType(BaseModel):
     databaseCode: str
     vocabSchemaName: str
@@ -127,12 +121,8 @@ class InternalPluginType(str, Enum):
     MEILISEARCH = "add_search_index_plugin"
     MEILISEARCH_EMBEDDINGS = "add_search_index_with_embeddings_plugin"
     R_CDM = "r_cdm_plugin"
+    DATA_LOAD = "data_load_plugin"
 
     @staticmethod
     def values():
         return InternalPluginType._value2member_map_
-
-
-class seedVocabType(dataModelBase):
-    vocab_schema: str
-

@@ -1,5 +1,6 @@
 from prefect import get_run_logger, task
 from functools import partial
+from datetime import datetime
 from alpconnection.dbutils import extract_db_credentials
 from utils.types import DBCredentialsType, DatabaseDialects, HANA_TENANT_USERS, PG_TENANT_USERS
 
@@ -13,15 +14,14 @@ from flows.alp_db_svc.hooks import *
 
 
 def create_datamodel(database_code: str,
-                    data_model: str,
-                    schema_name: str,
-                    vocab_schema: str,
-                    changelog_file: str,
-                    count: int,
-                    cleansed_schema_option: bool,
-                    plugin_classpath: str,
-                    dialect: str):
-
+                     data_model: str,
+                     schema_name: str,
+                     vocab_schema: str,
+                     changelog_file: str,
+                     plugin_classpath: str,
+                     dialect: str,
+                     count: int = 0,
+                     cleansed_schema_option: bool = False):
 
     tenant_configs = extract_db_credentials(database_code)
 
@@ -41,6 +41,7 @@ def create_datamodel(database_code: str,
         cleansed_schema_name = schema_name + "_cleansed"
         cleansed_task_status = create_schema_tasks(
             dialect=dialect,
+            database_code=database_code,
             data_model=data_model,
             changelog_file=changelog_file,
             schema_name=cleansed_schema_name,
@@ -111,7 +112,7 @@ def create_schema_tasks(dialect: str,
                                     **dict(schema_dao=schema_dao))])
             enable_and_create_audit_policies_wo(schema_dao)
         else:
-            print("`Skipping Alteration of system configuration")
+            print("Skipping Alteration of system configuration")
             print("Skipping creation of Audit policy for system configuration")
             print(f"Skipping creation of new audit policy for {schema_name}")
 
@@ -121,7 +122,7 @@ def create_schema_tasks(dialect: str,
                                    **dict(schema_dao=schema_dao))],
             on_failure=[partial(create_assign_roles_hook,
                                 **dict(schema_dao=schema_dao))])
-        create_and_assign_roles_wo(user_dao, tenant_configs)
+        create_and_assign_roles_wo(user_dao, tenant_configs, data_model)
 
         if data_model in OMOP_DATA_MODELS:
             cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
@@ -136,15 +137,15 @@ def create_schema_tasks(dialect: str,
 
 
 def update_datamodel(database_code: str,
-                    data_model: str,
-                    schema_name: str,
-                    vocab_schema: str,
-                    changelog_file: str,
-                    plugin_classpath: str,
-                    dialect: str):
+                     data_model: str,
+                     schema_name: str,
+                     vocab_schema: str,
+                     changelog_file: str,
+                     plugin_classpath: str,
+                     dialect: str):
 
     logger = get_run_logger()
-    
+
     tenant_configs = extract_db_credentials(database_code)
 
     match dialect:
@@ -188,13 +189,13 @@ def update_datamodel(database_code: str,
 
 
 def rollback_count_task(database_code: str,
-                    data_model: str,
-                    schema_name: str,
-                    vocab_schema: str,
-                    changelog_file: str,
-                    plugin_classpath: str,
-                    dialect: str,
-                    rollback_count: int):
+                        data_model: str,
+                        schema_name: str,
+                        vocab_schema: str,
+                        changelog_file: str,
+                        plugin_classpath: str,
+                        dialect: str,
+                        rollback_count: int):
 
     tenant_configs = extract_db_credentials(database_code)
 
@@ -223,17 +224,16 @@ def rollback_count_task(database_code: str,
         return return_code
 
 
-def rollback_tag(database_code: str,
-                data_model: str,
-                schema_name: str,
-                vocab_schema: str,
-                changelog_file: str,
-                plugin_classpath: str,
-                dialect: str,
-                rollback_tag: str):
+def rollback_tag_task(database_code: str,
+                      data_model: str,
+                      schema_name: str,
+                      vocab_schema: str,
+                      changelog_file: str,
+                      plugin_classpath: str,
+                      dialect: str,
+                      rollback_tag: str):
 
     tenant_configs = extract_db_credentials(database_code)
-
 
     try:
         rollback_tag_wo = run_liquibase_update_task.with_options(
@@ -273,10 +273,10 @@ def enable_and_create_audit_policies(schema_dao: DBDao):
 
 
 @task(log_prints=True)
-def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType):
+def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType, data_model: str):
 
     # Check if schema read role exists
-    schema_read_role = f"{userdao.schema_name}_READ_ROLE"
+    schema_read_role = f"{userdao.schema_name}_read_role"
     schema_read_role_exists = userdao.check_role_exists(schema_read_role)
     if schema_read_role_exists:
         print(f"{schema_read_role} role already exists")
@@ -308,8 +308,9 @@ def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType)
     # Grant read role read privileges
     userdao.grant_read_privileges(read_role)
 
-    # Grant write cohort and cohort_definition table privileges to read role
-    userdao.grant_cohort_write_privileges(read_role)
+    if data_model in OMOP_DATA_MODELS:
+        # Grant write cohort and cohort_definition table privileges to read role
+        userdao.grant_cohort_write_privileges(read_role)
 
 
 @task(log_prints=True)
@@ -328,9 +329,67 @@ def run_liquibase_update_task(**kwargs) -> str:
 
 @task(log_prints=True)
 def insert_cdm_version(schema_dao: DBDao, cdm_version: str):
-    row_count = schema_dao.insert_cdm_version(cdm_version)
+
+    values_to_insert = {
+        "cdm_source_name": schema_dao.schema_name,
+        "cdm_source_abbreviation": schema_dao.schema_name[0:25],
+        "cdm_holder": "D4L",
+        "source_release_date": datetime.now(),
+        "cdm_release_date": datetime.now(),
+        "cdm_version": cdm_version
+    }
+
+    schema_dao.insert_values_into_table("cdm_source", values_to_insert)
 
 
 @task(log_prints=True)
 def update_cdm_version(schema_dao: DBDao, cdm_version: str):
     schema_dao.update_cdm_version(cdm_version)
+
+
+def run_seed_postgres_tasks(database_code: str,
+                            data_model: str,
+                            schema_name: str,
+                            vocab_schema: str,
+                            changelog_file: str,
+                            plugin_classpath: str,
+                            dialect: str):
+    logger = get_run_logger()
+    # Begin by checking if the vocab schema exists or not
+    vocab_schema_dao = DBDao(database_code, vocab_schema,
+                             PG_TENANT_USERS.ADMIN_USER)
+    vocab_schema_exists = vocab_schema_dao.check_schema_exists()
+    if (vocab_schema_exists == False):
+        try:
+            # create vocab schema
+            create_datamodel(database_code=database_code,
+                             data_model=data_model,
+                             schema_name=vocab_schema,
+                             vocab_schema=vocab_schema,
+                             changelog_file=changelog_file,
+                             plugin_classpath=plugin_classpath,
+                             dialect=dialect)
+        except Exception as e:
+            logger.error(
+                f"Failed to create schema {vocab_schema} in db with code:{database_code}: {e}")
+            return False
+
+    if (schema_name != vocab_schema):
+        # Check if the incoming schema_name exists or not
+        cdm_schema_dao = DBDao(database_code, schema_name,
+                               PG_TENANT_USERS.ADMIN_USER)
+        cdm_schema_exists = cdm_schema_dao.check_schema_exists()
+        if (cdm_schema_exists == False):
+            try:
+                # create cdm schema
+                create_datamodel(database_code=database_code,
+                                 data_model=data_model,
+                                 schema_name=schema_name,
+                                 vocab_schema=vocab_schema,
+                                 changelog_file=changelog_file,
+                                 plugin_classpath=plugin_classpath,
+                                 dialect=dialect)
+            except Exception as e:
+                logger.error(
+                    f"Failed to create schema {schema_name} in db with code:{database_code}: {e}")
+                return False

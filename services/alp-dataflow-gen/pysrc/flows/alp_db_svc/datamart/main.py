@@ -2,10 +2,11 @@ from prefect import get_run_logger
 from dao.DBDao import DBDao
 from utils.types import PG_TENANT_USERS, HANA_TENANT_USERS, DatabaseDialects
 from flows.alp_db_svc.datamart.datamart import datamart_copy_schema
-from flows.alp_db_svc.datamart.types import DATAMART_ACTIONS, CreateDatamartType, 
+from flows.alp_db_svc.datamart.types import DATAMART_ACTIONS, CreateDatamartType
 from flows.alp_db_svc.dataset.main import create_datamodel
 
-async def create_datamart(options: CreateDatamartType):
+
+def create_datamart(options: CreateDatamartType):
     logger = get_run_logger()
     target_schema = options.target_schema
     source_schema = options.source_schema
@@ -24,7 +25,7 @@ async def create_datamart(options: CreateDatamartType):
             admin_user = HANA_TENANT_USERS.ADMIN_USER
         case DatabaseDialects.POSTGRES:
             admin_user = PG_TENANT_USERS.ADMIN_USER
-            
+
     # get db connection
     db_dao = DBDao(database_code, source_schema, admin_user)
 
@@ -37,7 +38,7 @@ async def create_datamart(options: CreateDatamartType):
 
     # create cdm schema
     if datamart_action == DATAMART_ACTIONS.COPY_AS_DB_SCHEMA:
-        await create_datamodel(
+        create_datamodel(
             database_code=database_code,
             data_model=data_model,
             schema_name=target_schema,

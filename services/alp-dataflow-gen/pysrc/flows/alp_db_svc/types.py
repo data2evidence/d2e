@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field, UUID4
-from typing import List, Dict, Optional
-from datetime import datetime
 from enum import Enum
+from datetime import datetime
+from typing import List, Dict, Optional
+from pydantic import BaseModel, Field, UUID4
 from flows.alp_db_svc.datamart.types import SnapshotCopyConfig
 
 
@@ -24,9 +24,9 @@ class DataModelBase(BaseModel):
 
 
 class CreateDataModelType(DataModelBase):
-    cleansed_schema_option: bool = Field(default=False)
+    cleansed_schema_option: Optional[bool]
     vocab_schema: str = Field(...)
-    update_count: int = Field(default=0)
+    update_count: Optional[int]
 
 
 class UpdateDataModelType(DataModelBase):
@@ -49,19 +49,12 @@ class CreateSnapshotType(DataModelBase):
     snapshot_copy_config: SnapshotCopyConfig
 
 
-class QuestionnaireDefinitionType(DataModelBase):
-    questionnaire_definition: Dict
-
-
-class questionnaireResponseType(DataModelBase):
+class QuestionnaireResponseType(DataModelBase):
     questionnaire_id: str
 
 
-class GetVersionInfoType(BaseModel):
-    token: str
-    flow_name: str = Field(...)
-    changelog_filepath: Optional[str]
-    changelog_filepath_list: Dict
+class SeedVocabType(DataModelBase):
+    vocab_schema: str
 
 
 class EntityCountDistributionType(BaseModel):
@@ -99,9 +92,15 @@ class PortalDatasetType(BaseModel):
     studyDetail: Optional[Dict]
 
 
+class GetVersionInfoType(DataModelBase):
+    token: str
+    datasets: List
+
+
 class ExtractDatasetSchemaType(BaseModel):
     datasets_with_schema: List[PortalDatasetType]
     datasets_without_schema: List[PortalDatasetType]
+
 
 class IItemType(BaseModel):
     id: str = ""

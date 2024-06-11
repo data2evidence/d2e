@@ -71,7 +71,6 @@ class DBDao:
             cdm_version = connection.execute(stmt).scalar()
             return cdm_version
 
-
     def update_cdm_version(self, cdm_version: str):
         with self.engine.connect() as connection:
             table = Table("cdm_source".casefold(), self.metadata,
@@ -216,7 +215,7 @@ class DBDao:
         return column.lower() not in ["system_valid_until", "system_valid_from"]
 
     def insert_values_into_table(self, table_name: str, column_value_mapping: dict):
-        # currently only suuports one row inserts
+        # currently only suuports single row inserts
         with self.engine.connect() as connection:
             table = Table(table_name.casefold(), self.metadata,
                           autoload_with=connection)
@@ -228,3 +227,14 @@ class DBDao:
             connection.commit()
             print(
                 f"Successfully inserted into table {table_name} columns {list(column_value_mapping.keys())}")
+
+    def call_stored_procedure(self, sp_name: str, sp_params: str):
+        with self.engine.connect() as connection:
+            call_stmt = text(f'CALL "{sp_name}"({sp_params}) ')
+            print(
+                f"Executing stored procedure {sp_name}")
+            res = connection.execute(call_stmt).fetchall()
+            connection.commit()
+            print(
+                f"Successfully executed stored prcoedure {sp_name}")
+            return res

@@ -20,15 +20,12 @@ from api.PortalServerAPI import PortalServerAPI
 
 def get_version_info_task(changelog_file: str,
                           plugin_classpath: str,
-                          token: str):
+                          token: str,
+                          dataset_list: List[PortalDatasetType]):
     logger = get_run_logger()
 
-    logger.info("Fetching datasets from portal...")
-    try:
-        dataset_list = get_datasets_from_portal(token)
-    except Exception as e:
-        logger.error("Failed to retrieve datasets from portal")
-        raise e
+    # temporary
+    logger.info(f"datasets in get_version_info_task is {dataset_list}")
 
     if len(dataset_list) == 0:
         logger.debug("No datasets fetched from portal")
@@ -53,19 +50,14 @@ def extract_db_schema(dataset_list: List[PortalDatasetType]) -> ExtractDatasetSc
             PortalDatasetType(**_dataset)
         except Exception as e:
             # dataset has no db_name and study name
-            get_run_logger().error(e)
+            id = _dataset["id"]
+            get_run_logger().error(
+                f"Unable to validate dataset with id'{id}': {e}")
             datasets_without_schema.append(_dataset)
         else:
             datasets_with_schema.append(_dataset)
     return {"datasets_with_schema": datasets_with_schema,
             "datasets_without_schema": datasets_without_schema}
-
-
-@task
-def get_datasets_from_portal(token: str) -> List[PortalDatasetType]:
-    portalServerApi = PortalServerAPI(token)
-    dataset_list = portalServerApi.get_datasets_from_portal()
-    return dataset_list
 
 
 @task
@@ -78,7 +70,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
 
     dataset_id = dataset.get("id")
     database_code = dataset.get("databaseCode")
-    schema_name = dataset.get("schemaName")
+    schema_name = dataset.get("schemaName").upper()
     vocab_schema = dataset.get("vocabSchemaName")
     data_model = dataset.get("dataModel").split(" ")[0]
 
@@ -98,7 +90,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
         # handle case where schema does not exist in db
         schema_exists = dataset_dao.check_schema_exists()
         if schema_exists == False:
-            error_msg = f"Schema {schema_name} does not exist in db {database_code} for dataset {dataset_id}"
+            error_msg = f"Schema '{schema_name}' does not exist in db {database_code} for dataset id '{dataset_id}'"
             logger.error(error_msg)
             update_dataset_attributes_table(
                 dataset_id, "schema_version", error_msg, token)
@@ -128,16 +120,15 @@ def get_and_update_attributes(dataset: PortalDatasetType,
                 dataset_id, "patient_count", patient_count, token)
         except Exception as e:
             logger.error(
-                f"Failed updating patient count for dataset {dataset_id}: {e}")
+                f"Failed to update attribute 'patient count' for dataset {dataset_id}: {e}")
         else:
             logger.info(
-                f"Updated patient count for dataset {dataset_id} with value {patient_count}")
+                f"Updated attribute 'patient count for dataset' {dataset_id} with value {patient_count}")
 
         try:
             # update with entity distribution json string
             entity_count_distribution = get_entity_count_distribution(
                 dataset_dao, is_lower_case)
-            print(f'entity_count_distribution is {entity_count_distribution}')
             update_dataset_attributes_table(
                 dataset_id, "entity_count_distribution", json.dumps(json.dumps(entity_count_distribution)), token)
         except Exception as e:

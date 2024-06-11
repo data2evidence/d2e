@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 from uuid import uuid4
 from typing import List
 from datetime import datetime
@@ -174,3 +175,25 @@ def convert_columns_to_hana(mapping: dict, old_key: str, new_key: str) -> dict:
     mapping[new_key] = mapping[old_key]
     mapping.pop(old_key)
     return mapping
+
+
+@task(log_prints=True)
+def get_questionnaire_response_task(database_code: str,
+                                    schema_name: str,
+                                    dialect: str,
+                                    questionnaire_id: str):
+
+    match dialect:
+        case DatabaseDialects.HANA:
+            admin_user = HANA_TENANT_USERS.ADMIN_USER
+        case DatabaseDialects.POSTGRES:
+            admin_user = PG_TENANT_USERS.ADMIN_USER
+
+    schema_dao = DBDao(database_code, schema_name, admin_user)
+
+    sp_params = f"'{questionnaire_id}'"
+    sp_name = "SP::GET_QUESTIONNAIRE_RESPONSE"
+
+    rows = schema_dao.call_stored_procedure(sp_name, sp_params)
+    columns = rows.keys()
+    df = pd.DataFrame(rows, columns=columns)
