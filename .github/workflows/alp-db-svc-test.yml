@@ -74,7 +74,7 @@ jobs:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          INTEGRATION_TEST__HANA__TENANT_CONFIGS: "op://${{ secrets.OP_VAULT_NAME }}/Github Actions Secrets/ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_GERMANY"
+          INTEGRATION_TEST__HANA__TENANT_CONFIGS: "op://${{ secrets.OP_VAULT_NAME }}/Github Actions Secrets/ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_SINGAPORE"
 
       - name: Get 1password files
         env:
