@@ -336,7 +336,6 @@ export class PrefectService {
     this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
 
     let flowMetadataInput
-    let existingFlowMetadata
     try {
       defaultDeploymentInfo.defaultPluginId
       if (defaultPluginId) {
@@ -371,7 +370,7 @@ export class PrefectService {
       await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
     } catch (err) {
       if (flowMetadataInput) {
-        existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+        const existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
         if (!existingFlowMetadata) {
           await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
           await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
@@ -401,7 +400,7 @@ export class PrefectService {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.COMPLETE)
       }
     } catch (err) {
-      existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+      const existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
       if (!existingFlowMetadata) {
         await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
         await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
