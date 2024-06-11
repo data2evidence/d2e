@@ -1244,6 +1244,7 @@ services:
     networks:
       alp:
         priority: 20
+    profiles: [sql]
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:

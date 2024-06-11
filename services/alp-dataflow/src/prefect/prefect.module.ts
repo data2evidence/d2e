@@ -10,8 +10,9 @@ import { AnalysisflowModule } from '../analysis-flow/analysis-flow.module'
 import { PrefectExecutionClient } from './prefect-execution.client'
 import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { FlowMetadata } from '../prefect-flow/entity'
+import { FlowMetadata, DefaultPlugins } from '../prefect-flow/entity'
 import { DataQualityModule } from '../data-quality/data-quality.module'
+import { DataCharacterizationModule } from '../data-characterization/data-characterization.module'
 import { PortalServerModule } from '../portal-server/portal-server.module'
 
 @Module({
@@ -20,8 +21,9 @@ import { PortalServerModule } from '../portal-server/portal-server.module'
     DataflowModule,
     AnalysisflowModule,
     DataQualityModule,
+    DataCharacterizationModule,
     PortalServerModule,
-    TypeOrmModule.forFeature([FlowMetadata])
+    TypeOrmModule.forFeature([FlowMetadata, DefaultPlugins])
   ],
   controllers: [PrefectController],
   providers: [
