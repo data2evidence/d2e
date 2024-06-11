@@ -244,7 +244,7 @@ export function _deleteBookmark(
   }
   // first get the bookmark record for the given params
   let fnGetBookmark = cb => {
-    let qry: QueryObject = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, userId)
+    let qry: QueryObject = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, paConfigId)
     qry.executeQuery(configConnection, (err, bookmarks) => {
       if (err) {
         cb(err)
