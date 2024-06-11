@@ -12,12 +12,12 @@ async function callback(path: string, headers: object, data: object) {
       console.log(JSON.stringify(json));
       return json;
     } else {
-      console.log("Request failed");
-      console.log(resp.statusText, " ", path, " ", JSON.stringify(data));
+      console.error("Request failed");
+      console.error(resp.statusText, " ", path, " ", JSON.stringify(data));
       return -1;
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 

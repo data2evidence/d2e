@@ -256,7 +256,6 @@ services:
     networks:
       - alp
     volumes:
-      - ./deploy/logto:/logto
       - ./services/alp-logto:/home/docker
     depends_on:
       alp-logto:
