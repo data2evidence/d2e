@@ -188,7 +188,7 @@ class DbQueryReader(Node):
             "columns": _node["columns"], "data": _node["testdata"]}
 
     def test(self, task_run_context):
-        return Result(None, dd.from_pandas(pd.read_json(json.dumps(self.testdata), self, orient="split"), npartitions=1), task_run_context)
+        return Result(None, dd.from_pandas(pd.read_json(json.dumps(self.testdata), orient="split"), npartitions=1), self, task_run_context)
 
     def task(self, task_run_context):
         # return dd.read_sql_query(sqlalchemy.select(sqlalchemy.text(self.sqlquery)), self.dbconn, self.index_col, divisions=self.divisions)
