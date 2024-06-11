@@ -12,18 +12,12 @@ export const defaultMetadata: ConnectorMetadata = {
   target: "azuread-alp",
   platform: ConnectorPlatform.Web,
   name: {
-    en: "ALP",
-    "zh-CN": "ALP",
-    "tr-TR": "ALP",
-    ko: "ALP",
+    en: "Data2Evidence",
   },
   logo: "./logo.svg",
   logoDark: null,
   description: {
-    en: "Microsoft Azure Active Directory is a leading AD provider.",
-    "zh-CN": "Microsoft Azure Active Directory 是领先的 AD 服务提供商。",
-    "tr-TR": "Microsoft Azure Active Directory en büyük AD servisidir.",
-    ko: "Microsoft Azure Active Directory is the biggest AD provider.",
+    en: "Integrate the Data2Evidence with Microsoft Entra ID to ensure only authorized users can access the application.",
   },
   readme: "./README.md",
   formItems: [

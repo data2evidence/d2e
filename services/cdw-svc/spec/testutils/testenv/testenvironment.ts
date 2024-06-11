@@ -7,7 +7,6 @@ import { DBConnectionUtil as dbConnectionUtil } from "@alp/alp-base-utils";
 import async = require("async");
 import IfAsync = require("if-async");
 import fs = require("fs-extra");
-import hdb = require("hdb");
 import * as path from "path";
 
 function log(msg: any) {

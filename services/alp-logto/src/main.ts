@@ -127,7 +127,7 @@ async function main() {
   let signinExperience = {
     branding: {
       favicon: "https://localhost:41100/portal/assets/favicon.ico",
-      logoUrl: "https://localhost:41100/portal/assets/d2e.png",
+      logoUrl: "https://localhost:41100/portal/assets/d2e.svg",
     },
     color: {
       primaryColor: "#000080",
