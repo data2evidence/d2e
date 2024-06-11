@@ -142,7 +142,7 @@ INSERT INTO public.users_roles(
 -- Sign-in Experiences
 UPDATE public.sign_in_experiences SET
 	sign_up = '{"verify": false, "password": false, "identifiers": []}',
-	branding = '{"favicon": "https://localhost:41100/portal/assets/favicon.ico", "logoUrl": "https://localhost:41100/portal/assets/d2e.png"}',
+	branding = '{"favicon": "https://localhost:41100/portal/assets/favicon.ico", "logoUrl": "https://localhost:41100/portal/assets/d2e.svg"}',
 	color = '{"primaryColor": "#000080", "darkPrimaryColor": "#0000B3", "isDarkModeEnabled": false}',
 	custom_css = 'a[aria-label="Powered By Logto"] { display: none; }'
 WHERE tenant_id = 'default' AND id = 'default'
