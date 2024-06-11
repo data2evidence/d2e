@@ -17,7 +17,7 @@ export const bookmarkIdSchema = z.object({
 export const bookmarkIdsSchema = z.object({
   query: z.object({
     ids: z.string(),
-    username: z.string(),
+    paConfigId: z.string(),
   }),
 })
 

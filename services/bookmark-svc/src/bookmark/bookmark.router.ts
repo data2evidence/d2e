@@ -153,6 +153,7 @@ export class BookmarkRouter {
 
           req.body.cmd = 'loadByIDs'
           req.body.bmkIds = (req.query.ids as string).split(',')
+          req.body.paConfigId = req.query.paConfigId
 
           queryBookmarks(req.body, userId, EnvVarUtils.getBookmarksTable(), configConnection, (err, data) => {
             if (err) {
