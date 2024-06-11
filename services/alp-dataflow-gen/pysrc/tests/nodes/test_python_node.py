@@ -26,6 +26,7 @@ def test_python_node_task_error_with_invalid_python_code(helpers, mock_task_run_
     invalid_python_code = "x = 5\npnt(x)"
     python_node = nodes.PythonNode(
         {
+            "id": "1",
             "type": "python_node",
             "python_code": invalid_python_code,
         },)

@@ -37,7 +37,7 @@ def test_generate_node_task_unknown_node(caplog):
         "_dummy", node, "undefined_node")
 
     assert generated_node == None
-    assert "ERR: Unknown Node"+node["type"] in caplog.text
+    assert "ERR: Unknown Node "+node["type"] in caplog.text
 
 
 def test_generate_nodes_flow(setup, mock_dataflow):

@@ -39,6 +39,8 @@ services:
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
     volumes:
       - ./services/alp-dataflow-gen/pysrc:/app/pysrc
+    ports:
+      - 9234:9234
     environment:
       ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
@@ -248,7 +250,6 @@ services:
       dockerfile: Dockerfile.frontend
     volumes:
     - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
-
 
   alp-logto-post-init:
     container_name: alp-logto-post-init
