@@ -34,11 +34,11 @@ https://*.alp.local:55555 {
 
 	# Logto api server
 	@logto {
-		path /index.*
+        path /index.*
         path /api/*
         path /oidc/*
         path /sign-in
-		path /consent
+        path /consent
     }
 
     handle @logto {
