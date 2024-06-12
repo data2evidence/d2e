@@ -32,7 +32,7 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	# Logto api & admin
+	# Logto api server
 	@logto {
 		path /index.*
         path /api/*
