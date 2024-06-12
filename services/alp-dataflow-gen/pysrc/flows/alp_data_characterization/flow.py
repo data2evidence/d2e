@@ -91,7 +91,6 @@ async def execute_export_to_ares(schemaName: str,
         raise e
 
 
-
 async def create_data_characterization_schema(
     databaseCode: str,
     resultsSchema: str,
@@ -129,7 +128,7 @@ def execute_data_characterization_flow(options: dcOptionsType):
     releaseDate = options.releaseDate
     resultsSchema = options.resultsSchema
     flowName = options.flowName
-    changelogFile = options.changelogFilepath
+    changelogFile = options.changelogFile
 
     # comma separated values in a string
     excludeAnalysisIds = options.excludeAnalysisIds
