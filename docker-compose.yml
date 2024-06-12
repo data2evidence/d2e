@@ -159,7 +159,7 @@ x-envs:
         },
         {
           "description": "Configure patient summary",
-          "enabled": true,
+          "enabled": false,
           "name": "Patient Summary Config",
           "notes": "",
           "pluginPath": "plugins/mri/PatientSummaryConfig/module",
