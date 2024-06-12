@@ -38,6 +38,8 @@ class dqdBaseOptionsType(BaseModel):
 class dqdOptionsType(dqdBaseOptionsType):
     cohortDefinitionId: Optional[str]
     checkNames: Optional[List[str]]
+    cohortDatabaseSchema: Optional[str]
+    cohortTableName: Optional[str]
 
 
 class dcOptionsType(dqdBaseOptionsType):
@@ -87,7 +89,8 @@ class meilisearchAddIndexType(BaseModel):
     tableName: str
     chunk_size: int
     meilisearch_index_config: Dict
-    
+
+
 class meilisearchAddIndexWithEmbeddingsType(BaseModel):
     databaseCode: str
     vocabSchemaName: str
@@ -180,6 +183,7 @@ class DATABASE_DIALECTS(str, Enum):
     HANA = "hana"
     POSTGRES = "postgres"
 
+
 class entityCountDistributionType(BaseModel):
     OBSERVATION_PERIOD_COUNT: str
     DEATH_COUNT: str
@@ -247,3 +251,7 @@ class questionnaireDefinitionType(dataModelBase):
 
 class questionnaireResponseType(dataModelBase):
     questionnaire_id: str
+
+
+class seedVocabType(dataModelBase):
+    vocab_schema: str

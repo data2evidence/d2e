@@ -67,7 +67,7 @@ x-envs:
         {
           "enabled": true,
           "featureFlag": "cohort",
-          "name": "Cohort",
+          "name": "Cohorts",
           "pluginPath": "plugins/mri/PatientAnalytics/module",
           "requiredRoles": [
             "RESEARCHER"
@@ -77,8 +77,8 @@ x-envs:
         { 
           "enabled": true,
           "featureFlag": "cohorts",
-          "name": "Cohorts", 
-          "pluginPath": "plugins/Researcher/Cohort/module",
+          "name": "Cohorts M", 
+          "pluginPath": "plugins/Cohort/module",
           "requiredRoles": [ 
             "RESEARCHER" 
           ], 
@@ -96,7 +96,7 @@ x-envs:
           "subMenus": "true"
         },
         {
-          "enabled": true,
+          "enabled": false,
           "featureFlag": "analysisFlow",
           "name": "Analysis",
           "route": "analysis",
@@ -159,7 +159,7 @@ x-envs:
         },
         {
           "description": "Configure patient summary",
-          "enabled": true,
+          "enabled": false,
           "name": "Patient Summary Config",
           "notes": "",
           "pluginPath": "plugins/mri/PatientSummaryConfig/module",
@@ -396,6 +396,7 @@ services:
       R_LIBS_USER: /home/docker/plugins/R/site-library
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
+
   alp-dataflow-gen-agent:
     command:
       - sh
@@ -460,6 +461,9 @@ services:
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
       TERMINOLOGY_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/terminology/
+      OHDSI__R_COHORT_DIAGNOSTICS_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortDiagnosticsModule/v0.2.0/SettingsFunctions.R
+      OHDSI__R_COHORT_GENERATOR_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortGeneratorModule/v0.3.0/SettingsFunctions.R
+
   alp-dataflow-gen-init:
     command:
       - sh
@@ -1237,6 +1241,7 @@ services:
     networks:
       alp:
         priority: 20
+    profiles: [sql]
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:

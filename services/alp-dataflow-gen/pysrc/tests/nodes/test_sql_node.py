@@ -8,7 +8,7 @@ def test_sql_node_task(helpers, mock_ddf_person, mock_dataflow, mock_task_run_co
         mock_dataflow["json_graph"]["nodes"]["person_sql_node"])
 
     _input = {'person_csv_node': nodes.Result(
-        None, mock_ddf_person, mock_task_run_context)}
+        None, mock_ddf_person, sql_node, mock_task_run_context)}
     result = sql_node.task(_input, mock_task_run_context)
 
     assert result.error == None
@@ -22,7 +22,7 @@ def test_sql_node_task_error_with_wrong_input(helpers, mock_ddf_person, mock_dat
     sql_node = nodes.SqlNode(
         mock_dataflow["json_graph"]["nodes"]["person_sql_node"])
     _input = {'incorrect_input_node': nodes.Result(
-        None, mock_ddf_person, mock_task_run_context)}
+        None, mock_ddf_person, sql_node, mock_task_run_context)}
     result = sql_node.task(_input, mock_task_run_context)
 
     assert isinstance(result.error, KeyError)
