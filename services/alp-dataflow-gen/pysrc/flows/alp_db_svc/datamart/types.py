@@ -21,13 +21,8 @@ class DatamartBaseConfig(BaseModel):
 
 
 class DATAMART_FLOW_ACTIONS(str, Enum):
-    create_snapshot = "create_snapshot"
-    create_parquet_snapshot = "create_parquet_snapshot"
-
-
-class DATAMART_ACTIONS(Enum):
-    COPY_AS_DB_SCHEMA = "Copy as db schema"  # Copy as a new db schema
-    COPY_AS_PARQUET_FILE = "Copy as parquet file"  # Copy as parquet file
+    CREATE_SNAPSHOT = "create_snapshot"  # Copy as a new db schema
+    CREATE_PARQUET_SNAPSHOT = "create_parquet_snapshot"  # Copy as parquet file
 
 
 class CreateDatamartType(BaseModel):
@@ -40,4 +35,4 @@ class CreateDatamartType(BaseModel):
     snapshot_copy_config: Optional[SnapshotCopyConfig]
     changelog_file: str
     plugin_classpath: str
-    datamart_action: DATAMART_ACTIONS
+    datamart_action: DATAMART_FLOW_ACTIONS

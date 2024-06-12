@@ -1,15 +1,13 @@
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE, STDOUT, run, CalledProcessError
 from re import sub, compile
 from typing import List
 import os
 from flows.alp_db_svc.types import LiquibaseAction
-from flows.alp_db_svc.const import OMOP_DATA_MODELS
+from flows.alp_db_svc.const import (OMOP_DATA_MODELS, CHANGESET_AVAILABLE_REGEX,
+                                    LB_ERROR_MESSAGE_REGEX, PASSWORD_REGEX,
+                                    SSL_TRUST_STORE_REGEX)
+
 from utils.types import DBCredentialsType, DatabaseDialects
-
-
-passwordReplacementRegex = compile(r"password=\S+")
-
-changesetAvailableRegex = compile(r"db/migrations/\S+")
 
 
 class Liquibase:
@@ -96,36 +94,59 @@ class Liquibase:
             params.append(f"-DVOCAB_SCHEMA={self.vocab_schema}")
         return params
 
-    def update_schema(self) -> int:
+    def update_schema(self):
         try:
             params = self.create_params()
-            out = Popen(params, stderr=STDOUT, stdout=PIPE)
-            liquibase_msg, return_code = out.communicate()[0], out.returncode
-            liquibase_msg_masked = sub(
-                passwordReplacementRegex, "***", liquibase_msg.decode("utf-8"))
-            print(liquibase_msg_masked)
-            return return_code
-        except Exception as e:
-            raise e
+            result = run(params, check=True, stderr=STDOUT,
+                         stdout=PIPE, text=True)
+            print(self._mask_secrets(result.stdout, "***"))  # print logs
+        except CalledProcessError as cpe:  # catches non-0 return code exception
+            # print(f"Command ran: '{cpe.cmd}'")  # for debugging
+            print(self._mask_secrets(cpe.output, "***"))  # print logs
+            liquibase_msg_list = cpe.output.split("\n")
+            liquibase_error_message = self._mask_secrets(self._find_error_message(
+                liquibase_msg_list), "***")
+            raise RuntimeError(
+                f"Liquibase failed to run with return code '{cpe.returncode}': {liquibase_error_message}")  # from cpe
+        else:
+            print(f"Successfully ran liquibase command '{params[1]}'")
 
     def get_latest_available_version(self) -> str:
-        params = self.create_params()
-        out = Popen(params, stderr=STDOUT, stdout=PIPE)
-        liquibase_msg, return_code = out.communicate()[0], out.returncode
-        liquibase_msg_masked = sub(
-            passwordReplacementRegex, "***", liquibase_msg.decode("utf-8"))
-        print(liquibase_msg_masked)  # print liquibase stdout
-
-        if return_code == 0:
+        try:
+            params = self.create_params()
+            result = run(params, check=True, stderr=STDOUT,
+                         stdout=PIPE, text=True)
+            liquibase_msg_masked = self._mask_secrets(result.stdout, "***")
+            print(liquibase_msg_masked)
+        except CalledProcessError as cpe:
+            print(self._mask_secrets(cpe.output, "***"))  # print logs
+            liquibase_msg_list = cpe.output.split("\n")
+            liquibase_error_message = self._mask_secrets(self._find_error_message(
+                liquibase_msg_list), "***")
+            raise RuntimeError(
+                f"Liquibase failed to run with return code '{cpe.returncode}': {liquibase_error_message}")
+        else:
+            print(f"Successfully ran liquibase command '{params[1]}'")
             liquibase_msg_list = liquibase_msg_masked.split("\n")
             latest_available_version_msg = self._find_latest_available_changeset(
                 liquibase_msg_list)
+            print(
+                f"latest_available_version_msg is {latest_available_version_msg}")
             return latest_available_version_msg
-        else:
-            raise Exception(
-                "Failed to run liquibase for latest available version")
 
     def _find_latest_available_changeset(self, liquibase_stdout: List) -> str:
         for output in reversed(liquibase_stdout):
-            if changesetAvailableRegex.search(output):
+            if CHANGESET_AVAILABLE_REGEX.search(output):
                 return output
+
+    def _find_error_message(self, liquibase_stdout: List) -> str:
+        for output in liquibase_stdout:
+            if LB_ERROR_MESSAGE_REGEX.search(output):
+                return output
+
+    def _mask_secrets(self, text, replacement):
+
+        text = sub(PASSWORD_REGEX, replacement, text)  # mask password
+        text = sub(SSL_TRUST_STORE_REGEX, replacement,
+                   text)  # mask sslTrustStore
+        return text

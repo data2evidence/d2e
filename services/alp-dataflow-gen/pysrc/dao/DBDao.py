@@ -16,7 +16,7 @@ class DBDao:
         self.metadata = MetaData(schema=schema_name)
         self.inspector = inspect(self.engine)
 
-    def check_schema_exists(self):
+    def check_schema_exists(self) -> bool:
         db_dialect = get_db_svc_endpoint_dialect(self.database_code)
         match db_dialect:
             case DatabaseDialects.POSTGRES:
@@ -33,7 +33,7 @@ class DBDao:
             else:
                 return True
 
-    def check_empty_schema(self):
+    def check_empty_schema(self) -> bool:
         sql_query = text(
             "select * from information_schema.tables where table_schema = :x;")
         with self.engine.connect() as connection:
@@ -214,19 +214,20 @@ class DBDao:
     def _system_columns(self, column):
         return column.lower() not in ["system_valid_until", "system_valid_from"]
 
+    # Todo: To support bulk insert, Currently only suuports single row inserts
     def insert_values_into_table(self, table_name: str, column_value_mapping: dict):
-        # currently only suuports single row inserts
+        columns = list(column_value_mapping.keys())
         with self.engine.connect() as connection:
             table = Table(table_name.casefold(), self.metadata,
                           autoload_with=connection)
             insert_stmt = table.insert().values(column_value_mapping)
 
             print(
-                f"Inserting into table {table_name} columns {list(column_value_mapping.keys())}")
+                f"Inserting into table {table_name} columns {columns}")
             res = connection.execute(insert_stmt)
             connection.commit()
             print(
-                f"Successfully inserted into table {table_name} columns {list(column_value_mapping.keys())}")
+                f"Successfully inserted into table {table_name} columns {columns}")
 
     def call_stored_procedure(self, sp_name: str, sp_params: str):
         with self.engine.connect() as connection:

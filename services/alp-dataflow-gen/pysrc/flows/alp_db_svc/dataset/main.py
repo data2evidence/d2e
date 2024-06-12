@@ -76,6 +76,7 @@ def create_schema_tasks(dialect: str,
         on_failure=[partial(create_dataset_schema_hook,
                             **dict(schema_dao=schema_dao))])
 
+    # create schema if not exists
     create_db_schema_wo(schema_dao)
 
     if count == 0 or count == None:
@@ -89,51 +90,51 @@ def create_schema_tasks(dialect: str,
         on_failure=[partial(create_tables_hook,
                             **dict(schema_dao=schema_dao))])
 
-    return_code = create_tables_wo(action=action,
-                                   dialect=dialect,
-                                   data_model=data_model,
-                                   changelog_file=changelog_file,
-                                   schema_name=schema_name,
-                                   vocab_schema=vocab_schema,
-                                   tenant_configs=tenant_configs,
-                                   plugin_classpath=plugin_classpath,
-                                   count=count
-                                   )
-    if return_code == 0:
-        enable_audit_policies = tenant_configs.get("enableAuditPolicies")
+    create_tables_wo(action=action,
+                     dialect=dialect,
+                     data_model=data_model,
+                     changelog_file=changelog_file,
+                     schema_name=schema_name,
+                     vocab_schema=vocab_schema,
+                     tenant_configs=tenant_configs,
+                     plugin_classpath=plugin_classpath,
+                     count=count
+                     )
 
-        # enable auditing
-        if enable_audit_policies:
+    enable_audit_policies = tenant_configs.get("enableAuditPolicies")
 
-            enable_and_create_audit_policies_wo = enable_and_create_audit_policies.with_options(
-                on_completion=[partial(create_audit_policies_hook,
-                                       **dict(schema_dao=schema_dao))],
-                on_failure=[partial(create_audit_policies_hook,
-                                    **dict(schema_dao=schema_dao))])
-            enable_and_create_audit_policies_wo(schema_dao)
-        else:
-            print("Skipping Alteration of system configuration")
-            print("Skipping creation of Audit policy for system configuration")
-            print(f"Skipping creation of new audit policy for {schema_name}")
+    # enable auditing
+    if enable_audit_policies:
 
-        user_dao = UserDao(database_code, schema_name, admin_user)
-        create_and_assign_roles_wo = create_and_assign_roles.with_options(
-            on_completion=[partial(create_assign_roles_hook,
+        enable_and_create_audit_policies_wo = enable_and_create_audit_policies.with_options(
+            on_completion=[partial(create_audit_policies_hook,
                                    **dict(schema_dao=schema_dao))],
-            on_failure=[partial(create_assign_roles_hook,
+            on_failure=[partial(create_audit_policies_hook,
                                 **dict(schema_dao=schema_dao))])
-        create_and_assign_roles_wo(user_dao, tenant_configs, data_model)
+        enable_and_create_audit_policies_wo(schema_dao)
+    else:
+        print("Skipping Alteration of system configuration")
+        print("Skipping creation of Audit policy for system configuration")
+        print(f"Skipping creation of new audit policy for {schema_name}")
 
-        if data_model in OMOP_DATA_MODELS:
-            cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
-            insert_cdm_version_wo = insert_cdm_version.with_options(
-                on_completion=[partial(update_cdm_version_hook,
-                                       **dict(db=database_code, schema=schema_name))],
-                on_failure=[partial(update_cdm_version_hook,
-                                    **dict(db=database_code, schema=schema_name))])
+    user_dao = UserDao(database_code, schema_name, admin_user)
+    create_and_assign_roles_wo = create_and_assign_roles.with_options(
+        on_completion=[partial(create_assign_roles_hook,
+                               **dict(schema_dao=schema_dao))],
+        on_failure=[partial(create_assign_roles_hook,
+                            **dict(schema_dao=schema_dao))])
+    create_and_assign_roles_wo(user_dao, tenant_configs, data_model, dialect)
 
-            insert_cdm_version_wo(schema_dao, cdm_version)
-        return True
+    if data_model in OMOP_DATA_MODELS:
+        cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
+        insert_cdm_version_wo = insert_cdm_version.with_options(
+            on_completion=[partial(update_cdm_version_hook,
+                                   **dict(db=database_code, schema=schema_name))],
+            on_failure=[partial(update_cdm_version_hook,
+                                **dict(db=database_code, schema=schema_name))])
+
+        insert_cdm_version_wo(schema_dao, cdm_version)
+    return True
 
 
 def update_datamodel(database_code: str,
@@ -163,25 +164,24 @@ def update_datamodel(database_code: str,
             on_failure=[partial(update_schema_hook,
                                 **dict(db=database_code, schema=schema_name))])
 
-        return_code = update_schema_wo(action=LiquibaseAction.UPDATE,
-                                       dialect=dialect,
-                                       data_model=data_model,
-                                       changelog_file=changelog_file,
-                                       schema_name=schema_name,
-                                       vocab_schema=vocab_schema,
-                                       tenant_configs=tenant_configs,
-                                       plugin_classpath=plugin_classpath
-                                       )
+        update_schema_wo(action=LiquibaseAction.UPDATE,
+                         dialect=dialect,
+                         data_model=data_model,
+                         changelog_file=changelog_file,
+                         schema_name=schema_name,
+                         vocab_schema=vocab_schema,
+                         tenant_configs=tenant_configs,
+                         plugin_classpath=plugin_classpath
+                         )
 
-        if return_code == 0:
-            if data_model in OMOP_DATA_MODELS:
-                cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
-                update_cdm_version_wo = update_cdm_version.with_options(
-                    on_completion=[partial(update_cdm_version_hook,
-                                           **dict(db=database_code, schema=schema_name))],
-                    on_failure=[partial(update_cdm_version_hook,
-                                        **dict(db=database_code, schema=schema_name))])
-                update_cdm_version_wo(schema_dao, cdm_version)
+        if data_model in OMOP_DATA_MODELS:
+            cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
+            update_cdm_version_wo = update_cdm_version.with_options(
+                on_completion=[partial(update_cdm_version_hook,
+                                       **dict(db=database_code, schema=schema_name))],
+                on_failure=[partial(update_cdm_version_hook,
+                                    **dict(db=database_code, schema=schema_name))])
+            update_cdm_version_wo(schema_dao, cdm_version)
 
     except Exception as e:
         logger.error(e)
@@ -205,23 +205,20 @@ def rollback_count_task(database_code: str,
                                    **dict(db=database_code, schema=schema_name))],
             on_failure=[partial(rollback_count_hook,
                                 **dict(db=database_code, schema=schema_name))])
-        return_code = rollback_count_wo(action=LiquibaseAction.ROLLBACK_COUNT,
-                                        dialect=dialect,
-                                        data_model=data_model,
-                                        changelog_file=changelog_file,
-                                        schema_name=schema_name,
-                                        vocab_schema=vocab_schema,
-                                        tenant_configs=tenant_configs,
-                                        plugin_classpath=plugin_classpath,
-                                        rollback_count=rollback_count
-                                        )
+        rollback_count_wo(action=LiquibaseAction.ROLLBACK_COUNT,
+                          dialect=dialect,
+                          data_model=data_model,
+                          changelog_file=changelog_file,
+                          schema_name=schema_name,
+                          vocab_schema=vocab_schema,
+                          tenant_configs=tenant_configs,
+                          plugin_classpath=plugin_classpath,
+                          rollback_count=rollback_count
+                          )
 
-        if return_code == 0:
-            pass
     except Exception as e:
+        print(e)
         raise e
-    else:
-        return return_code
 
 
 def rollback_tag_task(database_code: str,
@@ -241,28 +238,32 @@ def rollback_tag_task(database_code: str,
                                    **dict(db=database_code, schema=schema_name))],
             on_failure=[partial(rollback_tag_hook,
                                 **dict(db=database_code, schema=schema_name))])
-        return_code = rollback_tag_wo(action=LiquibaseAction.ROLLBACK_TAG,
-                                      dialect=dialect,
-                                      data_model=data_model,
-                                      changelog_file=changelog_file,
-                                      schema_name=schema_name,
-                                      vocab_schema=vocab_schema,
-                                      tenant_configs=tenant_configs,
-                                      plugin_classpath=plugin_classpath,
-                                      rollback_tag=rollback_tag
-                                      )
+        rollback_tag_wo(action=LiquibaseAction.ROLLBACK_TAG,
+                        dialect=dialect,
+                        data_model=data_model,
+                        changelog_file=changelog_file,
+                        schema_name=schema_name,
+                        vocab_schema=vocab_schema,
+                        tenant_configs=tenant_configs,
+                        plugin_classpath=plugin_classpath,
+                        rollback_tag=rollback_tag
+                        )
 
-        if return_code == 0:
-            pass
     except Exception as e:
+        print(e)
         raise e
-    else:
-        return return_code
 
 
 @task(log_prints=True)
 def create_db_schema(schema_dao: DBDao):
-    schema_dao.create_schema()
+    schema_exists = schema_dao.check_schema_exists()
+
+    if schema_exists == True:
+        raise ValueError(
+            f"Schema '{schema_dao.schema_name}' already exists in database '{schema_dao.database_code}'")
+    else:
+        get_run_logger().info(f"Creating schema '{schema_dao.schema_name}'")
+        schema_dao.create_schema()
 
 
 @task(log_prints=True)
@@ -273,16 +274,24 @@ def enable_and_create_audit_policies(schema_dao: DBDao):
 
 
 @task(log_prints=True)
-def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType, data_model: str):
-
+def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType, data_model: str, dialect: str):
+    logger = get_run_logger()
     # Check if schema read role exists
-    schema_read_role = f"{userdao.schema_name}_read_role"
+
+    match dialect:
+        case DatabaseDialects.HANA:
+            schema_read_role = f"{userdao.schema_name}_READ_ROLE"
+        case DatabaseDialects.POSTGRES:
+            schema_read_role = f"{userdao.schema_name}_read_role"
+
     schema_read_role_exists = userdao.check_role_exists(schema_read_role)
     if schema_read_role_exists:
-        print(f"{schema_read_role} role already exists")
+        logger.info(f"'{schema_read_role}' role already exists")
     else:
+        logger.info(f"{schema_read_role} does not exist")
         userdao.create_read_role(schema_read_role)
     # grant schema read role read privileges to schema
+    logger.info(f"Granting read privileges to '{schema_read_role}'")
     userdao.grant_read_privileges(schema_read_role)
 
     # Check if read user exists
@@ -290,9 +299,11 @@ def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType,
 
     read_user_exists = userdao.check_user_exists(read_user)
     if read_user_exists:
-        print(f"{read_user} user already exists")
+        logger.info(f"{read_user} user already exists")
     else:
+        logger.info(f"{read_user} user does not exist")
         read_password = tenant_configs.get("readPassword")
+        logger.info(f"Creating user '{read_user}'")
         userdao.create_user(read_user, read_password)
 
     # Check if read role exists
@@ -300,31 +311,31 @@ def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType,
 
     read_role_exists = userdao.check_role_exists(read_role)
     if read_role_exists:
-        print(f"{read_role} role already exists")
+        logger.info(f"'{read_role}' role already exists")
     else:
-        # userdao.create_read_role(schema_read_role)
-        userdao.create_and_assign_role(read_role)
+        logger.info(f"'{read_role}' role does not exist")
+        logger.info(
+            f"'Creating '{read_role}' role and assigning to '{read_user}' user")
+        userdao.create_and_assign_role(read_user, read_role)
 
     # Grant read role read privileges
+    logger.info(f"'Granting read privileges to '{read_role}' role")
     userdao.grant_read_privileges(read_role)
 
     if data_model in OMOP_DATA_MODELS:
         # Grant write cohort and cohort_definition table privileges to read role
+        logger.info(f"'Granting cohort write privileges to '{read_role}' role")
         userdao.grant_cohort_write_privileges(read_role)
 
 
 @task(log_prints=True)
-def run_liquibase_update_task(**kwargs) -> str:
+def run_liquibase_update_task(**kwargs):
     try:
         liquibase = Liquibase(**kwargs)
-        return_code = liquibase.update_schema()
-        if return_code != 0:
-            raise Exception(f"Liquibase returned non-0 code: {return_code}")
+        liquibase.update_schema()
     except Exception as e:
         get_run_logger().error(e)
         raise e
-    else:
-        return return_code
 
 
 @task(log_prints=True)

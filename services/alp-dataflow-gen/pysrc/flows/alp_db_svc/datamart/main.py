@@ -2,7 +2,7 @@ from prefect import get_run_logger
 from dao.DBDao import DBDao
 from utils.types import PG_TENANT_USERS, HANA_TENANT_USERS, DatabaseDialects
 from flows.alp_db_svc.datamart.datamart import datamart_copy_schema
-from flows.alp_db_svc.datamart.types import DATAMART_ACTIONS, CreateDatamartType
+from flows.alp_db_svc.datamart.types import DATAMART_FLOW_ACTIONS, CreateDatamartType
 from flows.alp_db_svc.dataset.main import create_datamodel
 
 
@@ -37,7 +37,7 @@ def create_datamart(options: CreateDatamartType):
         raise Exception(error_message)
 
     # create cdm schema
-    if datamart_action == DATAMART_ACTIONS.COPY_AS_DB_SCHEMA:
+    if datamart_action == DATAMART_FLOW_ACTIONS.CREATE_SNAPSHOT:
         create_datamodel(
             database_code=database_code,
             data_model=data_model,

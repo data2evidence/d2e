@@ -1,6 +1,6 @@
 from flows.alp_db_svc.dataset.main import create_datamodel, update_datamodel, rollback_count_task, rollback_tag_task, run_seed_postgres_tasks
 from flows.alp_db_svc.datamart.main import create_datamart
-from flows.alp_db_svc.datamart.types import DATAMART_FLOW_ACTIONS, DATAMART_ACTIONS, CreateDatamartType
+from flows.alp_db_svc.datamart.types import DATAMART_FLOW_ACTIONS, CreateDatamartType
 from flows.alp_db_svc.versioninfo.main import get_version_info_task
 from flows.alp_db_svc.questionnaire.main import create_questionnaire_definition_task, get_questionnaire_response_task
 from flows.alp_db_svc.const import get_plugin_classpath, get_db_dialect
@@ -109,14 +109,16 @@ def create_snapshot_flow(options: CreateSnapshotType):
         flow_action_type = options.flow_action_type
         db_dialect = get_db_dialect(options)
 
+        print(f"options in create_snapshot_flow is {options}")
+
         match flow_action_type:
-            case DATAMART_FLOW_ACTIONS.create_snapshot:
+            case DATAMART_FLOW_ACTIONS.CREATE_SNAPSHOT:
                 create_datamart_options = _parse_create_datamart_options(
-                    options, db_dialect, DATAMART_ACTIONS.COPY_AS_DB_SCHEMA
+                    options, db_dialect, DATAMART_FLOW_ACTIONS.CREATE_SNAPSHOT
                 )
-            case DATAMART_FLOW_ACTIONS.create_parquet_snapshot:
+            case DATAMART_FLOW_ACTIONS.CREATE_PARQUET_SNAPSHOT:
                 create_datamart_options = _parse_create_datamart_options(
-                    options, db_dialect, DATAMART_ACTIONS.COPY_AS_PARQUET_FILE)
+                    options, db_dialect, DATAMART_FLOW_ACTIONS.CREATE_PARQUET_SNAPSHOT)
         create_datamart(options=create_datamart_options)
     except Exception as e:
         get_run_logger().error(e)

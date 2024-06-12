@@ -66,7 +66,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
 
     dataset_id = dataset.get("id")
     database_code = dataset.get("databaseCode")
-    schema_name = dataset.get("schemaName").upper()
+    schema_name = dataset.get("schemaName")
     vocab_schema = dataset.get("vocabSchemaName")
     data_model = dataset.get("dataModel").split(" ")[0]
 

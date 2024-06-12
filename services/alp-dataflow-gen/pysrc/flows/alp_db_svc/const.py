@@ -1,4 +1,5 @@
 from os import getcwd
+from re import sub, compile
 from utils.types import InternalPluginType
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
 
@@ -42,3 +43,10 @@ def get_db_dialect(options):
         return get_db_svc_endpoint_dialect(options.database_code)
     else:
         return options.dialect
+
+
+CHANGESET_AVAILABLE_REGEX = compile(r"db/migrations/\S+")
+LB_ERROR_MESSAGE_REGEX = compile(r"Unexpected error running Liquibase:")
+PASSWORD_REGEX = compile(r"password=\S+")
+SSL_TRUST_STORE_REGEX = compile(
+    r"&sslTrustStore=-----BEGIN CERTIFICATE-----[a-zA-Z0-9\+\/]+-----END CERTIFICATE-----")

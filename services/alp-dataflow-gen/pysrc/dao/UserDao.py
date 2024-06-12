@@ -1,5 +1,5 @@
 from alpconnection.dbutils import GetDBConnection, get_db_svc_endpoint_dialect
-from sqlalchemy import text, MetaData, inspect
+from sqlalchemy import text, MetaData, inspect, Table, select
 from typing import List
 from datetime import datetime
 from utils.types import DatabaseDialects
@@ -15,38 +15,46 @@ class UserDao():
         self.dialect = get_db_svc_endpoint_dialect(self.database_code)
 
     def check_user_exists(self, user: str) -> bool:
-        match self.dialect:
-            case DatabaseDialects.POSTGRES:
-                select_stmt = text(
-                    "select * from pg_user where usename = :x")
-            case DatabaseDialects.HANA:
-                select_stmt = text(
-                    "select * from sys.users where user_name = :x")
         with self.engine.connect() as connection:
-            print(f"Executing check user exists statement..")
-            res = connection.execute(select_stmt, {"x": user}).fetchall()
+            if self.dialect == DatabaseDialects.POSTGRES:
+                select_stmt = text("select * from pg_user where usename = :x")
+                print(f"Executing check user exists statement..")
+                res = connection.execute(select_stmt, {"x": user}).fetchall()
+            elif DatabaseDialects.HANA:
+                schema_name = "SYS"
+                self.metadata = MetaData(schema=schema_name)
+                table = Table("USERS".casefold(), self.metadata,
+                              autoload_with=connection)
+                user_col = getattr(table.c, "USER_NAME".casefold())
+                select_stmt = select(table).where(user_col == user)
+                print(f"Executing check user exists statement..")
+                res = connection.execute(select_stmt).fetchall()
             if res == []:
                 return False
             else:
                 return True
 
     def check_role_exists(self, role_name: str) -> bool:
-        match self.dialect:
-            case DatabaseDialects.POSTGRES:
-                select_stmt = text(
-                    "select * from pg_roles where rolname = :x")
-            case DatabaseDialects.HANA:
-                select_stmt = text(
-                    "select * from sys.roles where role_name = :x")
         with self.engine.connect() as connection:
-            print(f"Executing check role exists statement..")
-            res = connection.execute(select_stmt, {"x": role_name}).fetchall()
+            if self.dialect == DatabaseDialects.POSTGRES:
+                select_stmt = text("select * from pg_roles where rolname = :x")
+                print(f"Executing check role exists statement..")
+                res = connection.execute(
+                    select_stmt, {"x": role_name}).fetchall()
+            elif DatabaseDialects.HANA:
+                schema_name = "SYS"
+                self.metadata = MetaData(schema=schema_name)
+                table = Table("ROLES".casefold(), self.metadata,
+                              autoload_with=connection)
+                role_col = getattr(table.c, "ROLE_NAME".casefold())
+                select_stmt = select(table).where(role_col == role_name)
+                print(f"Executing check role exists statement..")
+                res = connection.execute(select_stmt).fetchall()
             if res == []:
                 return False
             else:
                 return True
 
-    # Formatted string version
     def create_read_role(self, role_name: str):
         match self.dialect:
             case DatabaseDialects.POSTGRES:
