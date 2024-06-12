@@ -263,7 +263,7 @@ services:
         condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
-    entrypoint: ["sh", "-c", "cd /home/docker && npm run build-and-seed"] 
+    entrypoint: ["sh", "-c", "cd /home/docker && npm install && npm run build-and-seed"] 
     environment:
       PG__DB_NAME: logto
       PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
