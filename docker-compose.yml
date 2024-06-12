@@ -96,7 +96,7 @@ x-envs:
           "subMenus": "true"
         },
         {
-          "enabled": true,
+          "enabled": false,
           "featureFlag": "analysisFlow",
           "name": "Analysis",
           "route": "analysis",
