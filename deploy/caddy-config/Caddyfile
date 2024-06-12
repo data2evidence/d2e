@@ -33,7 +33,7 @@ https://*.alp.local:55555 {
 	}
 
 	# Logto api server
-	@logto {
+    @logto {
         path /index.*
         path /api/*
         path /oidc/*
