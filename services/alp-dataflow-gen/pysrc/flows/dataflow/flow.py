@@ -102,10 +102,34 @@ def execute_nodes_flow(graph, sorted_nodes, test):
                 "sql_query_node",
                 "r_node",
                 "data_mapping_node",
-                "subflow"
+                "subflow", 
+                "time_at_risk_node",
+                "cohort_generator_node",
+                "cohort_diagnostic_node",
+                "characterization_node", 
+                "negative_control_outcome_cohort_node",
+                "target_comparator_outcomes_node",
+                "cohort_method_analysis_node",
+                "default_covariate_settings_node",
+                "study_population_settings_node",
+                "cohort_incidence_target_cohorts_node",
+                "cohort_incidence_node",
+                "cohort_definition_set_node",
+                "outcomes_node",
+                "cohort_method_node",
+                "era_covariate_settings_node",
+                "seasonality_covariate_settings_node",
+                "calendar_time_covariate_settings_node",
+                "study_population_settings_node",
+                "nco_cohort_set_node",
+                "self_controlled_case_series_analysis_node",
+                "self_controlled_case_series_node",
+                "patient_level_prediction_node",
+                "exposure_node",
+                "strategus_node"
             ]:
-                get_run_logger().error("gen.py: execute_nodes: Node Type not known")
-            else:
+                get_run_logger().error(f"gen.py: execute_nodes: {node['type']} Node Type not known")
+            else: 
                 if node["type"] == "subflow":
                     # execute as a subflow with runner
                     result_of_subflow = execute_subflow_cluster(
@@ -145,9 +169,10 @@ def execute_node_task(nodename, node_type, node, input, test):
         result = _node.test(task_run_context)
     else:
         match node_type:
-            case 'db_reader_node':
-                result = _node.task(task_run_context)
-            case 'csv_node':
+            case ('db_reader_node' | 'csv_node' | 'cohort_diagnostic_node' | 'calendar_time_covariate_settings_node' |
+                'cohort_generator_node' | 'time_at_risk_node' | 'default_covariate_settings_node' | 
+                'study_population_settings_node' | 'cohort_incidence_target_cohorts_node' | 'cohort_definition_set_node' | 
+                'era_covariate_settings_node' | 'seasonality_covariate_settings_node' | 'nco_cohort_set_node'):
                 result = _node.task(task_run_context)
             case _:
                 result = _node.task(input, task_run_context)
@@ -236,7 +261,7 @@ def exec_flow(json_graph, options):
 
     generated_nodes = generate_nodes_flow_wo(graph, sorted_nodes)  # flow
 
-    get_run_logger().debug(f"Graph with nodes: {graph}")
+    get_run_logger().debug(f"Graph with nodes: {generated_nodes}")
 
     # Execute nodes
     execute_nodes_flow_wo = execute_nodes_flow.with_options(
