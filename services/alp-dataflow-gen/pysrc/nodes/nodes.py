@@ -37,7 +37,7 @@ class Flow(Node):
 
 
 class Result:
-    def __init__(self, error, data, node, task_run_context):
+    def __init__(self, error: bool, data, node: Node, task_run_context):
         self.error = error
         self.node = node
         self.data = data
@@ -49,22 +49,21 @@ class Result:
 class SqlNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
-        c = dask_sql.Context()
-        self.context = c
         self.tables = _node["tables"]
         self.sql = _node["sql"]
 
     def task(self, _input: Dict[str, Result], task_run_context):
         try:
+            c = dask_sql.Context()
             for tablename in self.tables.keys():
                 input_element = _input
                 for path in self.tables[tablename]:
                     input_element = input_element[path].data
-                self.context.create_table(tablename, input_element)
-            ddf = self.context.sql(self.sql).compute()
-            return Result(None, ddf, self, task_run_context)
+                c.create_table(tablename, input_element)
+            ddf = c.sql(self.sql).compute()
+            return Result(False,  ddf, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
     def test(self, _input: Dict[str, Result], task_run_context):
         return self.task(_input, task_run_context)
@@ -73,23 +72,23 @@ class SqlNode(Node):
 class PythonNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
-        source_code = _node["python_code"] + '\noutput = exec(myinput)'
-        test_source_code = _node["python_code"]+'\noutput = test_exec(myinput)'
-        self.code = compile(source_code, '<string>', 'exec')
-        self.testcode = compile(test_source_code, '<string>', 'exec')
-
+        self.source_code = _node["python_code"] + '\noutput = exec(myinput)'
+        self.test_source_code = _node["python_code"]+'\noutput = test_exec(myinput)'
+        
     def test(self, _input: Dict[str, Result], task_run_context):
         params = {"myinput": _input, "output": {}}
-        e = exec(self.testcode, params)
+        testcode = compile(self.test_source_code, '<string>', 'exec')
+        e = exec(testcode, params)
         return params["output"]
 
     def task(self, _input: Dict[str, Result], task_run_context):
         params = {"myinput": _input, "output": {}}
         try:
-            data = exec(self.code, params)
-            return Result(None, params["output"], self, task_run_context)
+            code = compile(self.source_code, '<string>', 'exec')
+            data = exec(code, params)
+            return Result(False,  params["output"], self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class RNode(Node):
@@ -118,9 +117,9 @@ class RNode(Node):
                 e = exec(f'output = convert_R_to_py(r_exec(myinput))',
                          global_params)
             output = global_params["output"]
-            return Result(None, output, self, task_run_context)
+            return Result(False,  output, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class CsvNode(Node):
@@ -150,17 +149,16 @@ class CsvNode(Node):
     def task(self, task_run_context):
         try:
             ddf = self._load_dask_dataframe()
-            return Result(None, ddf, self, task_run_context)
+            return Result(False,  ddf, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class DbWriter(Node):
     def __init__(self, _node):
         super().__init__(_node)
         self.tablename = _node["dbtablename"]
-        self.dbconn = dbutils.GetDBConnection(
-            _node["database"], PG_TENANT_USERS.ADMIN_USER)
+        self.database = _node["database"] 
         self.dataframe = _node["dataframe"]
 
     def test(self, _input: Dict[str, Result], task_run_context):
@@ -168,36 +166,39 @@ class DbWriter(Node):
 
     def task(self, _input: Dict[str, Result], task_run_context):
         input_element = _input
+        dbconn = dbutils.GetDBConnection(
+            self.database, PG_TENANT_USERS.ADMIN_USER)
         try:
             for path in self.dataframe:
                 input_element = input_element[path].data
             result = input_element.to_sql(
-                self.tablename, self.dbconn, if_exists='replace')
-            return Result(None, result, self, task_run_context)
+                self.tablename, dbconn, if_exists='replace')
+            return Result(False,  result, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class DbQueryReader(Node):
     def __init__(self, _node):
         super().__init__(_node)
         self.sqlquery = _node["sqlquery"]
-        self.dbconn = dbutils.GetDBConnection(
-            _node["database"], PG_TENANT_USERS.READ_USER)
+        self.database = _node["database"]
         self.testdata = {
             "columns": _node["columns"], "data": _node["testdata"]}
 
     def test(self, task_run_context):
-        return Result(None, dd.from_pandas(pd.read_json(json.dumps(self.testdata), orient="split"), npartitions=1), self, task_run_context)
+        return Result(False,  dd.from_pandas(pd.read_json(json.dumps(self.testdata), orient="split"), npartitions=1), self, task_run_context)
 
     def task(self, task_run_context):
         # return dd.read_sql_query(sqlalchemy.select(sqlalchemy.text(self.sqlquery)), self.dbconn, self.index_col, divisions=self.divisions)
+        dbconn = dbutils.GetDBConnection(
+            self.database, PG_TENANT_USERS.READ_USER)
         try:
             ddf = dd.from_pandas(pd.read_sql_query(
-                self.sqlquery, self.dbconn), npartitions=1)
-            return Result(None, ddf, self, task_run_context)
+                self.sqlquery, dbconn), npartitions=1)
+            return Result(False,  ddf, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class SqlQueryNode(Node):
@@ -212,8 +213,7 @@ class SqlQueryNode(Node):
         self._is_select = _node["is_select"]
         if "params" in _node:
             self.params = _node["params"]
-        self.dbconn = dbutils.GetDBConnection(
-            _node["database"], PG_TENANT_USERS.ADMIN_USER)
+        self.database = _node["database"]
 
     def _map_input(self, _input):
         _params = {}
@@ -227,11 +227,13 @@ class SqlQueryNode(Node):
     def _exec(self, _input: Dict[str, Result], sqlquery):
         _params = self._map_input(_input)
         res = None
-        with self.dbconn.connect() as connection:
+        dbconn = dbutils.GetDBConnection(
+            self.database, PG_TENANT_USERS.ADMIN_USER)
+        with dbconn.connect() as connection:
             if self._is_select:
-                res = self.dbconn.execute(sqlalchemy.text(sqlquery), _params)
+                res = dbconn.execute(sqlalchemy.text(sqlquery), _params)
             else:
-                self.dbconn.execute(sqlalchemy.text(sqlquery), _params)
+                dbconn.execute(sqlalchemy.text(sqlquery), _params)
             if res:
                 rows = res.fetchall()
                 query_results = [dict(row) for row in rows]
@@ -244,16 +246,15 @@ class SqlQueryNode(Node):
     def task(self, _input: Dict[str, Result], task_run_context):
         try:
             df = self._exec(_input, self.sqlquery)
-            return Result(None, df, self, task_run_context)
+            return Result(False,  df, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 # To do: link up with JSON from UI
 class DataMappingNode(Node):
     def __init__(self, _node):
         super().__init__(_node)
-        self.context = dask_sql.Context()
         self.data_mapping = _node["data_mapping"]
         self.parent_table = _node["parent_table"]
         self.table_joins = _node["table_joins"]
@@ -324,15 +325,16 @@ class DataMappingNode(Node):
     def task(self, _input: Dict[str, Result], task_run_context):  # executes the retrieved sql query
         try:
             sql_query = self._create_query(_input)
+            context = dask_sql.Context()
             for table_name in self.source_node_dfs.keys():
-                self.context.create_table(
+                context.create_table(
                     table_name, _input[self.source_node_dfs[table_name]].data)
             # temporarily log sql query because no UI
-            result_df = self.context.sql(sql_query).compute()
+            result_df = context.sql(sql_query).compute()
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
         else:
-            return Result(None, result_df, self, task_run_context)
+            return Result(False,  result_df, self, task_run_context)
 
 
 @flow(name="generate-nodes",
@@ -460,9 +462,9 @@ class OutcomeDef(Node):
                 cohortId = convert_py_to_R(self.cohortId), 
                 cleanWindow = convert_py_to_R(self.cleanWindow), 
             )
-            return Result(None, rOutcomeDef, self, task_run_context)
+            return Result(False,  rOutcomeDef, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class TimeAtRiskNode(Node):
@@ -485,9 +487,9 @@ class TimeAtRiskNode(Node):
                 startOffset = convert_py_to_R(self.startOffset),
                 endOffset = convert_py_to_R(self.endOffset)
             )
-            return Result(None, rTimeAtRisk, self, task_run_context)
+            return Result(False,  rTimeAtRisk, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class CohortIncidenceModuleSpec(Node):
@@ -529,9 +531,9 @@ class CohortIncidenceModuleSpec(Node):
             )
             rCreateCohortIncidenceModuleSpecifications = robjects.globalenv["createCohortIncidenceModuleSpecifications"]
             rCohortIncidenceSpec = rCreateCohortIncidenceModuleSpecifications(irDesign = rIncidenceDesign['toList']())
-            return Result(None, rCohortIncidenceSpec, self, task_run_context)
+            return Result(False,  rCohortIncidenceSpec, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
         
     def test(self):
         return None
@@ -566,9 +568,9 @@ class CharacterizationModuleSpecNode(Node):
                 timeAtRisk = convert_py_to_R(pd.DataFrame(self.timeAtRisk)), 
                 minPriorObservation = self.minPriorObservation
             )
-            return Result(None, rCharacterizationSpec, self, task_run_context)
+            return Result(False,  rCharacterizationSpec, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class DefaultCovariateSettingsNode(Node):
@@ -583,9 +585,9 @@ class DefaultCovariateSettingsNode(Node):
         try:
             rFeatureExtraction = importr('FeatureExtraction')
             rCovariateSettings = rFeatureExtraction.createDefaultCovariateSettings()
-            return Result(None, rCovariateSettings, self, task_run_context)
+            return Result(False,  rCovariateSettings, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 class CohortDefinitionSharedResource(Node):
     def __init__(self, node):
@@ -606,9 +608,9 @@ class CohortDefinitionSharedResource(Node):
             rSource("https://raw.githubusercontent.com/OHDSI/CohortGeneratorModule/v0.3.0/SettingsFunctions.R")
             rCreateCohortSharedResourceSpecifications = robjects.globalenv['createCohortSharedResourceSpecifications']
             rCohortDefinitionSharedResource = rCreateCohortSharedResourceSpecifications(cohortDefinitionSet = rCohortDefinitionSet)
-            return Result(None, rCohortDefinitionSharedResource, self, task_run_context)
+            return Result(False,  rCohortDefinitionSharedResource, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 class NegativeControlOutcomeCohortSharedResource(Node):
     def __init__(self, _node):
@@ -631,9 +633,9 @@ class NegativeControlOutcomeCohortSharedResource(Node):
                 occurrenceType = convert_py_to_R(self.occurenceType),
                 detectOnDescendants = convert_py_to_R(self.detectOnDescendants)
             )
-            return Result(None, rNegativeCoSharedResource, self, task_run_context)
+            return Result(False,  rNegativeCoSharedResource, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class CohortGeneratorSpecNode(Node):
@@ -648,9 +650,9 @@ class CohortGeneratorSpecNode(Node):
             rSource(os.getenv("OHDSI__R_COHORT_GENERATOR_MODULE_SETTINGS_URL"))
             rCreateCohortGeneratorModuleSpecifications = robjects.globalenv['createCohortGeneratorModuleSpecifications']
             rCohortGeneratorModuleSpecifications = rCreateCohortGeneratorModuleSpecifications(convert_py_to_R(self.incremental), convert_py_to_R(self.generate_stats))
-            return Result(None, rCohortGeneratorModuleSpecifications, self, task_run_context)
+            return Result(False,  rCohortGeneratorModuleSpecifications, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
     
     def test():
         return None
@@ -687,9 +689,9 @@ class CohortDiagnosticsModuleSpecNode(Node):
                 runTemporalCohortCharacterization = convert_py_to_R(self.runTemporalCohortCharacterization),
                 incremental = convert_py_to_R(self.incremental)
             )
-            return Result(None, rCohortDiagnosticsSpec, self, task_run_context)
+            return Result(False,  rCohortDiagnosticsSpec, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class CMOutcomes(Node):
@@ -713,9 +715,9 @@ class CMOutcomes(Node):
                 FUN = rCohortMethod.createOutcome,
                 **kwargs
             )
-            return Result(None, rOutcome, self, task_run_context)
+            return Result(False,  rOutcome, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class TargetComparatorOutcomes(Node):
@@ -742,9 +744,9 @@ class TargetComparatorOutcomes(Node):
                 excludedCovariateConceptIds = convert_py_to_R(self.excludedCovariateConceptIds if len(self.excludedCovariateConceptIds) else None), # if excludedCovariateConceptIds is empty list, use None
                 includedCovariateConceptIds = convert_py_to_R(self.includedCovariateConceptIds if len(self.includedCovariateConceptIds) else None) # if includedCovariateConceptIds is empty list, use None
             )
-            return Result(None, rCreateTargetComparatorOutcomes, self, task_run_context)
+            return Result(False,  rCreateTargetComparatorOutcomes, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class CohortMethodAnalysis(Node):
@@ -784,9 +786,9 @@ class CohortMethodAnalysis(Node):
                 createStudyPopArgs = rCreateStudyPopArgs[0],
                 fitOutcomeModelArgs = rFitOutcomeModelArgs
             )
-            return Result(None, rCmAnalysis, self, task_run_context)
+            return Result(False,  rCmAnalysis, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class CohortMethodModuleSpecNode(Node):
@@ -810,9 +812,9 @@ class CohortMethodModuleSpecNode(Node):
                 targetComparatorOutcomesList = rTargetComparatorOutcomesList,
                 analysesToExclude = convert_py_to_R(pd.DataFrame(self.analysesToExclude))
             )
-            return Result(None, rCohortMethodSpec, self, task_run_context)
+            return Result(False,  rCohortMethodSpec, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
     
     def test(self):
         return None
@@ -853,9 +855,9 @@ class EraCovariateSettings(Node):
                 profileLikelihood = convert_py_to_R(self.profileLikelihood),
                 exposureOfInterest = convert_py_to_R(self.exposureOfInterest)
             )
-            return Result(None, rCovarPreExp, self, task_run_context)
+            return Result(False,  rCovarPreExp, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class CalendarCovariateSettingsNode(Node):
@@ -875,9 +877,9 @@ class CalendarCovariateSettingsNode(Node):
                 allowRegularization = convert_py_to_R(self.allowRegularization),
                 computeConfidenceIntervals = convert_py_to_R(self.computeConfidenceIntervals)
             )
-            return Result(None, rCalendarTimeSettings, self, task_run_context)
+            return Result(False,  rCalendarTimeSettings, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class SeasonalityCovariateSettingsNode(Node):
@@ -897,9 +899,9 @@ class SeasonalityCovariateSettingsNode(Node):
                 allowRegularization = convert_py_to_R(self.allowRegularization),
                 computeConfidenceIntervals = convert_py_to_R(self.computeConfidenceIntervals)
             )
-            return Result(None, rSeasonalitySettings, self, task_run_context)
+            return Result(False,  rSeasonalitySettings, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class StudyPopulationArgs(Node):
@@ -947,9 +949,9 @@ class StudyPopulationArgs(Node):
                 )
                 data.patientLevelPredictionArgs = rPlpPopulationSettings
 
-            return Result(None, data, self, task_run_context)
+            return Result(False,  data, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
     def test(self):
         return None
@@ -966,9 +968,9 @@ class NegativeControlCohortSet(Node):
             rFile = rSystemFile('testdata/negative_controls_concept_set.csv', package='Strategus')
             # hardcoded to use testdata in Strategus R package
             rNcoCohortSet = rReadCsv(file=rFile)
-            return Result(None, rNcoCohortSet, self, task_run_context)
+            return Result(False,  rNcoCohortSet, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 class SCCSAnalysis(Node):
     def __init__(self, node):
@@ -1024,9 +1026,9 @@ class SCCSAnalysis(Node):
                 createIntervalDataArgs = rCreateSccsIntervalDataArgs,
                 fitSccsModelArgs = rFitSccsModelArgs
             )            
-            return Result(None, rSccsAnalysis, self, task_run_context)
+            return Result(False,  rSccsAnalysis, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 class SCCSModuleSpec(Node):
     def __init__(self, node):
@@ -1044,9 +1046,9 @@ class SCCSModuleSpec(Node):
                 exposuresOutcomeList = get_results_by_class_type(input, ExposuresOutcome), 
                 combineDataFetchAcrossOutcomes = convert_py_to_R(self.combineDataFetchAcrossOutcomes)
             )
-            return Result(None, rSccsModuleSpec, self, task_run_context)
+            return Result(False,  rSccsModuleSpec, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 class PLPModuleSpec(Node):
     def __init__(self, node):
@@ -1095,9 +1097,9 @@ class PLPModuleSpec(Node):
 
             rCreatePatientLevelPredictionModuleSpecifications = robjects.globalenv['createPatientLevelPredictionModuleSpecifications']
             rPlpModuleSpecifications = rCreatePatientLevelPredictionModuleSpecifications(modelDesignList = rModelDesignList)
-            return Result(None, rPlpModuleSpecifications, self, task_run_context)
+            return Result(False,  rPlpModuleSpecifications, self, task_run_context)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 class ExposuresOutcome(Node):
     def __init__(self, node):
@@ -1127,7 +1129,7 @@ class ExposuresOutcome(Node):
                         exposures = [rCreateExposure(exposureId = self.exposureOfInterestId, trueEffectSize = convert_py_to_R(1))] # hardcoded, TODO: trueEffectSize is not configurable on the UI yet
                     )
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 
 class StrategusNode(Node):
@@ -1161,7 +1163,7 @@ class StrategusNode(Node):
             # )
             # rStrategus.execute(analysisSpecifications = rSpec, executionSettings = rExecutionSettings)
         except Exception as e:
-            return Result(e, tb.format_exc(), self, task_run_context)
+            return Result(True, tb.format_exc(), self, task_run_context)
 
 def get_results_by_class_type(results: Dict[str, Result], nodeType: Node):
     return [results[o].data for o in results if not results[o].error and isinstance(results[o].node, nodeType)]

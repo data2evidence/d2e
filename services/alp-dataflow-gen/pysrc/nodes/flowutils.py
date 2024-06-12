@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import rpy2.robjects as ro
 from rpy2.robjects import pandas2ri
+from nodes.nodes import Result
 
 def get_node_list(graph):
     nodes = {}
@@ -91,6 +92,9 @@ def convert_R_to_py(r_obj, name=""):
                 for k, v in result.items():
                     result[k] = convert_R_to_py(v, name=k)
             return result
+
+def serialize_result_to_json(result: Result):
+    return serialize_to_json(result.data)
 
 def serialize_to_json(data):
     if isinstance(data, dd.DataFrame):

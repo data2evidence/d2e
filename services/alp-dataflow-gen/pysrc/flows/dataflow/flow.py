@@ -162,7 +162,7 @@ def execute_nodes_flow(graph, sorted_nodes, test):
 @task(task_run_name="execute-nodes-taskrun-{nodename}",
       result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")), 
       result_storage_key="{flow_run.id}_{parameters[nodename]}.json",
-      result_serializer=JSONSerializer(), log_prints=True,
+      result_serializer=JSONSerializer(object_encoder="nodes.flowutils.serialize_result_to_json"), log_prints=True,
       persist_result=True)
 def execute_node_task(nodename, node_type, node, input, test):
     # Get task run context
@@ -204,10 +204,8 @@ def persist_node_task(nodename, result, trace_db, root_flow_run_id):
                 task_run_result=result_json,
                 created_by="xyz",
                 modified_by="xyz",
-                error=True if isinstance(
-                    result.error, BaseException) else False,
-                error_message=result.data if isinstance(
-                    result.error, BaseException) else None
+                error=result.error,
+                error_message=result.data if result.error else None
             )
             connection.execute(insert_stmt)
             connection.commit()
