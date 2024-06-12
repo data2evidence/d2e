@@ -88,10 +88,11 @@ export class PrefectFlowService {
   }
 
   async createFlowMetadata(flowMetadataDto: IFlowMetadataDto) {
-    if (flowMetadataDto.type === FLOW_METADATA.datamodel) {
-      return await this.createNewFlowMetadata(flowMetadataDto)
+    const existingFlowMetadata = await this.getFlowMetadataById(flowMetadataDto.flowId)
+    if (existingFlowMetadata) {
+      return await this.updateFlowMetadata(flowMetadataDto)
     } else {
-      return await this.upsertFlowMetadata(flowMetadataDto)
+      return await this.createNewFlowMetadata(flowMetadataDto)
     }
   }
 
@@ -117,17 +118,14 @@ export class PrefectFlowService {
     return flowMetadataEntity
   }
 
-  private async upsertFlowMetadata(flowMetadataDto: IFlowMetadataDto) {
-    const flowMetadata = await this.getFlowMetadataByType(flowMetadataDto.type)
-    if (!flowMetadata) {
-      this.logger.info(`No existing flow metadata found for type: ${flowMetadataDto.type}}`)
-      return await this.createNewFlowMetadata(flowMetadataDto)
-    } else {
-      this.logger.info(`Existing flow metadata found for type: ${flowMetadataDto.type}}`)
-      await this.flowMetadataRepo.delete({ flowId: flowMetadataDto.flowId })
-      this.logger.info(`Flow metadata for ${flowMetadataDto.name}of type ${flowMetadataDto.type} deleted!}`)
-      return await this.createNewFlowMetadata(flowMetadataDto)
+  private async updateFlowMetadata(flowMetadataDto: IFlowMetadataDto) {
+    const { flowId, ...updateData } = flowMetadataDto
+    const updateObject = {} as Partial<FlowMetadata>
+    if (updateData) {
+      Object.assign(updateObject, updateData)
     }
+    this.logger.info(`Updating flow metadata for ${flowMetadataDto.name}`)
+    return await this.flowMetadataRepo.update({ flowId: flowMetadataDto.flowId }, this.addOwner(updateObject, true))
   }
 
   private async deleteFlowDeployment(flowId: string) {
