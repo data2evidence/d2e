@@ -15,15 +15,10 @@ export const publicURLs = [
 
 const logger = createLogger('AuthcConfig')
 
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: env.LOGTO_ISSUER!.startsWith('https://host.docker.internal:') ? false : true
-})
-
 export const logtoAuthOptions: StrategyOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKeyProvider: jwksRsa.passportJwtSecret({
     jwksUri: `${env.LOGTO_ISSUER}/jwks`,
-    requestAgent: httpsAgent,
     handleSigningKeyError: (err, cb) => {
       logger.error(`Signing key error: [${err?.name}] ${err?.message} ${err?.stack}`)
       return cb(err)
