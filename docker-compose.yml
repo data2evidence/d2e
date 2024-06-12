@@ -67,7 +67,7 @@ x-envs:
         {
           "enabled": true,
           "featureFlag": "cohort",
-          "name": "Cohort",
+          "name": "Cohorts",
           "pluginPath": "plugins/mri/PatientAnalytics/module",
           "requiredRoles": [
             "RESEARCHER"
@@ -77,7 +77,7 @@ x-envs:
         { 
           "enabled": true,
           "featureFlag": "cohorts",
-          "name": "Cohorts", 
+          "name": "Cohorts M", 
           "pluginPath": "plugins/Cohort/module",
           "requiredRoles": [ 
             "RESEARCHER" 
