@@ -78,7 +78,7 @@ x-envs:
           "enabled": true,
           "featureFlag": "cohorts",
           "name": "Cohorts", 
-          "pluginPath": "plugins/Researcher/Cohort/module",
+          "pluginPath": "plugins/Cohort/module",
           "requiredRoles": [ 
             "RESEARCHER" 
           ], 
