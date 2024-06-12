@@ -41,8 +41,10 @@ def getDatabaseConnectorConnectionDetailsString(databaseCode: str, releaseDate: 
         # Append sessionVariable to databaseConnectionStr if releaseDate is defined
         if releaseDate:
             databaseConnectionStr += f"&sessionVariable:TEMPORAL_SYSTEM_TIME_AS_OF={releaseDate}"
-    elif databaseDialect == "postgresql":
-        databaseConnectionStr = f"jdbc:postgresql://{databaseHost}:{databasePort}/{databaseName}"
+    elif databaseDialect == "postgres":
+        # OHDSI DatabaseConnector uses this postgres dialect naming
+        databaseDialect = "postgresql"
+        databaseConnectionStr = f"jdbc:{databaseDialect}://{databaseHost}:{databasePort}/{databaseName}"
 
     connectionDetailsString = f"connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = '{databaseDialect}', connectionString = '{databaseConnectionStr}', user = '{databaseUser}', password = '{databasePassword}', pathToDriver = '/app/inst/drivers')"
     return connectionDetailsString

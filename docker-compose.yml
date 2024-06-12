@@ -67,7 +67,7 @@ x-envs:
         {
           "enabled": true,
           "featureFlag": "cohort",
-          "name": "Cohort",
+          "name": "Cohorts",
           "pluginPath": "plugins/mri/PatientAnalytics/module",
           "requiredRoles": [
             "RESEARCHER"
@@ -77,8 +77,8 @@ x-envs:
         { 
           "enabled": true,
           "featureFlag": "cohorts",
-          "name": "Cohorts", 
-          "pluginPath": "plugins/Researcher/Cohort/module",
+          "name": "Cohorts M", 
+          "pluginPath": "plugins/Cohort/module",
           "requiredRoles": [ 
             "RESEARCHER" 
           ], 
@@ -96,7 +96,7 @@ x-envs:
           "subMenus": "true"
         },
         {
-          "enabled": true,
+          "enabled": false,
           "featureFlag": "analysisFlow",
           "name": "Analysis",
           "route": "analysis",
@@ -159,7 +159,7 @@ x-envs:
         },
         {
           "description": "Configure patient summary",
-          "enabled": true,
+          "enabled": false,
           "name": "Patient Summary Config",
           "notes": "",
           "pluginPath": "plugins/mri/PatientSummaryConfig/module",
