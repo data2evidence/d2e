@@ -49,6 +49,7 @@ def mock_dataflow():
             {
                 "my_data_mapping":
                 {
+                    "id": "1", 
                     "type": "data_mapping_node",
                     "tables":
                     {"death": "death_sql_node", "person": "person_sql_node"},
@@ -108,6 +109,7 @@ def mock_dataflow():
                 },
                 "person_csv_node":
                 {
+                    "id": "2", 
                     "type": "csv_node",
                     "file": "./tests/data/person.csv",
                     "delimiter": ",",
@@ -139,6 +141,7 @@ def mock_dataflow():
                 "death_csv_node":
                 {
                     "file": "./tests/data/death.csv",
+                    "id": "3", 
                     "type": "csv_node",
                     "columns":
                     [
@@ -157,18 +160,21 @@ def mock_dataflow():
                 },
                 "person_sql_node":
                 {
+                    "id": "4", 
                     "type": "sql_node",
                     "tables": {"person": ["person_csv_node"]},
                     "sql": "SELECT * FROM PERSON",
                 },
                 "death_sql_node":
                 {
+                    "id": "5", 
                     "type": "sql_node",
                     "tables": {"death": ["death_csv_node"]},
                     "sql": "SELECT * FROM DEATH",
                 },
                 "mysql_node":
                 {
+                    "id": "6", 
                     "type": "sql_node",
                     "tables":
                     {"person": ["person_csv_node"],
@@ -177,16 +183,19 @@ def mock_dataflow():
                 },
                 "py_node":
                 {
+                    "id": "7", 
                     "type": "python_node",
                     "python_code": "import sqlalchemy as asql\nimport pandas as pd\nimport dask.dataframe as dd\ndef exec(myinput):\n myinput[\"dbrjson\"] = myinput[\"dbread\"].data.compute().to_json(orient=\"records\")\n myinput[\"Hello\"] = \"hello world!\"\n return myinput\ndef test_exec(myinput):\n return exec(myinput)",
                 },
                 "my_r_node":
                 {
+                    "id": "8", 
                     "type": "r_node",
                     "r_code": "exec <- function(myinput) \n\n{return(myinput)}",
                 },
                 "writer_node":
                 {
+                    "id": "9", 
                     "type": "db_writer_node",
                     "dataframe": ["py_node", "mysql_node"],
                     "dbtablename": "JoinedTable",
@@ -194,6 +203,7 @@ def mock_dataflow():
                 },
                 "dbread":
                 {
+                    "id": "10", 
                     "type": "db_reader_node",
                     "database": "alp",
                     "sqlquery": "select name, size FROM horses",
@@ -202,6 +212,7 @@ def mock_dataflow():
                 },
                 "sqlquery":
                 {
+                    "id": "11", 
                     "type": "sql_query_node",
                     "database": "alp",
                     "sqlquery": "insert into horses values (:myname,5)",
@@ -211,6 +222,7 @@ def mock_dataflow():
                 },
                 "productsubflow":
                 {
+                    "id": "12", 
                     "type": "subflow",
                     "graph":
                     {
@@ -223,17 +235,20 @@ def mock_dataflow():
                         {
                             "givethree":
                             {
-                                "type": "python_node",
+                                "id": "13", 
+                    "type": "python_node",
                                 "python_code": "def exec(myinput):\n    return 3",
                             },
                             "givefive":
                             {
-                                "type": "python_node",
+                                "id": "14", 
+                    "type": "python_node",
                                 "python_code": "def exec(myinput):\n    return 5",
                             },
                             "tempproduct":
                             {
-                                "type": "python_node",
+                                "id": "15", 
+                    "type": "python_node",
                                 "python_code": "def exec(myinput):\n    givethree = myinput[\"givethree\"].data\n    givefive = myinput[\"givefive\"].data\n    return givefive * givethree",
                             },
                         },
@@ -246,11 +261,13 @@ def mock_dataflow():
                 },
                 "multiplybyten":
                 {
+                    "id": "16", 
                     "type": "python_node",
                     "python_code": "def exec(myinput):\n    val = myinput*10\n    return val",
                 },
                 "multiplyagain":
                 {
+                    "id": "17", 
                     "type": "python_node",
                     "python_code": "def exec(myinput):\n    multiplybyten = myinput[\"multiplybyten\"].data\n    productsubflow = myinput[\"productsubflow\"].data\n    return multiplybyten * productsubflow",
                 },

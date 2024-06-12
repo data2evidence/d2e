@@ -24,6 +24,7 @@
     "op:put:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn op:put; done",
     "op:put": "scripts/put-op.sh",
     "get:drivers": "scripts/get-drivers.sh",
+    "get:op:synpuf1k": "scripts/get-op-synpuf1k.sh",
     "sort:dc1": "scripts/sort-dc.mjs --backup --force",
     "sort:dc2": "scripts/sort-dc.mjs --update"
   }

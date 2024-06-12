@@ -87,7 +87,7 @@ Manage Database Objects in an Automated way
   - Example command: `npm run cdm-install-script -- create postgres alp cdmtest omop5-4`
 - Create Schema With MS Deidentified OMOP Tables:
   - Example command: `npm run cdm-install-script -- create postgres alp cdmtest custom-omop-ms`
-- Create Schema With MS PHI OMOP  Tables:
+- Create Schema With MS PHI OMOP Tables:
   - Example command: `npm run cdm-install-script -- create postgres alp cdmtest custom-omop-ms-phi`
 - Create Schema With Pathology Tables:
   - Example command: `npm run cdm-install-script -- create postgres alp cdmtest pathology`
@@ -95,7 +95,6 @@ Manage Database Objects in an Automated way
   - Example command: `npm run cdm-install-script -- create postgres alp cdmtest bio-me`
 - Create Schema With Reporting BI Tables:
   - Example command: `npm run cdm-install-script -- create postgres alp cdmtest reporting-bi`
-
 
 **PUT**
 
@@ -418,9 +417,12 @@ SELECT * FROM "temp_table_concept_recommended";
 select count(1) from CONCEPT_RECOMMENDED;
 DROP TABLE "temp_table_concept_recommended";
 ```
+
 ##### CONCEPT RECOMMENDED TABLE DATA
+
 The script to create the table and the data imported were from the following source.
- - https://ohdsiorg-my.sharepoint.com/personal/cknoll_ohdsi_org/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fcknoll%5Fohdsi%5Forg%2FDocuments%2FPHOEBE&ga=1
+
+- https://ohdsiorg-my.sharepoint.com/personal/cknoll_ohdsi_org/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fcknoll%5Fohdsi%5Forg%2FDocuments%2FPHOEBE&ga=1
 
 ##### POSTGRES
 
@@ -446,4 +448,12 @@ Steps
   - Input file: corresponding file from `vocab.zip`
     - also on the bottow section "Importer Settings", click on the Value column for "Column delimeter" and change it from `,` to `\t`
   - Go to "Confirm" and click "Proceed"
-  
+
+## Running tests locally
+
+- Setup steps required
+  1. Download file `cache-synpuf1k.zip` from one password to get synpuf1k folder and place folder into `d2e/services/alp-db-svc/db` folder
+  2. Download file `cache-ngdbc-latest` from one password to get hana driver and place file into `d2e/services/alp-db-svc/db/drivers/hana` folder
+  3. Download liquibase driver from `https://github.com/liquibase/liquibase/releases/download/v4.5.0/liquibase-4.5.0.tar.gz` and unpack folder into `d2e/services/alp-db-svc/db/migrations/liquibase`
+  4. Get migration scripts from [d2e-plugins](https://github.com/alp-os/d2e-plugins/tree/main/data-management) repo and place into `d2e/services/alp-db-svc/db/migrations`
+  5. Get migration scripts from [ms-datamodel-plugin](https://github.com/alp-os/ms-datamodel-plugin/) repo and place into `d2e/services/alp-db-svc/db/migrations`
