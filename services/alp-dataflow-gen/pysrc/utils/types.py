@@ -41,6 +41,8 @@ class dqdBaseOptionsType(BaseModel):
 class dqdOptionsType(dqdBaseOptionsType):
     cohortDefinitionId: Optional[str]
     checkNames: Optional[List[str]]
+    cohortDatabaseSchema: Optional[str]
+    cohortTableName: Optional[str]
 
 
 class dcOptionsType(dqdBaseOptionsType):
@@ -82,6 +84,15 @@ class meilisearchAddIndexType(BaseModel):
     databaseCode: str
     vocabSchemaName: str
     tableName: str
+    chunk_size: int
+    meilisearch_index_config: Dict
+
+
+class meilisearchAddIndexWithEmbeddingsType(BaseModel):
+    databaseCode: str
+    vocabSchemaName: str
+    tableName: str
+    token: str
     chunk_size: int
     meilisearch_index_config: Dict
 
