@@ -497,10 +497,6 @@ services:
       DATAFLOW_MGMT__ADHOC_FLOWS__S3_DIR_PATH: s3://dataflow-adhoc-flows/flows
       DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME: flow-results
       DATAFLOW_MGMT__FLOWS__RESULTS__S3_DIR_PATH: s3://flows/results
-      MINIO__ACCESS_KEY: ${MINIO__ACCESS_KEY:-root}
-      MINIO__ENDPOINT: ${MINIO__ENDPOINT:-alp-minerva-s3}
-      MINIO__PORT: ${MINIO__PORT:-9000}
-      MINIO__SECRET_KEY: ${MINIO__SECRET_KEY}
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       R_LIBS_USER: /home/docker/plugins/R/site-library
