@@ -277,7 +277,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://0.0.0.0:41110/check-liveness
+        - https://localhost:41110/check-liveness
       timeout: 30s
     hostname: alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/bookmark-svc:${DOCKER_TAG_NAME:-develop}
@@ -357,7 +357,7 @@ services:
         - CMD
         - curl
         - -f
-        - http://0.0.0.0:41120
+        - http://localhost:41120
       timeout: 30s
     hostname: alp-dataflow-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
@@ -427,7 +427,7 @@ services:
         tag: *c3
     networks:
       data:
-        priority: 10
+        priority: 20
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
@@ -515,7 +515,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41112/check-liveness
+        - https://localhost:41112/check-liveness
       timeout: 30s
     hostname: alp-minerva-db-credentials-mgr-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-db-credentials:${DOCKER_TAG_NAME:-develop}
@@ -640,7 +640,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://0.0.0.0:41102/check-liveness
+        - https://localhost:41102/check-liveness
     hostname: alp-minerva-analytics-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/analytics-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -701,7 +701,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41114/check-liveness
+        - https://localhost:41114/check-liveness
       timeout: 30s
     image: alpcr.azurecr.io/alp-data-node/mri-cdw-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -750,7 +750,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41107/check-liveness
+        - https://localhost:41107/check-liveness
       timeout: 30s
     hostname: alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-dataflow:${DOCKER_TAG_NAME:-develop}
@@ -798,7 +798,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/check-liveness
+        - https://localhost:41${BASE_PORT:-1}00/check-liveness
       timeout: 30s
     hostname: alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-gateway:${DOCKER_TAG_NAME:-develop}
@@ -917,7 +917,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://0.0.0.0:41113/check-liveness
+        - https://localhost:41113/check-liveness
       timeout: 30s
     hostname: alp-minerva-pa-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/mri-pa-config:${DOCKER_TAG_NAME:-develop}
@@ -1037,14 +1037,14 @@ services:
     healthcheck:
       interval: 20s
       retries: 30
-      start_period: 120s
+      start_period: 60s
       test:
         - CMD
         - wget
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41105/check-liveness
+        - https://localhost:41105/check-liveness
       timeout: 30s
     hostname: alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-portal-server:${DOCKER_TAG_NAME:-develop}
@@ -1130,7 +1130,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://0.0.0.0:41115/check-liveness
+        - https://localhost:41115/check-liveness
       timeout: 30s
     hostname: alp-minerva-ps-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/mri-ps-config:${DOCKER_TAG_NAME:-develop}
@@ -1269,7 +1269,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41108/check-liveness
+        - https://localhost:41108/check-liveness
     hostname: alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-terminology-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1316,7 +1316,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41104/check-liveness
+        - https://localhost:41104/check-liveness
       timeout: 30s
     hostname: alp-minerva-user-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-usermgmt:${DOCKER_TAG_NAME:-develop}
@@ -1422,7 +1422,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://0.0.0.0:41109/check-liveness
+        - https://localhost:41109/check-liveness
     hostname: alp-minerva-query-gen-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/query-gen-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1501,8 +1501,8 @@ services:
       options:
         tag: *c28
     depends_on:
-    - alp-fhir-server
-    networks: 
+      - alp-fhir-server
+    networks:
       alp:
 
   alp-meilisearch-post-init:
