@@ -12,7 +12,6 @@ export const env = {
   SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
   SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
   GATEWAY_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n'),
-  CADDY_LOGTO_IDP_PUBLIC_FQDN: process.env.CADDY__LOGTO_IDP__PUBLIC_FQDN,
   APP_DEPLOY_MODE: process.env.APP__DEPLOY_MODE,
   IDP_ALP_SVC_CLIENT_ID: process.env.IDP__ALP_SVC_CLIENT_ID,
   IDP_ALP_DATA_CLIENT_ID: process.env.IDP__ALP_DATA_CLIENT_ID,
