@@ -66,7 +66,7 @@ export function getSingleBookmarkQuery(table) {
        version as "version"
      FROM ${table} 
      WHERE id = %s 
-       AND user_id = %s 
+       AND pa_config_id = %s
        AND (type = 'BOOKMARK' OR type IS NULL)`
 }
 
@@ -127,12 +127,12 @@ export function _loadAllBookmarks(
  */
 export async function loadSingleBookmark(
   bookmarkId,
-  userId,
+  paConfigId,
   table,
   connection: ConnectionInterface,
   callback?: CallBackInterface
 ) {
-  let query: QueryObject = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, userId)
+  let query: QueryObject = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, paConfigId)
 
   return new Promise<{ bookmarks: IBookmark[] }>(async (resolve, reject) => {
     try {
@@ -244,7 +244,7 @@ export function _deleteBookmark(
   }
   // first get the bookmark record for the given params
   let fnGetBookmark = cb => {
-    let qry: QueryObject = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, userId)
+    let qry: QueryObject = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, paConfigId)
     qry.executeQuery(configConnection, (err, bookmarks) => {
       if (err) {
         cb(err)
@@ -415,19 +415,19 @@ export function _updateBookmark( //TODO remove user input
 export async function loadBookmarks({
   bookmarkIds,
   table,
-  userId,
+  paConfigId,
   configConnection,
   callback,
 }: {
   bookmarkIds: string[]
   table: string
-  userId: string
+  paConfigId: string
   configConnection: ConnectionInterface
   callback: CallBackInterface
 }) {
   const list = await Promise.all(
     bookmarkIds.map(bookmarkid =>
-      loadSingleBookmark(bookmarkid, userId, table, configConnection, null).then(result => result.bookmarks[0])
+      loadSingleBookmark(bookmarkid, paConfigId, table, configConnection, null).then(result => result.bookmarks[0])
     )
   )
     .then(data => {
@@ -526,13 +526,13 @@ export function queryBookmarks(
         )
         break
       case 'loadSingle':
-        loadSingleBookmark(bookmarkId, userId, table, configConnection, callback)
+        loadSingleBookmark(bookmarkId, paConfigId, table, configConnection, callback)
         break
       case 'loadByIDs':
         loadBookmarks({
           bookmarkIds,
           table,
-          userId,
+          paConfigId,
           configConnection,
           callback,
         })
