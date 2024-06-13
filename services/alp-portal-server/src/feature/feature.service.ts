@@ -11,7 +11,17 @@ import { TransactionRunner } from '../common/data-source/transaction-runner'
 
 @Injectable({ scope: Scope.REQUEST })
 export class FeatureService {
-  private readonly NON_PLUGIN_FEATURES = ['datasetFilter']
+  private readonly NON_PLUGIN_FEATURES = [
+    {
+      featureFlag: 'datasetFilter',
+      enabled: false
+    },
+    {
+      featureFlag: 'datasetSearch',
+      enabled: false
+    }
+  ]
+
   private readonly logger = createLogger(this.constructor.name)
   private readonly userId: string
   private readonly enabledFeaturePlugins: IPortalPlugin[]
@@ -33,7 +43,10 @@ export class FeatureService {
       throw new Error('Error while loading plugin config in TenantService')
     }
 
-    this.validFeatures = [...this.NON_PLUGIN_FEATURES, ...this.enabledFeaturePlugins.map(f => f.featureFlag)]
+    this.validFeatures = [
+      ...this.NON_PLUGIN_FEATURES.map(f => f.featureFlag),
+      ...this.enabledFeaturePlugins.map(f => f.featureFlag)
+    ]
 
     const token = decode(request.headers['authorization'].replace(/bearer /i, '')) as JwtPayload
     this.userId = token.sub
@@ -42,7 +55,9 @@ export class FeatureService {
   async getFeatures() {
     const savedFeatures = (await this.featureRepo.getFeatures()).filter(f => this.validFeatures.includes(f.feature))
 
-    const defaultNonPlugins = this.NON_PLUGIN_FEATURES.filter(f => !savedFeatures.map(s => s.feature).includes(f))
+    const defaultNonPlugins = this.NON_PLUGIN_FEATURES.filter(
+      f => !savedFeatures.map(s => s.feature).includes(f.featureFlag)
+    )
 
     const defaultEnabledPlugins = this.enabledFeaturePlugins.filter(
       f => !savedFeatures.map(s => s.feature).includes(f.featureFlag)
@@ -54,8 +69,8 @@ export class FeatureService {
         isEnabled: f.isEnabled
       })),
       ...defaultNonPlugins.map(f => ({
-        feature: f,
-        isEnabled: false
+        feature: f.featureFlag,
+        isEnabled: f.enabled
       })),
       ...defaultEnabledPlugins.map(p => ({
         feature: p.featureFlag,
