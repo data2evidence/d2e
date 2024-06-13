@@ -1,3 +1,4 @@
+import importlib
 import os
 import sys
 import asyncio
@@ -6,61 +7,116 @@ from rpy2 import robjects
 from rpy2.robjects import conversion, default_converter
 from prefect import task, get_run_logger
 from utils.types import PG_TENANT_USERS, cohortSurvivalOptionsType
-from utils.databaseConnectionUtils import getSetDBDriverEnvString, getDatabaseConnectorConnectionDetailsString
+from utils.databaseConnectionUtils import (
+    getSetDBDriverEnvString,
+    getDatabaseConnectorConnectionDetailsString,
+)
 from api.AnalyticsSvcAPI import AnalyticsSvcAPI
 
 
-def execute_cohort_survival(
-    options: cohortSurvivalOptionsType
-):
+def execute_cohort_survival(options: cohortSurvivalOptionsType):
     logger = get_run_logger()
-    logger.info('Running Cohort Survival')
+    logger.info("Running Cohort Survival")
     databaseCode = options.databaseCode
 
     generate_cohort_survival_data(databaseCode)
 
 
 @task
-def generate_cohort_survival_data(databaseCode: str):
+def generate_cohort_survival_data(database_code: str):
+    schema_name = "cdmdefault"
     r_libs_user_directory = os.getenv("R_LIBS_USER")
+
+    # Get credentials for database code
+    dbutils_module = importlib.import_module("alpconnection.dbutils")
+    db_credentials = dbutils_module.extract_db_credentials(database_code)
+
     with conversion.localconverter(default_converter):
-        robjects.r(f'''
-                .libPaths(c('{r_libs_user_directory}',.libPaths()))
-                library(CDMConnector)
-                library(CohortSurvival)
-                library(dplyr)
-                library(ggplot2)
-                library(rjson)
-                
-                filename <- "alpdev_pg_cdmdefault"
-                dbdir <- Sys.getenv("DUCKDB__DATA_FOLDER")
-                dbdir <- file.path(dbdir, filename)
-                con <- DBI::dbConnect(duckdb::duckdb(dbdir = dbdir))
-                cdm <- cdm_from_con(con = con, 
-                    cdm_schema = "main", 
-                    write_schema = "main", 
-                    cdm_name = "alpdev_pg_cdmdefault")
-                death_survival <- estimateSingleEventSurvival(cdm,
-                    targetCohortTable = "mgus_diagnosis",
-                    outcomeCohortTable = "death_cohort"
-                )
-                
-                cat("Generating cohort survival chart data")
-                )
-        ''')
+        robjects.r(
+            f"""
+# Function to generate a random string of specified length
+.libPaths(c('{r_libs_user_directory}',.libPaths()))
+library(CDMConnector)
+library(CohortSurvival)
+library(dplyr)
+library(ggplot2)
+library(rjson)
+library(tools)
+# Run R console inside the dataflow agent container to run these code
 
 
-    # copy tables from postgres into duckdb
-    for table in table_names:
-        try:
-            logger.info(f"Copying table: {table} from postgres into duckdb...")
-            with duckdb.connect(f"{os.getenv('DUCKDB__DATA_FOLDER')}/{duckdb_database_name}") as con:
-                result = con.execute(
-                    f"""CREATE TABLE {duckdb_database_name}.{table} AS FROM (SELECT * FROM postgres_scan('host={db_credentials['host']} port={db_credentials['port']} dbname={
-                        db_credentials['databaseName']} user={db_credentials['user']} password={db_credentials['password']}', '{schema_name}', '{table}'))"""
-                ).fetchone()
-                logger.info(f"{result[0]} rows copied")
-        except Exception as err:
-            logger.error(f"Table:{table} loading failed with error: {err}f")
-            raise (err)
-    logger.info("Postgres tables succesfully copied into duckdb database file")
+# VARIABLES
+filename <- "alpdev_pg_cdmdefault"
+target_cohort_definition_id <- 3
+outcome_cohort_definition_id <- 4
+pg_host <- "{db_credentials['host']}"
+pg_port <- "{db_credentials['port']}"
+pg_dbname <- "{db_credentials['databaseName']}"
+pg_user <- "{db_credentials['user']}"
+pg_password <- "{db_credentials['password']}"
+pg_schema <- "{schema_name}"
+# END VARIABLES
+duckdb_dir <- Sys.getenv("DUCKDB__DATA_FOLDER")
+filepath <- file.path(duckdb_dir, filename)
+
+random_string <- function(n = 6) {{
+    paste0(sample(c(0:9, letters, LETTERS), n, replace = TRUE), collapse = "")
+}}
+# Generate a random postfix and create a new filename
+postfix <- random_string()
+duplicate_filepath <- file.path(duckdb_dir, paste0(filename, "_", postfix))
+
+# Copy the original file to the new file
+file.copy(filepath, duplicate_filepath)
+print(paste("Created duckdb File: ", duplicate_filepath))
+con <- NULL
+tryCatch(
+    {{
+        duckdb_pg_con <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
+        postgres_con_query <- sprintf("INSTALL postgres_scanner;LOAD postgres_scanner;CREATE TABLE duckdb_cohort AS FROM (SELECT * FROM postgres_scan('host=%s port=%s dbname=%s user=%s password=%s', '%s',  'cohort'))", pg_host, pg_port, pg_dbname, pg_user, pg_password, pg_schema)
+        result <- DBI::dbExecute(duckdb_pg_con, postgres_con_query)
+        target_cohort <- DBI::dbGetQuery(duckdb_pg_con, sprintf("SELECT * from duckdb_cohort WHERE cohort_definition_id = %d;", target_cohort_definition_id))
+        outcome_cohort <- DBI::dbGetQuery(duckdb_pg_con, sprintf("SELECT * from duckdb_cohort WHERE cohort_definition_id = %d;", outcome_cohort_definition_id))
+
+        duckdb_con <- DBI::dbConnect(duckdb::duckdb(dbdir = duplicate_filepath, read_only = FALSE))
+
+        # Write the data frame to DuckDB as a table
+        DBI::dbWriteTable(duckdb_con, "target_cohort", target_cohort)
+        DBI::dbWriteTable(duckdb_con, "outcome_cohort", outcome_cohort)
+
+        # cdm_from_con is from CDMConnection
+        # duckdb uses 'main' as default schema name
+        cdm <- cdm_from_con(
+            con = duckdb_con,
+            write_schema = "main",
+            cdm_schema = "main",
+            cohort_tables = c("target_cohort", "outcome_cohort"),
+            .soft_validation = TRUE
+        )
+
+        death_survival <- estimateSingleEventSurvival(cdm,
+            targetCohortTable = "target_cohort",
+            outcomeCohortTable = "outcome_cohort"
+        )
+
+        plot <- plotSurvival(death_survival)
+        plot_data <- ggplot_build(plot)$data[[1]]
+        my_json <- toJSON(plot_data)
+        print(my_json)
+        # TODO: Send it to save
+        cdm_disconnect(cdm)
+    }},
+    error = function(e) {{
+        print(e)
+    }},
+    finally = {{
+        if (!is.null(con)) {{
+            DBI::dbDisconnect(con)
+            print("Disconnected the database.")
+        }}
+        file.remove(duplicate_filepath)
+        print("Removed temporary duckdb file")
+    }}
+)        
+"""
+        )
