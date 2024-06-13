@@ -615,7 +615,7 @@ services:
       NODE_ENV: test
       TRUST_PROXY_HEADER: true
 
-alp-minerva-analytics-svc:
+  alp-minerva-analytics-svc:
     container_name: &c9 alp-minerva-analytics-${BASE_PORT:-1}
     depends_on:
       alp-db-credentials-mgr:
