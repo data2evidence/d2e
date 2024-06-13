@@ -17,14 +17,28 @@ from api.AnalyticsSvcAPI import AnalyticsSvcAPI
 def execute_cohort_survival(options: cohortSurvivalOptionsType):
     logger = get_run_logger()
     logger.info("Running Cohort Survival")
-    databaseCode = options.databaseCode
+    database_code = options.database_code
+    schema_name = options.schema_name
+    target_cohort_definition_id = options.target_cohort_definition_id
+    outcome_cohort_definition_id = options.outcome_cohort_definition_id
+    schema_name = options.schema_name
 
-    generate_cohort_survival_data(databaseCode)
+    generate_cohort_survival_data(
+        database_code,
+        schema_name,
+        target_cohort_definition_id,
+        outcome_cohort_definition_id,
+    )
 
 
 @task
-def generate_cohort_survival_data(database_code: str):
-    schema_name = "cdmdefault"
+def generate_cohort_survival_data(
+    database_code: str,
+    schema_name: str,
+    target_cohort_definition_id: int,
+    outcome_cohort_definition_id: int,
+):
+    filename = f"{database_code}_{schema_name}"
     r_libs_user_directory = os.getenv("R_LIBS_USER")
 
     # Get credentials for database code
@@ -46,9 +60,9 @@ library(tools)
 
 
 # VARIABLES
-filename <- "alpdev_pg_cdmdefault"
-target_cohort_definition_id <- 3
-outcome_cohort_definition_id <- 4
+filename <- "{filename}"
+target_cohort_definition_id <- {target_cohort_definition_id}
+outcome_cohort_definition_id <- {outcome_cohort_definition_id}
 pg_host <- "{db_credentials['host']}"
 pg_port <- "{db_credentials['port']}"
 pg_dbname <- "{db_credentials['databaseName']}"
