@@ -68,7 +68,7 @@ const MRI_ROLE_ASSIGNMENTS = {
 }
 
 export const SAMPLE_USER_JWT: IAppTokenPayload = {
-  iss: 'https://dummy.com/f59c7915-9283-4fb5-b633/v2.0/',
+  iss: 'https://dummy.com/aaaaaaaa-aaaa-aaaa-aaaa/v2.0/',
   exp: 1603893181,
   nbf: 1603889581,
   aud: '30dccbb9-5705-483f-bbaf-1f7c8f0f4fce',
@@ -92,7 +92,7 @@ export const SAMPLE_USER_JWT: IAppTokenPayload = {
     alp_role_tenant_viewer: [],
     alp_role_system_admin: false
   },
-  tid: 'f59c7915-9283-4fb5-b633-435b9145ca00',
+  tid: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
   scp: 'pyqe.client',
   azp: '30dccbb9-5705-483f-bbaf-1f7c8f0f4fce',
   ver: '1.0',
