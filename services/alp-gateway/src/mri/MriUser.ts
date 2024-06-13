@@ -71,7 +71,7 @@ export const SAMPLE_USER_JWT: IAppTokenPayload = {
   iss: 'https://dummy.com/aaaaaaaa-aaaa-aaaa-aaaa/v2.0/',
   exp: 1603893181,
   nbf: 1603889581,
-  aud: '30dccbb9-5705-483f-bbaf-1f7c8f0f4fce',
+  aud: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
   sub: 'bbdaab1b-c43b-4f69-9542-5959a7c40e69',
   email: 'alice@wonderland',
   name: 'alice',
@@ -94,7 +94,7 @@ export const SAMPLE_USER_JWT: IAppTokenPayload = {
   },
   tid: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
   scp: 'pyqe.client',
-  azp: '30dccbb9-5705-483f-bbaf-1f7c8f0f4fce',
+  azp: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
   ver: '1.0',
   iat: 1603889581
 }
