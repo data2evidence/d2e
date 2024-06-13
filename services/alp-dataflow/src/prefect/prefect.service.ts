@@ -481,12 +481,8 @@ export class PrefectService {
       throw new BadRequestException(`Flow does not exist for ${metadata.type}!`)
     }
     if (metadata.type === FLOW_METADATA.datamodel) {
-      if (!metadata?.flowId && flowMetadata.length === 1) {
-        currentFlow = flowMetadata[0]
-      } else {
-        const flow = flowMetadata.find(flow => flow.flowId === metadata?.flowId)
-        currentFlow = flow
-      }
+      const flow = flowMetadata.find(flow => flow.flowId === metadata?.flowId)
+      currentFlow = flow
     } else {
       currentFlow = flowMetadata[0]
     }
