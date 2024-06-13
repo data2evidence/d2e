@@ -274,23 +274,3 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 		}
 	}
 }
-
-https://{$CADDY__LOGTO_IDP__PUBLIC_FQDN:localhost}:3002 {
-	log {
-		format console {
-			level_format color
-		}
-	}
-
-	{$TLS__CADDY_DIRECTIVE}
-
-	handle /* {
-		{$CADDY__BLOCK_LOGTO_ADMIN_CONSOLE}
-		reverse_proxy http://alp-logto-1:3002 {
-			header_up Host {upstream_hostport}
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-}

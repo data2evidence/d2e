@@ -318,7 +318,6 @@ services:
       - 80:80
       - 443:443
       - 3001:3001
-      - 3002:3002
       - 41101:41101
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
@@ -326,7 +325,6 @@ services:
       - ./deploy/caddy-config:/srv/caddy-config
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
-      CADDY__BLOCK_LOGTO_ADMIN_CONSOLE: ${CADDY__BLOCK_LOGTO_ADMIN_CONSOLE:-abort} # Values disable: "abort" | enable: ""
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
   alp-dataflow-gen:
     command:
@@ -596,6 +594,8 @@ services:
         priority: 20
       data:
         priority: 10
+    ports:
+      - 3002:3002
     entrypoint:
       - sh
       - -c
@@ -603,7 +603,7 @@ services:
     environment:
       <<:
         - *x-tls
-      ADMIN_ENDPOINT: https://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-localhost}:3002
+      ADMIN_ENDPOINT: http://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-localhost}:3002
       DB_URL: postgres://postgres:${PG_SUPER_PASSWORD}@alp-minerva-postgres-1:${PG_PORT:-5432}/logto
       ENDPOINT: https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO_API_M2M_CLIENT_ID: ${LOGTO_API_M2M_CLIENT_ID}
@@ -611,6 +611,7 @@ services:
       LOGTO_ROLES_AZ_GROUPS_MAPPING: ${LOGTO_ROLES_AZ_GROUPS_MAPPING:-{"role.systemadmin":"37b5364a-348c-494f-b67f-a59a40e52ab7","role.useradmin":"90597adc-92af-4649-8151-68c3b7feb66c","role.tenantviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5"}}
       NODE_ENV: test
       TRUST_PROXY_HEADER: true
+      ADMIN_DISABLE_LOCALHOST: ${LOGTO__DISABLE_ADMIN_CONSOLE:-true}
   alp-minerva-analytics-svc:
     container_name: &c9 alp-minerva-analytics-${BASE_PORT:-1}
     depends_on:
