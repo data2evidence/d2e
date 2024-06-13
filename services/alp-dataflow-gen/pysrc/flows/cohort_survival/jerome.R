@@ -13,6 +13,12 @@ library(tools)
 filename <- "alpdev_pg_cdmdefault"
 target_cohort_definition_id <- 3
 outcome_cohort_definition_id <- 4
+pg_host <- "alp-minerva-postgres-1"
+pg_port <- "5432"
+pg_dbname <- "alpdev_pg"
+pg_user <- "postgres_tenant_read_user"
+pg_password <- "Toor1234"
+pg_schema <- "cdmdefault"
 # END VARIABLES
 duckdb_dir <- Sys.getenv("DUCKDB__DATA_FOLDER")
 filepath <- file.path(duckdb_dir, filename)
@@ -31,7 +37,7 @@ con <- NULL
 tryCatch(
     {
         duckdb_pg_con <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
-        postgres_con_query <- "INSTALL postgres_scanner;LOAD postgres_scanner;CREATE TABLE duckdb_cohort AS FROM (SELECT * FROM postgres_scan('host=alp-minerva-postgres-1 port=5432 dbname=alpdev_pg user=postgres_tenant_read_user password=Toor1234', 'cdmdefault',  'cohort'))"
+        postgres_con_query <- sprintf("INSTALL postgres_scanner;LOAD postgres_scanner;CREATE TABLE duckdb_cohort AS FROM (SELECT * FROM postgres_scan('host=%s port=%s dbname=%s user=%s password=%s', '%s',  'cohort'))", pg_host, pg_port, pg_dbname, pg_user, pg_password, pg_schema)
         result <- DBI::dbExecute(duckdb_pg_con, postgres_con_query)
         target_cohort <- DBI::dbGetQuery(duckdb_pg_con, sprintf("SELECT * from duckdb_cohort WHERE cohort_definition_id = %d;", target_cohort_definition_id))
         outcome_cohort <- DBI::dbGetQuery(duckdb_pg_con, sprintf("SELECT * from duckdb_cohort WHERE cohort_definition_id = %d;", outcome_cohort_definition_id))
