@@ -317,7 +317,6 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 3001:3001
       - 41101:41101
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
