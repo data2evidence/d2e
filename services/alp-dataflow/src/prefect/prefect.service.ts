@@ -201,7 +201,6 @@ export class PrefectService {
     this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
 
     let flowMetadataInput
-    let newFlowMetadata
     try {
       if (defaultPluginId) {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.INSTALLING)
@@ -226,24 +225,21 @@ export class PrefectService {
 
       await this.prefectExecutionClient.executePipInstall(userId, modifiedFileStem)
 
-      // prepare metadata input
       if (defaultDeploymentInfo && defaultDeploymentInfo.url) {
         flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, defaultDeploymentInfo.url)
       } else {
         flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, url)
       }
 
-      // if metadata with same flowId exists
-      const existFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
-      if (existFlowMetadata) {
-        await this.prefectFlowService.deleteFlowMetadata(existFlowMetadata.flowId)
-      }
-      newFlowMetadata = await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
+      await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
     } catch (err) {
-      if (newFlowMetadata) {
-        await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+      if (flowMetadataInput) {
+        const existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+        if (!existingFlowMetadata) {
+          await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+          await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
+        }
       }
-      await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
       this.deleteDeploymentFolder(deploymentFolderPath)
       const errorMessage = `Error installing pip package, check if package is valid`
       this.logger.error(`${errorMessage}: ${err}`)
@@ -269,8 +265,11 @@ export class PrefectService {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.COMPLETE)
       }
     } catch (err) {
-      await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
-      await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+      const existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+      if (!existingFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+        await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
+      }
       const errorMessage = `Error creating flow with file ${fileStem}${fileType}`
       this.logger.error(`${errorMessage}: ${err}`)
       if (defaultPluginId) {
@@ -336,7 +335,6 @@ export class PrefectService {
     this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
 
     let flowMetadataInput
-    let newFlowMetadata
     try {
       defaultDeploymentInfo.defaultPluginId
       if (defaultPluginId) {
@@ -362,24 +360,21 @@ export class PrefectService {
 
       await this.prefectExecutionClient.executePipInstall(userId, modifiedFileStem)
 
-      // prepare metadata input
       if (defaultDeploymentInfo && defaultDeploymentInfo.url) {
         flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, defaultDeploymentInfo.url)
       } else {
         flowMetadataInput = await this.prepareFlowMetadata(deploymentFolderPath, url)
       }
 
-      // if metadata with same flowId exists
-      const existFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
-      if (existFlowMetadata) {
-        await this.prefectFlowService.deleteFlowMetadata(existFlowMetadata.flowId)
-      }
-      newFlowMetadata = await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
+      await this.prefectFlowService.createFlowMetadata(flowMetadataInput)
     } catch (err) {
-      if (newFlowMetadata) {
-        await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+      if (flowMetadataInput) {
+        const existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+        if (!existingFlowMetadata) {
+          await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+          await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
+        }
       }
-      await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
       this.deleteDeploymentFolder(deploymentFolderPath)
       const errorMessage = `Error installing pip package, check if package is valid`
       this.logger.error(`${errorMessage}: ${err}`)
@@ -404,8 +399,11 @@ export class PrefectService {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.COMPLETE)
       }
     } catch (err) {
-      await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
-      await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+      const existingFlowMetadata = await this.prefectFlowService.getFlowMetadataById(flowMetadataInput.flowId)
+      if (!existingFlowMetadata) {
+        await this.prefectFlowService.deleteFlowMetadata(flowMetadataInput.flowId)
+        await this.prefectApi.deleteFlow(flowMetadataInput.flowId)
+      }
       const errorMessage = `Error creating flow with file ${fileStem}${fileType}`
       this.logger.error(`${errorMessage}: ${err}`)
       if (defaultPluginId) {
@@ -483,12 +481,8 @@ export class PrefectService {
       throw new BadRequestException(`Flow does not exist for ${metadata.type}!`)
     }
     if (metadata.type === FLOW_METADATA.datamodel) {
-      if (!metadata?.flowId && flowMetadata.length === 1) {
-        currentFlow = flowMetadata[0]
-      } else {
-        const flow = flowMetadata.find(flow => flow.flowId === metadata?.flowId)
-        currentFlow = flow
-      }
+      const flow = flowMetadata.find(flow => flow.flowId === metadata?.flowId)
+      currentFlow = flow
     } else {
       currentFlow = flowMetadata[0]
     }
