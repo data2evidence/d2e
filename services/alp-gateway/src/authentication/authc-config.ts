@@ -24,6 +24,6 @@ export const logtoAuthOptions: StrategyOptions = {
       return cb(err)
     }
   }),
-  issuer: env.LOGTO_ISSUER,
+  issuer: `https://${env.GATEWAY_WO_PROTOCOL_FQDN}/oidc`,
   audience: [env.LOGTO_CLIENT_ID!, ...(env.LOGTO_AUDIENCES ? env.LOGTO_AUDIENCES.split(' ') : [])]
 }
