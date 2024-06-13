@@ -85,9 +85,7 @@ def create_schema_tasks(dialect: str,
         action = LiquibaseAction.UPDATECOUNT
 
     create_tables_wo = run_liquibase_update_task.with_options(
-        on_completion=[partial(create_tables_hook,
-                               **dict(schema_dao=schema_dao))],
-        on_failure=[partial(create_tables_hook,
+        on_failure=[partial(drop_schema_hook,
                             **dict(schema_dao=schema_dao))])
 
     create_tables_wo(action=action,
@@ -107,9 +105,7 @@ def create_schema_tasks(dialect: str,
     if enable_audit_policies:
 
         enable_and_create_audit_policies_wo = enable_and_create_audit_policies.with_options(
-            on_completion=[partial(create_audit_policies_hook,
-                                   **dict(schema_dao=schema_dao))],
-            on_failure=[partial(create_audit_policies_hook,
+            on_failure=[partial(drop_schema_hook,
                                 **dict(schema_dao=schema_dao))])
         enable_and_create_audit_policies_wo(schema_dao)
     else:
@@ -119,9 +115,7 @@ def create_schema_tasks(dialect: str,
 
     user_dao = UserDao(database_code, schema_name, admin_user)
     create_and_assign_roles_wo = create_and_assign_roles.with_options(
-        on_completion=[partial(create_assign_roles_hook,
-                               **dict(schema_dao=schema_dao))],
-        on_failure=[partial(create_assign_roles_hook,
+        on_failure=[partial(drop_schema_hook,
                             **dict(schema_dao=schema_dao))])
     create_and_assign_roles_wo(user_dao, tenant_configs, data_model, dialect)
 

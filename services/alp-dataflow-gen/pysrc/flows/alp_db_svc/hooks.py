@@ -14,56 +14,20 @@ def create_dataset_schema_hook(task, task_run, state, schema_dao: DBDao):
         logger.info(msg)
 
 
-def create_tables_hook(task, task_run, state, schema_dao: DBDao):
+def drop_schema_hook(task, task_run, state, schema_dao: DBDao):
     logger = task_run_logger(task_run, task)
-
-    if state.type == StateType.COMPLETED:
+    logger.info(
+        f"Dropping schema {schema_dao.database_code}.{schema_dao.schema_name}")
+    try:
+        drop_schema = schema_dao.drop_schema()
         msg = ""
         logger.info(msg)
-    elif state.type == StateType.FAILED:
+    except Exception as e:
         logger.info(
-            f"Dropping schema {schema_dao.database_code}.{schema_dao.schema_name}")
-        try:
-            drop_schema = schema_dao.drop_schema()
-            msg = ""
-            logger.info(msg)
-        except Exception as e:
-            logger.info(
-                f"Failed to drop schema {schema_dao.database_code}.{schema_dao.schema_name}")
-        else:
-            logger.info(
-                f"Successfully drop schema {schema_dao.database_code}.{schema_dao.schema_name}")
-
-
-def create_audit_policies_hook(task, task_run, state, schema_dao: DBDao):
-    logger = task_run_logger(task_run, task)
-
-    if state.type == StateType.COMPLETED:
-        msg = ""
-        logger.info(msg)
-    elif state.type == StateType.FAILED:
-        msg = ""
-        logger.info(msg)
-
-
-def create_assign_roles_hook(task, task_run, state, schema_dao: DBDao):
-    logger = task_run_logger(task_run, task)
-    if state.type == StateType.COMPLETED:
-        msg = ""
-        logger.info(msg)
-    elif state.type == StateType.FAILED:
+            f"Failed to drop schema {schema_dao.database_code}.{schema_dao.schema_name}")
+    else:
         logger.info(
-            f"Dropping schema {schema_dao.database_code}.{schema_dao.schema_name}")
-        try:
-            drop_schema = schema_dao.drop_schema()
-            msg = ""
-            logger.info(msg)
-        except Exception as e:
-            logger.info(
-                f"Failed to drop schema {schema_dao.database_code}.{schema_dao.schema_name}")
-        else:
-            logger.info(
-                f"Successfully drop schema {schema_dao.database_code}.{schema_dao.schema_name}")
+            f"Successfully drop schema {schema_dao.database_code}.{schema_dao.schema_name}")
 
 
 def update_cdm_version_hook(task, task_run, state, db: str, schema: str):
