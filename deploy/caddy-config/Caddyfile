@@ -14,7 +14,7 @@
 	}
 }
 
-https://*.alp.local:55555 {
+https://localhost:55555 https://*.alp.local:55555 {
 	tls {
 		issuer internal {
 			ca alp-internal
