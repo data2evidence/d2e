@@ -8,7 +8,12 @@ library(rjson)
 library(tools)
 # Run R console inside the dataflow agent container to run these code
 
+
+# VARIABLES
 filename <- "alpdev_pg_cdmdefault"
+exposure_cohort_definition_id <- 3
+outcome_cohort_definition_id <- 4
+# END VARIABLES
 duckdb_dir <- Sys.getenv("DUCKDB__DATA_FOLDER")
 filepath <- file.path(duckdb_dir, filename)
 
@@ -25,77 +30,25 @@ file.copy(filepath, new_filepath)
 con <- NULL
 tryCatch(
     {
-        con <- DBI::dbConnect(duckdb::duckdb(dbdir = new_filepath, read_only = FALSE))
+        duckdb_con <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
+        postgres_con_query <- "INSTALL postgres_scanner;LOAD postgres_scanner;CREATE TABLE jtable AS FROM (SELECT * FROM postgres_scan('host=alp-minerva-postgres-1 port=5432 dbname=alpdev_pg user=postgres_tenant_read_user password=Toor1234', 'cdmdefault',  'cohort'))"
+        result <- DBI::dbExecute(duckdb_con, postgres_con_query)
+        exposure_cohort <- DBI::dbGetQuery(duckdb_con, sprintf("SELECT * from jtable WHERE cohort_definition_id = %d;", exposure_cohort_definition_id))
+        outcome_cohort <- DBI::dbGetQuery(duckdb_con, sprintf("SELECT * from jtable WHERE cohort_definition_id = %d;", outcome_cohort_definition_id))
 
-        exposure_cohort <- data.frame(
-            subject_id = c(1, 2, 3, 3, 4, 5),
-            cohort_definition_id = c(1, 1, 1, 2, 2, 2),
-            cohort_start_date = c(
-                as.Date("2020-01-01"),
-                as.Date("2020-02-03"),
-                as.Date("2020-05-01"),
-                as.Date("2020-05-01"),
-                as.Date("2020-08-01"),
-                as.Date("2020-09-01")
-            ),
-            cohort_end_date = c(
-                as.Date("2020-01-31"),
-                as.Date("2022-02-03"),
-                as.Date("2021-06-28"),
-                as.Date("2021-06-01"),
-                as.Date("2021-08-01"),
-                as.Date("2021-09-01")
-            )
-        )
-
-        outcome_cohort <- dplyr::tibble(
-            cohort_definition_id = c(2, 3, 3),
-            subject_id = c(2, 3, 4),
-            cohort_start_date = c(
-                as.Date("2021-01-01"),
-                as.Date("2021-01-01"),
-                as.Date("2021-01-01")
-            ),
-            cohort_end_date = c(
-                as.Date("2021-01-01"),
-                as.Date("2021-01-01"),
-                as.Date("2021-01-01")
-            )
-        )
-
-        observation_period <- dplyr::tibble(
-            observation_period_id = c(1, 2, 3, 4, 5, 6, 7),
-            person_id = c(1, 2, 3, 4, 5, 6, 7),
-            observation_period_start_date = c(
-                rep(as.Date("1980-07-20"), 7)
-            ),
-            observation_period_end_date = c(
-                rep(as.Date("2023-05-20"), 7)
-            ),
-            period_type_concept_id = c(rep(0, 7))
-        )
-
-        person <- dplyr::tibble(
-            person_id = c(1, 2, 3, 4, 5),
-            year_of_birth = c(rep("1990", 5)),
-            month_of_birth = c(rep("02", 5)),
-            day_of_birth = c(rep("11", 5)),
-            gender_concept_id = c(rep(0, 5)),
-            ethnicity_concept_id = c(rep(0, 5)),
-            race_concept_id = c(rep(0, 5))
-        )
+        duckdb_con <- DBI::dbConnect(duckdb::duckdb(dbdir = new_filepath, read_only = FALSE))
 
         # Write the data frame to DuckDB as a table
-        DBI::dbWriteTable(con, "exposure_cohort", exposure_cohort)
-        DBI::dbWriteTable(con, "outcome_cohort", outcome_cohort)
+        DBI::dbWriteTable(duckdb_con, "exposure_cohort", exposure_cohort)
+        DBI::dbWriteTable(duckdb_con, "outcome_cohort", outcome_cohort)
 
         # These should be untouched from db i.e. overwrite = FALSE
-        DBI::dbWriteTable(con, "observation_period", observation_period, overwrite = TRUE)
-        DBI::dbWriteTable(con, "person", person, overwrite = TRUE)
+        # DBI::dbWriteTable(duckdb_con, "observation_period", observation_period, overwrite = TRUE)
+        # DBI::dbWriteTable(duckdb_con, "person", person, overwrite = TRUE)
 
         # cdm_from_con is from CDMConnection
         cdm <- cdm_from_con(
-            con = con,
+            con = duckdb_con,
             cdm_schema = "main",
             write_schema = "main",
             cdm_name = "alpdev_pg_cdmdefault",
