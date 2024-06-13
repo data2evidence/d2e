@@ -20,6 +20,8 @@ def execute_dqd(
     cohortDefinitionId: str,
     outputFolder: str,
     checkNames: str,
+    cohortDatabaseSchema: str,
+    cohortTableName: str,
 ):
     logger = get_run_logger()
 
@@ -37,7 +39,10 @@ def execute_dqd(
                     releaseDate: {releaseDate},
                     cohortDefinitionId: {cohortDefinitionId},
                     outputFolder: {outputFolder},
-                    checkNames: {checkNames}'''
+                    checkNames: {checkNames}
+                    cohortDatabaseSchema: {cohortDatabaseSchema}
+                    cohortTableName: {cohortTableName}
+                '''
                 )
 
     # raise Exception("test stop")
@@ -59,12 +64,14 @@ def execute_dqd(
                 checkNames <- {checkNames}
                 cohortDefinitionId <- {cohortDefinitionId}
                 cdmVersion <- '{cdmVersionNumber}'
+                cohortDatabaseSchema <- '{cohortDatabaseSchema}'
+                cohortTableName <- '{cohortTableName}'
 
                 # Set r_libs_user_directory to be the priority for packages to be loaded
                 .libPaths('{r_libs_user_directory}')
 
                 # Run executeDqChecks
-                DataQualityDashboard::executeDqChecks(connectionDetails = connectionDetails,cdmDatabaseSchema = cdmDatabaseSchema,resultsDatabaseSchema = resultsDatabaseSchema,cdmSourceName = cdmSourceName,numThreads = numThreads,sqlOnly = sqlOnly,outputFolder = outputFolder,outputFile = outputFile,verboseMode = verboseMode,writeToTable = writeToTable,checkLevels = checkLevels,checkNames = checkNames,cdmVersion = cdmVersion, cohortDefinitionId = cohortDefinitionId)
+                DataQualityDashboard::executeDqChecks(connectionDetails = connectionDetails,cdmDatabaseSchema = cdmDatabaseSchema,resultsDatabaseSchema = resultsDatabaseSchema,cdmSourceName = cdmSourceName,numThreads = numThreads,sqlOnly = sqlOnly,outputFolder = outputFolder,outputFile = outputFile,verboseMode = verboseMode,writeToTable = writeToTable,checkLevels = checkLevels,checkNames = checkNames,cdmVersion = cdmVersion, cohortDefinitionId = cohortDefinitionId, cohortDatabaseSchema = cohortDatabaseSchema, cohortTableName = cohortTableName)
         ''')
 
 
@@ -89,6 +96,16 @@ def execute_dqd_flow(options: dqdOptionsType):
     else:
         checkNames = "c()"
 
+    if options.cohortDatabaseSchema:
+        cohortDatabaseSchema = options.cohortDatabaseSchema
+    else:
+        cohortDatabaseSchema = schemaName
+
+    if options.cohortTableName:
+        cohortTableName = options.cohortTableName
+    else:   
+        cohortTableName = "cohort"
+
     flow_run_context = FlowRunContext.get().flow_run.dict()
     flow_run_id = str(flow_run_context.get("id"))
     outputFolder = f'/output/{flow_run_id}'
@@ -105,7 +122,9 @@ def execute_dqd_flow(options: dqdOptionsType):
                    releaseDate,
                    cohortDefinitionId,
                    outputFolder,
-                   checkNames)
+                   checkNames,
+                   cohortDatabaseSchema,
+                   cohortTableName)
 
 
 if __name__ == "__main__":
