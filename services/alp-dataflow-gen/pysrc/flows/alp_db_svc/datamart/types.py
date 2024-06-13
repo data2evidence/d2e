@@ -20,23 +20,19 @@ class DatamartBaseConfig(BaseModel):
     personId_column: str
 
 
-class DATAMART_ACTIONS(Enum):
-    COPY_AS_DB_SCHEMA = "Copy as db schema"  # Copy as a new db schema
-    COPY_AS_PARQUET_FILE = "Copy as parquet file"  # Copy as parquet file
+class DATAMART_FLOW_ACTIONS(str, Enum):
+    CREATE_SNAPSHOT = "create_snapshot"  # Copy as a new db schema
+    CREATE_PARQUET_SNAPSHOT = "create_parquet_snapshot"  # Copy as parquet file
+
 
 class CreateDatamartType(BaseModel):
+    dialect: str
     target_schema: str
     source_schema: str
+    vocab_schema: str
     data_model: str
     database_code: str
     snapshot_copy_config: Optional[SnapshotCopyConfig]
-    plugin_changelog_filepath: str
+    changelog_file: str
     plugin_classpath: str
-    datamart_action: DATAMART_ACTIONS
-
-
-class TempCreateDataModelType(BaseModel):
-    dialect: str
-    changelog_filepath: str
-    flow_name: str
-    vocab_schema: str
+    datamart_action: DATAMART_FLOW_ACTIONS

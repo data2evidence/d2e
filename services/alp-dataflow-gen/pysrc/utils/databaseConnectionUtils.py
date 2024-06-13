@@ -1,9 +1,10 @@
 import os
-from utils.types import HANA_TENANT_USERS, PG_TENANT_USERS
-from dao.DqdResultDao import DqdResultDao
 from prefect import get_run_logger
 from prefect.context import TaskRunContext
 from alpconnection.dbutils import extract_db_credentials
+from utils.types import HANA_TENANT_USERS, PG_TENANT_USERS, DatabaseDialects
+
+from dao.DqdResultDao import DqdResultDao
 
 # TODO make this run only once instead of setting everytime a job is ran
 
@@ -36,13 +37,16 @@ def getDatabaseConnectorConnectionDetailsString(databaseCode: str, releaseDate: 
     databasePort = db_credentials["port"]
     databaseDialect = db_credentials["dialect"]
 
-    if databaseDialect == "hana":
+    if databaseDialect == DatabaseDialects.HANA:
         databaseConnectionStr = f"jdbc:sap://{databaseHost}:{databasePort}?databaseName={databaseName}"
         # Append sessionVariable to databaseConnectionStr if releaseDate is defined
         if releaseDate:
             databaseConnectionStr += f"&sessionVariable:TEMPORAL_SYSTEM_TIME_AS_OF={releaseDate}"
-    elif databaseDialect == "postgresql":
-        databaseConnectionStr = f"jdbc:postgresql://{databaseHost}:{databasePort}/{databaseName}"
+    elif databaseDialect == DatabaseDialects.POSTGRES:
+        # OHDSI DatabaseConnector uses this postgres dialect naming
+        databaseDialect = "postgresql"
+        databaseConnectionStr = f"jdbc:{databaseDialect}://{databaseHost}:{databasePort}/{databaseName}"
+
 
     connectionDetailsString = f"connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = '{databaseDialect}', connectionString = '{databaseConnectionStr}', user = '{databaseUser}', password = '{databasePassword}', pathToDriver = '/app/inst/drivers')"
     return connectionDetailsString

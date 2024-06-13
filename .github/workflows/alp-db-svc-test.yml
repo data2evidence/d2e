@@ -74,16 +74,22 @@ jobs:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          INTEGRATION_TEST__HANA__TENANT_CONFIGS: "op://${{ secrets.OP_VAULT_NAME }}/Github Actions Secrets/ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_GERMANY"
+          INTEGRATION_TEST__HANA__TENANT_CONFIGS: "op://${{ secrets.OP_VAULT_NAME }}/Github Actions Secrets/ALP_DB_SVC_INTEGRATION_TEST_HANA_TENANT_CONFIGS_SINGAPORE"
 
       - name: Get 1password files
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
+          # Get drivers
           yarn --cwd internal get:drivers
           ls "${HANA__DRIVER_CLASS_PATH}"
           ls "${POSTGRES__DRIVER_CLASS_PATH}"
+
+          # Get synpuf1k
+          yarn --cwd internal get:op:synpuf1k
+          cp -prnl "${{ github.workspace }}/cache/synpuf1k" ./services/alp-db-svc/db/
+          ls -l ./services/alp-db-svc/db/synpuf1k
 
       - name: 1password ratelimit end
         env:
@@ -100,44 +106,99 @@ jobs:
           path: |
             ${{ github.job }}*.yml
 
+      # Get and merge ms-datamodel-plugin migration scripts
       - uses: actions/checkout@v4
-        name: sameBranch checkout (OverrideRepo)
-        id: sameBranch-checkout
+        name: sameBranch checkout (ms-datamodel-plugin)
+        id: sameBranch-checkout-ms-datamodel-plugin
         continue-on-error: true
         with:
-          repository:  ${{ vars.OVERRIDE_REPO }}
+          repository:  ${{ vars.MS_DATAMODEL_PLUGIN_REPO }}
           token: ${{ secrets.CI_PAT }}
           path: 'tmp'
-          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout: 'ms_datamodel_plugin'
           sparse-checkout-cone-mode: false
           ref: ${{ env.BRANCH_NAME }}
 
       - shell: bash
-        name: sameBranch checkout test
-        id: sameBranch-checkout-test
+        name: sameBranch checkout test (ms-datamodel-plugin)
+        id: sameBranch-checkout-test-ms-datamodel-plugin
         run: |
           ls -lhtr tmp
-          [ -d tmp/alp-data-node-override ] || echo OVERRIDE_DEVELOP_BRANCH=true | tee -a "$GITHUB_OUTPUT"
+          [ -d tmp/ms_datamodel_plugin ] || echo MS_DATAMODEL_PLUGIN_MAIN_BRANCH=true | tee -a "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
-        name: develop branch checkout (sameBranch checkout fails)
-        if: steps.sameBranch-checkout-test.outputs.OVERRIDE_DEVELOP_BRANCH == 'True' 
+        name: main branch checkout (sameBranch checkout fails) (ms-datamodel-plugin)
+        id: main-branch-checkout-ms-datamodel-plugin
+        if: steps.sameBranch-checkout-test-ms-datamodel-plugin.outputs.MS_DATAMODEL_PLUGIN_MAIN_BRANCH == 'True' 
         with:
-          repository:  ${{ vars.OVERRIDE_REPO }}
+          repository:  ${{ vars.MS_DATAMODEL_PLUGIN_REPO }}
           token: ${{ secrets.CI_PAT }}
           path: 'tmp'
-          sparse-checkout: 'alp-data-node-override'
+          sparse-checkout: 'ms_datamodel_plugin'
           sparse-checkout-cone-mode: false
-          ref: develop
+          ref: main
 
       - shell: bash
-        name: merge files from override
-        id: merge_files_from_override
+        name: merge files from ms-datamodel-plugin repo
+        id: merge_files_from_ms_datamodel_plugin
         run: |
-          ls -l tmp/alp-data-node-override
-          cp -prnl ./tmp/alp-data-node-override/* .
+          cp -prnl ./tmp/ms_datamodel_plugin/db/* ./services/alp-db-svc/db
           ls -l ./services/alp-db-svc/db/drivers
-          ln -s tmp/alp-data-node-override alp-data-node-override
+          ls -l ./services/alp-db-svc/db/migrations/hana
+          ls -l ./services/alp-db-svc/db/migrations/postgres
+
+      # Get and merge d2e-plugins migration scripts
+      - uses: actions/checkout@v4
+        name: sameBranch checkout (d2e-plugin)
+        id: sameBranch-checkout-d2e-plugin
+        continue-on-error: true
+        with:
+          repository:  ${{ vars.D2E_PLUGIN_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'data-management'
+          sparse-checkout-cone-mode: false
+          ref: ${{ env.BRANCH_NAME }}
+
+      - shell: bash
+        name: sameBranch checkout test (d2e-plugin)
+        id: sameBranch-checkout-test-d2e-plugin
+        run: |
+          ls -lhtr tmp
+          [ -d tmp/data-management ] || echo D2E_PLUGIN_MAIN_BRANCH=true | tee -a "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        name: main branch checkout (sameBranch checkout fails) (d2e-plugin)
+        id: main-branch-checkout-d2e-plugin
+        if: steps.sameBranch-checkout-test-d2e-plugin.outputs.D2E_PLUGIN_MAIN_BRANCH == 'True' 
+        with:
+          repository:  ${{ vars.D2E_PLUGIN_REPO }}
+          token: ${{ secrets.CI_PAT }}
+          path: 'tmp'
+          sparse-checkout: 'data-management'
+          sparse-checkout-cone-mode: false
+          ref: main
+
+      - shell: bash
+        name: merge files from d2e-plugin repo
+        id: merge_files_from_data-management
+        run: |
+          cp -prnl ./tmp/data-management/data_management_plugin/db/* ./services/alp-db-svc/db
+          ls -l ./services/alp-db-svc/db/drivers
+          ls -l ./services/alp-db-svc/db/migrations/hana
+          ls -l ./services/alp-db-svc/db/migrations/postgres
+
+      # Download liquibase driver
+      - shell: bash
+        name: Download liquibase driver
+        run: | 
+          wget https://github.com/liquibase/liquibase/releases/download/v4.5.0/liquibase-4.5.0.tar.gz -P /tmp/drivers/
+          ls -l /tmp/drivers/
+
+          # Create liquibase folder 
+          mkdir -p ./services/alp-db-svc/db/migrations/liquibase/
+          tar xvf /tmp/drivers/liquibase-4.5.0.tar.gz -C ./services/alp-db-svc/db/migrations/liquibase/
+          ls -l ./services/alp-db-svc/db/migrations/liquibase/
 
       - shell: bash
         # Give an id to the step, so we can reference it later

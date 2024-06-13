@@ -67,7 +67,7 @@ x-envs:
         {
           "enabled": true,
           "featureFlag": "cohort",
-          "name": "Cohort",
+          "name": "Cohorts",
           "pluginPath": "plugins/mri/PatientAnalytics/module",
           "requiredRoles": [
             "RESEARCHER"
@@ -77,8 +77,8 @@ x-envs:
         { 
           "enabled": true,
           "featureFlag": "cohorts",
-          "name": "Cohorts", 
-          "pluginPath": "plugins/Researcher/Cohort/module",
+          "name": "Cohorts M", 
+          "pluginPath": "plugins/Cohort/module",
           "requiredRoles": [ 
             "RESEARCHER" 
           ], 
@@ -96,7 +96,7 @@ x-envs:
           "subMenus": "true"
         },
         {
-          "enabled": true,
+          "enabled": false,
           "featureFlag": "analysisFlow",
           "name": "Analysis",
           "route": "analysis",
@@ -159,7 +159,7 @@ x-envs:
         },
         {
           "description": "Configure patient summary",
-          "enabled": true,
+          "enabled": false,
           "name": "Patient Summary Config",
           "notes": "",
           "pluginPath": "plugins/mri/PatientSummaryConfig/module",
@@ -277,7 +277,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://0.0.0.0:41110/check-liveness
+        - https://localhost:41110/check-liveness
       timeout: 30s
     hostname: alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/bookmark-svc:${DOCKER_TAG_NAME:-develop}
@@ -317,8 +317,6 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 3001:3001
-      - 3002:3002
       - 41101:41101
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
@@ -326,8 +324,6 @@ services:
       - ./deploy/caddy-config:/srv/caddy-config
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
-      CADDY__BLOCK_LOGTO_ADMIN_CONSOLE: ${CADDY__BLOCK_LOGTO_ADMIN_CONSOLE:-abort} # Values disable: "abort" | enable: ""
-      CADDY__LOGTO_IDP__PUBLIC_FQDN: ${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
   alp-dataflow-gen:
     command:
@@ -355,7 +351,7 @@ services:
         - CMD
         - curl
         - -f
-        - http://0.0.0.0:41120
+        - http://localhost:41120
       timeout: 30s
     hostname: alp-dataflow-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
@@ -425,7 +421,7 @@ services:
         tag: *c3
     networks:
       data:
-        priority: 10
+        priority: 20
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
@@ -512,7 +508,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41112/check-liveness
+        - https://localhost:41112/check-liveness
       timeout: 30s
     hostname: alp-minerva-db-credentials-mgr-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-db-credentials:${DOCKER_TAG_NAME:-develop}
@@ -597,6 +593,8 @@ services:
         priority: 20
       data:
         priority: 10
+    ports:
+      - 3002:3002
     entrypoint:
       - sh
       - -c
@@ -604,14 +602,15 @@ services:
     environment:
       <<:
         - *x-tls
-      ADMIN_ENDPOINT: https://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}:3002
+      ADMIN_ENDPOINT: http://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-localhost}:3002
       DB_URL: postgres://postgres:${PG_SUPER_PASSWORD}@alp-minerva-postgres-1:${PG_PORT:-5432}/logto
-      ENDPOINT: https://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}:3001
+      ENDPOINT: https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO_API_M2M_CLIENT_ID: ${LOGTO_API_M2M_CLIENT_ID}
       LOGTO_API_M2M_CLIENT_SECRET: ${LOGTO_API_M2M_CLIENT_SECRET}
       LOGTO_ROLES_AZ_GROUPS_MAPPING: ${LOGTO_ROLES_AZ_GROUPS_MAPPING:-{"role.systemadmin":"37b5364a-348c-494f-b67f-a59a40e52ab7","role.useradmin":"90597adc-92af-4649-8151-68c3b7feb66c","role.tenantviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5"}}
       NODE_ENV: test
       TRUST_PROXY_HEADER: true
+      ADMIN_DISABLE_LOCALHOST: ${LOGTO__DISABLE_ADMIN_CONSOLE:-true}
   alp-minerva-analytics-svc:
     container_name: &c9 alp-minerva-analytics-${BASE_PORT:-1}
     depends_on:
@@ -635,7 +634,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://0.0.0.0:41102/check-liveness
+        - https://localhost:41102/check-liveness
     hostname: alp-minerva-analytics-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/analytics-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -695,7 +694,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41114/check-liveness
+        - https://localhost:41114/check-liveness
       timeout: 30s
     image: alpcr.azurecr.io/alp-data-node/mri-cdw-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -743,7 +742,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41107/check-liveness
+        - https://localhost:41107/check-liveness
       timeout: 30s
     hostname: alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-dataflow:${DOCKER_TAG_NAME:-develop}
@@ -790,7 +789,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/check-liveness
+        - https://localhost:41${BASE_PORT:-1}00/check-liveness
       timeout: 30s
     hostname: alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-gateway:${DOCKER_TAG_NAME:-develop}
@@ -810,7 +809,6 @@ services:
       ALP_RELEASE: ${ALP_RELEASE:-v1alpha1}
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
       APP__DEPLOY_MODE: standalone
-      CADDY__LOGTO_IDP__PUBLIC_FQDN: ${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}
       DB_CREDENTIALS__PUBLIC_KEYS: |-
         {
          "DataPlatform": "",
@@ -820,7 +818,6 @@ services:
         http://alp-minerva-sqleditor:8888/
         http://localhost:8080
         https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
-        https://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}:3001
         https://*.alp-dev.org
         https://*.azure.com
         https://*.b2clogin.com
@@ -847,7 +844,7 @@ services:
       LOGTO__AUDIENCES: https://alp-default
       LOGTO__CLIENT_ID: 1d6wuydanyaiypbkchxzu
       LOGTO__CLIENT_SECRET: ${LOGTO__ALP_APP__CLIENT_SECRET}
-      LOGTO__ISSUER: https://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-host.docker.internal}:3001/oidc
+      LOGTO__ISSUER: http://alp-logto-${BASE_PORT}:3001/oidc
       LOGTO__RESOURCE_API: https://alp-default
       LOGTO__SCOPE: openid offline_access profile email
       LOGTO__SVC_CLIENT_ID: 6q6a13bg3dw6fncdr2kf6
@@ -916,7 +913,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://0.0.0.0:41113/check-liveness
+        - https://localhost:41113/check-liveness
       timeout: 30s
     hostname: alp-minerva-pa-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/mri-pa-config:${DOCKER_TAG_NAME:-develop}
@@ -1036,14 +1033,14 @@ services:
     healthcheck:
       interval: 20s
       retries: 30
-      start_period: 120s
+      start_period: 60s
       test:
         - CMD
         - wget
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41105/check-liveness
+        - https://localhost:41105/check-liveness
       timeout: 30s
     hostname: alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-portal-server:${DOCKER_TAG_NAME:-develop}
@@ -1137,7 +1134,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://0.0.0.0:41115/check-liveness
+        - https://localhost:41115/check-liveness
       timeout: 30s
     hostname: alp-minerva-ps-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/mri-ps-config:${DOCKER_TAG_NAME:-develop}
@@ -1282,7 +1279,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41108/check-liveness
+        - https://localhost:41108/check-liveness
     hostname: alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-terminology-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1329,7 +1326,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://0.0.0.0:41104/check-liveness
+        - https://localhost:41104/check-liveness
       timeout: 30s
     hostname: alp-minerva-user-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-usermgmt:${DOCKER_TAG_NAME:-develop}
@@ -1435,7 +1432,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://0.0.0.0:41109/check-liveness
+        - https://localhost:41109/check-liveness
     hostname: alp-minerva-query-gen-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/query-gen-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -1514,8 +1511,8 @@ services:
       options:
         tag: *c28
     depends_on:
-    - alp-fhir-server
-    networks: 
+      - alp-fhir-server
+    networks:
       alp:
 
   alp-meilisearch-post-init:
