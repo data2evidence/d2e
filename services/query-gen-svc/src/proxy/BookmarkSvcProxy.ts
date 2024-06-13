@@ -52,12 +52,12 @@ export async function loadBookmarks(
     switch (bookmark_cmd) {
         case BookmarkCMDType.LOAD_BOOKMARKS:
             const bookmarkIds = queryParams.bmkIds;
-            const studyId = queryParams.studyId;
+            const paConfigId = queryParams.configId;
             const fullPath =
                 "/analytics-svc/api/services/bookmark/bookmarkIds?ids=" +
                 bookmarkIds +
-                "&studyId=" +
-                studyId;
+                "&paConfigId=" +
+                paConfigId;
             options.path = fullPath;
             options.method = "GET";
             break;
