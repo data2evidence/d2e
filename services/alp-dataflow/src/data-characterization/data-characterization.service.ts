@@ -57,7 +57,7 @@ export class DataCharacterizationService {
   }
 
   async createDataCharacterizationFlowRun(dataCharacterizationFlowRunDto: DataCharacterizationFlowRunDto) {
-    const dcFlowName = PrefectFlowName.DATA_CHARACTERIZATION
+    const dcFlowName = dataCharacterizationFlowRunDto.flowName
     const dcDeploymentName = dataCharacterizationFlowRunDto.deploymentName
     const datasetId = dataCharacterizationFlowRunDto.datasetId
     const comment = dataCharacterizationFlowRunDto.comment
