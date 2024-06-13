@@ -689,8 +689,6 @@ services:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
-      alp-query-gen:
-        condition: service_started
     healthcheck:
       interval: 20s
       retries: 30
@@ -743,7 +741,7 @@ services:
     healthcheck:
       interval: 20s
       retries: 30
-      start_period: 60s
+      start_period: 120s
       test:
         - CMD
         - wget
@@ -1461,6 +1459,7 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+
   alp-dicom-server:
     # uses 8042 port on the container
     image: orthancteam/orthanc
