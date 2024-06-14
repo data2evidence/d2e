@@ -1,4 +1,4 @@
-from flows.alp_db_svc.dataset.main import create_datamodel, update_datamodel, rollback_count_task, rollback_tag_task, run_seed_postgres_tasks
+from flows.alp_db_svc.dataset.main import create_datamodel, update_datamodel, rollback_count_task, rollback_tag_task, create_cdm_schema_tasks
 from flows.alp_db_svc.datamart.main import create_datamart
 from flows.alp_db_svc.datamart.types import DATAMART_FLOW_ACTIONS, CreateDatamartType
 from flows.alp_db_svc.versioninfo.main import get_version_info_task
@@ -12,14 +12,14 @@ from flows.alp_db_svc.types import (CreateDataModelType,
                                     RollbackTagType,
                                     QuestionnaireDefinitionType,
                                     QuestionnaireResponseType,
-                                    SeedVocabType)
+                                    CreateSchemaType)
 from prefect import get_run_logger
 
 
-def run_seed_postgres(options: SeedVocabType):
+def create_cdm_schema(options: CreateSchemaType):
     db_dialect = get_db_dialect(options)
     try:
-        run_seed_postgres_tasks(
+        create_cdm_schema_tasks(
             database_code=options.database_code,
             data_model=options.data_model,
             schema_name=options.schema_name,

@@ -44,7 +44,7 @@
     "build:minerva-test": "yarn local:minerva build",
     "start:minerva-test": "yarn local:minerva start",
 
-    "seed-postgres-cdm-schemas": "bash scripts/trigger-seed-cdm-schema.sh",
+    "create-postgres-cdm-schemas": "bash scripts/create-cdm-schema.sh",
     "build": "ts-node internal/build/buildservices.ts build",
     "tsc": "ts-node internal/build/buildservices.ts build --only-tsc",
     "inittestdb": "node internal/build/initdb.js test",

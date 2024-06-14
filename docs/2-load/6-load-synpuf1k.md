@@ -85,7 +85,7 @@ wc -l *
 - Navigate back to root folder `d2e` and Run the following command to seed postgres cdm schemas with synpuf-1k
 ```bash
 cd $GIT_BASE_DIR
-yarn seed-postgres-cdm-schemas alpdev_pg cdmdefault cdmvocab
+yarn create-postgres-cdm-schemas alpdev_pg cdmdefault cdmvocab
 ```
 - where `cdmdefault` is the default cdm schema name
 - Wait ~2 minutes
@@ -119,8 +119,8 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
 
 # Troubleshooting
 
-## Seed-postgres-cdm-schemas fails to start
-- Seed-postgres-cdm-schemas requires the following containers: 
+## create-postgres-cdm-schemas fails to start
+- create-postgres-cdm-schemas requires the following containers: 
   - alp-minerva-postgres-1, alp-data-flow-gen-1, alp-data-flow-gen-agent-1
 - If not running then check container logs
 
