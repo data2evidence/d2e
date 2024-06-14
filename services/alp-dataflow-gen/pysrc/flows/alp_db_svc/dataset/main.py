@@ -352,7 +352,7 @@ def update_cdm_version(schema_dao: DBDao, cdm_version: str):
     schema_dao.update_cdm_version(cdm_version)
 
 
-def run_seed_postgres_tasks(database_code: str,
+def create_cdm_schema_tasks(database_code: str,
                             data_model: str,
                             schema_name: str,
                             vocab_schema: str,
