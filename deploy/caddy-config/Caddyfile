@@ -14,7 +14,7 @@
 	}
 }
 
-https://localhost:55555 https://*.alp.local:55555 {
+https://*.alp.local:55555 {
 	tls {
 		issuer internal {
 			ca alp-internal
@@ -245,6 +245,11 @@ https://localhost:55555 https://*.alp.local:55555 {
 			}
 		}
 	}
+}
+
+https://localhost:41101 {
+	tls internal
+	respond ""
 }
 
 https://{$CADDY__ALP__PUBLIC_FQDN} {
