@@ -23,7 +23,7 @@ def get_version_info_task(changelog_file: str,
                           token: str,
                           dataset_list: List[PortalDatasetType]):
     logger = get_run_logger()
-    if len(dataset_list) == 0:
+    if (dataset_list == None) or (len(dataset_list) == 0):
         logger.debug("No datasets fetched from portal")
     else:
         logger.info(
