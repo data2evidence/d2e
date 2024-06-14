@@ -24,7 +24,7 @@
         "writePassword": "",
         "cohortWritePassword": ""
       },
-      "host": "alp-hn-gold-sg.southeastasia.cloudapp.azure.com",
+      "host": "dummy-hostname.com",
       "port": "39013",
       "code": "ALPDEV",
       "databaseName": "ALPDEV",
@@ -39,7 +39,7 @@
       "encrypt": true,
       "sslCryptoProvider": "sapcrypto",
       "pooling": true,
-      "hostnameInCertificate": "alp-hn-gold-sg.southeastasia.cloudapp.azure.com",
+      "hostnameInCertificate": "dummy-hostname.com",
       "ca": "",
       "useTLS": false,
       "rejectUnauthorized": false,
