@@ -147,7 +147,7 @@ jobs:
       - name: Docker compose build core services
         run: |
           # Build DataNode services and pull dataflow-gen from cache
-          yarn build:minerva alp-bookmark alp-caddy alp-db-credentials-mgr alp-logto alp-minerva-cdw-svc alp-minerva-dataflow-mgmt alp-minerva-gateway alp-minerva-pa-config-svc alp-minerva-pg-mgmt-init alp-minerva-portal-server alp-minerva-ps-config-svc alp-minerva-terminology-svc alp-minerva-user-mgmt alp-mri-pg-config alp-dataflow --builder ${{ steps.builder1.outputs.name }}
+          yarn build:minerva alp-bookmark alp-caddy alp-db-credentials-mgr alp-logto alp-minerva-cdw-svc alp-minerva-dataflow-mgmt alp-minerva-gateway alp-minerva-pa-config-svc alp-minerva-pg-mgmt-init alp-minerva-portal-server alp-minerva-ps-config-svc alp-minerva-terminology-svc alp-minerva-user-mgmt alp-mri-pg-config alp-minerva-dataflow-mgmt --builder ${{ steps.builder1.outputs.name }}
 
       - name: Builder cache cleanup
         run: |  
