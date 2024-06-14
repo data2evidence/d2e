@@ -17487,7 +17487,7 @@ const cdwConfigDuckdb = {
           },
           {
             lang: 'de',
-            value: '',  
+            value: '',
             visible: true,
           },
           {
@@ -24744,47 +24744,6 @@ const cdwConfigDuckdb = {
           'birth_datetime',
         ],
       },
-      Gender: {
-        name: 'Gender concept id',
-        disabledLangName: [
-          {
-            lang: 'en',
-            value: '',
-            visible: true,
-          },
-          {
-            lang: 'de',
-            value: '',
-            visible: true,
-          },
-          {
-            lang: 'fr',
-            value: '',
-            visible: true,
-          },
-          {
-            lang: 'es',
-            value: '',
-            visible: true,
-          },
-          {
-            lang: 'pt',
-            value: '',
-            visible: true,
-          },
-          {
-            lang: 'zh',
-            value: '',
-            visible: true,
-          },
-        ],
-        type: 'text',
-        expression: '@PATIENT."gender_concept_id"',
-        referenceFilter: '@REF.DOMAIN_ID = \'Gender\' AND @REF.STANDARD_CONCEPT = \'S\' AND (@REF.CONCEPT_NAME) SIMILAR TO \'@SEARCH_QUERY\'',
-        referenceExpression: '@REF.CONCEPT_NAME',
-        order: 7,
-        useRefValue: true,
-      },
       ethnicityconceptid: {
         name: 'Ethnicity concept id',
         disabledLangName: [
@@ -25554,26 +25513,6 @@ const paConfigDuckdb = {
           modelName: "Ethnicity source value",
         },
         {
-          source: "patient.attributes.Gender",
-          ordered: false,
-          cached: true,
-          useRefText: false,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: true,
-            visible: true,
-            order: 10,
-          },
-          patientlist: {
-            initial: true,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Gender",
-        },
-        {
           source: "patient.attributes.gendersourcevalue",
           ordered: false,
           cached: true,
@@ -25602,12 +25541,12 @@ const paConfigDuckdb = {
           category: true,
           measure: false,
           filtercard: {
-            initial: false,
+            initial: true,
             visible: true,
             order: 12,
           },
           patientlist: {
-            initial: false,
+            initial: true,
             visible: true,
             linkColumn: false,
           },
@@ -29428,7 +29367,7 @@ const paConfigDuckdb = {
   chartOptions: {
     initialAttributes: {
       measures: ["patient.attributes.pcount"],
-      categories: ["patient.attributes.Gender"],
+      categories: ["patient.attributes.genderconceptid"],
     },
     initialChart: "stacked",
     stacked: {
@@ -29503,8 +29442,8 @@ const paConfigDuckdb = {
 const cdwI2b2ConfigDuckdb = {
   patient: {
     conditions: {},
-    interactions:{
-      visit:{
+    interactions: {
+      visit: {
         name: 'Visit',
         disabledLangName: [
           {
@@ -29543,8 +29482,8 @@ const cdwI2b2ConfigDuckdb = {
         order: 0,
         parentInteraction: [],
         parentInteractionLabel: 'parent',
-        attributes :{
-          encounternum:{
+        attributes: {
+          encounternum: {
             name: 'Encounter Number',
             disabledLangName: [
               {
@@ -29738,7 +29677,7 @@ const cdwI2b2ConfigDuckdb = {
           //   useRefValue: true,
           //   useRefText: true,
           // },
-          InOut:{
+          InOut: {
             name: 'In out Concept Id',
             disabledLangName: [
               {
@@ -29903,7 +29842,7 @@ const cdwI2b2ConfigDuckdb = {
           // }
         },
       },
-      observation:{
+      observation: {
         name: 'Observation Fact',
         disabledLangName: [
           {
@@ -29943,7 +29882,7 @@ const cdwI2b2ConfigDuckdb = {
         parentInteraction: [],
         parentInteractionLabel: 'parent',
         attributes: {
-          encounternum:{
+          encounternum: {
             name: 'Encounter Number',
             disabledLangName: [
               {
@@ -30061,7 +30000,7 @@ const cdwI2b2ConfigDuckdb = {
             useRefValue: true,
             useRefText: true,
           },
-          providerId:{
+          providerId: {
             name: 'Provider Id',
             disabledLangName: [
               {
@@ -30137,7 +30076,7 @@ const cdwI2b2ConfigDuckdb = {
             expression: '@OBSERVATION."start_date"',
             order: 4,
           },
-          modifierconceptid:{
+          modifierconceptid: {
             name: 'Modifier concept Id',
             disabledLangName: [
               {
@@ -30259,7 +30198,7 @@ const cdwI2b2ConfigDuckdb = {
             useRefValue: true,
             useRefText: true,
           },
-          verbatimtext:{
+          verbatimtext: {
             name: 'Value as text',
             disabledLangName: [
               {
@@ -30297,7 +30236,7 @@ const cdwI2b2ConfigDuckdb = {
             expression: '@OBSERVATION."tval_char"',
             order: 7,
           },
-          numval:{
+          numval: {
             name: 'Value as number',
             disabledLangName: [
               {
