@@ -302,6 +302,7 @@ services:
       PORT: 41110
       isTestEnv: ${isTestEnv}
       sqlOnly: false
+
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile
     container_name: &c1 alp-caddy
@@ -317,7 +318,6 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 41101:41101
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - caddy:/data
@@ -325,6 +325,7 @@ services:
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
+
   alp-dataflow-gen:
     command:
       - sh
@@ -491,6 +492,7 @@ services:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       R_LIBS_USER: /home/docker/plugins/R/site-library
+
   alp-db-credentials-mgr:
     container_name: &c5 alp-minerva-db-credentials-mgr-${BASE_PORT:-1}
     depends_on:
@@ -530,6 +532,7 @@ services:
       PG__DB_CREDENTIALS_MGR__PASSWORD: ${PG_WRITE_PASSWORD}
       PG__DB_CREDENTIALS_MGR__SCHEMA: db_credentials_mgr
       PG__DB_CREDENTIALS_MGR__USER: ${PG_WRITE_USER:-alp_pg_write_user}
+
   alp-fhir-server:
     container_name: &c6 alp-minerva-fhir-server-${BASE_PORT:-1}
     depends_on:
@@ -602,6 +605,7 @@ services:
     environment:
       <<:
         - *x-tls
+      ADMIN_DISABLE_LOCALHOST: ${LOGTO__DISABLE_ADMIN_CONSOLE:-true}
       ADMIN_ENDPOINT: http://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-localhost}:3002
       DB_URL: postgres://postgres:${PG_SUPER_PASSWORD}@alp-minerva-postgres-1:${PG_PORT:-5432}/logto
       ENDPOINT: https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
@@ -610,7 +614,7 @@ services:
       LOGTO_ROLES_AZ_GROUPS_MAPPING: ${LOGTO_ROLES_AZ_GROUPS_MAPPING:-{"role.systemadmin":"37b5364a-348c-494f-b67f-a59a40e52ab7","role.useradmin":"90597adc-92af-4649-8151-68c3b7feb66c","role.tenantviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5"}}
       NODE_ENV: test
       TRUST_PROXY_HEADER: true
-      ADMIN_DISABLE_LOCALHOST: ${LOGTO__DISABLE_ADMIN_CONSOLE:-true}
+
   alp-minerva-analytics-svc:
     container_name: &c9 alp-minerva-analytics-${BASE_PORT:-1}
     depends_on:
@@ -669,6 +673,7 @@ services:
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
       local: ${local}
+
   alp-minerva-cdw-svc:
     container_name: &c10 alp-minerva-cdw-svc-${BASE_PORT:-1}
     depends_on:
@@ -682,8 +687,6 @@ services:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
-      alp-query-gen:
-        condition: service_started
     healthcheck:
       interval: 20s
       retries: 30
@@ -721,6 +724,7 @@ services:
       USE_DUCKDB: ${USE_DUCKDB:-true}
       isTestEnv: ${isTestEnv}
       DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
+
   alp-minerva-dataflow-mgmt:
     container_name: &c11 alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
     depends_on:
@@ -735,7 +739,7 @@ services:
     healthcheck:
       interval: 20s
       retries: 30
-      start_period: 60s
+      start_period: 120s
       test:
         - CMD
         - wget
@@ -772,6 +776,7 @@ services:
       PG__DATAFLOW_MGMT__PASSWORD: ${PG_WRITE_PASSWORD}
       PG__DATAFLOW_MGMT__SCHEMA: dataflow
       PG__DATAFLOW_MGMT__USER: ${PG_WRITE_USER:-alp_pg_write_user}
+
   alp-minerva-gateway:
     container_name: &c12 alp-minerva-gateway-${BASE_PORT:-1}
     depends_on:
@@ -856,6 +861,7 @@ services:
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
+
   alp-minerva-meilisearch-svc:
     container_name: &c13 alp-minerva-meilisearch-svc-${BASE_PORT:-1}
     depends_on:
@@ -891,18 +897,10 @@ services:
   alp-minerva-pa-config-svc:
     container_name: &c14 alp-minerva-pa-config-svc-${BASE_PORT:-1}
     depends_on:
-      alp-db-credentials-mgr:
-        condition: service_healthy
-      alp-logto:
-        condition: service_healthy
-      alp-minerva-gateway:
-        condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
-      alp-query-gen:
-        condition: service_started
     healthcheck:
       interval: 20s
       retries: 10
@@ -1112,18 +1110,10 @@ services:
   alp-minerva-ps-config-svc:
     container_name: &c18 alp-minerva-ps-config-svc-${BASE_PORT:-1}
     depends_on:
-      alp-db-credentials-mgr:
-        condition: service_healthy
-      alp-logto:
-        condition: service_healthy
-      alp-minerva-gateway:
-        condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
-      alp-query-gen:
-        condition: service_started
     healthcheck:
       interval: 20s
       retries: 20
@@ -1256,12 +1246,6 @@ services:
   alp-minerva-terminology-svc:
     container_name: &c21 alp-minerva-terminology-svc-${BASE_PORT:-1}
     depends_on:
-      alp-db-credentials-mgr:
-        condition: service_healthy
-      alp-logto:
-        condition: service_healthy
-      alp-minerva-gateway:
-        condition: service_healthy
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
       alp-minerva-postgres:
@@ -1471,6 +1455,7 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+
   alp-dicom-server:
     # uses 8042 port on the container
     image: orthancteam/orthanc

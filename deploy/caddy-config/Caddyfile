@@ -14,7 +14,7 @@
 	}
 }
 
-https://*.alp.local:55555 {
+https://localhost:55555 https://*.alp.local:55555 {
 	tls {
 		issuer internal {
 			ca alp-internal
@@ -245,11 +245,6 @@ https://*.alp.local:55555 {
 			}
 		}
 	}
-}
-
-https://${CADDY__ALP__INTERNAL_FQDN:localhost}:41101 https://host.docker.internal:41101 {
-	tls internal
-	import portal
 }
 
 https://{$CADDY__ALP__PUBLIC_FQDN} {
