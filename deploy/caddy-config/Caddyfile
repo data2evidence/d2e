@@ -247,7 +247,7 @@ https://localhost:55555 https://*.alp.local:55555 {
 	}
 }
 
-https://{$CADDY__ALP__PUBLIC_FQDN} {
+https://{$CADDY__ALP__PUBLIC_FQDN} https://localhost {
 	{$TLS__CADDY_DIRECTIVE}
 	import portal
 }
