@@ -21,7 +21,7 @@ on:
       force-cleanup-containers:
         description: Force cleanup all containers
         type: boolean
-        default: false
+        default: true
 
 env:
   DOCKER_TAG_NAME: ${{ github.event.inputs.docker_tag_name }}
@@ -112,7 +112,7 @@ jobs:
       if: github.event_name == 'push'
       id: enable_delay_for_docker_build_to_complete
       run: |
-        sleep 500 # Temporary solution
+        sleep 700 # Temporary solution
 
     - name: docker compose up
       env:
