@@ -1458,7 +1458,7 @@ services:
 
   alp-dicom-server:
     # uses 8042 port on the container
-    image: orthancteam/orthanc
+    image: orthancteam/orthanc:24.6.1
     container_name: &c27 alp-dicom-server-${BASE_PORT:-1}
     depends_on:
       alp-minio-post-init:
