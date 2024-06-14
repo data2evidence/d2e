@@ -53,7 +53,7 @@ class QuestionnaireResponseType(DataModelBase):
     questionnaire_id: str
 
 
-class SeedVocabType(DataModelBase):
+class CreateSchemaType(DataModelBase):
     vocab_schema: str
 
 

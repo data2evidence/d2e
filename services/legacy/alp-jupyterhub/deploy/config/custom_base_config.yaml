@@ -23,8 +23,6 @@ hub:
   extraEnv:
     OAUTH2_AUTHORIZE_URL: https://alpsgdev.b2clogin.com/alpsgdev.onmicrosoft.com/oauth2/v2.0/authorize?p=b2c_1a_signin_resetpassword
     OAUTH2_TOKEN_URL: https://alpsgdev.b2clogin.com/alpsgdev.onmicrosoft.com/oauth2/v2.0/token?p=b2c_1a_signin_resetpassword
-    # OAUTH2_USERDATA_URL: https://login.microsoftonline.com/f59c7915-9283-4fb5-b633-435b9145ca00/openid/userinfo
-    AAD_TENANT_ID: "f59c7915-9283-4fb5-b633-435b9145ca00"
     OAUTH_CLIENT_ID: "" #passed from makefile
     JUPYTER_ENABLE_LAB: 1
   extraConfig:
@@ -201,9 +199,9 @@ singleuser:
     PYQE_URL: "https://alp-data.sg-dev.svc.cluster.local:5001/analytics-svc/"
     PYQE_CONNECT_TIMEOUT: "60"
     PYQE_READ_TIMEOUT: "200"
-    PYQE_JWT_AUDIENCE: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce"
+    PYQE_JWT_AUDIENCE: ""
     PYQE_JWT_ALGORITHMS: "RS256"
-    PYQE_AZUREADB2C_CLIENT_ID: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce"
+    PYQE_AZUREADB2C_CLIENT_ID: ""
     PYQE_TOKEN_TYPE: "ACCESS"
     CONDA_PKGS_DIRS: "/home/jovyan/user/tmp/pkgs"
     ALP_SYSTEM_ID: "fra1-d4l-dev"
