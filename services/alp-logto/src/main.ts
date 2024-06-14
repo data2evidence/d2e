@@ -258,10 +258,10 @@ async function seeding_alp_admin() {
   });
   await client.connect();
 
-  let LOGTO__ADMIN_ROLE__ID = "api-access";
+  let LOGTO__ADMIN_ROLE__ID = "jrmtgmb34iznwqdu5dhl1";
   let LOGTO__ADMIN_APP__ID = alpAdminApp.id;
-  let LOGTO__ADMIN_APP_ROLE__ID = "alp-admin";
-  let LOGTO__ADMIN_ROLE_SCOPE__ID = "alp-admin";
+  let LOGTO__ADMIN_APP_ROLE__ID = "34vzakbak1tp830d0s30o";
+  let LOGTO__ADMIN_ROLE_SCOPE__ID = "da9va7i1g6ojghbph104e";
   let LOGTO__TENANT_ID = "default";
 
   console.log(

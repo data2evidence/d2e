@@ -1,9 +1,9 @@
 import os
 from time import time
-from prefect import get_run_logger
+from prefect import task, get_run_logger
 import pandas as pd
 from typing import List
-from flows.alp_db_svc.datamart.types import SnapshotCopyTableConfig, SnapshotCopyConfig, DatamartBaseConfig, DATAMART_ACTIONS
+from flows.alp_db_svc.datamart.types import SnapshotCopyTableConfig, SnapshotCopyConfig, DatamartBaseConfig, DATAMART_FLOW_ACTIONS
 from flows.alp_db_svc.datamart.const import DatamartBaseConfigList
 from dao.DBDao import DBDao
 from dao.MinioDao import MinioDao
@@ -16,9 +16,10 @@ def _parse_snapshot_copy_config(snapshotCopyConfig: SnapshotCopyConfig | None) -
         table_config = []
         patients_to_be_copied = []
     else:
-        date_filter = "" if snapshotCopyConfig.timestamp is None else snapshotCopyConfig.timestamp 
-        table_config = [] if snapshotCopyConfig.tableConfig is None else snapshotCopyConfig.tableConfig 
-        patients_to_be_copied = [] if snapshotCopyConfig.patientsToBeCopied is None else snapshotCopyConfig.patientsToBeCopied 
+        date_filter = "" if snapshotCopyConfig.timestamp is None else snapshotCopyConfig.timestamp
+        table_config = [] if snapshotCopyConfig.tableConfig is None else snapshotCopyConfig.tableConfig
+        patients_to_be_copied = [
+        ] if snapshotCopyConfig.patientsToBeCopied is None else snapshotCopyConfig.patientsToBeCopied
 
     return date_filter, table_config, patients_to_be_copied
 
@@ -56,12 +57,13 @@ def _upload_dataframe_as_parquet_to_object_store(target_schema: str, table_name:
             bucket_name}/{file_name}""")
 
 
+@task(log_prints=True)
 def datamart_copy_schema(
     db: DBDao,
     sourceSchema,
     targetSchema,
     snapshotCopyConfig: SnapshotCopyConfig,
-    datamart_action: DATAMART_ACTIONS,
+    datamart_action: DATAMART_FLOW_ACTIONS,
 ) -> tuple[List[str], List[str]]:
     date_filter, table_config, patients_to_be_copied = _parse_snapshot_copy_config(
         snapshotCopyConfig)
@@ -85,7 +87,7 @@ def datamart_copy_schema(
         else:
             columns_to_be_copied = ["*"]
 
-        if datamart_action == DATAMART_ACTIONS.COPY_AS_DB_SCHEMA:
+        if datamart_action == DATAMART_FLOW_ACTIONS.CREATE_SNAPSHOT:
             try:
                 rows_inserted = db.datamart_copy_table(
                     datamart_base_config, targetSchema, columns_to_be_copied, date_filter, patients_to_be_copied)
@@ -98,7 +100,7 @@ def datamart_copy_schema(
                     sourceSchema} to {targetSchema} for table: {datamart_base_config['tableName']}""")
                 successful_tables.append(datamart_base_config["tableName"])
 
-        elif datamart_action == DATAMART_ACTIONS.COPY_AS_PARQUET_FILE:
+        elif datamart_action == DATAMART_FLOW_ACTIONS.CREATE_PARQUET_SNAPSHOT:
             try:
                 df = db.datamart_get_copy_as_dataframe(
                     datamart_base_config, columns_to_be_copied, date_filter, patients_to_be_copied)
