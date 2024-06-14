@@ -24,9 +24,6 @@ jobs:
       DB_SVC__PATH: "/alpdb"
       OMOP__VOCAB_SCHEMA: "CDMVOCAB"
       HANA__READ_ROLE: "TENANT_READ_ROLE"
-      B2C__ALP_APP__CLIENT_ID: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce"
-      AD__IDENTITY_METADATA: "https://login.microsoftonline.com/f59c7915-9283-4fb5-b633-435b9145ca00/v2.0/.well-known/openid-configuration"
-      AD__AUDIENCE: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce, 3da7b194-8456-4ef1-a790-00ef6360decd"
       SKIP_AUTH: "TRUE"
       DISABLE_SSL: "TRUE"
       ROLLBACK_SCHEMA_CREATION_FOR_LIQUIBASE_SCRIPT_FAILURE: "TRUE"
@@ -38,8 +35,6 @@ jobs:
       # INGESTION-SVC ENV
       ALP_INGESTION_HTTP_PORT: "3444"
       ALP_INGESTION_BASE_PATH: "/alp-ingestion"
-      OAUTH_CLIENT_ID: "30dccbb9-5705-483f-bbaf-1f7c8f0f4fce"
-      OAUTH_AD_META: "https://login.microsoftonline.com/f59c7915-9283-4fb5-b633-435b9145ca00/v2.0/.well-known/openid-configuration"
       POSTGRES_CONNECTION_CONFIG: "{}"
       POSTGRES_DATABASES_CREDENTIALS: "{}"
       PG__DATA_INGESTION__DB_NAME: "alp"

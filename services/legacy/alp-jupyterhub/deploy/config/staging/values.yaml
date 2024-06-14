@@ -38,8 +38,8 @@ singleuser:
     d4lNexus:
       tag: 'latest'
   extraEnv:
-    PYQE_JWT_AUDIENCE: "97222277-0b53-4d21-aa32-53676f4edb56"
-    PYQE_AZUREADB2C_CLIENT_ID: "97222277-0b53-4d21-aa32-53676f4edb56"
+    PYQE_JWT_AUDIENCE: ""
+    PYQE_AZUREADB2C_CLIENT_ID: ""
 
 ingress:
   enabled: true

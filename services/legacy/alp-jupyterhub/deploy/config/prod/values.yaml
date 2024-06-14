@@ -38,8 +38,8 @@ singleuser:
     azureCR:
       tag: 'v23.1-kita-dake'
   extraEnv:
-    PYQE_JWT_AUDIENCE: "d34ece38-f90e-41c0-8960-c76a432fcf9b"
-    PYQE_AZUREADB2C_CLIENT_ID: "d34ece38-f90e-41c0-8960-c76a432fcf9b"
+    PYQE_JWT_AUDIENCE: ""
+    PYQE_AZUREADB2C_CLIENT_ID: ""
 
 ingress:
   enabled: true
