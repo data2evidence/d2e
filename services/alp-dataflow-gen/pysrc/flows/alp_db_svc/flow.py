@@ -44,7 +44,7 @@ def create_datamodel_flow(options: CreateDataModelType):
             vocab_schema=options.vocab_schema,
             changelog_file=options.changelog_filepath_list.get(
                 options.data_model),
-            count=int(options.update_count),
+            count=options.update_count,
             cleansed_schema_option=options.cleansed_schema_option,
             plugin_classpath=get_plugin_classpath(options.flow_name),
             dialect=db_dialect
