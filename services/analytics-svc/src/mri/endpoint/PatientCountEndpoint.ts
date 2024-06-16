@@ -172,9 +172,9 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
             const studyAnalyticsCredential = {
                 ...analyticsCredentials[currStudyDBname],
             };
-            studyAnalyticsCredential.schema = currStudySchemaName
+            studyAnalyticsCredential.schemaName = currStudySchemaName
                 ? currStudySchemaName.toUpperCase()
-                : studyAnalyticsCredential.probeSchema.toUpperCase();
+                : studyAnalyticsCredential.probeSchemaName.toUpperCase();
 
             dbCreds[studyId] = studyAnalyticsCredential;
         });
@@ -211,7 +211,8 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
                         await dbConnectionUtil.DBConnectionUtil.getDBConnection(
                             {
                                 credentials: ac,
-                                schema: ac.schema || ac.cdwSchema,
+                                schemaName: ac.schemaName,
+                                vocabSchemaName: ac.vocabSchemaName,
                                 userObj,
                             }
                         );

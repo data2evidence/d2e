@@ -94,7 +94,7 @@ const getConfigDbConnection = async (
 ): Promise<Connection.ConnectionInterface> => {
   const db = await dbConnectionUtil.DBConnectionUtil.getDBConnection({
     credentials,
-    schema: credentials.configSchema || credentials.schema,
+    schemaName: credentials.schema,
   });
 
   return db;

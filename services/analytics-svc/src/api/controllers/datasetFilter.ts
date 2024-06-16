@@ -218,7 +218,8 @@ const queryFilterScopes = async (
     const dbConnection =
         await dbConnectionUtil.DBConnectionUtil.getDBConnection({
             credentials: dbCredentials,
-            schema: dbCredentials.schema,
+            schemaName: dbCredentials.schemaName,
+            vocabSchemaName: dbCredentials.vocabSchemaName,
             userObj,
         });
 
@@ -266,7 +267,8 @@ const filter = async (databaseName, schemas, dialect, filterParams, req) => {
     const dbConnection =
         await dbConnectionUtil.DBConnectionUtil.getDBConnection({
             credentials: dbCredentials,
-            schema: dbCredentials.schema,
+            schemaName: dbCredentials.schemaName,
+            vocabSchemaName: dbCredentials.vocabSchemaName,
             userObj,
         });
 
