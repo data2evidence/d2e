@@ -14,7 +14,6 @@ const Env = z.object({
     SERVICE_ROUTES: z
         .string()
         .transform((str, ctx): z.infer<ReturnType<typeof object>> => {
-            
             try {
                 return JSON.parse(str);
             } catch (e) {
@@ -22,6 +21,7 @@ const Env = z.object({
                 return z.never();
             }
         }),
+    TLS__INTERNAL__CA_CRT: z.string(),
 });
 
 const result = Env.safeParse(process.env);

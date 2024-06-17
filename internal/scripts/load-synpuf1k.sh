@@ -27,6 +27,6 @@ echo . unzip with OVERWRITE
 cd $CACHE_DIR
 unzip -o $CACHE_DIR/$ZIPFILE_NAME -d .
 
-echo . seed-postgres-cdm-schemas
+echo . create-postgres-cdm-schemas
 cd $GIT_BASE_DIR
-yarn seed-postgres-cdm-schemas alpdev_pg cdmdefault
+yarn create-postgres-cdm-schemas alpdev_pg cdmdefault
