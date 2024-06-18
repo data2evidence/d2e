@@ -26,12 +26,12 @@ jobs:
         repository: alp-os/d2e-dev-santan
         token: ${{ secrets.CI_PAT }}
 
-    - uses: dorny/paths-filter@v3.0.2
-      id: check_file_changed
-      with:
-        filters: |
-          alp_dataflow_gen_changed:
-            - 'services/alp-dataflow-gen/**'
+    # - uses: dorny/paths-filter@v3.0.2
+    #   id: check_file_changed
+    #   with:
+    #     filters: |
+    #       alp_dataflow_gen_changed:
+    #         - 'services/alp-dataflow-gen/**'
             
     - name: Setup python if files have changed
       uses: actions/setup-python@v2
