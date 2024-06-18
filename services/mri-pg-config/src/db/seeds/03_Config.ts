@@ -27151,12 +27151,7 @@ const cdwConfigDuckdb = {
 			"dimTables": [
 				{
 					"placeholder": "@COND",
-					"attributeTables": [
-						{
-							"placeholder": "@CONDVOCAB",
-							"oneToN": true
-						}
-					],
+					"attributeTables": [],
 					"hierarchy": true,
 					"time": true,
 					"oneToN": true,
@@ -27309,10 +27304,6 @@ const cdwConfigDuckdb = {
 			"@COND.START": "\"condition_concept_id\"",
 			"@COND.END": "\"condition_concept_id\"",
 			"@COND.INTERACTION_TYPE": "\"condition_type_concept_id\"",
-			"@CONDVOCAB": "$$VOCAB_SCHEMA$$.\"concept\"",
-			"@CONDVOCAB.INTERACTION_ID": "\"concept_id\"",
-			"@CONDVOCAB.ATTRIBUTE": "\"concept_id\"",
-			"@CONDVOCAB.VALUE": "\"concept_name\"",
 			"@VISIT": "$$SCHEMA$$.\"visit_occurrence\"",
 			"@VISIT.PATIENT_ID": "\"person_id\"",
 			"@VISIT.INTERACTION_ID": "\"visit_concept_id\"",
