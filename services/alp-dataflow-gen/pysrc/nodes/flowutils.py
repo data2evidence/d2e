@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 import rpy2.robjects as ro
 from rpy2.robjects import pandas2ri
-from nodes.nodes import Result
 
 def get_node_list(graph):
     nodes = {}
