@@ -1,5 +1,11 @@
-# Initialize the default plugins
+# Load Dataflow Plugins
 
+The following plugins are currently available:
+- [D2E-Plugins](https://github.com/alp-os/d2e-plugins)
+
+## 1-Step Upload
+
+### Add PAT to seeded plugin url
 Install the default plugins will require the PAT in order to access the private repositories.
 
 Run below shell command once the system is up
@@ -11,7 +17,10 @@ docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp 
 
 ```
 
-After running the shell commands, you should switch to the `setup` page to manually trigger the plugin upload.
+
+###  Initialize the default plugins
+
+Switch to `setup` page.
 
 Click the `initialize` button under `Plugin` 
 > ![](../../../docs/images/dataflow/PluginSetUp.png)
@@ -20,3 +29,4 @@ Click the `initialize` button under `Plugin`
 Confirm the upload by clicking `Yes, install` at the dialog.
 > ![](../../../docs/images/dataflow/PluginSetUpDialog.png)
 
+This will initialize all the plugins available.

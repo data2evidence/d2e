@@ -4,7 +4,7 @@ export default `[notebook]
  [[[db2]]]
   name = HANA
   interface=sqlalchemy
-  options='{"url": "hana://TENANT_READ_USER:@alp-hn-gold-sg.southeastasia.cloudapp.azure.com:39013/ALPDEV"}'
+  options='{"url": "hana://TENANT_READ_USER:@dummy-hostname.com:39013/ALPDEV"}'
   
  [[[postgresql]]]
   name = PostgreSql

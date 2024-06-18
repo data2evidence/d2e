@@ -247,9 +247,9 @@ https://*.alp.local:55555 {
 	}
 }
 
-https://${CADDY__ALP__INTERNAL_FQDN:localhost}:41101 https://host.docker.internal:41101 {
+https://localhost:41101 {
 	tls internal
-	import portal
+	respond ""
 }
 
 https://{$CADDY__ALP__PUBLIC_FQDN} {

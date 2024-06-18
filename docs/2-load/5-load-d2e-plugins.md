@@ -3,6 +3,21 @@
 The following plugins are currently available:
 - [D2E-Plugins](https://github.com/alp-os/d2e-plugins)
 
+## 1-Step Upload
+
+###  Initialize the default plugins
+
+Switch to `setup` page.
+
+Click the `initialize` button under `Plugin` .
+> ![](../images/dataflow/PluginSetUp.png)
+
+
+Confirm the upload by clicking `Yes, install` at the dialog.
+> ![](../images/dataflow/PluginSetUpDialog.png)
+
+This will initialize all the plugins available.
+
 ## Upload from zipfile
 ### Create Plugin zipfile
 - If needed, clone git repositories

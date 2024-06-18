@@ -1,4 +1,7 @@
 import { getJsonWalkFunction, getObjectByPath } from "@alp/alp-base-utils";
+import { Logger } from "@alp/alp-base-utils";
+import TerminologySvcAPI from "../../api/TerminologySvcAPI";
+const logger = Logger.CreateLogger();
 
 type ConceptSetConcept = {
     id: number;
@@ -112,25 +115,20 @@ const mockables = {
         datasetId: string,
         bearerToken: string
     ): Promise<number[]> => {
-        const url =
-            "http://alp-minerva-terminology-svc-1:41108/terminology/concept-set/included-concepts";
-        const res = await fetch(url, {
-            body: JSON.stringify({ conceptSetIds, datasetId }),
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "authorization": bearerToken,
-            },
-        });
-        if (res.ok) {
-            const conceptIds = (await res.json()) as number[];
-            return conceptIds;
-        } else {
-            throw new Error(
-                `Error getting concept ids for concept sets: ${JSON.stringify(
-                    conceptSetIds
-                )}`
+        try {
+            const terminologySvcApi = new TerminologySvcAPI();
+            const result = await terminologySvcApi.getConceptIds(
+                conceptSetIds,
+                datasetId,
+                bearerToken
             );
+            return result;
+        } catch (err) {
+            const errorMessage = `Error getting concept ids for concept sets: ${JSON.stringify(
+                conceptSetIds
+            )} with Error: ${err}`;
+            logger.error(errorMessage);
+            throw err;
         }
     },
 };
