@@ -21,6 +21,10 @@ jobs:
       run: sudo apt-get install protobuf-compiler
 
     - uses: actions/checkout@v4
+      with:
+        ref: internal-114_prefect-results-in-s3
+        repository: alp-os/d2e-dev-santan
+        token: ${{ secrets.CI_PAT }}
 
     - uses: dorny/paths-filter@v3.0.2
       id: check_file_changed
