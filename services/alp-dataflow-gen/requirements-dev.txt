@@ -1,5 +1,4 @@
 setuptools-rust==1.5.2
-pyarrow==11.0.0
 jsonpath-ng==1.5.3
 dask-sql==2023.8.0
 psycopg2-binary==2.9.6
