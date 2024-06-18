@@ -41,11 +41,11 @@ jobs:
         cache: 'pip'
   
     - name: Install pip packages if files have changed
-      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
+      # if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
       working-directory: ./services/alp-dataflow-gen
       run: pip install -r requirements-dev.txt
 
     - name: Run unit tests if files have changed
-      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
+      # if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.alp_dataflow_gen_changed == 'True'
       working-directory: ./services/alp-dataflow-gen/pysrc
       run: python3 -m pytest -v --disable-pytest-warnings
