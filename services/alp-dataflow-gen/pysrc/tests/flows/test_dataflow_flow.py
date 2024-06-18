@@ -7,6 +7,7 @@ import nodes.nodes as nodes
 import dask.dataframe as dd
 import pandas as pd
 from utils.types import PG_TENANT_USERS
+from prefect.testing.utilities import prefect_test_harness
 
 
 @pytest.fixture
@@ -26,6 +27,10 @@ def mock_GetDBConnection(db_name, user_type):
 def mock_persist_results_flow(nodes, trace, root_flow_run_id):
     return "_dummy_persist_results_flow"
 
+@pytest.fixture(autouse=True, scope="session")
+def prefect_test_fixture():
+    with prefect_test_harness():
+        yield
 
 def test_execute_dataflow_flow(setup, mock_dataflow):
     # results object will have 2 items, [generate_nodes_flow, execute_nodes_flow].
