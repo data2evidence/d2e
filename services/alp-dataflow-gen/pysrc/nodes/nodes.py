@@ -1170,3 +1170,6 @@ def get_results_by_class_type(results: Dict[str, Result], nodeType: Node):
 
 def get_input_nodes_by_class_type_from_results(inputs: Dict[str, Result], nodeType: Node) -> List[Node]:
     return [inputs[o].node for o in inputs if not inputs[o].error and isinstance(inputs[o].node, nodeType)]
+
+def serialize_result_to_json(result: Result):
+    return serialize_to_json(result.data)
