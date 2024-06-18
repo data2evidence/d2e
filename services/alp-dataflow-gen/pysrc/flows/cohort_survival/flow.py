@@ -46,7 +46,7 @@ def generate_cohort_survival_data(
     db_credentials = dbutils_module.extract_db_credentials(database_code)
 
     with conversion.localconverter(default_converter):
-        robjects.r(
+        result = robjects.r(
             f"""
 # Function to generate a random string of specified length
 .libPaths(c('{r_libs_user_directory}',.libPaths()))
@@ -115,13 +115,17 @@ tryCatch(
 
         plot <- plotSurvival(death_survival)
         plot_data <- ggplot_build(plot)$data[[1]]
-        my_json <- toJSON(plot_data)
-        print(my_json)
-        # TODO: Send it to save
+        plot_data$status <- "SUCCESS"
+        plot_data_json <- toJSON(plot_data)
+        
+        print(plot_data_json)
         cdm_disconnect(cdm)
+        return(plot_data_json)
     }},
     error = function(e) {{
         print(e)
+        data <- list(status="ERROR", e$message)
+        return(data)
     }},
     finally = {{
         if (!is.null(con)) {{
@@ -134,3 +138,5 @@ tryCatch(
 )        
 """
         )
+        # TODO: need to check api for sending data to s3
+        return result
