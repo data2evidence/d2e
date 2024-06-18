@@ -60,7 +60,7 @@ export class DuckdbConnection implements ConnectionInterface {
         public conn: Connection,
         public database: Database,
         public schemaName: string,
-        public duckdbSchemaFileName: string,
+        public vocabSchemaName: string,
         public dialect = "DUCKDB"
     ) {}
 
@@ -83,7 +83,7 @@ export class DuckdbConnection implements ConnectionInterface {
                 duckdDBconn,
                 duckdDB,
                 duckdbSchemaFileName,
-                duckdbSchemaFileName
+                duckdbVocabSchemaFileName,
             );
 
             callback(null, conn);
@@ -174,7 +174,7 @@ export class DuckdbConnection implements ConnectionInterface {
 
     private parseSql(temp: string): string {
         temp = this.getSqlStatementWithSchemaName(this.schemaName, temp);
-        return translateHanaToDuckdb(temp, this.schemaName);
+        return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName);
     }
 
     public getTranslatedSql(sql: string): string {
