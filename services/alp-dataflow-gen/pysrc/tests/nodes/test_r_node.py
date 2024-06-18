@@ -17,7 +17,7 @@ def test_r_node_task(helpers, mock_r_node_json, mock_task_run_context):
     r_node = nodes.RNode(mock_r_node_json)
     result = r_node.task(5, mock_task_run_context)
 
-    assert result.error == None
+    assert result.error == False
     assert result.data == 10
     helpers.assert_result_metadata(result, mock_task_run_context)
 
@@ -32,6 +32,6 @@ def test_r_node_task_fails_with_invalid_r_code(helpers, mock_task_run_context):
     })
     result = r_node.task('_dummy_input', mock_task_run_context)
 
-    assert isinstance(result.error, RRuntimeError)
+    assert isinstance(result.error, True)
     assert isinstance(result.data, str)
     helpers.assert_result_metadata(result, mock_task_run_context)

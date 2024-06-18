@@ -8,7 +8,7 @@ def test_csv_node_task(helpers, mock_dataflow, mock_task_run_context):
     csv_node = nodes.CsvNode(csv_node_object)
     result = csv_node.task(mock_task_run_context)
 
-    assert result.error == None
+    assert result.error == False
     assert isinstance(result.data, dd.DataFrame)
     assert len(result.data.compute().index) == 5
     helpers.assert_result_metadata(result, mock_task_run_context)
@@ -21,6 +21,6 @@ def test_csv_node_task_error_with_file_not_found(helpers, mock_dataflow, mock_ta
     csv_node = nodes.CsvNode(csv_node_object)
     result = csv_node.task(mock_task_run_context)
 
-    assert isinstance(result.error, FileNotFoundError)
+    assert isinstance(result.error, True)
     assert isinstance(result.data, str)
     helpers.assert_result_metadata(result, mock_task_run_context)

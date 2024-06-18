@@ -7,7 +7,7 @@ def test_python_node_task(helpers, mock_dataflow, mock_task_run_context):
         mock_dataflow["json_graph"]["nodes"]["multiplybyten"])
     result = python_node.task(5, mock_task_run_context)
 
-    assert result.error == None
+    assert result.error == False
     assert result.data == 50
     helpers.assert_result_metadata(result, mock_task_run_context)
 
@@ -17,7 +17,7 @@ def test_python_node_task_error_with_wrong_input(helpers, mock_dataflow, mock_ta
         mock_dataflow["json_graph"]["nodes"]["multiplybyten"])
     result = python_node.task(None, mock_task_run_context)
 
-    assert isinstance(result.error, TypeError)
+    assert isinstance(result.error, True)
     assert isinstance(result.data, str)
     helpers.assert_result_metadata(result, mock_task_run_context)
 
@@ -32,6 +32,6 @@ def test_python_node_task_error_with_invalid_python_code(helpers, mock_task_run_
         },)
     result = python_node.task(None, mock_task_run_context)
 
-    assert isinstance(result.error, NameError)
+    assert isinstance(result.error, True)
     assert isinstance(result.data, str)
     helpers.assert_result_metadata(result, mock_task_run_context)
