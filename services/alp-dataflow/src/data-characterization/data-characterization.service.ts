@@ -4,7 +4,7 @@ import { PrefectAPI } from '../prefect/prefect.api'
 import { DataCharacterizationFlowRunDto } from './dto'
 import { PortalServerAPI } from '../portal-server/portal-server.api'
 import { AnalyticsSvcAPI } from '../analytics-svc/analytics-svc.api'
-import { PrefectDeploymentName, PrefectFlowName, PrefectTagNames } from '../common/const'
+import { PrefectDeploymentName, PrefectTagNames } from '../common/const'
 import { FLOW_RUN_STATE_TYPES } from '../common/const'
 
 interface DataCharacterizationOptions {
@@ -57,7 +57,7 @@ export class DataCharacterizationService {
   }
 
   async createDataCharacterizationFlowRun(dataCharacterizationFlowRunDto: DataCharacterizationFlowRunDto) {
-    const dcFlowName = PrefectFlowName.DATA_CHARACTERIZATION
+    const dcFlowName = dataCharacterizationFlowRunDto.flowName
     const dcDeploymentName = dataCharacterizationFlowRunDto.deploymentName
     const datasetId = dataCharacterizationFlowRunDto.datasetId
     const comment = dataCharacterizationFlowRunDto.comment

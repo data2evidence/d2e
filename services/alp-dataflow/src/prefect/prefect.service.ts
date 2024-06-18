@@ -498,7 +498,7 @@ export class PrefectService {
     }
 
     if (metadata.type === FLOW_METADATA.data_characterization) {
-      const dcOptions = { ...metadata.options, deploymentName: deployment.name }
+      const dcOptions = { ...metadata.options, deploymentName: deployment.name, flowName: currentFlow.name }
       return this.dataCharacterizationService.createDataCharacterizationFlowRun(
         dcOptions as DataCharacterizationFlowRunDto
       )
