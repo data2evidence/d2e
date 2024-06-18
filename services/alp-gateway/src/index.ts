@@ -351,6 +351,7 @@ routes.forEach((route: IRouteProp) => {
           source,
           ensureAuthenticated,
           ensureAuthorized,
+          express.json(),
           ensureTerminologyDatasetAuthorized,
           checkScopes,
           createProxyMiddleware({ ...getCreateMiddlewareOptions(services.terminology), onProxyReq: onProxyReq })
