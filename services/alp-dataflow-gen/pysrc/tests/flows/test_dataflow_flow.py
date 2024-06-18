@@ -3,6 +3,7 @@ from main import execute_dataflow_flow
 import alpconnection.dbutils as dbutils
 import flows.dataflow.flow as dataflow_flow
 from nodes.nodes import DbQueryReader
+from prefect.filesystems import RemoteFileSystem as RFS
 import nodes.nodes as nodes
 import dask.dataframe as dd
 import pandas as pd
@@ -17,6 +18,7 @@ def setup(monkeypatch):
 
     # Mock DbQueryReader to run its own test method instead of task
     monkeypatch.setattr(DbQueryReader, 'task', DbQueryReader.test)
+    monkeypatch.setattr(RFS, 'load', lambda x: None)
 
 
 def mock_GetDBConnection(db_name, user_type):
