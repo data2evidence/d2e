@@ -25,6 +25,6 @@ def test_sql_node_task_error_with_wrong_input(helpers, mock_ddf_person, mock_dat
         None, mock_ddf_person, sql_node, mock_task_run_context)}
     result = sql_node.task(_input, mock_task_run_context)
 
-    assert isinstance(result.error, True)
+    assert result.error == True
     assert isinstance(result.data, str)
     helpers.assert_result_metadata(result, mock_task_run_context)

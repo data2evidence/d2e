@@ -34,6 +34,6 @@ def test_data_mapping_node_task_error_with_wrong_input(helpers, mock_ddf_person,
     }
     result = data_mapping_node.task(_input, mock_task_run_context)
 
-    assert isinstance(result.error, True)
+    assert result.error == True
     assert isinstance(result.data, str)
     helpers.assert_result_metadata(result, mock_task_run_context)

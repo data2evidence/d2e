@@ -32,6 +32,6 @@ def test_r_node_task_fails_with_invalid_r_code(helpers, mock_task_run_context):
     })
     result = r_node.task('_dummy_input', mock_task_run_context)
 
-    assert isinstance(result.error, True)
+    assert result.error == True
     assert isinstance(result.data, str)
     helpers.assert_result_metadata(result, mock_task_run_context)
