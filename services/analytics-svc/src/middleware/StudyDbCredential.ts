@@ -42,8 +42,8 @@ export default async (req: IMRIRequest, res, next) => {
         };
 
         if (studyAnalyticsCredential.dialect === DB.HANA) {
-            studyAnalyticsCredential.schemaName =
-                studyAnalyticsCredential.schemaName.toUpperCase();
+            studyAnalyticsCredential.schema =
+                studyAnalyticsCredential.schema.toUpperCase();
         }
         req.dbCredentials = {
             ...req.dbCredentials,
@@ -76,18 +76,18 @@ export default async (req: IMRIRequest, res, next) => {
             ...analyticsCredentials[studyDatabaseName],
         };
 
-        studyAnalyticsCredential.schemaName = studySchemaName
+        studyAnalyticsCredential.schema = studySchemaName
             ? studySchemaName
-            : studyAnalyticsCredential.probeSchemaName;
-        studyAnalyticsCredential.vocabSchemaName = studyVocabSchemaName
+            : studyAnalyticsCredential.probeSchema;
+        studyAnalyticsCredential.vocabSchema = studyVocabSchemaName
             ? studyVocabSchemaName
             : null;
 
         if (studyAnalyticsCredential.dialect === DB.HANA) {
-            studyAnalyticsCredential.schemaName =
-                studyAnalyticsCredential.schemaName.toUpperCase();
-            studyAnalyticsCredential.vocabSchemaName =
-                studyAnalyticsCredential.vocabSchemaName.toUpperCase();
+            studyAnalyticsCredential.schema =
+                studyAnalyticsCredential.schema.toUpperCase();
+            studyAnalyticsCredential.vocabSchema =
+                studyAnalyticsCredential.vocabSchema.toUpperCase();
         }
 
         req.dbCredentials = {

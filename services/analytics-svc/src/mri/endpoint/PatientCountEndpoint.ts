@@ -172,9 +172,9 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
             const studyAnalyticsCredential = {
                 ...analyticsCredentials[currStudyDBname],
             };
-            studyAnalyticsCredential.schemaName = currStudySchemaName
+            studyAnalyticsCredential.schema = currStudySchemaName
                 ? currStudySchemaName.toUpperCase()
-                : studyAnalyticsCredential.probeSchemaName.toUpperCase();
+                : studyAnalyticsCredential.probeSchema.toUpperCase();
 
             dbCreds[studyId] = studyAnalyticsCredential;
         });

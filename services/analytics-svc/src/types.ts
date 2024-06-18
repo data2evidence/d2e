@@ -367,10 +367,10 @@ export interface StudyAnalyticsCredential {
     user: string;
     password: string;
     encrypt: boolean;
-    probeSchemaName: string;
-    vocabSchemaName: string;
+    probeSchema: string;
+    vocabSchema: string;
     dialect: string;
-    schemaName: string;
+    schema: string;
 }
 
 export interface StudyDbMetadata {

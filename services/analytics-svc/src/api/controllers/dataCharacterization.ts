@@ -142,8 +142,8 @@ export async function getDataCharacterizationResult(
         const analyticsConnection =
             await dbConnectionUtil.DBConnectionUtil.getDBConnection({
                 credentials: studyAnalyticsCredential,
-                schemaName: studyAnalyticsCredential.schemaName,
-                vocabSchemaName: studyAnalyticsCredential.vocabSchemaName
+                schemaName: studyAnalyticsCredential.schema,
+                vocabSchemaName: studyAnalyticsCredential.vocabSchema
             });
 
         let dataCharacterizationEndpoint = new DataCharacterizationEndpoint(
@@ -207,8 +207,8 @@ export async function getDataCharacterizationDrilldownResult(
         const analyticsConnection =
             await dbConnectionUtil.DBConnectionUtil.getDBConnection({
                 credentials: studyAnalyticsCredential,
-                schemaName: studyAnalyticsCredential.schemaName,
-                vocabSchemaName: studyAnalyticsCredential.vocabSchemaName
+                schemaName: studyAnalyticsCredential.schema,
+                vocabSchemaName: studyAnalyticsCredential.vocabSchema
             });
 
         let dataCharacterizationEndpoint = new DataCharacterizationEndpoint(

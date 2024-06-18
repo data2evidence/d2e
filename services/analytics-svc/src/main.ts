@@ -522,8 +522,8 @@ const getDBConnections = async ({
     const vocabConnectionPromise =
         dbConnectionUtil.DBConnectionUtil.getDBConnection({
             credentials: vocabCredentials,
-            schemaName: vocabCredentials.vocabSchemaName,
-            vocabSchemaName: vocabCredentials.vocabSchemaName,
+            schemaName: vocabCredentials.vocabSchema,
+            vocabSchemaName: vocabCredentials.vocabSchema,
             userObj,
         });
 
@@ -585,8 +585,8 @@ const getDBConnections = async ({
         analyticsConnectionPromise =
             dbConnectionUtil.DBConnectionUtil.getDBConnection({
                 credentials: analyticsCredentials,
-                schemaName: analyticsCredentials.schemaName,
-                vocabSchemaName: vocabCredentials.vocabSchemaName,
+                schemaName: analyticsCredentials.schema,
+                vocabSchemaName: vocabCredentials.vocabSchema,
                 userObj,
             });
     }
