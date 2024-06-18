@@ -103,6 +103,15 @@ export default class DefaultPluginsSeeder implements Seeder {
         status: PluginUploadStatus.PENDING,
         createdBy: 'system',
         modifiedBy: 'system'
+      },
+      {
+        pluginId: '0b77fb09-7363-4bf5-8907-08d3dd72dd6e',
+        name: 'data-load',
+        type: 'default',
+        url: 'https://github.com/alp-os/d2e-plugins.git@main#subdirectory=data-load',
+        status: PluginUploadStatus.PENDING,
+        createdBy: 'system',
+        modifiedBy: 'system'
       }
     ])
     await repository.save(entities)
