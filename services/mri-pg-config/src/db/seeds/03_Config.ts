@@ -27950,6 +27950,26 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Visit type concept id"
+              },
+              {
+                  "source": "patient.interactions.visit.attributes.visit_occ_concept_name",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": true,
+                  "useRefValue": true,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 9
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Visit concept name"
               }
           ],
           "initialPatientlistColumn": false,
@@ -28530,6 +28550,26 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Unit concept set"
+              },
+              {
+                  "source": "patient.interactions.specimen.attributes.specimen_concept_name",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": true,
+                  "useRefValue": true,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 16
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Specimen concept name"
               }
           ],
           "initialPatientlistColumn": false,
@@ -28740,6 +28780,26 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Modifier concept set"
+              },
+              {
+                  "source": "patient.interactions.proc.attributes.proc_occ_concept_name",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": true,
+                  "useRefValue": true,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 11
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Procedure concept name"
               }
           ],
           "initialPatientlistColumn": false,
@@ -29290,6 +29350,26 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Observation concept id"
+              },
+              {
+                  "source": "patient.interactions.observation.attributes.obs_concept_name",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": true,
+                  "useRefValue": true,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 17
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Observation concept name"
               }
           ],
           "initialPatientlistColumn": false,
@@ -29540,6 +29620,26 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Unit concept id"
+              },
+              {
+                  "source": "patient.interactions.measurement.attributes.meas_concept_name",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": true,
+                  "useRefValue": true,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 13
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Measurement concept name"
               }
           ],
           "initialPatientlistColumn": false,
@@ -30100,6 +30200,26 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Drug type concept set"
+              },
+              {
+                  "source": "patient.interactions.drugexposure.attributes.drug_concept_name",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": true,
+                  "useRefValue": true,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 19
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Drug concept name"
               }
           ],
           "initialPatientlistColumn": false,
@@ -30630,6 +30750,26 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Device Type concept id"
+              },
+              {
+                  "source": "patient.interactions.deviceexposure.attributes.device_concept_name",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": true,
+                  "useRefValue": true,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 9
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Device concept name"
               }
           ],
           "initialPatientlistColumn": false,
@@ -30740,6 +30880,26 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Death Type concept id"
+              },
+              {
+                  "source": "patient.interactions.death.attributes.death_type_concept_name",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": false,
+                  "useRefValue": false,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 6
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Death Type concept name"
               }
           ],
           "initialPatientlistColumn": false,
