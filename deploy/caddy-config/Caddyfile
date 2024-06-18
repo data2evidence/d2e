@@ -32,6 +32,25 @@ https://*.alp.local:55555 {
 		}
 	}
 
+	# Logto api server
+    @logto {
+        path /index.*
+        path /api/*
+        path /oidc/*
+        path /sign-in
+        path /consent
+    }
+
+    handle @logto {
+
+        reverse_proxy http://alp-logto-1:3001 {
+			header_up Host {upstream_hostport}
+			transport http {
+				read_buffer 8192
+				}
+			}
+    }
+
 	handle /alp-prefect/* {
 		uri strip_prefix /alp-prefect
 		reverse_proxy http://alp-dataflow-gen-1:41120 {
@@ -228,33 +247,14 @@ https://*.alp.local:55555 {
 	}
 }
 
-https://${CADDY__ALP__INTERNAL_FQDN:localhost}:41101 https://host.docker.internal:41101 {
+https://localhost:41101 {
 	tls internal
-	import portal
+	respond ""
 }
 
 https://{$CADDY__ALP__PUBLIC_FQDN} {
 	{$TLS__CADDY_DIRECTIVE}
 	import portal
-}
-
-https://{$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3001 {
-	log {
-		format console {
-			level_format color
-		}
-	}
-
-	{$TLS__CADDY_DIRECTIVE}
-
-	handle /* {
-		reverse_proxy http://alp-logto-1:3001 {
-			header_up Host {$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3001
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
 }
 
 https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
@@ -268,27 +268,6 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 	handle /* {
 		reverse_proxy http://alp-minerva-fhir-fe-server-1:3000 {
 			header_up Host {$CADDY__FHIR_SERVER__PUBLIC_FQDN}:3000
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-}
-
-https://{$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3002 {
-	log {
-		format console {
-			level_format color
-		}
-	}
-
-	{$TLS__CADDY_DIRECTIVE}
-
-	handle /* {
-		{$CADDY__BLOCK_LOGTO_ADMIN_CONSOLE}
-		reverse_proxy http://alp-logto-1:3002 {
-			header_up Host {$CADDY__LOGTO_IDP__PUBLIC_FQDN}:3002
-
 			transport http {
 				read_buffer 8192
 			}

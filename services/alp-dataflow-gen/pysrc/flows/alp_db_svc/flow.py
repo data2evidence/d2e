@@ -1,369 +1,198 @@
-from prefect import flow, task, get_run_logger
-from dao.DBDao import DBDao
-from prefect_shell import ShellOperation
-import json
-import os
-import site
-from alpconnection.dbutils import get_db_svc_endpoint_dialect
-from utils.types import (PG_TENANT_USERS, AlpDBSvcOptionsType,
-                         requestType, internalPluginType,
-                         createDataModelType, seedVocabType, updateDataModelType,
-                         createSnapshotType,
-                         rollbackTagType, rollbackCountType,
-                         questionnaireDefinitionType, questionnaireResponseType, DATABASE_DIALECTS)
+from flows.alp_db_svc.dataset.main import create_datamodel, update_datamodel, rollback_count_task, rollback_tag_task, create_cdm_schema_tasks
 from flows.alp_db_svc.datamart.main import create_datamart
-from flows.alp_db_svc.datamart.types import DATAMART_ACTIONS, CreateDatamartType, TempCreateDataModelType
-MODULE_DIR = site.getsitepackages()[0]
+from flows.alp_db_svc.datamart.types import DATAMART_FLOW_ACTIONS, CreateDatamartType
+from flows.alp_db_svc.versioninfo.main import get_version_info_task
+from flows.alp_db_svc.questionnaire.main import create_questionnaire_definition_task, get_questionnaire_response_task
+from flows.alp_db_svc.const import get_plugin_classpath, get_db_dialect
+from flows.alp_db_svc.types import (CreateDataModelType,
+                                    UpdateDataModelType,
+                                    GetVersionInfoType,
+                                    CreateSnapshotType,
+                                    RollbackCountType,
+                                    RollbackTagType,
+                                    QuestionnaireDefinitionType,
+                                    QuestionnaireResponseType,
+                                    CreateSchemaType)
+from prefect import get_run_logger
 
 
-def run_alp_db_svc(options: AlpDBSvcOptionsType):
-    request_type = options.requestType
-    request_url = options.requestUrl
-    request_body = options.requestBody if options.requestBody else {}
+def create_cdm_schema(options: CreateSchemaType):
+    db_dialect = get_db_dialect(options)
     try:
-        run_command(request_type, request_url, request_body)
+        create_cdm_schema_tasks(
+            database_code=options.database_code,
+            data_model=options.data_model,
+            schema_name=options.schema_name,
+            vocab_schema=options.vocab_schema,
+            changelog_file=options.changelog_filepath_list.get(
+                options.data_model),
+            plugin_classpath=get_plugin_classpath(options.flow_name),
+            dialect=db_dialect
+        )
     except Exception as e:
-        get_run_logger().error(f"{e}")
+        get_run_logger().error(e)
+        raise (e)
 
-@task
-async def run_command(request_type: str, request_url: str, request_body):
-    logger = get_run_logger()
+
+def create_datamodel_flow(options: CreateDataModelType):
     try:
-        await _run_db_svc_shell_command(request_type, request_url, request_body)
+        db_dialect = get_db_dialect(options)
+        create_datamodel(
+            database_code=options.database_code,
+            data_model=options.data_model,
+            schema_name=options.schema_name,
+            vocab_schema=options.vocab_schema,
+            changelog_file=options.changelog_filepath_list.get(
+                options.data_model),
+            count=int(options.update_count),
+            cleansed_schema_option=options.cleansed_schema_option,
+            plugin_classpath=get_plugin_classpath(options.flow_name),
+            dialect=db_dialect
+        )
     except Exception as e:
-        logger.error(e)
-        raise e
-
-def run_seed_postgres(options: seedVocabType):
-    #Begin by checking if the vocab schema exists or not
-    schema_obj = DBDao(options.database_code, options.vocab_schema, PG_TENANT_USERS.ADMIN_USER)
-    schema_exists = check_seed_schema_exists(schema_obj)
-    
-    db_dialect = _get_db_dialect(options)
-    request_body = {}
-    request_body = _db_svc_flowrun_params(request_body, db_dialect, options.flow_name, options.changelog_filepath)
-    
-    if (schema_exists == False):
-        try:
-            request_body["cleansedSchemaOption"] = False
-            request_body["vocabSchema"] = options.vocab_schema
-            run_command(
-                request_type="post",
-                request_url=f"/alpdb/postgres/database/{options.database_code}/data-model/omop5-4/schema/{options.vocab_schema}",
-                request_body=request_body
-            )
-        except Exception as e:
-            get_run_logger().error(
-                f"Failed to create schema {options.vocab_schema} in db with code:{options.database_code}: {e}")
-            return False
-        
-    if(options.schema_name != options.vocab_schema):
-        #Check if the incoming schema_name exists or not
-        schema_obj = DBDao(options.database_code, options.schema_name, PG_TENANT_USERS.ADMIN_USER)
-        schema_exists = check_seed_schema_exists(schema_obj)
-        if (schema_exists == False):
-            try:
-                run_command(
-                    request_type="post",
-                    request_url=f"/alpdb/postgres/database/{options.database_code}/data-model/omop5-4/schema/{options.schema_name}",
-                    request_body=request_body
-                )
-            except Exception as e:
-                get_run_logger().error(
-                    f"Failed to create schema {options.schema_name} in db with code:{options.database_code}: {e}")
-                return False
-    load_data_flow(options.database_code, options.schema_name)
-
-@flow
-def load_data_flow(database_code: str, schema_name: str):
-    try:
-        run_command(request_type="put",
-                    request_url=f"/alpdb/postgres/database/{database_code}/importdata?schema={schema_name}", request_body={"filePath": "/app/synpuf1k"})
-    except Exception as e:
-        get_run_logger().error(
-            f"Failed to load data into schema {schema_name} in db with code:{database_code}: {e}")
-        return False
-    else:
-        return True
-
-
-@task
-def check_seed_schema_exists(schema_obj) -> bool:
-    return schema_obj.check_schema_exists()
-
-
-async def _run_db_svc_shell_command(request_type: str, request_url: str, request_body):
-    command = f"npm run cdm-install-script -- {request_type} {request_url} {json.dumps(json.dumps(request_body))}"
-
-    # Temporarily use as default class path for dbsvc endpoints not using plugin
-    os.environ["DEFAULT_MIGRATION_SCRIPTS_PATH"] = f"{MODULE_DIR}/d2e_dbsvc/nodejs/dbsvc_files/migration_scripts/"
-
-    print(f"Running DBSvc Command: {command}")
-    await ShellOperation(
-        commands=[
-            "cd /app/libs",
-            ". generated-env.sh",
-            f"cd {MODULE_DIR}/d2e_dbsvc/nodejs/dbsvc_files",
-            command]).run()
-
-
-def _db_svc_flowrun_params(request_body, dialect: str, flow_name: str, changelog_filepath: str):  # move to utils?
-    request_body["customClasspath"] = _get_custom_classpath(flow_name)
-    request_body["customChangelogFilepath"] = _get_custom_changelog_filepath(
-        dialect, changelog_filepath)
-    return request_body
-
-
-def _get_custom_classpath(flow_name: str) -> str:
-    cwd = os.getcwd()
-    return f'{cwd}/{flow_name}/'
-
-
-def _get_custom_changelog_filepath(dialect: str, changelog_filepath: str) -> str:
-    return f'db/migrations/{dialect}/{changelog_filepath}'
-
-
-def _get_db_dialect(options):
-    if (options.flow_name == internalPluginType.DATAMODEL_PLUGIN) or (options.flow_name == internalPluginType.DATAMODEL_PLUGIN):
-        return get_db_svc_endpoint_dialect(options.database_code)
-    else:
-        return options.dialect
-
-
-@task
-async def create_datamodel(options: createDataModelType):
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    update_count = options.update_count
-
-    request_type = requestType.POST
-    request_body = {
-        "cleansedSchemaOption": options.cleansed_schema_option,
-        "vocabSchema": options.vocab_schema}
-
-    try:
-        db_dialect = _get_db_dialect(options)
-
-        request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
-
-        if update_count == 0:
-            request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schema/{schema_name}"
-        elif update_count > 0:
-            request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schema/{schema_name}/update_count/{update_count}"
-
-        await _run_db_svc_shell_command(request_type, request_url, request_body)
-    except Exception as e:
+        get_run_logger().error(e)
         raise e
 
 
-@task
-async def update_datamodel(options: updateDataModelType):
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-
-    request_type = requestType.PUT
-    request_body = {"vocabSchema": options.vocab_schema}
-
+def update_datamodel_flow(options: UpdateDataModelType):
     try:
-        db_dialect = _get_db_dialect(options)
+        db_dialect = get_db_dialect(options)
 
-        request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
-
-        request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}?schema={schema_name}"
-
-        await _run_db_svc_shell_command(request_type, request_url, request_body)
+        update_datamodel(
+            database_code=options.database_code,
+            data_model=options.data_model,
+            schema_name=options.schema_name,
+            vocab_schema=options.vocab_schema,
+            changelog_file=options.changelog_filepath_list.get(
+                options.data_model),
+            plugin_classpath=get_plugin_classpath(options.flow_name),
+            dialect=db_dialect
+        )
     except Exception as e:
+        get_run_logger().error(e)
         raise e
 
 
-def _parse_create_datamart_options(options: createSnapshotType, dialect : str, datamart_action_type: str, ) -> CreateDatamartType:
+def get_version_info_flow(options: GetVersionInfoType):
+    try:
+        get_version_info_task(
+            changelog_file=options.changelog_filepath_list.get(
+                options.data_model),
+            plugin_classpath=get_plugin_classpath(options.flow_name),
+            token=options.token,
+            dataset_list=options.datasets
+        )
+    except Exception as e:
+        get_run_logger().error(e)
+        raise e
+
+
+def _parse_create_datamart_options(options: CreateSnapshotType,
+                                   dialect: str,
+                                   datamart_action_type: str) -> CreateDatamartType:
     return CreateDatamartType(
+        dialect=dialect,
         target_schema=options.schema_name,
         source_schema=options.source_schema,
         data_model=options.data_model,
         database_code=options.database_code,
+        vocab_schema=options.vocab_schema,
         snapshot_copy_config=options.snapshot_copy_config,
-        plugin_changelog_filepath=_get_custom_changelog_filepath(
-            dialect, options.changelog_filepath),
-        plugin_classpath=_get_custom_classpath(options.flow_name),
+        plugin_classpath=get_plugin_classpath(options.flow_name),
+        changelog_file=options.changelog_filepath_list.get(options.data_model),
         datamart_action=datamart_action_type
     )
 
 
-def _parse_temp_create_datamodel_options(options: createSnapshotType, dialect : str) -> TempCreateDataModelType:
-    return TempCreateDataModelType(
-        dialect=dialect,
-        changelog_filepath=options.changelog_filepath,
-        flow_name=options.flow_name,
-        vocab_schema=options.vocab_schema,
-    )
-
-
-@task
-async def create_snapshot(options: createSnapshotType):
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    source_schema = options.source_schema
-    vocab_schema = options.vocab_schema
-    snapshot_copy_config = options.snapshot_copy_config
-    changelog_filepath = options.changelog_filepath
-    flow_name = options.flow_name
-
-    request_type = requestType.POST
-    request_body = {"snapshotCopyConfig": snapshot_copy_config}
-
+def create_snapshot_flow(options: CreateSnapshotType):
     try:
-        db_dialect = _get_db_dialect(options)
+        flow_action_type = options.flow_action_type
+        db_dialect = get_db_dialect(options)
 
-        request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, flow_name, changelog_filepath)
+        print(f"options in create_snapshot_flow is {options}")
 
-        request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schemasnapshot/{schema_name}?source_schema={source_schema}"
-
-        if db_dialect == DATABASE_DIALECTS.HANA:
-            await _run_db_svc_shell_command(request_type, request_url, request_body)
-        elif db_dialect == DATABASE_DIALECTS.POSTGRES:
-            create_datamart_options = _parse_create_datamart_options(
-                options, db_dialect, DATAMART_ACTIONS.COPY_AS_DB_SCHEMA)
-            temp_create_data_model_options = _parse_temp_create_datamodel_options(
-                options, db_dialect)
-            await create_datamart(options=create_datamart_options,
-                            temp_create_data_model_options=temp_create_data_model_options)
-        else:
-            raise Exception(
-                f"Input dialect: {db_dialect} is not supported")
+        match flow_action_type:
+            case DATAMART_FLOW_ACTIONS.CREATE_SNAPSHOT:
+                create_datamart_options = _parse_create_datamart_options(
+                    options, db_dialect, DATAMART_FLOW_ACTIONS.CREATE_SNAPSHOT
+                )
+            case DATAMART_FLOW_ACTIONS.CREATE_PARQUET_SNAPSHOT:
+                create_datamart_options = _parse_create_datamart_options(
+                    options, db_dialect, DATAMART_FLOW_ACTIONS.CREATE_PARQUET_SNAPSHOT)
+        create_datamart(options=create_datamart_options)
     except Exception as e:
+        get_run_logger().error(e)
         raise e
 
 
-@task
-async def create_parquet_snapshot(options: createSnapshotType):
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    source_schema = options.source_schema
-    vocab_schema = options.vocab_schema
-    snapshot_copy_config = options.snapshot_copy_config
-    changelog_filepath = options.changelog_filepath
-    flow_name = options.flow_name
-
-    request_type = requestType.POST
-    request_body = {"snapshotCopyConfig": snapshot_copy_config}
-
+def rollback_count_flow(options: RollbackCountType):
     try:
-        db_dialect = _get_db_dialect(options)
+        db_dialect = get_db_dialect(options)
 
-        request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, flow_name, changelog_filepath)
-
-        request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/schemasnapshotparquet/{schema_name}?sourceschema={source_schema}"
-
-        if db_dialect == DATABASE_DIALECTS.HANA:
-            await _run_db_svc_shell_command(request_type, request_url, request_body)
-        elif db_dialect == DATABASE_DIALECTS.POSTGRES:
-            create_datamart_options = _parse_create_datamart_options(
-                options, db_dialect, DATAMART_ACTIONS.COPY_AS_PARQUET_FILE)
-            temp_create_data_model_options = _parse_temp_create_datamodel_options(
-                options, db_dialect)
-            await create_datamart(options=create_datamart_options,
-                            temp_create_data_model_options=temp_create_data_model_options)
-        else:
-            raise Exception(
-                f"Input dialect: {db_dialect} is not supported")
+        rollback_count_task(
+            database_code=options.database_code,
+            data_model=options.data_model,
+            schema_name=options.schema_name,
+            vocab_schema=options.vocab_schema,
+            changelog_file=options.changelog_filepath_list.get(
+                options.data_model),
+            plugin_classpath=get_plugin_classpath(options.flow_name),
+            dialect=db_dialect,
+            rollback_count=options.rollback_count
+        )
     except Exception as e:
+        get_run_logger().error(e)
         raise e
 
 
-@task
-async def rollback_tag(options: rollbackTagType):
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    rollback_tag = options.rollback_tag
-
-    request_type = requestType.DELETE
-    request_body = {}
-
+def rollback_tag_flow(options: RollbackTagType):
     try:
-        db_dialect = _get_db_dialect(options)
+        db_dialect = get_db_dialect(options)
 
-        request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
-
-        request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/tag/{rollback_tag}?schema={schema_name}"
-
-        await _run_db_svc_shell_command(request_type, request_url, request_body)
+        rollback_tag_task(
+            database_code=options.database_code,
+            data_model=options.data_model,
+            schema_name=options.schema_name,
+            vocab_schema=options.vocab_schema,
+            changelog_file=options.changelog_filepath_list.get(
+                options.data_model),
+            plugin_classpath=get_plugin_classpath(options.flow_name),
+            dialect=db_dialect,
+            rollback_tag=options.rollback_tag
+        )
     except Exception as e:
+        get_run_logger().error(e)
         raise e
 
 
-@task
-async def rollback_count(options: rollbackCountType):
-    database_code = options.database_code
-    data_model = options.data_model
-    schema_name = options.schema_name
-    rollback_count = options.rollback_count
-
-    request_type = requestType.DELETE
-    request_body = {}
-
+def create_questionnaire_definition_flow(options: QuestionnaireDefinitionType):
     try:
-        db_dialect = _get_db_dialect(options)
+        questionnaire_definition = options.questionnaire_definition
+        schema_name = options.schema_name
+        database_code = options.database_code
+        db_dialect = get_db_dialect(options)
 
-        request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
-
-        request_url = f"/alpdb/{db_dialect}/database/{database_code}/data-model/{data_model}/count/{rollback_count}/?schema={schema_name}"
-
-        await _run_db_svc_shell_command(request_type, request_url, request_body)
+        create_questionnaire_definition_task(
+            database_code=database_code,
+            schema_name=schema_name,
+            dialect=db_dialect,
+            questionnaire_definition=questionnaire_definition
+        )
     except Exception as e:
+        get_run_logger().error(e)
         raise e
 
 
-@task
-async def create_questionnaire_definition(options: questionnaireDefinitionType):
-    database_code = options.database_code
-    schema_name = options.schema_name
-    data_model = options.data_model  # not used but should only work with omop5-4
-
-    request_type = requestType.POST
-    request_body = {"definition": options.questionnaire_definition}
-
+def get_questionnaire_response_flow(options: QuestionnaireResponseType):
     try:
-        db_dialect = _get_db_dialect(options)
+        db_dialect = get_db_dialect(options)
 
-        request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
-
-        request_url = f"/alpdb/{db_dialect}/database/{database_code}/schema/{schema_name}"
-
-        await _run_db_svc_shell_command(request_type, request_url, request_body)
+        get_questionnaire_response_task(
+            database_code=options.database_code,
+            schema_name=options.schema_name,
+            dialect=db_dialect,
+            questionnaire_id=options.questionnaire_id
+        )
     except Exception as e:
-        raise e
-
-
-@task
-async def get_questionnaire_response(options: questionnaireResponseType):
-    database_code = options.database_code
-    schema_name = options.schema_name
-    questionnaire_id = options.questionnaire_id
-
-    request_type = requestType.GET
-    request_body = {}
-
-    try:
-        db_dialect = _get_db_dialect(options)
-
-        request_body = _db_svc_flowrun_params(
-            request_body, db_dialect, options.flow_name, options.changelog_filepath)
-
-        request_url = f"/alpdb/{db_dialect}/database/{database_code}/schema/{schema_name}/questionnaire/{questionnaire_id}"
-
-        await _run_db_svc_shell_command(request_type, request_url, request_body)
-    except Exception as e:
+        get_run_logger().error(e)
         raise e

@@ -1,5 +1,5 @@
 import os
-import sys
+
 from functools import partial
 from rpy2 import robjects
 from rpy2.robjects import conversion, default_converter
@@ -12,8 +12,8 @@ from utils.databaseConnectionUtils import getSetDBDriverEnvString, getDatabaseCo
 from flows.alp_data_characterization.hooks import persist_data_characterization, persist_export_to_ares, get_export_to_ares_results_from_file
 from utils.types import dcOptionsType
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
-import importlib
-from flows.alp_db_svc.flow import _run_db_svc_shell_command, _db_svc_flowrun_params
+from flows.alp_db_svc.dataset.main import create_datamodel
+from flows.alp_db_svc.const import get_plugin_classpath
 
 r_libs_user_directory = os.getenv("R_LIBS_USER")
 
@@ -97,26 +97,28 @@ async def execute_export_to_ares(schemaName: str,
         raise e
 
 
-@task
 async def create_data_characterization_schema(
     databaseCode: str,
     resultsSchema: str,
     vocabSchemaName: str,
     flowName: str,
-    changelog_filepath: str
+    changelogFile: str
 ):
     logger = get_run_logger()
     try:
-        databaseDialect = get_db_svc_endpoint_dialect(databaseCode)
-        request_url = f"/alpdb/{databaseDialect}/dataCharacterization/database/{databaseCode}/schema/{resultsSchema}"
-        request_body = {"vocabSchema": vocabSchemaName,
-                        "cdmSchema": vocabSchemaName}
-
-        request_body = _db_svc_flowrun_params(
-            request_body, databaseDialect, flowName, changelog_filepath)
-
-        await _run_db_svc_shell_command(
-            "post", request_url, request_body)
+        plugin_classpath = get_plugin_classpath(flowName)
+        dialect = get_db_svc_endpoint_dialect(databaseCode)
+        create_datamodel(
+            database_code=databaseCode,
+            data_model="characterization",
+            schema_name=resultsSchema,
+            vocab_schema=vocabSchemaName,
+            changelog_file=changelogFile,
+            count=0,
+            cleansed_schema_option=False,
+            plugin_classpath=plugin_classpath,
+            dialect=dialect
+        )
     except Exception as e:
         logger.error(e)
         raise e
@@ -132,7 +134,7 @@ def execute_data_characterization_flow(options: dcOptionsType):
     releaseDate = options.releaseDate
     resultsSchema = options.resultsSchema
     flowName = options.flowName
-    changelogFilepath = options.changelogFilepath
+    changelogFile = options.changelogFile
 
     # comma separated values in a string
     excludeAnalysisIds = options.excludeAnalysisIds
@@ -153,7 +155,7 @@ def execute_data_characterization_flow(options: dcOptionsType):
         resultsSchema,
         vocabSchemaName,
         flowName,
-        changelogFilepath
+        changelogFile
     )
 
     execute_data_characterization_wo = execute_data_characterization.with_options(on_failure=[

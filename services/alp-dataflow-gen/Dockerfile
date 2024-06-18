@@ -1,5 +1,9 @@
 FROM alpcr.azurecr.io/alp-dataflow-gen-base:develop as dbsvc-build
 
+ADD https://github.com/liquibase/liquibase/releases/download/v4.5.0/liquibase-4.5.0.tar.gz .
+RUN mkdir -p ./liquibase/
+RUN tar xvf liquibase-4.5.0.tar.gz -C ./liquibase/
+
 # Install node and yarn
 RUN mkdir -p /usr/local/node
 ENV NVM_DIR /usr/local/node
@@ -12,42 +16,6 @@ ENV NODE_PATH $NODE_HOME/lib/node_modules
 ENV PATH $NODE_HOME/bin:$PATH
 
 RUN npm install --global yarn
-
-# Copy python package
-COPY --chown=docker:docker ./alp-libs/python/pydbsvc ./libs/pydbsvc
-
-# Copy alp-libs files into python package
-COPY --chown=docker:docker ./alp-libs/nodejs ./libs/pydbsvc/d2e_dbsvc/nodejs/libs
-COPY --chown=docker:docker ./alp-libs/nodejs/package.json ./libs/pydbsvc/d2e_dbsvc/nodejs
-
-# Copy alp-db-svc files into python package
-
-# Copy existing migration scripts into separate folder so changelog filepath does not clash with plugin
-COPY --chown=docker:docker ./services/alp-db-svc/db ./libs/pydbsvc/d2e_dbsvc/nodejs/dbsvc_files/migration_scripts/db
-
-COPY --chown=docker:docker ./services/alp-db-svc/package.json ./libs/pydbsvc/d2e_dbsvc/nodejs/dbsvc_files/
-COPY --chown=docker:docker ./services/alp-db-svc/tsconfig.json ./libs/pydbsvc/d2e_dbsvc/nodejs/dbsvc_files/
-COPY --chown=docker:docker ./services/alp-db-svc/src ./libs/pydbsvc/d2e_dbsvc/nodejs/dbsvc_files/src
-
-# setup alp-libs
-WORKDIR /app/libs/pydbsvc/d2e_dbsvc/nodejs
-RUN yarn install --network-timeout 1000000
-RUN yarn workspace @alp/alp-base-utils run compile
-
-# setup alp-db-svc
-WORKDIR /app/libs/pydbsvc/d2e_dbsvc/nodejs/dbsvc_files
-RUN yarn compile
-RUN yarn cache clean
-
-# Add liquibase
-ADD https://github.com/liquibase/liquibase/releases/download/v4.5.0/liquibase-4.5.0.tar.gz ./db/migrations/
-RUN mkdir -p ./db/migrations/liquibase/
-RUN tar xvf ./db/migrations/liquibase-4.5.0.tar.gz -C ./db/migrations/liquibase/
-
-# Make wheel
-WORKDIR /app/libs/pydbsvc
-RUN pip install wheel
-RUN make package
 
 FROM dbsvc-build AS final-build
 
@@ -93,8 +61,6 @@ RUN chown docker:alp ./duckdb_data
 # Create folder to store synpuf1k csv
 RUN mkdir -p /app/synpuf1k
 RUN chown -R docker:docker /app/synpuf1k
-
-RUN rm -rf ./libs/pydbsvc
 
 USER docker
 

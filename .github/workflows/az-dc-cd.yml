@@ -21,7 +21,7 @@ on:
       force-cleanup-containers:
         description: Force cleanup all containers
         type: boolean
-        default: false
+        default: true
 
 env:
   DOCKER_TAG_NAME: ${{ github.event.inputs.docker_tag_name }}
@@ -112,11 +112,9 @@ jobs:
       if: github.event_name == 'push'
       id: enable_delay_for_docker_build_to_complete
       run: |
-        sleep 500 # Temporary solution
+        sleep 840 # Temporary solution
 
     - name: docker compose up
-      env:
-        GATEWAY_NAME: alp-minerva-gateway-1
       run: |
         yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
 

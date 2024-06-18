@@ -1,6 +1,6 @@
 {
   "ALPDEV": {
-    "host": "alp-hn-gold-sg.southeastasia.cloudapp.azure.com",
+    "host": "dummy-hostname.com",
     "port": "39013",
     "databaseName": "ALPDEV",
     "validate_certificate": true,
