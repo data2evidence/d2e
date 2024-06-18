@@ -8,6 +8,9 @@ export class DataCharacterizationFlowRunDto {
   deploymentName: string
 
   @IsString()
+  flowName: string
+
+  @IsString()
   @IsOptional()
   comment: string
 
