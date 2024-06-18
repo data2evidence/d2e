@@ -93,9 +93,6 @@ def convert_R_to_py(r_obj, name=""):
                     result[k] = convert_R_to_py(v, name=k)
             return result
 
-def serialize_result_to_json(result: Result):
-    return serialize_to_json(result.data)
-
 def serialize_to_json(data):
     if isinstance(data, dd.DataFrame):
         dd_to_pd_df = data.compute()
