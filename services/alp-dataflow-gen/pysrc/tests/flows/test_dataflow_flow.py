@@ -29,6 +29,7 @@ def mock_persist_results_flow(nodes, trace, root_flow_run_id):
 
 @pytest.mark.skip(reason="storing results S3 is not possible for tests, to be worked on in task internal-756")
 def test_execute_dataflow_flow(setup, mock_dataflow):
+    print('None')
     # results object will have 2 items, [generate_nodes_flow, execute_nodes_flow].
     # persist_results_flow is not in results as it is currently being mocked
     # results = execute_dataflow_flow(
