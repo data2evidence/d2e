@@ -1,3 +1,4 @@
+import os
 import pytest
 from main import execute_dataflow_flow
 import alpconnection.dbutils as dbutils
@@ -35,6 +36,7 @@ def prefect_test_fixture():
 def test_execute_dataflow_flow(setup, mock_dataflow):
     # results object will have 2 items, [generate_nodes_flow, execute_nodes_flow].
     # persist_results_flow is not in results as it is currently being mocked
+    os.environ.setdefault('PREFECT_RESULTS_PERSIST_BY_DEFAULT', False)
     results = execute_dataflow_flow(
         mock_dataflow["json_graph"], mock_dataflow["options"])
 
