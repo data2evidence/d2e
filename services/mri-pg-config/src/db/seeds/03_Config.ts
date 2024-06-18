@@ -27080,11 +27080,11 @@ const cdwConfigDuckdb = {
           "@PATIENT.PATIENT_ID": "\"person_id\"",
           "@PATIENT.DOD": "\"birth_datetime\"",
           "@PATIENT.DOB": "\"birth_datetime\"",
-          "@REF": "\"concept\"",
+          "@REF": "$$VOCAB_SCHEMA$$.\"concept\"",
           "@REF.VOCABULARY_ID": "\"vocabulary_id\"",
           "@REF.CODE": "\"concept_code\"",
           "@REF.TEXT": "\"concept_name\"",
-          "@TEXT": "\"concept\"",
+          "@TEXT": "$$VOCAB_SCHEMA$$.\"concept\"",
           "@TEXT.INTERACTION_ID": "\"concept_id\"",
           "@TEXT.INTERACTION_TEXT_ID": "\"concept_id\"",
           "@TEXT.VALUE": "\"concept_name\""
@@ -27112,7 +27112,7 @@ const cdwConfigDuckdb = {
           "dateFormat": "YYYY-MM-dd",
           "timeFormat": "HH:mm:ss",
           "otsTableMap": {
-              "@CODE": "\"concept\""
+              "@CODE": "$$VOCAB_SCHEMA$$.\"concept\""
           }
       },
       "shared": {},
