@@ -44,7 +44,7 @@ def create_datamodel_flow(options: CreateDataModelType):
             vocab_schema=options.vocab_schema,
             changelog_file=options.changelog_filepath_list.get(
                 options.data_model),
-            count=int(options.update_count),
+            count=options.update_count,
             cleansed_schema_option=options.cleansed_schema_option,
             plugin_classpath=get_plugin_classpath(options.flow_name),
             dialect=db_dialect
@@ -76,8 +76,7 @@ def update_datamodel_flow(options: UpdateDataModelType):
 def get_version_info_flow(options: GetVersionInfoType):
     try:
         get_version_info_task(
-            changelog_file=options.changelog_filepath_list.get(
-                options.data_model),
+            changelog_filepath_list=options.changelog_filepath_list,
             plugin_classpath=get_plugin_classpath(options.flow_name),
             token=options.token,
             dataset_list=options.datasets

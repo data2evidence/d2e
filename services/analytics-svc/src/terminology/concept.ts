@@ -43,11 +43,11 @@ export function getStandardConcept(
     let querySql: string;
     let queryObj;
     if (!vocabularyId || vocabularyId === "") {
-        querySql = QUERIES(connection.schemaName).GET_STANDARD_CONCEPT;
+        querySql = QUERIES(connection.vocabSchemaName).GET_STANDARD_CONCEPT;
         queryObj = QueryObject.format(querySql, conceptCode);
     } else {
         querySql = QUERIES(
-            connection.schemaName
+            connection.vocabSchemaName
         ).GET_STANDARD_CONCEPT_WITH_VOCAB;
         queryObj = QueryObject.format(querySql, conceptCode, vocabularyId);
     }
@@ -76,7 +76,7 @@ export function getDescendantConcepts(
     conceptId: string,
     callback: CallBackInterface
 ) {
-    let querySql = QUERIES(connection.schemaName).GET_DESCENDANT_CONCEPTS;
+    let querySql = QUERIES(connection.vocabSchemaName).GET_DESCENDANT_CONCEPTS;
 
     let queryObj = QueryObject.format(querySql, conceptId);
     queryObj.executeQuery(connection, (err, result) => {

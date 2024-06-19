@@ -22,13 +22,14 @@ function _getRows(result) {
 export class PostgresConnection implements ConnectionInterface {
   private constructor(
     public conn: Pool,
-    public schemaName = "postgres",
+    public schemaName,
+    public vocabSchemaName,
     public dialect = "POSTGRES",
   ) {}
 
-  public static createConnection(pool: Pool, schemaName, callback) {
+  public static createConnection(pool: Pool, schemaName, vocabSchemaName = schemaName, callback) {
     try {
-      const conn = new PostgresConnection(pool, schemaName);
+      const conn = new PostgresConnection(pool, schemaName, vocabSchemaName);
       callback(null, conn);
     } catch (err) {
       callback(err, null);
@@ -113,7 +114,7 @@ export class PostgresConnection implements ConnectionInterface {
   }
 
   private parseSql(temp: string): string {
-    return translateHanaToPostgres(temp, this.schemaName);
+    return translateHanaToPostgres(temp, this.schemaName, this.vocabSchemaName);
   }
 
   public getTranslatedSql(sql: string): string {
