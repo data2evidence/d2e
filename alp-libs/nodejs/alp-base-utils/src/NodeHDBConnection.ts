@@ -11,12 +11,14 @@ import { CreateLogger } from "./Logger";
 import { DBError } from "./DBError";
 const logger = CreateLogger();
 export class NodeHDBConnection implements ConnectionInterface {
+
   public static createConnection(
     client: any,
-    schemaName = "CDMVOCAB",
+    schemaName,
+    vocabSchemaName = schemaName,
     callback,
   ) {
-    const conn = new NodeHDBConnection(client, schemaName);
+    const conn = new NodeHDBConnection(client, schemaName, vocabSchemaName);
     const sql = 'SET SCHEMA "' + schemaName + '"';
     conn.execute(sql, [], (err, data) => {
       if (err) {
@@ -35,7 +37,8 @@ export class NodeHDBConnection implements ConnectionInterface {
    */
   constructor(
     public conn: any,
-    public schemaName = "CDMVOCAB",
+    public schemaName,
+    public vocabSchemaName,
     public dialect = "hana",
   ) {}
 

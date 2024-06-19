@@ -1,16 +1,22 @@
 import os
+import json
 import sys
 from functools import partial
 from rpy2 import robjects
 from rpy2.robjects import conversion, default_converter
 from prefect import task, get_run_logger
 from prefect.context import FlowRunContext
+from prefect.filesystems import RemoteFileSystem as RFS
+from prefect.serializers import JSONSerializer
 from utils.types import PG_TENANT_USERS, dqdOptionsType
 from utils.databaseConnectionUtils import getSetDBDriverEnvString, getDatabaseConnectorConnectionDetailsString
 from flows.alp_dqd.hooks import persist_dqd
 
 
-@task
+@task(result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")), 
+      result_storage_key="{flow_run.id}_dqd.json",
+      result_serializer=JSONSerializer(),
+      persist_result=True)
 def execute_dqd(
     schemaName: str,
     databaseCode: str,
@@ -73,6 +79,8 @@ def execute_dqd(
                 # Run executeDqChecks
                 DataQualityDashboard::executeDqChecks(connectionDetails = connectionDetails,cdmDatabaseSchema = cdmDatabaseSchema,resultsDatabaseSchema = resultsDatabaseSchema,cdmSourceName = cdmSourceName,numThreads = numThreads,sqlOnly = sqlOnly,outputFolder = outputFolder,outputFile = outputFile,verboseMode = verboseMode,writeToTable = writeToTable,checkLevels = checkLevels,checkNames = checkNames,cdmVersion = cdmVersion, cohortDefinitionId = cohortDefinitionId, cohortDatabaseSchema = cohortDatabaseSchema, cohortTableName = cohortTableName)
         ''')
+    with open(f'{outputFolder}/{schemaName}.json', 'rt') as f:
+            return json.loads(f.read())
 
 
 def execute_dqd_flow(options: dqdOptionsType):

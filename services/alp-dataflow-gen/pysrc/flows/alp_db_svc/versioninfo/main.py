@@ -8,7 +8,7 @@ from utils.types import (
 )
 from alpconnection.dbutils import get_db_svc_endpoint_dialect, extract_db_credentials
 from flows.alp_db_svc.liquibase.main import Liquibase
-from flows.alp_db_svc.const import OMOP_DATA_MODELS, NON_PERSON_ENTITIES
+from flows.alp_db_svc.const import OMOP_DATA_MODELS, NON_PERSON_ENTITIES, _check_table_case
 from flows.alp_db_svc.types import (LiquibaseAction,
                                     PortalDatasetType, ExtractDatasetSchemaType,
                                     EntityCountDistributionType)
@@ -18,12 +18,12 @@ from dao.DBDao import DBDao
 from api.PortalServerAPI import PortalServerAPI
 
 
-def get_version_info_task(changelog_file: str,
+def get_version_info_task(changelog_filepath_list: Dict,
                           plugin_classpath: str,
                           token: str,
                           dataset_list: List[PortalDatasetType]):
     logger = get_run_logger()
-    if len(dataset_list) == 0:
+    if (dataset_list is None) or (len(dataset_list) == 0):
         logger.debug("No datasets fetched from portal")
     else:
         logger.info(
@@ -33,7 +33,7 @@ def get_version_info_task(changelog_file: str,
 
         for dataset in dataset_schema_list["datasets_with_schema"]:
             get_and_update_attributes(
-                dataset, token, changelog_file, plugin_classpath)
+                dataset, token, changelog_filepath_list, plugin_classpath)
 
 
 @task
@@ -59,7 +59,7 @@ def extract_db_schema(dataset_list: List[PortalDatasetType]) -> ExtractDatasetSc
 @task
 def get_and_update_attributes(dataset: PortalDatasetType,
                               token: str,
-                              changelog_file: str,
+                              changelog_filepath_list: Dict,
                               plugin_classpath: str
                               ):
     logger = get_run_logger()
@@ -69,6 +69,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
     schema_name = dataset.get("schemaName")
     vocab_schema = dataset.get("vocabSchemaName")
     data_model = dataset.get("dataModel").split(" ")[0]
+    changelog_file = changelog_filepath_list.get(data_model)
 
     try:
         # handle case of wrong db credentials
@@ -92,92 +93,93 @@ def get_and_update_attributes(dataset: PortalDatasetType,
                 dataset_id, "schema_version", error_msg, token)
             update_dataset_attributes_table(
                 dataset_id, "latest_schema_version", error_msg, token)
-
-    try:
-        # update with current version count or error msg
-        current_schema_version = get_current_version(dataset_dao)
-        update_dataset_attributes_table(
-            dataset_id, "schema_version", current_schema_version, token)
-    except Exception as e:
-        logger.error(
-            f"Failed to update attribute 'current_schema_version' for dataset id '{dataset_id}' with value '{current_schema_version}' : {e}")
-    else:
-        logger.info(
-            f"Updated attribute 'current_schema_version' for dataset id '{dataset_id}'  with value '{current_schema_version}'")
-
-    if data_model in OMOP_DATA_MODELS:
-
-        is_lower_case = _check_table_case(dataset_dao)
-
-        try:
-            # update with patient count or error msg
-            patient_count = get_patient_count(dataset_dao, is_lower_case)
-            update_dataset_attributes_table(
-                dataset_id, "patient_count", patient_count, token)
-        except Exception as e:
-            logger.error(
-                f"Failed to update attribute 'patient count' for dataset {dataset_id}: {e}")
         else:
-            logger.info(
-                f"Updated attribute 'patient count for dataset' {dataset_id} with value {patient_count}")
+            try:
+                # update with current version count or error msg
+                current_schema_version = get_current_version(dataset_dao)
+                update_dataset_attributes_table(
+                    dataset_id, "schema_version", current_schema_version, token)
+            except Exception as e:
+                logger.error(
+                    f"Failed to update attribute 'current_schema_version' for dataset id '{dataset_id}' with value '{current_schema_version}' : {e}")
+            else:
+                logger.info(
+                    f"Updated attribute 'current_schema_version' for dataset id '{dataset_id}'  with value '{current_schema_version}'")
 
-        try:
-            # update with entity distribution json string
-            entity_count_distribution = get_entity_count_distribution(
-                dataset_dao, is_lower_case)
-            update_dataset_attributes_table(
-                dataset_id, "entity_count_distribution", json.dumps(json.dumps(entity_count_distribution)), token)
-        except Exception as e:
-            logger.error(
-                f"Failed to update attribute 'entity_count_distribution' for dataset id '{dataset_id}' with value '{entity_count_distribution}' : {e}")
-        else:
-            logger.info(
-                f"Updated attribute 'entity_count_distribution' for dataset id '{dataset_id}'  with value '{entity_count_distribution}'")
+            if data_model in OMOP_DATA_MODELS:
 
-        try:
-            # update with entity count or error msg
-            total_entity_count = get_total_entity_count(
-                entity_count_distribution)
-            update_dataset_attributes_table(
-                dataset_id, "entity_count", total_entity_count, token)
-        except Exception as e:
-            logger.error(
-                f"Failed to update attribute 'total_entity_count' for dataset id '{dataset_id}' with value '{total_entity_count}' : {e}")
-        else:
-            logger.info(
-                f"Updated attribute 'total_entity_count' for dataset id '{dataset_id}'  with value '{total_entity_count}'")
+                is_lower_case = _check_table_case(dataset_dao)
 
-        try:
-            # update cdm version with value or error
-            cdm_version = get_cdm_version(dataset_dao, is_lower_case)
-            update_dataset_attributes_table(
-                dataset_id, "cdm_version", cdm_version, token)
-        except Exception as e:
-            logger.error(
-                f"Failed to update attribute 'cdm_version' for dataset id '{dataset_id}' with value '{cdm_version}' : {e}")
-        else:
-            logger.info(
-                f"Updated attribute 'cdm_version' for dataset id '{dataset_id}'  with value '{cdm_version}'")
+                try:
+                    # update with patient count or error msg
+                    patient_count = get_patient_count(
+                        dataset_dao, is_lower_case)
+                    update_dataset_attributes_table(
+                        dataset_id, "patient_count", patient_count, token)
+                except Exception as e:
+                    logger.error(
+                        f"Failed to update attribute 'patient count' for dataset {dataset_id}: {e}")
+                else:
+                    logger.info(
+                        f"Updated attribute 'patient count for dataset' {dataset_id} with value {patient_count}")
 
-    try:
-        # update with latest version or error msg
-        tenant_configs = extract_db_credentials(database_code)
+                try:
+                    # update with entity distribution json string
+                    entity_count_distribution = get_entity_count_distribution(
+                        dataset_dao, is_lower_case)
+                    update_dataset_attributes_table(
+                        dataset_id, "entity_count_distribution", json.dumps(json.dumps(entity_count_distribution)), token)
+                except Exception as e:
+                    logger.error(
+                        f"Failed to update attribute 'entity_count_distribution' for dataset id '{dataset_id}' with value '{entity_count_distribution}' : {e}")
+                else:
+                    logger.info(
+                        f"Updated attribute 'entity_count_distribution' for dataset id '{dataset_id}'  with value '{entity_count_distribution}'")
 
-        latest_available_schema_version = get_latest_available_version(dialect=db_dialect,
-                                                                       data_model=data_model,
-                                                                       changelog_file=changelog_file,
-                                                                       schema_name=schema_name,
-                                                                       vocab_schema=vocab_schema,
-                                                                       tenant_configs=tenant_configs,
-                                                                       plugin_classpath=plugin_classpath)
-        update_dataset_attributes_table(
-            dataset_id, "latest_schema_version", latest_available_schema_version, token)
-    except Exception as e:
-        logger.error(
-            f"Failed to update attribute 'latest_available_schema_version' for dataset id '{dataset_id}' with value '{latest_available_schema_version}' : {e}")
-    else:
-        logger.info(
-            f"Updated attribute 'latest_available_schema_version' for dataset id '{dataset_id}'  with value '{latest_available_schema_version}'")
+                try:
+                    # update with entity count or error msg
+                    total_entity_count = get_total_entity_count(
+                        entity_count_distribution)
+                    update_dataset_attributes_table(
+                        dataset_id, "entity_count", total_entity_count, token)
+                except Exception as e:
+                    logger.error(
+                        f"Failed to update attribute 'total_entity_count' for dataset id '{dataset_id}' with value '{total_entity_count}' : {e}")
+                else:
+                    logger.info(
+                        f"Updated attribute 'total_entity_count' for dataset id '{dataset_id}'  with value '{total_entity_count}'")
+
+                try:
+                    # update cdm version with value or error
+                    cdm_version = get_cdm_version(dataset_dao, is_lower_case)
+                    update_dataset_attributes_table(
+                        dataset_id, "cdm_version", cdm_version, token)
+                except Exception as e:
+                    logger.error(
+                        f"Failed to update attribute 'cdm_version' for dataset id '{dataset_id}' with value '{cdm_version}' : {e}")
+                else:
+                    logger.info(
+                        f"Updated attribute 'cdm_version' for dataset id '{dataset_id}'  with value '{cdm_version}'")
+
+            try:
+                # update with latest version or error msg
+                tenant_configs = extract_db_credentials(database_code)
+
+                latest_available_schema_version = get_latest_available_version(dialect=db_dialect,
+                                                                               data_model=data_model,
+                                                                               changelog_file=changelog_file,
+                                                                               schema_name=schema_name,
+                                                                               vocab_schema=vocab_schema,
+                                                                               tenant_configs=tenant_configs,
+                                                                               plugin_classpath=plugin_classpath)
+                update_dataset_attributes_table(
+                    dataset_id, "latest_schema_version", latest_available_schema_version, token)
+            except Exception as e:
+                logger.error(
+                    f"Failed to update attribute 'latest_available_schema_version' for dataset id '{dataset_id}' with value '{latest_available_schema_version}' : {e}")
+            else:
+                logger.info(
+                    f"Updated attribute 'latest_available_schema_version' for dataset id '{dataset_id}'  with value '{latest_available_schema_version}'")
 
 
 def get_latest_available_version(**kwargs) -> str:
@@ -274,15 +276,6 @@ def update_dataset_attributes_table(dataset_id: str,
     portalServerApi = PortalServerAPI(token)
     portalServerApi.update_dataset_attributes_table(
         dataset_id, attribute_id, attribute_value)
-
-
-def _check_table_case(dao_obj: DBDao) -> bool:
-    # works only for omop, omop5-4 data models
-    table_names = dao_obj.get_table_names()
-    if 'person' in table_names:
-        return True
-    elif 'PERSON' in table_names:
-        return False
 
 
 def _extract_version(text_str: str) -> str:
