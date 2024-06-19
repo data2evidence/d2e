@@ -218,7 +218,7 @@ class DBDao:
     def insert_values_into_table(self, table_name: str, column_value_mapping: dict):
         columns = list(column_value_mapping.keys())
         with self.engine.connect() as connection:
-            table = Table(table_name.casefold(), self.metadata,
+            table = Table(table_name, self.metadata,
                           autoload_with=connection)
             insert_stmt = table.insert().values(column_value_mapping)
 
