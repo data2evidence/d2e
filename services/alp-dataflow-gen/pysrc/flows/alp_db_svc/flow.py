@@ -1,4 +1,4 @@
-from flows.alp_db_svc.dataset.main import create_datamodel, update_datamodel, rollback_count_task, rollback_tag_task, run_seed_postgres_tasks
+from flows.alp_db_svc.dataset.main import create_datamodel, update_datamodel, rollback_count_task, rollback_tag_task, create_cdm_schema_tasks
 from flows.alp_db_svc.datamart.main import create_datamart
 from flows.alp_db_svc.datamart.types import DATAMART_FLOW_ACTIONS, CreateDatamartType
 from flows.alp_db_svc.versioninfo.main import get_version_info_task
@@ -12,14 +12,14 @@ from flows.alp_db_svc.types import (CreateDataModelType,
                                     RollbackTagType,
                                     QuestionnaireDefinitionType,
                                     QuestionnaireResponseType,
-                                    SeedVocabType)
+                                    CreateSchemaType)
 from prefect import get_run_logger
 
 
-def run_seed_postgres(options: SeedVocabType):
+def create_cdm_schema(options: CreateSchemaType):
     db_dialect = get_db_dialect(options)
     try:
-        run_seed_postgres_tasks(
+        create_cdm_schema_tasks(
             database_code=options.database_code,
             data_model=options.data_model,
             schema_name=options.schema_name,
@@ -44,7 +44,7 @@ def create_datamodel_flow(options: CreateDataModelType):
             vocab_schema=options.vocab_schema,
             changelog_file=options.changelog_filepath_list.get(
                 options.data_model),
-            count=int(options.update_count),
+            count=options.update_count,
             cleansed_schema_option=options.cleansed_schema_option,
             plugin_classpath=get_plugin_classpath(options.flow_name),
             dialect=db_dialect
@@ -76,8 +76,7 @@ def update_datamodel_flow(options: UpdateDataModelType):
 def get_version_info_flow(options: GetVersionInfoType):
     try:
         get_version_info_task(
-            changelog_file=options.changelog_filepath_list.get(
-                options.data_model),
+            changelog_filepath_list=options.changelog_filepath_list,
             plugin_classpath=get_plugin_classpath(options.flow_name),
             token=options.token,
             dataset_list=options.datasets
