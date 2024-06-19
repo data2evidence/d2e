@@ -211,7 +211,8 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
                         await dbConnectionUtil.DBConnectionUtil.getDBConnection(
                             {
                                 credentials: ac,
-                                schema: ac.schema || ac.cdwSchema,
+                                schemaName: ac.schemaName,
+                                vocabSchemaName: ac.vocabSchemaName,
                                 userObj,
                             }
                         );
