@@ -66,7 +66,7 @@ const initRoutes = async (app: express.Application) => {
 
         const configConnection = await dbConnectionUtil.DBConnectionUtil.getDBConnection({
           credentials: configCredentials,
-          schema: configCredentials.schema,
+          schemaName: configCredentials.schema,
           userObj,
         })
 

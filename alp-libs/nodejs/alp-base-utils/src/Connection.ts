@@ -1,4 +1,3 @@
-import { DBError } from "./DBError";
 import { CreateLogger } from "./Logger";
 
 const logger = CreateLogger();
@@ -20,7 +19,8 @@ export type CallBackInterface = (err: any, data: any) => any;
  */
 export interface ConnectionInterface {
     conn: any;
-    schemaName?: string;
+    schemaName: string;
+    vocabSchemaName: string;
     dialect: string;
     execute(sql: string, parameters: ParameterInterface[], callback: CallBackInterface, schemaName?: string): void;
     executeQuery(sql: string, parameters: ParameterInterface[], callback: CallBackInterface, schemaName?: string): void;

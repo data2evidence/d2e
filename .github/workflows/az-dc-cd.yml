@@ -4,7 +4,7 @@ run-name: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.
 on:
   push:
     branches:
-    - develop
+      - develop
 
   workflow_dispatch:
     inputs:
@@ -36,106 +36,120 @@ jobs:
   deploy:
     environment: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
     name: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
-    runs-on: [ "${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}", self-hosted, Linux, X64 ]
+    runs-on:
+      [
+        "${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}",
+        self-hosted,
+        Linux,
+        X64,
+      ]
     steps:
-    - uses: actions/checkout@v4
-      with:
-        clean: false
+      - uses: actions/checkout@v4
+        with:
+          clean: false
 
-    - name: Install 1Password CLI
-      uses: 1Password/install-cli-action@v1.0.0
+      - name: Install 1Password CLI
+        uses: 1Password/install-cli-action@v1.0.0
 
-    - name: Force cleanup containers
-      if: github.event.inputs.force-cleanup-containers
-      continue-on-error: true
-      run: docker rm -v -f $(docker ps -qa)
+      - name: Force cleanup containers
+        if: github.event.inputs.force-cleanup-containers
+        continue-on-error: true
+        run: docker rm -v -f $(docker ps -qa)
 
-    - name: Generate dotenv
-      env:
-        DOTENV_FILE: .env.${{ env.ENV_TYPE }}
-        DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
-        OVERWRITE: true
-      run: |
-        ./internal/scripts/get-op-ratelimit.sh
-        ACTIONS_STEP_DEBUG=false
-      
-        # get env yml from 1password
-        yarn --cwd internal op:get:$ENV_TYPE
+      - name: Generate dotenv
+        env:
+          DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+          DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+          OVERWRITE: true
+        run: |
+          ./internal/scripts/get-op-ratelimit.sh
+          ACTIONS_STEP_DEBUG=false
 
-        # mask sensitive values
-        internal/scripts/gha-mask.sh
+          # get env yml from 1password
+          yarn --cwd internal op:get:$ENV_TYPE
 
-        # generate dotenv
-        yarn --cwd internal gen:env
+          # mask sensitive values
+          internal/scripts/gha-mask.sh
 
-        cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
+          # generate dotenv
+          yarn --cwd internal gen:env
 
-        echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
-        echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
-        echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
+          cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 
-    - name: Load dotenv from 1password
-      uses: 1password/load-secrets-action@v2
-      id: op-load-secret
-      with:
-        export-env: true
-      env:
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
-        REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
+          echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
+          echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
+          echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
 
-    - name: 1password ratelimit end
-      env:
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-      run: |
-        ./internal/scripts/get-op-ratelimit.sh
+      - name: Load dotenv from 1password
+        uses: 1password/load-secrets-action@v2
+        id: op-load-secret
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+          REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
 
-    - name: Upload stats.yml artifact
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: stats
-        retention-days: 30
-        path: |
-          ${{ github.job }}*.yml
+      - name: 1password ratelimit end
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        run: |
+          ./internal/scripts/get-op-ratelimit.sh
 
-    - name: Login to ACR
-      uses: docker/login-action@v3.1.0
-      with:
-        registry: alpcr.azurecr.io
-        username: ${{ env.REGISTRY_USERNAME }}
-        password: ${{ env.REGISTRY_PASSWORD }}
+      - name: Upload stats.yml artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stats
+          retention-days: 30
+          path: |
+            ${{ github.job }}*.yml
 
-    - shell: bash
-      if: github.event_name == 'push'
-      id: enable_delay_for_docker_build_to_complete
-      run: |
-        sleep 840 # Temporary solution
+      - name: Login to ACR
+        uses: docker/login-action@v3.1.0
+        with:
+          registry: alpcr.azurecr.io
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_PASSWORD }}
 
-    - name: docker compose up
-      run: |
-        yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
+      - shell: bash
+        if: github.event_name == 'push'
+        id: enable_delay_for_docker_build_to_complete
+        run: |
+          sleep 840 # Temporary solution
 
-        # Run ALP services
-        yarn remote:minerva up --remove-orphans --force-recreate --wait --pull always
-        EXIT_CODE=$?
+      - uses: nick-fields/retry@v3
+        with:
+          timeout_seconds: 1800
+          retry_wait_seconds: 60
+          max_attempts: 10
+          retry_on: error
+          command: yarn remote:minerva pull
 
-        yarn base:minerva ps --format "{{.Names}} {{.Status}}" 2> /dev/null | grep ^alp | tee -a $GITHUB_STEP_SUMMARY
-        echo | tee -a $GITHUB_STEP_SUMMARY
+      - name: docker compose up
+        run: |
+          yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
 
-        if [ $EXIT_CODE != 0 ]; then
-          echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-          exit $EXIT_CODE
-        fi
+          # Run ALP services
+          yarn remote:minerva up --remove-orphans --force-recreate --wait
+          EXIT_CODE=$?
 
-    - name: Logs minerva
-      if: success() || failure()
-      run: |  
-        yarn logs:minerva
+          yarn base:minerva ps --format "{{.Names}} {{.Status}}" 2> /dev/null | grep ^alp | tee -a $GITHUB_STEP_SUMMARY
+          echo | tee -a $GITHUB_STEP_SUMMARY
 
-    - name: Post cleanup
-      if: always()
-      run: |
-        docker rm -f alp-caddy-certs-mgmt || true # Cleanup cert mgmt container if job aborted
+          if [ $EXIT_CODE != 0 ]; then
+            echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
+            exit $EXIT_CODE
+          fi
+
+      - name: Logs minerva
+        if: success() || failure()
+        run: |
+          yarn logs:minerva
+
+      - name: Post cleanup
+        if: always()
+        run: |
+          docker rm -f alp-caddy-certs-mgmt || true # Cleanup cert mgmt container if job aborted

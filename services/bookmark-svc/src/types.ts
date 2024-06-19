@@ -105,7 +105,7 @@ export interface IBookmark {
 
 export interface IDBCredentialsType {
   database: string
-  schema?: string
+  schema: string
   dialect: string
   host: string
   port: number

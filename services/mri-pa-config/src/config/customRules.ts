@@ -216,7 +216,9 @@ export class UseRefTextRule extends RuleValidatorBase {
         if (config.hasOwnProperty("useRefText") && config.useRefText) {
             const source = config.source;
             const sourceAttribute = utils.getObjectByPath(cdwConfig, source);
-            return [sourceAttribute.hasOwnProperty("referenceFilter") && sourceAttribute.referenceFilter !== ""];
+            if (sourceAttribute.type != "conceptSet") {
+                return [sourceAttribute.hasOwnProperty("referenceFilter") && sourceAttribute.referenceFilter !== ""];
+            }
         }
         return [true];
     }
@@ -233,12 +235,14 @@ export class UseRefValueRule extends RuleValidatorBase {
         if (config.hasOwnProperty("useRefValue") && config.useRefValue) {
             const source = config.source;
             const sourceAttribute = utils.getObjectByPath(cdwConfig, source);
-            return [
-                sourceAttribute.hasOwnProperty("referenceExpression")
-                && sourceAttribute.referenceExpression !== ""
-                && sourceAttribute.hasOwnProperty("referenceFilter")
-                && sourceAttribute.referenceFilter !== "",
-            ];
+            if (sourceAttribute.type != "conceptSet") {
+                return [
+                    sourceAttribute.hasOwnProperty("referenceExpression")
+                    && sourceAttribute.referenceExpression !== ""
+                    && sourceAttribute.hasOwnProperty("referenceFilter")
+                    && sourceAttribute.referenceFilter !== "",
+                ];
+            }
         }
         return [true];
     }
