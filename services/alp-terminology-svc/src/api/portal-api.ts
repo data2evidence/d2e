@@ -17,8 +17,8 @@ export class SystemPortalAPI {
     if (!jwt) {
       throw new Error('No token passed for Portal API!');
     }
-    if (env.SYSTEM_PORTAL__API_URL) {
-      this.url = env.SYSTEM_PORTAL__API_URL;
+    if (env.SERVICE_ROUTES.portalServer) {
+      this.url = env.SERVICE_ROUTES.portalServer;
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.TLS__INTERNAL__CA_CRT,
@@ -28,16 +28,18 @@ export class SystemPortalAPI {
     }
   }
 
-  private async getDataset(
-    datasetId: string,
-  ): Promise<{ vocabSchemaName: string; databaseCode: string }> {
+  private async getDataset(datasetId: string): Promise<{
+    databaseCode: string;
+    dialect: string;
+    vocabSchemaName: string;
+  }> {
     this.logger.info(
       `Portal request to get dataset info for id : ${datasetId}`,
     );
     const errorMessage = `Error while getting dataset info for id : ${datasetId}`;
     try {
       const options = await this.createOptions();
-      const url = `${this.url}dataset/${datasetId}`;
+      const url = `${this.url}/dataset/${datasetId}`;
       const result = await axios.get(url, options);
       return result.data;
     } catch (error) {
@@ -69,6 +71,7 @@ export class SystemPortalAPI {
     return {
       databaseCode: dataset.databaseCode,
       vocabSchemaName: dataset.vocabSchemaName,
+      dialect: dataset.dialect,
     };
   }
 

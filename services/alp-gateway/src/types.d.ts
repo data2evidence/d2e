@@ -61,9 +61,7 @@ export interface IPlugin {
 
 export interface IRouteProp {
   source: string
-  target?: string
   destination: string
-  targetPath?: string
 }
 
 export interface IALPUser {

@@ -263,6 +263,50 @@ export class NodePgConnection implements DBSvcConnectionInterface {
         `;
             }
         }
+        // Get snapshot schema table metadata
+        const regex10 =
+            /SELECT tc.SCHEMA_NAME, tc.TABLE_NAME, tc.COLUMN_NAME, tc.IS_NULLABLE, c.IS_PRIMARY_KEY, rc.COLUMN_NAME AS IS_FOREIGN_KEY FROM SYS.TABLE_COLUMNS AS tc LEFT JOIN SYS."CONSTRAINTS" AS c ON \(tc.TABLE_NAME=c.TABLE_NAME AND tc.SCHEMA_NAME=c.SCHEMA_NAME AND tc.COLUMN_NAME=c.COLUMN_NAME\) LEFT JOIN SYS."REFERENTIAL_CONSTRAINTS" AS rc ON \(tc.TABLE_NAME=rc.TABLE_NAME AND tc.SCHEMA_NAME=rc.SCHEMA_NAME AND tc.COLUMN_NAME=rc.COLUMN_NAME\) WHERE tc.SCHEMA_NAME = \? AND tc.TABLE_NAME = \?/;
+        if (temp.match(regex10)) {
+            const regexResult = regex10.exec(temp);
+            if (regexResult) {
+                return `
+                    SELECT
+                        c.table_schema as "SCHEMA_NAME",
+                        c.table_name as "TABLE_NAME",
+                        c.column_name as "COLUMN_NAME",
+                        case
+                            when c.is_nullable = 'YES' then 'TRUE'
+                            else 'FALSE'
+                        end as "IS_NULLABLE",
+                        case
+                            when constraint_type = 'PRIMARY KEY' then 'TRUE'
+                            else 'NoValue'
+                        end as "IS_PRIMARY_KEY",
+                        case
+                            when constraint_type = 'FOREIGN KEY' then 'TRUE'
+                            else 'NoValue'
+                        end as "IS_FOREIGN_KEY"
+                    FROM
+                        information_schema.columns as c
+                        LEFT JOIN information_schema.key_column_usage AS kcu ON (
+                            kcu.table_name = c.table_name
+                            AND kcu.table_schema = c.table_schema
+                            AND kcu.column_name = c.column_name
+                        )
+                        LEFT JOIN information_schema.constraint_column_usage AS ccu ON (
+                            ccu.table_name = c.table_name
+                            AND ccu.table_schema = c.table_schema
+                            AND ccu.column_name = c.column_name
+                        )
+                        left join information_schema.table_constraints AS tc ON (
+                            tc.constraint_name = kcu.constraint_name
+                            AND tc.table_schema = kcu.table_schema
+                        )
+                    where
+                        c.table_schema = $1
+                        and c.table_name = $2`;
+            }
+        }
 
         // remove line breaks and multiple spaces
         temp = temp.replace(/\r?\n|\r/g, "");
@@ -286,6 +330,13 @@ export class NodePgConnection implements DBSvcConnectionInterface {
             /COLUMN_NAME as "value" FROM TABLE_COLUMNS WHERE SCHEMA_NAME/gi,
             'COLUMN_NAME AS "value" from information_schema.columns where table_schema'
         );
+
+        // Replace TABLE_NAME FROM SYS.M_TABLES WHERE SCHEMA_NAME=
+        temp = temp.replace(
+            /TABLE_NAME FROM SYS.M_TABLES WHERE SCHEMA_NAME=(\%s|\?) AND \(TABLE_NAME/gi,
+            `tablename as "TABLE_NAME" from pg_catalog.pg_tables where schemaname=? AND (UPPER(tablename)`
+        );
+
         // Replace VIEW_COLUMNS with pg_attribute
         temp = temp.replace(
             /COLUMN_NAME as \"value\" FROM VIEW_COLUMNS WHERE SCHEMA_NAME = (\%s|\?) AND VIEW_NAME = (\%s|\?)/gi,
