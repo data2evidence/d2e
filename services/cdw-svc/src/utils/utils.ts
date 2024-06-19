@@ -456,7 +456,8 @@ export async function getAnalyticsConnection(userObj) {
     analyticsConnection =
       await dbConnectionUtil.DBConnectionUtil.getDBConnection({
         credentials: analyticsCredentials,
-        schema: analyticsCredentials.cdwSchema || analyticsCredentials.schema,
+        schemaName: analyticsCredentials.schema,
+        vocabSchemaName: analyticsCredentials.vocabSchema,
         userObj,
       });
     }

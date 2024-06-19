@@ -116,7 +116,7 @@ const getConnections = async ({
   const configConnection =
     await dbConnectionUtil.DBConnectionUtil.getDBConnection({
       credentials: configCredentials,
-      schema: configCredentials.configSchema || configCredentials.schema,
+      schemaName: configCredentials.schema,
       userObj,
     });
 

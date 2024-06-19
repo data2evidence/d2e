@@ -32,9 +32,9 @@ on:
         required: true
         type: environment
       force-cleanup-containers:
-          description: Force cleanup all containers
-          type: boolean
-          default: false
+        description: Force cleanup all containers
+        type: boolean
+        default: false
       docker-tag-develop:
         description: tag:*:develop
         type: boolean
@@ -68,124 +68,132 @@ jobs:
   deploy:
     environment: ${{ github.event.inputs.env }}
     name: ${{ github.event.inputs.env }}
-    runs-on: [ "${{ github.event.inputs.env }}", self-hosted, Linux, X64 ]
+    runs-on: ["${{ github.event.inputs.env }}", self-hosted, Linux, X64]
     steps:
-    - uses: actions/checkout@v4.1.1
-      name: checkout d2e repo
-      with:
-        clean: false
-        ref: ${{ env.DOCKER_TAG_NAME }}
-        repository: ${{ github.event.inputs.repo_full_name }}
-        token: ${{ secrets.CI_PAT }}
+      - uses: actions/checkout@v4.1.1
+        name: checkout d2e repo
+        with:
+          clean: false
+          ref: ${{ env.DOCKER_TAG_NAME }}
+          repository: ${{ github.event.inputs.repo_full_name }}
+          token: ${{ secrets.CI_PAT }}
 
-    - name: Force cleanup containers
-      if: github.event.inputs.force-cleanup-containers
-      continue-on-error: true
-      run: docker rm -v -f $(docker ps -qa)
+      - name: Force cleanup containers
+        if: github.event.inputs.force-cleanup-containers
+        continue-on-error: true
+        run: docker rm -v -f $(docker ps -qa)
 
-    - name: Generate dotenv
-      env:
-        DOTENV_FILE: .env.${{ env.ENV_TYPE }}
-        DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
-        OVERWRITE: true
-      run: |
-        ACTIONS_STEP_DEBUG=false
-        ./internal/scripts/get-op-ratelimit.sh
-      
-        # get env yml from 1password
-        if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
-        then
-          yarn --cwd internal op:get:$ENV_TYPE
-        else
-          echo dotenv-boolean=false | tee -a $GITHUB_STEP_SUMMARY
-        fi
+      - name: Generate dotenv
+        env:
+          DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+          DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+          OVERWRITE: true
+        run: |
+          ACTIONS_STEP_DEBUG=false
+          ./internal/scripts/get-op-ratelimit.sh
 
-        # mask sensitive values
-        internal/scripts/gha-mask.sh
+          # get env yml from 1password
+          if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
+          then
+            yarn --cwd internal op:get:$ENV_TYPE
+          else
+            echo dotenv-boolean=false | tee -a $GITHUB_STEP_SUMMARY
+          fi
 
-        # generate dotenv
-        yarn --cwd internal gen:env
-        echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+          # mask sensitive values
+          internal/scripts/gha-mask.sh
 
-        cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
+          # generate dotenv
+          yarn --cwd internal gen:env
+          echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
 
-        [ "${{ github.event.inputs.docker-tag-develop }}" = true ] && DOCKER_TAG_NAME=develop
-        UI_DOCKER_TAG_NAME=$DOCKER_TAG_NAME
-        [ "${{ github.event.inputs.ui-docker-tag-develop }}" = true ] && UI_DOCKER_TAG_NAME=develop
-        [ "${{ github.event.inputs.ui-docker-tag-textbox }}" != '' ] && UI_DOCKER_TAG_NAME=${{ github.event.inputs.ui-docker-tag-textbox }}
+          cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 
-        echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-        echo UI_DOCKER_TAG_NAME=$UI_DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-        echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
-        echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
+          [ "${{ github.event.inputs.docker-tag-develop }}" = true ] && DOCKER_TAG_NAME=develop
+          UI_DOCKER_TAG_NAME=$DOCKER_TAG_NAME
+          [ "${{ github.event.inputs.ui-docker-tag-develop }}" = true ] && UI_DOCKER_TAG_NAME=develop
+          [ "${{ github.event.inputs.ui-docker-tag-textbox }}" != '' ] && UI_DOCKER_TAG_NAME=${{ github.event.inputs.ui-docker-tag-textbox }}
 
-    - name: Load dotenv from 1password
-      uses: 1password/load-secrets-action@v2
-      id: op-load-secret
-      with:
-        export-env: true
-      env:
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
-        REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
+          echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+          echo UI_DOCKER_TAG_NAME=$UI_DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+          echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
+          echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
 
-    - name: 1password ratelimit end
-      env:
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-      run: |
-        ./internal/scripts/get-op-ratelimit.sh
+      - name: Load dotenv from 1password
+        uses: 1password/load-secrets-action@v2
+        id: op-load-secret
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+          REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
 
-    - name: Upload stats.yml artifact
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: stats
-        retention-days: 30
-        path: |
-          ${{ github.job }}*.yml
+      - name: 1password ratelimit end
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        run: |
+          ./internal/scripts/get-op-ratelimit.sh
 
-    - name: Login to ACR
-      uses: docker/login-action@v3.1.0
-      with:
-        registry: alpcr.azurecr.io
-        username: ${{ env.REGISTRY_USERNAME }}
-        password: ${{ env.REGISTRY_PASSWORD }}
+      - name: Upload stats.yml artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stats
+          retention-days: 30
+          path: |
+            ${{ github.job }}*.yml
 
-    - name: docker compose up
-      env:
-        GATEWAY_NAME: alp-minerva-gateway-1
-      run: |
-        echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
+      - name: Login to ACR
+        uses: docker/login-action@v3.1.0
+        with:
+          registry: alpcr.azurecr.io
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_PASSWORD }}
 
-        # customize dc.yml
-        yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
-        yq -i '.services.alp-caddy.image="alpcr.azurecr.io/alp-data-node/alp-caddy:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
+      - uses: nick-fields/retry@v3
+        with:
+          timeout_seconds: 1800
+          retry_wait_seconds: 60
+          max_attempts: 10
+          retry_on: error
+          command: yarn remote:minerva pull
 
-        # Run ALP services
-        yarn remote:minerva up --remove-orphans --force-recreate --wait --pull always
-        EXIT_CODE=$?
-          
-        if [ "$( docker container inspect -f '{{.State.Status}}' $GATEWAY_NAME )" = "running" ]; then
-          echo open https://$CADDY__ALP__PUBLIC_FQDN/portal/index.html | tee -a $GITHUB_STEP_SUMMARY
+      - name: docker compose up
+        env:
+          GATEWAY_NAME: alp-minerva-gateway-1
+        run: |
+          echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
+
+          # customize dc.yml
+          yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
+          yq -i '.services.alp-caddy.image="alpcr.azurecr.io/alp-data-node/alp-caddy:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
+
+          # Run ALP services
+          yarn remote:minerva up --remove-orphans --force-recreate --wait
+          EXIT_CODE=$?
+            
+          if [ "$( docker container inspect -f '{{.State.Status}}' $GATEWAY_NAME )" = "running" ]; then
+            echo open https://$CADDY__ALP__PUBLIC_FQDN/portal/index.html | tee -a $GITHUB_STEP_SUMMARY
+            echo | tee -a $GITHUB_STEP_SUMMARY
+          fi
+
+          yarn base:minerva ps --format "{{.Names}} {{.Status}}" 2> /dev/null | grep ^alp | tee -a $GITHUB_STEP_SUMMARY
           echo | tee -a $GITHUB_STEP_SUMMARY
-        fi
 
-        yarn base:minerva ps --format "{{.Names}} {{.Status}}" 2> /dev/null | grep ^alp | tee -a $GITHUB_STEP_SUMMARY
-        echo | tee -a $GITHUB_STEP_SUMMARY
+          if [ $EXIT_CODE != 0 ]; then
+            echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
+            exit $EXIT_CODE
+          fi
 
-        if [ $EXIT_CODE != 0 ]; then
-          echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-          exit $EXIT_CODE
-        fi
+      - name: Logs minerva
+        if: success() || failure()
+        run: |
+          yarn logs:minerva
 
-    - name: Logs minerva
-      if: success() || failure()
-      run: |
-        yarn logs:minerva
-
-    - name: Post cleanup
-      if: always()
-      run: |
-        docker rm -f alp-caddy-certs-mgmt || true # Cleanup cert mgmt container if job aborted
+      - name: Post cleanup
+        if: always()
+        run: |
+          docker rm -f alp-caddy-certs-mgmt || true # Cleanup cert mgmt container if job aborted
