@@ -12,6 +12,8 @@ from utils.databaseConnectionUtils import (
     getDatabaseConnectorConnectionDetailsString,
 )
 from api.AnalyticsSvcAPI import AnalyticsSvcAPI
+from prefect.serializers import JSONSerializer
+from prefect.filesystems import RemoteFileSystem as RFS
 
 
 def execute_cohort_survival(options: cohortSurvivalOptionsType):
@@ -31,7 +33,12 @@ def execute_cohort_survival(options: cohortSurvivalOptionsType):
     )
 
 
-@task
+@task(
+    result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")),
+    result_storage_key="{flow_run.id}_km.json",
+    result_serializer=JSONSerializer(),
+    persist_result=True,
+)
 def generate_cohort_survival_data(
     database_code: str,
     schema_name: str,
@@ -125,7 +132,7 @@ tryCatch(
     error = function(e) {{
         print(e)
         data <- list(status="ERROR", e$message)
-        return(data)
+        return(toJSON(data))
     }},
     finally = {{
         if (!is.null(con)) {{
@@ -138,5 +145,6 @@ tryCatch(
 )        
 """
         )
-        # TODO: need to check api for sending data to s3
-        return result
+
+        result_dict = json.loads(str(result[0]))
+        return result_dict
