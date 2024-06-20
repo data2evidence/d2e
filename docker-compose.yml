@@ -572,6 +572,27 @@ services:
   #   networks:
   #     - alp
 
+  alp-fhir-post-init:
+    container_name: &c7 alp-minerva-fhir-server-post-init
+    depends_on:
+      - alp-minerva-postgres
+      - alp-fhir-server 
+    image: postgres:15-alpine
+    logging:
+      options:
+        tag: *c7
+    networks:
+      alp:
+        priority: 20
+    volumes:
+      - ./services/alp-fhir:/alp-fhir
+    entrypoint: sh alp-fhir/seed.sh
+    environment:
+      <<:
+        - *x-pg
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+
   alp-logto:
     container_name: &c8 alp-logto-${BASE_PORT:-1}
     depends_on:
