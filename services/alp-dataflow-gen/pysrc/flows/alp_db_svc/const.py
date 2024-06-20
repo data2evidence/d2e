@@ -1,4 +1,5 @@
 from os import getcwd
+from dao import DBDao
 from re import sub, compile
 from utils.types import InternalPluginType
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
@@ -43,6 +44,15 @@ def get_db_dialect(options):
         return get_db_svc_endpoint_dialect(options.database_code)
     else:
         return options.dialect
+
+
+def _check_table_case(dao_obj: DBDao) -> bool:
+    # works only for omop, omop5-4 data models
+    table_names = dao_obj.get_table_names()
+    if 'person' in table_names:
+        return True
+    elif 'PERSON' in table_names:
+        return False
 
 
 CHANGESET_AVAILABLE_REGEX = compile(r"db/migrations/\S+")
