@@ -160,7 +160,7 @@ jobs:
           retry_wait_seconds: 60
           max_attempts: 10
           retry_on: error
-          run: |
+          command: |
             # customize dc.yml
             yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
             yq -i '.services.alp-caddy.image="alpcr.azurecr.io/alp-data-node/alp-caddy:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
