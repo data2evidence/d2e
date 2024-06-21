@@ -128,7 +128,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
                     entity_count_distribution = get_entity_count_distribution(
                         dataset_dao, is_lower_case)
                     update_dataset_attributes_table(
-                        dataset_id, "entity_count_distribution", json.dumps(json.dumps(entity_count_distribution)), token)
+                        dataset_id, "entity_count_distribution", json.dumps(entity_count_distribution), token)
                 except Exception as e:
                     logger.error(
                         f"Failed to update attribute 'entity_count_distribution' for dataset id '{dataset_id}' with value '{entity_count_distribution}' : {e}")
