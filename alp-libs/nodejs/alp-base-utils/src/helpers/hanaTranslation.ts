@@ -148,6 +148,8 @@ const hanaCommonTranslation = (temp: string, schemaName: string, vocabSchemaName
 
   temp = temp.replace(/(\w+[.{1}])(\"[\w]*\").nextval/gi, `nextval('$1$2')`);
 
+  temp = temp.replace(/LIKE_REGEXPR/gi, "~*"); // ~* short for regex, case insensitive matching
+
   // Replace
   temp = temp.replace(/TO_NCLOB/gi, "");
   temp = temp.replace(/TO_TIMESTAMP\(TO_VARCHAR\(([\w_]*)(.*?\)){2}/gi, "$1::varchar::timestamp");
@@ -169,7 +171,7 @@ const hanaCommonTranslation = (temp: string, schemaName: string, vocabSchemaName
   temp = temp.replace(/\$\$SCHEMA\$\$./g, `"${schemaName}".`);
   temp = temp.replace(/\$\$VOCAB_SCHEMA\$\$./g, `"${vocabSchemaName}".`);
 
-  
+
   return temp;
 };
 
@@ -179,8 +181,6 @@ export const translateHanaToPostgres = (temp: string, schemaName: string, vocabS
     /DAYS_BETWEEN \(\(\(("[\w]*"."[\w]*")\)\),\(\(("[\w]*"."[\w]*")\)\)\)/gi,
     `($2::date - $1::date)`,
   );
-  // Replacements for concept name matching. hana and postgres regex search use different syntax
-  temp = temp.replace(/LIKE_REGEXPR/gi, "~*"); // ~* short for regex, case insensitive matching
 
   // Replace %s or `?` with $n
   let n = 0;
@@ -194,7 +194,6 @@ export const translateHanaToPostgres = (temp: string, schemaName: string, vocabS
 export const translateHanaToDuckdb = (temp: string, schemaName: string, vocabSchemaName: string): string => {
   temp = hanaCommonTranslation(temp, schemaName, vocabSchemaName);
   temp = temp.replace(/DAYS_BETWEEN \(/gi, `date_diff ('day', `);
-  temp = temp.replace(/LIKE_REGEXPR/gi, "SIMILAR TO");
   temp = temp.replace(
     /select count\(\*\) as \"TABLECOUNT\" from pg_tables where schemaname=(\%s|\?|\$[0-9]) and tablename=(\%s|\?|\$[0-9])/gi,
     `select count(*) AS tableCount from information_schema.tables where table_catalog=%s and table_name=%s`,
