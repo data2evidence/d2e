@@ -21,7 +21,6 @@ export const getProperties = (): any => {
             alp_db_http_port: Number(process.env.DB_SVC__PORT),
             alp_db_base_path: String(process.env.DB_SVC__PATH),
             alp_system_id: String(process.env.ALP__SYSTEM_ID),
-            user_mgmt_base_url: String(process.env.USER_MGMT__BASE_URL),
             sub_prop: String(process.env.DB_SVC__IDP_SUBJECT_PROP),
             skip_auth:
                 process.env.NODE_ENV === "test" ||
@@ -36,14 +35,6 @@ export const getProperties = (): any => {
                       readFileSync(`${k8sPathPrefix}/HANA_READ_ROLE`, "utf-8")
                   )
                 : utils.strUC(process.env.HANA__READ_ROLE),
-            omop_vocab_schema: isProd
-                ? utils.strUC(
-                      readFileSync(
-                          `${k8sPathPrefix}/OMOP_VOCAB_SCHEMA`,
-                          "utf-8"
-                      ).split(",")
-                  )
-                : String(process.env.OMOP__VOCAB_SCHEMA).split(","),
             postgres_tenant_configs: isProd
                 ? readFileSync(
                       `${k8sPathPrefix}/POSTGRES_TENANT_CONFIGS`,
