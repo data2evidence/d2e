@@ -17194,6 +17194,7 @@ const paConfig = {
   panelOptions: {
     addToCohorts: true,
     domainValuesLimit: 200,
+    maxFiltercardCount: 10,
     calcViewAccessPoint: true,
     externalAccessPoints: true
   },
@@ -31729,6 +31730,7 @@ const paConfigDuckdb = {
   "panelOptions": {
     "addToCohorts": true,
     "domainValuesLimit": 200,
+    "maxFiltercardCount": 10,
     "calcViewAccessPoint": true,
     "externalAccessPoints": true
   }
@@ -33355,6 +33357,7 @@ const paI2b2ConfigDuckdb = {
   panelOptions: {
     addToCohorts: true,
     domainValuesLimit: 200,
+    maxFiltercardCount: 10,
     calcViewAccessPoint: true,
     externalAccessPoints: true
   },
