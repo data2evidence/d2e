@@ -643,6 +643,7 @@
         "panelOptions": {
             "addToCohorts": true,
             "domainValuesLimit": 50,
+            "maxFiltercardCount": 10,
             "calcViewAccessPoint": true,
             "externalAccessPoints": true
         },
