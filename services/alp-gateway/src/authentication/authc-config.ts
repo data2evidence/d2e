@@ -10,7 +10,8 @@ export const publicURLs = [
   '/portalsvc/public-graphql',
   '/usermgmt/api/user-group/public',
   '/system-portal/dataset/public/list',
-  '/system-portal/feature/list'
+  '/system-portal/feature/list',
+  '/system-portal/overview-description/public'
 ]
 
 const logger = createLogger('AuthcConfig')
