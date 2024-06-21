@@ -273,3 +273,12 @@ export interface UserGroup {
   userId: string
   alp_role_study_researcher: string[]
 }
+
+export interface IOverviewDescription {
+  id: string
+  text: string
+}
+export interface IOverviewDescriptionUpdateDto {
+  id: string
+  text: string
+}
