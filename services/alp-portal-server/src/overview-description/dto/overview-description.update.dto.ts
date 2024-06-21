@@ -3,7 +3,6 @@ import { IOverviewDescriptionUpdateDto } from '../../types'
 
 export class OverviewDescriptionUpdateDto implements IOverviewDescriptionUpdateDto {
   @IsNotEmpty()
-  @IsUUID()
   id: string
 
   @IsString()

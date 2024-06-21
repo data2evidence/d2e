@@ -27,7 +27,7 @@ export class OverviewDescriptionService {
 
   async getOverviewDescription(): Promise<IOverviewDescription> {
     try {
-      const description = await this.overviewDescriptionRepo.findOneOrFail({ where: { createdBy: 'system' } })
+      const description = await this.overviewDescriptionRepo.findOneOrFail({ where: { id: '1' } })
       return description
     } catch (error) {
       this.logger.error(`Overview description not found! ${error}`)

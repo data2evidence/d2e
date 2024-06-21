@@ -12,7 +12,7 @@ export default class OverviewDescriptionSeeder implements Seeder {
     }
 
     const entities = repository.create({
-      id: '737bcc1c-c39d-48d7-a333-0929ae1020e7',
+      id: '1',
       text: 'Our vision is a world where health data is comprehensively, digitally, and securely available for research and directly impacts the prevention, diagnosis, and treatment of diseases.',
       createdBy: 'system',
       modifiedBy: 'system'
