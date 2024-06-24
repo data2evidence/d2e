@@ -13,20 +13,13 @@ volumes:
 
 x-envs:
   db-svc: &x-dbsvc
-    DATAFLOW_GATEWAY__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/dataflow-mgmt
-    DB_SVC__DEBUG: "false"
     DB_SVC__IDP_SUBJECT_PROP: sub
     DB_SVC__LOG_LEVEL: info
     DB_SVC__PATH: /alpdb
-    DB_SVC__PORT: 41${BASE_PORT:-1}01
     DISABLE_SSL: "TRUE"
     HANA__READ_ROLE: TENANT_READ_ROLE
-    JAVA_OPTS: -Xmx2g
     LB__LOG_LEVEL: debug
-    OMOP__VOCAB_SCHEMA: ${OMOP__VOCAB_SCHEMA:-cdmvocab}
     PG__READ_ROLE: postgres_tenant_read_role
-    ROLLBACK_SCHEMA_CREATION_FOR_LIQUIBASE_SCRIPT_FAILURE: "TRUE"
-    USER_MGMT__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/usermgmt/api/
   env_converter: &x-converter
     DB_CREDENTIALS_MGR__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/db-credentials/db/
     DB_CREDENTIALS__PRIVATE_KEY: ${DB_CREDENTIALS__INTERNAL__PRIVATE_KEY}
