@@ -35,13 +35,11 @@ describe('PublicDatasetQueryService', () => {
     const mockDatasetDetail = { id: 'detail-id', name: 'detail-name', description: 'detail-description' }
     const mockDatasetTags = [{ id: 'tag-id', name: 'tag-name' }]
     const mockDatasetAttributes = [{ dataType: 'STRING', name: 'attribute-name', value: 'attribute-value' }]
-    const mockDataModel = 'mock-data-model [mock-flow]'
     const mockDataset = {
       id: 'dataset-id',
       datasetDetail: mockDatasetDetail,
       attributes: mockDatasetAttributes,
-      tags: mockDatasetTags,
-      dataModel: mockDataModel
+      tags: mockDatasetTags
     }
     const mockTenantId = uuidv4()
     const mockTenant = {
@@ -76,8 +74,7 @@ describe('PublicDatasetQueryService', () => {
       studyDetail: mockDatasetDetail,
       tenant: mockTenant,
       attributes: [{ dataType: 'STRING', name: 'attribute-name', value: 'attribute-value' }],
-      tags: [{ id: 'tag-id', name: 'tag-name' }],
-      dataModel: 'mock-data-model'
+      tags: [{ id: 'tag-id', name: 'tag-name' }]
     })
     expect(mockTenantService.getTenant).toBeCalledTimes(1)
     expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('dataset')
