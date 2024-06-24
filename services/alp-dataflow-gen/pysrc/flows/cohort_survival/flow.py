@@ -133,7 +133,8 @@ tryCatch(
 
         death_survival <- estimateSingleEventSurvival(cdm,
             targetCohortTable = "target_cohort",
-            outcomeCohortTable = "outcome_cohort"
+            outcomeCohortTable = "outcome_cohort",
+            estimateGap = 30
         )
 
         plot <- plotSurvival(death_survival)
