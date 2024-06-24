@@ -5,7 +5,7 @@ export class AddConceptSetUsername1718767627913 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "terminology"."concept_set" ADD "user_name" character varying NOT NULL`,
+      `ALTER TABLE "terminology"."concept_set" ADD "user_name" character varying NOT NULL DEFAULT 'admin'`,
     );
   }
 
