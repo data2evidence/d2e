@@ -274,11 +274,11 @@ export interface UserGroup {
   alp_role_study_researcher: string[]
 }
 
-export interface IOverviewDescription {
-  id: string
-  text: string
+export interface IConfig {
+  type: string
+  value: string
 }
-export interface IOverviewDescriptionUpdateDto {
-  id: string
-  text: string
+export interface IConfigUpdateDto {
+  type: string
+  value: string
 }

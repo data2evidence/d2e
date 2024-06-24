@@ -2,22 +2,22 @@ import { Inject, Injectable, InternalServerErrorException, NotFoundException, Sc
 import { REQUEST } from '@nestjs/core'
 import { Request } from 'express'
 import { InjectRepository } from '@nestjs/typeorm'
-import { IOverviewDescription, IOverviewDescriptionUpdateDto } from '../types'
+import { IConfig, IConfigUpdateDto } from '../types'
 import { Repository } from 'typeorm'
-import { OverviewDescription } from './entity'
+import { Config } from './entity'
 import { DEFAULT_ERROR_MESSAGE } from '../common/const'
 import { createLogger } from '../logger'
 import { JwtPayload, decode } from 'jsonwebtoken'
 
 @Injectable({ scope: Scope.REQUEST })
-export class OverviewDescriptionService {
+export class ConfigService {
   private readonly logger = createLogger(this.constructor.name)
   private readonly userId: string
 
   constructor(
     @Inject(REQUEST) request: Request,
-    @InjectRepository(OverviewDescription)
-    private overviewDescriptionRepo: Repository<OverviewDescription>
+    @InjectRepository(Config)
+    private overviewDescriptionRepo: Repository<Config>
   ) {
     const token = request.headers['authorization']
       ? (decode(request.headers['authorization'].replace(/bearer /i, '')) as JwtPayload)
@@ -25,30 +25,24 @@ export class OverviewDescriptionService {
     this.userId = token ? token.sub : ''
   }
 
-  async getOverviewDescription(): Promise<IOverviewDescription> {
+  async getConfigByType(type: string): Promise<IConfig> {
     try {
-      const description = await this.overviewDescriptionRepo.findOneOrFail({ where: { id: '1' } })
-      return description
+      return await this.overviewDescriptionRepo.findOneOrFail({ where: { type } })
     } catch (error) {
-      this.logger.error(`Overview description not found! ${error}`)
-      throw new NotFoundException('Overview description not found')
+      this.logger.error(`Config of type ${type} not found! ${error}`)
+      throw new NotFoundException(`Config of type ${type} not found! ${error}`)
     }
   }
 
-  async updateOverviewDescription(
-    overviewDescriptionUpdateDto: IOverviewDescriptionUpdateDto
-  ): Promise<IOverviewDescription> {
+  async updateConfig(configUpdateDto: IConfigUpdateDto): Promise<IConfig> {
     try {
-      await this.overviewDescriptionRepo.update(
-        { id: overviewDescriptionUpdateDto.id },
-        this.addOwner(overviewDescriptionUpdateDto)
-      )
-      this.logger.info(`Updated overview description`)
-      return overviewDescriptionUpdateDto
+      await this.overviewDescriptionRepo.update({ type: configUpdateDto.type }, this.addOwner(configUpdateDto))
+      this.logger.info(`Config of type: ${configUpdateDto.type} updated`)
+      return configUpdateDto
     } catch (error) {
-      this.logger.error(`Error while updating overview description: ${error}`)
+      this.logger.error(`Error while updating config: ${error}`)
       if (error instanceof NotFoundException) {
-        throw new NotFoundException(`Overview description not found`)
+        throw new NotFoundException(`Config of type ${configUpdateDto.type} not found`)
       }
       throw new InternalServerErrorException(DEFAULT_ERROR_MESSAGE)
     }

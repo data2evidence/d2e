@@ -10,7 +10,7 @@ import { IToken } from '../types'
 const logger = createLogger('ScopeCheck')
 const userMgmtApi = new UserMgmtAPI()
 const subProp = env.GATEWAY_IDP_SUBJECT_PROP
-const PUBLIC_API_PATHS = ['^/system-portal/dataset/public/list(.*)', '^/system-portal/overview-description/public(.*)']
+const PUBLIC_API_PATHS = ['^/system-portal/dataset/public/list(.*)', '^/system-portal/config/public(.*)']
 
 export const checkScopes = async (req: Request, res: Response, next: NextFunction) => {
   const bearerToken = req.headers.authorization

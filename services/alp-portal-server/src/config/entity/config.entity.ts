@@ -1,11 +1,11 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm'
 import { Audit } from '../../common/entity/audit.entity'
 
-@Entity('overview_description')
-export class OverviewDescription extends Audit {
+@Entity('config')
+export class Config extends Audit {
   @PrimaryColumn()
-  id: string
+  type: string
 
   @Column()
-  text: string
+  value: string
 }

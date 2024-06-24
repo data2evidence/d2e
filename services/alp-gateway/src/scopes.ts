@@ -343,13 +343,13 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
-    path: `^/system-portal/overview-description$`,
-    scopes: ['portal.dataset.read'],
+    path: `^/system-portal/config(.*)`,
+    scopes: ['portal.config.read'],
     httpMethods: ['GET']
   },
   {
-    path: `^/system-portal/overview-description$`,
-    scopes: ['portal.dataset.read'],
+    path: `^/system-portal/config$`,
+    scopes: ['portal.config.write'],
     httpMethods: ['PUT']
   },
   {
@@ -726,17 +726,17 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
-    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_\-]+/settings(.*)',
+    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_-]+/settings(.*)',
     scopes: ['meilisearchSvc.index.setting.update'],
     httpMethods: ['PATCH']
   },
   {
-    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_\-]+/documents(.*)',
+    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_-]+/documents(.*)',
     scopes: ['meilisearchSvc.document.add'],
     httpMethods: ['POST', 'PUT']
   },
   {
-    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_\-]+/settings/synonyms',
+    path: '^/meilisearch-svc/indexes/[a-zA-Z0-9_-]+/settings/synonyms',
     scopes: ['meilisearchSvc.document.add'],
     httpMethods: ['PUT']
   },
@@ -848,8 +848,8 @@ export const ROLE_SCOPES = {
     'portal.dataset.metadataConfig.attribute.read',
     'portal.dataset.metadataConfig.attribute.write',
     'portal.dataset.metadataConfig.attribute.delete',
-    'portal.overviewDescription.read',
-    'portal.overviewDescription.write',
+    'portal.config.read',
+    'portal.config.write',
     'terminology.user.read',
     'dataflowmgmt.dataflow.read',
     'dataflowmgmt.dataflow.add',
@@ -927,7 +927,7 @@ export const ROLE_SCOPES = {
     'portal.dataset.read',
     'portal.filterScope.read',
     'portal.dataset.release.list.read',
-    'portal.overviewDescription.read'
+    'portal.config.read'
   ],
   RESEARCHER: [
     'portal.dataset.paConfig.read',
@@ -937,7 +937,7 @@ export const ROLE_SCOPES = {
     'portal.notebook.add',
     'portal.notebook.update',
     'portal.notebook.delete',
-    'portal.overviewDescription.read',
+    'portal.config.read',
     'terminology.user.read',
     'gateway.terminology.conceptSet.read',
     'gateway.terminology.conceptSet.create',

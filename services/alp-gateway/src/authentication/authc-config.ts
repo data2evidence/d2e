@@ -11,7 +11,7 @@ export const publicURLs = [
   '/usermgmt/api/user-group/public',
   '/system-portal/dataset/public/list',
   '/system-portal/feature/list',
-  '/system-portal/overview-description/public'
+  '/system-portal/config/public/overview-description'
 ]
 
 const logger = createLogger('AuthcConfig')
