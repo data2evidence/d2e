@@ -74,6 +74,9 @@ export async function getKmData(req: IMRIRequest, res) {
                 `cohort-survival/results/${req.query.flowRunId}`,
                 {}
             );
+            if (result.parameters.options.datasetId !== req.query.studyId) {
+                throw new Error("Not authorized to view this flow run.");
+            }
             if (
                 ["CANCELLING", "CANCELLED", "FAILED", "CRASHED"].includes(
                     result.state.type
@@ -152,6 +155,7 @@ export async function analyzeCohortsKm(req: IMRIRequest, res) {
                 databaseCode,
                 targetCohortDefinitionId: req.body.targetCohortId,
                 outcomeCohortDefinitionId: req.body.outcomeCohortId,
+                datasetId: req.query.studyId,
             },
         }
     );

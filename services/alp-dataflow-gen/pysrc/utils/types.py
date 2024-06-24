@@ -79,6 +79,7 @@ class cohortSurvivalOptionsType(BaseModel):
     schemaName: str
     targetCohortDefinitionId: int
     outcomeCohortDefinitionId: int
+    datasetId: str
 
 
 class omopCDMOptionsType(BaseModel):

@@ -23,12 +23,14 @@ def execute_cohort_survival(options: cohortSurvivalOptionsType):
     schemaName = options.schemaName
     targetCohortDefinitionId = options.targetCohortDefinitionId
     outcomeCohortDefinitionId = options.outcomeCohortDefinitionId
+    datasetId = options.datasetId
 
     generate_cohort_survival_data(
         databaseCode,
         schemaName,
         targetCohortDefinitionId,
         outcomeCohortDefinitionId,
+        datasetId
     )
 
 

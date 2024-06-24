@@ -7,6 +7,9 @@ export class CohortSurvivalFlowRunOptions {
   @IsString()
   schemaName: string
 
+  @IsString()
+  datasetId: string
+
   @IsNumber()
   targetCohortDefinitionId: number
 
