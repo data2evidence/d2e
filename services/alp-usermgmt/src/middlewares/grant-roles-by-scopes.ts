@@ -39,8 +39,8 @@ export const grantRolesByScopes = async (req: Request, res: Response, next: Next
         const logtoApi = Container.get(LogtoAPI)
         const logtoUser = await logtoApi.getUser(sub)
         if (logtoUser != null) {
-          // Use username in Logto context
-          username = logtoUser.username
+          // Use username in Logto context (fallback to email if empty)
+          username = logtoUser.username ?? logtoUser.primaryEmail
         }
       }
 

@@ -1,1 +1,0 @@
--- permissions are now managed differently by the alp-pg-management service
