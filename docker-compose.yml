@@ -1539,8 +1539,29 @@ services:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
 
   alp-dataflow-gen-data-load-agent:
-      container_name: &c3 alp-dataflow-gen-data-load-agent-${BASE_PORT:-1}
-      extends: alp-dataflow-gen-agent
-      volumes:
-        - ./cache/vocab/transformed:/tmp/data
-      profiles: [data-load]
+    container_name: &c3 alp-dataflow-gen-data-load-agent-${BASE_PORT:-1}
+    extends: alp-dataflow-gen-agent
+    volumes:
+      - ./cache/vocab/transformed:/tmp/data
+    profiles: [data-load]
+
+  # alp-dataflow-gen-data-load-agent:
+  #     container_name: &c3 alp-dataflow-gen-data-load-agent-${BASE_PORT:-1}
+  #     image: data-load-agent:latest
+  #     #extends: alp-dataflow-gen-agent
+  #     volumes:
+  #       - ./cache/vocab/transformed:/tmp/data
+  #     #profiles: [data-load]
+  #     networks:
+  #       data:
+  #     platform: linux/amd64
+  #     pull_policy: never
+  #     environment:
+  #       <<:
+  #         - *x-pg
+  #         - *x-minio
+  #       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT}:41${BASE_PORT}20/api
+  #       PREFECT_LOGGING_LEVEL: DEBUG
+  #       PYTHON_VERIFY_SSL: false # Only use this for apis calling internal docker urls
+  #       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/portalsvc/graphql
+  
