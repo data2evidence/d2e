@@ -29,8 +29,7 @@ def execute_cohort_survival(options: cohortSurvivalOptionsType):
         databaseCode,
         schemaName,
         targetCohortDefinitionId,
-        outcomeCohortDefinitionId,
-        datasetId
+        outcomeCohortDefinitionId
     )
 
 
