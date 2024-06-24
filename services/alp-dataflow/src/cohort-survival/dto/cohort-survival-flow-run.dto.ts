@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsBoolean, IsArray, IsObject, ValidateNested } from 'class-validator'
+import { IsString, IsNumber, ValidateNested } from 'class-validator'
 
 export class CohortSurvivalFlowRunOptions {
   @IsString()
@@ -13,7 +13,7 @@ export class CohortSurvivalFlowRunOptions {
   @IsNumber()
   outcomeCohortDefinitionId: number
 }
-export class CohortSurvivalGeneratorFlowRunDto {
+export class CohortSurvivalFlowRunDto {
   @ValidateNested()
   options: CohortSurvivalFlowRunOptions
 }

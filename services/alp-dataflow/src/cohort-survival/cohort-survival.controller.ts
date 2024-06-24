@@ -1,13 +1,18 @@
-import { Controller, Post, Body } from '@nestjs/common'
+import { Controller, Post, Body, Get, Param, ParseUUIDPipe } from '@nestjs/common'
 import { CohortSurvivalService } from './cohort-survival.service'
-import { CohortSurvivalGeneratorFlowRunDto } from './dto'
+import { CohortSurvivalFlowRunDto } from './dto'
 
 @Controller()
 export class CohortSurvivalController {
   constructor(private readonly cohortSurvivalService: CohortSurvivalService) {}
 
   @Post('flow-run')
-  createCohortSurvivalFlowRun(@Body() cohortSurvivalFlowRunDto: CohortSurvivalGeneratorFlowRunDto) {
+  createCohortSurvivalFlowRun(@Body() cohortSurvivalFlowRunDto: CohortSurvivalFlowRunDto) {
     return this.cohortSurvivalService.createCohortSurvivalFlowRun(cohortSurvivalFlowRunDto)
+  }
+
+  @Get('results/:flowRunId')
+  getCohortSurvivalResults(@Param('flowRunId', ParseUUIDPipe) flowRunId: string) {
+    return this.cohortSurvivalService.getCohortSurvivalResults(flowRunId)
   }
 }

@@ -54,37 +54,85 @@ async function getStudyDetails(
 }
 
 export async function getKmData(req: IMRIRequest, res) {
-    // TODO: get object location from flow first
-    const bucketName = "flows";
-    const objectKey = "results/fe82e061-c5d8-46f5-9b0a-0e6c256ea606_km.json";
+    const timeoutMs = 20 * 60 * 1000;
+    const retryIntervalMs = 10 * 1000;
+    let startTimeMs = +new Date();
 
-    try {
-        // Get the object from MinIO
-        minioClient.getObject(bucketName, objectKey, (err, dataStream) => {
-            if (err) {
-                console.error("Error fetching object:", err);
-                return res.status(500).send("Error fetching object from MinIO");
+    const wait = () => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(true);
+            }, retryIntervalMs);
+        });
+    };
+
+    const checkFlowRunState = async () => {
+        if (+new Date() < startTimeMs + timeoutMs) {
+            const result = await dataflowRequest(
+                req,
+                "GET",
+                `cohort-survival/results/${req.query.flowRunId}`,
+                {}
+            );
+            if (
+                ["CANCELLING", "CANCELLED", "FAILED", "CRASHED"].includes(
+                    result.state.type
+                )
+            ) {
+                throw new Error(
+                    "Cohort survival results could not be retrieved as flow run was unsuccessful"
+                );
             }
 
-            // Set appropriate headers
-            res.setHeader(
-                "Content-Disposition",
-                `attachment; filename="${objectKey}"`
+            if (result.state.type === "COMPLETED") {
+                return;
+            }
+            await wait();
+            await checkFlowRunState();
+        } else {
+            throw new Error(
+                "Check flow run state for Kaplan Meier analysis timeout"
             );
-            res.setHeader("Content-Type", "application/json"); // Adjust based on your file type
+        }
+    };
+    await checkFlowRunState();
 
-            // Pipe the object data directly to the response
-            dataStream.pipe(res);
+    const bucketName = "flows";
+    const objectKey = `results/${req.query.flowRunId}_km.json`;
+    try {
+        console.info("Checking for Kapler-Meier Data");
+        minioClient.getObject(
+            bucketName,
+            objectKey,
+            async (err, dataStream) => {
+                if (err) {
+                    // if (typeof error === )
+                    console.error("Error fetching object:", err);
+                    return res
+                        .status(500)
+                        .send("Error fetching object from MinIO");
+                }
 
-            dataStream.on("end", () => {
-                console.log("Object successfully streamed to response");
-            });
+                // Set appropriate headers
+                res.setHeader(
+                    "Content-Disposition",
+                    `attachment; filename="${objectKey}"`
+                );
+                res.setHeader("Content-Type", "application/json"); // Adjust based on your file type
 
-            dataStream.on("error", (err) => {
-                console.error("Stream error:", err);
-                res.status(500).send("Error streaming object data");
-            });
-        });
+                // Pipe the object data directly to the response
+                dataStream.pipe(res);
+
+                dataStream.on("end", () => {
+                    console.log("Object successfully streamed to response");
+                });
+
+                dataStream.on("error", (err) => {
+                    console.error("Stream error:", err);
+                    res.status(500).send("Error streaming object data");
+                });
+            }
+        );
     } catch (error) {
         console.error("Error in handling request:", error);
         res.status(500).send("Internal Server Error");
