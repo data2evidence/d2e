@@ -173,6 +173,14 @@ x-envs:
           "notes": "",
           "pluginPath": "plugins/Setup/HybridSearch/module",
           "route": "hybrid-search"
+        },
+        {
+          "description": "Configure overview description text",
+          "enabled": true,
+          "name": "Overview description",
+          "notes": "",
+          "pluginPath": "plugins/Setup/OverviewDescription/module",
+          "route": "overview-description"
         }
       ],
       "systemadmin": [
