@@ -19,17 +19,16 @@ from prefect.filesystems import RemoteFileSystem as RFS
 def execute_cohort_survival(options: cohortSurvivalOptionsType):
     logger = get_run_logger()
     logger.info("Running Cohort Survival")
-    database_code = options.database_code
-    schema_name = options.schema_name
-    target_cohort_definition_id = options.target_cohort_definition_id
-    outcome_cohort_definition_id = options.outcome_cohort_definition_id
-    schema_name = options.schema_name
+    databaseCode = options.databaseCode
+    schemaName = options.schemaName
+    targetCohortDefinitionId = options.targetCohortDefinitionId
+    outcomeCohortDefinitionId = options.outcomeCohortDefinitionId
 
     generate_cohort_survival_data(
-        database_code,
-        schema_name,
-        target_cohort_definition_id,
-        outcome_cohort_definition_id,
+        databaseCode,
+        schemaName,
+        targetCohortDefinitionId,
+        outcomeCohortDefinitionId,
     )
 
 
@@ -123,7 +122,11 @@ tryCatch(
 
         plot <- plotSurvival(death_survival)
         plot_data <- ggplot_build(plot)$data[[1]]
-        plot_data$status <- "SUCCESS"
+        # Convert data to a list if not already
+        plot_data <- as.list(plot_data)
+
+        # Add a key to the list
+        plot_data[["status"]] <- "SUCCESS"
         plot_data_json <- toJSON(plot_data)
         
         print(plot_data_json)
