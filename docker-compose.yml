@@ -580,9 +580,9 @@ services:
   alp-fhir-post-init:
     container_name: &c7 alp-minerva-fhir-server-post-init
     depends_on:
-      - alp-minerva-postgres:
+      alp-minerva-postgres:
         condition: service_healthy
-      - alp-fhir-server:
+      alp-fhir-server:
         condition: service_healthy
     image: postgres:15-alpine
     logging:
