@@ -39,6 +39,7 @@ https://*.alp.local:55555 {
         path /oidc/*
         path /sign-in
         path /consent
+        path /callback/* # For azure connector
     }
 
     handle @logto {

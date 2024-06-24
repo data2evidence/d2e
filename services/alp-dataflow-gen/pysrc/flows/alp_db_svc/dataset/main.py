@@ -9,7 +9,7 @@ from dao.UserDao import UserDao
 
 from flows.alp_db_svc.liquibase.main import Liquibase
 from flows.alp_db_svc.types import LiquibaseAction
-from flows.alp_db_svc.const import DATAMODEL_CDM_VERSION, OMOP_DATA_MODELS
+from flows.alp_db_svc.const import DATAMODEL_CDM_VERSION, OMOP_DATA_MODELS, _check_table_case
 from flows.alp_db_svc.hooks import *
 
 
@@ -61,74 +61,79 @@ def create_schema_tasks(dialect: str,
                         tenant_configs: DBCredentialsType,
                         plugin_classpath: str,
                         count: int) -> bool:
+    try:
+        match dialect:
+            case DatabaseDialects.HANA:
+                admin_user = HANA_TENANT_USERS.ADMIN_USER
+            case DatabaseDialects.POSTGRES:
+                admin_user = PG_TENANT_USERS.ADMIN_USER
 
-    match dialect:
-        case DatabaseDialects.HANA:
-            admin_user = HANA_TENANT_USERS.ADMIN_USER
-        case DatabaseDialects.POSTGRES:
-            admin_user = PG_TENANT_USERS.ADMIN_USER
+        schema_dao = DBDao(database_code, schema_name, admin_user)
 
-    schema_dao = DBDao(database_code, schema_name, admin_user)
+        create_db_schema_wo = create_db_schema.with_options(
+            on_completion=[partial(create_dataset_schema_hook,
+                                   **dict(schema_dao=schema_dao))],
+            on_failure=[partial(create_dataset_schema_hook,
+                                **dict(schema_dao=schema_dao))])
 
-    create_db_schema_wo = create_db_schema.with_options(
-        on_completion=[partial(create_dataset_schema_hook,
-                               **dict(schema_dao=schema_dao))],
-        on_failure=[partial(create_dataset_schema_hook,
-                            **dict(schema_dao=schema_dao))])
+        # create schema if not exists
+        create_db_schema_wo(schema_dao)
 
-    # create schema if not exists
-    create_db_schema_wo(schema_dao)
+        if count == 0 or count is None:
+            action = LiquibaseAction.UPDATE
+        elif count > 0:
+            action = LiquibaseAction.UPDATECOUNT
 
-    if count == 0 or count == None:
-        action = LiquibaseAction.UPDATE
-    elif count > 0:
-        action = LiquibaseAction.UPDATECOUNT
-
-    create_tables_wo = run_liquibase_update_task.with_options(
-        on_failure=[partial(drop_schema_hook,
-                            **dict(schema_dao=schema_dao))])
-
-    create_tables_wo(action=action,
-                     dialect=dialect,
-                     data_model=data_model,
-                     changelog_file=changelog_file,
-                     schema_name=schema_name,
-                     vocab_schema=vocab_schema,
-                     tenant_configs=tenant_configs,
-                     plugin_classpath=plugin_classpath,
-                     count=count
-                     )
-
-    enable_audit_policies = tenant_configs.get("enableAuditPolicies")
-
-    # enable auditing
-    if enable_audit_policies:
-
-        enable_and_create_audit_policies_wo = enable_and_create_audit_policies.with_options(
+        create_tables_wo = run_liquibase_update_task.with_options(
             on_failure=[partial(drop_schema_hook,
                                 **dict(schema_dao=schema_dao))])
-        enable_and_create_audit_policies_wo(schema_dao)
-    else:
-        print("Skipping Alteration of system configuration")
-        print("Skipping creation of Audit policy for system configuration")
-        print(f"Skipping creation of new audit policy for {schema_name}")
 
-    user_dao = UserDao(database_code, schema_name, admin_user)
-    create_and_assign_roles_wo = create_and_assign_roles.with_options(
-        on_failure=[partial(drop_schema_hook,
-                            **dict(schema_dao=schema_dao))])
-    create_and_assign_roles_wo(user_dao, tenant_configs, data_model, dialect)
+        create_tables_wo(action=action,
+                         dialect=dialect,
+                         data_model=data_model,
+                         changelog_file=changelog_file,
+                         schema_name=schema_name,
+                         vocab_schema=vocab_schema,
+                         tenant_configs=tenant_configs,
+                         plugin_classpath=plugin_classpath,
+                         count=count
+                         )
 
-    if data_model in OMOP_DATA_MODELS:
-        cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
-        insert_cdm_version_wo = insert_cdm_version.with_options(
-            on_completion=[partial(update_cdm_version_hook,
-                                   **dict(db=database_code, schema=schema_name))],
-            on_failure=[partial(update_cdm_version_hook,
-                                **dict(db=database_code, schema=schema_name))])
+        enable_audit_policies = tenant_configs.get("enableAuditPolicies")
 
-        insert_cdm_version_wo(schema_dao, cdm_version)
-    return True
+        # enable auditing
+        if enable_audit_policies:
+
+            enable_and_create_audit_policies_wo = enable_and_create_audit_policies.with_options(
+                on_failure=[partial(drop_schema_hook,
+                                    **dict(schema_dao=schema_dao))])
+            enable_and_create_audit_policies_wo(schema_dao)
+        else:
+            print("Skipping Alteration of system configuration")
+            print("Skipping creation of Audit policy for system configuration")
+            print(f"Skipping creation of new audit policy for {schema_name}")
+
+        user_dao = UserDao(database_code, schema_name, admin_user)
+        create_and_assign_roles_wo = create_and_assign_roles.with_options(
+            on_failure=[partial(drop_schema_hook,
+                                **dict(schema_dao=schema_dao))])
+        create_and_assign_roles_wo(
+            user_dao, tenant_configs, data_model, dialect, count)
+
+        if data_model in OMOP_DATA_MODELS:
+            cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
+            insert_cdm_version_wo = insert_cdm_version.with_options(
+                on_completion=[partial(update_cdm_version_hook,
+                                       **dict(db=database_code, schema=schema_name))],
+                on_failure=[partial(update_cdm_version_hook,
+                                    **dict(db=database_code, schema=schema_name))])
+
+            insert_cdm_version_wo(schema_dao, cdm_version)
+        print("Dataset schema successfully created and privileges assigned!")
+        return True
+    except Exception as e:
+        print(f"Dataset schema creation failed! Error: {e}")
+        raise e
 
 
 def update_datamodel(database_code: str,
@@ -176,9 +181,10 @@ def update_datamodel(database_code: str,
                 on_failure=[partial(update_cdm_version_hook,
                                     **dict(db=database_code, schema=schema_name))])
             update_cdm_version_wo(schema_dao, cdm_version)
-
+        logger.info(
+            "Dataset schema successfully updated!")
     except Exception as e:
-        logger.error(e)
+        logger.error(f"Dataset schema update failed! Error: {e}")
         raise e
 
 
@@ -268,7 +274,8 @@ def enable_and_create_audit_policies(schema_dao: DBDao):
 
 
 @task(log_prints=True)
-def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType, data_model: str, dialect: str):
+def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType,
+                            data_model: str, dialect: str, count: int = 0):
     logger = get_run_logger()
     # Check if schema read role exists
 
@@ -316,7 +323,7 @@ def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType,
     logger.info(f"'Granting read privileges to '{read_role}' role")
     userdao.grant_read_privileges(read_role)
 
-    if data_model in OMOP_DATA_MODELS:
+    if data_model in OMOP_DATA_MODELS and count == 0:
         # Grant write cohort and cohort_definition table privileges to read role
         logger.info(f"'Granting cohort write privileges to '{read_role}' role")
         userdao.grant_cohort_write_privileges(read_role)
@@ -334,17 +341,28 @@ def run_liquibase_update_task(**kwargs):
 
 @task(log_prints=True)
 def insert_cdm_version(schema_dao: DBDao, cdm_version: str):
-
-    values_to_insert = {
-        "cdm_source_name": schema_dao.schema_name,
-        "cdm_source_abbreviation": schema_dao.schema_name[0:25],
-        "cdm_holder": "D4L",
-        "source_release_date": datetime.now(),
-        "cdm_release_date": datetime.now(),
-        "cdm_version": cdm_version
-    }
-
-    schema_dao.insert_values_into_table("cdm_source", values_to_insert)
+    is_lower_case = _check_table_case(schema_dao)
+    if is_lower_case:
+        values_to_insert = {
+            "cdm_source_name": schema_dao.schema_name,
+            "cdm_source_abbreviation": schema_dao.schema_name[0:25],
+            "cdm_holder": "D4L",
+            "source_release_date": datetime.now(),
+            "cdm_release_date": datetime.now(),
+            "cdm_version": cdm_version
+        }
+        schema_dao.insert_values_into_table("cdm_source", values_to_insert)
+    else:
+        # for hana & pg schemas before conversion to lower case
+        values_to_insert = {
+            "CDM_SOURCE_NAME": schema_dao.schema_name,
+            "CDM_SOURCE_ABBREVIATION": schema_dao.schema_name[0:25],
+            "CDM_HOLDER": "D4L",
+            "SOURCE_RELEASE_DATE": datetime.now(),
+            "CDM_RELEASE_DATE": datetime.now(),
+            "CDM_VERSION": cdm_version
+        }
+        schema_dao.insert_values_into_table("CDM_SOURCE", values_to_insert)
 
 
 @task(log_prints=True)

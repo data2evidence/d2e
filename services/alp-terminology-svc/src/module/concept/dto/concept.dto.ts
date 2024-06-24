@@ -25,12 +25,12 @@ export class ConceptHierarchyDto {
   datasetId: string;
 
   @IsNumber()
-  @Min(1)
-  @Max(10)
   @Type(() => Number)
   conceptId: number;
 
   @IsNumber()
+  @Min(1)
+  @Max(10)
   @Type(() => Number)
   depth: number;
 }

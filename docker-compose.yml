@@ -13,20 +13,13 @@ volumes:
 
 x-envs:
   db-svc: &x-dbsvc
-    DATAFLOW_GATEWAY__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/dataflow-mgmt
-    DB_SVC__DEBUG: "false"
     DB_SVC__IDP_SUBJECT_PROP: sub
     DB_SVC__LOG_LEVEL: info
     DB_SVC__PATH: /alpdb
-    DB_SVC__PORT: 41${BASE_PORT:-1}01
     DISABLE_SSL: "TRUE"
     HANA__READ_ROLE: TENANT_READ_ROLE
-    JAVA_OPTS: -Xmx2g
     LB__LOG_LEVEL: debug
-    OMOP__VOCAB_SCHEMA: ${OMOP__VOCAB_SCHEMA:-cdmvocab}
     PG__READ_ROLE: postgres_tenant_read_role
-    ROLLBACK_SCHEMA_CREATION_FOR_LIQUIBASE_SCRIPT_FAILURE: "TRUE"
-    USER_MGMT__BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/usermgmt/api/
   env_converter: &x-converter
     DB_CREDENTIALS_MGR__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/db-credentials/db/
     DB_CREDENTIALS__PRIVATE_KEY: ${DB_CREDENTIALS__INTERNAL__PRIVATE_KEY}
@@ -190,6 +183,14 @@ x-envs:
           "notes": "",
           "pluginPath": "plugins/Setup/HybridSearch/module",
           "route": "hybrid-search"
+        },
+        {
+          "description": "Configure overview description text",
+          "enabled": true,
+          "name": "Overview description",
+          "notes": "",
+          "pluginPath": "plugins/Setup/OverviewDescription/module",
+          "route": "overview-description"
         }
       ],
       "systemadmin": [
@@ -628,6 +629,7 @@ services:
       LOGTO_API_M2M_CLIENT_SECRET: ${LOGTO_API_M2M_CLIENT_SECRET}
       LOGTO_ROLES_AZ_GROUPS_MAPPING: ${LOGTO_ROLES_AZ_GROUPS_MAPPING:-{"role.systemadmin":"37b5364a-348c-494f-b67f-a59a40e52ab7","role.useradmin":"90597adc-92af-4649-8151-68c3b7feb66c","role.tenantviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5"}}
       NODE_ENV: test
+      PORT: 3001
       TRUST_PROXY_HEADER: true
 
   alp-minerva-analytics-svc:
