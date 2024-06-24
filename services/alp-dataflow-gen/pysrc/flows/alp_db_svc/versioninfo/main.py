@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from typing import List, Dict
 from prefect import task, get_run_logger
 from utils.types import (
@@ -95,6 +96,42 @@ def get_and_update_attributes(dataset: PortalDatasetType,
                 dataset_id, "latest_schema_version", error_msg, token)
         else:
             try:
+                # update with data model creation date
+                created_date = get_created_date(dataset_dao)
+                update_dataset_attributes_table(
+                    dataset_id, "created_date", created_date, token)
+            except Exception as e:
+                logger.error(
+                    f"Failed to update attribute 'created_date' for dataset id '{dataset_id}' with value '{created_date}' : {e}")
+            else:
+                logger.info(
+                    f"Updated attribute 'created_date' for dataset id '{dataset_id}' with value '{created_date}'")
+
+            try:
+                # update with data model last updated date
+                updated_date = get_updated_date(dataset_dao)
+                update_dataset_attributes_table(
+                    dataset_id, "updated_date", updated_date, token)
+            except Exception as e:
+                logger.error(
+                    f"Failed to update attribute 'updated_date' for dataset id '{dataset_id}' with value '{updated_date}' : {e}")
+            else:
+                logger.info(
+                    f"Updated attribute 'updated_date' for dataset id '{dataset_id}' with value '{updated_date}'")
+
+            try:
+                # update with last fetched medata date
+                metadata_last_fetch_date = datetime.now().strftime('%Y-%m-%d')
+                update_dataset_attributes_table(
+                    dataset_id, "metadata_last_fetch_date", metadata_last_fetch_date, token)
+            except Exception as e:
+                logger.error(
+                    f"Failed to update attribute 'metadata_last_fetch_date' for dataset id '{dataset_id}' with value '{metadata_last_fetch_date}' : {e}")
+            else:
+                logger.info(
+                    f"Updated attribute 'metadata_last_fetch_date' for dataset id '{dataset_id}' with value '{metadata_last_fetch_date}'")
+
+            try:
                 # update with current version count or error msg
                 current_schema_version = get_current_version(dataset_dao)
                 update_dataset_attributes_table(
@@ -104,7 +141,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
                     f"Failed to update attribute 'current_schema_version' for dataset id '{dataset_id}' with value '{current_schema_version}' : {e}")
             else:
                 logger.info(
-                    f"Updated attribute 'current_schema_version' for dataset id '{dataset_id}'  with value '{current_schema_version}'")
+                    f"Updated attribute 'current_schema_version' for dataset id '{dataset_id}' with value '{current_schema_version}'")
 
             if data_model in OMOP_DATA_MODELS:
 
@@ -128,7 +165,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
                     entity_count_distribution = get_entity_count_distribution(
                         dataset_dao, is_lower_case)
                     update_dataset_attributes_table(
-                        dataset_id, "entity_count_distribution", json.dumps(json.dumps(entity_count_distribution)), token)
+                        dataset_id, "entity_count_distribution", json.dumps(entity_count_distribution), token)
                 except Exception as e:
                     logger.error(
                         f"Failed to update attribute 'entity_count_distribution' for dataset id '{dataset_id}' with value '{entity_count_distribution}' : {e}")
@@ -153,7 +190,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
                     # update cdm version with value or error
                     cdm_version = get_cdm_version(dataset_dao, is_lower_case)
                     update_dataset_attributes_table(
-                        dataset_id, "cdm_version", cdm_version, token)
+                        dataset_id, "version", cdm_version, token)
                 except Exception as e:
                     logger.error(
                         f"Failed to update attribute 'cdm_version' for dataset id '{dataset_id}' with value '{cdm_version}' : {e}")
@@ -204,6 +241,26 @@ def get_current_version(dao_obj: DBDao) -> str:
         get_run_logger().error(f"{error_msg}: {e}")
         current_version = error_msg
     return current_version
+
+
+def get_created_date(dao_obj: DBDao) -> str:
+    try:
+        created_date = str(dao_obj.get_datamodel_created_date()).split(" ")[0]
+    except Exception as e:
+        error_msg = f"Error retrieving created date"
+        get_run_logger().error(f"{error_msg}: {e}")
+        created_date = error_msg
+    return created_date
+
+
+def get_updated_date(dao_obj: DBDao) -> str:
+    try:
+        updated_date = str(dao_obj.get_datamodel_updated_date()).split(" ")[0]
+    except Exception as e:
+        error_msg = f"Error retrieving updated date"
+        get_run_logger().error(f"{error_msg}: {e}")
+        updated_date = error_msg
+    return updated_date
 
 
 def get_patient_count(dao_obj: DBDao, is_lower_case: bool) -> str:
