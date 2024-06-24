@@ -94,18 +94,18 @@ export async function getKmData(req: IMRIRequest, res) {
 export async function analyzeCohortsKm(req: IMRIRequest, res) {
     const studyId = req.query.studyId as string;
     const { schemaName, databaseCode } = await getStudyDetails(studyId, res);
-    const flowRunId = await dataflowRequest(
+    const result = await dataflowRequest(
         req,
         "POST",
         `cohort-survival/flow-run`,
         {
             options: {
-                schema_name: schemaName,
-                database_code: databaseCode,
+                schemaName,
+                databaseCode,
                 targetCohortDefinitionId: req.body.targetCohortId,
                 outcomeCohortDefinitionId: req.body.outcomeCohortId,
             },
         }
     );
-    res.json({ flowRunId });
+    res.json(result);
 }

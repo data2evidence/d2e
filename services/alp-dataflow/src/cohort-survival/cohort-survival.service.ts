@@ -17,6 +17,6 @@ export class CohortSurvivalService {
       flowName,
       parameters
     )
-    return flowRunId
+    return { flowRunId }
   }
 }
