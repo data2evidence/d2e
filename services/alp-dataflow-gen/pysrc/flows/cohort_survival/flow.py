@@ -34,7 +34,8 @@ def execute_cohort_survival(options: cohortSurvivalOptionsType):
 
 
 @task(
-    result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")),
+    result_storage=RFS.load(
+        os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")),
     result_storage_key="{flow_run.id}_km.json",
     result_serializer=JSONSerializer(),
     persist_result=True,
@@ -145,6 +146,7 @@ tryCatch(
 )        
 """
         )
-
+        # Parsing the json from R and returning to prevent double serialization
+        # of the string
         result_dict = json.loads(str(result[0]))
         return result_dict
