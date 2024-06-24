@@ -119,15 +119,20 @@ export class DatasetQueryService {
       const acc = await accP
       const datasetDto = await this.buildDatasetResponseDto(dataset, tenant)
 
-      const { databaseCode, schemaName, ...rest } = datasetDto
+      const { databaseCode, schemaName, dataModel, ...rest } = datasetDto
+      const formattedDataModel = dataModel.replace(/\s*\[.*?\]/, '').trim()
       if (!isResearcher) {
         acc.push(datasetDto)
       } else if (!hasFilterParams) {
-        acc.push(rest)
+        acc.push({ dataModel: formattedDataModel, ...rest })
       } else if (databaseCode && Object.keys(dbFilterResults).length > 0) {
         const filterResults = dbFilterResults[databaseCode]
         if (filterResults && filterResults[schemaName] && filterResults[schemaName].isMatched) {
-          acc.push({ ...rest, totalSubjects: filterResults[schemaName].totalSubjects })
+          acc.push({
+            ...rest,
+            totalSubjects: filterResults[schemaName].totalSubjects,
+            dataModel: formattedDataModel
+          })
         }
       }
       return acc
@@ -143,6 +148,7 @@ export class DatasetQueryService {
       'dataset.databaseCode',
       'dataset.schemaName',
       'dataset.vocabSchemaName',
+      'dataset.dataModel',
       'datasetDetail.name',
       'datasetDetail.description',
       'datasetDetail.summary',
@@ -164,7 +170,7 @@ export class DatasetQueryService {
   private getDatasetsColumns(role?: string) {
     const baseColumns = [...this.getDatasetBaseColumns(), 'dataset.tokenDatasetCode']
     if (role === 'systemAdmin') {
-      return baseColumns.concat(['dataset.paConfigId', 'dataset.type', 'dataset.visibilityStatus', 'dataset.dataModel'])
+      return baseColumns.concat(['dataset.paConfigId', 'dataset.type', 'dataset.visibilityStatus'])
     }
     return baseColumns
   }
