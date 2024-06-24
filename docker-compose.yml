@@ -583,7 +583,7 @@ services:
       alp-minerva-postgres:
         condition: service_healthy
       alp-fhir-server:
-        condition: service_healthy
+        condition: service_started
     image: postgres:15-alpine
     logging:
       options:
