@@ -93,8 +93,7 @@ file.copy(filepath, duplicate_filepath)
 print(paste("Created duckdb File: ", duplicate_filepath))
 con <- NULL
 tryCatch(
-    {{
-        duckdb_pg_con <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
+    {{ duckdb_pg_con <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
         postgres_con_query <- sprintf("INSTALL postgres_scanner;LOAD postgres_scanner;CREATE TABLE duckdb_cohort AS FROM (SELECT * FROM postgres_scan('host=%s port=%s dbname=%s user=%s password=%s', '%s',  'cohort'))", pg_host, pg_port, pg_dbname, pg_user, pg_password, pg_schema)
         result <- DBI::dbExecute(duckdb_pg_con, postgres_con_query)
         target_cohort <- DBI::dbGetQuery(duckdb_pg_con, sprintf("SELECT * from duckdb_cohort WHERE cohort_definition_id = %d;", target_cohort_definition_id))
@@ -105,6 +104,22 @@ tryCatch(
         # Write the data frame to DuckDB as a table
         DBI::dbWriteTable(duckdb_con, "target_cohort", target_cohort)
         DBI::dbWriteTable(duckdb_con, "outcome_cohort", outcome_cohort)
+
+        # Remove these when cohorts functionality are improved
+        query <- "
+            UPDATE outcome_cohort
+            SET cohort_start_date = death_date, cohort_end_date = death.death_date
+            FROM death
+            WHERE outcome_cohort.subject_id = death.person_id
+            AND death_date IS NOT NULL
+        "
+        DBI::dbExecute(duckdb_con, query)
+
+        query <- "
+            UPDATE target_cohort
+            SET cohort_end_date = cohort_start_date
+        "
+        DBI::dbExecute(duckdb_con, query)
 
         # cdm_from_con is from CDMConnection
         # duckdb uses 'main' as default schema name
@@ -129,25 +144,18 @@ tryCatch(
         # Add a key to the list
         plot_data[["status"]] <- "SUCCESS"
         plot_data_json <- toJSON(plot_data)
-        
+
         print(plot_data_json)
         cdm_disconnect(cdm)
-        return(plot_data_json)
-    }},
-    error = function(e) {{
-        print(e)
-        data <- list(status="ERROR", e$message)
-        return(toJSON(data))
-    }},
-    finally = {{
-        if (!is.null(con)) {{
-            DBI::dbDisconnect(con)
-            print("Disconnected the database.")
-        }}
-        file.remove(duplicate_filepath)
-        print("Removed temporary duckdb file")
-    }}
-)        
+        return(plot_data_json) }},
+    error = function(e) {{ print(e)
+        data <- list(status = "ERROR", e$message)
+        return(toJSON(data)) }},
+    finally = {{ if (!is.null(con)) {{ DBI::dbDisconnect(con)
+        print("Disconnected the database.") }}
+    file.remove(duplicate_filepath)
+    print("Removed temporary duckdb file") }}
+)
 """
         )
         # Parsing the json from R and returning to prevent double serialization
