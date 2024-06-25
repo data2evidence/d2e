@@ -26710,54 +26710,6 @@ const cdwConfigDuckdb = {
         "domainFilter": "",
         "standardConceptCodeFilter": ""
       },
-      "Gender": {
-        "name": [
-          {
-            "lang": "",
-            "value": "Gender concept id"
-          }
-        ],
-        "disabledLangName": [
-          {
-            "lang": "en",
-            "value": "",
-            "visible": true
-          },
-          {
-            "lang": "de",
-            "value": "",
-            "visible": true
-          },
-          {
-            "lang": "fr",
-            "value": "",
-            "visible": true
-          },
-          {
-            "lang": "es",
-            "value": "",
-            "visible": true
-          },
-          {
-            "lang": "pt",
-            "value": "",
-            "visible": true
-          },
-          {
-            "lang": "zh",
-            "value": "",
-            "visible": true
-          }
-        ],
-        "type": "text",
-        "expression": "@PATIENT.\"gender_concept_id\"",
-        "referenceFilter": "@REF.DOMAIN_ID = 'Gender' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower('@REF.CONCEPT_NAME'), lower('@SEARCH_QUERY')) >= 0.65",
-        "referenceExpression": "@REF.CONCEPT_NAME",
-        "order": 7,
-        "domainFilter": "",
-        "standardConceptCodeFilter": "",
-        "useRefValue": true
-      },
       "ethnicityconceptid": {
         "name": [
           {
@@ -27039,7 +26991,7 @@ const cdwConfigDuckdb = {
         ],
         "type": "text",
         "expression": "@PATIENT.\"GENDER_CONCEPT_ID\"",
-        "referenceFilter": "@REF.DOMAIN_ID = 'Gender' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower('@REF.CONCEPT_NAME'), lower('@SEARCH_QUERY')) >= 0.65",
+        "referenceFilter": "@REF.DOMAIN_ID = 'Gender' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower('@REF.CONCEPT_ID'), lower('@SEARCH_QUERY')) >= 0.65",
         "referenceExpression": "@REF.CONCEPT_ID",
         "order": 16,
         "domainFilter": "",
@@ -27592,26 +27544,6 @@ const paConfigDuckdb = {
             "linkColumn": false
           },
           "modelName": "Birth Datetime"
-        },
-        {
-          "source": "patient.attributes.Gender",
-          "ordered": false,
-          "cached": true,
-          "useRefText": true,
-          "useRefValue": true,
-          "category": true,
-          "measure": false,
-          "filtercard": {
-            "initial": false,
-            "visible": true,
-            "order": 6
-          },
-          "patientlist": {
-            "initial": false,
-            "visible": true,
-            "linkColumn": false
-          },
-          "modelName": "Gender concept id"
         },
         {
           "source": "patient.attributes.ethnicityconceptid",
