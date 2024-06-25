@@ -28,6 +28,7 @@ export class PublicDatasetQueryService {
         'dataset.tokenDatasetCode',
         'dataset.databaseCode',
         'dataset.schemaName',
+        'dataset.dataModel',
         'datasetDetail.id',
         'datasetDetail.name',
         'datasetDetail.description',
@@ -65,8 +66,11 @@ export class PublicDatasetQueryService {
     const datasetDtos = await datasets.reduce<Promise<IDatasetResponseDto[]>>(async (accP, dataset) => {
       const acc = await accP
 
+      const { dataModel, ...restDataset } = dataset
+      const formattedDataModel = dataModel.replace(/\s*\[.*?\]/, '').trim()
       const datasetDto: IDatasetResponseDto = {
-        ...dataset,
+        dataModel: formattedDataModel,
+        ...restDataset,
         tenant
       }
 

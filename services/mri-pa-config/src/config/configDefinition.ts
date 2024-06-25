@@ -722,6 +722,11 @@ function _getValidDefinition(cdwConfig) {
                 strict: false,
             },
             {
+                name: "maxFiltercardCount",
+                type: "number",
+                strict: false,
+            },
+            {
                 name: "calcViewAccessPoint",
                 type: "boolean",
                 strict: false,

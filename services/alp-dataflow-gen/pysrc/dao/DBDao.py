@@ -1,5 +1,5 @@
 from alpconnection.dbutils import GetDBConnection, get_db_svc_endpoint_dialect
-from sqlalchemy import text, MetaData, Table, select, func, inspect, insert, desc, update
+from sqlalchemy import text, MetaData, Table, select, func, inspect, insert, asc, desc, update
 from sqlalchemy.schema import CreateSchema, DropSchema
 from sqlalchemy.sql.selectable import Select
 import pandas as pd
@@ -94,6 +94,26 @@ class DBDao:
                 desc(dateexecuted_col)).limit(1)
             latest_changeset = connection.execute(select_stmt).scalar()
             return latest_changeset
+
+    def get_datamodel_created_date(self) -> str:
+        with self.engine.connect() as connection:
+            table = Table("databasechangelog".casefold(), self.metadata,
+                          autoload_with=connection)
+            dateexecuted_col = getattr(table.c, "dateexecuted".casefold())
+            select_stmt = select(dateexecuted_col).order_by(
+                asc(dateexecuted_col)).limit(1)
+            created_date = connection.execute(select_stmt).scalar()
+            return created_date
+
+    def get_datamodel_updated_date(self) -> str:
+        with self.engine.connect() as connection:
+            table = Table("databasechangelog".casefold(), self.metadata,
+                          autoload_with=connection)
+            dateexecuted_col = getattr(table.c, "dateexecuted".casefold())
+            select_stmt = select(dateexecuted_col).order_by(
+                desc(dateexecuted_col)).limit(1)
+            updated_date = connection.execute(select_stmt).scalar()
+            return updated_date
 
     def get_table_names(self):
         table_names = self.inspector.get_table_names(schema=self.schema_name)
