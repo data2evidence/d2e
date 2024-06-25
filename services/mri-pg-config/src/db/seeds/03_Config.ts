@@ -31729,7 +31729,7 @@ const paConfigDuckdb = {
   },
   "panelOptions": {
     "addToCohorts": true,
-    "domainValuesLimit": 200,
+    "domainValuesLimit": 1000,
     "maxFiltercardCount": 10,
     "calcViewAccessPoint": true,
     "externalAccessPoints": true
