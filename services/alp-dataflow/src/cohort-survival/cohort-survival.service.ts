@@ -12,7 +12,7 @@ export class CohortSurvivalService {
     const deploymentName = PrefectDeploymentName.COHORT_SURVIVAL
     const parameters = cohortSurvivalFlowRunDto
     const flowRunId = await this.prefectApi.createFlowRun(
-      `Run Kaplan Meier analysis`,
+      `Run Kaplan-Meier analysis`,
       deploymentName,
       flowName,
       parameters
