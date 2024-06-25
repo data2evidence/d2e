@@ -5,7 +5,6 @@ from rpy2 import robjects
 from rpy2.robjects import conversion, default_converter
 from prefect import task, get_run_logger
 from utils.types import cohortSurvivalOptionsType
-from api.AnalyticsSvcAPI import AnalyticsSvcAPI
 from prefect.serializers import JSONSerializer
 from prefect.filesystems import RemoteFileSystem as RFS
 
