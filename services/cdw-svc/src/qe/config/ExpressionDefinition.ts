@@ -138,7 +138,7 @@ export class ExpressionDefinition {
             { regex: /<((?:EXP)|(?:AGGR))>[\s]*AND REGEXP_MATCHES[\s]*\(<((?:EXP)|(?:AGGR))>,[\s]*<((?:EXP)|(?:AGGR))>\)?[\s]*/, placeholder: "<COND>" },
 
             // <EXP>/<AGGR>/<COND> AND <EXP> ~* <EXP>/<AGGR>
-            { regex: /<((?:EXP)|(?:AGGR)|(?:COND))>[\s]*AND[\s]*<((?:EXP))>[\s]*\~\*[\s]*<((?:EXP)|(?:AGGR))>[\s]*/, placeholder: "<COND>" },
+            { regex: /<((?:EXP)|(?:AGGR)|(?:COND))>[\s]*AND[\s]*<((?:EXP))>[\s]*\~[\s]*<((?:EXP)|(?:AGGR))>[\s]*/, placeholder: "<COND>" },
 
             // Operators
             { regex: /\([\s]*<((?:EXP)|(?:AGGR))>[\s]*\)/ },
