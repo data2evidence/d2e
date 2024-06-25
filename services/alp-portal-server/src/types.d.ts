@@ -159,6 +159,7 @@ export interface IDatasetResponseDto {
   attributes: IDatasetAttribute[]
   tags: IDatasetTag[]
   totalSubjects?: number
+  dataModel: string
 }
 
 export interface IDatasetSearchDto {
@@ -272,4 +273,13 @@ export interface IFeatureUpdateDto {
 export interface UserGroup {
   userId: string
   alp_role_study_researcher: string[]
+}
+
+export interface IConfig {
+  type: string
+  value: string
+}
+export interface IConfigUpdateDto {
+  type: string
+  value: string
 }

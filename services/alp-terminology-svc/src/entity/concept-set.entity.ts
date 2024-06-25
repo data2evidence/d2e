@@ -34,4 +34,7 @@ export class ConceptSet {
     default: () => 'CURRENT_TIMESTAMP',
   })
   modifiedDate!: Date;
+
+  @Column({ name: 'user_name' })
+  userName: string;
 }
