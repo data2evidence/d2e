@@ -1,5 +1,5 @@
 from alpconnection.dbutils import GetDBConnection, get_db_svc_endpoint_dialect
-from sqlalchemy import text, MetaData, Table, select, func, inspect, insert, asc, desc, update
+from sqlalchemy import *
 from sqlalchemy.schema import CreateSchema, DropSchema
 from sqlalchemy.sql.selectable import Select
 import pandas as pd
@@ -54,6 +54,22 @@ class DBDao:
             connection.execute(DropSchema(self.schema_name, cascade=True))
             connection.commit()
 
+    def create_i2b2_metadata_table(self):
+        with self.engine.connect() as connection:
+            new_table = Table("dataset_metadata",
+                              self.metadata,
+                              Column('schema_name', String),
+                              Column('created_date', TIMESTAMP,
+                                     default=datetime.utcnow()),
+                              Column('updated_date', TIMESTAMP,
+                                     default=datetime.utcnow()),
+                              Column('data_ingestion_date', TIMESTAMP),
+                              Column('tag', String),
+                              Column('release_version', String)
+                              )
+            self.metadata.create_all(self.engine)
+            connection.commit()
+
     def get_distinct_count(self, table_name: str, column_name: str) -> int:
         with self.engine.connect() as connection:
             table = Table(table_name, self.metadata,
@@ -62,14 +78,13 @@ class DBDao:
                 func.distinct(getattr(table.c, column_name)))).scalar()
         return distinct_count
 
-    # Get cdm version
-    def get_cdm_version(self, table_name: str, column_name: str) -> int:
+    def get_value(self, table_name: str, column_name: str) -> str:
         with self.engine.connect() as connection:
             table = Table(table_name, self.metadata,
                           autoload_with=connection)
             stmt = select(table.c[column_name]).select_from(table)
-            cdm_version = connection.execute(stmt).scalar()
-            return cdm_version
+            value = connection.execute(stmt).scalar()
+            return value
 
     def update_cdm_version(self, cdm_version: str):
         with self.engine.connect() as connection:
@@ -83,6 +98,19 @@ class DBDao:
             res = connection.execute(update_stmt)
             connection.commit()
             print(f"Updated cdm version {cdm_version} for {self.schema_name}")
+
+    def update_data_ingestion_date(self):
+        with self.engine.connect() as connection:
+            table = Table("dataset_metadata".casefold(), self.metadata,
+                          autoload_with=connection)
+            condition_col = getattr(table.c, "schema_name".casefold())
+            update_stmt = update(table).where(
+                condition_col == self.schema_name).values(data_ingestion_date=datetime.now())
+            print(
+                f"Updating data ingestion date for schema {self.schema_name}")
+            res = connection.execute(update_stmt)
+            connection.commit()
+            print(f"Updated data ingestion date for {self.schema_name}")
 
     def get_last_executed_changeset(self) -> str:
         with self.engine.connect() as connection:

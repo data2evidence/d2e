@@ -120,7 +120,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
                     f"Updated attribute 'updated_date' for dataset id '{dataset_id}' with value '{updated_date}'")
 
             try:
-                # update with last fetched medata date
+                # update with last fetched metadata date
                 metadata_last_fetch_date = datetime.now().strftime('%Y-%m-%d')
                 update_dataset_attributes_table(
                     dataset_id, "metadata_last_fetch_date", metadata_last_fetch_date, token)
@@ -316,9 +316,9 @@ def get_entity_count_distribution(dao_obj: DBDao, is_lower_case: bool) -> Entity
 def get_cdm_version(dao_obj: DBDao, is_lower_case: bool) -> str:
     try:
         if is_lower_case:
-            cdm_version = dao_obj.get_cdm_version("cdm_source", "cdm_version")
+            cdm_version = dao_obj.get_value("cdm_source", "cdm_version")
         else:
-            cdm_version = dao_obj.get_cdm_version("CDM_SOURCE", "CDM_VERSION")
+            cdm_version = dao_obj.get_value("CDM_SOURCE", "CDM_VERSION")
     except Exception as e:
         error_msg = f"Error retrieving CDM version"
         get_run_logger().error(f"{error_msg}: {e}")
