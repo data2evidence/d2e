@@ -102,7 +102,7 @@ x-envs:
           ],
           "children": [
             {
-              "name": "Kaplan Meier",
+              "name": "Kaplan-Meier",
               "route": "kaplan-meier",
               "pluginPath": "plugins/Researcher/KaplanMeier/module",
               "featureFlag": "kaplanMeier",
