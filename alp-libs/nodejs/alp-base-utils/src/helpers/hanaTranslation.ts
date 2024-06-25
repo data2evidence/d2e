@@ -192,8 +192,6 @@ export const translateHanaToPostgres = (temp: string, schemaName: string, vocabS
 };
 
 export const translateHanaToDuckdb = (temp: string, schemaName: string, vocabSchemaName: string): string => {
-  temp = hanaCommonTranslation(temp, schemaName, vocabSchemaName);
-  // temp = temp.replace(/SIMILAR TO/gi, "~*"); // ~* short for regex, case insensitive matching. "SIMILAR TO" Not working for case insensitive on duckdb. Hence using posix style "~*"
   temp = temp.replace(/DAYS_BETWEEN \(/gi, `date_diff ('day', `);
   temp = temp.replace(
     /select count\(\*\) as \"TABLECOUNT\" from pg_tables where schemaname=(\%s|\?|\$[0-9]) and tablename=(\%s|\?|\$[0-9])/gi,

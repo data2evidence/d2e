@@ -137,7 +137,7 @@ export class ExpressionDefinition {
             // <EXP>/<AGGR> AND REGEXP_MATCHES(<EXP>/<AGGR>, <EXP>/<AGGR>)
             { regex: /<((?:EXP)|(?:AGGR))>[\s]*AND REGEXP_MATCHES[\s]*\(<((?:EXP)|(?:AGGR))>,[\s]*<((?:EXP)|(?:AGGR))>\)?[\s]*/, placeholder: "<COND>" },
 
-            // <EXP>/<AGGR>/<COND> AND <EXP> SIMILAR TO <EXP>/<AGGR>
+            // <EXP>/<AGGR>/<COND> AND JARO_SIMILARITY(<EXP>,<EXP>)
             { regex: /<((?:EXP)|(?:AGGR)|(?:COND))> AND JARO_SIMILARITY\(<EXP>,[\s]*<EXP>\)[\s]*(>=|<=|>|<) \d*\.\d+/, placeholder: "<COND>" },
             // Operators
             { regex: /\([\s]*<((?:EXP)|(?:AGGR))>[\s]*\)/ },
