@@ -1,5 +1,5 @@
 from alpconnection.dbutils import GetDBConnection, get_db_svc_endpoint_dialect
-from sqlalchemy import *
+import sqlalchemy as sql
 from sqlalchemy.schema import CreateSchema, DropSchema
 from sqlalchemy.sql.selectable import Select
 import pandas as pd
@@ -13,17 +13,17 @@ class DBDao:
         self.database_code = database_code
         self.engine = GetDBConnection(database_code, user_type)
         self.schema_name = schema_name
-        self.metadata = MetaData(schema=schema_name)
-        self.inspector = inspect(self.engine)
+        self.metadata = sql.MetaData(schema=schema_name)
+        self.inspector = sql.inspect(self.engine)
 
     def check_schema_exists(self) -> bool:
         db_dialect = get_db_svc_endpoint_dialect(self.database_code)
         match db_dialect:
             case DatabaseDialects.POSTGRES:
-                sql_query = text(
+                sql_query = sql.text(
                     "select * from information_schema.schemata where schema_name = :x;")
             case DatabaseDialects.HANA:
-                sql_query = text(
+                sql_query = sql.text(
                     "select * from SYS.SCHEMAS where SCHEMA_NAME = :x;")
         with self.engine.connect() as connection:
             res = connection.execute(
@@ -34,7 +34,7 @@ class DBDao:
                 return True
 
     def check_empty_schema(self) -> bool:
-        sql_query = text(
+        sql_query = sql.text(
             "select * from information_schema.tables where table_schema = :x;")
         with self.engine.connect() as connection:
             res = connection.execute(
@@ -56,42 +56,43 @@ class DBDao:
 
     def create_i2b2_metadata_table(self):
         with self.engine.connect() as connection:
-            new_table = Table("dataset_metadata",
-                              self.metadata,
-                              Column('schema_name', String),
-                              Column('created_date', TIMESTAMP,
-                                     default=datetime.utcnow()),
-                              Column('updated_date', TIMESTAMP,
-                                     default=datetime.utcnow()),
-                              Column('data_ingestion_date', TIMESTAMP),
-                              Column('tag', String),
-                              Column('release_version', String)
-                              )
+            new_table = sql.Table("dataset_metadata",
+                                  self.metadata,
+                                  sql.Column('schema_name', sql.String),
+                                  sql.Column('created_date', sql.TIMESTAMP,
+                                             default=datetime.utcnow()),
+                                  sql.Column('updated_date', sql.TIMESTAMP,
+                                             default=datetime.utcnow()),
+                                  sql.Column('data_ingestion_date',
+                                             sql.TIMESTAMP),
+                                  sql.Column('tag', sql.String),
+                                  sql.Column('release_version', sql.String)
+                                  )
             self.metadata.create_all(self.engine)
             connection.commit()
 
     def get_distinct_count(self, table_name: str, column_name: str) -> int:
         with self.engine.connect() as connection:
-            table = Table(table_name, self.metadata,
-                          autoload_with=connection)
-            distinct_count = connection.execute(func.count(
-                func.distinct(getattr(table.c, column_name)))).scalar()
+            table = sql.Table(table_name, self.metadata,
+                              autoload_with=connection)
+            distinct_count = connection.execute(sql.func.count(
+                sql.func.distinct(getattr(table.c, column_name)))).scalar()
         return distinct_count
 
     def get_value(self, table_name: str, column_name: str) -> str:
         with self.engine.connect() as connection:
-            table = Table(table_name, self.metadata,
-                          autoload_with=connection)
-            stmt = select(table.c[column_name]).select_from(table)
+            table = sql.Table(table_name, self.metadata,
+                              autoload_with=connection)
+            stmt = sql.select(table.c[column_name]).select_from(table)
             value = connection.execute(stmt).scalar()
             return value
 
     def update_cdm_version(self, cdm_version: str):
         with self.engine.connect() as connection:
-            table = Table("cdm_source".casefold(), self.metadata,
-                          autoload_with=connection)
+            table = sql.Table("cdm_source".casefold(), self.metadata,
+                              autoload_with=connection)
             cdm_source_col = getattr(table.c, "cdm_source_name".casefold())
-            update_stmt = update(table).where(
+            update_stmt = sql.update(table).where(
                 cdm_source_col == self.schema_name).values(cdm_version=cdm_version)
             print(
                 f"Updating cdm version {cdm_version} for schema {self.schema_name}")
@@ -101,10 +102,10 @@ class DBDao:
 
     def update_data_ingestion_date(self):
         with self.engine.connect() as connection:
-            table = Table("dataset_metadata".casefold(), self.metadata,
-                          autoload_with=connection)
+            table = sql.Table("dataset_metadata".casefold(), self.metadata,
+                              autoload_with=connection)
             condition_col = getattr(table.c, "schema_name".casefold())
-            update_stmt = update(table).where(
+            update_stmt = sql.update(table).where(
                 condition_col == self.schema_name).values(data_ingestion_date=datetime.now())
             print(
                 f"Updating data ingestion date for schema {self.schema_name}")
@@ -114,32 +115,32 @@ class DBDao:
 
     def get_last_executed_changeset(self) -> str:
         with self.engine.connect() as connection:
-            table = Table("databasechangelog".casefold(), self.metadata,
-                          autoload_with=connection)
+            table = sql.Table("databasechangelog".casefold(), self.metadata,
+                              autoload_with=connection)
             filename_col = getattr(table.c, "filename".casefold())
             dateexecuted_col = getattr(table.c, "dateexecuted".casefold())
-            select_stmt = select(filename_col).order_by(
-                desc(dateexecuted_col)).limit(1)
+            select_stmt = sql.select(filename_col).order_by(
+                sql.desc(dateexecuted_col)).limit(1)
             latest_changeset = connection.execute(select_stmt).scalar()
             return latest_changeset
 
     def get_datamodel_created_date(self) -> str:
         with self.engine.connect() as connection:
-            table = Table("databasechangelog".casefold(), self.metadata,
-                          autoload_with=connection)
+            table = sql.Table("databasechangelog".casefold(), self.metadata,
+                              autoload_with=connection)
             dateexecuted_col = getattr(table.c, "dateexecuted".casefold())
-            select_stmt = select(dateexecuted_col).order_by(
-                asc(dateexecuted_col)).limit(1)
+            select_stmt = sql.select(dateexecuted_col).order_by(
+                sql.asc(dateexecuted_col)).limit(1)
             created_date = connection.execute(select_stmt).scalar()
             return created_date
 
     def get_datamodel_updated_date(self) -> str:
         with self.engine.connect() as connection:
-            table = Table("databasechangelog".casefold(), self.metadata,
-                          autoload_with=connection)
+            table = sql.Table("databasechangelog".casefold(), self.metadata,
+                              autoload_with=connection)
             dateexecuted_col = getattr(table.c, "dateexecuted".casefold())
-            select_stmt = select(dateexecuted_col).order_by(
-                desc(dateexecuted_col)).limit(1)
+            select_stmt = sql.select(dateexecuted_col).order_by(
+                sql.desc(dateexecuted_col)).limit(1)
             updated_date = connection.execute(select_stmt).scalar()
             return updated_date
 
@@ -153,8 +154,8 @@ class DBDao:
         personId_column = datamart_table_config['personId_column'].casefold()
 
         with self.engine.connect() as connection:
-            source_table = Table(table_name, self.metadata,
-                                 autoload_with=connection)
+            source_table = sql.Table(table_name, self.metadata,
+                                     autoload_with=connection)
 
             if columns_to_be_copied == ["*"]:
                 columns_to_be_copied = [
@@ -163,7 +164,7 @@ class DBDao:
             columns_to_be_copied = list(
                 filter(self._system_columns, columns_to_be_copied))
 
-            select_stmt = select(
+            select_stmt = sql.select(
                 *map(lambda x: getattr(source_table.c, x), columns_to_be_copied))
 
             # Filter by patients if patients_to_be_copied is provided
@@ -182,11 +183,11 @@ class DBDao:
         table_name = datamart_table_config['tableName'].casefold()
 
         with self.engine.connect() as connection:
-            target_table = Table(table_name, MetaData(
+            target_table = sql.Table(table_name, sql.MetaData(
                 schema=target_schema), autoload_with=connection)
 
-            source_table = Table(table_name, self.metadata,
-                                 autoload_with=connection)
+            source_table = sql.Table(table_name, self.metadata,
+                                     autoload_with=connection)
             if columns_to_be_copied == ["*"]:
                 columns_to_be_copied = [
                     column.key for column in source_table.c]
@@ -197,7 +198,7 @@ class DBDao:
             select_stmt = self.__get_datamart_select_statement(
                 datamart_table_config, columns_to_be_copied, date_filter, patients_to_be_copied)
 
-            insert_stmt = insert(target_table).from_select(
+            insert_stmt = sql.insert(target_table).from_select(
                 columns_to_be_copied, select_stmt)
 
             res = connection.execute(insert_stmt)
@@ -212,7 +213,7 @@ class DBDao:
 
     def enable_auditing(self):
         with self.engine.connect() as connection:
-            stmt = text(
+            stmt = sql.text(
                 f"ALTER SYSTEM ALTER CONFIGURATION ('global.ini','SYSTEM') set ('auditing configuration','global_auditing_state' ) = 'true' with reconfigure")
             print("Executing enable audit statement..")
             res = connection.execute(stmt)
@@ -221,19 +222,19 @@ class DBDao:
 
     def create_system_audit_policy(self):
         with self.engine.connect() as connection:
-            check_audit_policy = text(
+            check_audit_policy = sql.text(
                 f"SELECT * from SYS.AUDIT_POLICIES WHERE AUDIT_POLICY_NAME = 'alp_conf_changes'")
             print("Executing check system audit policy statement..")
             check_audit_policy_res = connection.execute(
                 check_audit_policy).fetchall()
             if check_audit_policy_res == []:
-                create_audit_policy = text(
+                create_audit_policy = sql.text(
                     f'''CREATE AUDIT POLICY "alp_conf_changes" AUDITING SUCCESSFUL SYSTEM CONFIGURATION CHANGE LEVEL INFO''')
                 print("Executing create system audit policy statement..")
                 create_audit_policy_res = connection.execute(
                     create_audit_policy)
                 print("Executing alter system audit policy statement..")
-                alter_audit_policy = text(
+                alter_audit_policy = sql.text(
                     f'''ALTER AUDIT POLICY "alp_conf_changes" ENABLE''')
                 alter_audit_policy.res = connection.execute(alter_audit_policy)
                 connection.commit()
@@ -244,14 +245,14 @@ class DBDao:
 
     def create_schema_audit_policy(self):
         with self.engine.connect() as connection:
-            create_audit_policy = text(f'''
+            create_audit_policy = sql.text(f'''
                         CREATE AUDIT POLICY ALP_AUDIT_POLICY_{self.schema_name}
                         AUDITING ALL INSERT, SELECT, UPDATE, DELETE ON
                         {self.schema_name}.* LEVEL INFO
                         ''')
             print("Executing create schema audit policy statement..")
             create_audit_policy_res = connection.execute(create_audit_policy)
-            alter_audit_policy = text(
+            alter_audit_policy = sql.text(
                 f'''ALTER AUDIT POLICY ALP_AUDIT_POLICY_{self.schema_name} ENABLE''')
             print("Executing alter schema audit policy statement..")
             alter_audit_policy_res = connection.execute(alter_audit_policy)
@@ -266,8 +267,8 @@ class DBDao:
     def insert_values_into_table(self, table_name: str, column_value_mapping: dict):
         columns = list(column_value_mapping.keys())
         with self.engine.connect() as connection:
-            table = Table(table_name, self.metadata,
-                          autoload_with=connection)
+            table = sql.Table(table_name, self.metadata,
+                              autoload_with=connection)
             insert_stmt = table.insert().values(column_value_mapping)
 
             print(
@@ -279,7 +280,7 @@ class DBDao:
 
     def call_stored_procedure(self, sp_name: str, sp_params: str):
         with self.engine.connect() as connection:
-            call_stmt = text(f'CALL "{sp_name}"({sp_params}) ')
+            call_stmt = sql.text(f'CALL "{sp_name}"({sp_params}) ')
             print(
                 f"Executing stored procedure {sp_name}")
             res = connection.execute(call_stmt).fetchall()
