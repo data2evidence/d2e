@@ -24,7 +24,7 @@ export class FeatureService {
 
   private readonly logger = createLogger(this.constructor.name)
   private readonly userId: string
-  private readonly enabledFeaturePlugins: IPortalPlugin[]
+  private readonly featurePlugins: IPortalPlugin[]
   private readonly validFeatures: string[]
 
   constructor(
@@ -35,18 +35,27 @@ export class FeatureService {
     try {
       const plugins = JSON.parse(env.PORTAL_PLUGINS || '{}')
       this.logger.debug(`Plugins: ${JSON.stringify(plugins)}`)
-      const researcherPlugins = plugins.researcher?.filter(p => Boolean(p.featureFlag) && p.enabled) || []
+      const researcherPlugins = plugins.researcher?.filter(p => Boolean(p.featureFlag)) || []
       const systemadminPlugins = plugins.systemadmin?.filter(p => Boolean(p.featureFlag)) || []
-      this.enabledFeaturePlugins = [...researcherPlugins, ...systemadminPlugins]
+      this.featurePlugins = [...researcherPlugins, ...systemadminPlugins]
     } catch (err) {
       this.logger.error(`Error while loading plugin config: ${err}`)
       throw new Error('Error while loading plugin config in TenantService')
     }
 
-    this.validFeatures = [
-      ...this.NON_PLUGIN_FEATURES.map(f => f.featureFlag),
-      ...this.enabledFeaturePlugins.map(f => f.featureFlag)
-    ]
+    const pluginFeatureFlags: string[] = []
+    this.featurePlugins.forEach(f => {
+      if (f.enabled) {
+        pluginFeatureFlags.push(f.featureFlag)
+      }
+      f.children?.forEach(childPlugin => {
+        if (childPlugin.enabled) {
+          pluginFeatureFlags.push(childPlugin.featureFlag)
+        }
+      })
+    })
+
+    this.validFeatures = [...this.NON_PLUGIN_FEATURES.map(f => f.featureFlag), ...pluginFeatureFlags]
 
     const token = decode(request.headers['authorization'].replace(/bearer /i, '')) as JwtPayload
     this.userId = token.sub
@@ -59,8 +68,10 @@ export class FeatureService {
       f => !savedFeatures.map(s => s.feature).includes(f.featureFlag)
     )
 
-    const defaultEnabledPlugins = this.enabledFeaturePlugins.filter(
-      f => !savedFeatures.map(s => s.feature).includes(f.featureFlag)
+    const defaultEnabledPluginFlags = this.validFeatures.filter(
+      featureFlag =>
+        !savedFeatures.map(s => s.feature).includes(featureFlag) &&
+        !defaultNonPlugins.map(s => s.featureFlag).includes(featureFlag)
     )
 
     return [
@@ -72,8 +83,8 @@ export class FeatureService {
         feature: f.featureFlag,
         isEnabled: f.enabled
       })),
-      ...defaultEnabledPlugins.map(p => ({
-        feature: p.featureFlag,
+      ...defaultEnabledPluginFlags.map(featureFlag => ({
+        feature: featureFlag,
         isEnabled: true
       }))
     ]
