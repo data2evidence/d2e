@@ -362,6 +362,7 @@ export interface IBookmark {
 export interface StudyAnalyticsCredential {
     host: string;
     port: string;
+    code: string;
     databaseName: string;
     user: string;
     password: string;

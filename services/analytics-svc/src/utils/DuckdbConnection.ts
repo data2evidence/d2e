@@ -113,13 +113,13 @@ export class DuckdbConnection implements ConnectionInterface {
 
             // Load vocab schema into duckdb connection
             await duckdDBconn.all(
-                `ATTACH '${env.DUCKDB__DATA_FOLDER}/${credentials.vocabSchema}' (READ_ONLY);`
+                `ATTACH '${env.DUCKDB__DATA_FOLDER}/${credentials.code}_${credentials.vocabSchema}' (READ_ONLY);`
             );
             const conn: DuckdbConnection = new DuckdbConnection(
                 duckdDBconn,
                 duckdDB,
                 `${randomDBName}.${schema}`,
-                credentials.vocabSchema
+                `${credentials.code}_${credentials.vocabSchema}`
             );
 
             callback(null, conn);
