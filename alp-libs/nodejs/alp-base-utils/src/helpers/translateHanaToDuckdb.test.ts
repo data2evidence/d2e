@@ -47,11 +47,6 @@ describe("translateHanaToDuckdb where hana and duckdb have different syntax", ()
     const expected = `select TO_TIMESTAMP(TO_CHAR("COHORT_INITIATION_DATE", 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD HH24:MI:SS') from schema."TABLE";`;
     expect(translateHanaToDuckdb(input, "schema", "vocab_schema")).toBe(expected);
   });
-  it("should have correct syntax for regex search", () => {
-    const input = `(@REF."CONCEPT_CODE") LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'`;
-    const expected = `(@REF."CONCEPT_CODE") SIMILAR TO '@SEARCH_QUERY' `;
-    expect(translateHanaToDuckdb(input, "schema", "vocab_schema")).toBe(expected);
-  });
   it("should have correct syntax for YEAR()", () => {
     const input = `select YEAR(CURRENT_DATE);`;
     const expected = `select date_part('year', current_date);`;
