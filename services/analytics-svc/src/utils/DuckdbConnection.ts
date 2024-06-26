@@ -110,11 +110,16 @@ export class DuckdbConnection implements ConnectionInterface {
             await duckdDBconn.all(
                 `ATTACH 'host=${credentials.host} port=${credentials.port} dbname=${credentials.databaseName} user=${credentials.user} password=${credentials.password}' AS ${randomDBName} (TYPE postgres)`
             );
+
+            // Load vocab schema into duckdb connection
+            await duckdDBconn.all(
+                `ATTACH '${env.DUCKDB__DATA_FOLDER}/${credentials.vocabSchema}' (READ_ONLY);`
+            );
             const conn: DuckdbConnection = new DuckdbConnection(
                 duckdDBconn,
                 duckdDB,
                 `${randomDBName}.${schema}`,
-                `${randomDBName}.${schema}`
+                credentials.vocabSchema
             );
 
             callback(null, conn);
