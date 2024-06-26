@@ -9,7 +9,6 @@ import { Request } from "express";
 export interface IMRIRequest extends Request {
     dbConnections: {
         analyticsConnection: ConnectionInterface;
-        vocabConnection: ConnectionInterface;
     };
     dbCredentials: {
         analyticsCredentials: any;

@@ -6,7 +6,7 @@ const log = Logger.CreateLogger("analytics-log");
 
 export function getStandardConcept(req: IMRIRequest, res) {
     log.addRequestCorrelationID(req);
-    const { analyticsConnection: vocabConnection  } = req.dbConnections;
+    const { analyticsConnection  } = req.dbConnections;
     let conceptCode: string;
     let vocabularyId: string;
     if (req.swagger.params.conceptCode.value) {
@@ -16,7 +16,7 @@ export function getStandardConcept(req: IMRIRequest, res) {
         vocabularyId = req.swagger.params.vocabularyId.value;
     }
     conceptRepository.getStandardConcept(
-        vocabConnection,
+        analyticsConnection,
         conceptCode,
         vocabularyId,
         (err, resultSet) => {
@@ -36,13 +36,13 @@ export function getStandardConcept(req: IMRIRequest, res) {
 
 export function getDescendantConcepts(req: IMRIRequest, res) {
     log.addRequestCorrelationID(req);
-    const { analyticsConnection: vocabConnection } = req.dbConnections;
+    const { analyticsConnection } = req.dbConnections;
     let conceptId: string;
     if (req.swagger.params.conceptId.value) {
         conceptId = req.swagger.params.conceptId.value;
     }
     conceptRepository.getDescendantConcepts(
-        vocabConnection,
+        analyticsConnection,
         conceptId,
         (err, resultSet) => {
             if (err) {
