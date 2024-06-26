@@ -5,7 +5,6 @@ export default class MockRequest implements Partial<IMRIRequest> {
   public dbConnections = {
     configConnection: null,
     analyticsConnection: null,
-    vocabConnection: null,
   }
 
   constructor() {
