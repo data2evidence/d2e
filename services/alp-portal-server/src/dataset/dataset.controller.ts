@@ -101,7 +101,12 @@ export class DatasetController {
   }
 
   @Get('dashboard/:name')
-  async getDashboardById(@Param('name') name) {
+  async getDashboardByName(@Param('name') name) {
     return await this.datasetQueryService.getDatasetDashboardByName(name)
+  }
+
+  @Get('dashboards/list')
+  async getDashboards() {
+    return await this.datasetQueryService.getDashboards()
   }
 }

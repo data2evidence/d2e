@@ -204,6 +204,10 @@ export class DatasetQueryService {
     }
   }
 
+  async getDashboards() {
+    return await this.dashboardRepo.createQueryBuilder('dataset_dashboard').getMany()
+  }
+
   async getDatasetDashboardByName(name: string) {
     const formattedName = name.replace(/-/g, ' ')
     const dashboard = await this.dashboardRepo

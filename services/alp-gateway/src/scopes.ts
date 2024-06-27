@@ -343,6 +343,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
+    path: `^/system-portal/dataset/dashboards/list$`,
+    scopes: ['portal.dataset.update'],
+    httpMethods: ['GET']
+  },
+  {
     path: `^/system-portal/config(.*)`,
     scopes: ['portal.config.read'],
     httpMethods: ['GET']
