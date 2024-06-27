@@ -10,6 +10,7 @@ volumes:
   minio-data-1:
   pg-minerva-data-1:
   dicom-sqlite-storage:
+  r-libs:
 
 x-envs:
   db-svc: &x-dbsvc
@@ -443,6 +444,7 @@ services:
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
       - duckdb-data-1:/app/duckdb_data
+      - r-libs:/home/docker/plugins/R/site-library
     environment:
       <<:
         - *x-converter
