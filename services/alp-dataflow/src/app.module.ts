@@ -16,6 +16,7 @@ import { PrefectFlowModule } from './prefect-flow/prefect-flow.module'
 import { CohortModule } from './cohort/cohort.module'
 import { JobHistoryModule } from './job-history/job-history.module'
 import { MeilisearchModule } from './meilisearch/meilisearch.module'
+import { CohortSurvivalModule } from './cohort-survival/cohort-survival.module'
 import { SeedService } from './common/data-source/seeds/seed.service'
 
 const dqdRoutes = {
@@ -49,6 +50,11 @@ const cohortRoutes = {
   module: CohortModule
 }
 
+const cohortSurvivalRoutes = {
+  path: 'cohort-survival',
+  module: CohortSurvivalModule
+}
+
 const dbSvcRoutes = {
   path: 'db-svc',
   module: DbSvcModule
@@ -80,7 +86,16 @@ const meilisearchRoutes = {
     PrefectFlowModule,
     JobHistoryModule,
     MeilisearchModule,
-    RouterModule.register([prefectRoutes, dqdRoutes, cohortRoutes, dbSvcRoutes, jobHistoryRoutes, meilisearchRoutes])
+    CohortSurvivalModule,
+    RouterModule.register([
+      prefectRoutes,
+      dqdRoutes,
+      cohortRoutes,
+      dbSvcRoutes,
+      jobHistoryRoutes,
+      meilisearchRoutes,
+      cohortSurvivalRoutes
+    ])
   ],
   providers: [SeedService]
 })

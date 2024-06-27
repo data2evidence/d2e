@@ -142,17 +142,34 @@ const assignLogtoRolesByAzureGroups = async (
     (role) => azureGroups.indexOf(rolesGroupMap[role]) > -1
   );
 
+  const oid = decodedIdToken["oid"];
+  const name = decodedIdToken["name"];
   const email = decodedAccessToken["email"] || decodedAccessToken["upn"]; // For D4L & MS
   const logtoAPItoken: any = await getM2MLogtoAPIToken();
-  const logtoUserID: any = await getLogtoUserId(email, logtoAPItoken);
+  let logtoUserID: string = await getLogtoUserId(email, logtoAPItoken);
 
   if (!logtoUserID) {
-    console.warn(`Unable to find Logto user with email: ${email}`);
-    return;
+    // Create user
+    const newUser = await addUser(decodedIdToken.name, email, logtoAPItoken);
+    if (newUser?.id) {
+      logtoUserID = newUser.id;
+
+      const identityDetails = { id: oid, name, email };
+      await updateUserIdentity(
+        newUser?.id,
+        defaultMetadata.id,
+        { userId: oid, details: identityDetails },
+        logtoAPItoken
+      );
+    } else {
+      console.warn(`Unable to find Logto user with email: ${email}`);
+      return;
+    }
   }
 
   const logtoRoles = await getLogtoRoles(logtoAPItoken);
   const userRoles = await getUserRoles(logtoUserID, logtoAPItoken);
+  // console.log(`USER ${logtoUserID} ROLES ${JSON.stringify(userRoles)}`);
 
   const toBeAssignedLogtoRoles = logtoRoles.filter(
     (role: any) =>
@@ -164,7 +181,6 @@ const assignLogtoRolesByAzureGroups = async (
     await assignRolesToUser(logtoRole.id, logtoUserID, logtoAPItoken);
   });
 
-  // console.log(`USER ${logtoUserID} ROLES ${JSON.stringify(userRoles)}`);
   const toBeRemovedLogtoRoles = userRoles.filter(
     (role: any) =>
       !eligibleLogtoRoles.includes(role.name) &&
@@ -262,6 +278,59 @@ const getUserRoles = async (userId: string, apiToken: string) => {
     );
 
     // console.log(`Logto User ${userId} Roles ${JSON.stringify(httpResponse.body)}`);
+
+    return JSON.parse(httpResponse.body);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const addUser = async (name: string, email: string, apiToken: string) => {
+  try {
+    const httpResponse = await got.post(`${ENDPOINT}/api/users`, {
+      headers: {
+        authorization: `Bearer ${apiToken}`,
+      },
+      json: {
+        name,
+        primaryEmail: email,
+      },
+      timeout: { request: defaultTimeout },
+      https: {
+        rejectUnauthorized: false,
+      },
+    });
+
+    // console.log(`Logto User creation ${JSON.stringify(httpResponse.body)}`);
+
+    return JSON.parse(httpResponse.body) as { id: string };
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const updateUserIdentity = async (
+  userId: string,
+  target: string,
+  data: object,
+  apiToken: string
+) => {
+  try {
+    const httpResponse = await got.put(
+      `${ENDPOINT}/api/users/${userId}/identities/${target}`,
+      {
+        headers: {
+          authorization: `Bearer ${apiToken}`,
+        },
+        json: data,
+        timeout: { request: defaultTimeout },
+        https: {
+          rejectUnauthorized: false,
+        },
+      }
+    );
+
+    // console.log(`Logto User identity update ${JSON.stringify(httpResponse.body)}`);
 
     return JSON.parse(httpResponse.body);
   } catch (e) {
