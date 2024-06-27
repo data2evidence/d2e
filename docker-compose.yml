@@ -1548,3 +1548,10 @@ services:
       MEILI_HTTP_ADDR: 0.0.0.0:41${BASE_PORT:-1}11
       MEILI_LOG_LEVEL: INFO
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+
+  alp-dataflow-gen-data-load-agent:
+    container_name: &c3 alp-dataflow-gen-data-load-agent-${BASE_PORT:-1}
+    extends: alp-dataflow-gen-agent
+    volumes:
+      - ./cache/vocab/transformed:/tmp/data
+    profiles: [data-load]
