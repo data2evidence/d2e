@@ -222,7 +222,8 @@ export class DatasetRouter {
                 schema_name: this.schemaCase(newSchemaName, dialect as DbDialect),
                 source_schema: this.schemaCase(schemaName, dialect as DbDialect),
                 dialect: dialect,
-                vocab_schema: vocabSchemaName
+                vocab_schema: vocabSchemaName,
+                snapshot_copy_config: snapshotCopyConfig
               }
             }
 
