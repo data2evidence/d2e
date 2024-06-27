@@ -73,6 +73,8 @@ done
 
   docker exec -it alp-dataflow-gen-data-load-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options='{"files":[{"name": "CONCEPT_ANCESTOR","path": "/tmp/data/CONCEPT_ANCESTOR.csv", "truncate": "True", "table_name": "concept_ancestor"},{"name": "CONCEPT_CLASS","path": "/tmp/data/CONCEPT_CLASS.csv", "truncate": "True", "table_name": "concept_class"},{"name": "CONCEPT_RELATIONSHIP","path": "/tmp/data/CONCEPT_RELATIONSHIP.csv", "truncate": "True", "table_name": "concept_relationship"},{"name": "CONCEPT_SYNONYM","path": "/tmp/data/CONCEPT_SYNONYM.csv", "truncate": "True", "table_name": "concept_synonym"},{"name": "CONCEPT","path": "/tmp/data/CONCEPT.csv", "truncate": "True", "table_name": "concept"},{"name": "DOMAIN","path": "/tmp/data/DOMAIN.csv", "truncate": "True", "table_name": "domain"},{"name": "DRUG_STRENGTH","path": "/tmp/data/DRUG_STRENGTH.csv", "truncate": "True", "table_name": "drug_strength"},{"name": "RELATIONSHIP","path": "/tmp/data/RELATIONSHIP.csv", "truncate": "True", "table_name": "relationship"},{"name": "VOCABULARY","path": "/tmp/data/VOCABULARY.csv", "truncate": "True", "table_name": "vocabulary"}],"schema_name":"cdmvocab","header":"true","delimiter":"\t","database_code": "alpdev_pg", "chunksize": "50000", "encoding": "utf_8"}'
 
+- Once the flow is completed, the container logs the message "Finished in state Completed()". After which run the following commands to stop the data-load agent and start dataflow-gen-agent
+  
   docker stop alp-dataflow-gen-data-load-agent-1
   docker start alp-dataflow-gen-agent-1
   ```
