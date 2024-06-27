@@ -9,7 +9,6 @@ import { Request } from "express";
 export interface IMRIRequest extends Request {
     dbConnections: {
         analyticsConnection: ConnectionInterface;
-        vocabConnection: ConnectionInterface;
     };
     dbCredentials: {
         analyticsCredentials: any;
@@ -363,6 +362,7 @@ export interface IBookmark {
 export interface StudyAnalyticsCredential {
     host: string;
     port: string;
+    code: string;
     databaseName: string;
     user: string;
     password: string;

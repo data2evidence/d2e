@@ -99,6 +99,16 @@ x-envs:
           "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
           "requiredRoles": [
             "RESEARCHER"
+          ],
+          "children": [
+            {
+              "name": "Kaplan-Meier",
+              "route": "kaplan-meier",
+              "pluginPath": "plugins/Researcher/KaplanMeier/module",
+              "featureFlag": "kaplanMeier",
+              "requiredRoles": ["RESEARCHER"],
+              "enabled": true
+            }
           ]
         }
       ],
@@ -332,8 +342,6 @@ services:
       - sh
       - ./startprefectserver.sh
     container_name: &c2 alp-dataflow-gen-${BASE_PORT:-1}
-    ports:
-      - 41${BASE_PORT:-1}20:41${BASE_PORT:-1}20
     depends_on:
       alp-db-credentials-mgr:
         condition: service_healthy
