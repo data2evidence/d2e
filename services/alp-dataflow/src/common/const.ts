@@ -5,7 +5,8 @@ export enum PrefectDeploymentName {
   DB_SVC = 'alp-db-svc',
   MEILISEARCH_ADD_INDEX = 'add_search_index',
   DATASET_ATTRIBUTE = 'update-dataset-attributes',
-  FETCH_VERSION_INFO = 'fetch-version-info'
+  FETCH_VERSION_INFO = 'fetch-version-info',
+  COHORT_SURVIVAL = 'cohort-survival-plugin_deployment'
 }
 
 export enum PrefectFlowName {
@@ -15,7 +16,8 @@ export enum PrefectFlowName {
   DB_SVC = 'execute-alp-db-svc-flow',
   MEILISEARCH_ADD_INDEX = 'execute-add-search-index-flow',
   DATASET_ATTRIBUTE = 'update-dataset-attributes-flow',
-  FETCH_VERSION_INFO = 'fetch-version-info-flow'
+  FETCH_VERSION_INFO = 'fetch-version-info-flow',
+  COHORT_SURVIVAL = 'cohort-survival-plugin'
 }
 
 export const PrefectTagNames = {

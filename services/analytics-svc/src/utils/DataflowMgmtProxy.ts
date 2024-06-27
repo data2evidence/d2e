@@ -26,7 +26,7 @@ export const dataflowRequest = (
     const { hostname, port, protocol } = new URL(
         env.SERVICE_ROUTES.dataflowMgmt
     );
-    const protocolLib = http;
+    const protocolLib = protocol === "https:" ? https : http;
     const data = JSON.stringify(payload);
 
     const sourceOrigin = req.headers["x-source-origin"];
