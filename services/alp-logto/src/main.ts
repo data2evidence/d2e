@@ -1,16 +1,19 @@
 import * as logto from "./middleware/logto";
 import * as pg from "pg";
 
-async function callback(path: string, headers: object, data: object) {
+async function callback(path: string, headers: object, data: object, hasResponseBody = true) {
   try {
     console.log(`Requesting ${path}`);
     console.log(`${JSON.stringify(data)}`);
     const resp = await logto.post(path, headers, data);
     console.log(`Responded with ${resp.status}`);
+
     if (resp.ok) {
-      let json = await resp.json();
-      console.log(JSON.stringify(json));
-      return json;
+      if(hasResponseBody) {
+        let json = await resp.json();
+        console.log(JSON.stringify(json));
+        return json;
+      }
     } else {
       console.error("Request failed");
       console.error(resp.statusText, " ", path, " ", JSON.stringify(data));
@@ -38,12 +41,7 @@ async function main() {
     accessTokenTtl: 3600,
   };
 
-  let user: Object = JSON.parse(process.env.LOGTO__USER) || {
-    username: "admin",
-    password:
-      "$argon2i$v=19$m=4096,t=256,p=1$gFXKgnc0tFywI7DcRVN+Tg$c0TeMUiDq6PMCLyJmR/V/sb1MV8MpMBeRy24+ZsZgeY",
-    passwordAlgorithm: "Argon2i",
-  };
+  let user: Object = JSON.parse(process.env.LOGTO__USER);
 
   let scopes: Array<Object> = JSON.parse(process.env.LOGTO__SCOPES) || [];
 
@@ -56,10 +54,34 @@ async function main() {
   };
 
   console.log(
-    "*********************************************************************************"
+    "*********************************** BEGIN REGISTER APPS **********************************************"
   );
   for (const a of apps) {
-    await callback("applications", headers, a);
+    const {id: appID, name: appName, secret: appSecret} = await callback("applications", headers, a);
+    let ENV__CLIENT_ID, ENV__CLIENT_SECRET;
+
+    switch (appName) {
+      case "alp-app":
+        ENV__CLIENT_ID = "LOGTO__ALP_APP__CLIENT_ID"
+        ENV__CLIENT_SECRET = "LOGTO__ALP_APP__CLIENT_SECRET"
+        break;
+      case "alp-svc":
+        ENV__CLIENT_ID = "LOGTO__ALP_SVC__CLIENT_ID"
+        ENV__CLIENT_SECRET = "LOGTO__ALP_SVC__CLIENT_SECRET"
+        break;
+      case "alp-data":
+        ENV__CLIENT_ID = "LOGTO__ALP_DATA__CLIENT_ID"
+        ENV__CLIENT_SECRET = "LOGTO__ALP_DATA__CLIENT_SECRET"
+        break;
+      default:
+        throw new Error(`Unrecoginized app name ${appName}!! Please reconfigure`)
+    }
+    
+    console.log(`**********************COPY OVER ENV ASSIGNMENTS FOR ${appName} IN .env.local **********************`)
+    console.log(`${ENV__CLIENT_ID}=${appID}`)
+    console.log(`${ENV__CLIENT_SECRET}=${appSecret}`)
+    console.log(`***********************************************************************************`)
+
   }
 
   console.log(
@@ -118,7 +140,7 @@ async function main() {
   for (const ur of userRoles) {
     await callback(`users/${ur.userId}/roles`, headers, {
       roleIds: ur.roleIds,
-    });
+    }, false);
   }
 
   console.log(
@@ -230,7 +252,7 @@ async function main() {
       `Users-Roles created: ${
         userRoleRows.rowCount
       } \n UserRoles creation successful: ${
-        userRoleRows.rowCount == userRoles.length
+        userRoleRows.rowCount == (userRoles.length * logtoRoles.length)
       }`
     );
   }, 3000);
