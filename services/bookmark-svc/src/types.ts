@@ -64,7 +64,6 @@ export const deleteBookmarkSchema = z.object({
 export interface IMRIRequest extends Request {
   dbConnections: {
     analyticsConnection: ConnectionInterface
-    vocabConnection: ConnectionInterface
     configConnection: ConnectionInterface
   }
   studiesDbMetadata: {

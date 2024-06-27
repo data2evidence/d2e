@@ -71,3 +71,4 @@ cd $BASE_DIR
 - If repo is private
 - Enter git url `https://<access_token>@github.com/<username>/<repository>.git`
 - If it has subdirectories: `https://<access_token>@github.com/<username>/<repository>.git#subdirectory=<subdir>`
+>![](../images/dataflow/AddFlowURLPrivate.png)

@@ -3,27 +3,31 @@ import pandas as pd
 from prefect.logging.loggers import flow_run_logger, task_run_logger
 from prefect.server.schemas.states import StateType
 from utils.databaseConnectionUtils import insert_to_dqd_result_table
-from utils.types import requestType, dcOptionsType
+from utils.types import dcOptionsType, DatabaseDialects, HANA_TENANT_USERS, PG_TENANT_USERS
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
-import importlib
-from flows.alp_db_svc.flow import _run_db_svc_shell_command, _get_db_dialect
+from dao.DBDao import DBDao
 
 
-async def drop_data_characterization_schema(flow, flow_run, state, dropSchemaOptions: dcOptionsType):
-    logger = flow_run_logger(flow_run, flow)
-    options = dcOptionsType(**flow_run.parameters['options'])
+async def drop_data_characterization_schema(dropSchemaOptions: dcOptionsType):
+
     database_code = dropSchemaOptions.databaseCode
     results_schema = dropSchemaOptions.resultsSchema
 
-    request_type = requestType.DELETE
-    request_body = {}
+    db_dialect = get_db_svc_endpoint_dialect(database_code)
+    if db_dialect == DatabaseDialects.HANA:
+        admin_user = HANA_TENANT_USERS.ADMIN_USER
+    elif db_dialect == DatabaseDialects.POSTGRES:
+        admin_user = PG_TENANT_USERS.ADMIN_USER
 
     try:
-        db_dialect = _get_db_dialect(dropSchemaOptions)
-        request_url = f"/alpdb/{db_dialect}/dataCharacterization/database/{database_code}/schema/{results_schema}"
-        await _run_db_svc_shell_command(request_type, request_url, request_body)
+        print
+        (f"Dropping data characterization results schema '{results_schema}'")
+
+        schema_dao = DBDao(database_code, results_schema, admin_user)
+        schema_dao.drop_schema()
     except Exception as e:
-        logger.error(e)
+        print(
+            f"Failed to drop data characterization results schema '{results_schema}': {e}")
         raise e
 
 

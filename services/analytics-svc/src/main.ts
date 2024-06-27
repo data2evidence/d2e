@@ -188,7 +188,6 @@ const initRoutes = async (app: express.Application) => {
 
                 req.dbConnections = await getDBConnections({
                     analyticsCredentials: credentials,
-                    vocabCredentials: credentials,
                     userObj,
                 });
             }
@@ -510,27 +509,17 @@ let initSettingsFromEnvVars = () => {
 
 const getDBConnections = async ({
     analyticsCredentials,
-    vocabCredentials,
     userObj,
 }): Promise<{
     analyticsConnection: Connection.ConnectionInterface;
-    vocabConnection: Connection.ConnectionInterface;
 }> => {
     // Define defaults for both analytics & Vocab connections
     let analyticsConnectionPromise;
 
-    const vocabConnectionPromise =
-        dbConnectionUtil.DBConnectionUtil.getDBConnection({
-            credentials: vocabCredentials,
-            schemaName: vocabCredentials.vocabSchema,
-            vocabSchemaName: vocabCredentials.vocabSchema,
-            userObj,
-        });
-
     if (env.USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
         // Use duckdb as analyticsConnection if USE_DUCKDB flag is set to true
         const duckdbSchemaFileName = `${analyticsCredentials.code}_${analyticsCredentials.schema}`;
-        const duckdbVocabSchemaFileName = `${vocabCredentials.code}_${vocabCredentials.vocabSchema}`;
+        const duckdbVocabSchemaFileName = `${analyticsCredentials.code}_${analyticsCredentials.vocabSchema}`;
 
         try {
             // Check duckdb dataset access
@@ -586,19 +575,17 @@ const getDBConnections = async ({
             dbConnectionUtil.DBConnectionUtil.getDBConnection({
                 credentials: analyticsCredentials,
                 schemaName: analyticsCredentials.schema,
-                vocabSchemaName: vocabCredentials.vocabSchema,
+                vocabSchemaName: analyticsCredentials.vocabSchema,
                 userObj,
             });
     }
 
-    const [analyticsConnection, vocabConnection] = await Promise.all([
+    const [analyticsConnection] = await Promise.all([
         analyticsConnectionPromise,
-        vocabConnectionPromise,
     ]);
 
     return {
         analyticsConnection,
-        vocabConnection,
     };
 };
 

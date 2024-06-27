@@ -47,6 +47,8 @@ let authCodeRequest: AuthorizationCodeRequest;
 // Temporarily keep this as this is a refactor, which should not change the logics.
 const cryptoProvider = new CryptoProvider();
 
+const ENDPOINT = `http://localhost:${process.env.PORT}`;
+
 const getAuthorizationUri =
   (getConfig: GetConnectorConfig): GetAuthorizationUri =>
   async ({ state, redirectUri }) => {
@@ -140,25 +142,59 @@ const assignLogtoRolesByAzureGroups = async (
     (role) => azureGroups.indexOf(rolesGroupMap[role]) > -1
   );
 
+  const oid = decodedIdToken["oid"];
+  const name = decodedIdToken["name"];
   const email = decodedAccessToken["email"] || decodedAccessToken["upn"]; // For D4L & MS
   const logtoAPItoken: any = await getM2MLogtoAPIToken();
-  const logtoUserID: any = await getLogtoUserId(email, logtoAPItoken);
+  let logtoUserID: string = await getLogtoUserId(email, logtoAPItoken);
 
-  if (logtoUserID) {
-    const logtoRoles = await getLogtoRoles(logtoAPItoken);
-    const toBeAssignedLogtoRoles = logtoRoles.filter(
-      (role: any) => eligibleLogtoRoles.indexOf(role.name) > -1
-    );
-    // console.log(`TO BE ASSIGNED LOGTO ROLES ${JSON.stringify(toBeAssignedLogtoRoles)}`);
-    toBeAssignedLogtoRoles.forEach(async (logtoRole: any) => {
-      await assignRolesToUser(logtoRole.id, logtoUserID, logtoAPItoken);
-    });
+  if (!logtoUserID) {
+    // Create user
+    const newUser = await addUser(decodedIdToken.name, email, logtoAPItoken);
+    if (newUser?.id) {
+      logtoUserID = newUser.id;
+
+      const identityDetails = { id: oid, name, email };
+      await updateUserIdentity(
+        newUser?.id,
+        defaultMetadata.id,
+        { userId: oid, details: identityDetails },
+        logtoAPItoken
+      );
+    } else {
+      console.warn(`Unable to find Logto user with email: ${email}`);
+      return;
+    }
   }
+
+  const logtoRoles = await getLogtoRoles(logtoAPItoken);
+  const userRoles = await getUserRoles(logtoUserID, logtoAPItoken);
+  // console.log(`USER ${logtoUserID} ROLES ${JSON.stringify(userRoles)}`);
+
+  const toBeAssignedLogtoRoles = logtoRoles.filter(
+    (role: any) =>
+      eligibleLogtoRoles.includes(role.name) &&
+      !userRoles.some((userRole: any) => userRole.name.includes(role.name))
+  );
+  // console.log(`TO BE ASSIGNED LOGTO ROLES ${JSON.stringify(toBeAssignedLogtoRoles)}`);
+  toBeAssignedLogtoRoles.forEach(async (logtoRole: any) => {
+    await assignRolesToUser(logtoRole.id, logtoUserID, logtoAPItoken);
+  });
+
+  const toBeRemovedLogtoRoles = userRoles.filter(
+    (role: any) =>
+      !eligibleLogtoRoles.includes(role.name) &&
+      !toBeAssignedLogtoRoles.includes(role.name)
+  );
+  // console.log(`TO BE REMOVED LOGTO ROLES ${JSON.stringify(toBeRemovedLogtoRoles)}`);
+  toBeRemovedLogtoRoles.forEach(async (logtoRole: any) => {
+    await removeRolesFromUser(logtoRole.id, logtoUserID, logtoAPItoken);
+  });
 };
 
 const getM2MLogtoAPIToken = async () => {
   try {
-    const httpResponse = await got.post(`${process.env.ENDPOINT}/oidc/token`, {
+    const httpResponse = await got.post(`${ENDPOINT}/oidc/token`, {
       form: {
         grant_type: "client_credentials",
         client_id: process.env.LOGTO_API_M2M_CLIENT_ID,
@@ -185,7 +221,7 @@ const getM2MLogtoAPIToken = async () => {
 
 const getLogtoUserId = async (email: string, apiToken: string) => {
   try {
-    const httpResponse = await got.get(`${process.env.ENDPOINT}/api/users`, {
+    const httpResponse = await got.get(`${ENDPOINT}/api/users`, {
       searchParams: {
         search: email,
       },
@@ -200,7 +236,7 @@ const getLogtoUserId = async (email: string, apiToken: string) => {
 
     // console.log(`Logto USER INFO ${JSON.stringify(httpResponse.body)}`);
 
-    return JSON.parse(httpResponse.body)[0].id!;
+    return JSON.parse(httpResponse.body)[0]?.id;
   } catch (e) {
     console.error(e);
   }
@@ -208,7 +244,7 @@ const getLogtoUserId = async (email: string, apiToken: string) => {
 
 const getLogtoRoles = async (apiToken: string) => {
   try {
-    const httpResponse = await got.get(`${process.env.ENDPOINT}/api/roles`, {
+    const httpResponse = await got.get(`${ENDPOINT}/api/roles`, {
       headers: {
         authorization: `Bearer ${apiToken}`,
       },
@@ -226,6 +262,82 @@ const getLogtoRoles = async (apiToken: string) => {
   }
 };
 
+const getUserRoles = async (userId: string, apiToken: string) => {
+  try {
+    const httpResponse = await got.get(
+      `${ENDPOINT}/api/users/${userId}/roles`,
+      {
+        headers: {
+          authorization: `Bearer ${apiToken}`,
+        },
+        timeout: { request: defaultTimeout },
+        https: {
+          rejectUnauthorized: false,
+        },
+      }
+    );
+
+    // console.log(`Logto User ${userId} Roles ${JSON.stringify(httpResponse.body)}`);
+
+    return JSON.parse(httpResponse.body);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const addUser = async (name: string, email: string, apiToken: string) => {
+  try {
+    const httpResponse = await got.post(`${ENDPOINT}/api/users`, {
+      headers: {
+        authorization: `Bearer ${apiToken}`,
+      },
+      json: {
+        name,
+        primaryEmail: email,
+      },
+      timeout: { request: defaultTimeout },
+      https: {
+        rejectUnauthorized: false,
+      },
+    });
+
+    // console.log(`Logto User creation ${JSON.stringify(httpResponse.body)}`);
+
+    return JSON.parse(httpResponse.body) as { id: string };
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const updateUserIdentity = async (
+  userId: string,
+  target: string,
+  data: object,
+  apiToken: string
+) => {
+  try {
+    const httpResponse = await got.put(
+      `${ENDPOINT}/api/users/${userId}/identities/${target}`,
+      {
+        headers: {
+          authorization: `Bearer ${apiToken}`,
+        },
+        json: data,
+        timeout: { request: defaultTimeout },
+        https: {
+          rejectUnauthorized: false,
+        },
+      }
+    );
+
+    // console.log(`Logto User identity update ${JSON.stringify(httpResponse.body)}`);
+
+    return JSON.parse(httpResponse.body);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 const assignRolesToUser = async (
   roleId: string,
   userId: string,
@@ -234,7 +346,7 @@ const assignRolesToUser = async (
   try {
     console.log(`assignRolesToUser roleid ${roleId}, userId ${userId}`);
     const httpResponse = await got.post(
-      `${process.env.ENDPOINT}/api/roles/${roleId}/users`,
+      `${ENDPOINT}/api/roles/${roleId}/users`,
       {
         headers: {
           authorization: `Bearer ${apiToken}`,
@@ -251,6 +363,33 @@ const assignRolesToUser = async (
     );
 
     // console.log(`Logto Roles assignment ${JSON.stringify(httpResponse)}`);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const removeRolesFromUser = async (
+  roleId: string,
+  userId: string,
+  apiToken: string
+) => {
+  try {
+    console.log(`removeRolesFromUser roleid ${roleId}, userId ${userId}`);
+    const httpResponse = await got.delete(
+      `${ENDPOINT}/api/users/${userId}/roles/${roleId}`,
+      {
+        headers: {
+          authorization: `Bearer ${apiToken}`,
+          "content-type": "application/json",
+        },
+        timeout: { request: defaultTimeout },
+        https: {
+          rejectUnauthorized: false,
+        },
+      }
+    );
+
+    // console.log(`Logto Roles removal ${JSON.stringify(httpResponse)}`);
   } catch (e) {
     console.error(e);
   }

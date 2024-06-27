@@ -148,7 +148,6 @@ const hanaCommonTranslation = (temp: string, schemaName: string, vocabSchemaName
 
   temp = temp.replace(/(\w+[.{1}])(\"[\w]*\").nextval/gi, `nextval('$1$2')`);
 
-  temp = temp.replace(/LIKE_REGEXPR/gi, "~*"); // ~* short for regex, case insensitive matching
 
   // Replace
   temp = temp.replace(/TO_NCLOB/gi, "");
@@ -177,6 +176,7 @@ const hanaCommonTranslation = (temp: string, schemaName: string, vocabSchemaName
 
 export const translateHanaToPostgres = (temp: string, schemaName: string, vocabSchemaName: string) => {
   temp = hanaCommonTranslation(temp, schemaName, vocabSchemaName);
+  temp = temp.replace(/LIKE_REGEXPR/gi, "~*"); // ~* short for regex, case insensitive matching
   temp = temp.replace(
     /DAYS_BETWEEN \(\(\(("[\w]*"."[\w]*")\)\),\(\(("[\w]*"."[\w]*")\)\)\)/gi,
     `($2::date - $1::date)`,
