@@ -53,7 +53,6 @@ wc -l *.csv | sort
 - This transformation is done in case there is a literal string character e.g. `\t` or `\n` in the value.
 - Enclosing the values in double quotes would prevent interpretation as a tab or newline.
 - Move files to a folder named `transformed`
-- copy transformed CSVs to container
 ```bash
 mkdir -p transformed
 for CSV_FILE in *.csv; do 
@@ -62,10 +61,8 @@ for CSV_FILE in *.csv; do
       CSV_FILE2=./transformed/$CSV_FILE
       sed "s/\"/\"\"/g;s/\t/\"\t\"/g;s/\(.*\)/\"\1\"/" $CSV_FILE > $CSV_FILE2; 
       wc -l $CSV_FILE2
-      docker cp $CSV_FILE2 alp-minerva-postgres-1:/
 done
 ```
-
 ## Load data to cdmvocab
 
 - Run the following command in terminal to stop an alp docker container and start another container to load data
@@ -83,7 +80,6 @@ docker exec -it alp-dataflow-gen-data-load-agent-1 prefect deployment run data-l
 docker stop alp-dataflow-gen-data-load-agent-1
 docker start alp-dataflow-gen-agent-1
 ```
-  
 - note: expected output is 
 > COPY ${LINE_COUNT}
 
@@ -111,9 +107,4 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
 
 # Troubleshooting
 ## Repeat load
-- Before repeat load suggest truncate existing tables with the following command:
-```
-docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "truncate cdmvocab.concept, cdmvocab.concept_ancestor, cdmvocab.concept_class, cdmvocab.concept_relationship, cdmvocab.concept_synonym, cdmvocab.domain, cdmvocab.drug_strength, cdmvocab.relationship, cdmvocab.vocabulary;"
-```
-- Expected output
-> TRUNCATE TABLE
+- To repeat, run "Load data to cdmvocab" commands in the sequence given
