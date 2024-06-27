@@ -153,23 +153,24 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_PASSWORD }}
 
-      - uses: nick-fields/retry@v3
+      - name: Pull docker images
+        uses: nick-fields/retry@v3
         with:
           timeout_seconds: 1800
           retry_wait_seconds: 60
           max_attempts: 10
           retry_on: error
-          command: yarn remote:minerva pull
+          command: |
+            # customize dc.yml
+            yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
+            yq -i '.services.alp-caddy.image="alpcr.azurecr.io/alp-data-node/alp-caddy:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
+            yarn remote:minerva pull
 
       - name: docker compose up
         env:
           GATEWAY_NAME: alp-minerva-gateway-1
         run: |
           echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
-
-          # customize dc.yml
-          yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
-          yq -i '.services.alp-caddy.image="alpcr.azurecr.io/alp-data-node/alp-caddy:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
 
           # Run ALP services
           yarn remote:minerva up --remove-orphans --force-recreate --wait

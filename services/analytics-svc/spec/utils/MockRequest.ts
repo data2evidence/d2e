@@ -9,7 +9,6 @@ export default class MockRequest implements Partial<IMRIRequest> {
   public dbConnections = {
     analyticsConnection: null,
     analyticsWriteConnection: null,
-    vocabConnection: null,
   };
 
   constructor() {
@@ -25,7 +24,6 @@ export default class MockRequest implements Partial<IMRIRequest> {
   }
 
   public setConnections({ analyticsConnection, analyticsWriteConnection }) {
-    this.dbConnections.vocabConnection = analyticsConnection;
     this.dbConnections.analyticsWriteConnection = analyticsWriteConnection;
     this.dbConnections.analyticsConnection = analyticsConnection;
   }

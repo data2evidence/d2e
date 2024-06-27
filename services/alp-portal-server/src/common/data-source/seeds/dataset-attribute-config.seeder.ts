@@ -37,7 +37,7 @@ export default class DatasetAttributeConfigSeeder implements Seeder {
         id: 'version',
         name: 'Version',
         category: ATTRIBUTE_CONFIG_CATEGORIES.DATASET,
-        dataType: ATTRIBUTE_CONFIG_DATA_TYPES.NUMBER,
+        dataType: ATTRIBUTE_CONFIG_DATA_TYPES.STRING,
         isDisplayed: true,
         createdBy: 'system',
         modifiedBy: 'system'
@@ -79,6 +79,15 @@ export default class DatasetAttributeConfigSeeder implements Seeder {
         modifiedBy: 'system'
       },
       {
+        id: 'metadata_last_fetch_date',
+        name: 'Metadata Last Fetched Date',
+        category: ATTRIBUTE_CONFIG_CATEGORIES.DATASET,
+        dataType: ATTRIBUTE_CONFIG_DATA_TYPES.TIMESTAMP,
+        isDisplayed: true,
+        createdBy: 'system',
+        modifiedBy: 'system'
+      },
+      {
         id: 'start_date',
         name: 'Start date',
         category: ATTRIBUTE_CONFIG_CATEGORIES.DATASET,
@@ -108,15 +117,6 @@ export default class DatasetAttributeConfigSeeder implements Seeder {
       {
         id: 'source_dataset_name',
         name: 'Source Dataset Name',
-        category: ATTRIBUTE_CONFIG_CATEGORIES.DATASET,
-        dataType: ATTRIBUTE_CONFIG_DATA_TYPES.STRING,
-        isDisplayed: true,
-        createdBy: 'system',
-        modifiedBy: 'system'
-      },
-      {
-        id: 'cdm_version',
-        name: 'CDM Version',
         category: ATTRIBUTE_CONFIG_CATEGORIES.DATASET,
         dataType: ATTRIBUTE_CONFIG_DATA_TYPES.STRING,
         isDisplayed: true,

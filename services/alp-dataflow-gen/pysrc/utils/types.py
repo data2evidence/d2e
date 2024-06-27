@@ -74,6 +74,14 @@ class cohortGeneratorOptionsType(BaseModel):
     token: str
 
 
+class cohortSurvivalOptionsType(BaseModel):
+    databaseCode: str
+    schemaName: str
+    targetCohortDefinitionId: int
+    outcomeCohortDefinitionId: int
+    datasetId: str
+
+
 class omopCDMOptionsType(BaseModel):
     databaseCode: str
     schemaName: str

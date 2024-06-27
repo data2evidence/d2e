@@ -125,6 +125,7 @@ export class Formatter {
         config.panelOptions = {
             addToCohorts: mriConfig.panelOptions.addToCohorts,
             domainValuesLimit: mriConfig.panelOptions.domainValuesLimit,
+            maxFiltercardCount: mriConfig.panelOptions.maxFiltercardCount,
             calcViewAccessPoint: mriConfig.panelOptions.calcViewAccessPoint,
             externalAccessPoints: mriConfig.panelOptions.externalAccessPoints
         };

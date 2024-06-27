@@ -73,7 +73,6 @@ const initRoutes = async (app: express.Application) => {
         req.dbConnections = {
           analyticsConnection: null,
           configConnection,
-          vocabConnection: null,
         }
       } catch (err) {
         next(err)
