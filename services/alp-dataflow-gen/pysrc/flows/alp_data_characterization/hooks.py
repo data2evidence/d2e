@@ -3,7 +3,32 @@ import pandas as pd
 from prefect.logging.loggers import flow_run_logger, task_run_logger
 from prefect.server.schemas.states import StateType
 from utils.databaseConnectionUtils import insert_to_dqd_result_table
-from utils.types import requestType, dcOptionsType
+from utils.types import dcOptionsType, DatabaseDialects, HANA_TENANT_USERS, PG_TENANT_USERS
+from alpconnection.dbutils import get_db_svc_endpoint_dialect
+from dao.DBDao import DBDao
+
+
+async def drop_data_characterization_schema(dropSchemaOptions: dcOptionsType):
+
+    database_code = dropSchemaOptions.databaseCode
+    results_schema = dropSchemaOptions.resultsSchema
+
+    db_dialect = get_db_svc_endpoint_dialect(database_code)
+    if db_dialect == DatabaseDialects.HANA:
+        admin_user = HANA_TENANT_USERS.ADMIN_USER
+    elif db_dialect == DatabaseDialects.POSTGRES:
+        admin_user = PG_TENANT_USERS.ADMIN_USER
+
+    try:
+        print
+        (f"Dropping data characterization results schema '{results_schema}'")
+
+        schema_dao = DBDao(database_code, results_schema, admin_user)
+        schema_dao.drop_schema()
+    except Exception as e:
+        print(
+            f"Failed to drop data characterization results schema '{results_schema}': {e}")
+        raise e
 
 
 async def persist_data_characterization(task, task_run, state, output_folder):

@@ -105,6 +105,8 @@ def serialize_to_json(data):
             if isinstance(data[key], dd.DataFrame) or isinstance(data[key], pd.DataFrame):
                 data[key] = serialize_to_json(value)
         return data
+    elif hasattr(data, 'rid') and hasattr(data, 'rclass') and hasattr(data, 'r_repr'):
+        return data.r_repr()
     else:
         return data
 
