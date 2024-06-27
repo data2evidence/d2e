@@ -100,8 +100,8 @@ export class DatasetController {
     return await this.datasetQueryService.getDatasetReleaseById(id)
   }
 
-  @Get('dashboard/:id')
-  async getDashboardById(@Param('id', ParseUUIDPipe) id) {
-    return await this.datasetQueryService.getDatasetDashboardById(id)
+  @Get('dashboard/:name')
+  async getDashboardById(@Param('name') name) {
+    return await this.datasetQueryService.getDatasetDashboardByName(name)
   }
 }

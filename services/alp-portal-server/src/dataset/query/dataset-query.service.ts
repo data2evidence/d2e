@@ -204,10 +204,11 @@ export class DatasetQueryService {
     }
   }
 
-  async getDatasetDashboardById(id: string) {
+  async getDatasetDashboardByName(name: string) {
+    const formattedName = name.replace(/-/g, ' ')
     const dashboard = await this.dashboardRepo
       .createQueryBuilder('dataset_dashboard')
-      .where('dataset_dashboard.id = :id', { id })
+      .where('dataset_dashboard.name = :name', { name: formattedName })
       .getOne()
 
     return {
