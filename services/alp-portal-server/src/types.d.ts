@@ -240,6 +240,7 @@ interface IPortalPlugin {
   name: string
   featureFlag?: string
   enabled?: string
+  children?: IPortalPlugin[]
 }
 
 export interface PaConfig {

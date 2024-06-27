@@ -99,6 +99,16 @@ x-envs:
           "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
           "requiredRoles": [
             "RESEARCHER"
+          ],
+          "children": [
+            {
+              "name": "Kaplan-Meier",
+              "route": "kaplan-meier",
+              "pluginPath": "plugins/Researcher/KaplanMeier/module",
+              "featureFlag": "kaplanMeier",
+              "requiredRoles": ["RESEARCHER"],
+              "enabled": true
+            }
           ]
         }
       ],

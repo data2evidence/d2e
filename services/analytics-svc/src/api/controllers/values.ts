@@ -16,7 +16,7 @@ export function values(req: IMRIRequest, res, next) {
         next();
     }
 
-    const { vocabConnection } = req.dbConnections;
+    const { analyticsConnection } = req.dbConnections;
     const user = getUser(req);
     const language = user.lang;
     const attributePath = req.swagger.params.attributePath.value;
@@ -33,14 +33,14 @@ export function values(req: IMRIRequest, res, next) {
             (o) => o.id === selectedStudyEntityValue
         );
         if (studyMetadata && studyMetadata.vocabSchemaName) {
-            vocabConnection.schemaName = studyMetadata.vocabSchemaName;
+            analyticsConnection.schemaName = studyMetadata.vocabSchemaName;
         } else {
             throw new Error(`Vocab schema undefined for Dataset ${selectedStudyEntityValue}`)
         }
     }
     
 
-    vocabConnection.setCurrentUserToDbSession(
+    analyticsConnection.setCurrentUserToDbSession(
         user.getUser(),
         async (err, data) => {
             if (err) {
@@ -74,7 +74,7 @@ export function values(req: IMRIRequest, res, next) {
                             selectedStudyEntityValue,
                         },
                     },
-                    vocabConnection,
+                    analyticsConnection,
                     _sendResult
                 );
             } catch (err) {
