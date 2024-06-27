@@ -49,7 +49,7 @@
     "tsc": "ts-node internal/build/buildservices.ts build --only-tsc",
     "inittestdb": "node internal/build/initdb.js test",
     "removetestdb": "node internal/build/initdb.js rmonly",
-
+    "start:data-load": "yarn local:minerva --profile data-load up --wait",
     "internal": "npm run-script --prefix internal"
   },
   "devDependencies": {

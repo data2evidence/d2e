@@ -89,17 +89,20 @@ yarn create-postgres-cdm-schemas alpdev_pg cdmdefault cdmvocab
 ```
 - where `cdmdefault` is the default cdm schema name
 - Wait ~2 minutes
-- Run the following commands seed postgres cdm schemas with synpuf-1k
 
-```
-yarn start:data-load alp-dataflow-gen-data-load-agent --wait
+# Load data to `cdmdefault`
+
+- Run the following commands to seed postgres cdm schemas with synpuf-1k
+```bash
+yarn start:data-load
   
 docker stop alp-dataflow-gen-agent-1
 
-docker exec -it alp-dataflow-gen-data-load-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options='{"files":[{"name": "Location","path": "/tmp/data/002_LOCATION.csv", "truncate": "True", "table_name": "location"}],"schema_name":"cdmdefault","header":"true","delimiter":",","database_code": "alpdev_pg", "chunksize": "50000", "encoding": "utf_8"}'
-
+docker exec -it alp-dataflow-gen-data-load-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options='{"files":[{"name": "Location","path": "/tmp/data/002_LOCATION.csv", "truncate": "True", "table_name": "location"},{"name": "CARE_SITE","path": "/tmp/data/003_CARE_SITE.csv", "truncate": "True", "table_name": "care_site"},{"name": "Provider","path": "/tmp/data/004_PROVIDER.csv", "truncate": "True", "table_name": "provider"},{"name": "Cost","path": "/tmp/data/005_COST.csv", "truncate": "True", "table_name": "cost"},{"name": "Person","path": "/tmp/data/006_PERSON.csv", "truncate": "True", "table_name": "person"},{"name": "Death","path": "/tmp/data/007_DEATH.csv", "truncate": "True", "table_name": "death"},{"name": "Condition_Occirence","path": "/tmp/data/008_CONDITION_OCCURRENCE.csv", "truncate": "True", "table_name": "condition_occurrence"},{"name": "Condition_Era","path": "/tmp/data/009_CONDITION_ERA.csv", "truncate": "True", "table_name": "condition_era"},{"name": "Device_Exposure","path": "/tmp/data/010_DEVICE_EXPOSURE.csv", "truncate": "True", "table_name": "device_exposure"},{"name": "Drug_Exposure","path": "/tmp/data/011_DRUG_EXPOSURE.csv", "truncate": "True", "table_name": "drug_exposure"},{"name": "Drug_Era","path": "/tmp/data/012_DRUG_ERA.csv", "truncate": "True", "table_name": "drug_era"},{"name": "Measurement","path": "/tmp/data/013_MEASUREMENT.csv", "truncate": "True", "table_name": "measurement"},{"name": "Observation","path": "/tmp/data/014_OBSERVATION.csv", "truncate": "True", "table_name": "observation"},{"name": "Observation_Period","path": "/tmp/data/015_OBSERVATION_PERIOD.csv", "truncate": "True", "table_name": "observation_period"},{"name": "Payer_Plan_Period","path": "/tmp/data/016_PAYER_PLAN_PERIOD.csv", "truncate": "True", "table_name": "payer_plan_period"},{"name": "Procedure_Occurrence","path": "/tmp/data/017_PROCEDURE_OCCURRENCE.csv", "truncate": "True", "table_name": "procedure_occurrence"},{"name": "Visit_Occurrence","path": "/tmp/data/018_VISIT_OCCURRENCE.csv", "truncate": "True", "table_name": "visit_occurrence"}],"schema_name":"cdmdefault","header":"true","delimiter":",","database_code": "alpdev_pg", "chunksize": "50000", "encoding": "utf_8"}'
+```
+- Docker container logs can be checked with the bash command `docker logs --tail 100 alp-dataflow-gen-data-load-agent-1`
 - Once the flow is completed, the container logs the message "Finished in state Completed()". After which run the following commands to stop the data-load agent and start dataflow-gen-agent
-  
+```bash
 docker stop alp-dataflow-gen-data-load-agent-1
 docker start alp-dataflow-gen-agent-1
 ```
@@ -142,12 +145,8 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
 - To check job logs, open https://localhost:41100/portal/systemadmin/jobs & select **View** in Logs column
 
 ## Repeat seed
-- Before repeat seed suggest truncate existing tables with the following command:
-```
-docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "truncate cdmdefault.CARE_SITE, cdmdefault.CONDITION_ERA, cdmdefault.CONDITION_OCCURRENCE, cdmdefault.COST, cdmdefault.DEATH, cdmdefault.DEVICE_EXPOSURE, cdmdefault.DRUG_ERA, cdmdefault.DRUG_EXPOSURE, cdmdefault.LOCATION, cdmdefault.MEASUREMENT, cdmdefault.OBSERVATION, cdmdefault.OBSERVATION_PERIOD, cdmdefault.PAYER_PLAN_PERIOD, cdmdefault.PERSON, cdmdefault.PROCEDURE_OCCURRENCE, cdmdefault.PROVIDER, cdmdefault.VISIT_OCCURRENCE;"
-```
-- Expected output
-> TRUNCATE TABLE
+- To repeat, run "Load data to cdmdefault" commands in the sequence given
+
 
 see: 
 - [load-synpuf1k](../knowledgebase/dbcreds/missing-db-creds.md)
