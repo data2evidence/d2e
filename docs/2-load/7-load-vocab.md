@@ -53,7 +53,6 @@ wc -l *.csv | sort
 - This transformation is done in case there is a literal string character e.g. `\t` or `\n` in the value.
 - Enclosing the values in double quotes would prevent interpretation as a tab or newline.
 - Move files to a folder named `transformed`
-- copy transformed CSVs to container
 ```bash
 mkdir -p transformed
 for CSV_FILE in *.csv; do 
@@ -62,23 +61,24 @@ for CSV_FILE in *.csv; do
       CSV_FILE2=./transformed/$CSV_FILE
       sed "s/\"/\"\"/g;s/\t/\"\t\"/g;s/\(.*\)/\"\1\"/" $CSV_FILE > $CSV_FILE2; 
       wc -l $CSV_FILE2
-      docker cp $CSV_FILE2 alp-minerva-postgres-1:/
 done
 ```
-
 ## Load data to cdmvocab
-- Run the following commands to load tables
-```bash
-for CSV_FILE in ./transformed/*.csv; do
-	TABLE_NAME=$(echo $CSV_FILE | sed -e 's/\.\/transformed\///'); 
-	echo . load $TABLE_NAME ...; 
-	if [ "$TABLE_NAME" = "DRUG_STRENGTH.csv" ]; then
-		docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "\\copy cdmvocab.$(echo $TABLE_NAME | sed -e 's/.csv//') FROM '/${TABLE_NAME}' WITH (FORMAT CSV, HEADER, DELIMITER E'\t', FORCE_NULL (amount_value, amount_unit_concept_id, denominator_value, box_size, numerator_value, numerator_unit_concept_id, denominator_unit_concept_id), ENCODING 'UTF8', QUOTE '\"', ESCAPE E'\\\\');" 
-	else
-		docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "\\copy cdmvocab.$(echo $TABLE_NAME | sed -e 's/.csv//') FROM '/${TABLE_NAME}' WITH (FORMAT CSV, HEADER, DELIMITER E'\t', ENCODING 'UTF8', QUOTE '\"', ESCAPE E'\\\\');"
-	fi
-done
-```
+
+- Run the following command in terminal to stop an alp docker container and start another container to load data
+  ```bash
+  yarn start:data-load
+  
+  docker stop alp-dataflow-gen-agent-1
+
+  docker exec -it alp-dataflow-gen-data-load-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options='{"files":[{"name": "CONCEPT_ANCESTOR","path": "/tmp/data/CONCEPT_ANCESTOR.csv", "truncate": "True", "table_name": "concept_ancestor"},{"name": "CONCEPT_CLASS","path": "/tmp/data/CONCEPT_CLASS.csv", "truncate": "True", "table_name": "concept_class"},{"name": "CONCEPT_RELATIONSHIP","path": "/tmp/data/CONCEPT_RELATIONSHIP.csv", "truncate": "True", "table_name": "concept_relationship"},{"name": "CONCEPT_SYNONYM","path": "/tmp/data/CONCEPT_SYNONYM.csv", "truncate": "True", "table_name": "concept_synonym"},{"name": "CONCEPT","path": "/tmp/data/CONCEPT.csv", "truncate": "True", "table_name": "concept"},{"name": "DOMAIN","path": "/tmp/data/DOMAIN.csv", "truncate": "True", "table_name": "domain"},{"name": "DRUG_STRENGTH","path": "/tmp/data/DRUG_STRENGTH.csv", "truncate": "True", "table_name": "drug_strength"},{"name": "RELATIONSHIP","path": "/tmp/data/RELATIONSHIP.csv", "truncate": "True", "table_name": "relationship"},{"name": "VOCABULARY","path": "/tmp/data/VOCABULARY.csv", "truncate": "True", "table_name": "vocabulary"}],"schema_name":"cdmvocab","header":"true","delimiter":"\t","database_code": "alpdev_pg", "chunksize": "50000", "encoding": "utf_8"}'
+
+- Once the flow is completed, the container logs the message "Finished in state Completed()". After which run the following commands to stop the data-load agent and start dataflow-gen-agent
+  
+  docker stop alp-dataflow-gen-data-load-agent-1
+  docker start alp-dataflow-gen-agent-1
+  ```
+  
 - note: expected output is 
 > COPY ${LINE_COUNT}
 
@@ -106,9 +106,4 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
 
 # Troubleshooting
 ## Repeat load
-- Before repeat load suggest truncate existing tables with the following command:
-```
-docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "truncate cdmvocab.concept, cdmvocab.concept_ancestor, cdmvocab.concept_class, cdmvocab.concept_relationship, cdmvocab.concept_synonym, cdmvocab.domain, cdmvocab.drug_strength, cdmvocab.relationship, cdmvocab.vocabulary;"
-```
-- Expected output
-> TRUNCATE TABLE
+- To repeat, run "Load data to cdmvocab" commands in the sequence given
