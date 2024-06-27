@@ -67,7 +67,7 @@ done
 
 - Run the following command in terminal to stop an alp docker container and start another container to load data
   ```bash
-  yarn start:data-load alp-dataflow-gen-data-load-agent --wait
+  yarn start:data-load
   
   docker stop alp-dataflow-gen-agent-1
 
