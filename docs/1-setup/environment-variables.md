@@ -1,4 +1,20 @@
 # Environment Variables
+
+## Manual Copy of Logto Apps Env
+
+Look for the Logto App Client IDs & Secrets at the bottom of the logs and <b>copy them over to the</b> `.env.local` file thats printed in logs in the following format below
+```
+********************** COPY OVER ENV ASSIGNMENTS FOR LOGTO IN .env.local ***********************
+LOGTO__ALP_SVC__CLIENT_ID=xxxxxxx
+LOGTO__ALP_SVC__CLIENT_SECRET=xxxxxxx
+LOGTO__ALP_DATA__CLIENT_ID=xxxxxxx
+LOGTO__ALP_DATA__CLIENT_SECRET=xxxxxxx
+LOGTO__ALP_APP__CLIENT_ID=xxxxxxx
+LOGTO__ALP_APP__CLIENT_SECRET=xxxxxxx
+************************************************************************************************
+```
+
+
 key | type | comment 
 --- | --- | --- 
 DB_CREDENTIALS__INTERNAL__PRIVATE_KEY | rsaPrivateKey | to encrypt dbcredentials entered in admin>setup>databases>configure
