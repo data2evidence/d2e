@@ -3,7 +3,7 @@ import sqlalchemy as sql
 from sqlalchemy.schema import CreateSchema, DropSchema
 from sqlalchemy.sql.selectable import Select
 import pandas as pd
-from typing import List
+from typing import List, Dict
 from datetime import datetime
 from utils.types import DatabaseDialects
 
@@ -54,19 +54,11 @@ class DBDao:
             connection.execute(DropSchema(self.schema_name, cascade=True))
             connection.commit()
 
-    def create_i2b2_metadata_table(self):
+    def create_table(self, table_name: str, columns: Dict):
         with self.engine.connect() as connection:
-            new_table = sql.Table("dataset_metadata",
+            new_table = sql.Table(table_name,
                                   self.metadata,
-                                  sql.Column('schema_name', sql.String),
-                                  sql.Column('created_date', sql.TIMESTAMP,
-                                             default=datetime.utcnow()),
-                                  sql.Column('updated_date', sql.TIMESTAMP,
-                                             default=datetime.utcnow()),
-                                  sql.Column('data_ingestion_date',
-                                             sql.TIMESTAMP),
-                                  sql.Column('tag', sql.String),
-                                  sql.Column('release_version', sql.String)
+                                  *(Column(name, dtype) for name, dtype in columns.items())
                                   )
             self.metadata.create_all(self.engine)
             connection.commit()
