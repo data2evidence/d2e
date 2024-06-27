@@ -342,8 +342,6 @@ services:
       - sh
       - ./startprefectserver.sh
     container_name: &c2 alp-dataflow-gen-${BASE_PORT:-1}
-    ports:
-      - 41${BASE_PORT:-1}20:41${BASE_PORT:-1}20
     depends_on:
       alp-db-credentials-mgr:
         condition: service_healthy
