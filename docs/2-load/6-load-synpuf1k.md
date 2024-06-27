@@ -82,13 +82,27 @@ wc -l *
 > - [Grant postgres_tenant_admin_user permissions](4-set-pg-permissions.md)
 > - Ensure the D2E system is up
 
-- Navigate back to root folder `d2e` and Run the following command to seed postgres cdm schemas with synpuf-1k
+- Navigate back to root folder `d2e` and Run the following command to create postgres schemas
 ```bash
 cd $GIT_BASE_DIR
 yarn create-postgres-cdm-schemas alpdev_pg cdmdefault cdmvocab
 ```
 - where `cdmdefault` is the default cdm schema name
 - Wait ~2 minutes
+- Run the following commands seed postgres cdm schemas with synpuf-1k
+
+```
+yarn start:data-load alp-dataflow-gen-data-load-agent --wait
+  
+docker stop alp-dataflow-gen-agent-1
+
+docker exec -it alp-dataflow-gen-data-load-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options='{"files":[{"name": "Location","path": "/tmp/data/002_LOCATION.csv", "truncate": "True", "table_name": "location"}],"schema_name":"cdmdefault","header":"true","delimiter":",","database_code": "alpdev_pg", "chunksize": "50000", "encoding": "utf_8"}'
+
+- Once the flow is completed, the container logs the message "Finished in state Completed()". After which run the following commands to stop the data-load agent and start dataflow-gen-agent
+  
+docker stop alp-dataflow-gen-data-load-agent-1
+docker start alp-dataflow-gen-agent-1
+```
 - Confirm data loaded with 
 ```
 docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "SELECT schemaname as table_schema,relname as table_name,n_live_tup as table_rows FROM pg_stat_user_tables where schemaname='cdmdefault' ORDER BY n_live_tup DESC limit 17;"
