@@ -1,15 +1,20 @@
 import * as logto from "./middleware/logto";
 import * as pg from "pg";
 
-async function callback(path: string, headers: object, data: object, hasResponseBody = true) {
+async function create(
+  path: string,
+  headers: object,
+  data: object,
+  hasResponseBody = true
+) {
   try {
-    console.log(`Requesting ${path}`);
+    console.log(`Request creation ${path}`);
     console.log(`${JSON.stringify(data)}`);
     const resp = await logto.post(path, headers, data);
     console.log(`Responded with ${resp.status}`);
 
     if (resp.ok) {
-      if(hasResponseBody) {
+      if (hasResponseBody) {
         let json = await resp.json();
         console.log(JSON.stringify(json));
         return json;
@@ -17,6 +22,26 @@ async function callback(path: string, headers: object, data: object, hasResponse
     } else {
       console.error("Request failed");
       console.error(resp.statusText, " ", path, " ", JSON.stringify(data));
+      return -1;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function fetchExisting(path: string, headers: object) {
+  try {
+    console.log(`Request existing ${path}`);
+    const resp = await logto.get(path, headers);
+    console.log(`Responded with ${resp.status}`);
+
+    if (resp.ok) {
+      let json = await resp.json();
+      console.log(JSON.stringify(json));
+      return json;
+    } else {
+      console.error("Request failed");
+      console.error(resp.statusText, " ", path);
       return -1;
     }
   } catch (error) {
@@ -33,19 +58,22 @@ async function queryPostgres(
 }
 
 async function main() {
-  let apps: Array<Object> = JSON.parse(process.env.LOGTO__CLIENT_APPS) || [];
+  let apps: Array<{ name: string }> =
+    JSON.parse(process.env.LOGTO__CLIENT_APPS) || [];
 
-  let resource: Object = JSON.parse(process.env.LOGTO__RESOURCE) || {
+  let resource: { name: string } = JSON.parse(process.env.LOGTO__RESOURCE) || {
     name: "alp-default",
     indicator: "https://alp-default",
     accessTokenTtl: 3600,
   };
 
-  let user: Object = JSON.parse(process.env.LOGTO__USER);
+  let user: { username: string } = JSON.parse(process.env.LOGTO__USER);
 
-  let scopes: Array<Object> = JSON.parse(process.env.LOGTO__SCOPES) || [];
+  let scopes: Array<{ name: string }> =
+    JSON.parse(process.env.LOGTO__SCOPES) || [];
 
-  let roles: Array<Object> = JSON.parse(process.env.LOGTO__ROLES) || [];
+  let roles: Array<{ name: string }> =
+    JSON.parse(process.env.LOGTO__ROLES) || [];
 
   let jwt = await logto.fetchToken();
   let accessToken: string = jwt.access_token;
@@ -53,83 +81,170 @@ async function main() {
     Authorization: `Bearer ${accessToken}`,
   };
 
+  // Create Apps
   console.log(
-    "*********************************** BEGIN REGISTER APPS **********************************************"
+    "*********************************** APPLICATIONS **********************************************"
   );
+
+  const fetchExistingApps: Array<Object> = await fetchExisting(
+    "applications",
+    headers
+  );
+  const APP_ENVS: String[] = [];
   for (const a of apps) {
-    const {id: appID, name: appName, secret: appSecret} = await callback("applications", headers, a);
+    const appExists = fetchExistingApps.find(
+      (existingApp: any) => existingApp.name === a.name
+    );
+    const {
+      id: appID,
+      name: appName,
+      secret: appSecret,
+    } = appExists || (await create("applications", headers, a));
+
     let ENV__CLIENT_ID, ENV__CLIENT_SECRET;
 
     switch (appName) {
       case "alp-app":
-        ENV__CLIENT_ID = "LOGTO__ALP_APP__CLIENT_ID"
-        ENV__CLIENT_SECRET = "LOGTO__ALP_APP__CLIENT_SECRET"
+        ENV__CLIENT_ID = "LOGTO__ALP_APP__CLIENT_ID";
+        ENV__CLIENT_SECRET = "LOGTO__ALP_APP__CLIENT_SECRET";
         break;
       case "alp-svc":
-        ENV__CLIENT_ID = "LOGTO__ALP_SVC__CLIENT_ID"
-        ENV__CLIENT_SECRET = "LOGTO__ALP_SVC__CLIENT_SECRET"
+        ENV__CLIENT_ID = "LOGTO__ALP_SVC__CLIENT_ID";
+        ENV__CLIENT_SECRET = "LOGTO__ALP_SVC__CLIENT_SECRET";
         break;
       case "alp-data":
-        ENV__CLIENT_ID = "LOGTO__ALP_DATA__CLIENT_ID"
-        ENV__CLIENT_SECRET = "LOGTO__ALP_DATA__CLIENT_SECRET"
+        ENV__CLIENT_ID = "LOGTO__ALP_DATA__CLIENT_ID";
+        ENV__CLIENT_SECRET = "LOGTO__ALP_DATA__CLIENT_SECRET";
         break;
       default:
-        throw new Error(`Unrecoginized app name ${appName}!! Please reconfigure`)
+        throw new Error(
+          `Unrecoginized app name ${appName}!! Please reconfigure`
+        );
     }
-    
-    console.log(`**********************COPY OVER ENV ASSIGNMENTS FOR ${appName} IN .env.local **********************`)
-    console.log(`${ENV__CLIENT_ID}=${appID}`)
-    console.log(`${ENV__CLIENT_SECRET}=${appSecret}`)
-    console.log(`***********************************************************************************`)
 
+    console.log(
+      `********************** COPY OVER ENV ASSIGNMENTS FOR ${appName} IN .env.local ***********************`
+    );
+    APP_ENVS.push(`${ENV__CLIENT_ID}=${appID}`,`${ENV__CLIENT_SECRET}=${appSecret}`)
+    console.log(`${ENV__CLIENT_ID}=${appID}`);
+    console.log(`${ENV__CLIENT_SECRET}=${appSecret}`);
+    console.log(
+      `******************************************************************************************\n`
+    );
   }
 
+  // Create Resource
   console.log(
-    "*********************************************************************************"
+    "*********************************** RESOURCE **********************************************"
   );
-  let { id: resourceId } = await callback("resources", headers, resource);
+  const fetchExistingResources: Array<{ name: string }> = await fetchExisting(
+    "resources",
+    headers
+  );
+  const resourceExists = fetchExistingResources.find(
+    (existingRes: any) => existingRes.name === resource.name
+  );
+  let { id: resourceId } =
+    resourceExists || (await create("resources", headers, resource));
 
   console.log(
-    "*********************************************************************************"
+    "*********************************************************************************\n"
   );
-  let logtoAdminUser = await callback("users", headers, user);
 
+  // Create Users
   console.log(
-    "*********************************************************************************"
+    "*********************************** USERS **********************************************"
+  );
+  const fetchExistingUsers: Array<{ username: string }> = await fetchExisting(
+    "users",
+    headers
+  );
+  const userExists = fetchExistingUsers.find(
+    (existingUser: any) => existingUser.username === user.username
+  );
+  let logtoAdminUser = userExists || (await create("users", headers, user));
+  console.log(
+    "*********************************************************************************\n"
+  );
+
+
+  // Create Scopes
+  console.log(
+    "*********************************** SCOPES **********************************************"
+  );
+  const fetchExistingResourceScopes: Array<Object> = await fetchExisting(
+    `resources/${resourceId}/scopes`,
+    headers
   );
   let logtoScopes: Array<LogtoScope> = [];
   for (const s of scopes) {
-    let logtoScope = await callback(
-      `resources/${resourceId}/scopes`,
-      headers,
-      s
+    const resourceScopeExists = fetchExistingResourceScopes.find(
+      (existingResourceScope: any) => existingResourceScope.name === s.name
     );
+    let logtoScope =
+      resourceScopeExists ||
+      (await create(`resources/${resourceId}/scopes`, headers, s));
     logtoScopes.push(logtoScope);
   }
-
   console.log(
-    "*********************************************************************************"
+    "*********************************************************************************\n"
+  );
+
+  // Create Roles
+  console.log(
+    "*********************************** ROLES **********************************************"
+  );
+  const fetchExistingRoles: Array<Object> = await fetchExisting(
+    "roles",
+    headers
   );
   let logtoRoles: Array<LogtoScope> = [];
   for (const r of roles) {
-    let logtoRole = await callback("roles", headers, r);
+    const roleExists = fetchExistingRoles.find(
+      (existingRole: any) => existingRole.name === r.name
+    );
+    let logtoRole = roleExists || (await create("roles", headers, r));
     logtoRoles.push(logtoRole);
   }
-
   console.log(
-    "*********************************************************************************"
+    "*********************************************************************************\n"
   );
-  let roleScopes: Array<{ roleId: string; scopeId: string }> = logtoRoles.map(
-    (r, indx) => ({ roleId: r.id, scopeId: logtoScopes[indx]["id"] })
+
+  // Create Roles-scopes
+  console.log(
+    "*********************************** ROLES-SCOPES **********************************************"
   );
+  let roleScopes: Array<{
+    roleId: string;
+    scopeId: string;
+    scopeName: string;
+  }> = logtoRoles.map((r, indx) => ({
+    roleId: r.id,
+    scopeId: logtoScopes[indx]["id"],
+    scopeName: logtoScopes[indx]["name"],
+  }));
+
   for (const rs of roleScopes) {
-    await callback(`roles/${rs.roleId}/scopes`, headers, {
-      scopeIds: [rs.scopeId],
-    });
-  }
+    const fetchExistingRoleScopes: Array<Object> = await fetchExisting(
+      `roles/${rs.roleId}/scopes`,
+      headers
+    );
+    const scopeExists = fetchExistingRoleScopes.find(
+      (existingScope: any) => existingScope.name === rs.scopeName
+    );
 
+    scopeExists ||
+      (await create(`roles/${rs.roleId}/scopes`, headers, {
+        scopeIds: [rs.scopeId],
+      }));
+  }
   console.log(
-    "*********************************************************************************"
+    "*********************************************************************************\n"
+  );
+
+  // Create User-roles
+  console.log(
+    "*********************************** USER-ROLES **********************************************"
   );
   let userRoles: Array<{ userId: string; roleIds: Array<string> }> = [
     {
@@ -138,14 +253,34 @@ async function main() {
     },
   ];
   for (const ur of userRoles) {
-    await callback(`users/${ur.userId}/roles`, headers, {
-      roleIds: ur.roleIds,
-    }, false);
-  }
+    const fetchExistingUserRoles: Array<Object> = await fetchExisting(
+      `users/${ur.userId}/roles`,
+      headers
+    );
 
+    const missingRoleIDs = [];
+
+    for (const roleId of ur.roleIds) {
+      const userRoleExist = fetchExistingUserRoles.find(
+        (existingRole: any) => existingRole.id === roleId
+      );
+      if (!userRoleExist) missingRoleIDs.push(roleId);
+    }
+
+    missingRoleIDs.length && await create(
+      `users/${ur.userId}/roles`,
+      headers,
+      {
+        roleIds: missingRoleIDs,
+      },
+      false
+    );
+  }
   console.log(
-    "*********************************************************************************"
+    "*********************************************************************************\n"
   );
+
+  // Create Sign-in Experiences
   let signinExperience = {
     branding: {
       favicon: "https://localhost:41100/portal/assets/favicon.ico",
@@ -217,6 +352,10 @@ async function main() {
     client.end();
 
     console.log(
+      "*********************************** SUMMARY **********************************\n"
+    );
+
+    console.log(
       `Applications created: ${
         appRows.rowCount
       } \n Applications creation successful: ${appRows.rowCount == apps.length}`
@@ -252,9 +391,18 @@ async function main() {
       `Users-Roles created: ${
         userRoleRows.rowCount
       } \n UserRoles creation successful: ${
-        userRoleRows.rowCount == (userRoles.length * logtoRoles.length)
+        userRoleRows.rowCount == userRoles.length * logtoRoles.length
       }`
     );
+
+    console.log(
+      `\n********************** COPY OVER ENV ASSIGNMENTS FOR LOGTO IN .env.local ***********************`
+    );
+    console.log(APP_ENVS.join("\n"))
+    console.log(
+      `****************************************************************************\n`
+    );
+
   }, 3000);
 }
 
@@ -309,7 +457,7 @@ async function seeding_alp_admin() {
   );
 
   console.log(
-    "*********************************************************************************"
+    "*********************************************************************************\n"
   );
   console.log(`Inserting ${alpAdminRole.name} role to roles table`);
   await queryPostgres(
@@ -346,7 +494,7 @@ async function seeding_alp_admin() {
   );
 
   console.log(
-    "*********************************************************************************"
+    "*********************************************************************************\n"
   );
   console.log(`Adding scope "management-api-all" to role ${alpAdminRole.name}`);
   await queryPostgres(
