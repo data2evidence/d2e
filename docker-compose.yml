@@ -612,8 +612,9 @@ services:
         priority: 20
       data:
         priority: 10
-    ports:
-      - 3002:3002
+    # Enable if need to access admin console
+    # ports:
+    #   - 3002:3002
     entrypoint:
       - sh
       - -c
@@ -621,7 +622,7 @@ services:
     environment:
       <<:
         - *x-tls
-      ADMIN_DISABLE_LOCALHOST: ${LOGTO__DISABLE_ADMIN_CONSOLE:-true}
+      ADMIN_DISABLE_LOCALHOST: ${LOGTO__DISABLE_ADMIN_CONSOLE:-false}
       ADMIN_ENDPOINT: http://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-localhost}:3002
       DB_URL: postgres://postgres:${PG_SUPER_PASSWORD}@alp-minerva-postgres-1:${PG_PORT:-5432}/logto
       ENDPOINT: https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
