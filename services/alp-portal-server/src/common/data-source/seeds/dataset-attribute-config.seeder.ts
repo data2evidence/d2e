@@ -79,6 +79,15 @@ export default class DatasetAttributeConfigSeeder implements Seeder {
         modifiedBy: 'system'
       },
       {
+        id: 'data_ingestion_date',
+        name: 'Data Ingestion Date',
+        category: ATTRIBUTE_CONFIG_CATEGORIES.DATASET,
+        dataType: ATTRIBUTE_CONFIG_DATA_TYPES.TIMESTAMP,
+        isDisplayed: true,
+        createdBy: 'system',
+        modifiedBy: 'system'
+      },
+      {
         id: 'metadata_last_fetch_date',
         name: 'Metadata Last Fetched Date',
         category: ATTRIBUTE_CONFIG_CATEGORIES.DATASET,
