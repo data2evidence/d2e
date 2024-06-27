@@ -1177,29 +1177,32 @@ class StrategusNode(Node):
                     # rSpec = rStrategus.addModuleSpecifications(rSpec, moduleSpecResults[0])
                 print(rSpec.r_repr())
 
-                databaseConnectorJarFolder = '/app/inst/drivers'
-                os.environ['DATABASECONNECTOR_JAR_FOLDER'] = databaseConnectorJarFolder
-                db_credentials = extract_db_credentials('alpdev_pg')
-                rDatabaseConnector = importr('DatabaseConnector')
-                rConnectionDetails = rDatabaseConnector.createConnectionDetails(
-                    dbms='postgresql', 
-                    connectionString=f'jdbc:{db_credentials["dialect"]}://{db_credentials["host"]}:{db_credentials["port"]}/{db_credentials["databaseName"]}',
-                    user=db_credentials["adminUser"],
-                    password=db_credentials["adminPassword"]
-                )
-                rStrategus.storeConnectionDetails(
-                    connectionDetails = rConnectionDetails,
-                    connectionDetailsReference = "alpdev_pg"
-                )
-                rExecutionSettings = rStrategus.createCdmExecutionSettings(
-                    connectionDetailsReference = "alpdev_pg",
-                    workDatabaseSchema = "cdmdefault",
-                    cdmDatabaseSchema = "cdmdefault",
-                    workFolder = '/tmp/work_folder',
-                    resultsFolder = '/tmp/results_folder'
-                )
+                # TODO: internal-656
+                # databaseConnectorJarFolder = '/app/inst/drivers'
+                # os.environ['DATABASECONNECTOR_JAR_FOLDER'] = databaseConnectorJarFolder
+                # os.environ['STRATEGUS_KEYRING_PASSWORD']='Toor1234'
+                # db_credentials = extract_db_credentials('alpdev_pg')
+                # rDatabaseConnector = importr('DatabaseConnector')
+                # rConnectionDetails = rDatabaseConnector.createConnectionDetails(
+                #     dbms='postgresql', 
+                #     connectionString=f'jdbc:{db_credentials["dialect"]}://{db_credentials["host"]}:{db_credentials["port"]}/{db_credentials["databaseName"]}',
+                #     user=db_credentials["adminUser"],
+                #     password=db_credentials["adminPassword"],
+                #     pathToDriver = '/app/inst/drivers'
+                # )
+                # rStrategus.storeConnectionDetails(
+                #     connectionDetails = rConnectionDetails,
+                #     connectionDetailsReference = "alpdev_pg"
+                # )
+                # rExecutionSettings = rStrategus.createCdmExecutionSettings(
+                #     connectionDetailsReference = "alpdev_pg",
+                #     workDatabaseSchema = "cdmdefault",
+                #     cdmDatabaseSchema = "cdmdefault",
+                #     workFolder = '/tmp/work_folder',
+                #     resultsFolder = '/tmp/results_folder'
+                # )
 
-                rStrategus.execute(analysisSpecifications = rSpec, executionSettings = rExecutionSettings)
+                # rStrategus.execute(analysisSpecifications = rSpec, executionSettings = rExecutionSettings)
                 return Result(False, rSpec, self, task_run_context)
             except Exception as e:
                 return Result(True, tb.format_exc(), self, task_run_context)
