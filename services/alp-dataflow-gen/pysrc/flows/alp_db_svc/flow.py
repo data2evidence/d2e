@@ -108,8 +108,6 @@ def create_snapshot_flow(options: CreateSnapshotType):
         flow_action_type = options.flow_action_type
         db_dialect = get_db_dialect(options)
 
-        print(f"options in create_snapshot_flow is {options}")
-
         match flow_action_type:
             case DATAMART_FLOW_ACTIONS.CREATE_SNAPSHOT:
                 create_datamart_options = _parse_create_datamart_options(
