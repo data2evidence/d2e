@@ -338,8 +338,13 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
-    path: `^/system-portal/dataset/dashboard/${UUID}$`,
+    path: `^/system-portal/dataset/dashboard/(.*)`,
     scopes: ['portal.dataset.read'],
+    httpMethods: ['GET']
+  },
+  {
+    path: `^/system-portal/dataset/dashboards/list$`,
+    scopes: ['portal.dataset.update'],
     httpMethods: ['GET']
   },
   {
