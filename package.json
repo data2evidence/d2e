@@ -23,7 +23,7 @@
     "start:nest-dev:minerva": "yarn build:nest-dev:minerva && ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc --wait --force-recreate --no-deps",
     "start:nest-prod:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc --wait --force-recreate --no-deps",
 
-    "start:logto": "yarn local:minerva up alp-caddy alp-logto alp-minerva-postgres alp-logto-post-init --renew-anon-volumes",
+    "init:logto": "yarn local:minerva up alp-minerva-postgres alp-logto --wait && yarn local:minerva up alp-logto-post-init",
     
     "build:minerva": "yarn local:minerva build --build-arg GIT_COMMIT_ARG=$(git rev-parse HEAD)",
     "build:nest-dev:minerva": "ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn build:minerva alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc",
@@ -49,7 +49,7 @@
     "tsc": "ts-node internal/build/buildservices.ts build --only-tsc",
     "inittestdb": "node internal/build/initdb.js test",
     "removetestdb": "node internal/build/initdb.js rmonly",
-    "start:data-load": "yarn local:minerva --profile data-load up",
+    "start:data-load": "yarn local:minerva --profile data-load up --wait",
     "internal": "npm run-script --prefix internal"
   },
   "devDependencies": {
