@@ -58,15 +58,15 @@ async def persist_export_to_ares(task, task_run, state, output_folder, schema_na
     result_json = {}
     is_error = state.type == StateType.FAILED
     if is_error:
-        error_message = await get_export_to_ares_execute_error_message_from_file(output_folder, schema_name)
+        error_message = get_export_to_ares_execute_error_message_from_file(output_folder, schema_name)
         logger.error(error_message)
     else:
-        result_json = await get_export_to_ares_results_from_file(output_folder, schema_name)
+        result_json = get_export_to_ares_results_from_file(output_folder, schema_name)
     await insert_to_dqd_result_table(flow_run_id=task_run.flow_run_id, result=result_json, error=is_error, error_message=error_message)
 
 
-async def get_export_to_ares_execute_error_message_from_file(outputFolder: str, schema_name):
-    ares_path = os.path.join(outputFolder, schema_name)
+def get_export_to_ares_execute_error_message_from_file(outputFolder: str, schema_name):
+    ares_path = os.path.join(outputFolder, schema_name[:25] if len(schema_name) > 25 else schema_name)
     # Get name of folder created by at {outputFolder/schema_name}
 
     cdm_release_date = os.listdir(ares_path)[0]
@@ -75,8 +75,8 @@ async def get_export_to_ares_execute_error_message_from_file(outputFolder: str, 
     return error_message
 
 
-async def get_export_to_ares_results_from_file(outputFolder: str, schema_name):
-    ares_path = os.path.join(outputFolder, schema_name)
+def get_export_to_ares_results_from_file(outputFolder: str, schema_name):
+    ares_path = os.path.join(outputFolder, schema_name[:25] if len(schema_name) > 25 else schema_name)
     # Get name of folder created by at {outputFolder/schema_name}
 
     cdm_release_date = os.listdir(ares_path)[0]

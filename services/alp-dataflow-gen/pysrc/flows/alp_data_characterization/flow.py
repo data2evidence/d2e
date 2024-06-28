@@ -143,13 +143,6 @@ def execute_data_characterization_flow(options: dcOptionsType):
     flow_run_id = str(flow_run_context.get("id"))
     outputFolder = f'/output/{flow_run_id}'
 
-    foldersToCreate = f"{outputFolder}/{schemaName}"
-    logger.debug(f"Output directory to be created {foldersToCreate}")
-
-    # Prepare directories for the run
-    os.makedirs(
-        f"{foldersToCreate}", 0o777, True)
-
     create_data_characterization_schema(
         databaseCode,
         resultsSchema,
