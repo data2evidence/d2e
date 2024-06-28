@@ -141,7 +141,7 @@ class DBDao:
         return table_names
 
     def __get_datamart_select_statement(self, datamart_table_config, columns_to_be_copied: List[str], date_filter: str = "", patients_to_be_copied: List[str] = []) -> Select:
-        table_name = datamart_table_config['tableName'].casefold()
+        table_name = self._casefold(datamart_table_config['tableName'])
         timestamp_column = datamart_table_config['timestamp_column'].casefold()
         personId_column = datamart_table_config['personId_column'].casefold()
 
@@ -157,7 +157,7 @@ class DBDao:
                 filter(self._system_columns, columns_to_be_copied))
 
             select_stmt = sql.select(
-                *map(lambda x: getattr(source_table.c, x.casefold()), columns_to_be_copied))
+                *map(lambda x: getattr(source_table.c, self._casefold(x)), columns_to_be_copied))
 
             # Filter by patients if patients_to_be_copied is provided
             if len(patients_to_be_copied) > 0 and personId_column:
@@ -171,14 +171,14 @@ class DBDao:
 
         return select_stmt
 
-    def _casefold(self, column_name: str) -> str:
-        if not column_name.startswith("GDM."):
-            return column_name.casefold()
+    def _casefold(self, obj_name: str) -> str:
+        if not obj_name.startswith("GDM."):
+            return obj_name.casefold()
         else:
-            return column_name
+            return obj_name
 
     def datamart_copy_table(self, datamart_table_config, target_schema: str, columns_to_be_copied: List[str], date_filter: str = "", patients_to_be_copied: List[str] = []) -> int:
-        table_name = datamart_table_config['tableName'].casefold()
+        table_name = self._casefold(datamart_table_config['tableName'])
 
         with self.engine.connect() as connection:
             target_table = sql.Table(table_name, sql.MetaData(
