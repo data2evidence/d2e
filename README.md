@@ -18,6 +18,11 @@ docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 ```bash
 yarn gen:dotenv
 ```
+#### Initalize Logto Apps
+```bash
+yarn init:logto
+```
+- Copy [Logto Envs ](docs/1-setup/environment-variables.md#manual-copy-of-logto-apps-env)
 
 ## Build
 - Standard build

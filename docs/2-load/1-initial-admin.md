@@ -1,12 +1,5 @@
 # Login as Initial Admin
 
-## Confirm /etc/hosts
-- See: [install docker-compose](../1-setup/README.md#docker-compose)
-- Confirm `127.0.0.1 host.docker.internal` is present in `/etc/hosts` with the following command
-```
-cat /etc/hosts
-```
-
 ## Open Portal
 - Open https://localhost:41100/portal
 - A message indicating `Your connection is not private` is expected due to the self-signed certificate

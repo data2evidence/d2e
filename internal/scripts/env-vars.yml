@@ -27,19 +27,28 @@ DOCKER_TAG_NAME:
   comment: default tag
   type: string
 LOGTO_API_M2M_CLIENT_ID:
-  comment: logto static secrets matching deploy/logto/seed.sql - randomize with API later
+  comment: logto static secrets
   type: password
 LOGTO_API_M2M_CLIENT_SECRET:
-  comment: logto static secrets matching deploy/logto/seed.sql - randomize with API later
+  comment: logto static secrets
   type: password
-LOGTO__ALP_ADMIN__CLIENT_SECRET:
-  comment: logto static secrets matching deploy/logto/seed.sql - randomize with API later
-  type: password
+LOGTO__ALP_APP__CLIENT_ID:
+  comment: generated with logto APIs post init
+  type: string
 LOGTO__ALP_APP__CLIENT_SECRET:
-  comment: logto static secrets matching deploy/logto/seed.sql - randomize with API later
+  comment: generated with logto APIs post init
   type: password
+LOGTO__ALP_SVC__CLIENT_ID:
+  comment: generated with logto APIs post init
+  type: string
 LOGTO__ALP_SVC__CLIENT_SECRET:
-  comment: logto static secrets matching deploy/logto/seed.sql - randomize with API later
+  comment: generated with logto APIs post init
+  type: password
+LOGTO__ALP_DATA__CLIENT_ID:
+  comment: generated with logto APIs post init
+  type: string
+LOGTO__ALP_DATA__CLIENT_SECRET:
+  comment: generated with logto APIs post init
   type: password
 MEILI_MASTER_KEY:
   comment: meilisearch master key
