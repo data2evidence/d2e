@@ -31,7 +31,9 @@ export const env = {
   DB_CREDENTIALS_PUBLIC_KEYS: process.env.DB_CREDENTIALS__PUBLIC_KEYS,
   SERVICE_ROUTES: process.env.SERVICE_ROUTES || '{}',
   MEILI_MASTER_KEY: process.env.MEILI_MASTER_KEY,
-  APP_LOCALE: process.env.APP_LOCALE
+  APP_LOCALE: process.env.APP_LOCALE,
+  FHIR_CLIENT_ID: process.env.FHIR_CLIENT_ID,
+  FHIR_CLIENT_SECRET: process.env.FHIR_CLIENT_SECRET
 }
 
 export const services = JSON.parse(env.SERVICE_ROUTES)
