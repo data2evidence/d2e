@@ -264,7 +264,8 @@ x-envs:
        "sqlEditor" : "http://alp-minerva-sqleditor:8888",
        "appRouter": "https://alp-mercury-approuter:41000",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
-       "minio": ""
+       "minio": "",
+       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:8103"
       }
   tls: &x-tls
     TLS__INTERNAL__CA_CRT: ${TLS__INTERNAL__CA_CRT}
@@ -587,6 +588,29 @@ services:
   #   networks:
   #     - alp
 
+  alp-fhir-post-init:
+    container_name: &c7 alp-minerva-fhir-server-post-init
+    depends_on:
+      alp-minerva-postgres:
+        condition: service_healthy
+      alp-fhir-server:
+        condition: service_started
+    image: postgres:15-alpine
+    logging:
+      options:
+        tag: *c7
+    networks:
+      alp:
+        priority: 20
+    volumes:
+      - ./deploy/alp-fhir:/alp-fhir
+    entrypoint: sh alp-fhir/seed.sh
+    environment:
+      <<:
+        - *x-pg
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+
   alp-logto:
     container_name: &c8 alp-logto-${BASE_PORT:-1}
     depends_on:
@@ -879,6 +903,8 @@ services:
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
+      FHIR_CLIENT_ID: db6b2304-f236-45ec-b10c-a852681e7129
+      FHIR_CLIENT_SECRET: d64bff124d11f1e2a852b1076bacd081fefffa82e2db2711509b88a3397c2f3d
 
   alp-minerva-meilisearch-svc:
     container_name: &c13 alp-minerva-meilisearch-svc-${BASE_PORT:-1}

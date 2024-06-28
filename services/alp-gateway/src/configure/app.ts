@@ -4,7 +4,6 @@ import expressSession from 'express-session'
 import methodOverride from 'method-override'
 import morgan from 'morgan'
 import cors from 'cors'
-import { VersionCheckMiddleware } from '../middlewares/VersionCheckMiddleware'
 import { createAuthc } from '../authentication'
 import { env } from '../env'
 import { configureStandalone } from './standalone'
@@ -48,9 +47,6 @@ const corsOptions = {
   }
 }
 app.use(cors(corsOptions))
-if (env.APP_DEPLOY_MODE !== 'standalone') {
-  app.use(VersionCheckMiddleware)
-}
 
 configureStandalone(app)
 
