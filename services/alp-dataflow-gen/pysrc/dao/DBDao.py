@@ -58,7 +58,7 @@ class DBDao:
         with self.engine.connect() as connection:
             new_table = sql.Table(table_name,
                                   self.metadata,
-                                  *(Column(name, dtype) for name, dtype in columns.items())
+                                  *(sql.Column(name, dtype) for name, dtype in columns.items())
                                   )
             self.metadata.create_all(self.engine)
             connection.commit()
