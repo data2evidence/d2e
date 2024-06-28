@@ -1,5 +1,6 @@
 interface LogtoScope {
   id: string;
+  name: string;
 }
 
 interface LogtoRole {
