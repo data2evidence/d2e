@@ -7,7 +7,7 @@ export class DatasetDashboard extends Audit {
   @PrimaryColumn({ type: 'uuid' })
   id: string
 
-  @Column()
+  @Column({ unique: true })
   name: string
 
   @Column()
