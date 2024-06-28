@@ -17,7 +17,8 @@ def _parse_snapshot_copy_config(snapshotCopyConfig: SnapshotCopyConfig | None) -
         patients_to_be_copied = []
     else:
         date_filter = "" if snapshotCopyConfig.timestamp is None else snapshotCopyConfig.timestamp
-        table_config = [] if snapshotCopyConfig.tableConfig is None else snapshotCopyConfig.tableConfig
+        table_config = [] if snapshotCopyConfig.tableConfig is None else [
+            table.dict() for table in snapshotCopyConfig.tableConfig]
         patients_to_be_copied = [
         ] if snapshotCopyConfig.patientsToBeCopied is None else snapshotCopyConfig.patientsToBeCopied
 
