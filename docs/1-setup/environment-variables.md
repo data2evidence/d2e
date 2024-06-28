@@ -2,7 +2,7 @@
 
 ## Manual Copy of Logto Apps Env
 
-Look for the Logto App Client IDs & Secrets at the bottom of the logs and <b>copy them over / Replace values with `<TO_BE_REPLACED>` placeholder in the</b> `.env.local` file thats printed in logs in the following format below
+Look for the Logto App Client IDs & Secrets at the bottom of the logs and <b>copy them over / Replace values with `<TO_BE_MANUALLY_REPLACED>` placeholder in the</b> `.env.local` file thats printed in logs in the following format below
 ```
 ********************** COPY OVER ENV ASSIGNMENTS FOR LOGTO IN .env.local ***********************
 LOGTO__ALP_SVC__CLIENT_ID=xxxxxxx
