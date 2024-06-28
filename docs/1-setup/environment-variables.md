@@ -25,9 +25,8 @@ MEILI_MASTER_KEY | password | meilisearch master key
 MINIO__SECRET_KEY | password | meilisearch secret_key
 LOGTO_API_M2M_CLIENT_ID | string | generated with logto APIs post init
 TLS__INTERNAL__CA_CRT | PEM | generated
-LOGTO_API_M2M_CLIENT_SECRET | password | generated with logto APIs post init
-LOGTO__ALP_ADMIN__CLIENT_ID | string | generated with logto APIs post init
-LOGTO__ALP_ADMIN__CLIENT_SECRET | password | generated with logto APIs post init
+LOGTO_API_M2M_CLIENT_ID | password | logto static secrets matching deploy/logto/seed.sql - randomize with API later
+LOGTO_API_M2M_CLIENT_SECRET | password | logto static secrets matching deploy/logto/seed.sql - randomize with API later
 LOGTO__ALP_APP__CLIENT_ID | string | generated with logto APIs post init
 LOGTO__ALP_APP__CLIENT_SECRET | password | generated with logto APIs post init
 LOGTO__ALP_SVC__CLIENT_ID | string | generated with logto APIs post init
@@ -37,5 +36,5 @@ PG_SUPER_PASSWORD | password | all permissions
 PG_WRITE_PASSWORD | password | write permissions only
 POSTGRES_TENANT_ADMIN_PASSWORD | password | set in admin>setup>databases>configure but not in env.example
 POSTGRES_TENANT_READ_PASSWORD | password | set in admin>setup>databases>configure but not in env.example
-
-
+REDIS_PASSWORD | password | all permissions
+DICOM__HEALTH_CHECK_PASSWORD | password | static secret to be generated later
