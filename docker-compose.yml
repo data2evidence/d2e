@@ -1541,7 +1541,10 @@ services:
       options:
         tag: *c28
     depends_on:
-      - alp-fhir-server
+      alp-fhir-server:
+        condition: service_started
+      alp-fhir-post-init:
+        condition: service_completed_successfully
     networks:
       alp:
 
