@@ -157,7 +157,7 @@ class DBDao:
                 filter(self._system_columns, columns_to_be_copied))
 
             select_stmt = sql.select(
-                *map(lambda x: getattr(source_table.c, x), columns_to_be_copied))
+                *map(lambda x: getattr(source_table.c, x.casefold()), columns_to_be_copied))
 
             # Filter by patients if patients_to_be_copied is provided
             if len(patients_to_be_copied) > 0 and personId_column:
@@ -170,6 +170,12 @@ class DBDao:
                     date_filter >= source_table.c[timestamp_column.casefold()])
 
         return select_stmt
+
+    def _casefold(self, column_name: str) -> str:
+        if not column_name.startswith("GDM."):
+            return column_name.casefold()
+        else:
+            return column_name
 
     def datamart_copy_table(self, datamart_table_config, target_schema: str, columns_to_be_copied: List[str], date_filter: str = "", patients_to_be_copied: List[str] = []) -> int:
         table_name = datamart_table_config['tableName'].casefold()
@@ -190,12 +196,23 @@ class DBDao:
             select_stmt = self.__get_datamart_select_statement(
                 datamart_table_config, columns_to_be_copied, date_filter, patients_to_be_copied)
 
+            columns_to_insert = [self._casefold(
+                col) for col in columns_to_be_copied]
+
             insert_stmt = sql.insert(target_table).from_select(
-                columns_to_be_copied, select_stmt)
+                columns_to_insert, select_stmt)
 
             res = connection.execute(insert_stmt)
             connection.commit()
-            return res.rowcount
+            db_dialect = get_db_svc_endpoint_dialect(self.database_code)
+            if db_dialect == DatabaseDialects.POSTGRES:
+                return res.rowcount
+            elif db_dialect == DatabaseDialects.HANA:
+                select_count_stmt = sql.select(
+                    sql.func.count()).select_from(target_table)
+                inserted_row_count = connection.execute(
+                    select_count_stmt).scalar()
+                return inserted_row_count
 
     def datamart_get_copy_as_dataframe(self, datamart_table_config, columns_to_be_copied: List[str], date_filter: str = "", patients_to_be_copied: List[str] = []) -> pd.DataFrame:
         select_stmt = self.__get_datamart_select_statement(
