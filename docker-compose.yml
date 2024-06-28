@@ -1581,4 +1581,5 @@ services:
     extends: alp-dataflow-gen-agent
     volumes:
       - ./cache/vocab/transformed:/tmp/data
+      - ./cache/synpuf1k/:/tmp/data
     profiles: [data-load]
