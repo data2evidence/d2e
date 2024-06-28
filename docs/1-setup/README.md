@@ -28,7 +28,6 @@ sudo snap install docker
 
 #### macos
 knowledgebase articles:
-- [host.docker.internal](../knowledgebase/docker-compose/host.docker.internal.md)
 - [dns fails multiple networks](../knowledgebase/docker-compose/dns-fails-multiple-networks.md)
 - [disable virtualization framework on x86](../knowledgebase/docker-compose/virtualization-framework-x86.md)
 
