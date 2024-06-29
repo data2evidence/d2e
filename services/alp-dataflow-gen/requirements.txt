@@ -9,3 +9,4 @@ transformers>=4.34.0,<5.0.0
 torch==1.13.1
 debugpy==1.8.1
 numpy==1.26.4
+sqlalchemy-hana==2.2.0
