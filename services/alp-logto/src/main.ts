@@ -67,7 +67,7 @@ async function main() {
     accessTokenTtl: 3600,
   };
 
-  let user: { username: string } = JSON.parse(process.env.LOGTO__USER);
+  let user: { username: string; initialPassword: string } = JSON.parse(process.env.LOGTO__USER);
 
   let scopes: Array<{ name: string }> =
     JSON.parse(process.env.LOGTO__SCOPES) || [];
@@ -167,10 +167,15 @@ async function main() {
     (existingUser: any) => existingUser.username === user.username
   );
   let logtoAdminUser = userExists || (await create("users", headers, user));
+
+  if(!logtoAdminUser["lastSignInAt"])
+      await logto.patch(`users/${logtoAdminUser.id}/password`, 
+                        headers, 
+                        {"password": user["initialPassword"]})
+
   console.log(
     "*********************************************************************************\n"
   );
-
 
   // Create Scopes
   console.log(

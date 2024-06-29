@@ -11,7 +11,7 @@
 ## Login
 - Login as Admin with following credentials:
   - username - `admin`
-  - password - `Toor12345678`
+  - password - `Updatepassword12345`
 
 ## Change your password
 - Once you login, it is recommended change your password
