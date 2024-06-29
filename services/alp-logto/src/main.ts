@@ -147,6 +147,10 @@ async function main() {
   let { id: resourceId } =
     resourceExists || (await create("resources", headers, resource));
 
+  // Set the resource as the default
+  await logto.patch(`resources/${resourceId}/is-default`, headers, { "isDefault": true })
+
+
   console.log(
     "*********************************************************************************\n"
   );
