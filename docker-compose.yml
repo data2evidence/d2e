@@ -1566,11 +1566,11 @@ services:
       - curl
       - -X
       - PATCH
-      - "http://alp-minerva-meilisearch-svc-1:41${BASE_PORT:-1}11/experimental-features/"
+      - 'http://alp-minerva-meilisearch-svc-1:41${BASE_PORT:-1}11/experimental-features/'
       - -H
-      - "Content-Type: application/json"
+      - 'Content-Type: application/json'
       - -H
-      - "Authorization: Bearer ${MEILI_MASTER_KEY}"
+      - 'Authorization: Bearer ${MEILI_MASTER_KEY}'
       - --data-binary
       - '{ "vectorStore": true }'
     networks:
