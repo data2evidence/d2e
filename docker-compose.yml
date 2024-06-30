@@ -69,7 +69,7 @@ x-envs:
           "route": "cohort"
         },
         { 
-          "enabled": true,
+          "enabled": false,
           "featureFlag": "cohorts",
           "name": "Cohorts M", 
           "pluginPath": "plugins/Cohort/module",
@@ -320,7 +320,7 @@ services:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile
     container_name: &c1 alp-caddy
     hostname: alp-caddy.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image:  alpcr.azurecr.io/alp-data-node/alp-caddy:${DOCKER_TAG_NAME:-develop}
+    image: alpcr.azurecr.io/alp-data-node/alp-caddy:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c1
@@ -1526,7 +1526,11 @@ services:
       ORTHANC__AWS_S3_STORAGE__REGION: ${MINIO__REGION:-ap-southeast-1}
       ORTHANC__AUTHENTICATION_ENABLED: false
     healthcheck:
-      test: ["CMD-SHELL", "/probes/test-aliveness.py --user=healthcheck --pwd=${DICOM__HEALTH_CHECK_PASSWORD}"]
+      test:
+        [
+          "CMD-SHELL",
+          "/probes/test-aliveness.py --user=healthcheck --pwd=${DICOM__HEALTH_CHECK_PASSWORD}",
+        ]
       start_period: 10s
       interval: 20s
       retries: 20
@@ -1562,11 +1566,11 @@ services:
       - curl
       - -X
       - PATCH
-      - 'http://alp-minerva-meilisearch-svc-1:41${BASE_PORT:-1}11/experimental-features/'
+      - "http://alp-minerva-meilisearch-svc-1:41${BASE_PORT:-1}11/experimental-features/"
       - -H
-      - 'Content-Type: application/json'
+      - "Content-Type: application/json"
       - -H
-      - 'Authorization: Bearer ${MEILI_MASTER_KEY}'
+      - "Authorization: Bearer ${MEILI_MASTER_KEY}"
       - --data-binary
       - '{ "vectorStore": true }'
     networks:
