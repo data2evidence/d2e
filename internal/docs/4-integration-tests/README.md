@@ -1,8 +1,5 @@
 ## Integration tests - `analytics-svc`, `query-gen-svc` & `bookmark-svc`
-- Navigate to the root of D2E repo (i.e. the `alp-data-node` folder)
-```bash
-cd alp-data-node
-```
+- Navigate to the root of D2E repo
 - Build the required services
 ```bash
 yarn build --no-ui
