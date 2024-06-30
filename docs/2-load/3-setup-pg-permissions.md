@@ -8,8 +8,8 @@
 
 - Copy values of the following password variables from `.env.local`
 ```
-export POSTGRES_TENANT_READ_PASSWORD=xxx
-export POSTGRES_TENANT_ADMIN_PASSWORD=xxx
+POSTGRES_TENANT_READ_PASSWORD=xxx
+POSTGRES_TENANT_ADMIN_PASSWORD=xxx
 ```
 
 ## Note
