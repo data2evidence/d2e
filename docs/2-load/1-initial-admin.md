@@ -15,7 +15,7 @@
 
 ## Change your password
 - Once you login, it is recommended change your password
-- On top right hover over `Account`
-- Select `Change password`
-- Enter New password / Click `Generate`
+- On top right click `Account`
+- On left -> Select `Change password`
+- Enter Old Password & New password / Click `Generate`
 - Click `Update`

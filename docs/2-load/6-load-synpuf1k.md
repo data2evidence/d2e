@@ -79,7 +79,7 @@ wc -l *
 # Create the database `alpdev_pg` and schema `cdmdefault`
 
 **Reminder: Before running the next steps**
-> - [Grant postgres_tenant_admin_user permissions](4-set-pg-permissions.md)
+> - [Grant postgres_tenant_admin_user permissions](3-setup-pg-permissions.md)
 > - Ensure the D2E system is up
 
 - Navigate back to root folder `d2e` and Run the following command to create postgres schemas

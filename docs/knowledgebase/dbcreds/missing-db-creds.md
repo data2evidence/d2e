@@ -8,4 +8,4 @@
 ## Cause
 - Setup>Configure>Database Credentials>Extra field is incorrect or empty
 ## Action
-- Populate Setup>Configure>Database Credentials Extra field as per [setup-db-credentials](../../2-load/3-setup-db-credentials.md)
+- Populate Setup>Configure>Database Credentials Extra field as per [setup-db-credentials](../../2-load/4-setup-db-credentials.md)

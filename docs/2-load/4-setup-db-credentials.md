@@ -3,12 +3,12 @@
 ## Add database connection details & credentials
 
 - Login as the new admin user
-- Select **Admin** view in dropdown view on top left
+- Switch to **Admin Portal**
 - Select **Setup** on top right
   - URL is now https://localhost:41100/portal/systemadmin/setup
 - Select **Databases** **Configure** button
 - Select **Add database**
-- Add the values from the table/image:
+- Add the values from the table/image below based on the previous step [Postgres database and users setup](3-setup-pg-permissions.md):
 - Click **Save**
 
 name | value | note
