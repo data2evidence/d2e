@@ -1,4 +1,4 @@
-FROM alpcr.azurecr.io/alp-dataflow-gen-base:develop as dbsvc-build
+FROM alpcr.azurecr.io/alp-dataflow-gen-base:v0.3-alpha as dbsvc-build
 
 ADD https://github.com/liquibase/liquibase/releases/download/v4.5.0/liquibase-4.5.0.tar.gz .
 RUN mkdir -p ./liquibase/
