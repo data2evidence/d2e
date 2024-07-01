@@ -1,5 +1,4 @@
 ## Cohort
 - Open https://localhost:41100/portal/researcher
-- Select **Cohort** dropdown
-- Select **Cohorts Overview**
+- Select **Cohorts**
 > ![](../images/cohort/Cohort.png)

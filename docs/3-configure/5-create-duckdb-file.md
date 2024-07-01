@@ -1,6 +1,6 @@
 # Create duckdb database file
 
-After uploading duckdb-plugin in step `docs/2-load/7-load-d2e-plugins.md`
+After uploading duckdb-plugin in step `docs/2-load/5-load-d2e-plugins.md`
 
 - [D2E-Plugins/duckdb](https://github.com/alp-os/d2e-plugins/tree/main/duckdb)
 

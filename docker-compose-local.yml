@@ -270,7 +270,7 @@ services:
       PG__USER: ${PG_SUPER_USER:-postgres}
       LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine"},{"name":"alp-app","description":"alp-app","type":"Traditional","oidcClientMetadata":{"redirectUris":["https://localhost:41100/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://localhost:41100/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
       LOGTO__RESOURCE:  '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
-      LOGTO__USER: '{"username":"admin","password":"$argon2i$v=19$m=4096,t=256,p=1$gFXKgnc0tFywI7DcRVN+Tg$c0TeMUiDq6PMCLyJmR/V/sb1MV8MpMBeRy24+ZsZgeY","passwordAlgorithm":"Argon2i"}'
+      LOGTO__USER: '{"username":"admin","initialPassword":"Updatepassword12345"}'
       LOGTO__ROLES: '[{"name":"role.systemadmin","description":"ALP System admin","type":"User"},{"name":"role.useradmin","description":"ALP User admin","type":"User"},{"name":"role.tenantviewer","description":"ALP Tenant viewer","type":"User"}]'
       LOGTO__SCOPES: '[{"name":"role.systemadmin","description":"ALP System admin"},{"name":"role.useradmin","description":"ALP User admin"},{"name":"role.tenantviewer","description":"ALP Tenant viewer"}]'
       LOGTO__ADMIN_SERVER__FQDN_URL: "http://alp-logto-1:3002"

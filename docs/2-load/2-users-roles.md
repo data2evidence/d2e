@@ -3,14 +3,16 @@
 ## Users
 ### Add Primary Admin user
 - Open https://localhost:41100/portal
-- Switch to **Admin** mode
-- Select **Users**
+- Switch to **Admin Portal**
+	- On top right, Click **Account** 
+	- On middle left, Click **Switch to Admin portal**
+- On top right, Select **Users**
 - Click **Add user**
 
 > ![](../images/user/UserAdd.png)
 
 ### Edit roles
-- click **Edit roles** and **Select** the following roles.
+- On the new user row, click **Edit** and **Select** the following roles.
 
 > ![](../images/user/UserRoles.png)
 

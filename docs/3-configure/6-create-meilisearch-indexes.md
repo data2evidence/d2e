@@ -14,7 +14,7 @@ D2E requires the following tables from the OMOP concept schema to have meilisear
 
 Follow the steps below to create search indexes for the following tables mentioned above
 
-After uploading meilisearch-plugin in step `docs/2-load/7-load-d2e-plugins.md`
+After uploading meilisearch-plugin in step `docs/2-load/5-load-d2e-plugins.md`
 
 - [D2E-Plugins/meilisearch](https://github.com/alp-os/d2e-plugins/tree/main/meilisearch)
 

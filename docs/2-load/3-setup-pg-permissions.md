@@ -1,9 +1,20 @@
-# Postgres `alpdev_pg` database and user initialization
-- set `POSTGRES_TENANT_READ_PASSWORD` to value used in the [setup-db-credentials](3-setup-db-credentials.md) step
+# Postgres `alpdev_pg` database and users initialization
+
+- Postgres users to be created
+```
+1. postgres_tenant_read_user
+2. postgres_tenant_admin_user
+```
+
+- Copy values of the following password variables from `.env.local`
 ```
 POSTGRES_TENANT_READ_PASSWORD=xxx
 POSTGRES_TENANT_ADMIN_PASSWORD=xxx
 ```
+
+## Note
+
+If using the postgres docker container please run the following commands as is, otherwise subselect the postgres part of the command (i.e, excluding docker tty) to be executed on the other standalone postgres database.
 
 ## Create read role
 - Run the following command:
