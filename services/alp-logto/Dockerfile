@@ -8,7 +8,7 @@ COPY experience.zip .
 RUN unzip experience.zip
 
 ###### [STAGE] Seal ######
-FROM ghcr.io/logto-io/logto:1.14
+FROM ghcr.io/logto-io/logto:1.17
 
 WORKDIR /etc/logto
 
