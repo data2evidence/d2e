@@ -265,7 +265,11 @@ export class CohortEndpoint {
             let patientIds;
             if (selectQueryResult.data instanceof Array) {
                 patientIds = selectQueryResult.data.map((obj) => {
-                    return obj.SUBJECT_ID;
+                    if ("subject_id" in obj) {
+                        return obj.subject_id;
+                    } else if ("SUBJECT_ID" in obj) {
+                        return obj.SUBJECT_ID;
+                    }
                 });
             }
             return patientIds;
