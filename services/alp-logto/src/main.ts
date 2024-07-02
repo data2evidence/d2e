@@ -29,6 +29,34 @@ async function create(
   }
 }
 
+async function update(
+  path: string,
+  headers: object,
+  data: object,
+  hasResponseBody = true
+) {
+  try {
+    console.log(`Request update ${path}`);
+    console.log(JSON.stringify(data));
+    const resp = await logto.patch(path, headers, data);
+    console.log(`Responded with ${resp.status}`);
+
+    if (resp.ok) {
+      if (hasResponseBody) {
+        let json = await resp.json();
+        console.log(JSON.stringify(json));
+        return json;
+      }
+    } else {
+      console.error("Request failed");
+      console.error(resp.statusText, " ", path, " ", JSON.stringify(data));
+      return -1;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 async function fetchExisting(path: string, headers: object) {
   try {
     console.log(`Request existing ${path}`);
@@ -101,6 +129,10 @@ async function main() {
       secret: appSecret,
     } = appExists || (await create("applications", headers, a));
 
+    if (appExists) {
+      await update(`applications/${appID}`, headers, a);
+    }
+
     let ENV__CLIENT_ID, ENV__CLIENT_SECRET;
 
     switch (appName) {
@@ -144,12 +176,18 @@ async function main() {
   const resourceExists = fetchExistingResources.find(
     (existingRes: any) => existingRes.name === resource.name
   );
-  let { id: resourceId } =
+  let { id: resourceId, isDefault } =
     resourceExists || (await create("resources", headers, resource));
 
-  // Set the resource as the default
-  await logto.patch(`resources/${resourceId}/is-default`, headers, { "isDefault": true })
+  if (resourceExists) {
+    const updated = await update(`resources/${resourceId}`, headers, resource);
+    isDefault = updated.isDefault;
+  }
 
+  if (!isDefault) {
+    // Set the resource as the default
+    await logto.patch(`resources/${resourceId}/is-default`, headers, { "isDefault": true })
+  }
 
   console.log(
     "*********************************************************************************\n"
@@ -168,9 +206,13 @@ async function main() {
   );
   let logtoAdminUser = userExists || (await create("users", headers, user));
 
+  if (userExists) {
+    await update(`users/${logtoAdminUser.id}`, headers, user);
+  }
+
   if(!logtoAdminUser["lastSignInAt"])
-      await logto.patch(`users/${logtoAdminUser.id}/password`, 
-                        headers, 
+    await logto.patch(`users/${logtoAdminUser.id}/password`,
+                        headers,
                         {"password": user["initialPassword"]})
 
   console.log(
@@ -193,6 +235,11 @@ async function main() {
     let logtoScope =
       resourceScopeExists ||
       (await create(`resources/${resourceId}/scopes`, headers, s));
+
+    if (resourceScopeExists) {
+      await update(`resources/${resourceId}/scopes/${logtoScope.id}`, headers, s);
+    }
+
     logtoScopes.push(logtoScope);
   }
   console.log(
@@ -213,6 +260,11 @@ async function main() {
       (existingRole: any) => existingRole.name === r.name
     );
     let logtoRole = roleExists || (await create("roles", headers, r));
+
+    if (roleExists) {
+      await update(`roles/${logtoRole.id}`, headers, r);
+    }
+
     logtoRoles.push(logtoRole);
   }
   console.log(
@@ -277,13 +329,13 @@ async function main() {
     }
 
     missingRoleIDs.length && await create(
-      `users/${ur.userId}/roles`,
-      headers,
-      {
-        roleIds: missingRoleIDs,
-      },
-      false
-    );
+        `users/${ur.userId}/roles`,
+        headers,
+        {
+          roleIds: missingRoleIDs,
+        },
+        false
+      );
   }
   console.log(
     "*********************************************************************************\n"
