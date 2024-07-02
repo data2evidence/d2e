@@ -33,11 +33,11 @@ zip -r ~/Downloads/$PLUGIN_PACKAGE_NAME.zip . -x ".git*" -x "*/.*"
 - scripted
 ```bash
 BASE_DIR=$PWD
-for PLUGIN_PACKAGE_NAME in dqd-plugin datamodel-plugin; do 
+for PLUGIN_PACKAGE_NAME in duckdb cohort-generator data-management i2b2 cohort-survival data-quality meilisearch data-characterization dataflow-ui meilisearch-embeddings data-load r-cdm; do 
   cd $BASE_DIR/$PLUGIN_PACKAGE_NAME
-  git pull
+  git pull                                    
   ZIPFILE=~/Downloads/$PLUGIN_PACKAGE_NAME.zip
-  rm $ZIPFILE
+  rm $ZIPFILE                              
   zip -q -r $ZIPFILE . -x ".git*" -x "*/.*"
   ls -lh $ZIPFILE
 done
