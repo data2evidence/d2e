@@ -37,7 +37,9 @@ for PLUGIN_PACKAGE_NAME in duckdb cohort-generator data-management i2b2 cohort-s
   cd $BASE_DIR/$PLUGIN_PACKAGE_NAME
   git pull                                    
   ZIPFILE=~/Downloads/$PLUGIN_PACKAGE_NAME.zip
-  rm $ZIPFILE                              
+  if [ -e "$ZIPFILE" ]; then
+    rm $ZIPFILE
+  fi                              
   zip -q -r $ZIPFILE . -x ".git*" -x "*/.*"
   ls -lh $ZIPFILE
 done
