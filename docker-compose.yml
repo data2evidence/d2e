@@ -595,16 +595,16 @@ services:
         condition: service_healthy
       alp-fhir-server:
         condition: service_started
-    image: postgres:15-alpine
+    image: node:18.20.2-slim
+    volumes:
+      - ./services/alp-fhir:/home/docker
     logging:
       options:
         tag: *c7
     networks:
       alp:
         priority: 20
-    volumes:
-      - ./deploy/alp-fhir:/alp-fhir
-    entrypoint: sh alp-fhir/seed.sh
+    entrypoint: ["sh", "-c", "cd /home/docker && npm install && npm run build-and-seed"] 
     environment:
       <<:
         - *x-pg
