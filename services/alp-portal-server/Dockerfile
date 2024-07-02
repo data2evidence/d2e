@@ -1,4 +1,4 @@
-ARG IMAGE=node:18.14.0-alpine
+ARG IMAGE=node:18.20.0-alpine
 
 FROM $IMAGE AS development
 
