@@ -57,15 +57,15 @@ async function update(
   }
 }
 
-async function fetchExisting(path: string, headers: object) {
+async function fetchExisting(path: string, headers: object, showLog = true) {
   try {
-    console.log(`Request existing ${path}`);
+    showLog && console.log(`Request existing ${path}`);
     const resp = await logto.get(path, headers);
-    console.log(`Responded with ${resp.status}`);
+    showLog && console.log(`Responded with ${resp.status}`);
 
     if (resp.ok) {
       let json = await resp.json();
-      console.log(JSON.stringify(json));
+      showLog && console.log(JSON.stringify(json));
       return json;
     } else {
       console.error("Request failed");
@@ -360,111 +360,88 @@ async function main() {
   };
   await logto.patch("sign-in-exp", headers, signinExperience);
 
-  setTimeout(async () => {
-    let client = new pg.Client({
-      user: process.env.PG__USER,
-      password: process.env.PG__PASSWORD,
-      host: process.env.PG__HOST,
-      port: parseInt(process.env.PG__PORT),
-      database: process.env.PG__DB_NAME,
-    });
 
-    await client.connect();
+  console.log(
+    "*********************************** SUMMARY **********************************\n"
+  );
 
-    let appRows = await queryPostgres(
-      client,
-      "select * from public.applications where name in ($1, $2, $3)",
-      ["alp-app", "alp-svc", "alp-data"]
-    );
-    let resourcesRows = await queryPostgres(
-      client,
-      "select * from public.resources where name = $1",
-      ["alp-default"]
-    );
-    let userRows = await queryPostgres(
-      client,
-      "select * from public.users where username = $1 and tenant_id = $2",
-      ["admin", "default"]
-    );
-    let scopeRows = await queryPostgres(
-      client,
-      "select * from public.scopes where name in ($1, $2, $3)",
-      ["role.systemadmin", "role.useradmin", "role.tenantviewer"]
-    );
+  const createdApps: Array<Object> = (await fetchExisting(
+    "applications",
+    headers,
+    false
+  )).filter((a: any) => apps.map(x => x.name).includes(a.name));
 
-    let roleRows = await queryPostgres(
-      client,
-      "select * from public.roles where name in ($1, $2, $3)",
-      ["role.systemadmin", "role.useradmin", "role.tenantviewer"]
-    );
+  console.log(
+    `Applications created: ${createdApps.length} \n Applications creation successful: ${createdApps.length == apps.length}`
+  );
 
-    let roleScopeRows = await queryPostgres(
-      client,
-      "select * from public.roles_scopes rs join public.roles r on rs.role_id = r.id where r.name in ($1, $2, $3)",
-      ["role.systemadmin", "role.useradmin", "role.tenantviewer"]
-    );
+  const createdResources: Array<Object> = (await fetchExisting(
+    "resources",
+    headers,
+    false
+  )).filter((a: any) => resource.name === a.name);
 
-    let userRoleRows = await queryPostgres(
-      client,
-      "select * from public.users_roles ur join public.roles r on ur.role_id = r.id where r.name in ($1, $2, $3)",
-      ["role.systemadmin", "role.useradmin", "role.tenantviewer"]
-    );
+  console.log(
+    `Resources created: ${createdResources.length} \n Resources creation successful: ${createdResources.length == 1}`
+  );
 
-    client.end();
+  const createdUsers: Array<Object> = (await fetchExisting(
+    "users",
+    headers,
+    false
+  )).filter((a: any) => user.username === a.username);
 
-    console.log(
-      "*********************************** SUMMARY **********************************\n"
-    );
+  console.log(
+    `Users created: ${createdUsers.length} \n Users creation successful: ${createdUsers.length == 1}`
+  );
 
-    console.log(
-      `Applications created: ${
-        appRows.rowCount
-      } \n Applications creation successful: ${appRows.rowCount == apps.length}`
-    );
-    console.log(
-      `Resources created: ${
-        resourcesRows.rowCount
-      } \n Resources creation successful: ${resourcesRows.rowCount == 1}`
-    );
-    console.log(
-      `Users created: ${userRows.rowCount} \n Users creation successful: ${
-        userRows.rowCount == 1
-      }`
-    );
-    console.log(
-      `Scopes created: ${scopeRows.rowCount} \n Scopes creation successful: ${
-        scopeRows.rowCount == scopes.length
-      }`
-    );
-    console.log(
-      `Roles created: ${roleRows.rowCount} \n Roles creation successful: ${
-        roleRows.rowCount == roles.length
-      }`
-    );
-    console.log(
-      `Roles-Scopes created: ${
-        roleScopeRows.rowCount
-      } \n RoleScopes creation successful: ${
-        roleScopeRows.rowCount == roleScopes.length
-      }`
-    );
-    console.log(
-      `Users-Roles created: ${
-        userRoleRows.rowCount
-      } \n UserRoles creation successful: ${
-        userRoleRows.rowCount == userRoles.length * logtoRoles.length
-      }`
-    );
+  const createdScopes: Array<Object> = (await fetchExisting(
+    `resources/${resourceId}/scopes`,
+    headers,
+    false
+  )).filter((s: any) => scopes.map(x => x.name).includes(s.name));
 
-    console.log(
-      `\n********************** COPY OVER ENV ASSIGNMENTS FOR LOGTO IN .env.local ***********************`
-    );
-    console.log(APP_ENVS.join("\n"))
-    console.log(
-      `****************************************************************************\n`
-    );
+  console.log(
+    `Scopes created: ${createdScopes.length} \n Scopes creation successful: ${createdScopes.length == scopes.length}`
+  );
 
-  }, 3000);
+  const createdRoles: Array<Object> = (await fetchExisting(
+    "roles",
+    headers,
+    false
+  )).filter((r: any) => roles.map(x => x.name).includes(r.name));
+
+  console.log(
+    `Roles created: ${createdRoles.length} \n Roles creation successful: ${createdRoles.length == roles.length}`
+  );
+
+  const createdRoleScopes: Array<Object> = (await Promise.all(roleScopes.map(rs => fetchExisting(
+    `roles/${rs.roleId}/scopes`,
+    headers,
+    false
+  )))).filter((rs: any) => roleScopes.map(x => x.scopeName === rs.name))
+
+  console.log(
+    `Roles-Scopes created: ${createdRoleScopes.length} \n Role-Scopes creation successful: ${createdRoleScopes.length == roleScopes.length}`
+  );
+
+  const createdUserRoles: Array<Object> = (await Promise.all(userRoles.map(ur => fetchExisting(
+    `users/${ur.userId}/roles`,
+    headers,
+    false
+  )))).filter((rs: any) => userRoles.map(x => x.roleIds === rs.id)).flat()
+  
+  console.log(
+    `Users-Roles created: ${createdUserRoles.length} \n User-Roles creation successful: ${createdUserRoles.length == userRoles.map(x => x.roleIds).flat().length}`
+  );
+
+  console.log(
+    `\n********************** COPY OVER ENV ASSIGNMENTS FOR LOGTO IN .env.local ***********************`
+  );
+  console.log(APP_ENVS.join("\n"))
+  console.log(
+    `****************************************************************************\n`
+  );
 }
 
 async function seeding_alp_admin() {
