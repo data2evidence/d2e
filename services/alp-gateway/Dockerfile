@@ -36,8 +36,8 @@ RUN yarn install --production &&\
 
 FROM $IMAGE AS production
 
-RUN apk update && apk add busybox=1.36.1-r19
-RUN apk add --upgrade openssl
+RUN apk update && apk add busybox=1.36.1-r19 \
+    openssl=3.1.6-r0
 
 RUN rm -rf /usr/local/lib/node_modules/npm
 
