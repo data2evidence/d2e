@@ -60,7 +60,7 @@ const seed = async () => {
     VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT(id) \
     DO NOTHING;`,
     [
-      "${FHIR_CLIENT_ID}",
+      `${FHIR_CLIENT_ID}`,
       ClientApplicationContent,
       "2024-06-13 14:40:48.738 +0800",
       `{${projectId}}`,
@@ -78,7 +78,7 @@ const seed = async () => {
     DO NOTHING;`,
     [
       "7ef81144-11f4-40ef-a017-da8885a0d36e",
-      "${FHIR_CLIENT_ID}",
+      `${FHIR_CLIENT_ID}`,
       ClientApplicationContent,
       "2024-06-13 14:40:48.738 +0800",
     ]
@@ -98,8 +98,8 @@ const seed = async () => {
       "2024-06-13 14:40:48.762 +0800",
       `{${projectId}}`,
       `Project/${projectId}`,
-      "ClientApplication/${FHIR_CLIENT_ID}",
-      "ClientApplication/${FHIR_CLIENT_ID}",
+      `ClientApplication/${FHIR_CLIENT_ID}`,
+      `ClientApplication/${FHIR_CLIENT_ID}`,
       "ClientApplication",
       projectId,
     ]
