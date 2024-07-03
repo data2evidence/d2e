@@ -1,0 +1,10 @@
+{
+    "bots": [
+      {
+        "name": "helloWorld",
+        "id": "bc0d68da-527e-456e-9d3a-81fa47c22602",
+        "source": "src/helloWorld.ts",
+        "dist": "dist/helloWorld.js"
+      }
+  ]
+}

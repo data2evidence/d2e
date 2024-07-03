@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios'
 import { MedplumClient } from '@medplum/core'
-import { Resource, Project } from '@medplum/fhirtypes'
+import { Project } from '@medplum/fhirtypes'
 import { env, services } from '../env'
 import { createLogger } from '../Logger'
 
@@ -47,7 +47,8 @@ export class FhirAPI {
       const resource: Project = {
         resourceType: 'Project',
         name: name,
-        description: description
+        description: description,
+        features:['bots']
       }
 
       return await this.medplumClient.createResource(resource)

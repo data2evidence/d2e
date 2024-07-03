@@ -41,5 +41,6 @@
     },
     "shutdownTimeoutMilliseconds": 30000,
     "logLevel": "DEBUG",
-    "logRequests": true
+    "logRequests": true,
+    "defaultProjectFeatures": ["bots"]
   }
