@@ -15,7 +15,6 @@ const seed = async () => {
   if (!FHIR_CLIENT_ID || !FHIR_CLIENT_SECRET) {
     throw new Error("No client credentials are set for Fhir");
   }
-  console.log(FHIR_CLIENT_ID, FHIR_CLIENT_SECRET);
 
   let client = new pg.Client({
     user: process.env.PG_SUPER_USER,
@@ -27,9 +26,7 @@ const seed = async () => {
 
   await client.connect();
 
-  console.log(
-    "Retrieving existing Super Admin project and Practitioner details"
-  );
+  console.log("Retrieving existing Super Admin project and Practitioner ids");
 
   const projectIdResult = await queryPostgres(
     client,
@@ -39,8 +36,6 @@ const seed = async () => {
 
   const projectId: string = projectIdResult.rows[0].projectId;
 
-  console.log(projectId);
-
   const practitionerResult = await queryPostgres(
     client,
     `SELECT id FROM public."Practitioner" WHERE "projectId" = $1`,
@@ -49,7 +44,7 @@ const seed = async () => {
 
   const practitioner: string = practitionerResult.rows[0].id;
 
-  console.log("Seeding Client Application");
+  console.log("Seeding tables");
 
   const ClientApplicationContent = `{"meta":{"project":"${projectId}","versionId":"7ef81144-11f4-40ef-a017-da8885a0d36e","lastUpdated":"2024-06-13T06:40:48.738Z","author":{"reference":"Practitioner/${practitioner}","display":"Medplum Admin"},"compartment":[{"reference":"Project/${projectId}"}]},"resourceType":"ClientApplication","name":"d2eClient","secret":"${FHIR_CLIENT_SECRET}","description":"d2eClient","id":"${FHIR_CLIENT_ID}"}`;
   const ProjectMembershipContent = `{"meta":{"project":"${projectId}","versionId":"6e4864a8-b1df-417c-8aa9-35a4cb660e07","lastUpdated":"2024-06-13T06:40:48.762Z","author":{"reference":"system"},"compartment":[{"reference":"Project/${projectId}"}]},"resourceType":"ProjectMembership","project":{"reference":"Project/${projectId}"},"user":{"reference":"ClientApplication/${FHIR_CLIENT_ID}","display":"d2eClient"},"profile":{"reference":"ClientApplication/${FHIR_CLIENT_ID}","display":"d2eClient"},"id":"c5e1a35d-c979-428f-81db-9e3502c3ffa3"}`;
@@ -69,7 +64,7 @@ const seed = async () => {
     ]
   );
 
-  console.log("Seeding Client Application Table Complete");
+  console.log("Seeding Client Application table complete");
 
   await queryPostgres(
     client,
@@ -84,7 +79,7 @@ const seed = async () => {
     ]
   );
 
-  console.log("Seeding Client Application History Table Complete");
+  console.log("Seeding Client Application History table complete");
 
   await queryPostgres(
     client,
@@ -105,7 +100,7 @@ const seed = async () => {
     ]
   );
 
-  console.log("Seeding Project Membership Table Complete");
+  console.log("Seeding Project Membership table complete");
 
   await queryPostgres(
     client,
@@ -120,7 +115,7 @@ const seed = async () => {
     ]
   );
 
-  console.log("Seeding Project Membership History Table Complete");
+  console.log("Seeding Project Membership History table complete");
 
   client.end();
 };
