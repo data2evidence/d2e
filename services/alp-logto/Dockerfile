@@ -3,6 +3,8 @@ FROM node:20-alpine as builder
 
 WORKDIR /etc/logto/packages
 
+RUN apk update && apk add busybox=1.36.1-r29 \
+    openssl=3.3.0-r3
 RUN apk add unzip
 COPY experience.zip .
 RUN unzip experience.zip
