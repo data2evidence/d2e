@@ -1,4 +1,4 @@
-ARG IMAGE=node:18.20.0-alpine
+ARG IMAGE=node:18.20.1-alpine
 FROM $IMAGE as builder
 
 RUN apk add --update yarn
