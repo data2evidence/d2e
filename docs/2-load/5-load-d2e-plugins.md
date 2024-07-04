@@ -32,14 +32,13 @@ zip -r ~/Downloads/$PLUGIN_PACKAGE_NAME.zip . -x ".git*" -x "*/.*"
 ```
 - scripted
 ```bash
-BASE_DIR=$PWD
-for PLUGIN_PACKAGE_NAME in duckdb cohort-generator data-management i2b2 cohort-survival data-quality meilisearch data-characterization dataflow-ui meilisearch-embeddings data-load r-cdm; do 
+for PLUGIN_PACKAGE_NAME in $(curl -s -H "Authorization: token {PAT}" https://api.github.com/repos/alp-os/d2e-plugins/contents | jq -r '.[] | select(.type == "dir" and (.name | startswith(".") | not)) | .name' | tr '\n' ' '); do 
   cd $BASE_DIR/$PLUGIN_PACKAGE_NAME
-  git pull                                    
+  git pull
   ZIPFILE=~/Downloads/$PLUGIN_PACKAGE_NAME.zip
   if [ -e "$ZIPFILE" ]; then
     rm $ZIPFILE
-  fi                              
+  fi
   zip -q -r $ZIPFILE . -x ".git*" -x "*/.*"
   ls -lh $ZIPFILE
 done
