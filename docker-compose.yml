@@ -234,7 +234,8 @@ x-envs:
           "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/flow/module.js",
           "route": "dataflow",
           "type": "hidden",
-          "featureFlag": "dataflow"
+          "featureFlag": "dataflow",
+          "enabled": "true"
         },
         {
           "iconSize": 24,
