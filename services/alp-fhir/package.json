@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run clean && npm run lint && tsc && node --no-warnings esbuild-script.mjs",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "dev": "tsnd --inspect=0.0.0.0:9210 --respawn ./src/main.ts",
+    "start": "node ./dist/main.js"
   },
   "author": "",
   "license": "Apache-2.0",
@@ -29,6 +31,8 @@
     "vitest": "1.6.0"
   },
   "dependencies": {
-    "@medplum/cli": "^3.1.11"
+    "@medplum/cli": "^3.1.11",
+    "jq": "^1.7.2",
+    "ts-node": "^10.9.2"
   }
 }

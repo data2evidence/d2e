@@ -3,8 +3,6 @@ import { CreateBinaryOptions, MedplumClient } from '@medplum/core'
 import { Project, Resource, Attachment } from '@medplum/fhirtypes'
 import { env } from '../env'
 import { createLogger } from '../logger'
-import { ContentType, createReference, getReferenceString } from '@medplum/core';
-import { getBinaryStorage } from '../utils/fhirStorage';
 
 export class FhirAPI {
     private readonly clientId: string
@@ -20,12 +18,15 @@ export class FhirAPI {
         this.logger.error('No client credentials are set for Fhir')
         throw new Error('No client credentials are set for Fhir')
         }
-        this.medplumClient = new MedplumClient()
+        this.medplumClient = new MedplumClient({
+            baseUrl: "http://localhost:8103"
+        })
     }
 
-    private async clientCredentialslogin() {
+    async clientCredentialslogin() {
         try {
         const res = await this.medplumClient.startClientLogin(this.clientId, this.clientSecret)
+        return res
         } catch (error) {
         this.logger.error('Error performing client credentials authentication', error)
         }
@@ -73,43 +74,4 @@ export class FhirAPI {
     fhirUrl_Bot(botId?: string){
         return this.medplumClient.fhirUrl('Bot', botId as string, '$deploy')
     }
-
-    // async createResource_Bot(name: string, description: string, botCode: string, projectId: string){
-    //     const filename = 'index.ts';
-    //     const contentType = ContentType.TYPESCRIPT;
-    //     const binary = await this.medplumClient.createResource<Binary>({
-    //     resourceType: 'Binary',
-    //     contentType,
-    //     });
-    //     await getBinaryStorage().writeBinary(binary, filename, contentType, Readable.from(defaultBotCode));
-    
-    //     const bot = await this.medplumClient.createResource<Bot>({
-    //     meta: {
-    //         project: projectId,
-    //     },
-    //     resourceType: 'Bot',
-    //     name: name,
-    //     description: description,
-    //     runtimeVersion: request.runtimeVersion ?? getConfig().defaultBotRuntimeVersion,
-    //     sourceCode: {
-    //         contentType,
-    //         title: filename,
-    //         url: getReferenceString(binary),
-    //     },
-    //     });
-    
-    //     const systemRepo = getSystemRepo();
-    //     await systemRepo.createResource<ProjectMembership>({
-    //     meta: {
-    //         project: request.project.id,
-    //     },
-    //     resourceType: 'ProjectMembership',
-    //     project: createReference(request.project),
-    //     user: createReference(bot),
-    //     profile: createReference(bot),
-    //     accessPolicy: request.accessPolicy,
-    //     });
-    
-    //     return bot;
-    // }
 }

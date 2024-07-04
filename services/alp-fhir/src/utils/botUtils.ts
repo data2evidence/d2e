@@ -6,27 +6,32 @@ import { basename, resolve } from "path";
 import { existsSync, readFileSync } from "fs";
 import { ContentType } from "@medplum/core";
 
-export async function readBotConfigs(botName: string){
-    const botConfigs = botConfig.bots?.filter((b) => b.name = botName);
-    if (!botConfigs) {
-        return [];
-    }
-    let saved = 0;
-    for (const botConfig of botConfigs) {
-        try
-        {
-            let fhirApi = new FhirAPI()
-            await createBot(fhirApi, 'Project Id', botConfig, 'vmcontext');
-            saved++;
-            console.log(`Bot ${botConfig.name} saved and deployed successfully!`)
-        } catch (err: unknown) {
-            console.log(`Failed to save bot: ${botConfig.name}`)
+//Reads bots.config.json file and creates bot for each and deploys it
+export async function readAndCreateBotFromConfig(){
+    const botConfigs = botConfig.bots;
+    try{
+        if (!botConfigs) {
+            console.log('0 bots configured in bot config.')
+            return [];
         }
+        console.log(botConfig.bots.length + ' bots configured in bot config.')
+        let saved = 0;
+        for (const botConfig of botConfigs) {
+            
+                let fhirApi = new FhirAPI()
+                let profileResource = await fhirApi.clientCredentialslogin()
+                await createBot(fhirApi, 'Project Id', botConfig, 'vmcontext');
+                saved++;
+                console.log(`Bot ${botConfig.name} saved and deployed successfully!`)
+            
+        }
+        console.log('All bots are saved and deployed successfully!')
+    } catch (err: unknown) {
+        console.log(`Failed to save bots`)
     }
-    console.log('All bots are saved and deployed successfully!')
 }
 
-export async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<void> {
+async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<void> {
     try{
         const codePath = botConfig.source;
         const code = readFileContents(codePath);
@@ -42,10 +47,11 @@ export async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot
         console.log('Success! New bot version: ' + updateResult.meta?.versionId);
     }catch(err){
         console.log('Failed to save bot: ' + botConfig.name);
+        throw err;
     }
 }
 
-export async function createBot(
+async function createBot(
     fhirApi: FhirAPI,
     projectId: string,
     botConfig: MedplumBotConfig,
@@ -68,18 +74,11 @@ export async function createBot(
         console.log(`Success! Bot created: ${bot.id}`);
     }catch(err){
         console.log('Failed to create bot: ' + botConfig.name);
+        throw err;
     }
   }
 
-function readFileContents(fileName: string): string {
-    const path = resolve(fileName);
-    if (!existsSync(path)) {
-      return '';
-    }
-    return readFileSync(path, 'utf8');
-}
-
-export async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<void> {
+async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<void> {
     const codePath = botConfig.dist ?? botConfig.source;
     try{
         const code = readFileContents(codePath);
@@ -95,5 +94,14 @@ export async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, b
         console.log('Deploy result: ' + deployResult.issue?.[0]?.details?.text);
     }catch(err){
         console.log('Failed to deploy bot: ' + botConfig.name);
+        throw err;
     }
+}
+
+function readFileContents(fileName: string): string {
+    const path = resolve(fileName);
+    if (!existsSync(path)) {
+      return '';
+    }
+    return readFileSync(path, 'utf8');
 }
