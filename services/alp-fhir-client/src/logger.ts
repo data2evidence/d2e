@@ -4,7 +4,7 @@ import { env } from './env'
 
 export const createLogger = (className = '') => {
   return winston.createLogger({
-    level: 'info',
+    level: env.FHIR__LOG_LEVEL,
     format: winston.format.json(),
     transports: [
       new winston.transports.Console({

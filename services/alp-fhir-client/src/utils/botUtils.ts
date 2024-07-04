@@ -27,6 +27,7 @@ export async function readAndCreateBotFromConfig(){
         }
         console.log('All bots are saved and deployed successfully!')
     } catch (err: unknown) {
+        console.log(JSON.stringify(err))
         console.log(`Failed to save bots`)
     }
 }
@@ -46,6 +47,7 @@ async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot):
         const updateResult = await fhirApi.updateResource_Bot(bot, sourceCode);
         console.log('Success! New bot version: ' + updateResult.meta?.versionId);
     }catch(err){
+        console.log(JSON.stringify(err))
         console.log('Failed to save bot: ' + botConfig.name);
         throw err;
     }
@@ -64,15 +66,17 @@ async function createBot(
     };
     try{
         //Check if the bot exists
-        let bot: Bot = await fhirApi.readResource_Bot(botConfig.id);
-        if(!bot.id){        
+        console.log('Get bot by id from database : ' + botConfig.id)
+        // let bot: Bot = await fhirApi.readResource_Bot(botConfig.id);
+        // if(!bot.id){        
             const newBot = await fhirApi.create_Bot('admin/projects/' + projectId + '/bot', body)
-            bot = await fhirApi.readResource_Bot(newBot.id);
-        }
+            let bot: Bot = await fhirApi.readResource_Bot(newBot.id);
+        //}
         await saveBot(fhirApi, botConfig as MedplumBotConfig, bot);
         await deployBot(fhirApi, botConfig as MedplumBotConfig, bot);
         console.log(`Success! Bot created: ${bot.id}`);
     }catch(err){
+        console.log(JSON.stringify(err))
         console.log('Failed to create bot: ' + botConfig.name);
         throw err;
     }
@@ -93,6 +97,7 @@ async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot
         })) as OperationOutcome;
         console.log('Deploy result: ' + deployResult.issue?.[0]?.details?.text);
     }catch(err){
+        console.log(JSON.stringify(err))
         console.log('Failed to deploy bot: ' + botConfig.name);
         throw err;
     }

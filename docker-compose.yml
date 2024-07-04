@@ -567,6 +567,16 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    healthcheck:
+      interval: 20s
+      retries: 30
+      start_period: 120s
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8103
+      timeout: 30s
     entrypoint:
       - ./start.sh
     environment:
@@ -1595,3 +1605,40 @@ services:
       - ./cache/vocab/transformed:/tmp/data
       - ./cache/synpuf1k/:/tmp/data
     profiles: [data-load]
+
+  alp-fhir-client:
+    container_name: &c30 alp-minerva-fhir-client-${BASE_PORT:-1}
+    depends_on:
+      alp-logto:
+        condition: service_healthy
+      alp-fhir-server:
+        condition: service_healthy
+    hostname: alp-minerva-fhir-client-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/alp-fhir-client:${DOCKER_TAG_NAME:-develop}
+    healthcheck:
+      interval: 20s
+      retries: 30
+      start_period: 120s
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:41112
+      timeout: 30s
+    logging:
+      options:
+        tag: *c30
+    networks:
+      alp:
+        priority: 20
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    environment:
+      <<:
+        - *x-tls
+        - *x-routes
+      FHIR__LOG_LEVEL: debug
+      LOCAL_DEBUG: "false"
+      NODE_ENV: development
+      FHIR_CLIENT_ID: db6b2304-f236-45ec-b10c-a852681e7129
+      FHIR_CLIENT_SECRET: d64bff124d11f1e2a852b1076bacd081fefffa82e2db2711509b88a3397c2f3d
+      PORT: 41${BASE_PORT:-1}12

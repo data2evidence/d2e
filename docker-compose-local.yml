@@ -276,3 +276,10 @@ services:
       LOGTO__ADMIN_SERVER__FQDN_URL: "http://alp-logto-1:3002"
       LOGTO__CLIENTID_PASSWORD__BASIC_AUTH: ${LOGTO__CLIENTID_PASSWORD__BASIC_AUTH:-YTU2MG84dHF3NzloeTJjcG44eDFxOnhrOEhQNFZEenFKY25YQ1RwZGFRTTZVdDJTd3JHMzd1}
       LOGTO__ALP_ADMIN_APP: '{"application": {"id": "${LOGTO_API_M2M_CLIENT_ID}", "name":"alp-admin","description":"alp-admin", "secret": "${LOGTO_API_M2M_CLIENT_SECRET}"}, "role": { "name":"api-access","description":"Logto API access"}}'
+    
+  alp-fhir-client:
+    build:
+      context: ./services/alp-fhir-client
+      dockerfile: Dockerfile
+    ports:
+      - 9226:9226

@@ -18,17 +18,20 @@ export class FhirAPI {
         this.logger.error('No client credentials are set for Fhir')
         throw new Error('No client credentials are set for Fhir')
         }
+        console.log(env.SERVICE_ROUTES.fhir)
         this.medplumClient = new MedplumClient({
-            baseUrl: "http://localhost:8103"
+            baseUrl: env.SERVICE_ROUTES.fhir
         })
     }
 
     async clientCredentialslogin() {
         try {
         const res = await this.medplumClient.startClientLogin(this.clientId, this.clientSecret)
+        console.log(JSON.stringify(res))
         return res
         } catch (error) {
-        this.logger.error('Error performing client credentials authentication', error)
+            console.log(JSON.stringify(error))
+            this.logger.error('Error performing client credentials authentication', error)
         }
     }
 
@@ -42,7 +45,7 @@ export class FhirAPI {
             features: ['bots']
         })
         } catch (error) {
-        console.log(error)
+            console.log(error)
         }
     }
 
