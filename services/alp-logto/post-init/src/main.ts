@@ -218,9 +218,7 @@ async function main() {
     headers
   );
   const userExists = fetchExistingUsers.find(
-    (existingUser: any) =>
-      existingUser.username === user.username &&
-      existingUser.tenant_id === "default"
+    (existingUser: any) => existingUser.username === user.username && existingUser.tenant_id === 'default'
   );
   let logtoAdminUser = userExists || (await create("users", headers, user));
 
@@ -325,7 +323,7 @@ async function main() {
     "*********************************************************************************\n"
   );
 
-  let userRoles: Array<{ userId: string; roleIds: Array<string> }> = [];
+  let userRoles: Array<{ userId: string; roleIds: Array<string> }> = []
   if (logtoAdminUser && logtoAdminUser["id"]) {
     // Create User-roles
     console.log(
@@ -352,15 +350,14 @@ async function main() {
         if (!userRoleExist) missingRoleIDs.push(roleId);
       }
 
-      missingRoleIDs.length &&
-        (await create(
+      missingRoleIDs.length && await create(
           `users/${ur.userId}/roles`,
           headers,
           {
             roleIds: missingRoleIDs,
           },
           false
-        ));
+        );
     }
     console.log(
       "*********************************************************************************\n"
