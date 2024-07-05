@@ -117,9 +117,6 @@ services:
       dockerfile: Dockerfile
       target: development
     command: yarn dev
-    depends_on:
-      alp-logto-post-init:
-        condition: service_completed_successfully
     external_links:
       - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
       - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}

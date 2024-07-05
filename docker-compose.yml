@@ -850,6 +850,8 @@ services:
     depends_on:
       alp-logto:
         condition: service_healthy
+      alp-logto-post-init:
+        condition: service_completed_successfully
       alp-minerva-portal-server:
         condition: service_healthy
     healthcheck:
