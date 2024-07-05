@@ -56,78 +56,68 @@ library(dplyr)
 library(ggplot2)
 library(rjson)
 library(tools)
+library(RPostgres)
 # Run R console inside the dataflow agent container to run these code
 
 
 # VARIABLES
-filename <- "{filename}"
 target_cohort_definition_id <- {target_cohort_definition_id}
 outcome_cohort_definition_id <- {outcome_cohort_definition_id}
 pg_host <- "{db_credentials['host']}"
 pg_port <- "{db_credentials['port']}"
 pg_dbname <- "{db_credentials['databaseName']}"
-pg_user <- "{db_credentials['user']}"
-pg_password <- "{db_credentials['password']}"
+pg_user <- "{db_credentials['adminUser']}"
+pg_password <- "{db_credentials['adminPassword']}"
 pg_schema <- "{schema_name}"
-# END VARIABLES
-duckdb_dir <- Sys.getenv("DUCKDB__DATA_FOLDER")
-filepath <- file.path(duckdb_dir, filename)
 
-random_string <- function(n = 6) {{
-    paste0(sample(c(0:9, letters, LETTERS), n, replace = TRUE), collapse = "")
-}}
-# Generate a random postfix and create a new filename
-postfix <- random_string()
-duplicate_filepath <- file.path(duckdb_dir, paste0(filename, "_", postfix))
-
-# Copy the original file to the new file
-file.copy(filepath, duplicate_filepath)
-print(paste("Created duckdb File: ", duplicate_filepath))
 con <- NULL
 tryCatch(
-    {{ duckdb_pg_con <- DBI::dbConnect(duckdb::duckdb(), dbdir = ":memory:")
-        postgres_con_query <- sprintf("INSTALL postgres_scanner;LOAD postgres_scanner;CREATE TABLE duckdb_cohort AS FROM (SELECT * FROM postgres_scan('host=%s port=%s dbname=%s user=%s password=%s', '%s',  'cohort'))", pg_host, pg_port, pg_dbname, pg_user, pg_password, pg_schema)
-        result <- DBI::dbExecute(duckdb_pg_con, postgres_con_query)
-        target_cohort <- DBI::dbGetQuery(duckdb_pg_con, sprintf("SELECT * from duckdb_cohort WHERE cohort_definition_id = %d;", target_cohort_definition_id))
-        outcome_cohort <- DBI::dbGetQuery(duckdb_pg_con, sprintf("SELECT * from duckdb_cohort WHERE cohort_definition_id = %d;", outcome_cohort_definition_id))
+    {{ 
+        pg_con <- DBI::dbConnect(RPostgres::Postgres(),
+            dbname = pg_dbname,
+            host = pg_host,
+            user = pg_user,
+            password = pg_password,
+            options=sprintf("-c search_path=%s", pg_schema))
 
-        duckdb_con <- DBI::dbConnect(duckdb::duckdb(dbdir = duplicate_filepath, read_only = FALSE))
-
-        # Write the data frame to DuckDB as a table
-        DBI::dbWriteTable(duckdb_con, "target_cohort", target_cohort)
-        DBI::dbWriteTable(duckdb_con, "outcome_cohort", outcome_cohort)
-
+        # Begin transaction to run below 2 queries as is required for cohort survival but are not needed to be commited to database
+        DBI::dbBegin(pg_con)
         # Remove these when cohorts functionality are improved
-        query <- "
-            UPDATE outcome_cohort
+        query <- sprintf("
+            UPDATE cohort
             SET cohort_start_date = death_date, cohort_end_date = death.death_date
             FROM death
-            WHERE outcome_cohort.subject_id = death.person_id
+            WHERE subject_id = death.person_id
             AND death_date IS NOT NULL
-        "
-        DBI::dbExecute(duckdb_con, query)
+            AND COHORT_DEFINITION_ID=%d", outcome_cohort_definition_id)
+        DBI::dbExecute(pg_con, query)
 
-        query <- "
-            UPDATE target_cohort
+        query <- sprintf("
+            UPDATE cohort
             SET cohort_end_date = cohort_start_date
-        "
-        DBI::dbExecute(duckdb_con, query)
+            WHERE COHORT_DEFINITION_ID=%d", target_cohort_definition_id)
+            
+        DBI::dbExecute(pg_con, query)
 
         # cdm_from_con is from CDMConnection
-        # duckdb uses 'main' as default schema name
-        cdm <- cdm_from_con(
-            con = duckdb_con,
-            write_schema = "main",
-            cdm_schema = "main",
-            cohort_tables = c("target_cohort", "outcome_cohort"),
+        cdm <- CDMConnector::cdm_from_con(
+            con = pg_con,
+            write_schema = pg_schema,
+            cdm_schema = pg_schema,
+            cohort_tables = c("cohort"),
             .soft_validation = TRUE
         )
 
         death_survival <- estimateSingleEventSurvival(cdm,
-            targetCohortTable = "target_cohort",
-            outcomeCohortTable = "outcome_cohort",
+            targetCohortId = target_cohort_definition_id,
+            outcomeCohortId = outcome_cohort_definition_id,
+            targetCohortTable = "cohort",
+            outcomeCohortTable = "cohort",
             estimateGap = 30
         )
+        
+        # Rollback queries done above after cohort survival is done
+        DBI::dbRollback(pg_con)
 
         plot <- plotSurvival(death_survival)
         plot_data <- ggplot_build(plot)$data[[1]]
@@ -146,8 +136,7 @@ tryCatch(
         return(toJSON(data)) }},
     finally = {{ if (!is.null(con)) {{ DBI::dbDisconnect(con)
         print("Disconnected the database.") }}
-    file.remove(duplicate_filepath)
-    print("Removed temporary duckdb file") }}
+    }}
 )
 """
         )
