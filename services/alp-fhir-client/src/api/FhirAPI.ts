@@ -1,6 +1,6 @@
 
 import { CreateBinaryOptions, MedplumClient, OperationOutcomeError } from '@medplum/core'
-import { Resource, Attachment, Bot } from '@medplum/fhirtypes'
+import { Resource, Attachment, Bot, Subscription } from '@medplum/fhirtypes'
 import { env } from '../env'
 import { createLogger } from '../logger'
 
@@ -85,7 +85,25 @@ export class FhirAPI {
         })
     }
 
-    fhirUrl_bot(botId?: string){
-        return this.medplumClient.fhirUrl('Bot', botId as string, '$deploy')
+    fhirUrl_bot(action: string, botId?: string){
+        return this.medplumClient.fhirUrl('Bot', botId as string, action)
+    }
+
+    // async executeBot(botId: string){
+    //     return await this.medplumClient.executeBot(botId, {})
+    // }
+
+    async createResource_subscription(endpoint: string, reason: string, criteria: any){
+        return await this.medplumClient.createResource<Subscription>({
+            resourceType: 'Subscription',
+            status: 'active',
+            reason: reason,
+            channel: { type: 'rest-hook', endpoint:  endpoint},
+            criteria: criteria
+        });
+    }
+    
+    async searchResource_subscription(query: string){
+        return await this.medplumClient.searchOne('Subscription', query=query)
     }
 }

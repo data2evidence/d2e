@@ -30,6 +30,39 @@ export async function readAndCreateBotFromConfig(){
     }
 }
 
+async function createBot(
+    fhirApi: FhirAPI,
+    projectId: string,
+    botConfig: MedplumBotConfig,
+    runtimeVersion: string,
+  ): Promise<void> {
+    const body = {
+      name: botConfig.name,
+      description: botConfig.description,
+      runtimeVersion:runtimeVersion
+    };
+    try{
+        //Check if the bot exists
+        console.log(`Check if bot ${botConfig.id} already exists in DB`)
+        let bot:Bot
+        let searchResult = await fhirApi.searchResource_bot('name='+botConfig.name);
+        if(searchResult){
+            bot = searchResult; 
+        }else{
+            console.log(`Create new bot ${botConfig.name}`)     
+            let newBot = await fhirApi.create_bot('admin/projects/' + projectId + '/bot', body)
+            bot = await fhirApi.readResource_bot(newBot.id);
+        }
+        await saveBot(fhirApi, botConfig as MedplumBotConfig, bot);
+        await deployBot(fhirApi, botConfig as MedplumBotConfig, bot);
+        await createSubscription(fhirApi, botConfig as MedplumBotConfig, bot)
+        console.log(`Success! Bot created: ${bot.id}`);
+    }catch(err){
+        console.log('Failed to create bot: ' + botConfig.name);
+        throw err;
+    }
+}
+
 async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<void> {
     try{
         const codePath = botConfig.source;
@@ -49,52 +82,20 @@ async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot):
     }
 }
 
-async function createBot(
-    fhirApi: FhirAPI,
-    projectId: string,
-    botConfig: MedplumBotConfig,
-    runtimeVersion: string,
-  ): Promise<void> {
-    const body = {
-      name: botConfig.name,
-      description: botConfig.description,
-      runtimeVersion:runtimeVersion
-    };
-    try{
-        //Check if the bot exists
-        console.log(`Check if bot ${botConfig.id} already exists in DB`)
-        let bot:Bot
-        let searchResult = await fhirApi.searchResource_bot('name='+botConfig.name);
-        console.log(JSON.stringify(searchResult))
-        if(searchResult){
-            bot = searchResult; 
-        }else{
-            console.log(`Create new bot ${botConfig.name}`)     
-            let newBot = await fhirApi.create_bot('admin/projects/' + projectId + '/bot', body)
-            bot = await fhirApi.readResource_bot(newBot.id);
-        }
-        await saveBot(fhirApi, botConfig as MedplumBotConfig, bot);
-        await deployBot(fhirApi, botConfig as MedplumBotConfig, bot);
-        console.log(`Success! Bot created: ${bot.id}`);
-    }catch(err){
-        console.log('Failed to create bot: ' + botConfig.name);
-        throw err;
-    }
-  }
-
 async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<void> {
     const codePath = botConfig.dist ?? botConfig.source;
     try{
         const code = readFileContents(codePath);
-        if (!code) {
-        return;
-        }
+        if (!code) return;
         console.log('Deploying bot...');
-        console.log(fhirApi.fhirUrl_bot(bot.id).toString())
-        const deployResult = (await fhirApi.create_bot(fhirApi.fhirUrl_bot(bot.id).toString(), {
-        code,
-        filename: basename(codePath),
-        })) as OperationOutcome;
+        console.log(fhirApi.fhirUrl_bot('$deploy', bot.id).toString())
+        const deployResult = (await fhirApi.create_bot(
+            fhirApi.fhirUrl_bot('$deploy', bot.id).toString(), 
+            {
+                code,
+                filename: basename(codePath)
+            }
+        )) as OperationOutcome;
         console.log('Deploy result: ' + deployResult.issue?.[0]?.details?.text);
     }catch(err){
         console.log(JSON.stringify(err))
@@ -103,10 +104,21 @@ async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot
     }
 }
 
+async function createSubscription(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot){
+    const result = fhirApi.searchResource_subscription(`channel={endpoint=Bot\\${bot.id}}`)
+    console.log(`Existing subscription: ${JSON.stringify(result)}`)
+    if (!result) {
+        // Make a new subscription
+        const subscription = await fhirApi.createResource_subscription(`Bot\\${bot.id}`, `Rest hook subscription for ${botConfig.subscriptionCriteria} resource`, botConfig.subscriptionCriteria);
+        console.log(`Subscription for bot: ${bot.name} successfully created!`)
+        console.log(JSON.stringify(subscription))
+    }
+}
+
 function readFileContents(fileName: string): string {
     const path = resolve(fileName);
     if (!existsSync(path)) {
-      return '';
+        return '';
     }
     return readFileSync(path, 'utf8');
 }
