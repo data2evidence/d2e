@@ -32,7 +32,9 @@ zip -r ~/Downloads/$PLUGIN_PACKAGE_NAME.zip . -x ".git*" -x "*/.*"
 ```
 - scripted
 ```bash
-for PLUGIN_PACKAGE_NAME in $(curl -s -H "Authorization: token {PAT}" https://api.github.com/repos/alp-os/d2e-plugins/contents | jq -r '.[] | select(.type == "dir" and (.name | startswith(".") | not)) | .name' | tr '\n' ' '); do 
+cd <plugin-directory>
+BASE_DIR=$PWD
+for PLUGIN_PACKAGE_NAME in $(find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d ! -name ".*" -exec basename {} \; | tr '\n' ' '); do 
   cd $BASE_DIR/$PLUGIN_PACKAGE_NAME
   git pull
   ZIPFILE=~/Downloads/$PLUGIN_PACKAGE_NAME.zip
@@ -42,7 +44,6 @@ for PLUGIN_PACKAGE_NAME in $(curl -s -H "Authorization: token {PAT}" https://api
   zip -q -r $ZIPFILE . -x ".git*" -x "*/.*"
   ls -lh $ZIPFILE
 done
-cd $BASE_DIR
 ```
 ### Upload Plugin zipfile
 - In Portal, navigate to the **Jobs** page in the Admin portal
