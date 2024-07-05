@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc",
     "lint": "eslint src/",
-    "dev": "tsnd --inspect=0.0.0.0:9210 --respawn ./src/main.ts",
+    "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/main.ts",
     "start": "node ./dist/main.js"
   },
   "author": "",

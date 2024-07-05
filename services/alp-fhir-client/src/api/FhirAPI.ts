@@ -1,6 +1,6 @@
 
-import { CreateBinaryOptions, MedplumClient } from '@medplum/core'
-import { Project, Resource, Attachment } from '@medplum/fhirtypes'
+import { CreateBinaryOptions, MedplumClient, OperationOutcomeError } from '@medplum/core'
+import { Resource, Attachment, Bot } from '@medplum/fhirtypes'
 import { env } from '../env'
 import { createLogger } from '../logger'
 
@@ -12,13 +12,12 @@ export class FhirAPI {
 
     constructor() {
         if (env.FHIR_CLIENT_ID && env.FHIR_CLIENT_SECRET) {
-        this.clientId = env.FHIR_CLIENT_ID
-        this.clientSecret = env.FHIR_CLIENT_SECRET
+            this.clientId = env.FHIR_CLIENT_ID
+            this.clientSecret = env.FHIR_CLIENT_SECRET
         } else {
-        this.logger.error('No client credentials are set for Fhir')
-        throw new Error('No client credentials are set for Fhir')
+            this.logger.error('No client credentials are set for Fhir')
+            throw new Error('No client credentials are set for Fhir')
         }
-        console.log(env.SERVICE_ROUTES.fhir)
         this.medplumClient = new MedplumClient({
             baseUrl: env.SERVICE_ROUTES.fhir
         })
@@ -26,39 +25,51 @@ export class FhirAPI {
 
     async clientCredentialslogin() {
         try {
-        const res = await this.medplumClient.startClientLogin(this.clientId, this.clientSecret)
-        console.log(JSON.stringify(res))
-        return res
+            return await this.medplumClient.startClientLogin(this.clientId, this.clientSecret)
         } catch (error) {
             console.log(JSON.stringify(error))
             this.logger.error('Error performing client credentials authentication', error)
         }
     }
 
-    async createResource_Project(name: string, description: string) {
-        try {
-        await this.clientCredentialslogin()
-        return await this.medplumClient.createResource<Project>({
-            resourceType: 'Project',
-            name: name,
-            description: description,
-            features: ['bots']
-        })
-        } catch (error) {
-            console.log(error)
+    // async createResource_Project(name: string, description: string) {
+    //     try {
+    //         return await this.medplumClient.createResource<Project>({
+    //             resourceType: 'Project',
+    //             name: name,
+    //             description: description,
+    //             features: ['bots']
+    //         })
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+
+    async readResource_bot(id: string){
+        try{
+            return await this.medplumClient.readResource('Bot', id);
+        }catch(err){
+            if(err instanceof OperationOutcomeError && err.outcome.id == 'not-found'){
+                let bot: Bot = {
+                    resourceType: 'Bot'
+                }
+                return bot
+            }else{
+                console.log("Not of type Operation outcome")
+                throw err;
+            }
         }
     }
 
-    async readResource_Bot(id: string){
-        let bot = await this.medplumClient.readResource('Bot', id);
-        return bot;
+    async searchResource_bot(query: string){
+        return await this.medplumClient.searchOne('Bot', query=query)
     }
 
-    async create_Bot(url: string, body: any){
+    async create_bot(url: string, body: any){
        return await this.medplumClient.post(url, body);
     }
 
-    async createAttachment_Bot(fileName: string, fileContent: string, fileContentType: string){
+    async createAttachment_bot(fileName: string, fileContent: string, fileContentType: string){
         let binaryOptions: CreateBinaryOptions = {
             filename: fileName,
             data: fileContent,
@@ -67,14 +78,14 @@ export class FhirAPI {
         return await this.medplumClient.createAttachment(binaryOptions)
     }
 
-    async updateResource_Bot(resource: Resource, sourceCode: Attachment){
+    async updateResource_bot(resource: Resource, sourceCode: Attachment){
         return await this.medplumClient.updateResource({
             ...resource,
             sourceCode
         })
     }
 
-    fhirUrl_Bot(botId?: string){
+    fhirUrl_bot(botId?: string){
         return this.medplumClient.fhirUrl('Bot', botId as string, '$deploy')
     }
 }

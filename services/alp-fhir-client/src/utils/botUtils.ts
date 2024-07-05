@@ -17,13 +17,11 @@ export async function readAndCreateBotFromConfig(){
         console.log(botConfig.bots.length + ' bots configured in bot config.')
         let saved = 0;
         for (const botConfig of botConfigs) {
-            
-                let fhirApi = new FhirAPI()
-                let profileResource = await fhirApi.clientCredentialslogin()
-                await createBot(fhirApi, 'Project Id', botConfig, 'vmcontext');
-                saved++;
-                console.log(`Bot ${botConfig.name} saved and deployed successfully!`)
-            
+            let fhirApi = new FhirAPI()
+            await fhirApi.clientCredentialslogin()
+            await createBot(fhirApi, 'Project Id', botConfig, 'vmcontext');
+            saved++;
+            console.log(`Bot ${botConfig.name} saved and deployed successfully!`)
         }
         console.log('All bots are saved and deployed successfully!')
     } catch (err: unknown) {
@@ -39,15 +37,13 @@ async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot):
         if (!code) {
           return;
         }
-      
         console.log('Saving source code...');
-        const sourceCode = await fhirApi.createAttachment_Bot(basename(codePath), code, ContentType.TYPESCRIPT);
+        const sourceCode = await fhirApi.createAttachment_bot(basename(codePath), code, ContentType.TYPESCRIPT);
       
         console.log('Updating bot...');
-        const updateResult = await fhirApi.updateResource_Bot(bot, sourceCode);
+        const updateResult = await fhirApi.updateResource_bot(bot, sourceCode);
         console.log('Success! New bot version: ' + updateResult.meta?.versionId);
     }catch(err){
-        console.log(JSON.stringify(err))
         console.log('Failed to save bot: ' + botConfig.name);
         throw err;
     }
@@ -57,26 +53,30 @@ async function createBot(
     fhirApi: FhirAPI,
     projectId: string,
     botConfig: MedplumBotConfig,
-    runtimeVersion?: string,
+    runtimeVersion: string,
   ): Promise<void> {
     const body = {
       name: botConfig.name,
-      description: '',
-      runtimeVersion,
+      description: botConfig.description,
+      runtimeVersion:runtimeVersion
     };
     try{
         //Check if the bot exists
-        console.log('Get bot by id from database : ' + botConfig.id)
-        // let bot: Bot = await fhirApi.readResource_Bot(botConfig.id);
-        // if(!bot.id){        
-            const newBot = await fhirApi.create_Bot('admin/projects/' + projectId + '/bot', body)
-            let bot: Bot = await fhirApi.readResource_Bot(newBot.id);
-        //}
+        console.log(`Check if bot ${botConfig.id} already exists in DB`)
+        let bot:Bot
+        let searchResult = await fhirApi.searchResource_bot('name='+botConfig.name);
+        console.log(JSON.stringify(searchResult))
+        if(searchResult){
+            bot = searchResult; 
+        }else{
+            console.log(`Create new bot ${botConfig.name}`)     
+            let newBot = await fhirApi.create_bot('admin/projects/' + projectId + '/bot', body)
+            bot = await fhirApi.readResource_bot(newBot.id);
+        }
         await saveBot(fhirApi, botConfig as MedplumBotConfig, bot);
         await deployBot(fhirApi, botConfig as MedplumBotConfig, bot);
         console.log(`Success! Bot created: ${bot.id}`);
     }catch(err){
-        console.log(JSON.stringify(err))
         console.log('Failed to create bot: ' + botConfig.name);
         throw err;
     }
@@ -89,9 +89,9 @@ async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot
         if (!code) {
         return;
         }
-    
         console.log('Deploying bot...');
-        const deployResult = (await fhirApi.create_Bot(fhirApi.fhirUrl_Bot(bot.id).toString(), {
+        console.log(fhirApi.fhirUrl_bot(bot.id).toString())
+        const deployResult = (await fhirApi.create_bot(fhirApi.fhirUrl_bot(bot.id).toString(), {
         code,
         filename: basename(codePath),
         })) as OperationOutcome;

@@ -6,6 +6,7 @@ WORKDIR /usr/src/app
 
 COPY --chown=node:node --chmod=711 package.json ./
 COPY --chown=node:node --chmod=711 yarn.lock ./
+COPY --chown=node:node --chmod=711 src ./
 
 RUN yarn install --network-timeout 1000000
 
@@ -55,6 +56,7 @@ WORKDIR /usr/src/app
 
 COPY --chown=docker:alp --chmod=711 --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=docker:alp --chmod=711 --from=build /usr/src/app/dist ./dist
+COPY --chown=docker:alp --chmod=711 --from=build /usr/src/app/src ./src
 
 ENTRYPOINT ["node", "dist/main.js"]
 EXPOSE ${PORT}
