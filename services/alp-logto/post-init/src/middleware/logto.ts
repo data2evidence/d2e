@@ -1,8 +1,7 @@
 let LOGTO__ADMIN_SERVER__FQDN_URL =
   process.env.LOGTO__ADMIN_SERVER__FQDN_URL || "http://alp-logto-1:3002";
 let LOGTO__CLIENTID_PASSWORD__BASIC_AUTH =
-  process.env.LOGTO__CLIENTID_PASSWORD__BASIC_AUTH ||
-  "YTU2MG84dHF3NzloeTJjcG44eDFxOnhrOEhQNFZEenFKY25YQ1RwZGFRTTZVdDJTd3JHMzd1";
+  process.env.LOGTO__CLIENTID_PASSWORD__BASIC_AUTH;
 
 // TODO: remove any type
 function encodeData(data: any) {
@@ -63,16 +62,12 @@ export async function patch(
   return resp;
 }
 
-
-export async function get(
-  path: string,
-  headers: any,
-): Promise<Response> {
+export async function get(path: string, headers: any): Promise<Response> {
   const resp = await fetch(`${LOGTO__ADMIN_SERVER__FQDN_URL}/api/${path}`, {
     method: "GET",
     headers: Object.assign({}, headers, {
       "Content-Type": "application/json",
-    })
+    }),
   });
   return resp;
 }
