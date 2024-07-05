@@ -27,11 +27,14 @@ DOCKER_TAG_NAME:
   comment: default tag
   type: string
 LOGTO_API_M2M_CLIENT_ID:
-  comment: logto static secrets
+  comment: generated
   type: password
 LOGTO_API_M2M_CLIENT_SECRET:
-  comment: logto static secrets
+  comment: generated
   type: password
+LOGTO__CLIENTID_PASSWORD__BASIC_AUTH:
+  comment: generated
+  type: base64 encoded
 LOGTO__ALP_APP__CLIENT_ID:
   comment: generated with logto APIs post init
   type: string
