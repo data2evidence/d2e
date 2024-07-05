@@ -202,7 +202,7 @@ async function main() {
     headers
   );
   const userExists = fetchExistingUsers.find(
-    (existingUser: any) => existingUser.username === user.username
+    (existingUser: any) => existingUser.username === user.username && existingUser.tenant_id === 'default'
   );
   let logtoAdminUser = userExists || (await create("users", headers, user));
 
@@ -303,43 +303,46 @@ async function main() {
     "*********************************************************************************\n"
   );
 
-  // Create User-roles
-  console.log(
-    "*********************************** USER-ROLES **********************************************"
-  );
-  let userRoles: Array<{ userId: string; roleIds: Array<string> }> = [
-    {
-      userId: logtoAdminUser["id"],
-      roleIds: logtoRoles.map((r) => r["id"]),
-    },
-  ];
-  for (const ur of userRoles) {
-    const fetchExistingUserRoles: Array<Object> = await fetchExisting(
-      `users/${ur.userId}/roles`,
-      headers
+  let userRoles: Array<{ userId: string; roleIds: Array<string> }> = []
+  if (logtoAdminUser && logtoAdminUser["id"]) {
+    // Create User-roles
+    console.log(
+      "*********************************** USER-ROLES **********************************************"
     );
-
-    const missingRoleIDs = [];
-
-    for (const roleId of ur.roleIds) {
-      const userRoleExist = fetchExistingUserRoles.find(
-        (existingRole: any) => existingRole.id === roleId
-      );
-      if (!userRoleExist) missingRoleIDs.push(roleId);
-    }
-
-    missingRoleIDs.length && await create(
+    userRoles = [
+      {
+        userId: logtoAdminUser["id"],
+        roleIds: logtoRoles.map((r) => r["id"]),
+      },
+    ];
+    for (const ur of userRoles) {
+      const fetchExistingUserRoles: Array<Object> = await fetchExisting(
         `users/${ur.userId}/roles`,
-        headers,
-        {
-          roleIds: missingRoleIDs,
-        },
-        false
+        headers
       );
+
+      const missingRoleIDs = [];
+
+      for (const roleId of ur.roleIds) {
+        const userRoleExist = fetchExistingUserRoles.find(
+          (existingRole: any) => existingRole.id === roleId
+        );
+        if (!userRoleExist) missingRoleIDs.push(roleId);
+      }
+
+      missingRoleIDs.length && await create(
+          `users/${ur.userId}/roles`,
+          headers,
+          {
+            roleIds: missingRoleIDs,
+          },
+          false
+        );
+    }
+    console.log(
+      "*********************************************************************************\n"
+    );
   }
-  console.log(
-    "*********************************************************************************\n"
-  );
 
   // Create Sign-in Experiences
   let signinExperience = {
