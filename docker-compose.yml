@@ -612,6 +612,32 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
 
+  alp-logto-post-init:
+    container_name: alp-logto-post-init-${BASE_PORT:-1}
+    depends_on:
+      alp-logto:
+        condition: service_healthy
+      alp-minerva-postgres:
+        condition: service_healthy
+    image: alpcr.azurecr.io/alp-data-node/alp-logto-post-init:${DOCKER_TAG_NAME:-develop}
+    networks:
+      alp:
+        priority: 20
+    environment:
+      PG__DB_NAME: logto
+      PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
+      PG__PASSWORD: ${PG_SUPER_PASSWORD}
+      PG__PORT: ${PG_PORT:-5432}
+      PG__USER: ${PG_SUPER_USER:-postgres}
+      LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine"},{"name":"alp-app","description":"alp-app","type":"Traditional","oidcClientMetadata":{"redirectUris":["https://localhost:41100/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://localhost:41100/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
+      LOGTO__RESOURCE:  '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
+      LOGTO__USER: '{"username":"admin","initialPassword":"Updatepassword12345"}'
+      LOGTO__ROLES: '[{"name":"role.systemadmin","description":"ALP System admin","type":"User"},{"name":"role.useradmin","description":"ALP User admin","type":"User"},{"name":"role.tenantviewer","description":"ALP Tenant viewer","type":"User"}]'
+      LOGTO__SCOPES: '[{"name":"role.systemadmin","description":"ALP System admin"},{"name":"role.useradmin","description":"ALP User admin"},{"name":"role.tenantviewer","description":"ALP Tenant viewer"}]'
+      LOGTO__ADMIN_SERVER__FQDN_URL: "http://alp-logto-1:3002"
+      LOGTO__CLIENTID_PASSWORD__BASIC_AUTH: ${LOGTO__CLIENTID_PASSWORD__BASIC_AUTH:-YTU2MG84dHF3NzloeTJjcG44eDFxOnhrOEhQNFZEenFKY25YQ1RwZGFRTTZVdDJTd3JHMzd1}
+      LOGTO__ALP_ADMIN_APP: '{"application": {"id": "${LOGTO_API_M2M_CLIENT_ID}", "name":"alp-admin","description":"alp-admin", "secret": "${LOGTO_API_M2M_CLIENT_SECRET}"}, "role": { "name":"api-access","description":"Logto API access"}}'
+
   alp-logto:
     container_name: &c8 alp-logto-${BASE_PORT:-1}
     depends_on:
