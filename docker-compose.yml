@@ -11,6 +11,8 @@ volumes:
   pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
+  shareddb:
+  vocabularydb:
 
 x-envs:
   db-svc: &x-dbsvc
@@ -339,6 +341,7 @@ services:
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
+    profiles: [perseus]
 
   alp-dataflow-gen:
     command:
@@ -1150,6 +1153,7 @@ services:
         - *x-tls
       POSTGRES_DB: ${PG_DB_NAME:-alp}
       POSTGRES_PASSWORD: ${PG_SUPER_PASSWORD}
+    profiles: [perseus]
 
   alp-minerva-ps-config-svc:
     container_name: &c18 alp-minerva-ps-config-svc-${BASE_PORT:-1}
@@ -1592,3 +1596,102 @@ services:
       - ./cache/vocab/transformed:/tmp/data
       - ./cache/synpuf1k/:/tmp/data
     profiles: [data-load]
+  
+  web:
+    image: perseushub/web:latest
+    container_name:
+      web
+    ports:
+      - "81:81"
+    restart: always
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  alp-perseus-shareddb:
+    image: perseushub/shareddb:latest
+    container_name: shareddb
+    volumes:
+      - shareddb:/data/postgres
+    ports:
+      - "5432:5432"
+    profiles: [perseus]
+
+  alp-perseus-vocabularydb:
+    image: perseushub/vocabularydb:latest
+    container_name: vocabularydb
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "vocabulary", "-U", "admin" ]
+      timeout: 60s
+      interval: 30s
+      retries: 10
+    volumes:
+      - vocabularydb:/data/postgres
+    ports:
+      - "5431:5432"
+    profiles: [perseus]
+
+  alp-perseus-files-manager:
+    image: perseushub/files-manager:latest
+    container_name: files-manager
+    ports:
+      - "10500:10500"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - alp-perseus-shareddb
+    profiles: [perseus]
+
+  alp-perseus-user:
+    image: perseushub/user:latest
+    container_name: user
+    environment:
+      USER_ENV: Docker
+    # env_file:
+    #   - user/user-envs.txt
+    ports:
+      - "5001:5001"
+    depends_on:
+      - alp-perseus-shareddb
+    profiles: [perseus]
+
+  alp-perseus-backend:
+    image: perseushub/backend:latest
+    build: ./perseus-api
+    container_name: backend
+    environment:
+      PERSEUS_ENV: Docker
+    ports:
+      - "5004:5004"
+    depends_on:
+      - alp-perseus-shareddb
+      - alp-perseus-files-manager
+    profiles: [perseus]
+
+  alp-perseus-white-rabbit:
+    image: perseushub/white-rabbit:latest
+    container_name:
+      white-rabbit
+    ports:
+      - "8000:8000"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - alp-perseus-shareddb
+      - alp-perseus-files-manager
+    profiles: [perseus]
+
+  alp-perseus-cdm-builder:
+    image: perseushub/cdm-builder:latest
+    container_name:
+      cdm-builder
+    ports:
+      - "9000:9000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    depends_on:
+      - alp-perseus-shareddb
+      - alp-perseus-files-manager
+      - alp-perseus-vocabularydb
+    profiles: [perseus]
