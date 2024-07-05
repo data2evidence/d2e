@@ -23,10 +23,10 @@ DB_CREDENTIALS__INTERNAL__PUBLIC_KEY | x509publicKey | to encrypt dbcredentials 
 DOCKER_TAG_NAME | string | default tag
 MEILI_MASTER_KEY | password | meilisearch master key
 MINIO__SECRET_KEY | password | meilisearch secret_key
-LOGTO_API_M2M_CLIENT_ID | string | generated with logto APIs post init
 TLS__INTERNAL__CA_CRT | PEM | generated
-LOGTO_API_M2M_CLIENT_ID | password | logto static secrets matching deploy/logto/seed.sql - randomize with API later
-LOGTO_API_M2M_CLIENT_SECRET | password | logto static secrets matching deploy/logto/seed.sql - randomize with API later
+LOGTO_API_M2M_CLIENT_ID | password | generated
+LOGTO_API_M2M_CLIENT_SECRET | password | generated
+LOGTO__CLIENTID_PASSWORD__BASIC_AUTH | base64 encoded | generated
 LOGTO__ALP_APP__CLIENT_ID | string | generated with logto APIs post init
 LOGTO__ALP_APP__CLIENT_SECRET | password | generated with logto APIs post init
 LOGTO__ALP_SVC__CLIENT_ID | string | generated with logto APIs post init

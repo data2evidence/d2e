@@ -44,6 +44,18 @@ function set-openssl {
     echo DB_CREDENTIALS__INTERNAL__PUBLIC_KEY=\'"${PUBLIC_KEY}"\' >> $tmp_file
 }
 set-openssl
+echo
+
+echo encode-basic-auth ...
+encode-basic-auth() {
+    echo INFO set LOGTO__CLIENTID_PASSWORD__BASIC_AUTH ...
+    client_id=$(grep '^LOGTO_API_M2M_CLIENT_ID=' "$tmp_file" | cut -d"=" -f2)
+    client_secret=$(grep '^LOGTO_API_M2M_CLIENT_SECRET=' "$tmp_file" | cut -d"=" -f2)
+    encoded_basic_auth=$(echo -n "${client_id}:${client_secret}" | base64)
+    echo LOGTO__CLIENTID_PASSWORD__BASIC_AUTH=${encoded_basic_auth} >> $tmp_file
+}
+encode-basic-auth
+echo
 
 bash -c "set -a; source $tmp_file; cat $example_file | envsubst > $env_file"
 echo >> $env_file
