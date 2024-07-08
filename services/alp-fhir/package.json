@@ -1,0 +1,30 @@
+{
+  "name": "alp-fhir-client",
+  "version": "1.0.0",
+  "description": "`start.sh` script uses envsubst (for env variable substitution) and jq (for type conversion) tools to add POSTGRES and REDIS database connection parameters to the `medplum.config.json` required by the fhir-server.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc",
+    "lint": "eslint src/",
+    "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/main.ts",
+    "start": "node ./dist/main.js"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "esbuild": "0.21.5",
+    "typescript": "5.5.2"
+  },
+  "dependencies": {
+    "@medplum/core": "^3.1.11",
+    "@medplum/fhirtypes": "^3.1.11",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.9",
+    "express": "^4.19.2",
+    "ts-node": "^10.9.2",
+    "winston": "^3.13.0",
+    "zod": "^3.23.8"
+  }
+}

@@ -234,7 +234,7 @@
       "restart": true,
       "port": 9226,
       "address": "localhost",
-      "localRoot": "${workspaceFolder}/services/alp-fhir-client",
+      "localRoot": "${workspaceFolder}/services/alp-fhir",
       "remoteRoot": "/usr/src/app",
       "protocol": "inspector",
       "sourceMaps": true,

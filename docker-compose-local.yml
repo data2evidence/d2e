@@ -279,7 +279,7 @@ services:
     
   alp-fhir-client:
     build:
-      context: ./services/alp-fhir-client
-      dockerfile: Dockerfile
+      context: ./services/alp-fhir
+      dockerfile: Dockerfile.client
     ports:
       - 9226:9226
