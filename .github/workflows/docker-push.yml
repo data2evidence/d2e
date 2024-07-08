@@ -156,6 +156,10 @@ jobs:
             directory: ./services/alp-logto
             context: ./services/alp-logto
             fileName: Dockerfile
+          - name: alp-data-node/alp-logto-post-init
+            directory: ./services/alp-logto/post-init
+            context: ./services/alp-logto/post-init
+            fileName: Dockerfile
           - name: alp-data-node/alp-fhir-server
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
