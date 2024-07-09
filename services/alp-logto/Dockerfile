@@ -8,11 +8,10 @@ COPY experience.zip .
 RUN unzip experience.zip
 
 ###### [STAGE] Seal ######
-FROM ghcr.io/logto-io/logto:1.17
+FROM ghcr.io/logto-io/logto:1.18
 
 WORKDIR /etc/logto
-RUN apk update && apk add busybox=1.36.1-r29 \
-    openssl=3.3.1-r1
+RUN apk update && apk add openssl=3.3.1-r1
 
 RUN rm -rf packages/experience
 COPY --from=builder /etc/logto/packages/experience packages/experience
