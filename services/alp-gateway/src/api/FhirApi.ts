@@ -48,7 +48,7 @@ export class FhirAPI {
         resourceType: 'Project',
         name: name,
         description: description,
-        features:['bots']
+        features: ['bots']
       }
 
       return await this.medplumClient.createResource(resource)

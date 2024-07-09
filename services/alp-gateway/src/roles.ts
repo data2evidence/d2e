@@ -53,5 +53,10 @@ export const REQUIRED_URL_SCOPES: UrlScope[] = [
   {
     path: '^/ps-config-svc/(.*)',
     scopes: ['PSConfig.svc']
+  },
+  {
+    path: '^/fhir-server/(.*)',
+    scopes: ['fhirServer.import'],
+    httpMethods: ['POST']
   }
 ]

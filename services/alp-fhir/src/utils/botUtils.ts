@@ -7,12 +7,12 @@ import { existsSync, readFileSync } from "fs";
 import { ContentType } from "@medplum/core";
 
 //Reads bots.config.json file and creates bot for each and deploys it
-export async function readAndCreateBotFromConfig(){
+export async function readAndCreateBotFromConfig():Promise<void> {
     const botConfigs = botConfig.bots;
     try{
         if (!botConfigs) {
             console.log('0 bots configured in bot config.')
-            return [];
+            return ;
         }
         console.log(botConfig.bots.length + ' bots configured in bot config.')
         let saved = 0;

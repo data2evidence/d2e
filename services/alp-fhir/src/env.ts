@@ -1,9 +1,4 @@
-// import * as dotenv from 'dotenv'
 import { object, z } from 'zod'
-// dotenv.config()
-// // if (process.env.DOTENV_PATH) {
-// //   dotenv.config({ path: process.env.DOTENV_PATH })
-// // }
 
 const Env = z.object({
   TLS__INTERNAL__KEY: z.string(),
@@ -22,6 +17,7 @@ const Env = z.object({
           return z.never();
       }
   }),
+  // DUCKDB__DATA_FOLDER: z.string()
 })
 
 const result = Env.safeParse(process.env)

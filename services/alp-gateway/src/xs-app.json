@@ -76,6 +76,10 @@
     {
       "source": "^/ps-config-svc/(.*)$",
       "destination": "ps-config"
+    },
+    {
+      "source": "^/fhir-server/(.*)$",
+      "destination": "fhir-server"
     }
   ]
 }

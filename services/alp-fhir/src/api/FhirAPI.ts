@@ -1,6 +1,6 @@
 
-import { CreateBinaryOptions, MedplumClient, OperationOutcomeError } from '@medplum/core'
-import { Resource, Attachment, Bot, Subscription } from '@medplum/fhirtypes'
+import { CreateBinaryOptions, MedplumClient, MedplumRequestOptions, OperationOutcomeError } from '@medplum/core'
+import { Resource, Attachment, Bot, Subscription, Project, ResourceType } from '@medplum/fhirtypes'
 import { env } from '../env'
 import { createLogger } from '../logger'
 
@@ -32,18 +32,18 @@ export class FhirAPI {
         }
     }
 
-    // async createResource_Project(name: string, description: string) {
-    //     try {
-    //         return await this.medplumClient.createResource<Project>({
-    //             resourceType: 'Project',
-    //             name: name,
-    //             description: description,
-    //             features: ['bots']
-    //         })
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
+    async createResource_Project(name: string, description: string) {
+        try {
+            return await this.medplumClient.createResource<Project>({
+                resourceType: 'Project',
+                name: name,
+                description: description,
+                features: ['bots']
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     async readResource_bot(id: string){
         try{
@@ -89,10 +89,6 @@ export class FhirAPI {
         return this.medplumClient.fhirUrl('Bot', botId as string, action)
     }
 
-    // async executeBot(botId: string){
-    //     return await this.medplumClient.executeBot(botId, {})
-    // }
-
     async createResource_subscription(endpoint: string, reason: string, criteria: any){
         return await this.medplumClient.createResource<Subscription>({
             resourceType: 'Subscription',
@@ -105,5 +101,13 @@ export class FhirAPI {
     
     async searchResource_subscription(query: string){
         return await this.medplumClient.search('Subscription', query=query)
+    }
+
+    async createResource(resource: Resource, options?: MedplumRequestOptions){
+        await this.medplumClient.createResource(resource, options)
+    }
+
+    async validateResouce(resource: Resource){
+        return await this.medplumClient.validateResource(resource)
     }
 }

@@ -2,48 +2,42 @@ ARG IMAGE=node:18.14.0-alpine
 
 FROM $IMAGE as development
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src
 
-COPY --chown=node:node --chmod=711 package.json ./
-COPY --chown=node:node --chmod=711 yarn.lock ./
-COPY --chown=node:node --chmod=711 src ./
+COPY ./alp-libs/nodejs/alp-base-utils ./libs/alp-base-utils
+COPY ./alp-libs/nodejs/package.json .
 
-RUN yarn install --network-timeout 1000000
+COPY ./services/alp-fhir/package.json alp-data-node/app/package.json
+COPY ./services/alp-fhir/yarn.lock alp-data-node/app/yarn.lock
 
-COPY --chown=node:node --chmod=711 . .
+RUN --mount=type=cache,target=~/.cache/yarn \
+    yarn install --network-timeout 1000000 --frozen-lockfile
 
-RUN chown -R node:node /usr/src/app
+COPY ./services/alp-fhir alp-data-node/app
 
-USER node
+RUN yarn workspace @alp/alp-base-utils run compile
+
+WORKDIR /usr/src/alp-data-node/app
+
+FROM development AS final-build
+
+WORKDIR /usr/
 
 FROM $IMAGE AS build
 
-WORKDIR /usr/src/app
-
-COPY --chown=node:node --chmod=711 package.json ./
-COPY --chown=node:node --chmod=711 yarn.lock ./
-
-COPY --chown=node:node --chmod=711 --from=development /usr/src/app/node_modules ./node_modules
-
-COPY --chown=node:node --chmod=711 . .
-
-RUN yarn compile
-
-ENV NODE_ENV production
-
-RUN yarn install --production &&\
-    yarn autoclean --force &&\
-    yarn cache clean
-
-FROM $IMAGE AS production
-
+RUN apk add --update --upgrade openssl zlib
 RUN rm -rf /usr/local/lib/node_modules/npm
-
 RUN addgroup -S alp -g 3000 && adduser --uid 3000 -S docker -G alp
 
-RUN mkdir -p /usr/src/app && chown -R docker:alp /usr/src/app
-
 USER docker
+WORKDIR /home/docker/
+
+COPY --chown=docker:alp --chmod=711 --from=final-build /usr/src ./
+
+WORKDIR /home/docker/alp-data-node/app/
+
+RUN yarn compile
+RUN yarn cache clean
 
 #ARG
 #GIT COMMIT Passed during docker build time
@@ -52,12 +46,6 @@ ARG GIT_COMMIT_ARG
 # ENV
 ENV GIT_COMMIT=$GIT_COMMIT_ARG
 
-WORKDIR /usr/src/app
-
-COPY --chown=docker:alp --chmod=711 --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=docker:alp --chmod=711 --from=build /usr/src/app/dist ./dist
-COPY --chown=docker:alp --chmod=711 --from=build /usr/src/app/src ./src
-
 ENTRYPOINT ["node", "dist/main.js"]
 EXPOSE ${PORT}
-
+# CMD ["tail", "-f", "/dev/null"]
