@@ -392,15 +392,14 @@ routes.forEach((route: IRouteProp) => {
           })
         )
         break
-      case 'fhir-server':
+      case 'fhir':
         app.use(
           source,
           // ensureAuthenticated,
           // ensureAuthorized,
           createProxyMiddleware({
             ...getCreateMiddlewareOptions(services.fhirClient),
-            headers: { Connection: 'keep-alive' },
-            pathRewrite: path => path.replace('/fhir-server', '')
+            headers: { Connection: 'keep-alive' }
           })
         )
         break

@@ -7,7 +7,7 @@ class Routes {
   private readonly router = express.Router()
   
   constructor(private readonly fhirRouter: FhirRouter) {
-    this.router.use('/', this.fhirRouter.getRouter())
+    this.router.use('/fhir', this.fhirRouter.getRouter())
   }
 
   getRouter() {

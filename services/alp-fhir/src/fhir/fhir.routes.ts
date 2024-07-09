@@ -30,6 +30,20 @@ export class FhirRouter {
           res.sendStatus(500)
         }
       })
+
+      this.router.post(
+        '/createProject',
+        async (req,  res) => {
+          this.log.info('Create project resource')
+          try {
+              let fhirService = new FhirService()
+              await fhirService.createProject(req.query.name as string, req.query.description as string)
+              res.sendStatus(200)
+          } catch (err) {
+            this.log.error(`Failed to create project in fhir server: ${err}`)
+            res.sendStatus(500)
+          }
+        })
   }
 }
 

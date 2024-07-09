@@ -1,59 +1,74 @@
 import { AxiosRequestConfig } from 'axios'
-import { MedplumClient } from '@medplum/core'
-import { Project } from '@medplum/fhirtypes'
 import { env, services } from '../env'
 import { createLogger } from '../Logger'
+import { Agent } from 'https'
+import { post } from './request-util'
 
 export class FhirAPI {
   private readonly baseURL: string
-  private readonly clientId: string
-  private readonly clientSecret: string
   private readonly logger = createLogger(this.constructor.name)
-  private medplumClient: MedplumClient
+  private readonly token: string
+  private readonly httpsAgent: Agent
 
-  constructor() {
-    if (services.fhir) {
-      this.baseURL = services.fhir
+  constructor(token: string) {
+    this.token = token
+    if (!token) {
+      throw new Error('No token passed for Fhir')
+    }
+    if (services.dataflowMgmt) {
+      this.baseURL = services.dataflowMgmt
+      this.httpsAgent = new Agent({
+        rejectUnauthorized: true,
+        ca: env.GATEWAY_CA_CERT
+      })
     } else {
       this.logger.error('No url is set for Fhir')
       throw new Error('No url is set for Fhir')
     }
-
-    if (env.FHIR_CLIENT_ID && env.FHIR_CLIENT_SECRET) {
-      this.clientId = env.FHIR_CLIENT_ID
-      this.clientSecret = env.FHIR_CLIENT_SECRET
-    } else {
-      this.logger.error('No client credentials are set for Fhir')
-      throw new Error('No client credentials are set for Fhir')
-    }
-
-    this.medplumClient = new MedplumClient({
-      baseUrl: this.baseURL
-    })
   }
 
-  private async clientCredentialslogin() {
-    try {
-      const res = await this.medplumClient.startClientLogin(this.clientId, this.clientSecret)
-    } catch (error) {
-      this.logger.error('Error performing client credentials authentication', error)
+  private async getRequestConfig() {
+    let options: AxiosRequestConfig = {}
+
+    options = {
+      headers: {
+        Authorization: this.token
+      },
+      httpsAgent: this.httpsAgent
     }
+
+    return options
   }
 
   async createProject(name: string, description: string) {
     try {
-      await this.clientCredentialslogin()
-
-      const resource: Project = {
-        resourceType: 'Project',
+      this.logger.info(`Create fhir project for the dataset`)
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}/createProject`
+      const details = {
         name: name,
-        description: description,
-        features: ['bots']
+        description: description
       }
-
-      return await this.medplumClient.createResource(resource)
+      const result = await post(url, details, options)
+      if (result.data) {
+        return result.data
+      }
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  async importData(fhirResource: string) {
+    try {
+      this.logger.info(`Import data into fhir server`)
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}/`
+      const result = await post(url, fhirResource, options)
+      if (result.data) {
+        return result.data
+      }
+    } catch (err) {
+      throw new Error(`Failed to import data into fhir server`)
     }
   }
 }

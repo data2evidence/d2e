@@ -796,8 +796,8 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
-    path: '^/fhir-server/(.*)',
-    scopes: ['fhirServer.import'],
+    path: '^/fhir/(.*)',
+    scopes: ['fhir.import'],
     httpMethods: ['POST']
   }
 ]
@@ -921,7 +921,7 @@ export const ROLE_SCOPES = {
     'dataflowmgmt.analysisflow.delete',
     'dataflowmgmt.analysisflow.revision.delete',
     'gateway.fhir.create',
-    'fhirServer.import'
+    'fhir.import'
   ],
   ALP_DASHBOARD_VIEWER: ['gateway.dashboardGate.content'],
   TENANT_VIEWER: [

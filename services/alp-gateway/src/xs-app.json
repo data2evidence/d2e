@@ -78,8 +78,8 @@
       "destination": "ps-config"
     },
     {
-      "source": "^/fhir-server/(.*)$",
-      "destination": "fhir-server"
+      "source": "^/fhir/(.*)$",
+      "destination": "fhir"
     }
   ]
 }
