@@ -1510,6 +1510,7 @@ services:
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
       isTestEnv: ${isTestEnv}
+      TESTSCHEMA: ${TESTSCHEMA}
 
   redis:
     command: redis-server --requirepass ${REDIS_PASSWORD}
