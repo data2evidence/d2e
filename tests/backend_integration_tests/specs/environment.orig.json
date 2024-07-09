@@ -1,6 +1,6 @@
 {
   "host": "https://localhost",
-  "appport": "41000",
+  "appport": "41100",
   "sysappport": "41100",
   "dbhost": "${HANASERVER}",
   "dbport": "${HDIPORT}",
