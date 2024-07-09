@@ -2,11 +2,19 @@
     "bots": [
       {
         "name": "helloWorld",
-        "id": "bc0d68da-527e-456e-9d3a-81fa47c22602",
+        "id": "",
         "description": "Hello World",
         "source": "src/bots/helloWorld/index.ts",
         "dist": "dist/bots/helloWorld/index.js",
         "subscriptionCriteria": "Patient"
+      },
+      {
+        "name": "questionnaireResponse",
+        "id": "",
+        "description": "FHIR to GDM Questionnaire Response",
+        "source": "src/bots/questionnaireResponse/index.ts",
+        "dist": "dist/bots/questionnaireResponse/index.js",
+        "subscriptionCriteria": "QuestionnaireResponse"
       }
   ]
 }
