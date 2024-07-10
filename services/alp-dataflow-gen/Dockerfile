@@ -1,5 +1,8 @@
 FROM alpcr.azurecr.io/alp-dataflow-gen-base:v0.3-alpha as dbsvc-build
 
+# Dependency for pandas in dataflow-gen
+RUN apt-get -y install musl-dev && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.
+
 ADD https://github.com/liquibase/liquibase/releases/download/v4.5.0/liquibase-4.5.0.tar.gz .
 RUN mkdir -p ./liquibase/
 RUN tar xvf liquibase-4.5.0.tar.gz -C ./liquibase/
