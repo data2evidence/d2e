@@ -341,7 +341,6 @@ services:
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
-    profiles: [perseus]
 
   alp-dataflow-gen:
     command:
@@ -1181,7 +1180,6 @@ services:
         - *x-tls
       POSTGRES_DB: ${PG_DB_NAME:-alp}
       POSTGRES_PASSWORD: ${PG_SUPER_PASSWORD}
-    profiles: [perseus]
 
   alp-minerva-ps-config-svc:
     container_name: &c18 alp-minerva-ps-config-svc-${BASE_PORT:-1}
@@ -1624,9 +1622,10 @@ services:
       - ./cache/vocab/transformed:/tmp/data
       - ./cache/synpuf1k/:/tmp/data
     profiles: [data-load]
-  
+
   web:
     image: perseushub/web:latest
+    build: ./nginx
     container_name:
       web
     ports:
@@ -1685,8 +1684,8 @@ services:
     container_name: user
     environment:
       USER_ENV: Docker
-    # env_file:
-    #   - user/user-envs.txt
+    env_file:
+      - user/user-envs.txt
     ports:
       - "5001:5001"
     depends_on:
@@ -1707,6 +1706,21 @@ services:
     depends_on:
       - alp-perseus-shareddb
       - alp-perseus-files-manager
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  frontend:
+    image: perseushub/frontend:latest
+    # build:
+    #   context: ./UI
+    #   args:
+    #     env: prod
+    container_name:
+      frontend
+    ports:
+      - "4200:4200"
     networks:
       alp:
         priority: 20
