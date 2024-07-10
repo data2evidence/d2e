@@ -25,6 +25,22 @@ https://*.alp.local:55555 {
 	respond alp-internal
 }
 
+(perseus) {
+	log {
+		format console {
+			level_format color
+		}
+	}
+
+	handle /* {
+		reverse_proxy host.docker.internal:4200 {
+			transport http {
+				read_buffer 8192
+			}
+		}
+	}
+}
+
 (portal) {
 	log {
 		format console {
@@ -33,24 +49,23 @@ https://*.alp.local:55555 {
 	}
 
 	# Logto api server
-    @logto {
-        path /index.*
-        path /api/*
-        path /oidc/*
-        path /sign-in
-        path /consent
-        path /callback/* # For azure connector
-    }
+	@logto {
+		path /index.*
+		path /api/*
+		path /oidc/*
+		path /sign-in
+		path /consent
+		path /callback/* # For azure connector
+	}
 
-    handle @logto {
-
-        reverse_proxy http://alp-logto-1:3001 {
+	handle @logto {
+		reverse_proxy http://alp-logto-1:3001 {
 			header_up Host {upstream_hostport}
 			transport http {
 				read_buffer 8192
-				}
 			}
-    }
+		}
+	}
 
 	handle /alp-prefect/* {
 		uri strip_prefix /alp-prefect
@@ -69,7 +84,6 @@ https://*.alp.local:55555 {
 			}
 		}
 	}
-
 
 	handle /alp-fhir/* {
 		uri strip_prefix /alp-fhir
@@ -274,4 +288,8 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 			}
 		}
 	}
+}
+
+http://localhost:41180 {
+	import perseus
 }
