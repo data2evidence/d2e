@@ -32,16 +32,18 @@ zip -r ~/Downloads/$PLUGIN_PACKAGE_NAME.zip . -x ".git*" -x "*/.*"
 ```
 - scripted
 ```bash
+cd <plugin-directory>
 BASE_DIR=$PWD
-for PLUGIN_PACKAGE_NAME in dqd-plugin datamodel-plugin; do 
+for PLUGIN_PACKAGE_NAME in $(find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d ! -name ".*" -exec basename {} \; | tr '\n' ' '); do 
   cd $BASE_DIR/$PLUGIN_PACKAGE_NAME
   git pull
   ZIPFILE=~/Downloads/$PLUGIN_PACKAGE_NAME.zip
-  rm $ZIPFILE
+  if [ -e "$ZIPFILE" ]; then
+    rm $ZIPFILE
+  fi
   zip -q -r $ZIPFILE . -x ".git*" -x "*/.*"
   ls -lh $ZIPFILE
 done
-cd $BASE_DIR
 ```
 ### Upload Plugin zipfile
 - In Portal, navigate to the **Jobs** page in the Admin portal
