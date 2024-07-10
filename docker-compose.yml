@@ -513,6 +513,7 @@ services:
 
   alp-db-credentials-mgr:
     container_name: &c5 alp-minerva-db-credentials-mgr-${BASE_PORT:-1}
+    init: true
     depends_on:
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
@@ -768,6 +769,7 @@ services:
 
   alp-minerva-dataflow-mgmt:
     container_name: &c11 alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
+    init: true
     depends_on:
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
@@ -821,6 +823,7 @@ services:
 
   alp-minerva-gateway:
     container_name: &c12 alp-minerva-gateway-${BASE_PORT:-1}
+    init: true
     depends_on:
       alp-logto:
         condition: service_healthy
@@ -940,6 +943,7 @@ services:
 
   alp-minerva-pa-config-svc:
     container_name: &c14 alp-minerva-pa-config-svc-${BASE_PORT:-1}
+    init: true
     depends_on:
       alp-minerva-postgres:
         condition: service_healthy
@@ -1065,6 +1069,7 @@ services:
 
   alp-minerva-portal-server:
     container_name: &c16 alp-minerva-portal-server-${BASE_PORT:-1}
+    init: true
     depends_on:
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
@@ -1153,6 +1158,7 @@ services:
 
   alp-minerva-ps-config-svc:
     container_name: &c18 alp-minerva-ps-config-svc-${BASE_PORT:-1}
+    init: true
     depends_on:
       alp-minerva-postgres:
         condition: service_healthy
@@ -1290,6 +1296,7 @@ services:
 
   alp-minerva-terminology-svc:
     container_name: &c21 alp-minerva-terminology-svc-${BASE_PORT:-1}
+    init: true
     depends_on:
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
