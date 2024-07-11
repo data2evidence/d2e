@@ -25,6 +25,13 @@ https://*.alp.local:55555 {
 	respond alp-internal
 }
 
+(forward_authentication) {
+	forward_auth http://user:5001 {
+		uri /user/api/is_token_valid_internal
+		copy_headers Username
+	}
+}
+
 (perseus) {
 	log {
 		format console {
@@ -32,11 +39,56 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle /* {
-		reverse_proxy host.docker.internal:4200 {
-			transport http {
-				read_buffer 8192
-			}
+	handle / {
+		reverse_proxy http://frontend:4200 {
+			header_up X-Real-IP {http.request.remote_host}
+		}
+	}
+
+	redir / /
+
+	handle_path /user/api/is_token_valid_internal {
+		reverse_proxy http://user:5001 {
+			header_up Content-Length ""
+			header_up X-Original-URI {http.request.uri}
+		}
+	}
+
+	handle /user/* {
+		reverse_proxy http://user:5001 {
+			header_up X-Real-IP {http.request.remote_host}
+		}
+	}
+
+	handle /backend {
+		import forward_authentication
+		reverse_proxy http://backend:5004 {
+			header_up X-Real-IP {http.request.remote_host}
+			header_up Username {http.request.header.Username}
+		}
+	}
+
+	handle /white-rabbit {
+		import forward_authentication
+		reverse_proxy http://white-rabbit:8000 {
+			header_up X-Real-IP {http.request.remote_host}
+			header_up Username {http.request.header.Username}
+		}
+	}
+
+	handle /cdm-builder {
+		import forward_authentication
+		reverse_proxy http://cdm-builder:9000 {
+			header_up X-Real-IP {http.request.remote_host}
+			header_up Username {http.request.header.Username}
+		}
+	}
+
+	handle /files-manager {
+		import forward_authentication
+		reverse_proxy http://files-manager:10500 {
+			header_up X-Real-IP {http.request.remote_host}
+			header_up Username {http.request.header.Username}
 		}
 	}
 }
