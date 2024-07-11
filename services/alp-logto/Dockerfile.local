@@ -47,19 +47,6 @@ FROM node:20-alpine as app
 WORKDIR /etc/logto
 COPY --from=builder /etc/logto .
 
-COPY ./connector-alp-azuread /etc/logto/packages/connectors/connector-alp-azuread
-
-WORKDIR /etc/logto/packages/connectors/connector-alp-azuread
-
-RUN yarn
-RUN yarn build
-
-WORKDIR /etc/logto/
-
-RUN npx @logto/cli connector link
-
-RUN ls -l /etc/logto/packages/core/connectors/
-
 EXPOSE 3001
 ENTRYPOINT ["npm", "run"]
 CMD ["start"]
