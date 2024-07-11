@@ -1617,6 +1617,6 @@ services:
     container_name: &c3 alp-dataflow-gen-data-load-agent-${BASE_PORT:-1}
     extends: alp-dataflow-gen-agent
     volumes:
-      - ./cache/vocab/transformed:/tmp/data
-      - ./cache/synpuf1k/:/tmp/data
+      - ./cache/vocab/:/tmp/data/vocab
+      - ./cache/synpuf1k/:/tmp/data/synpuf1k
     profiles: [data-load]
