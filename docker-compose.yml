@@ -1665,8 +1665,9 @@ services:
     container_name: user
     environment:
       USER_ENV: Docker
-    env_file:
-      - user/user-envs.txt
+      TOKEN_SECRET_KEY: Perseus-Arcad!a
+      EMAIL_SECRET_KEY: 8cmuh4t5xTtR1EHaojWL0aqCR3vZ48PZF5AYkTe0iqo=
+      SERVER_ADDRESS: http://localhost
     ports:
       - "5001:5001"
     depends_on:
@@ -1697,10 +1698,6 @@ services:
 
   frontend:
     image: perseushub/frontend:latest
-    # build:
-    #   context: ./UI
-    #   args:
-    #     env: prod
     container_name:
       frontend
     ports:
