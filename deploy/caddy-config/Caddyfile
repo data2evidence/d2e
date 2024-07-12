@@ -26,8 +26,8 @@ https://*.alp.local:55555 {
 }
 
 (forward_authentication) {
-	forward_auth  / http://user:5001 {
-		uri /api/is_token_valid_internal
+	forward_auth http://user:5001 {
+		uri /user/api/is_token_valid_internal
 		copy_headers Username
 	}
 }
@@ -60,9 +60,9 @@ https://*.alp.local:55555 {
 
 	handle /backend/* {
 		import forward_authentication
+
 		reverse_proxy http://backend:5004 {
 			header_up X-Real-IP {http.request.remote_host}
-			header_up Username {http.request.header.Username}
 		}
 	}
 
@@ -70,7 +70,6 @@ https://*.alp.local:55555 {
 		import forward_authentication
 		reverse_proxy http://white-rabbit:8000 {
 			header_up X-Real-IP {http.request.remote_host}
-			header_up Username {http.request.header.Username}
 		}
 	}
 
@@ -78,7 +77,6 @@ https://*.alp.local:55555 {
 		import forward_authentication
 		reverse_proxy http://cdm-builder:9000 {
 			header_up X-Real-IP {http.request.remote_host}
-			header_up Username {http.request.header.Username}
 		}
 	}
 
@@ -86,7 +84,6 @@ https://*.alp.local:55555 {
 		import forward_authentication
 		reverse_proxy http://files-manager:10500 {
 			header_up X-Real-IP {http.request.remote_host}
-			header_up Username {http.request.header.Username}
 		}
 	}
 }
