@@ -11,8 +11,6 @@ volumes:
   pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
-  shareddb:
-  vocabularydb:
 
 x-envs:
   db-svc: &x-dbsvc
