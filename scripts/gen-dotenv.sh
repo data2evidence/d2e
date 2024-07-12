@@ -9,7 +9,7 @@ example_file=env.example
 tmp_file=.env.tmp
 
 passphrase_length=10
-password_length=30
+default_password_length=30
 x509_subject="/C=SG/O=ALP Dev"
 
 # vars
@@ -20,6 +20,7 @@ echo '' > $env_file
 echo set-passwords ...
 function set-password {
     export password_name=$1
+    export password_length=$2
     echo INFO set password:$password_name ...
     export password_value=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c $password_length)
     echo ${password_name}=${password_value} >> $tmp_file
@@ -28,7 +29,11 @@ function set-password {
 password_keys=($(cat $example_file | grep password$ | awk -F= '{print $1}')) # echo ${password_keys[@]}; 
 password_name=${password_keys[1]}
 for password_name in ${password_keys[@]}; do
-    set-password $password_name
+    length=$default_password_length
+    if [ $password_name = "LOGTO_API_M2M_CLIENT_ID" ]; then
+        length=21
+    fi
+    set-password $password_name $length
 done
 echo
 
