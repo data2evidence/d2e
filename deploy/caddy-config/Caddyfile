@@ -39,13 +39,11 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle / {
+	handle /* {
 		reverse_proxy http://frontend:4200 {
 			header_up X-Real-IP {http.request.remote_host}
 		}
 	}
-
-	redir / /
 
 	handle_path /user/api/is_token_valid_internal {
 		reverse_proxy http://user:5001 {
