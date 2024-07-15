@@ -1,6 +1,5 @@
 from enum import Enum
 from pydantic import BaseModel
-from typing import Optional, List, Dict
 
 
 class DBCredentialsType(BaseModel):
@@ -20,6 +19,11 @@ class DBCredentialsType(BaseModel):
     readRole: str
 
 
+class UserType(str, Enum):
+    ADMIN_USER = "admin_user"
+    READ_USER = "read_user"
+
+
 class HANA_TENANT_USERS(str, Enum):
     ADMIN_USER = "TENANT_ADMIN_USER",
     READ_USER = "TENANT_READ_USER",
@@ -30,99 +34,12 @@ class PG_TENANT_USERS(str, Enum):
     READ_USER = "postgres_tenant_read_user",
 
 
-class dqdBaseOptionsType(BaseModel):
-    schemaName: str
-    databaseCode: str
-    cdmVersionNumber: str
-    vocabSchemaName: str
-    releaseDate: str
-
-
-class dqdOptionsType(dqdBaseOptionsType):
-    cohortDefinitionId: Optional[str]
-    checkNames: Optional[List[str]]
-    cohortDatabaseSchema: Optional[str]
-    cohortTableName: Optional[str]
-
-
-class dcOptionsType(dqdBaseOptionsType):
-    resultsSchema: str
-    excludeAnalysisIds: str
-    flowName: str
-    changelogFile: str
-
-
-class cohortJsonType(BaseModel):
-    id: int
-    name: str
-    createdDate: int
-    modifiedDate: int
-    hasWriteAccess: bool
-    tags: list
-    expressionType: str
-    expression: dict
-
-
-class cohortGeneratorOptionsType(BaseModel):
-    databaseCode: str
-    schemaName: str
-    vocabSchemaName: str
-    cohortJson: cohortJsonType
-    datasetId: str
-    description: str
-    owner: str
-    token: str
-
-
-class cohortSurvivalOptionsType(BaseModel):
-    databaseCode: str
-    schemaName: str
-    targetCohortDefinitionId: int
-    outcomeCohortDefinitionId: int
-    datasetId: str
-
-
-class omopCDMOptionsType(BaseModel):
-    databaseCode: str
-    schemaName: str
-    cdmVersion: str
-
-
-class meilisearchAddIndexType(BaseModel):
-    databaseCode: str
-    vocabSchemaName: str
-    tableName: str
-    chunk_size: int
-    meilisearch_index_config: Dict
-
-
-class meilisearchAddIndexWithEmbeddingsType(BaseModel):
-    databaseCode: str
-    vocabSchemaName: str
-    tableName: str
-    token: str
-    chunk_size: int
-    meilisearch_index_config: Dict
-
-
-class StrategusAnalysisType(BaseModel):
-    sharedResources: List
-    moduleSpecifications: List
-
-
-class StrategusOptionsType(BaseModel):
-    workSchema: str
-    cdmSchema: str
-    databaseCode: str
-    vocabSchemaName: str
-
-
 class DatabaseDialects(str, Enum):
     HANA = "hana"
     POSTGRES = "postgres"
 
 
-class requestType(str, Enum):
+class RequestType(str, Enum):
     GET = "get"
     POST = "post"
     PUT = "put"
