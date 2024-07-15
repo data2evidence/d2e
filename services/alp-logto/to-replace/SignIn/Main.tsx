@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import type { SignIn, ConnectorMetadata } from '@logto/schemas';
+import { type SignIn, type ExperienceSocialConnector, AgreeToTermsPolicy } from '@logto/schemas';
 
 import LoadingLayer from '@/components/LoadingLayer';
 import SocialSignInList from '@/containers/SocialSignInList';
+import TermsAndPrivacyCheckbox from '@/containers/TermsAndPrivacyCheckbox';
+import useTerms from '@/hooks/use-terms';
 import useSocial from '@/containers/SocialSignInList/use-social';
 
 import IdentifierSignInForm from './IdentifierSignInForm';
@@ -11,11 +13,12 @@ import PasswordSignInForm from './PasswordSignInForm';
 import * as styles from './index.module.scss';
 
 type Props = {
-  signInMethods: SignIn['methods'];
-  socialConnectors: ConnectorMetadata[];
+  readonly signInMethods: SignIn['methods'];
+  readonly socialConnectors: ExperienceSocialConnector[];
 };
 
 const Main = ({ signInMethods, socialConnectors }: Props) => {
+  const { agreeToTermsPolicy } = useTerms();
   const { invokeSocialSignIn } = useSocial();
   const { pathname } = useLocation();
   const [searchParameters] = useSearchParams();
@@ -33,7 +36,20 @@ const Main = ({ signInMethods, socialConnectors }: Props) => {
   }
 
   if (signInMethods.length === 0 && socialConnectors.length > 0) {
-    return <SocialSignInList className={styles.main} socialConnectors={socialConnectors} />;
+    return (
+      <>
+        <SocialSignInList className={styles.main} socialConnectors={socialConnectors} />
+        {
+          /**
+           * Display agreement checkbox when only social sign-in methods are available
+           * and the user needs to agree to terms manually.
+           */
+          agreeToTermsPolicy === AgreeToTermsPolicy.Manual && (
+            <TermsAndPrivacyCheckbox className={styles.checkbox} />
+          )
+        }
+      </>
+    );
   }
 
   const isPasswordOnly =
