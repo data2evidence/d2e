@@ -670,6 +670,7 @@ services:
       - sh
       - -c
       - npm run cli db seed -- --swe && npx @logto/cli db alteration deploy 1.14.0 && npm start
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
         - *x-tls
@@ -993,6 +994,7 @@ services:
     networks:
       alp:
         priority: 20
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
         - *x-tls
@@ -1228,6 +1230,7 @@ services:
     networks:
       alp:
         priority: 20
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     environment:
       <<:
         - *x-tls
