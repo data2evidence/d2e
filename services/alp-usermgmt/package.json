@@ -43,7 +43,7 @@
     "@types/compression": "^1.7.0",
     "@types/express": "4.17.13",
     "@types/jsonwebtoken": "^9.0.0",
-    "@types/lodash": "^4.14.161",
+    "@types/lodash": "4.14.172",
     "@types/node": "^18",
     "@types/passport": "^1.0.6",
     "@types/passport-azure-ad": "^4.3.0",
@@ -62,5 +62,10 @@
   },
   "resolutions": {
     "json-schema": "^0.4.0"
+  },
+  "overrides": {
+    "@typescript-eslint/parser": {
+      "micromatch": "~4.0.7"
+    }
   }
 }
