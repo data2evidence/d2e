@@ -1,7 +1,8 @@
-ARG IMAGE=node:18.14.0-alpine
+ARG IMAGE=node:18.20.1-alpine
 
 FROM $IMAGE as development
 
+RUN apk update && apk add busybox=1.36.1-r19
 WORKDIR /usr/src/app
 
 COPY --chown=node:node --chmod=711 package.json ./
@@ -44,6 +45,7 @@ RUN yarn install --production
 
 FROM $IMAGE AS production
 
+RUN apk update && apk add busybox=1.36.1-r19
 RUN rm -rf /usr/local/lib/node_modules/npm
 
 RUN addgroup -S alp -g 3000 && adduser --uid 3000 -S docker -G alp
