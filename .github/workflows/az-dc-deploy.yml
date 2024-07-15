@@ -27,7 +27,7 @@ on:
         required: true
         type: choice
       env:
-        default: alp-dev-sg-1
+        default: alp-dev-sg-3
         description: Select the environment
         required: true
         type: environment

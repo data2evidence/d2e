@@ -8,8 +8,8 @@
 
 - Copy values of the following password variables from `.env.local`
 ```
-POSTGRES_TENANT_READ_PASSWORD=xxx
-POSTGRES_TENANT_ADMIN_PASSWORD=xxx
+POSTGRES_TENANT_READ_PASSWORD_PLAIN=xxx
+POSTGRES_TENANT_ADMIN_PASSWORD_PLAIN=xxx
 ```
 
 ## Note
@@ -19,19 +19,19 @@ If using the postgres docker container please run the following commands as is, 
 ## Create read role
 - Run the following command:
 ```bash
-docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_read_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_READ_PASSWORD}';"
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_read_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_READ_PASSWORD_PLAIN}';"
 ```
 - Expected successful response:
 > CREATE ROLE
 
 ## Troubleshooting 
-- If you create the role with a blank password because ${POSTGRES_TENANT_READ_PASSWORD} is not set, then delete the role & create again with the following command:
+- If you create the role with a blank password because ${POSTGRES_TENANT_READ_PASSWORD_PLAIN} is not set, then delete the role & create again with the following command:
 > docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "DROP ROLE postgres_tenant_read_user;"
 
 ## Create admin role
 - Run the following command:
 ```bash
-docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_admin_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_ADMIN_PASSWORD}';"
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_admin_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_ADMIN_PASSWORD_PLAIN}';"
 ```
 - Expected successful response:
 > CREATE ROLE
