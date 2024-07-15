@@ -347,8 +347,8 @@ async function main() {
   // Create Sign-in Experiences
   let signinExperience = {
     branding: {
-      favicon: `https://${PUBLIC__FQDN}/portal/assets/favicon.ico`,
-      logoUrl: `https://${PUBLIC__FQDN}/portal/assets/d2e.svg`,
+      favicon: `https://${process.env.PUBLIC__FQDN}/portal/assets/favicon.ico`,
+      logoUrl: `https://${process.env.PUBLIC__FQDN}/portal/assets/d2e.svg`,
     },
     color: {
       primaryColor: "#000080",
