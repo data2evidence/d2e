@@ -1,4 +1,5 @@
-FROM node:18.14.0-alpine as builder
+ARG IMAGE=node:18.20.1-alpine
+FROM $IMAGE as builder
 
 RUN apk add --update yarn
 
@@ -9,8 +10,9 @@ COPY --chown=docker:alp --chmod=711 ./app app/
 RUN cd app && yarn install --network-timeout 1000000 && yarn postinstall
 
 
-FROM node:18.14.0-alpine as final
+FROM $IMAGE as final
 
+RUN apk update && apk add busybox=1.36.1-r19
 RUN apk add --update --upgrade bash yarn zlib
 
 RUN rm -rf /usr/local/lib/node_modules/npm
