@@ -1,0 +1,22 @@
+{
+    "name": "alp-fhir",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/main.ts",
+    "scripts": {
+      "build": "tsc",
+      "seed": "node ./dist/main.js",
+      "build-and-seed": "npm run build && npm run seed",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "pg": "^8.4.2"
+    },
+    "devDependencies": {
+      "@types/pg": "^8.11.6",
+      "typescript": "^5.4.5"
+    }
+  }
