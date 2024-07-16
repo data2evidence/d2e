@@ -294,6 +294,7 @@ const addUser = async (name: string, email: string, apiToken: string) => {
       json: {
         name,
         primaryEmail: email,
+        username: (name || "").replace(/[^a-zA-Z0-9_]/g, "_"),
       },
       timeout: { request: defaultTimeout },
       https: {
