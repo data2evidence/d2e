@@ -5,13 +5,13 @@ D2E_RESOURCE_PERCENTAGE=${D2E_RESOURCE_PERCENTAGE:-0.7}
 ENV_TYPE=${ENV_TYPE:-local}
 
 # vars
+OS="$(uname -s)"
 DOTENV_FILE=.env.$ENV_TYPE
 touch ${DOTENV_FILE}
 
 echo D2E_RESOURCE_PERCENTAGE=$D2E_RESOURCE_PERCENTAGE
 
 get_cpu_count() {
-    OS="$(uname -s)"
     if [ "$OS" = "Linux" ]; then
         NPROCS="$(nproc --all)"
     elif [ "$OS" = "Darwin" ] || \
@@ -23,7 +23,6 @@ get_cpu_count() {
     D2E_CPU_LIMIT=$(echo "scale=2;$NPROCS*$D2E_RESOURCE_PERCENTAGE" |bc)
     # Strip decimal numbers
     D2E_CPU_LIMIT=${D2E_CPU_LIMIT%%.*}
-
     echo D2E_CPU_LIMIT=$D2E_CPU_LIMIT
 
     # remove existing env var from dotenv
@@ -33,13 +32,17 @@ get_cpu_count() {
 }
 
 get_memory() {
-    MEMORY=$(free -g | grep Mem: | awk '{print $2}')
+    if [ "$OS" = "Darwin" ]; then
+        # mem_size=$(sysctl -n hw.memsize)
+        MEMORY=$(system_profiler SPHardwareDataType | grep "  Memory:" | awk '{print $2}')
+    else
+        MEMORY=$(free -g | grep Mem: | awk '{print $2}')
+    fi
     D2E_MEMORY_LIMIT=$(echo "scale=2;$MEMORY*$D2E_RESOURCE_PERCENTAGE" |bc)
     # Strip decimal numbers
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT%%.*}
     # Add G suffix for gigabyte
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT}G
-
     echo D2E_MEMORY_LIMIT=$D2E_MEMORY_LIMIT
 
     # remove existing env var from dotenv
