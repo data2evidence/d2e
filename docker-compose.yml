@@ -266,7 +266,8 @@ x-envs:
        "appRouter": "https://alp-mercury-approuter:41000",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
        "minio": "",
-       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:8103"
+       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:8103",
+       "dicom_server": "http://alp-dicom-server:8042"
       }
   tls: &x-tls
     TLS__INTERNAL__CA_CRT: ${TLS__INTERNAL__CA_CRT}
@@ -455,6 +456,7 @@ services:
         - *x-routes
       ACHILLES_THREAD_COUNT: 5
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
+      DICOM_SERVER__API_BASE_URL: http://alp-dicom-server:8042/
       ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
       DOCKER_HOST: unix://var/run/docker.sock
       DQD_THREAD_COUNT: 1
@@ -1543,6 +1545,8 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     networks:
       alp:
+      data:
+    hostname: alp-dicom-server.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       VERBOSE_ENABLED: true
       VERBOSE_STARTUP: true
