@@ -674,6 +674,7 @@ services:
       PG__PASSWORD: ${PG_SUPER_PASSWORD}
       PG__PORT: ${PG_PORT:-5432}
       PG__USER: ${PG_SUPER_USER:-postgres}
+      PUBLIC__FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine"},{"name":"alp-app","description":"alp-app","type":"Traditional","oidcClientMetadata":{"redirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
       LOGTO__RESOURCE:  '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
       LOGTO__USER: '{"username":"admin","initialPassword":"Updatepassword12345"}'
@@ -710,7 +711,7 @@ services:
         priority: 10
     # Enable if need to access admin console
     # ports:
-    #   - 3002:3002
+    #  - 3002:3002
     entrypoint:
       - sh
       - -c
@@ -720,7 +721,7 @@ services:
       <<:
         - *x-tls
       ADMIN_DISABLE_LOCALHOST: ${LOGTO__DISABLE_ADMIN_CONSOLE:-false}
-      ADMIN_ENDPOINT: http://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-localhost}:3002
+      # ADMIN_ENDPOINT: http://${CADDY__ALP__PUBLIC_FQDN:-localhost}:3002 # Enable if need to access admin console
       DB_URL: postgres://postgres:${PG_SUPER_PASSWORD}@alp-minerva-postgres-1:${PG_PORT:-5432}/logto
       ENDPOINT: https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO_API_M2M_CLIENT_ID: ${LOGTO_API_M2M_CLIENT_ID}

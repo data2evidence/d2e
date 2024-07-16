@@ -347,8 +347,8 @@ async function main() {
   // Create Sign-in Experiences
   let signinExperience = {
     branding: {
-      favicon: "https://localhost:41100/portal/assets/favicon.ico",
-      logoUrl: "https://localhost:41100/portal/assets/d2e.svg",
+      favicon: `https://${process.env.PUBLIC__FQDN}/portal/assets/favicon.ico`,
+      logoUrl: `https://${process.env.PUBLIC__FQDN}/portal/assets/d2e.svg`,
     },
     color: {
       primaryColor: "#000080",
@@ -356,6 +356,7 @@ async function main() {
       darkPrimaryColor: "#0000B3",
     },
     customCss: 'a[aria-label="Powered By Logto"] { display: none; }',
+    signInMode: "SignIn", //Disable user registration At Login screen
     signUp: {
       password: false,
       verify: false,
