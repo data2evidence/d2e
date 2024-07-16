@@ -5,7 +5,7 @@
   "author": "Mobilist Inc. <info@mobilist.com.tr>",
   "dependencies": {
     "@azure/msal-node": "^2.6.4",
-    "@logto/connector-kit": "^2.0.0",
+    "@logto/connector-kit": "^4.0.0",
     "@silverhand/essentials": "^2.9.0",
     "got": "^14.0.0",
     "zod": "^3.22.4",
