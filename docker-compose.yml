@@ -1180,7 +1180,6 @@ services:
         priority: 10
     ports:
       - 41190:5432
-      - 5432:5432
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     shm_size: 1gb
     volumes:
@@ -1659,8 +1658,6 @@ services:
   alp-perseus-files-manager:
     image: perseushub/files-manager:latest
     container_name: files-manager
-    ports:
-      - "10500:10500"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
@@ -1673,14 +1670,12 @@ services:
 
   alp-perseus-user:
     image: perseushub/user:latest
-    container_name: user
+    container_name: alp-perseus-user-${BASE_PORT:-1}
     environment:
       USER_ENV: Docker
       TOKEN_SECRET_KEY: Perseus-Arcad!a
       EMAIL_SECRET_KEY: 8cmuh4t5xTtR1EHaojWL0aqCR3vZ48PZF5AYkTe0iqo=
       SERVER_ADDRESS: http://localhost
-    ports:
-      - "5001:5001"
     depends_on:
       alp-minerva-postgres-post-init:
         condition: service_completed_successfully
@@ -1691,12 +1686,9 @@ services:
 
   alp-perseus-backend:
     image: perseushub/backend:latest
-    build: ./perseus-api
-    container_name: backend
+    container_name: alp-perseus-backend-${BASE_PORT:-1}
     environment:
       PERSEUS_ENV: Docker
-    ports:
-      - "5004:5004"
     depends_on:
       alp-minerva-postgres-post-init:
         condition: service_completed_successfully
@@ -1707,12 +1699,10 @@ services:
         priority: 20
     profiles: [perseus]
 
-  frontend:
+  alp-perseus-frontend:
     image: perseushub/frontend:latest
     container_name:
-      frontend
-    ports:
-      - "4200:4200"
+      alp-perseus-frontend-${BASE_PORT:-1}
     networks:
       alp:
         priority: 20
@@ -1721,9 +1711,7 @@ services:
   alp-perseus-white-rabbit:
     image: perseushub/white-rabbit:latest
     container_name:
-      white-rabbit
-    ports:
-      - "8000:8000"
+      alp-perseus-white-rabbit-${BASE_PORT:-1}
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
@@ -1739,9 +1727,7 @@ services:
   alp-perseus-cdm-builder:
     image: perseushub/cdm-builder:latest
     container_name:
-      cdm-builder
-    ports:
-      - "9000:9000"
+      alp-perseus-cdm-builder-${BASE_PORT:-1}
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
     depends_on:

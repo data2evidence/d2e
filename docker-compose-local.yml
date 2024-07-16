@@ -167,6 +167,7 @@ services:
   alp-minerva-postgres:
     ports:
       - 41190:5432
+      - 5432:5432
 
   alp-minerva-ps-config-svc:
     build:
