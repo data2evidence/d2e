@@ -107,9 +107,7 @@ jobs:
 
       - name: Docker
         run: |  
-          docker image prune -af
-          docker builder prune -af
-          docker buildx prune -af
+          docker system prune -af
 
       # - name: Build dataflow-gen
       #   uses: docker/build-push-action@v5
