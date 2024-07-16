@@ -16,3 +16,6 @@ MEDPLUM_REGISTER_ENABLED=true
 
 - Open port `41130` for serving the UI and re-route the requests to the container `alp-fhir-fe-server`
 - Open port `8103` for re-routing requests to the container `alp-fhir-server`
+
+`src/main.ts` seeds the fhir server with a client application to be used by other services. 
+- update `FHIR__CLIENT_ID` and `FHIR__CLIENT_SECRET` to create the application with a custom client id and secret 
