@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # inputs
-D2E_RESOURCE_PERCENTAGE=${D2E_RESOURCE_PERCENTAGE:-0.7}
+D2E_RESOURCE_LIMIT=${D2E_RESOURCE_LIMIT:-0.7}
 ENV_TYPE=${ENV_TYPE:-local}
 
 # vars
@@ -9,7 +9,7 @@ OS="$(uname -s)"
 DOTENV_FILE=.env.$ENV_TYPE
 touch ${DOTENV_FILE}
 
-echo D2E_RESOURCE_PERCENTAGE=$D2E_RESOURCE_PERCENTAGE
+echo D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT
 
 get_cpu_count() {
     if [ "$OS" = "Linux" ]; then
@@ -20,7 +20,7 @@ get_cpu_count() {
     else
         NPROCS="$(getconf _NPROCESSORS_ONLN)"  # glibc/coreutils fallback
     fi
-    D2E_CPU_LIMIT=$(echo "scale=2;$NPROCS*$D2E_RESOURCE_PERCENTAGE" |bc)
+    D2E_CPU_LIMIT=$(echo "scale=2;$NPROCS*$D2E_RESOURCE_LIMIT" |bc)
     # Strip decimal numbers
     D2E_CPU_LIMIT=${D2E_CPU_LIMIT%%.*}
     echo D2E_CPU_LIMIT=$D2E_CPU_LIMIT
@@ -38,7 +38,7 @@ get_memory() {
     else
         MEMORY=$(free -g | grep Mem: | awk '{print $2}')
     fi
-    D2E_MEMORY_LIMIT=$(echo "scale=2;$MEMORY*$D2E_RESOURCE_PERCENTAGE" |bc)
+    D2E_MEMORY_LIMIT=$(echo "scale=2;$MEMORY*$D2E_RESOURCE_LIMIT" |bc)
     # Strip decimal numbers
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT%%.*}
     # Add G suffix for gigabyte
