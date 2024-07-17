@@ -1214,6 +1214,9 @@ services:
     networks:
       alp:
         priority: 20
+        aliases:
+          - shareddb
+          - vocabularydb
       data:
         priority: 10
     ports:
@@ -1229,6 +1232,24 @@ services:
         - *x-tls
       POSTGRES_DB: ${PG_DB_NAME:-alp}
       POSTGRES_PASSWORD: ${PG_SUPER_PASSWORD}
+
+  alp-minerva-postgres-post-init:
+    depends_on:
+        alp-minerva-postgres:
+          condition: service_healthy
+    image: postgres:15-alpine
+    networks:
+      alp:
+        priority: 20
+    volumes:
+      - ./deploy/perseus:/perseus
+    entrypoint: sh perseus/seed.sh
+    environment:
+      <<:
+        - *x-pg
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+    profiles: [perseus]
 
   alp-minerva-ps-config-svc:
     container_name: &c18 alp-minerva-ps-config-svc-${BASE_PORT:-1}
@@ -1675,38 +1696,87 @@ services:
       - ./cache/synpuf1k/:/tmp/data/synpuf1k
     profiles: [data-load]
 
-  alp-fhir-client:
-    container_name: &c30 alp-minerva-fhir-client-${BASE_PORT:-1}
+  alp-perseus-files-manager:
+    image: perseushub/files-manager:latest
+    container_name: files-manager
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
-      alp-logto:
-        condition: service_healthy
-      alp-fhir-server:
-        condition: service_healthy
-    hostname: alp-minerva-fhir-client-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-fhir-client:${DOCKER_TAG_NAME:-develop}
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 120s
-      test:
-        - CMD
-        - curl
-        - -f
-        - http://localhost:41112
-      timeout: 30s
-    logging:
-      options:
-        tag: *c30
+      alp-minerva-postgres-post-init:
+        condition: service_completed_successfully
     networks:
       alp:
         priority: 20
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    profiles: [perseus]
+
+  alp-perseus-user:
+    image: perseushub/user:latest
+    container_name: alp-perseus-user-${BASE_PORT:-1}
     environment:
-      <<:
-        - *x-tls
-        - *x-routes
-        - *x-fhir
-      FHIR__LOG_LEVEL: debug
-      LOCAL_DEBUG: "false"
-      NODE_ENV: development
-      PORT: 41${BASE_PORT:-1}12
+      USER_ENV: Docker
+      TOKEN_SECRET_KEY: Perseus-Arcad!a
+      EMAIL_SECRET_KEY: 8cmuh4t5xTtR1EHaojWL0aqCR3vZ48PZF5AYkTe0iqo=
+      SERVER_ADDRESS: http://localhost
+    depends_on:
+      alp-minerva-postgres-post-init:
+        condition: service_completed_successfully
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  alp-perseus-backend:
+    image: perseushub/backend:latest
+    container_name: alp-perseus-backend-${BASE_PORT:-1}
+    environment:
+      PERSEUS_ENV: Docker
+    depends_on:
+      alp-minerva-postgres-post-init:
+        condition: service_completed_successfully
+      alp-perseus-files-manager:
+        condition: service_started
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  alp-perseus-frontend:
+    image: perseushub/frontend:latest
+    container_name:
+      alp-perseus-frontend-${BASE_PORT:-1}
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  alp-perseus-white-rabbit:
+    image: perseushub/white-rabbit:latest
+    container_name:
+      alp-perseus-white-rabbit-${BASE_PORT:-1}
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      alp-minerva-postgres-post-init:
+        condition: service_completed_successfully
+      alp-perseus-files-manager:
+        condition: service_started
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  alp-perseus-cdm-builder:
+    image: perseushub/cdm-builder:latest
+    container_name:
+      alp-perseus-cdm-builder-${BASE_PORT:-1}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    depends_on:
+      alp-minerva-postgres-post-init:
+        condition: service_completed_successfully
+      alp-perseus-files-manager:
+        condition: service_started
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
