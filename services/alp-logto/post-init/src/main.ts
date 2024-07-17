@@ -1,5 +1,12 @@
 import * as logto from "./middleware/logto";
 import * as pg from "pg";
+import {
+  writeEnvFile,
+  removeEnvLine,
+  copyBackupFile,
+  restoreFile,
+  cleanupFile,
+} from "./utils/manipulateFile";
 
 async function create(
   path: string,
@@ -95,7 +102,9 @@ async function main() {
     accessTokenTtl: 3600,
   };
 
-  let user: { username: string; initialPassword: string } = JSON.parse(process.env.LOGTO__USER);
+  let user: { username: string; initialPassword: string } = JSON.parse(
+    process.env.LOGTO__USER
+  );
 
   let scopes: Array<{ name: string }> =
     JSON.parse(process.env.LOGTO__SCOPES) || [];
@@ -118,7 +127,7 @@ async function main() {
     "applications",
     headers
   );
-  const APP_ENVS: String[] = [];
+  const APP_ENVS: string[] = [];
   for (const a of apps) {
     const appExists = fetchExistingApps.find(
       (existingApp: any) => existingApp.name === a.name
@@ -157,7 +166,10 @@ async function main() {
     console.log(
       `********************** COPY OVER ENV ASSIGNMENTS FOR ${appName} IN .env.local ***********************`
     );
-    APP_ENVS.push(`${ENV__CLIENT_ID}=${appID}`,`${ENV__CLIENT_SECRET}=${appSecret}`)
+    APP_ENVS.push(
+      `${ENV__CLIENT_ID}=${appID}`,
+      `${ENV__CLIENT_SECRET}=${appSecret}`
+    );
     console.log(`${ENV__CLIENT_ID}=${appID}`);
     console.log(`${ENV__CLIENT_SECRET}=${appSecret}`);
     console.log(
@@ -186,7 +198,9 @@ async function main() {
 
   if (!isDefault) {
     // Set the resource as the default
-    await logto.patch(`resources/${resourceId}/is-default`, headers, { "isDefault": true })
+    await logto.patch(`resources/${resourceId}/is-default`, headers, {
+      isDefault: true,
+    });
   }
 
   console.log(
@@ -202,7 +216,9 @@ async function main() {
     headers
   );
   const userExists = fetchExistingUsers.find(
-    (existingUser: any) => existingUser.username === user.username && existingUser.tenant_id === 'default'
+    (existingUser: any) =>
+      existingUser.username === user.username &&
+      existingUser.tenant_id === "default"
   );
   let logtoAdminUser = userExists || (await create("users", headers, user));
 
@@ -210,10 +226,10 @@ async function main() {
     await update(`users/${logtoAdminUser.id}`, headers, user);
   }
 
-  if(!logtoAdminUser["lastSignInAt"])
-    await logto.patch(`users/${logtoAdminUser.id}/password`,
-                        headers,
-                        {"password": user["initialPassword"]})
+  if (!logtoAdminUser["lastSignInAt"])
+    await logto.patch(`users/${logtoAdminUser.id}/password`, headers, {
+      password: user["initialPassword"],
+    });
 
   console.log(
     "*********************************************************************************\n"
@@ -237,7 +253,11 @@ async function main() {
       (await create(`resources/${resourceId}/scopes`, headers, s));
 
     if (resourceScopeExists) {
-      await update(`resources/${resourceId}/scopes/${logtoScope.id}`, headers, s);
+      await update(
+        `resources/${resourceId}/scopes/${logtoScope.id}`,
+        headers,
+        s
+      );
     }
 
     logtoScopes.push(logtoScope);
@@ -303,7 +323,7 @@ async function main() {
     "*********************************************************************************\n"
   );
 
-  let userRoles: Array<{ userId: string; roleIds: Array<string> }> = []
+  let userRoles: Array<{ userId: string; roleIds: Array<string> }> = [];
   if (logtoAdminUser && logtoAdminUser["id"]) {
     // Create User-roles
     console.log(
@@ -330,14 +350,15 @@ async function main() {
         if (!userRoleExist) missingRoleIDs.push(roleId);
       }
 
-      missingRoleIDs.length && await create(
+      missingRoleIDs.length &&
+        (await create(
           `users/${ur.userId}/roles`,
           headers,
           {
             roleIds: missingRoleIDs,
           },
           false
-        );
+        ));
     }
     console.log(
       "*********************************************************************************\n"
@@ -364,87 +385,109 @@ async function main() {
   };
   await logto.patch("sign-in-exp", headers, signinExperience);
 
-
   console.log(
     "*********************************** SUMMARY **********************************\n"
   );
 
-  const createdApps: Array<Object> = (await fetchExisting(
-    "applications",
-    headers,
-    false
-  )).filter((a: any) => apps.map(x => x.name).includes(a.name));
+  const createdApps: Array<Object> = (
+    await fetchExisting("applications", headers, false)
+  ).filter((a: any) => apps.map((x) => x.name).includes(a.name));
 
   console.log(
-    `Applications created: ${createdApps.length} \n Applications creation successful: ${createdApps.length == apps.length}`
+    `Applications created: ${
+      createdApps.length
+    } \n Applications creation successful: ${createdApps.length == apps.length}`
   );
 
-  const createdResources: Array<Object> = (await fetchExisting(
-    "resources",
-    headers,
-    false
-  )).filter((a: any) => resource.name === a.name);
+  const createdResources: Array<Object> = (
+    await fetchExisting("resources", headers, false)
+  ).filter((a: any) => resource.name === a.name);
 
   console.log(
-    `Resources created: ${createdResources.length} \n Resources creation successful: ${createdResources.length == 1}`
+    `Resources created: ${
+      createdResources.length
+    } \n Resources creation successful: ${createdResources.length == 1}`
   );
 
-  const createdUsers: Array<Object> = (await fetchExisting(
-    "users",
-    headers,
-    false
-  )).filter((a: any) => user.username === a.username);
+  const createdUsers: Array<Object> = (
+    await fetchExisting("users", headers, false)
+  ).filter((a: any) => user.username === a.username);
 
   console.log(
-    `Users created: ${createdUsers.length} \n Users creation successful: ${createdUsers.length == 1}`
+    `Users created: ${createdUsers.length} \n Users creation successful: ${
+      createdUsers.length == 1
+    }`
   );
 
-  const createdScopes: Array<Object> = (await fetchExisting(
-    `resources/${resourceId}/scopes`,
-    headers,
-    false
-  )).filter((s: any) => scopes.map(x => x.name).includes(s.name));
+  const createdScopes: Array<Object> = (
+    await fetchExisting(`resources/${resourceId}/scopes`, headers, false)
+  ).filter((s: any) => scopes.map((x) => x.name).includes(s.name));
 
   console.log(
-    `Scopes created: ${createdScopes.length} \n Scopes creation successful: ${createdScopes.length == scopes.length}`
+    `Scopes created: ${createdScopes.length} \n Scopes creation successful: ${
+      createdScopes.length == scopes.length
+    }`
   );
 
-  const createdRoles: Array<Object> = (await fetchExisting(
-    "roles",
-    headers,
-    false
-  )).filter((r: any) => roles.map(x => x.name).includes(r.name));
+  const createdRoles: Array<Object> = (
+    await fetchExisting("roles", headers, false)
+  ).filter((r: any) => roles.map((x) => x.name).includes(r.name));
 
   console.log(
-    `Roles created: ${createdRoles.length} \n Roles creation successful: ${createdRoles.length == roles.length}`
+    `Roles created: ${createdRoles.length} \n Roles creation successful: ${
+      createdRoles.length == roles.length
+    }`
   );
 
-  const createdRoleScopes: Array<Object> = (await Promise.all(roleScopes.map(rs => fetchExisting(
-    `roles/${rs.roleId}/scopes`,
-    headers,
-    false
-  )))).filter((rs: any) => roleScopes.map(x => x.scopeName === rs.name))
+  const createdRoleScopes: Array<Object> = (
+    await Promise.all(
+      roleScopes.map((rs) =>
+        fetchExisting(`roles/${rs.roleId}/scopes`, headers, false)
+      )
+    )
+  ).filter((rs: any) => roleScopes.map((x) => x.scopeName === rs.name));
 
   console.log(
-    `Roles-Scopes created: ${createdRoleScopes.length} \n Role-Scopes creation successful: ${createdRoleScopes.length == roleScopes.length}`
+    `Roles-Scopes created: ${
+      createdRoleScopes.length
+    } \n Role-Scopes creation successful: ${
+      createdRoleScopes.length == roleScopes.length
+    }`
   );
 
-  const createdUserRoles: Array<Object> = (await Promise.all(userRoles.map(ur => fetchExisting(
-    `users/${ur.userId}/roles`,
-    headers,
-    false
-  )))).filter((rs: any) => userRoles.map(x => x.roleIds === rs.id)).flat()
-  
-  console.log(
-    `Users-Roles created: ${createdUserRoles.length} \n User-Roles creation successful: ${createdUserRoles.length == userRoles.map(x => x.roleIds).flat().length}`
-  );
+  const createdUserRoles: Array<Object> = (
+    await Promise.all(
+      userRoles.map((ur) =>
+        fetchExisting(`users/${ur.userId}/roles`, headers, false)
+      )
+    )
+  )
+    .filter((rs: any) => userRoles.map((x) => x.roleIds === rs.id))
+    .flat();
 
   console.log(
-    `\n********************** COPY OVER ENV ASSIGNMENTS FOR LOGTO IN .env.local ***********************`
+    `Users-Roles created: ${
+      createdUserRoles.length
+    } \n User-Roles creation successful: ${
+      createdUserRoles.length == userRoles.map((x) => x.roleIds).flat().length
+    }`
   );
-  console.log(APP_ENVS.join("\n"))
+
+  const orignalEnvFileWithPath = `/run/envs/.env.${process.env.ENV_TYPE}`;
+  const backupFileWithPath = orignalEnvFileWithPath + ".tmp";
+  await copyBackupFile(orignalEnvFileWithPath, backupFileWithPath);
+  console.log(`backup file path ${backupFileWithPath}`);
+  // Remove existing env & Write to env file
+  APP_ENVS.forEach(async (env) => {
+    const key = env.split("=")[0];
+    await removeEnvLine(key, backupFileWithPath);
+  });
+  await writeEnvFile("\n" + APP_ENVS.join("\n"), backupFileWithPath);
+  await restoreFile(backupFileWithPath, orignalEnvFileWithPath);
+  await cleanupFile(backupFileWithPath);
+
   console.log(
-    `****************************************************************************\n`
+    `\n********************** LOGTO ENV ASSIGNMENTS Generated IN .env.${process.env.ENV_TYPE} *************************`
   );
 }
 
@@ -557,3 +600,4 @@ async function seeding_alp_admin() {
 
 seeding_alp_admin();
 main();
+setTimeout(() => console.log("THE END"), 10000000);
