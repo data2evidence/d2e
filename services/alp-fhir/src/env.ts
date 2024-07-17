@@ -17,7 +17,6 @@ const Env = z.object({
           return z.never();
       }
   }),
-  // DUCKDB__DATA_FOLDER: z.string()
 })
 
 const result = Env.safeParse(process.env)

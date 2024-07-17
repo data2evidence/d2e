@@ -13,25 +13,25 @@ export class FhirRouter {
   }
 
   private registerRoutes() {
-    this.router.post('/createProject', async (req, res) => {
-      const token = req.headers.authorization!
-      const fhirApi = new FhirAPI(token)
-      const name = req.query.name as string
-      const description = req.query.description as string
-      try {
-        const newProject = await fhirApi.createProject(name, description)
-        return res.status(200).json(newProject)
-      } catch (error) {
-        this.logger.error(`Error creating new project: ${error}`)
-        res.status(500).send('Error creating new project')
-      }
-    })
+    // this.router.post('/createProject', async (req, res) => {
+    //   const token = req.headers.authorization!
+    //   const fhirApi = new FhirAPI(token)
+    //   const name = req.query.name as string
+    //   const description = req.query.description as string
+    //   try {
+    //     const newProject = await fhirApi.createProject(name, description)
+    //     return res.status(200).json(newProject)
+    //   } catch (error) {
+    //     this.logger.error(`Error creating new project: ${error}`)
+    //     res.status(500).send('Error creating new project')
+    //   }
+    // })
 
-    this.router.post('/', async (req, res) => {
-      const token = req.headers.authorization!
+    this.router.post('/:resource', async (req, res) => {
       try {
-        const fhirApi = new FhirAPI(token)
-        const newProject = await fhirApi.importData(req.body)
+        const fhirApi = new FhirAPI()
+        const { resource } = req.params
+        const newProject = await fhirApi.importData(resource, req.body)
         return res.status(200).json(newProject)
       } catch (error) {
         this.logger.error(`Error importing data into fhir: ${error}`)

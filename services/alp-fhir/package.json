@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "tsc",
+    "compile": "tsc && node --no-warnings esbuild-script.mjs",
     "lint": "eslint src/",
     "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/main.ts",
     "start": "node ./dist/main.js"
@@ -18,6 +18,15 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:alp/alp-clinical-research.git"
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "extends": [
+      "@medplum/eslint-config"
+    ],
+    "root": true
   },
   "devDependencies": {
     "esbuild": "0.21.5",
