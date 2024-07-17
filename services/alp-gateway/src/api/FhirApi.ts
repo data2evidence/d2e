@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from 'axios'
 import { env, services } from '../env'
 import { createLogger } from '../Logger'
 import { Agent } from 'https'
@@ -6,64 +5,98 @@ import { post } from './request-util'
 
 export class FhirAPI {
   private readonly baseURL: string
+  private readonly fhirTokenUrl: string
   private readonly logger = createLogger(this.constructor.name)
-  private readonly token: string
+  private token: string
   private readonly httpsAgent: Agent
+  private readonly clientId: string
+  private readonly clientSecret: string
 
-  constructor(token: string) {
-    this.token = token
-    if (!token) {
-      throw new Error('No token passed for Fhir')
-    }
-    if (services.dataflowMgmt) {
-      this.baseURL = services.dataflowMgmt
-      this.httpsAgent = new Agent({
-        rejectUnauthorized: true,
-        ca: env.GATEWAY_CA_CERT
-      })
+  constructor() {
+    if (services.fhir) {
+      this.baseURL = services.fhir
+      this.fhirTokenUrl = services.fhirTokenUrl
     } else {
       this.logger.error('No url is set for Fhir')
       throw new Error('No url is set for Fhir')
     }
+
+    if (env.FHIR_CLIENT_ID && env.FHIR_CLIENT_SECRET) {
+      this.clientId = env.FHIR_CLIENT_ID
+      this.clientSecret = env.FHIR_CLIENT_SECRET
+    } else {
+      this.logger.error('No client credentials are set for Fhir')
+      throw new Error('No client credentials are set for Fhir')
+    }
   }
 
   private async getRequestConfig() {
-    let options: AxiosRequestConfig = {}
+    const formBody = new URLSearchParams()
+    formBody.set('grant_type', 'client_credentials')
+    formBody.set('client_id', this.clientId)
+    formBody.set('client_secret', this.clientSecret)
 
-    options = {
+    const options = {
+      body: formBody.toString(),
+      credentials: 'include',
       headers: {
-        Authorization: this.token
-      },
-      httpsAgent: this.httpsAgent
+        Authorization: `Basic ${Buffer.from(this.clientId + ':' + this.clientSecret, 'binary').toString('base64')}`
+      }
     }
-
+    const headers = options.headers
+    headers['Content-type'] = 'application/x-www-form-urlencoded'
     return options
   }
 
-  async createProject(name: string, description: string) {
+  async authenticate() {
     try {
-      this.logger.info(`Create fhir project for the dataset`)
-      const options = await this.getRequestConfig()
-      const url = `${this.baseURL}/createProject`
-      const details = {
-        name: name,
-        description: description
+      let response
+      try {
+        const options = await this.getRequestConfig();
+        response = await post(this.fhirTokenUrl, options)
+      } catch (err) {
+        throw err
       }
-      const result = await post(url, details, options)
-      if (result.data) {
-        return result.data
+
+      if (!response.ok) {
+        try {
+          const error = await response.json()
+          throw error
+        } catch (err) {
+          throw 'Failed to fetch tokens: ' + err
+        }
       }
-    } catch (error) {
-      console.log(error)
+      this.token = await response.json()
+    } catch (err) {
+      throw err
     }
   }
 
-  async importData(fhirResource: string) {
+  // async createProject(name: string, description: string) {
+  //   try {
+  //     this.logger.info(`Create fhir project for the dataset`)
+  //     await this.authenticate()
+  //     const options = await this.getRequestConfig()
+  //     const url = `${this.baseURL}/createProject`
+  //     const details = {
+  //       name: name,
+  //       description: description
+  //     }
+  //     const result = await post(url, details, options)
+  //     if (result.data) {
+  //       return result.data
+  //     }
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
+
+  async importData(fhirResouce: string, resourceDetails: string) {
     try {
       this.logger.info(`Import data into fhir server`)
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}/`
-      const result = await post(url, fhirResource, options)
+      const url = `${this.baseURL}/${fhirResouce}`
+      const result = await post(url, resourceDetails, options)
       if (result.data) {
         return result.data
       }

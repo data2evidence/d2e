@@ -76,10 +76,6 @@
     {
       "source": "^/ps-config-svc/(.*)$",
       "destination": "ps-config"
-    },
-    {
-      "source": "^/fhir/(.*)$",
-      "destination": "fhir"
     }
   ]
 }
