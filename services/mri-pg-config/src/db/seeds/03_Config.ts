@@ -17424,7 +17424,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@CONDERA.person_id AS VARCHAR)",
+            "expression": "@CONDERA.person_id",
             "order": 4,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -17469,7 +17469,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@CONDERA.\"CONDITION_ERA_ID\" AS VARCHAR)",
+            "expression": "@CONDERA.\"CONDITION_ERA_ID\"",
             "order": 5,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -17610,7 +17610,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@COND.\"VISIT_OCCURRENCE_ID\" AS VARCHAR)",
+            "expression": "@COND.\"VISIT_OCCURRENCE_ID\"",
             "order": 1,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -17745,7 +17745,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@COND.person_id AS VARCHAR)",
+            "expression": "@COND.person_id",
             "order": 4,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -17790,7 +17790,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@COND.\"CONDITION_OCCURRENCE_ID\" AS VARCHAR)",
+            "expression": "@COND.\"CONDITION_OCCURRENCE_ID\"",
             "order": 9,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -17835,7 +17835,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@COND.\"CONDITION_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@COND.\"CONDITION_TYPE_CONCEPT_ID\"",
             "order": 12,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -17882,7 +17882,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@COND.\"CONDITION_SOURCE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@COND.\"CONDITION_SOURCE_CONCEPT_ID\"",
             "order": 14,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -17927,7 +17927,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@COND.\"CONDITION_STATUS_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@COND.\"CONDITION_STATUS_CONCEPT_ID\"",
             "order": 16,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -18023,7 +18023,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@COND.\"CONDITION_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@COND.\"CONDITION_CONCEPT_ID\"",
             "order": 18,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -18070,7 +18070,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@COND.\"CONDITION_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@COND.\"CONDITION_TYPE_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Condition Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
             "referenceExpression": "@REF.CONCEPT_ID",
             "order": 19,
@@ -18119,7 +18119,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@COND.\"CONDITION_SOURCE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@COND.\"CONDITION_SOURCE_CONCEPT_ID\"",
             "order": 20,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -18164,7 +18164,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@COND.\"CONDITION_STATUS_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@COND.\"CONDITION_STATUS_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Condition Status' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
             "referenceExpression": "@REF.CONCEPT_ID",
             "order": 21,
@@ -18307,7 +18307,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@DEATH.\"DEATH_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DEATH.\"DEATH_TYPE_CONCEPT_ID\"",
             "order": 2,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -18354,7 +18354,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DEATH.person_id AS VARCHAR)",
+            "expression": "@DEATH.person_id",
             "order": 3,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -18489,7 +18489,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DEATH.\"DEATH_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DEATH.\"DEATH_TYPE_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Death Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
             "referenceExpression": "@REF.CONCEPT_ID",
             "order": 7,
@@ -18720,7 +18720,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DEVEXP.person_id AS VARCHAR)",
+            "expression": "@DEVEXP.person_id",
             "order": 4,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -18765,7 +18765,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DEVEXP.\"DEVICE_EXPOSURE_ID\" AS VARCHAR)",
+            "expression": "@DEVEXP.\"DEVICE_EXPOSURE_ID\"",
             "order": 5,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -18810,7 +18810,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@DEVEXP.\"DEVICE_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DEVEXP.\"DEVICE_TYPE_CONCEPT_ID\"",
             "order": 9,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -18906,7 +18906,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@DEVEXP.\"DEVICE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DEVEXP.\"DEVICE_CONCEPT_ID\"",
             "order": 11,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -18953,7 +18953,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DEVEXP.\"DEVICE_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DEVEXP.\"DEVICE_TYPE_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Device Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
             "referenceExpression": "@REF.CONCEPT_ID",
             "order": 12,
@@ -19096,7 +19096,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DOSEERA.person_id AS VARCHAR)",
+            "expression": "@DOSEERA.person_id",
             "order": 2,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -19276,7 +19276,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DOSEERA.\"DOSE_ERA_ID\" AS VARCHAR)",
+            "expression": "@DOSEERA.\"DOSE_ERA_ID\"",
             "order": 6,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -19321,7 +19321,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@DOSEERA.\"DRUG_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DOSEERA.\"DRUG_CONCEPT_ID\"",
             "order": 8,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -19368,7 +19368,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@DOSEERA.\"UNIT_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DOSEERA.\"UNIT_CONCEPT_ID\"",
             "order": 10,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -19415,7 +19415,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DOSEERA.\"DRUG_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DOSEERA.\"DRUG_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Drug' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
             "referenceExpression": "@REF.CONCEPT_ID",
             "order": 11,
@@ -19464,7 +19464,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DOSEERA.\"UNIT_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DOSEERA.\"UNIT_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Unit' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
             "referenceExpression": "@REF.CONCEPT_ID",
             "order": 12,
@@ -19650,7 +19650,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DRUGERA.person_id AS VARCHAR)",
+            "expression": "@DRUGERA.person_id",
             "order": 3,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -19695,7 +19695,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DRUGERA.\"DRUG_ERA_ID\" AS VARCHAR)",
+            "expression": "@DRUGERA.\"DRUG_ERA_ID\"",
             "order": 4,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -19785,7 +19785,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "num",
-            "expression": "CAST (@DRUGERA.\"DRUG_EXPOSURE_COUNT\" AS VARCHAR)",
+            "expression": "@DRUGERA.\"DRUG_EXPOSURE_COUNT\"",
             "order": 6,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -19830,7 +19830,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@DRUGERA.\"DRUG_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DRUGERA.\"DRUG_CONCEPT_ID\"",
             "order": 8,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -19877,7 +19877,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DRUGERA.\"DRUG_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DRUGERA.\"DRUG_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Drug' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
             "referenceExpression": "@REF.CONCEPT_ID",
             "order": 9,
@@ -20018,7 +20018,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "num",
-            "expression": "CAST (@DRUGEXP.\"REFILLS\" AS VARCHAR)",
+            "expression": "@DRUGEXP.\"REFILLS\"",
             "order": 2,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -20288,7 +20288,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DRUGEXP.\"DRUG_EXPOSURE_ID\" AS VARCHAR)",
+            "expression": "@DRUGEXP.\"DRUG_EXPOSURE_ID\"",
             "order": 11,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -20333,7 +20333,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DRUGEXP.\"SIG\" AS VARCHAR)",
+            "expression": "@DRUGEXP.\"SIG\"",
             "order": 12,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -20378,7 +20378,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@DRUGEXP.person_id AS VARCHAR)",
+            "expression": "@DRUGEXP.person_id",
             "order": 13,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -20468,7 +20468,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "num",
-            "expression": "CAST (@DRUGEXP.\"DAYS_SUPPLY\" AS VARCHAR)",
+            "expression": "@DRUGEXP.\"DAYS_SUPPLY\"",
             "order": 15,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -20562,7 +20562,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@DRUGEXP.\"DRUG_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DRUGEXP.\"DRUG_CONCEPT_ID\"",
             "order": 20,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -20658,7 +20658,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@DRUGEXP.\"ROUTE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DRUGEXP.\"ROUTE_CONCEPT_ID\"",
             "order": 22,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -20754,7 +20754,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@DRUGEXP.\"DRUG_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@DRUGEXP.\"DRUG_TYPE_CONCEPT_ID\"",
             "order": 24,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -20985,7 +20985,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@MEAS.person_id AS VARCHAR)",
+            "expression": "@MEAS.person_id",
             "order": 5,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -21030,7 +21030,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@MEAS.\"MEASUREMENT_ID\" AS VARCHAR)",
+            "expression": "@MEAS.\"MEASUREMENT_ID\"",
             "order": 6,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -21075,7 +21075,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@MEAS.\"MEASUREMENT_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@MEAS.\"MEASUREMENT_TYPE_CONCEPT_ID\"",
             "order": 10,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -21122,7 +21122,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@MEAS.\"VALUE_AS_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@MEAS.\"VALUE_AS_CONCEPT_ID\"",
             "order": 12,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -21167,7 +21167,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@MEAS.\"UNIT_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@MEAS.\"UNIT_CONCEPT_ID\"",
             "order": 14,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -21261,7 +21261,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@MEAS.\"MEASUREMENT_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@MEAS.\"MEASUREMENT_CONCEPT_ID\"",
             "order": 16,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -21308,7 +21308,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@MEAS.\"MEASUREMENT_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@MEAS.\"MEASUREMENT_TYPE_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Meas Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
             "referenceExpression": "@REF.CONCEPT_ID",
             "order": 17,
@@ -21357,7 +21357,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@MEAS.\"VALUE_AS_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@MEAS.\"VALUE_AS_CONCEPT_ID\"",
             "order": 18,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -21402,7 +21402,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@MEAS.\"UNIT_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@MEAS.\"UNIT_CONCEPT_ID\"",
             "order": 19,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -21586,7 +21586,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@OBS.person_id AS VARCHAR)",
+            "expression": "@OBS.person_id",
             "order": 3,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -21676,7 +21676,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@OBS.\"OBSERVATION_ID\" AS VARCHAR)",
+            "expression": "@OBS.\"OBSERVATION_ID\"",
             "order": 5,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -21811,7 +21811,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@OBS.\"OBSERVATION_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@OBS.\"OBSERVATION_CONCEPT_ID\"",
             "order": 13,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -21907,7 +21907,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@OBS.\"OBSERVATION_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@OBS.\"OBSERVATION_TYPE_CONCEPT_ID\"",
             "order": 19,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -21954,7 +21954,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@OBS.\"VALUE_AS_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@OBS.\"VALUE_AS_CONCEPT_ID\"",
             "order": 20,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -21999,7 +21999,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@OBS.\"VALUE_AS_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@OBS.\"VALUE_AS_CONCEPT_ID\"",
             "order": 21,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -22093,7 +22093,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@OBS.\"QUALIFIER_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@OBS.\"QUALIFIER_CONCEPT_ID\"",
             "order": 23,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -22189,7 +22189,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@OBS.\"UNIT_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@OBS.\"UNIT_CONCEPT_ID\"",
             "order": 25,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -22236,7 +22236,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@OBS.\"OBSERVATION_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@OBS.\"OBSERVATION_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Observation' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
             "referenceExpression": "@REF.CONCEPT_ID",
             "order": 26,
@@ -22469,7 +22469,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@OBSPER.person_id AS VARCHAR)",
+            "expression": "@OBSPER.person_id",
             "order": 2,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -22561,7 +22561,7 @@ const cdwConfigDuckdb = {
             "type": "text",
             "expression": "@OBSPER.\"PERIOD_TYPE_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Obs Period Type' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-            "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
+            "referenceExpression": "@REF.CONCEPT_ID",
             "order": 6,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -22608,7 +22608,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@OBSPER.\"PERIOD_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@OBSPER.\"PERIOD_TYPE_CONCEPT_ID\"",
             "order": 7,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -22792,7 +22792,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@PPPER.person_id AS VARCHAR)",
+            "expression": "@PPPER.person_id",
             "order": 2,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -22837,7 +22837,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@PPPER.\"PAYER_PLAN_PERIOD_ID\" AS VARCHAR)",
+            "expression": "@PPPER.\"PAYER_PLAN_PERIOD_ID\"",
             "order": 3,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -22974,7 +22974,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@PROC.\"PROCEDURE_OCCURRENCE_ID\" AS VARCHAR)",
+            "expression": "@PROC.\"PROCEDURE_OCCURRENCE_ID\"",
             "order": 2,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -23019,7 +23019,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@PROC.\"PROCEDURE_OCCURRENCE_ID\" AS VARCHAR)",
+            "expression": "@PROC.\"PROCEDURE_OCCURRENCE_ID\"",
             "order": 3,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -23109,7 +23109,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "num",
-            "expression": "CAST (@PROC.\"QUANTITY\" AS VARCHAR)",
+            "expression": "@PROC.\"QUANTITY\"",
             "order": 5,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -23154,7 +23154,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@PROC.person_id AS VARCHAR)",
+            "expression": "@PROC.person_id",
             "order": 8,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -23248,7 +23248,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@PROC.\"PROCEDURE_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@PROC.\"PROCEDURE_TYPE_CONCEPT_ID\"",
             "order": 14,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -23295,7 +23295,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@PROC.\"MODIFIER_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@PROC.\"MODIFIER_CONCEPT_ID\"",
             "order": 15,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -23340,7 +23340,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@PROC.\"MODIFIER_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@PROC.\"MODIFIER_CONCEPT_ID\"",
             "order": 16,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -23479,7 +23479,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@SPEC.person_id AS VARCHAR)",
+            "expression": "@SPEC.person_id",
             "order": 5,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -23524,7 +23524,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@SPEC.\"SPECIMEN_ID\" AS VARCHAR)",
+            "expression": "@SPEC.\"SPECIMEN_ID\"",
             "order": 6,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -23753,7 +23753,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@SPEC.\"SPECIMEN_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@SPEC.\"SPECIMEN_CONCEPT_ID\"",
             "order": 17,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -23849,7 +23849,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@SPEC.\"SPECIMEN_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@SPEC.\"SPECIMEN_TYPE_CONCEPT_ID\"",
             "order": 19,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -23945,7 +23945,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@SPEC.\"ANATOMIC_SITE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@SPEC.\"ANATOMIC_SITE_CONCEPT_ID\"",
             "order": 21,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -24041,7 +24041,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@SPEC.\"DISEASE_STATUS_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@SPEC.\"DISEASE_STATUS_CONCEPT_ID\"",
             "order": 23,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -24137,7 +24137,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@SPEC.\"UNIT_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@SPEC.\"UNIT_CONCEPT_ID\"",
             "order": 25,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -24368,7 +24368,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@VISIT.person_id AS VARCHAR)",
+            "expression": "@VISIT.person_id",
             "order": 3,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -24413,7 +24413,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@VISIT.\"VISIT_OCCURRENCE_ID\" AS VARCHAR)",
+            "expression": "@VISIT.\"VISIT_OCCURRENCE_ID\"",
             "order": 6,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -24458,7 +24458,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@VISIT.\"VISIT_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@VISIT.\"VISIT_TYPE_CONCEPT_ID\"",
             "order": 9,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -24554,7 +24554,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "conceptSet",
-            "expression": "CAST (@VISIT.\"VISIT_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@VISIT.\"VISIT_CONCEPT_ID\"",
             "order": 11,
             "domainFilter": "",
             "standardConceptCodeFilter": "",
@@ -24601,7 +24601,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@VISIT.\"VISIT_TYPE_CONCEPT_ID\" AS VARCHAR)",
+            "expression": "@VISIT.\"VISIT_TYPE_CONCEPT_ID\"",
             "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Visit Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
             "referenceExpression": "@REF.CONCEPT_ID",
             "order": 12,
@@ -24790,7 +24790,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@CONSENT.\"PERSON_ID\" AS VARCHAR)",
+            "expression": "@CONSENT.\"PERSON_ID\"",
             "order": 1,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -24834,7 +24834,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@CONSENT.\"PARENT_CONSENT_DETAIL_ID\" AS VARCHAR)",
+            "expression": "@CONSENT.\"PARENT_CONSENT_DETAIL_ID\"",
             "order": 2,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -26410,7 +26410,7 @@ const cdwConfigDuckdb = {
               }
             ],
             "type": "text",
-            "expression": "CAST (@COHORT.\"subject_id\" AS VARCHAR)",
+            "expression": "@COHORT.\"subject_id\"",
             "order": 1,
             "domainFilter": "",
             "standardConceptCodeFilter": ""
@@ -26543,7 +26543,7 @@ const cdwConfigDuckdb = {
           }
         ],
         "type": "text",
-        "expression": "CAST (@PATIENT.\"person_id\" AS VARCHAR)",
+        "expression": "@PATIENT.\"person_id\"",
         "order": 0,
         "annotations": [
           "person_id"
