@@ -25,21 +25,21 @@ jobs:
     runs-on: test
     if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
     steps:
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
-          tool-cache: false
+      # - name: Free Disk Space (Ubuntu)
+      #   uses: jlumbroso/free-disk-space@main
+      #   with:
+      #     # this might remove tools that are actually needed,
+      #     # if set to "true" but frees about 6 GB
+      #     tool-cache: false
 
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: false
-          docker-images: true
-          swap-storage: true
+      #     # all of these default to true, but feel free to set to
+      #     # "false" if necessary for your workflow
+      #     android: true
+      #     dotnet: true
+      #     haskell: true
+      #     large-packages: false
+      #     docker-images: true
+      #     swap-storage: true
 
       - uses: actions/checkout@v4
 
@@ -78,20 +78,20 @@ jobs:
           REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
           REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
 
-      - name: 1password ratelimit end
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        run: |
-          ./internal/scripts/get-op-ratelimit.sh
+      # - name: 1password ratelimit end
+      #   env:
+      #     OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      #   run: |
+      #     ./internal/scripts/get-op-ratelimit.sh
 
-      - name: Upload stats.yml artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: stats
-          retention-days: 30
-          path: |
-            ${{ github.job }}*.yml
+      # - name: Upload stats.yml artifact
+      #   uses: actions/upload-artifact@v4
+      #   if: always()
+      #   with:
+      #     name: stats
+      #     retention-days: 30
+      #     path: |
+      #       ${{ github.job }}*.yml
 
       - name: Login to ACR
         uses: docker/login-action@v3.1.0
@@ -105,51 +105,51 @@ jobs:
         with:
           config: .github/buildkitd.toml
 
-      - name: Docker
-        run: |
-          docker system prune -af
+      # - name: Docker
+      #   run: |
+      #     docker system prune -af
 
       - name: Docker compose build
         run: |
           # Build DataNode services and pull dataflow-gen from cache
-          yarn build:minerva  --builder ${{ steps.builder1.outputs.name }}
+          yarn build:minerva alp-logto alp-logto-post-init    --builder ${{ steps.builder1.outputs.name }}
 
       # - name: Docker compose build data-flow-gen services
       #   run: |
       #     # Build DataNode services and pull dataflow-gen from cache
       #     yarn build:minerva alp-dataflow-gen alp-dataflow-gen-agent alp-dataflow-gen-init  --builder ${{ steps.builder1.outputs.name }}
 
-      - name: Builder cache cleanup
-        run: |
-          docker buildx prune -af
+      # - name: Builder cache cleanup
+      #   run: |
+      #     docker buildx prune -af
 
       # - name: Docker compose build other services
       #   run: |
       #     # Build other services
       #     yarn build:minerva alp-minerva-analytics-svc alp-query-gen alp-fhir-server alp-fhir-fe-server alp-bookmark alp-caddy alp-db-credentials-mgr alp-logto alp-logto-post-init alp-minerva-cdw-svc alp-minerva-dataflow-mgmt alp-minerva-gateway alp-minerva-pa-config-svc alp-minerva-pg-mgmt-init alp-minerva-portal-server alp-minerva-ps-config-svc alp-minerva-terminology-svc alp-minerva-user-mgmt alp-mri-pg-config --builder ${{ steps.builder1.outputs.name }}
 
-      - name: Builder cache cleanup
-        run: |
-          docker buildx prune -af
+      # - name: Builder cache cleanup
+      #   run: |
+      #     docker buildx prune -af
 
       - name: Initalize Logto
         run: |
           yarn init:logto
 
-      - name: Docker compose up Local Mode without UI Container
-        env:
-          PORTAL_NAME: alp-minerva-gateway-1
-        run: |
-          # Run DataNode services
-          ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml --env-file .env.local up --wait
-          EXIT_CODE=$?
+      # - name: Docker compose up Local Mode without UI Container
+      #   env:
+      #     PORTAL_NAME: alp-minerva-gateway-1
+      #   run: |
+      #     # Run DataNode services
+      #     ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml --env-file .env.local up --wait
+      #     EXIT_CODE=$?
 
-          docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
-          echo | tee -a $GITHUB_STEP_SUMMARY
+      #     docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
+      #     echo | tee -a $GITHUB_STEP_SUMMARY
 
-          if [ $EXIT_CODE != 0 ]; then
-            echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-          fi
+      #     if [ $EXIT_CODE != 0 ]; then
+      #       echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
+      #     fi
 
       - name: Logs minerva
         if: success() || failure()
