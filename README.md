@@ -22,8 +22,6 @@ yarn gen:dotenv
 ```bash
 yarn init:logto
 ```
-- Copy [Logto Envs ](docs/1-setup/environment-variables.md#manual-copy-of-logto-apps-env)
-
 ## Build
 - Standard build
 ```bash
