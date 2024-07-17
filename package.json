@@ -8,8 +8,9 @@
     "env_names_dev": "local remote base-all base-local base-remote alp-dev-sg-3"
   },
   "scripts": {
-    "gen:dotenv": "scripts/gen-dotenv.sh && yarn gen:tls",
+    "gen:dotenv": "scripts/gen-dotenv.sh && yarn gen:tls && yarn gen:resource-limits",
     "gen:tls": "scripts/gen-tls.sh",
+    "gen:resource-limits": "scripts/gen-resource-limits.sh",
 
     "start:local:caddy": "yarn local:minerva up alp-caddy --force-recreate --wait",
     "start:remote:caddy": "yarn remote:minerva up alp-caddy --wait",
