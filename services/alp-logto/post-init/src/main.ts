@@ -600,4 +600,3 @@ async function seeding_alp_admin() {
 
 seeding_alp_admin();
 main();
-setTimeout(() => console.log("THE END"), 10000000);
