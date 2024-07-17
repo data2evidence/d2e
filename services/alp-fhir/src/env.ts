@@ -16,7 +16,7 @@ const Env = z.object({
           ctx.addIssue({ code: "custom", message: "Invalid JSON" });
           return z.never();
       }
-  })
+  }),
 })
 
 const result = Env.safeParse(process.env)

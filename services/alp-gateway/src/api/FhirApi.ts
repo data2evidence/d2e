@@ -8,7 +8,7 @@ export class FhirAPI {
   private readonly baseURL: string
   private readonly fhirTokenUrl: string
   private readonly logger = createLogger(this.constructor.name)
-  private fhirServerToken: string
+  private token: string
   private readonly httpsAgent: Agent
   private readonly clientId: string
   private readonly clientSecret: string
@@ -17,10 +17,6 @@ export class FhirAPI {
     if (services.fhir) {
       this.baseURL = services.fhir
       this.fhirTokenUrl = services.fhirTokenUrl
-      this.httpsAgent = new Agent({
-        rejectUnauthorized: true,
-        ca: env.GATEWAY_CA_CERT
-      })
     } else {
       this.logger.error('No url is set for Fhir')
       throw new Error('No url is set for Fhir')
@@ -36,129 +32,74 @@ export class FhirAPI {
   }
 
   private async getRequestConfig() {
+    const formBody = new URLSearchParams()
+    formBody.set('grant_type', 'client_credentials')
+    formBody.set('client_id', this.clientId)
+    formBody.set('client_secret', this.clientSecret)
+
     const options = {
+      body: formBody.toString(),
+      credentials: 'include',
       headers: {
-        Authorization: this.fhirServerToken
-      },
-      httpsAgent: this.httpsAgent
+        Authorization: `Basic ${Buffer.from(this.clientId + ':' + this.clientSecret, 'binary').toString('base64')}`
+      }
     }
+    const headers = options.headers
+    headers['Content-type'] = 'application/x-www-form-urlencoded'
     return options
   }
 
-  async authenticate(clientId: string, clientSecret: string) {
+  async authenticate() {
     try {
       let response
       try {
-        const params = {
-          grant_type: 'client_credentials',
-          client_id: clientId,
-          client_secret: clientSecret
-        }
-        const body = Object.keys(params)
-          .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-          .join('&')
-
-        const config = {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }
-        response = await post(this.fhirTokenUrl, body, config)
+        const options = await this.getRequestConfig();
+        response = await post(this.fhirTokenUrl, options)
       } catch (err) {
         throw err
       }
 
-      if (response && response.status != 200) {
-        throw 'Failed to fetch tokens'
+      if (!response.ok) {
+        try {
+          const error = await response.json()
+          throw error
+        } catch (err) {
+          throw 'Failed to fetch tokens: ' + err
+        }
       }
-      this.fhirServerToken = response.data.token_type + ' ' + response.data.access_token
+      this.token = await response.json()
     } catch (err) {
       throw err
     }
   }
 
-  async createProject(name: string, description: string) {
-    try {
-      this.logger.info(`Create fhir project for the dataset`)
-      const ProjectDetails = {
-        resourceType: 'Project',
-        name: name,
-        strictMode: true,
-        features: ['bots'],
-        description: description
-      }
-      const ProjectResult = await this.createResource('Project', ProjectDetails)
-      const projectId = ProjectResult.data.id
+  // async createProject(name: string, description: string) {
+  //   try {
+  //     this.logger.info(`Create fhir project for the dataset`)
+  //     await this.authenticate()
+  //     const options = await this.getRequestConfig()
+  //     const url = `${this.baseURL}/createProject`
+  //     const details = {
+  //       name: name,
+  //       description: description
+  //     }
+  //     const result = await post(url, details, options)
+  //     if (result.data) {
+  //       return result.data
+  //     }
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
 
-      this.logger.info('Create client application for the project')
-      const clientSecret = crypto.randomBytes(32).toString('hex')
-      const clientApplicationDetails = {
-        resourceType: 'ClientApplication',
-        name: name,
-        description: description,
-        meta: {
-          project: projectId,
-          compartment: [
-            {
-              reference: `Project/${projectId}`
-            }
-          ]
-        },
-        secret: clientSecret
-      }
-      const ClientApplicationResult = await this.createResource(
-        'ClientApplication',
-        clientApplicationDetails,
-        '',
-        false
-      )
-      const clientId = ClientApplicationResult.data.id
-
-      this.logger.info('Create project membership for the project')
-      const projectMembershipDetails = {
-        resourceType: 'ProjectMembership',
-        project: {
-          reference: `Project/${projectId}`
-        },
-        meta: {
-          project: projectId,
-          compartment: [
-            {
-              reference: `Project/${projectId}`
-            }
-          ]
-        },
-        user: {
-          reference: `ClientApplication/${clientId}`,
-          display: name
-        },
-        profile: {
-          reference: `ClientApplication/${clientId}`,
-          display: name
-        }
-      }
-      await this.createResource('ProjectMembership', projectMembershipDetails, '', false)
-      return projectId
-    } catch (error) {
-      throw new Error(`Failed to create project in fhir server: ${error}`)
-    }
-  }
-
-  async createResource(fhirResouce: string, resourceDetails: any, projectName?: string, isAuthenticate = true) {
+  async importData(fhirResouce: string, resourceDetails: string) {
     try {
       this.logger.info(`Import data into fhir server`)
-      if (isAuthenticate) await this.authenticate(this.clientId, this.clientSecret)
-      let options = await this.getRequestConfig()
-      // If the incoming resource is for a particular project, then get the project's clientId and secret for Authentication
-      if (projectName && projectName != '') {
-        const url = `${this.baseURL}/ClientApplication?name=${projectName}`
-        const searchResult = await get(url, options)
-        if (searchResult.data.entry && searchResult.data.entry.length > 0) {
-          const clientId = searchResult.data.entry[0].resource.id
-          const clientSecret = searchResult.data.entry[0].resource.secret
-          await this.authenticate(clientId, clientSecret)
-          options = await this.getRequestConfig()
-        } else throw 'Dataset not found!'
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}/${fhirResouce}`
+      const result = await post(url, resourceDetails, options)
+      if (result.data) {
+        return result.data
       }
       const url = `${this.baseURL}/${fhirResouce}`
       const result = await post(url, resourceDetails, options)

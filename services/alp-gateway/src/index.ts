@@ -392,6 +392,18 @@ routes.forEach((route: IRouteProp) => {
           })
         )
         break
+      // case 'fhir':
+      //   app.use(
+      //     source,
+      //     // ensureAuthenticated,
+      //     // ensureAuthorized,
+      //     createProxyMiddleware({
+      //       ...getCreateMiddlewareOptions(services.fhir),
+      //       headers: { Connection: 'keep-alive' }
+      //       //pathRewrite: path => path.replace('/fhir', '')
+      //     })
+      //   )
+      //   break
       default:
         if (plugins && Object.keys(plugins).length > 0) {
           Object.keys(plugins).forEach((type: keyof IPlugin) => {
