@@ -250,5 +250,18 @@ services:
     build:
       context: ./services/alp-logto/post-init
       dockerfile: Dockerfile
+    # volumes:
+    #   - ./services/alp-logto/post-init:/home/docker
+
+  alp-fhir-client:
+    build:
+      context: .
+      dockerfile: ./services/alp-fhir/Dockerfile.client
+      target: development
+    command: yarn dev
     volumes:
-      - ./services/alp-logto/post-init:/home/docker
+      - ./services/alp-fhir/src:/home/docker/src/alp-data-node/app/src
+    environment:
+      LOCAL_DEBUG: "true"
+    ports:
+      - 9226:9226

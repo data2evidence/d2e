@@ -97,9 +97,7 @@ export class FhirAPI {
       const options = await this.getRequestConfig()
       const url = `${this.baseURL}/${fhirResouce}`
       const result = await post(url, resourceDetails, options)
-      if (result.data) {
-        return result.data
-      }
+      return result
     } catch (err) {
       throw new Error(`Failed to import data into fhir server`)
     }

@@ -11,15 +11,15 @@ export class FhirAPI {
     private medplumClient: MedplumClient
 
     constructor() {
-        if (env.FHIR_CLIENT_ID && env.FHIR_CLIENT_SECRET) {
-            this.clientId = env.FHIR_CLIENT_ID
-            this.clientSecret = env.FHIR_CLIENT_SECRET
+        if (env.FHIR__CLIENT_ID && env.FHIR__CLIENT_SECRET) {
+            this.clientId = env.FHIR__CLIENT_ID
+            this.clientSecret = env.FHIR__CLIENT_SECRET
         } else {
             this.logger.error('No client credentials are set for Fhir')
             throw new Error('No client credentials are set for Fhir')
         }
         this.medplumClient = new MedplumClient({
-            baseUrl: env.SERVICE_ROUTES.fhir
+            baseUrl: env.SERVICE_ROUTES.fhir.replace('/fhir/R4', '')
         })
     }
 

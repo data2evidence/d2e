@@ -5,7 +5,9 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "tsc && node --no-warnings esbuild-script.mjs",
+    "compile": "tsc",
+    "seed": "node ./dist/main.js",
+    "build-and-seed": "npm run compile && npm run seed",
     "lint": "eslint src/",
     "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/main.ts",
     "start": "node ./dist/main.js"
@@ -29,11 +31,10 @@
     "root": true
   },
   "devDependencies": {
-    "esbuild": "0.21.5",
-    "typescript": "^5.5.2"
+    "@types/pg": "^8.11.6",
+    "esbuild": "0.21.5"
   },
   "dependencies": {
-    "@alp/alp-base-utils": "1.1.9",
     "@medplum/core": "^3.1.11",
     "@medplum/fhirtypes": "^3.1.11",
     "@types/express": "^4.17.21",
@@ -41,11 +42,13 @@
     "duckdb-async": "^1.0.0",
     "express": "^4.19.2",
     "helmet": "^7.1.0",
+    "pg": "^8.4.2",
     "reflect-metadata": "^0.2.2",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typedi": "^0.10.0",
-    "winston": "^3.13.0",
+    "typescript": "^5.5.3",
+    "winston": "^3.13.1",
     "zod": "^3.23.8"
   }
 }

@@ -21,7 +21,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "strict": true,
-    "lib": ["ES2021.String"]
+    "lib": ["ES2019", "DOM", "ES5"]
   },
   "include": ["src"],
   "exclude": [""]

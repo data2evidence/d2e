@@ -3,8 +3,8 @@ import { object, z } from 'zod'
 const Env = z.object({
   TLS__INTERNAL__KEY: z.string(),
   TLS__INTERNAL__CRT: z.string(),
-  FHIR_CLIENT_ID: z.string(),
-  FHIR_CLIENT_SECRET: z.string(),
+  FHIR__CLIENT_ID: z.string(),
+  FHIR__CLIENT_SECRET: z.string(),
   FHIR__LOG_LEVEL: z.string(),
   PORT: z.string(),
   SERVICE_ROUTES: z
