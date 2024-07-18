@@ -373,6 +373,26 @@ export class PrefectAPI {
     }
   }
 
+  async getFlowRunsArtifacts(id: string) {
+    const errorMessage = `Error while getting prefect flow run artifacts by id: ${id}`
+    try {
+      const options = await this.createOptions()
+      const url = `${this.url}/artifacts/filter`
+      const data: Record<string, string | object | Number> = {
+        artifacts: {
+          task_run_id: {
+            any_: [id]
+          }
+        }
+      }
+      const obs = this.httpService.post(url, data, options)
+      return await firstValueFrom(obs.pipe(map(result => result.data)))
+    } catch (error) {
+      this.logger.info(`${errorMessage}: ${error}`)
+      throw new InternalServerErrorException(errorMessage)
+    }
+  }
+
   private getFilters(filter?: IFlowRunQueryDto) {
     if (filter == null) {
       return {}

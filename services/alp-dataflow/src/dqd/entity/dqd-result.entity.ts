@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm'
 import { IDataCharacterizationResult, IDataQualityResult } from '../../types'
-
+// TODO: Remove this table, read from MinIO
 @Entity('dqd_result')
 export class DqdResult {
   @PrimaryColumn({ name: 'flow_run_id', type: 'uuid' })

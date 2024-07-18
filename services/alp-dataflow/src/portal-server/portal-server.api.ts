@@ -63,9 +63,23 @@ export class PortalServerAPI {
     const errorMessage = 'Error while deleting deployment files'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}/prefect-deployment?filePath=${deploymentFolderPath}&bucketName=${env.ADHOC_DEPLOYMENT_FLOWS_BUCKET_NAME}`
+      const url = `${this.url}/prefect?filePath=${deploymentFolderPath}&bucketName=${env.ADHOC_DEPLOYMENT_FLOWS_BUCKET_NAME}`
       this.logger.info(url)
       const obs = this.httpService.delete(url, options)
+      return firstValueFrom(obs.pipe(map(result => result.data)))
+    } catch (error) {
+      this.logger.error(`${errorMessage}: ${error}`)
+      throw new InternalServerErrorException(errorMessage)
+    }
+  }
+
+  async getFlowRunResults(filePath: string) {
+    const errorMessage = 'Error while getting flow run results'
+    try {
+      const options = await this.createOptions()
+      const url = `${this.url}/prefect/dqd?filePath=${filePath}`
+      this.logger.info(url)
+      const obs = this.httpService.get(url, options)
       return firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
       this.logger.error(`${errorMessage}: ${error}`)

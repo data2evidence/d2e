@@ -57,17 +57,25 @@ export class DataQualityService {
 
     return this.prefectApi.createFlowRun(name, dqDeploymentName, dqFlowName, parameters)
   }
-
+  // TODO: To replace
   async getDataQualityFlowRunResults(flowRunId: string) {
     const dqdResult = await this.dqdService.getDqdResultByFlowRunId(flowRunId)
+    // const dqdResult = await this.dqdService.getDqdResultByTaskRunId(flowRunId)
+
     if (isDataQualityResult(dqdResult.result)) {
       return dqdResult.result.CheckResults
     }
     throw new InternalServerErrorException('Invalid DQD results found')
   }
 
+  async getDataQualityTaskRunResults(taskRunId: string) {
+    const dqdResult = await this.dqdService.getDqdResultByTaskRunId(taskRunId)
+    return dqdResult
+  }
+  // TODO: To replace
   async getDataQualityFlowRunOverview(flowRunId: string) {
     const checkResults = await this.getDataQualityFlowRunResults(flowRunId)
+    this.logger.info(`CheckResult: ${checkResults.toString()}`)
     return this.dataQualityOverviewParser.parse(checkResults)
   }
 
