@@ -160,36 +160,3 @@ def rollback_tag_flow(options: RollbackTagType):
     except Exception as e:
         get_run_logger().error(e)
         raise e
-
-
-def create_questionnaire_definition_flow(options: QuestionnaireDefinitionType):
-    try:
-        questionnaire_definition = options.questionnaire_definition
-        schema_name = options.schema_name
-        database_code = options.database_code
-        db_dialect = get_db_dialect(options)
-
-        create_questionnaire_definition_task(
-            database_code=database_code,
-            schema_name=schema_name,
-            dialect=db_dialect,
-            questionnaire_definition=questionnaire_definition
-        )
-    except Exception as e:
-        get_run_logger().error(e)
-        raise e
-
-
-def get_questionnaire_response_flow(options: QuestionnaireResponseType):
-    try:
-        db_dialect = get_db_dialect(options)
-
-        get_questionnaire_response_task(
-            database_code=options.database_code,
-            schema_name=options.schema_name,
-            dialect=db_dialect,
-            questionnaire_id=options.questionnaire_id
-        )
-    except Exception as e:
-        get_run_logger().error(e)
-        raise e
