@@ -636,6 +636,7 @@ services:
       PG__PASSWORD: ${PG_SUPER_PASSWORD}
       PG__PORT: ${PG_PORT:-5432}
       PG__USER: ${PG_SUPER_USER:-postgres}
+      PUBLIC__FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine"},{"name":"alp-app","description":"alp-app","type":"Traditional","oidcClientMetadata":{"redirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
       LOGTO__RESOURCE:  '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
       LOGTO__USER: '{"username":"admin","initialPassword":"Updatepassword12345"}'
@@ -672,7 +673,7 @@ services:
         priority: 10
     # Enable if need to access admin console
     # ports:
-    #   - 3002:3002
+    #  - 3002:3002
     entrypoint:
       - sh
       - -c
@@ -682,7 +683,7 @@ services:
       <<:
         - *x-tls
       ADMIN_DISABLE_LOCALHOST: ${LOGTO__DISABLE_ADMIN_CONSOLE:-false}
-      ADMIN_ENDPOINT: http://${CADDY__LOGTO_IDP__PUBLIC_FQDN:-localhost}:3002
+      # ADMIN_ENDPOINT: http://${CADDY__ALP__PUBLIC_FQDN:-localhost}:3002 # Enable if need to access admin console
       DB_URL: postgres://postgres:${PG_SUPER_PASSWORD}@alp-minerva-postgres-1:${PG_PORT:-5432}/logto
       ENDPOINT: https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO_API_M2M_CLIENT_ID: ${LOGTO_API_M2M_CLIENT_ID}
@@ -1175,6 +1176,9 @@ services:
     networks:
       alp:
         priority: 20
+        aliases:
+          - shareddb
+          - vocabularydb
       data:
         priority: 10
     ports:
@@ -1190,6 +1194,24 @@ services:
         - *x-tls
       POSTGRES_DB: ${PG_DB_NAME:-alp}
       POSTGRES_PASSWORD: ${PG_SUPER_PASSWORD}
+
+  alp-minerva-postgres-post-init:
+    depends_on:
+        alp-minerva-postgres:
+          condition: service_healthy
+    image: postgres:15-alpine
+    networks:
+      alp:
+        priority: 20
+    volumes:
+      - ./deploy/perseus:/perseus
+    entrypoint: sh perseus/seed.sh
+    environment:
+      <<:
+        - *x-pg
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+    profiles: [perseus]
 
   alp-minerva-ps-config-svc:
     container_name: &c18 alp-minerva-ps-config-svc-${BASE_PORT:-1}
@@ -1637,3 +1659,88 @@ services:
       - ./cache/vocab/:/tmp/data/vocab
       - ./cache/synpuf1k/:/tmp/data/synpuf1k
     profiles: [data-load]
+
+  alp-perseus-files-manager:
+    image: perseushub/files-manager:latest
+    container_name: files-manager
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      alp-minerva-postgres-post-init:
+        condition: service_completed_successfully
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  alp-perseus-user:
+    image: perseushub/user:latest
+    container_name: alp-perseus-user-${BASE_PORT:-1}
+    environment:
+      USER_ENV: Docker
+      TOKEN_SECRET_KEY: Perseus-Arcad!a
+      EMAIL_SECRET_KEY: 8cmuh4t5xTtR1EHaojWL0aqCR3vZ48PZF5AYkTe0iqo=
+      SERVER_ADDRESS: http://localhost
+    depends_on:
+      alp-minerva-postgres-post-init:
+        condition: service_completed_successfully
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  alp-perseus-backend:
+    image: perseushub/backend:latest
+    container_name: alp-perseus-backend-${BASE_PORT:-1}
+    environment:
+      PERSEUS_ENV: Docker
+    depends_on:
+      alp-minerva-postgres-post-init:
+        condition: service_completed_successfully
+      alp-perseus-files-manager:
+        condition: service_started
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  alp-perseus-frontend:
+    image: perseushub/frontend:latest
+    container_name:
+      alp-perseus-frontend-${BASE_PORT:-1}
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  alp-perseus-white-rabbit:
+    image: perseushub/white-rabbit:latest
+    container_name:
+      alp-perseus-white-rabbit-${BASE_PORT:-1}
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      alp-minerva-postgres-post-init:
+        condition: service_completed_successfully
+      alp-perseus-files-manager:
+        condition: service_started
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
+
+  alp-perseus-cdm-builder:
+    image: perseushub/cdm-builder:latest
+    container_name:
+      alp-perseus-cdm-builder-${BASE_PORT:-1}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    depends_on:
+      alp-minerva-postgres-post-init:
+        condition: service_completed_successfully
+      alp-perseus-files-manager:
+        condition: service_started
+    networks:
+      alp:
+        priority: 20
+    profiles: [perseus]
