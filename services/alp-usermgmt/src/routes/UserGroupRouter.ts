@@ -9,6 +9,7 @@ import { permittedUserCheck } from 'middlewares/permitted-user-check'
 import { permittedTenantCheck } from 'middlewares/permitted-tenant-check'
 import { PortalAPI } from 'api'
 import { grantRolesByScopes } from 'middlewares/grant-roles-by-scopes'
+import { env } from 'env'
 
 @Service()
 export class UserGroupRouter {
@@ -109,7 +110,8 @@ export class UserGroupRouter {
       '/register-tenant-roles',
       permittedTenantCheck(['TENANT_ADMIN'], { tenantIdPath: 'body.tenantId' }),
       async (req: IAppRequest, res: Response, next: NextFunction) => {
-        const { userId, tenantId, roles } = req.body || {}
+        const { userId, roles } = req.body || {}
+        const tenantId = env.APP_TENANT_ID!
 
         if (!userId) {
           this.logger.warn(`Param 'userId' is required`)
@@ -237,7 +239,8 @@ export class UserGroupRouter {
       permittedUserCheck(),
       permittedTenantCheck(['TENANT_ADMIN'], { tenantIdPath: 'body.tenantId' }),
       async (req: IAppRequest, res: Response, next: NextFunction) => {
-        const { userId, tenantId, roles } = req.body || {}
+        const { userId, roles } = req.body || {}
+        const tenantId = env.APP_TENANT_ID!
 
         if (!userId) {
           this.logger.warn(`Param 'userId' is required`)

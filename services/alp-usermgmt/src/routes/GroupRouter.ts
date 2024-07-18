@@ -5,6 +5,7 @@ import { IAppRequest } from '../types'
 import { camelToSnakeCase } from 'utils'
 import { B2cGroupCriteria, B2cGroupCriteriaKeys } from 'repositories'
 import { createLogger } from 'Logger'
+import { env } from 'env'
 
 @Service()
 export class GroupRouter {
@@ -113,7 +114,8 @@ export class GroupRouter {
     })
 
     this.router.post('/', async (req: IAppRequest, res: Response, next: NextFunction) => {
-      const { role, tenantId, studyId } = req.body || {}
+      const { role, studyId } = req.body || {}
+      const tenantId = env.APP_TENANT_ID!
       this.logger.info(`Create group ${role} ${tenantId} ${studyId}`)
 
       try {
