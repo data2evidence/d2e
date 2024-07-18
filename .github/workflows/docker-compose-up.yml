@@ -109,24 +109,14 @@ jobs:
         run: |
           docker system prune -af
 
-      # - name: Docker compose build
-      #   run: |
-      #     # Build DataNode services
-      #     yarn build:minerva   --builder ${{ steps.builder1.outputs.name }}
-
-      - name: Docker compose build dataflow-gen services
+      - name: Docker compose build
         run: |
-          # Build DataNode services and pull dataflow-gen from cache
-          yarn build:minerva alp-dataflow-gen alp-dataflow-gen-agent alp-dataflow-gen-init  --builder ${{ steps.builder1.outputs.name }}
+          # Build DataNode services
+          yarn build:minerva   --builder ${{ steps.builder1.outputs.name }}
 
       - name: Builder cache cleanup
         run: |
           docker buildx prune -af
-
-      - name: Docker compose build other services
-        run: |
-          # Build other services
-          yarn build:minerva alp-minerva-analytics-svc alp-query-gen alp-fhir-server alp-fhir-fe-server alp-bookmark alp-caddy alp-db-credentials-mgr alp-logto alp-logto-post-init alp-minerva-cdw-svc alp-minerva-dataflow-mgmt alp-minerva-gateway alp-minerva-pa-config-svc alp-minerva-pg-mgmt-init alp-minerva-portal-server alp-minerva-ps-config-svc alp-minerva-terminology-svc alp-minerva-user-mgmt alp-mri-pg-config --builder ${{ steps.builder1.outputs.name }}
 
       - name: Builder cache cleanup
         run: |
