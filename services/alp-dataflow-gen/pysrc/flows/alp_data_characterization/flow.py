@@ -12,6 +12,8 @@ from prefect.filesystems import RemoteFileSystem as RFS
 from utils import DBUtils
 from utils.types import dcOptionsType, UserType
 
+from dao import DqdResultDao
+
 from flows.alp_db_svc.dataset.main import create_datamodel
 from flows.alp_db_svc.const import get_plugin_classpath
 
@@ -153,6 +155,7 @@ def execute_data_characterization_flow(options: dcOptionsType):
     outputFolder = f'/output/{flow_run_id}'
 
     dbutils = DBUtils(databaseCode)
+    dqdresult_dao = DqdResultDao()
 
     create_data_characterization_schema(
         databaseCode,
@@ -165,7 +168,7 @@ def execute_data_characterization_flow(options: dcOptionsType):
 
     execute_data_characterization_wo = execute_data_characterization.with_options(on_failure=[
         partial(persist_data_characterization, **
-                dict(output_folder=outputFolder))
+                dict(output_folder=outputFolder, dqdresult_dao=dqdresult_dao))
     ])
     execute_data_characterization_wo(schemaName,
                                      cdmVersionNumber,
@@ -176,7 +179,7 @@ def execute_data_characterization_flow(options: dcOptionsType):
                                      outputFolder)
 
     ares_base_hook = partial(persist_export_to_ares, **
-                             dict(output_folder=outputFolder, schema_name=schemaName))
+                             dict(output_folder=outputFolder, schema_name=schemaName, dqdresult_dao=dqdresult_dao))
     execute_export_to_ares_wo = execute_export_to_ares.with_options(
         on_completion=[ares_base_hook],
         on_failure=[ares_base_hook]
