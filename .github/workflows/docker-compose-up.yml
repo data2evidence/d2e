@@ -109,10 +109,10 @@ jobs:
         run: |
           docker system prune -af
 
-      - name: Docker compose build
-        run: |
-          # Build DataNode services
-          yarn build:minerva   --builder ${{ steps.builder1.outputs.name }}
+      # - name: Docker compose build
+      #   run: |
+      #     # Build DataNode services
+      #     yarn build:minerva   --builder ${{ steps.builder1.outputs.name }}
 
       - name: Docker compose build dataflow-gen services
         run: |
