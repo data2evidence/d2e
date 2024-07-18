@@ -118,10 +118,6 @@ jobs:
         run: |
           docker buildx prune -af
 
-      - name: Builder cache cleanup
-        run: |
-          docker buildx prune -af
-
       - name: Initalize Logto
         run: |
           yarn init:logto
