@@ -49,6 +49,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET', 'PUT', 'DELETE']
   },
   {
+    path: '^/usermgmt/api/me/is_token_valid_internal',
+    scopes: ['usermgmt.me'],
+    httpMethods: ['GET']
+  },
+  {
     path: '^/usermgmt/api/study/access-request/list/(.+)',
     scopes: ['usermgmt.studyAccessRequest.read']
   },
@@ -820,6 +825,8 @@ export const ROLE_SCOPES = {
   ],
   ALP_SYSTEM_ADMIN: [
     'usermgmt.dataAdmin.read',
+    'usermgmt.group.read',
+    'usermgmt.me',
     'usermgmt.studyAccessRequest.read',
     'usermgmt.studyAccessRequest.update',
     'usermgmt.user.read',
