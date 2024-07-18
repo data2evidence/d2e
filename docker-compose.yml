@@ -1804,3 +1804,39 @@ services:
       alp:
         priority: 20
     profiles: [perseus]
+    
+  alp-fhir-client:
+    container_name: &c30 alp-minerva-fhir-client-${BASE_PORT:-1}
+    depends_on:
+      alp-logto:
+        condition: service_healthy
+      alp-fhir-server:
+        condition: service_healthy
+    hostname: alp-minerva-fhir-client-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/alp-fhir-client:${DOCKER_TAG_NAME:-develop}
+    healthcheck:
+      interval: 20s
+      retries: 30
+      start_period: 120s
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:41112
+      timeout: 30s
+    logging:
+      options:
+        tag: *c30
+    networks:
+      alp:
+        priority: 20
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    environment:
+      <<:
+        - *x-tls
+        - *x-routes
+        - *x-fhir
+      FHIR__LOG_LEVEL: debug
+      LOCAL_DEBUG: "false"
+      NODE_ENV: development
+      PORT: 41${BASE_PORT:-1}12
