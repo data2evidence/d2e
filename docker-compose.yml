@@ -750,8 +750,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: ${D2E_CPU_LIMIT}
-          memory: ${D2E_MEMORY_LIMIT}
+          cpus: ${D2E_CPU_LIMIT:-2}
+          memory: ${D2E_MEMORY_LIMIT:-7G}
 
   alp-minerva-cdw-svc:
     container_name: &c10 alp-minerva-cdw-svc-${BASE_PORT:-1}
