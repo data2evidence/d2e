@@ -3,9 +3,12 @@
   "version": "1.0.0-dev",
   "description": "fhir-client",
   "private": true,
+  "main": "src/main.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "tsc && node --no-warnings esbuild-script.mjs",
+    "build": "tsc && node --no-warnings esbuild-script.mjs",
+    "seed": "node ./dist/main.js",
+    "build-and-seed": "npm run build && npm run seed",
     "lint": "eslint src/",
     "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/main.ts",
     "start": "node ./dist/main.js"
@@ -30,7 +33,8 @@
   },
   "devDependencies": {
     "esbuild": "0.21.5",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.2",
+    "@types/pg": "^8.11.6"
   },
   "dependencies": {
     "@alp/alp-base-utils": "1.1.9",
@@ -46,6 +50,7 @@
     "ts-node-dev": "^2.0.0",
     "typedi": "^0.10.0",
     "winston": "^3.13.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "pg": "^8.4.2"
   }
 }

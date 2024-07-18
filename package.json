@@ -4,8 +4,8 @@
   "description": "ALP Data Node",
   "license": "MIT",
   "config": {
-    "env_names_all": "local remote base-all base-local base-remote alp-dev-sg-1 alp-dev-sg-2 alp-stg-de-1 alp-stg-sg-1 alp-stg-sg-2",
-    "env_names_dev": "local remote base-all base-local base-remote alp-dev-sg-1"
+    "env_names_all": "local remote base-all base-local base-remote alp-dev-sg-3 alp-dev-sg-2 alp-stg-de-1 alp-stg-sg-1 alp-stg-sg-2",
+    "env_names_dev": "local remote base-all base-local base-remote alp-dev-sg-3"
   },
   "scripts": {
     "gen:dotenv": "scripts/gen-dotenv.sh && yarn gen:tls",
@@ -20,6 +20,7 @@
     "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local --profile sql",
 
     "start:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes",
+    "start:minerva:perseus": "yarn local:minerva --profile perseus up --renew-anon-volumes",
     "start:nest-dev:minerva": "yarn build:nest-dev:minerva && ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc --wait --force-recreate --no-deps",
     "start:nest-prod:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc --wait --force-recreate --no-deps",
 

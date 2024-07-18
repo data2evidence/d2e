@@ -235,7 +235,7 @@ export class ConceptService {
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResultCR = await meilisearchApi.getRecommendedConcepts(
         conceptIds,
-        `${databaseCode}_${vocabSchemaName}_${vocabSchemaName}_${
+        `${databaseCode}_${vocabSchemaName}_${
           dialect === 'hana' ? 'CONCEPT_RECOMMENDED' : 'concept_recommended'
         }`,
       );
