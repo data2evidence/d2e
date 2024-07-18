@@ -489,6 +489,10 @@ async function main() {
   console.log(
     `\n********************** LOGTO ENV ASSIGNMENTS Generated IN .env.${process.env.ENV_TYPE} *************************`
   );
+  console.log(APP_ENVS.join("\n"));
+  console.log(
+    `**********************************************************************************************`
+  );
 }
 
 async function seeding_alp_admin() {
@@ -600,3 +604,4 @@ async function seeding_alp_admin() {
 
 seeding_alp_admin();
 main();
+// setTimeout(() => console.log("THE END"), 10000000);
