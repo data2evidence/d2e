@@ -1181,6 +1181,7 @@ services:
         priority: 10
     ports:
       - 41190:5432
+      - 5432:5432
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     shm_size: 1gb
     volumes:
