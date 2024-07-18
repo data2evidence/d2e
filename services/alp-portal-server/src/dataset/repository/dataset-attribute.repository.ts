@@ -9,8 +9,8 @@ export class DatasetAttributeRepository extends Repository<DatasetAttribute> {
     super(DatasetAttribute, dataSource.createEntityManager())
   }
 
-  async getAttributeDto(datasetId: string) {
-    const entities = await this.createQueryBuilder('attribute')
+  async getAttributeDto(datasetId: string, trxMgr: EntityManager | undefined = undefined) {
+    const entities = await this.createQueryBuilder('attribute', trxMgr?.queryRunner)
       .where('attribute.datasetId = :datasetId', { datasetId })
       .getMany()
 
