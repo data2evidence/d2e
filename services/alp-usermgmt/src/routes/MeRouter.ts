@@ -1,5 +1,6 @@
 import express, { NextFunction, Response } from 'express'
 import { Service } from 'typedi'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import { MemberService, UserGroupService, UserService } from '../services'
 import { IAppRequest, UserDeleteRequest } from '../types'
 import { createLogger } from 'Logger'
@@ -133,6 +134,39 @@ export class MeRouter {
         this.logger.error(`Error when updating user password ${idpUserId}`)
         return next(err)
       }
+    })
+
+    this.router.get('/is_token_valid_internal', async (req: IAppRequest, res: Response, next: NextFunction) => {
+      let token: string | undefined
+
+      if ('authorization' in req.headers) {
+        token = req.headers['authorization']!.replace(/bearer /i, '')
+      }
+
+      if (!token) {
+        this.logger.error('A valid token is missing')
+        return res.status(401).send({ message: 'A valid token is missing' })
+      }
+
+      const payload = jwt.decode(token) as JwtPayload
+      if (!payload.sub) {
+        this.logger.error(`A 'sub' claim is missing`)
+        return res.status(401).send({ message: `A 'sub' claim is missing` })
+      }
+
+      const user = await this.userService.getUserByIdpUserId(payload.sub)
+      if (!user) {
+        this.logger.error(`User '${payload.sub}' is missing`)
+        return res.status(401).send({ message: `User '${payload.sub}' is missing` })
+      }
+
+      if (!user.active) {
+        this.logger.error(`User '${payload.sub}' is inactive`)
+        return res.status(401).send({ message: `User '${payload.sub}' is inactive` })
+      }
+
+      res.setHeader('Username', user.username)
+      return res.status(200).send()
     })
   }
 }
