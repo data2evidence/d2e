@@ -235,7 +235,7 @@
       "port": 9226,
       "address": "localhost",
       "localRoot": "${workspaceFolder}/services/alp-fhir",
-      "remoteRoot": "/home/docker/src/alp-data-node/app",
+      "remoteRoot": "/usr/src/alp-data-node/app",
       "protocol": "inspector",
       "sourceMaps": true,
       "resolveSourceMapLocations": [
