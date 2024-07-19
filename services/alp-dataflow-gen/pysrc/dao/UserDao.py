@@ -24,7 +24,7 @@ class UserDao():
 
     def check_user_exists(self, user: str) -> bool:
         with self.engine.connect() as connection:
-            if self.dialect == DatabaseDialects.POSTGRES:
+            if self.db_dialect == DatabaseDialects.POSTGRES:
                 select_stmt = text("select * from pg_user where usename = :x")
                 print(f"Executing check user exists statement..")
                 res = connection.execute(select_stmt, {"x": user}).fetchall()
@@ -44,7 +44,7 @@ class UserDao():
 
     def check_role_exists(self, role_name: str) -> bool:
         with self.engine.connect() as connection:
-            if self.dialect == DatabaseDialects.POSTGRES:
+            if self.db_dialect == DatabaseDialects.POSTGRES:
                 select_stmt = text("select * from pg_roles where rolname = :x")
                 print(f"Executing check role exists statement..")
                 res = connection.execute(
@@ -64,7 +64,7 @@ class UserDao():
                 return True
 
     def create_read_role(self, role_name: str):
-        match self.dialect:
+        match self.db_dialect:
             case DatabaseDialects.POSTGRES:
                 create_role_stmt = text(f'CREATE ROLE {role_name}')
             case DatabaseDialects.HANA:
@@ -78,7 +78,7 @@ class UserDao():
             print(f"{role_name} role Created Successfully")
 
     def create_user(self, user: str, password: str):
-        match self.dialect:
+        match self.db_dialect:
             case DatabaseDialects.POSTGRES:
                 create_user_stmt = text(
                     f'CREATE USER {user} WITH PASSWORD "{password}"')
@@ -108,7 +108,7 @@ class UserDao():
             print(f" {role_name} Role Granted to {user} User Successfully")
 
     def grant_read_privileges(self, role_name: str):
-        match self.dialect:
+        match self.db_dialect:
             case DatabaseDialects.POSTGRES:
                 grant_read_stmt = text(f"""
                     GRANT USAGE ON SCHEMA {self.schema_name} TO {role_name};
