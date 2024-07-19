@@ -91,7 +91,8 @@ export class DatasetRouter {
         detail,
         dashboards,
         attributes,
-        tags
+        tags,
+        fhirProjectId
       } = req.body
 
       const dataModel = dataModelName.split(' ')[0]
@@ -167,7 +168,8 @@ export class DatasetRouter {
           detail,
           dashboards,
           attributes,
-          tags
+          tags,
+          fhir_project_id: fhirProjectId
         }
         const newDataset = await portalAPI.createDataset(newDatasetInput)
         if (newDataset.error) {
