@@ -161,7 +161,7 @@ async function main() {
       
     server.listen(process.env.PORT)
     logger.info(`🚀 ALP FHIR Client started on port ${env.PORT}`)
-    seed()
+    //seed()
     load_bots()
 }
 

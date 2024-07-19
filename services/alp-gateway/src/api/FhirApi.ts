@@ -49,29 +49,29 @@ export class FhirAPI {
     return options
   }
 
-  async authenticate() {
-    try {
-      let response
-      try {
-        const options = await this.getRequestConfig();
-        response = await post(this.fhirTokenUrl, options)
-      } catch (err) {
-        throw err
-      }
+  // async authenticate() {
+  //   try {
+  //     let response
+  //     try {
+  //       const options = await this.getRequestConfig();
+  //       response = await post(this.fhirTokenUrl, options)
+  //     } catch (err) {
+  //       throw err
+  //     }
 
-      if (!response.ok) {
-        try {
-          const error = await response.json()
-          throw error
-        } catch (err) {
-          throw 'Failed to fetch tokens: ' + err
-        }
-      }
-      this.token = await response.json()
-    } catch (err) {
-      throw err
-    }
-  }
+  //     if (!response.ok) {
+  //       try {
+  //         const error = await response.json()
+  //         throw error
+  //       } catch (err) {
+  //         throw 'Failed to fetch tokens: ' + err
+  //       }
+  //     }
+  //     this.token = await response.json()
+  //   } catch (err) {
+  //     throw err
+  //   }
+  // }
 
   // async createProject(name: string, description: string) {
   //   try {

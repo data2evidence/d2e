@@ -19,7 +19,9 @@ export class FhirAPI {
             throw new Error('No client credentials are set for Fhir')
         }
         this.medplumClient = new MedplumClient({
-            baseUrl: env.SERVICE_ROUTES.fhir.replace('/fhir/R4', '')
+            baseUrl: env.SERVICE_ROUTES.fhir.replace('/fhir/R4', '/'),
+            clientId: this.clientId,
+            clientSecret: this.clientSecret
         })
     }
 
