@@ -260,6 +260,7 @@ services:
       target: development
     command: yarn dev
     volumes:
+      - ./services/alp-fhir/dist:/home/docker/src/alp-data-node/app/dist
       - ./services/alp-fhir/src:/home/docker/src/alp-data-node/app/src
     environment:
       LOCAL_DEBUG: "true"
