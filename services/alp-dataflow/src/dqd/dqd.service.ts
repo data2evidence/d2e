@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { DqdResult } from './entity'
@@ -15,31 +15,24 @@ export class DqdService {
   ) {}
 
   async getDqdResultByFlowRunId(flowRunId: string) {
-    const result = await this.dqdResultRepo
-      .createQueryBuilder('results')
-      .select(['results.flowRunId', 'results.result'])
-      .where('results.flowRunId = :flowRunId', { flowRunId: flowRunId })
-      .getOne()
-
-    if (result) {
-      return result
-    }
-  }
-
-  async getDqdResultByTaskRunId(taskRunId: string) {
-    const result = await this.prefectApi.getFlowRunsArtifacts(taskRunId)
+    const result = await this.prefectApi.getFlowRunsArtifacts(flowRunId)
     console.log(result)
-    const regex = /\[s3:\/\/[^)]+\]/
+    if (result.length === 0) {
+      throw new InternalServerErrorException(`No DQD result with flowRunId: ${flowRunId} was found`)
+    }
+
+    const regex = /\[s3:\/\/[^)]+\]/ // To match [s3://flows/results/<flowRunID>_dqd/dc.json]
     const match = result[0].description.match(regex)
     let filePath = ''
     if (match) {
       const s3Path = match[0].slice(1, -1) // Removing the surrounding brackets []
       filePath = this.extractRelativePath(s3Path)
+      return await this.portalServerApi.getFlowRunDqdResults(filePath)
     }
-    const data = await this.portalServerApi.getFlowRunResults(filePath)
-    return data
+    throw new InternalServerErrorException(`Invalid S3 path found`)
   }
 
+  // TODO: Replace get multiple Dqd results to use S3 result
   async getDqdResults(dqdResultDto: IDqdResultDto) {
     const query = this.dqdResultRepo.createQueryBuilder('result').select()
     if (dqdResultDto.flowRunId) {

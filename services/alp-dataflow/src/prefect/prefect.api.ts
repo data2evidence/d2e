@@ -380,13 +380,14 @@ export class PrefectAPI {
       const url = `${this.url}/artifacts/filter`
       const data: Record<string, string | object | Number> = {
         artifacts: {
-          task_run_id: {
+          flow_run_id: {
             any_: [id]
           }
         }
       }
       const obs = this.httpService.post(url, data, options)
-      return await firstValueFrom(obs.pipe(map(result => result.data)))
+      const result = await firstValueFrom(obs.pipe(map(result => result.data)))
+      return result.filter(item => item.task_run_id !== null) // only keep the task run with non-null taskRunId
     } catch (error) {
       this.logger.info(`${errorMessage}: ${error}`)
       throw new InternalServerErrorException(errorMessage)

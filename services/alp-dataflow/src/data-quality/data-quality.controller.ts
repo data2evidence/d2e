@@ -10,11 +10,6 @@ export class DataQualityController {
   getDataQualityFlowRunResults(@Param('flowRunId', ParseUUIDPipe) flowRunId: string) {
     return this.dataQualityService.getDataQualityFlowRunResults(flowRunId)
   }
-  // TODO: replace above controller with this one, adjust frontend query params
-  @Get('task-run/:taskRunId/results')
-  getDataQualityFlowRunResultsTest(@Param('taskRunId', ParseUUIDPipe) taskRunId: string) {
-    return this.dataQualityService.getDataQualityTaskRunResults(taskRunId)
-  }
 
   @Get('flow-run/:flowRunId/overview')
   getDataQualityFlowRunOverview(@Param('flowRunId', ParseUUIDPipe) flowRunId: string) {

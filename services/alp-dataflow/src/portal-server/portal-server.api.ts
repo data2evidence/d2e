@@ -73,8 +73,8 @@ export class PortalServerAPI {
     }
   }
 
-  async getFlowRunResults(filePath: string) {
-    const errorMessage = 'Error while getting flow run results'
+  async getFlowRunDqdResults(filePath: string) {
+    const errorMessage = 'Error while getting flow run DQD results'
     try {
       const options = await this.createOptions()
       const url = `${this.url}/prefect/dqd?filePath=${filePath}`
