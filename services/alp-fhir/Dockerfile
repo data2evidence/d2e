@@ -4,7 +4,7 @@ COPY config.json .
 
 COPY --chown=docker:docker --chmod=711 start.sh start.sh
 
-FROM node:18.14.0-alpine
+FROM node:18.14.0-slim
 
 WORKDIR /home/docker/app
 
@@ -13,7 +13,7 @@ COPY ./src/duckdb /home/docker/app/duckdb
 COPY package-server.json ./package.json
 
 RUN yarn install
-RUN apk add --update gettext jq
+RUN apt update && apt install -y gettext jq
 
 #ARG
 #GIT COMMIT Passed during docker build time
