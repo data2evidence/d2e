@@ -35,6 +35,7 @@
     "esbuild": "0.21.5"
   },
   "dependencies": {
+    "@alp/alp-base-utils": "1.1.9",
     "@medplum/bot-layer": "^3.2.2",
     "@medplum/core": "^3.1.11",
     "@medplum/fhirtypes": "^3.1.11",
@@ -51,4 +52,9 @@
     "typescript": "^5.5.3",
     "winston": "^3.13.1",
     "zod": "^3.23.8"
+  },
+  "workspaces": {
+    "packages": [
+      "../../alp-libs/nodejs/alp-base-utils"
+    ]
   }
