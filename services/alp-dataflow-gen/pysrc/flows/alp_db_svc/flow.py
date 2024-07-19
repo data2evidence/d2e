@@ -2,7 +2,6 @@ from flows.alp_db_svc.dataset.main import create_datamodel, update_datamodel, ro
 from flows.alp_db_svc.datamart.main import create_datamart
 from flows.alp_db_svc.datamart.types import DATAMART_FLOW_ACTIONS, CreateDatamartType
 from flows.alp_db_svc.versioninfo.main import get_version_info_task
-from flows.alp_db_svc.questionnaire.main import create_questionnaire_definition_task, get_questionnaire_response_task
 from flows.alp_db_svc.const import get_plugin_classpath, get_db_dialect
 from flows.alp_db_svc.types import (CreateDataModelType,
                                     UpdateDataModelType,
@@ -10,8 +9,6 @@ from flows.alp_db_svc.types import (CreateDataModelType,
                                     CreateSnapshotType,
                                     RollbackCountType,
                                     RollbackTagType,
-                                    QuestionnaireDefinitionType,
-                                    QuestionnaireResponseType,
                                     CreateSchemaType)
 from prefect import get_run_logger
 
