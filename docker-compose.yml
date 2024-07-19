@@ -578,8 +578,6 @@ services:
         - -f
         - http://localhost:8103
       timeout: 30s
-    entrypoint:
-      - ./start.sh
     environment:
       <<:
         - *x-pg
