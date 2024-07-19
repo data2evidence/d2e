@@ -18,6 +18,7 @@
 
     "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml",
     "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile sql",
+    "remote:minerva:perseus": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile sql --profile perseus",
     "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local --profile sql",
 
     "start:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes",
