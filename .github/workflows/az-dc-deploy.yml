@@ -173,7 +173,7 @@ jobs:
           echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
 
           # Run ALP services
-          yarn remote:minerva up --remove-orphans --force-recreate --wait
+          yarn remote:minerva:perseus up --remove-orphans --force-recreate --wait
           EXIT_CODE=$?
             
           if [ "$( docker container inspect -f '{{.State.Status}}' $GATEWAY_NAME )" = "running" ]; then
