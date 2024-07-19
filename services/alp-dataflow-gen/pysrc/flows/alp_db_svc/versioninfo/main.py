@@ -194,7 +194,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
                 # update with latest version or error msg
                 dbutils = DBUtils(database_code)
                 db_dialect = dbutils.get_database_dialect()
-                tenant_configs = dbutils.extract_db_credentials()
+                tenant_configs = dbutils.extract_database_credentials()
 
                 latest_available_schema_version = get_latest_available_version(dialect=db_dialect,
                                                                                data_model=data_model,
