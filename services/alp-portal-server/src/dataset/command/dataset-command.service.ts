@@ -193,14 +193,6 @@ export class DatasetCommandService {
       this.logger.info(`Copy dataset detail: ${newDatasetName}`)
       await this.detailRepo.insertDetail(entityMgr, this.addOwner(datasetDetail, true))
 
-      // Copy dataset attribute
-      const sourceDatasetAttribute = await this.attributeRepo.getAttributeDto(sourceDatasetId)
-      for (const attribute of sourceDatasetAttribute) {
-        this.logger.info(`Copy dataset attribute: ${attribute.attributeId}`)
-        const newAttributes = this.attributeRepo.createAttribute(snapshotId, attribute)
-        await this.attributeRepo.insertAttribute(entityMgr, this.addOwner(newAttributes, true))
-      }
-
       // Create version attribute
       const version = String(timestamp.valueOf())
       const newVersionAttribute: IDatasetAttribute = {
@@ -223,6 +215,17 @@ export class DatasetCommandService {
         value: sourceDatasetDetail.name
       }
       await this.addCustomAttribute(entityMgr, snapshotId, newDatasetNameAttribute)
+
+      // Copy dataset attribute (excluding the ones inserted previously)
+      const sourceDatasetAttributes = await this.attributeRepo.getAttributeDto(sourceDatasetId)
+      const existingAttributes = await this.attributeRepo.getAttributeDto(snapshotId, entityMgr)
+      const existingAttributeIds = existingAttributes.map(att => att.attributeId)
+
+      for (const attribute of sourceDatasetAttributes.filter(att => !existingAttributeIds.includes(att.attributeId))) {
+        this.logger.info(`Copy dataset attribute: ${attribute.attributeId}`)
+        const newAttributes = this.attributeRepo.createAttribute(snapshotId, attribute)
+        await this.attributeRepo.insertAttribute(entityMgr, this.addOwner(newAttributes, true))
+      }
 
       // Copy dataset tags
       const sourceDatasetTags = await this.tagRepo.getTags(sourceDatasetId)
