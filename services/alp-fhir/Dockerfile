@@ -1,16 +1,10 @@
-FROM medplum/medplum-server:3.1.1
-
-RUN apt-get update && \
-	apt-get install -y --no-install-recommends \
-		gettext-base \
-        jq \
-		wget
+FROM medplum/medplum-server:3.1.1 as builder
 
 COPY config.json .
 
 COPY --chown=docker:docker --chmod=711 start.sh start.sh
 
-FROM node:18.14.0-slim
+FROM node:18.14.0-alpine
 
 WORKDIR /home/docker/app
 
@@ -19,7 +13,7 @@ COPY ./src/duckdb /home/docker/app/duckdb
 COPY package-server.json ./package.json
 
 RUN yarn install
-RUN apt update && apt install -y gettext jq
+RUN apk add --update gettext jq
 
 #ARG
 #GIT COMMIT Passed during docker build time
