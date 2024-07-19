@@ -414,6 +414,10 @@ https://{$CADDY__ALP__PUBLIC_FQDN} {
 	import portal
 }
 
+https://{$CADDY__ALP__PUBLIC_FQDN}:41180 {
+	import perseus
+}
+
 https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 	log {
 		format console {
