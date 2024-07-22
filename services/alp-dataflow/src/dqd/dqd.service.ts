@@ -15,33 +15,52 @@ export class DqdService {
   ) {}
 
   async getDqdResultByFlowRunId(flowRunId: string) {
-    const result = await this.prefectApi.getFlowRunsArtifacts(flowRunId)
+    const result = await this.prefectApi.getFlowRunsArtifacts([flowRunId])
     console.log(result)
     if (result.length === 0) {
       throw new InternalServerErrorException(`No DQD result with flowRunId: ${flowRunId} was found`)
     }
 
-    const regex = /\[s3:\/\/[^)]+\]/ // To match [s3://flows/results/<flowRunID>_dqd/dc.json]
-    const match = result[0].description.match(regex)
-    let filePath = ''
+    const match = this.regexMatcher(result)
+    console.log(`match: ${match[0].slice(1, -1)} , ${match[0]}`)
+    let filePath = []
     if (match) {
       const s3Path = match[0].slice(1, -1) // Removing the surrounding brackets []
-      filePath = this.extractRelativePath(s3Path)
+      filePath.push(this.extractRelativePath(s3Path))
       return await this.portalServerApi.getFlowRunDqdResults(filePath)
     }
     throw new InternalServerErrorException(`Invalid S3 path found`)
   }
 
-  // TODO: Replace get multiple Dqd results to use S3 result
+  // TODO: Testing with multiple DQD runs
   async getDqdResults(dqdResultDto: IDqdResultDto) {
-    const query = this.dqdResultRepo.createQueryBuilder('result').select()
-    if (dqdResultDto.flowRunId) {
-      query.where('result.flowRunId = :flowRunId', { flowRunId: dqdResultDto.flowRunId })
-    } else if (dqdResultDto.flowRunIds) {
-      query.where('result.flowRunId IN(:...flowRunIds)', { flowRunIds: dqdResultDto.flowRunIds })
+    const results = await this.prefectApi.getFlowRunsArtifacts(dqdResultDto.flowRunIds)
+    console.log(`Multiple ids result artifacts: ${results}`)
+    if (results.length === 0) {
+      throw new InternalServerErrorException(`No DQD results with flowRunIds ${dqdResultDto.flowRunIds} were found`)
     }
-    query.andWhere('result.error = false')
-    return (await query.getMany()) || []
+    const match = this.regexMatcher(results)
+    console.log(`match: ${match}`)
+    let filePaths = []
+    if (match) {
+      for (const m of match) {
+        const s3Path = m.slice(1, -1) // Removing the surrounding brackets []
+        const filePath = this.extractRelativePath(s3Path)
+        filePaths.push(filePath)
+      }
+      return await this.portalServerApi.getFlowRunDqdResults(filePaths)
+    }
+    throw new InternalServerErrorException(`Invalid S3 path found`)
+  }
+
+  private regexMatcher(result) {
+    const regex = /\[s3:\/\/[^)]+\]/ // To match [s3://flows/results/<flowRunID>_dqd/dc.json]
+    const match = result.reduce((acc, item) => {
+      const itemMatch = item.description.match(regex)
+      if (itemMatch) return itemMatch
+      return acc
+    }, null)
+    return match
   }
 
   private extractRelativePath(path: string) {

@@ -134,7 +134,6 @@ export class MinioClient {
   async getFlowRunResults(filePath: string) {
     const flowBucketName = this.getFlowBucketName()
     this.logger.info(`Object path: ${flowBucketName}/${filePath}`)
-    // TODO: replace hardcoded path
     try {
       const dataStream = await this.client.getObject(flowBucketName, filePath)
       const dataChunks = []
@@ -151,8 +150,7 @@ export class MinioClient {
             const dataStr = jsonData['data']
             // Parse again the double serialized data
             const parsedData = JSON.parse(dataStr)
-            jsonData['data'] = parsedData
-            resolve(parsedData)
+            resolve([parsedData])
           } catch (err) {
             console.error('Error parsing JSON:', err)
             reject(err)
@@ -168,6 +166,15 @@ export class MinioClient {
       console.error('Error fetching object from MinIO:', err)
       throw err
     }
+  }
+  // TODO: Testing with multiple DQD runs result together with dqd service on dataflow-mgmt
+  async getMultipleFlowRunResults(filePaths: string[]) {
+    const results = []
+    for (const filePath of filePaths) {
+      results.push(await this.getFlowRunResults(filePath))
+    }
+    console.log(`MultipleFlowRunResults: ${results}`)
+    return results
   }
 
   private getBucketName(datasetId: string) {

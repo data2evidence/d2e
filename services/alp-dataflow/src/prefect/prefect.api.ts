@@ -373,20 +373,21 @@ export class PrefectAPI {
     }
   }
 
-  async getFlowRunsArtifacts(id: string) {
-    const errorMessage = `Error while getting prefect flow run artifacts by id: ${id}`
+  async getFlowRunsArtifacts(ids: string[]) {
+    const errorMessage = `Error while getting prefect flow run artifacts by ids: ${ids}`
     try {
       const options = await this.createOptions()
       const url = `${this.url}/artifacts/filter`
-      const data: Record<string, string | object | number> = {
+      const data: Record<string, string | object> = {
         artifacts: {
           flow_run_id: {
-            any_: [id]
+            any_: ids
           }
         }
       }
       const obs = this.httpService.post(url, data, options)
       const result = await firstValueFrom(obs.pipe(map(result => result.data)))
+      console.log(`result from prefect api artifacts: ${result}`)
       return result.filter(item => item.task_run_id !== null) // only keep the task run with non-null taskRunId
     } catch (error) {
       this.logger.info(`${errorMessage}: ${error}`)

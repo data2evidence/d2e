@@ -60,8 +60,8 @@ export class DataQualityService {
 
   async getDataQualityFlowRunResults(flowRunId: string) {
     const dqdResult = await this.dqdService.getDqdResultByFlowRunId(flowRunId)
-    if (isDataQualityResult(dqdResult)) {
-      return dqdResult.CheckResults
+    if (isDataQualityResult(dqdResult[0])) {
+      return dqdResult[0].CheckResults
     }
     throw new InternalServerErrorException('Invalid DQD results found')
   }
@@ -127,7 +127,7 @@ export class DataQualityService {
       .filter(r => {
         return isDataCharacterizationResult(r.result)
       })
-      .reduce<IDomainContinuityResult[]>((acc, r) => {
+      .reduce((acc, r) => {
         const result = r.result as IDataCharacterizationResult
         const continuityResults = this.transformToDomainContinuity(result)
         if (acc.length > 0) {
@@ -175,9 +175,7 @@ export class DataQualityService {
     const dataQualityResults = await this.getDatasetDataQualityResults(datasetId)
     return dataQualityResults
       .map(dataQualityResult => {
-        const domainFailures = dataQualityResult.CheckResults.reduce<{
-          [domain: string]: number
-        }>((acc, cr) => {
+        const domainFailures = dataQualityResult.CheckResults.reduce((acc, cr) => {
           if (DATA_QUALITY_DOMAINS.includes(cr.cdmTableName)) {
             acc[cr.cdmTableName] = cr.failed
           } else {
@@ -201,11 +199,9 @@ export class DataQualityService {
     const flowRunIds = flowRuns.map(run => run.id)
     const dqdResults = await this.dqdService.getDqdResults({ flowRunIds: flowRunIds })
 
-    return dqdResults
-      .filter(r => {
-        return isDataQualityResult(r.result)
-      })
-      .map(r => r.result as IDataQualityResult)
+    return dqdResults.filter(r => {
+      return isDataQualityResult(r)
+    })
   }
 
   private transformToDomainContinuity(result: IDataCharacterizationResult) {

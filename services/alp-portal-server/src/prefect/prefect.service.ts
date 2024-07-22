@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { MinioClient } from '../minio/minio.client'
 import { PrefectDeploymentDeletionDto, PrefectFlowRunResultDto } from './dto'
 
@@ -14,6 +14,11 @@ export class PrefectService {
 
   // Get flow run result for dqd / dc
   async getFlowRunResults(prefectFlowRunResultDto: PrefectFlowRunResultDto) {
-    return this.minioClient.getFlowRunResults(prefectFlowRunResultDto.filePath)
+    if (prefectFlowRunResultDto.filePath) {
+      return this.minioClient.getFlowRunResults(prefectFlowRunResultDto.filePath)
+    } else if (prefectFlowRunResultDto.filePaths) {
+      return this.minioClient.getMultipleFlowRunResults(prefectFlowRunResultDto.filePaths)
+    }
+    throw new InternalServerErrorException('File path is not defined for DQD flow run results')
   }
 }

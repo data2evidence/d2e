@@ -1,7 +1,13 @@
-import { IsNotEmpty, IsString } from 'class-validator'
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class PrefectFlowRunResultDto {
   @IsString()
   @IsNotEmpty()
-  filePath: string
+  @IsOptional()
+  filePath?: string
+
+  @IsArray()
+  @IsNotEmpty()
+  @IsOptional()
+  filePaths?: string[]
 }
