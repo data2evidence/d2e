@@ -10,7 +10,7 @@ from prefect.serializers import JSONSerializer
 from utils.types import PG_TENANT_USERS
 from utils.databaseConnectionUtils import getSetDBDriverEnvString, getDatabaseConnectorConnectionDetailsString
 from flows.alp_data_characterization.hooks import persist_data_characterization, persist_export_to_ares, get_export_to_ares_results_from_file
-from utils.types import dcOptionsType
+from utils.types import dcOptionsType, DatabaseDialects
 from alpconnection.dbutils import get_db_svc_endpoint_dialect
 from flows.alp_db_svc.dataset.main import create_datamodel
 from flows.alp_db_svc.const import get_plugin_classpath
@@ -142,6 +142,19 @@ def execute_data_characterization_flow(options: dcOptionsType):
     flow_run_context = FlowRunContext.get().flow_run.dict()
     flow_run_id = str(flow_run_context.get("id"))
     outputFolder = f'/output/{flow_run_id}'
+    
+    
+    dialect = get_db_svc_endpoint_dialect(databaseCode)
+    match dialect:
+        case DatabaseDialects.POSTGRES:
+            resultsSchema = resultsSchema.lower()
+            vocabSchemaName = vocabSchemaName.lower()
+            schemaName = schemaName.lower()
+        case DatabaseDialects.HANA:
+            resultsSchema = resultsSchema.upper()
+            vocabSchemaName = vocabSchemaName.upper()
+            schemaName = schemaName.upper()      
+    
 
     create_data_characterization_schema(
         databaseCode,
