@@ -41,6 +41,9 @@ export class Dataset extends Audit {
   @Column({ name: 'pa_config_id', type: 'uuid', nullable: true })
   paConfigId: string
 
+  @Column({ name: 'fhir_project_id', type: 'uuid', nullable: true })
+  fhir_project_id: string
+
   @OneToOne(() => DatasetDetail, datasetDetail => datasetDetail.dataset)
   datasetDetail: DatasetDetail
 
