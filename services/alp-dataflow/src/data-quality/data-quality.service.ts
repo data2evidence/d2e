@@ -58,8 +58,8 @@ export class DataQualityService {
     return this.prefectApi.createFlowRun(name, dqDeploymentName, dqFlowName, parameters)
   }
 
-  async getDataQualityFlowRunResults(taskRunId: string) {
-    const dqdResult = await this.dqdService.getDqdResultByFlowRunId(taskRunId)
+  async getDataQualityFlowRunResults(flowRunId: string) {
+    const dqdResult = await this.dqdService.getDqdResultByFlowRunId(flowRunId)
     if (isDataQualityResult(dqdResult)) {
       return dqdResult.CheckResults
     }

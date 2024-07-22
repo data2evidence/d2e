@@ -378,7 +378,7 @@ export class PrefectAPI {
     try {
       const options = await this.createOptions()
       const url = `${this.url}/artifacts/filter`
-      const data: Record<string, string | object | Number> = {
+      const data: Record<string, string | object | number> = {
         artifacts: {
           flow_run_id: {
             any_: [id]

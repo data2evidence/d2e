@@ -148,7 +148,7 @@ export class MinioClient {
           const jsonStr = Buffer.concat(dataChunks).toString('utf8')
           try {
             const jsonData = JSON.parse(jsonStr)
-            let dataStr = jsonData['data']
+            const dataStr = jsonData['data']
             // Parse again the double serialized data
             const parsedData = JSON.parse(dataStr)
             jsonData['data'] = parsedData
