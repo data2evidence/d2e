@@ -5,8 +5,6 @@ import helmet from 'helmet'
 import { env } from './env'
 import express from 'express'
 import { readAndCreateBotFromConfig } from './utils/botUtils';
-import { Container } from 'typedi'
-import Routes from './routes';
 import * as pg from "pg";
 const logger = createLogger('FHIR Client');
 
@@ -140,16 +138,9 @@ const seed = async () => {
   client.end();
 };
 
-const registerRoutes = async (app: express.Application) => {
-  const routes = Container.get(Routes)
-  app.use('/', routes.getRouter())
-}
-
 async function main() {
   const app = express()
-  await initRoutes(app)
-  await registerRoutes(app)
-  
+  await initRoutes(app)  
   const server = https.createServer(
       {
           key: process.env.TLS__INTERNAL__KEY,

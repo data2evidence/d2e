@@ -269,8 +269,7 @@ x-envs:
        "appRouter": "https://alp-mercury-approuter:41000",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
        "minio": "",
-       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:8103/fhir/R4",
-       "fhirClient": "https://alp-minerva-fhir-client-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41112"
+       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}:8103/fhir/R4"
       }
   tls: &x-tls
     TLS__INTERNAL__CA_CRT: ${TLS__INTERNAL__CA_CRT}
