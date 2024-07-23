@@ -3,6 +3,7 @@ import { Audit } from '../../common/entity/audit.entity'
 import { Dataflow } from './dataflow.entity'
 import { DataflowResult } from './dataflow-result.entity'
 
+// TODO: Add flow_run_id column to allow insertion from dataflow-gen during flow execution
 @Entity('dataflow_run')
 export class DataflowRun extends Audit {
   @PrimaryColumn({ name: 'root_flow_run_id', type: 'uuid' })

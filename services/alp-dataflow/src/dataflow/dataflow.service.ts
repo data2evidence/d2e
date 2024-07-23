@@ -7,8 +7,10 @@ import { JwtPayload, decode } from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import { IDataflowDto, IDataflowDuplicateDto } from '../types'
 import { Dataflow, DataflowRevision, DataflowResult, DataflowRun } from './entity'
+import { PortalServerAPI } from '../portal-server/portal-server.api'
+import { PrefectAPI } from '../prefect/prefect.api'
 import { createLogger } from '../logger'
-import { BadRequestException } from '@nestjs/common'
+import { BadRequestException, InternalServerErrorException } from '@nestjs/common'
 
 @Injectable({ scope: Scope.REQUEST })
 export class DataflowService {
@@ -20,7 +22,9 @@ export class DataflowService {
     @InjectRepository(Dataflow) private readonly dataflowRepo: Repository<Dataflow>,
     @InjectRepository(DataflowRevision) private readonly dataflowRevisionRepo: Repository<DataflowRevision>,
     @InjectRepository(DataflowResult) private readonly dataflowResultRepo: Repository<DataflowResult>,
-    @InjectRepository(DataflowRun) private readonly dataflowRunRepo: Repository<DataflowRun>
+    @InjectRepository(DataflowRun) private readonly dataflowRunRepo: Repository<DataflowRun>,
+    private readonly portalServerApi: PortalServerAPI,
+    private readonly prefectApi: PrefectAPI
   ) {
     const token = decode(request.headers['authorization'].replace(/bearer /i, '')) as JwtPayload
     this.userId = token.sub
@@ -74,7 +78,7 @@ export class DataflowService {
     }
     return null
   }
-
+  // TODO: Replace to using prefect result
   async getTaskRunResult(taskRunId: string) {
     const result = await this.dataflowResultRepo
       .createQueryBuilder('result')
@@ -93,7 +97,7 @@ export class DataflowService {
     }
     return null
   }
-
+  // TODO: Replace to using prefect result
   async getFlowRunResultsByDataflowId(dataflowId: string) {
     const latestRun = await this.dataflowRunRepo
       .createQueryBuilder('run')
@@ -103,8 +107,41 @@ export class DataflowService {
       .orderBy('run.createdDate', 'DESC')
       .getOne()
     const results = latestRun?.results
+    if (!results) {
+      return []
+    }
+    // TODO: Replace the flowRunId to get from dataflow_run table directly
+    const flowRunId = results[0].flowRunId
+    const flowResult = await this.prefectApi.getFlowRunsArtifacts([flowRunId])
 
-    return results ? results : []
+    if (flowResult.length === 0) {
+      console.log(`No flow run artifacts result found for flowRunId: ${flowRunId}`)
+      return flowResult
+    }
+    console.log(JSON.stringify(flowResult))
+    const match = this.regexMatcher(flowResult)
+    const filePath = []
+    if (match) {
+      for (const m of match) {
+        const s3Path = match[0].slice(1, -1) // Removing the surrounding brackets []
+        filePath.push(this.extractRelativePath(s3Path))
+      }
+      console.log(`filePath: ${filePath}`)
+      const res = await this.portalServerApi.getFlowRunDqdResults(filePath)
+      console.log(`res: ${res}`)
+
+      // TODO: replace the hardcoded transformed result
+      const transformedRes = res.map((result, index) => ({
+        nodeName: `p${index + 1}`,
+        taskRunResult: {
+          result
+        },
+        error: false,
+        errorMessage: null
+      }))
+      return transformedRes
+    }
+    throw new InternalServerErrorException(`Invalid S3 path found`)
   }
 
   async getDataflows() {
@@ -223,5 +260,24 @@ export class DataflowService {
     }
 
     throw new BadRequestException('Dataflow and/or dataflow revision do not match')
+  }
+
+  private regexMatcher(result) {
+    const regex = /\[s3:\/\/[^)]+\]/ // To match [s3://flows/results/<flowRunID>_dqd/dc.json]
+    return result
+      .map(item => item.description.match(regex)) // Extract matches for each item
+      .filter(match => match) // Filter out null matches
+      .flat()
+  }
+
+  private extractRelativePath(path: string) {
+    const prefix = 's3://flows/'
+    const start = path.indexOf(prefix)
+    if (start === -1) return null
+
+    const end = path.indexOf(')', start)
+    if (end === -1) return path.substring(start + prefix.length)
+
+    return path.substring(start + prefix.length, end)
   }
 }

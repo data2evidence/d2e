@@ -566,11 +566,6 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
-    path: `^/dataflow-mgmt/dqd/data-quality/task-run/${UUID}/(results|overview)$`,
-    scopes: ['dataflowmgmt.dqd.dataQuality.flowRun.results.overview.read'],
-    httpMethods: ['GET']
-  },
-  {
     path: `^/dataflow-mgmt/dqd/data-quality/dataset/${UUID}/cohort/[0-9]+/flow-run/latest$`,
     scopes: ['dataflowmgmt.dqd.dataQuality.dataset.cohort.flowRun.latest.read'],
     httpMethods: ['GET']

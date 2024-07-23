@@ -2,13 +2,14 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { DqdResult } from './entity'
-import { PrefectAPI } from 'src/prefect/prefect.api'
-import { PortalServerAPI } from 'src/portal-server/portal-server.api'
+import { PrefectAPI } from '../prefect/prefect.api'
+import { PortalServerAPI } from '../portal-server/portal-server.api'
 import { IDqdResultDto } from '../types'
 
 @Injectable()
 export class DqdService {
   constructor(
+    // TODO: Remove unused dqdResultRepo and entity
     @InjectRepository(DqdResult) private readonly dqdResultRepo: Repository<DqdResult>,
     private readonly prefectApi: PrefectAPI,
     private readonly portalServerApi: PortalServerAPI
@@ -16,7 +17,6 @@ export class DqdService {
 
   async getDqdResultByFlowRunId(flowRunId: string) {
     const result = await this.prefectApi.getFlowRunsArtifacts([flowRunId])
-    console.log(result)
     if (result.length === 0) {
       throw new InternalServerErrorException(`No DQD result with flowRunId: ${flowRunId} was found`)
     }
