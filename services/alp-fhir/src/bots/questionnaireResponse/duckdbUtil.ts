@@ -35,6 +35,7 @@ export class DuckdbConnection{
 
     public parseResults(result: any) {
         function formatResult(value: any) {
+            // TODO: investigate if more cases are needed to handle DATE, TIMESTAMP and BIT datetypes
             switch (typeof value) {
                 case "bigint": //bigint
                     return Number(value) * 1;
