@@ -6,7 +6,7 @@ import * as crypto from 'crypto'
 
 export class FhirAPI {
   private readonly baseURL: string
-  private readonly fhirTokenUrl: string
+  private readonly fhirTokenUrl = 'http://alp-minerva-fhir-server-1:8103/oauth2/token'
   private readonly logger = createLogger(this.constructor.name)
   private token: string
   private readonly httpsAgent: Agent
@@ -16,7 +16,11 @@ export class FhirAPI {
   constructor() {
     if (services.fhir) {
       this.baseURL = services.fhir
-      this.fhirTokenUrl = services.fhirTokenUrl
+      this.fhirTokenUrl = 'http://alp-minerva-fhir-server-1:8103/oauth2/token'
+      this.httpsAgent = new Agent({
+        rejectUnauthorized: true,
+        ca: env.GATEWAY_CA_CERT
+      })
     } else {
       this.logger.error('No url is set for Fhir')
       throw new Error('No url is set for Fhir')
@@ -32,75 +36,77 @@ export class FhirAPI {
   }
 
   private async getRequestConfig() {
-    const formBody = new URLSearchParams()
-    formBody.set('grant_type', 'client_credentials')
-    formBody.set('client_id', this.clientId)
-    formBody.set('client_secret', this.clientSecret)
-
     const options = {
-      body: formBody.toString(),
-      credentials: 'include',
       headers: {
-        Authorization: `Basic ${Buffer.from(this.clientId + ':' + this.clientSecret, 'binary').toString('base64')}`
-      }
+        Authorization: this.token
+      },
+      httpsAgent: this.httpsAgent
     }
-    const headers = options.headers
-    headers['Content-type'] = 'application/x-www-form-urlencoded'
     return options
   }
 
-  // async authenticate() {
-  //   try {
-  //     let response
-  //     try {
-  //       const options = await this.getRequestConfig();
-  //       response = await post(this.fhirTokenUrl, options)
-  //     } catch (err) {
-  //       throw err
-  //     }
+  async authenticate() {
+    try {
+      let response
+      try {
+        const params = {
+          grant_type: 'client_credentials',
+          client_id: this.clientId,
+          client_secret: this.clientSecret
+        }
+        const body = Object.keys(params)
+          .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+          .join('&')
 
-  //     if (!response.ok) {
-  //       try {
-  //         const error = await response.json()
-  //         throw error
-  //       } catch (err) {
-  //         throw 'Failed to fetch tokens: ' + err
-  //       }
-  //     }
-  //     this.token = await response.json()
-  //   } catch (err) {
-  //     throw err
-  //   }
-  // }
+        const config = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+        response = await post(this.fhirTokenUrl, body, config)
+      } catch (err) {
+        throw err
+      }
 
-  // async createProject(name: string, description: string) {
-  //   try {
-  //     this.logger.info(`Create fhir project for the dataset`)
-  //     await this.authenticate()
-  //     const options = await this.getRequestConfig()
-  //     const url = `${this.baseURL}/createProject`
-  //     const details = {
-  //       name: name,
-  //       description: description
-  //     }
-  //     const result = await post(url, details, options)
-  //     if (result.data) {
-  //       return result.data
-  //     }
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
+      if (response.status != 200) {
+        throw 'Failed to fetch tokens'
+      }
+      this.token = response.data.token_type + ' ' + response.data.access_token
+    } catch (err) {
+      throw err
+    }
+  }
+
+  async createProject(name: string, description: string) {
+    try {
+      this.logger.info(`Create fhir project for the dataset`)
+      await this.authenticate()
+      const url = `${this.baseURL}/Project`
+      const details = {
+        resourceType: 'Project',
+        name: name,
+        strictMode: true,
+        features: ['bots'],
+        description: description
+      }
+      const options = await this.getRequestConfig()
+      const result = await post(url, details, options)
+      return result
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
 
   async importData(fhirResouce: string, resourceDetails: string) {
     try {
       this.logger.info(`Import data into fhir server`)
+      await this.authenticate()
       const options = await this.getRequestConfig()
       const url = `${this.baseURL}/${fhirResouce}`
       const result = await post(url, resourceDetails, options)
       return result
-    } catch (err) {
-      throw new Error(`Failed to import data into fhir server`)
+    } catch (error) {
+      throw new Error(error)
     }
   }
 }
