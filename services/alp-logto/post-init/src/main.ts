@@ -7,6 +7,8 @@ import {
   restoreFile,
   cleanupFile,
 } from "./utils/manipulateFile";
+import * as nodeutil from "node:util";
+const sleep = nodeutil.promisify(setTimeout);
 
 async function create(
   path: string,
@@ -485,6 +487,7 @@ async function main() {
       console.debug(`Removing key ${key}`);
       await removeEnvLine(key, backupFileWithPath);
     });
+    await sleep(3000);
     await writeEnvFile("\n" + APP_ENVS.join("\n"), backupFileWithPath);
     await restoreFile(backupFileWithPath, orignalEnvFileWithPath);
     await cleanupFile(backupFileWithPath);
@@ -608,4 +611,3 @@ async function seeding_alp_admin() {
 
 seeding_alp_admin();
 main();
-// setTimeout(() => console.log("THE END"), 10000000);
