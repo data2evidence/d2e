@@ -150,7 +150,7 @@ export class MinioClient {
             const dataStr = jsonData['data']
             // Parse again the double serialized data
             const parsedData = JSON.parse(dataStr)
-            resolve([parsedData])
+            resolve(parsedData)
           } catch (err) {
             console.error('Error parsing JSON:', err)
             reject(err)
@@ -167,13 +167,13 @@ export class MinioClient {
       throw err
     }
   }
-  // TODO: Testing with multiple DQD runs result together with dqd service on dataflow-mgmt
+
   async getMultipleFlowRunResults(filePaths: string[]) {
     const results = []
     for (const filePath of filePaths) {
-      results.push(await this.getFlowRunResults(filePath))
+      const flowRunResult = await this.getFlowRunResults(filePath)
+      results.push(flowRunResult)
     }
-    console.log(`MultipleFlowRunResults: ${results}`)
     return results
   }
 

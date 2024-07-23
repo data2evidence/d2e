@@ -23,7 +23,7 @@ export class DqdService {
 
     const match = this.regexMatcher(result)
     console.log(`match: ${match[0].slice(1, -1)} , ${match[0]}`)
-    let filePath = []
+    const filePath = []
     if (match) {
       const s3Path = match[0].slice(1, -1) // Removing the surrounding brackets []
       filePath.push(this.extractRelativePath(s3Path))
@@ -35,13 +35,11 @@ export class DqdService {
   // TODO: Testing with multiple DQD runs
   async getDqdResults(dqdResultDto: IDqdResultDto) {
     const results = await this.prefectApi.getFlowRunsArtifacts(dqdResultDto.flowRunIds)
-    console.log(`Multiple ids result artifacts: ${results}`)
     if (results.length === 0) {
       throw new InternalServerErrorException(`No DQD results with flowRunIds ${dqdResultDto.flowRunIds} were found`)
     }
     const match = this.regexMatcher(results)
-    console.log(`match: ${match}`)
-    let filePaths = []
+    const filePaths = []
     if (match) {
       for (const m of match) {
         const s3Path = m.slice(1, -1) // Removing the surrounding brackets []
@@ -55,12 +53,10 @@ export class DqdService {
 
   private regexMatcher(result) {
     const regex = /\[s3:\/\/[^)]+\]/ // To match [s3://flows/results/<flowRunID>_dqd/dc.json]
-    const match = result.reduce((acc, item) => {
-      const itemMatch = item.description.match(regex)
-      if (itemMatch) return itemMatch
-      return acc
-    }, null)
-    return match
+    return result
+      .map(item => item.description.match(regex)) // Extract matches for each item
+      .filter(match => match) // Filter out null matches
+      .flat()
   }
 
   private extractRelativePath(path: string) {

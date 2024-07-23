@@ -199,9 +199,11 @@ export class DataQualityService {
     const flowRunIds = flowRuns.map(run => run.id)
     const dqdResults = await this.dqdService.getDqdResults({ flowRunIds: flowRunIds })
 
-    return dqdResults.filter(r => {
-      return isDataQualityResult(r)
-    })
+    return dqdResults
+      .filter(r => {
+        return isDataQualityResult(r)
+      })
+      .map(r => r as IDataQualityResult)
   }
 
   private transformToDomainContinuity(result: IDataCharacterizationResult) {

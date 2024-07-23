@@ -73,21 +73,33 @@ export class PortalServerAPI {
     }
   }
 
-  // TODO: to support list of file paths
   async getFlowRunDqdResults(filePaths: string[]) {
     const errorMessage = 'Error while getting flow run DQD results '
     try {
       const options = await this.createOptions()
-      let url
-      console.log(`filepaths: ${filePaths}`)
+      let url = `${this.url}/prefect/dqd`
+      // To build query parameters
+      const params = new URLSearchParams()
       if (filePaths.length === 1) {
-        url = `${this.url}/prefect/dqd?filePath=${filePaths[0]}`
+        params.append('filePath', filePaths[0])
       } else {
-        url = `${this.url}/prefect/dqd?filePaths=${filePaths}`
+        filePaths.forEach(path => params.append('filePaths[]', path))
       }
+      // Append query parameters to the URL
+      url += `?${params.toString()}`
       this.logger.info(url)
-      const obs = this.httpService.get(url, options)
-      return firstValueFrom(obs.pipe(map(result => result.data)))
+      const obs = this.httpService.get(url, options).pipe(
+        map(result => {
+          // If result.data is an array, return it as is
+          if (Array.isArray(result.data)) {
+            return result.data
+          } else {
+            // If result.data is not an array, wrap it in an array
+            return [result.data]
+          }
+        })
+      )
+      return await firstValueFrom(obs)
     } catch (error) {
       this.logger.error(`${errorMessage}: ${error}`)
       throw new InternalServerErrorException(errorMessage)
