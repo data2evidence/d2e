@@ -473,18 +473,22 @@ async function main() {
     }`
   );
 
-  const orignalEnvFileWithPath = `/run/envs/.env.${process.env.ENV_TYPE}`;
-  const backupFileWithPath = orignalEnvFileWithPath + ".tmp";
-  await copyBackupFile(orignalEnvFileWithPath, backupFileWithPath);
-  console.log(`backup file path ${backupFileWithPath}`);
-  // Remove existing env & Write to env file
-  APP_ENVS.forEach(async (env) => {
-    const key = env.split("=")[0];
-    await removeEnvLine(key, backupFileWithPath);
-  });
-  await writeEnvFile("\n" + APP_ENVS.join("\n"), backupFileWithPath);
-  await restoreFile(backupFileWithPath, orignalEnvFileWithPath);
-  await cleanupFile(backupFileWithPath);
+  // Inject Logto envs to .env.$ENV_TYPE
+  await (async () => {
+    const orignalEnvFileWithPath = `/run/envs/.env.${process.env.ENV_TYPE}`;
+    const backupFileWithPath = orignalEnvFileWithPath + ".tmp";
+    await copyBackupFile(orignalEnvFileWithPath, backupFileWithPath);
+    console.debug(`backup file path ${backupFileWithPath}`);
+    // Remove existing env & Write to env file
+    APP_ENVS.forEach(async (env) => {
+      const key = env.split("=")[0];
+      console.debug(`Removing key ${key}`);
+      await removeEnvLine(key, backupFileWithPath);
+    });
+    await writeEnvFile("\n" + APP_ENVS.join("\n"), backupFileWithPath);
+    await restoreFile(backupFileWithPath, orignalEnvFileWithPath);
+    await cleanupFile(backupFileWithPath);
+  })();
 
   console.log(
     `\n********************** LOGTO ENV ASSIGNMENTS Generated IN .env.${process.env.ENV_TYPE} *************************`
