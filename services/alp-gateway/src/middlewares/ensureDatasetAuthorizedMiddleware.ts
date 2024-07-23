@@ -53,6 +53,10 @@ export const ensureAnalyticsDatasetAuthorized = async (req, res: Response, next:
 }
 
 export const ensureDataflowMgmtDatasetAuthorized = async (req, res: Response, next: NextFunction) => {
+  // This middleware should be used after checkScopes
+  // Skip dataset authorization check for admin role
+  if (req.user.userMgmtGroups.alp_role_system_admin) return next()
+
   const allowedDatasets = req.user.userMgmtGroups.alp_role_study_researcher
   let dataset
 
