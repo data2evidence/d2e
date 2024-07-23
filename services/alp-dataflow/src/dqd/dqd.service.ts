@@ -22,7 +22,6 @@ export class DqdService {
     }
 
     const match = this.regexMatcher(result)
-    console.log(`match: ${match[0].slice(1, -1)} , ${match[0]}`)
     const filePath = []
     if (match) {
       const s3Path = match[0].slice(1, -1) // Removing the surrounding brackets []
@@ -32,11 +31,11 @@ export class DqdService {
     throw new InternalServerErrorException(`Invalid S3 path found`)
   }
 
-  // TODO: Testing with multiple DQD runs
   async getDqdResults(dqdResultDto: IDqdResultDto) {
     const results = await this.prefectApi.getFlowRunsArtifacts(dqdResultDto.flowRunIds)
     if (results.length === 0) {
-      throw new InternalServerErrorException(`No DQD results with flowRunIds ${dqdResultDto.flowRunIds} were found`)
+      console.log(`No flow run artifacts result found for flowRunIds: ${dqdResultDto.flowRunIds}`)
+      return results
     }
     const match = this.regexMatcher(results)
     const filePaths = []

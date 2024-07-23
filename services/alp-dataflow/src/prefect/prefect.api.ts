@@ -387,7 +387,6 @@ export class PrefectAPI {
       }
       const obs = this.httpService.post(url, data, options)
       const result = await firstValueFrom(obs.pipe(map(result => result.data)))
-      console.log(`result from prefect api artifacts: ${result}`)
       return result.filter(item => item.task_run_id !== null) // only keep the task run with non-null taskRunId
     } catch (error) {
       this.logger.info(`${errorMessage}: ${error}`)
