@@ -1,42 +1,41 @@
 import { BotEvent, MedplumClient } from '@medplum/core';
 import { QuestionnaireResponse, QuestionnaireResponseItem, QuestionnaireResponseItemAnswer } from '@medplum/fhirtypes';
-import { Connection, Database } from "duckdb-async";
+import { DuckdbConnection } from './duckdbUtil';
 import { v4 as uuid } from 'uuid';
 
 export async function handler(medplum: MedplumClient, event: BotEvent): Promise<any> {
   const questionnaireResponse = event.input as QuestionnaireResponse;
-  const duckdDB = await Database.create(
-    `../duckdb/cdmdefault.duckdb`
-  );
-  const duckdDBconn = await duckdDB.connect();
-  await duckdDBconn.all(`insert into gdm_questionnaire_response ("id", "person_id", "etl_source_table", "etl_source_table_record_id", "etl_source_table_record_created_at", "etl_session_id", "etl_started_at") values('${questionnaireResponse.id}', 0, 'XYZ', 789, '2024-07-23', 'avsade',  '${new Date().toISOString()}')`)
+  let duckdb = new DuckdbConnection()
+  await duckdb.createConnection();
+  let query = `insert into gdm_questionnaire_response ("id", "person_id", "etl_source_table", "etl_source_table_record_id", "etl_source_table_record_created_at", "etl_session_id", "etl_started_at") values('${questionnaireResponse.id}', 0, 'XYZ', 789, '2024-07-23', 'avsade', now())`;
+  await duckdb.executeQuery(query)
   if(questionnaireResponse.item.length > 0){
-    await handleItems(questionnaireResponse.item, questionnaireResponse.id, duckdDBconn)
+    await handleItems(questionnaireResponse.item, questionnaireResponse.id, duckdb)
     console.log('Items inserted successfully!')
   }
   //Testing
-  let result1 = await duckdDBconn.all(`select * from gdm_questionnaire_response where id=${questionnaireResponse.id}`)
-  console.log('Select from' + JSON.stringify(parseResults(result1)))
+  let result1 = await duckdb.executeQuery(`select * from gdm_questionnaire_response where id=${questionnaireResponse.id}`)
+  console.log('Select from' + JSON.stringify(result1))
   
-  duckdDB.close()
+  duckdb.close()
   return true
 }
 
-async function handleItems(items: QuestionnaireResponseItem[], questionnaireResponseId: string, duckDBConn: Connection){
+async function handleItems(items: QuestionnaireResponseItem[], questionnaireResponseId: string, duckDBConn: DuckdbConnection){
   for(var item of items){
     let itemId = uuid();
-    await duckDBConn.all(`insert into gdm_item ("id", "gdm_questionnaire_response_id", "link_id", "text", "definition", "etl_started_at") values('${itemId}', '${questionnaireResponseId}', '${item.linkId}', '${item.text}', '${item.definition}', '${new Date().toISOString()}')`);
+    await duckDBConn.executeQuery(`insert into gdm_item ("id", "gdm_questionnaire_response_id", "link_id", "text", "definition", "etl_started_at") values('${itemId}', '${questionnaireResponseId}', '${item.linkId}', '${item.text}', '${item.definition}', now())`);
     if(item.answer.length > 0){
         await handleAnswers(item.answer, itemId, duckDBConn)
         console.log('Item Answers inserted successfully!')
     }
     //Testing
-    let result = await duckDBConn.all(`select * from gdm_item where id=${itemId}`)
-    console.log('Select from' + JSON.stringify(parseResults(result)))
+    let result = await duckDBConn.executeQuery(`select * from gdm_item where id=${itemId}`)
+    console.log('Select from' + JSON.stringify(result))
   }
 }
 
-async function handleAnswers(answers: QuestionnaireResponseItemAnswer[], itemId: string, duckDBConn: Connection){
+async function handleAnswers(answers: QuestionnaireResponseItemAnswer[], itemId: string, duckDBConn: DuckdbConnection){
   for(var answer of answers){
     let answerValue = ""
     let answerType = ""
@@ -51,13 +50,13 @@ async function handleAnswers(answers: QuestionnaireResponseItemAnswer[], itemId:
       answerValue = answer.valueInteger.toString()
       answerType = "valueInteger"
     }else if(answer.valueDate){
-      answerValue = answer.valueDate
+      answerValue = answer.valueDate.toString()
       answerType = "valueDate"
     } else if(answer.valueDateTime){
-      answerValue = answer.valueDateTime
+      answerValue = answer.valueDateTime.toString()
       answerType = "valueDateTime"
     } else if(answer.valueTime){
-      answerValue = answer.valueTime
+      answerValue = answer.valueTime.toString()
       answerType = "valueTime"
     } else if(answer.valueString != ""){
       answerValue = answer.valueString
@@ -75,37 +74,15 @@ async function handleAnswers(answers: QuestionnaireResponseItemAnswer[], itemId:
     else{
       answerType = "valueReference"
     }
-    await duckDBConn.all(`INSERT INTO gdm_answer
-      (id, gdm_item_id, value_type, value, valueattachment_contenttype, valueattachment_language, valueattachment_data, valueattachment_url, valueattachment_size, valueattachment_hash, valueattachment_title, valueattachment_creation, valuecoding_system, valuecoding_version, valuecoding_code, valuecoding_display, valuecoding_userselected, valuequantity_value, valuequantity_comparator, valuequantity_unit, valuequantity_system, valuequantity_code, valuereference_reference, valuereference_type, valuereference_identifier, valuereference_display, etl_started_at, etl_created_at)
-      VALUES('${answerId}', '${itemId}', '${answerType}', '${answerValue}', '${answer.valueAttachment!== undefined?answer.valueAttachment.contentType: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.language:''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.data: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.url: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.size: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.hash:''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.title:''}','${answer.valueAttachment!== undefined?answer.valueAttachment.creation:''}', '${answer.valueCoding!== undefined?answer.valueCoding.system:''}', '${answer.valueCoding!== undefined?answer.valueCoding.version:''}', '${answer.valueCoding!== undefined?answer.valueCoding.code:''}', '${answer.valueCoding!== undefined?answer.valueCoding.display:''}', '${answer.valueCoding!== undefined?answer.valueCoding.userSelected:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.value: ''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.comparator:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.unit:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.system:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.code:''}', '${answer.valueReference!== undefined?answer.valueReference.reference:''}', '${answer.valueReference!== undefined?answer.valueReference.type:''}', '${answer.valueReference!== undefined?answer.valueReference.identifier:''}', '${answer.valueReference!== undefined?answer.valueReference.display:''}', '${new Date().toISOString()}', '${new Date().toISOString()}')`);
+    console.log('Insert into gdm_answer table!')
+    //valueattachment_contenttype, valueattachment_language, valueattachment_data, valueattachment_url, valueattachment_size, valueattachment_hash, valueattachment_title, valueattachment_creation, valuecoding_system, valuecoding_version, valuecoding_code, valuecoding_display, valuecoding_userselected, valuequantity_value, valuequantity_comparator, valuequantity_unit, valuequantity_system, valuequantity_code, valuereference_reference, valuereference_type, valuereference_identifier, valuereference_display,
+    // , '${answer.valueAttachment!== undefined?answer.valueAttachment.contentType: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.language:''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.data: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.url: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.size: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.hash:''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.title:''}','${answer.valueAttachment!== undefined?answer.valueAttachment.creation:''}', '${answer.valueCoding!== undefined?answer.valueCoding.system:''}', '${answer.valueCoding!== undefined?answer.valueCoding.version:''}', '${answer.valueCoding!== undefined?answer.valueCoding.code:''}', '${answer.valueCoding!== undefined?answer.valueCoding.display:''}', '${answer.valueCoding!== undefined?answer.valueCoding.userSelected:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.value: ''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.comparator:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.unit:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.system:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.code:''}', '${answer.valueReference!== undefined?answer.valueReference.reference:''}', '${answer.valueReference!== undefined?answer.valueReference.type:''}', '${answer.valueReference!== undefined?answer.valueReference.identifier:''}', '${answer.valueReference!== undefined?answer.valueReference.display:''}', 
+    await duckDBConn.executeQuery(`INSERT INTO gdm_answer
+      (id, gdm_item_id, value_type, value, etl_started_at)
+      VALUES('${answerId}', '${itemId}', '${answerType}', '${answerValue}', now())`);
     
     //Testing
-    let result = await duckDBConn.all(`select * from gdm_item where id=${answerId}`)
-    console.log('Select from' + JSON.stringify(parseResults(result)))
+    let result = await duckDBConn.executeQuery(`select * from gdm_item where id=${answerId}`)
+    console.log('Select from' + JSON.stringify(result))
   }
-}
-
-function parseResults(result: any) {
-  function formatResult(value: any) {
-      // TODO: investigate if more cases are needed to handle DATE, TIMESTAMP and BIT datetypes
-      switch (typeof value) {
-          case "bigint": //bigint
-              return Number(value) * 1;
-          default:
-              return value;
-      }
-  }
-  Object.keys(result).forEach((rowId) => {
-      Object.keys(result[rowId]).forEach((colKey) => {
-          if (
-              result[rowId][colKey] === null ||
-              typeof result[rowId][colKey] === "undefined"
-          ) {
-              result[rowId][colKey] = "NoValue";
-          } else {
-              result[rowId][colKey] = formatResult(result[rowId][colKey]);
-          }
-      });
-  });
-  return result;
 }
