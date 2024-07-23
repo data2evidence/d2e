@@ -19,7 +19,7 @@ x-envs:
     DB_SVC__PATH: /alpdb
     DISABLE_SSL: "TRUE"
     HANA__READ_ROLE: TENANT_READ_ROLE
-    LB__LOG_LEVEL: FINE
+    LB__LOG_LEVEL: ${LB__LOG_LEVEL:-FINE}
     PG__READ_ROLE: postgres_tenant_read_role
   env_converter: &x-converter
     DB_CREDENTIALS_MGR__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/db-credentials/db/
