@@ -90,8 +90,9 @@ class Liquibase:
             case LiquibaseAction.ROLLBACK_TAG:
                 params.append(f"--tag={self.rollback_tag}")
 
-        if self.data_model in OMOP_DATA_MODELS:
+        if self.data_model in OMOP_DATA_MODELS or self.data_model == "characterization":
             params.append(f"-DVOCAB_SCHEMA={self.vocab_schema}")
+            params.append(f"-DDATA_CHARACTERIZATION_SCHEMA={self.schema_name}")
         return params
 
     def update_schema(self):
