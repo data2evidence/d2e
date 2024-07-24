@@ -1550,6 +1550,7 @@ services:
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
       isTestEnv: ${isTestEnv}
+      NOT_EQ_FILTERCARDS: 0
 
   redis:
     command: redis-server --requirepass ${REDIS_PASSWORD}
