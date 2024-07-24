@@ -170,15 +170,17 @@ export class Patient implements Request {
                     let currIdx = i;
                     while (currIdx > 0) {
                         if (typeof interaction[i].isExclude === Keys.TERM_UNDEFINED) {
-                            patient.where.push({
-                                path: Keys.MRITERM_INTERACTIONID,
-                                alias: interaction[origin].alias,
-                                filter: [{
-                                    op: Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
-                                    value: interaction[currIdx - 1].alias,
-                                    type: Keys.TERM_OPERANDTYPE_EXPRESSION,
-                                }],
-                            });
+                            if(process.env.NOT_EQ_FILTERCARDS == true) {
+                                patient.where.push({
+                                    path: Keys.MRITERM_INTERACTIONID,
+                                    alias: interaction[origin].alias,
+                                    filter: [{
+                                        op: Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
+                                        value: interaction[currIdx - 1].alias,
+                                        type: Keys.TERM_OPERANDTYPE_EXPRESSION,
+                                    }],
+                                });
+                            }
                         }
                         --currIdx;
                     }
