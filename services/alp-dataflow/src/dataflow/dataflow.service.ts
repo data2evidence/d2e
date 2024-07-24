@@ -97,40 +97,34 @@ export class DataflowService {
     }
     return null
   }
-  // TODO: Replace to using prefect result
+
   async getFlowRunResultsByDataflowId(dataflowId: string) {
-    const latestRun = await this.dataflowRunRepo
-      .createQueryBuilder('run')
-      .select('run.rootFlowRunId')
-      .leftJoinAndSelect('run.results', 'dataflowResults')
-      .where('run.dataflowId = :dataflowId', { dataflowId })
-      .orderBy('run.createdDate', 'DESC')
+    const lastFlowRun = await this.dataflowRepo
+      .createQueryBuilder('dataflow')
+      .select('dataflow.lastFlowRunId')
+      .where('dataflow.id = :dataflowId', { dataflowId })
       .getOne()
-    const results = latestRun?.results
-    if (!results) {
-      return []
-    }
-    // TODO: Replace the flowRunId to get from dataflow_run table directly
-    const flowRunId = results[0].flowRunId
-    const flowResult = await this.prefectApi.getFlowRunsArtifacts([flowRunId])
+
+    const lastFlowRunId = lastFlowRun?.lastFlowRunId
+    const subflowRuns = await this.prefectApi.getFlowRunsByParentFlowRunId(lastFlowRunId)
+    const flowRunIds = subflowRuns.map(flow => flow.id)
+    const flowResult = await this.prefectApi.getFlowRunsArtifacts(subflowRuns.map(item => item.id))
 
     if (flowResult.length === 0) {
-      console.log(`No flow run artifacts result found for flowRunId: ${flowRunId}`)
-      return flowResult
+      console.log(`No flow run artifacts result found for flowRunIds: ${flowRunIds}`)
+      return []
     }
-    console.log(JSON.stringify(flowResult))
+    // regex will only match flow runs with description which has path
     const match = this.regexMatcher(flowResult)
     const filePath = []
     if (match) {
       for (const m of match) {
-        const s3Path = match[0].slice(1, -1) // Removing the surrounding brackets []
+        const s3Path = m.slice(1, -1) // Removing the surrounding brackets []
         filePath.push(this.extractRelativePath(s3Path))
       }
-      console.log(`filePath: ${filePath}`)
       const res = await this.portalServerApi.getFlowRunResults(filePath)
-      console.log(`res: ${res}`)
 
-      // TODO: replace the hardcoded transformed result
+      // TODO: replace the hardcoded transformed after persisted result been updated
       const transformedRes = res.map((result, index) => ({
         nodeName: `p${index + 1}`,
         taskRunResult: {
@@ -186,6 +180,7 @@ export class DataflowService {
     return { id }
   }
 
+  // TODO: to remove,getting lastFlowRunId from prefect API
   async createDataflowRun(id, prefectflowRunId) {
     const dataflowRunEntity = this.dataflowRunRepo.create({
       dataflowId: id,

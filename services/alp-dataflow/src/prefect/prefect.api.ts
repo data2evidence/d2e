@@ -394,6 +394,26 @@ export class PrefectAPI {
     }
   }
 
+  async getFlowRunsByParentFlowRunId(parentFlowRunId: string) {
+    const errorMessage = `Error while getting prefect flow run by parent flow run id: ${parentFlowRunId}`
+    try {
+      const options = await this.createOptions()
+      const url = `${this.url}/flow_runs/filter`
+      const data: Record<string, string | object> = {
+        flow_runs: {
+          parent_flow_run_id: {
+            any_: [parentFlowRunId]
+          }
+        }
+      }
+      const obs = this.httpService.post(url, data, options)
+      return await firstValueFrom(obs.pipe(map(result => result.data)))
+    } catch (error) {
+      this.logger.info(`${errorMessage}: ${error}`)
+      throw new InternalServerErrorException(errorMessage)
+    }
+  }
+
   private getFilters(filter?: IFlowRunQueryDto) {
     if (filter == null) {
       return {}
