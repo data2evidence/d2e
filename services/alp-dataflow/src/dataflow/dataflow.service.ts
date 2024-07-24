@@ -127,7 +127,7 @@ export class DataflowService {
         filePath.push(this.extractRelativePath(s3Path))
       }
       console.log(`filePath: ${filePath}`)
-      const res = await this.portalServerApi.getFlowRunDqdResults(filePath)
+      const res = await this.portalServerApi.getFlowRunResults(filePath)
       console.log(`res: ${res}`)
 
       // TODO: replace the hardcoded transformed result

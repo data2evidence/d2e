@@ -73,11 +73,11 @@ export class PortalServerAPI {
     }
   }
   // TODO: Unified to be an generic function for different result
-  async getFlowRunDqdResults(filePaths: string[]) {
-    const errorMessage = 'Error while getting flow run DQD results '
+  async getFlowRunResults(filePaths: string[]) {
+    const errorMessage = `Error while getting flow run results with filepath ${filePaths}`
     try {
       const options = await this.createOptions()
-      let url = `${this.url}/prefect/dqd`
+      let url = `${this.url}/prefect/results`
       // To build query parameters
       const params = new URLSearchParams()
       if (filePaths.length === 1) {

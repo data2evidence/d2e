@@ -11,7 +11,7 @@ export class PrefectController {
     return await this.prefectService.deleteDeploymentResource(prefectDeploymentDeletionDto)
   }
 
-  @Get('dqd')
+  @Get('results')
   async getFlowRunResults(@Query() prefectFlowRunResultDto: PrefectFlowRunResultDto) {
     return await this.prefectService.getFlowRunResults(prefectFlowRunResultDto)
   }

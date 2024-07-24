@@ -26,7 +26,7 @@ export class DqdService {
     if (match) {
       const s3Path = match[0].slice(1, -1) // Removing the surrounding brackets []
       filePath.push(this.extractRelativePath(s3Path))
-      return await this.portalServerApi.getFlowRunDqdResults(filePath)
+      return await this.portalServerApi.getFlowRunResults(filePath)
     }
     throw new InternalServerErrorException(`Invalid S3 path found`)
   }
@@ -45,7 +45,7 @@ export class DqdService {
         const filePath = this.extractRelativePath(s3Path)
         filePaths.push(filePath)
       }
-      return await this.portalServerApi.getFlowRunDqdResults(filePaths)
+      return await this.portalServerApi.getFlowRunResults(filePaths)
     }
     throw new InternalServerErrorException(`Invalid S3 path found`)
   }
