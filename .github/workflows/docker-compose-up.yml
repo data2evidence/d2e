@@ -136,7 +136,7 @@ jobs:
       - name: Docker compose build data 2 services excluding alp-sqleditor
         run: |
           # Build DataNode services and pull dataflow-gen from cache
-          yarn build:minerva alp-minerva-analytics-svc alp-query-gen alp-fhir-server alp-fhir-fe-server  --builder ${{ steps.builder1.outputs.name }}
+          yarn build:minerva alp-minerva-analytics-svc alp-query-gen alp-fhir-server alp-fhir-fe-server alp-fhir-client --builder ${{ steps.builder1.outputs.name }}
 
       - name: Builder cache cleanup
         run: |  
