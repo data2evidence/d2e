@@ -63,11 +63,9 @@ def create_schema_tasks(dialect: str,
                         tenant_configs: DBCredentialsType,
                         plugin_classpath: str,
                         count: int) -> bool:
-    try:
-
-
 
         schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
+
 
         create_db_schema_wo = create_db_schema.with_options(
             on_completion=[partial(create_dataset_schema_hook,
@@ -86,7 +84,6 @@ def create_schema_tasks(dialect: str,
         create_tables_wo = run_liquibase_update_task.with_options(
             on_failure=[partial(drop_schema_hook,
                                 **dict(schema_dao=schema_dao))])
-
         create_tables_wo(action=action,
                          dialect=dialect,
                          data_model=data_model,
@@ -147,6 +144,7 @@ def update_datamodel(database_code: str,
     
     dbutils = DBUtils(database_code)
     tenant_configs = dbutils.extract_database_credentials()
+
 
     schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
 
@@ -253,7 +251,6 @@ def rollback_tag_task(database_code: str,
 @task(log_prints=True)
 def create_db_schema(schema_dao: DBDao):
     schema_exists = schema_dao.check_schema_exists()
-
     if schema_exists == True:
         raise ValueError(
             f"Schema '{schema_dao.schema_name}' already exists in database '{schema_dao.database_code}'")

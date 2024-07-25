@@ -9,18 +9,14 @@ from prefect.context import FlowRunContext
 from prefect.serializers import JSONSerializer
 from prefect.filesystems import RemoteFileSystem as RFS
 
-from utils import DBUtils
-from utils.types import dcOptionsType, UserType
+from utils.DBUtils import DBUtils
+from utils.types import dcOptionsType, UserType, DatabaseDialects
 
 from dao import DqdResultDao
 
+from flows.alp_data_characterization.hooks import persist_data_characterization, persist_export_to_ares, get_export_to_ares_results_from_file
 from flows.alp_db_svc.dataset.main import create_datamodel
 from flows.alp_db_svc.const import get_plugin_classpath
-
-from flows.alp_data_characterization.hooks import (persist_data_characterization, 
-                                                   persist_export_to_ares, 
-                                                   get_export_to_ares_results_from_file)
-
 
 r_libs_user_directory = os.getenv("R_LIBS_USER")
 
@@ -64,7 +60,7 @@ async def execute_data_characterization(schemaName: str,
         raise e
 
 
-@task(result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")), 
+@task(result_storage=RFS.load(os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME")),
       result_storage_key="{flow_run.id}_export_to_ares.json",
       result_serializer=JSONSerializer(),
       persist_result=True)
@@ -105,7 +101,7 @@ async def execute_export_to_ares(schemaName: str,
         raise e
 
 
-async def create_data_characterization_schema(
+def create_data_characterization_schema(
     databaseCode: str,
     resultsSchema: str,
     vocabSchemaName: str,
@@ -153,6 +149,19 @@ def execute_data_characterization_flow(options: dcOptionsType):
     flow_run_context = FlowRunContext.get().flow_run.dict()
     flow_run_id = str(flow_run_context.get("id"))
     outputFolder = f'/output/{flow_run_id}'
+    
+    
+    dialect = get_db_svc_endpoint_dialect(databaseCode)
+    match dialect:
+        case DatabaseDialects.POSTGRES:
+            resultsSchema = resultsSchema.lower()
+            vocabSchemaName = vocabSchemaName.lower()
+            schemaName = schemaName.lower()
+        case DatabaseDialects.HANA:
+            resultsSchema = resultsSchema.upper()
+            vocabSchemaName = vocabSchemaName.upper()
+            schemaName = schemaName.upper()      
+    
 
     dbutils = DBUtils(databaseCode)
     dqdresult_dao = DqdResultDao()
