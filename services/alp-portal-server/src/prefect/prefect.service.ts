@@ -12,7 +12,7 @@ export class PrefectService {
     return this.minioClient.deleteDeployment(filePath, bucketName)
   }
 
-  // Get flow run result for dqd / dc
+  // Get flow run result
   async getFlowRunResults(prefectFlowRunResultDto: PrefectFlowRunResultDto) {
     if (prefectFlowRunResultDto.filePath) {
       return this.minioClient.getFlowRunResults(prefectFlowRunResultDto.filePath)
