@@ -1,20 +1,23 @@
 import { env, services } from '../env'
 import { createLogger } from '../Logger'
 import { Agent } from 'https'
-import { post } from './request-util'
+import { get, post } from './request-util'
+import * as crypto from 'crypto'
 
 export class FhirAPI {
   private readonly baseURL: string
   private readonly fhirTokenUrl = 'http://alp-minerva-fhir-server-1:8103/oauth2/token'
   private readonly logger = createLogger(this.constructor.name)
+  private fhirServerToken: string
   private token: string
   private readonly httpsAgent: Agent
   private readonly clientId: string
   private readonly clientSecret: string
 
-  constructor() {
+  constructor(token) {
     if (services.fhir) {
       this.baseURL = services.fhir
+      this.token = token
       this.fhirTokenUrl = 'http://alp-minerva-fhir-server-1:8103/oauth2/token'
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
@@ -34,24 +37,24 @@ export class FhirAPI {
     }
   }
 
-  private async getRequestConfig() {
+  private async getRequestConfig(token) {
     const options = {
       headers: {
-        Authorization: this.token
+        Authorization: token
       },
       httpsAgent: this.httpsAgent
     }
     return options
   }
 
-  async authenticate() {
+  async authenticate(clientId: string, clientSecret: string) {
     try {
       let response
       try {
         const params = {
           grant_type: 'client_credentials',
-          client_id: this.clientId,
-          client_secret: this.clientSecret
+          client_id: clientId,
+          client_secret: clientSecret
         }
         const body = Object.keys(params)
           .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
@@ -70,7 +73,7 @@ export class FhirAPI {
       if (response.status != 200) {
         throw 'Failed to fetch tokens'
       }
-      this.token = response.data.token_type + ' ' + response.data.access_token
+      this.fhirServerToken = response.data.token_type + ' ' + response.data.access_token
     } catch (err) {
       throw err
     }
@@ -79,30 +82,90 @@ export class FhirAPI {
   async createProject(name: string, description: string) {
     try {
       this.logger.info(`Create fhir project for the dataset`)
-      await this.authenticate()
-      const url = `${this.baseURL}/Project`
-      const details = {
+      const ProjectDetails = {
         resourceType: 'Project',
         name: name,
         strictMode: true,
         features: ['bots'],
         description: description
       }
-      const options = await this.getRequestConfig()
-      const result = await post(url, details, options)
-      return result
+      const ProjectResult = await this.createResource('Project', ProjectDetails)
+      const projectId = ProjectResult.data.id
+
+      this.logger.info('Create client application for the project')
+      const clientSecret = crypto.randomBytes(32).toString('hex')
+      const clientApplicationDetails = {
+        resourceType: 'ClientApplication',
+        name: name,
+        description: description,
+        meta: {
+          project: projectId,
+          compartment: [
+            {
+              reference: `Project/${projectId}`
+            }
+          ]
+        },
+        secret: clientSecret
+      }
+      const ClientApplicationResult = await this.createResource(
+        'ClientApplication',
+        clientApplicationDetails,
+        '',
+        false
+      )
+      const clientId = ClientApplicationResult.data.id
+      this.logger.info('Create project membership for the project')
+      const projectMembershipDetails = {
+        resourceType: 'ProjectMembership',
+        project: {
+          reference: `Project/${projectId}`
+        },
+        meta: {
+          project: projectId,
+          compartment: [
+            {
+              reference: `Project/${projectId}`
+            }
+          ]
+        },
+        user: {
+          reference: `ClientApplication/${clientId}`,
+          display: name
+        },
+        profile: {
+          reference: `ClientApplication/${clientId}`,
+          display: name
+        }
+      }
+      await this.createResource('ProjectMembership', projectMembershipDetails, '', false)
+      return projectId
     } catch (error) {
-      throw new Error(error)
+      throw new Error(`Failed to create project in fhir server: ${error}`)
     }
   }
 
-  async importData(fhirResouce: string, resourceDetails: string) {
+  async createResource(fhirResouce: string, resourceDetails: any, projectName?: string, isAuthenticate = true) {
     try {
       this.logger.info(`Import data into fhir server`)
-      await this.authenticate()
-      const options = await this.getRequestConfig()
+      if (isAuthenticate) await this.authenticate(this.clientId, this.clientSecret)
+      // If the incoming resource is for a particular project, then get the project's clientId and secret for Authentication
+      if (projectName && projectName != '') {
+        const url = `${this.baseURL}/ClientApplication?name=${projectName}`
+        const options = await this.getRequestConfig(this.fhirServerToken)
+        const searchResult = await get(url, options)
+        if (searchResult.data.entry && searchResult.data.entry.length > 0) {
+          const clientId = searchResult.data.entry[0].resource.id
+          const clientSecret = searchResult.data.entry[0].resource.secret
+          await this.authenticate(clientId, clientSecret)
+        } else throw 'Dataset not found!'
+      }
+      const options = await this.getRequestConfig(this.fhirServerToken)
       const url = `${this.baseURL}/${fhirResouce}`
       const result = await post(url, resourceDetails, options)
+      if (result.status != 201) {
+        throw result
+      }
       return result
     } catch (error) {
       throw new Error(error)
