@@ -6,19 +6,17 @@ import * as crypto from 'crypto'
 
 export class FhirAPI {
   private readonly baseURL: string
-  private readonly fhirTokenUrl = 'http://alp-minerva-fhir-server-1:8103/oauth2/token'
+  private readonly fhirTokenUrl: string
   private readonly logger = createLogger(this.constructor.name)
   private fhirServerToken: string
-  private token: string
   private readonly httpsAgent: Agent
   private readonly clientId: string
   private readonly clientSecret: string
 
-  constructor(token) {
+  constructor() {
     if (services.fhir) {
       this.baseURL = services.fhir
-      this.token = token
-      this.fhirTokenUrl = 'http://alp-minerva-fhir-server-1:8103/oauth2/token'
+      this.fhirTokenUrl = services.fhirTokenUrl
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.GATEWAY_CA_CERT
@@ -37,10 +35,10 @@ export class FhirAPI {
     }
   }
 
-  private async getRequestConfig(token) {
+  private async getRequestConfig() {
     const options = {
       headers: {
-        Authorization: token
+        Authorization: this.fhirServerToken
       },
       httpsAgent: this.httpsAgent
     }
@@ -115,6 +113,7 @@ export class FhirAPI {
         false
       )
       const clientId = ClientApplicationResult.data.id
+
       this.logger.info('Create project membership for the project')
       const projectMembershipDetails = {
         resourceType: 'ProjectMembership',
@@ -149,18 +148,18 @@ export class FhirAPI {
     try {
       this.logger.info(`Import data into fhir server`)
       if (isAuthenticate) await this.authenticate(this.clientId, this.clientSecret)
+      let options = await this.getRequestConfig()
       // If the incoming resource is for a particular project, then get the project's clientId and secret for Authentication
       if (projectName && projectName != '') {
         const url = `${this.baseURL}/ClientApplication?name=${projectName}`
-        const options = await this.getRequestConfig(this.fhirServerToken)
         const searchResult = await get(url, options)
         if (searchResult.data.entry && searchResult.data.entry.length > 0) {
           const clientId = searchResult.data.entry[0].resource.id
           const clientSecret = searchResult.data.entry[0].resource.secret
           await this.authenticate(clientId, clientSecret)
+          options = await this.getRequestConfig()
         } else throw 'Dataset not found!'
       }
-      const options = await this.getRequestConfig(this.fhirServerToken)
       const url = `${this.baseURL}/${fhirResouce}`
       const result = await post(url, resourceDetails, options)
       if (result.status != 201) {
