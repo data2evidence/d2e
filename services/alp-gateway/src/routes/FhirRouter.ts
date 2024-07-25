@@ -14,8 +14,7 @@ export class FhirRouter {
 
   private registerRoutes() {
     this.router.post('/createProject', async (req, res) => {
-      const token = req.headers.authorization!
-      const fhirApi = new FhirAPI(token)
+      const fhirApi = new FhirAPI()
       const name = req.query.name as string
       const description = req.query.description as string
       try {
@@ -29,8 +28,7 @@ export class FhirRouter {
 
     this.router.post('/:projectName/:resource', async (req, res) => {
       try {
-        const token = req.headers.authorization!
-        const fhirApi = new FhirAPI(token)
+        const fhirApi = new FhirAPI()
         const { resource, projectName } = req.params
         const response = await fhirApi.createResource(resource, req.body, projectName)
         return res.status(response.status).json(response.data)
