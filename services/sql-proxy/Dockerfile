@@ -1,4 +1,4 @@
-FROM docker.io/python:3.11.1
+FROM python:3.11.1 AS base
 
 ENV PYTHONUNBUFFERED=1
 ENV TZ=UTC
@@ -16,15 +16,22 @@ RUN groupadd alp \
 USER docker
 
 WORKDIR /home/docker
-COPY dev-requirements.txt .
+COPY ./services/sql-proxy/requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY ./services/sql-proxy/src .
+
+FROM base AS development
+
+COPY ./services/sql-proxy/dev-requirements.txt .
 RUN pip install -r dev-requirements.txt
 
-COPY .src .
+ENTRYPOINT ["/tini", "--"]
+CMD python -m watchdog.watchmedo auto-restart --recursive --pattern="*.py" --directory="/home/docker/src" python ./src/main.py
 
-# RUN python setup.py build
-# RUN python setup.py install
-
-EXPOSE 5433
+FROM base AS production
 
 ENTRYPOINT ["/tini", "--"]
-# CMD python -m buenavista.examples.duckdb_postgres
+CMD python ./src/main.py
+
+

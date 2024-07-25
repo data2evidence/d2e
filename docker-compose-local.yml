@@ -254,3 +254,13 @@ services:
       dockerfile: Dockerfile
     # volumes:
     #   - ./services/alp-logto/post-init:/home/docker
+
+  alp-sql-proxy:
+    build:
+      context: .
+      dockerfile: ./services/sql-proxy/Dockerfile
+      target: development
+    volumes:
+      - ./services/sql-proxy/src:/home/docker/src
+    environment:
+      LOCAL_DEBUG: "true"
