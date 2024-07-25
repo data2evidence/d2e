@@ -26,10 +26,10 @@ export class DataflowController {
     return this.dataflowService.deleteDataflow(id)
   }
 
-  @Get('task-run-result/:taskRunId')
-  getTaskRunResult(@Param('taskRunId', ParseUUIDPipe) taskRunId: string) {
-    return this.dataflowService.getTaskRunResult(taskRunId)
-  }
+  // @Get('task-run-result/:taskRunId')
+  // getTaskRunResult(@Param('taskRunId', ParseUUIDPipe) taskRunId: string) {
+  //   return this.dataflowService.getTaskRunResult(taskRunId)
+  // }
 
   @Get('/:dataflowId/flow-run-results')
   getFlowRunResults(@Param('dataflowId', ParseUUIDPipe) dataflowId: string) {

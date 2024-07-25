@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { REQUEST } from '@nestjs/core'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { DataflowService } from './dataflow.service'
-import { Dataflow, DataflowRevision, DataflowResult, DataflowRun } from './entity'
+import { Dataflow, DataflowRevision } from './entity'
 import { repositoryMockFactory } from '../../test/repository.mock'
 import { portalApiMockFactory } from '../portal-server/portal-server.mock'
 import { PortalServerAPI } from '../portal-server/portal-server.api'
@@ -30,8 +30,6 @@ describe('DataflowService', () => {
         { provide: REQUEST, useValue: req },
         { provide: getRepositoryToken(Dataflow), useFactory: repositoryMockFactory },
         { provide: getRepositoryToken(DataflowRevision), useFactory: repositoryMockFactory },
-        { provide: getRepositoryToken(DataflowRun), useFactory: repositoryMockFactory },
-        { provide: getRepositoryToken(DataflowResult), useFactory: repositoryMockFactory },
         { provide: PortalServerAPI, useFactory: portalApiMockFactory },
         { provide: PrefectAPI, useFactory: prefectApiMockFactory },
         { provide: UtilsService, useFactory: utilsSvcMockFactory }

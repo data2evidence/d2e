@@ -6,7 +6,7 @@ import { Repository } from 'typeorm'
 import { JwtPayload, decode } from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import { IDataflowDto, IDataflowDuplicateDto } from '../types'
-import { Dataflow, DataflowRevision, DataflowResult, DataflowRun } from './entity'
+import { Dataflow, DataflowRevision } from './entity'
 import { UtilsService } from '../utils/utils.service'
 import { PortalServerAPI } from '../portal-server/portal-server.api'
 import { PrefectAPI } from '../prefect/prefect.api'
@@ -22,8 +22,6 @@ export class DataflowService {
     @Inject(REQUEST) request: Request,
     @InjectRepository(Dataflow) private readonly dataflowRepo: Repository<Dataflow>,
     @InjectRepository(DataflowRevision) private readonly dataflowRevisionRepo: Repository<DataflowRevision>,
-    @InjectRepository(DataflowResult) private readonly dataflowResultRepo: Repository<DataflowResult>,
-    @InjectRepository(DataflowRun) private readonly dataflowRunRepo: Repository<DataflowRun>,
     private readonly portalServerApi: PortalServerAPI,
     private readonly prefectApi: PrefectAPI,
     private readonly utilsService: UtilsService
@@ -80,25 +78,25 @@ export class DataflowService {
     }
     return null
   }
-  // TODO: Replace to using prefect result, deprecate if not in use
-  async getTaskRunResult(taskRunId: string) {
-    const result = await this.dataflowResultRepo
-      .createQueryBuilder('result')
-      .select([
-        'result.taskRunId',
-        'result.rootFlowRunId',
-        'result.flowRunId',
-        'result.taskRunResult',
-        'result.createdDate'
-      ])
-      .where('result.taskRunId = :taskRunId', { taskRunId: taskRunId })
-      .getOne()
+  // TODO: check use case, deprecate if not in use
+  // async getTaskRunResult(taskRunId: string) {
+  //   const result = await this.dataflowResultRepo
+  //     .createQueryBuilder('result')
+  //     .select([
+  //       'result.taskRunId',
+  //       'result.rootFlowRunId',
+  //       'result.flowRunId',
+  //       'result.taskRunResult',
+  //       'result.createdDate'
+  //     ])
+  //     .where('result.taskRunId = :taskRunId', { taskRunId: taskRunId })
+  //     .getOne()
 
-    if (result) {
-      return result
-    }
-    return null
-  }
+  //   if (result) {
+  //     return result
+  //   }
+  //   return null
+  // }
 
   async getFlowRunResultsByDataflowId(dataflowId: string) {
     const lastFlowRun = await this.dataflowRepo
