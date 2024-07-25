@@ -232,7 +232,12 @@ export function getStandardJoin({
             return `${returnString} ${attributeJoins.join(" ")}`;
         }).join(" ");
 
-    if (oPlaceholders["@TEXT"]) {
+    if (oPlaceholders["@TEXT"] && defaultAttrFilter) {
+            const aliasDefaultAttrFilter = replacePlaceholderWithTables(placeholderAliasMap, defaultAttrFilter)
+            sQuery += " INNER JOIN " + placeholderTableMap["@TEXT"]
+                + " " + placeholderAliasMap["@TEXT"]
+                + " ON " + aliasDefaultAttrFilter;
+    } else if (oPlaceholders["@TEXT"]) {
         // there should be a corresponding single dim table for @TEXT
         if (sQuery && foundDimTables.length === 1) {
             const foundDimTablePlaceholder = foundDimTables[0].placeholder;
