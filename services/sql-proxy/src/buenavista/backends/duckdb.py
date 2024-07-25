@@ -194,7 +194,7 @@ class DuckDBSession(Session):
 
         lsql = lsql.lower()
         if self.in_txn:
-            if "commit" in lsql:
+            if "commit" in lsql and "read committed" not in lsql:
                 self.in_txn = False
                 status = "COMMIT"
             elif "rollback" in lsql:
