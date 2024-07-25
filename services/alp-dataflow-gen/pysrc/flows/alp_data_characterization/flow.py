@@ -143,15 +143,14 @@ def execute_data_characterization_flow(options: dcOptionsType):
 
     # comma separated values in a string
     excludeAnalysisIds = options.excludeAnalysisIds
-    
-    
 
     flow_run_context = FlowRunContext.get().flow_run.dict()
     flow_run_id = str(flow_run_context.get("id"))
     outputFolder = f'/output/{flow_run_id}'
     
+    dbutils = DBUtils(databaseCode)
     
-    dialect = get_db_svc_endpoint_dialect(databaseCode)
+    dialect = dbutils.get_database_dialect()
     match dialect:
         case DatabaseDialects.POSTGRES:
             resultsSchema = resultsSchema.lower()
@@ -162,8 +161,6 @@ def execute_data_characterization_flow(options: dcOptionsType):
             vocabSchemaName = vocabSchemaName.upper()
             schemaName = schemaName.upper()      
     
-
-    dbutils = DBUtils(databaseCode)
     dqdresult_dao = DqdResultDao()
 
     create_data_characterization_schema(

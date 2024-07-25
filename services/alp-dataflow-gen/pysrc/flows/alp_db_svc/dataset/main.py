@@ -63,7 +63,7 @@ def create_schema_tasks(dialect: str,
                         tenant_configs: DBCredentialsType,
                         plugin_classpath: str,
                         count: int) -> bool:
-
+    try:
         schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
 
 
