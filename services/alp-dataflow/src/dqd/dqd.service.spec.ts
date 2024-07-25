@@ -1,8 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { getRepositoryToken } from '@nestjs/typeorm'
 import { DqdService } from './dqd.service'
-import { DqdResult } from './entity'
-import { repositoryMockFactory } from '../../test/repository.mock'
 import { PrefectAPI } from '../prefect/prefect.api'
 import { prefectApiMockFactory } from '../prefect/prefect.mock'
 import { portalApiMockFactory } from '../portal-server/portal-server.mock'
@@ -18,7 +15,6 @@ describe('DqdService', () => {
       providers: [
         DqdService,
         { provide: PrefectAPI, useFactory: prefectApiMockFactory },
-        { provide: getRepositoryToken(DqdResult), useFactory: repositoryMockFactory },
         { provide: PortalServerAPI, useFactory: portalApiMockFactory },
         { provide: UtilsService, useFactory: utilsSvcMockFactory }
       ]

@@ -1,7 +1,4 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { DqdResult } from './entity'
 import { PrefectAPI } from '../prefect/prefect.api'
 import { PortalServerAPI } from '../portal-server/portal-server.api'
 import { UtilsService } from '../utils/utils.service'
@@ -10,8 +7,6 @@ import { IDqdResultDto } from '../types'
 @Injectable()
 export class DqdService {
   constructor(
-    // TODO: Remove unused dqdResultRepo and entity
-    @InjectRepository(DqdResult) private readonly dqdResultRepo: Repository<DqdResult>,
     private readonly prefectApi: PrefectAPI,
     private readonly portalServerApi: PortalServerAPI,
     private readonly utilsService: UtilsService
