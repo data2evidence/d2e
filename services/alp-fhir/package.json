@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc && node --no-warnings esbuild-script.mjs",
-    "seed": "node ./dist/main.js",
-    "build-and-seed": "npm run compile && npm run seed",
+    "seed": "node ./dist/seed.js",
+    "build-and-seed": "tsc && npm run seed",
     "lint": "eslint src/",
     "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/main.ts",
     "start": "node ./dist/main.js"

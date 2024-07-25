@@ -1,15 +1,7 @@
 {
     "bots": [
       {
-        "name": "helloWorld",
-        "id": "",
-        "description": "Hello World",
-        "source": "src/bots/helloWorld/index.ts",
-        "dist": "dist/helloWorld/index.js",
-        "subscriptionCriteria": "Patient"
-      },
-      {
-        "name": "questionnaireResponse",
+        "name": "Questionnaire Response",
         "id": "",
         "description": "FHIR to GDM Questionnaire Response",
         "source": "src/bots/questionnaireResponse/index.ts",
@@ -17,12 +9,12 @@
         "subscriptionCriteria": "QuestionnaireResponse"
       },
       {
-        "name": "Bundle",
+        "name": "Patient",
         "id": "",
-        "description": "Bundle bot",
-        "source": "src/bots/bundle/index.ts",
-        "dist": "dist/bundle/index.js",
-        "subscriptionCriteria": "Bundle"
+        "description": "Patient bot",
+        "source": "src/bots/patient/index.ts",
+        "dist": "dist/patient/index.js",
+        "subscriptionCriteria": "Patient"
       }
   ]
 }
