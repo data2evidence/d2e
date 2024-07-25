@@ -6,7 +6,7 @@ import { basename, resolve } from "path";
 import { existsSync, readFileSync } from "fs";
 import { ContentType } from "@medplum/core";
 
-//Reads bots.config.json file and creates bot for each and deploys it
+//Reads bots.config.json file and creates, deploys the bots and creates subcription for 'Super Admin' project
 export async function readAndCreateBotFromConfig():Promise<void> {
     const botConfigs = botConfig.bots;
     try{
