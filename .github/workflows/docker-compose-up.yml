@@ -116,6 +116,11 @@ jobs:
 
       - name: Builder cache cleanup
         run: |
+          # Build DataNode services and pull dataflow-gen from cache
+          yarn build:minerva alp-minerva-analytics-svc alp-query-gen alp-fhir-server alp-fhir-fe-server alp-fhir-client --builder ${{ steps.builder1.outputs.name }}
+
+      - name: Builder cache cleanup
+        run: |  
           docker buildx prune -af
 
       - name: Initalize Logto
