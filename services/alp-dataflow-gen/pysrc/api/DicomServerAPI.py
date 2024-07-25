@@ -7,11 +7,14 @@ from orthanc_api_client import OrthancApiClient
 
 class DicomServerAPI:
     def __init__(self):
-        if os.getenv('DICOM_SERVER__API_BASE_URL') is None:
-            raise ValueError("DICOM_SERVER__API_BASE_URL is undefined")
+        if os.getenv('SERVICE_ROUTES') is None:
+            raise ValueError("SERVICE_ROUTES is undefined")
+        
         if os.getenv("PYTHON_VERIFY_SSL") == 'true' and os.getenv('TLS__INTERNAL__CA_CRT') is None:
             raise ValueError("TLS__INTERNAL__CA_CRT is undefined")
-        self.url = os.getenv('DICOM_SERVER__API_BASE_URL')
+        
+        # Parse SERVICE_ROUTES and get dicomServer
+        self.url = json.loads(os.getenv('SERVICE_ROUTES'))["dicomServer"]
         self.verifySsl = False if os.getenv(
             "PYTHON_VERIFY_SSL") == 'false' else os.getenv('TLS__INTERNAL__CA_CRT')
 
