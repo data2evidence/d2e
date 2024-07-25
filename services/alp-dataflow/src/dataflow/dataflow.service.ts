@@ -7,6 +7,7 @@ import { JwtPayload, decode } from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import { IDataflowDto, IDataflowDuplicateDto } from '../types'
 import { Dataflow, DataflowRevision, DataflowResult, DataflowRun } from './entity'
+import { UtilsService } from '../utils/utils.service'
 import { PortalServerAPI } from '../portal-server/portal-server.api'
 import { PrefectAPI } from '../prefect/prefect.api'
 import { createLogger } from '../logger'
@@ -24,7 +25,8 @@ export class DataflowService {
     @InjectRepository(DataflowResult) private readonly dataflowResultRepo: Repository<DataflowResult>,
     @InjectRepository(DataflowRun) private readonly dataflowRunRepo: Repository<DataflowRun>,
     private readonly portalServerApi: PortalServerAPI,
-    private readonly prefectApi: PrefectAPI
+    private readonly prefectApi: PrefectAPI,
+    private readonly utilsService: UtilsService
   ) {
     const token = decode(request.headers['authorization'].replace(/bearer /i, '')) as JwtPayload
     this.userId = token.sub
@@ -78,7 +80,7 @@ export class DataflowService {
     }
     return null
   }
-  // TODO: Replace to using prefect result
+  // TODO: Replace to using prefect result, deprecate if not in use
   async getTaskRunResult(taskRunId: string) {
     const result = await this.dataflowResultRepo
       .createQueryBuilder('result')
@@ -115,12 +117,12 @@ export class DataflowService {
       return []
     }
     // regex will only match flow runs with description which has path
-    const match = this.regexMatcher(flowResult)
+    const match = this.utilsService.regexMatcher(flowResult)
     const filePath = []
     if (match) {
       for (const m of match) {
         const s3Path = m.slice(1, -1) // Removing the surrounding brackets []
-        filePath.push(this.extractRelativePath(s3Path))
+        filePath.push(this.utilsService.extractRelativePath(s3Path))
       }
       const res = await this.portalServerApi.getFlowRunResults(filePath)
 
@@ -178,17 +180,6 @@ export class DataflowService {
   async deleteDataflow(id: string) {
     await this.dataflowRepo.delete(id)
     return { id }
-  }
-
-  // TODO: to remove,getting lastFlowRunId from prefect API
-  async createDataflowRun(id, prefectflowRunId) {
-    const dataflowRunEntity = this.dataflowRunRepo.create({
-      dataflowId: id,
-      rootFlowRunId: prefectflowRunId
-    })
-    await this.dataflowRunRepo.insert(this.addOwner(dataflowRunEntity, true))
-    await this.dataflowRepo.update({ id }, { lastFlowRunId: prefectflowRunId })
-    this.logger.info(`Created dataflow run for dataflow (${id}) and prefect flow run (${prefectflowRunId})`)
   }
 
   private addOwner<T>(object: T, isNewEntity = false) {
@@ -255,24 +246,5 @@ export class DataflowService {
     }
 
     throw new BadRequestException('Dataflow and/or dataflow revision do not match')
-  }
-
-  private regexMatcher(result) {
-    const regex = /\[s3:\/\/[^)]+\]/ // To match [s3://flows/results/<flowRunID>_dqd/dc.json]
-    return result
-      .map(item => item.description.match(regex)) // Extract matches for each item
-      .filter(match => match) // Filter out null matches
-      .flat()
-  }
-
-  private extractRelativePath(path: string) {
-    const prefix = 's3://flows/'
-    const start = path.indexOf(prefix)
-    if (start === -1) return null
-
-    const end = path.indexOf(')', start)
-    if (end === -1) return path.substring(start + prefix.length)
-
-    return path.substring(start + prefix.length, end)
   }
 }
