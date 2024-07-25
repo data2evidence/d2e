@@ -53,15 +53,19 @@ export class Source extends AstElement {
 
             let queryNode = this.resolveQuery(this.parent);
             if (queryNode instanceof Query) {
-                let joinState = queryNode.joinState;
-                let parentJoinCondition =
-                    joinState.getPatientId() +
-                    " = " +
-                    this.joinElements[tableObj.table].alias +
-                    "." +
-                    AstElement.getConfig().getColumn(
-                        `${tableObj.baseEntity}.PATIENT_ID`
-                    );
+                //This is a special case where there is no explicit base join condition between @TEXT and other base entity. Its usually 1=1. Because @TEXT is not a standard interaction entity rather a special entity for vocab lookup. The additional join condition between @TEXT & base entity would be configured in the attribute config as part of the defaultFilter / Filter expression in the UI.
+                let parentJoinCondition = "1=1";
+                if (tableObj.baseEntity !== "@TEXT") {
+                    let joinState = queryNode.joinState;
+                    parentJoinCondition =
+                        joinState.getPatientId() +
+                        " = " +
+                        this.joinElements[tableObj.table].alias +
+                        "." +
+                        AstElement.getConfig().getColumn(
+                            `${tableObj.baseEntity}.PATIENT_ID`
+                        );
+                }
 
                 this.joinElements[tableObj.table].on.push(
                     QueryObject.format("%UNSAFE", parentJoinCondition)

@@ -127,7 +127,15 @@ export class With extends AstElement {
                     this.node.joinUsingConditionId;
             }
             if (this.getBaseTableAlias()) {
-                this.addBaseTableJoin(tableObj.table);
+                if (tableObj.baseEntity === "@TEXT") {
+                    //This is a special case where there is no explicit base join condition between @TEXT and other base entity. Its usually 1=1. Because @TEXT is not a standard interaction entity rather a special entity for vocab lookup. The additional join condition between @TEXT & base entity would be configured in the attribute config as part of the defaultFilter / Filter expression in the UI.
+                    this.addBaseTableJoinForText(
+                        tableObj,
+                        this.getDefaultFilter()
+                    );
+                } else {
+                    this.addBaseTableJoin(tableObj.table);
+                }
             }
         } else if (joinType !== "LEFT JOIN") {
             if (this.joinElements[tableObj.table].joinType !== "left join") {
@@ -207,22 +215,33 @@ export class With extends AstElement {
         }
     }
 
-    public addBaseTableJoin(x) {
+    public addBaseTableJoin(tableName: string) {
         let interactionIdColumn = AstElement.getConfig().getColumn(
             this.entityConfig.getBaseEntity() + ".INTERACTION_ID"
         );
         let referenceInteractionIdColumn = AstElement.getConfig().getColumn(
-            `${this.joinElements[x].baseEntity}.INTERACTION_ID`
+            `${this.joinElements[tableName].baseEntity}.INTERACTION_ID`
         );
         let baseTableJoin =
             this.getTableAlias(this.getBaseTableAlias()).alias +
             "." +
             interactionIdColumn +
             " = " +
-            this.joinElements[x].alias +
+            this.joinElements[tableName].alias +
             "." +
             referenceInteractionIdColumn;
-        this.joinElements[x].on.push(
+
+        this.joinElements[tableName].on.push(
+            QueryObject.format("%UNSAFE", baseTableJoin)
+        );
+    }
+
+    public addBaseTableJoinForText(
+        tableObj: { baseEntity: string; table: string },
+        defaultFilter: string
+    ) {
+        let baseTableJoin = defaultFilter;
+        this.joinElements[tableObj.table].on.push(
             QueryObject.format("%UNSAFE", baseTableJoin)
         );
     }
