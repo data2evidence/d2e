@@ -106,6 +106,10 @@ export class DataflowService {
       .getOne()
 
     const lastFlowRunId = lastFlowRun?.lastFlowRunId
+    if (!lastFlowRunId) {
+      console.log('No last flowRun found for dataflowId:', dataflowId)
+      return []
+    }
     const subflowRuns = await this.prefectApi.getFlowRunsByParentFlowRunId(lastFlowRunId)
     const flowRunIds = subflowRuns.map(flow => flow.id)
     const flowResult = await this.prefectApi.getFlowRunsArtifacts(subflowRuns.map(item => item.id))
