@@ -19,7 +19,7 @@ WORKDIR /home/docker
 COPY ./services/sql-proxy/requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY ./services/sql-proxy/src .
+COPY ./services/sql-proxy/src/ .src
 
 FROM base AS development
 
