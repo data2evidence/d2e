@@ -53,9 +53,9 @@ export class Source extends AstElement {
 
             let queryNode = this.resolveQuery(this.parent);
             if (queryNode instanceof Query) {
-                //This is a special case where there is no explicit base join condition between @TEXT and other base entity. Its usually 1=1. Because @TEXT is not a standard interaction entity rather a special entity for vocab lookup. The additional join condition between @TEXT & base entity would be configured in the attribute config as part of the defaultFilter / Filter expression in the UI.
+                //This is a special case where there is no explicit base join condition between @REF and other base entity. Its usually 1=1. Because @REF is not a standard interaction entity rather a special entity for vocab lookup. The additional join condition between @REF & base entity would be configured in the attribute config as part of the defaultFilter / Filter expression in the UI.
                 let parentJoinCondition = "1=1";
-                if (tableObj.baseEntity !== "@TEXT") {
+                if (tableObj.baseEntity !== "@REF") {
                     let joinState = queryNode.joinState;
                     parentJoinCondition =
                         joinState.getPatientId() +

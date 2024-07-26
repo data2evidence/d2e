@@ -79,7 +79,7 @@ export class Property extends AstElement {
                     joinType = "left join";
                 } else if (
                     this.parent instanceof Operator ||
-                    this.attrConfig.getBaseEntity() === "@TEXT" //Even though its an additional query @TEXT is a special entity thats used now for vocab lookup and not the standard interaction.
+                    this.attrConfig.getBaseEntity() === "@REF" //Even though its an additional query @REF is a special entity thats used now for vocab lookup and not the standard interaction.
                 ) {
                     joinType = "INNER JOIN";
                 }

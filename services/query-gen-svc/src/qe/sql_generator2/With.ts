@@ -127,9 +127,9 @@ export class With extends AstElement {
                     this.node.joinUsingConditionId;
             }
             if (this.getBaseTableAlias()) {
-                if (tableObj.baseEntity === "@TEXT") {
-                    //This is a special case where there is no explicit base join condition between @TEXT and other base entity. Its usually 1=1. Because @TEXT is not a standard interaction entity rather a special entity for vocab lookup. The additional join condition between @TEXT & base entity would be configured in the attribute config as part of the defaultFilter / Filter expression in the UI.
-                    this.addBaseTableJoinForText(
+                if (tableObj.baseEntity === "@REF") {
+                    //This is a special case where there is no explicit base join condition between @REF and other base entity. Its usually 1=1. Because @REF is not a standard interaction entity rather a special entity for vocab lookup. The additional join condition between @REF & base entity would be configured in the attribute config as part of the defaultFilter / Filter expression in the UI.
+                    this.addBaseTableJoinForRef(
                         tableObj,
                         this.getDefaultFilter()
                     );
@@ -236,7 +236,7 @@ export class With extends AstElement {
         );
     }
 
-    public addBaseTableJoinForText(
+    public addBaseTableJoinForRef(
         tableObj: { baseEntity: string; table: string },
         defaultFilter: string
     ) {
