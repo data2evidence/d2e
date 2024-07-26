@@ -1656,16 +1656,6 @@ services:
 
   alp-sql-proxy:
     container_name: &c30 alp-sql-proxy
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 60s
-      test:
-        - CMD
-        - wget
-        - -O
-        - liveness
-        - http://localhost:41191
     hostname: alp-sql-proxy.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-sql-proxy:${DOCKER_TAG_NAME:-develop}
     logging:
