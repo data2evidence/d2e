@@ -26,7 +26,7 @@ export class FhirRouter {
       }
     })
 
-    this.router.post('/:projectName/:resource', async (req, res) => {
+    this.router.post('/:resource/:projectName?', async (req, res) => {
       try {
         const fhirApi = new FhirAPI()
         const { resource, projectName } = req.params
