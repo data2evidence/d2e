@@ -189,7 +189,8 @@ class BVContext:
     def get_hashed_password(self, auth: dict) -> str:
         user = self.params["user"]
         password = auth[user]
-        first = hashlib.md5(password.encode("utf-8") + user.encode("utf-8")).hexdigest()
+        first = hashlib.md5(password.encode("utf-8") +
+                            user.encode("utf-8")).hexdigest()
         return "md5" + hashlib.md5(first.encode("utf-8") + self.salt).hexdigest()
 
     def mark_error(self):
@@ -220,7 +221,8 @@ class BVContext:
         stmt, params, result_fmt = self.portals[name]
         sql, param_oids = self.stmts[stmt]
         # todo: parse params? LIMIT 0?
-        query_result = self.execute_sql(sql=sql, params=params, result_fmt=result_fmt)
+        query_result = self.execute_sql(
+            sql=sql, params=params, result_fmt=result_fmt)
         self.result_cache[name] = query_result
         return query_result
 
@@ -238,7 +240,8 @@ class BVContext:
             stmt, params, result_fmt = self.portals[name]
             sql, param_oids = self.stmts[stmt]
             # parse the params?
-            qr = self.execute_sql(sql=sql, params=params, result_fmt=result_fmt)
+            qr = self.execute_sql(sql=sql, params=params,
+                                  result_fmt=result_fmt)
             return qr
 
     def add_statement(self, name: str, sql: str, param_oids: List[int]):
@@ -316,10 +319,17 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             del self.server.ctxts[ctx.process_id]
             ctx = None
 
+    def handle_health_check(self):
+        data = self.rfile.readline().strip()
+        print("{} wrote:".format(self.client_address[0]))
+        print(data)
+        return {"status":  "available"}
+
     def handle_startup(self, conn: Connection) -> BVContext:
+        self.handle_health_check()
         msglen = self.r.read_uint32() - 4
         code = self.r.read_uint32()
-        if code == 80877103:  ## SSL request
+        if code == 80877103:  # SSL request
             self.send_notice()
             return self.handle_startup(conn)
         elif code == 196608:  # Protocol 3.0
@@ -329,10 +339,12 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             ]
             params = dict(zip(msg[::2], msg[1::2]))
             logger.info("Client connection params: %s", params)
-            ctx = BVContext(conn.create_session(), self.server.rewriter, params)
+            print("Client connection params: %s", params)
+            ctx = BVContext(conn.create_session(),
+                            self.server.rewriter, params)
             self.send_auth_request(ctx)
             return ctx
-        elif code == 80877102:  ## Cancel request
+        elif code == 80877102:  # Cancel request
             process_id, secret_key = self.r.read_uint32(), self.r.read_uint32()
             ctx = self.server.ctxts.get(process_id)
             if ctx and ctx.secret_key == secret_key:
@@ -389,7 +401,8 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
                 if not extension:
                     raise Exception("Unknown method: " + str(method))
                 else:
-                    query_result = extension.apply(req.get("params"), ctx.session)
+                    query_result = extension.apply(
+                        req.get("params"), ctx.session)
             else:
                 query_result = ctx.execute_sql(decoded)
         except Exception as e:
@@ -414,9 +427,9 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
         stmt_idx = ba.index(NULL_BYTE)
         stmt = ba[:stmt_idx].decode("utf-8")
         query_idx = ba.index(NULL_BYTE, stmt_idx + 1)
-        sql = ba[stmt_idx + 1 : query_idx].decode("utf-8")
+        sql = ba[stmt_idx + 1: query_idx].decode("utf-8")
         logger.debug("Parsed statement: %s", sql)
-        buf = BVBuffer(io.BytesIO(ba[query_idx + 1 :]))
+        buf = BVBuffer(io.BytesIO(ba[query_idx + 1:]))
         num_params = buf.read_int16()
         param_oids = []
         for i in range(num_params):
@@ -430,8 +443,8 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
         portal_idx = ba.index(NULL_BYTE)
         portal = ba[:portal_idx].decode("utf-8")
         stmt_idx = ba.index(NULL_BYTE, portal_idx + 1)
-        stmt = ba[portal_idx + 1 : stmt_idx].decode("utf-8")
-        buf = BVBuffer(io.BytesIO(ba[stmt_idx + 1 :]))
+        stmt = ba[portal_idx + 1: stmt_idx].decode("utf-8")
+        buf = BVBuffer(io.BytesIO(ba[stmt_idx + 1:]))
         # First param format stuff...
         num_formats = buf.read_int16()
         formats = []
@@ -473,14 +486,14 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
         describe_type = ba[0]
         query_result = None
         if describe_type == ord("P"):
-            portal = ba[1 : len(ba) - 1].decode("utf-8")
+            portal = ba[1: len(ba) - 1].decode("utf-8")
             try:
                 query_result = ctx.describe_portal(portal)
             except Exception as e:
                 self.send_error(e, ctx)
                 return
         elif describe_type == ord("S"):
-            stmt = ba[1 : len(ba) - 1].decode("utf-8")
+            stmt = ba[1: len(ba) - 1].decode("utf-8")
             try:
                 query_result = ctx.describe_statement(stmt)
             except Exception as e:
@@ -499,7 +512,7 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
         ba = bytearray(payload)
         portal_idx = ba.index(NULL_BYTE)
         portal = ba[:portal_idx].decode("utf-8")
-        limit = struct.unpack("!i", ba[portal_idx + 1 : portal_idx + 5])[0]
+        limit = struct.unpack("!i", ba[portal_idx + 1: portal_idx + 5])[0]
         query_result = None
         try:
             query_result = ctx.execute_portal(portal)
@@ -586,7 +599,8 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
         buf.write_string(estr)
         buf.write_byte(NULL_BYTE)
         out = buf.get_value()
-        err_sig = struct.pack("!ci", ServerResponse.ERROR_RESPONSE, len(out) + 4)
+        err_sig = struct.pack(
+            "!ci", ServerResponse.ERROR_RESPONSE, len(out) + 4)
         self.wfile.write(err_sig + out)
         if ctx:
             ctx.mark_error()
@@ -608,7 +622,8 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
     def send_ready_for_query(self, ctx: Optional[BVContext]):
         logger.debug("Sending ready for query")
         status = ctx.transaction_status() if ctx else TransactionStatus.IDLE
-        self.wfile.write(struct.pack("!cic", ServerResponse.READY_FOR_QUERY, 5, status))
+        self.wfile.write(struct.pack(
+            "!cic", ServerResponse.READY_FOR_QUERY, 5, status))
 
     def send_parameter_status(self, params: Dict[str, str]):
         for name, value in params.items():
@@ -616,7 +631,8 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             buf.write_string(name)
             buf.write_string(value)
             out = buf.get_value()
-            psig = struct.pack("!ci", ServerResponse.PARAMETER_STATUS, len(out) + 4)
+            psig = struct.pack(
+                "!ci", ServerResponse.PARAMETER_STATUS, len(out) + 4)
             self.wfile.write(psig + out)
 
     def send_parse_complete(self):
