@@ -55,7 +55,10 @@ BackendUplink.prototype.redirectQueriesToTestSchema = function (schemaName, cb) 
       method: 'POST',
       path: '/hc/hph/config/services/global.xsjs',
       body: JSON.stringify({ action: 'loadGlobalSettings' }),
-      contentType: 'application/json;charset=UTF-8'
+      contentType: 'application/json;charset=UTF-8',
+      headers: {
+        authorization: process.env.BEARER_TOKEN
+      }
     }
     that.log('Retriving stored global configuration')
     that.hanaRequest.request(retrieveQuery, function (err, response, body) {
@@ -79,7 +82,10 @@ BackendUplink.prototype.redirectQueriesToTestSchema = function (schemaName, cb) 
       var retrieveDefaultQuery = {
         method: 'POST',
         path: '/hc/hph/config/services/global.xsjs',
-        body: JSON.stringify({ action: 'getDefaultSettings' })
+        body: JSON.stringify({ action: 'getDefaultSettings' }),
+        headers: {
+          authorization: process.env.BEARER_TOKEN
+        }
       }
       that.hanaRequest.request(retrieveDefaultQuery, function (err, response, body2) {
         if (err) {
@@ -103,7 +109,10 @@ BackendUplink.prototype.redirectQueriesToTestSchema = function (schemaName, cb) 
       body: JSON.stringify({
         action: 'setGlobalSettings',
         settings: newGlobalSettings
-      })
+      }),
+      headers: {
+        authorization: process.env.BEARER_TOKEN
+      }
     }
     that.log('Activating modified global settings')
     that.hanaRequest.request(setQuery, function (err, response, body) {
@@ -165,7 +174,10 @@ BackendUplink.prototype.redirectQueriesBackToStandardSchema = function (cb) {
       action: 'setGlobalSettings',
       settings: oldGlobalSettings
     }),
-    contentType: 'application/json;charset=UTF-8'
+    contentType: 'application/json;charset=UTF-8',
+    headers: {
+      authorization: process.env.BEARER_TOKEN
+    }
   }
   this.log('Reverting global settings to state before tests')
   this.hanaRequest.request(setQuery, function (err, response, body) {
@@ -202,7 +214,10 @@ BackendUplink.prototype.addCdwConfiguration = function (config, configId, config
     method: 'POST',
     path: '/hc/hph/cdw/config/services/config.xsjs',
     body: JSON.stringify(reqBody),
-    contentType: 'application/json;charset=UTF-8'
+    contentType: 'application/json;charset=UTF-8',
+    headers: {
+      authorization: process.env.BEARER_TOKEN
+    }
   }
 
   this.log('Storing and activating test CDW configuration')
@@ -248,7 +263,10 @@ BackendUplink.prototype.removeCdwConfiguration = function (configId, cb) {
     method: 'POST',
     path: '/hc/hph/cdw/config/services/config.xsjs',
     body: JSON.stringify(reqBody),
-    contentType: 'application/json;charset=UTF-8'
+    contentType: 'application/json;charset=UTF-8',
+    headers: {
+      authorization: process.env.BEARER_TOKEN
+    }
   }
   this.log('Removing test CDW configuration')
   var that = this
@@ -282,7 +300,10 @@ BackendUplink.prototype.addMriConfiguration = function (mriConfig, mriConfigId, 
     method: 'POST',
     path: '/pa-config-svc/services/config.xsjs',
     body: JSON.stringify(reqBody),
-    contentType: 'application/json;charset=UTF-8'
+    contentType: 'application/json;charset=UTF-8',
+    headers: {
+      authorization: process.env.BEARER_TOKEN
+    }
   }
   this.log('Storing and activating test MRI configuration')
   var that = this
@@ -313,7 +334,10 @@ BackendUplink.prototype.removeMriConfiguration = function (configId, cb) {
     method: 'POST',
     path: '/pa-config-svc/services/config.xsjs',
     body: JSON.stringify(reqBody),
-    contentType: 'application/json;charset=UTF-8'
+    contentType: 'application/json;charset=UTF-8',
+    headers: {
+      authorization: process.env.BEARER_TOKEN
+    }
   }
   this.log('Removing test MRI configuration')
   var that = this
@@ -368,7 +392,10 @@ BackendUplink.prototype.addPatientConfiguration = function (
   var setQuery = {
     method: 'POST',
     path: '/hc/hph/patient/config/services/config.xsjs',
-    body: JSON.stringify(reqBody)
+    body: JSON.stringify(reqBody),
+    headers: {
+      authorization: process.env.BEARER_TOKEN
+    }
   }
   this.log('Storing and activating test Patient Summary configuration')
   var that = this
@@ -395,7 +422,10 @@ BackendUplink.prototype.removePatientConfiguration = function (configId, cb) {
   var setQuery = {
     method: 'POST',
     path: '/hc/hph/patient/config/services/config.xsjs',
-    body: JSON.stringify(reqBody)
+    body: JSON.stringify(reqBody),
+    headers: {
+      authorization: process.env.BEARER_TOKEN
+    }
   }
   this.log('Removing test Patient Summary configuration')
   var that = this
@@ -447,7 +477,10 @@ BackendUplink.prototype.addConfigurationAssignment = function (userName, configI
     method: 'POST',
     path: '/hc/hph/config/assignment',
     body: JSON.stringify(reqBody),
-    contentType: 'application/json;charset=UTF-8'
+    contentType: 'application/json;charset=UTF-8',
+    headers: {
+      authorization: process.env.BEARER_TOKEN
+    }
   }
   this.log('Assigning test config to user used by tests')
   var that = this
@@ -476,7 +509,10 @@ BackendUplink.prototype.removeConfigurationAssignment = function (assignmentId, 
     method: 'DELETE',
     path: '/hc/hph/config/assignment.xsjs/' + assignmentId.assignmentID,
     body: JSON.stringify(reqBody),
-    contentType: 'application/json;charset=UTF-8'
+    contentType: 'application/json;charset=UTF-8',
+    headers: {
+      authorization: process.env.BEARER_TOKEN
+    }
   }
   this.log('Removing assignment of test config to user used by tests')
   var that = this

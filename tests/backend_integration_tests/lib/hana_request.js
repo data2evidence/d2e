@@ -234,6 +234,10 @@ HanaRequest.prototype._makeRequestOptions = function (query) {
     assert(method === 'get', 'invalid method')
   }
 
+  if (query.headers['authorization']) {
+    options.headers['authorization'] = `Bearer ${query.headers['authorization']}`
+  }
+
   return options
 }
 

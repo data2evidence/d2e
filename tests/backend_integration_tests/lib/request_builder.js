@@ -667,7 +667,10 @@ RequestBuilder.prototype.submit = function (hanaRequest, urlPath, parameters, cb
     path: urlPath,
     body: JSON.stringify(this.buildIFR(kmRequest)),
     parameters: parameters,
-    contentType: 'application/json;charset=UTF-8'
+    contentType: 'application/json;charset=UTF-8',
+    headers: {
+      authorization: process.env.BEARER_TOKEN
+    }
   }
   hanaRequest.request(setQuery, function (err, response, body) {
     cb(err, response, body)

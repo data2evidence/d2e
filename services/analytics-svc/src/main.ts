@@ -66,21 +66,16 @@ const initRoutes = async (app: express.Application) => {
         app.use(timerMiddleware());
     }
 
-    if (envVarUtils.isTestEnv()) {
-        analyticsCredentials = xsenv.cfServiceCredentials({ tag: "httptest" });
-        log.info(`TESTSCHEMA: ${analyticsCredentials.schema}`);
-    } else {
-        alpPortalStudiesDbMetadataCacheTTLSeconds =
-            +env.ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS || 600;
+    alpPortalStudiesDbMetadataCacheTTLSeconds =
+        +env.ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS || 600;
 
-        analyticsCredentials = xsenv
-            .filterServices({ tag: "analytics" })
-            .reduce((acc, item) => {
-                // Reduce credentials so that key of object is databaseCode
-                acc[item.credentials.code] = item.credentials;
-                return acc;
-            }, {});
-    }
+    analyticsCredentials = xsenv
+        .filterServices({ tag: "analytics" })
+        .reduce((acc, item) => {
+            // Reduce credentials so that key of object is databaseCode
+            acc[item.credentials.code] = item.credentials;
+            return acc;
+        }, {});
 
     // Calls Alp-Portal for studies db metadata and cache it
     // Ignore Alp-Portal check for readiness probe check
