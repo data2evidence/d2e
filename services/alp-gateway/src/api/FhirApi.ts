@@ -68,7 +68,7 @@ export class FhirAPI {
         throw err
       }
 
-      if (response.status != 200) {
+      if (response && response.status != 200) {
         throw 'Failed to fetch tokens'
       }
       this.fhirServerToken = response.data.token_type + ' ' + response.data.access_token
