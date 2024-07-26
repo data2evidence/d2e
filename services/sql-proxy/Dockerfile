@@ -23,8 +23,8 @@ COPY ./services/sql-proxy/src/ .src
 
 FROM base AS development
 
-COPY ./services/sql-proxy/dev-requirements.txt .
-RUN pip install -r dev-requirements.txt
+COPY ./services/sql-proxy/requirements-dev.txt .
+RUN pip install -r requirements-dev.txt
 
 ENTRYPOINT ["/tini", "--"]
 CMD python -m watchdog.watchmedo auto-restart --recursive --pattern="*.py" --directory="/home/docker/src" python ./src/main.py
