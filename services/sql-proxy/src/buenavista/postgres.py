@@ -332,7 +332,6 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             ]
             params = dict(zip(msg[::2], msg[1::2]))
             logger.info("Client connection params: %s", params)
-            print("Client connection params: %s", params)
             ctx = BVContext(conn.create_session(),
                             self.server.rewriter, params)
             self.send_auth_request(ctx)
