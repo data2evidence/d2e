@@ -9,12 +9,12 @@
         "subscriptionCriteria": "QuestionnaireResponse"
       },
       {
-        "name": "Patient",
+        "name": "Bundle",
         "id": "",
-        "description": "Patient bot",
-        "source": "src/bots/patient/index.ts",
-        "dist": "dist/patient/index.js",
-        "subscriptionCriteria": "Patient"
+        "description": "Bundle bot",
+        "source": "src/bots/bundle/index.ts",
+        "dist": "dist/bundle/index.js",
+        "subscriptionCriteria": "Bundle"
       }
   ]
 }
