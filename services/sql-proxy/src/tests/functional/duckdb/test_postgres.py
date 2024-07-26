@@ -1,6 +1,5 @@
 import threading
 import time
-
 import pytest
 
 import duckdb
@@ -13,7 +12,9 @@ from main import create
 
 @pytest.fixture(scope="session")
 def db():
-    return duckdb.connect("tests/data/testduckdb", read_only=True)
+    db = duckdb.connect("tests/data/testduckdb", read_only=True)
+    yield db
+    db.close()
 
 
 @pytest.fixture(scope="session")
@@ -31,7 +32,8 @@ def duckdb_postgres_server(db, user_password):
         time.sleep(1)  # wait for server to start
         yield server
     finally:
-        db.close()
+        server.shutdown()
+        server.server_close()
 
 
 @pytest.fixture(scope="session")
@@ -39,7 +41,9 @@ def conn(duckdb_postgres_server, user_password):
     assert duckdb_postgres_server is not None
     user, password = list(user_password.items())[0]
     conn_str = f"postgresql://{user}:{password}@localhost:5444/memory"
-    return psycopg.connect(conn_str)
+    connection = psycopg.connect(conn_str)
+    yield connection
+    connection.close()
 
 
 def test_select(conn):
@@ -65,6 +69,7 @@ def sqlalchemy_conn(duckdb_postgres_server, user_password):
     conn = engine.connect()
     yield conn
     conn.close()
+    engine.dispose()
 
 
 def test_sqlalchemy_select(sqlalchemy_conn):
@@ -78,6 +83,5 @@ def test_sqlalchemy_parameterized_select(sqlalchemy_conn):
     stmt = text("SELECT * FROM person WHERE person_id = :x")
     stmt = stmt.bindparams(x="1")
     result = sqlalchemy_conn.execute(stmt).fetchone()
-    print('findme, result', result)
     assert result == (1, 8507, 1923, 5, 1, None, 8527, 38003564,
                       1, None, None, '00013D2EFD8E45D1', 1, None, 1, None, 1, None)
