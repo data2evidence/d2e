@@ -112,6 +112,14 @@ x-envs:
               "featureFlag": "kaplanMeier",
               "requiredRoles": ["RESEARCHER"],
               "enabled": true
+            },
+            {
+              "name": "Strategus",
+              "route": "analysis",
+              "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
+              "featureFlag": "strategus",
+              "requiredRoles": ["RESEARCHER"],
+              "enabled": true
             }
           ]
         }
