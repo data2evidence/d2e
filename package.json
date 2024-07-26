@@ -12,24 +12,20 @@
     "gen:tls": "scripts/gen-tls.sh",
     "gen:resource-limits": "scripts/gen-resource-limits.sh",
 
-    "start:local:caddy": "yarn local:minerva up alp-caddy --force-recreate --wait",
-    "start:remote:caddy": "yarn remote:minerva up alp-caddy --wait",
-    "logs:caddy": "yarn base:minerva logs alp-caddy -t --until 1s",
-
     "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml",
     "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile sql",
     "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local --profile sql",
+
+    "build:minerva": "yarn local:minerva build --build-arg GIT_COMMIT_ARG=$(git rev-parse HEAD)",
+    "build:nest-dev:minerva": "ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn build:minerva alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc",
+    "build:nest-prod:minerva": "yarn build:minerva alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc",
+
+    "init:logto": "ENV_TYPE=${ENV_TYPE:-local} && yarn $ENV_TYPE:minerva up alp-minerva-postgres alp-logto --wait && sleep 10 && yarn $ENV_TYPE:minerva up alp-logto-post-init",
 
     "start:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes",
     "start:minerva:perseus": "yarn local:minerva --profile perseus up --renew-anon-volumes",
     "start:nest-dev:minerva": "yarn build:nest-dev:minerva && ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc --wait --force-recreate --no-deps",
     "start:nest-prod:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc --wait --force-recreate --no-deps",
-
-    "init:logto": "yarn local:minerva up alp-minerva-postgres alp-logto --wait && yarn local:minerva up alp-logto-post-init",
-    
-    "build:minerva": "yarn local:minerva build --build-arg GIT_COMMIT_ARG=$(git rev-parse HEAD)",
-    "build:nest-dev:minerva": "ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn build:minerva alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc",
-    "build:nest-prod:minerva": "yarn build:minerva alp-minerva-dataflow-mgmt alp-minerva-portal-server alp-minerva-terminology-svc",
     
     "stop:minerva": "yarn local:minerva stop",
     "clean:minerva": "yarn local:minerva down --volumes --remove-orphans",

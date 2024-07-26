@@ -19,7 +19,7 @@ x-envs:
     DB_SVC__PATH: /alpdb
     DISABLE_SSL: "TRUE"
     HANA__READ_ROLE: TENANT_READ_ROLE
-    LB__LOG_LEVEL: debug
+    LB__LOG_LEVEL: ${LB__LOG_LEVEL:-FINE}
     PG__READ_ROLE: postgres_tenant_read_role
   env_converter: &x-converter
     DB_CREDENTIALS_MGR__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/db-credentials/db/
@@ -570,6 +570,16 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      interval: 20s
+      retries: 5
+      start_period: 120s
+      test:
+        - CMD
+        - wget
+        - -O
+        - fhir.status
+        - http://localhost:8103/healthcheck
     hostname: alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-fhir-server:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -607,7 +617,7 @@ services:
       alp-minerva-postgres:
         condition: service_healthy
       alp-fhir-server:
-        condition: service_started
+        condition: service_healthy
     image: node:18.20.2-slim
     volumes:
       - ./services/alp-fhir:/home/docker
@@ -637,7 +647,10 @@ services:
     networks:
       alp:
         priority: 20
+    volumes:
+      - ./.env.${ENV_TYPE:-local}:/run/envs/.env.${ENV_TYPE:-local}:rw
     environment:
+      ENV_TYPE: ${ENV_TYPE:-local}
       PG__DB_NAME: logto
       PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
       PG__PASSWORD: ${PG_SUPER_PASSWORD}
@@ -1193,8 +1206,6 @@ services:
           - vocabularydb
       data:
         priority: 10
-    ports:
-      - 41190:5432
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     shm_size: 1gb
     volumes:
