@@ -44,9 +44,9 @@ export async function seed(knex: Knex): Promise<void> {
         ParentId: "",
         ParentVersion: "",
         Creator: "ALICE",
-        Created: "2021-09-15 15:30:54",
+        Created: "2024-07-26 00:00:00",
         Modifier: "ALICE",
-        Modified: "2022-09-13 17:56:54",
+        Modified: "2024-07-26 00:00:00",
       },
       {
         Id: "4fce3cb7-32bf-4b46-8cba-32e4f77a14dd",
@@ -58,9 +58,9 @@ export async function seed(knex: Knex): Promise<void> {
         ParentId: "e10f83a0-ade9-4a33-90ae-cf760813943c",
         ParentVersion: "1",
         Creator: "ALICE",
-        Created: "2021-09-15 15:30:54",
+        Created: "2024-07-26 00:00:00",
         Modifier: "ALICE",
-        Modified: "2022-09-13 17:56:54",
+        Modified: "2024-07-26 00:00:00",
       },
       {
         Id: "b0717586-7217-4a63-a15c-2bf8d76226be",
