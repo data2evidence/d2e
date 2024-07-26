@@ -277,7 +277,8 @@ x-envs:
        "appRouter": "https://alp-mercury-approuter:41000",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
        "minio": "",
-       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:8103"
+       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:8103",
+       "dicomServer": "http://alp-dicom-server:8042"
       }
   tls: &x-tls
     TLS__INTERNAL__CA_CRT: ${TLS__INTERNAL__CA_CRT}
@@ -1603,6 +1604,8 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     networks:
       alp:
+      data:
+    hostname: alp-dicom-server.${TLS__INTERNAL__DOMAIN:-alp.local}
     environment:
       VERBOSE_ENABLED: true
       VERBOSE_STARTUP: true
