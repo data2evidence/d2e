@@ -437,7 +437,7 @@ export class InternalFilterRepresentation implements Request {
             }, []);
 
         // Retrieves interactions with multiple associated filtercards and adds not equal conditions to where clause
-        let filtercardsWithIdenticalInteractions: BaseNode[] =
+        let filtercardsWithIdenticalInteractions: BaseNode[] = process.env.NOT_EQ_CHECK_FILTERCARDS === "false" ? []:
             Object.keys(patient.filter)
                 .filter((e, key) => patient.filter[e].length > 1)
                 .reduce((whereConditions, interaction) => {
