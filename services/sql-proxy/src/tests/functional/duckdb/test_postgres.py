@@ -5,13 +5,15 @@ import pytest
 
 import duckdb
 import psycopg
+from sqlalchemy import create_engine, text
 
-from buenavista.examples.duckdb_postgres import create
+
+from main import create
 
 
 @pytest.fixture(scope="session")
 def db():
-    return duckdb.connect()
+    return duckdb.connect("tests/data/testduckdb", read_only=True)
 
 
 @pytest.fixture(scope="session")
@@ -52,3 +54,30 @@ def test_pg_version(conn):
     cur.execute("SELECT pg_catalog.version()")
     assert cur.fetchone() == ("PostgreSQL 9.3",)
     cur.close()
+
+
+@pytest.fixture(scope="session")
+def sqlalchemy_conn(duckdb_postgres_server, user_password):
+    assert duckdb_postgres_server is not None
+    user, password = list(user_password.items())[0]
+    conn_string = f"postgresql+psycopg2://{user}:{password}@localhost:5444"
+    engine = create_engine(conn_string)
+    conn = engine.connect()
+    yield conn
+    conn.close()
+
+
+def test_sqlalchemy_select(sqlalchemy_conn):
+    result = sqlalchemy_conn.execute(
+        text("SELECT * from person where person_id = 1;")).fetchone()
+    assert result == (1, 8507, 1923, 5, 1, None, 8527, 38003564,
+                      1, None, None, '00013D2EFD8E45D1', 1, None, 1, None, 1, None)
+
+
+def test_sqlalchemy_parameterized_select(sqlalchemy_conn):
+    stmt = text("SELECT * FROM person WHERE person_id = :x")
+    stmt = stmt.bindparams(x="1")
+    result = sqlalchemy_conn.execute(stmt).fetchone()
+    print('findme, result', result)
+    assert result == (1, 8507, 1923, 5, 1, None, 8527, 38003564,
+                      1, None, None, '00013D2EFD8E45D1', 1, None, 1, None, 1, None)
