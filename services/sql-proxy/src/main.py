@@ -1,11 +1,15 @@
+from buenavista import bv_dialects, postgres, rewrite
+from buenavista.backends.duckdb import DuckDBConnection
 import os
 import sys
 from typing import Tuple
 
 import duckdb
+import logging
 
-from buenavista.backends.duckdb import DuckDBConnection
-from buenavista import bv_dialects, postgres, rewrite
+
+if os.environ["LOCAL_DEBUG"] == "true":
+    logging.basicConfig(level=logging.DEBUG)
 
 
 class DuckDBPostgresRewriter(rewrite.Rewriter):
