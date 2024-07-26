@@ -319,14 +319,7 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             del self.server.ctxts[ctx.process_id]
             ctx = None
 
-    def handle_health_check(self):
-        data = self.rfile.readline().strip()
-        print("{} wrote:".format(self.client_address[0]))
-        print(data)
-        return {"status":  "available"}
-
     def handle_startup(self, conn: Connection) -> BVContext:
-        self.handle_health_check()
         msglen = self.r.read_uint32() - 4
         code = self.r.read_uint32()
         if code == 80877103:  # SSL request
