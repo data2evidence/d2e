@@ -13,10 +13,7 @@ export async function handler(medplum: MedplumClient, event: BotEvent): Promise<
     await handleItems(questionnaireResponse.item, questionnaireResponse.id, duckdb)
     console.log('Items inserted successfully!')
   }
-  //Testing
-  let result1 = await duckdb.executeQuery(`select * from gdm_questionnaire_response where id=${questionnaireResponse.id}`)
-  console.log('Select from' + JSON.stringify(result1))
-  
+  console.log('FHIR QuestionnaireResponse resource successfully inserted into OMOP GDM tables')
   duckdb.close()
   return true
 }
@@ -27,11 +24,9 @@ async function handleItems(items: QuestionnaireResponseItem[], questionnaireResp
     await duckDBConn.executeQuery(`insert into gdm_item ("id", "gdm_questionnaire_response_id", "link_id", "text", "definition", "etl_started_at") values('${itemId}', '${questionnaireResponseId}', '${item.linkId}', '${item.text}', '${item.definition}', now())`);
     if(item.answer.length > 0){
         await handleAnswers(item.answer, itemId, duckDBConn)
-        console.log('Item Answers inserted successfully!')
+        console.log('Answers inserted successfully!')
     }
-    //Testing
-    let result = await duckDBConn.executeQuery(`select * from gdm_item where id=${itemId}`)
-    console.log('Select from' + JSON.stringify(result))
+    return
   }
 }
 
@@ -74,15 +69,9 @@ async function handleAnswers(answers: QuestionnaireResponseItemAnswer[], itemId:
     else{
       answerType = "valueReference"
     }
-    console.log('Insert into gdm_answer table!')
-    //valueattachment_contenttype, valueattachment_language, valueattachment_data, valueattachment_url, valueattachment_size, valueattachment_hash, valueattachment_title, valueattachment_creation, valuecoding_system, valuecoding_version, valuecoding_code, valuecoding_display, valuecoding_userselected, valuequantity_value, valuequantity_comparator, valuequantity_unit, valuequantity_system, valuequantity_code, valuereference_reference, valuereference_type, valuereference_identifier, valuereference_display,
-    // , '${answer.valueAttachment!== undefined?answer.valueAttachment.contentType: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.language:''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.data: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.url: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.size: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.hash:''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.title:''}','${answer.valueAttachment!== undefined?answer.valueAttachment.creation:''}', '${answer.valueCoding!== undefined?answer.valueCoding.system:''}', '${answer.valueCoding!== undefined?answer.valueCoding.version:''}', '${answer.valueCoding!== undefined?answer.valueCoding.code:''}', '${answer.valueCoding!== undefined?answer.valueCoding.display:''}', '${answer.valueCoding!== undefined?answer.valueCoding.userSelected:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.value: ''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.comparator:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.unit:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.system:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.code:''}', '${answer.valueReference!== undefined?answer.valueReference.reference:''}', '${answer.valueReference!== undefined?answer.valueReference.type:''}', '${answer.valueReference!== undefined?answer.valueReference.identifier:''}', '${answer.valueReference!== undefined?answer.valueReference.display:''}', 
     await duckDBConn.executeQuery(`INSERT INTO gdm_answer
-      (id, gdm_item_id, value_type, value, etl_started_at)
-      VALUES('${answerId}', '${itemId}', '${answerType}', '${answerValue}', now())`);
-    
-    //Testing
-    let result = await duckDBConn.executeQuery(`select * from gdm_item where id=${answerId}`)
-    console.log('Select from' + JSON.stringify(result))
+      (id, gdm_item_id, value_type, value, valueattachment_contenttype, valueattachment_language, valueattachment_data, valueattachment_url, valueattachment_size, valueattachment_hash, valueattachment_title, valueattachment_creation, valuecoding_system, valuecoding_version, valuecoding_code, valuecoding_display, valuecoding_userselected, valuequantity_value, valuequantity_comparator, valuequantity_unit, valuequantity_system, valuequantity_code, valuereference_reference, valuereference_type, valuereference_identifier, valuereference_display, etl_started_at)
+      VALUES('${answerId}', '${itemId}', '${answerType}', '${answerValue}', '${answer.valueAttachment!== undefined?answer.valueAttachment.contentType: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.language:''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.data: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.url: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.size: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.hash:''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.title:''}','${answer.valueAttachment!== undefined?answer.valueAttachment.creation:'1900-01-01 00:00:00'}', '${answer.valueCoding!== undefined?answer.valueCoding.system:''}', '${answer.valueCoding!== undefined?answer.valueCoding.version:''}', '${answer.valueCoding!== undefined?answer.valueCoding.code:''}', '${answer.valueCoding!== undefined?answer.valueCoding.display:''}', '${answer.valueCoding!== undefined?answer.valueCoding.userSelected:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.value: ''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.comparator:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.unit:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.system:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.code:''}', '${answer.valueReference!== undefined?answer.valueReference.reference:''}', '${answer.valueReference!== undefined?answer.valueReference.type:''}', '${answer.valueReference!== undefined?answer.valueReference.identifier:''}', '${answer.valueReference!== undefined?answer.valueReference.display:''}', now())`);
+      return;
   }
 }
