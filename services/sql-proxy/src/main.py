@@ -37,6 +37,8 @@ def main():
     if len(sys.argv) < 2:
         print("Using in-memory DuckDB database")
         db = duckdb.connect()
+        # TODO: TBD in workshop to see how to dynamically handle duckdb connections to different duckdb database files
+        # For now hardcoded connection to alpdev_pg_cdmdefault for testing purposes
         db.execute(
             "ATTACH '/home/docker/duckdb_data/alpdev_pg_cdmdefault' (READ_ONLY);")
     else:
