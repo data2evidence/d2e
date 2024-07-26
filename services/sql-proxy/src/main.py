@@ -8,10 +8,6 @@ import duckdb
 import logging
 
 
-if os.environ["LOCAL_DEBUG"] == "true":
-    logging.basicConfig(level=logging.DEBUG)
-
-
 class DuckDBPostgresRewriter(rewrite.Rewriter):
     def rewrite(self, sql: str) -> str:
         if sql.lower() == "select pg_catalog.version()":
@@ -34,6 +30,10 @@ def create(
 
 
 def main():
+    if "LOCAL_DEBUG" in os.environ:
+        if os.environ["LOCAL_DEBUG"] == "true":
+            logging.basicConfig(level=logging.DEBUG)
+
     if len(sys.argv) < 2:
         print("Using in-memory DuckDB database")
         db = duckdb.connect()
