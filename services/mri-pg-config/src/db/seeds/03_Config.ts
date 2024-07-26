@@ -27362,7 +27362,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": true,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 13
                   },
@@ -27382,7 +27382,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 14
                   },
@@ -27392,6 +27392,46 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Gender"
+              },
+              {
+                  "source": "patient.attributes.raceName",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": true,
+                  "useRefValue": true,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 15
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Race"
+              },
+              {
+                  "source": "patient.attributes.ethnicityName",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": true,
+                  "useRefValue": true,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 16
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Ethnicity"
               }
           ],
           "initialPatientlistColumn": true,
@@ -27532,7 +27572,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 7
                   },
@@ -27572,7 +27612,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 9
                   },
@@ -27992,7 +28032,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 7
                   },
@@ -28172,7 +28212,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 16
                   },
@@ -28242,7 +28282,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 3
                   },
@@ -28402,7 +28442,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 11
                   },
@@ -28412,6 +28452,26 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Procedure concept name"
+              },
+              {
+                  "source": "patient.interactions.proc.attributes.Procedure_concept_id_copy_cf2468c2_0849_4d67_8fa7_e876aef757a1",
+                  "ordered": false,
+                  "cached": true,
+                  "useRefText": true,
+                  "useRefValue": true,
+                  "category": true,
+                  "measure": false,
+                  "filtercard": {
+                      "initial": false,
+                      "visible": true,
+                      "order": 12
+                  },
+                  "patientlist": {
+                      "initial": false,
+                      "visible": true,
+                      "linkColumn": false
+                  },
+                  "modelName": "Procedure concept id"
               }
           ],
           "initialPatientlistColumn": false,
@@ -28772,7 +28832,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 7
                   },
@@ -28972,7 +29032,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 17
                   },
@@ -29162,7 +29222,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 9
                   },
@@ -29242,7 +29302,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 13
                   },
@@ -29722,7 +29782,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 14
                   },
@@ -29822,7 +29882,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 19
                   },
@@ -29972,7 +30032,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 7
                   },
@@ -30122,7 +30182,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 6
                   },
@@ -30332,7 +30392,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 7
                   },
@@ -30372,7 +30432,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 9
                   },
@@ -30402,7 +30462,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 1
                   },
@@ -30532,7 +30592,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 1
                   },
@@ -30732,7 +30792,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 11
                   },
@@ -30932,39 +30992,9 @@ const paConfigDuckdb = {
                       "linkColumn": false
                   },
                   "modelName": "Condition concept id"
-              }
-          ],
-          "initialPatientlistColumn": false,
-          "modelName": "Condition Era"
-      },
-      {
-          "source": "patient.interactions.ptoken",
-          "visible": true,
-          "order": 18,
-          "initial": false,
-          "attributes": [
-              {
-                  "source": "patient.interactions.ptoken.attributes.participationtokenid",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 1
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participation Token Id"
               },
               {
-                  "source": "patient.interactions.ptoken.attributes.participationtokenstudyid",
+                  "source": "patient.interactions.conditionera.attributes.Condition_era_concept_set",
                   "ordered": false,
                   "cached": true,
                   "useRefText": false,
@@ -30972,107 +31002,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": false,
                   "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 2
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participation Token Study Id"
-              },
-              {
-                  "source": "patient.interactions.ptoken.attributes.participationtokenexternalid",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 3
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participation Token External Id"
-              },
-              {
-                  "source": "patient.interactions.ptoken.attributes.participationtoken",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 4
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participation Token"
-              },
-              {
-                  "source": "patient.interactions.ptoken.attributes.participationtokencreatedby",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 5
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participant Token Created By"
-              },
-              {
-                  "source": "patient.interactions.ptoken.attributes.participanttokencreateddate",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 6
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participant Token Created Date"
-              },
-              {
-                  "source": "patient.interactions.ptoken.attributes.participationtokenmodifiedby",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 7
                   },
@@ -31081,116 +31011,16 @@ const paConfigDuckdb = {
                       "visible": true,
                       "linkColumn": false
                   },
-                  "modelName": "Participation Token Modified By"
-              },
-              {
-                  "source": "patient.interactions.ptoken.attributes.participationtokenmodifieddate",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 8
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participation Token Modified Date"
-              },
-              {
-                  "source": "patient.interactions.ptoken.attributes.participationtokenstatus",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 9
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participation Token Status"
-              },
-              {
-                  "source": "patient.interactions.ptoken.attributes.participationtokenlastdonationdate",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 10
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participation Token Last Donation Date"
-              },
-              {
-                  "source": "patient.interactions.ptoken.attributes.participationtokenvalidationdate",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 11
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participation Token Validation Date"
-              },
-              {
-                  "source": "patient.interactions.ptoken.attributes.participationtokenpersonid",
-                  "ordered": false,
-                  "cached": true,
-                  "useRefText": false,
-                  "useRefValue": false,
-                  "category": true,
-                  "measure": false,
-                  "filtercard": {
-                      "initial": false,
-                      "visible": true,
-                      "order": 12
-                  },
-                  "patientlist": {
-                      "initial": false,
-                      "visible": true,
-                      "linkColumn": false
-                  },
-                  "modelName": "Participation Token Person Id"
+                  "modelName": "Condition concept set"
               }
           ],
           "initialPatientlistColumn": false,
-          "modelName": "Participation Token"
+          "modelName": "Condition Era"
       },
       {
           "source": "patient.interactions.cohort",
           "visible": true,
-          "order": 19,
+          "order": 18,
           "initial": false,
           "attributes": [
               {
@@ -31202,7 +31032,7 @@ const paConfigDuckdb = {
                   "category": true,
                   "measure": true,
                   "filtercard": {
-                      "initial": false,
+                      "initial": true,
                       "visible": true,
                       "order": 1
                   },
