@@ -10,7 +10,7 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
 RUN groupadd alp \
-  && useradd docker \
+  && useradd docker -u 1001 \
   && adduser docker alp
 
 USER docker
