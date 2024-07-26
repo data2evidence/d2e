@@ -19,7 +19,7 @@ x-envs:
     DB_SVC__PATH: /alpdb
     DISABLE_SSL: "TRUE"
     HANA__READ_ROLE: TENANT_READ_ROLE
-    LB__LOG_LEVEL: debug
+    LB__LOG_LEVEL: ${LB__LOG_LEVEL:-FINE}
     PG__READ_ROLE: postgres_tenant_read_role
   env_converter: &x-converter
     DB_CREDENTIALS_MGR__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/db-credentials/db/
@@ -570,6 +570,16 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      interval: 20s
+      retries: 5
+      start_period: 120s
+      test:
+        - CMD
+        - wget
+        - -O
+        - fhir.status
+        - http://localhost:8103/healthcheck
     hostname: alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-fhir-server:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -607,7 +617,7 @@ services:
       alp-minerva-postgres:
         condition: service_healthy
       alp-fhir-server:
-        condition: service_started
+        condition: service_healthy
     image: node:18.20.2-slim
     volumes:
       - ./services/alp-fhir:/home/docker
@@ -617,7 +627,8 @@ services:
     networks:
       alp:
         priority: 20
-    entrypoint: ["sh", "-c", "cd /home/docker && npm install && npm run build-and-seed"] 
+    entrypoint:
+      ["sh", "-c", "cd /home/docker && npm install && npm run build-and-seed"]
     environment:
       <<:
         - *x-pg
@@ -636,7 +647,10 @@ services:
     networks:
       alp:
         priority: 20
+    volumes:
+      - ./.env.${ENV_TYPE:-local}:/run/envs/.env.${ENV_TYPE:-local}:rw
     environment:
+      ENV_TYPE: ${ENV_TYPE:-local}
       PG__DB_NAME: logto
       PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
       PG__PASSWORD: ${PG_SUPER_PASSWORD}
@@ -644,7 +658,7 @@ services:
       PG__USER: ${PG_SUPER_USER:-postgres}
       PUBLIC__FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine"},{"name":"alp-app","description":"alp-app","type":"Traditional","oidcClientMetadata":{"redirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
-      LOGTO__RESOURCE:  '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
+      LOGTO__RESOURCE: '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
       LOGTO__USER: '{"username":"admin","initialPassword":"Updatepassword12345"}'
       LOGTO__ROLES: '[{"name":"role.systemadmin","description":"ALP System admin","type":"User"},{"name":"role.useradmin","description":"ALP User admin","type":"User"},{"name":"role.tenantviewer","description":"ALP Tenant viewer","type":"User"}]'
       LOGTO__SCOPES: '[{"name":"role.systemadmin","description":"ALP System admin"},{"name":"role.useradmin","description":"ALP User admin"},{"name":"role.tenantviewer","description":"ALP Tenant viewer"}]'
@@ -1192,8 +1206,6 @@ services:
           - vocabularydb
       data:
         priority: 10
-    ports:
-      - 41190:5432
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     shm_size: 1gb
     volumes:
@@ -1208,8 +1220,8 @@ services:
 
   alp-minerva-postgres-post-init:
     depends_on:
-        alp-minerva-postgres:
-          condition: service_healthy
+      alp-minerva-postgres:
+        condition: service_healthy
     image: postgres:15-alpine
     networks:
       alp:
@@ -1643,11 +1655,11 @@ services:
       - curl
       - -X
       - PATCH
-      - 'http://alp-minerva-meilisearch-svc-1:41${BASE_PORT:-1}11/experimental-features/'
+      - "http://alp-minerva-meilisearch-svc-1:41${BASE_PORT:-1}11/experimental-features/"
       - -H
-      - 'Content-Type: application/json'
+      - "Content-Type: application/json"
       - -H
-      - 'Authorization: Bearer ${MEILI_MASTER_KEY}'
+      - "Authorization: Bearer ${MEILI_MASTER_KEY}"
       - --data-binary
       - '{ "vectorStore": true }'
     networks:
@@ -1715,8 +1727,7 @@ services:
 
   alp-perseus-frontend:
     image: perseushub/frontend:latest
-    container_name:
-      alp-perseus-frontend-${BASE_PORT:-1}
+    container_name: alp-perseus-frontend-${BASE_PORT:-1}
     networks:
       alp:
         priority: 20
@@ -1724,8 +1735,7 @@ services:
 
   alp-perseus-white-rabbit:
     image: perseushub/white-rabbit:latest
-    container_name:
-      alp-perseus-white-rabbit-${BASE_PORT:-1}
+    container_name: alp-perseus-white-rabbit-${BASE_PORT:-1}
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
@@ -1740,8 +1750,7 @@ services:
 
   alp-perseus-cdm-builder:
     image: perseushub/cdm-builder:latest
-    container_name:
-      alp-perseus-cdm-builder-${BASE_PORT:-1}
+    container_name: alp-perseus-cdm-builder-${BASE_PORT:-1}
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
     depends_on:
