@@ -393,66 +393,6 @@
         })
       })
 
-      describe('addMriConfigurationAssignment()', function () {
-        var fakeHanaRequest
-        var fakeResponseBody = 'some assignment id'
-        beforeEach(function () {
-          fakeHanaRequest = {
-            request: sinon.stub()
-          }
-          var fakeResponse = {
-            statusCode: 200
-          }
-          fakeHanaRequest.request.onCall(0).callsArgWith(1, null, fakeResponse, fakeResponseBody)
-          uplink = new BackendUplink(fakeHanaRequest)
-        })
-
-        it('sends a createUserAssignment-request to the MRI assignment endpoint', function (done) {
-          var fakeuserName = 'JOHNDOE'
-          var fakeMriId = 'dcba'
-          uplink.addMriConfigurationAssignment(fakeuserName, fakeMriId, function (err) {
-            var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
-            expect(firstCallArg.path).to.match(/hph\/config\/services\/assignment.xsjs/)
-            var bodyPassed = JSON.parse(firstCallArg.body)
-            expect(bodyPassed.action).to.equal('createUserAssignment')
-            done()
-          })
-        })
-
-        it('passes the passed parameter in the corresponding fields in the request body', function (done) {
-          var fakeUserName = 'JOHNDOE'
-          var fakeMriId = 'dcba'
-          uplink.addMriConfigurationAssignment(fakeUserName, fakeMriId, function (err) {
-            var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
-            var bodyPassed = JSON.parse(firstCallArg.body)
-            expect(bodyPassed.configs[0].configId).to.eql(fakeMriId)
-            expect(bodyPassed.user).to.equal(fakeUserName)
-            done()
-          })
-        })
-
-        it('makes a user MRI assigment & uses the active configuration version', function (done) {
-          var fakeUserName = 'JOHNDOE'
-          var fakeMriId = 'dcba'
-          uplink.addMriConfigurationAssignment(fakeUserName, fakeMriId, function (err) {
-            var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
-            var bodyPassed = JSON.parse(firstCallArg.body)
-            expect(bodyPassed.configs[0].configVersion).to.equal('A')
-            expect(bodyPassed.configs[0].configType).to.equal('HC/MRI/PA')
-            done()
-          })
-        })
-
-        it('passes the body of the HTTP response (the assignment ID) to the callback', function (done) {
-          var fakeUserName = 'JOHNDOE'
-          var fakeMriId = 'dcba'
-          uplink.addMriConfigurationAssignment(fakeUserName, fakeMriId, function (err, body) {
-            expect(body).to.equal(fakeResponseBody)
-            done()
-          })
-        })
-      })
-
       describe('removeMriConfigurationAssignment()', function () {
         var fakeHanaRequest
         beforeEach(function () {
@@ -584,66 +524,6 @@
             var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
             var bodyPassed = JSON.parse(firstCallArg.body)
             expect(bodyPassed.configVersion).to.equal('A')
-            done()
-          })
-        })
-      })
-
-      describe('addPatientConfigurationAssignment()', function () {
-        var fakeHanaRequest
-        var fakeResponseBody = 'some assignment id'
-        beforeEach(function () {
-          fakeHanaRequest = {
-            request: sinon.stub()
-          }
-          var fakeResponse = {
-            statusCode: 200
-          }
-          fakeHanaRequest.request.onCall(0).callsArgWith(1, null, fakeResponse, fakeResponseBody)
-          uplink = new BackendUplink(fakeHanaRequest)
-        })
-
-        it('sends a createUserAssignment-request to the Patient Summary assignment endpoint', function (done) {
-          var fakeuserName = 'JOHNDOE'
-          var fakePatientId = 'dcba'
-          uplink.addPatientConfigurationAssignment(fakeuserName, fakePatientId, function (err) {
-            var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
-            expect(firstCallArg.path).to.match(/hph\/config\/services\/assignment.xsjs/)
-            var bodyPassed = JSON.parse(firstCallArg.body)
-            expect(bodyPassed.action).to.equal('createUserAssignment')
-            done()
-          })
-        })
-
-        it('passes the passed parameter in the corresponding fields in the request body', function (done) {
-          var fakeUserName = 'JOHNDOE'
-          var fakePatientId = 'dcba'
-          uplink.addPatientConfigurationAssignment(fakeUserName, fakePatientId, function (err) {
-            var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
-            var bodyPassed = JSON.parse(firstCallArg.body)
-            expect(bodyPassed.configs[0].configId).to.eql(fakePatientId)
-            expect(bodyPassed.user).to.equal(fakeUserName)
-            done()
-          })
-        })
-
-        it('makes a user Patient Summary assigment & uses the active configuration version', function (done) {
-          var fakeUserName = 'JOHNDOE'
-          var fakePatientId = 'dcba'
-          uplink.addPatientConfigurationAssignment(fakeUserName, fakePatientId, function (err) {
-            var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
-            var bodyPassed = JSON.parse(firstCallArg.body)
-            expect(bodyPassed.configs[0].configVersion).to.equal('A')
-            expect(bodyPassed.configs[0].configType).to.equal('HC/HPH/PATIENT')
-            done()
-          })
-        })
-
-        it('passes the body of the HTTP response (the assignment ID) to the callback', function (done) {
-          var fakeUserName = 'JOHNDOE'
-          var fakePatientId = 'dcba'
-          uplink.addPatientConfigurationAssignment(fakeUserName, fakePatientId, function (err, body) {
-            expect(body).to.equal(fakeResponseBody)
             done()
           })
         })

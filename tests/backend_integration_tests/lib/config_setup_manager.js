@@ -109,13 +109,6 @@ ConfigSetupManager.prototype.setupConfiguration = function (testSchemaName, minC
       cb
     )
   }
-  var addMriTestConfigAssignmentToAliceTask = function (cb) {
-    that.log('Assigning MRI config with ID ' + that.MRI_CONFIG_ID + ' to user ' + aliceUser)
-    that.hphUplink.addMriConfigurationAssignment(aliceUser, that.MRI_CONFIG_ID, function (err, body) {
-      that.mriAssignmentId = body
-      cb(err)
-    })
-  }
   var addPatientTestConfigTask = function (cb) {
     that.log('Adding Patient Summary configuration with ID ' + that.PATIENT_CONFIG_ID)
     that.hphUplink.addPatientConfiguration(
@@ -126,16 +119,9 @@ ConfigSetupManager.prototype.setupConfiguration = function (testSchemaName, minC
       cb
     )
   }
-  var addPatientTestConfigAssignmentToAliceTask = function (cb) {
-    that.log('Assigning Patient Sumamry config with ID ' + that.PATIENT_CONFIG_ID + ' to user ' + aliceUser)
-    that.hphUplink.addPatientConfigurationAssignment(aliceUser, that.PATIENT_CONFIG_ID, function (err, body) {
-      that.patientAssignmentId = body
-      cb(err)
-    })
-  }
 
   // Do the actual work here
-  async.series([addCdwTestConfigTask, addMriTestConfigTask, addMriTestConfigAssignmentToAliceTask], callback)
+  async.series([addCdwTestConfigTask, addMriTestConfigTask], callback)
 }
 
 /**
