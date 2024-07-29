@@ -591,16 +591,6 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 120s
-      test:
-        - CMD
-        - curl
-        - -f
-        - http://localhost:8103
-      timeout: 30s
     environment:
       <<:
         - *x-pg
