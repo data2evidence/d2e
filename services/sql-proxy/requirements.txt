@@ -5,3 +5,4 @@ psycopg-pool==3.2.2
 pyarrow==17.0.0
 pydantic>=1.2.0,<2.0.0
 sqlglot==25.6.1
+debugpy==1.8.2

@@ -262,5 +262,7 @@ services:
       target: development
     volumes:
       - ./services/sql-proxy/src:/home/docker/src
+    ports:
+      - 9235:9235
     environment:
       LOCAL_DEBUG: "true"

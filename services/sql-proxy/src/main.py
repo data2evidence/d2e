@@ -1,3 +1,4 @@
+import debugpy
 from buenavista import bv_dialects, postgres, rewrite
 from buenavista.backends.duckdb import DuckDBConnection
 import os
@@ -32,6 +33,7 @@ def create(
 def main():
     if "LOCAL_DEBUG" in os.environ:
         if os.environ["LOCAL_DEBUG"] == "true":
+            debugpy.listen(("0.0.0.0", 9235))
             logging.basicConfig(level=logging.DEBUG)
 
     if len(sys.argv) < 2:
