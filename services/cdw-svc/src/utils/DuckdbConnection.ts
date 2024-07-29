@@ -61,7 +61,30 @@ export class DuckdbConnection implements ConnectionInterface {
         }
     }
 
-    
+    public parseResults(result: any) {
+        function formatResult(value: any) {
+            // TODO: investigate if more cases are needed to handle DATE, TIMESTAMP and BIT datetypes
+            switch (typeof value) {
+                case "bigint": //bigint
+                    return Number(value) * 1;
+                default:
+                    return value;
+            }
+        }
+        Object.keys(result).forEach((rowId) => {
+            Object.keys(result[rowId]).forEach((colKey) => {
+                if (
+                    result[rowId][colKey] === null ||
+                    typeof result[rowId][colKey] === "undefined"
+                ) {
+                    result[rowId][colKey] = DBValues.NOVALUE;
+                } else {
+                    result[rowId][colKey] = formatResult(result[rowId][colKey]);
+                }
+            });
+        });
+        return result;
+    }
 
     public async execute(
         sql,
