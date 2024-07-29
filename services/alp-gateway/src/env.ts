@@ -6,7 +6,7 @@ export const env = {
   GATEWAY_WO_PROTOCOL_FQDN: process.env.GATEWAY__WO_PROTOCOL__FQDN,
   GATEWAY_API_ALLOWED_DOMAINS:
     process.env.GATEWAY__API_ALLOWED_DOMAINS ||
-    'http://localhost:9000 http://localhost:8080 https://localhost:5000 https://localhost:4000 https://localhost:5001 https://localhost:8080 https://localhost:4088 https://localhost:41112',
+    'http://localhost:9000 http://localhost:8080 https://localhost:5000 https://localhost:4000 https://localhost:5001 https://localhost:8080 https://localhost:4088',
   GATEWAY_IDP_AUTH_TYPE: process.env.GATEWAY__IDP_AUTH_TYPE!,
   GATEWAY_IDP_SUBJECT_PROP: process.env.GATEWAY__IDP_SUBJECT_PROP!,
   SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
