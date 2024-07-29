@@ -38,8 +38,8 @@
   "dependencies": {
     "@alp/alp-base-utils": "1.1.9",
     "@medplum/bot-layer": "^3.2.2",
-    "@medplum/core": "^3.1.11",
-    "@medplum/fhirtypes": "^3.1.11",
+    "@medplum/core": "^3.2.2",
+    "@medplum/fhirtypes": "^3.2.2",
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.9",
     "duckdb-async": "^1.0.0",
