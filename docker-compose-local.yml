@@ -257,8 +257,8 @@ services:
 
   alp-sql-proxy:
     build:
-      context: .
-      dockerfile: ./services/sql-proxy/Dockerfile
+      context: ./services/sql-proxy
+      dockerfile: Dockerfile
       target: development
     volumes:
       - ./services/sql-proxy/src:/home/docker/src

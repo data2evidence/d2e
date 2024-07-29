@@ -16,14 +16,14 @@ RUN groupadd alp \
 USER docker
 
 WORKDIR /home/docker
-COPY ./services/sql-proxy/requirements.txt .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY ./services/sql-proxy/src/ .src
+COPY src .src
 
 FROM base AS development
 
-COPY ./services/sql-proxy/requirements-dev.txt .
+COPY requirements-dev.txt .
 RUN pip install -r requirements-dev.txt
 
 ENTRYPOINT ["/tini", "--"]

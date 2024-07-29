@@ -168,6 +168,10 @@ jobs:
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile.frontend
+          - name: alp-data-node/alp-sql-proxy
+            directory: ./services/alp-sql-proxy
+            context: ./services/alp-sql-proxy
+            fileName: Dockerfile
 
     steps:
     - uses: actions/checkout@v4
