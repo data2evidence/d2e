@@ -21,7 +21,7 @@ const Env = z.object({
                 return z.never();
             }
         }),
-    TLS__INTERNAL__CA_CRT: z.string(),
+    TLS__INTERNAL__CA_CRT: z.string()
 });
 
 const result = Env.safeParse(process.env);

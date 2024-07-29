@@ -799,6 +799,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     path: '^/gateway/api/fhir',
     scopes: ['gateway.fhir.create'],
     httpMethods: ['POST']
+  },
+  {
+    path: '^/fhir/(.*)',
+    scopes: ['fhir.import'],
+    httpMethods: ['POST']
   }
 ]
 export const ROLE_SCOPES = {
@@ -922,7 +927,8 @@ export const ROLE_SCOPES = {
     'dataflowmgmt.analysisflow.add',
     'dataflowmgmt.analysisflow.delete',
     'dataflowmgmt.analysisflow.revision.delete',
-    'gateway.fhir.create'
+    'gateway.fhir.create',
+    'fhir.import'
   ],
   ALP_DASHBOARD_VIEWER: ['gateway.dashboardGate.content'],
   TENANT_VIEWER: [

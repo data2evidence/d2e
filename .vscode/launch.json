@@ -226,6 +226,22 @@
           "remoteRoot": "./pysrc" 
         }
       ]
-    }
+    },
+    {
+      "name": "alp-fhir-client",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9226,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/alp-fhir",
+      "remoteRoot": "/usr/src/alp-data-node/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
   ]
 }
