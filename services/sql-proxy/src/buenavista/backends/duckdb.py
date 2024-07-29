@@ -165,7 +165,11 @@ class DuckDBSession(Session):
         ):
             return "SELECT 32 as setting"
         elif "::regclass" in sql:
-            return sql.replace("::regclass", "")
+            return sql.replace("::regclass", "::string")
+        elif "::REGCLASS" in sql:
+            return sql.replace("::REGCLASS", "::string")
+        elif "AS REGCLASS" in sql:
+            return sql.replace("AS REGCLASS", "AS STRING")
         elif "::regtype" in sql:
             return sql.replace("::regtype", "")
         elif "::regproc" in sql:
@@ -179,6 +183,10 @@ class DuckDBSession(Session):
             return sql.replace("pg_catalog.current_schemas", "current_schemas")
         elif "pg_catalog.generate_series" in sql:
             return sql.replace("pg_catalog.generate_series", "generate_series")
+        elif "AND d.classoid = CAST('pg_namespace' AS REGCLASS)" in sql:
+            sql = sql.replace(
+                "AND d.classoid = CAST('pg_namespace' AS REGCLASS)", "")
+            logger.info("Rewritten SQL to remove REGCLASS reference: " + sql)
         return sql
 
     def in_transaction(self) -> bool:
