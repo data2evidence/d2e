@@ -116,6 +116,9 @@ x-envs:
             {
               "name": "Strategus",
               "route": "analysis",
+              "data": {
+                "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
+              },
               "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
               "featureFlag": "strategus",
               "requiredRoles": ["RESEARCHER"],
