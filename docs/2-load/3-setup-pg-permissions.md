@@ -20,6 +20,8 @@ If using the postgres docker container please run the following commands as is, 
 - Run the following command:
 ```bash
 docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_read_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_READ_PASSWORD_PLAIN}';"
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_read_role;"
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "GRANT postgres_tenant_read_role to postgres_tenant_read_user;"
 ```
 - Expected successful response:
 > CREATE ROLE

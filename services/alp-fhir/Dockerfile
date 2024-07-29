@@ -13,7 +13,7 @@ COPY ./src/duckdb /home/docker/app/duckdb
 COPY package-server.json ./package.json
 
 RUN yarn install
-RUN apt update && apt install -y gettext jq
+RUN apt update && apt install -y gettext jq wget
 
 #ARG
 #GIT COMMIT Passed during docker build time

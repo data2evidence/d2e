@@ -25,6 +25,81 @@ https://*.alp.local:55555 {
 	respond alp-internal
 }
 
+(forward_authentication) {
+	# Enable this for using perseus user service
+	forward_auth http://alp-perseus-user-1:5001 {
+		uri /user/api/is_token_valid_internal
+		copy_headers Username
+	}
+
+	# Enable this for using D2E user-mgmt service
+	# forward_auth https://alp-minerva-gateway-1:41100 {
+	# 	transport http {
+	# 		tls
+	# 		tls_insecure_skip_verify
+	# 		read_buffer 8192
+	# 	}
+	# 	uri /usermgmt/api/me/is_token_valid_internal
+	# 	copy_headers Username
+	# }
+}
+
+(perseus) {
+	log {
+		format console {
+			level_format color
+		}
+	}
+
+	handle /* {
+		reverse_proxy http://alp-perseus-frontend-1:4200 {
+			header_up X-Real-IP {http.request.remote_host}
+		}
+	}
+
+	handle_path /user/api/is_token_valid_internal {
+		reverse_proxy http://alp-perseus-user-1:5001 {
+			header_up Content-Length ""
+			header_up X-Original-URI {http.request.uri}
+		}
+	}
+
+	handle /user/* {
+		reverse_proxy http://alp-perseus-user-1:5001 {
+			header_up X-Real-IP {http.request.remote_host}
+		}
+	}
+
+	handle /backend/* {
+		import forward_authentication
+
+		reverse_proxy http://alp-perseus-backend-1:5004 {
+			header_up X-Real-IP {http.request.remote_host}
+		}
+	}
+
+	handle /white-rabbit/* {
+		import forward_authentication
+		reverse_proxy http://alp-perseus-white-rabbit-1:8000 {
+			header_up X-Real-IP {http.request.remote_host}
+		}
+	}
+
+	handle /cdm-builder/* {
+		import forward_authentication
+		reverse_proxy http://alp-perseus-cdm-builder-1:9000 {
+			header_up X-Real-IP {http.request.remote_host}
+		}
+	}
+
+	handle /files-manager/* {
+		import forward_authentication
+		reverse_proxy http://files-manager:10500 {
+			header_up X-Real-IP {http.request.remote_host}
+		}
+	}
+}
+
 (portal) {
 	log {
 		format console {
@@ -33,24 +108,23 @@ https://*.alp.local:55555 {
 	}
 
 	# Logto api server
-    @logto {
-        path /index.*
-        path /api/*
-        path /oidc/*
-        path /sign-in
-        path /consent
-        path /callback/* # For azure connector
-    }
+	@logto {
+		path /index.*
+		path /api/*
+		path /oidc/*
+		path /sign-in
+		path /consent
+		path /callback/* # For azure connector
+	}
 
-    handle @logto {
-
-        reverse_proxy http://alp-logto-1:3001 {
+	handle @logto {
+		reverse_proxy http://alp-logto-1:3001 {
 			header_up Host {upstream_hostport}
 			transport http {
 				read_buffer 8192
-				}
 			}
-    }
+		}
+	}
 
 	handle /alp-prefect/* {
 		uri strip_prefix /alp-prefect
@@ -70,7 +144,6 @@ https://*.alp.local:55555 {
 		}
 	}
 
-
 	handle /alp-fhir/* {
 		uri strip_prefix /alp-fhir
 		reverse_proxy http://alp-minerva-fhir-server-1:8103 {
@@ -85,32 +158,50 @@ https://*.alp.local:55555 {
 	handle_path /portal* {
 		handle_path /static/css/* {
 			root * /home/docker/ui-files/portal/static/css/
-			file_server
+			encode zstd gzip
+			file_server {
+				precompressed zstd br gzip
+			}
 		}
 
 		handle_path /static/js/* {
 			root * /home/docker/ui-files/portal/static/js/
-			file_server
+			encode zstd gzip
+			file_server {
+				precompressed zstd br gzip
+			}
 		}
 
 		handle_path /static/media/* {
 			root * /home/docker/ui-files/portal/static/media/
-			file_server
+			encode zstd gzip
+			file_server {
+				precompressed zstd br gzip
+			}
 		}
 
 		handle_path /icons/* {
 			root * /home/docker/ui-files/portal/icons/
-			file_server
+			encode zstd gzip
+			file_server {
+				precompressed zstd br gzip
+			}
 		}
 
 		handle_path /assets/* {
 			root * /home/docker/ui-files/portal/assets/
-			file_server
+			encode zstd gzip
+			file_server {
+				precompressed zstd br gzip
+			}
 		}
 
 		handle_path /translations/* {
 			root * /home/docker/ui-files/portal/translations/
-			file_server
+			encode zstd gzip
+			file_server {
+				precompressed zstd br gzip
+			}
 		}
 
 		handle_path /env.js {
@@ -127,113 +218,178 @@ https://*.alp.local:55555 {
 		handle {
 			rewrite * /
 			root * /home/docker/ui-files/portal/index.html
-			file_server
+			encode zstd gzip
+			file_server {
+				precompressed zstd br gzip
+			}
 		}
 	}
 
 	handle_path /flow/* {
 		root * /home/docker/ui-files/flow/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /analysis/* {
 		root * /home/docker/ui-files/analysis/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /log-viewer/* {
 		root * /home/docker/ui-files/log-viewer/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /starboard-jupyter/* {
 		root * /home/docker/ui-files/starboard-jupyter/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /starboard-notebook-base/* {
 		root * /home/docker/ui-files/starboard-notebook-base/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /mri/* {
 		root * /home/docker/ui-files/mri/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/hph/core/ui/* {
 		root * /home/docker/ui-files/mri-ui5/utils/core/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/hph/config/global/ui/* {
 		root * /home/docker/ui-files/mri-ui5/utils/global/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/mri/pa/config/ui/* {
 		root * /home/docker/ui-files/mri-ui5/PatientAnalyticsConfig/ui5/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/mri/pa/ui/* {
 		root * /home/docker/ui-files/mri-ui5/mri-pa-ui/mri/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/hph/genomics/ui/* {
 		root * /home/docker/ui-files/mri-ui5/genomics-ui/ui/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/mri/pa/config/i18n/* {
 		root * /home/docker/ui-files/mri-ui5/PatientAnalyticsConfig/ui5/i18n/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /ui/core/* {
 		root * /home/docker/ui-files/ui5/resources/sap/ui/core/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /ui/m/* {
 		root * /home/docker/ui-files/ui5/resources/sap/m/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/hph/patient/app/ui/* {
 		root * /home/docker/ui-files/mri-ui5/chp-ps-ui/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/hph/cdw/config/i18n/* {
 		root * /home/docker/ui-files/mri-ui5/CDM/ui5/i18n/
-		file_server
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/hph/cdw/config/ui/* {
 		root * /home/docker/ui-files/mri-ui5/CDM/ui5/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/hph/patient/config/ui/* {
 		root * /home/docker/ui-files/mri-ui5/PatientSummaryConfig/ui5/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/hph/patient/shared/* {
 		root * /home/docker/ui-files/mri-ui5/PatientSummaryConfig/ui5/shared/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /hc/hph/patient/config/i18n/* {
 		root * /home/docker/ui-files/mri-ui5/PatientSummaryConfig/ui5/i18n/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle_path /ui/* {
 		root * /home/docker/ui-files/ui5/resources/
-		file_server
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	## call gateway if there are no matched files
@@ -274,4 +430,8 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 			}
 		}
 	}
+}
+
+http://localhost:41180 {
+	import perseus
 }

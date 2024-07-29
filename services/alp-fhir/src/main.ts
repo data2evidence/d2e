@@ -38,4 +38,3 @@ try {
         ${err.stack}`)
   process.exit(1)
 }
-  

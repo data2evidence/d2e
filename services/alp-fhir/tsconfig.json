@@ -21,8 +21,9 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "strict": true,
-    "lib": ["ES2019", "DOM", "ES5"]
+    // "types": ["node"],
+    // "lib": ["ES2019", "DOM", "ES5"]
   },
   "include": ["src"],
-  "exclude": [""]
+  "exclude": ["node_modules"]
 }
