@@ -19,8 +19,9 @@ from utils.DBUtils import DBUtils
 
 class DBDao:
     def __init__(self, database_code: str, schema_name: str, user_type: UserType):
+        self.database_code = database_code
         self.schema_name = schema_name
-        dbutils = DBUtils(database_code)
+        dbutils = DBUtils(self.database_code)
         self.db_dialect = dbutils.get_database_dialect()
 
         if (user_type == UserType.ADMIN_USER) or (user_type == UserType.READ_USER):
