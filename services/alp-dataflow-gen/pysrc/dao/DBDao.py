@@ -1,16 +1,11 @@
 
 import pandas as pd
-import sqlalchemy as sql
-from sqlalchemy.schema import CreateSchema, DropSchema
-from sqlalchemy.sql.selectable import Select
-from sqlalchemy.sql.schema import Table, Column
+from datetime import datetime
 from typing import List, Dict, Any, Callable
 
-from datetime import datetime
-from typing import List, Dict
-
 import sqlalchemy as sql
 from sqlalchemy.sql.selectable import Select
+from sqlalchemy.sql.schema import Table, Column
 from sqlalchemy.schema import CreateSchema, DropSchema
 
 from utils.types import *
