@@ -28,13 +28,6 @@ class DBDao:
         self.metadata = sql.MetaData(schema_name)  # sql.MetaData()
         self.inspector = sql.inspect(self.engine)
 
-    def translate_table_names(self, table_name: str) -> str:
-        match self.db_dialect:
-            case DatabaseDialects.HANA:
-                return table_name.lower().replace("gdm_", "gdm.").upper()
-            case DatabaseDialects.POSTGRES:
-                return table_name.lower().replace(".", "_")
-
     def check_schema_exists(self) -> bool:
         match self.db_dialect:
             case DatabaseDialects.POSTGRES:
