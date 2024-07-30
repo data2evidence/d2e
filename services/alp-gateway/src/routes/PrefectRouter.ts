@@ -24,5 +24,18 @@ export class PrefectRouter {
         throw new Error(`Error getting health status: ${error}`)
       }
     })
+
+    this.router.get('/flows/:flowId', async (req, res) => {
+      try {
+        const token = req.headers.authorization!
+        const flowId = req.params.flowId
+        const prefectAPI = new PrefectAPI(token)
+        const flows = await prefectAPI.getFlowById(flowId)
+        return res.status(200).json(flows)
+      } catch (error) {
+        this.logger.info(`Error getting flows: ${error}`)
+        throw new Error(`Error getting flows: ${error}`)
+      }
+    })
   }
 }

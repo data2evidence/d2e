@@ -50,4 +50,16 @@ export class PrefectAPI {
       throw new Error('Error getting health status')
     }
   }
+
+  async getFlowById(id: string) {
+    try {
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}/flows/${id}`
+      const result = await axios.get(url, options)
+      return result.data
+    } catch (error) {
+      this.logger.error(`Error getting flow ${id}`)
+      throw new Error(`Error getting flow ${id}`)
+    }
+  }
 }
