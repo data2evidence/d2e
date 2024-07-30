@@ -78,25 +78,6 @@ export class DataflowService {
     }
     return null
   }
-  // TODO: check use case, deprecate if not in use
-  // async getTaskRunResult(taskRunId: string) {
-  //   const result = await this.dataflowResultRepo
-  //     .createQueryBuilder('result')
-  //     .select([
-  //       'result.taskRunId',
-  //       'result.rootFlowRunId',
-  //       'result.flowRunId',
-  //       'result.taskRunResult',
-  //       'result.createdDate'
-  //     ])
-  //     .where('result.taskRunId = :taskRunId', { taskRunId: taskRunId })
-  //     .getOne()
-
-  //   if (result) {
-  //     return result
-  //   }
-  //   return null
-  // }
 
   async getFlowRunResultsByDataflowId(dataflowId: string) {
     const lastFlowRun = await this.dataflowRepo
@@ -182,6 +163,11 @@ export class DataflowService {
   async deleteDataflow(id: string) {
     await this.dataflowRepo.delete(id)
     return { id }
+  }
+
+  async createDataflowRun(id, prefecflowRunId) {
+    await this.dataflowRepo.update({ id }, { lastFlowRunId: prefecflowRunId })
+    this.logger.info(`Created dataflow run for dataflow ${id} with lastflowRunId ${prefecflowRunId}`)
   }
 
   private addOwner<T>(object: T, isNewEntity = false) {

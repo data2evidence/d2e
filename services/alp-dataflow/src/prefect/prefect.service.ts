@@ -85,6 +85,7 @@ export class PrefectService {
       flowRunName: revision.name,
       options: prefectParams
     })
+    await this.dataflowService.createDataflowRun(id, flowRunId)
     return flowRunId
   }
 
