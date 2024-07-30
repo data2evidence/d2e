@@ -20,7 +20,7 @@ def GetDBConnection(database_code: str, user_type: str):
             encrypt = conn_details["encrypt"]
             validateCertificate = conn_details["validateCertificate"]
             db = database_name + \
-                f"?encrypt={encrypt}?validateCertificate={validateCertificate}"
+                f"?encrypt={encrypt}?sslValidateCertificate={validateCertificate}"
         elif conn_details['dialect'] == DatabaseDialects.POSTGRES:
             dialect_driver = "postgresql+psycopg2"
             db = database_name
