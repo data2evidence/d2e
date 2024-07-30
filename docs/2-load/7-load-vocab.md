@@ -51,19 +51,10 @@ wc -l *.csv | sort
 
 - Run the following command in terminal to stop an alp docker container and start another container to load data
 ```bash
-yarn start:data-load
-
-docker stop alp-dataflow-gen-agent-1
-
-docker exec -it alp-dataflow-gen-data-load-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options='{"files":[{"name": "CONCEPT_ANCESTOR","path": "/tmp/data/vocab/CONCEPT_ANCESTOR.csv", "truncate": "True", "table_name": "concept_ancestor"},{"name": "CONCEPT_CLASS","path": "/tmp/data/vocab/CONCEPT_CLASS.csv", "truncate": "True", "table_name": "concept_class"},{"name": "CONCEPT_RELATIONSHIP","path": "/tmp/data/vocab/CONCEPT_RELATIONSHIP.csv", "truncate": "True", "table_name": "concept_relationship"},{"name": "CONCEPT_SYNONYM","path": "/tmp/data/vocab/CONCEPT_SYNONYM.csv", "truncate": "True", "table_name": "concept_synonym"},{"name": "CONCEPT","path": "/tmp/data/vocab/CONCEPT.csv", "truncate": "True", "table_name": "concept"},{"name": "DOMAIN","path": "/tmp/data/vocab/DOMAIN.csv", "truncate": "True", "table_name": "domain"},{"name": "DRUG_STRENGTH","path": "/tmp/data/vocab/DRUG_STRENGTH.csv", "truncate": "True", "table_name": "drug_strength"},{"name": "RELATIONSHIP","path": "/tmp/data/vocab/RELATIONSHIP.csv", "truncate": "True", "table_name": "relationship"},{"name": "VOCABULARY","path": "/tmp/data/vocab/VOCABULARY.csv", "truncate": "True", "table_name": "vocabulary"}],"schema_name":"cdmvocab","header":"true","delimiter":"\t","database_code": "alpdev_pg", "chunksize": "50000", "encoding": "utf_8"}'
+docker exec -it alp-dataflow-gen-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options='{"files":[{"name": "CONCEPT_ANCESTOR","path": "/app/vocab/CONCEPT_ANCESTOR.csv", "truncate": "True", "table_name": "concept_ancestor"},{"name": "CONCEPT_CLASS","path": "/app/vocab/CONCEPT_CLASS.csv", "truncate": "True", "table_name": "concept_class"},{"name": "CONCEPT_RELATIONSHIP","path": "/app/vocab/CONCEPT_RELATIONSHIP.csv", "truncate": "True", "table_name": "concept_relationship"},{"name": "CONCEPT_SYNONYM","path": "/app/vocab/CONCEPT_SYNONYM.csv", "truncate": "True", "table_name": "concept_synonym"},{"name": "CONCEPT","path": "/app/vocab/CONCEPT.csv", "truncate": "True", "table_name": "concept"},{"name": "DOMAIN","path": "/app/vocab/DOMAIN.csv", "truncate": "True", "table_name": "domain"},{"name": "DRUG_STRENGTH","path": "/app/vocab/DRUG_STRENGTH.csv", "truncate": "True", "table_name": "drug_strength"},{"name": "RELATIONSHIP","path": "/app/vocab/RELATIONSHIP.csv", "truncate": "True", "table_name": "relationship"},{"name": "VOCABULARY","path": "/app/vocab/VOCABULARY.csv", "truncate": "True", "table_name": "vocabulary"}],"schema_name":"cdmvocab","header":"true","delimiter":"\t","database_code": "alpdev_pg", "chunksize": "50000", "encoding": "utf_8"}'
 ```
-- Docker container logs can be checked with the bash command `docker logs --tail 100 alp-dataflow-gen-data-load-agent-1`
-- Once the flow is completed, the container logs the message "Finished in state Completed()". After which run the following commands to stop the data-load agent and start dataflow-gen-agent
-    
-```bash
-docker stop alp-dataflow-gen-data-load-agent-1
-docker start alp-dataflow-gen-agent-1
-```
+- Docker container logs can be checked with the bash command `docker logs --tail 100 alp-dataflow-gen-agent-1`
+- Once the flow is completed, the container logs the message "Finished in state Completed()"
 - note: expected output is 
 > COPY ${LINE_COUNT}
 

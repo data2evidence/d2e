@@ -453,6 +453,7 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - ./cache/synpuf1k:/app/synpuf1k
+      - ./cache/vocab/:/app/vocab
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
       - duckdb-data-1:/app/duckdb_data
@@ -1675,14 +1676,6 @@ services:
       MEILI_HTTP_ADDR: 0.0.0.0:41${BASE_PORT:-1}11
       MEILI_LOG_LEVEL: INFO
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-
-  alp-dataflow-gen-data-load-agent:
-    container_name: &c3 alp-dataflow-gen-data-load-agent-${BASE_PORT:-1}
-    extends: alp-dataflow-gen-agent
-    volumes:
-      - ./cache/vocab/:/tmp/data/vocab
-      - ./cache/synpuf1k/:/tmp/data/synpuf1k
-    profiles: [data-load]
 
   alp-perseus-files-manager:
     image: perseushub/files-manager:latest
