@@ -15,12 +15,10 @@ export async function readAndCreateBotFromConfig():Promise<void> {
             return ;
         }
         console.log(botConfig.bots.length + ' bots configured in bot config.')
-        let saved = 0;
         for (const botConfig of botConfigs) {
             let fhirApi = new FhirAPI()
             await fhirApi.clientCredentialslogin()
             await createBot(fhirApi, 'Project Id', botConfig, 'vmcontext');
-            saved++;
             console.log(`Bot ${botConfig.name} saved and deployed successfully!`)
         }
         console.log('All bots are saved and deployed successfully!')
