@@ -5,4 +5,3 @@ minio==7.2.5
 torch==1.13.1
 debugpy==1.8.1
 sqlalchemy-hana==2.2.0
-pipdeptree==2.23.1
