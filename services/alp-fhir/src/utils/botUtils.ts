@@ -48,7 +48,7 @@ async function createBot(
             bot = searchResult; 
         }else{
             console.log(`Create new bot ${botConfig.name}`)     
-            let newBot = await fhirApi.create_bot('admin/projects/' + projectId + '/bot', body)
+            let newBot = await fhirApi.post('admin/projects/' + projectId + '/bot', body)
             bot = await fhirApi.readResource_bot(newBot.id);
         }
         await saveBot(fhirApi, botConfig as MedplumBotConfig, bot);
@@ -87,7 +87,7 @@ async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot
         if (!code) return;
         console.log('Deploying bot...');
         console.log(fhirApi.fhirUrl_bot('$deploy', bot.id).toString())
-        const deployResult = (await fhirApi.create_bot(
+        const deployResult = (await fhirApi.post(
             fhirApi.fhirUrl_bot('$deploy', bot.id).toString(), 
             {
                 code,

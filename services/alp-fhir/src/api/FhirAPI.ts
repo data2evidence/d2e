@@ -67,7 +67,7 @@ export class FhirAPI {
         return await this.medplumClient.searchOne('Bot', query=query)
     }
 
-    async create_bot(url: string, body: any){
+    async post(url: string, body: any){
        return await this.medplumClient.post(url, body);
     }
 
