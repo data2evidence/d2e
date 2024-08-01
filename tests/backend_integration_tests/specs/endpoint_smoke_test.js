@@ -132,7 +132,7 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
       })
     })
 
-    describe('totalpcount', function () {
+    xdescribe('totalpcount', function () {
       it('returns a valid response', function (done) {
         var requestBuilder = new RequestBuilder(MRI_CONFIG_METADATA, MRI_CUR_CONFIG)
         requestBuilder

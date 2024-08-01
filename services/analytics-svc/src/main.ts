@@ -176,7 +176,7 @@ const initRoutes = async (app: express.Application) => {
 
                 let credentials = null;
                 if (envVarUtils.isTestEnv()) {
-                    credentials = analyticsCredentials;
+                    credentials = analyticsCredentials[process.env.TESTSCHEMA];
                 } else {
                     credentials = req.dbCredentials.studyAnalyticsCredential;
                 }

@@ -740,6 +740,7 @@ services:
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
       local: ${local}
+      TESTSCHEMA: ${TESTSCHEMA}
 
   alp-minerva-cdw-svc:
     container_name: &c10 alp-minerva-cdw-svc-${BASE_PORT:-1}
@@ -802,7 +803,8 @@ services:
            },
            "name": "OMOP",
            "tags": [
-            "httptest"
+            "httptest",
+            "cdw"
            ]
           }
          ]
