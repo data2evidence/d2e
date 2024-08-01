@@ -1674,6 +1674,27 @@ services:
       MEILI_HTTP_ADDR: 0.0.0.0:41${BASE_PORT:-1}11
       MEILI_LOG_LEVEL: INFO
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+      
+
+  alp-sql-proxy:
+    container_name: &c30 alp-sql-proxy
+    hostname: alp-sql-proxy.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/sql-proxy:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c30
+    networks:
+      alp:
+        priority: 20
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    ports:
+      - 41191:41191
+    volumes:
+      - duckdb-data-1:/home/docker/duckdb_data
+    environment:
+      SQL_PROXY__PORT: 41191
+      DUCKDB__DATA_FOLDER: /home/docker/duckdb_data
+      LOCAL_DEBUG: "false"
 
   alp-dataflow-gen-data-load-agent:
     container_name: &c3 alp-dataflow-gen-data-load-agent-${BASE_PORT:-1}
