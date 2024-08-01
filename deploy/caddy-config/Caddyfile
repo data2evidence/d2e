@@ -126,33 +126,6 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle /alp-prefect/* {
-		uri strip_prefix /alp-prefect
-		reverse_proxy http://alp-dataflow-gen-1:41120 {
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-
-	handle /dicom/* {
-		uri strip_prefix /dicom
-		reverse_proxy http://alp-dicom-server:8042 {
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-
-	handle /alp-fhir/* {
-		uri strip_prefix /alp-fhir
-		reverse_proxy http://alp-minerva-fhir-server-1:8103 {
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-
 	redir / /portal
 
 	handle_path /portal* {
