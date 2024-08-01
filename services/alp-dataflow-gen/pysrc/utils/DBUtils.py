@@ -126,7 +126,7 @@ class DBUtils:
                     validate_certificate = database_credentials.get(
                         "validateCertificate")
                     database_config_string = database_name + \
-                        f"?encrypt={encrypt}?validateCertificate={validate_certificate}"
+                        f"?encrypt={encrypt}?sslValidateCertificate={validate_certificate}"
 
                 case DatabaseDialects.POSTGRES:
                     dialect_driver = "postgresql+psycopg2"
