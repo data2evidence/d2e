@@ -153,6 +153,14 @@ https://*.alp.local:55555 {
 			}
 		}
 
+		handle_path /docs/* {
+			root * /home/docker/ui-files/portal/docs/
+			encode zstd gzip
+			file_server {
+				precompressed zstd br gzip
+			}
+		}
+
 		handle_path /icons/* {
 			root * /home/docker/ui-files/portal/icons/
 			encode zstd gzip
