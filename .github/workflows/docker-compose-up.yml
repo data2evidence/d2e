@@ -123,11 +123,9 @@ jobs:
           yarn init:logto
 
       - name: Docker compose up Local Mode without UI Container
-        env:
-          PORTAL_NAME: alp-minerva-gateway-1
         run: |
-          # Run DataNode services
-          yarn local:minerva up --wait
+          # Run DataNode services without sql-editor
+          BASE_PORT=1 docker compose --file docker-compose.yml --file docker-compose-local.yml --env-file .env.local up --wait
           EXIT_CODE=$?
 
           docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
