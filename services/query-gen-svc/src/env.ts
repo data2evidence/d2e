@@ -29,7 +29,7 @@ const result = Env.safeParse(process.env);
 let env = process.env as unknown as z.infer<typeof Env>;
 if (result.success) {
     env = result.data;
-    console.log(env);
+    // console.log(env);
 } else {
     // @ts-ignore
     console.warn(JSON.stringify(result.error));
