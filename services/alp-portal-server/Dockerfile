@@ -1,4 +1,4 @@
-ARG IMAGE=node:18.14.0-alpine
+ARG IMAGE=node:18.20.1-alpine
 
 FROM $IMAGE AS development
 
@@ -37,6 +37,9 @@ RUN --mount=type=cache,target=~/.cache/yarn \
 USER node
 
 FROM $IMAGE AS production
+
+RUN apk update && apk add busybox=1.36.1-r19 \
+    openssl=3.1.6-r2
 
 RUN rm -rf /usr/local/lib/node_modules/npm
 

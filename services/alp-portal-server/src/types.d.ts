@@ -62,6 +62,7 @@ export interface IDatasetDto {
   dashboards: IDatasetDashboardBaseDto[]
   attributes: IDatasetAttribute[]
   tags: string[]
+  fhir_project_id?: string
 }
 
 export interface IDatasetSnapshotDto {

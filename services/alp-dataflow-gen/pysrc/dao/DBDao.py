@@ -2,8 +2,9 @@ from alpconnection.dbutils import GetDBConnection, get_db_svc_endpoint_dialect
 import sqlalchemy as sql
 from sqlalchemy.schema import CreateSchema, DropSchema
 from sqlalchemy.sql.selectable import Select
+from sqlalchemy.sql.schema import Table, Column
 import pandas as pd
-from typing import List, Dict
+from typing import List, Dict, Any, Callable
 from datetime import datetime
 from utils.types import DatabaseDialects
 
@@ -141,7 +142,7 @@ class DBDao:
         return table_names
 
     def __get_datamart_select_statement(self, datamart_table_config, columns_to_be_copied: List[str], date_filter: str = "", patients_to_be_copied: List[str] = []) -> Select:
-        table_name = self._casefold(datamart_table_config['tableName'])
+        table_name = self.__casefold(datamart_table_config['tableName'])
         timestamp_column = datamart_table_config['timestamp_column'].casefold()
         personId_column = datamart_table_config['personId_column'].casefold()
 
@@ -157,7 +158,7 @@ class DBDao:
                 filter(self._system_columns, columns_to_be_copied))
 
             select_stmt = sql.select(
-                *map(lambda x: getattr(source_table.c, self._casefold(x)), columns_to_be_copied))
+                *map(lambda x: getattr(source_table.c, self.__casefold(x)), columns_to_be_copied))
 
             # Filter by patients if patients_to_be_copied is provided
             if len(patients_to_be_copied) > 0 and personId_column:
@@ -171,14 +172,14 @@ class DBDao:
 
         return select_stmt
 
-    def _casefold(self, obj_name: str) -> str:
+    def __casefold(self, obj_name: str) -> str:
         if not obj_name.startswith("GDM."):
             return obj_name.casefold()
         else:
             return obj_name
 
     def datamart_copy_table(self, datamart_table_config, target_schema: str, columns_to_be_copied: List[str], date_filter: str = "", patients_to_be_copied: List[str] = []) -> int:
-        table_name = self._casefold(datamart_table_config['tableName'])
+        table_name = self.__casefold(datamart_table_config['tableName'])
 
         with self.engine.connect() as connection:
             target_table = sql.Table(table_name, sql.MetaData(
@@ -196,7 +197,7 @@ class DBDao:
             select_stmt = self.__get_datamart_select_statement(
                 datamart_table_config, columns_to_be_copied, date_filter, patients_to_be_copied)
 
-            columns_to_insert = [self._casefold(
+            columns_to_insert = [self.__casefold(
                 col) for col in columns_to_be_copied]
 
             insert_stmt = sql.insert(target_table).from_select(
@@ -272,20 +273,13 @@ class DBDao:
     def _system_columns(self, column):
         return column.lower() not in ["system_valid_until", "system_valid_from"]
 
-    # Todo: To support bulk insert, Currently only suuports single row inserts
-    def insert_values_into_table(self, table_name: str, column_value_mapping: dict):
-        columns = list(column_value_mapping.keys())
+    # Todo: To support bulk insert, Currently only suports single row inserts
+    def insert_values_into_table(self, table_name: str, column_value_mapping: List[Dict]):
         with self.engine.connect() as connection:
             table = sql.Table(table_name, self.metadata,
                               autoload_with=connection)
-            insert_stmt = table.insert().values(column_value_mapping)
-
-            print(
-                f"Inserting into table {table_name} columns {columns}")
-            res = connection.execute(insert_stmt)
+            res = connection.execute(table.insert(), column_value_mapping)
             connection.commit()
-            print(
-                f"Successfully inserted into table {table_name} columns {columns}")
 
     def call_stored_procedure(self, sp_name: str, sp_params: str):
         with self.engine.connect() as connection:
@@ -297,3 +291,52 @@ class DBDao:
             print(
                 f"Successfully executed stored prcoedure {sp_name}")
             return res
+
+    def get_sqlalchemy_columns(self, table_name: str, column_names: List[str]) -> Dict[str, Column]:
+        '''
+        Returns a dictionary mapping column names to sqlalchemy Column objects
+        '''
+        with self.engine.connect() as connection:
+            table = Table(table_name, self.metadata,
+                          autoload_with=connection)
+            return {column_name: getattr(table.c, column_name.casefold()) for column_name in column_names}
+
+    def execute_sqlalchemy_statement(self, sqlalchemy_statement, callback: Callable) -> Any | None:
+        with self.engine.connect() as connection:
+            res = connection.execute(sqlalchemy_statement)
+            connection.commit()
+            return callback(res)
+
+    def get_next_record_id(self, table_name: str, id_column_name: str) -> int:
+        table = sql.Table(table_name, self.metadata,
+                          autoload_with=self.engine)
+        id_column = getattr(table.c, id_column_name.casefold())
+        last_record_id_stmt = sql.select(sql.func.max(id_column))
+        last_record_id = self.execute_sqlalchemy_statement(
+            last_record_id_stmt, self.get_single_value)
+        if last_record_id is None:
+            return 1
+        else:
+            return int(last_record_id) + 1
+
+    def delete_records(self, table_name: str, conditions: List):
+        table = sql.Table(table_name, self.metadata, autoload_with=self.engine)
+        delete_from_conditions = sql.and_(*conditions)
+        delete_from_statement = table.delete().where(delete_from_conditions)
+        result = self.execute_sqlalchemy_statement(
+            delete_from_statement, self.return_affected_rowcounts
+        )
+        
+        return result
+    
+    # Callables
+    def get_single_value(self, result) -> Any:  # Todo: Replace other dbdao function
+        if result.rowcount == 0:
+            raise Exception("No value returned")
+        if result.rowcount > 1:
+            raise Exception(f"Multiple values returned: {result.fetchall()}")
+        else:
+            return result.scalar()
+    
+    def return_affected_rowcounts(self, result) -> int:
+        return result.rowcount

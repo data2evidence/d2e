@@ -65,11 +65,13 @@ def create_schema_tasks(dialect: str,
         match dialect:
             case DatabaseDialects.HANA:
                 admin_user = HANA_TENANT_USERS.ADMIN_USER
+                schema_name = schema_name.upper()
             case DatabaseDialects.POSTGRES:
                 admin_user = PG_TENANT_USERS.ADMIN_USER
+                schema_name = schema_name.lower()
 
         schema_dao = DBDao(database_code, schema_name, admin_user)
-
+        
         create_db_schema_wo = create_db_schema.with_options(
             on_completion=[partial(create_dataset_schema_hook,
                                    **dict(schema_dao=schema_dao))],
@@ -87,7 +89,6 @@ def create_schema_tasks(dialect: str,
         create_tables_wo = run_liquibase_update_task.with_options(
             on_failure=[partial(drop_schema_hook,
                                 **dict(schema_dao=schema_dao))])
-
         create_tables_wo(action=action,
                          dialect=dialect,
                          data_model=data_model,
@@ -151,8 +152,10 @@ def update_datamodel(database_code: str,
     match dialect:
         case DatabaseDialects.HANA:
             admin_user = HANA_TENANT_USERS.ADMIN_USER
+            schema_name = schema_name.upper()
         case DatabaseDialects.POSTGRES:
             admin_user = PG_TENANT_USERS.ADMIN_USER
+            schema_name = schema_name.lower()
 
     schema_dao = DBDao(database_code, schema_name, admin_user)
 
@@ -257,7 +260,6 @@ def rollback_tag_task(database_code: str,
 @task(log_prints=True)
 def create_db_schema(schema_dao: DBDao):
     schema_exists = schema_dao.check_schema_exists()
-
     if schema_exists == True:
         raise ValueError(
             f"Schema '{schema_dao.schema_name}' already exists in database '{schema_dao.database_code}'")
