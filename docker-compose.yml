@@ -403,6 +403,7 @@ services:
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       PREFECT_SERVER_ANALYTICS_ENABLED: "false"
       PREFECT_SERVER_API_HOST: 0.0.0.0
+      PREFECT_UI_STATIC_DIRECTORY: /app/ui-files
       PREFECT_SERVER_API_PORT: 41${BASE_PORT:-1}20
       PYTHON_VERIFY_SSL: false # Only use this for apis calling internal docker urls
       R_LIBS_USER: /home/docker/plugins/R/site-library
