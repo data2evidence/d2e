@@ -1,22 +1,30 @@
-from alpconnection.dbutils import GetDBConnection, get_db_svc_endpoint_dialect
+
 from sqlalchemy import text, MetaData, inspect, Table, select
 from typing import List
 from datetime import datetime
-from utils.types import DatabaseDialects
+from utils.types import DatabaseDialects, UserType
+from utils.DBUtils import DBUtils
 
 
 class UserDao():
-    def __init__(self, database_code: str, schema_name: str, user_type: str):
-        self.database_code = database_code
+    def __init__(self, database_code: str, schema_name: str, user_type: UserType):
+        #self.database_code = database_code
         self.schema_name = schema_name
-        self.engine = GetDBConnection(database_code, user_type)
-        self.metadata = MetaData(schema=schema_name)
+        dbutils = DBUtils(database_code)
+        self.db_dialect = dbutils.get_database_dialect()
+        
+        if user_type in UserType:
+            self.user = user_type
+        else:
+            raise ValueError(f"User type '{user_type}' not allowed, only '{[user.value for user in UserType]}'.")
+        
+        self.engine = dbutils.create_database_engine(self.user)
+        self.metadata = MetaData(schema_name)
         self.inspector = inspect(self.engine)
-        self.dialect = get_db_svc_endpoint_dialect(self.database_code)
 
     def check_user_exists(self, user: str) -> bool:
         with self.engine.connect() as connection:
-            if self.dialect == DatabaseDialects.POSTGRES:
+            if self.db_dialect == DatabaseDialects.POSTGRES:
                 select_stmt = text("select * from pg_user where usename = :x")
                 print(f"Executing check user exists statement..")
                 res = connection.execute(select_stmt, {"x": user}).fetchall()
@@ -36,7 +44,7 @@ class UserDao():
 
     def check_role_exists(self, role_name: str) -> bool:
         with self.engine.connect() as connection:
-            if self.dialect == DatabaseDialects.POSTGRES:
+            if self.db_dialect == DatabaseDialects.POSTGRES:
                 select_stmt = text("select * from pg_roles where rolname = :x")
                 print(f"Executing check role exists statement..")
                 res = connection.execute(
@@ -56,7 +64,7 @@ class UserDao():
                 return True
 
     def create_read_role(self, role_name: str):
-        match self.dialect:
+        match self.db_dialect:
             case DatabaseDialects.POSTGRES:
                 create_role_stmt = text(f'CREATE ROLE {role_name}')
             case DatabaseDialects.HANA:
@@ -70,7 +78,7 @@ class UserDao():
             print(f"{role_name} role Created Successfully")
 
     def create_user(self, user: str, password: str):
-        match self.dialect:
+        match self.db_dialect:
             case DatabaseDialects.POSTGRES:
                 create_user_stmt = text(
                     f'CREATE USER {user} WITH PASSWORD "{password}"')
@@ -100,7 +108,7 @@ class UserDao():
             print(f" {role_name} Role Granted to {user} User Successfully")
 
     def grant_read_privileges(self, role_name: str):
-        match self.dialect:
+        match self.db_dialect:
             case DatabaseDialects.POSTGRES:
                 grant_read_stmt = text(f"""
                     GRANT USAGE ON SCHEMA {self.schema_name} TO {role_name};

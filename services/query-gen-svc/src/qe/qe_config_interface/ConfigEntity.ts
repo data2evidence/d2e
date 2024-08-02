@@ -26,6 +26,10 @@ export class ConfigEntity {
         return this.__config;
     }
 
+    public getBaseEntity(): string {
+        return this.baseEntity;
+    }
+
     public getColumn(columnId: string): string {
         let col = this.placeholderMap[`${this.baseEntity}.${columnId}`];
         if (col) {
