@@ -1,14 +1,17 @@
-from alpconnection.dbutils import GetDBConnection
-from sqlalchemy import MetaData, Table, select, func, text
+from typing import List
+
 from sqlalchemy.engine import Connection
 from sqlalchemy.engine.cursor import CursorResult
-from utils.types import PG_TENANT_USERS
-from typing import List
+from sqlalchemy import MetaData, Table, select, func, text
+
+from utils.types import UserType
+from utils.DBUtils import DBUtils
 
 
 class VocabDao:
     def __init__(self, database_code, schema_name):
-        self.engine = GetDBConnection(database_code, PG_TENANT_USERS.READ_USER)
+        dbutils = DBUtils(database_code)
+        self.engine = dbutils.create_database_engine(UserType.READ_USER)
         self.schema_name = schema_name
         self.metadata = MetaData(schema=schema_name)
 

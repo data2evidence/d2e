@@ -268,3 +268,15 @@ services:
       LOCAL_DEBUG: "true"
     ports:
       - 9226:9226
+
+  alp-sql-proxy:
+    build:
+      context: ./services/sql-proxy
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - ./services/sql-proxy/src:/home/docker/src
+    ports:
+      - 9235:9235
+    environment:
+      LOCAL_DEBUG: "true"

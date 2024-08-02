@@ -218,12 +218,27 @@
       "request": "attach",
       "connect": {
         "host": "localhost",
-        "port": 9234,  
+        "port": 9234
       },
       "pathMappings": [
         {
           "localRoot": "${workspaceFolder}/services/alp-dataflow-gen/pysrc",
-          "remoteRoot": "./pysrc" 
+          "remoteRoot": "./pysrc"
+        }
+      ]
+    },
+    {
+      "name": "alp-sql-proxy",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 9235
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/services/sql-proxy/src",
+          "remoteRoot": "./src"
         }
       ]
     },

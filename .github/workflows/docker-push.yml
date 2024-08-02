@@ -172,6 +172,10 @@ jobs:
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile.client
+          - name: alp-data-node/sql-proxy
+            directory: ./services/sql-proxy
+            context: ./services/sql-proxy
+            fileName: Dockerfile
 
     steps:
     - uses: actions/checkout@v4
