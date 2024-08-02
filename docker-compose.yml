@@ -509,6 +509,8 @@ services:
       DATAFLOW_MGMT__FLOWS__RESULTS__S3_DIR_PATH: s3://flows/results
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
+      PREFECT__PROCESS_WORKER_POOL_NAME: process-pool
+      PREFECT__DOCKER_WORKER_POOL_NAME: docker-pool
       R_LIBS_USER: /home/docker/plugins/R/site-library
 
   alp-db-credentials-mgr:
@@ -1620,3 +1622,42 @@ services:
       - ./cache/vocab/transformed:/tmp/data
       - ./cache/synpuf1k/:/tmp/data
     profiles: [data-load]
+
+  alp-dataflow-gen-process-worker:
+    container_name: &c30 alp-dataflow-gen-process-worker-${BASE_PORT:-1}
+    privileged: true
+    depends_on:
+      alp-dataflow-gen-init:
+        condition: service_completed_successfully
+    healthcheck:
+      interval: 20s
+      retries: 30
+      start_period: 60s
+      test:
+        # TODO: add healthcheck on worker
+        - CMD
+        - curl
+        - -f
+        - http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
+      timeout: 30s
+    hostname: alp-dataflow-gen-process-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen-worker:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c30
+    networks:
+      data:
+        priority: 20
+    platform: linux/amd64
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    environment:
+      PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
+      PREFECT_LOGGING_SERVER_LEVEL: WARNING
+      PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool}
+
+  alp-dataflow-gen-docker-worker:
+    extends: alp-dataflow-gen-process-worker
+    container_name: &c31 alp-dataflow-gen-docker-worker-${BASE_PORT:-1}
+    hostname: alp-dataflow-gen-docker-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    environment:
+      PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}    

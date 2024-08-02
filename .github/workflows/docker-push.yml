@@ -168,6 +168,10 @@ jobs:
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile.frontend
+          - name: alp-data-node/alp-dataflow-gen-worker
+            directory: ./services/alp-dataflow-gen
+            context: .
+            fileName: Dockerfile.worker
 
     steps:
     - uses: actions/checkout@v4

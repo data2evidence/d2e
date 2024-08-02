@@ -1,0 +1,28 @@
+FROM docker:27.1.1-dind as dind
+
+# To fix pendulum timezone bug with prefect in node alpine image
+RUN echo UTC > /etc/timezone
+
+RUN apk add --no-cache python3 py3-pip python3-dev \
+    g++ gcc libxslt-dev libffi-dev cargo musl-dev \
+    bash py3-setuptools git
+
+WORKDIR /usr/src/app
+
+RUN python -m venv /usr/src/app/venv
+ENV PATH="/usr/src/app/venv/bin:$PATH"
+
+ARG PREFECT__WORKER_POOL_NAME
+ARG COMMIT_ID=main
+ARG GIT_TOKEN
+ARG REPO_URL=github.com/alp-os/d2e-plugins.git
+RUN git clone https://${GIT_TOKEN}@${REPO_URL} d2e-plugins 
+RUN cd d2e-plugins && git fetch --all && git checkout $COMMIT_ID
+ENV COMMIT_ID=$COMMIT_ID
+
+COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/worker.requirements.txt requirements.txt
+COPY --chown=docker:docker ./services/alp-dataflow-gen/init-dind.sh .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+ENTRYPOINT [ "init-dind.sh" ]

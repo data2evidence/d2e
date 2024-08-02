@@ -252,3 +252,15 @@ services:
       dockerfile: Dockerfile
     # volumes:
     #   - ./services/alp-logto/post-init:/home/docker
+
+  alp-dataflow-gen-process-worker:
+    build:
+      context: .
+      dockerfile: services/alp-dataflow-gen/Dockerfile.worker
+      args:
+        COMMIT_ID: internal-896_flow-builder # TODO: change it to main before merging to develop
+        GIT_TOKEN: 
+        REPO_URL: github.com/alp-os/d2e-plugins-dev-santan.git # TODO: change it to github.com/alp-os/d2e-plugins before merging to develop
+
+  alp-dataflow-gen-docker-worker:
+    extends: alp-dataflow-gen-process-worker
