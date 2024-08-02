@@ -10,7 +10,7 @@ import struct
 from typing import Dict, List, Optional
 
 from .core import BVType, Connection, Extension, Session, QueryResult
-from .database import get_db_conn_from_connection_params, parse_connection_param_database
+from .database import get_db_conn_from_connection_params, parse_connection_param_database, get_rewriter_from_dialect
 from .rewrite import Rewriter
 
 logger = logging.getLogger(__name__)
@@ -352,9 +352,11 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             print("findme, obj", dialect, database_code, schema)
             conn = get_db_conn_from_connection_params(
                 dialect, database_code, schema)
+            rewriter = get_rewriter_from_dialect(
+                dialect)
             logger.info("Client connection params: %s", params)
             ctx = BVContext(conn, conn.create_session(),
-                            self.server.rewriter, params)
+                            rewriter, params)
             self.send_auth_request(ctx)
             return ctx
         elif code == 80877102:  # Cancel request
@@ -692,12 +694,10 @@ class BuenaVistaServer(socketserver.ThreadingTCPServer):
         self,
         server_address,
         *,
-        rewriter: Optional[Rewriter] = None,
         extensions: List[Extension] = [],
         auth: Optional[Dict[str, str]] = None,
     ):
         super().__init__(server_address, BuenaVistaHandler)
-        self.rewriter = rewriter
         self.extensions = {e.type(): e for e in extensions}
         self.ctxts = {}
         self.auth = auth

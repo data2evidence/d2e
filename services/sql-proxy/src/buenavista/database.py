@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+from typing import Optional
 import duckdb
 import json
 from pydantic import BaseModel
@@ -8,6 +9,8 @@ from sqlalchemy import create_engine
 from .core import Connection
 from .backends.duckdb import DuckDBConnection
 from .backends.postgres import PGConnection
+from .backends.hana import HANAConnection
+from buenavista import bv_dialects, rewrite
 
 
 class DBCredentialsType(BaseModel):
@@ -140,7 +143,8 @@ def get_db_conn_from_connection_params(dialect: str, database_code: str, schema:
         return PGConnection(db)
 
     if dialect == DatabaseDialects.HANA:
-        raise NotImplementedError
+        db = GetDBConnection(database_code)
+        return HANAConnection(db)
 
 
 def parse_connection_param_database(database: str) -> tuple[str, str, str]:
@@ -155,6 +159,22 @@ def parse_connection_param_database(database: str) -> tuple[str, str, str]:
     return databaseComponents
 
 
-# import duckdb
-# db = duckdb.connect()
-# db.execute(f"ATTACH '/home/docker/duckdb_data/alpdev_pg_cdmdefault'  (READ_ONLY);")
+def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:
+    class DefaultRewriterForPostgres(rewrite.Rewriter):
+        def rewrite(self, sql: str) -> str:
+            if sql.lower() == "select pg_catalog.version()":
+                return "SELECT 'PostgreSQL 9.3' as version"
+            else:
+                return super().rewrite(sql)
+
+    if dialect == DatabaseDialects.DUCKDB:
+        return DefaultRewriterForPostgres(
+            bv_dialects.BVPostgres(), bv_dialects.BVDuckDB()
+        )
+
+    if dialect == DatabaseDialects.POSTGRES:
+        return DefaultRewriterForPostgres(
+            bv_dialects.BVPostgres(), bv_dialects.BVPostgres()
+        )
+
+    return None

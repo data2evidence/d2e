@@ -26,7 +26,7 @@ OID_TO_BVTYPE = {
 }
 
 
-class PGQueryResult(QueryResult):
+class HANAQueryResult(QueryResult):
     def __init__(
         self,
         fields: List[Tuple[str, BVType]],
@@ -54,7 +54,7 @@ class PGQueryResult(QueryResult):
         return self._status
 
 
-class PGSession(Session):
+class HANASession(Session):
     def __init__(self, parent, conn):
         super().__init__()
         self.parent = parent
@@ -70,18 +70,21 @@ class PGSession(Session):
         return self._cursor
 
     def execute_sql(self, sql: str, params=None) -> QueryResult:
-        print("findme, execute_sql(postgres)")
+        print("findme, execute_sql(hana)")
         if params:
             sql = re.sub(r"\$\d+", r"%s", sql)
             self._cursor.execute(sql, params)
         else:
             self._cursor.execute(sql)
-        status = self._cursor.statusmessage
+        print("findme, self._cursor.print_message()",
+              self._cursor.print_message())
+        # Used to be .statusmessage, this change might be wrong
+        status = self._cursor.print_message()
         if self._cursor.description:
             rows = self._cursor.fetchall()
             res = self.to_query_result(self._cursor.description, rows, status)
         else:
-            res = PGQueryResult([], [], status=status)
+            res = HANAQueryResult([], [], status=status)
         return res
 
     def in_transaction(self) -> bool:
@@ -102,10 +105,10 @@ class PGSession(Session):
             name, oid = d[0], d[1]
             f = (name, OID_TO_BVTYPE.get(oid, BVType.UNKNOWN))
             fields.append(f)
-        return PGQueryResult(fields, rows, status)
+        return HANAQueryResult(fields, rows, status)
 
 
-class PGConnection(Connection):
+class HANAConnection(Connection):
     def __init__(self, db):
         super().__init__()
         self.db = db
@@ -113,10 +116,10 @@ class PGConnection(Connection):
     def new_session(self) -> Session:
         session = sessionmaker(bind=self.db)()
         conn = session.connection()
-        return PGSession(self, conn)
+        return HANASession(self, conn)
 
     def release(self, conn):
         conn.close()
 
     def parameters(self) -> Dict[str, str]:
-        return {"server_version": "9.3.pgproxy", "client_encoding": "UTF8"}
+        return {"server_version": "9.3.hanaproxy", "client_encoding": "UTF8"}

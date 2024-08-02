@@ -2,30 +2,28 @@ import debugpy
 from buenavista import bv_dialects, postgres, rewrite
 from buenavista.backends.duckdb import DuckDBConnection
 import os
-import sys
 from typing import Tuple
 
-import duckdb
 import logging
 
 
-class DuckDBPostgresRewriter(rewrite.Rewriter):
-    def rewrite(self, sql: str) -> str:
-        if sql.lower() == "select pg_catalog.version()":
-            return "SELECT 'PostgreSQL 9.3' as version"
-        else:
-            return super().rewrite(sql)
+# class DuckDBPostgresRewriter(rewrite.Rewriter):
+#     def rewrite(self, sql: str) -> str:
+#         if sql.lower() == "select pg_catalog.version()":
+#             return "SELECT 'PostgreSQL 9.3' as version"
+#         else:
+#             return super().rewrite(sql)
 
 
-rewriter = DuckDBPostgresRewriter(
-    bv_dialects.BVPostgres(), bv_dialects.BVDuckDB())
+# rewriter = DuckDBPostgresRewriter(
+#     bv_dialects.BVPostgres(), bv_dialects.BVDuckDB())
 
 
 def create(
     host_addr: Tuple[str, int], auth: dict = None
 ) -> postgres.BuenaVistaServer:
     server = postgres.BuenaVistaServer(
-        host_addr, rewriter=rewriter, auth=auth
+        host_addr, auth=auth
     )
     return server
 
