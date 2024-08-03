@@ -172,6 +172,10 @@ jobs:
             directory: ./services/alp-dataflow-gen
             context: .
             fileName: Dockerfile.worker
+          - name: alp-data-node/sql-proxy
+            directory: ./services/sql-proxy
+            context: ./services/sql-proxy
+            fileName: Dockerfile
 
     steps:
     - uses: actions/checkout@v4

@@ -27,7 +27,7 @@ unzip -o -d . "${ZIP_FILE}"
 rm CONCEPT_CPT4.csv
 ```
 
-## Confirm Line Count Before Transformation
+## Confirm Line Count Before Ingestion
 - Run command to output line count for each CSV file 
 ```bash
 wc -l *.csv | sort
@@ -47,39 +47,14 @@ wc -l *.csv | sort
 ```
 - Note that unzipped CSV file from Athena contains an extra new line that is empty.
 
-## Transform csv files to expected format
-- Escape existing double quotes
-- Add double quotes around each value
-- This transformation is done in case there is a literal string character e.g. `\t` or `\n` in the value.
-- Enclosing the values in double quotes would prevent interpretation as a tab or newline.
-- Move files to a folder named `transformed`
-```bash
-mkdir -p transformed
-for CSV_FILE in *.csv; do 
-      echo . transform $CSV_FILE; 
-      wc -l $CSV_FILE
-      CSV_FILE2=./transformed/$CSV_FILE
-      sed "s/\"/\"\"/g;s/\t/\"\t\"/g;s/\(.*\)/\"\1\"/" $CSV_FILE > $CSV_FILE2; 
-      wc -l $CSV_FILE2
-done
-```
 ## Load data to cdmvocab
 
 - Run the following command in terminal to stop an alp docker container and start another container to load data
 ```bash
-yarn start:data-load
-
-docker stop alp-dataflow-gen-agent-1
-
-docker exec -it alp-dataflow-gen-data-load-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options='{"files":[{"name": "CONCEPT_ANCESTOR","path": "/tmp/data/CONCEPT_ANCESTOR.csv", "truncate": "True", "table_name": "concept_ancestor"},{"name": "CONCEPT_CLASS","path": "/tmp/data/CONCEPT_CLASS.csv", "truncate": "True", "table_name": "concept_class"},{"name": "CONCEPT_RELATIONSHIP","path": "/tmp/data/CONCEPT_RELATIONSHIP.csv", "truncate": "True", "table_name": "concept_relationship"},{"name": "CONCEPT_SYNONYM","path": "/tmp/data/CONCEPT_SYNONYM.csv", "truncate": "True", "table_name": "concept_synonym"},{"name": "CONCEPT","path": "/tmp/data/CONCEPT.csv", "truncate": "True", "table_name": "concept"},{"name": "DOMAIN","path": "/tmp/data/DOMAIN.csv", "truncate": "True", "table_name": "domain"},{"name": "DRUG_STRENGTH","path": "/tmp/data/DRUG_STRENGTH.csv", "truncate": "True", "table_name": "drug_strength"},{"name": "RELATIONSHIP","path": "/tmp/data/RELATIONSHIP.csv", "truncate": "True", "table_name": "relationship"},{"name": "VOCABULARY","path": "/tmp/data/VOCABULARY.csv", "truncate": "True", "table_name": "vocabulary"}],"schema_name":"cdmvocab","header":"true","delimiter":"\t","database_code": "alpdev_pg", "chunksize": "50000", "encoding": "utf_8"}'
+docker exec -it alp-dataflow-gen-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options='{"files":[{"name": "CONCEPT_ANCESTOR","path": "/app/vocab/CONCEPT_ANCESTOR.csv", "truncate": "True", "table_name": "concept_ancestor"},{"name": "CONCEPT_CLASS","path": "/app/vocab/CONCEPT_CLASS.csv", "truncate": "True", "table_name": "concept_class"},{"name": "CONCEPT_RELATIONSHIP","path": "/app/vocab/CONCEPT_RELATIONSHIP.csv", "truncate": "True", "table_name": "concept_relationship"},{"name": "CONCEPT_SYNONYM","path": "/app/vocab/CONCEPT_SYNONYM.csv", "truncate": "True", "table_name": "concept_synonym"},{"name": "CONCEPT","path": "/app/vocab/CONCEPT.csv", "truncate": "True", "table_name": "concept"},{"name": "DOMAIN","path": "/app/vocab/DOMAIN.csv", "truncate": "True", "table_name": "domain"},{"name": "DRUG_STRENGTH","path": "/app/vocab/DRUG_STRENGTH.csv", "truncate": "True", "table_name": "drug_strength"},{"name": "RELATIONSHIP","path": "/app/vocab/RELATIONSHIP.csv", "truncate": "True", "table_name": "relationship"},{"name": "VOCABULARY","path": "/app/vocab/VOCABULARY.csv", "truncate": "True", "table_name": "vocabulary"}],"schema_name":"cdmvocab","header":"true","delimiter":"\t","database_code": "alpdev_pg", "chunksize": "50000", "encoding": "utf_8"}'
 ```
-- Docker container logs can be checked with the bash command `docker logs --tail 100 alp-dataflow-gen-data-load-agent-1`
-- Once the flow is completed, the container logs the message "Finished in state Completed()". After which run the following commands to stop the data-load agent and start dataflow-gen-agent
-    
-```bash
-docker stop alp-dataflow-gen-data-load-agent-1
-docker start alp-dataflow-gen-agent-1
-```
+- Docker container logs can be checked with the bash command `docker logs --tail 100 alp-dataflow-gen-agent-1`
+- Once the flow is completed, the container logs the message "Finished in state Completed()"
 - note: expected output is 
 > COPY ${LINE_COUNT}
 
