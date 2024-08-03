@@ -429,6 +429,8 @@ services:
     depends_on:
       alp-dataflow-gen:
         condition: service_healthy
+      alp-dataflow-gen-init:
+        condition: service_completed_successfully
       alp-minio-post-init:
         condition: service_completed_successfully
     healthcheck:
@@ -498,8 +500,6 @@ services:
     container_name: &c4 alp-dataflow-gen-init-${BASE_PORT:-1}
     depends_on:
       alp-dataflow-gen:
-        condition: service_healthy
-      alp-dataflow-gen-agent:
         condition: service_healthy
       alp-minio-post-init:
         condition: service_completed_successfully
