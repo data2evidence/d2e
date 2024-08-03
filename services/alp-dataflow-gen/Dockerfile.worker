@@ -25,4 +25,4 @@ COPY --chown=docker:docker ./services/alp-dataflow-gen/init-dind.sh .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT [ "init-dind.sh" ]
+ENTRYPOINT sh ./init-dind.sh
