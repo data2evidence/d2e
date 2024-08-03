@@ -1,25 +1,35 @@
-from alpconnection.dbutils import GetDBConnection, get_db_svc_endpoint_dialect
+
+import pandas as pd
+from datetime import datetime
+from typing import List, Dict, Any, Callable
+
 import sqlalchemy as sql
-from sqlalchemy.schema import CreateSchema, DropSchema
 from sqlalchemy.sql.selectable import Select
 from sqlalchemy.sql.schema import Table, Column
-import pandas as pd
-from typing import List, Dict, Any, Callable
-from datetime import datetime
-from utils.types import DatabaseDialects
+from sqlalchemy.schema import CreateSchema, DropSchema
+
+from utils.types import *
+from utils.DBUtils import DBUtils
 
 
 class DBDao:
-    def __init__(self, database_code, schema_name, user_type):
+    def __init__(self, database_code: str, schema_name: str, user_type: UserType):
         self.database_code = database_code
-        self.engine = GetDBConnection(database_code, user_type)
         self.schema_name = schema_name
-        self.metadata = sql.MetaData(schema=schema_name)
+        dbutils = DBUtils(self.database_code)
+        self.db_dialect = dbutils.get_database_dialect()
+
+        if (user_type == UserType.ADMIN_USER) or (user_type == UserType.READ_USER):
+            self.user = user_type
+        else:
+            raise ValueError(f"User type '{user_type}' not allowed, only '{[user.value for user in UserType]}'.")
+
+        self.engine = dbutils.create_database_engine(self.user)
+        self.metadata = sql.MetaData(schema_name)  # sql.MetaData()
         self.inspector = sql.inspect(self.engine)
 
     def check_schema_exists(self) -> bool:
-        db_dialect = get_db_svc_endpoint_dialect(self.database_code)
-        match db_dialect:
+        match self.db_dialect:
             case DatabaseDialects.POSTGRES:
                 sql_query = sql.text(
                     "select * from information_schema.schemata where schema_name = :x;")
@@ -205,10 +215,9 @@ class DBDao:
 
             res = connection.execute(insert_stmt)
             connection.commit()
-            db_dialect = get_db_svc_endpoint_dialect(self.database_code)
-            if db_dialect == DatabaseDialects.POSTGRES:
+            if self.db_dialect == DatabaseDialects.POSTGRES:
                 return res.rowcount
-            elif db_dialect == DatabaseDialects.HANA:
+            elif self.db_dialect == DatabaseDialects.HANA:
                 select_count_stmt = sql.select(
                     sql.func.count()).select_from(target_table)
                 inserted_row_count = connection.execute(
