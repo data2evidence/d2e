@@ -638,7 +638,7 @@ RequestBuilder.prototype.buildJson = function () {
  */
 RequestBuilder.prototype.buildIFR = function (isKMRequest) {
   var request = isKMRequest ? request2Bookmark(this.buildJson(), 'km') : request2Bookmark(this.buildJson())
-  return request
+  return { ...request, selectedStudyEntityValue: 'cd13fd3e-9f35-4812-b2a1-497b232a8771' }
 }
 
 /**

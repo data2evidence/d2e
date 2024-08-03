@@ -35,8 +35,7 @@ var defaultPCountParameters = {
   httpMethod: 'GET'
 }
 var defaultBookmarkParameters = {
-  httpMethod: 'GET',
-  studyId: 'testStudy'
+  httpMethod: 'GET'
 }
 var defaultValuesParameters = {
   urlEncodingRequired: 'false',
@@ -132,7 +131,7 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
       })
     })
 
-    xdescribe('totalpcount', function () {
+    describe('totalpcount', function () {
       it('returns a valid response', function (done) {
         var requestBuilder = new RequestBuilder(MRI_CONFIG_METADATA, MRI_CUR_CONFIG)
         requestBuilder
@@ -152,10 +151,7 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
       })
     })
 
-    // TODO: de-activating temporarily.
-    // test case is failing to due to insufficient privileges to create a temporary table.
-    // current database user has read privileges and cannot successfully fulfill the test case
-    xdescribe('patient list', function () {
+    describe('patient list', function () {
       it('returns a valid response', function (done) {
         // TODO: This should also be handled by the request builder
         var requestBody = {
@@ -202,14 +198,17 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
               }
             ]
           },
-          selectedStudyEntityValue: 'testStudyEntityValue'
+          selectedStudyEntityValue: 'cd13fd3e-9f35-4812-b2a1-497b232a8771'
         }
         var setQuery = {
           method: 'GET',
           path: PATIENT_PATH,
           body: JSON.stringify(requestBody),
           parameters: defaultPatientListParameters,
-          contentType: 'application/json;charset=UTF-8'
+          contentType: 'application/json;charset=UTF-8',
+          headers: {
+            authorization: process.env.BEARER_TOKEN
+          }
         }
         aliceHanaRequest.request(setQuery, function (err, response) {
           specUtils.assertIsValidResponse(err, response.statusCode)
@@ -218,17 +217,17 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
       })
     })
 
-    xdescribe('bookmarks', function () {
+    describe('bookmarks', function () {
       it('returns a valid response', function (done) {
         var setQuery = {
           method: defaultBookmarkParameters.httpMethod,
           path: BOOKMARK_PATH,
-          /*  The two parameters below actually look like they are encoded
-                    differently when looking at the request in a browser, but this is the only
-                    way I found of making this work here */
-          parameters: defaultBookmarkParameters,
+          parameters: { paConfigId: '4321DCBA', r: '1', username: process.env.IDP_SUB },
           body: '',
-          contentType: 'application/json;charset=UTF-8'
+          contentType: 'application/json;charset=UTF-8',
+          headers: {
+            authorization: process.env.BEARER_TOKEN
+          }
         }
         aliceHanaRequest.request(setQuery, function (err, response, body) {
           specUtils.assertIsValidResponse(err, response.statusCode)
@@ -240,13 +239,14 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
     // TODO: de-activating temporarily.
     // test case is failing to due to insufficient privileges to create a temporary table.
     // current database user has read privileges and cannot successfully fulfill the test case
-    xdescribe('domain values', function () {
+    describe('domain values', function () {
       it('returns a valid response', function (done) {
         var requestBody = {
           attributePath: 'patient.attributes.lastName',
+          attributeType: 'text',
           configId: '4321DCBAB',
           configVersion: 'A',
-          selectedStudyEntityValue: 'testStudyEntityValue',
+          selectedStudyEntityValue: 'cd13fd3e-9f35-4812-b2a1-497b232a8771',
           searchQuery: 'testSearchQuery'
         }
         var setQuery = {
@@ -254,7 +254,10 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
           path: VALUES_PATH,
           body: JSON.stringify(requestBody),
           parameters: requestBody,
-          contentType: 'application/json;charset=UTF-8'
+          contentType: 'application/json;charset=UTF-8',
+          headers: {
+            authorization: process.env.BEARER_TOKEN
+          }
         }
         aliceHanaRequest.request(setQuery, function (err, response, body) {
           specUtils.assertIsValidResponse(err, response.statusCode)

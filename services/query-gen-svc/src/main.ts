@@ -84,27 +84,29 @@ const main = async () => {
     await initSwaggerRoutes(app);
     utils.setupGlobalErrorHandling(app, log);
 
-    const server = https.createServer(
-        {
-            key: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, "\n"),
-            cert: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, "\n"),
-            ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
-            maxHeaderSize: 8192 * 10,
-        },
-        app
-    );
-
-    server.listen(port, () => {
-        log.info(
-            `🚀 Query-gen svc started successfully!. Server listening on port ${port} [hostname: ${os.hostname}...`
-        );
-    });
-    if (envVarUtils.isTestEnv()) {
+    if (envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun()) {
+        app.listen(port);
         log.info(
             `Test mode details: [isTestEnv: ${envVarUtils.isTestEnv()}, test schema name: ${
                 process.env.TESTSCHEMA
             }]`
         );
+    } else {
+        const server = https.createServer(
+            {
+                key: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, "\n"),
+                cert: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, "\n"),
+                ca: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
+                maxHeaderSize: 8192 * 10,
+            },
+            app
+        );
+
+        server.listen(port, () => {
+            log.info(
+                `🚀 Query-gen svc started successfully!. Server listening on port ${port} [hostname: ${os.hostname}...`
+            );
+        });
     }
 };
 

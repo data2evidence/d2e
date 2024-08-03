@@ -100,11 +100,7 @@ const initRoutes = async (app: express.Application) => {
         };
 
         try {
-            if (
-                !envVarUtils.isTestEnv() &&
-                req.url !== "/check-readiness" &&
-                !utils.isClientCredReq(req)
-            ) {
+            if (req.url !== "/check-readiness" && !utils.isClientCredReq(req)) {
                 const publicEndpoint = "/analytics-svc/api/services/public";
                 let studies: StudyDbMetadata[];
                 // Checks if its public
@@ -127,18 +123,6 @@ const initRoutes = async (app: express.Application) => {
                 }
 
                 req.studiesDbMetadata = studiesDbMetadata;
-            } else {
-                // for http tests
-                req.studiesDbMetadata = {
-                    studies: [
-                        {
-                            id: "testStudyEntityValue",
-                            schemaName: "HTTPTESTSCHEMA",
-                            databaseName: "testDatabaseName",
-                        },
-                    ],
-                    cachedAt: Date.now(),
-                };
             }
 
             req.dbCredentials = {
@@ -153,7 +137,7 @@ const initRoutes = async (app: express.Application) => {
         }
     });
 
-    if (!envVarUtils.isTestEnv()) {
+    if (envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun()) {
         // Get Analytics Credential for study based on selected study
         // Otherwise, default it to the first db connection and use default schema in the connection string
         await app.use(studyDbCredentialMiddleware);
