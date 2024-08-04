@@ -205,7 +205,6 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
           path: PATIENT_PATH,
           body: JSON.stringify(requestBody),
           parameters: defaultPatientListParameters,
-          contentType: 'application/json;charset=UTF-8',
           headers: {
             authorization: process.env.BEARER_TOKEN
           }
@@ -224,7 +223,6 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
           path: BOOKMARK_PATH,
           parameters: { paConfigId: '4321DCBA', r: '1', username: process.env.IDP_SUB },
           body: '',
-          contentType: 'application/json;charset=UTF-8',
           headers: {
             authorization: process.env.BEARER_TOKEN
           }
@@ -254,7 +252,6 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
           path: VALUES_PATH,
           body: JSON.stringify(requestBody),
           parameters: requestBody,
-          contentType: 'application/json;charset=UTF-8',
           headers: {
             authorization: process.env.BEARER_TOKEN
           }

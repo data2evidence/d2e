@@ -219,7 +219,7 @@ HanaRequest.prototype._makeRequestOptions = function (query) {
     }
   }
 
-  if (query.body) {
+  if ((query.method === 'POST' || query.method === 'PUT') && query.body) {
     options.body = query.body
     options['Content-Length'] = options.body.length
     options['Content-Type'] = query.contentType || 'text/plain;charset=UTF-8'
