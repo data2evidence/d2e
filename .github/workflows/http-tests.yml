@@ -113,7 +113,6 @@ jobs:
           echo "${DOCKER_COMPOSE_DN_LOCAL_ENV}" > .env.local.yml
           wc -l .env.base-all.yml .env.base-local.yml .env.local.yml
           yarn --cwd internal gen:env
-          sed -i "s/${HANASERVER_REPLACE}/${HANASERVER}/g" .env.local
           sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
           # sed -i "s/HTTPTEST_ADMIN_USER/${HDIUSER}/g" .env.local
           # sed -i "s/HTTPTEST_ADMIN_PWD/${HDIPW}/g" .env.local
