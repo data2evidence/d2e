@@ -2,7 +2,7 @@ from os import getcwd
 from dao import DBDao
 from re import sub, compile
 from utils.types import InternalPluginType
-from alpconnection.dbutils import get_db_svc_endpoint_dialect
+from utils.DBUtils import DBUtils
 
 OMOP_DATA_MODELS = ["omop", "omop5-4", "custom-omop-ms", "custom-omop-ms-phi"]
 
@@ -41,7 +41,7 @@ def hana_to_postgres(table_name: str) -> str:
 
 def get_db_dialect(options):
     if options.flow_name in InternalPluginType.values():
-        return get_db_svc_endpoint_dialect(options.database_code)
+        return DBUtils(options.database_code).get_database_dialect()
     else:
         return options.dialect
 

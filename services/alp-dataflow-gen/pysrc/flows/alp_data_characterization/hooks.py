@@ -1,11 +1,11 @@
 import os
 import pandas as pd
-from prefect.logging.loggers import flow_run_logger, task_run_logger
+
+from prefect.logging.loggers import task_run_logger
 from prefect.server.schemas.states import StateType
-from utils.databaseConnectionUtils import insert_to_dqd_result_table
-from utils.types import dcOptionsType, DatabaseDialects, HANA_TENANT_USERS, PG_TENANT_USERS
-from alpconnection.dbutils import get_db_svc_endpoint_dialect
+
 from dao.DBDao import DBDao
+from utils.types import dcOptionsType, UserType
 
 
 async def drop_data_characterization_schema(dropSchemaOptions: dcOptionsType):
@@ -13,17 +13,9 @@ async def drop_data_characterization_schema(dropSchemaOptions: dcOptionsType):
     database_code = dropSchemaOptions.databaseCode
     results_schema = dropSchemaOptions.resultsSchema
 
-    db_dialect = get_db_svc_endpoint_dialect(database_code)
-    if db_dialect == DatabaseDialects.HANA:
-        admin_user = HANA_TENANT_USERS.ADMIN_USER
-    elif db_dialect == DatabaseDialects.POSTGRES:
-        admin_user = PG_TENANT_USERS.ADMIN_USER
-
     try:
-        print
-        (f"Dropping data characterization results schema '{results_schema}'")
-
-        schema_dao = DBDao(database_code, results_schema, admin_user)
+        print(f"Dropping data characterization results schema '{results_schema}'")
+        schema_dao = DBDao(database_code, results_schema, UserType.ADMIN_USER)
         schema_dao.drop_schema()
     except Exception as e:
         print(
@@ -31,7 +23,7 @@ async def drop_data_characterization_schema(dropSchemaOptions: dcOptionsType):
         raise e
 
 
-async def persist_data_characterization(task, task_run, state, output_folder):
+async def persist_data_characterization(task, task_run, state, output_folder, dqdresult_dao):
     logger = task_run_logger(task_run, task)
     error_message = None
     result_json = {}
@@ -44,7 +36,7 @@ async def persist_data_characterization(task, task_run, state, output_folder):
     else:
         # Data_characterization run does not need to insert data into table on completion
         return
-    await insert_to_dqd_result_table(
+    await dqdresult_dao.insert(
         flow_run_id=task_run.flow_run_id,
         result=result_json,
         error=is_error,
@@ -52,7 +44,7 @@ async def persist_data_characterization(task, task_run, state, output_folder):
     )
 
 
-async def persist_export_to_ares(task, task_run, state, output_folder, schema_name):
+async def persist_export_to_ares(task, task_run, state, output_folder, schema_name, dqdresult_dao):
     logger = task_run_logger(task_run, task)
     error_message = None
     result_json = {}
@@ -62,7 +54,7 @@ async def persist_export_to_ares(task, task_run, state, output_folder, schema_na
         logger.error(error_message)
     else:
         result_json = get_export_to_ares_results_from_file(output_folder, schema_name)
-    await insert_to_dqd_result_table(flow_run_id=task_run.flow_run_id, result=result_json, error=is_error, error_message=error_message)
+    await dqdresult_dao.insert(flow_run_id=task_run.flow_run_id, result=result_json, error=is_error, error_message=error_message)
 
 
 def get_export_to_ares_execute_error_message_from_file(outputFolder: str, schema_name):

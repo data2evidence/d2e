@@ -1,6 +1,6 @@
 name: Docker compose Build & Up
 
-on: 
+on:
   pull_request:
     types: [opened, ready_for_review, reopened, synchronize]
   push:
@@ -16,14 +16,14 @@ env:
   GIT_COMMIT_ARG: ${{ github.sha }}
 
 # Run only one job per branch
-concurrency: 
-  group: ${{ github.head_ref || github.ref_name }}-docker-compose-up # Run the latest push 
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}-docker-compose-up # Run the latest push
   cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
 
 jobs:
   docker-compose-up:
-    runs-on: ubuntu-latest
-    if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    runs-on: test # Custom runner 4 cpus & 14gb ram
+    if: (github.ref_name == 'develop' ||  contains('rc-', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/rc/workflow_dispatch and doesnt have a PR
     steps:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
@@ -31,7 +31,7 @@ jobs:
           # this might remove tools that are actually needed,
           # if set to "true" but frees about 6 GB
           tool-cache: false
-          
+
           # all of these default to true, but feel free to set to
           # "false" if necessary for your workflow
           android: true
@@ -52,11 +52,11 @@ jobs:
           DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
-          OVERWRITE: true  
+          OVERWRITE: true
         run: |
           ACTIONS_STEP_DEBUG=false
           ./internal/scripts/get-op-ratelimit.sh
-        
+
           # get env yml from 1password
           yarn --cwd internal op:get:$ENV_TYPE
 
@@ -78,20 +78,20 @@ jobs:
           REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
           REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
 
-      - name: 1password ratelimit end
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        run: |
-          ./internal/scripts/get-op-ratelimit.sh
+      # - name: 1password ratelimit end
+      #   env:
+      #     OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      #   run: |
+      #     ./internal/scripts/get-op-ratelimit.sh
 
-      - name: Upload stats.yml artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: stats
-          retention-days: 30
-          path: |
-            ${{ github.job }}*.yml
+      # - name: Upload stats.yml artifact
+      #   uses: actions/upload-artifact@v4
+      #   if: always()
+      #   with:
+      #     name: stats
+      #     retention-days: 30
+      #     path: |
+      #       ${{ github.job }}*.yml
 
       - name: Login to ACR
         uses: docker/login-action@v3.1.0
@@ -106,76 +106,43 @@ jobs:
           config: .github/buildkitd.toml
 
       - name: Docker
-        run: |  
-          docker image prune -af
-          docker builder prune -af
-          docker buildx prune -af
-
-      # - name: Build dataflow-gen
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     builder: ${{ steps.builder1.outputs.name }}
-      #     platforms: 'linux/amd64'
-      #     load: true
-      #     context: .
-      #     pull: true
-      #     file: ./services/alp-dataflow-gen/Dockerfile
-      #     push: false
-      #     tags: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:local
-      #     build-args: |
-      #       docker_image_prefix=alpcr.azurecr.io
-      #       GIT_COMMIT_ARG=${{ github.sha }}
-
-      - name: Docker compose build data-flow-gen services
         run: |
-            # Build DataNode services and pull dataflow-gen from cache
-            yarn build:minerva alp-dataflow-gen alp-dataflow-gen-agent alp-dataflow-gen-init  --builder ${{ steps.builder1.outputs.name }}
+          docker system prune -af
+
+      - name: Docker compose build
+        run: |
+          # Build DataNode services
+          yarn build:minerva   --builder ${{ steps.builder1.outputs.name }}
 
       - name: Builder cache cleanup
-        run: |  
-          docker buildx prune -af
-
-      - name: Docker compose build data 2 services excluding alp-sqleditor
         run: |
-          # Build DataNode services and pull dataflow-gen from cache
-          yarn build:minerva alp-minerva-analytics-svc alp-query-gen alp-fhir-server alp-fhir-fe-server  --builder ${{ steps.builder1.outputs.name }}
-
-      - name: Builder cache cleanup
-        run: |  
           docker buildx prune -af
 
-      - name: Docker compose build core services
+      - name: Initalize Logto
         run: |
-          # Build DataNode services and pull dataflow-gen from cache
-          yarn build:minerva alp-bookmark alp-caddy alp-db-credentials-mgr alp-logto alp-minerva-cdw-svc alp-minerva-dataflow-mgmt alp-minerva-gateway alp-minerva-pa-config-svc alp-minerva-pg-mgmt-init alp-minerva-portal-server alp-minerva-ps-config-svc alp-minerva-terminology-svc alp-minerva-user-mgmt alp-mri-pg-config --builder ${{ steps.builder1.outputs.name }}
-
-      - name: Builder cache cleanup
-        run: |  
-          docker buildx prune -af
+          yarn init:logto
 
       - name: Docker compose up Local Mode without UI Container
-        env:
-          PORTAL_NAME: alp-minerva-gateway-1
         run: |
-          # Run DataNode services
-          ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml --env-file .env.local up --wait
+          # Run DataNode services without sql-editor
+          BASE_PORT=1 docker compose --file docker-compose.yml --file docker-compose-local.yml --env-file .env.local up --wait
           EXIT_CODE=$?
 
           docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
           echo | tee -a $GITHUB_STEP_SUMMARY
-  
+
           if [ $EXIT_CODE != 0 ]; then
             echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-          fi  
+          fi
 
       - name: Logs minerva
         if: success() || failure()
-        run: |  
+        run: |
           yarn logs:minerva
 
       - name: Clean Docker compose
         if: always()
-        run: |  
+        run: |
           # Clean DataNode services
           yarn clean:minerva
           docker system prune -af
