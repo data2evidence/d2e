@@ -54,7 +54,7 @@ done
 echo "USE_DUCKDB=false" >>.env.local
 
 # *** Start postgres for seeding db credentials ***
-yarn start:minerva-test alp-minerva-postgres alp-minerva-pg-mgmt-init -d --force-recreate
+yarn start:minerva-test alp-minerva-postgres alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d --force-recreate
 
 echo . create read role
 docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "INSERT INTO db_credentials_mgr.db (id,host,port,name,dialect,created_by,created_date,modified_by,modified_date,code) VALUES
