@@ -66,7 +66,7 @@ services:
 
   alp-logto:
     build:
-      context: ./services/alp-logto
+      context: .
       dockerfile: ./services/alp-logto/Dockerfile
 
   alp-minerva-analytics-svc:
