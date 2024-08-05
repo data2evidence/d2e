@@ -140,6 +140,8 @@ jobs:
           docker network create alp
 
       - name: Get and set logto values
+        env:
+          ENV_TYPE: "local"
         run: |
           log_output=$(yarn init:logto)
           echo "$log_output" | grep "LOGTO__" | awk -F'|' '{print $2}' | awk '{$1=$1};1' | while IFS='=' read -r key value; do
