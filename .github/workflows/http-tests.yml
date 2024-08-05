@@ -141,7 +141,7 @@ jobs:
 
       - name: Start postgres
         run: |
-          yarn start:minerva-test alp-minerva-postgres
+          yarn start:minerva-test alp-minerva-postgres -d
 
       - name: Get and set logto values
         env:
