@@ -17,15 +17,15 @@ async function create(
   hasResponseBody = true
 ) {
   try {
-    console.info(`Request creation ${path}`);
-    console.info(`${JSON.stringify(data)}`);
+    console.log(`Request creation ${path}`);
+    console.log(`${JSON.stringify(data)}`);
     const resp = await logto.post(path, headers, data);
-    console.info(`Responded with ${resp.status}`);
+    console.log(`Responded with ${resp.status}`);
 
     if (resp.ok) {
       if (hasResponseBody) {
         let json = await resp.json();
-        console.info(JSON.stringify(json));
+        console.log(JSON.stringify(json));
         return json;
       }
     } else {
@@ -45,15 +45,15 @@ async function update(
   hasResponseBody = true
 ) {
   try {
-    console.info(`Request update ${path}`);
-    console.info(JSON.stringify(data));
+    console.log(`Request update ${path}`);
+    console.log(JSON.stringify(data));
     const resp = await logto.patch(path, headers, data);
-    console.info(`Responded with ${resp.status}`);
+    console.log(`Responded with ${resp.status}`);
 
     if (resp.ok) {
       if (hasResponseBody) {
         let json = await resp.json();
-        console.info(JSON.stringify(json));
+        console.log(JSON.stringify(json));
         return json;
       }
     } else {
@@ -68,13 +68,13 @@ async function update(
 
 async function fetchExisting(path: string, headers: object, showLog = true) {
   try {
-    showLog && console.info(`Request existing ${path}`);
+    showLog && console.log(`Request existing ${path}`);
     const resp = await logto.get(path, headers);
-    showLog && console.info(`Responded with ${resp.status}`);
+    showLog && console.log(`Responded with ${resp.status}`);
 
     if (resp.ok) {
       let json = await resp.json();
-      showLog && console.info(JSON.stringify(json));
+      showLog && console.log(JSON.stringify(json));
       return json;
     } else {
       console.error("Request failed");
@@ -121,7 +121,7 @@ async function main() {
   };
 
   // Create Apps
-  console.info(
+  console.log(
     "*********************************** APPLICATIONS **********************************************"
   );
 
@@ -165,22 +165,22 @@ async function main() {
         );
     }
 
-    console.info(
+    console.log(
       `********************** COPY OVER ENV ASSIGNMENTS FOR ${appName} IN .env.local ***********************`
     );
     APP_ENVS.push(
       `${ENV__CLIENT_ID}=${appID}`,
       `${ENV__CLIENT_SECRET}=${appSecret}`
     );
-    console.info(`${ENV__CLIENT_ID}=${appID}`);
-    console.info(`${ENV__CLIENT_SECRET}=${appSecret}`);
-    console.info(
+    console.log(`${ENV__CLIENT_ID}=${appID}`);
+    console.log(`${ENV__CLIENT_SECRET}=${appSecret}`);
+    console.log(
       `******************************************************************************************\n`
     );
   }
 
   // Create Resource
-  console.info(
+  console.log(
     "*********************************** RESOURCE **********************************************"
   );
   const fetchExistingResources: Array<{ name: string }> = await fetchExisting(
@@ -205,12 +205,12 @@ async function main() {
     });
   }
 
-  console.info(
+  console.log(
     "*********************************************************************************\n"
   );
 
   // Create Users
-  console.info(
+  console.log(
     "*********************************** USERS **********************************************"
   );
   const fetchExistingUsers: Array<{ username: string }> = await fetchExisting(
@@ -233,12 +233,12 @@ async function main() {
       password: user["initialPassword"],
     });
 
-  console.info(
+  console.log(
     "*********************************************************************************\n"
   );
 
   // Create Scopes
-  console.info(
+  console.log(
     "*********************************** SCOPES **********************************************"
   );
   const fetchExistingResourceScopes: Array<Object> = await fetchExisting(
@@ -264,12 +264,12 @@ async function main() {
 
     logtoScopes.push(logtoScope);
   }
-  console.info(
+  console.log(
     "*********************************************************************************\n"
   );
 
   // Create Roles
-  console.info(
+  console.log(
     "*********************************** ROLES **********************************************"
   );
   const fetchExistingRoles: Array<Object> = await fetchExisting(
@@ -289,12 +289,12 @@ async function main() {
 
     logtoRoles.push(logtoRole);
   }
-  console.info(
+  console.log(
     "*********************************************************************************\n"
   );
 
   // Create Roles-scopes
-  console.info(
+  console.log(
     "*********************************** ROLES-SCOPES **********************************************"
   );
   let roleScopes: Array<{
@@ -321,14 +321,14 @@ async function main() {
         scopeIds: [rs.scopeId],
       }));
   }
-  console.info(
+  console.log(
     "*********************************************************************************\n"
   );
 
   let userRoles: Array<{ userId: string; roleIds: Array<string> }> = [];
   if (logtoAdminUser && logtoAdminUser["id"]) {
     // Create User-roles
-    console.info(
+    console.log(
       "*********************************** USER-ROLES **********************************************"
     );
     userRoles = [
@@ -362,7 +362,7 @@ async function main() {
           false
         ));
     }
-    console.info(
+    console.log(
       "*********************************************************************************\n"
     );
   }
@@ -387,7 +387,7 @@ async function main() {
   };
   await logto.patch("sign-in-exp", headers, signinExperience);
 
-  console.info(
+  console.log(
     "*********************************** SUMMARY **********************************\n"
   );
 
@@ -395,7 +395,7 @@ async function main() {
     await fetchExisting("applications", headers, false)
   ).filter((a: any) => apps.map((x) => x.name).includes(a.name));
 
-  console.info(
+  console.log(
     `Applications created: ${
       createdApps.length
     } \n Applications creation successful: ${createdApps.length == apps.length}`
@@ -405,7 +405,7 @@ async function main() {
     await fetchExisting("resources", headers, false)
   ).filter((a: any) => resource.name === a.name);
 
-  console.info(
+  console.log(
     `Resources created: ${
       createdResources.length
     } \n Resources creation successful: ${createdResources.length == 1}`
@@ -415,7 +415,7 @@ async function main() {
     await fetchExisting("users", headers, false)
   ).filter((a: any) => user.username === a.username);
 
-  console.info(
+  console.log(
     `Users created: ${createdUsers.length} \n Users creation successful: ${
       createdUsers.length == 1
     }`
@@ -425,7 +425,7 @@ async function main() {
     await fetchExisting(`resources/${resourceId}/scopes`, headers, false)
   ).filter((s: any) => scopes.map((x) => x.name).includes(s.name));
 
-  console.info(
+  console.log(
     `Scopes created: ${createdScopes.length} \n Scopes creation successful: ${
       createdScopes.length == scopes.length
     }`
@@ -435,7 +435,7 @@ async function main() {
     await fetchExisting("roles", headers, false)
   ).filter((r: any) => roles.map((x) => x.name).includes(r.name));
 
-  console.info(
+  console.log(
     `Roles created: ${createdRoles.length} \n Roles creation successful: ${
       createdRoles.length == roles.length
     }`
@@ -449,7 +449,7 @@ async function main() {
     )
   ).filter((rs: any) => roleScopes.map((x) => x.scopeName === rs.name));
 
-  console.info(
+  console.log(
     `Roles-Scopes created: ${
       createdRoleScopes.length
     } \n Role-Scopes creation successful: ${
@@ -467,7 +467,7 @@ async function main() {
     .filter((rs: any) => userRoles.map((x) => x.roleIds === rs.id))
     .flat();
 
-  console.info(
+  console.log(
     `Users-Roles created: ${
       createdUserRoles.length
     } \n User-Roles creation successful: ${
@@ -493,11 +493,11 @@ async function main() {
     await cleanupFile(backupFileWithPath);
   })();
 
-  console.info(
+  console.log(
     `\n********************** LOGTO ENV ASSIGNMENTS Generated IN .env.${process.env.ENV_TYPE} *************************`
   );
-  console.info(APP_ENVS.join("\n"));
-  console.info(
+  console.log(APP_ENVS.join("\n"));
+  console.log(
     `**********************************************************************************************`
   );
 }
@@ -530,10 +530,10 @@ async function seeding_alp_admin() {
   let LOGTO__ADMIN_ROLE_SCOPE__ID = "da9va7i1g6ojghbph104e";
   let LOGTO__TENANT_ID = "default";
 
-  console.info(
+  console.log(
     "*********************************************************************************"
   );
-  console.info(
+  console.log(
     `Inserting ${alpAdminApp.name} application to applications table`
   );
   await queryPostgres(
@@ -552,10 +552,10 @@ async function seeding_alp_admin() {
     ]
   );
 
-  console.info(
+  console.log(
     "*********************************************************************************\n"
   );
-  console.info(`Inserting ${alpAdminRole.name} role to roles table`);
+  console.log(`Inserting ${alpAdminRole.name} role to roles table`);
   await queryPostgres(
     client,
     "INSERT INTO public.roles(tenant_id, id, name, description, type) \
@@ -570,10 +570,10 @@ async function seeding_alp_admin() {
     ]
   );
 
-  console.info(
+  console.log(
     "*********************************************************************************"
   );
-  console.info(
+  console.log(
     `Adding role ${alpAdminRole.name} to application ${alpAdminApp.name}`
   );
   await queryPostgres(
@@ -589,10 +589,10 @@ async function seeding_alp_admin() {
     ]
   );
 
-  console.info(
+  console.log(
     "*********************************************************************************\n"
   );
-  console.info(`Adding scope "management-api-all" to role ${alpAdminRole.name}`);
+  console.log(`Adding scope "management-api-all" to role ${alpAdminRole.name}`);
   await queryPostgres(
     client,
     "INSERT INTO public.roles_scopes(tenant_id, id, role_id, scope_id) \
