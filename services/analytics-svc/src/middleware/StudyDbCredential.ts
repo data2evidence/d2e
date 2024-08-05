@@ -27,6 +27,8 @@ export default async (req: IMRIRequest, res, next) => {
         // If still not found, return empty string
         if (req.query.studyId) {
             return req.query.studyId.toString();
+        } else if (req.query.selectedStudyId) {
+            return req.query.selectedStudyId.toString();
         } else if (req.body.studyId) {
             return req.body.studyId.toString();
         } else if (req.query.selectedStudyEntityValue) {
