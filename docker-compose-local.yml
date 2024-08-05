@@ -67,7 +67,7 @@ services:
   alp-logto:
     build:
       context: ./services/alp-logto
-      dockerfile: Dockerfile
+      dockerfile: ./services/alp-logto/Dockerfile
 
   alp-minerva-analytics-svc:
     build:
@@ -250,8 +250,8 @@ services:
 
   alp-logto-post-init:
     build:
-      context: ./services/alp-logto/post-init
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./services/alp-logto/post-init/Dockerfile
     # volumes:
     #   - ./services/alp-logto/post-init:/home/docker
 
