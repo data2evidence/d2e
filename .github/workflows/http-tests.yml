@@ -139,12 +139,15 @@ jobs:
         run: |
           docker network create alp
 
+      - name: Start postgres
+        run: |
+          yarn start:minerva-test alp-minerva-postgres
+
       - name: Get and set logto values
         env:
           ENV_TYPE: "local"
         run: |
           log_output=$(yarn init:logto)
-          sleep 5
           echo "$log_output" | grep "LOGTO__" | awk -F'|' '{print $2}' | awk '{$1=$1};1' | while IFS='=' read -r key value; do
               export "$key=$value"            # Make available to bash script
               echo "$key=$value" >>.env.local # Make available to docker-compose
@@ -154,7 +157,7 @@ jobs:
 
       - name: Seed db credentials
         run: |
-          yarn start:minerva-test alp-minerva-postgres alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d --force-recreate
+          yarn start:minerva-test alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d --force-recreate
 
           echo . create read role
           docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "INSERT INTO db_credentials_mgr.db (id,host,port,name,dialect,created_by,created_date,modified_by,modified_date,code) VALUES
@@ -172,7 +175,7 @@ jobs:
 
       - name: start system services
         run: |
-          yarn start:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-analytics-svc alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init -d --force-recreate
+          yarn start:minerva-test alp-caddy alp-minerva-gateway alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-analytics-svc alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init -d --force-recreate
           sleep 120
       - name: check status of docker containers
         run: |
