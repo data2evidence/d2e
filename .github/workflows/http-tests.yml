@@ -144,6 +144,7 @@ jobs:
           ENV_TYPE: "local"
         run: |
           log_output=$(yarn init:logto)
+          sleep 5
           echo "$log_output" | grep "LOGTO__" | awk -F'|' '{print $2}' | awk '{$1=$1};1' | while IFS='=' read -r key value; do
               export "$key=$value"            # Make available to bash script
               echo "$key=$value" >>.env.local # Make available to docker-compose
