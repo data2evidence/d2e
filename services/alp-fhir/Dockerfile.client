@@ -4,8 +4,8 @@ FROM ${IMAGE} as development
 
 WORKDIR /usr/src
 
-COPY ./alp-libs/nodejs/alp-base-utils ./libs/alp-base-utils
-COPY ./alp-libs/nodejs/package.json .
+# COPY ./alp-libs/nodejs/alp-base-utils ./libs/alp-base-utils
+# COPY ./alp-libs/nodejs/package.json .
 COPY ./services/alp-fhir/package.json alp-data-node/app/package.json
 
 RUN --mount=type=cache,target=~/.cache/yarn \
@@ -13,7 +13,7 @@ RUN --mount=type=cache,target=~/.cache/yarn \
 
 COPY ./services/alp-fhir alp-data-node/app
 
-RUN yarn workspace @alp/alp-base-utils run compile
+# RUN yarn workspace @alp/alp-base-utils run compile
 
 WORKDIR /usr/src/alp-data-node/app
 
