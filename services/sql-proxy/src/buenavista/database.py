@@ -29,7 +29,7 @@ class DBCredentialsType(BaseModel):
 
 class DatabaseDialects(str, Enum):
     HANA = "hana"
-    POSTGRES = "postgres"
+    POSTGRES = "postgresql"
     DUCKDB = "duckdb"
 
 
