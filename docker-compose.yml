@@ -96,11 +96,7 @@ x-envs:
           "enabled": false,
           "featureFlag": "analysisFlow",
           "name": "Analysis",
-          "route": "analysis",
-          "data": {
-            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
-          },
-          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
+          "route": "analysis_parent",
           "requiredRoles": [
             "RESEARCHER"
           ],
