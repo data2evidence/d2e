@@ -139,10 +139,6 @@ jobs:
         run: |
           docker network create alp
 
-      - name: Start postgres
-        run: |
-          yarn start:minerva-test alp-minerva-postgres -d
-
       - name: Get and set logto values
         env:
           ENV_TYPE: "local"
@@ -173,11 +169,11 @@ jobs:
             ('Internal','9addef8a-56d1-42c2-bcad-3c10035d540b','local','2024-05-20 02:02:08.102165','local','2024-05-20 02:02:08.102165','{\"ca\": \"-----BEGIN CERTIFICATE-----MIIDuTCCAqGgAwIBAgIUX/oNqJTx15vT2SI6fg9bEInu3mAwDQYJKoZIhvcNAQELBQAwIDEMMAoGA1UEChMDU1JFMRAwDgYDVQQDEwdjYS1yb290MB4XDTIwMDkwODEzMzExOFoXDTMwMDkwNjEzMzE0N1owIDEMMAoGA1UEChMDU1JFMRAwDgYDVQQDEwdjYS1yb290MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArf7hNfOgoFzY/Cfk8XrRIq4eG6rsf7o8DZKMCoLnwR+uFtzCXyY8HWsD33Po6azXIaTqhT7JFO9osbK8JhzcgiIhxDLT5y5jx77AwKjqPWezgwuKutNAw2E8U5In+1i4mDwP1jJg2pXSoxUzKYQub03Zt04VzXhUD9HT8E8oON9TgQOFMP2+14zQ8VM1OtDLImOedSmyAtk34Tytu38ra1VRIWAkwz7G2O3O5Lsn2NvljLpSasR1Y3JALN1ePeegDr05mQXnNkRkYa4AutMhbfg+P1elCuJEVKfp+80IMnmJXXHwXXbPg6VqYzZkYZRbob2ESynjy7qUL6W/MJg6JwIDAQABo4HqMIHnMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSFTCgp1EHdFv14efJlS7Pl7xcZjzAfBgNVHSMEGDAWgBSFTCgp1EHdFv14efJlS7Pl7xcZjzA8BggrBgEFBQcBAQQwMC4wLAYIKwYBBQUHMAKGIGh0dHBzOi8vdmF1bHQuaHBzZ2MuZGUvdjEvcGtpL2NhMBIGA1UdEQQLMAmCB2NhLXJvb3QwMgYDVR0fBCswKTAnoCWgI4YhaHR0cHM6Ly92YXVsdC5ocHNnYy5kZS92MS9wa2kvY3JsMA0GCSqGSIb3DQEBCwUAA4IBAQBMhvDhtbWPc8O65zV3I76ecpvIPUY6Rc8aHRRdNzUUu6EgyGnK/KHJ0v3+k5yxP2axbDzcviHcvU/zf64FHoM7j+ObcsfwrmtbD9ZyJUcE2vRyH8yFppnHHIQP1nmVjXzAxWLysnko5D3myLcK5CJzUaTCnAld2R6cj774MyekCytbN4U3VvMKfGBJ544tfMgAPPBGAfPEB6qDBw0S5cLD1tIrsikrx8FReQHU9r+yJl4uRjz4SY/397i9QdzQGlZPpWaw/3GCnBwJiEDCwZnSK14v62LwJVH97JvX4/a5YS+GQpIEwD6cC5Ru1dbCMYTYZAcEcPDJk0ldRnahn/5u-----END CERTIFICATE-----\", \"schema\": \"${TESTSCHEMA}\", \"useTLS\": false, \"encrypt\": true, \"pooling\": true, \"cdwSchema\": \"${TESTSCHEMA}\", \"autoCommit\": false, \"probeSchema\": \"${TESTSCHEMA}\", \"vocabSchema\": \"CDMVOCAB\", \"configSchema\": \"MRI\", \"sslTrustStore\": \"-----BEGIN CERTIFICATE-----MIIDuTCCAqGgAwIBAgIUX/oNqJTx15vT2SI6fg9bEInu3mAwDQYJKoZIhvcNAQELBQAwIDEMMAoGA1UEChMDU1JFMRAwDgYDVQQDEwdjYS1yb290MB4XDTIwMDkwODEzMzExOFoXDTMwMDkwNjEzMzE0N1owIDEMMAoGA1UEChMDU1JFMRAwDgYDVQQDEwdjYS1yb290MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArf7hNfOgoFzY/Cfk8XrRIq4eG6rsf7o8DZKMCoLnwR+uFtzCXyY8HWsD33Po6azXIaTqhT7JFO9osbK8JhzcgiIhxDLT5y5jx77AwKjqPWezgwuKutNAw2E8U5In+1i4mDwP1jJg2pXSoxUzKYQub03Zt04VzXhUD9HT8E8oON9TgQOFMP2+14zQ8VM1OtDLImOedSmyAtk34Tytu38ra1VRIWAkwz7G2O3O5Lsn2NvljLpSasR1Y3JALN1ePeegDr05mQXnNkRkYa4AutMhbfg+P1elCuJEVKfp+80IMnmJXXHwXXbPg6VqYzZkYZRbob2ESynjy7qUL6W/MJg6JwIDAQABo4HqMIHnMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSFTCgp1EHdFv14efJlS7Pl7xcZjzAfBgNVHSMEGDAWgBSFTCgp1EHdFv14efJlS7Pl7xcZjzA8BggrBgEFBQcBAQQwMC4wLAYIKwYBBQUHMAKGIGh0dHBzOi8vdmF1bHQuaHBzZ2MuZGUvdjEvcGtpL2NhMBIGA1UdEQQLMAmCB2NhLXJvb3QwMgYDVR0fBCswKTAnoCWgI4YhaHR0cHM6Ly92YXVsdC5ocHNnYy5kZS92MS9wa2kvY3JsMA0GCSqGSIb3DQEBCwUAA4IBAQBMhvDhtbWPc8O65zV3I76ecpvIPUY6Rc8aHRRdNzUUu6EgyGnK/KHJ0v3+k5yxP2axbDzcviHcvU/zf64FHoM7j+ObcsfwrmtbD9ZyJUcE2vRyH8yFppnHHIQP1nmVjXzAxWLysnko5D3myLcK5CJzUaTCnAld2R6cj774MyekCytbN4U3VvMKfGBJ544tfMgAPPBGAfPEB6qDBw0S5cLD1tIrsikrx8FReQHU9r+yJl4uRjz4SY/397i9QdzQGlZPpWaw/3GCnBwJiEDCwZnSK14v62LwJVH97JvX4/a5YS+GQpIEwD6cC5Ru1dbCMYTYZAcEcPDJk0ldRnahn/5u-----END CERTIFICATE-----\", \"sslCryptoProvider\": \"sapcrypto\", \"rejectUnauthorized\": false, \"enableAuditPolicies\": false, \"validateCertificate\": true, \"hostnameInCertificate\": \"alp-hn-gold-sg.southeastasia.cloudapp.azure.com\"}') ON CONFLICT DO NOTHING"
 
           docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "INSERT INTO db_credentials_mgr.db_vocab_schema (name,db_id,created_by,created_date,modified_by,modified_date) VALUES
-            ('CDMVOCAB','9addef8a-56d1-42c2-bcad-3c10035d540a','local','2024-05-20 02:02:08.102165','local','2024-05-20 02:02:08.102165') ON CONFLICT DO NOTHING"
+            ('CDMVOCAB','9addef8a-56d1-42c2-bcad-3c10035d540b','local','2024-05-20 02:02:08.102165','local','2024-05-20 02:02:08.102165') ON CONFLICT DO NOTHING"
 
       - name: start system services
         run: |
-          yarn start:minerva-test alp-caddy alp-minerva-gateway alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-analytics-svc alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init -d --force-recreate
+          yarn start:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-analytics-svc alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init -d --force-recreate
           sleep 120
       - name: check status of docker containers
         run: |
