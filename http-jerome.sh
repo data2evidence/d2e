@@ -9,6 +9,41 @@ export isTestEnv="true"
 export isHttpTestRun="true"
 export DOCKER_TAG_NAME="local"
 export SKIP_AUTH="FALSE"
+
+# Set env vars from OP
+# OP_SERVICE_ACCOUNT_TOKEN=secrets.OP_SERVICE_ACCOUNT_TOKEN
+export DOCKER_COMPOSE_DN_BASE_ALL_ENV="op://Singapore/.env.base-all.yml/notesPlain"
+export DOCKER_COMPOSE_DN_BASE_LOCAL_ENV=op://Singapore/.env.base-local.yml/notesPlain
+export DOCKER_COMPOSE_DN_LOCAL_ENV=op://Singapore/.env.http.tests.yml/notesPlain
+export HANASERVER="op://Singapore/az-hn-db/DE_FQDN"
+export HANASERVER="alp-hn-gold-de.germanywestcentral.cloudapp.azure.com"
+export HANASERVER_REPLACE="op://Singapore/az-hn-db/SG_FQDN"
+export HANASERVER_REPLACE="alp-hn-gold-sg.southeastasia.cloudapp.azure.com"
+export HANASERVER="alp-hn-gold-sg.southeastasia.cloudapp.azure.com"
+export HDIUSER="op://Singapore/az-hn-db/Admin user"
+export HDIUSER="TENANT_ADMIN_USER"
+export HDIPORT="op://Singapore/az-hn-db/DB Port"
+export HDIPORT="39041"
+export HDIPW="op://Singapore/az-hn-db/Admin password"
+export HDIPW="sxnM3JMNhWzLgogHZNTBEWMFZ"
+export TESTSYSTEMPW="op://Singapore/az-hn-db/Admin password"
+export TESTSYSTEMPW="sxnM3JMNhWzLgogHZNTBEWMFZ"
+export TESTPORT="op://Singapore/az-hn-db/DB Port"
+export TESTPORT="39041"
+# tenant read user pw : wijLfyhnZ6yzgChpDM2KV8fMw
+
+# NEW ENVS
+# New logto stuff
+# export LOGTO_API_M2M_CLIENT_ID=a560o8tqw79hy2cpn8x1q
+# export LOGTO_API_M2M_CLIENT_SECRET=xk8HP4VDzqJcnXCTpdaQM6Ut2SwrG37u
+# export LOGTO__ALP_APP__CLIENT_ID=1d6wuydanyaiypbkchxzu
+# export LOGTO__ALP_APP__CLIENT_SECRET=yFRvkJg8NKXx3phL27QembSa4ZHzcVD5
+# export LOGTO__ALP_DATA__CLIENT_ID=t5vwuno8ckh5hmqozjqyj
+# export LOGTO__ALP_DATA__CLIENT_SECRET=esgCzGT7d6AREhWqyLY9fxb4wX8auMpZ
+# export LOGTO__ALP_SVC__CLIENT_ID=6q6a13bg3dw6fncdr2kf6
+# export LOGTO__ALP_SVC__CLIENT_SECRET=YEuzmvJfsWMHwFV7hSB5P9p8ky2Gqdxn
+# export LOGTO__CLIENTID_PASSWORD__BASIC_AUTH=YTU2MG84dHF3NzloeTJjcG44eDFxOnhrOEhQNFZEenFKY25YQ1RwZGFRTTZVdDJTd3JHMzd1
+
 # Get drivers from 1password
 # OP_SERVICE_ACCOUNT_TOKEN=secrets.OP_SERVICE_ACCOUNT_TOKEN
 :'
@@ -49,9 +84,9 @@ docker network create alp
 log_output=$(yarn init:logto)
 processed_output=$(echo "$log_output" | grep "LOGTO__" | awk -F'|' '{print $2}' | awk '{$1=$1};1')
 while IFS='=' read -r key value; do
-    export "$key=$value"             # Make available to bash script
-    echo "$key=$value" >>.env.local  # Make available to docker-compose
-    echo "$key=$value" >>$GITHUB_ENV # Make available to subsequent github actions steps
+    export "$key\"=$value\""             # Make available to bash script
+    echo "$key=\"$value\"" >>.env.local  # Make available to docker-compose
+    echo "$key=\"$value\"" >>$GITHUB_ENV # Make available to subsequent github actions steps
 done <<<"$processed_output"
 
 echo "USE_DUCKDB=false" >>.env.local
