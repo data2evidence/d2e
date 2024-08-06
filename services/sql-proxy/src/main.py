@@ -1,29 +1,20 @@
 import debugpy
-from buenavista import bv_dialects, postgres, rewrite
-from buenavista.backends.duckdb import DuckDBConnection
 import os
 from typing import Tuple
+from buenavista import bv_dialects, postgres, rewrite
+from buenavista.backends.duckdb import DuckDBConnection
+from buenavista.core import Connection
+from buenavista.database import initialize_db_clients, SqlProxyDatabaseClients
+
 
 import logging
 
 
-# class DuckDBPostgresRewriter(rewrite.Rewriter):
-#     def rewrite(self, sql: str) -> str:
-#         if sql.lower() == "select pg_catalog.version()":
-#             return "SELECT 'PostgreSQL 9.3' as version"
-#         else:
-#             return super().rewrite(sql)
-
-
-# rewriter = DuckDBPostgresRewriter(
-#     bv_dialects.BVPostgres(), bv_dialects.BVDuckDB())
-
-
 def create(
-    host_addr: Tuple[str, int], auth: dict = None
+    db_clients: SqlProxyDatabaseClients, host_addr: Tuple[str, int], auth: dict = None
 ) -> postgres.BuenaVistaServer:
     server = postgres.BuenaVistaServer(
-        host_addr, auth=auth
+        db_clients, host_addr, auth=auth
     )
     return server
 
@@ -37,8 +28,9 @@ def main():
     if "SQL_PROXY__PORT" in os.environ:
         port = int(os.environ["SQL_PROXY__PORT"])
 
+    db_clients = initialize_db_clients()
     address = ("0.0.0.0", port)
-    server = create(address)
+    server = create(db_clients, address)
     ip, port = server.server_address
     print(f"Listening on {ip}:{port}")
 

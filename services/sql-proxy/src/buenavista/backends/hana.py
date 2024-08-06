@@ -1,3 +1,4 @@
+import logging
 import io
 import re
 from typing import Any, Dict, Iterator, List, Optional, Tuple
@@ -7,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 from buenavista.core import BVType, Connection, QueryResult, Session
 
+logger = logging.getLogger(__name__)
 
 OID_TO_BVTYPE = {
     -1: BVType.NULL,
@@ -69,8 +71,18 @@ class HANASession(Session):
     def cursor(self):
         return self._cursor
 
+    def rewrite_sql(self, sql: str) -> str:
+        if "session.application_user" in sql:
+            sql = sql.replace("session.application_user", "'APPLICATIONUSER'")
+            sql = sql.replace('"', "'")
+        sql = re.sub(r"\$[0-9]+", "?", sql)
+        return sql
+
     def execute_sql(self, sql: str, params=None) -> QueryResult:
-        print("findme, execute_sql(hana)")
+        logger.debug("execute_sql(hana)")
+        logger.debug("Original SQL: %s", sql)
+        sql = self.rewrite_sql(sql)
+        logger.debug("Rewritten SQL: %s", sql)
         if params:
             sql = re.sub(r"\$\d+", r"%s", sql)
             self._cursor.execute(sql, params)

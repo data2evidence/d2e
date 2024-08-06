@@ -1,3 +1,4 @@
+import logging
 import io
 import re
 from typing import Any, Dict, Iterator, List, Optional, Tuple
@@ -7,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 from buenavista.core import BVType, Connection, QueryResult, Session
 
+logger = logging.getLogger(__name__)
 
 OID_TO_BVTYPE = {
     -1: BVType.NULL,
@@ -70,7 +72,7 @@ class PGSession(Session):
         return self._cursor
 
     def execute_sql(self, sql: str, params=None) -> QueryResult:
-        print("findme, execute_sql(postgres)")
+        logger.debug("execute_sql(postgres)")
         if params:
             sql = re.sub(r"\$\d+", r"%s", sql)
             self._cursor.execute(sql, params)

@@ -1,12 +1,12 @@
 import os
 from enum import Enum
-from typing import Optional
+from typing import Optional, Dict
 import duckdb
 import json
 from pydantic import BaseModel
 from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
 
-from .core import Connection
 from .backends.duckdb import DuckDBConnection
 from .backends.postgres import PGConnection
 from .backends.hana import HANAConnection
@@ -33,9 +33,21 @@ class DatabaseDialects(str, Enum):
     DUCKDB = "duckdb"
 
 
+class SqlProxyDatabaseClients(BaseModel):
+    hana: Optional[Dict[str, Engine]] = {}
+    postgresql: Optional[Dict[str, Engine]] = {}
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+def get_database_code_and_dialect_from_db_creds():
+    dbs = json.loads(os.environ["DATABASE_CREDENTIALS"])
+    return [[db["values"]["code"], db["values"]["dialect"]] for db in dbs]
+
+
 def extract_db_credentials(database_code: str):
     dbs = json.loads(os.environ["DATABASE_CREDENTIALS"])
-
     if dbs == []:
         raise ValueError(
             f"Database credentials environment variable is empty")
@@ -80,7 +92,6 @@ class DatabaseCredentials:
 def GetDBConnection(database_code: str):
     try:
         conn_details = extract_db_credentials(database_code)
-        print("findme, conn_details", conn_details)
     except Exception as e:
         raise ValueError(
             f"Failed to extract database credential values for database code '{database_code}'") from e
@@ -112,14 +123,18 @@ def _CreateConnectionString(dialect_driver: str, user: str, pw: str,
     return conn_string
 
 
-def get_db_conn_from_connection_params(dialect: str, database_code: str, schema: str) -> Connection:
+def get_db_connection(connections, dialect, database_code, schema):
     # TODO: Get vocab schema dynamically
     vocab_schema = "cdmvocab"
+    connection = None
 
-    # Guard clause against invalid dialects
-    if dialect not in [e.value for e in DatabaseDialects]:
-        raise Exception(
-            f"Dialect:{dialect} not support! Supported dialects are: {', '.join([e.value for e in DatabaseDialects])}")
+    if dialect == DatabaseDialects.POSTGRES:
+        connection = PGConnection(
+            connections[dialect][database_code])
+
+    if dialect == DatabaseDialects.HANA:
+        connection = HANAConnection(
+            connections[dialect][database_code])
 
     if dialect == DatabaseDialects.DUCKDB:
         db = duckdb.connect()
@@ -136,15 +151,14 @@ def get_db_conn_from_connection_params(dialect: str, database_code: str, schema:
         db.execute(
             f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
 
-        return DuckDBConnection(db)
+        connection = DuckDBConnection(db)
 
-    if dialect == DatabaseDialects.POSTGRES:
-        db = GetDBConnection(database_code)
-        return PGConnection(db)
-
-    if dialect == DatabaseDialects.HANA:
-        db = GetDBConnection(database_code)
-        return HANAConnection(db)
+    if connection:
+        return connection
+    else:
+        # If no connection can be found
+        raise Exception(
+            f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
 
 
 def parse_connection_param_database(database: str) -> tuple[str, str, str]:
@@ -156,6 +170,13 @@ def parse_connection_param_database(database: str) -> tuple[str, str, str]:
     if len(databaseComponents) != 3:
         raise Exception(
             f"Database param:{database} is in the wrong format! Database has to be in the format of [DIALECT-DATABASE_CODE-SCHEMA]")
+    dialect, _database_code, _schema = databaseComponents
+
+    # Guard clause against invalid dialects
+    if dialect not in [e.value for e in DatabaseDialects]:
+        raise Exception(
+            f"Dialect:{dialect} not support! Supported dialects are: {', '.join([e.value for e in DatabaseDialects])}")
+
     return databaseComponents
 
 
@@ -178,3 +199,20 @@ def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:
         )
 
     return None
+
+
+def initialize_db_clients() -> SqlProxyDatabaseClients:
+    sql_proxy_database_clients = {
+        "hana": {},
+        "postgresql": {}
+    }
+
+    # Dynamically fill up sql_proxy_database_clients with connection based on each entry in database_credentials
+    database_codes_and_dialects = get_database_code_and_dialect_from_db_creds()
+
+    for database_code, dialect in database_codes_and_dialects:
+        if dialect == DatabaseDialects.HANA or dialect == DatabaseDialects.POSTGRES:
+            sql_proxy_database_clients[dialect] = {
+                database_code: GetDBConnection(database_code)}
+
+    return sql_proxy_database_clients

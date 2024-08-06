@@ -10,7 +10,7 @@ import struct
 from typing import Dict, List, Optional
 
 from .core import BVType, Connection, Extension, Session, QueryResult
-from .database import get_db_conn_from_connection_params, parse_connection_param_database, get_rewriter_from_dialect
+from .database import parse_connection_param_database, get_rewriter_from_dialect, get_db_connection, SqlProxyDatabaseClients
 from .rewrite import Rewriter
 
 logger = logging.getLogger(__name__)
@@ -350,8 +350,8 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             dialect, database_code, schema = parse_connection_param_database(
                 params["database"])
             print("findme, obj", dialect, database_code, schema)
-            conn = get_db_conn_from_connection_params(
-                dialect, database_code, schema)
+            conn = get_db_connection(
+                self.server.db_clients, dialect, database_code, schema)
             rewriter = get_rewriter_from_dialect(
                 dialect)
             logger.info("Client connection params: %s", params)
@@ -692,12 +692,14 @@ class BuenaVistaServer(socketserver.ThreadingTCPServer):
 
     def __init__(
         self,
+        db_clients: SqlProxyDatabaseClients,
         server_address,
         *,
         extensions: List[Extension] = [],
         auth: Optional[Dict[str, str]] = None,
     ):
         super().__init__(server_address, BuenaVistaHandler)
+        self.db_clients = db_clients
         self.extensions = {e.type(): e for e in extensions}
         self.ctxts = {}
         self.auth = auth
