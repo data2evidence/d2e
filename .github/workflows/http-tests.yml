@@ -160,6 +160,7 @@ jobs:
       - name: Seed db credentials
         run: |
           yarn start:minerva-test alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d --force-recreate
+          sleep 5 # wait for db migrations to complete
 
           echo . create read role
           docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "INSERT INTO db_credentials_mgr.db (id,host,port,name,dialect,created_by,created_date,modified_by,modified_date,code) VALUES
