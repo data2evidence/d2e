@@ -9,7 +9,7 @@ from dao.DBDao import DBDao
 from dao.UserDao import UserDao
 
 from flows.alp_db_svc.liquibase.main import Liquibase
-from flows.alp_db_svc.types import LiquibaseAction
+from flows.alp_db_svc.types import LiquibaseAction, UpdateFlowActionType
 from flows.alp_db_svc.const import DATAMODEL_CDM_VERSION, OMOP_DATA_MODELS, _check_table_case
 from flows.alp_db_svc.hooks import *
 
@@ -132,7 +132,8 @@ def create_schema_tasks(dialect: str,
         raise e
 
 
-def update_datamodel(database_code: str,
+def update_datamodel(flow_action_type: str,
+                     database_code: str,
                      data_model: str,
                      schema_name: str,
                      vocab_schema: str,
@@ -147,6 +148,12 @@ def update_datamodel(database_code: str,
 
 
     schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
+    
+    match flow_action_type:
+        case UpdateFlowActionType.UPDATE:
+            action = LiquibaseAction.UPDATE
+        case UpdateFlowActionType.CHANGELOG_SYNC:
+            action = LiquibaseAction.CHANGELOG_SYNC
 
     try:
         update_schema_wo = run_liquibase_update_task.with_options(
@@ -155,7 +162,7 @@ def update_datamodel(database_code: str,
             on_failure=[partial(update_schema_hook,
                                 **dict(db=database_code, schema=schema_name))])
 
-        update_schema_wo(action=LiquibaseAction.UPDATE,
+        update_schema_wo(action=action,
                          dialect=dialect,
                          data_model=data_model,
                          changelog_file=changelog_file,
@@ -165,7 +172,7 @@ def update_datamodel(database_code: str,
                          plugin_classpath=plugin_classpath
                          )
 
-        if data_model in OMOP_DATA_MODELS:
+        if data_model in OMOP_DATA_MODELS and action == LiquibaseAction.UPDATE:
             cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
             update_cdm_version_wo = update_cdm_version.with_options(
                 on_completion=[partial(update_cdm_version_hook,

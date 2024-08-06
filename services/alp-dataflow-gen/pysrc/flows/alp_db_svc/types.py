@@ -11,6 +11,7 @@ class LiquibaseAction(str, Enum):
     STATUS = "status"  # Get Version Info
     ROLLBACK_COUNT = "rollbackCount"  # Rollback on n changesets
     ROLLBACK_TAG = "rollback"  # Rollback on tag
+    CHANGELOG_SYNC = "changelog-sync" # mark all changesets in databasechangelog table as executed
 
 
 class DataModelBase(BaseModel):
@@ -29,7 +30,13 @@ class CreateDataModelType(DataModelBase):
     update_count: Optional[int]
 
 
+class UpdateFlowActionType(Enum):
+    UPDATE = "update_datamodel"
+    CHANGELOG_SYNC = "changelog_sync"
+    
+
 class UpdateDataModelType(DataModelBase):
+    flow_action_type: UpdateFlowActionType
     vocab_schema: str = Field(...)
 
 
