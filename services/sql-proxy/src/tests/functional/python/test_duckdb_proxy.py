@@ -11,7 +11,7 @@ from main import create
 
 
 mp = pytest.MonkeyPatch()
-mp.setenv('DUCKDB__DATA_FOLDER', '/home/docker/src/tests/data/')
+mp.setenv('DUCKDB__DATA_FOLDER', './tests/data/')
 
 
 @pytest.fixture(scope="session")
