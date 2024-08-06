@@ -48,7 +48,7 @@ https://*.alp.local:55555 {
 	@cors_preflight method OPTIONS
 
 	header {
-		Access-Control-Allow-Origin "{header.origin}"
+		Access-Control-Allow-Origin {args[0]}
 		Vary Origin
 		Access-Control-Allow-Headers "Authorization"
 		Access-Control-Allow-Credentials "true"
@@ -434,6 +434,6 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 }
 
 http://localhost:41180 {
-	import cors {header.origin}
+	import cors http://localhost:5173
 	import perseus
 }
