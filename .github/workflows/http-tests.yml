@@ -75,8 +75,8 @@ jobs:
           HDIPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
           TESTSYSTEMPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
           TESTPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
-          ACR_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
-          ACR_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
+          REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+          REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
 
       - name: Print env vars
         run: |
@@ -95,8 +95,8 @@ jobs:
         uses: docker/login-action@v3.1.0
         with:
           registry: alpcr.azurecr.io
-          username: ${ACR_USERNAME}
-          password: ${ACR_PASSWORD}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_PASSWORD }}
 
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
