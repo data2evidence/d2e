@@ -47,11 +47,13 @@ docker network create alp
 
 # Get logto values
 log_output=$(yarn init:logto)
-echo "$log_output" | grep "LOGTO__" | awk -F'|' '{print $2}' | awk '{$1=$1};1' | while IFS='=' read -r key value; do
+processed_output=$(echo "$log_output" | grep "LOGTO__" | awk -F'|' '{print $2}' | awk '{$1=$1};1')
+while IFS='=' read -r key value; do
     export "$key=$value"             # Make available to bash script
     echo "$key=$value" >>.env.local  # Make available to docker-compose
     echo "$key=$value" >>$GITHUB_ENV # Make available to subsequent github actions steps
-done
+done <<<"$processed_output"
+
 echo "USE_DUCKDB=false" >>.env.local
 
 # *** Start postgres for seeding db credentials ***
