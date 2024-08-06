@@ -30,7 +30,7 @@ class CreateDataModelType(DataModelBase):
     update_count: Optional[int]
 
 
-class UpdateFlowActionType(Enum):
+class UpdateFlowActionType(str, Enum):
     UPDATE = "update_datamodel"
     CHANGELOG_SYNC = "changelog_sync"
     
