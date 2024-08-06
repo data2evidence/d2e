@@ -96,7 +96,7 @@ x-envs:
           "enabled": false,
           "featureFlag": "analysisFlow",
           "name": "Analysis",
-          "route": "analysis",
+          "route": "analysis_parent",
           "requiredRoles": [
             "RESEARCHER"
           ],
