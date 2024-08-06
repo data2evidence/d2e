@@ -172,7 +172,7 @@ def update_datamodel(flow_action_type: str,
                          plugin_classpath=plugin_classpath
                          )
 
-        if data_model in OMOP_DATA_MODELS and action == LiquibaseAction.UPDATE:
+        if data_model in OMOP_DATA_MODELS and flow_action_type == UpdateFlowActionType.UPDATE:
             cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
             update_cdm_version_wo = update_cdm_version.with_options(
                 on_completion=[partial(update_cdm_version_hook,
