@@ -1,5 +1,5 @@
-from alpconnection.dbutils import GetDBConnection, GetConfigDBConnection
 from sqlalchemy import MetaData, insert, Table
+from utils.DBUtils import GetConfigDBConnection
 
 
 class DqdResultDao:

@@ -1,8 +1,9 @@
 from prefect import get_run_logger, task
 from functools import partial
 from datetime import datetime
-from alpconnection.dbutils import extract_db_credentials
-from utils.types import DBCredentialsType, DatabaseDialects, HANA_TENANT_USERS, PG_TENANT_USERS
+
+from utils.types import DBCredentialsType, DatabaseDialects, UserType
+from utils.DBUtils import DBUtils
 
 from dao.DBDao import DBDao
 from dao.UserDao import UserDao
@@ -23,7 +24,8 @@ def create_datamodel(database_code: str,
                      count: int = 0,
                      cleansed_schema_option: bool = False):
 
-    tenant_configs = extract_db_credentials(database_code)
+    dbutils = DBUtils(database_code)
+    tenant_configs = dbutils.extract_database_credentials()
 
     task_status = create_schema_tasks(
         dialect=dialect,
@@ -62,16 +64,9 @@ def create_schema_tasks(dialect: str,
                         plugin_classpath: str,
                         count: int) -> bool:
     try:
-        match dialect:
-            case DatabaseDialects.HANA:
-                admin_user = HANA_TENANT_USERS.ADMIN_USER
-                schema_name = schema_name.upper()
-            case DatabaseDialects.POSTGRES:
-                admin_user = PG_TENANT_USERS.ADMIN_USER
-                schema_name = schema_name.lower()
+        schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
 
-        schema_dao = DBDao(database_code, schema_name, admin_user)
-        
+
         create_db_schema_wo = create_db_schema.with_options(
             on_completion=[partial(create_dataset_schema_hook,
                                    **dict(schema_dao=schema_dao))],
@@ -114,7 +109,7 @@ def create_schema_tasks(dialect: str,
             print("Skipping creation of Audit policy for system configuration")
             print(f"Skipping creation of new audit policy for {schema_name}")
 
-        user_dao = UserDao(database_code, schema_name, admin_user)
+        user_dao = UserDao(database_code, schema_name, UserType.ADMIN_USER)
         create_and_assign_roles_wo = create_and_assign_roles.with_options(
             on_failure=[partial(drop_schema_hook,
                                 **dict(schema_dao=schema_dao))])
@@ -146,18 +141,12 @@ def update_datamodel(database_code: str,
                      dialect: str):
 
     logger = get_run_logger()
+    
+    dbutils = DBUtils(database_code)
+    tenant_configs = dbutils.extract_database_credentials()
 
-    tenant_configs = extract_db_credentials(database_code)
 
-    match dialect:
-        case DatabaseDialects.HANA:
-            admin_user = HANA_TENANT_USERS.ADMIN_USER
-            schema_name = schema_name.upper()
-        case DatabaseDialects.POSTGRES:
-            admin_user = PG_TENANT_USERS.ADMIN_USER
-            schema_name = schema_name.lower()
-
-    schema_dao = DBDao(database_code, schema_name, admin_user)
+    schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
 
     try:
         update_schema_wo = run_liquibase_update_task.with_options(
@@ -200,7 +189,8 @@ def rollback_count_task(database_code: str,
                         dialect: str,
                         rollback_count: int):
 
-    tenant_configs = extract_db_credentials(database_code)
+    dbutils = DBUtils(database_code)
+    tenant_configs = dbutils.extract_database_credentials()
 
     try:
         rollback_count_wo = run_liquibase_update_task.with_options(
@@ -233,7 +223,8 @@ def rollback_tag_task(database_code: str,
                       dialect: str,
                       rollback_tag: str):
 
-    tenant_configs = extract_db_credentials(database_code)
+    dbutils = DBUtils(database_code)
+    tenant_configs = dbutils.extract_database_credentials()
 
     try:
         rollback_tag_wo = run_liquibase_update_task.with_options(
@@ -381,8 +372,7 @@ def create_cdm_schema_tasks(database_code: str,
                             dialect: str):
     logger = get_run_logger()
     # Begin by checking if the vocab schema exists or not
-    vocab_schema_dao = DBDao(database_code, vocab_schema,
-                             PG_TENANT_USERS.ADMIN_USER)
+    vocab_schema_dao = DBDao(database_code, vocab_schema, UserType.ADMIN_USER)
     vocab_schema_exists = vocab_schema_dao.check_schema_exists()
     if (vocab_schema_exists == False):
         try:
@@ -401,8 +391,7 @@ def create_cdm_schema_tasks(database_code: str,
 
     if (schema_name != vocab_schema):
         # Check if the incoming schema_name exists or not
-        cdm_schema_dao = DBDao(database_code, schema_name,
-                               PG_TENANT_USERS.ADMIN_USER)
+        cdm_schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
         cdm_schema_exists = cdm_schema_dao.check_schema_exists()
         if (cdm_schema_exists == False):
             try:

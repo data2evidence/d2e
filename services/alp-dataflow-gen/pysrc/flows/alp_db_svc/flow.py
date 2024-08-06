@@ -2,7 +2,6 @@ from flows.alp_db_svc.dataset.main import create_datamodel, update_datamodel, ro
 from flows.alp_db_svc.datamart.main import create_datamart
 from flows.alp_db_svc.datamart.types import DATAMART_FLOW_ACTIONS, CreateDatamartType
 from flows.alp_db_svc.versioninfo.main import get_version_info_task
-from flows.alp_db_svc.questionnaire.main import create_questionnaire_definition_task, get_questionnaire_response_task
 from flows.alp_db_svc.const import get_plugin_classpath, get_db_dialect
 from flows.alp_db_svc.types import (CreateDataModelType,
                                     UpdateDataModelType,
@@ -10,8 +9,6 @@ from flows.alp_db_svc.types import (CreateDataModelType,
                                     CreateSnapshotType,
                                     RollbackCountType,
                                     RollbackTagType,
-                                    QuestionnaireDefinitionType,
-                                    QuestionnaireResponseType,
                                     CreateSchemaType)
 from prefect import get_run_logger
 
@@ -156,39 +153,6 @@ def rollback_tag_flow(options: RollbackTagType):
             plugin_classpath=get_plugin_classpath(options.flow_name),
             dialect=db_dialect,
             rollback_tag=options.rollback_tag
-        )
-    except Exception as e:
-        get_run_logger().error(e)
-        raise e
-
-
-def create_questionnaire_definition_flow(options: QuestionnaireDefinitionType):
-    try:
-        questionnaire_definition = options.questionnaire_definition
-        schema_name = options.schema_name
-        database_code = options.database_code
-        db_dialect = get_db_dialect(options)
-
-        create_questionnaire_definition_task(
-            database_code=database_code,
-            schema_name=schema_name,
-            dialect=db_dialect,
-            questionnaire_definition=questionnaire_definition
-        )
-    except Exception as e:
-        get_run_logger().error(e)
-        raise e
-
-
-def get_questionnaire_response_flow(options: QuestionnaireResponseType):
-    try:
-        db_dialect = get_db_dialect(options)
-
-        get_questionnaire_response_task(
-            database_code=options.database_code,
-            schema_name=options.schema_name,
-            dialect=db_dialect,
-            questionnaire_id=options.questionnaire_id
         )
     except Exception as e:
         get_run_logger().error(e)
