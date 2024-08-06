@@ -26,10 +26,22 @@ https://*.alp.local:55555 {
 }
 
 (forward_authentication) {
+	# Enable this for using perseus user service
 	forward_auth http://alp-perseus-user-1:5001 {
 		uri /user/api/is_token_valid_internal
 		copy_headers Username
 	}
+
+	# Enable this for using D2E user-mgmt service
+	# forward_auth https://alp-minerva-gateway-1:41100 {
+	# 	transport http {
+	# 		tls
+	# 		tls_insecure_skip_verify
+	# 		read_buffer 8192
+	# 	}
+	# 	uri /usermgmt/api/me/is_token_valid_internal
+	# 	copy_headers Username
+	# }
 }
 
 (perseus) {
@@ -114,33 +126,6 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle /alp-prefect/* {
-		uri strip_prefix /alp-prefect
-		reverse_proxy http://alp-dataflow-gen-1:41120 {
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-
-	handle /dicom/* {
-		uri strip_prefix /dicom
-		reverse_proxy http://alp-dicom-server:8042 {
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-
-	handle /alp-fhir/* {
-		uri strip_prefix /alp-fhir
-		reverse_proxy http://alp-minerva-fhir-server-1:8103 {
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-
 	redir / /portal
 
 	handle_path /portal* {
@@ -162,6 +147,14 @@ https://*.alp.local:55555 {
 
 		handle_path /static/media/* {
 			root * /home/docker/ui-files/portal/static/media/
+			encode zstd gzip
+			file_server {
+				precompressed zstd br gzip
+			}
+		}
+
+		handle_path /docs/* {
+			root * /home/docker/ui-files/portal/docs/
 			encode zstd gzip
 			file_server {
 				precompressed zstd br gzip

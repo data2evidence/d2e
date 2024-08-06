@@ -48,3 +48,4 @@ echo "${DOTENV_YMLS[@]} => $(wc -l $DOTENV_FILE)"
 rm .env.tmp .env.tmp.yml
 
 $GIT_BASE_DIR/scripts/gen-tls.sh
+$GIT_BASE_DIR/scripts/gen-resource-limits.sh

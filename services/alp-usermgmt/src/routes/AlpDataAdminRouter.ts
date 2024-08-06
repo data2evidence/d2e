@@ -5,6 +5,7 @@ import { IAppRequest, IUserWithRolesInfo } from 'types'
 import { SystemAdminService, SqleditorAdminService, NifiAdminService } from 'services'
 import { createLogger } from 'Logger'
 import { UserGroupExt } from 'dtos'
+import { env } from 'env'
 
 @Service()
 export class AlpDataAdminRouter {
@@ -39,7 +40,8 @@ export class AlpDataAdminRouter {
     })
 
     this.router.post('/register', async (req: IAppRequest, res: Response, next: NextFunction) => {
-      const { userId, system, roles } = req.body || {}
+      const { userId, roles } = req.body || {}
+      const system = env.ALP_SYSTEM_NAME!
 
       if (!userId) {
         this.logger.warn(`Param 'userId' is required`)
@@ -65,7 +67,8 @@ export class AlpDataAdminRouter {
     })
 
     this.router.post('/withdraw', async (req: IAppRequest, res: Response, next: NextFunction) => {
-      const { userId, system, roles } = req.body || {}
+      const { userId, roles } = req.body || {}
+      const system = env.ALP_SYSTEM_NAME!
 
       if (!userId) {
         this.logger.warn(`Param 'userId' is required`)

@@ -71,11 +71,12 @@ export class UserGroupRepository extends Repository<UserGroup, UserGroupCriteria
   async getUserGroupExtList(
     criteria: { [key in keyof UserGroupExtCriteria]?: UserGroupExtCriteria[key] } = {}
   ): Promise<UserGroupExt[]> {
-    const query = this.db(this.tableName)
-      .innerJoin('b2c_group', 'b2c_group.id', 'user_group.b2c_group_id')
-      .innerJoin('user', 'user.id', 'user_group.user_id')
+    const query = this.db('user')
+      .leftJoin('user_group', 'user.id', 'user_group.user_id')
+      .leftJoin('b2c_group', 'b2c_group.id', 'user_group.b2c_group_id')
       .select(
         `${this.tableName}.*`,
+        { user_id: 'user.id' },
         'user.username',
         'b2c_group.role',
         'b2c_group.tenant_id',
