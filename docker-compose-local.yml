@@ -259,8 +259,8 @@ services:
     build:
       context: .
       dockerfile: ./services/alp-fhir/Dockerfile.client
-      target: development
-    command: yarn dev
+    #   target: development
+    # command: yarn dev
     volumes:
       - ./services/alp-fhir/dist:/home/docker/src/alp-data-node/app/dist
       - ./services/alp-fhir/src:/home/docker/src/alp-data-node/app/src

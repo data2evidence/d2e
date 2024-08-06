@@ -1,19 +1,14 @@
 ARG IMAGE=node:18.14.0-alpine
 
-FROM ${IMAGE} as development
+FROM ${IMAGE} AS development
 
 WORKDIR /usr/src
 
-# COPY ./alp-libs/nodejs/alp-base-utils ./libs/alp-base-utils
-# COPY ./alp-libs/nodejs/package.json .
 COPY ./services/alp-fhir/package.json alp-data-node/app/package.json
 
-RUN --mount=type=cache,target=~/.cache/yarn \
-	yarn install --network-timeout 1000000 --frozen-lockfile
+RUN yarn install --network-timeout 1000000 --frozen-lockfile
 
 COPY ./services/alp-fhir alp-data-node/app
-
-# RUN yarn workspace @alp/alp-base-utils run compile
 
 WORKDIR /usr/src/alp-data-node/app
 
@@ -34,7 +29,10 @@ COPY --chown=docker:alp --chmod=711 --from=final-build /usr/src ./
 
 WORKDIR /home/docker/alp-data-node/app/
 
+RUN yarn install
+
 RUN yarn compile
+RUN yarn bundleFiles
 RUN yarn cache clean
 
 #ARG
