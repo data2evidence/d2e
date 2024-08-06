@@ -144,11 +144,16 @@ jobs:
           ENV_TYPE: "local"
         run: |
           log_output=$(yarn init:logto)
-          processed_output=$(echo "$log_output" | grep "LOGTO__" | awk -F'|' '{print $2}' | awk '{$1=$1};1')
+          processed_output=$(echo "$log_output" | grep 'LOGTO__.*=' | awk -F'|' '{print $2}' | awk '{$1=$1};1')
           while IFS='=' read -r key value; do
-              export "$key=\"$value\""             # Make available to bash script
-              echo "$key=\"$value\"" >>.env.local  # Make available to docker-compose
-              echo "$key=\"$value\"" >>$GITHUB_ENV # Make available to subsequent github actions steps
+              # Check if value is empty
+              if [ -z "$value" ]; then
+                  echo "Skipping empty value for key: \"$key\""
+                  continue
+              fi
+              export "$key=$value"             # Make available to bash script
+              echo "$key=$value" >>.env.local  # Make available to docker-compose
+              echo "$key=$value" >>$GITHUB_ENV # Make available to subsequent github actions steps
           done <<<"$processed_output"
           echo "USE_DUCKDB=false" >>.env.local
 

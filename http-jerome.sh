@@ -50,17 +50,23 @@ docker network create alp
 
 # Get logto values
 log_output=$(yarn init:logto)
-processed_output=$(echo "$log_output" | grep "LOGTO__" | awk -F'|' '{print $2}' | awk '{$1=$1};1')
+processed_output=$(echo "$log_output" | grep 'LOGTO__.*=' | awk -F'|' '{print $2}' | awk '{$1=$1};1')
 while IFS='=' read -r key value; do
-    export "$key=\\"$value\\""           # Make available to bash script
-    echo "$key=\"$value\"" >>.env.local  # Make available to docker-compose
-    echo "$key=\"$value\"" >>$GITHUB_ENV # Make available to subsequent github actions steps
+    # Check if value is empty
+    if [ -z "$value" ]; then
+        echo "Skipping empty value for key: \"$key\""
+        continue
+    fi
+    export "$key=$value"            # Make available to bash script
+    echo "$key=$value" >>.env.local # Make available to docker-compose
+    # echo "$key=$value" >>$GITHUB_ENV # Make available to subsequent github actions steps
 done <<<"$processed_output"
 
 echo "USE_DUCKDB=false" >>.env.local
 
 # *** Start postgres for seeding db credentials ***
 yarn start:minerva-test alp-minerva-postgres alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d --force-recreate
+# sleep 5
 
 echo . create read role
 docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "INSERT INTO db_credentials_mgr.db (id,host,port,name,dialect,created_by,created_date,modified_by,modified_date,code) VALUES
