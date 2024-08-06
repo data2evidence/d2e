@@ -618,7 +618,7 @@ const getSqlProxyDbConnections = async ({
     analyticsCredentials.database = sqlProxyDatabase;
     analyticsCredentials.user = token;
 
-    // IF use duckdb is truem change dialect from postgres -> duckdb
+    // IF use duckdb is true change dialect from postgres -> duckdb
     if (env.USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
         analyticsCredentials.database = `duckdb-${analyticsCredentials.code}-${analyticsCredentials.schema}`;
     }
