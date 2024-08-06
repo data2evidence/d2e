@@ -767,6 +767,7 @@ services:
       LOCAL_DEBUG: "false"
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       USE_DUCKDB: ${USE_DUCKDB:-true}
+      USE_SQL_PROXY: ${USE_SQL_PROXY:-false}
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
