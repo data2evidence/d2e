@@ -88,8 +88,6 @@ class HANASession(Session):
             self._cursor.execute(sql, params)
         else:
             self._cursor.execute(sql)
-        print("findme, self._cursor.print_message()",
-              self._cursor.print_message())
         # Used to be .statusmessage, this change might be wrong
         status = self._cursor.print_message()
         if self._cursor.description:

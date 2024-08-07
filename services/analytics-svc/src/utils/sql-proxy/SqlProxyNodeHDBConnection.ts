@@ -51,9 +51,7 @@ export class SqlProxyNodeHDBConnection extends PostgresConnection.PostgresConnec
                 `parameters: ${JSON.stringify(flattenParameter(parameters))}`
             );
             let temp = sql;
-            console.log("findme, sql", sql);
             temp = this.parseSql(temp);
-            console.log("findme, temp", temp);
             this.conn.connect((err, client, release) => {
                 if (err) {
                     logger.error(err);

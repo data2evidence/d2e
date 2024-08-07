@@ -196,12 +196,9 @@ class BVContext:
         return "md5" + hashlib.md5(first.encode("utf-8") + self.salt).hexdigest()
 
     def mark_error(self):
-        print("findme, mark_error")
         self.has_error = True
 
     def transaction_status(self):
-        print("findme, transaction_status",
-              self.session.in_transaction(), self.has_error)
         if self.session.in_transaction():
             if self.has_error:
                 return TransactionStatus.IN_FAILED_TRANSACTION
@@ -290,14 +287,6 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
                     payload = self.r.read_bytes(msglen - 4)
                 else:
                     payload = None
-                print("findme, ctx.session", ctx.session)
-                print("findme, ctx.params", ctx.params)
-                print("findme, ctx.process_id", ctx.process_id)
-                print("findme, ctx.stmts", ctx.stmts)
-                print("findme, ctx.portals", ctx.portals)
-                print("findme, ctx.result_cache", ctx.result_cache)
-                print("findme, ctx.authenticated", ctx.authenticated)
-                print("findme, payload", payload)
                 if not ctx.authenticated:
                     if type_code == ClientCommand.PASSWORD_MESSAGE:
                         self.handle_md5_password(ctx, payload)
@@ -335,21 +324,16 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
         msglen = self.r.read_uint32() - 4
         code = self.r.read_uint32()
         if code == 80877103:  # SSL request
-            print("findme, ssl request")
             self.send_notice()
             return self.handle_startup()
         elif code == 196608:  # Protocol 3.0
-            print("findme, protocol 3")
             msg = [
                 x.decode("utf-8")
                 for x in self.r.read_bytes(msglen - 4).split(NULL_BYTE)
             ]
-            print("findme, msg", msg)
             params = dict(zip(msg[::2], msg[1::2]))
-            print("findme, params", params)
             dialect, database_code, schema = parse_connection_param_database(
                 params["database"])
-            print("findme, obj", dialect, database_code, schema)
             conn = get_db_connection(
                 self.server.db_clients, dialect, database_code, schema)
             rewriter = get_rewriter_from_dialect(
@@ -371,7 +355,6 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             raise Exception(f"Unsupported startup message: {code}")
 
     def send_auth_request(self, ctx: BVContext):
-        print("findme, send_auth_request")
         if self.server.auth is None:
             self.send_authentication_ok()
             self.handle_post_auth(ctx)
@@ -379,13 +362,11 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             self.send_authentication_md5(ctx)
 
     def send_authentication_ok(self):
-        print("findme, send_authentication_ok")
         self.wfile.write(
             struct.pack("!cii", ServerResponse.AUTHENTICATION_REQUEST, 8, 0)
         )
 
     def send_authentication_md5(self, ctx: BVContext):
-        print("findme, send_authentication_md5")
         ctx.salt = os.urandom(4)
         self.wfile.write(
             struct.pack("!cii", ServerResponse.AUTHENTICATION_REQUEST, 12, 5)
@@ -394,7 +375,6 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
 
     def handle_md5_password(self, ctx: BVContext, payload: bytes):
         client_side = payload.decode("utf-8").rstrip("\x00")
-        print("findme, client_side", client_side)
         server_side = ctx.get_hashed_password(self.server.auth)
         if client_side == server_side:
             self.send_authentication_ok()
@@ -403,17 +383,8 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             self.send_error("Invalid password")
 
     def handle_post_auth(self, ctx: BVContext):
-        print("findme, handle_post_auth")
-        print("findme, ctx.conn.parameters()",
               ctx.conn.parameters())
         self.send_parameter_status(ctx.conn.parameters())
-        print("findme, ctx.session", ctx.session)
-        print("findme, ctx.params", ctx.params)
-        print("findme, ctx.process_id", ctx.process_id)
-        print("findme, ctx.stmts", ctx.stmts)
-        print("findme, ctx.portals", ctx.portals)
-        print("findme, ctx.result_cache", ctx.result_cache)
-        print("findme, ctx.authenticated", ctx.authenticated)
         self.send_backend_key_data(ctx)
         self.send_ready_for_query(ctx)
         ctx.authenticated = True
@@ -435,7 +406,6 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             else:
                 query_result = ctx.execute_sql(decoded)
         except Exception as e:
-            print("findme, handle_query_exception")
 
             self.send_error(e, ctx)
             self.send_ready_for_query(ctx)
