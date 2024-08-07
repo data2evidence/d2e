@@ -197,6 +197,7 @@ jobs:
         run: |
           yarn local:minerva stop alp-db-credentials-mgr
           yarn local:minerva rm -f alp-db-credentials-mgr
+          sleep 20
 
       # - name: start system services
       #   run: |
