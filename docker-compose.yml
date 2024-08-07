@@ -286,6 +286,9 @@ x-envs:
     TLS__INTERNAL__CRT: ${TLS__INTERNAL__CRT}
     TLS__INTERNAL__DOMAIN: ${TLS__INTERNAL__DOMAIN:-alp.local}
     TLS__INTERNAL__KEY: ${TLS__INTERNAL__KEY}
+  sql-proxy: &sql-proxy
+    SQL_PROXY_HOST: alp-sql-proxy
+    SQL_PROXY_PORT: 41191
 services:
   alp-bookmark:
     container_name: &c0 alp-minerva-bookmark-svc-${BASE_PORT:-1}
@@ -758,6 +761,7 @@ services:
         - *x-minio
         - *x-tls
         - *x-routes
+        - *sql-proxy
       ALP_GATEWAY_OAUTH__URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/oauth/token
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
       ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT

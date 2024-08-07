@@ -608,13 +608,11 @@ const getSqlProxyDbConnections = async ({
     // Define defaults for both analytics & Vocab connections
     let analyticsConnectionPromise;
 
-    const sqlProxyHost = "alp-sql-proxy";
-    const sqlProxyPort = 41191;
     const sqlProxyDatabase = `${analyticsCredentials.dialect}-${analyticsCredentials.code}-${analyticsCredentials.schema}`;
 
     // Overwrite analyticsCrendential values to connect to sql-proxy
-    analyticsCredentials.host = sqlProxyHost;
-    analyticsCredentials.port = sqlProxyPort;
+    analyticsCredentials.host = env.SQL_PROXY_HOST;
+    analyticsCredentials.port = env.SQL_PROXY_PORT;
     analyticsCredentials.database = sqlProxyDatabase;
     analyticsCredentials.user = token;
 
