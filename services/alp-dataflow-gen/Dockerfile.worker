@@ -30,15 +30,15 @@ RUN python -m venv /usr/src/app/venv
 ENV PATH="$PATH:/usr/src/app/venv/bin"
 
 ARG PREFECT__WORKER_POOL_NAME
-ARG COMMIT_ID=main
-ARG GIT_TOKEN
-ARG REPO_URL=github.com/alp-os/d2e-plugins.git
-RUN git clone https://${GIT_TOKEN}@${REPO_URL} d2e-plugins 
-RUN cd d2e-plugins && git fetch --all && git checkout $COMMIT_ID
+ARG GIT_COMMIT_ID__PLUGINS_REPO=main
+ARG GIT_TOKEN__PLUGINS_REPO_READ
+ARG GIT_URL__PLUGINS_REPO=github.com/alp-os/d2e-plugins.git
+RUN git clone https://${GIT_TOKEN__PLUGINS_REPO_READ}@${GIT_URL__PLUGINS_REPO} d2e-plugins 
+RUN cd d2e-plugins && git fetch --all && git checkout $GIT_COMMIT_ID__PLUGINS_REPO
 ENV COMMIT_ID=$COMMIT_ID
 
 COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/worker.requirements.txt requirements.txt
-COPY --chown=docker:docker ./services/alp-dataflow-gen/init-dind.sh .
+COPY --chown=docker:docker ./services/alp-dataflow-gen/init-worker.sh .
 
 RUN . /usr/src/app/venv/bin/activate && pip install --no-cache-dir -r requirements.txt
 
