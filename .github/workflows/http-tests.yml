@@ -195,7 +195,7 @@ jobs:
 
       - name: start system services
         run: |
-          yarn start:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-analytics-svc alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init -d
+          yarn start:minerva-test alp-caddy alp-minerva-postgres alp-logto alp-minerva-gateway alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-analytics-svc alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init -d --force-recreate
           sleep 120
       - name: check status of docker containers
         run: |
@@ -394,30 +394,10 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-minerva-postgres-1 -t
-      - name: print logs for user-mgmt
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-user-mgmt-1 -t
-      - name: print logs for query-gen-svc
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-query-gen-svc-1  -t
-      - name: print logs for bookmark-svc
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-bookmark-svc-1 -t
-      - name: print logs for gateway
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-gateway-1 -t
       - name: print logs for alp-minerva-db-credentials-mgr-1
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-minerva-db-credentials-mgr-1 -t
-      - name: print logs for analytics-svc
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-analytics-1 -t
       - name: print logs for gateway
         if: ${{ always() || cancelled() || failure() }}
         run: |
