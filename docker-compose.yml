@@ -96,11 +96,7 @@ x-envs:
           "enabled": false,
           "featureFlag": "analysisFlow",
           "name": "Analysis",
-          "route": "analysis",
-          "data": {
-            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
-          },
-          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
+          "route": "analysis_parent",
           "requiredRoles": [
             "RESEARCHER"
           ],
@@ -116,6 +112,9 @@ x-envs:
             {
               "name": "Strategus",
               "route": "analysis",
+              "data": {
+                "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
+              },
               "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
               "featureFlag": "strategus",
               "requiredRoles": ["RESEARCHER"],
@@ -277,7 +276,8 @@ x-envs:
        "appRouter": "https://alp-mercury-approuter:41000",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
        "minio": "",
-       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:8103",
+       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}:8103/fhir/R4",
+       "fhirTokenUrl": "http://alp-minerva-fhir-server-1:8103/oauth2/token",
        "dicomServer": "http://alp-dicom-server:8042"
       }
   tls: &x-tls
@@ -453,6 +453,7 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - ./cache/synpuf1k:/app/synpuf1k
+      - ./cache/vocab/:/app/vocab
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
       - duckdb-data-1:/app/duckdb_data
@@ -590,15 +591,15 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    entrypoint:
-      - ./start.sh
     environment:
       <<:
         - *x-pg
         - *x-redis
+        - *x-fhir
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+      
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -612,30 +613,34 @@ services:
   #   networks:
   #     - alp
 
-  alp-fhir-post-init:
+  alp-fhir-server-post-init:
     container_name: &c7 alp-minerva-fhir-server-post-init
     depends_on:
       alp-minerva-postgres:
         condition: service_healthy
       alp-fhir-server:
         condition: service_healthy
-    image: node:18.20.2-slim
-    volumes:
-      - ./services/alp-fhir:/home/docker
+    image: alpcr.azurecr.io/alp-data-node/alp-fhir-server-post-init:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c7
     networks:
       alp:
         priority: 20
-    entrypoint:
-      ["sh", "-c", "cd /home/docker && npm install && npm run build-and-seed"]
     environment:
       <<:
         - *x-pg
         - *x-fhir
+        - *x-routes
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+      PG__DB_NAME: alp
+      PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
+      PG__PORT: ${PG_PORT:-5432}
+      FHIR__LOG_LEVEL: debug
+      LOCAL_DEBUG: "false"
+      NODE_ENV: development
+      PORT: 41${BASE_PORT:-1}12
 
   alp-logto-post-init:
     container_name: alp-logto-post-init-${BASE_PORT:-1}
@@ -657,7 +662,6 @@ services:
       PG__PASSWORD: ${PG_SUPER_PASSWORD}
       PG__PORT: ${PG_PORT:-5432}
       PG__USER: ${PG_SUPER_USER:-postgres}
-      PUBLIC__FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine"},{"name":"alp-app","description":"alp-app","type":"Traditional","oidcClientMetadata":{"redirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
       LOGTO__RESOURCE: '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
       LOGTO__USER: '{"username":"admin","initialPassword":"Updatepassword12345"}'
@@ -1571,6 +1575,7 @@ services:
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
       isTestEnv: ${isTestEnv}
+      NOT_EQ_CHECK_FILTERCARDS: ${NOT_EQ_CHECK_FILTERCARDS:-true}
 
   redis:
     command: redis-server --requirepass ${REDIS_PASSWORD}
@@ -1639,7 +1644,7 @@ services:
     depends_on:
       alp-fhir-server:
         condition: service_started
-      alp-fhir-post-init:
+      alp-fhir-server-post-init:
         condition: service_completed_successfully
     networks:
       alp:
@@ -1676,13 +1681,25 @@ services:
       MEILI_LOG_LEVEL: INFO
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
 
-  alp-dataflow-gen-data-load-agent:
-    container_name: &c3 alp-dataflow-gen-data-load-agent-${BASE_PORT:-1}
-    extends: alp-dataflow-gen-agent
+  alp-sql-proxy:
+    container_name: &c30 alp-sql-proxy
+    hostname: alp-sql-proxy.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/sql-proxy:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c30
+    networks:
+      alp:
+        priority: 20
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    ports:
+      - 41191:41191
     volumes:
-      - ./cache/vocab/:/tmp/data/vocab
-      - ./cache/synpuf1k/:/tmp/data/synpuf1k
-    profiles: [data-load]
+      - duckdb-data-1:/home/docker/duckdb_data
+    environment:
+      SQL_PROXY__PORT: 41191
+      DUCKDB__DATA_FOLDER: /home/docker/duckdb_data
+      LOCAL_DEBUG: "false"
 
   alp-perseus-files-manager:
     image: perseushub/files-manager:latest

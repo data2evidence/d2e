@@ -2,12 +2,10 @@ import json
 from datetime import datetime
 from typing import List, Dict
 from prefect import task, get_run_logger
-from utils.types import (
-    PG_TENANT_USERS,
-    HANA_TENANT_USERS,
-    DatabaseDialects
-)
-from alpconnection.dbutils import get_db_svc_endpoint_dialect, extract_db_credentials
+
+from utils.types import UserType
+from utils.DBUtils import DBUtils
+
 from flows.alp_db_svc.liquibase.main import Liquibase
 from flows.alp_db_svc.const import OMOP_DATA_MODELS, NON_PERSON_ENTITIES, _check_table_case
 from flows.alp_db_svc.types import (LiquibaseAction,
@@ -74,13 +72,7 @@ def get_and_update_attributes(dataset: PortalDatasetType,
 
     try:
         # handle case of wrong db credentials
-        db_dialect = get_db_svc_endpoint_dialect(database_code)
-
-        if db_dialect == DatabaseDialects.HANA:
-            db_read_user = HANA_TENANT_USERS.ADMIN_USER
-        elif db_dialect == DatabaseDialects.POSTGRES:
-            db_read_user = PG_TENANT_USERS.ADMIN_USER
-        dataset_dao = DBDao(database_code, schema_name, db_read_user)
+        dataset_dao = DBDao(database_code, schema_name, UserType.READ_USER)
     except Exception as e:
         logger.error(f"Failed to connect to database")
         raise e
@@ -200,7 +192,9 @@ def get_and_update_attributes(dataset: PortalDatasetType,
 
             try:
                 # update with latest version or error msg
-                tenant_configs = extract_db_credentials(database_code)
+                dbutils = DBUtils(database_code)
+                db_dialect = dbutils.get_database_dialect()
+                tenant_configs = dbutils.extract_database_credentials()
 
                 latest_available_schema_version = get_latest_available_version(dialect=db_dialect,
                                                                                data_model=data_model,
