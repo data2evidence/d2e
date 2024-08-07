@@ -5,6 +5,7 @@ import {
 } from "@alp/alp-base-utils/target/src/Connection";
 import { PostgresConnection } from "@alp/alp-base-utils/target/src/";
 import { Pool } from "pg";
+import QueryStream from "pg-query-stream";
 import { DBError } from "@alp/alp-base-utils/target/src/DBError";
 import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
 const logger = CreateLogger("SqlProxyNodeHDBConnection");
@@ -98,6 +99,46 @@ export class SqlProxyNodeHDBConnection extends PostgresConnection.PostgresConnec
                 }
             });
         } catch (err) {
+            callback(new DBError(logger.error(err), err.message), null);
+        }
+    }
+
+    public executeStreamQuery(
+        sql,
+        parameters: ParameterInterface[],
+        callback: CallBackInterface,
+        schemaName: string = ""
+    ) {
+        try {
+            sql = this.parseSql(sql);
+
+            this.conn.connect((err, client, release) => {
+                if (err) {
+                    logger.error(`Execute error: ${JSON.stringify(err)}
+                =>sql: ${sql}
+                =>parameters: ${JSON.stringify(parameters)}`);
+                    callback(new DBError(logger.error(err), err.message), null);
+                }
+                const query = new QueryStream(
+                    sql,
+                    flattenParameter(parameters)
+                );
+                const stream = client.query(query);
+
+                stream.on("end", async () => {
+                    release(true); // true will destroy the client, removing the temp table at the same time
+                });
+
+                stream.on("error", (err: any) => {
+                    logger.error(err);
+                });
+
+                callback(null, stream);
+            });
+        } catch (err) {
+            logger.error(`Execute error: ${JSON.stringify(err)}
+          =>sql: ${sql}
+          =>parameters: ${JSON.stringify(parameters)}`);
             callback(new DBError(logger.error(err), err.message), null);
         }
     }
