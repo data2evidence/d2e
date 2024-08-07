@@ -118,6 +118,9 @@ class PGConnection(Connection):
         return PGSession(self, conn)
 
     def release(self, conn):
+        '''
+        Connection session is bound by sqlalchemy engine, after closing connection, the connection resource will be returned to the connection pool
+        '''
         conn.close()
 
     def parameters(self) -> Dict[str, str]:
