@@ -802,8 +802,8 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
   },
   {
     path: '^/gateway/api/prefect',
-    scopes: ['gateway.prefect.create'],
-    httpMethods: ['GET', 'POST', 'PUT']
+    scopes: ['gateway.prefect.read'],
+    httpMethods: ['GET']
   }
 ]
 export const ROLE_SCOPES = {
@@ -928,10 +928,7 @@ export const ROLE_SCOPES = {
     'dataflowmgmt.analysisflow.delete',
     'dataflowmgmt.analysisflow.revision.delete',
     'gateway.fhir.create',
-    'gateway.prefect.create',
-    'gateway.prefect.read',
-    'gateway.prefect.delete',
-    'gateway.prefect.udpate'
+    'gateway.prefect.read'
   ],
   ALP_DASHBOARD_VIEWER: ['gateway.dashboardGate.content'],
   TENANT_VIEWER: [
