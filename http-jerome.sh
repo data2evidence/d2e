@@ -86,7 +86,7 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
 # *** End postgres for seeding db credentials ***
 
 # Start system services
-yarn start:minerva-test alp-caddy alp-minerva-postgres alp-logto alp-minerva-gateway alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-analytics-svc alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init -d
+yarn start:minerva-test yarn start:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init alp-logto alp-logto-post-init alp-mri-pg-config alp-minio-post-init -d
 sleep 120
 
 ### START OF LOG IN TO GET BEARER TOKEN
