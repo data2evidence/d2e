@@ -383,7 +383,6 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             self.send_error("Invalid password")
 
     def handle_post_auth(self, ctx: BVContext):
-              ctx.conn.parameters())
         self.send_parameter_status(ctx.conn.parameters())
         self.send_backend_key_data(ctx)
         self.send_ready_for_query(ctx)
