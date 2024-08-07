@@ -168,10 +168,6 @@ jobs:
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile.frontend
-          - name: alp-data-node/alp-fhir-client
-            directory: ./services/alp-fhir
-            context: .
-            fileName: Dockerfile.client
           - name: alp-data-node/sql-proxy
             directory: ./services/sql-proxy
             context: ./services/sql-proxy
