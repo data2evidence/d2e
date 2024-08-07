@@ -62,18 +62,3 @@ class InternalPluginType(str, Enum):
     @staticmethod
     def values():
         return InternalPluginType._value2member_map_
-
-
-class dqdBaseOptionsType(BaseModel):
-    schemaName: str
-    databaseCode: str
-    cdmVersionNumber: str
-    vocabSchemaName: str
-    releaseDate: str
-
-
-class dcOptionsType(dqdBaseOptionsType):
-    resultsSchema: str
-    excludeAnalysisIds: str
-    flowName: str
-    changelogFile: str
