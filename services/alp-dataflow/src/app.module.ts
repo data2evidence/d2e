@@ -17,6 +17,7 @@ import { CohortModule } from './cohort/cohort.module'
 import { JobHistoryModule } from './job-history/job-history.module'
 import { MeilisearchModule } from './meilisearch/meilisearch.module'
 import { CohortSurvivalModule } from './cohort-survival/cohort-survival.module'
+import { UtilsModule } from './utils/utils.module'
 import { SeedService } from './common/data-source/seeds/seed.service'
 
 const dqdRoutes = {
@@ -87,6 +88,7 @@ const meilisearchRoutes = {
     JobHistoryModule,
     MeilisearchModule,
     CohortSurvivalModule,
+    UtilsModule,
     RouterModule.register([
       prefectRoutes,
       dqdRoutes,

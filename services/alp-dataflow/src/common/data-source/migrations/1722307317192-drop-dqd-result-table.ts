@@ -1,0 +1,21 @@
+import { MigrationInterface, QueryRunner } from 'typeorm'
+
+export class DropDqdResultTable1722307317192 implements MigrationInterface {
+  name = 'DropDqdResultTable1722307317192'
+
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DROP TABLE IF EXISTS "dataflow"."dqd_result"`)
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `CREATE TABLE "dataflow"."dqd_result" (
+        "flow_run_id" uuid NOT NULL,
+        "result" jsonb NOT NULL,
+        "error" boolean NOT NULL DEFAULT false,
+        "error_message" character varying,
+        CONSTRAINT "PK_a45f7f29cfba20b64e2d7339808" PRIMARY KEY ("flow_run_id")
+      )`
+    )
+  }
+}
