@@ -613,33 +613,34 @@ services:
   #   networks:
   #     - alp
 
-  alp-fhir-post-init:
+  alp-fhir-server-post-init:
     container_name: &c7 alp-minerva-fhir-server-post-init
     depends_on:
       alp-minerva-postgres:
         condition: service_healthy
       alp-fhir-server:
         condition: service_healthy
-    image: node:18.20.2-slim
-    volumes:
-      - ./services/alp-fhir:/home/docker
+    image: alpcr.azurecr.io/alp-data-node/alp-fhir-server-post-init:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c7
     networks:
       alp:
         priority: 20
-    entrypoint:
-      ["sh", "-c", "cd /home/docker && npm install && npm run build-and-seed"]
     environment:
       <<:
         - *x-pg
         - *x-fhir
+        - *x-routes
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       PG__DB_NAME: alp
       PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
       PG__PORT: ${PG_PORT:-5432}
+      FHIR__LOG_LEVEL: debug
+      LOCAL_DEBUG: "false"
+      NODE_ENV: development
+      PORT: 41${BASE_PORT:-1}12
 
   alp-logto-post-init:
     container_name: alp-logto-post-init-${BASE_PORT:-1}
@@ -1643,7 +1644,7 @@ services:
     depends_on:
       alp-fhir-server:
         condition: service_started
-      alp-fhir-post-init:
+      alp-fhir-server-post-init:
         condition: service_completed_successfully
     networks:
       alp:
@@ -1679,7 +1680,6 @@ services:
       MEILI_HTTP_ADDR: 0.0.0.0:41${BASE_PORT:-1}11
       MEILI_LOG_LEVEL: INFO
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-      
 
   alp-sql-proxy:
     container_name: &c30 alp-sql-proxy
@@ -1782,39 +1782,3 @@ services:
       alp:
         priority: 20
     profiles: [perseus]
-    
-  alp-fhir-client:
-    container_name: &c30 alp-minerva-fhir-client-${BASE_PORT:-1}
-    depends_on:
-      alp-logto:
-        condition: service_healthy
-      alp-fhir-server:
-        condition: service_healthy
-    hostname: alp-minerva-fhir-client-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-fhir-client:${DOCKER_TAG_NAME:-develop}
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 120s
-      test:
-        - CMD
-        - curl
-        - -f
-        - http://localhost:41112
-      timeout: 30s
-    logging:
-      options:
-        tag: *c30
-    networks:
-      alp:
-        priority: 20
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    environment:
-      <<:
-        - *x-tls
-        - *x-routes
-        - *x-fhir
-      FHIR__LOG_LEVEL: debug
-      LOCAL_DEBUG: "false"
-      NODE_ENV: development
-      PORT: 41${BASE_PORT:-1}12

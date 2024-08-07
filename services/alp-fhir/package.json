@@ -8,7 +8,8 @@
     "compile": "tsc",
     "bundleFiles": "node --no-warnings esbuild-script.mjs",
     "seed": "node ./dist/seed.js",
-    "build-and-seed": "tsc && npm run seed",
+    "load-bots": "node ./dist/main.js",
+    "build-and-seed": "tsc && yarn run seed && yarn run load-bots",
     "lint": "eslint src/",
     "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/main.ts",
     "start": "node ./dist/main.js"

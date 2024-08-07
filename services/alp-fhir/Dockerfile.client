@@ -42,6 +42,5 @@ ARG GIT_COMMIT_ARG
 # ENV
 ENV GIT_COMMIT=$GIT_COMMIT_ARG
 
-ENTRYPOINT ["node", "dist/main.js"]
-EXPOSE ${PORT}
+ENTRYPOINT ["yarn", "build-and-seed"]
 #CMD ["tail", "-f", "/dev/null"]
