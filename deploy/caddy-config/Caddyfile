@@ -243,8 +243,7 @@ https://*.alp.local:55555 {
 	}
 
 	handle_path /mapping/* {
-		# Allow CORS for portal UI local development
-		import cors https://localhost:4000
+		{$CADDY__CORS_LOCAL_PORTAL_UI:}
 
 		root * /home/docker/ui-files/mapping/
 		encode zstd gzip

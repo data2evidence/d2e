@@ -21,6 +21,7 @@ services:
       - 41180:41180
     environment:
       CADDY__FHIR_SERVER__PUBLIC_FQDN: ${CADDY__FHIR_SERVER__PUBLIC_FQDN:-localhost}
+      CADDY__CORS_LOCAL_PORTAL_UI: "import cors https://localhost:4000"
 
   alp-dataflow-gen:
     build:
