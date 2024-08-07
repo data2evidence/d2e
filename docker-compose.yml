@@ -1710,6 +1710,8 @@ services:
     depends_on:
       alp-dataflow-gen-init:
         condition: service_completed_successfully
+      alp-docker-server:
+        condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 30
@@ -1737,7 +1739,7 @@ services:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool}
-      PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool}
+      PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool} # used for flow_builder deployment
       DOCKER_HOST: 'tcp://dind:2376'
       DOCKER_CERT_PATH: /certs/client/
       DOCKER_TLS_VERIFY: false
