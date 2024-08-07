@@ -24,7 +24,7 @@ class MinioDao():
 
     def put_dataframe_as_parquet(self, bucket_name: str, file_name: str, df: pd.DataFrame):
         # Convert dataframe to parquet and buffer
-        bytes_data = df.to_parquet()
+        bytes_data = df.to_parquet(file_name, engine='pyarrow')
         buffer = BytesIO(bytes_data)
 
         if not self.client.bucket_exists(bucket_name):

@@ -36,10 +36,14 @@
       "password": "${REDIS_PASSWORD}"
     },
     "bullmq": {
-      "removeOnFail": { "count": 1 },
-      "removeOnComplete": { "count": 1 }
+      "attempts": 3,
+      "removeOnFail": { "count": 1000 },
+      "removeOnComplete": { 
+        "age": 3600,
+        "count": 20 }
     },
     "shutdownTimeoutMilliseconds": 30000,
     "logLevel": "DEBUG",
-    "logRequests": true
+    "logRequests": true,
+    "defaultProjectFeatures": ["bots"]
   }

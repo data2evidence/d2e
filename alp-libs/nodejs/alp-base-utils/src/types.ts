@@ -10,7 +10,7 @@ export interface IDBCredentialsType {
   schema?: string;
   dialect: string;
   host: string;
-  port: string | number;
+  port: number;
   user: string;
   password: string;
 }
