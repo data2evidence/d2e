@@ -8,11 +8,12 @@
     "compile": "tsc",
     "bundleFiles": "node --no-warnings esbuild-script.mjs",
     "seed": "node ./dist/seed.js",
-    "load-bots": "node ./dist/main.js",
+    "load-bots": "node ./dist/loadBots.js",
+    "create-data-model": "node ./dist/createDataModel.js",
     "build-and-seed": "tsc && yarn run seed && yarn run load-bots",
     "lint": "eslint src/",
-    "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/main.ts",
-    "start": "node ./dist/main.js"
+    "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/loadBots.ts",
+    "start": "node ./dist/loadBots.js"
   },
   "author": "",
   "license": "Apache-2.0",
