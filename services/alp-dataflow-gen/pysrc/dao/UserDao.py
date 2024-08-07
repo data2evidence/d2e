@@ -12,6 +12,7 @@ class UserDao():
         self.schema_name = schema_name
         dbutils = DBUtils(database_code)
         self.db_dialect = dbutils.get_database_dialect()
+        self.tenant_configs = dbutils.extract_database_credentials()
         
         if user_type in UserType:
             self.user = user_type
