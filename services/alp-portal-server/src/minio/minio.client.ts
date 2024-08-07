@@ -131,8 +131,58 @@ export class MinioClient {
     }
   }
 
+  async getFlowRunResults(filePath: string) {
+    const flowBucketName = this.getFlowBucketName()
+    this.logger.info(`Object path: ${flowBucketName}/${filePath}`)
+    try {
+      const dataStream = await this.client.getObject(flowBucketName, filePath)
+      const dataChunks = []
+
+      return new Promise((resolve, reject) => {
+        dataStream.on('data', chunk => {
+          dataChunks.push(chunk)
+        })
+
+        dataStream.on('end', () => {
+          const jsonStr = Buffer.concat(dataChunks).toString('utf8')
+          try {
+            const jsonData = JSON.parse(jsonStr)
+            const dataStr = jsonData['data']
+            // Parse again the double serialized data
+            const parsedData = JSON.parse(dataStr)
+            resolve(parsedData)
+          } catch (err) {
+            console.error('Error parsing JSON:', err)
+            reject(err)
+          }
+        })
+
+        dataStream.on('error', err => {
+          console.error('Error reading stream:', err)
+          reject(err)
+        })
+      })
+    } catch (err) {
+      console.error('Error fetching object from MinIO:', err)
+      throw err
+    }
+  }
+
+  async getMultipleFlowRunResults(filePaths: string[]) {
+    const results = []
+    for (const filePath of filePaths) {
+      const flowRunResult = await this.getFlowRunResults(filePath)
+      results.push(flowRunResult)
+    }
+    return results
+  }
+
   private getBucketName(datasetId: string) {
     return `portal-dataset-${datasetId}`
+  }
+
+  private getFlowBucketName() {
+    return 'flows'
   }
 
   private async createBucket(bucketName: string) {

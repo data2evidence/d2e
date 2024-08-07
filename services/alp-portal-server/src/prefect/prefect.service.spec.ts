@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { PrefectDeploymentService } from './prefect-deployment.service'
+import { PrefectService } from './prefect.service'
 import { MinioClient } from '../minio/minio.client'
 import { minioClientMockFactory } from '../minio/minio.mock'
 
-describe('PrefectDeploymentService', () => {
-  let service: PrefectDeploymentService
+describe('PrefectService', () => {
+  let service: PrefectService
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PrefectDeploymentService, { provide: MinioClient, useFactory: minioClientMockFactory }]
+      providers: [PrefectService, { provide: MinioClient, useFactory: minioClientMockFactory }]
     }).compile()
 
-    service = module.get<PrefectDeploymentService>(PrefectDeploymentService)
+    service = module.get<PrefectService>(PrefectService)
   })
 
   it('should be defined', () => {

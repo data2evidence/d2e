@@ -434,6 +434,7 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 }
 
 http://localhost:41180 {
+	# Allow CORS for mapping UI local development
 	import cors http://localhost:5173
 	import perseus
 }

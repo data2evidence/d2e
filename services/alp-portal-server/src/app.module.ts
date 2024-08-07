@@ -13,7 +13,7 @@ import { SystemModule } from './system/system.module'
 import { NotebookModule } from './notebook/notebook.module'
 import { MetadataConfigModule } from './dataset/metadata-config/metadata-config.module'
 import { FeatureModule } from './feature/feature.module'
-import { PrefectDeploymentModule } from './prefect-deployment/prefect-deployment.module'
+import { PrefectModule } from './prefect/prefect.module'
 import { ConfigModule } from './config/config.module'
 import { SeedService } from './common/data-source/seeds/seed.service'
 
@@ -32,9 +32,9 @@ const notebookRoutes: RouteTree = {
   module: NotebookModule
 }
 
-const prefectDeploymentRoutes: RouteTree = {
-  path: 'prefect-deployment',
-  module: PrefectDeploymentModule
+const prefectRoutes: RouteTree = {
+  path: 'prefect',
+  module: PrefectModule
 }
 
 const overviewDescriptionRoutes: RouteTree = {
@@ -55,13 +55,13 @@ const imports: Array<DynamicModule | Type<any>> = [
   DatasetPaConfigModule,
   MetadataConfigModule,
   NotebookModule,
-  PrefectDeploymentModule,
+  PrefectModule,
   ConfigModule,
   RouterModule.register([
     tenantRoutes,
     featureRoutes,
     notebookRoutes,
-    prefectDeploymentRoutes,
+    prefectRoutes,
     overviewDescriptionRoutes,
     {
       path: 'dataset',
