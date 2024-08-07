@@ -176,7 +176,7 @@ jobs:
 
       - name: Seed db credentials
         run: |
-          yarn start:minerva-test alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d --force-recreate
+          yarn start:minerva-test alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d
           sleep 20 # wait for db migrations to complete
 
           echo . create read role
@@ -192,6 +192,11 @@ jobs:
 
           docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "INSERT INTO db_credentials_mgr.db_vocab_schema (name,db_id,created_by,created_date,modified_by,modified_date) VALUES
             ('CDMVOCAB','9addef8a-56d1-42c2-bcad-3c10035d540b','local','2024-05-20 02:02:08.102165','local','2024-05-20 02:02:08.102165') ON CONFLICT DO NOTHING"
+
+      - name: Remove alp-db-credentials-mgr
+        run: |
+          yarn local:minerva stop alp-db-credentials-mgr
+          yarn local:minerva rm -f alp-db-credentials-mgr
 
       - name: start system services
         run: |

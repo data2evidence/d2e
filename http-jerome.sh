@@ -36,7 +36,7 @@ yarn inittestdb
 exit 0
 '
 # Build system services
-yarn build:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init alp-mri-pg-config
+yarn build:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init alp-logto alp-logto-post-init alp-mri-pg-config
 
 # Manipulate configuration
 yq -i '.networks.alp.external=true' docker-compose.yml
@@ -65,9 +65,11 @@ done <<<"$processed_output"
 echo "USE_DUCKDB=false" >>.env.local
 
 # *** Start postgres for seeding db credentials ***
-yarn start:minerva-test alp-minerva-postgres alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d --force-recreate
+yarn start:minerva-test alp-minerva-postgres alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d
 echo "sleeping... 5 sec..."
 sleep 20 # wait for db migrations to complete
+yarn local:minerva stop alp-db-credentials-mgr
+yarn local:minerva rm -f alp-db-credentials-mgr
 
 echo . create read role
 docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "INSERT INTO db_credentials_mgr.db (id,host,port,name,dialect,created_by,created_date,modified_by,modified_date,code) VALUES
@@ -86,7 +88,7 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
 # *** End postgres for seeding db credentials ***
 
 # Start system services
-yarn start:minerva-test yarn start:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init alp-logto alp-logto-post-init alp-mri-pg-config -d
+yarn start:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init alp-logto alp-logto-post-init alp-mri-pg-config -d
 sleep 120
 
 ### START OF LOG IN TO GET BEARER TOKEN
