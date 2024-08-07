@@ -63,10 +63,43 @@ export class PortalServerAPI {
     const errorMessage = 'Error while deleting deployment files'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}/prefect-deployment?filePath=${deploymentFolderPath}&bucketName=${env.ADHOC_DEPLOYMENT_FLOWS_BUCKET_NAME}`
+      const url = `${this.url}/prefect?filePath=${deploymentFolderPath}&bucketName=${env.ADHOC_DEPLOYMENT_FLOWS_BUCKET_NAME}`
       this.logger.info(url)
       const obs = this.httpService.delete(url, options)
       return firstValueFrom(obs.pipe(map(result => result.data)))
+    } catch (error) {
+      this.logger.error(`${errorMessage}: ${error}`)
+      throw new InternalServerErrorException(errorMessage)
+    }
+  }
+  // TODO: Unified to be an generic function for different result
+  async getFlowRunResults(filePaths: string[]) {
+    const errorMessage = `Error while getting flow run results with filepath ${filePaths}`
+    try {
+      const options = await this.createOptions()
+      let url = `${this.url}/prefect/results`
+      // To build query parameters
+      const params = new URLSearchParams()
+      if (filePaths.length === 1) {
+        params.append('filePath', filePaths[0])
+      } else {
+        filePaths.forEach(path => params.append('filePaths[]', path))
+      }
+      // Append query parameters to the URL
+      url += `?${params.toString()}`
+      this.logger.info(url)
+      const obs = this.httpService.get(url, options).pipe(
+        map(result => {
+          // If result.data is an array, return it as is
+          if (Array.isArray(result.data)) {
+            return result.data
+          } else {
+            // If result.data is not an array, wrap it in an array
+            return [result.data]
+          }
+        })
+      )
+      return await firstValueFrom(obs)
     } catch (error) {
       this.logger.error(`${errorMessage}: ${error}`)
       throw new InternalServerErrorException(errorMessage)
