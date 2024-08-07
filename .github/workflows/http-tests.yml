@@ -374,6 +374,10 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-caddy -t
+      - name: print logs for pg mgmt
+        if: ${{ always() || cancelled() || failure() }}
+        run: |
+          docker logs alp-minerva-pg-mgmt-init-1 -t
       - name: print logs for logto
         if: ${{ always() || cancelled() || failure() }}
         run: |
@@ -438,6 +442,14 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-minerva-cdw-svc -t
+      - name: print logs for alp-minerva-s3
+        if: ${{ always() || cancelled() || failure() }}
+        run: |
+          docker logs alp-minerva-s3 -t
+      - name: print logs for alp-minio-post-init
+        if: ${{ always() || cancelled() || failure() }}
+        run: |
+          docker logs alp-minio-post-init -t
       - name: Remove Test DB
         if: ${{ always() || cancelled() || failure() }}
         run: yarn removetestdb
