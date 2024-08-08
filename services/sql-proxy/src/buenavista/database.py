@@ -10,7 +10,7 @@ from .backends.duckdb import DuckDBConnection
 from .backends.postgres import PGConnection
 from .backends.hana import HANAConnection
 from buenavista import bv_dialects, rewrite
-from env import env
+from config import Env
 
 
 class DBCredentialsType(BaseModel):
@@ -42,12 +42,12 @@ class SqlProxyDatabaseClients(BaseModel):
 
 
 def get_database_code_and_dialect_from_db_creds():
-    dbs = env["DATABASE_CREDENTIALS"]
+    dbs = Env.DATABASE_CREDENTIALS
     return [[db["values"]["code"], db["values"]["dialect"]] for db in dbs]
 
 
 def extract_db_credentials(database_code: str):
-    dbs = env["DATABASE_CREDENTIALS"]
+    dbs = Env.DATABASE_CREDENTIALS
     if dbs == []:
         raise ValueError(
             f"Database credentials environment variable is empty")
@@ -113,7 +113,7 @@ def GetDBConnection(database_code: str):
         conn_string = _CreateConnectionString(
             dialect_driver, user, password, host, port, db)
         engine = create_engine(
-            conn_string, pool_size=env["SQL_PROXY__POOL_SIZE"])
+            conn_string, pool_size=Env.SQL_PROXY__POOL_SIZE)
 
         return engine
 
@@ -140,13 +140,13 @@ def get_db_connection(clients: SqlProxyDatabaseClients, dialect: str, database_c
 
         # Attach cdm schema
         cdm_schema_duckdb_file_path = os.path.join(
-            env["DUCKDB__DATA_FOLDER"], f"{database_code}_{schema}")
+            Env.DUCKDB__DATA_FOLDER, f"{database_code}_{schema}")
         db.execute(
             f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
 
         # Attach vocab schema
         vocab_schema_duckdb_file_path = os.path.join(
-            env["DUCKDB__DATA_FOLDER"], f"{database_code}_{vocab_schema}")
+            Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
         db.execute(
             f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
 

@@ -1,17 +1,17 @@
 import requests
-from env import env
+from config import Env
 
 
 class PortalServerAPI:
     def __init__(self, token):
 
-        if env["PYTHON_VERIFY_SSL"] == 'true' and env["TLS__INTERNAL__CA_CRT"] is None:
+        if Env.PYTHON_VERIFY_SSL == 'true' and Env.TLS__INTERNAL__CA_CRT is None:
             raise ValueError(
                 "PYTHON_VERIFY_SSL is true but, TLS__INTERNAL__CA_CRT is undefined")
 
         # Parse SERVICE_ROUTES and get portalServer
-        self.url = env["SERVICE_ROUTES"]["portalServer"]
-        self.verifySsl = False if env["PYTHON_VERIFY_SSL"] == 'false' else env["TLS__INTERNAL__CA_CRT"]
+        self.url = Env.SERVICE_ROUTES["portalServer"]
+        self.verifySsl = False if Env.PYTHON_VERIFY_SSL == 'false' else Env.TLS__INTERNAL__CA_CRT
         self.token = token
 
     def get_options(self):
