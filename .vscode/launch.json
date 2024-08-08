@@ -218,14 +218,45 @@
       "request": "attach",
       "connect": {
         "host": "localhost",
-        "port": 9234,  
+        "port": 9234
       },
       "pathMappings": [
         {
           "localRoot": "${workspaceFolder}/services/alp-dataflow-gen/pysrc",
-          "remoteRoot": "./pysrc" 
+          "remoteRoot": "./pysrc"
         }
       ]
-    }
+    },
+    {
+      "name": "alp-sql-proxy",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 9235
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/services/sql-proxy/src",
+          "remoteRoot": "./src"
+        }
+      ]
+    },
+    {
+      "name": "alp-fhir-client",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9226,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/alp-fhir",
+      "remoteRoot": "/usr/src/alp-data-node/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
   ]
 }

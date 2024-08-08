@@ -44,6 +44,26 @@ https://*.alp.local:55555 {
 	# }
 }
 
+(cors) {
+	@cors_preflight method OPTIONS
+
+	header {
+		Access-Control-Allow-Origin {args[0]}
+		Vary Origin
+		Access-Control-Allow-Headers "Authorization"
+		Access-Control-Allow-Credentials "true"
+		defer
+	}
+
+	handle @cors_preflight {
+		header {
+			Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE"
+			Access-Control-Max-Age "3600"
+		}
+		respond "" 204
+	}
+}
+
 (perseus) {
 	log {
 		format console {
@@ -126,33 +146,6 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle /alp-prefect/* {
-		uri strip_prefix /alp-prefect
-		reverse_proxy http://alp-dataflow-gen-1:41120 {
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-
-	handle /dicom/* {
-		uri strip_prefix /dicom
-		reverse_proxy http://alp-dicom-server:8042 {
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-
-	handle /alp-fhir/* {
-		uri strip_prefix /alp-fhir
-		reverse_proxy http://alp-minerva-fhir-server-1:8103 {
-			transport http {
-				read_buffer 8192
-			}
-		}
-	}
-
 	redir / /portal
 
 	handle_path /portal* {
@@ -174,6 +167,14 @@ https://*.alp.local:55555 {
 
 		handle_path /static/media/* {
 			root * /home/docker/ui-files/portal/static/media/
+			encode zstd gzip
+			file_server {
+				precompressed zstd br gzip
+			}
+		}
+
+		handle_path /docs/* {
+			root * /home/docker/ui-files/portal/docs/
 			encode zstd gzip
 			file_server {
 				precompressed zstd br gzip
@@ -235,6 +236,16 @@ https://*.alp.local:55555 {
 
 	handle_path /analysis/* {
 		root * /home/docker/ui-files/analysis/
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
+	}
+
+	handle_path /mapping/* {
+		{$CADDY__CORS_LOCAL_PORTAL_UI:}
+
+		root * /home/docker/ui-files/mapping/
 		encode zstd gzip
 		file_server {
 			precompressed zstd br gzip
@@ -437,5 +448,7 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 }
 
 http://localhost:41180 {
+	# Allow CORS for mapping UI local development
+	import cors http://localhost:5173
 	import perseus
 }
