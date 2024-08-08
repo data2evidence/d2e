@@ -165,6 +165,13 @@ export class MeRouter {
         return res.status(401).send({ message: `User '${payload.sub}' is inactive` })
       }
 
+      // Check if user is admin role
+      const userGroups = await this.userGroupService.getUserGroupsMetadata(user.id)
+      if (!userGroups.alp_role_system_admin) {
+        this.logger.error(`User '${payload.sub}' does not have admin role`)
+        return res.status(403).send({ message: `Access denied for non-admin role` })
+      }
+
       res.setHeader('Username', user.username)
       return res.status(200).send()
     })
