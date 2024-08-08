@@ -199,14 +199,11 @@ jobs:
           yarn local:minerva rm -f alp-db-credentials-mgr
           sleep 20
 
-      # - name: start system services
-      #   run: |
-      #     yarn start:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init alp-logto alp-logto-post-init alp-mri-pg-config -d
-      #     sleep 120
       - name: start system services
         run: |
-          yarn start:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-portal-server alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init alp-logto alp-logto-post-init alp-mri-pg-config -d
+          yarn start:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init alp-logto alp-logto-post-init alp-mri-pg-config -d
           sleep 120
+
       - name: check status of docker containers
         run: |
           docker ps -a
@@ -215,6 +212,7 @@ jobs:
         working-directory: ./tests/backend_integration_tests
         run: |
           yarn
+
       - name: Login to logto and get Bearer token and sub
         run: |
           response=$(curl -ik "https://localhost:41100/oidc/auth?redirect_uri=https%3A%2F%2Flocalhost%3A41100%2Fportal%2Flogin-callback&client_id=$LOGTO__ALP_APP__CLIENT_ID&response_type=code&state=lbFDB1hcko&scope=openid%20offline_access%20profile%20email&nonce=Osptnuwqc47w&code_challenge=n6eqz8p8jj1L9Qu7pY2_GrWO7XyaQbWrcs54x9OAnPg&code_challenge_method=S256")
