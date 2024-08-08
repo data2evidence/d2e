@@ -2,7 +2,6 @@ import os
 from enum import Enum
 from typing import Optional, Dict
 import duckdb
-import json
 from pydantic import BaseModel
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
@@ -11,6 +10,7 @@ from .backends.duckdb import DuckDBConnection
 from .backends.postgres import PGConnection
 from .backends.hana import HANAConnection
 from buenavista import bv_dialects, rewrite
+from env import env
 
 
 class DBCredentialsType(BaseModel):
@@ -42,12 +42,12 @@ class SqlProxyDatabaseClients(BaseModel):
 
 
 def get_database_code_and_dialect_from_db_creds():
-    dbs = json.loads(os.environ["DATABASE_CREDENTIALS"])
+    dbs = env["DATABASE_CREDENTIALS"]
     return [[db["values"]["code"], db["values"]["dialect"]] for db in dbs]
 
 
 def extract_db_credentials(database_code: str):
-    dbs = json.loads(os.environ["DATABASE_CREDENTIALS"])
+    dbs = env["DATABASE_CREDENTIALS"]
     if dbs == []:
         raise ValueError(
             f"Database credentials environment variable is empty")
@@ -112,7 +112,8 @@ def GetDBConnection(database_code: str):
         password = conn_details["password"]
         conn_string = _CreateConnectionString(
             dialect_driver, user, password, host, port, db)
-        engine = create_engine(conn_string)
+        engine = create_engine(
+            conn_string, pool_size=env["SQL_PROXY__POOL_SIZE"])
 
         return engine
 
@@ -123,31 +124,29 @@ def _CreateConnectionString(dialect_driver: str, user: str, pw: str,
     return conn_string
 
 
-def get_db_connection(connections, dialect, database_code, schema):
-    # TODO: Get vocab schema dynamically
-    vocab_schema = "cdmvocab"
+def get_db_connection(clients: SqlProxyDatabaseClients, dialect: str, database_code: str, schema: str, vocab_schema: str):
     connection = None
 
     if dialect == DatabaseDialects.POSTGRES:
         connection = PGConnection(
-            connections[dialect][database_code])
+            clients[dialect][database_code])
 
     if dialect == DatabaseDialects.HANA:
         connection = HANAConnection(
-            connections[dialect][database_code])
+            clients[dialect][database_code])
 
     if dialect == DatabaseDialects.DUCKDB:
         db = duckdb.connect()
 
         # Attach cdm schema
         cdm_schema_duckdb_file_path = os.path.join(
-            os.environ["DUCKDB__DATA_FOLDER"], f"{database_code}_{schema}")
+            env["DUCKDB__DATA_FOLDER"], f"{database_code}_{schema}")
         db.execute(
             f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
 
         # Attach vocab schema
         vocab_schema_duckdb_file_path = os.path.join(
-            os.environ["DUCKDB__DATA_FOLDER"], f"{database_code}_{vocab_schema}")
+            env["DUCKDB__DATA_FOLDER"], f"{database_code}_{vocab_schema}")
         db.execute(
             f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
 
@@ -161,16 +160,17 @@ def get_db_connection(connections, dialect, database_code, schema):
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
 
 
-def parse_connection_param_database(database: str) -> tuple[str, str, str]:
+def parse_connection_param_database(database: str) -> tuple[str, str]:
     '''
     Resolves client connection database d2e format into its individual component.
-    Expects database in the format of {DIALECT}-{DATABASE_CODE}-{SCHEMA}
+    Expects database in the format of {DIALECT}_{DATASETID}
     '''
-    databaseComponents = database.split("-")
-    if len(databaseComponents) != 3:
+    databaseComponents = database.split("_")
+    # Simple conditional check to check if database param has two compoenents separated by "_"
+    if len(databaseComponents) != 2:
         raise Exception(
-            f"Database param:{database} is in the wrong format! Database has to be in the format of [DIALECT-DATABASE_CODE-SCHEMA]")
-    dialect, _database_code, _schema = databaseComponents
+            f"Database param:{database} is in the wrong format! Database has to be in the format of [DIALECT_DATASETID]")
+    dialect, _dataset_id = databaseComponents
 
     # Guard clause against invalid dialects
     if dialect not in [e.value for e in DatabaseDialects]:
