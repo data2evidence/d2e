@@ -119,6 +119,10 @@ export default async (req: IMRIRequest, res, next) => {
                 log.info(
                     `Selected studyMetadata ${JSON.stringify(studyMetadata)}`
                 );
+                // Set req.selectedstudyDbMetadata if it does not already exist
+                if (!req.selectedstudyDbMetadata) {
+                    req.selectedstudyDbMetadata = studyMetadata;
+                }
                 getDbConnectionByStudyMetadata(studyMetadata);
             } else {
                 getDefaultDbConnection();
@@ -136,6 +140,10 @@ export default async (req: IMRIRequest, res, next) => {
                 req.studiesDbMetadata.studies.find(
                     (o) => o.id === selectedStudyEntityValue
                 );
+            // Set req.selectedstudyDbMetadata if it does not already exist
+            if (!req.selectedstudyDbMetadata) {
+                req.selectedstudyDbMetadata = studyMetadata;
+            }
             getDbConnectionByStudyMetadata(studyMetadata);
         }
 

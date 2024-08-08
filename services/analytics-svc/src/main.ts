@@ -192,6 +192,7 @@ const initRoutes = async (app: express.Application) => {
                         analyticsCredentials: credentials,
                         userObj: userObj,
                         token: req.headers.authorization,
+                        studyId: req.selectedstudyDbMetadata.id,
                     });
                 } else {
                     req.dbConnections = await getDBConnections({
@@ -602,24 +603,24 @@ const getSqlProxyDbConnections = async ({
     analyticsCredentials,
     userObj,
     token,
+    studyId,
 }): Promise<{
     analyticsConnection: Connection.ConnectionInterface;
 }> => {
     // Define defaults for both analytics & Vocab connections
     let analyticsConnectionPromise;
 
-    const sqlProxyDatabase = `${analyticsCredentials.dialect}-${analyticsCredentials.code}-${analyticsCredentials.schema}`;
+    let sqlProxyDatabase = `${analyticsCredentials.dialect}_${studyId}`;
+    // IF use duckdb is true change dialect from postgres -> duckdb
+    if (env.USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
+        sqlProxyDatabase = `duckdb_${studyId}`;
+    }
 
     // Overwrite analyticsCrendential values to connect to sql-proxy
     analyticsCredentials.host = env.SQL_PROXY_HOST;
     analyticsCredentials.port = env.SQL_PROXY_PORT;
     analyticsCredentials.database = sqlProxyDatabase;
     analyticsCredentials.user = token;
-
-    // IF use duckdb is true change dialect from postgres -> duckdb
-    if (env.USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
-        analyticsCredentials.database = `duckdb-${analyticsCredentials.code}-${analyticsCredentials.schema}`;
-    }
 
     analyticsConnectionPromise = SqlProxyDBConnectionUtil.getDBConnection({
         credentials: analyticsCredentials,
