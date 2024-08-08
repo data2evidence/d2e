@@ -50,7 +50,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
   },
   {
     path: '^/usermgmt/api/me/is_token_valid_internal',
-    scopes: ['usermgmt.me'],
+    scopes: ['usermgmt.me.perseus'],
     httpMethods: ['GET']
   },
   {
@@ -832,6 +832,7 @@ export const ROLE_SCOPES = {
     'usermgmt.dataAdmin.read',
     'usermgmt.group.read',
     'usermgmt.me',
+    'usermgmt.me.perseus',
     'usermgmt.studyAccessRequest.read',
     'usermgmt.studyAccessRequest.update',
     'usermgmt.user.read',
