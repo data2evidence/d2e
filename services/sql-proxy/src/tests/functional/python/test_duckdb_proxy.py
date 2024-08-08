@@ -23,12 +23,12 @@ test_dataset = {
 @pytest.fixture(scope="session")
 def setup():
     mp = pytest.MonkeyPatch()
-    mp.setenv('DUCKDB__DATA_FOLDER', './tests/data/')
     mp.setattr(OpenIdAPI, "get_user_id_from_token",
                _mock_get_user_id_from_token)
     mp.setattr(UserMgmtAPI, "get_user_allowed_dataset_ids",
                _mock_get_user_allowed_dataset_ids)
     mp.setattr(PortalServerAPI, "get_dataset", _mock_get_dataset)
+
     config.Env.DUCKDB__DATA_FOLDER = "./tests/data"
 
 
