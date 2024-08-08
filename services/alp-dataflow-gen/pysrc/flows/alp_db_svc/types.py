@@ -2,7 +2,6 @@ from enum import Enum
 from datetime import datetime
 from typing import List, Dict, Optional
 from pydantic import BaseModel, Field, UUID4
-from flows.alp_db_svc.datamart.types import SnapshotCopyConfig
 
 
 class LiquibaseAction(str, Enum):
@@ -41,12 +40,6 @@ class RollbackCountType(DataModelBase):
 class RollbackTagType(DataModelBase):
     vocab_schema: str = Field(...)
     rollback_tag: str = Field(...)
-
-
-class CreateSnapshotType(DataModelBase):
-    source_schema: str
-    vocab_schema: str
-    snapshot_copy_config: SnapshotCopyConfig
 
 
 class CreateSchemaType(DataModelBase):

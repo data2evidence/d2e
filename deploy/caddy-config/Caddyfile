@@ -27,21 +27,41 @@ https://*.alp.local:55555 {
 
 (forward_authentication) {
 	# Enable this for using perseus user service
-	forward_auth http://alp-perseus-user-1:5001 {
-		uri /user/api/is_token_valid_internal
-		copy_headers Username
-	}
-
-	# Enable this for using D2E user-mgmt service
-	# forward_auth https://alp-minerva-gateway-1:41100 {
-	# 	transport http {
-	# 		tls
-	# 		tls_insecure_skip_verify
-	# 		read_buffer 8192
-	# 	}
-	# 	uri /usermgmt/api/me/is_token_valid_internal
+	# forward_auth http://alp-perseus-user-1:5001 {
+	# 	uri /user/api/is_token_valid_internal
 	# 	copy_headers Username
 	# }
+
+	# Enable this for using D2E user-mgmt service
+	forward_auth https://alp-minerva-gateway-1:41100 {
+		transport http {
+			tls
+			tls_insecure_skip_verify
+			read_buffer 8192
+		}
+		uri /usermgmt/api/me/is_token_valid_internal
+		copy_headers Username
+	}
+}
+
+(cors) {
+	@cors_preflight method OPTIONS
+
+	header {
+		Access-Control-Allow-Origin {args[0]}
+		Vary Origin
+		Access-Control-Allow-Headers "Authorization"
+		Access-Control-Allow-Credentials "true"
+		defer
+	}
+
+	handle @cors_preflight {
+		header {
+			Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE"
+			Access-Control-Max-Age "3600"
+		}
+		respond "" 204
+	}
 }
 
 (perseus) {
@@ -216,6 +236,16 @@ https://*.alp.local:55555 {
 
 	handle_path /analysis/* {
 		root * /home/docker/ui-files/analysis/
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
+	}
+
+	handle_path /mapping/* {
+		{$CADDY__CORS_LOCAL_PORTAL_UI:}
+
+		root * /home/docker/ui-files/mapping/
 		encode zstd gzip
 		file_server {
 			precompressed zstd br gzip
@@ -414,5 +444,7 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 }
 
 http://localhost:41180 {
+	# Allow CORS for mapping UI local development
+	import cors http://localhost:5173
 	import perseus
 }
