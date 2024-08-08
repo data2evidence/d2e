@@ -42,4 +42,4 @@ jobs:
     - name: Run unit tests if files have changed
       if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.sql_proxy_changed == 'True'
       working-directory: ./services/sql-proxy/src
-      run: python3 -m pytest -v --disable-pytest-warnings
+      run: PYTHON_ENV=TEST python3 -m pytest -v --disable-pytest-warnings

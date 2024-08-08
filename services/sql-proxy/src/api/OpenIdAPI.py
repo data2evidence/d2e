@@ -1,7 +1,7 @@
 import jwt
 import logging
 
-from env import env
+from config import Env
 
 logger = logging.getLogger(__name__)
 
@@ -9,15 +9,15 @@ logger = logging.getLogger(__name__)
 class OpenIdAPI:
     def __init__(self):
 
-        if env["PYTHON_VERIFY_SSL"] == 'true' and env["TLS__INTERNAL__CA_CRT"] is None:
+        if Env.PYTHON_VERIFY_SSL == 'true' and Env.TLS__INTERNAL__CA_CRT is None:
             raise ValueError(
                 "PYTHON_VERIFY_SSL is true but, TLS__INTERNAL__CA_CRT is undefined")
 
         # Parse SERVICE_ROUTES and get idIssuerUrl
-        self.url = env["SERVICE_ROUTES"]["idIssuerUrl"]
-        self.scope = env["IDP__SCOPE"]
-        self.subject_prop = env["IDP_SUBJECT_PROP"]
-        self.verifySsl = False if env["PYTHON_VERIFY_SSL"] == 'false' else env["TLS__INTERNAL__CA_CRT"]
+        self.url = Env.SERVICE_ROUTES["idIssuerUrl"]
+        self.scope = Env.IDP__SCOPE
+        self.subject_prop = Env.IDP_SUBJECT_PROP
+        self.verifySsl = False if Env.PYTHON_VERIFY_SSL == 'false' else Env.TLS__INTERNAL__CA_CRT
 
     def get_signing_key(self, token):
         jwks_client = jwt.PyJWKClient(f"{self.url}/jwks")

@@ -2,7 +2,7 @@ import debugpy
 from typing import Tuple
 from buenavista import postgres
 from buenavista.database import initialize_db_clients, SqlProxyDatabaseClients
-from env import env
+from config import Env
 
 import logging
 
@@ -17,11 +17,11 @@ def create(
 
 
 def main():
-    if env["LOCAL_DEBUG"] == "true":
+    if Env.LOCAL_DEBUG == "true":
         debugpy.listen(("0.0.0.0", 9235))
         logging.basicConfig(level=logging.DEBUG)
 
-        port = env["SQL_PROXY__PORT"]
+        port = Env.SQL_PROXY__PORT
 
     db_clients = initialize_db_clients()
     address = ("0.0.0.0", port)
