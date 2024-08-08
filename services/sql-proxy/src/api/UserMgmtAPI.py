@@ -1,5 +1,4 @@
 import requests
-import tempfile
 from config import Env
 
 
