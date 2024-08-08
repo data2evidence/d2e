@@ -349,6 +349,7 @@ def run_liquibase_update_task(**kwargs):
 
 @task(log_prints=True)
 def insert_cdm_version(schema_dao: DBDao, cdm_version: str):
+    #Todo: make cdm_holder value more generic
     get_run_logger().info(f"Inserting cdm version '{cdm_version}' into '{schema_dao.schema_name}.cdm_source' table..")
     is_lower_case = _check_table_case(schema_dao)
     if is_lower_case:
