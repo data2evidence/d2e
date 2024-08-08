@@ -1715,9 +1715,14 @@ services:
         - *x-converter
         - *x-routes
         - *x-tls
+        - *x-routes
       SQL_PROXY__PORT: 41191
+      SQL_PROXY__POOL_SIZE: ${SQL_PROXY__POOL_SIZE-10}
       DUCKDB__DATA_FOLDER: /home/docker/duckdb_data
       LOCAL_DEBUG: "false"
+      IDP__SCOPE: https://alp-default
+      IDP_SUBJECT_PROP: sub
+      PYTHON_VERIFY_SSL: false # Only use this for apis calling internal docker urls
 
   alp-perseus-files-manager:
     image: perseushub/files-manager:latest
