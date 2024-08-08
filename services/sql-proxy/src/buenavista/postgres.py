@@ -10,6 +10,7 @@ import struct
 from typing import Dict, List, Optional
 
 from .core import BVType, Connection, Extension, Session, QueryResult
+from .database import parse_connection_param_database, get_rewriter_from_dialect, get_db_connection, SqlProxyDatabaseClients
 from .rewrite import Rewriter
 
 logger = logging.getLogger(__name__)
@@ -172,8 +173,9 @@ class BVContext:
     """Manages the state of a single connection to the server."""
 
     def __init__(
-        self, session: Session, rewriter: Optional[Rewriter], params: Dict[str, str]
+        self, conn: Connection, session: Session, rewriter: Optional[Rewriter], params: Dict[str, str]
     ):
+        self.conn = conn
         self.session = session
         self.rewriter = rewriter
         self.params = params
@@ -271,7 +273,7 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
         self.r = BVBuffer(self.rfile)
         ctx = None
         try:
-            ctx = self.handle_startup(self.server.conn)
+            ctx = self.handle_startup()
             if ctx:
                 self.server.ctxts[ctx.process_id] = ctx
             while ctx:
@@ -285,7 +287,6 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
                     payload = self.r.read_bytes(msglen - 4)
                 else:
                     payload = None
-
                 if not ctx.authenticated:
                     if type_code == ClientCommand.PASSWORD_MESSAGE:
                         self.handle_md5_password(ctx, payload)
@@ -315,32 +316,38 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             self.send_error(e)
 
         if ctx:
-            self.server.conn.close_session(ctx.session)
+            ctx.conn.close_session(ctx.session)
             del self.server.ctxts[ctx.process_id]
             ctx = None
 
-    def handle_startup(self, conn: Connection) -> BVContext:
+    def handle_startup(self) -> BVContext:
         msglen = self.r.read_uint32() - 4
         code = self.r.read_uint32()
         if code == 80877103:  # SSL request
             self.send_notice()
-            return self.handle_startup(conn)
+            return self.handle_startup()
         elif code == 196608:  # Protocol 3.0
             msg = [
                 x.decode("utf-8")
                 for x in self.r.read_bytes(msglen - 4).split(NULL_BYTE)
             ]
             params = dict(zip(msg[::2], msg[1::2]))
+            dialect, database_code, schema = parse_connection_param_database(
+                params["database"])
+            conn = get_db_connection(
+                self.server.db_clients, dialect, database_code, schema)
+            rewriter = get_rewriter_from_dialect(
+                dialect)
             logger.info("Client connection params: %s", params)
-            ctx = BVContext(conn.create_session(),
-                            self.server.rewriter, params)
+            ctx = BVContext(conn, conn.create_session(),
+                            rewriter, params)
             self.send_auth_request(ctx)
             return ctx
         elif code == 80877102:  # Cancel request
             process_id, secret_key = self.r.read_uint32(), self.r.read_uint32()
             ctx = self.server.ctxts.get(process_id)
             if ctx and ctx.secret_key == secret_key:
-                self.server.conn.close_session(ctx.session)
+                ctx.conn.close_session(ctx.session)
                 del self.server.ctxts[ctx.process_id]
                 ctx = None
             return None
@@ -376,7 +383,7 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             self.send_error("Invalid password")
 
     def handle_post_auth(self, ctx: BVContext):
-        self.send_parameter_status(self.server.conn.parameters())
+        self.send_parameter_status(ctx.conn.parameters())
         self.send_backend_key_data(ctx)
         self.send_ready_for_query(ctx)
         ctx.authenticated = True
@@ -398,7 +405,8 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             else:
                 query_result = ctx.execute_sql(decoded)
         except Exception as e:
-            self.send_error(e)
+
+            self.send_error(e, ctx)
             self.send_ready_for_query(ctx)
             return
 
@@ -653,16 +661,14 @@ class BuenaVistaServer(socketserver.ThreadingTCPServer):
 
     def __init__(
         self,
+        db_clients: SqlProxyDatabaseClients,
         server_address,
-        conn: Connection,
         *,
-        rewriter: Optional[Rewriter] = None,
         extensions: List[Extension] = [],
         auth: Optional[Dict[str, str]] = None,
     ):
         super().__init__(server_address, BuenaVistaHandler)
-        self.conn = conn
-        self.rewriter = rewriter
+        self.db_clients = db_clients
         self.extensions = {e.type(): e for e in extensions}
         self.ctxts = {}
         self.auth = auth

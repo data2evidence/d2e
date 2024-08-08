@@ -30,11 +30,12 @@ def mock_handler():
 
 def test_handle_startup(mock_handler):
     mock_handler.r.read_uint32.side_effect = [8, 196608]
-    mock_handler.r.read_bytes.return_value = b"user\x00test\x00database\x00testdb\x00"
-    ctx = mock_handler.handle_startup(mock_handler.server.conn)
+    mock_handler.r.read_bytes.return_value = b"user\x00test\x00database\x00duckdb-testdbcode-testschema\x00"
+    ctx = mock_handler.handle_startup()
     assert isinstance(ctx, BVContext)
     assert ctx.session is not None
-    assert ctx.params == {"user": "test", "database": "testdb"}
+    assert ctx.params == {"user": "test",
+                          "database": "duckdb-testdbcode-testschema"}
 
 
 def test_handle_query(mock_handler):
