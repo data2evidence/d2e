@@ -1762,7 +1762,7 @@ services:
       DOCKER_TLS_VERIFY: false
   
   alp-docker-server:
-    image: docker:27.1.1-dind
+    image: docker:dind
     container_name: &c33 alp-docker-server-${BASE_PORT:-1}
     hostname: dind
     networks:
