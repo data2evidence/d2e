@@ -12,8 +12,8 @@ export async function readJsonFileAndCreateDuckdbTables(){
         for(let resource in fhirResources){
             const parsedFhirDefinitions = getFhirTableStructure(result[0], resource)
             const duckdbTableStructure = getDuckdbColumnString(duckdbDataTypes, parsedFhirDefinitions, true)
-            console.log(`Fhir table created for resource ${resource}`)
             await createFhirTable(duckdb, resource, duckdbTableStructure)
+            console.log(`Fhir table created for resource ${resource}`)
         }
         console.log('Fhir Table creation successfuly!')
     }catch(err){
