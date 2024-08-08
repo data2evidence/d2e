@@ -14,7 +14,9 @@ env:
 jobs:
   test-sql-proxy:
     runs-on: ubuntu-22.04
-
+    env:
+      LOCAL_DEBUG: "true"
+      SERVICE_ROUTES: '{"portalServer": "dummy", "usermgmt": "dummy", "idIssuerUrl": "dummy"}'
     steps:
     - uses: actions/checkout@v4
 
