@@ -206,29 +206,29 @@ x-envs:
       ],
       "systemadmin": [
         {
-          "iconSize": 24,
-          "iconUrl": "icons/user.svg",
           "name": "Users",
           "pluginPath": "plugins/SystemAdmin/UserOverview/module",
           "route": "user-overview"
         },
         {
-          "iconSize": 24,
-          "iconUrl": "icons/database.svg",
           "name": "Datasets",
           "pluginPath": "plugins/SystemAdmin/StudyOverview/module",
           "route": "dataset-overview"
         },
         {
-          "iconSize": 24,
-          "iconUrl": "icons/database.svg",
           "name": "Jobs",
           "pluginPath": "plugins/SystemAdmin/Jobs/module",
           "route": "jobs"
         },
         {
-          "iconSize": 24,
-          "iconUrl": "icons/data-management.svg",
+          "data": {
+            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
+          },
+          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/mapping/module.js",
+          "name": "ETL",
+          "route": "etl"
+        },
+        {
           "name": "Sql Editor",
           "pluginPath": "plugins/SystemAdmin/Sqleditor/module",
           "route": "sqleditor"
@@ -245,8 +245,6 @@ x-envs:
           "enabled": "true"
         },
         {
-          "iconSize": 24,
-          "iconUrl": "icons/settings-gear.svg",
           "name": "Setup",
           "pluginPath": "plugins/Setup/module",
           "route": "setup"

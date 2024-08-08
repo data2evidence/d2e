@@ -242,6 +242,16 @@ https://*.alp.local:55555 {
 		}
 	}
 
+	handle_path /mapping/* {
+		{$CADDY__CORS_LOCAL_PORTAL_UI:}
+
+		root * /home/docker/ui-files/mapping/
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
+	}
+
 	handle_path /log-viewer/* {
 		root * /home/docker/ui-files/log-viewer/
 		encode zstd gzip
