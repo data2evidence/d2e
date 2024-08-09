@@ -50,7 +50,7 @@ https://*.alp.local:55555 {
 	header {
 		Access-Control-Allow-Origin {args[0]}
 		Vary Origin
-		Access-Control-Allow-Headers "Authorization"
+		Access-Control-Allow-Headers "Authorization, Content-Type"
 		Access-Control-Allow-Credentials "true"
 		defer
 	}
