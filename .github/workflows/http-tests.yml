@@ -420,11 +420,11 @@ jobs:
       - name: print logs for pa-config
         if: ${{ always() || cancelled() || failure() }}
         run: |
-          docker logs alp-minerva-pa-config-svc -t
+          docker logs alp-minerva-pa-config-svc-1 -t
       - name: print logs for cdw
         if: ${{ always() || cancelled() || failure() }}
         run: |
-          docker logs alp-minerva-cdw-svc -t
+          docker logs alp-minerva-cdw-svc-1 -t
       - name: print logs for alp-minerva-s3
         if: ${{ always() || cancelled() || failure() }}
         run: |
