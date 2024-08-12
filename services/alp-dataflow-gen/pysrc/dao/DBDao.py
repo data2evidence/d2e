@@ -1,10 +1,12 @@
 
+import re
 import pandas as pd
 from datetime import datetime
-from typing import List, Dict, Any, Callable
+from typing import Any, Callable
 
 import sqlalchemy as sql
 from sqlalchemy.sql.selectable import Select
+from sqlalchemy.types import Text, UnicodeText
 from sqlalchemy.sql.schema import Table, Column
 from sqlalchemy.schema import CreateSchema, DropSchema
 
@@ -28,51 +30,30 @@ class DBDao:
         self.metadata = sql.MetaData(schema_name)  # sql.MetaData()
         self.inspector = sql.inspect(self.engine)
 
+
     def check_schema_exists(self) -> bool:
-        match self.db_dialect:
-            case DatabaseDialects.POSTGRES:
-                sql_query = sql.text(
-                    "select * from information_schema.schemata where schema_name = :x;")
-            case DatabaseDialects.HANA:
-                sql_query = sql.text(
-                    "select * from SYS.SCHEMAS where SCHEMA_NAME = :x;")
-        with self.engine.connect() as connection:
-            res = connection.execute(
-                sql_query, {"x": self.schema_name}).fetchone()
-            if res is None:
-                return False
-            else:
-                return True
+        return self.inspector.has_schema(self.schema_name)
 
     def check_empty_schema(self) -> bool:
-        sql_query = sql.text(
-            "select * from information_schema.tables where table_schema = :x;")
-        with self.engine.connect() as connection:
-            res = connection.execute(
-                sql_query, {"x": self.schema_name}).fetchone()
-            if res is None:
-                return True
-            else:
-                return False
+        return self.inspector.get_tables(self.schema_name) > 0
 
-    def create_schema(self):
-        with self.engine.connect() as connection:
-            connection.execute(CreateSchema(self.schema_name))
-            connection.commit()
+    def check_table_exists(self, table) -> bool:
+        return self.inspector.has_table(schema=self.schema_name, table_name=table)
 
-    def drop_schema(self):
-        with self.engine.connect() as connection:
-            connection.execute(DropSchema(self.schema_name, cascade=True))
-            connection.commit()
+    def get_table_names(self):
+        table_names = self.inspector.get_table_names(schema=self.schema_name)
+        return table_names
+    
+    def get_columns(self, table: str) -> list[dict]:
+        column_list = self.inspector.get_columns(schema=self.schema_name, table_name=table)
+        return column_list
 
-    def create_table(self, table_name: str, columns: Dict):
+    def get_table_row_count(self, table_name: str) -> int:
         with self.engine.connect() as connection:
-            new_table = sql.Table(table_name,
-                                  self.metadata,
-                                  *(sql.Column(name, dtype) for name, dtype in columns.items())
-                                  )
-            self.metadata.create_all(self.engine)
-            connection.commit()
+            table = sql.Table(table_name, self.metadata, autoload_with=connection)
+            select_count_stmt = sql.select(sql.func.count()).select_from(table)
+            row_count = connection.execute(select_count_stmt).scalar()   
+        return row_count
 
     def get_distinct_count(self, table_name: str, column_name: str) -> int:
         with self.engine.connect() as connection:
@@ -90,6 +71,18 @@ class DBDao:
             value = connection.execute(stmt).scalar()
             return value
 
+    def get_next_record_id(self, table_name: str, id_column_name: str) -> int:
+        table = sql.Table(table_name, self.metadata,
+                          autoload_with=self.engine)
+        id_column = getattr(table.c, id_column_name.casefold())
+        last_record_id_stmt = sql.select(sql.func.max(id_column))
+        last_record_id = self.execute_sqlalchemy_statement(
+            last_record_id_stmt, self.get_single_value)
+        if last_record_id is None:
+            return 1
+        else:
+            return int(last_record_id) + 1
+
     def update_cdm_version(self, cdm_version: str):
         with self.engine.connect() as connection:
             table = sql.Table("cdm_source".casefold(), self.metadata,
@@ -97,11 +90,9 @@ class DBDao:
             cdm_source_col = getattr(table.c, "cdm_source_name".casefold())
             update_stmt = sql.update(table).where(
                 cdm_source_col == self.schema_name).values(cdm_version=cdm_version)
-            print(
-                f"Updating cdm version {cdm_version} for schema {self.schema_name}")
             res = connection.execute(update_stmt)
             connection.commit()
-            print(f"Updated cdm version {cdm_version} for {self.schema_name}")
+
 
     def update_data_ingestion_date(self):
         with self.engine.connect() as connection:
@@ -147,40 +138,163 @@ class DBDao:
             updated_date = connection.execute(select_stmt).scalar()
             return updated_date
 
-    def get_table_names(self):
-        table_names = self.inspector.get_table_names(schema=self.schema_name)
-        return table_names
 
-    def __get_datamart_select_statement(self, datamart_table_config, columns_to_be_copied: List[str], date_filter: str = "", patients_to_be_copied: List[str] = []) -> Select:
-        table_name = self.__casefold(datamart_table_config['tableName'])
-        timestamp_column = datamart_table_config['timestamp_column'].casefold()
-        personId_column = datamart_table_config['personId_column'].casefold()
 
+    def create_schema(self):
+        with self.engine.connect() as connection:
+            connection.execute(CreateSchema(self.schema_name))
+            connection.commit()
+
+    def drop_schema(self, cascade: bool=True):
+        with self.engine.connect() as connection:
+            connection.execute(DropSchema(self.schema_name, cascade=cascade))
+            connection.commit()
+
+    def create_table(self, table_name: str, columns: dict):
+        with self.engine.connect() as connection:
+            new_table = sql.Table(table_name,
+                                  self.metadata,
+                                  *(sql.Column(name, dtype) for name, dtype in columns.items())
+                                  )
+            self.metadata.create_all(self.engine)
+            connection.commit()
+
+    def copy_table(self, source_table_name: str, target_table_name: str, target_schema_name: str, columns_to_copy: list[str], filter_conditions: str) -> int:
+        with self.engine.connect() as connection:
+            source_table = sql.Table(source_table_name, self.metadata, autoload_with=connection)
+
+            # Copy column from source_table including data type
+            target_columns = [source_table.c[col].copy() for col in columns_to_copy]
+            target_metadata = sql.MetaData(schema=target_schema_name)
+            target_table = sql.Table(target_table_name, target_metadata, *target_columns, schema=target_schema_name)
+            
+            # Create the new table in the database
+            target_metadata.create_all(self.engine, tables=[target_table])
+            
+            # Construct select statements with filter conditions
+            select_statement = self.create_select_statement(source_table_name, columns_to_copy, filter_conditions)
+    
+            # Insert into target table from source table
+            insert_statement = sql.insert(target_table).from_select(columns_to_copy, select_statement)
+            
+            result = connection.execute(insert_statement)
+            connection.commit()
+            
+            if self.db_dialect == DatabaseDialects.POSTGRES:
+                row_count = result.rowcount
+            elif self.db_dialect == DatabaseDialects.HANA:
+                select_count_stmt = sql.select(
+                    sql.func.count()).select_from(target_table)
+                row_count = connection.execute(
+                    select_count_stmt).scalar()   
+        return row_count
+
+    def create_table_from_select(self, source_table: str, target_schema: str, target_table: str, columns_to_copy: list[str], filter_conditions: list) -> int:
+                               
+        sanitized_source_table = self.__sanitize_inputs(source_table)
+        sanitized_target_table = self.__sanitize_inputs(target_table)
+        sanitized_target_schema = self.__sanitize_inputs(target_schema)
+
+        with self.engine.connect() as connection:
+            source_table = sql.Table(sanitized_source_table, self.metadata,
+                                     autoload_with=connection)
+            
+            select_statement = self.create_select_statement(source_table, columns_to_copy, filter_conditions)
+
+            compiled_sql_query = str(select_statement.compile(compile_kwargs={"literal_binds": True}))
+            
+            create_from_select_statement = sql.text(f'''CREATE TABLE {sanitized_target_schema}.{sanitized_target_table} AS ({compiled_sql_query});''')
+            row_count = connection.execute(create_from_select_statement).rowcount
+
+        return row_count
+
+    def copy_table_as_dataframe(self, source_table_name: str, columns_to_copy: list[str], filter_conditions: str) -> pd.DataFrame:
+        # Construct select statements with filter conditions
+        select_statement = self.create_select_statement(source_table_name, columns_to_copy, filter_conditions)
+        df = pd.read_sql_query(select_statement, self.engine)
+        return df
+
+    def create_select_statement(self, table_name: str, columns_to_select: list[str], filter_conditions: list) -> Select:
+        select_from_conditions = sql.and_(*filter_conditions)
         with self.engine.connect() as connection:
             source_table = sql.Table(table_name, self.metadata,
                                      autoload_with=connection)
+            
+            match self.db_dialect:
+                case DatabaseDialects.HANA:
+                    # cast text columns to nclob
+                    select_statement = sql.select(*map(lambda x: sql.cast(getattr(source_table.c, x), UnicodeText) if isinstance(source_table.c[x].type, Text) else getattr(source_table.c, x), columns_to_select)).where(select_from_conditions)
 
-            if columns_to_be_copied == ["*"]:
-                columns_to_be_copied = [
-                    column.key for column in source_table.c]
+                case DatabaseDialects.POSTGRES:
+                    select_statement = sql.select(*map(lambda x: getattr(source_table.c, self.__casefold(x)), columns_to_select)).where(select_from_conditions)
+        
+        return select_statement
 
-            columns_to_be_copied = list(
-                filter(self._system_columns, columns_to_be_copied))
 
-            select_stmt = sql.select(
-                *map(lambda x: getattr(source_table.c, self.__casefold(x)), columns_to_be_copied))
+    # DML
+    # Todo: To support bulk insert, Currently only suports single row inserts
+    def insert_values_into_table(self, table_name: str, column_value_mapping: list[dict]):
+        with self.engine.connect() as connection:
+            table = sql.Table(table_name, self.metadata,
+                              autoload_with=connection)
+            res = connection.execute(table.insert(), column_value_mapping)
+            connection.commit()
 
-            # Filter by patients if patients_to_be_copied is provided
-            if len(patients_to_be_copied) > 0 and personId_column:
-                select_stmt = select_stmt.where(
-                    source_table.c[personId_column.casefold()].in_(patients_to_be_copied))
+    def delete_records(self, table_name: str, conditions: list):
+        table = sql.Table(table_name, self.metadata, autoload_with=self.engine)
+        delete_from_conditions = sql.and_(*conditions)
+        delete_from_statement = table.delete().where(delete_from_conditions)
+        result = self.execute_sqlalchemy_statement(
+            delete_from_statement, self.return_affected_rowcounts
+        )
+        
+        return result
 
-            # Filter by timestamp if date_filter is provided
-            if date_filter and timestamp_column:
-                select_stmt = select_stmt.where(
-                    date_filter >= source_table.c[timestamp_column.casefold()])
+    def call_stored_procedure(self, sp_name: str, sp_params: str):
+        with self.engine.connect() as connection:
+            call_stmt = sql.text(f'CALL "{sp_name}"({sp_params}) ')
+            print(
+                f"Executing stored procedure {sp_name}")
+            res = connection.execute(call_stmt).fetchall()
+            connection.commit()
+            print(
+                f"Successfully executed stored prcoedure {sp_name}")
+            return res
 
-        return select_stmt
+
+
+    def get_sqlalchemy_columns(self, table_name: str, column_names: list[str]) -> dict[str, Column]:
+        '''
+        Returns a dictionary mapping column names to sqlalchemy Column objects
+        '''
+        with self.engine.connect() as connection:
+            table = Table(table_name, self.metadata, autoload_with=connection)            
+            return {column_name: getattr(table.c, column_name.casefold()) for column_name in column_names}
+
+    def execute_sqlalchemy_statement(self, sqlalchemy_statement, callback: Callable) -> Any | None:
+        with self.engine.connect() as connection:
+            res = connection.execute(sqlalchemy_statement)
+            connection.commit()
+            return callback(res)
+
+    def get_single_value(self, result) -> Any:  # Todo: Replace other dbdao function
+        if result.rowcount == 0:
+            raise Exception("No value returned")
+        if result.rowcount > 1:
+            raise Exception(f"Multiple values returned: {result.fetchall()}")
+        else:
+            return result.scalar()
+    
+    def return_affected_rowcounts(self, result) -> int:
+        return result.rowcount
+
+
+
+    def __sanitize_inputs(self, input: str):
+        # Allow only alphanumeric characters, underscores, and periods
+        if not all(char.isalnum() or char in ("_", ".") for char in input):
+            raise ValueError("Invalid characters in idenitifier")
+        return re.sub(r'[^a-zA-Z0-9_.]', '', input)
 
     def __casefold(self, obj_name: str) -> str:
         if not obj_name.startswith("GDM."):
@@ -188,47 +302,7 @@ class DBDao:
         else:
             return obj_name
 
-    def datamart_copy_table(self, datamart_table_config, target_schema: str, columns_to_be_copied: List[str], date_filter: str = "", patients_to_be_copied: List[str] = []) -> int:
-        table_name = self.__casefold(datamart_table_config['tableName'])
 
-        with self.engine.connect() as connection:
-            target_table = sql.Table(table_name, sql.MetaData(
-                schema=target_schema), autoload_with=connection)
-
-            source_table = sql.Table(table_name, self.metadata,
-                                     autoload_with=connection)
-            if columns_to_be_copied == ["*"]:
-                columns_to_be_copied = [
-                    column.key for column in source_table.c]
-
-            columns_to_be_copied = list(
-                filter(self._system_columns, columns_to_be_copied))
-
-            select_stmt = self.__get_datamart_select_statement(
-                datamart_table_config, columns_to_be_copied, date_filter, patients_to_be_copied)
-
-            columns_to_insert = [self.__casefold(
-                col) for col in columns_to_be_copied]
-
-            insert_stmt = sql.insert(target_table).from_select(
-                columns_to_insert, select_stmt)
-
-            res = connection.execute(insert_stmt)
-            connection.commit()
-            if self.db_dialect == DatabaseDialects.POSTGRES:
-                return res.rowcount
-            elif self.db_dialect == DatabaseDialects.HANA:
-                select_count_stmt = sql.select(
-                    sql.func.count()).select_from(target_table)
-                inserted_row_count = connection.execute(
-                    select_count_stmt).scalar()
-                return inserted_row_count
-
-    def datamart_get_copy_as_dataframe(self, datamart_table_config, columns_to_be_copied: List[str], date_filter: str = "", patients_to_be_copied: List[str] = []) -> pd.DataFrame:
-        select_stmt = self.__get_datamart_select_statement(
-            datamart_table_config, columns_to_be_copied, date_filter, patients_to_be_copied)
-        df = pd.read_sql_query(select_stmt, self.engine)
-        return df
 
     def enable_auditing(self):
         with self.engine.connect() as connection:
@@ -278,74 +352,3 @@ class DBDao:
             connection.commit()
             print(
                 f"New audit policy for {self.schema_name} created & enabled successfully")
-
-    def _system_columns(self, column):
-        return column.lower() not in ["system_valid_until", "system_valid_from"]
-
-    # Todo: To support bulk insert, Currently only suports single row inserts
-    def insert_values_into_table(self, table_name: str, column_value_mapping: List[Dict]):
-        with self.engine.connect() as connection:
-            table = sql.Table(table_name, self.metadata,
-                              autoload_with=connection)
-            res = connection.execute(table.insert(), column_value_mapping)
-            connection.commit()
-
-    def call_stored_procedure(self, sp_name: str, sp_params: str):
-        with self.engine.connect() as connection:
-            call_stmt = sql.text(f'CALL "{sp_name}"({sp_params}) ')
-            print(
-                f"Executing stored procedure {sp_name}")
-            res = connection.execute(call_stmt).fetchall()
-            connection.commit()
-            print(
-                f"Successfully executed stored prcoedure {sp_name}")
-            return res
-
-    def get_sqlalchemy_columns(self, table_name: str, column_names: List[str]) -> Dict[str, Column]:
-        '''
-        Returns a dictionary mapping column names to sqlalchemy Column objects
-        '''
-        with self.engine.connect() as connection:
-            table = Table(table_name, self.metadata,
-                          autoload_with=connection)
-            return {column_name: getattr(table.c, column_name.casefold()) for column_name in column_names}
-
-    def execute_sqlalchemy_statement(self, sqlalchemy_statement, callback: Callable) -> Any | None:
-        with self.engine.connect() as connection:
-            res = connection.execute(sqlalchemy_statement)
-            connection.commit()
-            return callback(res)
-
-    def get_next_record_id(self, table_name: str, id_column_name: str) -> int:
-        table = sql.Table(table_name, self.metadata,
-                          autoload_with=self.engine)
-        id_column = getattr(table.c, id_column_name.casefold())
-        last_record_id_stmt = sql.select(sql.func.max(id_column))
-        last_record_id = self.execute_sqlalchemy_statement(
-            last_record_id_stmt, self.get_single_value)
-        if last_record_id is None:
-            return 1
-        else:
-            return int(last_record_id) + 1
-
-    def delete_records(self, table_name: str, conditions: List):
-        table = sql.Table(table_name, self.metadata, autoload_with=self.engine)
-        delete_from_conditions = sql.and_(*conditions)
-        delete_from_statement = table.delete().where(delete_from_conditions)
-        result = self.execute_sqlalchemy_statement(
-            delete_from_statement, self.return_affected_rowcounts
-        )
-        
-        return result
-    
-    # Callables
-    def get_single_value(self, result) -> Any:  # Todo: Replace other dbdao function
-        if result.rowcount == 0:
-            raise Exception("No value returned")
-        if result.rowcount > 1:
-            raise Exception(f"Multiple values returned: {result.fetchall()}")
-        else:
-            return result.scalar()
-    
-    def return_affected_rowcounts(self, result) -> int:
-        return result.rowcount
