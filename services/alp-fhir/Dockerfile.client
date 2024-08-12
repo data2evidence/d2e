@@ -19,8 +19,6 @@ WORKDIR /usr/
 FROM ${IMAGE}
 
 RUN apt-get update && apt-get -y install openssl
-# RUN apk add --update --upgrade openssl zlib musl-dev
-# RUN ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 
 WORKDIR /home/docker/
 
@@ -41,5 +39,5 @@ ARG GIT_COMMIT_ARG
 # ENV
 ENV GIT_COMMIT=$GIT_COMMIT_ARG
 
-#ENTRYPOINT ["yarn", "build-and-seed"]
-CMD ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["yarn", "build-and-seed"]
+#CMD ["tail", "-f", "/dev/null"]
