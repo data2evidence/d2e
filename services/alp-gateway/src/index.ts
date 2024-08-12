@@ -392,6 +392,20 @@ routes.forEach((route: IRouteProp) => {
           })
         )
         break
+      case 'prefect':
+        app.use(
+          source,
+          ensureAuthenticated,
+          addSubToRequestUserMiddleware,
+          ensureAlpSysAdminAuthorized,
+          express.json(),
+          checkScopes,
+          createProxyMiddleware({
+            ...getCreateMiddlewareOptions(services.prefect),
+            headers: { Connection: 'keep-alive' },
+            pathRewrite: path => path.replace('/gateway/api/prefect', '/api')
+          })
+        )
       default:
         if (plugins && Object.keys(plugins).length > 0) {
           Object.keys(plugins).forEach((type: keyof IPlugin) => {
