@@ -319,7 +319,8 @@ jobs:
               --data-raw "{\"userId\":\"$IDP_SUB\"}")
           printf "%s\n" "$response"
           USER_MGMT_ID=$(printf "%s\n" "$response" | grep -o '"userId":"[^"]*"' | awk -F':' '{print $2}' | tr -d '"')
-          echo "USER MGMT ID:"
+          echo "USER_MGMT_ID=$USER_MGMT_ID" >> $GITHUB_ENV # Make available to subsequent github actions steps
+          echo "USER_MGMT_ID:"
           echo $USER_MGMT_ID
 
       - name: Update roles
