@@ -813,7 +813,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
   {
     path: '^/gateway/api/prefect',
     scopes: ['gateway.prefect.update'],
-    httpMethods: ['PUT']
+    httpMethods: ['PUT', 'PATCH']
   },
   {
     path: '^/gateway/api/prefect',
