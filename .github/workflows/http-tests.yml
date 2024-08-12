@@ -48,7 +48,7 @@ jobs:
   run-http-tests:
     needs: [check_file_changes]
     if: (github.ref_name == 'develop' || contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
-    runs-on: ubuntu-latest
+    runs-on: test
     env:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       TESTSCHEMA: HTTP_${{github.run_id}}
@@ -142,7 +142,7 @@ jobs:
 
       - name: build system services
         run: |
-          yarn build:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init alp-logto alp-logto-post-init alp-mri-pg-config
+          yarn build:minerva
 
       - name: Manipulate configuration
         run: |
@@ -176,7 +176,7 @@ jobs:
 
       - name: Seed db credentials
         run: |
-          yarn start:minerva-test alp-minerva-postgres alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d
+          yarn start:minerva alp-minerva-postgres alp-minerva-pg-mgmt-init alp-db-credentials-mgr -d
           sleep 20 # wait for db migrations to complete
 
           echo . create read role
@@ -195,7 +195,7 @@ jobs:
 
       - name: start system services
         run: |
-          yarn start:minerva-test alp-caddy alp-minerva-postgres alp-minerva-gateway alp-minerva-analytics-svc alp-minerva-user-mgmt alp-minerva-portal-server alp-query-gen alp-bookmark alp-minerva-pg-mgmt-init alp-db-credentials-mgr alp-minerva-pa-config-svc alp-minerva-cdw-svc alp-minerva-s3 alp-minio-post-init alp-logto alp-logto-post-init alp-mri-pg-config -d
+          yarn start:minerva -d
           sleep 120
 
       - name: check status of docker containers
