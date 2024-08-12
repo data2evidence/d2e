@@ -10,7 +10,7 @@ import struct
 from typing import Dict, List, Optional
 
 from .core import BVType, Connection, Extension, Session, QueryResult
-from .database import parse_connection_param_database, get_rewriter_from_dialect, get_db_connection, SqlProxyDatabaseClients
+from .database import parse_connection_param_database, get_rewriter_from_dialect, get_db_connection, CachedbDatabaseClients
 from .rewrite import Rewriter
 from .middleware import dataset_auth_check, get_dataset_info
 
@@ -674,7 +674,7 @@ class BuenaVistaServer(socketserver.ThreadingTCPServer):
 
     def __init__(
         self,
-        db_clients: SqlProxyDatabaseClients,
+        db_clients: CachedbDatabaseClients,
         server_address,
         *,
         extensions: List[Extension] = [],
