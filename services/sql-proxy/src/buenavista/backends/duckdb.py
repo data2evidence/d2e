@@ -141,6 +141,10 @@ class DuckDBSession(Session):
         return self._cursor.query(f"select * from {table}")
 
     def rewrite_sql(self, sql: str) -> str:
+        """"D2E specific rewrites"""
+        if "session.application_user" in sql:
+            return "SELECT 'DUMMY'"
+
         """Some minimalist SQL rewrites, inspired by postlite, to make DBeaver less unhappy."""
         if match := re.search(r"PREPARE\s+(\w+)\s+FROM", sql):
             stmt = match.group(1)
@@ -187,12 +191,14 @@ class DuckDBSession(Session):
             sql = sql.replace(
                 "AND d.classoid = CAST('pg_namespace' AS REGCLASS)", "")
             logger.info("Rewritten SQL to remove REGCLASS reference: " + sql)
+
         return sql
 
     def in_transaction(self) -> bool:
         return self.in_txn
 
     def execute_sql(self, sql: str, params=None) -> QueryResult:
+        logger.debug("execute_sql(duckdb)")
         status = ""
         try:
             lsql = sqlglot.parse_one(sql).sql(comments=False)
@@ -243,7 +249,7 @@ class DuckDBConnection(Connection):
 
     def parameters(self) -> Dict[str, str]:
         return {
-            "server_version": "9.3.duckdb",
+            "server_version": "9.3.duckdbproxy",
             "client_encoding": "UTF8",
             "DateStyle": "ISO",
         }
