@@ -7,13 +7,11 @@ export async function readJsonFileAndCreateDuckdbTables(){
     try{
         await duckdb.createConnection();
         const result = await duckdb.executeQuery(`select * from read_json('${schemaPath}')`)
-        console.log(result)
         const fhirResources = result[0].discriminator.mapping
         const duckdbDataTypes = convertFhirDataTypesToDuckdb(result[0])
         for(let resource in fhirResources){
             const parsedFhirDefinitions = getFhirTableStructure(result[0], resource)
             const duckdbTableStructure = getDuckdbColumnString(duckdbDataTypes, parsedFhirDefinitions, true)
-            await duckdb.createConnection();
             await createFhirTable(duckdb, resource, duckdbTableStructure)
             console.log(`Fhir table created for resource ${resource}`)
         }
