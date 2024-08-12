@@ -75,7 +75,6 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           DOCKER_COMPOSE_DN_BASE_ALL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain
           DOCKER_COMPOSE_DN_BASE_LOCAL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.base-local.yml/notesPlain
-          DOCKER_COMPOSE_DN_LOCAL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.http.tests.yml/notesPlain
           HANASERVER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/SG_FQDN"
           HDIUSER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin user"
           HDIPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
@@ -126,14 +125,9 @@ jobs:
         run: |
           echo "${DOCKER_COMPOSE_DN_BASE_ALL_ENV}" > .env.base-all.yml
           echo "${DOCKER_COMPOSE_DN_BASE_LOCAL_ENV}" > .env.base-local.yml
-          echo "${DOCKER_COMPOSE_DN_LOCAL_ENV}" > .env.local.yml
-          wc -l .env.base-all.yml .env.base-local.yml .env.local.yml
+          wc -l .env.base-all.yml .env.base-local.yml
           yarn --cwd internal gen:env
           sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
-          # sed -i "s/HTTPTEST_ADMIN_USER/${HDIUSER}/g" .env.local
-          # sed -i "s/HTTPTEST_ADMIN_PWD/${HDIPW}/g" .env.local
-          # cat .env.local
-          # cd ..
 
       - name: Setup Test DB
         run: |
