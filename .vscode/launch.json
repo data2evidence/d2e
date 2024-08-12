@@ -228,7 +228,7 @@
       ]
     },
     {
-      "name": "alp-sql-proxy",
+      "name": "alp-cachedb",
       "type": "debugpy",
       "request": "attach",
       "connect": {
@@ -237,7 +237,7 @@
       },
       "pathMappings": [
         {
-          "localRoot": "${workspaceFolder}/services/sql-proxy/src",
+          "localRoot": "${workspaceFolder}/services/cachedb/src",
           "remoteRoot": "./src"
         }
       ]
@@ -257,6 +257,6 @@
         "${workspaceFolder}/**",
         "!**/node_modules/**"
       ]
-    },
+    }
   ]
 }
