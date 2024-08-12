@@ -62,10 +62,6 @@ class App {
   }
 
   start() {
-    this.app.use((err, req, res, next) => {
-      console.error(err.stack) // Log the error stack trace for debugging
-      res.status(500).json({ error: 'Internal Server Error' })
-    })
     runMigrations().then(() => {
       const server = https.createServer(
         {
