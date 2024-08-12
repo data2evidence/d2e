@@ -286,8 +286,9 @@ x-envs:
     TLS__INTERNAL__DOMAIN: ${TLS__INTERNAL__DOMAIN:-alp.local}
     TLS__INTERNAL__KEY: ${TLS__INTERNAL__KEY}
   sql-proxy: &sql-proxy
-    SQL_PROXY_HOST: alp-sql-proxy
-    SQL_PROXY_PORT: 41191
+    SQL_PROXY__HOST: alp-sql-proxy
+    SQL_PROXY__PORT: 41191
+    SQL_PROXY__POOL_SIZE: ${SQL_PROXY__POOL_SIZE-10}
 services:
   alp-bookmark:
     container_name: &c0 alp-minerva-bookmark-svc-${BASE_PORT:-1}
@@ -602,7 +603,7 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-      
+
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -1716,8 +1717,7 @@ services:
         - *x-routes
         - *x-tls
         - *x-routes
-      SQL_PROXY__PORT: 41191
-      SQL_PROXY__POOL_SIZE: ${SQL_PROXY__POOL_SIZE-10}
+        - *sql-proxy
       DUCKDB__DATA_FOLDER: /home/docker/duckdb_data
       LOCAL_DEBUG: "false"
       IDP__SCOPE: https://alp-default

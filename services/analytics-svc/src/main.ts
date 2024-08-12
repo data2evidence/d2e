@@ -617,8 +617,8 @@ const getSqlProxyDbConnections = async ({
     }
 
     // Overwrite analyticsCrendential values to connect to sql-proxy
-    analyticsCredentials.host = env.SQL_PROXY_HOST;
-    analyticsCredentials.port = env.SQL_PROXY_PORT;
+    analyticsCredentials.host = env.SQL_PROXY__HOST;
+    analyticsCredentials.port = env.SQL_PROXY__PORT;
     analyticsCredentials.database = sqlProxyDatabase;
     analyticsCredentials.user = token;
 
