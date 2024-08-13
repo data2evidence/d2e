@@ -70,29 +70,9 @@ https://*.alp.local:55555 {
 			level_format color
 		}
 	}
-
-	handle /* {
-		reverse_proxy http://alp-perseus-frontend-1:4200 {
-			header_up X-Real-IP {http.request.remote_host}
-		}
-	}
-
-	handle_path /user/api/is_token_valid_internal {
-		reverse_proxy http://alp-perseus-user-1:5001 {
-			header_up Content-Length ""
-			header_up X-Original-URI {http.request.uri}
-		}
-	}
-
-	handle /user/* {
-		reverse_proxy http://alp-perseus-user-1:5001 {
-			header_up X-Real-IP {http.request.remote_host}
-		}
-	}
-
+	# import cors https://localhost:5173
 	handle /backend/* {
 		import forward_authentication
-
 		reverse_proxy http://alp-perseus-backend-1:5004 {
 			header_up X-Real-IP {http.request.remote_host}
 		}
@@ -423,6 +403,7 @@ https://localhost:41101 {
 https://{$CADDY__ALP__PUBLIC_FQDN} {
 	{$TLS__CADDY_DIRECTIVE}
 	import portal
+	import perseus
 }
 
 https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
@@ -441,10 +422,4 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 			}
 		}
 	}
-}
-
-http://localhost:41180 {
-	# Allow CORS for mapping UI local development
-	import cors http://localhost:5173
-	import perseus
 }
