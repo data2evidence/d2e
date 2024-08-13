@@ -5,33 +5,33 @@
  * @author Shahzeb khan (D066567)
  */
 
-var fs = require('fs');
-var fd = require('fs');
-var request = require('request');
-var _ = require('underscore');
-var HanaRequest = require('./hana_request');
-var now = require('performance-now');
-var hdb = require('hdb');
-var mysql = require('mysql');
+var fs = require('fs')
+var fd = require('fs')
+var request = require('request')
+var _ = require('underscore')
+var HanaRequest = require('./hana_request')
+var now = require('performance-now')
+var hdb = require('hdb')
+var mysql = require('mysql')
 
-    var last_index;
-    var attempt = 1;
-    var url;
-    var request_payload;
-    var timing;
-    var key = 0;
-    var key1 = 0;
-    var payload;
-    var arr = [];
-    var url_array = [];
-    var payload_array = [];
-    var parameter_array = [];
-    var method_array=[];
-    var headers_array=[];
-    var num = 0;
-    var arr2 = [];
-    var status_code = [];
-    var timestamp = new Date();
+var last_index
+var attempt = 1
+var url
+var request_payload
+var timing
+var key = 0
+var key1 = 0
+var payload
+var arr = []
+var url_array = []
+var payload_array = []
+var parameter_array = []
+var method_array = []
+var headers_array = []
+var num = 0
+var arr2 = []
+var status_code = []
+var timestamp = new Date()
 
 /**
  * Generate a performance test baseline based on HAR files specified in specs and runSpecs json.
@@ -41,297 +41,315 @@ var mysql = require('mysql');
  * 4. Writes the data recorded above into hana database of machine mentioned in runSpecs.
  */
 var PerformanceTool = function (params) {
-    this.params = params;
-    this.config = fs.readFileSync(params[2]);
-    this.jsonConfig = JSON.parse(this.config);
-    this.contents = fs.readFileSync(this.jsonConfig.file);
-    this.jsonContent = JSON.parse(this.contents);
-    this.user_http = this.jsonConfig.user_http;
-    this.password_http = this.jsonConfig.password_http;
-    this.last_node = this.jsonContent.log.entries.length;
-    if (this.jsonConfig.user_hdb !== '' && this.jsonConfig.host !== '') {
-        this.host = this.jsonConfig.host;
-        this.instance = this.jsonConfig.instance;
-        this.user_hdb = this.jsonConfig.user_hdb;
-        this.password_hdb = this.jsonConfig.password_hdb;
-    } else {
-        this.host = params[3];
-        this.instance = params[4];
-        this.user_hdb = params[5];
-        this.password_hdb = params[6];
-    }
-    this.host_2 = this.jsonConfig.host_2;
-    this.user_hdb_2 = this.jsonConfig.user_hdb_2;
-    this.password_hdb_2 = this.jsonConfig.password_hdb_2;
-    this.instance_2 = this.jsonConfig.instance_2;
-    this.fold = this.jsonConfig.fold;
-    this.filter_tag = this.jsonConfig.filter_tag;
-    this.myHanaRequest = new HanaRequest(getMriAdminUserLogin(this.host, this.instance, this.user_http, this.password_http));
-    this.client1 = hdb.createClient({
-        host: this.host_2,
-        port: 3 + this.instance_2 + 15,
-        user: this.user_hdb_2,
-        password: this.password_hdb_2
-    });
-    this.client = hdb.createClient({
-        host: this.host,
-        port: 3 + this.instance + 15,
-        user: this.user_hdb,
-        password: this.password_hdb
-    });
-};
+  this.params = params
+  this.config = fs.readFileSync(params[2])
+  this.jsonConfig = JSON.parse(this.config)
+  this.contents = fs.readFileSync(this.jsonConfig.file)
+  this.jsonContent = JSON.parse(this.contents)
+  this.user_http = this.jsonConfig.user_http
+  this.password_http = this.jsonConfig.password_http
+  this.last_node = this.jsonContent.log.entries.length
+  if (this.jsonConfig.user_hdb !== '' && this.jsonConfig.host !== '') {
+    this.host = this.jsonConfig.host
+    this.instance = this.jsonConfig.instance
+    this.user_hdb = this.jsonConfig.user_hdb
+    this.password_hdb = this.jsonConfig.password_hdb
+  } else {
+    this.host = params[3]
+    this.instance = params[4]
+    this.user_hdb = params[5]
+    this.password_hdb = params[6]
+  }
+  this.host_2 = this.jsonConfig.host_2
+  this.user_hdb_2 = this.jsonConfig.user_hdb_2
+  this.password_hdb_2 = this.jsonConfig.password_hdb_2
+  this.instance_2 = this.jsonConfig.instance_2
+  this.fold = this.jsonConfig.fold
+  this.filter_tag = this.jsonConfig.filter_tag
+  this.myHanaRequest = new HanaRequest(
+    getMriAdminUserLogin(this.host, this.instance, this.user_http, this.password_http)
+  )
+  this.client1 = hdb.createClient({
+    host: this.host_2,
+    port: 3 + this.instance_2 + 15,
+    user: this.user_hdb_2,
+    password: this.password_hdb_2
+  })
+  this.client = hdb.createClient({
+    host: this.host,
+    port: 3 + this.instance + 15,
+    user: this.user_hdb,
+    password: this.password_hdb
+  })
+}
 
 PerformanceTool.prototype.start = function (callback) {
-    var last_node = this.last_node;
-    var jsonContent = this.jsonContent;
-    var jsonConfig = this.jsonConfig;
-    var myHanaRequest = this.myHanaRequest;
-    var filter_tag = this.filter_tag;
-    var host = this.host;
-    var port = 80 + this.instance;
-    var client1 = this.client1;
-    var client = this.client;
-    var fold = this.fold;
-    var that = this;
+  var last_node = this.last_node
+  var jsonContent = this.jsonContent
+  var jsonConfig = this.jsonConfig
+  var myHanaRequest = this.myHanaRequest
+  var filter_tag = this.filter_tag
+  var host = this.host
+  var port = 80 + this.instance
+  var client1 = this.client1
+  var client = this.client
+  var fold = this.fold
+  var that = this
 
-     // Initialize with each start
-    attempt = 1;
-    key = 0;
-    key1 = 0;
-    arr = [];
-    url_array = [];
-    payload_array = [];
-    parameter_array = [];
-    method_array = [];
-    headers_array = [];
-    status_code = [];
-    num = 0;
+  // Initialize with each start
+  attempt = 1
+  key = 0
+  key1 = 0
+  arr = []
+  url_array = []
+  payload_array = []
+  parameter_array = []
+  method_array = []
+  headers_array = []
+  status_code = []
+  num = 0
 
-    this.myHanaRequest._login(function (err) {
-        if (err) {
-            console.log('login failed ' + err);
-            throw new Error('Login failed');
+  this.myHanaRequest._login(function (err) {
+    if (err) {
+      console.log('login failed ' + err)
+      throw new Error('Login failed')
+    }
+  })
+  client.connect(function (err) {
+    if (err) {
+      console.log('Connect error: Missing parameters')
+      throw new Error('Connection Failed')
+    }
+  })
+  ;(function loop_first_execution() {
+    if (key < last_node) {
+      request_payload = jsonContent.log.entries[key].request.postData
+      url = jsonContent.log.entries[key].request.url
+
+      if (typeof request_payload === 'undefined') payload = ''
+      else if (typeof request_payload !== 'undefined') payload = request_payload.text
+      if (url.search(filter_tag) > -1) {
+        timing = jsonContent.log.entries[key].timings
+
+        // 1 => protocol, 2 => domain, 3 => port , 4 => path, 5  => params
+        var urlParts = url.match(
+          /^(?:((?:https?|s?ftp):)\/\/)([^:\/\s]+)(?::(\d*))?(?:\/([^\s?#]+)?([?][^?#]*)?(#.*)?)?/
+        )
+        var url_remade = urlParts[1] + '//' + host + ':' + port + '/' + urlParts[4]
+        var path = urlParts[4]
+        if (urlParts[5]) {
+          url_remade += urlParts[5]
+          if (jsonContent.log.entries[key].request.method === 'GET') {
+            path += urlParts[5]
+          }
         }
-    });
-    client.connect(function (err) {
-        if (err) {
-            console.log('Connect error: Missing parameters');
-            throw new Error('Connection Failed');
+
+        var query_parameter = {}
+        var queryString = jsonContent.log.entries[key].request.queryString
+        var method = jsonContent.log.entries[key].request.method
+        for (var q = 0; q < queryString.length; q++) query_parameter[queryString[q].name] = queryString[q].value
+
+        var parameter = JSON.parse(JSON.stringify(query_parameter))
+        if (jsonContent.log.entries[key].request.method === 'GET') {
+          parameter = ''
         }
-    });
-         (function loop_first_execution() {
 
-            if (key < last_node) {
-                request_payload = jsonContent.log.entries[key].request.postData;
-                url = jsonContent.log.entries[key].request.url;
+        var headers = jsonContent.log.entries[key].request.headers
 
-                if (typeof(request_payload) === 'undefined')
-                    payload = '';
-                else if (typeof(request_payload) !== 'undefined')
-                    payload = request_payload.text;
-                if (url.search(filter_tag) > -1) {
-                    timing = jsonContent.log.entries[key].timings;
+        var setQuery = {
+          method: jsonContent.log.entries[key].request.method,
+          path: path,
+          headers: headers,
+          body: payload,
+          parameters: parameter
+        }
+        var start = now()
 
-                    // 1 => protocol, 2 => domain, 3 => port , 4 => path, 5  => params
-                    var urlParts = url.match( /^(?:((?:https?|s?ftp):)\/\/)([^:\/\s]+)(?::(\d*))?(?:\/([^\s?#]+)?([?][^?#]*)?(#.*)?)?/ );
-                    var url_remade = urlParts[ 1 ] + '//' + host + ':' + port + '/' + urlParts[ 4 ];
-                    var path = urlParts[ 4 ];
-                    if ( urlParts[ 5 ] ) {
-                        url_remade += urlParts[ 5 ];
-                        if ( jsonContent.log.entries[key].request.method === 'GET' ) {
-                            path += urlParts[ 5 ];
-                        }
+        myHanaRequest.request(setQuery, function (err, response, body) {
+          if (response.statusCode !== 200 && response.statusCode !== 202) {
+            console.log(
+              'First request is unsuccessful for url ' + url_remade + '" :: "Status code: ' + response.statusCode + '"'
+            )
+          } else console.log('First request is successful for url ' + url_remade + ':: Status code: ' + response.statusCode)
+
+          var end = now()
+          var time = ((end - start) / 1000).toFixed(3)
+          arr.push(time)
+          url_array.push(url_remade)
+          payload_array.push(payload)
+          parameter_array.push(parameter)
+          method_array.push(method)
+          headers_array.push(headers)
+          key++
+          loop_first_execution()
+        })
+      } else {
+        //console.log( "Skipping request: " + url )
+        key++
+        loop_first_execution()
+      }
+    } else if (key === last_node) {
+      ;(function loop_second_execution() {
+        if (key1 < last_node) {
+          url = jsonContent.log.entries[key1].request.url
+          if (url.search(filter_tag) > -1) {
+            request_payload = jsonContent.log.entries[key1].request.postData
+            timing = jsonContent.log.entries[key1].timings
+
+            var urlParts = url.match(
+              /^(?:((?:https?|s?ftp):)\/\/)([^:\/\s]+)(?::(\d*))?(?:\/([^\s?#]+)?([?][^?#]*)?(#.*)?)?/
+            )
+            var new_url = urlParts[1] + '//' + host + ':' + port + '/' + urlParts[4] + urlParts[5]
+            var url_remade = urlParts[1] + '//' + host + ':' + port + '/' + urlParts[4]
+            if (urlParts[5]) url_remade = new_url
+
+            var queryString = jsonContent.log.entries[key1].request.queryString
+            var query_parameter = {}
+            for (var q = 0; q < queryString.length; q++) query_parameter[queryString[q].name] = queryString[q].value
+            var parameter = JSON.parse(JSON.stringify(query_parameter))
+            if (jsonContent.log.entries[key1].request.method === 'GET') {
+              parameter = ''
+            }
+            //if ( url_remade.match( /search\.xsjs/ ) )
+            //    parameter = '';
+
+            if (typeof request_payload === 'undefined') payload = ''
+            else payload = request_payload.text
+
+            var headers = jsonContent.log.entries[key1].request.headers
+
+            var setQuery = {
+              method: jsonContent.log.entries[key1].request.method,
+              path: url_remade,
+              headers: headers,
+              body: payload,
+              parameters: parameter
+            }
+            var start = now()
+
+            myHanaRequest.request(setQuery, function (err, response, body) {
+              var end = now()
+              var time = (end - start).toFixed(3)
+              status_code.push(response.statusCode)
+              console.log('Loop request of ' + url_remade + ':: "Status code: ' + response.statusCode + '"')
+              if (url.search(filter_tag) > -1) {
+                arr2[num] = time
+                num++
+              }
+              key1++
+              loop_second_execution()
+            })
+          } else {
+            //console.log( "Skipping request: " + url )
+            key1++
+            loop_second_execution()
+          }
+        } else if (key1 === last_node && attempt < fold) {
+          attempt++
+          key1 = 0
+          loop_second_execution()
+        } else if (attempt === fold) {
+          var n = 0
+          var last_index = 0
+          client.exec('SELECT RID FROM "PERFORMANCE"."MAIN" ORDER BY RID DESC LIMIT 1', function (err, rows) {
+            if (err) {
+              console.log(err)
+            } else if (typeof rows[0] == 'undefined') {
+              last_index = 0
+            } else {
+              last_index = rows[0].RID + 1
+            }
+          })
+          var bucketsize = num / fold
+          ;(function loop_inner() {
+            if (n < bucketsize) {
+              var array = []
+              for (var position = 0; position < fold; position++) {
+                var len = position * bucketsize + n
+                array.push(Number(arr2[len]))
+              }
+              var r = that.average(array)
+              console.log('Request URL: ' + url_array[n])
+              console.log(
+                'Average end to end time for endpoint request ' + (n + 1) + ' is (Cached)(seconds): ' + r.mean / 1000
+              )
+              console.log(
+                'Standard deviation for cached endpoint ' + (n + 1) + ' request is (seconds): ' + r.deviation / 1000
+              )
+
+              client.on('error', function (err) {
+                console.error('Network connection error', err)
+              })
+              var folderNameTemp = that.params[2].substring(0, that.params[2].lastIndexOf('/'))
+              var temp = folderNameTemp.substring(folderNameTemp.lastIndexOf('/') + 1, folderNameTemp.length)
+              var folderName = that.params[2].substring(that.params[2].lastIndexOf('/') + 1, that.params[2].length)
+              that.backend_request(
+                client,
+                url_array[n],
+                headers_array[n],
+                parameter_array[n],
+                payload_array[n],
+                method_array[n],
+                fold,
+                function (body, nocache_avg, response, exec_count, prep_count) {
+                  that.database_storing(
+                    body,
+                    nocache_avg,
+                    response,
+                    n,
+                    last_index,
+                    client,
+                    client1,
+                    url_array[n],
+                    headers_array[n],
+                    parameter_array[n],
+                    payload_array[n],
+                    method_array[n],
+                    array,
+                    status_code[n],
+                    timestamp,
+                    fold,
+                    temp + '_' + folderName,
+                    exec_count,
+                    prep_count,
+                    function (body) {
+                      console.log(body)
+                      n++
+                      loop_inner()
                     }
-
-                    var query_parameter = {};
-                    var queryString = jsonContent.log.entries[key].request.queryString;
-                    var method = jsonContent.log.entries[key].request.method;
-                    for (var q = 0; q < queryString.length; q++)
-                        query_parameter[queryString[q].name] = queryString[q].value;
-
-                    var parameter = JSON.parse(JSON.stringify(query_parameter));
-                    if ( jsonContent.log.entries[key].request.method === 'GET' ) {
-                        parameter = '';
-                    }
-
-                    var headers = jsonContent.log.entries[key].request.headers;
-
-                    var setQuery = {
-                        method: jsonContent.log.entries[key].request.method,
-                        path: path,
-                        headers : headers,
-                        body: payload,
-                        parameters: parameter
-                    };
-                    var start = now();
-
-                    myHanaRequest.request(setQuery, function (err, response, body) {
-                        if (response.statusCode !== 200 && response.statusCode !== 202)
-                            {
-                              console.log('First request is unsuccessful for url ' + url_remade +'" :: "Status code: '+response.statusCode+'"');
-                            }
-                        else
-                             console.log('First request is successful for url ' + url_remade + ':: Status code: ' + response.statusCode );
-
-                        var end = now();
-                        var time = ((end - start) / 1000).toFixed(3);
-                        arr.push(time);
-                        url_array.push(url_remade);
-                        payload_array.push(payload);
-                        parameter_array.push(parameter);
-                        method_array.push(method);
-                        headers_array.push(headers);
-                        key++;
-                        loop_first_execution();
-                    });
-                } else {
-                    //console.log( "Skipping request: " + url )
-                    key++;
-                    loop_first_execution();
+                  )
                 }
+              )
+            } else if (n === bucketsize) {
+              if (client1.readyState === 'connected') {
+                client1.disconnect(function (err) {
+                  client1.end()
+                })
+              }
+              client.disconnect(function (err) {
+                client.end()
+                return callback('success')
+              })
             }
-             else if (key === last_node) {
-                (function loop_second_execution() {
-                    if (key1 < last_node) {
-
-                        url = jsonContent.log.entries[key1].request.url;
-                        if (url.search(filter_tag) > -1) {
-                            request_payload = jsonContent.log.entries[key1].request.postData;
-                            timing = jsonContent.log.entries[key1].timings;
-
-                            var urlParts = url.match( /^(?:((?:https?|s?ftp):)\/\/)([^:\/\s]+)(?::(\d*))?(?:\/([^\s?#]+)?([?][^?#]*)?(#.*)?)?/ );
-                            var new_url = urlParts[ 1 ] + '//' + host + ':' + port + '/' + urlParts[ 4 ] + urlParts[ 5 ];
-                            var url_remade = urlParts[ 1 ] + '//' + host + ':' + port + '/' + urlParts[ 4 ];
-                            if (urlParts[ 5 ])
-                                url_remade = new_url;
-
-                            var queryString = jsonContent.log.entries[key1].request.queryString;
-                            var query_parameter = {};
-                            for (var q = 0; q < queryString.length; q++)
-                                query_parameter[queryString[q].name] = queryString[q].value;
-                            var parameter = JSON.parse(JSON.stringify(query_parameter));
-                            if ( jsonContent.log.entries[key1].request.method === 'GET' ) {
-                                parameter = '';
-                            }
-                            //if ( url_remade.match( /search\.xsjs/ ) )
-                            //    parameter = '';
-
-                            if (typeof(request_payload) === 'undefined')
-                                payload = '';
-
-                            else
-                                payload = request_payload.text;
-
-                            var headers = jsonContent.log.entries[key1].request.headers;
-
-                            var setQuery = {
-                                method: jsonContent.log.entries[key1].request.method,
-                                path: url_remade,
-                                headers : headers,
-                                body: payload,
-                                parameters: parameter
-                            };
-                            var start = now();
-
-                            myHanaRequest.request(setQuery, function (err, response, body) {
-                                var end = now();
-                                var time = ((end - start)).toFixed(3);
-                                status_code.push(response.statusCode);
-                                console.log('Loop request of ' + url_remade + ':: "Status code: '+response.statusCode+'"');
-                                if (url.search(filter_tag) > -1) {
-                                    arr2[num] = time;
-                                    num++;
-                                }
-                                key1++;
-                                loop_second_execution();
-                            });
-                        } else {
-                            //console.log( "Skipping request: " + url )
-                            key1++;
-                            loop_second_execution();
-                        }
-                    }
-                    else if (key1 === last_node && attempt < fold)
-                    {
-                        attempt++;
-                        key1 = 0;
-                        loop_second_execution();
-                    }
-                    else if (attempt === fold)
-                    {
-                        var n = 0;
-                        var last_index = 0;
-                        client.exec(
-                            'SELECT RID FROM \"PERFORMANCE\".\"MAIN\" ORDER BY RID DESC LIMIT 1',
-                            function(err, rows) {
-                                if (err) {
-                                    console.log(err);
-                                } else if (typeof(rows[0]) == 'undefined') {
-
-                                    last_index = 0;
-                                } else {
-                                    last_index = rows[0].RID + 1;
-                                }
-                            });
-                        var bucketsize = num / fold;
-                        (function loop_inner() {
-                            if (n < bucketsize) {
-                                var array = [];
-                                for (var position = 0; position < fold; position++) {
-                                    var len = (position * bucketsize) + n;
-                                    array.push(Number(arr2[len]));
-                                }
-                                var r = that.average(array);
-                                console.log('Request URL: ' + url_array[n]);
-                                console.log('Average end to end time for endpoint request ' + (n + 1) + ' is (Cached)(seconds): ' + r.mean / 1000);
-                                console.log('Standard deviation for cached endpoint ' + (n + 1) + ' request is (seconds): ' + r.deviation / 1000);
-
-                                client.on('error', function(err) {
-                                    console.error('Network connection error', err);
-                                });
-                                   var folderNameTemp = that.params[2].substring(0, that.params[2].lastIndexOf('/'));
-                                   var temp = folderNameTemp.substring(folderNameTemp.lastIndexOf('/') + 1, folderNameTemp.length);
-                                   var folderName = that.params[2].substring(that.params[2].lastIndexOf('/') + 1, that.params[2].length);
-                                    that.backend_request(client, url_array[n], headers_array[n], parameter_array[n], payload_array[n], method_array[n],fold, function(body, nocache_avg, response,exec_count,prep_count) {
-                                    that.database_storing(body, nocache_avg, response, n, last_index, client, client1, url_array[n], headers_array[n], parameter_array[n], payload_array[n], method_array[n], array, status_code[n], timestamp, fold, temp + '_' + folderName, exec_count, prep_count, function (body)
-                                        {
-                                           console.log(body);
-                                           n++;
-                                           loop_inner();
-                                        });
-                                    });
-                            }
-                            else if(n === bucketsize)
-                            {
-                                if ( client1.readyState === 'connected' ) {
-                                    client1.disconnect( function(err) {
-                                        client1.end();
-                                    } );
-                                }
-                                client.disconnect( function(err) {
-                                    client.end();
-                                    return callback('success');
-                                } );
-                            }
-                        }());
-                    }
-                }());
-            }
-        }());
-};
+          })()
+        }
+      })()
+    }
+  })()
+}
 
 PerformanceTool.prototype.average = function (a) {
-        var r = {
-                mean: 0,
-                variance: 0,
-                deviation: 0
-            },
-            t = a.length;
-        for (var m, s = 0, l = t; l--; s += a[l]);
-        for (m = r.mean = s / t, l = t, s = 0; l--; s += Math.pow(a[l] - m, 2));
-        r.deviation = Math.sqrt(r.variance = s / t);
-        return r;
-};
+  var r = {
+      mean: 0,
+      variance: 0,
+      deviation: 0
+    },
+    t = a.length
+  for (var m, s = 0, l = t; l--; s += a[l]);
+  for (m = r.mean = s / t, l = t, s = 0; l--; s += Math.pow(a[l] - m, 2));
+  r.deviation = Math.sqrt((r.variance = s / t))
+  return r
+}
 
 /**
  * Executing hana http request.
@@ -344,86 +362,93 @@ PerformanceTool.prototype.average = function (a) {
  * @param   {Int} Statuscode
  * @param   {Function} Callback
  */
-PerformanceTool.prototype.backend_request = function (client2, url, headers, parameter, payload, method1, fold, callback) {
-    var attempt = 0;
-    var tag = 'set';
-    var queries = this.Create2DArray(7, 7);
-    var average_total_time = [];
-    var average_total_time1 = [];
-    var exec_count = 0.0;
-    var prep_count = 0.0;
-    var myHanaRequest = new HanaRequest(getMriAdminUserLogin(this.host, this.instance, this.user_http, this.password_http));
-    (function hdb_loop_nested_exec () {
-        if (attempt < fold) {
-            var seq = '1';
-            var total_time = 0.0;
-            var clear = 'ALTER SYSTEM CLEAR SQL PLAN CACHE';
-            var sql = mysql.format("select TOP 7 STATEMENT_STRING,AVG_EXECUTION_TIME,EXECUTION_COUNT,MAX_EXECUTION_TIME,MAX_PREPARATION_TIME,PREPARATION_COUNT,TOTAL_EXECUTION_TIME,TOTAL_PREPARATION_TIME,AVG_PREPARATION_TIME from M_SQL_PLAN_CACHE where USER_NAME = 'HPH_TECHNICAL_USER' order by (TOTAL_EXECUTION_TIME+TOTAL_PREPARATION_TIME) desc");
-                client2.exec(
-                    clear,
-                    function(err, rows) {
-
-                        var urlParts = url.match( /^(?:((?:https?|s?ftp):)\/\/)([^:\/\s]+)(?::(\d*))?(?:\/([^\s?#]+)?([?][^?#]*)?(#.*)?)?/ );
-                        var path = urlParts[ 4 ];
-                        if (urlParts[ 5 ] && method1 === 'GET') {
-                            path += urlParts[ 5 ];
-                        }
-
-                        var setQuery = {
-                            method: method1,
-                            path: path,
-                            headers : headers,
-                            body: payload,
-                            parameters: parameter
-                        };
-                        var t1 = now();
-                        myHanaRequest.request(setQuery, function (err, response, body) {
-                            if (err)
-                                console.log('Error occured:');
-                            var t2 = now();
-                            var t3 = (t2 - t1).toFixed(3);
-                            average_total_time1.push(parseFloat(t3));
-                            client2.exec(
-                                sql,
-                                function(err, rows) {
-                                    var a = 0;
-                                    if (err) {
-                                        return console.error('Execute error:', err);
-                                    }
-                                    (function loop_nested_exec() {
-                                        if (a < rows.length) {
-
-                                            total_time += (rows[a].TOTAL_EXECUTION_TIME + rows[a].TOTAL_PREPARATION_TIME);
-
-                                            if (tag == 'set') {
-
-                                                queries[a][0] = rows[a].STATEMENT_STRING.toString('utf8');
-                                                queries[a][1] = ((rows[a].AVG_EXECUTION_TIME));
-                                                queries[a][2] = ((rows[a].AVG_PREPARATION_TIME));
-                                                queries[a][3] = rows[a].EXECUTION_COUNT;
-                                                exec_count+=rows[a].EXECUTION_COUNT;
-                                                queries[a][4] = rows[a].PREPARATION_COUNT;
-                                                prep_count+=rows[a].PREPARATION_COUNT;
-                                                queries[a][5] = ((rows[a].MAX_EXECUTION_TIME));
-                                                queries[a][6] = ((rows[a].MAX_PREPARATION_TIME));
-                                            }
-                                            a++;
-                                            loop_nested_exec();
-                                        } else if (a === rows.length) {
-                                            average_total_time.push(total_time);
-                                            attempt++;
-                                            tag = 'unset';
-                                            hdb_loop_nested_exec();
-                                        }
-                                    }());
-                                });
-                        });
-                    });
-        } else if (attempt === fold) {
-            return callback(average_total_time, average_total_time1, queries, exec_count, prep_count);
+PerformanceTool.prototype.backend_request = function (
+  client2,
+  url,
+  headers,
+  parameter,
+  payload,
+  method1,
+  fold,
+  callback
+) {
+  var attempt = 0
+  var tag = 'set'
+  var queries = this.Create2DArray(7, 7)
+  var average_total_time = []
+  var average_total_time1 = []
+  var exec_count = 0.0
+  var prep_count = 0.0
+  var myHanaRequest = new HanaRequest(
+    getMriAdminUserLogin(this.host, this.instance, this.user_http, this.password_http)
+  )
+  ;(function hdb_loop_nested_exec() {
+    if (attempt < fold) {
+      var seq = '1'
+      var total_time = 0.0
+      var clear = 'ALTER SYSTEM CLEAR SQL PLAN CACHE'
+      var sql = mysql.format(
+        "select TOP 7 STATEMENT_STRING,AVG_EXECUTION_TIME,EXECUTION_COUNT,MAX_EXECUTION_TIME,MAX_PREPARATION_TIME,PREPARATION_COUNT,TOTAL_EXECUTION_TIME,TOTAL_PREPARATION_TIME,AVG_PREPARATION_TIME from M_SQL_PLAN_CACHE where USER_NAME = 'HPH_TECHNICAL_USER' order by (TOTAL_EXECUTION_TIME+TOTAL_PREPARATION_TIME) desc"
+      )
+      client2.exec(clear, function (err, rows) {
+        var urlParts = url.match(
+          /^(?:((?:https?|s?ftp):)\/\/)([^:\/\s]+)(?::(\d*))?(?:\/([^\s?#]+)?([?][^?#]*)?(#.*)?)?/
+        )
+        var path = urlParts[4]
+        if (urlParts[5] && method1 === 'GET') {
+          path += urlParts[5]
         }
-    }());
-};
+
+        var setQuery = {
+          method: method1,
+          path: path,
+          headers: headers,
+          body: payload,
+          parameters: parameter
+        }
+        var t1 = now()
+        myHanaRequest.request(setQuery, function (err, response, body) {
+          if (err) console.log('Error occured:')
+          var t2 = now()
+          var t3 = (t2 - t1).toFixed(3)
+          average_total_time1.push(parseFloat(t3))
+          client2.exec(sql, function (err, rows) {
+            var a = 0
+            if (err) {
+              return console.error('Execute error:', err)
+            }
+            ;(function loop_nested_exec() {
+              if (a < rows.length) {
+                total_time += rows[a].TOTAL_EXECUTION_TIME + rows[a].TOTAL_PREPARATION_TIME
+
+                if (tag == 'set') {
+                  queries[a][0] = rows[a].STATEMENT_STRING.toString('utf8')
+                  queries[a][1] = rows[a].AVG_EXECUTION_TIME
+                  queries[a][2] = rows[a].AVG_PREPARATION_TIME
+                  queries[a][3] = rows[a].EXECUTION_COUNT
+                  exec_count += rows[a].EXECUTION_COUNT
+                  queries[a][4] = rows[a].PREPARATION_COUNT
+                  prep_count += rows[a].PREPARATION_COUNT
+                  queries[a][5] = rows[a].MAX_EXECUTION_TIME
+                  queries[a][6] = rows[a].MAX_PREPARATION_TIME
+                }
+                a++
+                loop_nested_exec()
+              } else if (a === rows.length) {
+                average_total_time.push(total_time)
+                attempt++
+                tag = 'unset'
+                hdb_loop_nested_exec()
+              }
+            })()
+          })
+        })
+      })
+    } else if (attempt === fold) {
+      return callback(average_total_time, average_total_time1, queries, exec_count, prep_count)
+    }
+  })()
+}
 
 /**
  * Get login details.
@@ -435,12 +460,12 @@ PerformanceTool.prototype.backend_request = function (client2, url, headers, par
  * @returns {Array} Login Object.
  */
 function getMriAdminUserLogin(host, instance, user, password) {
-    var login = {};
-    var port = 80 + instance;
-    login.target = host + ':' + port;
-    login.user = user;
-    login.password = password;
-    return login;
+  var login = {}
+  var port = 80 + instance
+  login.target = host + ':' + port
+  login.user = user
+  login.password = password
+  return login
 }
 
 /**
@@ -451,12 +476,12 @@ function getMriAdminUserLogin(host, instance, user, password) {
  * @returns {Array} Array object.
  */
 PerformanceTool.prototype.Create2DArray = function (rows, columns) {
-    var x = new Array(rows);
-    for (var i = 0; i < rows; i++) {
-        x[i] = new Array(columns);
-    }
-    return x;
-};
+  var x = new Array(rows)
+  for (var i = 0; i < rows; i++) {
+    x[i] = new Array(columns)
+  }
+  return x
+}
 
 /**
  * Store Data to hana database.
@@ -480,67 +505,148 @@ PerformanceTool.prototype.Create2DArray = function (rows, columns) {
  * @param   {Int} Folds
  * @param   {Function} Callback
  */
-PerformanceTool.prototype.database_storing = function (body, nocache_avg, response, n, last_index, client, client1, url_array, headers_array, parameter_array, payload_array,method, array, status_code, timestamp, fold, param,exec_count,prep_count,callback) {
+PerformanceTool.prototype.database_storing = function (
+  body,
+  nocache_avg,
+  response,
+  n,
+  last_index,
+  client,
+  client1,
+  url_array,
+  headers_array,
+  parameter_array,
+  payload_array,
+  method,
+  array,
+  status_code,
+  timestamp,
+  fold,
+  param,
+  exec_count,
+  prep_count,
+  callback
+) {
+  var that = this
+  var max_time_cached = Math.max.apply(Math, array).toString()
+  var min_time_cached = Math.min.apply(Math, array).toString()
+  var x = this.average(array)
+  var response_queries = this.Create2DArray(3, 7)
+  response_queries = response
+  var nocache = this.average(nocache_avg)
+  var database_avg = this.average(body)
+  var database_max_time = Math.max.apply(Math, body)
+  var database_min_time = Math.min.apply(Math, body)
 
-    var that=this;
-    var max_time_cached = (Math.max.apply(Math, array)).toString();
-    var min_time_cached = (Math.min.apply(Math, array)).toString();
-    var x = this.average(array);
-    var response_queries = this.Create2DArray(3, 7);
-    response_queries = response;
-    var nocache = this.average(nocache_avg);
-    var database_avg = this.average(body);
-    var database_max_time = Math.max.apply(Math, body);
-    var database_min_time = Math.min.apply(Math, body);
+  console.log(
+    'Average end to end time for endpoint request ' + (n + 1) + ' is (No Cached)(seconds): ' + nocache.mean / 1000
+  )
+  console.log(
+    'Max end to end time for endpoint request ' +
+      (n + 1) +
+      ' is (No Cached)(seconds): ' +
+      Math.max.apply(Math, nocache_avg) / 1000
+  )
+  console.log(
+    'Min end to end time for endpoint request ' +
+      (n + 1) +
+      ' is (No Cached)(seconds): ' +
+      Math.min.apply(Math, nocache_avg) / 1000
+  )
+  console.log('Database processing time w/o cached is(seconds): ' + database_avg.mean / 1000000)
 
-    console.log('Average end to end time for endpoint request ' + (n + 1) + ' is (No Cached)(seconds): ' + nocache.mean / 1000);
-    console.log('Max end to end time for endpoint request ' + (n + 1) + ' is (No Cached)(seconds): ' + Math.max.apply(Math, nocache_avg) / 1000);
-    console.log('Min end to end time for endpoint request ' + (n + 1) + ' is (No Cached)(seconds): ' + Math.min.apply(Math, nocache_avg) / 1000);
-    console.log('Database processing time w/o cached is(seconds): ' + database_avg.mean / 1000000);
+  that.main_table_create(client, function (body) {
+    var sql1 = 'insert into "PERFORMANCE"."MAIN"  values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
 
-    that.main_table_create(client,function(body){
-        var sql1 = "insert into \"PERFORMANCE\".\"MAIN\"  values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    headers_array = JSON.stringify(headers_array)
+    parameter_array = JSON.stringify(parameter_array)
+    timestamp = timestamp.toString()
+    status_code = status_code.toString()
 
-        headers_array = JSON.stringify(headers_array);
-        parameter_array = JSON.stringify(parameter_array);
-        timestamp = timestamp.toString();
-        status_code = status_code.toString();
+    var main_inserts = [
+      url_array,
+      parseFloat(x.mean),
+      parseFloat(x.deviation),
+      parseFloat(nocache.mean),
+      parseFloat(database_avg.mean),
+      n + last_index + 1,
+      timestamp,
+      param,
+      fold,
+      parseFloat(database_max_time),
+      parseFloat(database_min_time),
+      parseFloat(max_time_cached),
+      parseFloat(min_time_cached),
+      headers_array,
+      payload_array,
+      parameter_array,
+      Math.max.apply(Math, nocache_avg),
+      Math.min.apply(Math, nocache_avg),
+      parseFloat(nocache.deviation),
+      parseFloat(database_avg.deviation),
+      status_code,
+      this.user_http,
+      exec_count,
+      prep_count,
+      method
+    ]
 
-        var main_inserts = [url_array, parseFloat(x.mean), parseFloat(x.deviation), parseFloat(nocache.mean), parseFloat(database_avg.mean), n + last_index+1 , timestamp, param, fold, parseFloat(database_max_time), parseFloat(database_min_time), parseFloat(max_time_cached), parseFloat(min_time_cached), headers_array, payload_array, parameter_array, (Math.max.apply(Math, nocache_avg)), (Math.min.apply(Math, nocache_avg)), parseFloat(nocache.deviation), parseFloat(database_avg.deviation), status_code, this.user_http,exec_count,prep_count,method];
+    client.prepare(sql1, function (err, statement) {
+      if (err) {
+        return console.error('Prepare error:', err)
+      }
+      statement.exec(main_inserts, function (err, affectedRows) {
+        if (err) {
+          return console.error('Exec error:', err)
+        }
+        that.insert_queries_table(client, last_index, n, response_queries, function () {
+          console.log(body)
+          return callback('database operation complete')
+        })
+      })
+    })
+  })
 
-        client.prepare( sql1, function(err, statement) {
-                    if (err) {
-                        return console.error('Prepare error:', err);
-                    }
-                    statement.exec(main_inserts, function(err, affectedRows) {
-                        if (err) {
-                            return console.error('Exec error:', err);
-                        }
-                        that.insert_queries_table(client,last_index,n,response_queries, function(){
-                            console.log(body);
-                            return callback('database operation complete');
-                        });
-                    });
-                });
-    });
-
-    if (this.host_2 !== '') {
-        that.main_table_create(client1, function (body) {
-        var sql1 = "insert into \"PERFORMANCE\".\"MAIN\"  values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        var main_inserts = [url_array, parseFloat(x.mean), parseFloat(x.deviation), parseFloat(nocache.mean), parseFloat(database_avg.mean), n + last_index+1, timestamp, param, fold, parseFloat(database_max_time), parseFloat(database_min_time), parseFloat(max_time_cached), parseFloat(min_time_cached), headers_array, payload_array, parameter_array, (Math.max.apply(Math, nocache_avg)), (Math.min.apply(Math, nocache_avg)), parseFloat(nocache.deviation), parseFloat(database_avg.deviation), status_code, this.user_http,exec_count,prep_count,method];
-        sql1 = mysql.format(sql1, main_inserts);
-        client1.exec(
-            sql1,
-            function(err, rows) {
-                 that.insert_queries_table(client1, last_index, n, response_queries, function (body) {
-                    console.log(body);
-                    return callback('database operation complete');
-                 });
-
-            });
-    });
-    }
-};
+  if (this.host_2 !== '') {
+    that.main_table_create(client1, function (body) {
+      var sql1 = 'insert into "PERFORMANCE"."MAIN"  values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+      var main_inserts = [
+        url_array,
+        parseFloat(x.mean),
+        parseFloat(x.deviation),
+        parseFloat(nocache.mean),
+        parseFloat(database_avg.mean),
+        n + last_index + 1,
+        timestamp,
+        param,
+        fold,
+        parseFloat(database_max_time),
+        parseFloat(database_min_time),
+        parseFloat(max_time_cached),
+        parseFloat(min_time_cached),
+        headers_array,
+        payload_array,
+        parameter_array,
+        Math.max.apply(Math, nocache_avg),
+        Math.min.apply(Math, nocache_avg),
+        parseFloat(nocache.deviation),
+        parseFloat(database_avg.deviation),
+        status_code,
+        this.user_http,
+        exec_count,
+        prep_count,
+        method
+      ]
+      sql1 = mysql.format(sql1, main_inserts)
+      client1.exec(sql1, function (err, rows) {
+        that.insert_queries_table(client1, last_index, n, response_queries, function (body) {
+          console.log(body)
+          return callback('database operation complete')
+        })
+      })
+    })
+  }
+}
 
 /**
  * Insert data in Main table.
@@ -549,30 +655,31 @@ PerformanceTool.prototype.database_storing = function (body, nocache_avg, respon
  * @param   {Function} Callback
  * @returns {Function} Callback.
  */
-PerformanceTool.prototype.main_table_create = function (client,callback) {
-    client.exec('SELECT count(*) as count FROM "SYS"."SCHEMAS" WHERE SCHEMA_NAME=\'PERFORMANCE\'', function(err, rows) {
-            if (err) {
-                return console.log('');
-            }
-            if (rows[0].COUNT === 0) {
-                console.log('Schema Performance does not exist at system');
-                client.exec('CREATE SCHEMA performance OWNED BY system', function(err) {
-                    if (err) {
-                        return console.log('');
-                    }
-                    console.log('Schema "Performance" has been created');
-                });
-
-            }
-            client.exec('create column table PERFORMANCE.MAIN (REQUEST_URL VARCHAR(5000), AVG_TIME_CACHED bigint,SD_CACHED bigint,AVG_TIME_NOCACHED bigint,AVG_DATABASE_PROCESSING_TIME bigint, RID int,TIMESTAMP varchar(100),FILE varchar(2000), FOLDS int,MAX_DATABASE_PROCESSING_TIME bigint,MIN_DATABASE_PROCESSING_TIME bigint,MAX_TIME_CACHED bigint,MIN_TIME_CACHED bigint,headers nclob,payload nclob,parameters varchar(5000),MAX_TIME_NOCACHE bigint,MIN_TIME_NOCACHE bigint,SD_NOCACHE bigint,SD_DATABASE_PROCESSING_TIME bigint,STATUSCODE varchar(100),USERNAME varchar(100),EXEC_COUNT bigint,PREP_COUNT bigint, method varchar(100))', function(err) {
-            if (err)
-            {
-                return callback('Table already existed, now inserting into remote table(home)');
-            }
-            return callback('Table Performance has been created(home)');
-            });
-    });
-};
+PerformanceTool.prototype.main_table_create = function (client, callback) {
+  client.exec('SELECT count(*) as count FROM "SYS"."SCHEMAS" WHERE SCHEMA_NAME=\'PERFORMANCE\'', function (err, rows) {
+    if (err) {
+      return console.log('')
+    }
+    if (rows[0].COUNT === 0) {
+      console.log('Schema Performance does not exist at system')
+      client.exec('CREATE SCHEMA performance OWNED BY system', function (err) {
+        if (err) {
+          return console.log('')
+        }
+        console.log('Schema "Performance" has been created')
+      })
+    }
+    client.exec(
+      'create column table PERFORMANCE.MAIN (REQUEST_URL VARCHAR(5000), AVG_TIME_CACHED bigint,SD_CACHED bigint,AVG_TIME_NOCACHED bigint,AVG_DATABASE_PROCESSING_TIME bigint, RID int,TIMESTAMP varchar(100),FILE varchar(2000), FOLDS int,MAX_DATABASE_PROCESSING_TIME bigint,MIN_DATABASE_PROCESSING_TIME bigint,MAX_TIME_CACHED bigint,MIN_TIME_CACHED bigint,headers nclob,payload nclob,parameters varchar(5000),MAX_TIME_NOCACHE bigint,MIN_TIME_NOCACHE bigint,SD_NOCACHE bigint,SD_DATABASE_PROCESSING_TIME bigint,STATUSCODE varchar(100),USERNAME varchar(100),EXEC_COUNT bigint,PREP_COUNT bigint, method varchar(100))',
+      function (err) {
+        if (err) {
+          return callback('Table already existed, now inserting into remote table(home)')
+        }
+        return callback('Table Performance has been created(home)')
+      }
+    )
+  })
+}
 /**
  * Insert data in Query table.
  * @private
@@ -584,28 +691,60 @@ PerformanceTool.prototype.main_table_create = function (client,callback) {
  * @returns {Function} Callback.
  */
 PerformanceTool.prototype.insert_queries_table = function (client, last_index, n, response_queries, callback) {
-                client.exec('create column table PERFORMANCE.QUERIES (ID int, QUERY_STRING nclob,EXEC_TIME bigint,PREP_TIME bigint,EXEC_CNT int,PREP_CNT int,MAX_EXEC_TIME bigint,MAX_PREP_TIME bigint)', function(err) {
-                    if (err) {
-                        return console.log('Table PERFORMANCE.QUERIES already existed(home)');
-                    }
-                    console.log('Table PERFORMANCE.QUERIES has been created(home)');
-                });
-                client.prepare('insert into \"PERFORMANCE\".\"QUERIES\"  values(?,?,?,?,?,?,?,?)', function(err, statement) {
-                    if (err) {
-                        return console.error('Prepare error:', err);
-                    }
-                    statement.exec([
-                        [n + last_index+1, response_queries[0][0], response_queries[0][1], response_queries[0][2], response_queries[0][3], response_queries[0][4], response_queries[0][5], response_queries[0][6]],
-                        [n + last_index+1, response_queries[1][0], response_queries[1][1], response_queries[1][2], response_queries[1][3], response_queries[1][4], response_queries[1][5], response_queries[1][6]],
-                        [n + last_index+1, response_queries[2][0], response_queries[2][1], response_queries[2][2], response_queries[2][3], response_queries[2][4], response_queries[2][5], response_queries[2][6]]
-                    ], function(err, affectedRows) {
-                        if (err) {
-                            return console.error('Exec error:', err);
-                        }
-                        return callback('Inserting into query table');
-                    });
-                });
+  client.exec(
+    'create column table PERFORMANCE.QUERIES (ID int, QUERY_STRING nclob,EXEC_TIME bigint,PREP_TIME bigint,EXEC_CNT int,PREP_CNT int,MAX_EXEC_TIME bigint,MAX_PREP_TIME bigint)',
+    function (err) {
+      if (err) {
+        return console.log('Table PERFORMANCE.QUERIES already existed(home)')
+      }
+      console.log('Table PERFORMANCE.QUERIES has been created(home)')
+    }
+  )
+  client.prepare('insert into "PERFORMANCE"."QUERIES"  values(?,?,?,?,?,?,?,?)', function (err, statement) {
+    if (err) {
+      return console.error('Prepare error:', err)
+    }
+    statement.exec(
+      [
+        [
+          n + last_index + 1,
+          response_queries[0][0],
+          response_queries[0][1],
+          response_queries[0][2],
+          response_queries[0][3],
+          response_queries[0][4],
+          response_queries[0][5],
+          response_queries[0][6]
+        ],
+        [
+          n + last_index + 1,
+          response_queries[1][0],
+          response_queries[1][1],
+          response_queries[1][2],
+          response_queries[1][3],
+          response_queries[1][4],
+          response_queries[1][5],
+          response_queries[1][6]
+        ],
+        [
+          n + last_index + 1,
+          response_queries[2][0],
+          response_queries[2][1],
+          response_queries[2][2],
+          response_queries[2][3],
+          response_queries[2][4],
+          response_queries[2][5],
+          response_queries[2][6]
+        ]
+      ],
+      function (err, affectedRows) {
+        if (err) {
+          return console.error('Exec error:', err)
+        }
+        return callback('Inserting into query table')
+      }
+    )
+  })
+}
 
- };
-
-module.exports = PerformanceTool;
+module.exports = PerformanceTool
