@@ -288,7 +288,7 @@ x-envs:
   sql-proxy: &sql-proxy
     SQL_PROXY__HOST: alp-sql-proxy
     SQL_PROXY__PORT: 41191
-    SQL_PROXY__POOL_SIZE: ${SQL_PROXY__POOL_SIZE-10}
+    SQL_PROXY__POOL_SIZE: ${SQL_PROXY__POOL_SIZE:-10}
 services:
   alp-bookmark:
     container_name: &c0 alp-minerva-bookmark-svc-${BASE_PORT:-1}
