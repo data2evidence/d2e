@@ -126,8 +126,6 @@ function addTestFiles(dirPath, config, mochaObj) {
       return /\.js$/.test(filePath)
     })
     .filter(function (filePath) {
-      // Only including smoke tests as the other tests get fixed
-      return filePath.includes('endpoint_smoke_test')
       return filePatternRegex.test(filePath)
     })
     .forEach(function (file) {
