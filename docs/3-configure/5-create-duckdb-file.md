@@ -2,7 +2,7 @@
 
 After uploading duckdb-plugin in step `docs/2-load/5-load-d2e-plugins.md`
 
-- [D2E-Plugins/duckdb](https://github.com/alp-os/d2e-plugins/tree/main/duckdb)
+- [D2E-Plugins/duckdb](https://github.com/alp-os/d2e-plugins/tree/main/cachedb)
 
 <h1 id="gui">Creating via portal</h1>
 
@@ -10,7 +10,7 @@ After uploading duckdb-plugin in step `docs/2-load/5-load-d2e-plugins.md`
 - Login as primary admin as
 - Select **Admin** mode
 - Navigate to **Jobs**
-- Click **Execute** on **create-duckdb-file-plugin**
+- Click **Execute** on **create-cachedb-file-plugin**
   ![Execeute Duckdb Job](../images/duckdb/ExecuteDuckdbJob.png)
 
 - Enter values to create duckdb database file for cdmdefault
