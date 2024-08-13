@@ -7,7 +7,6 @@ import {
   EnvVarUtils,
   DBConnectionUtil as dbConnectionUtil,
   healthCheckMiddleware,
-  Constants,
   User,
   Connection,
   utils,
@@ -22,7 +21,6 @@ import { AssignmentProxy } from "./AssignmentProxy";
 import { Settings } from "./qe/settings/Settings";
 import { ICDWRequest, IDBCredentialsType } from "./types";
 import { getAnalyticsConnection } from "./utils/utils";
-import { testRouter } from "./testRoutes";
 
 const log = Logger.CreateLogger("cdw-log");
 
@@ -320,9 +318,6 @@ const initRoutes = (
   app.use("/check-readiness", healthCheckMiddleware);
 
   log.info("Initialized express routes..");
-  // if (envVarUtils.isTestEnv()) {
-  //   app.use(testRouter);
-  // }
 };
 
 try {

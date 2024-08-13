@@ -393,41 +393,6 @@
         })
       })
 
-      describe('removeMriConfigurationAssignment()', function () {
-        var fakeHanaRequest
-        beforeEach(function () {
-          fakeHanaRequest = {
-            request: sinon.stub()
-          }
-          var fakeResponse = {
-            statusCode: 200
-          }
-          fakeHanaRequest.request.onCall(0).callsArgWith(1, null, fakeResponse)
-          uplink = new BackendUplink(fakeHanaRequest)
-        })
-
-        it('sends a delete-request to the MRI assignemnt endpoint', function (done) {
-          var fakeId = 'abcd'
-          uplink.removeMriConfigurationAssignment(fakeId, function (err) {
-            var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
-            expect(firstCallArg.path).to.match(/hph\/config\/services\/assignment.xsjs/)
-            var bodyPassed = JSON.parse(firstCallArg.body)
-            expect(bodyPassed.action).to.equal('deleteAssignment')
-            done()
-          })
-        })
-
-        it('passes the assignment ID to the request body', function (done) {
-          var fakeId = 'abcd'
-          uplink.removeMriConfigurationAssignment(fakeId, function (err) {
-            var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
-            var bodyPassed = JSON.parse(firstCallArg.body)
-            expect(bodyPassed.assignmentId).to.equal(fakeId)
-            done()
-          })
-        })
-      })
-
       describe('addPatientConfiguration()', function () {
         var fakeHanaRequest
         var fakeConfig = {
@@ -524,41 +489,6 @@
             var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
             var bodyPassed = JSON.parse(firstCallArg.body)
             expect(bodyPassed.configVersion).to.equal('A')
-            done()
-          })
-        })
-      })
-
-      describe('removePatientConfigurationAssignment()', function () {
-        var fakeHanaRequest
-        beforeEach(function () {
-          fakeHanaRequest = {
-            request: sinon.stub()
-          }
-          var fakeResponse = {
-            statusCode: 200
-          }
-          fakeHanaRequest.request.onCall(0).callsArgWith(1, null, fakeResponse)
-          uplink = new BackendUplink(fakeHanaRequest)
-        })
-
-        it('sends a delete-request to the MRI assignemnt endpoint', function (done) {
-          var fakeId = 'abcd'
-          uplink.removePatientConfigurationAssignment(fakeId, function (err) {
-            var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
-            expect(firstCallArg.path).to.match(/hph\/config\/services\/assignment.xsjs/)
-            var bodyPassed = JSON.parse(firstCallArg.body)
-            expect(bodyPassed.action).to.equal('deleteAssignment')
-            done()
-          })
-        })
-
-        it('passes the assignment ID to the request body', function (done) {
-          var fakeId = 'abcd'
-          uplink.removePatientConfigurationAssignment(fakeId, function (err) {
-            var firstCallArg = fakeHanaRequest.request.getCall(0).args[0]
-            var bodyPassed = JSON.parse(firstCallArg.body)
-            expect(bodyPassed.assignmentId).to.equal(fakeId)
             done()
           })
         })
