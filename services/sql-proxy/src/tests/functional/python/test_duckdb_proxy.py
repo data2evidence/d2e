@@ -11,7 +11,10 @@ from api.OpenIdAPI import OpenIdAPI
 from api.UserMgmtAPI import UserMgmtAPI
 from api.PortalServerAPI import PortalServerAPI
 
-test_dataset_id = "11111111-2222-3333-4444-555555555555"
+test_group_metadata = {
+    "alp_role_system_admin": True,
+    "alp_role_study_researcher": ["11111111-2222-3333-4444-555555555555"]
+}
 test_user_id = "test_user"
 test_dataset = {
     "databaseCode": "testdbcode",
@@ -25,8 +28,8 @@ def setup():
     mp = pytest.MonkeyPatch()
     mp.setattr(OpenIdAPI, "get_user_id_from_token",
                _mock_get_user_id_from_token)
-    mp.setattr(UserMgmtAPI, "get_user_allowed_dataset_ids",
-               _mock_get_user_allowed_dataset_ids)
+    mp.setattr(UserMgmtAPI, "get_user_group_metadata",
+               _mock_get_user_group_metadata)
     mp.setattr(PortalServerAPI, "get_dataset", _mock_get_dataset)
 
     config.Env.DUCKDB__DATA_FOLDER = "./tests/data"
@@ -113,8 +116,8 @@ def _mock_get_user_id_from_token(self, token):
     return test_user_id
 
 
-def _mock_get_user_allowed_dataset_ids(self, user_id):
-    return test_dataset_id
+def _mock_get_user_group_metadata(self, user_id):
+    return test_group_metadata
 
 
 def _mock_get_dataset(self, dataset_id):
