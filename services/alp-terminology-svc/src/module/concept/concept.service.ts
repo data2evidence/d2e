@@ -23,6 +23,7 @@ import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { Request } from 'express';
 import { SystemPortalAPI } from 'src/api/portal-api';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
+import { GetFirstConceptsDto } from './dto/concept.dto';
 
 // Placed outside as FHIR server is unable to access
 const logger = createLogger('ConceptService');
@@ -105,6 +106,81 @@ export class ConceptService {
       logger.error(JSON.stringify(err));
       throw err;
     }
+  }
+  async getFirstConcepts(
+    getSuggestedConceptsDto: GetFirstConceptsDto,
+    hybridSearchConfigService: HybridSearchConfigService,
+  ): Promise<any> {
+    const data = getSuggestedConceptsDto.data;
+    const datasetId = getSuggestedConceptsDto.datasetId;
+
+    const systemPortalApi = new SystemPortalAPI(this.token);
+    const { databaseCode, vocabSchemaName, dialect } =
+      await systemPortalApi.getDatasetDetails(datasetId);
+    const meilisearchApi = new MeilisearchAPI();
+
+    const results = await Promise.all(
+      data.map(async (dataItem) => {
+        const domainId = dataItem.domainId;
+        const searchText = dataItem.searchText;
+        const row = dataItem.row;
+
+        const filters: Filters = {
+          conceptClassId: [],
+          domainId: [],
+          standardConcept: ['S'],
+          vocabularyId: [],
+          validity: [],
+        };
+
+        try {
+          if (domainId) {
+            const meiliIndex = `${databaseCode}_${vocabSchemaName}_${
+              dialect === 'hana' ? 'CONCEPT' : 'concept'
+            }`;
+            const domainIdFacets =
+              await meilisearchApi.getConceptFilterOptionsFaceted(
+                meiliIndex,
+                dataItem.searchText,
+                { ...filters, domainId: [] },
+              );
+
+            const keyExists = Object.keys(domainIdFacets).some(
+              (objKey) => objKey.toUpperCase() === domainId.toUpperCase(),
+            );
+
+            if (keyExists) {
+              filters.domainId.push(domainId);
+            }
+          }
+
+          const concept = await this.getConcepts(
+            0,
+            1,
+            datasetId,
+            searchText,
+            hybridSearchConfigService,
+            filters,
+          );
+
+          const [conceptResults] = concept.expansion.contains;
+
+          return {
+            row: row,
+            result: {
+              conceptId: conceptResults.conceptId,
+              conceptName: conceptResults.display,
+              domainId: conceptResults.domainId,
+            },
+          };
+        } catch (error) {
+          logger.error(error);
+          throw error;
+        }
+      }),
+    );
+
+    return results;
   }
 
   async getTerminologyDetailsWithRelationships(

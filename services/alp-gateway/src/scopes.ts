@@ -423,7 +423,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
   {
     path: '^/terminology/fhir/4_0_0/(.*)',
     scopes: ['gateway.terminology.fhir.read'],
-    httpMethods: ['GET']
+    httpMethods: ['GET', 'POST']
   },
   {
     path: '^/terminology/hybrid-search-config',

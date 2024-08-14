@@ -1,7 +1,8 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ConceptService } from './concept.service';
 import { SupportedFhirVersion } from '../../utils/types';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
+import { GetFirstConceptsDto as GetFirstConceptsDto } from './dto/concept.dto';
 
 @Controller()
 export class FhirController {
@@ -36,6 +37,16 @@ export class FhirController {
     return await this.appService.getTerminologyDetailsWithRelationships(
       conceptId,
       datasetId,
+    );
+  }
+
+  @Post(`${SupportedFhirVersion}/concepts`)
+  async getFirstConcepts(
+    @Body() getFirstConceptsDto: GetFirstConceptsDto,
+  ): Promise<any> {
+    return await this.appService.getFirstConcepts(
+      getFirstConceptsDto,
+      this.hybridSearchConfigService,
     );
   }
 }

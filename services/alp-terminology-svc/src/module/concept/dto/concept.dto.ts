@@ -5,6 +5,9 @@ import {
   IsNumber,
   Min,
   Max,
+  IsArray,
+  ValidateNested,
+  IsObject,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -33,4 +36,25 @@ export class ConceptHierarchyDto {
   @Max(10)
   @Type(() => Number)
   depth: number;
+}
+class GetFirstConceptsSingleDto {
+  @IsObject()
+  row: object;
+
+  @IsString()
+  searchText: string;
+
+  @IsOptional()
+  @IsString()
+  domainId?: string;
+}
+
+export class GetFirstConceptsDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => GetFirstConceptsSingleDto)
+  data: GetFirstConceptsSingleDto[];
+
+  @IsUUID()
+  datasetId: string;
 }
