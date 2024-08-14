@@ -6,4 +6,4 @@ if [[ "$PREFECT__WORKER_POOL_NAME" == "process-pool" ]]; then
     python flow.py cmd=deploy
 fi
 
-prefect worker start --pool $PREFECT__WORKER_POOL_NAME --install-policy always 
+prefect worker start --pool $PREFECT__WORKER_POOL_NAME
