@@ -12,7 +12,7 @@ from api.UserMgmtAPI import UserMgmtAPI
 from api.PortalServerAPI import PortalServerAPI
 
 test_group_metadata = {
-    "alp_role_system_admin": True,
+    "alp_role_system_admin": False,
     "alp_role_study_researcher": ["11111111-2222-3333-4444-555555555555"]
 }
 test_user_id = "test_user"
