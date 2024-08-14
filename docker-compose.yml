@@ -783,6 +783,7 @@ services:
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
       local: ${local}
+      TESTSCHEMA: ${TESTSCHEMA}
     deploy:
       resources:
         limits:
@@ -1048,31 +1049,6 @@ services:
       <<:
         - *x-tls
         - *x-pg
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest"
-           ]
-          }
-         ]
-        }
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41113
@@ -1283,31 +1259,6 @@ services:
       <<:
         - *x-tls
         - *x-pg
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest"
-           ]
-          }
-         ]
-        }
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41115
@@ -1584,6 +1535,7 @@ services:
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
       isTestEnv: ${isTestEnv}
+      TESTSCHEMA: ${TESTSCHEMA}
       NOT_EQ_CHECK_FILTERCARDS: ${NOT_EQ_CHECK_FILTERCARDS:-true}
 
   redis:

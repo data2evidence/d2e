@@ -47,7 +47,12 @@ function main() {
         exec(`node ../../node_modules/@alp/alp-dbcli/hdi.js grant-container-schema-privilege ${schema} INSERT ${HDI___SYS_DI__USER}`);
         exec(`node ../../node_modules/@alp/alp-dbcli/hdi.js grant-container-schema-privilege ${schema} DELETE ${HDI___SYS_DI__USER}`);
         exec(`node ../../node_modules/@alp/alp-dbcli/hdi.js grant-container-schema-privilege ${schema} UPDATE ${HDI___SYS_DI__USER}`);
+
+        // Grant same priveleges found in TENANT_READ_ROLE of other schemas
         exec(`node ../../node_modules/@alp/alp-dbcli/hdi.js grant-container-schema-privilege ${schema} SELECT TENANT_READ_USER`);
+        exec(`node ../../node_modules/@alp/alp-dbcli/hdi.js grant-container-schema-privilege ${schema} EXECUTE TENANT_READ_USER`);
+        exec(`node ../../node_modules/@alp/alp-dbcli/hdi.js grant-container-schema-privilege ${schema} 'CREATE TEMPORARY TABLE' TENANT_READ_USER`);
+
         exec(`yarn inittables`);
     }
 }
