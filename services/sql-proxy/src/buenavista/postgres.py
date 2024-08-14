@@ -12,7 +12,7 @@ from typing import Dict, List, Optional
 from .core import BVType, Connection, Extension, Session, QueryResult
 from .database import parse_connection_param_database, get_rewriter_from_dialect, get_db_connection, SqlProxyDatabaseClients
 from .rewrite import Rewriter
-from .middleware import dataset_auth_check, get_dataset_info
+from .middleware import auth_check, get_dataset_info
 
 logger = logging.getLogger(__name__)
 
@@ -340,7 +340,7 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
                 params["database"])
 
             # Ensure user has permission to access dataset
-            dataset_auth_check(token, dataset_id)
+            auth_check(token, dataset_id)
 
             # Get database_code and schema from dataset_id
             database_code, schema, vocab_schema = get_dataset_info(

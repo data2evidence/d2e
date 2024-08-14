@@ -20,7 +20,7 @@ class UserMgmtAPI:
             "Authorization": self.token
         }
 
-    def get_user_allowed_dataset_ids(self, user_id: str) -> list[str]:
+    def get_user_group_metadata(self, user_id: str):
         '''
         Returns list of dataset ids that user has access to
         '''
@@ -34,4 +34,4 @@ class UserMgmtAPI:
             verify=self.verifySsl,
             json=params
         )
-        return result.json()["alp_role_study_researcher"]
+        return result.json()
