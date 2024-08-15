@@ -396,9 +396,6 @@ routes.forEach((route: IRouteProp) => {
         app.use(
           source,
           ensureAuthenticated,
-          addSubToRequestUserMiddleware,
-          ensureAlpSysAdminAuthorized,
-          express.json(),
           checkScopes,
           createProxyMiddleware({
             ...getCreateMiddlewareOptions(services.prefect),
