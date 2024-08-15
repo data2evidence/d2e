@@ -50,7 +50,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
   },
   {
     path: '^/usermgmt/api/me/is_token_valid_internal',
-    scopes: ['usermgmt.me'],
+    scopes: ['usermgmt.me.perseus'],
     httpMethods: ['GET']
   },
   {
@@ -799,6 +799,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     path: '^/gateway/api/fhir',
     scopes: ['gateway.fhir.create'],
     httpMethods: ['POST']
+  },
+  {
+    path: '^/gateway/api/prefect',
+    scopes: ['gateway.prefect.read'],
+    httpMethods: ['GET']
   }
 ]
 export const ROLE_SCOPES = {
@@ -827,6 +832,7 @@ export const ROLE_SCOPES = {
     'usermgmt.dataAdmin.read',
     'usermgmt.group.read',
     'usermgmt.me',
+    'usermgmt.me.perseus',
     'usermgmt.studyAccessRequest.read',
     'usermgmt.studyAccessRequest.update',
     'usermgmt.user.read',
@@ -922,7 +928,8 @@ export const ROLE_SCOPES = {
     'dataflowmgmt.analysisflow.add',
     'dataflowmgmt.analysisflow.delete',
     'dataflowmgmt.analysisflow.revision.delete',
-    'gateway.fhir.create'
+    'gateway.fhir.create',
+    'gateway.prefect.read'
   ],
   ALP_DASHBOARD_VIEWER: ['gateway.dashboardGate.content'],
   TENANT_VIEWER: [

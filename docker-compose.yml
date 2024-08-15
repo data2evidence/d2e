@@ -3,6 +3,7 @@ networks:
   alp:
   data:
 
+
 volumes:
   caddy:
   duckdb-data-1:
@@ -11,6 +12,7 @@ volumes:
   pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
+
 
 x-envs:
   db-svc: &x-dbsvc
@@ -96,7 +98,7 @@ x-envs:
           "enabled": false,
           "featureFlag": "analysisFlow",
           "name": "Analysis",
-          "route": "analysis",
+          "route": "analysis_parent",
           "requiredRoles": [
             "RESEARCHER"
           ],
@@ -206,29 +208,29 @@ x-envs:
       ],
       "systemadmin": [
         {
-          "iconSize": 24,
-          "iconUrl": "icons/user.svg",
           "name": "Users",
           "pluginPath": "plugins/SystemAdmin/UserOverview/module",
           "route": "user-overview"
         },
         {
-          "iconSize": 24,
-          "iconUrl": "icons/database.svg",
           "name": "Datasets",
           "pluginPath": "plugins/SystemAdmin/StudyOverview/module",
           "route": "dataset-overview"
         },
         {
-          "iconSize": 24,
-          "iconUrl": "icons/database.svg",
           "name": "Jobs",
           "pluginPath": "plugins/SystemAdmin/Jobs/module",
           "route": "jobs"
         },
         {
-          "iconSize": 24,
-          "iconUrl": "icons/data-management.svg",
+          "data": {
+            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
+          },
+          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/mapping/module.js",
+          "name": "ETL",
+          "route": "etl"
+        },
+        {
           "name": "Sql Editor",
           "pluginPath": "plugins/SystemAdmin/Sqleditor/module",
           "route": "sqleditor"
@@ -245,8 +247,6 @@ x-envs:
           "enabled": "true"
         },
         {
-          "iconSize": 24,
-          "iconUrl": "icons/settings-gear.svg",
           "name": "Setup",
           "pluginPath": "plugins/Setup/module",
           "route": "setup"
@@ -276,7 +276,8 @@ x-envs:
        "appRouter": "https://alp-mercury-approuter:41000",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
        "minio": "",
-       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:8103",
+       "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}:8103/fhir/R4",
+       "fhirTokenUrl": "http://alp-minerva-fhir-server-1:8103/oauth2/token",
        "dicomServer": "http://alp-dicom-server:8042"
       }
   tls: &x-tls
@@ -284,6 +285,9 @@ x-envs:
     TLS__INTERNAL__CRT: ${TLS__INTERNAL__CRT}
     TLS__INTERNAL__DOMAIN: ${TLS__INTERNAL__DOMAIN:-alp.local}
     TLS__INTERNAL__KEY: ${TLS__INTERNAL__KEY}
+  sql-proxy: &sql-proxy
+    SQL_PROXY_HOST: alp-sql-proxy
+    SQL_PROXY_PORT: 41191
 services:
   alp-bookmark:
     container_name: &c0 alp-minerva-bookmark-svc-${BASE_PORT:-1}
@@ -590,15 +594,15 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    entrypoint:
-      - ./start.sh
     environment:
       <<:
         - *x-pg
         - *x-redis
+        - *x-fhir
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+      
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -612,30 +616,34 @@ services:
   #   networks:
   #     - alp
 
-  alp-fhir-post-init:
+  alp-fhir-server-post-init:
     container_name: &c7 alp-minerva-fhir-server-post-init
     depends_on:
       alp-minerva-postgres:
         condition: service_healthy
       alp-fhir-server:
         condition: service_healthy
-    image: node:18.20.2-slim
-    volumes:
-      - ./services/alp-fhir:/home/docker
+    image: alpcr.azurecr.io/alp-data-node/alp-fhir-server-post-init:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c7
     networks:
       alp:
         priority: 20
-    entrypoint:
-      ["sh", "-c", "cd /home/docker && npm install && npm run build-and-seed"]
     environment:
       <<:
         - *x-pg
         - *x-fhir
+        - *x-routes
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+      PG__DB_NAME: alp
+      PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
+      PG__PORT: ${PG_PORT:-5432}
+      FHIR__LOG_LEVEL: debug
+      LOCAL_DEBUG: "false"
+      NODE_ENV: development
+      PORT: 41${BASE_PORT:-1}12
 
   alp-logto-post-init:
     container_name: alp-logto-post-init-${BASE_PORT:-1}
@@ -657,7 +665,6 @@ services:
       PG__PASSWORD: ${PG_SUPER_PASSWORD}
       PG__PORT: ${PG_PORT:-5432}
       PG__USER: ${PG_SUPER_USER:-postgres}
-      PUBLIC__FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine"},{"name":"alp-app","description":"alp-app","type":"Traditional","oidcClientMetadata":{"redirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
       LOGTO__RESOURCE: '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
       LOGTO__USER: '{"username":"admin","initialPassword":"Updatepassword12345"}'
@@ -756,6 +763,7 @@ services:
         - *x-minio
         - *x-tls
         - *x-routes
+        - *sql-proxy
       ALP_GATEWAY_OAUTH__URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/oauth/token
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
       ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT
@@ -766,10 +774,12 @@ services:
       LOCAL_DEBUG: "false"
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       USE_DUCKDB: ${USE_DUCKDB:-true}
+      USE_SQL_PROXY: ${USE_SQL_PROXY:-false}
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
       local: ${local}
+      TESTSCHEMA: ${TESTSCHEMA}
     deploy:
       resources:
         limits:
@@ -1035,31 +1045,6 @@ services:
       <<:
         - *x-tls
         - *x-pg
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest"
-           ]
-          }
-         ]
-        }
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41113
@@ -1270,31 +1255,6 @@ services:
       <<:
         - *x-tls
         - *x-pg
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest"
-           ]
-          }
-         ]
-        }
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41115
@@ -1571,6 +1531,7 @@ services:
       PORT: 41109
       isHttpTestRun: ${isTestEnv}
       isTestEnv: ${isTestEnv}
+      TESTSCHEMA: ${TESTSCHEMA}
       NOT_EQ_CHECK_FILTERCARDS: ${NOT_EQ_CHECK_FILTERCARDS:-true}
 
   redis:
@@ -1640,7 +1601,7 @@ services:
     depends_on:
       alp-fhir-server:
         condition: service_started
-      alp-fhir-post-init:
+      alp-fhir-server-post-init:
         condition: service_completed_successfully
     networks:
       alp:
@@ -1676,12 +1637,20 @@ services:
       MEILI_HTTP_ADDR: 0.0.0.0:41${BASE_PORT:-1}11
       MEILI_LOG_LEVEL: INFO
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-      
 
   alp-sql-proxy:
     container_name: &c30 alp-sql-proxy
     hostname: alp-sql-proxy.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/sql-proxy:${DOCKER_TAG_NAME:-develop}
+    depends_on:
+      alp-db-credentials-mgr:
+        condition: service_healthy
+      alp-logto:
+        condition: service_healthy
+      alp-minerva-gateway:
+        condition: service_healthy
+      alp-minerva-postgres:
+        condition: service_healthy
     logging:
       options:
         tag: *c30
@@ -1694,6 +1663,10 @@ services:
     volumes:
       - duckdb-data-1:/home/docker/duckdb_data
     environment:
+      <<:
+        - *x-converter
+        - *x-routes
+        - *x-tls
       SQL_PROXY__PORT: 41191
       DUCKDB__DATA_FOLDER: /home/docker/duckdb_data
       LOCAL_DEBUG: "false"

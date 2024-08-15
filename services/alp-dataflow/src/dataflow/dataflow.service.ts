@@ -6,9 +6,12 @@ import { Repository } from 'typeorm'
 import { JwtPayload, decode } from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import { IDataflowDto, IDataflowDuplicateDto } from '../types'
-import { Dataflow, DataflowRevision, DataflowResult, DataflowRun } from './entity'
+import { Dataflow, DataflowRevision } from './entity'
+import { UtilsService } from '../utils/utils.service'
+import { PortalServerAPI } from '../portal-server/portal-server.api'
+import { PrefectAPI } from '../prefect/prefect.api'
 import { createLogger } from '../logger'
-import { BadRequestException } from '@nestjs/common'
+import { BadRequestException, InternalServerErrorException } from '@nestjs/common'
 
 @Injectable({ scope: Scope.REQUEST })
 export class DataflowService {
@@ -19,8 +22,9 @@ export class DataflowService {
     @Inject(REQUEST) request: Request,
     @InjectRepository(Dataflow) private readonly dataflowRepo: Repository<Dataflow>,
     @InjectRepository(DataflowRevision) private readonly dataflowRevisionRepo: Repository<DataflowRevision>,
-    @InjectRepository(DataflowResult) private readonly dataflowResultRepo: Repository<DataflowResult>,
-    @InjectRepository(DataflowRun) private readonly dataflowRunRepo: Repository<DataflowRun>
+    private readonly portalServerApi: PortalServerAPI,
+    private readonly prefectApi: PrefectAPI,
+    private readonly utilsService: UtilsService
   ) {
     const token = decode(request.headers['authorization'].replace(/bearer /i, '')) as JwtPayload
     this.userId = token.sub
@@ -75,36 +79,48 @@ export class DataflowService {
     return null
   }
 
-  async getTaskRunResult(taskRunId: string) {
-    const result = await this.dataflowResultRepo
-      .createQueryBuilder('result')
-      .select([
-        'result.taskRunId',
-        'result.rootFlowRunId',
-        'result.flowRunId',
-        'result.taskRunResult',
-        'result.createdDate'
-      ])
-      .where('result.taskRunId = :taskRunId', { taskRunId: taskRunId })
-      .getOne()
-
-    if (result) {
-      return result
-    }
-    return null
-  }
-
   async getFlowRunResultsByDataflowId(dataflowId: string) {
-    const latestRun = await this.dataflowRunRepo
-      .createQueryBuilder('run')
-      .select('run.rootFlowRunId')
-      .leftJoinAndSelect('run.results', 'dataflowResults')
-      .where('run.dataflowId = :dataflowId', { dataflowId })
-      .orderBy('run.createdDate', 'DESC')
+    const lastFlowRun = await this.dataflowRepo
+      .createQueryBuilder('dataflow')
+      .select('dataflow.lastFlowRunId')
+      .where('dataflow.id = :dataflowId', { dataflowId })
       .getOne()
-    const results = latestRun?.results
 
-    return results ? results : []
+    const lastFlowRunId = lastFlowRun?.lastFlowRunId
+    if (!lastFlowRunId) {
+      console.log('No last flowRun found for dataflowId:', dataflowId)
+      return []
+    }
+    const subflowRuns = await this.prefectApi.getFlowRunsByParentFlowRunId(lastFlowRunId)
+    const flowRunIds = subflowRuns.map(flow => flow.id)
+    const flowResult = await this.prefectApi.getFlowRunsArtifacts(subflowRuns.map(item => item.id))
+
+    if (flowResult.length === 0) {
+      console.log(`No flow run artifacts result found for flowRunIds: ${flowRunIds}`)
+      return []
+    }
+    // regex will only match flow runs with description which has path
+    const match = this.utilsService.regexMatcher(flowResult)
+    const filePath = []
+    if (match) {
+      for (const m of match) {
+        const s3Path = m.slice(1, -1) // Removing the surrounding brackets []
+        filePath.push(this.utilsService.extractRelativePath(s3Path))
+      }
+      const res = await this.portalServerApi.getFlowRunResults(filePath)
+
+      // TODO: replace the hardcoded transformed after persisted result been updated
+      const transformedRes = res.map((result, index) => ({
+        nodeName: `p${index + 1}`,
+        taskRunResult: {
+          result
+        },
+        error: false,
+        errorMessage: null
+      }))
+      return transformedRes
+    }
+    throw new InternalServerErrorException(`Invalid S3 path found`)
   }
 
   async getDataflows() {
@@ -149,14 +165,9 @@ export class DataflowService {
     return { id }
   }
 
-  async createDataflowRun(id, prefectflowRunId) {
-    const dataflowRunEntity = this.dataflowRunRepo.create({
-      dataflowId: id,
-      rootFlowRunId: prefectflowRunId
-    })
-    await this.dataflowRunRepo.insert(this.addOwner(dataflowRunEntity, true))
-    await this.dataflowRepo.update({ id }, { lastFlowRunId: prefectflowRunId })
-    this.logger.info(`Created dataflow run for dataflow (${id}) and prefect flow run (${prefectflowRunId})`)
+  async createDataflowRun(id, prefecflowRunId) {
+    await this.dataflowRepo.update({ id }, { lastFlowRunId: prefecflowRunId })
+    this.logger.info(`Created dataflow run for dataflow ${id} with lastflowRunId ${prefecflowRunId}`)
   }
 
   private addOwner<T>(object: T, isNewEntity = false) {

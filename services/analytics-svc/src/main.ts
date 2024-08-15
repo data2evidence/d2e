@@ -30,6 +30,7 @@ import studyDbCredentialMiddleware from "./middleware/StudyDbCredential";
 import { MriConfigConnection } from "@alp/alp-config-utils";
 import { StudiesDbMetadata, StudyDbMetadata, IMRIRequest } from "./types";
 import PortalServerAPI from "./api/PortalServerAPI";
+import { SqlProxyDBConnectionUtil } from "./utils/sql-proxy/SqlProxyDBConnectionUtil";
 import { getDuckdbDBConnection } from "./utils/DuckdbConnection";
 import { DB } from "./utils/DBSvcConfig";
 import { env } from "./env";
@@ -66,21 +67,16 @@ const initRoutes = async (app: express.Application) => {
         app.use(timerMiddleware());
     }
 
-    if (envVarUtils.isTestEnv()) {
-        analyticsCredentials = xsenv.cfServiceCredentials({ tag: "httptest" });
-        log.info(`TESTSCHEMA: ${analyticsCredentials.schema}`);
-    } else {
-        alpPortalStudiesDbMetadataCacheTTLSeconds =
-            +env.ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS || 600;
+    alpPortalStudiesDbMetadataCacheTTLSeconds =
+        +env.ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS || 600;
 
-        analyticsCredentials = xsenv
-            .filterServices({ tag: "analytics" })
-            .reduce((acc, item) => {
-                // Reduce credentials so that key of object is databaseCode
-                acc[item.credentials.code] = item.credentials;
-                return acc;
-            }, {});
-    }
+    analyticsCredentials = xsenv
+        .filterServices({ tag: "analytics" })
+        .reduce((acc, item) => {
+            // Reduce credentials so that key of object is databaseCode
+            acc[item.credentials.code] = item.credentials;
+            return acc;
+        }, {});
 
     // Calls Alp-Portal for studies db metadata and cache it
     // Ignore Alp-Portal check for readiness probe check
@@ -105,11 +101,7 @@ const initRoutes = async (app: express.Application) => {
         };
 
         try {
-            if (
-                !envVarUtils.isTestEnv() &&
-                req.url !== "/check-readiness" &&
-                !utils.isClientCredReq(req)
-            ) {
+            if (req.url !== "/check-readiness" && !utils.isClientCredReq(req)) {
                 const publicEndpoint = "/analytics-svc/api/services/public";
                 let studies: StudyDbMetadata[];
                 // Checks if its public
@@ -132,18 +124,6 @@ const initRoutes = async (app: express.Application) => {
                 }
 
                 req.studiesDbMetadata = studiesDbMetadata;
-            } else {
-                // for http tests
-                req.studiesDbMetadata = {
-                    studies: [
-                        {
-                            id: "testStudyEntityValue",
-                            schemaName: "HTTPTESTSCHEMA",
-                            databaseName: "testDatabaseName",
-                        },
-                    ],
-                    cachedAt: Date.now(),
-                };
             }
 
             req.dbCredentials = {
@@ -158,7 +138,7 @@ const initRoutes = async (app: express.Application) => {
         }
     });
 
-    if (!envVarUtils.isTestEnv()) {
+    if (envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun()) {
         // Get Analytics Credential for study based on selected study
         // Otherwise, default it to the first db connection and use default schema in the connection string
         await app.use(studyDbCredentialMiddleware);
@@ -181,15 +161,23 @@ const initRoutes = async (app: express.Application) => {
 
                 let credentials = null;
                 if (envVarUtils.isTestEnv()) {
-                    credentials = analyticsCredentials;
+                    credentials = analyticsCredentials[process.env.TESTSCHEMA];
                 } else {
                     credentials = req.dbCredentials.studyAnalyticsCredential;
                 }
 
-                req.dbConnections = await getDBConnections({
-                    analyticsCredentials: credentials,
-                    userObj,
-                });
+                if (env.USE_SQL_PROXY === "true") {
+                    req.dbConnections = await getSqlProxyDbConnections({
+                        analyticsCredentials: credentials,
+                        userObj: userObj,
+                        token: req.headers.authorization,
+                    });
+                } else {
+                    req.dbConnections = await getDBConnections({
+                        analyticsCredentials: credentials,
+                        userObj,
+                    });
+                }
             }
 
             next();
@@ -579,6 +567,45 @@ const getDBConnections = async ({
                 userObj,
             });
     }
+
+    const [analyticsConnection] = await Promise.all([
+        analyticsConnectionPromise,
+    ]);
+
+    return {
+        analyticsConnection,
+    };
+};
+
+const getSqlProxyDbConnections = async ({
+    analyticsCredentials,
+    userObj,
+    token,
+}): Promise<{
+    analyticsConnection: Connection.ConnectionInterface;
+}> => {
+    // Define defaults for both analytics & Vocab connections
+    let analyticsConnectionPromise;
+
+    const sqlProxyDatabase = `${analyticsCredentials.dialect}-${analyticsCredentials.code}-${analyticsCredentials.schema}`;
+
+    // Overwrite analyticsCrendential values to connect to sql-proxy
+    analyticsCredentials.host = env.SQL_PROXY_HOST;
+    analyticsCredentials.port = env.SQL_PROXY_PORT;
+    analyticsCredentials.database = sqlProxyDatabase;
+    analyticsCredentials.user = token;
+
+    // IF use duckdb is true change dialect from postgres -> duckdb
+    if (env.USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
+        analyticsCredentials.database = `duckdb-${analyticsCredentials.code}-${analyticsCredentials.schema}`;
+    }
+
+    analyticsConnectionPromise = SqlProxyDBConnectionUtil.getDBConnection({
+        credentials: analyticsCredentials,
+        schemaName: analyticsCredentials.schema,
+        vocabSchemaName: analyticsCredentials.vocabSchema,
+        userObj,
+    });
 
     const [analyticsConnection] = await Promise.all([
         analyticsConnectionPromise,
