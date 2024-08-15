@@ -182,14 +182,6 @@ x-envs:
           "route": "ps-config"
         },
         {
-          "description": "Map codes from a source system into terminologies stored in OMOP Vocabulary",
-          "enabled": true,
-          "name": "Concept Mapping",
-          "notes": "",
-          "pluginPath": "plugins/Setup/ConceptMapping/module",
-          "route": "concept-mapping"
-        },
-        {
           "description": "Configure hybrid search for concepts",
           "enabled": true,
           "name": "Hybrid Search",
@@ -231,9 +223,14 @@ x-envs:
           "route": "etl"
         },
         {
-          "name": "Sql Editor",
+          "name": "Sql",
           "pluginPath": "plugins/SystemAdmin/Sqleditor/module",
           "route": "sqleditor"
+        },
+        {
+          "name": "Codes",
+          "pluginPath": "plugins/SystemAdmin/ConceptMapping/module",
+          "route": "codes"
         },
         {
           "data": {
