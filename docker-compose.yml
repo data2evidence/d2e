@@ -329,6 +329,7 @@ services:
       PG_SCHEMA: qe_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       PORT: 41110
+      isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
       sqlOnly: false
 
@@ -834,6 +835,7 @@ services:
       NODE_ENV: development
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
+      isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
       DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
 
@@ -1052,6 +1054,7 @@ services:
       PG_SCHEMA: cdw_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       __MRI_SAC_EXTENSION: ENABLED
+      isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
 
   alp-minerva-pg-mgmt-init:
@@ -1262,7 +1265,8 @@ services:
       PG_SCHEMA: cdw_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       __MRI_SAC_EXTENSION: ENABLED
-      isTestEnv: false
+      isHttpTestRun: ${isHttpTestRun}
+      isTestEnv: ${isTestEnv}
 
   alp-minerva-s3:
     command:
@@ -1529,7 +1533,7 @@ services:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
       PORT: 41109
-      isHttpTestRun: ${isTestEnv}
+      isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
       TESTSCHEMA: ${TESTSCHEMA}
       NOT_EQ_CHECK_FILTERCARDS: ${NOT_EQ_CHECK_FILTERCARDS:-true}

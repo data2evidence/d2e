@@ -102,32 +102,6 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest",
-            "cdw"
-           ]
-          }
-         ]
-        }
 
   alp-minerva-dataflow-mgmt:
     build:
@@ -171,31 +145,6 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest"
-           ]
-          }
-         ]
-        }
 
   alp-minerva-pg-mgmt-init:
     build:
@@ -232,31 +181,6 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest"
-           ]
-          }
-         ]
-        }
 
   alp-minerva-sqleditor:
     build:
