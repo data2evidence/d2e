@@ -49,6 +49,7 @@ jobs:
     needs: [check_file_changes]
     if: (github.ref_name == 'develop' || contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
     runs-on: test
+    timeout-minutes: 60
     env:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       TESTSCHEMA: HTTP_${{github.run_id}}
@@ -150,7 +151,7 @@ jobs:
         env:
           ENV_TYPE: "local"
         run: |
-          log_output=$(yarn init:logto)
+          yarn init:logto
           export LOGTO__ALP_APP__CLIENT_ID=$(cat .env.local | grep LOGTO__ALP_APP__CLIENT_ID | cut -d'=' -f2)
           echo "LOGTO__ALP_APP__CLIENT_ID=$LOGTO__ALP_APP__CLIENT_ID" >>$GITHUB_ENV # Make available to subsequent github actions steps
           echo "USE_DUCKDB=false" >>.env.local
@@ -186,6 +187,7 @@ jobs:
       - name: Login to logto and get Bearer token and sub
         run: |
           response=$(curl -ik "https://localhost:41100/oidc/auth?redirect_uri=https%3A%2F%2Flocalhost%3A41100%2Fportal%2Flogin-callback&client_id=$LOGTO__ALP_APP__CLIENT_ID&response_type=code&state=lbFDB1hcko&scope=openid%20offline_access%20profile%20email&nonce=Osptnuwqc47w&code_challenge=n6eqz8p8jj1L9Qu7pY2_GrWO7XyaQbWrcs54x9OAnPg&code_challenge_method=S256")
+          printf "%s\n" "$response"
 
           # Extract cookies
           interaction_cookie=$(printf "%s\n" "$response" | grep _interaction= | awk -F'=' '{print $2}' | awk -F'; ' '{print $1}')
@@ -206,6 +208,7 @@ jobs:
                   "password": "Updatepassword12345"
               }
           }')
+          printf "%s\n" "$response"
 
           # Submit sign in page
           response=$(curl -ik --request POST 'https://localhost:41100/api/interaction/submit' \
@@ -213,6 +216,7 @@ jobs:
               --header 'origin: https://localhost:41100' \
               --header 'referer: https://localhost:41100/sign-in' \
               --header "Cookie: _interaction=$interaction_cookie; _interaction.sig=$interaction_sig_cookie; _logto={\"appId\":\"$LOGTO__ALP_APP__CLIENT_ID\"}")
+          printf "%s\n" "$response"
 
           # Get session
           response=$(curl -ik "https://localhost:41100/oidc/auth/$interaction_cookie" \
@@ -226,12 +230,14 @@ jobs:
           logto_cookie=$(printf "%s\n" "$response" | grep _logto= | awk -F'=' '{print $2}' | awk -F'; ' '{print $1}')
           session_cookie=$(printf "%s\n" "$response" | grep _session= | awk -F'=' '{print $2}' | awk -F'; ' '{print $1}')
           session_sig_cookie=$(printf "%s\n" "$response" | grep _session.sig= | awk -F'=' '{print $2}' | awk -F'; ' '{print $1}')
+          printf "%s\n" "$response"
 
           # Submit consent page
           response=$(curl -ik 'https://localhost:41100/consent' \
               --header 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
               --header 'referer: https://localhost:41100/sign-in' \
               --header "Cookie: _interaction=$interaction_cookie; _interaction.sig=$interaction_sig_cookie; _interaction_resume=$interaction_resume_cookie; _interaction_resume.sig=$interaction_resume_sig_cookie; _session=$session_cookie; _session.sig=$session_sig_cookie; _logto={\"appId\":\"$LOGTO__ALP_APP__CLIENT_ID\"}")
+          printf "%s\n" "$response"
 
           # Get authorization code
           response=$(curl -ik "https://localhost:41100/oidc/auth/$interaction_cookie" \
@@ -239,6 +245,7 @@ jobs:
               --header 'referer: https://localhost:41100/sign-in' \
               --header "Cookie: _interaction=$interaction_cookie; _interaction.sig=$interaction_sig_cookie; _interaction_resume=$interaction_resume_cookie; _interaction_resume.sig=$interaction_resume_sig_cookie; _session=$session_cookie; _session.sig=$session_sig_cookie; _logto={\"appId\":\"$LOGTO__ALP_APP__CLIENT_ID\"}")
 
+          printf "%s\n" "$response"
           authorization_code=$(printf "%s\n" "$response" | sed -n 's/.*code=\([^&]*\).*/\1/p' | head -n 1)
 
           # Complete login
@@ -246,6 +253,7 @@ jobs:
               --header 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
               --header 'referer: https://localhost:41100/sign-in' \
               --header "Cookie: _interaction=$interaction_cookie; _interaction.sig=$interaction_sig_cookie; _interaction_resume=$interaction_resume_cookie; _interaction_resume.sig=$interaction_resume_sig_cookie; _session=$session_cookie; _session.sig=$session_sig_cookie; _logto={\"appId\":\"$LOGTO__ALP_APP__CLIENT_ID\"}")
+          printf "%s\n" "$response"
 
           # Get Bearer token
           response=$(curl -ik 'https://localhost:41100/oauth/token' \
@@ -260,6 +268,7 @@ jobs:
               --data-urlencode "code=$authorization_code" \
               --data-urlencode 'code_verifier=kqVLhCyXRJ3Y9mXie6F9d1FW8AUbTUzIuJiqUf1SM9I')
 
+          printf "%s\n" "$response"
           export BEARER_TOKEN=$(echo "$response" | grep -o '"access_token":"[^"]*"' | sed 's/"access_token":"\([^"]*\)"/\1/')
           echo "BEARER_TOKEN=$BEARER_TOKEN" >> $GITHUB_ENV # Make available to subsequent github actions steps
 
@@ -341,6 +350,10 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-logto-1 -t
+      - name: print logs for alp-logto-post-init-1
+        if: ${{ always() || cancelled() || failure() }}
+        run: |
+          docker logs alp-logto-post-init-1
       - name: print logs for alp-minerva-portal-server-nest-prod-1
         if: ${{ always() || cancelled() || failure() }}
         run: |
