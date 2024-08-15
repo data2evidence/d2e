@@ -66,6 +66,10 @@
       "destination":"pa-config"
     },
     {
+      "source": "^/alp/hana/(.*)$",
+      "destination": "cdw"
+    },
+    {
       "source": "^/hc/hph/cdw/(.*)$",
       "destination": "cdw"
     },
