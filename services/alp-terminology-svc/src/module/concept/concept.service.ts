@@ -108,11 +108,10 @@ export class ConceptService {
     }
   }
   async getFirstConcepts(
-    getSuggestedConceptsDto: GetFirstConceptsDto,
+    getFirstConceptsDto: GetFirstConceptsDto,
     hybridSearchConfigService: HybridSearchConfigService,
   ): Promise<any> {
-    const data = getSuggestedConceptsDto.data;
-    const datasetId = getSuggestedConceptsDto.datasetId;
+    const { data, datasetId } = getFirstConceptsDto;
 
     const systemPortalApi = new SystemPortalAPI(this.token);
     const { databaseCode, vocabSchemaName, dialect } =
