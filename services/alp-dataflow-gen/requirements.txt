@@ -7,3 +7,4 @@ debugpy==1.8.1
 sqlalchemy-hana==2.2.0
 pyarrow==17.0.0
 duckdb==1.0
+dask==2024.8.0
