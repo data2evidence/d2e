@@ -801,22 +801,22 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
-    path: '^/gateway/api/prefect',
+    path: '^/prefect',
     scopes: ['gateway.prefect.read'],
     httpMethods: ['GET']
   },
   {
-    path: '^/gateway/api/prefect',
+    path: '^/prefect',
     scopes: ['gateway.prefect.post'],
     httpMethods: ['POST']
   },
   {
-    path: '^/gateway/api/prefect',
+    path: '^/prefect',
     scopes: ['gateway.prefect.update'],
     httpMethods: ['PUT', 'PATCH']
   },
   {
-    path: '^/gateway/api/prefect',
+    path: '^/prefect',
     scopes: ['gateway.prefect.delete'],
     httpMethods: ['DELETE']
   }

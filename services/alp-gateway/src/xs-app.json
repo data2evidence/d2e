@@ -82,7 +82,7 @@
       "destination": "ps-config"
     },
     {
-      "source": "^/gateway/api/prefect/(.*)$",
+      "source": "^/prefect/(.*)$",
       "destination": "prefect"
     }
   ]

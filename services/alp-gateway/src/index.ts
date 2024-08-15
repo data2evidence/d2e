@@ -400,7 +400,7 @@ routes.forEach((route: IRouteProp) => {
           createProxyMiddleware({
             ...getCreateMiddlewareOptions(services.prefect),
             headers: { Connection: 'keep-alive' },
-            pathRewrite: path => path.replace('/gateway/api/prefect', '/api')
+            pathRewrite: path => path.replace('/prefect', '/')
           })
         )
       default:
