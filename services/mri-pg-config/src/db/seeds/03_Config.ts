@@ -26941,7 +26941,7 @@ const cdwConfigDuckdb = {
           "@COND.PATIENT_ID": "\"person_id\"",
           "@COND.INTERACTION_ID": "\"condition_occurrence_id\"",
           "@COND.CONDITION_ID": "\"condition_concept_id\"",
-          "@COND.PARENT_INTERACT_ID": "\visit_occurrence_id\"",
+          "@COND.PARENT_INTERACT_ID": "\"visit_occurrence_id\"",
           "@COND.START": "\"condition_start_datetime\"",
           "@COND.END": "\"condition_end_datetime\"",
           "@COND.INTERACTION_TYPE": "\"condition_type_concept_id\"",
