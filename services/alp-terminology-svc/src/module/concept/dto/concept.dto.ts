@@ -38,8 +38,8 @@ export class ConceptHierarchyDto {
   depth: number;
 }
 class GetFirstConceptsSingleDto {
-  @IsObject()
-  row: object;
+  @IsNumber()
+  index: number;
 
   @IsString()
   searchText: string;
@@ -51,7 +51,6 @@ class GetFirstConceptsSingleDto {
 
 export class GetFirstConceptsDto {
   @IsArray()
-  @ValidateNested({ each: true })
   @Type(() => GetFirstConceptsSingleDto)
   data: GetFirstConceptsSingleDto[];
 

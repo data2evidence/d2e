@@ -121,9 +121,7 @@ export class ConceptService {
 
     const results = await Promise.all(
       data.map(async (dataItem) => {
-        const domainId = dataItem.domainId;
-        const searchText = dataItem.searchText;
-        const row = dataItem.row;
+        const { domainId, searchText, index } = dataItem;
 
         const filters: Filters = {
           conceptClassId: [],
@@ -166,12 +164,10 @@ export class ConceptService {
           const [conceptResults] = concept.expansion.contains;
 
           return {
-            row: row,
-            result: {
-              conceptId: conceptResults.conceptId,
-              conceptName: conceptResults.display,
-              domainId: conceptResults.domainId,
-            },
+            index,
+            conceptId: conceptResults.conceptId,
+            conceptName: conceptResults.display,
+            domainId: conceptResults.domainId,
           };
         } catch (error) {
           logger.error(error);
