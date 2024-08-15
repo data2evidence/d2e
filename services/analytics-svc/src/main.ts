@@ -138,10 +138,7 @@ const initRoutes = async (app: express.Application) => {
         }
     });
 
-    if (
-        !envVarUtils.isTestEnv() ||
-        (envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun())
-    ) {
+    if (!envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun()) {
         // Get Analytics Credential for study based on selected study
         // Otherwise, default it to the first db connection and use default schema in the connection string
         await app.use(studyDbCredentialMiddleware);
