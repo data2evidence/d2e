@@ -141,10 +141,6 @@ jobs:
       - name: Manipulate configuration
         run: |
           yq -i '.networks.alp.external=true' docker-compose.yml
-          yq -i '.services.alp-minerva-portal-server.environment.APP__DEPLOY_MODE="standalone"' docker-compose.yml
-          yq -i '.services.alp-minerva-gateway.environment.APP__DEPLOY_MODE="standalone"' docker-compose.yml
-          yq -i '.services.alp-caddy.environment.CS_PUBLIC_FQDN="localhost:41000"' docker-compose.yml
-          yq -i '.services.alp-caddy.ports |= ["41100:41100", "41000:41000"]' docker-compose.yml
 
       - name: Create network for external to use
         run: |
@@ -155,17 +151,8 @@ jobs:
           ENV_TYPE: "local"
         run: |
           log_output=$(yarn init:logto)
-          processed_output=$(echo "$log_output" | grep 'LOGTO__.*=' | awk -F'|' '{print $2}' | awk '{$1=$1};1')
-          while IFS='=' read -r key value; do
-              # Check if value is empty
-              if [ -z "$value" ]; then
-                  echo "Skipping empty value for key: \"$key\""
-                  continue
-              fi
-              export "$key=$value"             # Make available to bash script
-              echo "$key=$value" >>.env.local  # Make available to docker-compose
-              echo "$key=$value" >>$GITHUB_ENV # Make available to subsequent github actions steps
-          done <<<"$processed_output"
+          export LOGTO__ALP_APP__CLIENT_ID=$(cat .env.local | grep LOGTO__ALP_APP__CLIENT_ID | cut -d'=' -f2)
+          echo "LOGTO__ALP_APP__CLIENT_ID=$LOGTO__ALP_APP__CLIENT_ID" >>$GITHUB_ENV # Make available to subsequent github actions steps
           echo "USE_DUCKDB=false" >>.env.local
 
       - name: Seed db credentials
@@ -317,31 +304,6 @@ jobs:
           echo "USER_MGMT_ID:"
           echo $USER_MGMT_ID
 
-      - name: Update roles
-        run: |
-          curl -ik 'https://localhost:41100/usermgmt/api/user-group/register-tenant-roles' \
-              -H 'accept: application/json, text/plain, */*' \
-              -H "authorization: Bearer $BEARER_TOKEN" \
-              -H 'content-type: application/json' \
-              -H 'origin: https://localhost:41100' \
-              -H 'referer: https://localhost:41100/portal/systemadmin/user-overview' \
-              --data-raw "{\"userId\":\"$USER_MGMT_ID\",\"tenantId\":\"e0348e4d-2e17-43f2-a3c6-efd752d17c23\",\"roles\":[\"TENANT_VIEWER\"]}"
-
-          curl -ik 'https://localhost:41100/usermgmt/api/alp-data-admin/register' \
-              -H 'accept: application/json, text/plain, */*' \
-              -H "authorization: Bearer $BEARER_TOKEN" \
-              -H 'content-type: application/json' \
-              -H 'origin: https://localhost:41100' \
-              -H 'referer: https://localhost:41100/portal/systemadmin/user-overview' \
-              --data-raw "{\"userId\":\"$USER_MGMT_ID\",\"roles\":[\"ALP_SYSTEM_ADMIN\",\"ALP_SQLEDITOR_ADMIN\"],\"system\":\"Research System\"}"
-
-          curl -ik 'https://localhost:41100/usermgmt/api/alp-user/register' \
-              -H 'accept: application/json, text/plain, */*' \
-              -H "authorization: Bearer $BEARER_TOKEN" \
-              -H 'content-type: application/json' \
-              -H 'origin: https://localhost:41100' \
-              -H 'referer: https://localhost:41100/portal/systemadmin/user-overview' \
-              --data-raw "{\"userId\":\"$USER_MGMT_ID\",\"roles\":[\"ALP_USER_ADMIN\",\"ALP_DASHBOARD_VIEWER\"]}"
       - name: Seed dummy dataset
         run: |
           docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "INSERT INTO portal.dataset (id,tenant_id,visibility_status,database_code,schema_name,token_dataset_code,\"type\",created_by,created_date,modified_by,modified_date,data_model,source_dataset_id,pa_config_id,vocab_schema_name,dialect) VALUES
