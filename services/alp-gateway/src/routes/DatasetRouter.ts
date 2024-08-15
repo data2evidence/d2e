@@ -228,12 +228,11 @@ export class DatasetRouter {
                 snapshot_copy_config: snapshotCopyConfig
               }
             }
-
             await dataflowMgmtAPI.createFlowRunByMetadata(
               options,
-              'datamodel',
+              'datamart',
               dataModelInfo.flowId,
-              `datamodel-snapshot-${schemaName}`
+              `datamart-snapshot-${schemaName}`
             )
           } catch (error) {
             this.logger.error(`Error copying CDM schema! ${error}`)
