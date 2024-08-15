@@ -329,8 +329,6 @@ services:
       PG_SCHEMA: qe_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       PORT: 41110
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
       sqlOnly: false
 
   alp-caddy:
@@ -422,7 +420,6 @@ services:
       PREFECT_SERVER_API_PORT: 41${BASE_PORT:-1}20
       PYTHON_VERIFY_SSL: false # Only use this for apis calling internal docker urls
       R_LIBS_USER: /home/docker/plugins/R/site-library
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
 
   alp-dataflow-gen-agent:
@@ -489,7 +486,6 @@ services:
       PREFECT_LOGGING_LEVEL: DEBUG
       PYTHON_VERIFY_SSL: false # Only use this for apis calling internal docker urls
       R_LIBS_USER: /home/docker/plugins/R/site-library
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
       TERMINOLOGY_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/terminology/
       OHDSI__R_COHORT_DIAGNOSTICS_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortDiagnosticsModule/v0.2.0/SettingsFunctions.R
@@ -773,14 +769,9 @@ services:
       SQL_RETURN_ON: ${SQL_RETURN_ON:-false}
       DUCKDB__DATA_FOLDER: /home/docker/src/alp-data-node/app/duckdb_data
       LOCAL_DEBUG: "false"
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       USE_DUCKDB: ${USE_DUCKDB:-true}
       USE_SQL_PROXY: ${USE_SQL_PROXY:-false}
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
-      local: ${local}
-      TESTSCHEMA: ${TESTSCHEMA}
     deploy:
       resources:
         limits:
@@ -835,8 +826,6 @@ services:
       NODE_ENV: development
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
       DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
 
   alp-minerva-dataflow-mgmt:
@@ -978,9 +967,6 @@ services:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
       NODE_ENV: development
       PLUGINS__JSON: *x-plugins
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
 
   alp-minerva-meilisearch-svc:
     container_name: &c13 alp-minerva-meilisearch-svc-${BASE_PORT:-1}
@@ -1054,8 +1040,6 @@ services:
       PG_SCHEMA: cdw_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       __MRI_SAC_EXTENSION: ENABLED
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
 
   alp-minerva-pg-mgmt-init:
     container_name: &c15 alp-minerva-pg-mgmt-init-${BASE_PORT:-1}
@@ -1265,8 +1249,6 @@ services:
       PG_SCHEMA: cdw_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
       __MRI_SAC_EXTENSION: ENABLED
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
 
   alp-minerva-s3:
     command:
@@ -1533,9 +1515,6 @@ services:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
       PORT: 41109
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
-      TESTSCHEMA: ${TESTSCHEMA}
       NOT_EQ_CHECK_FILTERCARDS: ${NOT_EQ_CHECK_FILTERCARDS:-true}
 
   redis:
