@@ -23560,10 +23560,8 @@ const cdwConfigDuckdb = {
             "defaultFilter": "1=1",
             "defaultPlaceholder": "@SPEC",
             "order": 2,
-            "parentInteraction": [
-                "patient.interactions.visit"
-            ],
-            "parentInteractionLabel": "Visit Occurrence Parent",
+            "parentInteraction": [],
+            "parentInteractionLabel": "parent",
             "attributes": {
                 "pid": {
                     "name": [
