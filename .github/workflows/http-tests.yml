@@ -92,7 +92,6 @@ jobs:
           echo "HDIPW: ${HDIPW}"
           echo "HDIUSER: ${HDIUSER}"
           echo "HANASERVER: ${HANASERVER}"
-          echo "HANASERVER_REPLACE: ${HANASERVER_REPLACE}"
           echo "isHttpTestRun: ${isHttpTestRun}"
           echo "isTestEnv: ${isTestEnv:-false}"
           echo "SKIP_AUTH: ${SKIP_AUTH}"
@@ -151,10 +150,10 @@ jobs:
         env:
           ENV_TYPE: "local"
         run: |
-          yarn init:logto
-          export LOGTO__ALP_APP__CLIENT_ID=$(cat .env.local | grep LOGTO__ALP_APP__CLIENT_ID | cut -d'=' -f2)
-          echo "LOGTO__ALP_APP__CLIENT_ID=$LOGTO__ALP_APP__CLIENT_ID" >>$GITHUB_ENV # Make available to subsequent github actions steps
           echo "USE_DUCKDB=false" >>.env.local
+          yarn init:logto
+          export LOGTO__ALP_APP__CLIENT_ID=$(cat .env.local | grep LOGTO__ALP_APP__CLIENT_ID | cut -d'=' -f2 | head -n 1)
+          echo "LOGTO__ALP_APP__CLIENT_ID=$LOGTO__ALP_APP__CLIENT_ID" >>$GITHUB_ENV # Make available to subsequent github actions steps
 
       - name: Seed db credentials
         run: |
