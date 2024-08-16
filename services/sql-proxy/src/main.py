@@ -1,11 +1,8 @@
 import debugpy
-import os
 from typing import Tuple
-from buenavista import bv_dialects, postgres, rewrite
-from buenavista.backends.duckdb import DuckDBConnection
-from buenavista.core import Connection
+from buenavista import postgres
 from buenavista.database import initialize_db_clients, SqlProxyDatabaseClients
-
+from config import Env
 
 import logging
 
@@ -20,13 +17,11 @@ def create(
 
 
 def main():
-    if "LOCAL_DEBUG" in os.environ:
-        if os.environ["LOCAL_DEBUG"] == "true":
-            debugpy.listen(("0.0.0.0", 9235))
-            logging.basicConfig(level=logging.DEBUG)
+    if Env.LOCAL_DEBUG == "true":
+        debugpy.listen(("0.0.0.0", 9235))
+        logging.basicConfig(level=logging.DEBUG)
 
-    if "SQL_PROXY__PORT" in os.environ:
-        port = int(os.environ["SQL_PROXY__PORT"])
+        port = Env.SQL_PROXY__PORT
 
     db_clients = initialize_db_clients()
     address = ("0.0.0.0", port)
