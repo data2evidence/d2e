@@ -38,15 +38,18 @@ RUN yarn install
 WORKDIR /home/docker
 
 COPY ./services/sql-proxy/requirements.txt .
-RUN pip install -r requirements.txt
+
+RUN --mount=type=cache,target=/home/docker/.cache/pip \
+  pip install -r requirements.txt
 
 COPY ./services/sql-proxy/src .src
 
 FROM base AS development
 
 COPY ./services/sql-proxy/requirements-dev.txt .
-RUN pip install -r requirements-dev.txt
 
+RUN --mount=type=cache,target=/home/docker/.cache/pip \
+  pip install -r requirements-dev.txt
 
 ENTRYPOINT ["/tini", "--"]
 CMD cd ./envConverter && yarn generate:envs -s alp-minerva-analytics-svc && cd - && . ./generated-env.sh && python -m watchdog.watchmedo auto-restart --recursive --pattern="*.py" --directory="/home/docker/src" python ./src/main.py
