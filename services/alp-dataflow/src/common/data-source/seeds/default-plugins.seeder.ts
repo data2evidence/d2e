@@ -61,9 +61,9 @@ export default class DefaultPluginsSeeder implements Seeder {
       },
       {
         pluginId: 'c86f5f84-3f1d-479e-a076-55ca6ad4b43c',
-        name: 'duckdb',
+        name: 'cachedb',
         type: 'default',
-        url: 'https://github.com/alp-os/d2e-plugins.git@main#subdirectory=duckdb',
+        url: 'https://github.com/alp-os/d2e-plugins.git@main#subdirectory=cachedb',
         status: PluginUploadStatus.PENDING,
         createdBy: 'system',
         modifiedBy: 'system'

@@ -25,8 +25,8 @@ const Env = z.object({
     USE_DUCKDB: z.string(),
     USE_SQL_PROXY: z.string(),
 
-    SQL_PROXY_HOST: z.string(),
-    SQL_PROXY_PORT: z
+    SQL_PROXY__HOST: z.string(),
+    SQL_PROXY__PORT: z
         .string()
         .refine((val) => !isNaN(parseInt(val)))
         .transform(Number),
