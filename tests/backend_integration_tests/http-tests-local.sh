@@ -276,4 +276,4 @@ yarn
 ########################
 # Run HTTP tests
 ########################
-yarn test-specs --test_schema_name=JEROME_HTTP_TEST
+yarn test-specs --test_schema_name=$TESTSCHEMA
