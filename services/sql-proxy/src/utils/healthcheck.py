@@ -19,5 +19,4 @@ def tcp_port_check(Host, Port):
 
 if __name__ == "__main__":
     port = int(sys.argv[1].strip())
-    print(port)
     tcp_port_check("localhost", port)

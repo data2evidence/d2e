@@ -1660,14 +1660,16 @@ services:
       interval: 20s
       retries: 5
       start_period: 30s
-      test: ["CMD", "python", "/home/docker/src/utils/healthcheck.py", "41191"]
-      timeout: 30s
+      test: ["CMD", "python", "src/utils/healthcheck.py", "41191"]
+      timeout: 10s
     logging:
       options:
         tag: *c30
     networks:
       alp:
         priority: 20
+      data:
+        priority: 10
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     ports:
       - 41191:41191

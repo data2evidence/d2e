@@ -364,7 +364,7 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
                 del self.server.ctxts[ctx.process_id]
                 ctx = None
             return None
-        elif code == 1730178923 or code == 1986359929:  # Healthcheck request
+        elif code == 1986359929:  # Healthcheck request
             return self.send_notice()
         else:
             raise Exception(f"Unsupported startup message: {code}")
