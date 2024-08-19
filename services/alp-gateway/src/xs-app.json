@@ -80,6 +80,10 @@
     {
       "source": "^/ps-config-svc/(.*)$",
       "destination": "ps-config"
+    },
+    {
+      "source": "^/prefect/(.*)$",
+      "destination": "prefect"
     }
   ]
 }
