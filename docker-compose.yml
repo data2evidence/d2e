@@ -603,7 +603,7 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-      
+
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -1729,18 +1729,18 @@ services:
       options:
         tag: *c31
     networks:
-      alp:
+      data:
         priority: 20
     platform: linux/amd64
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    volumes: 
+    volumes:
       - dind-certs:/certs
     environment:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool}
       PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool} # used for flow_builder deployment
-      DOCKER_HOST: 'tcp://dind:2376'
+      DOCKER_HOST: "tcp://dind:2376"
       DOCKER_CERT_PATH: /certs/client/
       DOCKER_TLS_VERIFY: false
 
@@ -1757,30 +1757,31 @@ services:
     environment:
       PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
       PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
-      DOCKER_HOST: 'tcp://dind:2376'
+      DOCKER_HOST: "tcp://dind:2376"
       DOCKER_CERT_PATH: /certs/client/
       DOCKER_TLS_VERIFY: false
-  
+
   alp-docker-server:
     image: docker:dind
     container_name: &c33 alp-docker-server-${BASE_PORT:-1}
     hostname: dind
     networks:
-      alp:
+      data:
         priority: 20
     healthcheck:
       interval: 20s
       retries: 30
-      start_period: 60s
-      test: ["CMD", "nc", "-z", "localhost", "2376"]
-      # test: ["CMD", "bash", "-c", "echo -n '' > /dev/tcp/localhost/2376"]
-      timeout: 30s
+      start_period: 30s
+      test: ["CMD-SHELL", "netstat -ltn | grep -c :::2376"]
+      timeout: 10s
     logging:
       options:
         tag: *c33
     privileged: true
     volumes:
       - dind-certs:/certs
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
 
   alp-perseus-files-manager:
     image: perseushub/files-manager:latest
