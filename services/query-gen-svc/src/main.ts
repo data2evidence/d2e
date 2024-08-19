@@ -84,7 +84,14 @@ const main = async () => {
     await initSwaggerRoutes(app);
     utils.setupGlobalErrorHandling(app, log);
 
-    if (!envVarUtils.isTestEnv()) {
+    if (envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun()) {
+        app.listen(port);
+        log.info(
+            `Test mode details: [isTestEnv: ${envVarUtils.isTestEnv()}, test schema name: ${
+                process.env.TESTSCHEMA
+            }]`
+        );
+    } else {
         const server = https.createServer(
             {
                 key: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, "\n"),
@@ -100,13 +107,6 @@ const main = async () => {
                 `🚀 Query-gen svc started successfully!. Server listening on port ${port} [hostname: ${os.hostname}...`
             );
         });
-    } else {
-        app.listen(port);
-        log.info(
-            `Test mode details: [isTestEnv: ${envVarUtils.isTestEnv()}, test schema name: ${
-                process.env.TESTSCHEMA
-            }]`
-        );
     }
 };
 

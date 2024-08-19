@@ -23,6 +23,7 @@ NON_PERSON_ENTITIES = {
     "specimen": "specimen_id"
 }
 
+# Todo: Move to plugin
 DATAMODEL_CDM_VERSION = {
     "omop": "5.3",
     "omop5-4": "5.4",

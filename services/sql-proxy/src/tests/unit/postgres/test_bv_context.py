@@ -2,8 +2,14 @@ import pytest
 from typing import Dict
 from unittest.mock import MagicMock
 
-from buenavista.core import Session
+from buenavista.core import Session, Connection
 from buenavista.postgres import BVContext, TransactionStatus
+
+
+@pytest.fixture
+def mock_connection():
+    connection = MagicMock(spec=Connection)
+    return connection
 
 
 @pytest.fixture
@@ -14,8 +20,8 @@ def mock_session():
 
 
 @pytest.fixture
-def bv_context(mock_session):
-    return BVContext(session=mock_session, rewriter=None, params={})
+def bv_context(mock_connection, mock_session):
+    return BVContext(conn=mock_connection, session=mock_session, rewriter=None, params={})
 
 
 def test_bv_context_init(bv_context, mock_session):

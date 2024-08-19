@@ -20,7 +20,7 @@ function _getRows(result) {
 }
 
 export class PostgresConnection implements ConnectionInterface {
-  private constructor(
+  constructor(
     public conn: Pool,
     public schemaName,
     public vocabSchemaName,
@@ -113,7 +113,7 @@ export class PostgresConnection implements ConnectionInterface {
     }
   }
 
-  private parseSql(temp: string): string {
+  parseSql(temp: string): string {
     return translateHanaToPostgres(temp, this.schemaName, this.vocabSchemaName);
   }
 
