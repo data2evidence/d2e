@@ -12,6 +12,7 @@ const Env = z.object({
   TLS__INTERNAL__KEY: z.string(),
   TLS__INTERNAL__CRT: z.string(),
   DUCKDB_PATH: z.string(),
+  BUILT_IN_DUCKDB_PATH: z.string(),
   
   PG__HOST: z.string(),
   PG__DB_NAME: z.string(),
