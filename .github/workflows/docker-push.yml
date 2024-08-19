@@ -1,12 +1,12 @@
 name: Docker Build & Push
 run-name: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
 
-on: 
+on:
   pull_request:
     types: [opened, reopened, ready_for_review, synchronize]
   push:
-      branches:
-        - develop
+    branches:
+      - develop
 
   workflow_dispatch:
     inputs:
@@ -38,7 +38,7 @@ on:
         required: true
         type: string
 
-concurrency: 
+concurrency:
   group: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build
   cancel-in-progress: true
 
@@ -50,30 +50,30 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-    - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@main
-      with:
-        # this might remove tools that are actually needed,
-        # if set to "true" but frees about 6 GB
-        tool-cache: false
-        
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: false
-        docker-images: true
-        swap-storage: true
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
 
-    - id: setup
-      run: |
-        echo repo_full_name="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-        echo branch_name="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-    - name: Dump GitHub context
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: true
+          swap-storage: true
+
+      - id: setup
+        run: |
+          echo repo_full_name="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo branch_name="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
     outputs:
       branch_name: ${{ steps.setup.outputs.branch_name }}
       repo_full_name: ${{ steps.setup.outputs.repo_full_name }}
@@ -174,32 +174,41 @@ jobs:
             fileName: Dockerfile.worker
             build_args:
               GIT_COMMIT_ID__PLUGINS_REPO: internal-896_flow-builder # TODO: change it to main before merging to develop
-              GIT_TOKEN__PLUGINS_REPO_READ: ${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
-              GIT_URL__PLUGINS_REPO: github.com/alp-os/d2e-plugins-dev-santan.git # TODO: change it to github.com/alp-os/d2e-plugins before merging to develop
+              GIT_URL__PLUGINS_REPO: git@github.com:alp-os/d2e-plugins-dev-santan.git # TODO: change it to github.com/alp-os/d2e-plugins before merging to develop
           - name: alp-data-node/sql-proxy
             directory: ./services/sql-proxy
             context: ./services/sql-proxy
             fileName: Dockerfile
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ${{ env.BRANCH_NAME }}
-        repository: ${{ env.REPO_FULL_NAME }}
-        token: ${{ secrets.CI_PAT }}
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+          repository: ${{ env.REPO_FULL_NAME }}
+          token: ${{ secrets.CI_PAT }}
 
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.SSH_PRIVATE_KEY_D2E_PLUGINS }}
 
-    - name: Login to ACR
-      uses: docker/login-action@v3
-      with:
-        registry: alpcr.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Collect Git and SSH config files in a directory that is part of the Docker build context
+        run: |
+          cp -r ~/.gitconfig  ~/.ssh .github/
+          cd .github/
+          sed 's|/home/runner|/root|g' -i.bak .ssh/config
 
-    - name: Get docker tag name
-      id: docker_tag
-      shell: bash
-      run: |
+      - name: Login to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: alpcr.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Get docker tag name
+        id: docker_tag
+        shell: bash
+        run: |
           if [ $BRANCH_NAME == "develop" ]; then
             echo "tag_name=develop" | tee -a $GITHUB_OUTPUT
             echo "is_push=true" | tee -a $GITHUB_OUTPUT
@@ -211,32 +220,32 @@ jobs:
               echo "tag_name=$(echo ${{ github.sha }} | cut -c1-8)" | tee -a $GITHUB_OUTPUT
           fi
 
-    - uses: docker/setup-buildx-action@v3
-      id: builder
+      - uses: docker/setup-buildx-action@v3
+        id: builder
 
-    - name: Purge docker images and cache
-      run: |
-        docker image prune -af
-        docker buildx prune -af
+      - name: Purge docker images and cache
+        run: |
+          docker image prune -af
+          docker buildx prune -af
 
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        builder: ${{ steps.builder.outputs.name }}
-        platforms: 'linux/amd64'
-        context: ${{ matrix.context }}
-        pull: ${{ matrix.pull || false }}
-        file:  ${{ matrix.directory }}/${{ matrix.fileName }}
-        push: ${{ steps.docker_tag.outputs.is_push }}
-        tags: alpcr.azurecr.io/${{ matrix.name }}:${{ steps.docker_tag.outputs.tag_name }}
-        build-args: |
-          docker_image_prefix=alpcr.azurecr.io
-          GIT_COMMIT_ARG=${{ github.sha }}
-          GIT_COMMIT_ID__PLUGINS_REPO=${{ matrix.build_args.GIT_COMMIT_ID__PLUGINS_REPO || '' }}
-          GIT_TOKEN__PLUGINS_REPO_READ=${{ matrix.build_args.GIT_TOKEN__PLUGINS_REPO_READ || '' }}
-          GIT_URL__PLUGINS_REPO=${{ matrix.build_args.GIT_URL__PLUGINS_REPO || '' }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          builder: ${{ steps.builder.outputs.name }}
+          platforms: "linux/amd64"
+          context: ${{ matrix.context }}
+          pull: ${{ matrix.pull || false }}
+          file: ${{ matrix.directory }}/${{ matrix.fileName }}
+          push: ${{ steps.docker_tag.outputs.is_push }}
+          tags: alpcr.azurecr.io/${{ matrix.name }}:${{ steps.docker_tag.outputs.tag_name }}
+          build-args: |
+            docker_image_prefix=alpcr.azurecr.io
+            GIT_COMMIT_ARG=${{ github.sha }}
+            GIT_COMMIT_ID__PLUGINS_REPO=${{ matrix.build_args.GIT_COMMIT_ID__PLUGINS_REPO || '' }}
+            GIT_TOKEN__PLUGINS_REPO_READ=${{ matrix.build_args.GIT_TOKEN__PLUGINS_REPO_READ || '' }}
+            GIT_URL__PLUGINS_REPO=${{ matrix.build_args.GIT_URL__PLUGINS_REPO || '' }}
 
-    - name: Post purge
-      if: always()
-      run: |  
-        docker system prune -af
+      - name: Post purge
+        if: always()
+        run: |
+          docker system prune -af

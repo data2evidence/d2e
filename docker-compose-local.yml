@@ -1,5 +1,4 @@
 services:
-
   alp-bookmark:
     build:
       context: .
@@ -13,7 +12,7 @@ services:
 
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile --watch
-    image:  alpcr.azurecr.io/alp-data-node/alp-caddy:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop}
+    image: alpcr.azurecr.io/alp-data-node/alp-caddy:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop}
     ports:
       - 41100:41100
       - 41000:41000
@@ -248,7 +247,7 @@ services:
       context: ./services/alp-fhir/
       dockerfile: Dockerfile.frontend
     volumes:
-    - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
+      - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
 
   alp-logto-post-init:
     build:
@@ -261,12 +260,13 @@ services:
     build:
       context: .
       dockerfile: services/alp-dataflow-gen/Dockerfile.worker
+      ssh:
+        - default=${SSH_AUTH_SOCK}
       args:
         GIT_COMMIT_ID__PLUGINS_REPO: internal-896_flow-builder # TODO: change it to main before merging to develop
-        GIT_TOKEN__PLUGINS_REPO_READ: ${GIT_TOKEN__PLUGINS_REPO_READ}
-        GIT_URL__PLUGINS_REPO: github.com/alp-os/d2e-plugins-dev-santan.git # TODO: change it to github.com/alp-os/d2e-plugins before merging to develop
-#     volumes:
-#       - ../d2e-plugins-dev-santan:/usr/src/app/d2e-plugins
+        GIT_URL__PLUGINS_REPO: git@github.com:alp-os/d2e-plugins-dev-santan.git # TODO: change it to github.com/alp-os/d2e-plugins before merging to develop
+  #     volumes:
+  #       - ../d2e-plugins-dev-santan:/usr/src/app/d2e-plugins
 
   alp-dataflow-gen-docker-worker:
     extends: alp-dataflow-gen-process-worker

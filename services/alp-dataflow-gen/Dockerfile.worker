@@ -7,14 +7,14 @@ RUN echo UTC > /etc/timezone
 
 RUN apk add --no-cache python3-dev git \
     g++ gcc libxslt-dev libffi-dev cargo musl-dev \
-    bash py3-setuptools curl docker docker-compose
+    bash py3-setuptools curl docker docker-compose openssh-client
 
 RUN mkdir /tmp/node && cd /tmp/node && curl -fsSLO --compressed "https://unofficial-builds.nodejs.org/download/release/v$NODE_VERSION/node-v$NODE_VERSION-linux-$ARCH-musl.tar.xz" \
-      && tar -xJf "node-v$NODE_VERSION-linux-$ARCH-musl.tar.xz" --strip-components=1 --no-same-owner \
-      && cp -r /tmp/node/bin/* /usr/local/bin/ \
-      && cp -r /tmp/node/lib/* /usr/local/lib/ \
-      && cp -r /tmp/node/share/* /usr/local/share/ \
-      && cp -r /tmp/node/include/* /usr/local/include/
+    && tar -xJf "node-v$NODE_VERSION-linux-$ARCH-musl.tar.xz" --strip-components=1 --no-same-owner \
+    && cp -r /tmp/node/bin/* /usr/local/bin/ \
+    && cp -r /tmp/node/lib/* /usr/local/lib/ \
+    && cp -r /tmp/node/share/* /usr/local/share/ \
+    && cp -r /tmp/node/include/* /usr/local/include/
 RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs && \
     rm -f "node-v$NODE_VERSION-linux-$ARCH-musl.tar.xz" \
     rm -rf node
@@ -27,13 +27,14 @@ WORKDIR /usr/src/app
 
 RUN python -m venv /usr/src/app/venv
 ENV PATH="$PATH:/usr/src/app/venv/bin"
+ENV GIT_SSH_COMMAND='ssh -Tvv'
 
 ARG PREFECT__WORKER_POOL_NAME
 ARG GIT_COMMIT_ID__PLUGINS_REPO=main
-ARG GIT_TOKEN__PLUGINS_REPO_READ
-ARG GIT_URL__PLUGINS_REPO=github.com/alp-os/d2e-plugins.git
-RUN git clone https://${GIT_TOKEN__PLUGINS_REPO_READ}@${GIT_URL__PLUGINS_REPO} d2e-plugins 
-RUN cd d2e-plugins && git fetch --all && git checkout $GIT_COMMIT_ID__PLUGINS_REPO
+ARG GIT_URL__PLUGINS_REPO=git@github.com:alp-os/d2e-plugins.git
+RUN --mount=type=ssh mkdir -p -m 700 ~/.ssh/ &&  \
+    ssh-keyscan github.com >> ~/.ssh/known_hosts && git clone -b $GIT_COMMIT_ID__PLUGINS_REPO $GIT_URL__PLUGINS_REPO d2e-plugins
+RUN cd d2e-plugins
 ENV COMMIT_ID=$COMMIT_ID
 
 COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/worker.requirements.txt requirements.txt
