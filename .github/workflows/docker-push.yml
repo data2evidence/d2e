@@ -242,7 +242,6 @@ jobs:
             docker_image_prefix=alpcr.azurecr.io
             GIT_COMMIT_ARG=${{ github.sha }}
             GIT_COMMIT_ID__PLUGINS_REPO=${{ matrix.build_args.GIT_COMMIT_ID__PLUGINS_REPO || '' }}
-            GIT_TOKEN__PLUGINS_REPO_READ=${{ matrix.build_args.GIT_TOKEN__PLUGINS_REPO_READ || '' }}
             GIT_URL__PLUGINS_REPO=${{ matrix.build_args.GIT_URL__PLUGINS_REPO || '' }}
 
       - name: Post purge

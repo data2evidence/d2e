@@ -1,4 +1,3 @@
-
 # create a deployment on the process-worker container alone
 if [[ "$PREFECT__WORKER_POOL_NAME" == "process-pool" ]]; then
     . /usr/src/app/venv/bin/activate

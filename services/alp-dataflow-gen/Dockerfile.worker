@@ -34,8 +34,7 @@ ARG GIT_COMMIT_ID__PLUGINS_REPO=main
 ARG GIT_URL__PLUGINS_REPO=git@github.com:alp-os/d2e-plugins.git
 RUN --mount=type=ssh mkdir -p -m 700 ~/.ssh/ &&  \
     ssh-keyscan github.com >> ~/.ssh/known_hosts && git clone -b $GIT_COMMIT_ID__PLUGINS_REPO $GIT_URL__PLUGINS_REPO d2e-plugins
-RUN cd d2e-plugins
-ENV COMMIT_ID=$COMMIT_ID
+RUN cd d2e-plugins && git rev-parse HEAD > .git_commit_id
 
 COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/worker.requirements.txt requirements.txt
 COPY --chown=docker:docker ./services/alp-dataflow-gen/init-worker.sh .
