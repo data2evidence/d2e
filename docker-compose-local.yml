@@ -20,6 +20,7 @@ services:
       - 41180:41180
     environment:
       CADDY__FHIR_SERVER__PUBLIC_FQDN: ${CADDY__FHIR_SERVER__PUBLIC_FQDN:-localhost}
+      CADDY__CORS_LOCAL_PORTAL_UI: "import cors https://localhost:4000"
 
   alp-dataflow-gen:
     build:
@@ -102,6 +103,32 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+      VCAP_SERVICES: |-
+        {
+         "mridb": [
+          {
+           "credentials": {
+            "databaseName": "ALPDEV",
+            "dialect": "hana",
+            "encrypt": false,
+            "host": "${HANASERVER}",
+            "password": "${HDIPW}",
+            "pooling": "true",
+            "port": "${HDIPORT}",
+            "probeSchema": "${TESTSCHEMA}",
+            "schema": "${TESTSCHEMA}",
+            "user": "${HDIUSER}",
+            "validate_certificate": false,
+            "vocabSchema": "${TESTSCHEMA}"
+           },
+           "name": "OMOP",
+           "tags": [
+            "httptest",
+            "cdw"
+           ]
+          }
+         ]
+        }
 
   alp-minerva-dataflow-mgmt:
     build:
@@ -145,6 +172,31 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+      VCAP_SERVICES: |-
+        {
+         "mridb": [
+          {
+           "credentials": {
+            "databaseName": "ALPDEV",
+            "dialect": "hana",
+            "encrypt": false,
+            "host": "${HANASERVER}",
+            "password": "${HDIPW}",
+            "pooling": "true",
+            "port": "${HDIPORT}",
+            "probeSchema": "${TESTSCHEMA}",
+            "schema": "${TESTSCHEMA}",
+            "user": "${HDIUSER}",
+            "validate_certificate": false,
+            "vocabSchema": "${TESTSCHEMA}"
+           },
+           "name": "OMOP",
+           "tags": [
+            "httptest"
+           ]
+          }
+         ]
+        }
 
   alp-minerva-pg-mgmt-init:
     build:
@@ -181,6 +233,31 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+      VCAP_SERVICES: |-
+        {
+         "mridb": [
+          {
+           "credentials": {
+            "databaseName": "ALPDEV",
+            "dialect": "hana",
+            "encrypt": false,
+            "host": "${HANASERVER}",
+            "password": "${HDIPW}",
+            "pooling": "true",
+            "port": "${HDIPORT}",
+            "probeSchema": "${TESTSCHEMA}",
+            "schema": "${TESTSCHEMA}",
+            "user": "${HDIUSER}",
+            "validate_certificate": false,
+            "vocabSchema": "${TESTSCHEMA}"
+           },
+           "name": "OMOP",
+           "tags": [
+            "httptest"
+           ]
+          }
+         ]
+        }
 
   alp-minerva-sqleditor:
     build:
@@ -285,8 +362,8 @@ services:
 
   alp-sql-proxy:
     build:
-      context: ./services/sql-proxy
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./services/sql-proxy/Dockerfile
       target: development
     volumes:
       - ./services/sql-proxy/src:/home/docker/src

@@ -3,6 +3,20 @@ FROM python:3.11.1 AS base
 ENV PYTHONUNBUFFERED=1
 ENV TZ=UTC
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Install node and yarn for env converter
+RUN mkdir -p /usr/local/node
+ENV NVM_DIR /usr/local/node
+ENV NODE_VERSION 18.16.0
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+RUN . $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm use $NODE_VERSION
+ENV NODE_HOME $NVM_DIR/versions/node/v$NODE_VERSION
+ENV NODE_PATH $NODE_HOME/lib/node_modules
+ENV PATH $NODE_HOME/bin:$PATH
+
+RUN npm install --global yarn
+
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ENV TINI_VERSION="v0.19.0"
@@ -15,23 +29,31 @@ RUN groupadd alp \
 
 USER docker
 
+### Start env converter ###
+WORKDIR /home/docker/envConverter
+COPY ./services/envConverter .
+RUN yarn install
+### End env converter ###
+
 WORKDIR /home/docker
-COPY requirements.txt .
+
+COPY ./services/sql-proxy/requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY src .src
+COPY ./services/sql-proxy/src .src
 
 FROM base AS development
 
-COPY requirements-dev.txt .
+COPY ./services/sql-proxy/requirements-dev.txt .
 RUN pip install -r requirements-dev.txt
 
+
 ENTRYPOINT ["/tini", "--"]
-CMD python -m watchdog.watchmedo auto-restart --recursive --pattern="*.py" --directory="/home/docker/src" python ./src/main.py
+CMD cd ./envConverter && yarn generate:envs -s alp-minerva-analytics-svc && cd - && . ./generated-env.sh && python -m watchdog.watchmedo auto-restart --recursive --pattern="*.py" --directory="/home/docker/src" python ./src/main.py
 
 FROM base AS production
 
 ENTRYPOINT ["/tini", "--"]
-CMD python ./src/main.py
+CMD cd ./envConverter && yarn generate:envs -s alp-minerva-analytics-svc && cd - && . ./generated-env.sh && python ./src/main.py
 
 

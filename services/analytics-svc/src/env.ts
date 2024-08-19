@@ -23,6 +23,13 @@ const Env = z.object({
     USE_EXTENSION_FOR_COHORT_CREATION: z.string(),
 
     USE_DUCKDB: z.string(),
+    USE_SQL_PROXY: z.string(),
+
+    SQL_PROXY__HOST: z.string(),
+    SQL_PROXY__PORT: z
+        .string()
+        .refine((val) => !isNaN(parseInt(val)))
+        .transform(Number),
 
     SKIP_AUTH: z.string(),
     LOCAL_DEBUG: z.string(),

@@ -1,13 +1,14 @@
+import logging
 import io
 import re
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import pandas as pd
-import psycopg
-from psycopg_pool import ConnectionPool
+from sqlalchemy.orm import sessionmaker
 
 from buenavista.core import BVType, Connection, QueryResult, Session
 
+logger = logging.getLogger(__name__)
 
 OID_TO_BVTYPE = {
     -1: BVType.NULL,
@@ -60,7 +61,7 @@ class PGSession(Session):
         super().__init__()
         self.parent = parent
         self.conn = conn
-        self._cursor = conn.cursor()
+        self._cursor = conn.connection.cursor()
 
     def close(self):
         self._cursor.close()
@@ -71,6 +72,7 @@ class PGSession(Session):
         return self._cursor
 
     def execute_sql(self, sql: str, params=None) -> QueryResult:
+        logger.debug("execute_sql(postgres)")
         if params:
             sql = re.sub(r"\$\d+", r"%s", sql)
             self._cursor.execute(sql, params)
@@ -85,7 +87,7 @@ class PGSession(Session):
         return res
 
     def in_transaction(self) -> bool:
-        return self.conn.info.transaction_status != psycopg.pq.TransactionStatus.IDLE
+        return self.conn.in_transaction()
 
     def load_df_function(self, table: str):
         copy_query = f"COPY {table} TO STDOUT WITH CSV DELIMITER ',' HEADER"
@@ -106,17 +108,20 @@ class PGSession(Session):
 
 
 class PGConnection(Connection):
-    def __init__(self, conninfo="", **kwargs):
+    def __init__(self, db):
         super().__init__()
-        self.pool = ConnectionPool(psycopg.conninfo.make_conninfo(conninfo, **kwargs))
+        self.db = db
 
     def new_session(self) -> Session:
-        conn = self.pool.getconn()
-        conn.autocommit = True
+        session = sessionmaker(bind=self.db)()
+        conn = session.connection()
         return PGSession(self, conn)
 
     def release(self, conn):
-        self.pool.putconn(conn)
+        '''
+        Connection session is bound by sqlalchemy engine, after closing connection, the connection resource will be returned to the connection pool
+        '''
+        conn.close()
 
     def parameters(self) -> Dict[str, str]:
-        return {"server_version": "9.3.bvproxy", "client_encoding": "UTF8"}
+        return {"server_version": "9.3.pgproxy", "client_encoding": "UTF8"}

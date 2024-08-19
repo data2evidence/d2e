@@ -50,7 +50,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
   },
   {
     path: '^/usermgmt/api/me/is_token_valid_internal',
-    scopes: ['usermgmt.me'],
+    scopes: ['usermgmt.me.perseus'],
     httpMethods: ['GET']
   },
   {
@@ -801,9 +801,24 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
-    path: '^/gateway/api/prefect',
-    scopes: ['gateway.prefect.read'],
+    path: '^/prefect',
+    scopes: ['prefect.read'],
     httpMethods: ['GET']
+  },
+  {
+    path: '^/prefect',
+    scopes: ['prefect.post'],
+    httpMethods: ['POST']
+  },
+  {
+    path: '^/prefect',
+    scopes: ['prefect.update'],
+    httpMethods: ['PUT', 'PATCH']
+  },
+  {
+    path: '^/prefect',
+    scopes: ['prefect.delete'],
+    httpMethods: ['DELETE']
   }
 ]
 export const ROLE_SCOPES = {
@@ -832,6 +847,7 @@ export const ROLE_SCOPES = {
     'usermgmt.dataAdmin.read',
     'usermgmt.group.read',
     'usermgmt.me',
+    'usermgmt.me.perseus',
     'usermgmt.studyAccessRequest.read',
     'usermgmt.studyAccessRequest.update',
     'usermgmt.user.read',
@@ -928,7 +944,10 @@ export const ROLE_SCOPES = {
     'dataflowmgmt.analysisflow.delete',
     'dataflowmgmt.analysisflow.revision.delete',
     'gateway.fhir.create',
-    'gateway.prefect.read'
+    'prefect.read',
+    'prefect.post',
+    'prefect.update',
+    'prefect.delete'
   ],
   ALP_DASHBOARD_VIEWER: ['gateway.dashboardGate.content'],
   TENANT_VIEWER: [
