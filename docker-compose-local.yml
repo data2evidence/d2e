@@ -1,5 +1,4 @@
 services:
-
   alp-bookmark:
     build:
       context: .
@@ -13,7 +12,7 @@ services:
 
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile --watch
-    image:  alpcr.azurecr.io/alp-data-node/alp-caddy:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop}
+    image: alpcr.azurecr.io/alp-data-node/alp-caddy:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop}
     ports:
       - 41100:41100
       - 41000:41000
@@ -29,6 +28,8 @@ services:
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
     volumes:
       - ./services/alp-dataflow-gen/pysrc:/app/pysrc
+    ports:
+      - 41120:41120
     environment:
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
@@ -323,7 +324,7 @@ services:
       context: ./services/alp-fhir/
       dockerfile: Dockerfile.frontend
     volumes:
-    - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
+      - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
 
   alp-logto-post-init:
     build:
@@ -331,6 +332,22 @@ services:
       dockerfile: Dockerfile
     # volumes:
     #   - ./services/alp-logto/post-init:/home/docker
+  alp-dataflow-gen-process-worker:
+    build:
+      context: .
+      dockerfile: services/alp-dataflow-gen/Dockerfile.worker
+      # ssh: # Enable if GIT_CLONE_TYPE set to ssh
+      #   - default=${SSH_AUTH_SOCK}
+      args:
+        GIT_COMMIT_ID__PLUGINS_REPO: ${GIT_COMMIT_ID__PLUGINS_REPO:-main}
+        GIT_CLONE_TYPE: ${GIT_CLONE_TYPE:-https} # https / ssh
+        GIT_URL__PLUGINS_REPO: ${GIT_URL__PLUGINS_REPO:-github.com/alp-os/d2e-plugins.git} # git@github.com:alp-os/d2e-plugins.git
+        GIT_TOKEN__PLUGINS_REPO_READ: ${GIT_TOKEN__PLUGINS_REPO_READ} #only for https
+  #     volumes:
+  #       - ../d2e-plugins:/usr/src/app/d2e-plugins
+
+  alp-dataflow-gen-docker-worker:
+    extends: alp-dataflow-gen-process-worker
 
   alp-fhir-server-post-init:
     build:
@@ -344,13 +361,13 @@ services:
     ports:
       - 9226:9226
 
-  alp-sql-proxy:
+  alp-cachedb:
     build:
       context: .
-      dockerfile: ./services/sql-proxy/Dockerfile
+      dockerfile: ./services/cachedb/Dockerfile
       target: development
     volumes:
-      - ./services/sql-proxy/src:/home/docker/src
+      - ./services/cachedb/src:/home/docker/src
     ports:
       - 9235:9235
     environment:
