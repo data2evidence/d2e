@@ -58,3 +58,10 @@ jobs:
           ref: ${{ inputs.GIT_BRANCH_NAME }}
           repository: ${{ inputs.GIT_REPO_FULL_NAME }}
           token: ${{ secrets.CI_PAT }}
+
+      - name: Login to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: alpcr.azurecr.io
+          username: ${{ secrets.AZ_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZ_REGISTRY_PASSWORD }}

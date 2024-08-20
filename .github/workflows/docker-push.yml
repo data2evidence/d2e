@@ -102,6 +102,7 @@ jobs:
       GIT_BRANCH_NAME: ${{ needs.setup.outputs.branch_name }}
       GIT_REPO_FULL_NAME: ${{ needs.setup.outputs.repo_full_name }}
     secrets:
-      AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
-      AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
-      CI_PAT: ${{ secrets.CI_PAT }}
+      inherit
+      # AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
+      # AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
+      # CI_PAT: ${{ secrets.CI_PAT }}
