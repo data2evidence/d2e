@@ -175,7 +175,7 @@ jobs:
             build_args:
               GIT_TOKEN__PLUGINS_REPO_READ: ${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
               GIT_COMMIT_ID__PLUGINS_REPO: internal-896_flow-builder # TODO: change it to main before merging to develop
-              GIT_URL__PLUGINS_REPO: git@github.com:alp-os/d2e-plugins-dev-santan.git # TODO: change it to github.com/alp-os/d2e-plugins before merging to develop
+              GIT_URL__PLUGINS_REPO: https://github.com/alp-os/d2e-plugins-dev-santan.git # TODO: change it to github.com/alp-os/d2e-plugins before merging to develop
           - name: alp-data-node/sql-proxy
             directory: ./services/sql-proxy
             context: .
