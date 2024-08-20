@@ -39,14 +39,4 @@ export class FhirController {
       datasetId,
     );
   }
-
-  @Post(`${SupportedFhirVersion}/concepts`)
-  async getFirstConcepts(
-    @Body() getFirstConceptsDto: GetFirstConceptsDto,
-  ): Promise<any> {
-    return await this.appService.getFirstConcepts(
-      getFirstConceptsDto,
-      this.hybridSearchConfigService,
-    );
-  }
 }
