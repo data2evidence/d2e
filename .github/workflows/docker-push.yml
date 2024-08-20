@@ -1,4 +1,4 @@
-name: Docker Build & Push
+name: Docker Build, Push, Prune
 run-name: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
 
 on:

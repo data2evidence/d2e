@@ -1,8 +1,32 @@
-name: Azure Container Registry Prune
+name: Docker Build, Push, Prune (called)
 
 on:
   workflow_dispatch:
-  push:
+    inputs:
+      AZ_REGISTRY_REPOSITORY:
+        required: true
+        type: string
+      DOCKER_BUILD_CONTEXT:
+        required: true
+        type: string
+      DOCKER_BUILD_FILE_PATH:
+        required: true
+        type: string
+      DOCKER_BUILD_PULL_BOOL:
+        default: true
+        type: boolean
+      DOCKER_IMG_IS_PUSH:
+        required: true
+        type: string
+      DOCKER_IMG_TAG_NAME:
+        required: true
+        type: string
+      GIT_BRANCH_NAME:
+        required: true
+        type: string
+      GIT_REPO_FULL_NAME:
+        required: true
+        type: string
   workflow_call:
     inputs:
       AZ_REGISTRY_REPOSITORY:
@@ -16,7 +40,7 @@ on:
         type: string
       DOCKER_BUILD_PULL_BOOL:
         required: true
-        type: string
+        type: boolean
       DOCKER_IMG_IS_PUSH:
         required: true
         type: string
@@ -56,20 +80,20 @@ jobs:
           echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME | tee -a $GITHUB_STEP_SUMMARY
           echo DOCKER_IMG_IS_PUSH=$DOCKER_IMG_IS_PUSH | tee -a $GITHUB_STEP_SUMMARY
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.7
         with:
           ref: ${{ inputs.GIT_BRANCH_NAME }}
           repository: ${{ inputs.GIT_REPO_FULL_NAME }}
           token: ${{ secrets.CI_PAT }}
 
       - name: Login to ACR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v3.3.0
         with:
           registry: alpcr.azurecr.io
           username: ${{ secrets.AZ_REGISTRY_USERNAME }}
           password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3.6.1
         id: builder
 
       - name: Purge docker images and cache
@@ -78,7 +102,7 @@ jobs:
           docker buildx prune -af
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6.7.0
         with:
           builder: ${{ steps.builder.outputs.name }}
           platforms: "linux/amd64"
