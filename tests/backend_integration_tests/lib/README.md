@@ -1,4 +1,5 @@
 # MRI Request Builder
+
 ```
 var requestBuilder = new RequestBuilder(comfig, ['vStatus'], 'acme');
 requestBuilder.request()
@@ -36,8 +37,8 @@ requestBuilder.submit(hanaRequest, '/analytics-svc/pa/services/analytics.xsjs', 
 });
 ```
 
-
 # Patient Summary Request Builder
+
 ```
     Example 1 (specific interactions for patient):
         requestBuilder.request('abc')
@@ -56,6 +57,7 @@ requestBuilder.submit(hanaRequest, '/analytics-svc/pa/services/analytics.xsjs', 
 ```
 
 # Patient Summary Result Parser
+
 ```
     rP = new ResultParser(result);
 
