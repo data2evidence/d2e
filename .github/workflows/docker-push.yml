@@ -50,15 +50,18 @@ jobs:
   build-push-prune:
     strategy:
       matrix:
-        include:
-          - name: alp-data-node/alp-logto-post-init
-            directory: ./services/alp-logto/post-init
-            context: ./services/alp-logto/post-init
-            fileName: Dockerfile
+        name: [alp-data-node/alp-logto-post-init]
+        directory: [xxx]
+        fileName: [xxx]
+        # include:
+        #   - name: alp-data-node/alp-logto-post-init
+        #     directory: ./services/alp-logto/post-init
+        #     context: ./services/alp-logto/post-init
+        #     fileName: Dockerfile
     uses: ./.github/workflows/gha-event.yml
     with:
       AZ_REGISTRY_REPOSITORY: ${{ matrix.name }}
-      DOCKER_BUILD_CONTEXT: ${{ matrix.context }}
+      # DOCKER_BUILD_CONTEXT: ${{ matrix.context }}
       DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
       # DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
     secrets:
