@@ -34,8 +34,8 @@ on:
         required: true
 
 jobs:
-  az-reg-prune:
-    name: azure registry prune
+  build-push-prune:
+    name: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
     runs-on: ubuntu-latest
     steps:
       - name: echo

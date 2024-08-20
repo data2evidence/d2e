@@ -51,6 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Free Disk Space (Ubuntu)
+        if: false # debug
         uses: jlumbroso/free-disk-space@main
         with:
           # this might remove tools that are actually needed,
@@ -78,7 +79,7 @@ jobs:
       branch_name: ${{ steps.setup.outputs.branch_name }}
       repo_full_name: ${{ steps.setup.outputs.repo_full_name }}
 
-  build-push-prune:
+  bld:
     if: (needs.setup.outputs.branch_name == 'develop' ||  contains('release', needs.setup.outputs.branch_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
     needs: setup
     strategy:
@@ -87,6 +88,10 @@ jobs:
           - name: alp-data-node/alp-logto-post-init
             directory: ./services/alp-logto/post-init
             context: ./services/alp-logto/post-init
+            fileName: Dockerfile
+          - name: alp-data-node/alp-logto
+            directory: ./services/alp-logto
+            context: ./services/alp-logto
             fileName: Dockerfile
     uses: ./.github/workflows/gha-event.yml
     with:
