@@ -64,12 +64,12 @@ jobs:
         shell: bash
         run: |
           if [ $GIT_BRANCH_NAME == "develop" ]; then
-            echo "tag_name=develop" | tee -a $GITHUB_OUTPUT
-            echo "is_push=true" | tee -a $GITHUB_OUTPUT
+            echo "DOCKER_IMG_TAG_NAME=develop" | tee -a $GITHUB_OUTPUT
+            echo "DOCKER_IMG_IS_PUSH=true" | tee -a $GITHUB_OUTPUT
           elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
-              echo "tag_name=$GIT_BRANCH_NAME" | tee -a $GITHUB_OUTPUT
-              echo "is_push=true" | tee -a $GITHUB_OUTPUT
+              echo "DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME" | tee -a $GITHUB_OUTPUT
+              echo "DOCKER_IMG_IS_PUSH=true" | tee -a $GITHUB_OUTPUT
           else
-              echo "is_push=false" | tee -a $GITHUB_OUTPUT
-              echo "tag_name=$(echo ${{ github.sha }} | cut -c1-8)" | tee -a $GITHUB_OUTPUT
+              echo "DOCKER_IMG_IS_PUSH=false" | tee -a $GITHUB_OUTPUT
+              echo "DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)" | tee -a $GITHUB_OUTPUT
           fi
