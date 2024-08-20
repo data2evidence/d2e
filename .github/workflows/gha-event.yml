@@ -32,8 +32,7 @@ jobs:
     name: azure registry prune
     runs-on: ubuntu-latest
     steps:
-      - name: echo
-        shell: bash
+      - shell: bash
         env:
           AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY || vars.AZ_REGISTRY_REPOSITORY }}
           DOCKER_BUILD_CONTEXT: ${{ inputs.DOCKER_BUILD_CONTEXT }}
