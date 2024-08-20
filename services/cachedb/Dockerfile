@@ -37,14 +37,14 @@ RUN yarn install
 
 WORKDIR /home/docker
 
-COPY ./services/sql-proxy/requirements.txt .
+COPY ./services/cachedb/requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY ./services/sql-proxy/src .src
+COPY ./services/cachedb/src .src
 
 FROM base AS development
 
-COPY ./services/sql-proxy/requirements-dev.txt .
+COPY ./services/cachedb/requirements-dev.txt .
 RUN pip install -r requirements-dev.txt
 
 

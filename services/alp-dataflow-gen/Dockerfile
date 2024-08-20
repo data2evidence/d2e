@@ -67,6 +67,7 @@ RUN chown docker:alp ./duckdb_data
 
 # Create folder to store synpuf1k csv
 RUN mkdir -p /app/synpuf1k
-RUN chown -R docker:docker /app/synpuf1k
+RUN mkdir -p /app/ui-files
+RUN chown -R docker:docker /app/synpuf1k /app/ui-files
 
 USER docker

@@ -12,6 +12,7 @@ volumes:
   pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
+  dind-certs:
 
 
 x-envs:
@@ -286,10 +287,10 @@ x-envs:
     TLS__INTERNAL__CRT: ${TLS__INTERNAL__CRT}
     TLS__INTERNAL__DOMAIN: ${TLS__INTERNAL__DOMAIN:-alp.local}
     TLS__INTERNAL__KEY: ${TLS__INTERNAL__KEY}
-  sql-proxy: &sql-proxy
-    SQL_PROXY__HOST: alp-sql-proxy
-    SQL_PROXY__PORT: 41191
-    SQL_PROXY__POOL_SIZE: ${SQL_PROXY__POOL_SIZE:-10}
+  cachedb: &cachedb
+    CACHEDB__HOST: alp-cachedb
+    CACHEDB__PORT: 41191
+    CACHEDB__POOL_SIZE: ${CACHEDB__POOL_SIZE:-10}
   python-internal-ssl: &python-internal-ssl
     PYTHON_VERIFY_SSL: false # Only use this for apis calling internal docker urls
 services:
@@ -423,6 +424,7 @@ services:
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       PREFECT_SERVER_ANALYTICS_ENABLED: "false"
       PREFECT_SERVER_API_HOST: 0.0.0.0
+      PREFECT_UI_STATIC_DIRECTORY: /app/ui-files
       PREFECT_SERVER_API_PORT: 41${BASE_PORT:-1}20
       R_LIBS_USER: /home/docker/plugins/R/site-library
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
@@ -436,6 +438,8 @@ services:
     depends_on:
       alp-dataflow-gen:
         condition: service_healthy
+      alp-dataflow-gen-init:
+        condition: service_completed_successfully
       alp-minio-post-init:
         condition: service_completed_successfully
     healthcheck:
@@ -506,8 +510,6 @@ services:
     depends_on:
       alp-dataflow-gen:
         condition: service_healthy
-      alp-dataflow-gen-agent:
-        condition: service_healthy
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: alp-dataflow-gen-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
@@ -529,6 +531,8 @@ services:
       DATAFLOW_MGMT__FLOWS__RESULTS__S3_DIR_PATH: s3://flows/results
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
+      PREFECT__PROCESS_WORKER_POOL_NAME: process-pool
+      PREFECT__DOCKER_WORKER_POOL_NAME: docker-pool
       R_LIBS_USER: /home/docker/plugins/R/site-library
 
   alp-db-credentials-mgr:
@@ -767,7 +771,7 @@ services:
         - *x-minio
         - *x-tls
         - *x-routes
-        - *sql-proxy
+        - *cachedb
       ALP_GATEWAY_OAUTH__URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/oauth/token
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
       ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT
@@ -778,7 +782,7 @@ services:
       LOCAL_DEBUG: "false"
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       USE_DUCKDB: ${USE_DUCKDB:-true}
-      USE_SQL_PROXY: ${USE_SQL_PROXY:-false}
+      USE_CACHEDB: ${USE_CACHEDB:-false}
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
@@ -1642,10 +1646,10 @@ services:
       MEILI_LOG_LEVEL: INFO
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
 
-  alp-sql-proxy:
-    container_name: &c30 alp-sql-proxy
-    hostname: alp-sql-proxy.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/sql-proxy:${DOCKER_TAG_NAME:-develop}
+  alp-cachedb:
+    container_name: &c30 alp-cachedb
+    hostname: alp-cachedb.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/cachedb:${DOCKER_TAG_NAME:-develop}
     depends_on:
       alp-db-credentials-mgr:
         condition: service_healthy
@@ -1672,10 +1676,88 @@ services:
         - *x-routes
         - *x-tls
         - *x-routes
-        - *sql-proxy
+        - *cachedb
         - *python-internal-ssl
       DUCKDB__DATA_FOLDER: /home/docker/duckdb_data
       LOCAL_DEBUG: "false"
+
+  alp-dataflow-gen-process-worker:
+    container_name: &c31 alp-dataflow-gen-process-worker-${BASE_PORT:-1}
+    depends_on:
+      alp-dataflow-gen-init:
+        condition: service_completed_successfully
+      alp-docker-server:
+        condition: service_healthy
+    healthcheck:
+      interval: 20s
+      retries: 30
+      start_period: 60s
+      test:
+        # TODO: add healthcheck on worker
+        - CMD
+        - curl
+        - -f
+        - http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
+      timeout: 30s
+    hostname: alp-dataflow-gen-process-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen-worker:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c31
+    networks:
+      data:
+        priority: 20
+    platform: linux/amd64
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    volumes:
+      - dind-certs:/certs
+    environment:
+      PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
+      PREFECT_LOGGING_SERVER_LEVEL: WARNING
+      PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool}
+      PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool} # used for flow_builder deployment
+      DOCKER_HOST: "tcp://dind:2376"
+      DOCKER_CERT_PATH: /certs/client/
+      DOCKER_TLS_VERIFY: false
+
+  alp-dataflow-gen-docker-worker:
+    extends: alp-dataflow-gen-process-worker
+    container_name: &c32 alp-dataflow-gen-docker-worker-${BASE_PORT:-1}
+    hostname: alp-dataflow-gen-docker-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    networks:
+      data:
+        priority: 20
+    logging:
+      options:
+        tag: *c32
+    environment:
+      PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
+      PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
+      DOCKER_HOST: "tcp://dind:2376"
+      DOCKER_CERT_PATH: /certs/client/
+      DOCKER_TLS_VERIFY: false
+
+  alp-docker-server:
+    image: docker:dind
+    container_name: &c33 alp-docker-server-${BASE_PORT:-1}
+    hostname: dind
+    networks:
+      data:
+        priority: 20
+    healthcheck:
+      interval: 20s
+      retries: 30
+      start_period: 30s
+      test: ["CMD-SHELL", "netstat -ltn | grep -c :::2376"]
+      timeout: 10s
+    logging:
+      options:
+        tag: *c33
+    privileged: true
+    volumes:
+      - dind-certs:/certs
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
 
   alp-perseus-files-manager:
     image: perseushub/files-manager:latest
