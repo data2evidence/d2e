@@ -361,13 +361,13 @@ services:
     ports:
       - 9226:9226
 
-  alp-sql-proxy:
+  alp-cachedb:
     build:
       context: .
-      dockerfile: ./services/sql-proxy/Dockerfile
+      dockerfile: ./services/cachedb/Dockerfile
       target: development
     volumes:
-      - ./services/sql-proxy/src:/home/docker/src
+      - ./services/cachedb/src:/home/docker/src
     ports:
       - 9235:9235
     environment:

@@ -33,7 +33,7 @@ class DatabaseDialects(str, Enum):
     DUCKDB = "duckdb"
 
 
-class SqlProxyDatabaseClients(BaseModel):
+class CachedbDatabaseClients(BaseModel):
     hana: Optional[Dict[str, Engine]] = {}
     postgresql: Optional[Dict[str, Engine]] = {}
 
@@ -113,7 +113,7 @@ def GetDBConnection(database_code: str):
         conn_string = _CreateConnectionString(
             dialect_driver, user, password, host, port, db)
         engine = create_engine(
-            conn_string, pool_size=Env.SQL_PROXY__POOL_SIZE)
+            conn_string, pool_size=Env.CACHEDB__POOL_SIZE)
 
         return engine
 
@@ -124,7 +124,7 @@ def _CreateConnectionString(dialect_driver: str, user: str, pw: str,
     return conn_string
 
 
-def get_db_connection(clients: SqlProxyDatabaseClients, dialect: str, database_code: str, schema: str, vocab_schema: str):
+def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_code: str, schema: str, vocab_schema: str):
     connection = None
 
     if dialect == DatabaseDialects.POSTGRES:
@@ -201,18 +201,18 @@ def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:
     return None
 
 
-def initialize_db_clients() -> SqlProxyDatabaseClients:
-    sql_proxy_database_clients = {
+def initialize_db_clients() -> CachedbDatabaseClients:
+    cachedb_database_clients = {
         "hana": {},
         "postgresql": {}
     }
 
-    # Dynamically fill up sql_proxy_database_clients with connection based on each entry in database_credentials
+    # Dynamically fill up cachedb_database_clients with connection based on each entry in database_credentials
     database_codes_and_dialects = get_database_code_and_dialect_from_db_creds()
 
     for database_code, dialect in database_codes_and_dialects:
         if dialect == DatabaseDialects.HANA or dialect == DatabaseDialects.POSTGRES:
-            sql_proxy_database_clients[dialect] = {
+            cachedb_database_clients[dialect] = {
                 database_code: GetDBConnection(database_code)}
 
-    return sql_proxy_database_clients
+    return cachedb_database_clients
