@@ -18,6 +18,7 @@ export interface IMRIRequest extends Request {
         studies: any;
         cachedAt: number;
     };
+    selectedstudyDbMetadata: StudyDbMetadata;
     swagger: any;
     fileName?: string;
     usage?: "EXPORT";
