@@ -62,7 +62,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: inputs
-        shell: bash
         env:
           AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY || vars.AZ_REGISTRY_REPOSITORY }}
           DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
