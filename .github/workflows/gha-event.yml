@@ -42,6 +42,8 @@ jobs:
           DOCKER_BUILD_CONTEXT: ${{ inputs.DOCKER_BUILD_CONTEXT }}
           DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
           DOCKER_BUILD_PULL_BOOL: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
+          DOCKER_IMG_IS_PUSH: ${{ inputs.DOCKER_IMG_IS_PUSH }}
+          DOCKER_IMG_TAG_NAME: ${{ inputs.DOCKER_IMG_TAG_NAME }}
           GIT_BRANCH_NAME: ${{ inputs.GIT_BRANCH_NAME }}
           GIT_REPO_FULL_NAME: ${{ inputs.GIT_REPO_FULL_NAME }}
         run: |
@@ -67,24 +69,24 @@ jobs:
           username: ${{ secrets.AZ_REGISTRY_USERNAME }}
           password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
 
-      # - uses: docker/setup-buildx-action@v3
-      #   id: builder
+      - uses: docker/setup-buildx-action@v3
+        id: builder
 
-      # - name: Purge docker images and cache
-      #   run: |
-      #     docker image prune -af
-      #     docker buildx prune -af
+      - name: Purge docker images and cache
+        run: |
+          docker image prune -af
+          docker buildx prune -af
 
-      # - name: Build and push
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     builder: ${{ steps.builder.outputs.name }}
-      #     platforms: "linux/amd64"
-      #     context: ${{ inputs.DOCKER_BUILD_CONTEXT }}
-      #     pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
-      #     file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
-      #     push: ${{ inputs.DOCKER_IMG_IS_PUSH }}
-      #     tags: alpcr.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
-      #     build-args: |
-      #       docker_image_prefix=alpcr.azurecr.io
-      #       GIT_COMMIT_ARG=${{ github.sha }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          builder: ${{ steps.builder.outputs.name }}
+          platforms: "linux/amd64"
+          context: ${{ inputs.DOCKER_BUILD_CONTEXT }}
+          pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
+          file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
+          push: ${{ inputs.DOCKER_IMG_IS_PUSH }}
+          tags: alpcr.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
+          build-args: |
+            docker_image_prefix=alpcr.azurecr.io
+            GIT_COMMIT_ARG=${{ github.sha }}
