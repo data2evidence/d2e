@@ -8,6 +8,11 @@ on:
       AZ_REGISTRY_REPOSITORY:
         required: true
         type: string
+    secrets:
+      AZ_REGISTRY_USERNAME:
+        required: true
+      AZ_REGISTRY_PASSWORD:
+        required: true
 
 jobs:
   reg-img-prune:
@@ -69,9 +74,9 @@ jobs:
       - name: prune registry images
         shell: bash
         env:
-          AZ_REGISTRY_PRUNE_ENABLE: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE }}
           AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
           AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
+          AZ_REGISTRY_PRUNE_ENABLE: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE }}
           AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS: ${{ vars.AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS }}
           AZ_REGISTRY_REPOSITORY: ${{ vars.AZ_REGISTRY_REPOSITORY }}
           AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}

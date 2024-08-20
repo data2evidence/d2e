@@ -236,3 +236,6 @@ jobs:
     uses: ./.github/workflows/gha-event.yml
     with:
       AZ_REGISTRY_REPOSITORY: alp-data-node/alp-logto
+    secrets:
+      AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
+      AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
