@@ -10,11 +10,11 @@ on:
         type: string
 
 jobs:
-  img-prune:
-    name: Generate output
+  reg-img-prune:
+    name: prune registry images
     runs-on: ubuntu-latest
     steps:
-      - name: prune images
+      - name: prune registry images
         shell: bash
         env:
           AZ_REGISTRY_PRUNE_ENABLE: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE }}
