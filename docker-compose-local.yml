@@ -336,8 +336,8 @@ services:
     build:
       context: .
       dockerfile: services/alp-dataflow-gen/Dockerfile.worker
-      ssh:
-        - default=${SSH_AUTH_SOCK}
+      # ssh: # Enable if GIT_CLONE_TYPE set to ssh
+      #   - default=${SSH_AUTH_SOCK}
       args:
         GIT_COMMIT_ID__PLUGINS_REPO: ${GIT_COMMIT_ID__PLUGINS_REPO:-main}
         GIT_CLONE_TYPE: ${GIT_CLONE_TYPE:-https} # https / ssh
