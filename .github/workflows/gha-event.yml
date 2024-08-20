@@ -6,13 +6,16 @@ on:
   workflow_call:
     inputs:
       AZ_REGISTRY_REPOSITORY:
-        required: true
+        required: false
+        default: "xxx"
         type: string
-      # DOCKER_BUILD_CONTEXT:
-      #   required: true
-      #   type: string
+      DOCKER_BUILD_CONTEXT:
+        required: false
+        default: "xxx"
+        type: string
       DOCKER_BUILD_FILE_PATH:
-        required: true
+        required: false
+        default: "xxx"
         type: string
       DOCKER_BUILD_PULL_BOOL:
         required: false

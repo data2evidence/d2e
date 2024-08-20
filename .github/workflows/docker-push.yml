@@ -51,8 +51,8 @@ jobs:
     strategy:
       matrix:
         name: [alp-data-node/alp-logto-post-init]
-        directory: [xxx]
-        fileName: [xxx]
+        # directory: [xxx]
+        # fileName: [xxx]
         # include:
         #   - name: alp-data-node/alp-logto-post-init
         #     directory: ./services/alp-logto/post-init
