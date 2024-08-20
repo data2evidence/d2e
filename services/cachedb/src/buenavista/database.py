@@ -127,6 +127,12 @@ def _CreateConnectionString(dialect_driver: str, user: str, pw: str,
 def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_code: str, schema: str, vocab_schema: str):
     connection = None
 
+    # Guard clause for postgres and hana for unsupported database_codes
+    if dialect == DatabaseDialects.POSTGRES or dialect == DatabaseDialects.HANA:
+        if database_code not in clients[dialect]:
+            raise Exception(
+                f"Dialect:{dialect} has no configuration with database code:{database_code}")
+
     if dialect == DatabaseDialects.POSTGRES:
         connection = PGConnection(
             clients[dialect][database_code])
