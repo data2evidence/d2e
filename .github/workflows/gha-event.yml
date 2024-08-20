@@ -14,9 +14,10 @@ on:
       DOCKER_BUILD_FILE_PATH:
         required: true
         type: string
-      DOCKER_BUILD_PULL_BOOL:
-        required: true
-        type: string
+      # DOCKER_BUILD_PULL_BOOL:
+      #   required: false
+      # default: false
+      #   type: string
     secrets:
       AZ_REGISTRY_USERNAME:
         required: true
