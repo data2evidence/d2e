@@ -344,7 +344,7 @@ services:
         GIT_URL__PLUGINS_REPO: ${GIT_URL__PLUGINS_REPO:-github.com/alp-os/d2e-plugins.git} # git@github.com:alp-os/d2e-plugins.git
         GIT_TOKEN__PLUGINS_REPO_READ: ${GIT_TOKEN__PLUGINS_REPO_READ} #only for https
   #     volumes:
-  #       - ../d2e-plugins-dev-santan:/usr/src/app/d2e-plugins
+  #       - ../d2e-plugins:/usr/src/app/d2e-plugins
 
   alp-dataflow-gen-docker-worker:
     extends: alp-dataflow-gen-process-worker

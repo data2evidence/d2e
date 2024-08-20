@@ -110,9 +110,6 @@ jobs:
           docker system prune -af
 
       - name: Docker compose build
-        env:
-          GIT_URL__PLUGINS_REPO: github.com/alp-os/d2e-plugins-dev-santan.git
-          GIT_COMMIT_ID__PLUGINS_REPO: internal-896_flow-builder
         run: |
           # Build DataNode services
           yarn build:minerva   --builder ${{ steps.builder1.outputs.name }}

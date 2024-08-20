@@ -174,8 +174,8 @@ jobs:
             context: .
             fileName: Dockerfile.worker
             build_args:
-              GIT_COMMIT_ID__PLUGINS_REPO: internal-896_flow-builder # TODO: change it to main before merging to develop
-              GIT_URL__PLUGINS_REPO: github.com/alp-os/d2e-plugins-dev-santan.git # TODO: change it to github.com/alp-os/d2e-plugins before merging to develop
+              GIT_COMMIT_ID__PLUGINS_REPO: main
+              GIT_URL__PLUGINS_REPO: github.com/alp-os/d2e-plugins.git
           - name: alp-data-node/cachedb
             directory: ./services/cachedb
             context: .
