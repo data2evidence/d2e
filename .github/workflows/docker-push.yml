@@ -81,8 +81,8 @@ jobs:
             DOCKER_IMG_IS_PUSH=false
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
           fi
-          echo DOCKER_IMG_IS_PUSH=$DOCKER_IMG_IS_PUSH | $GITHUB_ENV | tee $GITHUB_OUTPUT
-          echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME | $GITHUB_ENV | tee $GITHUB_OUTPUT
+          echo DOCKER_IMG_IS_PUSH=$DOCKER_IMG_IS_PUSH | tee -a $GITHUB_OUTPUT
+          echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME | tee -a $GITHUB_OUTPUT
 
       - name: Dump GitHub context
         env:

@@ -35,20 +35,7 @@ jobs:
     name: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.GIT_BRANCH_NAME }}
-          repository: ${{ inputs.GIT_REPO_FULL_NAME }}
-          token: ${{ secrets.CI_PAT }}
-
-      - name: Login to ACR
-        uses: docker/login-action@v3
-        with:
-          registry: alpcr.azurecr.io
-          username: ${{ secrets.AZ_REGISTRY_USERNAME }}
-          password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
-
-      - name: echo
+      - name: inputs
         shell: bash
         env:
           AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY || vars.AZ_REGISTRY_REPOSITORY }}
@@ -62,29 +49,42 @@ jobs:
           echo DOCKER_BUILD_CONTEXT=$DOCKER_BUILD_CONTEXT
           echo DOCKER_BUILD_FILE_PATH=$DOCKER_BUILD_FILE_PATH
           echo DOCKER_BUILD_PULL_BOOL=$DOCKER_BUILD_PULL_BOOL
-          echo GIT_BRANCH_NAME=$GIT_BRANCH_NAME
-          echo GIT_REPO_FULL_NAME=$GIT_REPO_FULL_NAME
-          echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME
-          echo DOCKER_IMG_IS_PUSH=$DOCKER_IMG_IS_PUSH
+          echo GIT_BRANCH_NAME=$GIT_BRANCH_NAME | tee -a $GITHUB_STEP_SUMMARY
+          echo GIT_REPO_FULL_NAME=$GIT_REPO_FULL_NAME | tee -a $GITHUB_STEP_SUMMARY
+          echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME | tee -a $GITHUB_STEP_SUMMARY
+          echo DOCKER_IMG_IS_PUSH=$DOCKER_IMG_IS_PUSH | tee -a $GITHUB_STEP_SUMMARY
 
-      - uses: docker/setup-buildx-action@v3
-        id: builder
-
-      - name: Purge docker images and cache
-        run: |
-          docker image prune -af
-          docker buildx prune -af
-
-      - name: Build and push
-        uses: docker/build-push-action@v5
+      - uses: actions/checkout@v4
         with:
-          builder: ${{ steps.builder.outputs.name }}
-          platforms: "linux/amd64"
-          context: ${{ inputs.DOCKER_BUILD_CONTEXT }}
-          pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
-          file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
-          push: ${{ inputs.DOCKER_IMG_IS_PUSH }}
-          tags: alpcr.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
-          build-args: |
-            docker_image_prefix=alpcr.azurecr.io
-            GIT_COMMIT_ARG=${{ github.sha }}
+          ref: ${{ inputs.GIT_BRANCH_NAME }}
+          repository: ${{ inputs.GIT_REPO_FULL_NAME }}
+          token: ${{ secrets.CI_PAT }}
+
+      - name: Login to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: alpcr.azurecr.io
+          username: ${{ secrets.AZ_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
+
+      # - uses: docker/setup-buildx-action@v3
+      #   id: builder
+
+      # - name: Purge docker images and cache
+      #   run: |
+      #     docker image prune -af
+      #     docker buildx prune -af
+
+      # - name: Build and push
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     builder: ${{ steps.builder.outputs.name }}
+      #     platforms: "linux/amd64"
+      #     context: ${{ inputs.DOCKER_BUILD_CONTEXT }}
+      #     pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
+      #     file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
+      #     push: ${{ inputs.DOCKER_IMG_IS_PUSH }}
+      #     tags: alpcr.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
+      #     build-args: |
+      #       docker_image_prefix=alpcr.azurecr.io
+      #       GIT_COMMIT_ARG=${{ github.sha }}
