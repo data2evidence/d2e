@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  reg-prune:
+  reg-img-prune:
     name: prune registry images
     runs-on: ubuntu-latest
     steps:
