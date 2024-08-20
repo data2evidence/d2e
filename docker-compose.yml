@@ -3,7 +3,6 @@ networks:
   alp:
   data:
 
-
 volumes:
   caddy:
   duckdb-data-1:
@@ -12,7 +11,6 @@ volumes:
   pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
-
 
 x-envs:
   db-svc: &x-dbsvc
@@ -778,7 +776,7 @@ services:
       LOCAL_DEBUG: "false"
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       USE_DUCKDB: ${USE_DUCKDB:-true}
-      USE_CACHEDB: ${USE_CACHEDB:-false}
+      USE_CACHEDB: ${USE_CACHEDB:-true}
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}

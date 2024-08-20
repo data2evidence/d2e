@@ -65,7 +65,7 @@ def duckdb_postgres_server(db, user_password):
 def conn(duckdb_postgres_server, user_password):
     assert duckdb_postgres_server is not None
     user, password = list(user_password.items())[0]
-    conn_str = f"postgresql://{user}:{password}@localhost:5444/duckdb_11111111-2222-3333-4444-555555555555"
+    conn_str = f"postgresql://{user}:{password}@localhost:5444/A|duckdb|11111111-2222-3333-4444-555555555555"
     connection = psycopg.connect(conn_str)
     yield connection
     connection.close()
@@ -89,7 +89,7 @@ def test_pg_version(conn):
 def sqlalchemy_conn(duckdb_postgres_server, user_password):
     assert duckdb_postgres_server is not None
     user, password = list(user_password.items())[0]
-    conn_string = f"postgresql+psycopg2://{user}:{password}@localhost:5444/duckdb_11111111-2222-3333-4444-555555555555"
+    conn_string = f"postgresql+psycopg2://{user}:{password}@localhost:5444/A|duckdb|11111111-2222-3333-4444-555555555555"
     engine = create_engine(conn_string)
     conn = engine.connect()
     yield conn

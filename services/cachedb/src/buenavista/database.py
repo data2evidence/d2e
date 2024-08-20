@@ -160,26 +160,6 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
 
 
-def parse_connection_param_database(database: str) -> tuple[str, str]:
-    '''
-    Resolves client connection database d2e format into its individual component.
-    Expects database in the format of {DIALECT}_{DATASETID}
-    '''
-    databaseComponents = database.split("_")
-    # Simple conditional check to check if database param has two compoenents separated by "_"
-    if len(databaseComponents) != 2:
-        raise Exception(
-            f"Database param:{database} is in the wrong format! Database has to be in the format of [DIALECT_DATASETID]")
-    dialect, _dataset_id = databaseComponents
-
-    # Guard clause against invalid dialects
-    if dialect not in [e.value for e in DatabaseDialects]:
-        raise Exception(
-            f"Dialect:{dialect} not support! Supported dialects are: {', '.join([e.value for e in DatabaseDialects])}")
-
-    return databaseComponents
-
-
 def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:
     class DefaultRewriterForPostgres(rewrite.Rewriter):
         def rewrite(self, sql: str) -> str:
