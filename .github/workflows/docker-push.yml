@@ -1,50 +1,7 @@
 name: Docker Build & Push
-run-name: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
 
 on:
-  pull_request:
-    types: [opened, reopened, ready_for_review, synchronize]
-  push:
-    branches:
-      - develop
-
   workflow_dispatch:
-    inputs:
-      repo_full_name:
-        description: Select RepoName
-        required: false
-        type: choice
-        options:
-          - alp-os/d2e
-          - alp-os/d2e-dev-afreen
-          - alp-os/d2e-dev-alicia
-          - alp-os/d2e-dev-brandan
-          - alp-os/d2e-dev-brian
-          - alp-os/d2e-dev-hengxian
-          - alp-os/d2e-dev-jerome
-          - alp-os/d2e-dev-khairul
-          - alp-os/d2e-dev-karthik
-          - alp-os/d2e-dev-nadirah
-          - alp-os/d2e-dev-nicholas
-          - alp-os/d2e-dev-peter
-          - alp-os/d2e-dev-qiya
-          - alp-os/d2e-dev-ragavan
-          - alp-os/d2e-dev-santan
-          - alp-os/d2e-dev-satish
-          - alp-os/d2e-dev-suwarno
-      branch_name:
-        default: develop
-        description: Enter BranchName / Release Tag Name
-        required: true
-        type: string
-
-concurrency:
-  group: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build
-  cancel-in-progress: true
-
-env:
-  BRANCH_NAME: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
-  REPO_FULL_NAME: ${{ github.event.inputs.repo_full_name || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
 
 jobs:
   build-push-prune:
