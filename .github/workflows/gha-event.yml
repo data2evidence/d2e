@@ -114,3 +114,8 @@ jobs:
           build-args: |
             docker_image_prefix=alpcr.azurecr.io
             GIT_COMMIT_ARG=${{ github.sha }}
+
+      - name: Post purge
+        if: always()
+        run: |
+          docker system prune -af
