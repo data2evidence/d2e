@@ -5,12 +5,6 @@ on:
   push:
   workflow_call:
     inputs:
-      GIT_BRANCH_NAME:
-        required: true
-        type: string
-      GIT_REPO_FULL_NAME:
-        required: true
-        type: string
       AZ_REGISTRY_REPOSITORY:
         required: true
         type: string
@@ -23,6 +17,12 @@ on:
         default: "xxx"
         type: string
       DOCKER_BUILD_PULL_BOOL:
+        required: true
+        type: string
+      GIT_BRANCH_NAME:
+        required: true
+        type: string
+      GIT_REPO_FULL_NAME:
         required: true
         type: string
 
@@ -65,7 +65,7 @@ jobs:
         id: docker_tag
         shell: bash
         run: |
-          if [ $GIT_BRANCH_NAME == "develop" ]; then
+          if [ ${{ inputs.GIT_BRANCH_NAME }} == "develop" ]; then
             echo "DOCKER_IMG_TAG_NAME=develop" | tee -a $GITHUB_OUTPUT
             echo "DOCKER_IMG_IS_PUSH=true" | tee -a $GITHUB_OUTPUT
           elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
