@@ -45,6 +45,7 @@ concurrency:
 env:
   BRANCH_NAME: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
   REPO_FULL_NAME: ${{ github.event.inputs.repo_full_name || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
+  GIT_TOKEN__PLUGINS_REPO_READ: ${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
 
 jobs:
   setup:
@@ -231,13 +232,12 @@ jobs:
           file: ${{ matrix.directory }}/${{ matrix.fileName }}
           push: ${{ steps.docker_tag.outputs.is_push }}
           tags: alpcr.azurecr.io/${{ matrix.name }}:${{ steps.docker_tag.outputs.tag_name }}
-          secrets: |
-            GIT_TOKEN__PLUGINS_REPO_READ=${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
           build-args: |
             docker_image_prefix=alpcr.azurecr.io
             GIT_COMMIT_ARG=${{ github.sha }}
             GIT_COMMIT_ID__PLUGINS_REPO=${{ matrix.build_args.GIT_COMMIT_ID__PLUGINS_REPO || '' }}
             GIT_URL__PLUGINS_REPO=${{ matrix.build_args.GIT_URL__PLUGINS_REPO || '' }}
+            GIT_TOKEN__PLUGINS_REPO_READ=${{ env.GIT_TOKEN__PLUGINS_REPO_READ }}
 
       - name: Post purge
         if: always()
