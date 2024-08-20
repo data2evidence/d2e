@@ -1,0 +1,14 @@
+name: Azure Container Registry Prune
+
+on:
+  workflow_dispatch:
+
+jobs:
+  img-prune:
+    name: prune images
+    runs-on: ubuntu-latest
+    steps:
+      - name: prune images
+        shell: bash
+        run: |
+          echo hello world
