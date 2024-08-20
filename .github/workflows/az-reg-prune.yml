@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  img-prune:
-    name: prune images
+  reg-prune:
+    name: prune registry images
     runs-on: ubuntu-latest
     steps:
-      - name: prune images
+      - name: prune registry images
         shell: bash
         run: |
           echo hello world
