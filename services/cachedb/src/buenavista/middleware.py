@@ -4,6 +4,7 @@ from api.OpenIdAPI import OpenIdAPI
 from api.UserMgmtAPI import UserMgmtAPI
 from api.PortalServerAPI import PortalServerAPI
 from .database import DatabaseDialects
+from config import Env
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +12,8 @@ logger = logging.getLogger(__name__)
 class DatabaseProtocols(str, Enum):
     A = "A"
     B = "B"
-    
+
+
 PROTOCOL_A_FORMAT = "[PROTOCOL|DIALECT|DATASETID]"
 PROTOCOL_B_FORMAT = "[PROTOCOL|DIALECT|DATABASE_CODE|SCHEMA_NAME|VOCAB_SCHEMA_NAME]"
 
@@ -46,24 +48,58 @@ def parse_d2e_database_format(token: str, d2e_database_format: str) -> tuple[str
 
 def auth_check(token: str, d2e_database_format: str):
     '''
-    Gets user_id from token, then sends a requets to user mgmt to get user group metadata.
-    If user is a system admin, allow access by returning early
-    Else check if user has access to dataset
-    Raise error if user is not allowed
+    auth check, first check if token is from client credentials, if not, move to authorization code flow.
     '''
     # Get user_id from token
     openIdAPI = OpenIdAPI()
     user_id = openIdAPI.get_user_id_from_token(token)
 
+    # Client credentials flow
+    # Allow access by returning early for client credentials flow tokens
+    if _client_credentials_flow_(user_id, d2e_database_format):
+        return
+
+    # Authorization code flow
+    if _authorization_code_flow(token, user_id, d2e_database_format):
+        return
+
+    raise Exception("Unexpected error occurred in auth_check()!")
+
+
+def _client_credentials_flow_(user_id, d2e_database_format) -> bool:
+    '''
+    Check if user_id is in list of application client ids
+    '''
+    APPLICATION_CLIENT_IDS = [Env.IDP__ALP_DATA_CLIENT_ID]
+
+    if user_id in APPLICATION_CLIENT_IDS:
+        logger.debug(
+            f"User: {user_id} allowed access for {d2e_database_format} via client credentials flow access")
+        return True
+
+    return False
+
+
+def _authorization_code_flow(token, user_id, d2e_database_format) -> bool:
+    '''
+    Gets user_id from token, then sends a requets to user mgmt to get user group metadata.
+    If user is a system admin, allow access by returning early
+    Else check if user has access to dataset
+    Raise error if user is not allowed
+    '''
     # Get user group metadata from user mgmt
     userMgmtAPI = UserMgmtAPI(token)
     user_group_metadata = userMgmtAPI.get_user_group_metadata(user_id)
 
+    # Guard clause against non-existent user_id
+    if user_group_metadata == None:
+        raise Exception(f"User with id:{user_id} does not exist")
+
     # Allow access by returning early if user is a system admin
     if user_group_metadata["alp_role_system_admin"]:
         logger.debug(
-            f"User: {user_id} allowed access via system admin access")
-        return
+            f"User: {user_id} allowed access for {d2e_database_format} via system admin access")
+        return True
 
     protocol = _get_protocol_from_d2e_database_format(d2e_database_format)
 
@@ -81,8 +117,12 @@ def auth_check(token: str, d2e_database_format: str):
             error_msg = "User does not have access to dataset"
             logger.exception(error_msg)
             raise Exception(error_msg)
+
         logger.debug(
-            f"User: {user_id} allowed for dataset: {dataset_id} via dataset access")
+            f"User: {user_id} allowed access for {d2e_database_format} via dataset access")
+        return True
+
+    return False
 
 
 def _get_protocol_from_d2e_database_format(d2e_database_format: str):
