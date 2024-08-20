@@ -332,7 +332,6 @@ services:
       dockerfile: Dockerfile
     # volumes:
     #   - ./services/alp-logto/post-init:/home/docker
-
   alp-dataflow-gen-process-worker:
     build:
       context: .
@@ -340,11 +339,10 @@ services:
       ssh:
         - default=${SSH_AUTH_SOCK}
       args:
-        # SSH Specific
-        GIT_COMMIT_ID__PLUGINS_REPO: ${GIT_COMMIT_ID__PLUGINS_REPO:-main} # TODO: change it to main before merging to develop
-        GIT_URL__PLUGINS_REPO: ${GIT_URL__PLUGINS_REPO:-git@github.com:alp-os/d2e-plugins.git} # TODO: change it to github.com/alp-os/d2e-plugins before merging to develop
-        GIT_CLONE_TYPE: ${GIT_CLONE_TYPE:-ssh}
-        GIT_TOKEN__PLUGINS_REPO_READ: ${GIT_TOKEN__PLUGINS_REPO_READ:-} #only for https
+        GIT_COMMIT_ID__PLUGINS_REPO: ${GIT_COMMIT_ID__PLUGINS_REPO:-main}
+        GIT_CLONE_TYPE: ${GIT_CLONE_TYPE:-https} # https / ssh
+        GIT_URL__PLUGINS_REPO: ${GIT_URL__PLUGINS_REPO:-github.com/alp-os/d2e-plugins.git} # git@github.com:alp-os/d2e-plugins.git
+        GIT_TOKEN__PLUGINS_REPO_READ: ${GIT_TOKEN__PLUGINS_REPO_READ} #only for https
   #     volumes:
   #       - ../d2e-plugins-dev-santan:/usr/src/app/d2e-plugins
 
