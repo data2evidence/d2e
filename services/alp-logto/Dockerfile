@@ -1,5 +1,5 @@
 ###### [STAGE] Build ######
-FROM node:20-alpine AS builder
+FROM node:20-alpine as builder
 
 WORKDIR /etc/logto/packages
 
