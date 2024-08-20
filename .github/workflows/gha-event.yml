@@ -117,10 +117,10 @@ jobs:
             docker_image_prefix=${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
             GIT_COMMIT_ARG=${{ github.sha }}
 
-      - name: Post purge
-        if: always()
-        run: |
-          docker system prune -af
+      # - name: Post purge
+      #   if: always()
+      #   run: |
+      #     docker system prune -af
 
       - name: Prune old images
         shell: bash
