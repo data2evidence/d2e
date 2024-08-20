@@ -112,8 +112,9 @@ jobs:
       - name: Docker compose build
         env:
           GIT_CLONE_TYPE: https
-          GIT_URL__PLUGINS_REPO: https://github.com/alp-os/d2e-plugins-dev-santan.git
+          GIT_URL__PLUGINS_REPO: github.com/alp-os/d2e-plugins-dev-santan.git
           GIT_COMMIT_ID__PLUGINS_REPO: internal-896_flow-builder
+          GIT_TOKEN__PLUGINS_REPO_READ: ${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
         run: |
           # Build DataNode services
           yarn build:minerva   --builder ${{ steps.builder1.outputs.name }}
