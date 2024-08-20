@@ -112,7 +112,7 @@ jobs:
       DOCKER_BUILD_CONTEXT: ${{ matrix.context }}
       DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
       DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
-      DOCKER_IMG_IS_PUSH: ${{ needs.setup.outputs.DOCKER_IMG_IS_PUSH }}
+      DOCKER_IMG_IS_PUSH: false # ${{ needs.setup.outputs.DOCKER_IMG_IS_PUSH }}
       DOCKER_IMG_TAG_NAME: ${{ needs.setup.outputs.DOCKER_IMG_TAG_NAME }}
       GIT_BRANCH_NAME: ${{ needs.setup.outputs.GIT_BRANCH_NAME }}
       GIT_REPO_FULL_NAME: ${{ needs.setup.outputs.GIT_REPO_FULL_NAME }}

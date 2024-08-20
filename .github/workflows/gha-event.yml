@@ -81,7 +81,7 @@ jobs:
           builder: ${{ steps.builder.outputs.name }}
           platforms: "linux/amd64"
           context: ${{ inputs.DOCKER_BUILD_CONTEXT }}
-          pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL || false }}
+          pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
           file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
           push: ${{ inputs.DOCKER_IMG_IS_PUSH }}
           tags: alpcr.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
