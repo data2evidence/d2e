@@ -9,10 +9,10 @@ import { IDBCredentialsType } from "@alp/alp-base-utils/target/src/types";
 import { DBConnectionUtil } from "@alp/alp-base-utils/target/src/";
 import { NodeCleanup } from "@alp/alp-base-utils/target/src/NodeCleanup";
 import { QueryObject } from "@alp/alp-base-utils/target/src/QueryObject";
-import { SqlProxyNodeHDBConnection } from "./SqlProxyNodeHDBConnection";
-const logger = CreateLogger("SqlProxyDBConnectionUtil");
+import { CachedbNodeHDBConnection } from "./CachedbNodeHDBConnection";
+const logger = CreateLogger("CachedbDBConnectionUtil");
 
-export class SqlProxyDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil {
+export class CachedbDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil {
     static pool: Pool;
 
     public static getDBConnection({
@@ -115,7 +115,7 @@ export class SqlProxyDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil 
                     callback
                 );
             } else {
-                SqlProxyNodeHDBConnection.createConnection(
+                CachedbNodeHDBConnection.createConnection(
                     client,
                     schemaName,
                     vocabSchemaName,
