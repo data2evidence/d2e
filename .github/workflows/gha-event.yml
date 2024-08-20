@@ -5,10 +5,10 @@ on:
   push:
   workflow_call:
     inputs:
-      BRANCH_NAME:
+      GIT_BRANCH_NAME:
         required: true
         type: string
-      REPO_FULL_NAME:
+      GIT_REPO_FULL_NAME:
         required: true
         type: string
       AZ_REGISTRY_REPOSITORY:
@@ -45,6 +45,8 @@ jobs:
           DOCKER_BUILD_CONTEXT: ${{ inputs.DOCKER_BUILD_CONTEXT }}
           DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
           DOCKER_BUILD_PULL_BOOL: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
+          GIT_BRANCH_NAME: ${{ inputs.GIT_BRANCH_NAME }}
+          GIT_REPO_FULL_NAME: ${{ inputs.GIT_REPO_FULL_NAME }}
         run: |
           echo AZ_REGISTRY_REPOSITORY=$AZ_REGISTRY_REPOSITORY | tee -a $GITHUB_STEP_SUMMARY
           echo DOCKER_BUILD_CONTEXT=$DOCKER_BUILD_CONTEXT | tee -a $GITHUB_STEP_SUMMARY
@@ -53,6 +55,6 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.BRANCH_NAME }}
-          repository: ${{ inputs.REPO_FULL_NAME }}
+          ref: ${{ inputs.GIT_BRANCH_NAME }}
+          repository: ${{ inputs.GIT_REPO_FULL_NAME }}
           token: ${{ secrets.CI_PAT }}

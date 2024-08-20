@@ -43,8 +43,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  BRANCH_NAME: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
-  REPO_FULL_NAME: ${{ github.event.inputs.repo_full_name || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
+  GIT_BRANCH_NAME: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
+  GIT_REPO_FULL_NAME: ${{ github.event.inputs.repo_full_name || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
 
 jobs:
   setup:
@@ -68,8 +68,8 @@ jobs:
 
       - id: setup
         run: |
-          echo repo_full_name="${REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-          echo branch_name="${BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo repo_full_name="${GIT_REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo branch_name="${GIT_BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -94,8 +94,9 @@ jobs:
       DOCKER_BUILD_CONTEXT: ${{ matrix.context }}
       DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
       DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
-      BRANCH_NAME: ${{ needs.setup.outputs.branch_name }}
-      REPO_FULL_NAME: ${{ needs.setup.outputs.repo_full_name }}
+      GIT_BRANCH_NAME: ${{ needs.setup.outputs.branch_name }}
+      GIT_REPO_FULL_NAME: ${{ needs.setup.outputs.repo_full_name }}
     secrets:
       AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
       AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
+      CI_PAT: ${{ secrets.CI_PAT }}
