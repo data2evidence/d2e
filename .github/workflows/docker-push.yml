@@ -232,7 +232,7 @@ jobs:
   #       if: always()
   #       run: |
   #         docker system prune -af
-  reg-img-prune:
+  az-reg-prune:
     uses: ./.github/workflows/gha-event.yml
     with:
       AZ_REGISTRY_REPOSITORY: alp-data-node/alp-logto

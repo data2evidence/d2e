@@ -15,8 +15,8 @@ on:
         required: true
 
 jobs:
-  reg-img-prune:
-    name: prune registry images
+  az-reg-prune:
+    name: azure registry prune
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
