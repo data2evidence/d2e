@@ -6,20 +6,19 @@ on:
   workflow_call:
     inputs:
       AZ_REGISTRY_REPOSITORY:
-        required: false
+        required: true
         default: "xxx"
         type: string
       DOCKER_BUILD_CONTEXT:
-        required: false
+        required: true
         default: "xxx"
         type: string
       DOCKER_BUILD_FILE_PATH:
-        required: false
+        required: true
         default: "xxx"
         type: string
       DOCKER_BUILD_PULL_BOOL:
-        required: false
-        default: "false"
+        required: true
         type: string
     secrets:
       AZ_REGISTRY_USERNAME:
