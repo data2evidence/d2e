@@ -31,7 +31,7 @@ COPY --chown=node:node --chmod=711 . .
 
 RUN yarn compile
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 RUN yarn install --production &&\
     yarn autoclean --force &&\

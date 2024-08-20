@@ -13,14 +13,14 @@ RUN tar xvf liquibase-4.5.0.tar.gz -C ./liquibase/
 
 # Install node and yarn
 RUN mkdir -p /usr/local/node
-ENV NVM_DIR /usr/local/node
-ENV NODE_VERSION 18.16.0
+ENV NVM_DIR=/usr/local/node
+ENV NODE_VERSION=18.16.0
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 RUN . $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm use $NODE_VERSION
-ENV NODE_HOME $NVM_DIR/versions/node/v$NODE_VERSION
-ENV NODE_PATH $NODE_HOME/lib/node_modules
-ENV PATH $NODE_HOME/bin:$PATH
+ENV NODE_HOME=$NVM_DIR/versions/node/v$NODE_VERSION
+ENV NODE_PATH=$NODE_HOME/lib/node_modules
+ENV PATH=$NODE_HOME/bin:$PATH
 
 RUN npm install --global yarn
 
@@ -70,4 +70,3 @@ RUN mkdir -p /app/synpuf1k
 RUN chown -R docker:docker /app/synpuf1k
 
 USER docker
-

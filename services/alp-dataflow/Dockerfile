@@ -40,7 +40,7 @@ COPY --chown=node:node --chmod=711 . .
 
 RUN yarn build
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 RUN --mount=type=cache,target=~/.cache/yarn \
     yarn install --production --network-timeout 1000000 &&\
