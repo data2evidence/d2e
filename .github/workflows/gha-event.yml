@@ -6,18 +6,19 @@ on:
       AZ_REGISTRY_REPOSITORY:
         required: true
         type: string
-      DOCKER_BUILD_CONTEXT:
+      DOCKER_BUILD_CONTEXT_PATH:
         required: true
         type: string
       DOCKER_BUILD_FILE_PATH:
         required: true
         type: string
       DOCKER_BUILD_PULL_BOOL:
-        default: true
+        default: false
         type: boolean
       DOCKER_IMG_IS_PUSH:
-        required: true
-        type: string
+        required: false
+        default: true
+        type: boolean
       DOCKER_IMG_TAG_NAME:
         required: true
         type: string
@@ -32,7 +33,7 @@ on:
       AZ_REGISTRY_REPOSITORY:
         required: true
         type: string
-      DOCKER_BUILD_CONTEXT:
+      DOCKER_BUILD_CONTEXT_PATH:
         required: true
         type: string
       DOCKER_BUILD_FILE_PATH:
@@ -42,8 +43,9 @@ on:
         required: true
         type: boolean
       DOCKER_IMG_IS_PUSH:
-        required: true
-        type: string
+        required: false
+        default: true
+        type: boolean
       DOCKER_IMG_TAG_NAME:
         required: true
         type: string
@@ -63,7 +65,7 @@ jobs:
         shell: bash
         env:
           AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY || vars.AZ_REGISTRY_REPOSITORY }}
-          DOCKER_BUILD_CONTEXT: ${{ inputs.DOCKER_BUILD_CONTEXT }}
+          DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
           DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
           DOCKER_BUILD_PULL_BOOL: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
           DOCKER_IMG_IS_PUSH: ${{ inputs.DOCKER_IMG_IS_PUSH }}
@@ -72,7 +74,7 @@ jobs:
           GIT_REPO_FULL_NAME: ${{ inputs.GIT_REPO_FULL_NAME }}
         run: |
           echo AZ_REGISTRY_REPOSITORY=$AZ_REGISTRY_REPOSITORY | tee -a $GITHUB_STEP_SUMMARY
-          echo DOCKER_BUILD_CONTEXT=$DOCKER_BUILD_CONTEXT
+          echo DOCKER_BUILD_CONTEXT_PATH=$DOCKER_BUILD_CONTEXT_PATH
           echo DOCKER_BUILD_FILE_PATH=$DOCKER_BUILD_FILE_PATH
           echo DOCKER_BUILD_PULL_BOOL=$DOCKER_BUILD_PULL_BOOL
           echo GIT_BRANCH_NAME=$GIT_BRANCH_NAME | tee -a $GITHUB_STEP_SUMMARY
@@ -106,7 +108,7 @@ jobs:
         with:
           builder: ${{ steps.builder.outputs.name }}
           platforms: "linux/amd64"
-          context: ${{ inputs.DOCKER_BUILD_CONTEXT }}
+          context: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
           pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
           file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
           push: ${{ inputs.DOCKER_IMG_IS_PUSH }}
