@@ -79,6 +79,8 @@ jobs:
       repo_full_name: ${{ steps.setup.outputs.repo_full_name }}
 
   build-push-prune:
+    if: (needs.setup.outputs.branch_name == 'develop' ||  contains('release', needs.setup.outputs.branch_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
+    needs: setup
     strategy:
       matrix:
         include:
