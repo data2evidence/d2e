@@ -1,5 +1,5 @@
 name: Docker Build & Push
-run-name: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
+run-name: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ on:
 
   workflow_dispatch:
     inputs:
-      repo_full_name:
+      GIT_REPO_FULL_NAME:
         description: Select RepoName
         required: false
         type: choice
@@ -32,19 +32,19 @@ on:
           - alp-os/d2e-dev-santan
           - alp-os/d2e-dev-satish
           - alp-os/d2e-dev-suwarno
-      branch_name:
+      GIT_BRANCH_NAME:
         default: develop
         description: Enter BranchName / Release Tag Name
         required: true
         type: string
 
 concurrency:
-  group: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build
+  group: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build
   cancel-in-progress: true
 
 env:
-  GIT_BRANCH_NAME: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
-  GIT_REPO_FULL_NAME: ${{ github.event.inputs.repo_full_name || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
+  GIT_BRANCH_NAME: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
+  GIT_REPO_FULL_NAME: ${{ github.event.inputs.GIT_REPO_FULL_NAME || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
 
 jobs:
   setup:
@@ -69,18 +69,18 @@ jobs:
 
       - id: setup
         run: |
-          echo repo_full_name="${GIT_REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-          echo branch_name="${GIT_BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo GIT_REPO_FULL_NAME="${GIT_REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo GIT_BRANCH_NAME="${GIT_BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
     outputs:
-      branch_name: ${{ steps.setup.outputs.branch_name }}
-      repo_full_name: ${{ steps.setup.outputs.repo_full_name }}
+      GIT_BRANCH_NAME: ${{ steps.setup.outputs.GIT_BRANCH_NAME }}
+      GIT_REPO_FULL_NAME: ${{ steps.setup.outputs.GIT_REPO_FULL_NAME }}
 
   bld:
-    if: (needs.setup.outputs.branch_name == 'develop' ||  contains('release', needs.setup.outputs.branch_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
+    if: (needs.setup.outputs.GIT_BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.GIT_BRANCH_NAME) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
     needs: setup
     strategy:
       matrix:
@@ -99,8 +99,8 @@ jobs:
       DOCKER_BUILD_CONTEXT: ${{ matrix.context }}
       DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
       DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
-      GIT_BRANCH_NAME: ${{ needs.setup.outputs.branch_name }}
-      GIT_REPO_FULL_NAME: ${{ needs.setup.outputs.repo_full_name }}
+      GIT_BRANCH_NAME: ${{ needs.setup.outputs.GIT_BRANCH_NAME }}
+      GIT_REPO_FULL_NAME: ${{ needs.setup.outputs.GIT_REPO_FULL_NAME }}
     secrets:
       inherit
       # AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}

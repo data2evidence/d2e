@@ -25,13 +25,6 @@ on:
       DOCKER_BUILD_PULL_BOOL:
         required: true
         type: string
-    secrets:
-      AZ_REGISTRY_USERNAME:
-        required: true
-      AZ_REGISTRY_PASSWORD:
-        required: true
-      CI_PAT:
-        required: true
 
 jobs:
   build-push-prune:
@@ -65,3 +58,18 @@ jobs:
           registry: alpcr.azurecr.io
           username: ${{ secrets.AZ_REGISTRY_USERNAME }}
           password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
+
+      - name: Get docker tag name
+        id: docker_tag
+        shell: bash
+        run: |
+          if [ $GIT_BRANCH_NAME == "develop" ]; then
+            echo "tag_name=develop" | tee -a $GITHUB_OUTPUT
+            echo "is_push=true" | tee -a $GITHUB_OUTPUT
+          elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
+              echo "tag_name=$GIT_BRANCH_NAME" | tee -a $GITHUB_OUTPUT
+              echo "is_push=true" | tee -a $GITHUB_OUTPUT
+          else
+              echo "is_push=false" | tee -a $GITHUB_OUTPUT
+              echo "tag_name=$(echo ${{ github.sha }} | cut -c1-8)" | tee -a $GITHUB_OUTPUT
+          fi
