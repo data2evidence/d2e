@@ -15,9 +15,9 @@ jobs:
     uses: ./.github/workflows/gha-event.yml
     with:
       AZ_REGISTRY_REPOSITORY: ${{ matrix.name }}
-      # DOCKER_BUILD_CONTEXT: ${{ matrix.context }}
-      # DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
-      # DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
+      DOCKER_BUILD_CONTEXT: ${{ matrix.context }}
+      DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
+      DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
     secrets:
       AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
       AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
