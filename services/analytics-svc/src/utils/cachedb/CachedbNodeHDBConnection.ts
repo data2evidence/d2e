@@ -8,7 +8,7 @@ import { Pool } from "pg";
 import QueryStream from "pg-query-stream";
 import { DBError } from "@alp/alp-base-utils/target/src/DBError";
 import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
-const logger = CreateLogger("SqlProxyNodeHDBConnection");
+const logger = CreateLogger("CachedbNodeHDBConnection");
 
 function _getRows(result) {
     if ("rows" in result) {
@@ -18,10 +18,10 @@ function _getRows(result) {
 }
 
 /* 
-Extends PostgresConnection to use as a HANA connection for sql-proxy
+Extends PostgresConnection to use as a HANA connection for cachedb
 Overwrites parseSql to remove translation from postgres->hana and adds some parsing of hana query-gen specific placeholders
 */
-export class SqlProxyNodeHDBConnection extends PostgresConnection.PostgresConnection {
+export class CachedbNodeHDBConnection extends PostgresConnection.PostgresConnection {
     public static createConnection(
         pool: Pool,
         schemaName,
@@ -29,7 +29,7 @@ export class SqlProxyNodeHDBConnection extends PostgresConnection.PostgresConnec
         callback
     ) {
         try {
-            const conn = new SqlProxyNodeHDBConnection(
+            const conn = new CachedbNodeHDBConnection(
                 pool,
                 schemaName,
                 vocabSchemaName

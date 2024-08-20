@@ -168,8 +168,8 @@ jobs:
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile.frontend
-          - name: alp-data-node/sql-proxy
-            directory: ./services/sql-proxy
+          - name: alp-data-node/cachedb
+            directory: ./services/cachedb
             context: .
             fileName: Dockerfile
           - name: alp-data-node/alp-fhir-server-post-init
