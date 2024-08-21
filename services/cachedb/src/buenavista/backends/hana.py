@@ -75,6 +75,8 @@ class HANASession(Session):
         if "session.application_user" in sql:
             sql = sql.replace("session.application_user", "'APPLICATIONUSER'")
             sql = sql.replace('"', "'")
+        if "SET datestyle TO 'ISO'" in sql:
+                    return "SET 'DATE_FORMAT' = 'ISO'"
         sql = re.sub(r"\$[0-9]+", "?", sql)
         return sql
 

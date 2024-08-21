@@ -37,7 +37,8 @@ class Liquibase:
         self.rollback_tag = rollback_tag
 
     def create_params(self) -> List:
-        changeLogFile = f"db/migrations/{self.dialect}/{self.changelog_file}"
+        dialect = "postgres" if self.dialect == DatabaseDialects.POSTGRES else self.dialect
+        changeLogFile = f"db/migrations/{dialect}/{self.changelog_file}"
 
         host = self.tenant_configs.get("host")
         port = self.tenant_configs.get("port")

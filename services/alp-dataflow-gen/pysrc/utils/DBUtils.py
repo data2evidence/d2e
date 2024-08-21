@@ -2,6 +2,7 @@ import os
 import json
 from typing import Dict
 from utils.types import *
+from api.OpenIdAPI import OpenIdAPI
 from sqlalchemy import create_engine
 
 
@@ -24,16 +25,19 @@ class DBUtils:
         if database_credentials:
             return database_credentials.get("dialect")
 
-    def create_database_engine(self, user_type):
+    def create_database_engine(self, schema_name: str, vocab_schema_name: str = None):
         '''
         Used for SQLAlchemy 
         '''
         connection_string = self.__create_connection_string(
-            user_type, create_engine=True)
+            schema_name, vocab_schema_name, create_engine=True)
+        print(f"schema name is {schema_name}")
+        print(f"vocab schema is {vocab_schema_name}")
+        print(f"connection_string in create_database_engine is {connection_string}")
         engine = create_engine(connection_string)
         return engine
 
-    def get_database_connector_connection_string(self, user_type: str, release_date: str = None) -> str:
+    def get_database_connector_connection_string(self, schema_name: str, vocab_schema_name: str = None, release_date: str = None) -> str:
         '''
         Used for Database Connector package
         '''
@@ -43,12 +47,13 @@ class DBUtils:
                 # Append sessionVariable to database connection string if release_date is defined
                 if release_date:
                     extra_config = f"&sessionVariable:TEMPORAL_SYSTEM_TIME_AS_OF={release_date}"
-                connection_string = self.__create_connection_string(user_type=user_type, extra_config=extra_config,
-                                                                    create_engine=False)
+                connection_string = self.__create_connection_string(schema_name=schema_name, vocab_schema_name=vocab_schema_name, 
+                                                                    extra_config=extra_config, create_engine=False)
             case DatabaseDialects.POSTGRES:
                 # DatabaseConnector R package uses this postgres dialect naming
-                connection_string = self.__create_connection_string(
-                    user_type=user_type, create_engine=False)
+                connection_string = self.__create_connection_string(schema_name=schema_name, 
+                                                                    vocab_schema_name=vocab_schema_name, 
+                                                                    create_engine=False)
 
         return connection_string
 
@@ -70,13 +75,17 @@ class DBUtils:
                 database_credentials = self.__process_database_credentials(_db)
                 return database_credentials
 
-    def __process_database_credentials(self, database_credential_json: Dict) -> DBCredentialsType:   
+    def __process_database_credentials(self, database_credential_json: Dict) -> DBCredentialsType:
         base_values = database_credential_json.get("values")
         database_credential_values = base_values["credentials"]
-        database_credential_values["databaseName"] = base_values["databaseName"]
-        database_credential_values["dialect"] = base_values["dialect"]
-        database_credential_values["host"] = base_values["host"]
-        database_credential_values["port"] = base_values["port"]
+        
+        database_credential_values["dialect"] = base_values["dialect"] # Todo: get from cachedb db-credentials svc?
+        database_credential_values["adminUser"] = "Bearer " + OpenIdAPI().getClientCredentialToken()
+        database_credential_values["adminPassword"] = ""
+        database_credential_values["host"] = str(os.getenv("CACHEDB__HOST"))
+        database_credential_values["port"] = int(os.getenv("CACHEDB__PORT"))
+        database_credential_values["databaseName"] = f"B|{base_values['dialect']}|{base_values['databaseName']}"
+        
         database_credential_values["encrypt"] = base_values.get("encrypt", False)
         database_credential_values["validateCertificate"] = base_values.get(
             "validateCertificate", False)
@@ -100,62 +109,37 @@ class DBUtils:
         DBCredentialsType(**database_credential_values)
         return database_credential_values
 
-    def __create_connection_string(self, user_type: UserType, extra_config: str = "", create_engine: bool = False) -> str:
+    def __create_connection_string(self, schema_name: str, vocab_schema_name: str, extra_config: str = "", create_engine: bool = False) -> str:
         '''
         Creates database connection string to be used for SqlAlchemy Engine and Database Connector
         '''
         database_credentials = self.extract_database_credentials()
-        dialect = database_credentials.get("dialect")
-        database_name = database_credentials.get("databaseName")
+        dialect = database_credentials.get("dialect") 
+        user = database_credentials.get("adminUser")
         host = database_credentials.get("host")
         port = database_credentials.get("port")
-
-        match user_type:
-            case UserType.ADMIN_USER:
-                user = database_credentials.get("adminUser")
-                password = database_credentials.get("adminPassword")
-            case UserType.READ_USER:
-                user = database_credentials.get("readUser")
-                password = database_credentials.get("readPassword")
-
+        database_name = database_credentials.get("databaseName") + f"|{schema_name}"        
+        if vocab_schema_name:
+            database_name += f"|{vocab_schema_name}"
+        
         if create_engine:  # for sqlalchemy
-            match dialect:
-                case DatabaseDialects.HANA:
-                    dialect_driver = "hana+hdbcli"
-                    encrypt = database_credentials.get("encrypt")
-                    validate_certificate = database_credentials.get(
-                        "validateCertificate")
-                    database_config_string = database_name + \
-                        f"?encrypt={encrypt}?sslValidateCertificate={validate_certificate}"
-
-                case DatabaseDialects.POSTGRES:
-                    dialect_driver = "postgresql+psycopg2"
-                    database_config_string = database_name
-                case _:
-                    raise ValueError(f"Dialect '{dialect}' not supported!")
-
-            connection_string = create_base_connection_string(
-                dialect_driver, user, password, host, port, database_config_string)
+            dialect_driver = "postgresql+psycopg2"
+            connection_string = f"{dialect_driver}://{user}@{host}:{port}/{database_name}"
+            print(f"create engine connection_string is {connection_string}")
             return connection_string
 
-        match dialect:
-            case DatabaseDialects.HANA:
-                base_connection_string = f"jdbc:sap://{host}:{port}?databaseName={database_name}{extra_config}"
-            case DatabaseDialects.POSTGRES:
-                dialect = "postgresql"
-                base_connection_string = f"jdbc:{dialect}://{host}:{port}/{database_name}"
-            case _:
-                raise ValueError(f"Dialect '{dialect}' not supported!")
-        connection_string = f"connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = '{dialect}', connectionString = '{base_connection_string}', user = '{user}', password = '{password}', pathToDriver = '{DBUtils.path_to_driver}')"
+        base_connection_string = f"jdbc:{dialect}://{host}:{port}/{database_name}"
+        connection_string = f"connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = '{dialect}', connectionString = '{base_connection_string}', user = '{user}', password = '', pathToDriver = '{DBUtils.path_to_driver}')"
         return connection_string
 
 
 def create_base_connection_string(dialect_driver: str, user: str, password: str,
-                                  host: str, port: int, database_config_string: str) -> str:
-    return f"{dialect_driver}://{user}:{password}@{host}:{port}/{database_config_string}"
+                                  host: str, port: int, database_name: str) -> str:
+    return f"{dialect_driver}://{user}:{password}@{host}:{port}/{database_name}"
 
 
 def GetConfigDBConnection():
+    # Connect directly to db?
     # Single pre-configured postgres database
     dialect_driver = "postgresql+psycopg2"
     db = os.getenv("PG__DB_NAME")

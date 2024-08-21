@@ -64,7 +64,7 @@ def create_schema_tasks(dialect: str,
                         plugin_classpath: str,
                         count: int) -> bool:
     try:
-        schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
+        schema_dao = DBDao(database_code, schema_name, vocab_schema)
 
 
         create_db_schema_wo = create_db_schema.with_options(

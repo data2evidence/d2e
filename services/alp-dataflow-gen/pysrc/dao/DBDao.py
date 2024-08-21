@@ -15,18 +15,13 @@ from utils.DBUtils import DBUtils
 
 
 class DBDao:
-    def __init__(self, database_code: str, schema_name: str, user_type: UserType):
+    def __init__(self, database_code: str, schema_name: str, vocab_schema_name: str = None):
         self.database_code = database_code
         self.schema_name = schema_name
+        self.vocab_schema_name = vocab_schema_name
         dbutils = DBUtils(self.database_code)
         self.db_dialect = dbutils.get_database_dialect()
-
-        if (user_type == UserType.ADMIN_USER) or (user_type == UserType.READ_USER):
-            self.user = user_type
-        else:
-            raise ValueError(f"User type '{user_type}' not allowed, only '{[user.value for user in UserType]}'.")
-
-        self.engine = dbutils.create_database_engine(self.user)
+        self.engine = dbutils.create_database_engine(self.schema_name, self.vocab_schema_name)
         self.metadata = sql.MetaData(schema_name)  # sql.MetaData()
         self.inspector = sql.inspect(self.engine)
 

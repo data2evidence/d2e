@@ -10,9 +10,9 @@ import struct
 from typing import Dict, List, Optional
 
 from .core import BVType, Connection, Extension, Session, QueryResult
-from .database import parse_connection_param_database, get_rewriter_from_dialect, get_db_connection, CachedbDatabaseClients
+from .database import get_rewriter_from_dialect, get_db_connection, CachedbDatabaseClients
 from .rewrite import Rewriter
-from .middleware import auth_check, get_dataset_info
+from .middleware import d2e_database_format_validation, parse_d2e_database_format, auth_check
 
 logger = logging.getLogger(__name__)
 
@@ -333,18 +333,19 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
                 for x in self.r.read_bytes(msglen - 4).split(NULL_BYTE)
             ]
             params = dict(zip(msg[::2], msg[1::2]))
-            token = params["user"]
 
-            # Resolve database param in connection params
-            dialect, dataset_id = parse_connection_param_database(
-                params["database"])
+            token = params["user"]
+            d2e_database_format = params["database"]
+
+            # Validate protocol and dialect in d2e_database_format
+            d2e_database_format_validation(d2e_database_format)
 
             # Ensure user has permission to access dataset
-            auth_check(token, dataset_id)
+            auth_check(token, d2e_database_format)
 
-            # Get database_code and schema from dataset_id
-            database_code, schema, vocab_schema = get_dataset_info(
-                token, dataset_id)
+            # Resolve database param in connection params
+            dialect, database_code, schema, vocab_schema = parse_d2e_database_format(token,
+                                                                                     d2e_database_format)
 
             # Get database connection and rewriter
             conn = get_db_connection(

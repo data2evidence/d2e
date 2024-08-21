@@ -108,8 +108,8 @@ def GetDBConnection(database_code: str):
             db = database_name
         host = conn_details["host"]
         port = conn_details["port"]
-        user = conn_details["user"]
-        password = conn_details["password"]
+        user = conn_details["adminUser"]
+        password = conn_details["adminPassword"]
         conn_string = _CreateConnectionString(
             dialect_driver, user, password, host, port, db)
         engine = create_engine(
@@ -126,6 +126,12 @@ def _CreateConnectionString(dialect_driver: str, user: str, pw: str,
 
 def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_code: str, schema: str, vocab_schema: str):
     connection = None
+
+    # Guard clause for postgres and hana for unsupported database_codes
+    if dialect == DatabaseDialects.POSTGRES or dialect == DatabaseDialects.HANA:
+        if database_code not in clients[dialect]:
+            raise Exception(
+                f"Dialect:{dialect} has no configuration with database code:{database_code}")
 
     if dialect == DatabaseDialects.POSTGRES:
         connection = PGConnection(
@@ -158,26 +164,6 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
         # If no connection can be found
         raise Exception(
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
-
-
-def parse_connection_param_database(database: str) -> tuple[str, str]:
-    '''
-    Resolves client connection database d2e format into its individual component.
-    Expects database in the format of {DIALECT}_{DATASETID}
-    '''
-    databaseComponents = database.split("_")
-    # Simple conditional check to check if database param has two compoenents separated by "_"
-    if len(databaseComponents) != 2:
-        raise Exception(
-            f"Database param:{database} is in the wrong format! Database has to be in the format of [DIALECT_DATASETID]")
-    dialect, _dataset_id = databaseComponents
-
-    # Guard clause against invalid dialects
-    if dialect not in [e.value for e in DatabaseDialects]:
-        raise Exception(
-            f"Dialect:{dialect} not support! Supported dialects are: {', '.join([e.value for e in DatabaseDialects])}")
-
-    return databaseComponents
 
 
 def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:
