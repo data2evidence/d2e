@@ -69,13 +69,14 @@ jobs:
       - name: inputs
         shell: bash
         env:
-          AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY || vars.AZ_REGISTRY_REPOSITORY }}
+          AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
           DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
           DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
           DOCKER_BUILD_PULL_BOOL: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
           DOCKER_IMG_PUSH_BOOL: ${{ inputs.DOCKER_IMG_PUSH_BOOL }}
           DOCKER_IMG_TAG_NAME: ${{ inputs.DOCKER_IMG_TAG_NAME }}
           GIT_BRANCH_NAME: ${{ inputs.GIT_BRANCH_NAME }}
+          GIT_COMMIT_ID__PLUGINS_REPO: ${{ inputs.GIT_COMMIT_ID__PLUGINS_REPO }}
           GIT_REPO_FULL_NAME: ${{ inputs.GIT_REPO_FULL_NAME }}
         run: |
           echo AZ_REGISTRY_REPOSITORY=$AZ_REGISTRY_REPOSITORY | tee -a $GITHUB_STEP_SUMMARY
@@ -123,6 +124,7 @@ jobs:
             GIT_COMMIT_ARG=${{ github.sha }}
             GIT_COMMIT_ID__PLUGINS_REPO=${{ inputs.GIT_COMMIT_ID__PLUGINS_REPO }}
             D2E_PLUGIN_REPO=${{ vars.D2E_PLUGIN_REPO }}
+          secrets: |
             GIT_TOKEN__PLUGINS_REPO_READ=${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
 
       - name: Post purge
