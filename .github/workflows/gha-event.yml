@@ -15,8 +15,7 @@ on:
       DOCKER_BUILD_PULL_BOOL:
         default: false
         type: boolean
-      DOCKER_IMG_IS_PUSH:
-        required: false
+      DOCKER_IMG_PUSH_BOOL:
         default: true
         type: boolean
       DOCKER_IMG_TAG_NAME:
@@ -42,7 +41,7 @@ on:
       DOCKER_BUILD_PULL_BOOL:
         required: true
         type: boolean
-      DOCKER_IMG_IS_PUSH:
+      DOCKER_IMG_PUSH_BOOL:
         required: false
         default: true
         type: boolean
@@ -68,7 +67,7 @@ jobs:
           DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
           DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
           DOCKER_BUILD_PULL_BOOL: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
-          DOCKER_IMG_IS_PUSH: ${{ inputs.DOCKER_IMG_IS_PUSH }}
+          DOCKER_IMG_PUSH_BOOL: ${{ inputs.DOCKER_IMG_PUSH_BOOL }}
           DOCKER_IMG_TAG_NAME: ${{ inputs.DOCKER_IMG_TAG_NAME }}
           GIT_BRANCH_NAME: ${{ inputs.GIT_BRANCH_NAME }}
           GIT_REPO_FULL_NAME: ${{ inputs.GIT_REPO_FULL_NAME }}
@@ -77,7 +76,7 @@ jobs:
           echo DOCKER_BUILD_CONTEXT_PATH=$DOCKER_BUILD_CONTEXT_PATH
           echo DOCKER_BUILD_FILE_PATH=$DOCKER_BUILD_FILE_PATH
           echo DOCKER_BUILD_PULL_BOOL=$DOCKER_BUILD_PULL_BOOL
-          echo DOCKER_IMG_IS_PUSH=$DOCKER_IMG_IS_PUSH
+          echo DOCKER_IMG_PUSH_BOOL=$DOCKER_IMG_PUSH_BOOL
           echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME
           echo GIT_BRANCH_NAME=$GIT_BRANCH_NAME
           echo GIT_REPO_FULL_NAME=$GIT_REPO_FULL_NAME
@@ -111,7 +110,7 @@ jobs:
           context: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
           pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
           file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
-          push: ${{ inputs.DOCKER_IMG_IS_PUSH }}
+          push: ${{ inputs.DOCKER_IMG_PUSH_BOOL }}
           tags: ${{ vars.AZ_REGISTRY_NAME }}.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
           build-args: |
             docker_image_prefix=${{ vars.AZ_REGISTRY_NAME }}.azurecr.io

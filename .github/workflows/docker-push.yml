@@ -71,16 +71,16 @@ jobs:
           echo GIT_BRANCH_NAME="${GIT_BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo GIT_REPO_FULL_NAME="${GIT_REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
 
-          DOCKER_IMG_IS_PUSH=true
+          DOCKER_IMG_PUSH_BOOL=true
           if [ $GIT_BRANCH_NAME == "develop" ]; then
             DOCKER_IMG_TAG_NAME=develop
           elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
             DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME
           else
-            # DOCKER_IMG_IS_PUSH=false
+            # DOCKER_IMG_PUSH_BOOL=false
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
           fi
-          echo DOCKER_IMG_IS_PUSH=$DOCKER_IMG_IS_PUSH | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo DOCKER_IMG_PUSH_BOOL=$DOCKER_IMG_PUSH_BOOL | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Dump GitHub context
@@ -90,7 +90,7 @@ jobs:
           echo HOSTNAME=$HOSTNAME
           echo "$GITHUB_CONTEXT"
     outputs:
-      DOCKER_IMG_IS_PUSH: ${{ steps.setup.outputs.DOCKER_IMG_IS_PUSH }}
+      DOCKER_IMG_PUSH_BOOL: ${{ steps.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
       DOCKER_IMG_TAG_NAME: ${{ steps.setup.outputs.DOCKER_IMG_TAG_NAME }}
       GIT_BRANCH_NAME: ${{ steps.setup.outputs.GIT_BRANCH_NAME }}
       GIT_REPO_FULL_NAME: ${{ steps.setup.outputs.GIT_REPO_FULL_NAME }}
@@ -203,7 +203,7 @@ jobs:
       DOCKER_BUILD_CONTEXT_PATH: ${{ matrix.context }}
       DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
       DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
-      DOCKER_IMG_IS_PUSH: false # ${{ needs.setup.outputs.DOCKER_IMG_IS_PUSH }}
+      DOCKER_IMG_PUSH_BOOL: false # ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
       DOCKER_IMG_TAG_NAME: ${{ needs.setup.outputs.DOCKER_IMG_TAG_NAME }}
       GIT_BRANCH_NAME: ${{ needs.setup.outputs.GIT_BRANCH_NAME }}
       GIT_REPO_FULL_NAME: ${{ needs.setup.outputs.GIT_REPO_FULL_NAME }}
