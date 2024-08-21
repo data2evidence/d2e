@@ -10,13 +10,12 @@ RUN apk add --no-cache git bash
 
 WORKDIR /usr/src/app
 
-ARG GIT_TOKEN__PLUGINS_REPO_READ
 ARG GIT_COMMIT_ID__PLUGINS_REPO
 ARG D2E_PLUGIN_REPO
 
 RUN --mount=type=secret,id=GIT_TOKEN__PLUGINS_REPO_READ \
-    GIT_TOKEN__PLUGINS_REPO_READ=$(cat /run/secrets/GIT_TOKEN__PLUGINS_REPO_READ) \
-    git clone -b $GIT_COMMIT_ID__PLUGINS_REPO https://${GIT_TOKEN__PLUGINS_REPO_READ}@github.com/${D2E_PLUGIN_REPO} d2e-plugins
+    git clone -b $GIT_COMMIT_ID__PLUGINS_REPO https://$(cat /run/secrets/GIT_TOKEN__PLUGINS_REPO_READ)@github.com/${D2E_PLUGIN_REPO} d2e-plugins
+
 RUN cd d2e-plugins && git rev-parse HEAD > .git_commit_id
 
 
