@@ -1,6 +1,6 @@
 ARG GIT_CLONE_TYPE=https
 ARG GIT_COMMIT_ID__PLUGINS_REPO=main
-ARG D2E_PLUGIN_REPO=alp-os/d2e-plugins.git
+ARG GIT_URL__PLUGINS_REPO=github.com/alp-os/d2e-plugins.git
 ARG NODE_VERSION=18.19.1
 ARG ARCH=x64
 
@@ -10,12 +10,11 @@ RUN apk add --no-cache git bash
 
 WORKDIR /usr/src/app
 
+ARG GIT_TOKEN__PLUGINS_REPO_READ
 ARG GIT_COMMIT_ID__PLUGINS_REPO
-ARG D2E_PLUGIN_REPO
+ARG GIT_URL__PLUGINS_REPO
 
-RUN --mount=type=secret,id=GIT_TOKEN__PLUGINS_REPO_READ \
-    git clone -b $GIT_COMMIT_ID__PLUGINS_REPO https://$(cat /run/secrets/GIT_TOKEN__PLUGINS_REPO_READ)@github.com/${D2E_PLUGIN_REPO} d2e-plugins
-
+RUN git clone -b $GIT_COMMIT_ID__PLUGINS_REPO https://${GIT_TOKEN__PLUGINS_REPO_READ}@${GIT_URL__PLUGINS_REPO} d2e-plugins 
 RUN cd d2e-plugins && git rev-parse HEAD > .git_commit_id
 
 
@@ -25,11 +24,11 @@ RUN apk add --no-cache git bash openssh-client
 
 ENV GIT_SSH_COMMAND='ssh -Tvv'
 ARG GIT_COMMIT_ID__PLUGINS_REPO
-ARG D2E_PLUGIN_REPO
+ARG GIT_URL__PLUGINS_REPO
 
 WORKDIR /usr/src/app
 RUN --mount=type=ssh mkdir -p -m 700 ~/.ssh/ &&  \
-    ssh-keyscan github.com >> ~/.ssh/known_hosts && git clone -b $GIT_COMMIT_ID__PLUGINS_REPO github.com/${D2E_PLUGIN_REPO} d2e-plugins
+    ssh-keyscan github.com >> ~/.ssh/known_hosts && git clone -b $GIT_COMMIT_ID__PLUGINS_REPO $GIT_URL__PLUGINS_REPO d2e-plugins
 RUN cd d2e-plugins && git rev-parse HEAD > .git_commit_id
 
 

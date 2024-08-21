@@ -122,9 +122,8 @@ jobs:
           build-args: |
             docker_image_prefix=${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
             GIT_COMMIT_ARG=${{ github.sha }}
-            GIT_COMMIT_ID__PLUGINS_REPO=${{ inputs.GIT_COMMIT_ID__PLUGINS_REPO }}
             D2E_PLUGIN_REPO=${{ vars.D2E_PLUGIN_REPO }}
-          secrets: |
+            GIT_COMMIT_ID__PLUGINS_REPO=${{ inputs.GIT_COMMIT_ID__PLUGINS_REPO }}
             GIT_TOKEN__PLUGINS_REPO_READ=${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
 
       - name: Post purge
