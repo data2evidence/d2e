@@ -103,10 +103,10 @@ jobs:
       - uses: docker/setup-buildx-action@v3.6.1
         id: builder
 
-      # - name: Purge docker images and cache
-      #   run: |
-      #     docker image prune -af
-      #     docker buildx prune -af
+      - name: Purge docker images and cache
+        run: |
+          docker image prune -af
+          docker buildx prune -af
 
       - name: Build and push
         uses: docker/build-push-action@v6.7.0
@@ -121,15 +121,14 @@ jobs:
           build-args: |
             docker_image_prefix=${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
             GIT_COMMIT_ARG=${{ github.sha }}
-            GIT_COMMIT_ID__PLUGINS_REPO=main
+            GIT_COMMIT_ID__PLUGINS_REPO=${{ inputs.GIT_COMMIT_ID__PLUGINS_REPO }}
             D2E_PLUGIN_REPO=${{ vars.D2E_PLUGIN_REPO }}
             GIT_TOKEN__PLUGINS_REPO_READ=${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
 
-      # ${{ inputs.GIT_COMMIT_ID__PLUGINS_REPO }}
-      # - name: Post purge
-      #   if: always()
-      #   run: |
-      #     docker system prune -af
+      - name: Post purge
+        if: always()
+        run: |
+          docker system prune -af
 
       - name: Prune old images
         shell: bash
