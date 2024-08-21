@@ -54,6 +54,9 @@ on:
       GIT_BRANCH_NAME:
         required: true
         type: string
+      GIT_COMMIT_ID__PLUGINS_REPO:
+        required: false
+        type: string
       GIT_REPO_FULL_NAME:
         required: true
         type: string
