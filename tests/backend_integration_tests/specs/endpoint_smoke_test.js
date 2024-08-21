@@ -234,9 +234,6 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
       })
     })
 
-    // TODO: de-activating temporarily.
-    // test case is failing to due to insufficient privileges to create a temporary table.
-    // current database user has read privileges and cannot successfully fulfill the test case
     describe('domain values', function () {
       it('returns a valid response', function (done) {
         var requestBody = {
