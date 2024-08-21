@@ -400,6 +400,7 @@ services:
     environment:
       <<:
         - *x-converter
+        - *cachedb
         - *x-dbsvc
         - *x-minio
         - *x-pg
@@ -468,6 +469,7 @@ services:
     environment:
       <<:
         - *x-converter
+        - *cachedb
         - *x-pg
         - *x-dbsvc
         - *x-minio
@@ -1661,6 +1663,8 @@ services:
     networks:
       alp:
         priority: 20
+      data:
+        priority: 10
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     ports:
       - 41191:41191
