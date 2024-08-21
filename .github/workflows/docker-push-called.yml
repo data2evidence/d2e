@@ -25,7 +25,7 @@ on:
         required: true
         type: string
       GIT_COMMIT_ID__PLUGINS_REPO:
-        required: true
+        required: false
         type: string
       GIT_REPO_FULL_NAME:
         required: true
@@ -118,10 +118,11 @@ jobs:
           build-args: |
             docker_image_prefix=${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
             GIT_COMMIT_ARG=${{ github.sha }}
-            GIT_COMMIT_ID__PLUGINS_REPO=main # ${{ inputs.GIT_COMMIT_ID__PLUGINS_REPO }}
+            GIT_COMMIT_ID__PLUGINS_REPO=main
             D2E_PLUGIN_REPO=${{ vars.D2E_PLUGIN_REPO }}
             GIT_TOKEN__PLUGINS_REPO_READ=${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
 
+      # ${{ inputs.GIT_COMMIT_ID__PLUGINS_REPO }}
       # - name: Post purge
       #   if: always()
       #   run: |

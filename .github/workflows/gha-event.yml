@@ -1,175 +1,63 @@
-name: Docker Build, Push, Prune (called)
-
-on:
+name: gha-event
+run-name: ${{ github.event_name }}:${{  github.event.action }} 🚀
+on: 
+  push:
+  pull_request:
+    types: [opened, ready_for_review, reopened, synchronize]
   workflow_dispatch:
-    inputs:
-      AZ_REGISTRY_REPOSITORY:
-        required: true
-        type: string
-      DOCKER_BUILD_CONTEXT_PATH:
-        required: true
-        type: string
-      DOCKER_BUILD_FILE_PATH:
-        required: true
-        type: string
-      DOCKER_BUILD_PULL_BOOL:
-        default: false
-        type: boolean
-      DOCKER_IMG_PUSH_BOOL:
-        default: true
-        type: boolean
-      DOCKER_IMG_TAG_NAME:
-        required: true
-        type: string
-      GIT_BRANCH_NAME:
-        required: true
-        type: string
-      GIT_COMMIT_ID__PLUGINS_REPO:
-        required: false
-        type: string
-      GIT_REPO_FULL_NAME:
-        required: true
-        type: string
-  workflow_call:
-    inputs:
-      AZ_REGISTRY_REPOSITORY:
-        required: true
-        type: string
-      DOCKER_BUILD_CONTEXT_PATH:
-        required: true
-        type: string
-      DOCKER_BUILD_FILE_PATH:
-        required: true
-        type: string
-      DOCKER_BUILD_PULL_BOOL:
-        required: true
-        type: boolean
-      DOCKER_IMG_PUSH_BOOL:
-        required: false
-        default: true
-        type: boolean
-      DOCKER_IMG_TAG_NAME:
-        required: true
-        type: string
-      GIT_BRANCH_NAME:
-        required: true
-        type: string
-      GIT_REPO_FULL_NAME:
-        required: true
-        type: string
 
 jobs:
-  build-push-prune:
-    name: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
+  Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
-      - name: inputs
-        shell: bash
-        env:
-          AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY || vars.AZ_REGISTRY_REPOSITORY }}
-          DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
-          DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
-          DOCKER_BUILD_PULL_BOOL: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
-          DOCKER_IMG_PUSH_BOOL: ${{ inputs.DOCKER_IMG_PUSH_BOOL }}
-          DOCKER_IMG_TAG_NAME: ${{ inputs.DOCKER_IMG_TAG_NAME }}
-          GIT_BRANCH_NAME: ${{ inputs.GIT_BRANCH_NAME }}
-          GIT_REPO_FULL_NAME: ${{ inputs.GIT_REPO_FULL_NAME }}
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref_name }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: List files in the repository
         run: |
-          echo AZ_REGISTRY_REPOSITORY=$AZ_REGISTRY_REPOSITORY | tee -a $GITHUB_STEP_SUMMARY
-          echo DOCKER_BUILD_CONTEXT_PATH=$DOCKER_BUILD_CONTEXT_PATH
-          echo DOCKER_BUILD_FILE_PATH=$DOCKER_BUILD_FILE_PATH
-          echo DOCKER_BUILD_PULL_BOOL=$DOCKER_BUILD_PULL_BOOL
-          echo DOCKER_IMG_PUSH_BOOL=$DOCKER_IMG_PUSH_BOOL
-          echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME
-          echo GIT_BRANCH_NAME=$GIT_BRANCH_NAME
-          echo GIT_REPO_FULL_NAME=$GIT_REPO_FULL_NAME
-
-      - uses: actions/checkout@v4.1.7
-        with:
-          ref: ${{ inputs.GIT_BRANCH_NAME }}
-          repository: ${{ inputs.GIT_REPO_FULL_NAME }}
-          token: ${{ secrets.CI_PAT }}
-
-      - name: Login to ACR
-        uses: docker/login-action@v3.3.0
-        with:
-          registry: ${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
-          username: ${{ secrets.AZ_REGISTRY_USERNAME }}
-          password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
-
-      - uses: docker/setup-buildx-action@v3.6.1
-        id: builder
-
-      # - name: Purge docker images and cache
-      #   run: |
-      #     docker image prune -af
-      #     docker buildx prune -af
-
-      - name: Build and push
-        uses: docker/build-push-action@v6.7.0
-        with:
-          builder: ${{ steps.builder.outputs.name }}
-          platforms: "linux/amd64"
-          context: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
-          pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
-          file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
-          push: ${{ inputs.DOCKER_IMG_PUSH_BOOL }}
-          tags: ${{ vars.AZ_REGISTRY_NAME }}.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
-          build-args: |
-            docker_image_prefix=${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
-            GIT_COMMIT_ARG=${{ github.sha }}
-            GIT_COMMIT_ID__PLUGINS_REPO=main
-            D2E_PLUGIN_REPO=${{ vars.D2E_PLUGIN_REPO }}
-            GIT_TOKEN__PLUGINS_REPO_READ=${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
-
-      # ${{ inputs.GIT_COMMIT_ID__PLUGINS_REPO }}
-      # - name: Post purge
-      #   if: always()
-      #   run: |
-      #     docker system prune -af
-
-      - name: Prune old images
-        shell: bash
+          ls ${{ github.workspace }}
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Dump GitHub context
         env:
-          AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
-          AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
-          AZ_REGISTRY_PRUNE_ENABLE: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE }}
-          AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS: ${{ vars.AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS }}
-          AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
-          AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
-          AZ_REGISTRY_WHITELIST_REGEX: ${{ vars.AZ_REGISTRY_WHITELIST_REGEX }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
+      - name: Dump vars context
+        env:
+          VARS_CONTEXT: ${{ toJson(vars) }}
+        run: echo "$SECRETS_CONTEXT"
+      - name: Dump secrets context
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+        run: echo "$SECRETS_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
+      - name: Dump runner context
+        env:
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+        run: echo "$RUNNER_CONTEXT"
+      - name: Dump strategy context
+        env:
+          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+        run: echo "$STRATEGY_CONTEXT"
+      - name: Dump matrix context
+        env:
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+        run: echo "$MATRIX_CONTEXT"
+
+      - name: Show default environment variables
         run: |
-          # echo AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS=$AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS | tee -a $GITHUB_STEP_SUMMARY
-          # echo AZ_REGISTRY_WHITELIST_REGEX=$AZ_REGISTRY_WHITELIST_REGEX | tee -a $GITHUB_STEP_SUMMARY
-          # echo AZ_REGISTRY_REPOSITORY=$AZ_REGISTRY_REPOSITORY | tee -a $GITHUB_STEP_SUMMARY
-          # echo AZ_REGISTRY_PRUNE_ENABLE=$AZ_REGISTRY_PRUNE_ENABLE | tee -a $GITHUB_STEP_SUMMARY
-
-          if [ $AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS = 0 ]; then
-            AZ_REGISTRY_PRUNE_TIMESTAMP=$(date -u -Is)
-          else
-            TODAY=$(date +%Y-%m-%d)
-            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS} days" +%Y-%m-%d)"
-          fi
-
-          # echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP | tee -a $GITHUB_STEP_SUMMARY
-
-          echo ". 1 - GET manifest metadata -  deprecated warning is not relevant"
-          az acr manifest metadata list --name ${AZ_REGISTRY_REPOSITORY} --registry ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && not_null(tags)]" > private.json
-          wc -l private.json
-
-          echo ". 2 - ANALYZE each tag as deletable True/False - show first 20"
-          cat private.json | yq -rP 'map({"digest":.digest, "tags":(.tags|@json),"count":(.tags|length),"lengths":([.tags[]|length]|@json),"deletable":(.tags|map(test(env(AZ_REGISTRY_WHITELIST_REGEX))|not)|@json)})' | tee private1-analysis.yml | yq '.[0:20]'
-
-          echo ". 3 - SELECT images to be deleted i.e. manifests excepting deletable False tags"
-          cat private1-analysis.yml | yq 'map(select(.deletable|contains("false")|not))' > private2-todelete.yml
-          echo . INFO for deletion - BranchNames
-          cat private2-todelete.yml | yq -P 'map(select(.lengths!="[40]") | .tags | @jsond)'
-          echo . INFO for deletion - single tag commitIds
-          cat private2-todelete.yml | yq -P 'map(select(.lengths=="[40]") | .tags | @jsond)'
-
-          if [ "${AZ_REGISTRY_PRUNE_ENABLE}" = true ]; then
-            echo ". 4 - ACTION delete digests ..."
-            yq '.[].digest' private2-todelete.yml | sort -u | xargs -I% az acr repository delete -u ${AZ_REGISTRY_USERNAME} -p ${AZ_REGISTRY_PASSWORD} --name ${AZ_REGISTRY_NAME} --image ${AZ_REGISTRY_REPOSITORY}@% --yes
-          else
-            echo ". 4 - SKIPPED delete digests ..."
-          fi
+          echo "The job_id is: $GITHUB_JOB"   # reference the default environment variables
+          echo "The id of this action is: $GITHUB_ACTION"   # reference the default environment variables
+          echo "The run id is: $GITHUB_RUN_ID"
+          echo "The GitHub Actor's username is: $GITHUB_ACTOR"
+          echo "GitHub SHA: $GITHUB_SHA"      

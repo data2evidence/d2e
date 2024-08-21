@@ -196,7 +196,7 @@ jobs:
           #   directory: ./services/alp-fhir
           #   context: .
           #   fileName: Dockerfile.client
-    uses: ./.github/workflows/gha-event.yml
+    uses: ./.github/workflows/docker-push-called.yml
     with:
       AZ_REGISTRY_REPOSITORY: ${{ matrix.name }}
       DOCKER_BUILD_CONTEXT_PATH: ${{ matrix.context }}
