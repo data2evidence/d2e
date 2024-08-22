@@ -2,7 +2,7 @@ FROM alpcr.azurecr.io/alp-dataflow-gen-base:189_bump-version as dbsvc-build
 # FROM alpcr.azurecr.io/alp-dataflow-gen-base:develop as dbsvc-build
 
 # Required for RPostgres R package
-RUN apt-get install libpq5 libpq-dev -y --no-install-recommends && apt-get clean
+RUN apt-get update && apt-get install libpq5 libpq-dev -y --no-install-recommends && apt-get clean
 
 # Dependency for pandas in dataflow-gen
 RUN apt-get -y install musl-dev

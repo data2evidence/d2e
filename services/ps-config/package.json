@@ -9,7 +9,7 @@
     "dev": "tsnd --inspect=0.0.0.0:9209 --respawn ./src/main.ts"
   },
   "engines": {
-    "node": ">=18.14.0"
+    "node": ">=18.20.4"
   },
   "dependencies": {
     "@alp/alp-metadata": "1.0.2",

@@ -1016,6 +1016,8 @@ services:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
+      alp-logto: # to avoid race condition and timeout in logto container
+        condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 10
@@ -1225,6 +1227,8 @@ services:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
+      alp-logto: # to avoid race condition and timeout in logto container
+        condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 20
