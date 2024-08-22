@@ -16,6 +16,7 @@ on:
         default: false
         type: boolean
       DOCKER_IMG_PUSH_BOOL:
+        required: false
         default: true
         type: boolean
       DOCKER_IMG_TAG_NAME:
