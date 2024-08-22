@@ -1,7 +1,7 @@
 FROM alpcr.azurecr.io/alp-dataflow-gen-base:develop as dbsvc-build
 
 # Required for RPostgres R package
-RUN apt-get install libpq5 libpq-dev -y --no-install-recommends && apt-get clean
+RUN apt-get update && apt-get install libpq5 libpq-dev -y --no-install-recommends && apt-get clean
 
 # Dependency for pandas in dataflow-gen
 RUN apt-get -y install musl-dev
@@ -67,7 +67,7 @@ RUN chown docker:alp ./duckdb_data
 
 # Create folder to store synpuf1k csv
 RUN mkdir -p /app/synpuf1k
-RUN chown -R docker:docker /app/synpuf1k
+RUN mkdir -p /app/ui-files
+RUN chown -R docker:docker /app/synpuf1k /app/ui-files
 
 USER docker
-
