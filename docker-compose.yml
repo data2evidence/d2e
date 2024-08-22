@@ -1016,6 +1016,8 @@ services:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
+      alp-logto: # to avoid race condition and timeout in logto container
+        condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 10
@@ -1176,12 +1178,6 @@ services:
       timeout: 30s
     hostname: alp-minerva-postgres-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: postgres:15-alpine
-    command:
-      - "postgres"
-      - "-c"
-      - "max_connections=200"
-      - "-c"
-      - "shared_buffers=256MB"
     logging:
       options:
         tag: *c17
@@ -1231,6 +1227,8 @@ services:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
+      alp-logto: # to avoid race condition and timeout in logto container
+        condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 20
