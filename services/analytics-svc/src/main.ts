@@ -30,7 +30,7 @@ import studyDbCredentialMiddleware from "./middleware/StudyDbCredential";
 import { MriConfigConnection } from "@alp/alp-config-utils";
 import { StudiesDbMetadata, StudyDbMetadata, IMRIRequest } from "./types";
 import PortalServerAPI from "./api/PortalServerAPI";
-import { SqlProxyDBConnectionUtil } from "./utils/sql-proxy/SqlProxyDBConnectionUtil";
+import { CachedbDBConnectionUtil } from "./utils/cachedb/CachedbDBConnectionUtil";
 import { getDuckdbDBConnection } from "./utils/DuckdbConnection";
 import { DB } from "./utils/DBSvcConfig";
 import { env } from "./env";
@@ -166,8 +166,8 @@ const initRoutes = async (app: express.Application) => {
                     credentials = req.dbCredentials.studyAnalyticsCredential;
                 }
 
-                if (env.USE_SQL_PROXY === "true") {
-                    req.dbConnections = await getSqlProxyDbConnections({
+                if (env.USE_CACHEDB === "true") {
+                    req.dbConnections = await getCachedbDbConnections({
                         analyticsCredentials: credentials,
                         userObj: userObj,
                         token: req.headers.authorization,
@@ -578,7 +578,7 @@ const getDBConnections = async ({
     };
 };
 
-const getSqlProxyDbConnections = async ({
+const getCachedbDbConnections = async ({
     analyticsCredentials,
     userObj,
     token,
@@ -589,19 +589,19 @@ const getSqlProxyDbConnections = async ({
     // Define defaults for both analytics & Vocab connections
     let analyticsConnectionPromise;
 
-    let sqlProxyDatabase = `${analyticsCredentials.dialect}_${studyId}`;
+    let cachedbDatabase = `${analyticsCredentials.dialect}_${studyId}`;
     // IF use duckdb is true change dialect from postgres -> duckdb
     if (env.USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
-        sqlProxyDatabase = `duckdb_${studyId}`;
+        cachedbDatabase = `duckdb_${studyId}`;
     }
 
-    // Overwrite analyticsCrendential values to connect to sql-proxy
-    analyticsCredentials.host = env.SQL_PROXY__HOST;
-    analyticsCredentials.port = env.SQL_PROXY__PORT;
-    analyticsCredentials.database = sqlProxyDatabase;
+    // Overwrite analyticsCrendential values to connect to cachedb
+    analyticsCredentials.host = env.CACHEDB__HOST;
+    analyticsCredentials.port = env.CACHEDB__PORT;
+    analyticsCredentials.database = cachedbDatabase;
     analyticsCredentials.user = token;
 
-    analyticsConnectionPromise = SqlProxyDBConnectionUtil.getDBConnection({
+    analyticsConnectionPromise = CachedbDBConnectionUtil.getDBConnection({
         credentials: analyticsCredentials,
         schemaName: analyticsCredentials.schema,
         vocabSchemaName: analyticsCredentials.vocabSchema,
