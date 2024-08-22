@@ -1633,6 +1633,7 @@ services:
     container_name: &c30 alp-cachedb
     hostname: alp-cachedb.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/cachedb:${DOCKER_TAG_NAME:-develop}
+    platform: linux/amd64
     depends_on:
       alp-db-credentials-mgr:
         condition: service_healthy
