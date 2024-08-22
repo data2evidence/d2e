@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install node and yarn for env converter
 RUN mkdir -p /usr/local/node
 ENV NVM_DIR /usr/local/node
-ENV NODE_VERSION 18.16.0
+ENV NODE_VERSION 18.20.4
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 RUN . $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm use $NODE_VERSION
