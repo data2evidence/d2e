@@ -1,6 +1,6 @@
 ARG libs_install_type_arg=submodule
 
-FROM node:18.14.0-alpine AS libs-install-from-submodule
+FROM node:18.20.4-alpine AS libs-install-from-submodule
 
 WORKDIR /usr/src
 
@@ -21,7 +21,7 @@ RUN yarn workspace query-gen run compile && \
     yarn install --network-timeout 1000000 --ignore-scripts --production
 
 
-FROM node:18.14.0-alpine AS final
+FROM node:18.20.4-alpine AS final
 
 LABEL app="query-gen-svc"
 

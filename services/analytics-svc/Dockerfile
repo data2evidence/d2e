@@ -1,6 +1,6 @@
 ARG libs_install_type_arg=submodule
 
-FROM node:18.14.0-slim AS libs-install-from-submodule
+FROM node:18.20.4-slim AS libs-install-from-submodule
 
 WORKDIR /usr/src
 
@@ -31,7 +31,7 @@ WORKDIR /usr/envConverter
 COPY ./services/envConverter .
 RUN yarn install
 
-FROM node:18.14.0-slim AS final
+FROM node:18.20.4-slim AS final
 
 RUN apt update && apt install -y openssl zlib1g wget
 
