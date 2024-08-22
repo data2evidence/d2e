@@ -212,7 +212,7 @@ x-envs:
           "name": "Plugins Table",
           "notes": "",
           "pluginPath": "plugins/Setup/PluginTable/module",
-          "route": "plugins-table",
+          "route": "plugins-table"
         }
       ],
       "systemadmin": [
