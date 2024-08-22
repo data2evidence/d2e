@@ -1,4 +1,4 @@
-FROM node:18.14.0-alpine AS base
+FROM node:18.20.4-alpine AS base
 
 RUN apk add --update --upgrade openssl openjdk11-jre bash zlib
 

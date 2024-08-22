@@ -48,7 +48,8 @@ jobs:
   run-http-tests:
     needs: [check_file_changes]
     if: (github.ref_name == 'develop' || contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
-    runs-on: test
+    runs-on:
+      group: dockerup # Custom runner 4 cpus & 14gb ram
     timeout-minutes: 60
     env:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
@@ -116,7 +117,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.14.0"
+          node-version: "18.20.4"
 
       - name: create .env.local for docker-compose in system services
         env:
