@@ -1,4 +1,4 @@
-FROM node:18.14.0-alpine AS final-build
+FROM node:18.20.4-alpine AS final-build
 
 WORKDIR /usr/envConverter
 COPY ./services/envConverter .
@@ -13,7 +13,7 @@ RUN ./build/env/bin/pip install --no-cache-dir \
 
 USER root
 RUN npm install -g n yarn
-RUN n 18.14.0
+RUN n 18.20.4
 
 COPY --chown=hue:hue --chmod=711 --from=final-build /usr/envConverter ./envConverter/
 COPY --chown=hue:hue --chmod=711 ./services/alp-sqleditor/sqleditor.ini .
