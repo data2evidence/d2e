@@ -740,6 +740,8 @@ services:
         condition: service_healthy
       alp-query-gen:
         condition: service_healthy
+      alp-cachedb:
+        condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 30
@@ -1642,6 +1644,7 @@ services:
     container_name: &c30 alp-cachedb
     hostname: alp-cachedb.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/cachedb:${DOCKER_TAG_NAME:-develop}
+    platform: linux/amd64
     depends_on:
       alp-db-credentials-mgr:
         condition: service_healthy
@@ -1651,12 +1654,20 @@ services:
         condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
+    healthcheck:
+      interval: 20s
+      retries: 5
+      start_period: 30s
+      test: ["CMD", "python", "src/utils/healthcheck.py", "41191"]
+      timeout: 10s
     logging:
       options:
         tag: *c30
     networks:
       alp:
         priority: 20
+      data:
+        priority: 10
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     ports:
       - 41191:41191
