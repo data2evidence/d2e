@@ -14,7 +14,7 @@ ARG GIT_TOKEN__PLUGINS_REPO_READ
 ARG GIT_COMMIT_ID__PLUGINS_REPO
 ARG D2E_PLUGIN_REPO
 
-RUN git clone -b $GIT_COMMIT_ID__PLUGINS_REPO https://${GIT_TOKEN__PLUGINS_REPO_READ}@$github.com/{D2E_PLUGIN_REPO} d2e-plugins
+RUN git clone -b $GIT_COMMIT_ID__PLUGINS_REPO https://${GIT_TOKEN__PLUGINS_REPO_READ}@github.com/${D2E_PLUGIN_REPO} d2e-plugins
 RUN cd d2e-plugins && git rev-parse HEAD > .git_commit_id
 
 
