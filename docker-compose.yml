@@ -737,7 +737,7 @@ services:
         condition: service_healthy
       alp-query-gen:
         condition: service_healthy
-      alp-sql-proxy:
+      alp-cachedb:
         condition: service_healthy
     healthcheck:
       interval: 20s
