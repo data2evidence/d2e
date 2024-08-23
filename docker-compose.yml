@@ -957,6 +957,7 @@ services:
         https://localhost:4000
         https://localhost:4100
         https://localhost:5173
+        http://localhost:5173
         https://localhost:8081
         https://login.microsoftonline.com
       # IDP authentication type
