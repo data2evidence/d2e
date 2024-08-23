@@ -1,0 +1,82 @@
+name: Docker Build, Push, Prune (called)
+
+on:
+  workflow_dispatch:
+    inputs:
+      AZ_REGISTRY_REPOSITORY:
+        required: true
+        type: string
+      DOCKER_BUILD_CONTEXT_PATH:
+        required: true
+        type: string
+      DOCKER_BUILD_FILE_PATH:
+        required: true
+        type: string
+      DOCKER_BUILD_PULL_BOOL:
+        default: false
+        type: boolean
+      DOCKER_IMG_IS_PUSH:
+        required: false
+        default: true
+        type: boolean
+      DOCKER_IMG_TAG_NAME:
+        required: true
+        type: string
+      GIT_BRANCH_NAME:
+        required: true
+        type: string
+      GIT_REPO_FULL_NAME:
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      AZ_REGISTRY_REPOSITORY:
+        required: true
+        type: string
+      DOCKER_BUILD_CONTEXT_PATH:
+        required: true
+        type: string
+      DOCKER_BUILD_FILE_PATH:
+        required: true
+        type: string
+      DOCKER_BUILD_PULL_BOOL:
+        required: true
+        type: boolean
+      DOCKER_IMG_IS_PUSH:
+        required: false
+        default: true
+        type: boolean
+      DOCKER_IMG_TAG_NAME:
+        required: true
+        type: string
+      GIT_BRANCH_NAME:
+        required: true
+        type: string
+      GIT_REPO_FULL_NAME:
+        required: true
+        type: string
+
+jobs:
+  build-push-prune:
+    name: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: inputs
+        env:
+          AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY || vars.AZ_REGISTRY_REPOSITORY }}
+          DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
+          DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
+          DOCKER_BUILD_PULL_BOOL: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
+          DOCKER_IMG_IS_PUSH: ${{ inputs.DOCKER_IMG_IS_PUSH }}
+          DOCKER_IMG_TAG_NAME: ${{ inputs.DOCKER_IMG_TAG_NAME }}
+          GIT_BRANCH_NAME: ${{ inputs.GIT_BRANCH_NAME }}
+          GIT_REPO_FULL_NAME: ${{ inputs.GIT_REPO_FULL_NAME }}
+        run: |
+          echo AZ_REGISTRY_REPOSITORY=$AZ_REGISTRY_REPOSITORY | tee -a $GITHUB_STEP_SUMMARY
+          echo DOCKER_BUILD_CONTEXT_PATH=$DOCKER_BUILD_CONTEXT_PATH
+          echo DOCKER_BUILD_FILE_PATH=$DOCKER_BUILD_FILE_PATH
+          echo DOCKER_BUILD_PULL_BOOL=$DOCKER_BUILD_PULL_BOOL
+          echo DOCKER_IMG_IS_PUSH=$DOCKER_IMG_IS_PUSH
+          echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME
+          echo GIT_BRANCH_NAME=$GIT_BRANCH_NAME
+          echo GIT_REPO_FULL_NAME=$GIT_REPO_FULL_NAME
