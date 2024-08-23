@@ -48,8 +48,8 @@ https://*.alp.local:55555 {
 	@cors_preflight method OPTIONS
 
 	@cors_origin {
-        header_regexp Origin ^https?://localhost:(4000|5173|8081|4800|4900)?$
-    }
+		header_regexp Origin ^https?://localhost:(4000|5173|8081|4800|4900)?$
+	}
 
 	header @cors_origin {
 		Access-Control-Allow-Origin "{http.request.header.Origin}"
@@ -62,7 +62,7 @@ https://*.alp.local:55555 {
 	handle @cors_preflight {
 		header {
 			Access-Control-Allow-Origin "{http.request.header.Origin}"
-            Access-Control-Allow-Credentials true
+			Access-Control-Allow-Credentials true
 			Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE"
 			Access-Control-Max-Age "3600"
 			Vary Origin
@@ -427,7 +427,7 @@ https://localhost:41101 {
 }
 
 https://{$CADDY__ALP__PUBLIC_FQDN} {
-	{$TLS__CADDY_DIRECTIVE}
+	{$TLS__CADDY_DIRECTIVE} 
 	{$CADDY__CORS_LOCAL_UI}
 	import perseus
 	import portal
