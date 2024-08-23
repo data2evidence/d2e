@@ -46,19 +46,27 @@ https://*.alp.local:55555 {
 
 (cors) {
 	@cors_preflight method OPTIONS
+ 
+	@cors_origin {
+        header_regexp Origin ^https?://localhost:(4000|5173|8081)?$
+    }
 
-	header {
-		Access-Control-Allow-Origin {args[0]}
+	header @cors_origin {
+		Access-Control-Allow-Origin "{http.request.header.Origin}"
 		Vary Origin
-		Access-Control-Allow-Headers "Authorization, Content-Type, x-prefect-ui"
+		Access-Control-Allow-Headers "*"
 		Access-Control-Allow-Credentials "true"
 		defer
 	}
 
 	handle @cors_preflight {
 		header {
+			Access-Control-Allow-Origin "{http.request.header.Origin}"
+            Access-Control-Allow-Credentials true
 			Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE"
 			Access-Control-Max-Age "3600"
+			Vary Origin
+			defer
 		}
 		respond "" 204
 	}
@@ -71,6 +79,7 @@ https://*.alp.local:55555 {
 		}
 	}
 
+	# Enable this to use perseus frontend
 	# handle /* {
 	# 	reverse_proxy http://alp-perseus-frontend-1:4200 {
 	# 		header_up X-Real-IP {http.request.remote_host}
@@ -242,7 +251,6 @@ https://*.alp.local:55555 {
 	}
 
 	handle_path /mapping/* {
-		# {$CADDY__CORS_LOCAL_PORTAL_UI}
 		root * /home/docker/ui-files/mapping/
 		encode zstd gzip
 		file_server {
@@ -275,7 +283,6 @@ https://*.alp.local:55555 {
 	}
 
 	handle_path /mri/* {
-		# {$CADDY__CORS_LOCAL_PORTAL_UI}
 		root * /home/docker/ui-files/mri/
 		encode zstd gzip
 		file_server {
@@ -421,7 +428,7 @@ https://localhost:41101 {
 
 https://{$CADDY__ALP__PUBLIC_FQDN} {
 	{$TLS__CADDY_DIRECTIVE}
-	import cors https://localhost:4000
+	{$CADDY__CORS_LOCAL_UI}
 	import perseus
 	import portal
 }
