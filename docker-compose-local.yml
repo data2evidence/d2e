@@ -1,5 +1,4 @@
 services:
-
   alp-bookmark:
     build:
       context: .
@@ -13,7 +12,7 @@ services:
 
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile --watch
-    image:  alpcr.azurecr.io/alp-data-node/alp-caddy:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop}
+    image: alpcr.azurecr.io/alp-data-node/alp-caddy:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop}
     ports:
       - 41100:41100
       - 41000:41000
@@ -21,6 +20,8 @@ services:
     environment:
       CADDY__FHIR_SERVER__PUBLIC_FQDN: ${CADDY__FHIR_SERVER__PUBLIC_FQDN:-localhost}
       CADDY__CORS_LOCAL_PORTAL_UI: "import cors https://localhost:4000"
+      isHttpTestRun: ${isHttpTestRun}
+      isTestEnv: ${isTestEnv}
 
   alp-dataflow-gen:
     build:
@@ -28,9 +29,12 @@ services:
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
     volumes:
       - ./services/alp-dataflow-gen/pysrc:/app/pysrc
+    ports:
+      - 41120:41120
     environment:
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
+      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-dataflow-gen-agent:
     build:
@@ -44,6 +48,7 @@ services:
       ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
+      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-dataflow-gen-init:
     build:
@@ -89,6 +94,11 @@ services:
       MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
       MINIO__SSL: false
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
+      isHttpTestRun: ${isHttpTestRun}
+      isTestEnv: ${isTestEnv}
+      local: ${local}
+      TESTSCHEMA: ${TESTSCHEMA}
+      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-minerva-cdw-svc:
     build:
@@ -101,6 +111,8 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+      isHttpTestRun: ${isHttpTestRun}
+      isTestEnv: ${isTestEnv}
 
   alp-minerva-dataflow-mgmt:
     build:
@@ -128,6 +140,9 @@ services:
       - ./services/alp-gateway/src:/usr/src/app/src
     environment:
       LOCAL_DEBUG: "true"
+      isHttpTestRun: ${isHttpTestRun}
+      isTestEnv: ${isTestEnv}
+      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-minerva-meilisearch-svc:
     ports:
@@ -144,6 +159,8 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+      isHttpTestRun: ${isHttpTestRun}
+      isTestEnv: ${isTestEnv}
 
   alp-minerva-pg-mgmt-init:
     build:
@@ -180,6 +197,8 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+      isHttpTestRun: ${isHttpTestRun}
+      isTestEnv: ${isTestEnv}
 
   alp-minerva-sqleditor:
     build:
@@ -230,6 +249,9 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
+      isHttpTestRun: ${isHttpTestRun}
+      isTestEnv: ${isTestEnv}
+      TESTSCHEMA: ${TESTSCHEMA}
 
   alp-dicom-server:
     # uses 8042 port on the container
@@ -246,7 +268,7 @@ services:
       context: ./services/alp-fhir/
       dockerfile: Dockerfile.frontend
     volumes:
-    - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
+      - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
 
   alp-logto-post-init:
     build:
@@ -254,6 +276,22 @@ services:
       dockerfile: Dockerfile
     # volumes:
     #   - ./services/alp-logto/post-init:/home/docker
+  alp-dataflow-gen-process-worker:
+    build:
+      context: .
+      dockerfile: services/alp-dataflow-gen/Dockerfile.worker
+      # ssh: # Enable if GIT_CLONE_TYPE set to ssh
+      #   - default=${SSH_AUTH_SOCK}
+      args:
+        GIT_COMMIT_ID__PLUGINS_REPO: ${GIT_COMMIT_ID__PLUGINS_REPO:-main}
+        GIT_CLONE_TYPE: ${GIT_CLONE_TYPE:-https} # https / ssh
+        GIT_URL__PLUGINS_REPO: ${GIT_URL__PLUGINS_REPO:-github.com/alp-os/d2e-plugins.git} # git@github.com:alp-os/d2e-plugins.git
+        GIT_TOKEN__PLUGINS_REPO_READ: ${GIT_TOKEN__PLUGINS_REPO_READ} #only for https
+  #     volumes:
+  #       - ../d2e-plugins:/usr/src/app/d2e-plugins
+
+  alp-dataflow-gen-docker-worker:
+    extends: alp-dataflow-gen-process-worker
 
   alp-fhir-server-post-init:
     build:
@@ -267,13 +305,13 @@ services:
     ports:
       - 9226:9226
 
-  alp-sql-proxy:
+  alp-cachedb:
     build:
       context: .
-      dockerfile: ./services/sql-proxy/Dockerfile
+      dockerfile: ./services/cachedb/Dockerfile
       target: development
     volumes:
-      - ./services/sql-proxy/src:/home/docker/src
+      - ./services/cachedb/src:/home/docker/src
     ports:
       - 9235:9235
     environment:

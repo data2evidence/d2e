@@ -23,10 +23,10 @@ const Env = z.object({
     USE_EXTENSION_FOR_COHORT_CREATION: z.string(),
 
     USE_DUCKDB: z.string(),
-    USE_SQL_PROXY: z.string(),
+    USE_CACHEDB: z.string(),
 
-    SQL_PROXY_HOST: z.string(),
-    SQL_PROXY_PORT: z
+    CACHEDB__HOST: z.string(),
+    CACHEDB__PORT: z
         .string()
         .refine((val) => !isNaN(parseInt(val)))
         .transform(Number),
