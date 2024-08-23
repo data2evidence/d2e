@@ -46,9 +46,9 @@ https://*.alp.local:55555 {
 
 (cors) {
 	@cors_preflight method OPTIONS
- 
+
 	@cors_origin {
-        header_regexp Origin ^https?://localhost:(4000|5173|8081)?$
+        header_regexp Origin ^https?://localhost:(4000|5173|8081|4800|4900)?$
     }
 
 	header @cors_origin {
