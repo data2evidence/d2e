@@ -334,6 +334,7 @@ services:
         - *x-fhir
         - *x-minio
         - *x-pg
+      REP_PG: postgres://postgres:mypass@broadsea-atlasdb:5432/postgres
       SERVICE_ROUTES: |-
           {
           "analytics": "http://alp-minerva-analytics-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41102",
