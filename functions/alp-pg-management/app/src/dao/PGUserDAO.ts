@@ -1,4 +1,4 @@
-import * as config from "../utils/config";
+import * as config from "../utils/config.ts";
 
 export default class PGUserDAO {
   private logger = config.getLogger();

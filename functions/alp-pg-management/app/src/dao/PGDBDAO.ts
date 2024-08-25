@@ -1,5 +1,5 @@
-import * as config from "../utils/config"
-const { Client } = require('pg')
+import * as config from "../utils/config.ts"
+import * as pg from "pg"
 
 export default class PGDBRouter {
 
@@ -29,7 +29,7 @@ export default class PGDBRouter {
 	}
 
 	openConnection = async (config: any) => {
-		const client = new Client(config)
+		const client = new pg.Client(config)
 		await client.connect()
 		this.logger.debug("Client Connected.")
 		return client

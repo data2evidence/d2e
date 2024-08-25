@@ -356,6 +356,48 @@ services:
           "dicomServer": "http://alp-dicom-server:8042",
           "logto": "http://alp-logto-1:3001"
           }
+      POSTGRES_CONNECTION_CONFIG: |-
+        {
+         "connectionTimeoutMillis": 60000,
+         "database": "${PG_DB_NAME:-alp}",
+         "host": "${PG_HOST:-alp-minerva-postgres-1}",
+         "idle_in_transaction_session_timeout": 60000,
+         "password": "${PG_SUPER_PASSWORD}",
+         "port": "${PG_PORT:-5432}",
+         "query_timeout": 60000,
+         "statement_timeout": 60000,
+         "user": "${PG_SUPER_USER:-postgres}"
+        }
+      POSTGRES_MANAGE_CONFIG: |-
+        {
+         "databases": {
+          "+${PG_DB_NAME:-alp}": {
+           "schemas": {
+            "+cdw_config": {},
+            "+dataflow": {},
+            "+db_credentials_mgr": {},
+            "+portal": {},
+            "+public": {},
+            "+qe_config": {},
+            "+terminology": {},
+            "+usermgmt": {}
+           }
+          }
+         }
+        }
+      POSTGRES_MANAGE_USERS: |-
+        {
+         "${PG_DB_NAME:-alp}": {
+          "manager": "${PG_ADMIN_USER:-alp_pg_admin_user}",
+          "managerPassword": "${PG_ADMIN_PASSWORD}",
+          "reader": "${PG_WRITE_USER:-alp_pg_write_user}",
+          "readerPassword": "${PG_WRITE_PASSWORD}",
+          "writer": "${PG_WRITE_USER:-alp_pg_write_user}",
+          "writerPassword": "${PG_WRITE_PASSWORD}"
+         }
+        }
+      POSTGRES_SUPERUSER: ${PG_SUPER_USER:-postgres}
+      POSTGRES_SUPERUSER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG__DB_CREDENTIALS_MGR__MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
       PG__DB_CREDENTIALS_MGR__MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
       PG__DB_CREDENTIALS_MGR__PASSWORD: ${PG_WRITE_PASSWORD}
@@ -708,8 +750,8 @@ services:
   alp-mri-pg-config:
     container_name: &c24 alp-mri-pg-config-${BASE_PORT:-1}
     depends_on:
-      alp-minerva-pg-mgmt-init:
-        condition: service_completed_successfully
+      trex:
+        condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
     hostname: alp-mri-pg-config-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
@@ -731,65 +773,65 @@ services:
       PG_SCHEMA: cdw_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
 
-  alp-minerva-pg-mgmt-init:
-    container_name: &c15 alp-minerva-pg-mgmt-init-${BASE_PORT:-1}
-    depends_on:
-      alp-minerva-postgres:
-        condition: service_healthy
-    hostname: alp-minerva-pg-mgmt-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-pg-mgmt-init:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c15
-    networks:
-      alp:
-        priority: 20
-    environment:
-      <<:
-        - *x-tls
-      NODE_ENV: development
-      POSTGRES_CONNECTION_CONFIG: |-
-        {
-         "connectionTimeoutMillis": 60000,
-         "database": "${PG_DB_NAME:-alp}",
-         "host": "${PG_HOST:-alp-minerva-postgres-1}",
-         "idle_in_transaction_session_timeout": 60000,
-         "password": "${PG_SUPER_PASSWORD}",
-         "port": "${PG_PORT:-5432}",
-         "query_timeout": 60000,
-         "statement_timeout": 60000,
-         "user": "${PG_SUPER_USER:-postgres}"
-        }
-      POSTGRES_MANAGE_CONFIG: |-
-        {
-         "databases": {
-          "+${PG_DB_NAME:-alp}": {
-           "schemas": {
-            "+cdw_config": {},
-            "+dataflow": {},
-            "+db_credentials_mgr": {},
-            "+portal": {},
-            "+public": {},
-            "+qe_config": {},
-            "+terminology": {},
-            "+usermgmt": {}
-           }
-          }
-         }
-        }
-      POSTGRES_MANAGE_USERS: |-
-        {
-         "${PG_DB_NAME:-alp}": {
-          "manager": "${PG_ADMIN_USER:-alp_pg_admin_user}",
-          "managerPassword": "${PG_ADMIN_PASSWORD}",
-          "reader": "${PG_WRITE_USER:-alp_pg_write_user}",
-          "readerPassword": "${PG_WRITE_PASSWORD}",
-          "writer": "${PG_WRITE_USER:-alp_pg_write_user}",
-          "writerPassword": "${PG_WRITE_PASSWORD}"
-         }
-        }
-      POSTGRES_SUPERUSER: ${PG_SUPER_USER:-postgres}
-      POSTGRES_SUPERUSER_PASSWORD: ${PG_SUPER_PASSWORD}
+  # alp-minerva-pg-mgmt-init:
+  #   container_name: &c15 alp-minerva-pg-mgmt-init-${BASE_PORT:-1}
+  #   depends_on:
+  #     alp-minerva-postgres:
+  #       condition: service_healthy
+  #   hostname: alp-minerva-pg-mgmt-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+  #   image: alpcr.azurecr.io/alp-data-node/alp-pg-mgmt-init:${DOCKER_TAG_NAME:-develop}
+  #   logging:
+  #     options:
+  #       tag: *c15
+  #   networks:
+  #     alp:
+  #       priority: 20
+  #   environment:
+  #     <<:
+  #       - *x-tls
+  #     NODE_ENV: development
+  #     POSTGRES_CONNECTION_CONFIG: |-
+  #       {
+  #        "connectionTimeoutMillis": 60000,
+  #        "database": "${PG_DB_NAME:-alp}",
+  #        "host": "${PG_HOST:-alp-minerva-postgres-1}",
+  #        "idle_in_transaction_session_timeout": 60000,
+  #        "password": "${PG_SUPER_PASSWORD}",
+  #        "port": "${PG_PORT:-5432}",
+  #        "query_timeout": 60000,
+  #        "statement_timeout": 60000,
+  #        "user": "${PG_SUPER_USER:-postgres}"
+  #       }
+  #     POSTGRES_MANAGE_CONFIG: |-
+  #       {
+  #        "databases": {
+  #         "+${PG_DB_NAME:-alp}": {
+  #          "schemas": {
+  #           "+cdw_config": {},
+  #           "+dataflow": {},
+  #           "+db_credentials_mgr": {},
+  #           "+portal": {},
+  #           "+public": {},
+  #           "+qe_config": {},
+  #           "+terminology": {},
+  #           "+usermgmt": {}
+  #          }
+  #         }
+  #        }
+  #       }
+  #     POSTGRES_MANAGE_USERS: |-
+  #       {
+  #        "${PG_DB_NAME:-alp}": {
+  #         "manager": "${PG_ADMIN_USER:-alp_pg_admin_user}",
+  #         "managerPassword": "${PG_ADMIN_PASSWORD}",
+  #         "reader": "${PG_WRITE_USER:-alp_pg_write_user}",
+  #         "readerPassword": "${PG_WRITE_PASSWORD}",
+  #         "writer": "${PG_WRITE_USER:-alp_pg_write_user}",
+  #         "writerPassword": "${PG_WRITE_PASSWORD}"
+  #        }
+  #       }
+  #     POSTGRES_SUPERUSER: ${PG_SUPER_USER:-postgres}
+  #     POSTGRES_SUPERUSER_PASSWORD: ${PG_SUPER_PASSWORD}
 
 
   alp-caddy:
@@ -1223,8 +1265,8 @@ services:
     container_name: &c11 alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
     init: true
     depends_on:
-      alp-minerva-pg-mgmt-init:
-        condition: service_completed_successfully
+      trex:
+        condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
       alp-minio-post-init:
@@ -1349,8 +1391,8 @@ services:
     container_name: &c16 alp-minerva-portal-server-${BASE_PORT:-1}
     init: true
     depends_on:
-      alp-minerva-pg-mgmt-init:
-        condition: service_completed_successfully
+      trex:
+        condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
       alp-minio-post-init:
@@ -1571,8 +1613,8 @@ services:
     container_name: &c21 alp-minerva-terminology-svc-${BASE_PORT:-1}
     init: true
     depends_on:
-      alp-minerva-pg-mgmt-init:
-        condition: service_completed_successfully
+      trex:
+        condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
       alp-meilisearch-post-init:
