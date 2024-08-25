@@ -648,15 +648,15 @@ const main = async () => {
     await initSwaggerRoutes(app);
     utils.setupGlobalErrorHandling(app, log);
 
-    const server = https.createServer(
+    /*const server = https.createServer(
         {
             key: env.TLS__INTERNAL__KEY?.replace(/\\n/g, "\n"),
             cert: env.TLS__INTERNAL__CRT?.replace(/\\n/g, "\n"),
             maxHeaderSize: 8192 * 10,
         },
         app
-    );
-    server.listen(port);
+    );*/
+    app.listen(port);
     log.info(
         `🚀 MRI Application started successfully!. Server listening on port ${port}`
     );

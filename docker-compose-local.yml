@@ -1,15 +1,38 @@
 services:
-
-  alp-bookmark:
+  trex:
     build:
-      context: .
-      dockerfile: ./services/bookmark-svc/Dockerfile
+      context: ./services/trex
+      dockerfile: build/Dockerfile
+      target: development
+    command: npm run watch
+    external_links:
+      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
+      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
+      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
     ports:
-      - 9205:9205
+      - 33000:33000
     volumes:
-      - ./services/bookmark-svc/src:/home/docker/src/alp-data-node/app/src
+      - ./services/trex/core:/usr/src/core
+      - ./services/trex/plugins:/usr/src/plugins
+      - ./functions:/usr/src/plugins/d2ef
+      - ./services/trex/package.json:/usr/src/package.json
+      - ./services/trex/cert:/usr/src/cert
     environment:
       LOCAL_DEBUG: "true"
+      DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
+
+
+  
+  # alp-bookmark:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/bookmark-svc/Dockerfile
+  #   ports:
+  #     - 9205:9205
+  #   volumes:
+  #     - ./services/bookmark-svc/src:/home/docker/src/alp-data-node/app/src
+  #   environment:
+  #     LOCAL_DEBUG: "true"
 
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile --watch
@@ -24,46 +47,48 @@ services:
       CADDY__CORS_LOCAL_PORTAL_UI: "import cors https://localhost:4000"
 
   alp-dataflow-gen:
-    build:
-      context: .
-      dockerfile: ./services/alp-dataflow-gen/Dockerfile
-    volumes:
-      - ./services/alp-dataflow-gen/pysrc:/app/pysrc
+    # build:
+    #   context: .
+    #   dockerfile: ./services/alp-dataflow-gen/Dockerfile
+    # volumes:
+    #   - ./services/alp-dataflow-gen/pysrc:/app/pysrc
+    ports:
+      - 41120:41120
     environment:
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
 
-  alp-dataflow-gen-agent:
-    build:
-      context: .
-      dockerfile: ./services/alp-dataflow-gen/Dockerfile
-    volumes:
-      - ./services/alp-dataflow-gen/pysrc:/app/pysrc
-    ports:
-      - 9234:9234
-    environment:
-      ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
-      PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
-      SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
+  # alp-dataflow-gen-agent:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/alp-dataflow-gen/Dockerfile
+  #   volumes:
+  #     - ./services/alp-dataflow-gen/pysrc:/app/pysrc
+  #   ports:
+  #     - 9234:9234
+  #   environment:
+  #     ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
+  #     PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
+  #     SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
 
-  alp-dataflow-gen-init:
-    build:
-      context: .
-      dockerfile: ./services/alp-dataflow-gen/Dockerfile
-    volumes:
-      - ./services/alp-dataflow-gen/init.sh:/app/init.sh
-      - ./services/alp-dataflow-gen/init.py:/app/init.py
-      - ./services/alp-dataflow-gen/pysrc:/app/pysrc
+  # alp-dataflow-gen-init:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/alp-dataflow-gen/Dockerfile
+  #   volumes:
+  #     - ./services/alp-dataflow-gen/init.sh:/app/init.sh
+  #     - ./services/alp-dataflow-gen/init.py:/app/init.py
+  #     - ./services/alp-dataflow-gen/pysrc:/app/pysrc
 
-  alp-db-credentials-mgr:
-    extends:
-      file: ./services/alp-db-credentials/docker-compose.yml
-      service: db-credentials-mgr
-    ports:
-      - 9229:9229
-    environment:
-      DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
-      NODE_ENV: development
+  # alp-db-credentials-mgr:
+  #   extends:
+  #     file: ./services/alp-db-credentials/docker-compose.yml
+  #     service: db-credentials-mgr
+  #   ports:
+  #     - 9229:9229
+  #   environment:
+  #     DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
+  #     NODE_ENV: development
 
   alp-logto:
     build:
@@ -91,43 +116,43 @@ services:
       MINIO__SSL: false
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
 
-  alp-minerva-cdw-svc:
-    build:
-      context: .
-      dockerfile: ./services/cdw-svc/Dockerfile
-    ports:
-      - 9206:9206
-    volumes:
-      - ./services/cdw-svc/src:/home/docker/src/services/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-      NODE_ENV: development
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest",
-            "cdw"
-           ]
-          }
-         ]
-        }
+  # alp-minerva-cdw-svc:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/cdw-svc/Dockerfile
+  #   ports:
+  #     - 9206:9206
+  #   volumes:
+  #     - ./services/cdw-svc/src:/home/docker/src/services/app/src
+  #   environment:
+  #     LOCAL_DEBUG: "true"
+  #     NODE_ENV: development
+  #     VCAP_SERVICES: |-
+  #       {
+  #        "mridb": [
+  #         {
+  #          "credentials": {
+  #           "databaseName": "ALPDEV",
+  #           "dialect": "hana",
+  #           "encrypt": false,
+  #           "host": "${HANASERVER}",
+  #           "password": "${HDIPW}",
+  #           "pooling": "true",
+  #           "port": "${HDIPORT}",
+  #           "probeSchema": "${TESTSCHEMA}",
+  #           "schema": "${TESTSCHEMA}",
+  #           "user": "${HDIUSER}",
+  #           "validate_certificate": false,
+  #           "vocabSchema": "${TESTSCHEMA}"
+  #          },
+  #          "name": "OMOP",
+  #          "tags": [
+  #           "httptest",
+  #           "cdw"
+  #          ]
+  #         }
+  #        ]
+  #       }
 
   alp-minerva-dataflow-mgmt:
     build:
@@ -139,63 +164,63 @@ services:
     environment:
       NODE_ENV: development
 
-  alp-minerva-gateway:
-    build:
-      context: ./services/alp-gateway
-      dockerfile: Dockerfile
-      target: development
-    command: yarn dev
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
-      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
-    ports:
-      - 9220:9220
-    volumes:
-      - ./services/alp-gateway/src:/usr/src/app/src
-    environment:
-      LOCAL_DEBUG: "true"
+  # alp-minerva-gateway:
+  #   build:
+  #     context: ./services/alp-gateway
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   command: yarn dev
+  #   external_links:
+  #     - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
+  #     - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
+  #     - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
+  #   ports:
+  #     - 9220:9220
+  #   volumes:
+  #     - ./services/alp-gateway/src:/usr/src/app/src
+  #   environment:
+  #     LOCAL_DEBUG: "true"
 
   alp-minerva-meilisearch-svc:
     ports:
       - 41111:41111
 
-  alp-minerva-pa-config-svc:
-    build:
-      context: .
-      dockerfile: services/mri-pa-config/Dockerfile
-    ports:
-      - 9207:9207
-    volumes:
-      - ./services/mri-pa-config/src:/home/docker/src/services/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-      NODE_ENV: development
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest"
-           ]
-          }
-         ]
-        }
+  # alp-minerva-pa-config-svc:
+  #   build:
+  #     context: .
+  #     dockerfile: services/mri-pa-config/Dockerfile
+  #   ports:
+  #     - 9207:9207
+  #   volumes:
+  #     - ./services/mri-pa-config/src:/home/docker/src/services/app/src
+  #   environment:
+  #     LOCAL_DEBUG: "true"
+  #     NODE_ENV: development
+  #     VCAP_SERVICES: |-
+  #       {
+  #        "mridb": [
+  #         {
+  #          "credentials": {
+  #           "databaseName": "ALPDEV",
+  #           "dialect": "hana",
+  #           "encrypt": false,
+  #           "host": "${HANASERVER}",
+  #           "password": "${HDIPW}",
+  #           "pooling": "true",
+  #           "port": "${HDIPORT}",
+  #           "probeSchema": "${TESTSCHEMA}",
+  #           "schema": "${TESTSCHEMA}",
+  #           "user": "${HDIUSER}",
+  #           "validate_certificate": false,
+  #           "vocabSchema": "${TESTSCHEMA}"
+  #          },
+  #          "name": "OMOP",
+  #          "tags": [
+  #           "httptest"
+  #          ]
+  #         }
+  #        ]
+  #       }
 
   alp-minerva-pg-mgmt-init:
     build:
@@ -221,97 +246,97 @@ services:
       - 41190:5432
       - 5432:5432
 
-  alp-minerva-ps-config-svc:
-    build:
-      context: .
-      dockerfile: services/ps-config/Dockerfile
-    ports:
-      - 9209:9209
-    volumes:
-      - ./services/ps-config/src:/home/docker/src/services/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-      NODE_ENV: development
-      VCAP_SERVICES: |-
-        {
-         "mridb": [
-          {
-           "credentials": {
-            "databaseName": "ALPDEV",
-            "dialect": "hana",
-            "encrypt": false,
-            "host": "${HANASERVER}",
-            "password": "${HDIPW}",
-            "pooling": "true",
-            "port": "${HDIPORT}",
-            "probeSchema": "${TESTSCHEMA}",
-            "schema": "${TESTSCHEMA}",
-            "user": "${HDIUSER}",
-            "validate_certificate": false,
-            "vocabSchema": "${TESTSCHEMA}"
-           },
-           "name": "OMOP",
-           "tags": [
-            "httptest"
-           ]
-          }
-         ]
-        }
+  # alp-minerva-ps-config-svc:
+  #   build:
+  #     context: .
+  #     dockerfile: services/ps-config/Dockerfile
+  #   ports:
+  #     - 9209:9209
+  #   volumes:
+  #     - ./services/ps-config/src:/home/docker/src/services/app/src
+  #   environment:
+  #     LOCAL_DEBUG: "true"
+  #     NODE_ENV: development
+  #     VCAP_SERVICES: |-
+  #       {
+  #        "mridb": [
+  #         {
+  #          "credentials": {
+  #           "databaseName": "ALPDEV",
+  #           "dialect": "hana",
+  #           "encrypt": false,
+  #           "host": "${HANASERVER}",
+  #           "password": "${HDIPW}",
+  #           "pooling": "true",
+  #           "port": "${HDIPORT}",
+  #           "probeSchema": "${TESTSCHEMA}",
+  #           "schema": "${TESTSCHEMA}",
+  #           "user": "${HDIUSER}",
+  #           "validate_certificate": false,
+  #           "vocabSchema": "${TESTSCHEMA}"
+  #          },
+  #          "name": "OMOP",
+  #          "tags": [
+  #           "httptest"
+  #          ]
+  #         }
+  #        ]
+  #       }
 
-  alp-minerva-sqleditor:
-    build:
-      context: .
-      dockerfile: ./services/alp-sqleditor/Dockerfile
-    ports:
-      - 8888:8888
-    volumes:
-      - ./services/alp-sqleditor/init.sh:/usr/share/hue/init.sh
+  #alp-minerva-sqleditor:
+  #  build:
+  #    context: .
+  #    dockerfile: ./services/alp-sqleditor/Dockerfile
+  #  ports:
+  #   - 8888:8888
+  #  volumes:
+  #    - ./services/alp-sqleditor/init.sh:/usr/share/hue/init.sh
 
   alp-minerva-terminology-svc:
-    build:
-      context: .
-      dockerfile: ./services/alp-terminology-svc/Dockerfile
+#    build:
+#      context: .
+#      dockerfile: ./services/alp-terminology-svc/Dockerfile
     container_name: alp-minerva-terminology-svc-nest-prod-${BASE_PORT:-1}
     environment:
       LOCAL_DEBUG: "false"
 
-  alp-minerva-user-mgmt:
-    build:
-      context: ./services/alp-usermgmt
-      target: development
-    command:
-      - sh
-      - start.sh
-    ports:
-      - 9224:9224
-    volumes:
-      - ./services/alp-usermgmt/src:/usr/src/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-      NODE_ENV: development
+  # alp-minerva-user-mgmt:
+  #   # build:
+  #   #   context: ./services/alp-usermgmt
+  #   #   target: development
+  #   command:
+  #     - sh
+  #     - start.sh
+  #   ports:
+  #     - 9224:9224
+  #   volumes:
+  #     - ./services/alp-usermgmt/src:/usr/src/app/src
+  #   environment:
+  #     LOCAL_DEBUG: "true"
+  #     NODE_ENV: development
 
   alp-mri-pg-config:
     build: ./services/mri-pg-config
 
-  alp-query-gen:
-    build:
-      context: .
-      dockerfile: services/query-gen-svc/Dockerfile
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
-    ports:
-      - 9208:9208
-    volumes:
-      - ./services/query-gen-svc/src:/home/docker/src/alp-data-node/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-      NODE_ENV: development
+  # alp-query-gen:
+  #   build:
+  #     context: .
+  #     dockerfile: services/query-gen-svc/Dockerfile
+  #   external_links:
+  #     - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
+  #     - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
+  #   ports:
+  #     - 9208:9208
+  #   volumes:
+  #     - ./services/query-gen-svc/src:/home/docker/src/alp-data-node/app/src
+  #   environment:
+  #     LOCAL_DEBUG: "true"
+  #     NODE_ENV: development
 
-  alp-dicom-server:
+  #alp-dicom-server:
     # uses 8042 port on the container
-    ports:
-      - 8042:8042
+  #  ports:
+  #    - 8042:8042
 
   alp-fhir-server:
     build:

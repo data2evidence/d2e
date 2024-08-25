@@ -40,7 +40,7 @@ export default class MriConfigConnection {
               hostname,
               protocol,
               port,
-              path: `/dataset/${datasetId}/pa-config/${urlPath}`,
+              path: `/system-portal/dataset/${datasetId}/pa-config/${urlPath}`,
               headers: {
                 authorization: authorizationValue, // Replace user JWT (req.headers.authorization) with CCF
                 "user-agent": "ALP Service",

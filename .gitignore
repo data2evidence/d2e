@@ -1,5 +1,6 @@
 !.vscode/settings.json
 node_modules
+**/.clj-kondo
 npm-debug.log
 *.tmp*
 pyqeenv
