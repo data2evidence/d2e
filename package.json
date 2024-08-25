@@ -12,7 +12,7 @@
     "gen:tls": "scripts/gen-tls.sh",
     "gen:resource-limits": "scripts/gen-resource-limits.sh",
 
-    "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml",
+    "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml --file docker-compose-atlas.yml ",
     "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile sql",
     "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local --profile sql",
 
