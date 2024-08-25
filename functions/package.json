@@ -1,0 +1,120 @@
+{
+  "name": "apifun",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "trex" : {
+    "type": "functions",
+    "routes": [
+      {
+        "source":"/oak2",
+        "function":"/_Xoak"
+      },
+      {
+        "source":"/portalsvc",
+        "function":"/alp-portal-server",
+        "imports": "/alp-portal-server/import.json"
+      },
+      {
+        "source":"/analytics-svc/api/services/query",
+        "function":"/query-gen-svc",
+        "imports": "/query-gen-svc/import.json"
+      },
+      {
+        "source":"/system-portal",
+        "rmsrc": true,
+        "service":"portalServer"
+      },
+      {
+        "source":"/dataflow-mgmt",
+        "rmsrc": true,
+        "service":"dataflowMgmt"
+      },
+      {
+        "source":"/usermgmt",
+        "function":"/alp-usermgmt",
+        "imports": "/alp-usermgmt/import.json"
+      },
+      {
+        "source":"/db",
+        "function":"/alp-db-credentials",
+        "imports": "/alp-db-credentials/import.json"
+      },
+      {
+        "source":"/analytics-svc/api/services/bookmark",
+        "function":"/bookmark-svc",
+        "imports": "/bookmark-svc/import.json"
+      },
+      {  
+        "source":"/analytics-svc/api/services/public",
+        "service":"analytics"
+      },
+      {  
+        "source":"/analytics-svc/api/services",
+        "service":"analytics"
+      },
+      {  
+        "source":"/analytics-svc/pa/services",
+        "service":"analytics"
+      },
+      {
+        "source":"/analytics-svc/pa/config",
+        "function":"/mri-pa-config",
+        "imports": "/mri-pa-config/import.json"
+      },
+      {
+        "source":"/terminology",
+        "service":"terminology"
+      },
+      {
+        "source":"/meilisearch-svc",
+        "service":"meilisearch"
+      },
+      {
+        "source": "/pa-config-svc",
+        "function":"/mri-pa-config",
+        "imports": "/mri-pa-config/import.json"
+      },
+      {
+        "source": "/hc/hph/cdw",
+        "function":"/cdw-svc",
+        "imports": "/cdw-svc/import.json"
+      },
+      {
+        "source": "/hc/hph/config/services",
+        "function":"/cdw-svc",
+        "imports": "/cdw-svc/import.json"
+      },
+      {
+        "source":"/index.html",
+        "service":"logto"
+      },
+      {
+        "source":"/api",
+        "service":"logto"
+      },
+      {
+        "source":"/oidc",
+        "service":"logto"
+      },
+      {
+        "source":"/sign-in",
+        "service":"logto"
+      },
+      {
+        "source":"/consent",
+        "service":"logto"
+      },
+      {
+        "source":"/callback",
+        "service":"logto"
+      }
+    ]
+  }
+
+}
