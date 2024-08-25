@@ -23,7 +23,6 @@ services:
       priority: 10
     volumes:
      - atlasdb-postgres-data:/var/lib/postgresql/data
-     - ./100_populate_source_source_daimon.sql:/docker-entrypoint-initdb.d/100_populate_source_source_daimon.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
