@@ -7,19 +7,19 @@ on:
         required: true
         type: string
       DOCKER_BUILD_CONTEXT_PATH:
+        default: "."
         required: false
         type: string
-        default: "."
       DOCKER_BUILD_FILE_PATH:
         required: true
         type: string
       DOCKER_BUILD_PULL_BOOL:
-        required: false
         default: false
+        required: false
         type: boolean
       DOCKER_IMG_PUSH_BOOL:
-        required: false
         default: false
+        required: false
         type: boolean
       DOCKER_IMG_TAG_NAME:
         required: true
@@ -28,8 +28,8 @@ on:
         required: true
         type: string
       GIT_COMMIT_ID__PLUGINS_REPO:
-        required: false
         default: main
+        required: false
         type: string
       GIT_REPO_FULL_NAME:
         required: true
@@ -40,17 +40,19 @@ on:
         required: true
         type: string
       DOCKER_BUILD_CONTEXT_PATH:
-        required: true
+        default: "."
+        required: false
         type: string
       DOCKER_BUILD_FILE_PATH:
         required: true
         type: string
       DOCKER_BUILD_PULL_BOOL:
-        required: true
+        default: false
+        required: false
         type: boolean
       DOCKER_IMG_PUSH_BOOL:
-        required: false
         default: true
+        required: false
         type: boolean
       DOCKER_IMG_TAG_NAME:
         required: true
@@ -59,6 +61,7 @@ on:
         required: true
         type: string
       GIT_COMMIT_ID__PLUGINS_REPO:
+        default: main
         required: false
         type: string
       GIT_REPO_FULL_NAME:
