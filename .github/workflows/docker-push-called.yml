@@ -125,7 +125,7 @@ jobs:
           context: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
           pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
           file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
-          push: ${{ inputs.DOCKER_IMG_PUSH_BOOL }}
+          push: ${{ inputs.DOCKER_IMG_PUSH_BOOL == 'yes' }}
           tags: ${{ vars.AZ_REGISTRY_NAME }}.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
           build-args: |
             docker_image_prefix=${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
