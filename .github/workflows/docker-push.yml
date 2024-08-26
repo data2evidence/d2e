@@ -100,7 +100,7 @@ jobs:
       DOCKER_IMG_PUSH_BOOL: ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
     steps:
       - run: |
-        echo DOCKER_IMG_PUSH_BOOL=$DOCKER_IMG_PUSH_BOOL | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo DOCKER_IMG_PUSH_BOOL=$DOCKER_IMG_PUSH_BOOL | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
 
   bld:
     if: false
