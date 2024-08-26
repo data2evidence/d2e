@@ -1775,22 +1775,6 @@ services:
         priority: 20
     profiles: [perseus]
 
-  alp-perseus-user:
-    image: perseushub/user:latest
-    container_name: alp-perseus-user-${BASE_PORT:-1}
-    environment:
-      USER_ENV: Docker
-      TOKEN_SECRET_KEY: Perseus-Arcad!a
-      EMAIL_SECRET_KEY: 8cmuh4t5xTtR1EHaojWL0aqCR3vZ48PZF5AYkTe0iqo=
-      SERVER_ADDRESS: http://localhost
-    depends_on:
-      alp-minerva-postgres-post-init:
-        condition: service_completed_successfully
-    networks:
-      alp:
-        priority: 20
-    profiles: [perseus]
-
   alp-perseus-backend:
     image: perseushub/backend:latest
     container_name: alp-perseus-backend-${BASE_PORT:-1}
