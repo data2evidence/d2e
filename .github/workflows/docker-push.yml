@@ -61,7 +61,7 @@ jobs:
       AZ_REGISTRY_REPOSITORY: alp-data-node/alp-fhir-server-post-init # ${{ matrix.name }}
       DOCKER_BUILD_CONTEXT_PATH: . # ${{ matrix.context }}
       DOCKER_BUILD_FILE_PATH: ./services/alp-fhir/Dockerfile.client # ${{ matrix.directory }}/${{ matrix.fileName }}
-      # DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
+      DOCKER_BUILD_PULL_BOOL: false # ${{ matrix.pull || false }}
       # DOCKER_IMG_PUSH_BOOL: ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
       DOCKER_IMG_TAG_NAME: 189_docker-build-push-prune3 # ${{ needs.setup.outputs.DOCKER_IMG_TAG_NAME }}
       GIT_BRANCH_NAME: 189_docker-build-push-prune3 # ${{ needs.setup.outputs.GIT_BRANCH_NAME }}
