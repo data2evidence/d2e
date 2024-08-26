@@ -21,7 +21,7 @@ def main():
         debugpy.listen(("0.0.0.0", 9235))
         logging.basicConfig(level=logging.DEBUG)
 
-        port = Env.CACHEDB__PORT
+    port = Env.CACHEDB__PORT
 
     db_clients = initialize_db_clients()
     address = ("0.0.0.0", port)
