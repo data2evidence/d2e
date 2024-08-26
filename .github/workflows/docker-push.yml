@@ -94,15 +94,6 @@ jobs:
       GIT_BRANCH_NAME: ${{ steps.setup.outputs.GIT_BRANCH_NAME }}
       GIT_REPO_FULL_NAME: ${{ steps.setup.outputs.GIT_REPO_FULL_NAME }}
 
-  test:
-    runs-on: ubuntu-latest
-    needs: setup
-    env:
-      DOCKER_BUILD_PUSH_BOOL_STR: ${{ needs.setup.outputs.DOCKER_BUILD_PUSH_BOOL_STR }}
-    steps:
-      - run: |
-          echo DOCKER_BUILD_PUSH_BOOL_STR=$DOCKER_BUILD_PUSH_BOOL_STR | tee -a $GITHUB_STEP_SUMMARY
-
   bld:
     needs: setup
     if: (needs.setup.outputs.GIT_BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.GIT_BRANCH_NAME) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR any non-draft pull_request
@@ -110,96 +101,96 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - name: alp-data-node/analytics-svc
-          #   directory: ./services/analytics-svc
-          #   context: .
-          #   fileName: Dockerfile
-          # - name: alp-data-node/query-gen-svc
-          #   directory: ./services/query-gen-svc
-          #   context: .
-          #   fileName: Dockerfile
-          # - name: alp-data-node/bookmark-svc
-          #   directory: ./services/bookmark-svc
-          #   context: .
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-usermgmt
-          #   directory: ./services/alp-usermgmt
-          #   context: ./services/alp-usermgmt
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-db-credentials
-          #   directory: ./services/alp-db-credentials
-          #   context: ./services/alp-db-credentials
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-portal-server
-          #   directory: ./services/alp-portal-server
-          #   context: ./services/alp-portal-server
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-dataflow
-          #   directory: ./services/alp-dataflow
-          #   context: ./services/alp-dataflow
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-pg-mgmt-init
-          #   directory: ./services/alp-pg-management
-          #   context: ./services/alp-pg-management
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-gateway
-          #   directory: ./services/alp-gateway
-          #   context: ./services/alp-gateway
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-terminology-svc
-          #   directory: ./services/alp-terminology-svc
-          #   context: .
-          #   fileName: Dockerfile
+          - name: alp-data-node/analytics-svc
+            directory: ./services/analytics-svc
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/query-gen-svc
+            directory: ./services/query-gen-svc
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/bookmark-svc
+            directory: ./services/bookmark-svc
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/alp-usermgmt
+            directory: ./services/alp-usermgmt
+            context: ./services/alp-usermgmt
+            fileName: Dockerfile
+          - name: alp-data-node/alp-db-credentials
+            directory: ./services/alp-db-credentials
+            context: ./services/alp-db-credentials
+            fileName: Dockerfile
+          - name: alp-data-node/alp-portal-server
+            directory: ./services/alp-portal-server
+            context: ./services/alp-portal-server
+            fileName: Dockerfile
+          - name: alp-data-node/alp-dataflow
+            directory: ./services/alp-dataflow
+            context: ./services/alp-dataflow
+            fileName: Dockerfile
+          - name: alp-data-node/alp-pg-mgmt-init
+            directory: ./services/alp-pg-management
+            context: ./services/alp-pg-management
+            fileName: Dockerfile
+          - name: alp-data-node/alp-gateway
+            directory: ./services/alp-gateway
+            context: ./services/alp-gateway
+            fileName: Dockerfile
+          - name: alp-data-node/alp-terminology-svc
+            directory: ./services/alp-terminology-svc
+            context: .
+            fileName: Dockerfile
           - name: alp-data-node/alp-dataflow-gen
             directory: ./services/alp-dataflow-gen
             context: .
             fileName: Dockerfile
             pull: true
-          # - name: alp-data-node/alp-sqleditor
-          #   directory: ./services/alp-sqleditor
-          #   context: .
-          #   fileName: Dockerfile
-          # - name: alp-data-node/mri-pa-config
-          #   directory: ./services/mri-pa-config
-          #   context: .
-          #   fileName: Dockerfile
-          # - name: alp-data-node/mri-pg-config
-          #   directory: ./services/mri-pg-config
-          #   context: ./services/mri-pg-config
-          #   fileName: Dockerfile
-          # - name: alp-data-node/mri-cdw-svc
-          #   directory: ./services/cdw-svc
-          #   context: .
-          #   fileName: Dockerfile
-          # - name: alp-data-node/mri-ps-config
-          #   directory: ./services/ps-config
-          #   context: .
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-logto
-          #   directory: ./services/alp-logto
-          #   context: ./services/alp-logto
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-logto-post-init
-          #   directory: ./services/alp-logto/post-init
-          #   context: ./services/alp-logto/post-init
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-fhir-server
-          #   directory: ./services/alp-fhir
-          #   context: ./services/alp-fhir
-          #   fileName: Dockerfile
-          # - name: alp-data-node/alp-fhir-fe-server
-          #   directory: ./services/alp-fhir
-          #   context: ./services/alp-fhir
-          #   fileName: Dockerfile.frontend
-          # - name: alp-data-node/alp-dataflow-gen-worker
-          #   directory: ./services/alp-dataflow-gen
-          #   context: .
-          #   fileName: Dockerfile.worker
-          #   GIT_COMMIT_ID__PLUGINS_REPO: main
-          # - name: alp-data-node/cachedb
-          #   directory: ./services/cachedb
-          #   context: .
-          #   fileName: Dockerfile
+          - name: alp-data-node/alp-sqleditor
+            directory: ./services/alp-sqleditor
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/mri-pa-config
+            directory: ./services/mri-pa-config
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/mri-pg-config
+            directory: ./services/mri-pg-config
+            context: ./services/mri-pg-config
+            fileName: Dockerfile
+          - name: alp-data-node/mri-cdw-svc
+            directory: ./services/cdw-svc
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/mri-ps-config
+            directory: ./services/ps-config
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/alp-logto
+            directory: ./services/alp-logto
+            context: ./services/alp-logto
+            fileName: Dockerfile
+          - name: alp-data-node/alp-logto-post-init
+            directory: ./services/alp-logto/post-init
+            context: ./services/alp-logto/post-init
+            fileName: Dockerfile
+          - name: alp-data-node/alp-fhir-server
+            directory: ./services/alp-fhir
+            context: ./services/alp-fhir
+            fileName: Dockerfile
+          - name: alp-data-node/alp-fhir-fe-server
+            directory: ./services/alp-fhir
+            context: ./services/alp-fhir
+            fileName: Dockerfile.frontend
+          - name: alp-data-node/alp-dataflow-gen-worker
+            directory: ./services/alp-dataflow-gen
+            context: .
+            fileName: Dockerfile.worker
+            GIT_COMMIT_ID__PLUGINS_REPO: main
+          - name: alp-data-node/cachedb
+            directory: ./services/cachedb
+            context: .
+            fileName: Dockerfile
           - name: alp-data-node/alp-fhir-server-post-init
             directory: ./services/alp-fhir
             context: .
