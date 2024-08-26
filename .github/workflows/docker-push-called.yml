@@ -9,6 +9,7 @@ on:
       DOCKER_BUILD_CONTEXT_PATH:
         required: true
         type: string
+        default: "."
       DOCKER_BUILD_FILE_PATH:
         required: true
         type: string
@@ -17,7 +18,7 @@ on:
         type: boolean
       DOCKER_IMG_PUSH_BOOL:
         required: false
-        default: true
+        default: false
         type: boolean
       DOCKER_IMG_TAG_NAME:
         required: true
@@ -27,6 +28,7 @@ on:
         type: string
       GIT_COMMIT_ID__PLUGINS_REPO:
         required: false
+        default: main
         type: string
       GIT_REPO_FULL_NAME:
         required: true
