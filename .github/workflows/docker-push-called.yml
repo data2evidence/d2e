@@ -112,6 +112,7 @@ jobs:
         id: builder
 
       - name: Purge docker images and cache
+        if: ${{ vars.GHA_BUILD_DEBUG != 'true' }}
         run: |
           docker image prune -af
           docker buildx prune -af
