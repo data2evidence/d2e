@@ -1,5 +1,5 @@
 name: Docker Build, Push, Prune
-run-name: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
+run-name: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
 
 on:
   pull_request:
@@ -39,24 +39,24 @@ on:
         type: string
 
 concurrency:
-  group: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build-push-prune
+  group: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build-push-prune
   cancel-in-progress: true
 
 env:
-  GIT_BRANCH_NAME: ${{ github.event.inputs.branch_name || github.head_ref || github.ref_name }}
-  GIT_REPO_FULL_NAME: ${{ github.event.inputs.git_repo_full_name || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
+  GIT_BRANCH_NAME: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
+  GIT_REPO_FULL_NAME: ${{ github.event.inputs.GIT_REPO_FULL_NAME || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
 
 jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
       - name: Free Disk Space (Ubuntu)
+        if: ${{ vars.GHA_BUILD_DEBUG != 'true' }}
         uses: jlumbroso/free-disk-space@main
         with:
           # this might remove tools that are actually needed,
           # if set to "true" but frees about 6 GB
           tool-cache: false
-
           # all of these default to true, but feel free to set to
           # "false" if necessary for your workflow
           android: true
@@ -68,20 +68,19 @@ jobs:
 
       - id: setup
         run: |
-          echo GIT_BRANCH_NAME="${GIT_BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-          echo GIT_REPO_FULL_NAME="${GIT_REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
-
-          DOCKER_IMG_PUSH_BOOL=true
+          DOCKER_BUILD_PUSH_BOOL_STR=true
           if [ $GIT_BRANCH_NAME == "develop" ]; then
             DOCKER_IMG_TAG_NAME=develop
           elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
             DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME
           else
-            DOCKER_IMG_PUSH_BOOL=false
+            DOCKER_BUILD_PUSH_BOOL_STR=false
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
           fi
-          echo DOCKER_IMG_PUSH_BOOL=$DOCKER_IMG_PUSH_BOOL | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo DOCKER_BUILD_PUSH_BOOL_STR=$DOCKER_BUILD_PUSH_BOOL_STR | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo GIT_BRANCH_NAME="${GIT_BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo GIT_REPO_FULL_NAME="${GIT_REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Dump GitHub context
         env:
@@ -90,14 +89,14 @@ jobs:
           echo HOSTNAME=$HOSTNAME
           echo "$GITHUB_CONTEXT"
     outputs:
-      DOCKER_IMG_PUSH_BOOL: ${{ steps.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
+      DOCKER_BUILD_PUSH_BOOL_STR: ${{ steps.setup.outputs.DOCKER_BUILD_PUSH_BOOL_STR }}
       DOCKER_IMG_TAG_NAME: ${{ steps.setup.outputs.DOCKER_IMG_TAG_NAME }}
       GIT_BRANCH_NAME: ${{ steps.setup.outputs.GIT_BRANCH_NAME }}
       GIT_REPO_FULL_NAME: ${{ steps.setup.outputs.GIT_REPO_FULL_NAME }}
 
   bld:
-    if: (needs.setup.outputs.GIT_BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.GIT_BRANCH_NAME) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
     needs: setup
+    if: (needs.setup.outputs.GIT_BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.GIT_BRANCH_NAME) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR any non-draft pull_request
     strategy:
       fail-fast: false
       matrix:
@@ -201,10 +200,10 @@ jobs:
       AZ_REGISTRY_REPOSITORY: ${{ matrix.name }}
       DOCKER_BUILD_CONTEXT_PATH: ${{ matrix.context }}
       DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
-      DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
-      DOCKER_IMG_PUSH_BOOL: ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
+      DOCKER_BUILD_PULL_BOOL_STR: ${{ matrix.pull }}
+      GIT_COMMIT_ID__PLUGINS_REPO: ${{ matrix.GIT_COMMIT_ID__PLUGINS_REPO }}
+      DOCKER_BUILD_PUSH_BOOL_STR: ${{ needs.setup.outputs.DOCKER_BUILD_PUSH_BOOL_STR }}
       DOCKER_IMG_TAG_NAME: ${{ needs.setup.outputs.DOCKER_IMG_TAG_NAME }}
       GIT_BRANCH_NAME: ${{ needs.setup.outputs.GIT_BRANCH_NAME }}
-      GIT_COMMIT_ID__PLUGINS_REPO: ${{ matrix.GIT_COMMIT_ID__PLUGINS_REPO }}
       GIT_REPO_FULL_NAME: ${{ needs.setup.outputs.GIT_REPO_FULL_NAME }}
     secrets: inherit

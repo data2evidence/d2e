@@ -7,18 +7,20 @@ on:
         required: true
         type: string
       DOCKER_BUILD_CONTEXT_PATH:
-        required: true
+        default: "."
+        required: false
         type: string
       DOCKER_BUILD_FILE_PATH:
         required: true
         type: string
-      DOCKER_BUILD_PULL_BOOL:
-        default: false
-        type: boolean
-      DOCKER_IMG_PUSH_BOOL:
+      DOCKER_BUILD_PULL_BOOL_STR:
+        default: "false"
         required: false
-        default: true
-        type: boolean
+        type: string
+      DOCKER_BUILD_PUSH_BOOL_STR:
+        default: "false"
+        required: false
+        type: string
       DOCKER_IMG_TAG_NAME:
         required: true
         type: string
@@ -26,6 +28,7 @@ on:
         required: true
         type: string
       GIT_COMMIT_ID__PLUGINS_REPO:
+        default: main
         required: false
         type: string
       GIT_REPO_FULL_NAME:
@@ -37,18 +40,20 @@ on:
         required: true
         type: string
       DOCKER_BUILD_CONTEXT_PATH:
-        required: true
+        default: "."
+        required: false
         type: string
       DOCKER_BUILD_FILE_PATH:
         required: true
         type: string
-      DOCKER_BUILD_PULL_BOOL:
-        required: true
-        type: boolean
-      DOCKER_IMG_PUSH_BOOL:
+      DOCKER_BUILD_PULL_BOOL_STR:
+        default: "false"
         required: false
-        default: true
-        type: boolean
+        type: string
+      DOCKER_BUILD_PUSH_BOOL_STR:
+        default: "true"
+        required: false
+        type: string
       DOCKER_IMG_TAG_NAME:
         required: true
         type: string
@@ -56,6 +61,7 @@ on:
         required: true
         type: string
       GIT_COMMIT_ID__PLUGINS_REPO:
+        default: main
         required: false
         type: string
       GIT_REPO_FULL_NAME:
@@ -73,8 +79,8 @@ jobs:
           AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
           DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
           DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
-          DOCKER_BUILD_PULL_BOOL: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
-          DOCKER_IMG_PUSH_BOOL: ${{ inputs.DOCKER_IMG_PUSH_BOOL }}
+          DOCKER_BUILD_PULL_BOOL_STR: ${{ inputs.DOCKER_BUILD_PULL_BOOL_STR }}
+          DOCKER_BUILD_PUSH_BOOL_STR: ${{ inputs.DOCKER_BUILD_PUSH_BOOL_STR }}
           DOCKER_IMG_TAG_NAME: ${{ inputs.DOCKER_IMG_TAG_NAME }}
           GIT_BRANCH_NAME: ${{ inputs.GIT_BRANCH_NAME }}
           GIT_COMMIT_ID__PLUGINS_REPO: ${{ inputs.GIT_COMMIT_ID__PLUGINS_REPO }}
@@ -83,8 +89,8 @@ jobs:
           echo AZ_REGISTRY_REPOSITORY=$AZ_REGISTRY_REPOSITORY | tee -a $GITHUB_STEP_SUMMARY
           echo DOCKER_BUILD_CONTEXT_PATH=$DOCKER_BUILD_CONTEXT_PATH
           echo DOCKER_BUILD_FILE_PATH=$DOCKER_BUILD_FILE_PATH
-          echo DOCKER_BUILD_PULL_BOOL=$DOCKER_BUILD_PULL_BOOL
-          echo DOCKER_IMG_PUSH_BOOL=$DOCKER_IMG_PUSH_BOOL
+          echo DOCKER_BUILD_PULL_BOOL_STR=$DOCKER_BUILD_PULL_BOOL_STR
+          echo DOCKER_BUILD_PUSH_BOOL_STR=$DOCKER_BUILD_PUSH_BOOL_STR
           echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME
           echo GIT_BRANCH_NAME=$GIT_BRANCH_NAME
           echo GIT_REPO_FULL_NAME=$GIT_REPO_FULL_NAME
@@ -106,19 +112,21 @@ jobs:
         id: builder
 
       - name: Purge docker images and cache
+        if: ${{ vars.GHA_BUILD_DEBUG != 'true' }}
         run: |
           docker image prune -af
           docker buildx prune -af
 
       - name: Build and push
         uses: docker/build-push-action@v6
+        if: ${{ vars.DOCKER_BUILD_DISABLE != 'true' }}
         with:
           builder: ${{ steps.builder.outputs.name }}
           platforms: "linux/amd64"
           context: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
-          pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL }}
+          pull: ${{ inputs.DOCKER_BUILD_PULL_BOOL_STR == 'true' }}
           file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
-          push: ${{ inputs.DOCKER_IMG_PUSH_BOOL }}
+          push: ${{ inputs.DOCKER_BUILD_PUSH_BOOL_STR == 'true' }}
           tags: ${{ vars.AZ_REGISTRY_NAME }}.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
           build-args: |
             docker_image_prefix=${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
