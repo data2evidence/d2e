@@ -96,6 +96,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    needs: setup
     env:
       DOCKER_IMG_PUSH_BOOL: ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
     steps:
