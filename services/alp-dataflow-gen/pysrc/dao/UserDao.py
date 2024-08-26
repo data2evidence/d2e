@@ -1,27 +1,26 @@
 
 from sqlalchemy import text, MetaData, inspect, Table, select
-from typing import List
 from datetime import datetime
 from utils.types import DatabaseDialects, UserType
 from utils.DBUtils import DBUtils
 
 
-class UserDao():
-    def __init__(self, database_code: str, schema_name: str, user_type: UserType):
-        #self.database_code = database_code
+class UserDao(DBUtils):
+    def __init__(self, use_cache_db: bool, database_code: str, schema_name: str):
+        super().__init__(use_cache_db=use_cache_db, database_code=database_code)
         self.schema_name = schema_name
-        dbutils = DBUtils(database_code)
-        self.db_dialect = dbutils.get_database_dialect()
-        self.tenant_configs = dbutils.extract_database_credentials()
-        
-        if user_type in UserType:
-            self.user = user_type
+        self.db_dialect = self.get_database_dialect()
+
+        if self.use_cache_db:
+            self.engine = self.create_database_engine(schema_name=self.schema_name)
         else:
-            raise ValueError(f"User type '{user_type}' not allowed, only '{[user.value for user in UserType]}'.")
-        
-        self.engine = dbutils.create_database_engine(self.user)
-        self.metadata = MetaData(schema_name)
-        self.inspector = inspect(self.engine)
+            self.engine = self.create_database_engine(user_type=UserType.ADMIN_USER)
+            
+        self.metadata = MetaData(schema_name)  # sql.MetaData()
+        self.inspector = inspect(self.engine)    
+        self.read_user = self.get_tenant_configs().get("readUser")
+        self.read_role = self.get_tenant_configs().get("readRole")
+
 
     def check_user_exists(self, user: str) -> bool:
         with self.engine.connect() as connection:
@@ -42,6 +41,7 @@ class UserDao():
                 return False
             else:
                 return True
+
 
     def check_role_exists(self, role_name: str) -> bool:
         with self.engine.connect() as connection:
@@ -78,7 +78,12 @@ class UserDao():
             connection.commit()
             print(f"{role_name} role Created Successfully")
 
-    def create_user(self, user: str, password: str):
+    def create_user(self, user: str, password: str = None):
+        if user == self.read_user:
+            password = self.__extract_database_credentials().get("readPassword")
+        else:
+            raise ValueError("Password cannot be empty")
+        
         match self.db_dialect:
             case DatabaseDialects.POSTGRES:
                 create_user_stmt = text(
