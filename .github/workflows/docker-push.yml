@@ -68,16 +68,16 @@ jobs:
 
       - id: setup
         run: |
-          DOCKER_IMG_PUSH_BOOL_STR=yes
+          DOCKER_BUILD_PUSH_BOOL_STR=yes
           if [ $GIT_BRANCH_NAME == "develop" ]; then
             DOCKER_IMG_TAG_NAME=develop
           elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
             DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME
           else
-            DOCKER_IMG_PUSH_BOOL_STR=no
+            DOCKER_BUILD_PUSH_BOOL_STR=no
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
           fi
-          echo DOCKER_IMG_PUSH_BOOL_STR=$DOCKER_IMG_PUSH_BOOL_STR | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
+          echo DOCKER_BUILD_PUSH_BOOL_STR=$DOCKER_BUILD_PUSH_BOOL_STR | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo GIT_BRANCH_NAME="${GIT_BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo GIT_REPO_FULL_NAME="${GIT_REPO_FULL_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
@@ -89,7 +89,7 @@ jobs:
           echo HOSTNAME=$HOSTNAME
           echo "$GITHUB_CONTEXT"
     outputs:
-      DOCKER_IMG_PUSH_BOOL_STR: ${{ steps.setup.outputs.DOCKER_IMG_PUSH_BOOL_STR }}
+      DOCKER_BUILD_PUSH_BOOL_STR: ${{ steps.setup.outputs.DOCKER_BUILD_PUSH_BOOL_STR }}
       DOCKER_IMG_TAG_NAME: ${{ steps.setup.outputs.DOCKER_IMG_TAG_NAME }}
       GIT_BRANCH_NAME: ${{ steps.setup.outputs.GIT_BRANCH_NAME }}
       GIT_REPO_FULL_NAME: ${{ steps.setup.outputs.GIT_REPO_FULL_NAME }}
@@ -98,10 +98,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup
     env:
-      DOCKER_IMG_PUSH_BOOL_STR: ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL_STR }}
+      DOCKER_BUILD_PUSH_BOOL_STR: ${{ needs.setup.outputs.DOCKER_BUILD_PUSH_BOOL_STR }}
     steps:
       - run: |
-          echo DOCKER_IMG_PUSH_BOOL_STR=$DOCKER_IMG_PUSH_BOOL_STR | tee -a $GITHUB_STEP_SUMMARY
+          echo DOCKER_BUILD_PUSH_BOOL_STR=$DOCKER_BUILD_PUSH_BOOL_STR | tee -a $GITHUB_STEP_SUMMARY
 
   bld:
     needs: setup
@@ -150,11 +150,11 @@ jobs:
           #   directory: ./services/alp-terminology-svc
           #   context: .
           #   fileName: Dockerfile
-          # - name: alp-data-node/alp-dataflow-gen
-          #   directory: ./services/alp-dataflow-gen
-          #   context: .
-          #   fileName: Dockerfile
-          #   pull: true
+          - name: alp-data-node/alp-dataflow-gen
+            directory: ./services/alp-dataflow-gen
+            context: .
+            fileName: Dockerfile
+            pull: true
           # - name: alp-data-node/alp-sqleditor
           #   directory: ./services/alp-sqleditor
           #   context: .
@@ -209,9 +209,9 @@ jobs:
       AZ_REGISTRY_REPOSITORY: ${{ matrix.name }}
       DOCKER_BUILD_CONTEXT_PATH: ${{ matrix.context }}
       DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
-      DOCKER_BUILD_PULL_BOOL_STR: false # ${{ matrix.pull }}
+      DOCKER_BUILD_PULL_BOOL_STR: ${{ matrix.pull }}
       GIT_COMMIT_ID__PLUGINS_REPO: ${{ matrix.GIT_COMMIT_ID__PLUGINS_REPO }}
-      DOCKER_IMG_PUSH_BOOL_STR: ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL_STR }} # false
+      DOCKER_BUILD_PUSH_BOOL_STR: ${{ needs.setup.outputs.DOCKER_BUILD_PUSH_BOOL_STR }} # false
       DOCKER_IMG_TAG_NAME: ${{ needs.setup.outputs.DOCKER_IMG_TAG_NAME }} # 189_docker-build-push-prune3 #
       GIT_BRANCH_NAME: ${{ needs.setup.outputs.GIT_BRANCH_NAME }} # 189_docker-build-push-prune3
       GIT_REPO_FULL_NAME: ${{ needs.setup.outputs.GIT_REPO_FULL_NAME }} # alp-os/d2e-dev-brian
