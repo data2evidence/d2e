@@ -41,7 +41,7 @@ COPY ./services/cachedb/requirements.txt .
 RUN --mount=type=cache,target=/home/docker/.cache/pip \
   pip install -r requirements.txt
 
-COPY ./services/cachedb/src .src
+COPY ./services/cachedb/src src
 
 FROM base AS development
 
@@ -50,11 +50,11 @@ RUN --mount=type=cache,target=/home/docker/.cache/pip \
   pip install -r requirements-dev.txt
 
 ENTRYPOINT ["/tini", "--"]
-CMD cd ./envConverter && yarn generate:envs -s alp-minerva-analytics-svc && cd - && . ./generated-env.sh && python -m watchdog.watchmedo auto-restart --recursive --pattern="*.py" --directory="/home/docker/src" python src/main.py
+CMD cd ./envConverter && yarn generate:envs -s alp-minerva-analytics-svc && cd - && . ./generated-env.sh && python -m watchdog.watchmedo auto-restart --recursive --pattern="*.py" --directory="/home/docker/src" python ./src/main.py
 
 FROM base AS production
 
 ENTRYPOINT ["/tini", "--"]
-CMD cd ./envConverter && yarn generate:envs -s alp-minerva-analytics-svc && cd - && . ./generated-env.sh && python src/main.py
+CMD cd ./envConverter && yarn generate:envs -s alp-minerva-analytics-svc && cd - && . ./generated-env.sh && python ./src/main.py
 
 
