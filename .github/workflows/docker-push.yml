@@ -77,7 +77,7 @@ jobs:
           elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
             DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME
           else
-            # DOCKER_IMG_PUSH_BOOL=false
+            DOCKER_IMG_PUSH_BOOL=false
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
           fi
           echo DOCKER_IMG_PUSH_BOOL=$DOCKER_IMG_PUSH_BOOL | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
@@ -202,7 +202,7 @@ jobs:
       DOCKER_BUILD_CONTEXT_PATH: ${{ matrix.context }}
       DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
       DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
-      DOCKER_IMG_PUSH_BOOL: false # ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
+      DOCKER_IMG_PUSH_BOOL: ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
       DOCKER_IMG_TAG_NAME: ${{ needs.setup.outputs.DOCKER_IMG_TAG_NAME }}
       GIT_BRANCH_NAME: ${{ needs.setup.outputs.GIT_BRANCH_NAME }}
       GIT_COMMIT_ID__PLUGINS_REPO: ${{ matrix.GIT_COMMIT_ID__PLUGINS_REPO }}
