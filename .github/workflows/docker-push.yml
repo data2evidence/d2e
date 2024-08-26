@@ -48,6 +48,7 @@ env:
 
 jobs:
   setup:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Free Disk Space (Ubuntu)
@@ -200,13 +201,13 @@ jobs:
             fileName: Dockerfile.client
     uses: ./.github/workflows/docker-push-called.yml
     with:
-      AZ_REGISTRY_REPOSITORY: ${{ matrix.name }}
-      DOCKER_BUILD_CONTEXT_PATH: ${{ matrix.context }}
-      DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
-      DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
-      DOCKER_IMG_PUSH_BOOL: ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
-      DOCKER_IMG_TAG_NAME: ${{ needs.setup.outputs.DOCKER_IMG_TAG_NAME }}
-      GIT_BRANCH_NAME: ${{ needs.setup.outputs.GIT_BRANCH_NAME }}
-      GIT_COMMIT_ID__PLUGINS_REPO: ${{ matrix.GIT_COMMIT_ID__PLUGINS_REPO }}
-      GIT_REPO_FULL_NAME: ${{ needs.setup.outputs.GIT_REPO_FULL_NAME }}
+      AZ_REGISTRY_REPOSITORY: alp-data-node/alp-fhir-server-post-init # ${{ matrix.name }}
+      # DOCKER_BUILD_CONTEXT_PATH: ${{ matrix.context }}
+      DOCKER_BUILD_FILE_PATH: ./services/alp-fhir/Dockerfile.client # ${{ matrix.directory }}/${{ matrix.fileName }}
+      # DOCKER_BUILD_PULL_BOOL: ${{ matrix.pull || false }}
+      # DOCKER_IMG_PUSH_BOOL: ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }}
+      DOCKER_IMG_TAG_NAME: 189_docker-build-push-prune3 # ${{ needs.setup.outputs.DOCKER_IMG_TAG_NAME }}
+      GIT_BRANCH_NAME: 189_docker-build-push-prune3 # ${{ needs.setup.outputs.GIT_BRANCH_NAME }}
+      GIT_COMMIT_ID__PLUGINS_REPO: alp-os/d2e-dev-brian # ${{ matrix.GIT_COMMIT_ID__PLUGINS_REPO }}
+      GIT_REPO_FULL_NAME: alp-os/d2e-dev-brian # ${{ needs.setup.outputs.GIT_REPO_FULL_NAME }}
     secrets: inherit
