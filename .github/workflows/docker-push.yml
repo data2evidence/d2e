@@ -68,13 +68,13 @@ jobs:
 
       - id: setup
         run: |
-          DOCKER_IMG_PUSH_BOOL=true
+          DOCKER_IMG_PUSH_BOOL='true'
           if [ $GIT_BRANCH_NAME == "develop" ]; then
             DOCKER_IMG_TAG_NAME=develop
           elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
             DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME
           else
-            DOCKER_IMG_PUSH_BOOL=false
+            DOCKER_IMG_PUSH_BOOL='false'
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
           fi
           echo DOCKER_IMG_PUSH_BOOL=$DOCKER_IMG_PUSH_BOOL | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
