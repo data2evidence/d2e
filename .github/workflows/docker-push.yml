@@ -96,7 +96,7 @@ jobs:
       GIT_REPO_FULL_NAME: ${{ steps.setup.outputs.GIT_REPO_FULL_NAME }}
 
   bld:
-    if: (needs.setup.outputs.GIT_BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.GIT_BRANCH_NAME) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
+    # if: (needs.setup.outputs.GIT_BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.GIT_BRANCH_NAME) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR non-draft pull_request
     needs: setup
     strategy:
       fail-fast: false
