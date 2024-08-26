@@ -211,7 +211,7 @@ jobs:
       DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
       DOCKER_BUILD_PULL_BOOL: false # ${{ matrix.pull }}
       GIT_COMMIT_ID__PLUGINS_REPO: ${{ matrix.GIT_COMMIT_ID__PLUGINS_REPO }}
-      DOCKER_IMG_PUSH_BOOL: false # ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }} # false
+      DOCKER_IMG_PUSH_BOOL: ${{ needs.setup.outputs.DOCKER_IMG_PUSH_BOOL }} # false
       DOCKER_IMG_TAG_NAME: ${{ needs.setup.outputs.DOCKER_IMG_TAG_NAME }} # 189_docker-build-push-prune3 #
       GIT_BRANCH_NAME: ${{ needs.setup.outputs.GIT_BRANCH_NAME }} # 189_docker-build-push-prune3
       GIT_REPO_FULL_NAME: ${{ needs.setup.outputs.GIT_REPO_FULL_NAME }} # alp-os/d2e-dev-brian
