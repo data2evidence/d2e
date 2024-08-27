@@ -56,7 +56,7 @@ def auth_check(token: str, d2e_database_format: str):
 
     # Client credentials flow
     # Allow access by returning early for client credentials flow tokens
-    if _client_credentials_flow_(user_id, d2e_database_format):
+    if _client_credentials_flow(user_id, d2e_database_format):
         return
 
     # Authorization code flow
@@ -66,7 +66,7 @@ def auth_check(token: str, d2e_database_format: str):
     raise Exception("Unexpected error occurred in auth_check()!")
 
 
-def _client_credentials_flow_(user_id, d2e_database_format) -> bool:
+def _client_credentials_flow(user_id, d2e_database_format) -> bool:
     '''
     Check if user_id is in list of application client ids
     '''
