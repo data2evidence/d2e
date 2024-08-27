@@ -17,11 +17,11 @@ concurrency:
   cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
 jobs:
   check_file_changes:
-      runs-on: ubuntu-latest
-      if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
-      outputs:
-          changes: ${{ steps.file_changes.outputs.src }}
-      steps:
+    runs-on: ubuntu-latest
+    if: (github.ref_name == 'develop' ||  contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    outputs:
+      changes: ${{ steps.file_changes.outputs.src }}
+    steps:
       - uses: actions/checkout@v4
 
       - uses: dorny/paths-filter@v3.0.2
@@ -42,7 +42,6 @@ jobs:
               - "services/mri-db/**"
               - "internal/build/**"
               - ".github/workflows/mri-tests.yml"
-
 
   test-mri:
     # needs: [check_file_changes]
@@ -105,7 +104,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.14.0"
+          node-version: "18.20.4"
 
       - name: check if files changed
         id: check_file_changed

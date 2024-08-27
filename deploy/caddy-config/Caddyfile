@@ -252,8 +252,8 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle_path /log-viewer/* {
-		root * /home/docker/ui-files/log-viewer/
+	handle_path /jobs/* {
+		root * /home/docker/ui-files/jobs/
 		encode zstd gzip
 		file_server {
 			precompressed zstd br gzip

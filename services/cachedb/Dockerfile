@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install node and yarn for env converter
 RUN mkdir -p /usr/local/node
 ENV NVM_DIR /usr/local/node
-ENV NODE_VERSION 18.16.0
+ENV NODE_VERSION 18.20.4
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 RUN . $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm use $NODE_VERSION
@@ -38,15 +38,16 @@ RUN yarn install
 WORKDIR /home/docker
 
 COPY ./services/cachedb/requirements.txt .
-RUN pip install -r requirements.txt
+RUN --mount=type=cache,target=/home/docker/.cache/pip \
+  pip install -r requirements.txt
 
-COPY ./services/cachedb/src .src
+COPY ./services/cachedb/src src
 
 FROM base AS development
 
 COPY ./services/cachedb/requirements-dev.txt .
-RUN pip install -r requirements-dev.txt
-
+RUN --mount=type=cache,target=/home/docker/.cache/pip \
+  pip install -r requirements-dev.txt
 
 ENTRYPOINT ["/tini", "--"]
 CMD cd ./envConverter && yarn generate:envs -s alp-minerva-analytics-svc && cd - && . ./generated-env.sh && python -m watchdog.watchmedo auto-restart --recursive --pattern="*.py" --directory="/home/docker/src" python ./src/main.py

@@ -6,7 +6,7 @@
   "main": "./target/src/qe.js",
   "typings": "./target/src/qe.d.ts",
   "engines": {
-    "node": ">=18.14.0"
+    "node": ">=18.20.4"
   },
   "scripts": {
     "test": "jest --runInBand",

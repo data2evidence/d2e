@@ -1,4 +1,4 @@
-FROM node:18.14.0-alpine AS final
+FROM node:18.20.4-alpine AS final
 
 USER root
 

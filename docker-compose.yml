@@ -6,6 +6,7 @@ networks:
 volumes:
   caddy:
   duckdb-data-1:
+  cdw-config-duckdb-data-1:
   meilisearch-minerva-data-1:
   minio-data-1:
   pg-minerva-data-1:
@@ -204,6 +205,14 @@ x-envs:
           "notes": "",
           "pluginPath": "plugins/Setup/OverviewDescription/module",
           "route": "overview-description"
+        },
+        { 
+          "description": "Upload / delete flows",
+          "enabled": true,
+          "name": "Plugins Table",
+          "notes": "",
+          "pluginPath": "plugins/Setup/PluginTable/module",
+          "route": "plugins-table"
         }
       ],
       "systemadmin": [
@@ -464,6 +473,7 @@ services:
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
       - duckdb-data-1:/app/duckdb_data
+      - cdw-config-duckdb-data-1:/app/cdw-config/duckdb_data
       - r-libs:/home/docker/plugins/R/site-library
     environment:
       <<:
@@ -480,6 +490,7 @@ services:
       DOCKER_HOST: unix://var/run/docker.sock
       DQD_THREAD_COUNT: 1
       DUCKDB__DATA_FOLDER: /app/duckdb_data
+      CDW_CONFIG_DUCKDB__DATA_FOLDER: /app/cdw-config/duckdb_data
       DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME: flow-results
       IDP__ALP_DATA__CLIENT_ID: ${LOGTO__ALP_DATA__CLIENT_ID}
       IDP__ALP_DATA__CLIENT_SECRET: ${LOGTO__ALP_DATA__CLIENT_SECRET}
@@ -737,6 +748,8 @@ services:
         condition: service_healthy
       alp-query-gen:
         condition: service_healthy
+      alp-cachedb:
+        condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 30
@@ -797,6 +810,8 @@ services:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
+    volumes:
+      - cdw-config-duckdb-data-1:/home/docker/duckdb_data
     healthcheck:
       interval: 20s
       retries: 30
@@ -832,7 +847,9 @@ services:
       NODE_ENV: development
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
-      DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
+      isTestEnv: ${isTestEnv}
+      BUILT_IN_DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
+      DUCKDB_PATH: /home/docker/duckdb_data
 
   alp-minerva-dataflow-mgmt:
     container_name: &c11 alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
@@ -1014,6 +1031,8 @@ services:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
+      alp-logto: # to avoid race condition and timeout in logto container
+        condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 10
@@ -1223,6 +1242,8 @@ services:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
+      alp-logto: # to avoid race condition and timeout in logto container
+        condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 20
@@ -1631,6 +1652,7 @@ services:
     container_name: &c30 alp-cachedb
     hostname: alp-cachedb.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/cachedb:${DOCKER_TAG_NAME:-develop}
+    platform: linux/amd64
     depends_on:
       alp-db-credentials-mgr:
         condition: service_healthy
@@ -1640,12 +1662,20 @@ services:
         condition: service_healthy
       alp-minerva-postgres:
         condition: service_healthy
+    healthcheck:
+      interval: 20s
+      retries: 5
+      start_period: 30s
+      test: ["CMD", "python", "src/utils/healthcheck.py", "41191"]
+      timeout: 10s
     logging:
       options:
         tag: *c30
     networks:
       alp:
         priority: 20
+      data:
+        priority: 10
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     ports:
       - 41191:41191
