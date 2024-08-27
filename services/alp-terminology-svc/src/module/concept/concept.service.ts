@@ -24,6 +24,12 @@ import { Request } from 'express';
 import { SystemPortalAPI } from 'src/api/portal-api';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 
+// TODO move to NESTJS DI
+import { CachedbAPI } from 'src/api/cachedb-api';
+
+// TODO: MOVE TO env var
+const USE_DUCKDB_FTS = true;
+
 // Placed outside as FHIR server is unable to access
 const logger = createLogger('ConceptService');
 @Injectable()
@@ -59,8 +65,30 @@ export class ConceptService {
     const systemPortalApi = new SystemPortalAPI(this.token);
     const { databaseCode, vocabSchemaName, dialect } =
       await systemPortalApi.getDatasetDetails(datasetId);
+
+    if (USE_DUCKDB_FTS) {
+      logger.info('Searching with Duckdb FTS');
+      const startTime = performance.now();
+      // ####### Duckdb FTS #######
+      const cachedbApi = new CachedbAPI(this.token, datasetId);
+      // TODO: Create mapping for duckdbftsresult
+      const duckdbFtsResult: any = await cachedbApi.getConcepts(
+        pageNumber,
+        Number(rowsPerPage),
+        searchText,
+        `${databaseCode}_${vocabSchemaName}`,
+        completeFilters,
+      );
+      const endTime = performance.now();
+      console.log(`Duckdb FTS took ${endTime - startTime} milliseconds`);
+
+      return this.meilisearchResultMapping(duckdbFtsResult);
+    }
+    // ####### Duckdb FTS #######
+
     try {
       logger.info('Searching with Meilisearch');
+      const startTime = performance.now();
       const meilisearchApi = new MeilisearchAPI();
       const hybridSearchConfig: HybridSearchConfig =
         await hybridSearchConfigService.getHybridSearchConfig();
@@ -74,6 +102,8 @@ export class ConceptService {
         completeFilters,
         hybridSearchConfig,
       );
+      const endTime = performance.now();
+      console.log(`Meilisearch took ${endTime - startTime} milliseconds`);
       return this.meilisearchResultMapping(meilisearchResult);
     } catch (err) {
       logger.error(JSON.stringify(err));
@@ -320,59 +350,74 @@ export class ConceptService {
       const meiliIndex = `${databaseCode}_${vocabSchemaName}_${
         dialect === 'hana' ? 'CONCEPT' : 'concept'
       }`;
-      const conceptClassIdFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
+
+      if (USE_DUCKDB_FTS) {
+        logger.info('Searching concept filters with Duckdb FTS');
+        const cachedbApi = new CachedbAPI(this.token, datasetId);
+        const filterOptions = await cachedbApi.getConceptFilterOptionsFaceted(
+          `${databaseCode}_${vocabSchemaName}`,
+          searchText,
+          filters,
+        );
+        return { filterOptions };
+      } else {
+        logger.info('Searching concept filters with Meilisearch');
+        const conceptClassIdFacets =
+          await meilisearchApi.getConceptFilterOptionsFaceted(
+            meiliIndex,
+            searchText,
+            { ...filters, conceptClassId: [] },
+          );
+        const domainIdFacets =
+          await meilisearchApi.getConceptFilterOptionsFaceted(
+            meiliIndex,
+            searchText,
+            { ...filters, domainId: [] },
+          );
+        const standardConceptFacets =
+          await meilisearchApi.getConceptFilterOptionsFaceted(
+            meiliIndex,
+            searchText,
+            {
+              ...filters,
+              standardConcept: [],
+            },
+          );
+        const vocabularyIdFacets =
+          await meilisearchApi.getConceptFilterOptionsFaceted(
+            meiliIndex,
+            searchText,
+            { ...filters, vocabularyId: [] },
+          );
+        const validity = await meilisearchApi.getConceptFilterOptionsValidity(
           meiliIndex,
           searchText,
-          { ...filters, conceptClassId: [] },
+          { ...filters, validity: [] },
         );
-      const domainIdFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          { ...filters, domainId: [] },
-        );
-      const standardConceptFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          {
-            ...filters,
-            standardConcept: [],
-          },
-        );
-      const vocabularyIdFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          { ...filters, vocabularyId: [] },
-        );
-      const validity = await meilisearchApi.getConceptFilterOptionsValidity(
-        meiliIndex,
-        searchText,
-        { ...filters, validity: [] },
-      );
-      const filterOptions = {
-        conceptClassId: conceptClassIdFacets.facetDistribution.concept_class_id,
-        domainId: domainIdFacets.facetDistribution.domain_id,
-        standardConcept:
-          standardConceptFacets.facetDistribution.standard_concept,
-        vocabularyId: vocabularyIdFacets.facetDistribution.vocabulary_id,
-        validity,
-        // concept is a derived value, not from meilisearch index
-        concept: (() => {
-          const standardConcepts =
-            standardConceptFacets.facetDistribution.standard_concept;
-          const standardConceptsCount = standardConcepts['S'] || 0;
-          const nonStandardConceptsCount =
-            standardConceptFacets.totalHits - standardConceptsCount;
-          return {
-            Standard: standardConceptsCount,
-            'Non-standard': nonStandardConceptsCount,
-          };
-        })(),
-      };
-      return { filterOptions };
+        const filterOptions = {
+          conceptClassId:
+            conceptClassIdFacets.facetDistribution.concept_class_id,
+          domainId: domainIdFacets.facetDistribution.domain_id,
+          standardConcept:
+            standardConceptFacets.facetDistribution.standard_concept,
+          vocabularyId: vocabularyIdFacets.facetDistribution.vocabulary_id,
+          validity,
+          // concept is a derived value, not from meilisearch index
+          concept: (() => {
+            const standardConcepts =
+              standardConceptFacets.facetDistribution.standard_concept;
+            const standardConceptsCount = standardConcepts['S'] || 0;
+            const nonStandardConceptsCount =
+              standardConceptFacets.totalHits - standardConceptsCount;
+            return {
+              Standard: standardConceptsCount,
+              'Non-standard': nonStandardConceptsCount,
+            };
+          })(),
+        };
+
+        return { filterOptions };
+      }
     } catch (err) {
       logger.error(err);
       throw err;
