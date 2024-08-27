@@ -1,14 +1,14 @@
 import debugpy
 from typing import Tuple
 from buenavista import postgres
-from buenavista.database import initialize_db_clients, SqlProxyDatabaseClients
+from buenavista.database import initialize_db_clients, CachedbDatabaseClients
 from config import Env
 
 import logging
 
 
 def create(
-    db_clients: SqlProxyDatabaseClients, host_addr: Tuple[str, int], auth: dict = None
+    db_clients: CachedbDatabaseClients, host_addr: Tuple[str, int], auth: dict = None
 ) -> postgres.BuenaVistaServer:
     server = postgres.BuenaVistaServer(
         db_clients, host_addr, auth=auth
@@ -21,7 +21,7 @@ def main():
         debugpy.listen(("0.0.0.0", 9235))
         logging.basicConfig(level=logging.DEBUG)
 
-        port = Env.SQL_PROXY__PORT
+    port = Env.CACHEDB__PORT
 
     db_clients = initialize_db_clients()
     address = ("0.0.0.0", port)

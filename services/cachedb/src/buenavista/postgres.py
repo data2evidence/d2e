@@ -10,7 +10,7 @@ import struct
 from typing import Dict, List, Optional
 
 from .core import BVType, Connection, Extension, Session, QueryResult
-from .database import parse_connection_param_database, get_rewriter_from_dialect, get_db_connection, SqlProxyDatabaseClients
+from .database import parse_connection_param_database, get_rewriter_from_dialect, get_db_connection, CachedbDatabaseClients
 from .rewrite import Rewriter
 from .middleware import auth_check, get_dataset_info
 
@@ -364,6 +364,8 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
                 del self.server.ctxts[ctx.process_id]
                 ctx = None
             return None
+        elif code == 1986359929:  # Healthcheck request
+            return self.send_notice()
         else:
             raise Exception(f"Unsupported startup message: {code}")
 
@@ -674,7 +676,7 @@ class BuenaVistaServer(socketserver.ThreadingTCPServer):
 
     def __init__(
         self,
-        db_clients: SqlProxyDatabaseClients,
+        db_clients: CachedbDatabaseClients,
         server_address,
         *,
         extensions: List[Extension] = [],

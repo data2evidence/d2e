@@ -5,7 +5,7 @@ of the [Postgres wire protocol (PDF)](https://beta.pgcon.org/2014/schedule/attac
 
 # To run tests
 
-Attach shell into `alp-sql-proxy` container, navigate to the directory `/home/docker/src` and run.
+Attach shell into `alp-cachedb` container, navigate to the directory `/home/docker/src` and run.
 
 ```
 PYTHON_ENV=TEST python3 -m pytest
