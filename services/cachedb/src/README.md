@@ -10,7 +10,7 @@ of the [Postgres wire protocol (PDF)](https://beta.pgcon.org/2014/schedule/attac
    #### Example connection values with protocol A
 
    - host: `alp-cachedb`
-   - post: `41191`
+   - port: `41191`
    - database: `A|dialect|11111111-2222-3333-4444-555555555555`
    - user: `jwt_token`
 
@@ -28,7 +28,7 @@ of the [Postgres wire protocol (PDF)](https://beta.pgcon.org/2014/schedule/attac
    1. #### Example connection values with protocol B
 
       - host: `alp-cachedb`
-      - post: `41191`
+      - port: `41191`
       - database: `B|dialect|alpdev_pg|cdmdefault|cdmvocab`
       - user: `jwt_token`
 
@@ -39,7 +39,7 @@ of the [Postgres wire protocol (PDF)](https://beta.pgcon.org/2014/schedule/attac
    2. #### Example connection values with protocol B to postgresql without providing cdmdefault and cdmvocab in database parameter.
 
       - host: `alp-cachedb`
-      - post: `41191`
+      - port: `41191`
       - database: `B|postgresql|alpdev_pg`
       - user: `jwt_token`
 
