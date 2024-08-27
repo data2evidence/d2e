@@ -26,13 +26,6 @@ https://*.alp.local:55555 {
 }
 
 (forward_authentication) {
-	# Enable this for using perseus user service
-	# forward_auth http://alp-perseus-user-1:5001 {
-	# 	uri /user/api/is_token_valid_internal
-	# 	copy_headers Username
-	# }
-
-	# Enable this for using D2E user-mgmt service
 	forward_auth https://alp-minerva-gateway-1:41100 {
 		transport http {
 			tls
@@ -76,26 +69,6 @@ https://*.alp.local:55555 {
 	log {
 		format console {
 			level_format color
-		}
-	}
-
-	# Enable this to use perseus frontend
-	# handle /* {
-	# 	reverse_proxy http://alp-perseus-frontend-1:4200 {
-	# 		header_up X-Real-IP {http.request.remote_host}
-	# 	}
-	# }
-
-	handle_path /user/api/is_token_valid_internal {
-		reverse_proxy http://alp-perseus-user-1:5001 {
-			header_up Content-Length ""
-			header_up X-Original-URI {http.request.uri}
-		}
-	}
-
-	handle /user/* {
-		reverse_proxy http://alp-perseus-user-1:5001 {
-			header_up X-Real-IP {http.request.remote_host}
 		}
 	}
 
@@ -258,8 +231,8 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle_path /log-viewer/* {
-		root * /home/docker/ui-files/log-viewer/
+	handle_path /jobs/* {
+		root * /home/docker/ui-files/jobs/
 		encode zstd gzip
 		file_server {
 			precompressed zstd br gzip
