@@ -23,7 +23,7 @@ import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { Request } from 'express';
 import { SystemPortalAPI } from 'src/api/portal-api';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
-import { GetFirstConceptsDto } from './dto/concept.dto';
+import { GetStandardConceptsDto } from './dto/concept.dto';
 
 // Placed outside as FHIR server is unable to access
 const logger = createLogger('ConceptService');
@@ -107,11 +107,11 @@ export class ConceptService {
       throw err;
     }
   }
-  async getFirstConcepts(
-    getFirstConceptsDto: GetFirstConceptsDto,
+  async getStandardConcepts(
+    getStandardConceptsDto: GetStandardConceptsDto,
     hybridSearchConfigService: HybridSearchConfigService,
   ): Promise<any> {
-    const { data, datasetId } = getFirstConceptsDto;
+    const { data, datasetId } = getStandardConceptsDto;
 
     const systemPortalApi = new SystemPortalAPI(this.token);
     const { databaseCode, vocabSchemaName, dialect } =

@@ -37,7 +37,7 @@ export class ConceptHierarchyDto {
   @Type(() => Number)
   depth: number;
 }
-class GetFirstConceptsSingleDto {
+class GetStandardConceptsSingleDto {
   @IsNumber()
   index: number;
 
@@ -49,10 +49,10 @@ class GetFirstConceptsSingleDto {
   domainId?: string;
 }
 
-export class GetFirstConceptsDto {
+export class GetStandardConceptsDto {
   @IsArray()
-  @Type(() => GetFirstConceptsSingleDto)
-  data: GetFirstConceptsSingleDto[];
+  @Type(() => GetStandardConceptsSingleDto)
+  data: GetStandardConceptsSingleDto[];
 
   @IsUUID()
   datasetId: string;

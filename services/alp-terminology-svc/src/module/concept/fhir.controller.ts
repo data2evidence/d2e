@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ConceptService } from './concept.service';
 import { SupportedFhirVersion } from '../../utils/types';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
-import { GetFirstConceptsDto as GetFirstConceptsDto } from './dto/concept.dto';
+import { GetStandardConceptsDto as GetStandardConceptsDto } from './dto/concept.dto';
 
 @Controller()
 export class FhirController {

@@ -4,7 +4,7 @@ import { transformPipe } from '../../utils/TransformPipe';
 import {
   ConceptFilterOptionsDto,
   ConceptHierarchyDto,
-  GetFirstConceptsDto,
+  GetStandardConceptsDto,
 } from './dto/concept.dto';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 @Controller()
@@ -66,12 +66,12 @@ export class ConceptController {
     );
   }
 
-  @Post(`getFirstConcepts`)
-  async getFirstConcepts(
-    @Body() getFirstConceptsDto: GetFirstConceptsDto,
+  @Post(`getStandardConcepts`)
+  async getStandardConcepts(
+    @Body() getStandardConceptsDto: GetStandardConceptsDto,
   ): Promise<any> {
-    return await this.appService.getFirstConcepts(
-      getFirstConceptsDto,
+    return await this.appService.getStandardConcepts(
+      getStandardConceptsDto,
       this.hybridSearchConfigService,
     );
   }
