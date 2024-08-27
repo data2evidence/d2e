@@ -136,21 +136,16 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
             clients[dialect][database_code])
 
     if dialect == DatabaseDialects.DUCKDB:
-        db = duckdb.connect()
+        # In order for FTS to work, vocab schema cannot be using ATTACH
+        # TODO: Revert back to using _get_duckdb_connection after issue has been fixed
+        # https://github.com/duckdb/duckdb/issues/13523
+        connection = _temp_workaround_get_duckdb_connection(
+            database_code, schema, vocab_schema)
 
-        # Attach cdm schema
-        cdm_schema_duckdb_file_path = os.path.join(
-            Env.DUCKDB__DATA_FOLDER, f"{database_code}_{schema}")
-        db.execute(
-            f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
-
-        # Attach vocab schema
-        vocab_schema_duckdb_file_path = os.path.join(
-            Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
-        db.execute(
-            f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
-
-        connection = DuckDBConnection(db)
+        '''
+        connection = _get_duckdb_connection(
+            database_code, schema, vocab_schema)
+        '''
 
     if connection:
         return connection
@@ -158,6 +153,44 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
         # If no connection can be found
         raise Exception(
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
+
+
+def _temp_workaround_get_duckdb_connection(database_code: str, schema: str, vocab_schema: str) -> DuckDBConnection:
+    '''
+    Temp workaround function to get duckdb connection due to issue with duckdb FTS.
+    Refer to ticket issue below.
+    https://github.com/duckdb/duckdb/issues/13523
+    '''
+    vocab_schema_duckdb_file_path = os.path.join(
+        Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
+
+    db = duckdb.connect(vocab_schema_duckdb_file_path, read_only=True)
+
+    # Attach cdm schema
+    cdm_schema_duckdb_file_path = os.path.join(
+        Env.DUCKDB__DATA_FOLDER, f"{database_code}_{schema}")
+    db.execute(
+        f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
+
+    return DuckDBConnection(db)
+
+
+def _get_duckdb_connection(database_code: str, schema: str, vocab_schema: str) -> DuckDBConnection:
+    db = duckdb.connect()
+
+    # Attach cdm schema
+    cdm_schema_duckdb_file_path = os.path.join(
+        Env.DUCKDB__DATA_FOLDER, f"{database_code}_{schema}")
+    db.execute(
+        f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
+
+    # Attach vocab schema
+    vocab_schema_duckdb_file_path = os.path.join(
+        Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
+    db.execute(
+        f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
+
+    return DuckDBConnection(db)
 
 
 def parse_connection_param_database(database: str) -> tuple[str, str]:
