@@ -64,12 +64,6 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle /* {
-		reverse_proxy http://alp-perseus-frontend-1:4200 {
-			header_up X-Real-IP {http.request.remote_host}
-		}
-	}
-
 	handle /backend/* {
 		import forward_authentication
 

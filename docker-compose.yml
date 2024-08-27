@@ -1790,14 +1790,6 @@ services:
         priority: 20
     profiles: [perseus]
 
-  alp-perseus-frontend:
-    image: perseushub/frontend:latest
-    container_name: alp-perseus-frontend-${BASE_PORT:-1}
-    networks:
-      alp:
-        priority: 20
-    profiles: [perseus]
-
   alp-perseus-white-rabbit:
     image: perseushub/white-rabbit:latest
     container_name: alp-perseus-white-rabbit-${BASE_PORT:-1}
