@@ -180,8 +180,10 @@ jobs:
           cat private2-todelete.yml | yq -P 'map(select(.lengths=="[40]") | .tags | @jsond)'
 
           if [ "${AZ_REGISTRY_PRUNE_ENABLE}" = true ]; then
-            echo ". 4 - ACTION delete digests ..."
+            echo ". 4 - ACTION delete tagged digests ..."
             yq '.[].digest' private2-todelete.yml | sort -u | xargs -I% az acr repository delete -u ${AZ_REGISTRY_USERNAME} -p ${AZ_REGISTRY_PASSWORD} --name ${AZ_REGISTRY_NAME} --image ${AZ_REGISTRY_REPOSITORY}@% --yes
+            echo ". 5 - ACTION delete untagged digests ..."
+            az acr manifest metadata list --name ${AZ_REGISTRY_REPOSITORY} --registry ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && tags[0]==null].digest" -o tsv  | xargs -I% az acr repository delete -n ${AZ_REGISTRY_NAME} -t ${AZ_REGISTRY_REPOSITORY}@% -y
           else
             echo ". 4 - SKIPPED delete digests ..."
           fi
