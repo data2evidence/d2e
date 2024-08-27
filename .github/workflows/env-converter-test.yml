@@ -16,26 +16,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - uses: dorny/paths-filter@v3.0.2
-      id: check_file_changed
-      with:
-        filters: |
-          env_converter_changed:
-            - 'services/envConverter/**'
+      - uses: dorny/paths-filter@v3.0.2
+        id: check_file_changed
+        with:
+          filters: |
+            env_converter_changed:
+              - 'services/envConverter/**'
 
-    - name: Setup node if files have changed
-      uses: actions/setup-node@v4
-      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.env_converter_changed == 'True'
-      with:
-        node-version: '18.14.0'
+      - name: Setup node if files have changed
+        uses: actions/setup-node@v4
+        if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.env_converter_changed == 'True'
+        with:
+          node-version: "18.20.4"
 
-    # Run the step only with "env_converter_changed" equals "True"
-    - name: Run unit tests if files have changed
-      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.env_converter_changed == 'True'
-      run: |
-        rm -rf package.json
-        cd services/envConverter
-        yarn install --prefer-offline
-        yarn test
+      # Run the step only with "env_converter_changed" equals "True"
+      - name: Run unit tests if files have changed
+        if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.env_converter_changed == 'True'
+        run: |
+          rm -rf package.json
+          cd services/envConverter
+          yarn install --prefer-offline
+          yarn test

@@ -3,12 +3,11 @@
   "version": "1.0.0-dev",
   "description": "fhir-server",
   "private": true,
-  "scripts": {
-  },
+  "scripts": {},
   "author": "",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=18.14.0"
+    "node": ">=18.20.4"
   },
   "repository": {
     "type": "git",

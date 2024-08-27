@@ -16,25 +16,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - uses: dorny/paths-filter@v3.0.2
-      id: check_file_changed
-      with:
-        filters: |
-          dataflow_changed:
-            - 'services/alp-dataflow/**'
+      - uses: dorny/paths-filter@v3.0.2
+        id: check_file_changed
+        with:
+          filters: |
+            dataflow_changed:
+              - 'services/alp-dataflow/**'
 
-    - name: Setup node if files have changed
-      uses: actions/setup-node@v4
-      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
-      with:
-        node-version: '18.14.0'
+      - name: Setup node if files have changed
+        uses: actions/setup-node@v4
+        if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
+        with:
+          node-version: "18.20.4"
 
-    - name: Run unit tests if files have changed
-      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
-      run: |
-        cd services/alp-dataflow
-        yarn --prefer-offline
-        yarn build:lint
-        yarn test
+      - name: Run unit tests if files have changed
+        if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.dataflow_changed == 'True'
+        run: |
+          cd services/alp-dataflow
+          yarn --prefer-offline
+          yarn build:lint
+          yarn test
