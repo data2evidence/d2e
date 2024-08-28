@@ -159,7 +159,7 @@ jobs:
             GIT_TOKEN__PLUGINS_REPO_READ=${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
 
       - name: Post purge
-        if: always()
+        if: ${{ vars.GHA_BUILD_DEBUG != 'true' }}
         run: |
           docker system prune -af
 
