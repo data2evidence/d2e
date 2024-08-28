@@ -38,9 +38,9 @@ on:
         required: true
         type: string
 
-concurrency:
-  group: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build-push-prune
-  cancel-in-progress: false
+# concurrency:
+#   group: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build-push-prune
+#   cancel-in-progress: true
 
 env:
   GIT_BRANCH_NAME: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
