@@ -13,7 +13,7 @@ const Env = z.object({
   TLS__INTERNAL__CRT: z.string(),
   DUCKDB_PATH: z.string(),
   BUILT_IN_DUCKDB_PATH: z.string(),
-  
+
   PG__HOST: z.string(),
   PG__DB_NAME: z.string(),
   PG_USER: z.string(),
@@ -40,7 +40,7 @@ const Env = z.object({
 
 const result = Env.safeParse(process.env);
 
-let env = process.env as unknown as z.infer<typeof Env>;
+let env;
 if (result.success) {
   env = result.data;
 } else {
