@@ -141,6 +141,7 @@ jobs:
           docker system prune -af
 
       - name: Prune old images
+        if: needs.setup.outputs.GIT_BRANCH_NAME == 'develop'
         shell: bash
         env:
           AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
