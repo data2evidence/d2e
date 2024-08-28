@@ -26,7 +26,7 @@ const Env = z.object({
 
 const result = Env.safeParse(process.env);
 
-let env;
+let env: z.infer<typeof Env>;
 if (result.success) {
     env = result.data;
     // console.log(env);
