@@ -47,7 +47,7 @@ let env = process.env as unknown as z.infer<typeof Env>;
 if (result.success) {
   env = result.data;
 } else {
-  console.warn(JSON.stringify(result));
+  throw Error(`Service Failed to Start!! ${JSON.stringify(result)}`);
 }
 
 export { env };

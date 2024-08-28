@@ -1,5 +1,7 @@
 import * as dotenv from "dotenv";
 import { object, z } from "zod";
+import process from 'node:process';
+
 
 if (process.env.DOTENV_PATH) {
     dotenv.config({ path: process.env.DOTENV_PATH });
@@ -60,7 +62,7 @@ let env = process.env as unknown as z.infer<typeof Env>;
 if (result.success) {
     env = result.data;
 } else {
-    console.warn(JSON.stringify(result));
+    throw Error(`Service Failed to Start!! ${JSON.stringify(result)}`);
 }
 
 export { env };

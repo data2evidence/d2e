@@ -44,12 +44,12 @@ const Env = z.object({
 });
 
 const result = Env.safeParse(process.env);
-
-if (result.success === false) {
-  log.warn(result.error);
+let env = process.env as unknown as z.infer<typeof Env>;
+if (result.success) {
+  env = result.data;
+} else {
+  throw Error(`Service Failed to Start!! ${JSON.stringify(result)}`);
 }
-
-const env = process.env as z.infer<typeof Env>;
 const envVarUtils = new EnvVarUtils(process.env);
 
 export { env, envVarUtils };

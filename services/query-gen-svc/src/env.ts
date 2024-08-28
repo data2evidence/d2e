@@ -31,8 +31,7 @@ if (result.success) {
     env = result.data;
     // console.log(env);
 } else {
-    // @ts-ignore
-    console.warn(JSON.stringify(result.error));
+    throw Error(`Service Failed to Start!! ${JSON.stringify(result)}`);
 }
 
 export { env };
