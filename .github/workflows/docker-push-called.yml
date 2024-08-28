@@ -111,12 +111,19 @@ jobs:
           username: ${{ secrets.AZ_REGISTRY_USERNAME }}
           password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
 
-      - uses: webfactory/ssh-agent@v0.9.0
+      - name: SSH_AUTH_SOCK if GIT_SSH_PRIVATE_KEYS is not null
+        uses: webfactory/ssh-agent@v0.9.0
         if: ${{ inputs.GIT_SSH_PRIVATE_KEYS != 'null' }}
         with:
           ssh-private-key: |
             ${{ secrets.SSH_PRIVATE_KEY_STARBOARD_WRAP }}
             ${{ secrets.SSH_PRIVATE_KEY_NOTEBOOK_BASE }}
+
+      - name: SSH_AUTH_SOCK if GIT_SSH_PRIVATE_KEYS is null
+        shell: bash
+        if: ${{ inputs.GIT_SSH_PRIVATE_KEYS == 'null' }}
+        run: |
+          eval $(ssh-agent -s)
 
       - name: Collect Git and SSH config files in a directory that is part of the Docker build context
         if: ${{ inputs.GIT_SSH_PRIVATE_KEYS != 'null' }}
@@ -148,8 +155,8 @@ jobs:
           file: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
           push: ${{ inputs.DOCKER_BUILD_PUSH_BOOL_STR == 'true' }}
           tags: ${{ vars.AZ_REGISTRY_NAME }}.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
-          # ssh: |
-          #   default=${{ inputs.GIT_SSH_PRIVATE_KEYS != 'null' && env.SSH_AUTH_SOCK }}
+          ssh: |
+            default=${{ env.SSH_AUTH_SOCK }}
           build-args: |
             docker_image_prefix=${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
             GIT_COMMIT_ARG=${{ github.sha }}
