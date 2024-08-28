@@ -40,18 +40,26 @@ https://*.alp.local:55555 {
 (cors) {
 	@cors_preflight method OPTIONS
 
-	header {
-		Access-Control-Allow-Origin {args[0]}
+	@cors_origin {
+		header_regexp Origin ^https?://localhost:(4000|5173|8081|4800|4900)?$
+	}
+
+	header @cors_origin {
+		Access-Control-Allow-Origin "{http.request.header.Origin}"
 		Vary Origin
-		Access-Control-Allow-Headers "Authorization, Content-Type"
+		Access-Control-Allow-Headers "*"
 		Access-Control-Allow-Credentials "true"
 		defer
 	}
 
 	handle @cors_preflight {
 		header {
+			Access-Control-Allow-Origin "{http.request.header.Origin}"
+			Access-Control-Allow-Credentials true
 			Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE"
 			Access-Control-Max-Age "3600"
+			Vary Origin
+			defer
 		}
 		respond "" 204
 	}
@@ -66,7 +74,6 @@ https://*.alp.local:55555 {
 
 	handle /backend/* {
 		import forward_authentication
-
 		reverse_proxy http://alp-perseus-backend-1:5004 {
 			header_up X-Real-IP {http.request.remote_host}
 		}
@@ -217,8 +224,6 @@ https://*.alp.local:55555 {
 	}
 
 	handle_path /mapping/* {
-		{$CADDY__CORS_LOCAL_PORTAL_UI:}
-
 		root * /home/docker/ui-files/mapping/
 		encode zstd gzip
 		file_server {
@@ -395,7 +400,9 @@ https://localhost:41101 {
 }
 
 https://{$CADDY__ALP__PUBLIC_FQDN} {
-	{$TLS__CADDY_DIRECTIVE}
+	{$TLS__CADDY_DIRECTIVE} 
+	{$CADDY__CORS_LOCAL_UI}
+	import perseus
 	import portal
 }
 
@@ -415,10 +422,4 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 			}
 		}
 	}
-}
-
-http://localhost:41180 {
-	# Allow CORS for mapping UI local development
-	import cors http://localhost:5173
-	import perseus
 }
