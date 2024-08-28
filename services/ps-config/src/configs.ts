@@ -24,20 +24,20 @@ const Env = z.object({
   PG_SCHEMA: z.string(),
   PG__PORT: z
     .string()
-    .refine(val => !isNaN(parseInt(val)))
+    .refine((val) => !isNaN(parseInt(val)))
     .transform(Number),
   PG__MAX_POOL: z
     .string()
-    .refine(val => !isNaN(parseInt(val)))
+    .refine((val) => !isNaN(parseInt(val)))
     .transform(Number),
   PG__MIN_POOL: z
     .string()
-    .refine(val => !isNaN(parseInt(val)))
+    .refine((val) => !isNaN(parseInt(val)))
     .transform(Number),
   PG__IDLE_TIMEOUT_IN_MS: z
     .string()
-    .refine(val => !isNaN(parseInt(val)))
-    .transform(Number)
+    .refine((val) => !isNaN(parseInt(val)))
+    .transform(Number),
 });
 
 const result = Env.safeParse(process.env);
@@ -45,7 +45,8 @@ let env: z.infer<typeof Env>;
 if (result.success) {
   env = result.data;
 } else {
-  throw Error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+  console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+  process.exit(1);
 }
 const envVarUtils = new EnvVarUtils(process.env);
 

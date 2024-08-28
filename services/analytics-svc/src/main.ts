@@ -164,7 +164,7 @@ const initRoutes = async (app: express.Application) => {
                     credentials = analyticsCredentials[EnvVarUtils.getEnvs().TESTSCHEMA];
                 } else {
                     credentials = req.dbCredentials.studyAnalyticsCredential;
-                }
+                } 
 
                 if (env.USE_CACHEDB === "true") {
                     req.dbConnections = await getCachedbDbConnections({

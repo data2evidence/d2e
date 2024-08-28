@@ -10,8 +10,8 @@ const Env = z
             .string()
             .refine((val) => !isNaN(parseInt(val)))
             .transform(Number),
-        isHttpTestRun: z.string().transform(Boolean).optional(),
-        isTestEnv: z.string().transform(Boolean).optional(),
+        isHttpTestRun: z.string().optional(),
+        isTestEnv: z.string().optional(),
         TESTSCHEMA: z.string().optional(),
         SERVICE_ROUTES: z
             .string()
@@ -31,7 +31,7 @@ const Env = z
             refinementContext
         ) => {
             //Validate for non-prod scenarios
-            if (LOCAL_DEBUG.toLowerCase() === "true") {
+            if (LOCAL_DEBUG === "true") {
                 const addError = (env) => {
                     refinementContext.addIssue({
                         code: z.ZodIssueCode.custom,
@@ -42,8 +42,12 @@ const Env = z
 
                 if (!isHttpTestRun) addError("isHttpTestRun");
                 if (!isTestEnv) addError("isTestEnv");
-                if (!TESTSCHEMA && (isTestEnv && isTestEnv === true)) addError("TESTSCHEMA");
-
+                if (
+                    !TESTSCHEMA &&
+                    isTestEnv &&
+                    isTestEnv.toLowerCase() === "true"
+                )
+                    addError("TESTSCHEMA");
             }
         }
     );
@@ -53,9 +57,9 @@ const result = Env.safeParse(process.env);
 let env: z.infer<typeof Env>;
 if (result.success) {
     env = result.data;
-    // console.log(env);
 } else {
-    throw Error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+    console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+    process.exit(1);
 }
 
 export { env };
