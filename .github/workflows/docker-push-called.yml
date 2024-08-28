@@ -141,28 +141,28 @@ jobs:
         run: |
           docker system prune -af
 
-      - name: Prune old images
-        if: needs.setup.outputs.GIT_BRANCH_NAME == 'develop'
+      - name: Prune tagged images
+        if: needs.setup.outputs.GIT_BRANCH_NAME == 'develop' # on merge to develop branch only
         shell: bash
         env:
           AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
           AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
           AZ_REGISTRY_PRUNE_ENABLE: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE }}
-          AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS: ${{ vars.AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS }}
+          AZ_REGISTRY_PRUNE_DAYS_TAGGED: ${{ vars.AZ_REGISTRY_PRUNE_DAYS_TAGGED }}
           AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
           AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
           AZ_REGISTRY_WHITELIST_REGEX: ${{ vars.AZ_REGISTRY_WHITELIST_REGEX }}
         run: |
-          # echo AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS=$AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS | tee -a $GITHUB_STEP_SUMMARY
+          # echo AZ_REGISTRY_PRUNE_DAYS_TAGGED=$AZ_REGISTRY_PRUNE_DAYS_TAGGED | tee -a $GITHUB_STEP_SUMMARY
           # echo AZ_REGISTRY_WHITELIST_REGEX=$AZ_REGISTRY_WHITELIST_REGEX | tee -a $GITHUB_STEP_SUMMARY
           # echo AZ_REGISTRY_REPOSITORY=$AZ_REGISTRY_REPOSITORY | tee -a $GITHUB_STEP_SUMMARY
           # echo AZ_REGISTRY_PRUNE_ENABLE=$AZ_REGISTRY_PRUNE_ENABLE | tee -a $GITHUB_STEP_SUMMARY
 
-          if [ $AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS = 0 ]; then
+          if [ $AZ_REGISTRY_PRUNE_DAYS_TAGGED = 0 ]; then
             AZ_REGISTRY_PRUNE_TIMESTAMP=$(date -u -Is)
           else
             TODAY=$(date +%Y-%m-%d)
-            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_NUMBER_OF_DAYS} days" +%Y-%m-%d)"
+            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_TAGGED} days" +%Y-%m-%d)"
           fi
 
           # echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP | tee -a $GITHUB_STEP_SUMMARY
@@ -174,7 +174,10 @@ jobs:
           echo ". 2 - ANALYZE each tag as deletable True/False - show first 20"
           cat private.json | yq -rP 'map({"digest":.digest, "tags":(.tags|@json),"count":(.tags|length),"lengths":([.tags[]|length]|@json),"deletable":(.tags|map(test(env(AZ_REGISTRY_WHITELIST_REGEX))|not)|@json)})' | tee private1-analysis.yml | yq '.[0:20]'
 
-          echo ". 3 - SELECT images to be deleted i.e. manifests excepting deletable False tags"
+          echo ". 3 - ACTION lock manifests with deletable False i.e. tags matching RegEx"
+          cat private1-analysis.yml | yq 'map(select(.deletable|contains("false")).digest) | .[1]' | xargs -I% az acr repository update -u ${AZ_REGISTRY_USERNAME} -p ${AZ_REGISTRY_PASSWORD} --name ${AZ_REGISTRY_NAME} --image ${AZ_REGISTRY_REPOSITORY}@% --delete-enabled false --write-enabled true | yq -P
+
+          echo ". 4 - SELECT images to be deleted i.e. manifests excepting deletable False i.e. tags not matching RegEx"
           cat private1-analysis.yml | yq 'map(select(.deletable|contains("false")|not))' > private2-todelete.yml
           echo . INFO for deletion - BranchNames
           cat private2-todelete.yml | yq -P 'map(select(.lengths!="[40]") | .tags | @jsond)'
@@ -182,10 +185,34 @@ jobs:
           cat private2-todelete.yml | yq -P 'map(select(.lengths=="[40]") | .tags | @jsond)'
 
           if [ "${AZ_REGISTRY_PRUNE_ENABLE}" = true ]; then
-            echo ". 4 - ACTION delete tagged digests ..."
+            echo ". 5 - ACTION delete tagged digests ..."
             yq '.[].digest' private2-todelete.yml | sort -u | xargs -I% az acr repository delete -u ${AZ_REGISTRY_USERNAME} -p ${AZ_REGISTRY_PASSWORD} --name ${AZ_REGISTRY_NAME} --image ${AZ_REGISTRY_REPOSITORY}@% --yes
-            echo ". 5 - ACTION delete untagged digests ..."
-            az acr manifest metadata list --name ${AZ_REGISTRY_REPOSITORY} --registry ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && tags[0]==null].digest" -o tsv  | xargs -I% az acr repository delete -n ${AZ_REGISTRY_NAME} -t ${AZ_REGISTRY_REPOSITORY}@% -y
           else
-            echo ". 4 - SKIPPED delete digests ..."
+            echo ". 5 - SKIPPED delete digests ..."
           fi
+
+      - name: Prune untagged images
+        shell: bash
+        env:
+          AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
+          AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
+          AZ_REGISTRY_PRUNE_ENABLE: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE }}
+          AZ_REGISTRY_PRUNE_DAYS_UNTAGGED: ${{ vars.AZ_REGISTRY_PRUNE_DAYS_UNTAGGED }}
+          AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
+          AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
+          AZ_REGISTRY_WHITELIST_REGEX: ${{ vars.AZ_REGISTRY_WHITELIST_REGEX }}
+        run: |
+          # echo AZ_REGISTRY_PRUNE_DAYS_UNTAGGED=$AZ_REGISTRY_PRUNE_DAYS_UNTAGGED | tee -a $GITHUB_STEP_SUMMARY
+          # echo AZ_REGISTRY_WHITELIST_REGEX=$AZ_REGISTRY_WHITELIST_REGEX | tee -a $GITHUB_STEP_SUMMARY
+          # echo AZ_REGISTRY_REPOSITORY=$AZ_REGISTRY_REPOSITORY | tee -a $GITHUB_STEP_SUMMARY
+          # echo AZ_REGISTRY_PRUNE_ENABLE=$AZ_REGISTRY_PRUNE_ENABLE | tee -a $GITHUB_STEP_SUMMARY
+
+          if [ $AZ_REGISTRY_PRUNE_DAYS_UNTAGGED = 0 ]; then
+            AZ_REGISTRY_PRUNE_TIMESTAMP=$(date -u -Is)
+          else
+            TODAY=$(date +%Y-%m-%d)
+            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_UNTAGGED} days" +%Y-%m-%d)"
+          fi
+
+          echo ". ACTION delete untagged digests ..."
+          az acr manifest metadata list --name ${AZ_REGISTRY_REPOSITORY} --registry ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && tags[0]==null].digest" -o tsv  | xargs -I% az acr repository delete -n ${AZ_REGISTRY_NAME} -t ${AZ_REGISTRY_REPOSITORY}@% -y
