@@ -67,6 +67,9 @@ on:
       GIT_REPO_FULL_NAME:
         required: true
         type: string
+      GIT_SSH_PRIVATE_KEYS:
+        default: "null"
+        type: string
 
 jobs:
   build-push-prune:
@@ -109,12 +112,14 @@ jobs:
           password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
 
       - uses: webfactory/ssh-agent@v0.9.0
+        if: ${{ inputs.GIT_SSH_PRIVATE_KEYS != 'null' }}
         with:
           ssh-private-key: |
             ${{ secrets.SSH_PRIVATE_KEY_STARBOARD_WRAP }}
             ${{ secrets.SSH_PRIVATE_KEY_NOTEBOOK_BASE }}
 
       - name: Collect Git and SSH config files in a directory that is part of the Docker build context
+        if: ${{ inputs.GIT_SSH_PRIVATE_KEYS != 'null' }}
         run: |
           cp -r ~/.gitconfig  ~/.ssh .github/
           cd .github/
