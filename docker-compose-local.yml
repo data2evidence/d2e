@@ -34,7 +34,6 @@ services:
     environment:
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-dataflow-gen-agent:
     build:
@@ -48,7 +47,6 @@ services:
       ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-dataflow-gen-init:
     build:
@@ -96,9 +94,7 @@ services:
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
-      local: ${local}
       TESTSCHEMA: ${TESTSCHEMA}
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-minerva-cdw-svc:
     build:
@@ -142,7 +138,6 @@ services:
       LOCAL_DEBUG: "true"
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-minerva-meilisearch-svc:
     ports:

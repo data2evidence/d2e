@@ -33,12 +33,10 @@ const Env = z.object({
         .refine((val) => !isNaN(parseInt(val)))
         .transform(Number),
 
-    SKIP_AUTH: z.string(),
     LOCAL_DEBUG: z.string(),
     SQL_RETURN_ON: z.string(),
     isHttpTestRun: z.string(),
     isTestEnv: z.string(),
-    local: z.string(),
 
     TLS__INTERNAL__KEY: z.string(),
     TLS__INTERNAL__CRT: z.string(),
