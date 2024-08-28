@@ -119,7 +119,8 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v6
-        if: ${{ vars.DOCKER_BUILD_DISABLE != 'true' }}
+        if: false
+        # if: ${{ vars.DOCKER_BUILD_DISABLE != 'true' }}
         with:
           builder: ${{ steps.builder.outputs.name }}
           platforms: "linux/amd64"
