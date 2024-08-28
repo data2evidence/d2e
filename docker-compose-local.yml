@@ -20,8 +20,6 @@ services:
     environment:
       CADDY__FHIR_SERVER__PUBLIC_FQDN: ${CADDY__FHIR_SERVER__PUBLIC_FQDN:-localhost}
       CADDY__CORS_LOCAL_UI: "import cors"
-      isHttpTestRun: ${isHttpTestRun:-false}
-      isTestEnv: ${isTestEnv:-false}
 
   alp-dataflow-gen:
     build:
