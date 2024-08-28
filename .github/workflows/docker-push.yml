@@ -40,7 +40,7 @@ on:
 
 concurrency:
   group: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build-push-prune
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   GIT_BRANCH_NAME: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
