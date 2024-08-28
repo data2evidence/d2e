@@ -142,7 +142,7 @@ jobs:
           docker system prune -af
 
       - name: Prune tagged images
-        if: needs.setup.outputs.GIT_BRANCH_NAME == 'develop' # on merge to develop branch only
+        if: needs.setup.outputs.GIT_BRANCH_NAME == 'develop' || github.event_name == 'workflow_dispatch'
         shell: bash
         env:
           AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
@@ -193,6 +193,7 @@ jobs:
 
       - name: Prune untagged images
         shell: bash
+        if: always()
         env:
           AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
           AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
@@ -215,4 +216,4 @@ jobs:
           fi
 
           echo ". ACTION delete untagged digests ..."
-          az acr manifest metadata list --name ${AZ_REGISTRY_REPOSITORY} --registry ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && tags[0]==null].digest" -o tsv  | xargs -I% az acr repository delete -n ${AZ_REGISTRY_NAME} -t ${AZ_REGISTRY_REPOSITORY}@% -y
+          az acr manifest metadata list --registry ${AZ_REGISTRY_NAME} --name ${AZ_REGISTRY_REPOSITORY} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && tags[0]==null].digest" -o tsv  | xargs -I% az acr repository delete -n ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" -t ${AZ_REGISTRY_REPOSITORY}@% -y
