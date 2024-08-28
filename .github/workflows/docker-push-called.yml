@@ -123,7 +123,7 @@ jobs:
         shell: bash
         if: ${{ inputs.GIT_SSH_PRIVATE_KEYS == 'null' }}
         run: |
-          eval $(ssh-agent -s)
+          ssh-agent -s | tee -a GITHUB_OUTPUT
 
       - name: Collect Git and SSH config files in a directory that is part of the Docker build context
         if: ${{ inputs.GIT_SSH_PRIVATE_KEYS != 'null' }}
