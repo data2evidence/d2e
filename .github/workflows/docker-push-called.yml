@@ -34,6 +34,11 @@ on:
       GIT_REPO_FULL_NAME:
         required: true
         type: string
+      GIT_SSH_PRIVATE_KEYS:
+        default: "null"
+        required: false
+        type: string
+
   workflow_call:
     inputs:
       AZ_REGISTRY_REPOSITORY:
@@ -69,6 +74,7 @@ on:
         type: string
       GIT_SSH_PRIVATE_KEYS:
         default: "null"
+        required: false
         type: string
 
 jobs:
