@@ -35,8 +35,9 @@ const Env = z.object({
 
     LOCAL_DEBUG: z.string(),
     SQL_RETURN_ON: z.string(),
-    isHttpTestRun: z.string(),
-    isTestEnv: z.string(),
+    isHttpTestRun: z.string().optional(),
+    isTestEnv: z.string().optional(),
+    TESTSCHEMA: z.string().optional(),
 
     TLS__INTERNAL__KEY: z.string(),
     TLS__INTERNAL__CRT: z.string(),
@@ -52,11 +53,26 @@ const Env = z.object({
                 return z.never();
             }
         }),
+}).superRefine(({ LOCAL_DEBUG, isHttpTestRun, isTestEnv, TESTSCHEMA }, refinementContext) => {
+    //Validate for non-prod scenarios
+    if (LOCAL_DEBUG.toLowerCase() === "true") {
+        const addError = (env) => {
+            refinementContext.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `No value for ${env}`,
+                path: [env],
+              });
+        }
+
+        if (!isHttpTestRun) addError("isHttpTestRun")
+        if (!isTestEnv) addError("isTestEnv")
+        if (!TESTSCHEMA && (isTestEnv && isTestEnv.toLowerCase() === "true")) addError("TESTSCHEMA");
+    }
 });
 
 const result = Env.safeParse(process.env);
 
-let env;
+let env: z.infer<typeof Env>;
 if (result.success) {
     env = result.data;
 } else {

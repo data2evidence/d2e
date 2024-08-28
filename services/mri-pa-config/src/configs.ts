@@ -19,6 +19,11 @@ const Env = z.object({
   TLS__INTERNAL__KEY: z.string(),
   TLS__INTERNAL__CRT: z.string(),
 
+  LOCAL_DEBUG: z.string(),
+  isHttpTestRun: z.string().optional(),
+  isTestEnv: z.string().optional(),
+  TESTSCHEMA: z.string().optional(),
+
   PG__HOST: z.string(),
   PG__DB_NAME: z.string(),
   PG_USER: z.string(),
@@ -41,7 +46,23 @@ const Env = z.object({
     .string()
     .refine(val => !isNaN(parseInt(val)))
     .transform(Number),
+}).superRefine(({ LOCAL_DEBUG, isHttpTestRun, isTestEnv, TESTSCHEMA }, refinementContext) => {
+  //Validate for non-prod scenarios
+  if (LOCAL_DEBUG.toLowerCase() === "true") {
+    const addError = (env) => {
+          refinementContext.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `No value for ${env}`,
+              path: [env],
+            });
+      }
+
+      if (!isHttpTestRun) addError("isHttpTestRun")
+      if (!isTestEnv) addError("isTestEnv")
+      if (!TESTSCHEMA && (isTestEnv && isTestEnv.toLowerCase() === "true")) addError("TESTSCHEMA");
+  }
 });
+
 
 const result = Env.safeParse(process.env);
 let env: z.infer<typeof Env>;
