@@ -117,6 +117,12 @@ jobs:
           username: ${{ secrets.AZ_REGISTRY_USERNAME }}
           password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
 
+      - name: SSH_AUTH_SOCK if GIT_SSH_PRIVATE_KEYS is null
+        shell: bash
+        if: ${{ inputs.GIT_SSH_PRIVATE_KEYS == 'null' }}
+        run: |
+          ssh-agent -s | sed -e 's/;.*//' -e '/^echo/d' | tee -a $GITHUB_ENV
+
       - name: SSH_AUTH_SOCK if GIT_SSH_PRIVATE_KEYS is not null
         uses: webfactory/ssh-agent@v0.9.0
         if: ${{ inputs.GIT_SSH_PRIVATE_KEYS != 'null' }}
@@ -124,12 +130,6 @@ jobs:
           ssh-private-key: |
             ${{ secrets.SSH_PRIVATE_KEY_STARBOARD_WRAP }}
             ${{ secrets.SSH_PRIVATE_KEY_NOTEBOOK_BASE }}
-
-      - name: SSH_AUTH_SOCK if GIT_SSH_PRIVATE_KEYS is null
-        shell: bash
-        if: ${{ inputs.GIT_SSH_PRIVATE_KEYS == 'null' }}
-        run: |
-          ssh-agent -s | sed -e 's/;.*//' -e '/^echo/d' | tee -a $GITHUB_ENV
 
       - name: Collect Git and SSH config files in a directory that is part of the Docker build context
         if: ${{ inputs.GIT_SSH_PRIVATE_KEYS != 'null' }}
@@ -187,11 +187,11 @@ jobs:
           AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
           AZ_REGISTRY_WHITELIST_REGEX: ${{ vars.AZ_REGISTRY_WHITELIST_REGEX }}
         run: |
-          if [ $AZ_REGISTRY_PRUNE_DAYS_TAGGED = 0 ]; then
+          if [ ${AZ_REGISTRY_PRUNE_DAYS_TAGGED:-20} = 0 ]; then
             AZ_REGISTRY_PRUNE_TIMESTAMP=$(date -u -Is)
           else
             TODAY=$(date +%Y-%m-%d)
-            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_TAGGED} days" +%Y-%m-%d)"
+            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_TAGGED:-20} days" +%Y-%m-%d)"
           fi
           echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP | tee -a $GITHUB_STEP_SUMMARY
 
@@ -231,11 +231,11 @@ jobs:
           AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
           AZ_REGISTRY_WHITELIST_REGEX: ${{ vars.AZ_REGISTRY_WHITELIST_REGEX }}
         run: |
-          if [ $AZ_REGISTRY_PRUNE_DAYS_UNTAGGED = 0 ]; then
+          if [ ${AZ_REGISTRY_PRUNE_DAYS_UNTAGGED:-1} = 0 ]; then
             AZ_REGISTRY_PRUNE_TIMESTAMP=$(date -u -Is)
           else
             TODAY=$(date +%Y-%m-%d)
-            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_UNTAGGED} days" +%Y-%m-%d)"
+            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_UNTAGGED:-1} days" +%Y-%m-%d)"
           fi
           echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP | tee -a $GITHUB_STEP_SUMMARY
 
