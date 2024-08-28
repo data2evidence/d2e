@@ -25,7 +25,7 @@ export async function loadBookmarks(
         urlParams = new URL(`http://localhost:41005`);
         protocolLib = http;
     } else {
-        urlParams = new URL(env.SERVICE_ROUTES["bookmark"]);
+        urlParams = new URL(env.SERVICE_ROUTES.bookmark);
         protocolLib = https;
     }
 
