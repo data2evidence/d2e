@@ -17,10 +17,9 @@ services:
       - 41100:41100
       - 41000:41000
       - 41130:41130
-      - 41180:41180
     environment:
       CADDY__FHIR_SERVER__PUBLIC_FQDN: ${CADDY__FHIR_SERVER__PUBLIC_FQDN:-localhost}
-      CADDY__CORS_LOCAL_PORTAL_UI: "import cors https://localhost:4000"
+      CADDY__CORS_LOCAL_UI: "import cors"
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
 
