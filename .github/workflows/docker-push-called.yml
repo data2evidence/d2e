@@ -149,7 +149,7 @@ jobs:
           push: ${{ inputs.DOCKER_BUILD_PUSH_BOOL_STR == 'true' }}
           tags: ${{ vars.AZ_REGISTRY_NAME }}.azurecr.io/${{ inputs.AZ_REGISTRY_REPOSITORY }}:${{ inputs.DOCKER_IMG_TAG_NAME }}
           ssh: |
-            default=${{ env.SSH_AUTH_SOCK }}
+            default=${{ inputs.GIT_SSH_PRIVATE_KEYS != 'null' && env.SSH_AUTH_SOCK }}
           build-args: |
             docker_image_prefix=${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
             GIT_COMMIT_ARG=${{ github.sha }}
