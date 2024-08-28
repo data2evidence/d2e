@@ -8,7 +8,6 @@ export TESTSCHEMA="$TESTSCHEMA"
 export isTestEnv="true"
 export isHttpTestRun="true"
 export DOCKER_TAG_NAME="local"
-export SKIP_AUTH="FALSE"
 export OP_VAULT_NAME=Singapore
 
 export HANASERVER="$HANASERVER"
