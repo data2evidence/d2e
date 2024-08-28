@@ -42,7 +42,7 @@ const Env = z
 
                 if (!isHttpTestRun) addError("isHttpTestRun");
                 if (!isTestEnv) addError("isTestEnv");
-                if (!TESTSCHEMA && (isTestEnv && isTestEnv.toLowerCase() === "true")) addError("TESTSCHEMA");
+                if (!TESTSCHEMA && (isTestEnv && isTestEnv === true)) addError("TESTSCHEMA");
 
             }
         }
