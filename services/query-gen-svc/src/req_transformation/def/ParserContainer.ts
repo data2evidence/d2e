@@ -3,17 +3,19 @@ export interface ICloneable<T> {
 }
 
 export class ParserContainer implements ICloneable<ParserContainer> {
-    constructor(public name: string,
-                public context: string,
-                public idx: number,
-                public alias: string = "",
-                public filter: any = {},
-                public groupBy: any[] = [],
-                public where: any[] = [],
-                public measure: any[] = [],
-                public having: any[] = [],
-                public orderBy: any[] = [],
-                public customClauseMap: string[] = []) {
+    constructor(
+        public name: string,
+        public context: string,
+        public idx: number,
+        public alias: string = "",
+        public filter: any = {},
+        public groupBy: any[] = [],
+        public where: any[] = [],
+        public measure: any[] = [],
+        public having: any[] = [],
+        public orderBy: any[] = [],
+        public customClauseMap: string[] = []
+    ) {
         if (!alias) {
             this.alias = context.substring(0, 1).toUpperCase() + idx.toString();
         } else {
@@ -27,39 +29,44 @@ export class ParserContainer implements ICloneable<ParserContainer> {
     }
 
     public clone(): ParserContainer {
-        return new ParserContainer(this.name,
-                                   this.context,
-                                   this.idx,
-                                   this.alias,
-                                   this.filter,
-                                   this.groupBy,
-                                   this.where,
-                                   this.measure,
-                                   this.having,
-                                   this.orderBy,
-                                   this.customClauseMap);
+        return new ParserContainer(
+            this.name,
+            this.context,
+            this.idx,
+            this.alias,
+            this.filter,
+            this.groupBy,
+            this.where,
+            this.measure,
+            this.having,
+            this.orderBy,
+            this.customClauseMap
+        );
     }
 }
 
 // tslint:disable-next-line:max-classes-per-file
 export class FilterNode implements ICloneable<FilterNode> {
-    constructor(public identifier: string,
-                public templateId: string,
-                public dataType: string,
-                public alias: string,
-                public attributeList: BaseNode[] = [],
-                public isExclude?: boolean,
-                public isLeftJoin?: boolean) {
-    }
+    constructor(
+        public identifier: string,
+        public templateId: string,
+        public dataType: string,
+        public alias: string,
+        public attributeList: BaseNode[] = [],
+        public isExclude?: boolean,
+        public isLeftJoin?: boolean
+    ) {}
 
     public clone(): FilterNode {
-        return new FilterNode(this.identifier,
-                              this.templateId,
-                              this.dataType,
-                              this.alias,
-                              this.attributeList,
-                              this.isExclude,
-                              this.isLeftJoin);
+        return new FilterNode(
+            this.identifier,
+            this.templateId,
+            this.dataType,
+            this.alias,
+            this.attributeList,
+            this.isExclude,
+            this.isLeftJoin
+        );
     }
 
     public withAttributeList(attributeList: BaseNode[]) {
@@ -133,8 +140,8 @@ export class BaseNode {
     }
 
     public withPathId(pathId: string) {
-    this.pathId = pathId;
-    return this;
+        this.pathId = pathId;
+        return this;
     }
 
     public withMeasure(isMeasure: boolean) {
@@ -185,14 +192,24 @@ export class BaseNode {
 // tslint:disable-next-line:max-classes-per-file
 export class And {
     constructor(public and: Filter) {
-        this.and = this.and.filter((e) => (e instanceof Expression && e.value !== null) || e instanceof Or || e instanceof TemporalQueryNode);
+        this.and = this.and.filter(
+            (e) =>
+                (e instanceof Expression && e.value !== null) ||
+                e instanceof Or ||
+                e instanceof TemporalQueryNode
+        );
     }
 }
 
 // tslint:disable-next-line:max-classes-per-file
 export class Or {
     constructor(public or: Filter) {
-        this.or = this.or.filter( (e) => (e instanceof Expression && e.value !== null) || e instanceof And || e instanceof TemporalQueryNode);
+        this.or = this.or.filter(
+            (e) =>
+                (e instanceof Expression && e.value !== null) ||
+                e instanceof And ||
+                e instanceof TemporalQueryNode
+        );
     }
 }
 
@@ -205,7 +222,7 @@ export class Expression {
     public isValid: Boolean;
 
     constructor(public op: string, public value: string) {
-        this.isValid = (this.op === "invalid_op") ? false : true;
+        this.isValid = this.op === "invalid_op" ? false : true;
     }
 
     public withType(type: string) {
@@ -231,7 +248,10 @@ export class Expression {
 
 // tslint:disable-next-line:max-classes-per-file
 export class TemporalQueryNode {
-    constructor(public value: string, public filter: TemporalQueryExpression[]) {}
+    constructor(
+        public value: string,
+        public filter: TemporalQueryExpression[]
+    ) {}
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -239,5 +259,14 @@ export class TemporalQueryExpression {
     constructor(public and: Expression[]) {}
 }
 
-export type Filter = (Expression|And|Or|TemporalQueryNode)[];
+export class JoinQueryNode {
+    constructor(public alias: string, public type: "With" | "Without") {}
+}
 
+export type Filter = (
+    | Expression
+    | And
+    | Or
+    | TemporalQueryNode
+    | JoinQueryNode
+)[];
