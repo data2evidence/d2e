@@ -1536,7 +1536,7 @@ services:
         - *x-tls
         - *x-routes
       SQL_RETURN_ON: ${SQL_RETURN_ON:-false}
-      LOCAL_DEBUG: "true"
+      LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41109
       NOT_EQ_CHECK_FILTERCARDS: ${NOT_EQ_CHECK_FILTERCARDS:-true}

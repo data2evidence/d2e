@@ -20,8 +20,6 @@ services:
     environment:
       CADDY__FHIR_SERVER__PUBLIC_FQDN: ${CADDY__FHIR_SERVER__PUBLIC_FQDN:-localhost}
       CADDY__CORS_LOCAL_UI: "import cors"
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
 
   alp-dataflow-gen:
     build:
@@ -34,7 +32,6 @@ services:
     environment:
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-dataflow-gen-agent:
     build:
@@ -48,7 +45,6 @@ services:
       ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
       PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-dataflow-gen-init:
     build:
@@ -94,11 +90,9 @@ services:
       MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
       MINIO__SSL: false
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
-      local: ${local}
+      isHttpTestRun: ${isHttpTestRun:-false}
+      isTestEnv: ${isTestEnv:-false}
       TESTSCHEMA: ${TESTSCHEMA}
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-minerva-cdw-svc:
     build:
@@ -111,8 +105,9 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
+      isHttpTestRun: ${isHttpTestRun:-false}
+      isTestEnv: ${isTestEnv:-false}
+      TESTSCHEMA: ${TESTSCHEMA}
 
   alp-minerva-dataflow-mgmt:
     build:
@@ -140,9 +135,6 @@ services:
       - ./services/alp-gateway/src:/usr/src/app/src
     environment:
       LOCAL_DEBUG: "true"
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-minerva-meilisearch-svc:
     ports:
@@ -159,8 +151,9 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
+      isHttpTestRun: ${isHttpTestRun:-false}
+      isTestEnv: ${isTestEnv:-false}
+      TESTSCHEMA: ${TESTSCHEMA}
 
   alp-minerva-pg-mgmt-init:
     build:
@@ -197,8 +190,6 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
 
   alp-minerva-sqleditor:
     build:
@@ -249,8 +240,8 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       NODE_ENV: development
-      isHttpTestRun: ${isHttpTestRun}
-      isTestEnv: ${isTestEnv}
+      isHttpTestRun: ${isHttpTestRun:-false}
+      isTestEnv: ${isTestEnv:-false}
       TESTSCHEMA: ${TESTSCHEMA}
 
   alp-dicom-server:
