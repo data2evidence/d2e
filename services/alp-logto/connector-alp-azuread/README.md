@@ -1,9 +1,9 @@
 ## How to switch from Basic to IDP Azure Authentication on D2E
 - Add social connector
-         - Enable admin endpoint. Update env `ADMIN_DISABLE_LOCALHOST`: `false`
-         - Port forward to logto container and access `http://localhost:3002`
-         - Follow the steps below to create the D2E social connector and configure in sign-in-experiences
-         - Disable Admin console. Update env `ADMIN_DISABLE_LOCALHOST`: `true`
+  - Enable admin endpoint. Update env `ADMIN_DISABLE_LOCALHOST`: `false`
+  - Port forward to logto container and access `http://localhost:3002`
+  - Follow the steps below to create the D2E social connector and configure in sign-in-experiences
+  - Disable Admin console. Update env `ADMIN_DISABLE_LOCALHOST`: `true`
 
 - In Azure, under app registrations
      - Add Token configuration -> Add groups claim
