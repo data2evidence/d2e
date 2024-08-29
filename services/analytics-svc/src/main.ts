@@ -161,10 +161,10 @@ const initRoutes = async (app: express.Application) => {
 
                 let credentials = null;
                 if (envVarUtils.isTestEnv()) {
-                    credentials = analyticsCredentials[process.env.TESTSCHEMA];
+                    credentials = analyticsCredentials[EnvVarUtils.getEnvs().TESTSCHEMA];
                 } else {
                     credentials = req.dbCredentials.studyAnalyticsCredential;
-                }
+                } 
 
                 if (env.USE_CACHEDB === "true") {
                     req.dbConnections = await getCachedbDbConnections({
