@@ -5,6 +5,7 @@ import {
   Filters,
   HybridSearchConfig,
   IMeilisearchConcept,
+  IMeilisearchGetMapped,
 } from '../utils/types';
 import { INDEX_ATTRIBUTES } from '../utils/constants';
 
@@ -51,6 +52,44 @@ export class CachedbAPI {
       const data = {
         hits: results[0].rows,
         totalHits: results[1] ? parseInt(results[1].rows[0].count) : 0,
+      };
+      return data;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await client.end();
+    }
+  }
+
+  async getMultipleExactConcepts(
+    searchTexts: number[],
+    vocab_file_name: string,
+    includeInvalid = true,
+  ) {
+    const client = getCachedbConnection(this.jwt, this.datasetId);
+    try {
+      const searchTextWhereclause =
+        searchTexts.reduce((accumulator, searchText, index: number) => {
+          accumulator += `$${index + 1},`;
+          return accumulator;
+        }, `${INDEX_ATTRIBUTES.concept.conceptId} IN (`) + ') ';
+
+      const invalidReasonWhereClause = includeInvalid
+        ? ''
+        : `AND ${INDEX_ATTRIBUTES.concept.invalidReason} = '' `;
+
+      const sql = `
+        select *
+        from ${vocab_file_name}.concept
+        WHERE 
+        ${searchTextWhereclause}
+        ${invalidReasonWhereClause}
+        `;
+
+      const result = await client.query(sql, [...searchTexts]);
+      const data = {
+        hits: result.rows,
+        totalHits: result.rowCount,
       };
       return data;
     } catch (error) {
@@ -229,18 +268,71 @@ export class CachedbAPI {
       return ` AND ${filterList.join(' AND ')}`;
     }
   }
+
+  async getConceptRelationships(
+    conceptId: number,
+    vocab_file_name: string,
+  ): Promise<any> {
+    const client = getCachedbConnection(this.jwt, this.datasetId);
+    try {
+      const sql = `
+      select *
+          from ${vocab_file_name}.concept_relationship
+          WHERE ${INDEX_ATTRIBUTES.concept_relationship.conceptId1}=$1
+          `;
+      const result = await client.query(sql, [conceptId]);
+
+      const data = {
+        hits: result.rows,
+        totalHits: result.rowCount,
+      };
+      return data;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await client.end();
+    }
+  }
+
+  async getRelationships(
+    relationshipId: number,
+    vocab_file_name: string,
+  ): Promise<any> {
+    const client = getCachedbConnection(this.jwt, this.datasetId);
+    try {
+      const sql = `
+      select *
+          from ${vocab_file_name}.relationship
+          WHERE ${INDEX_ATTRIBUTES.relationship.relationshipId}=$1
+          `;
+      const result = await client.query(sql, [relationshipId]);
+      const data = {
+        hits: result.rows,
+        totalHits: result.rowCount,
+      };
+      return data;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await client.end();
+    }
+  }
 }
 
 const getCachedbConnection = (jwt: string, datasetId: string) => {
   // TODO: GET cachedb connection details from env / modularize
-  const client = new pg.Client({
-    host: 'alp-cachedb',
-    port: 41191,
-    user: jwt,
-    database: `duckdb_${datasetId}`,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
-  });
-  client.connect();
-  return client;
+  try {
+    const client = new pg.Client({
+      host: 'alp-cachedb',
+      port: 41191,
+      user: jwt,
+      database: `duckdb_${datasetId}`,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 30000,
+    });
+    client.connect();
+    return client;
+  } catch (err) {
+    throw err;
+  }
 };

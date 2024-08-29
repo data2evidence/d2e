@@ -27,6 +27,7 @@ import { GetStandardConceptsDto } from './dto/concept.dto';
 
 // TODO move to NESTJS DI
 import { CachedbAPI } from 'src/api/cachedb-api';
+import { CachedbService } from 'src/cachedb/cachedb.service';
 
 // TODO: MOVE TO env var
 const USE_DUCKDB_FTS = true;
@@ -36,9 +37,11 @@ const logger = createLogger('ConceptService');
 @Injectable()
 export class ConceptService {
   private token: string;
+  private request: Request;
 
   constructor(@Inject(REQUEST) request: Request) {
     this.token = request.headers['authorization'];
+    this.request = request;
   }
 
   // Used by FHIR server, where request cannot be injected as it does not use nest
@@ -220,6 +223,20 @@ export class ConceptService {
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
       const searchConcepts1: number[] = [conceptId];
+
+      // If USE_DUCKDB_FTS, use duckdb fts and return early
+      if (USE_DUCKDB_FTS) {
+        // TODO: move to nestjs DI
+        const cachedbService = new CachedbService(this.request);
+        return await cachedbService.getTerminologyDetailsWithRelationships(
+          databaseCode,
+          vocabSchemaName,
+          dialect,
+          conceptId,
+          datasetId,
+        );
+      }
+
       const meilisearchResultConcept1 =
         await meilisearchApi.getMultipleExactConcepts(
           searchConcepts1,
