@@ -37,9 +37,10 @@ def setup():
 
 @pytest.fixture(scope="session")
 def db(setup):
-    db = duckdb.connect("tests/data/testdbcode_testschema", read_only=True)
-    yield db
-    db.close()
+    return {
+        "hana": {},
+        "postgresql": {"testdbcode": "dummy"}
+    }
 
 
 @pytest.fixture(scope="session")

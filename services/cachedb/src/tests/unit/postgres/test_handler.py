@@ -19,6 +19,10 @@ def mock_handler():
     server = MagicMock()
     server.conn = MagicMock(spec=Connection)
     server.rewriter = MagicMock(spec=Rewriter)
+    server.db_clients = {
+        "hana": {},
+        "postgresql": {"testdbcode": "dummy"}
+    }
     server.ctxts = {}
 
     handler = BuenaVistaHandler(request, client_address, server)
