@@ -16,7 +16,6 @@ const logger = CreateLogger("analytics-log");
 export class DBDAO {
     public connection: DBSvcConnectionInterface;
     private properties = config.getProperties();
-    private skipAuth: boolean = this.properties.skip_auth;
 
     constructor(public dialect: string, public tenant: string) {}
 
@@ -197,11 +196,7 @@ export class DBDAO {
             }
         })()
             .then((db) => {
-                if (this.skipAuth) {
-                    callback(null, db);
-                } else {
-                    callback(null, db);
-                }
+                callback(null, db);
             })
             .catch((err) => {
                 callback(err);
@@ -228,12 +223,7 @@ export class DBDAO {
                     if (res != null) {
                         this.addCloseDBConnectionCallback(res, dbConnection);
                     }
-                    // might not be needed for postgres db connections
-                    if (this.skipAuth) {
-                        resolve(dbConnection);
-                    } else {
-                        resolve(dbConnection);
-                    }
+                    resolve(dbConnection);
                 } catch (err) {
                     reject(err);
                 }
