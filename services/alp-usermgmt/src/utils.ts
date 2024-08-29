@@ -4,7 +4,6 @@ import crypto from 'crypto'
 export const DateNow = () => new Date().toISOString()
 
 export const isDev = process.env.NODE_ENV === 'development'
-export const isSkipAuth = process.env.SKIP_AUTH && process.env.SKIP_AUTH === 'TRUE'
 
 export const getRandomString = (length: number) => {
   const buff = crypto.randomBytes(length + 2)
