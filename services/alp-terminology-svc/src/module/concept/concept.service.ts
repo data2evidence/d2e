@@ -391,38 +391,36 @@ export class ConceptService {
       const meiliIndex = `${databaseCode}_${vocabSchemaName}_${
         dialect === 'hana' ? 'CONCEPT' : 'concept'
       }`;
-      const conceptClassIdFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          { ...filters, conceptClassId: [] },
-        );
-      const domainIdFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          { ...filters, domainId: [] },
-        );
-      const standardConceptFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          {
-            ...filters,
-            standardConcept: [],
-          },
-        );
-      const vocabularyIdFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          { ...filters, vocabularyId: [] },
-        );
-      const validity = await meilisearchApi.getConceptFilterOptionsValidity(
-        meiliIndex,
-        searchText,
-        { ...filters, validity: [] },
-      );
+
+      const [
+        conceptClassIdFacets,
+        domainIdFacets,
+        standardConceptFacets,
+        vocabularyIdFacets,
+        validity,
+      ] = await Promise.all([
+        meilisearchApi.getConceptFilterOptionsFaceted(meiliIndex, searchText, {
+          ...filters,
+          conceptClassId: [],
+        }),
+        meilisearchApi.getConceptFilterOptionsFaceted(meiliIndex, searchText, {
+          ...filters,
+          domainId: [],
+        }),
+        meilisearchApi.getConceptFilterOptionsFaceted(meiliIndex, searchText, {
+          ...filters,
+          standardConcept: [],
+        }),
+        meilisearchApi.getConceptFilterOptionsFaceted(meiliIndex, searchText, {
+          ...filters,
+          vocabularyId: [],
+        }),
+        meilisearchApi.getConceptFilterOptionsValidity(meiliIndex, searchText, {
+          ...filters,
+          validity: [],
+        }),
+      ]);
+
       const filterOptions = {
         conceptClassId: conceptClassIdFacets.facetDistribution.concept_class_id,
         domainId: domainIdFacets.facetDistribution.domain_id,
