@@ -307,3 +307,8 @@ services:
       - 9235:9235
     environment:
       LOCAL_DEBUG: "true"
+
+  alp-perseus-backend:
+    build:
+      context: ./services/alp-perseus-backend
+      dockerfile: Dockerfile

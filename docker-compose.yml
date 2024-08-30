@@ -1784,7 +1784,11 @@ services:
     image: perseushub/backend:latest
     container_name: alp-perseus-backend-${BASE_PORT:-1}
     environment:
+      <<:
+          - *x-pg
       PERSEUS_ENV: Docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
       alp-minerva-postgres-post-init:
         condition: service_completed_successfully
