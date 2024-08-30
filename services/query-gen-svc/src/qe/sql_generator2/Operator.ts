@@ -142,6 +142,51 @@ export class Operator extends AstElement {
                     this.node.operand.map((x) => x.getSQL())
                 )
             );
+        } else if (this.op.trim() === "!=" && this.name === "joinOn") {
+            // this.node.operand.map((x) => {
+            //     const a = x.getSQL();
+            //     console.log(a)
+            // })
+
+            //this.node.operand[0].node.alias //drugera1
+            //this.parent.node.alias //drugera2
+
+            //this.parent.entityConfig.baseEntity //@drugera
+
+            // find((e) => {if(this.parent.joinElements[e].alias.contains(this.parent.node.alias)) return this.parent.joinElements[e]}))
+
+            // const baseTableAlias = nodelement.alias
+            //placeholdermap | column name
+
+            //patient.drugera2
+            const baseTableAlias =
+                this.parent.joinElements[
+                    Object.keys(this.parent.joinElements).find((e) => {
+                        if (
+                            this.parent.joinElements[e].alias.indexOf(
+                                this.parent.node.alias
+                            ) > -1
+                        )
+                            return e;
+                    })
+                ].alias;
+
+
+            const baseTableJoinConditionColumn =
+                this.parent.entityConfig.placeholderMap[
+                    `${this.parent.entityConfig.baseEntity}.INTERACTION_ID`
+                ];
+
+            let qos: QueryObject[] = this.node.operand.map(
+                (identicalOperand) => {
+                    return QueryObject.format(
+                        ` ${baseTableAlias}.${baseTableJoinConditionColumn} != "patient.${identicalOperand.node.alias}".${baseTableJoinConditionColumn} `
+                    );
+                }
+            );
+
+            return (new QueryObject()).join(qos)
+
         } else if (this.node.operand.length === 2) {
             let literal = this.node.operand.find((x) => x instanceof Literal);
 
