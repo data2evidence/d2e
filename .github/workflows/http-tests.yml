@@ -57,6 +57,7 @@ jobs:
       isTestEnv: "true"
       isHttpTestRun: "true"
       DOCKER_TAG_NAME: "local"
+      USE_CACHEDB: "false"
     steps:
       - uses: actions/checkout@v4
 
