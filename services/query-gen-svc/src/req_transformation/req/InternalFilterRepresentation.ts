@@ -820,19 +820,34 @@ export class InternalFilterRepresentation implements Request {
             .filter((e) => patient.filter[e].length > 1)
             .forEach((interaction) =>
                 patient.filter[interaction].forEach((e, i) => {
+                    e.join = [];
                     if (i === 0) return; //Skip the first filtercard alone
-                    e.isUnique = true;
                     // Traverse to previous nodes and get their alias for establishing join relationship
                     for (let k = i-1; k >= 0; k--) {
                         const identicalNode = patient.filter[interaction][k]
-                        e.attributeList.push(
-                            new BaseNode(Keys.MRITERM_JOINQUERY)
-                                .withAlias(e.alias)
-                                .withFilter([
-                                    new JoinQueryNode(identicalNode.alias, "Without"),
-                                ])
-                        );
-                    }                    
+                        //path, e.alias, e.filter, e.pathId
+                        e.join.push({   path: null, 
+                                        pathId: null,
+                                        alias: identicalNode.alias, 
+                                        filter: [new Expression(
+                                                        Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
+                                                        identicalNode.alias
+                                                    ).withType("expressionOp")]})
+                        // e.join.push(
+                        //     new BaseNode(Keys.MRITERM_JOINQUERY)
+                        //         .withAlias(e.alias)
+                        //         .withFilter([
+                        //             new Expression(
+                        //                 Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
+                        //                 identicalNode.alias
+                        //             ).withType("expressionOp"),
+                        //         ])
+                                // .withAlias(e.alias)
+                                // .withFilter([
+                                //     new JoinQueryNode(identicalNode.alias),
+                                // ])
+                        // );
+                    }
                 })
             );
 

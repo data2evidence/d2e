@@ -54,7 +54,8 @@ export class FilterNode implements ICloneable<FilterNode> {
         public alias: string,
         public attributeList: BaseNode[] = [],
         public isExclude?: boolean,
-        public isLeftJoin?: boolean
+        public isLeftJoin?: boolean,
+        public join?: any[],
     ) {}
 
     public clone(): FilterNode {
