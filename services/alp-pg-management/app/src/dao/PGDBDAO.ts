@@ -1,5 +1,5 @@
-import * as config from "../utils/config.ts"
-import * as pg from "pg"
+import * as config from "../utils/config.js"
+import pg from "pg"
 
 export default class PGDBRouter {
 

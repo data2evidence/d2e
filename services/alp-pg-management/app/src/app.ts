@@ -1,7 +1,7 @@
 import crypto from "crypto";
-import PGUserDAO from "./dao/PGUserDAO.ts";
-import PGDBDAO from "./dao/PGDBDAO.ts";
-import * as config from "./utils/config.ts";
+import PGUserDAO from "./dao/PGUserDAO.js";
+import PGDBDAO from "./dao/PGDBDAO.js";
+import * as config from "./utils/config.js";
 //import { Client } from "pg";
 
 //require("dotenv");

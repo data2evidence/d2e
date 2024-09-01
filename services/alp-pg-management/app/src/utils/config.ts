@@ -2,7 +2,7 @@
 import winston from "winston";
 import { readFileSync } from "fs";
 
-const _env = Deno.env.toObject();
+const _env = process.env;
 
 export const getProperties = (): any => {
 	let properties
@@ -30,6 +30,7 @@ export const getProperties = (): any => {
 	return properties
 } 
 export const getLogger = (): any => {
+	//return console;
 	let logger
 	if (!logger) {
 	  logger = winston.createLogger({
