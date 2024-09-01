@@ -1,4 +1,5 @@
-import * as pg from "pg";
+import pg from "pg";
+const _env = Deno.env.toObject();
 
 const queryPostgres = async (
     client: pg.Client,
@@ -8,20 +9,20 @@ const queryPostgres = async (
     return await client.query(query, values);
   };
   
-const seed = async () => {
-  const FHIR_CLIENT_ID = process.env.FHIR__CLIENT_ID
-  const FHIR_CLIENT_SECRET = process.env.FHIR__CLIENT_SECRET;
+export const seed = async () => {
+  const FHIR_CLIENT_ID = _env.FHIR__CLIENT_ID
+  const FHIR_CLIENT_SECRET = _env.FHIR__CLIENT_SECRET;
 
   if (!FHIR_CLIENT_ID || !FHIR_CLIENT_SECRET) {
     throw new Error("No client credentials are set for Fhir");
   }
 
   let client = new pg.Client({
-    user: process.env.PG_SUPER_USER,
-    password: process.env.PG_SUPER_PASSWORD,
-    host: process.env.PG__HOST,
-    port: parseInt(process.env.PG__PORT),
-    database: process.env.PG__DB_NAME,
+    user: _env.PG_SUPER_USER,
+    password: _env.PG_SUPER_PASSWORD,
+    host: _env.PG__HOST,
+    port: parseInt(_env.PG__PORT),
+    database: _env.PG__DB_NAME,
   });
 
   await client.connect();

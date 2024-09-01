@@ -1,10 +1,18 @@
-import { MedplumBotConfig } from "./types";
 import { Bot, OperationOutcome } from '@medplum/fhirtypes'
-import * as botConfig from '../bots.config.json'
-import { FhirAPI } from "../api/FhirAPI";
+import { config as botConfig } from '../bots.config.ts'
+import { FhirAPI } from "../api/FhirAPI.ts";
 import { basename, resolve } from "path";
 import { existsSync, readFileSync } from "fs";
 import { ContentType } from "@medplum/core";
+
+interface MedplumBotConfig {
+    readonly name: string;
+    readonly id: string;
+    readonly description: string;
+    readonly source: string;
+    readonly dist?: string;
+    readonly subscriptionCriteria?: string;
+}
 
 //Reads bots.config.json file and creates, deploys the bots and creates subcription for 'Super Admin' project
 export async function readAndCreateBotFromConfig():Promise<void> {

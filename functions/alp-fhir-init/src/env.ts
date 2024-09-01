@@ -17,9 +17,10 @@ const Env = z.object({
   })
 })
 
-const result = Env.safeParse(process.env)
+const _env = Deno.env.toObject()
+const result = Env.safeParse(_env)
 
-let env = process.env as unknown as z.infer<typeof Env>
+let env = _env as unknown as z.infer<typeof Env>
 if (result.success) {
   env = result.data
 } else {

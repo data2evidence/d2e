@@ -1,6 +1,6 @@
 import { BotEvent, MedplumClient } from '@medplum/core';
 import { QuestionnaireResponse, QuestionnaireResponseItem, QuestionnaireResponseItemAnswer } from '@medplum/fhirtypes';
-import { DuckdbConnection } from './duckdbUtil';
+import { DuckdbConnection } from './duckdbUtil.ts';
 import { v4 as uuid } from 'uuid';
 
 export async function handler(medplum: MedplumClient, event: BotEvent): Promise<any> {

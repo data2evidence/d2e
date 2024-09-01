@@ -1,8 +1,8 @@
 
 import { CreateBinaryOptions, MedplumClient, MedplumRequestOptions, OperationOutcomeError } from '@medplum/core'
 import { Resource, Attachment, Bot, Subscription, Project, ResourceType } from '@medplum/fhirtypes'
-import { env } from '../env'
-import { createLogger } from '../logger'
+import { env } from '../env.ts'
+import { createLogger } from '../logger.ts'
 
 export class FhirAPI {
     private readonly clientId: string

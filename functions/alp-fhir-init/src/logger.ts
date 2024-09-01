@@ -1,6 +1,6 @@
 import winston from 'winston'
 import { NextFunction, Request, Response } from 'express'
-import { env } from './env'
+import { env } from './env.ts'
 
 export const createLogger = (className = '') => {
   return winston.createLogger({

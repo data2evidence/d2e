@@ -1,4 +1,4 @@
-{
+export const config = {
     "bots": [
       {
         "name": "Questionnaire Response",
