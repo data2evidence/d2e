@@ -56,6 +56,7 @@ export class App {
         }
       })
       .catch(error => {
+        //console.log(env.PG_HOST)
         logger.error(`Error while initialising datasource: ${error}`)
         process.exit(0)
       })
@@ -65,15 +66,15 @@ export class App {
 
     await runMigrations();
     
-    const server = https.createServer(
+    /*const server = https.createServer(
       {
         key: env.SSL_PRIVATE_KEY,
         cert: env.SSL_PUBLIC_CERT,
         maxHeaderSize: 8192 * 10
       },
       this.app
-    )
-    server.listen(PORT)
+    )*/
+    this.app.listen(PORT)
     logger.info(`🚀 ALP DB Credentials Manager started successfully!. Server listening on port ${PORT}`)
     
   }

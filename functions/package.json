@@ -10,12 +10,24 @@
   "license": "ISC",
   "trex" : {
     "functions": {
-      "init": [{
-        "function":"/alp-pg-management/app",
-        "imports": "/alp-pg-management/app/import.json"
+      "init": [
+      {
+        "function":"/mri-pg-config",
+        "imports": "/mri-pg-config/import.json",
+        "env": "mri-pg-config"
+      },
+      {
+        "function":"/alp-fhir-init",
+        "imports": "/alp-fhir-init/import.json",
+        "env": "alp-fhir-init",
+        "waitfor": "http://alp-minerva-fhir-server-1:8103/healthcheck"
       }
       ],
     "api": [
+      {
+        "source":"/jobplugins",
+        "function":"/jobplugins"
+      },
       {
         "source":"/portalsvc",
         "function":"/alp-portal-server",
@@ -44,7 +56,8 @@
       {
         "source":"/db",
         "function":"/alp-db-credentials",
-        "imports": "/alp-db-credentials/import.json"
+        "imports": "/alp-db-credentials/import.json",
+        "env": "alp-db-credentials"
       },
       {
         "source":"/analytics-svc/api/services/bookmark",
@@ -70,7 +83,8 @@
       },
       {
         "source":"/terminology",
-        "service":"terminology"
+        "function":"/alp-terminology-svc",
+        "imports": "/alp-terminology-svc/import.json"
       },
       {
         "source":"/meilisearch-svc",
