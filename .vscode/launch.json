@@ -14,6 +14,7 @@
       "localRoot": "${workspaceFolder}/services/trex",
       "resolveSourceMapLocations": [
         "${workspaceFolder}/service/trex**",
+        "${workspaceFolder}/functions/**",
         "!**/node_modules/**"
       ],
       "type": "node"

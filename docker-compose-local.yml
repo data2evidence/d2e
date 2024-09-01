@@ -1,10 +1,6 @@
 services:
   trex:
-    build:
-      context: ./services/trex
-      dockerfile: build/Dockerfile
-      target: development
-    command: npm run watch
+    command: npm run startdev
     external_links:
       - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
       - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
@@ -15,11 +11,11 @@ services:
       - ./services/trex/core:/usr/src/core
       - ./services/trex/plugins:/usr/src/plugins
       - ./functions:/usr/src/plugins/d2ef
-      - ./services/trex/package.json:/usr/src/package.json
-      - ./services/trex/cert:/usr/src/cert
     environment:
       LOCAL_DEBUG: "true"
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
+      PLUGIN_BASE_PATH: "./plugins"
+      WATCH_FUNCTIONS: true
 
 
   
@@ -222,14 +218,14 @@ services:
   #        ]
   #       }
 
-  # alp-minerva-pg-mgmt-init:
-  #   build:
-  #     context: services/alp-pg-management
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - ./services/alp-pg-management/app:/home/docker/app
-  #   environment:
-  #     LOCAL_DEBUG: "true"
+  alp-minerva-pg-mgmt-init:
+    build:
+      context: services/alp-pg-management
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/alp-pg-management/app:/home/docker/app
+    environment:
+      LOCAL_DEBUG: "true"
 
   alp-minerva-portal-server:
     build:
@@ -292,13 +288,13 @@ services:
   #  volumes:
   #    - ./services/alp-sqleditor/init.sh:/usr/share/hue/init.sh
 
-  alp-minerva-terminology-svc:
-#    build:
-#      context: .
-#      dockerfile: ./services/alp-terminology-svc/Dockerfile
-    container_name: alp-minerva-terminology-svc-nest-prod-${BASE_PORT:-1}
-    environment:
-      LOCAL_DEBUG: "false"
+#   alp-minerva-terminology-svc:
+# #    build:
+# #      context: .
+# #      dockerfile: ./services/alp-terminology-svc/Dockerfile
+#     container_name: alp-minerva-terminology-svc-nest-prod-${BASE_PORT:-1}
+#     environment:
+#       LOCAL_DEBUG: "false"
 
   # alp-minerva-user-mgmt:
   #   # build:
@@ -315,8 +311,8 @@ services:
   #     LOCAL_DEBUG: "true"
   #     NODE_ENV: development
 
-  alp-mri-pg-config:
-    build: ./services/mri-pg-config
+  # alp-mri-pg-config:
+  #   build: ./services/mri-pg-config
 
   # alp-query-gen:
   #   build:
@@ -357,17 +353,17 @@ services:
     # volumes:
     #   - ./services/alp-logto/post-init:/home/docker
 
-  alp-fhir-server-post-init:
-    build:
-      context: .
-      dockerfile: ./services/alp-fhir/Dockerfile.client
-    volumes:
-      - ./services/alp-fhir/dist:/home/docker/src/alp-data-node/app/dist
-      - ./services/alp-fhir/src:/home/docker/src/alp-data-node/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-    ports:
-      - 9226:9226
+  # alp-fhir-server-post-init:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/alp-fhir/Dockerfile.client
+  #   volumes:
+  #     - ./services/alp-fhir/dist:/home/docker/src/alp-data-node/app/dist
+  #     - ./services/alp-fhir/src:/home/docker/src/alp-data-node/app/src
+  #   environment:
+  #     LOCAL_DEBUG: "true"
+  #   ports:
+  #     - 9226:9226
 
   alp-sql-proxy:
     build:
