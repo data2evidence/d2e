@@ -16,6 +16,13 @@ class DBUtils:
         self.use_cache_db = use_cache_db
         
         
+    def get_tenant_configs(self, schema_name: str = None):
+        if self.schema_name:
+            return self.__extract_database_credentials(schema_name=schema_name)
+        else:
+            return self.__extract_database_credentials()        
+
+
     def set_db_driver_env(self) -> str:
         database_connector_jar_folder = DBUtils.path_to_driver
         set_jar_file_path = f"Sys.setenv(\'DATABASECONNECTOR_JAR_FOLDER\' = '{database_connector_jar_folder}')"
@@ -26,11 +33,6 @@ class DBUtils:
         database_credentials = self.__extract_database_credentials()
         if database_credentials:
             return database_credentials.get("dialect")
-
-
-    def get_tenant_configs(self, schema_name: str = None) -> dict:
-        tenant_configs = self.__extract_database_credentials(schema_name)
-        return tenant_configs
 
 
     def create_database_engine(self, schema_name: str = None, user_type: UserType = None):
@@ -56,11 +58,12 @@ class DBUtils:
         if self.use_cache_db:
             if not schema_name:
                 raise ValueError("schema_name cannot be None")
+            # uses admin user for cachedb
             connection_string = self.__create_connection_string(schema_name=schema_name, create_engine=False)
 
         else:
             if not user_type:
-                raise ValueError("User Type cannot be None")
+                raise ValueError(f"User type '{user_type}' not allowed, only '{[user.value for user in UserType]}'.")
             
             dialect = self.get_database_dialect()
             match dialect:
@@ -151,9 +154,9 @@ class DBUtils:
                 database_credentials = self.__process_database_credentials(_db)
 
                 if schema_name:
-                    database_credentials["databaseName"] = f"B|{database_credentials.get('dialect')}|{database_credentials.get('databaseName')}|{database_credentials.get('schema_name')}"
-                    database_credentials["adminUser"] = "Bearer " + OpenIdAPI().getClientCredentialToken()
-                    database_credentials["adminPassword"] = ""
+                    database_credentials["databaseName"] = f"B|{database_credentials.get('dialect')}|{database_credentials.get('databaseName')}|{schema_name}"
+                    database_credentials["adminUser"] = database_credentials["readUser"] = "Bearer " + OpenIdAPI().getClientCredentialToken()
+                    database_credentials["adminPassword"] = database_credentials["readPassword"] = "qwerty"
                     database_credentials["host"] = os.getenv("CACHEDB__HOST")
                     database_credentials["port"]  = os.getenv("CACHEDB__PORT")
 

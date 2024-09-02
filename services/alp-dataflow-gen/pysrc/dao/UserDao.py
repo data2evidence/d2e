@@ -13,8 +13,10 @@ class UserDao(DBUtils):
 
         if self.use_cache_db:
             self.engine = self.create_database_engine(schema_name=self.schema_name)
+            self.tenant_configs = self.get_tenant_configs(schema_name=self.schema_name)
         else:
             self.engine = self.create_database_engine(user_type=UserType.ADMIN_USER)
+            self.tenant_configs = self.get_tenant_configs()
             
         self.metadata = MetaData(schema_name)  # sql.MetaData()
         self.inspector = inspect(self.engine)    
@@ -80,7 +82,7 @@ class UserDao(DBUtils):
 
     def create_user(self, user: str, password: str = None):
         if user == self.read_user:
-            password = self.__extract_database_credentials().get("readPassword")
+            password = self.tenant_configs.get("readPassword")
         else:
             raise ValueError("Password cannot be empty")
         

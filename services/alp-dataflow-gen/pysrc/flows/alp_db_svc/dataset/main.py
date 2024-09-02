@@ -66,7 +66,7 @@ def create_schema_tasks(use_cache_db: bool,
                             schema_name=schema_name
                             )
 
-        tenant_configs = schema_dao.get_tenant_configs()
+        tenant_configs = schema_dao.tenant_configs
 
 
         create_db_schema_wo = create_db_schema.with_options(
@@ -153,7 +153,7 @@ def update_datamodel(use_cache_db: bool,
                         schema_name=schema_name
                         )
     
-    tenant_configs = schema_dao.get_tenant_configs()
+    tenant_configs = schema_dao.tenant_configs
 
     
     match flow_action_type:
@@ -217,7 +217,7 @@ def rollback_count_task(use_cache_db: bool,
                         schema_name=schema_name
                         )
     
-    tenant_configs = schema_dao.get_tenant_configs()
+    tenant_configs = schema_dao.tenant_configs
 
 
     try:
@@ -257,7 +257,7 @@ def rollback_tag_task(use_cache_db: bool,
                         schema_name=schema_name
                         )
     
-    tenant_configs = schema_dao.get_tenant_configs()
+    tenant_configs = schema_dao.tenant_configs
 
     try:
         rollback_tag_wo = run_liquibase_update_task.with_options(

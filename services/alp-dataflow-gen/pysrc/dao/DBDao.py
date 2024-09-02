@@ -14,19 +14,20 @@ from utils.types import *
 from utils.DBUtils import DBUtils
 
 class DBDao(DBUtils):
-    def __init__(self, use_cache_db: bool, database_code: str, schema_name: str):
+    def __init__(self, use_cache_db: bool, database_code: str, schema_name: str):        
         super().__init__(use_cache_db=use_cache_db, database_code=database_code)
         self.schema_name = schema_name
         self.db_dialect = self.get_database_dialect()
 
         if self.use_cache_db:
             self.engine = self.create_database_engine(schema_name=self.schema_name)
+            self.tenant_configs = self.get_tenant_configs(schema_name=self.schema_name)
         else:
             self.engine = self.create_database_engine(user_type=UserType.ADMIN_USER)
-            
+            self.tenant_configs = self.get_tenant_configs()
+           
         self.metadata = sql.MetaData(schema_name)  # sql.MetaData()
         self.inspector = sql.inspect(self.engine)
-
 
 
     def check_schema_exists(self) -> bool:

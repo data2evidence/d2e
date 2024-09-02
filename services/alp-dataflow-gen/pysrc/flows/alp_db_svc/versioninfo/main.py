@@ -191,7 +191,7 @@ def get_and_update_attributes(use_cache_db: bool,
 
             try:
                 # update with latest version or error msg
-                tenant_configs = dataset_dao.get_tenant_configs()
+                tenant_configs = dataset_dao.tenant_configs
 
                 latest_available_schema_version = get_latest_available_version(dialect=dataset_dao.db_dialect,
                                                                                data_model=data_model,

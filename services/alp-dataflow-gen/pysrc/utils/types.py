@@ -36,7 +36,7 @@ class PG_TENANT_USERS(str, Enum):
 
 class DatabaseDialects(str, Enum):
     HANA = "hana"
-    POSTGRES = "postgresql"
+    POSTGRES = "postgres"
 
 
 class RequestType(str, Enum):
