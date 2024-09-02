@@ -322,3 +322,8 @@ services:
     build:
         context: ./services/alp-perseus-cdm-builder
         dockerfile: Dockerfile
+
+  alp-perseus-white-rabbit:
+    build:
+        context: ./services/alp-perseus-white-rabbit
+        dockerfile: Dockerfile
