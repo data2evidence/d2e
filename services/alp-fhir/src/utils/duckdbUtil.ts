@@ -1,12 +1,11 @@
 import { Connection, Database } from "duckdb-async";
-import { env } from "../env"
 export class DuckdbConnection{
     private connection: Connection;
     constructor(){}
-    public async createConnection(isReadonly?: boolean){
+    public async createConnection(){
         try{
             const duckdDB = await Database.create(
-                `${process.env.DUCKDB_PATH}/cdmdefault.duckdb, ${isReadonly}?'OPEN_READONLY': ''`
+                `${process.env.DUCKDB_PATH}/cdmdefault.duckdb`
             );
             this.connection = await duckdDB.connect();
         }catch(err){
