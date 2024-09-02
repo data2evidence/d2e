@@ -1,4 +1,4 @@
-FROM node:18.14.0-alpine as builder
+FROM node:18.20.4-alpine as builder
 
 RUN apk add --update yarn
 
@@ -9,7 +9,7 @@ COPY --chown=docker:alp --chmod=711 package.json tsconfig.json ./
 
 RUN yarn install && yarn compile
 
-FROM node:18.14.0-alpine as final
+FROM node:18.20.4-alpine as final
 
 RUN apk add --update bash yarn
 

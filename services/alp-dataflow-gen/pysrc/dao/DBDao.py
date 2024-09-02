@@ -40,9 +40,13 @@ class DBDao:
     def check_table_exists(self, table) -> bool:
         return self.inspector.has_table(schema=self.schema_name, table_name=table)
 
-    def get_table_names(self):
+    def get_table_names(self, include_views=False):
         table_names = self.inspector.get_table_names(schema=self.schema_name)
-        return table_names
+        if include_views:
+            view_names = self.inspector.get_view_names(schema=self.schema_name)
+        else:
+            view_names = []
+        return table_names + view_names
     
     def get_columns(self, table: str) -> list[dict]:
         column_list = self.inspector.get_columns(schema=self.schema_name, table_name=table)

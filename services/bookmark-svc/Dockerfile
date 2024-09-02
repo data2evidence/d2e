@@ -1,6 +1,6 @@
 ARG libs_install_type_arg=submodule
 
-FROM node:18.14.0-alpine AS libs-install-from-submodule
+FROM node:18.20.4-alpine AS libs-install-from-submodule
 
 WORKDIR /usr/src
 
@@ -20,7 +20,7 @@ RUN yarn workspace bookmark run compile && \
     yarn install --ignore-scripts --production
 
 
-FROM node:18.14.0-alpine AS final
+FROM node:18.20.4-alpine AS final
 
 LABEL app="bookmark-svc"
 

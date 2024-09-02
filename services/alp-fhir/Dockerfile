@@ -4,7 +4,7 @@ COPY config.json .
 
 COPY --chown=docker:docker --chmod=711 start.sh start.sh
 
-FROM node:18.14.0-slim
+FROM node:18.20.4-slim
 
 RUN apt update && apt install -y gettext jq wget
 

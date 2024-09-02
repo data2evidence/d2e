@@ -1,6 +1,6 @@
 {
-    "host": "%HOST%",
-    "instance": "%INSTANCE%",
-    "user_hdb": "%USER_HDB%",
-    "password_hdb":"%PASSWORD_HDB%"
+  "host": "%HOST%",
+  "instance": "%INSTANCE%",
+  "user_hdb": "%USER_HDB%",
+  "password_hdb": "%PASSWORD_HDB%"
 }

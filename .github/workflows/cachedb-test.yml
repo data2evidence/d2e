@@ -1,4 +1,4 @@
-name: SQL proxy tests
+name: Cachedb tests
 
 on:
   pull_request:
@@ -12,9 +12,11 @@ env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
-  test-sql-proxy:
+  test-cachedb:
     runs-on: ubuntu-22.04
-
+    env:
+      LOCAL_DEBUG: "true"
+      SERVICE_ROUTES: '{"portalServer": "dummy", "usermgmt": "dummy", "idIssuerUrl": "dummy"}'
     steps:
     - uses: actions/checkout@v4
 
@@ -22,24 +24,24 @@ jobs:
       id: check_file_changed
       with:
         filters: |
-          sql_proxy_changed:
-            - 'services/sql-proxy/**'
+          cachedb_changed:
+            - 'services/cachedb/**'
             
     - name: Setup python if files have changed
       uses: actions/setup-python@v2
-      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.sql_proxy_changed == 'True'
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.cachedb_changed == 'True'
       with:
         python-version: 3.11.1
         cache: 'pip'
   
     - name: Install pip packages if files have changed
-      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.sql_proxy_changed == 'True'
-      working-directory: ./services/sql-proxy
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.cachedb_changed == 'True'
+      working-directory: ./services/cachedb
       run: |
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
 
     - name: Run unit tests if files have changed
-      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.sql_proxy_changed == 'True'
-      working-directory: ./services/sql-proxy/src
-      run: python3 -m pytest -v --disable-pytest-warnings
+      if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.cachedb_changed == 'True'
+      working-directory: ./services/cachedb/src
+      run: PYTHON_ENV=TEST python3 -m pytest -v --disable-pytest-warnings

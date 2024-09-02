@@ -10,8 +10,9 @@ import struct
 from typing import Dict, List, Optional
 
 from .core import BVType, Connection, Extension, Session, QueryResult
-from .database import parse_connection_param_database, get_rewriter_from_dialect, get_db_connection, SqlProxyDatabaseClients
+from .database import get_rewriter_from_dialect, get_db_connection, CachedbDatabaseClients
 from .rewrite import Rewriter
+from .middleware import d2e_database_format_validation, parse_d2e_database_format, auth_check
 
 logger = logging.getLogger(__name__)
 
@@ -332,12 +333,25 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
                 for x in self.r.read_bytes(msglen - 4).split(NULL_BYTE)
             ]
             params = dict(zip(msg[::2], msg[1::2]))
-            dialect, database_code, schema = parse_connection_param_database(
-                params["database"])
+
+            token = params["user"]
+            d2e_database_format = params["database"]
+
+            # Validate protocol and dialect in d2e_database_format
+            d2e_database_format_validation(d2e_database_format)
+
+            # Ensure user has permission to access dataset
+            auth_check(token, d2e_database_format)
+
+            # Resolve database param in connection params
+            dialect, database_code, schema, vocab_schema = parse_d2e_database_format(token,
+                                                                                     d2e_database_format)
+
+            # Get database connection and rewriter
             conn = get_db_connection(
-                self.server.db_clients, dialect, database_code, schema)
-            rewriter = get_rewriter_from_dialect(
-                dialect)
+                self.server.db_clients, dialect, database_code, schema, vocab_schema)
+            rewriter = get_rewriter_from_dialect(dialect)
+
             logger.info("Client connection params: %s", params)
             ctx = BVContext(conn, conn.create_session(),
                             rewriter, params)
@@ -351,6 +365,8 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
                 del self.server.ctxts[ctx.process_id]
                 ctx = None
             return None
+        elif code == 1986359929:  # Healthcheck request
+            return self.send_notice()
         else:
             raise Exception(f"Unsupported startup message: {code}")
 
@@ -661,7 +677,7 @@ class BuenaVistaServer(socketserver.ThreadingTCPServer):
 
     def __init__(
         self,
-        db_clients: SqlProxyDatabaseClients,
+        db_clients: CachedbDatabaseClients,
         server_address,
         *,
         extensions: List[Extension] = [],

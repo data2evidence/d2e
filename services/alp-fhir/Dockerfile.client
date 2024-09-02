@@ -1,4 +1,4 @@
-ARG IMAGE=node:18.14.0-slim
+ARG IMAGE=node:18.20.4-slim
 
 FROM ${IMAGE} AS development
 

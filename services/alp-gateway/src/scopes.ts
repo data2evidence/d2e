@@ -421,6 +421,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
+    path: '^/terminology/concept/getStandardConcepts$',
+    scopes: ['gateway.terminology.concept.getStandardConcepts.read'],
+    httpMethods: ['POST']
+  },
+  {
     path: '^/terminology/fhir/4_0_0/(.*)',
     scopes: ['gateway.terminology.fhir.read'],
     httpMethods: ['GET']
@@ -801,9 +806,24 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
-    path: '^/gateway/api/prefect',
-    scopes: ['gateway.prefect.read'],
+    path: '^/prefect',
+    scopes: ['prefect.read'],
     httpMethods: ['GET']
+  },
+  {
+    path: '^/prefect',
+    scopes: ['prefect.post'],
+    httpMethods: ['POST']
+  },
+  {
+    path: '^/prefect',
+    scopes: ['prefect.update'],
+    httpMethods: ['PUT', 'PATCH']
+  },
+  {
+    path: '^/prefect',
+    scopes: ['prefect.delete'],
+    httpMethods: ['DELETE']
   }
 ]
 export const ROLE_SCOPES = {
@@ -924,12 +944,16 @@ export const ROLE_SCOPES = {
     'gateway.db.schema.update',
     'gateway.terminology.hybridSearchConfig.read',
     'gateway.terminology.hybridSearchConfig.update',
+    'gateway.terminology.concept.getStandardConcepts.read',
     'dataflowmgmt.analysisflow.read',
     'dataflowmgmt.analysisflow.add',
     'dataflowmgmt.analysisflow.delete',
     'dataflowmgmt.analysisflow.revision.delete',
     'gateway.fhir.create',
-    'gateway.prefect.read'
+    'prefect.read',
+    'prefect.post',
+    'prefect.update',
+    'prefect.delete'
   ],
   ALP_DASHBOARD_VIEWER: ['gateway.dashboardGate.content'],
   TENANT_VIEWER: [
