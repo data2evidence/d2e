@@ -11,9 +11,7 @@ try:
     DB_HOST = os.environ['PG__HOST']
     DB_PORT = os.environ['PG__PORT']
     API_URL = 'http://files-manager:10500/files-manager'
-    print(DB_NAME, DB_USER)
-    print(DB_PASSWORD, DB_HOST)
-    print(DB_PORT, API_URL)
+
 except KeyError as e:
     raise str(e)
 
