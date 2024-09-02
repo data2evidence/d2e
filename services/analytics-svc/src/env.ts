@@ -23,13 +23,19 @@ const Env = z.object({
     USE_EXTENSION_FOR_COHORT_CREATION: z.string(),
 
     USE_DUCKDB: z.string(),
+    USE_CACHEDB: z.string(),
 
-    SKIP_AUTH: z.string(),
+    CACHEDB__HOST: z.string(),
+    CACHEDB__PORT: z
+        .string()
+        .refine((val) => !isNaN(parseInt(val)))
+        .transform(Number),
+
     LOCAL_DEBUG: z.string(),
     SQL_RETURN_ON: z.string(),
-    isHttpTestRun: z.string(),
-    isTestEnv: z.string(),
-    local: z.string(),
+    isHttpTestRun: z.string().optional(),
+    isTestEnv: z.string().optional(),
+    TESTSCHEMA: z.string().optional(),
 
     TLS__INTERNAL__KEY: z.string(),
     TLS__INTERNAL__CRT: z.string(),
@@ -45,15 +51,31 @@ const Env = z.object({
                 return z.never();
             }
         }),
+}).superRefine(({ LOCAL_DEBUG, isHttpTestRun, isTestEnv, TESTSCHEMA }, refinementContext) => {
+    //Validate for non-prod scenarios
+    if (LOCAL_DEBUG.toLowerCase() === "true") {
+        const addError = (env) => {
+            refinementContext.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `No value for ${env}`,
+                path: [env],
+              });
+        }
+ 
+        if (!isHttpTestRun) addError("isHttpTestRun")
+        if (!isTestEnv) addError("isTestEnv")
+        if (!TESTSCHEMA && (isTestEnv && isTestEnv.toLowerCase() === "true")) addError("TESTSCHEMA");
+    }
 });
 
 const result = Env.safeParse(process.env);
 
-let env = process.env as unknown as z.infer<typeof Env>;
+let env: z.infer<typeof Env>;
 if (result.success) {
     env = result.data;
 } else {
-    console.warn(JSON.stringify(result));
+   console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+   process.exit(1)
 }
 
 export { env };

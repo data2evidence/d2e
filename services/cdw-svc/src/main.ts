@@ -7,7 +7,6 @@ import {
   EnvVarUtils,
   DBConnectionUtil as dbConnectionUtil,
   healthCheckMiddleware,
-  Constants,
   User,
   Connection,
   utils,
@@ -47,32 +46,25 @@ const main = () => {
   let configCredentials;
   let isTestEnvironment = false;
 
-  if (envVarUtils.isTestEnv()) {
-    // reset configDB.host to point to analyticsDB.host, schema name will be the supplied TESTSCHEMA name
-    analyticsCredential = xsenv.cfServiceCredentials({ tag: "httptest" });
-    configCredentials = xsenv.cfServiceCredentials({ tag: "httptest" });
-    isTestEnvironment = true;
-    // set default cdw config path
-    log.info("TESTSCHEMA :" + configCredentials.schema);
-  } else {
-    let cdwService = xsenv.filterServices({ tag: "cdw" }).map(db => db.credentials);
-    if(env.USE_DUCKDB !== "true"){
-      cdwService = cdwService.filter((db) => db.dialect == 'hana')
-      analyticsCredential = cdwService[0];
-    }
-    configCredentials =  {
-      database: env.PG__DB_NAME,
-      schema: env.PG_SCHEMA,
-      dialect: env.PG__DIALECT,
-      host: env.PG__HOST,
-      port: env.PG__PORT,
-      user: env.PG_USER,
-      password: env.PG_PASSWORD,
-      max: env.PG__MAX_POOL,
-      min: env.PG__MIN_POOL,
-      idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
-    } as IDBCredentialsType
+  let cdwService = xsenv
+    .filterServices({ tag: "cdw" })
+    .map((db) => db.credentials);
+  if (env.USE_DUCKDB !== "true") {
+    cdwService = cdwService.filter((db) => db.dialect == "hana");
+    analyticsCredential = cdwService[0];
   }
+  configCredentials = {
+    database: env.PG__DB_NAME,
+    schema: env.PG_SCHEMA,
+    dialect: env.PG__DIALECT,
+    host: env.PG__HOST,
+    port: env.PG__PORT,
+    user: env.PG_USER,
+    password: env.PG_PASSWORD,
+    max: env.PG__MAX_POOL,
+    min: env.PG__MIN_POOL,
+    idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS,
+  } as IDBCredentialsType;
 
   EnvVarUtils.loadDevSettings();
 
@@ -111,8 +103,8 @@ const getConnections = async ({
   configCredentials,
   userObj,
 }): Promise<{
-  configConnection: Connection.ConnectionInterface}
-  > => {
+  configConnection: Connection.ConnectionInterface;
+}> => {
   const configConnection =
     await dbConnectionUtil.DBConnectionUtil.getDBConnection({
       credentials: configCredentials,
@@ -121,8 +113,8 @@ const getConnections = async ({
     });
 
   return {
-    configConnection: configConnection
-  }
+    configConnection: configConnection,
+  };
 };
 
 const initRoutes = (
@@ -195,7 +187,7 @@ const initRoutes = (
   app.post(
     "/hc/hph/config/user/global_enduser.xsjs",
     (req: ICDWRequest, res) => {
-      const {configConnection } = req.dbConnections;
+      const { configConnection } = req.dbConnections;
       const user = getUser(req);
       const facade = new SettingsFacade(user);
       const assignment = new AssignmentProxy(req.assignment);

@@ -40,13 +40,24 @@ class DBDao:
     def check_table_exists(self, table) -> bool:
         return self.inspector.has_table(schema=self.schema_name, table_name=table)
 
-    def get_table_names(self):
+    def get_table_names(self, include_views=False):
         table_names = self.inspector.get_table_names(schema=self.schema_name)
-        return table_names
+        if include_views:
+            view_names = self.inspector.get_view_names(schema=self.schema_name)
+        else:
+            view_names = []
+        return table_names + view_names
     
     def get_columns(self, table: str) -> list[dict]:
         column_list = self.inspector.get_columns(schema=self.schema_name, table_name=table)
         return column_list
+
+    def get_table_row_count(self, table_name: str) -> int:
+        with self.engine.connect() as connection:
+            table = sql.Table(table_name, self.metadata, autoload_with=connection)
+            select_count_stmt = sql.select(sql.func.count()).select_from(table)
+            row_count = connection.execute(select_count_stmt).scalar()   
+        return row_count
 
     def get_distinct_count(self, table_name: str, column_name: str) -> int:
         with self.engine.connect() as connection:
@@ -83,11 +94,9 @@ class DBDao:
             cdm_source_col = getattr(table.c, "cdm_source_name".casefold())
             update_stmt = sql.update(table).where(
                 cdm_source_col == self.schema_name).values(cdm_version=cdm_version)
-            print(
-                f"Updating cdm version {cdm_version} for schema {self.schema_name}")
             res = connection.execute(update_stmt)
             connection.commit()
-            print(f"Updated cdm version {cdm_version} for {self.schema_name}")
+
 
     def update_data_ingestion_date(self):
         with self.engine.connect() as connection:

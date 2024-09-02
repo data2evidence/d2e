@@ -9,7 +9,7 @@ from dao.DBDao import DBDao
 from dao.UserDao import UserDao
 
 from flows.alp_db_svc.liquibase.main import Liquibase
-from flows.alp_db_svc.types import LiquibaseAction
+from flows.alp_db_svc.types import LiquibaseAction, UpdateFlowActionType
 from flows.alp_db_svc.const import DATAMODEL_CDM_VERSION, OMOP_DATA_MODELS, _check_table_case
 from flows.alp_db_svc.hooks import *
 
@@ -132,7 +132,8 @@ def create_schema_tasks(dialect: str,
         raise e
 
 
-def update_datamodel(database_code: str,
+def update_datamodel(flow_action_type: str,
+                     database_code: str,
                      data_model: str,
                      schema_name: str,
                      vocab_schema: str,
@@ -147,6 +148,12 @@ def update_datamodel(database_code: str,
 
 
     schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
+    
+    match flow_action_type:
+        case UpdateFlowActionType.UPDATE:
+            action = LiquibaseAction.UPDATE
+        case UpdateFlowActionType.CHANGELOG_SYNC:
+            action = LiquibaseAction.CHANGELOG_SYNC
 
     try:
         update_schema_wo = run_liquibase_update_task.with_options(
@@ -155,7 +162,7 @@ def update_datamodel(database_code: str,
             on_failure=[partial(update_schema_hook,
                                 **dict(db=database_code, schema=schema_name))])
 
-        update_schema_wo(action=LiquibaseAction.UPDATE,
+        update_schema_wo(action=action,
                          dialect=dialect,
                          data_model=data_model,
                          changelog_file=changelog_file,
@@ -167,12 +174,20 @@ def update_datamodel(database_code: str,
 
         if data_model in OMOP_DATA_MODELS:
             cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
-            update_cdm_version_wo = update_cdm_version.with_options(
-                on_completion=[partial(update_cdm_version_hook,
-                                       **dict(db=database_code, schema=schema_name))],
-                on_failure=[partial(update_cdm_version_hook,
-                                    **dict(db=database_code, schema=schema_name))])
-            update_cdm_version_wo(schema_dao, cdm_version)
+            
+            # check if cdm source table is empty
+            cdm_source_row_count = schema_dao.get_table_row_count("cdm_source")
+            if cdm_source_row_count == 0:
+                # insert cdm version
+                insert_cdm_version(schema_dao, cdm_version) 
+            else:
+                # update cdm version
+                update_cdm_version_wo = update_cdm_version.with_options(
+                    on_completion=[partial(update_cdm_version_hook,
+                                        **dict(db=database_code, schema=schema_name))],
+                    on_failure=[partial(update_cdm_version_hook,
+                                        **dict(db=database_code, schema=schema_name))])
+                update_cdm_version_wo(schema_dao, cdm_version)
         logger.info(
             "Dataset schema successfully updated!")
     except Exception as e:
@@ -334,6 +349,8 @@ def run_liquibase_update_task(**kwargs):
 
 @task(log_prints=True)
 def insert_cdm_version(schema_dao: DBDao, cdm_version: str):
+    #Todo: make cdm_holder value more generic
+    get_run_logger().info(f"Inserting cdm version '{cdm_version}' into '{schema_dao.schema_name}.cdm_source' table..")
     is_lower_case = _check_table_case(schema_dao)
     if is_lower_case:
         values_to_insert = {
@@ -356,12 +373,13 @@ def insert_cdm_version(schema_dao: DBDao, cdm_version: str):
             "CDM_VERSION": cdm_version
         }
         schema_dao.insert_values_into_table("CDM_SOURCE", values_to_insert)
-
+    get_run_logger().info(f"Successfully inserted cdm version '{cdm_version}' into '{schema_dao.schema_name}.cdm_source' table..")
 
 @task(log_prints=True)
 def update_cdm_version(schema_dao: DBDao, cdm_version: str):
+    get_run_logger().info(f"Updating cdm version '{cdm_version}' for '{schema_dao.schema_name}.cdm_source' table..")
     schema_dao.update_cdm_version(cdm_version)
-
+    get_run_logger().info(f"Successfully updated cdm version '{cdm_version}' for '{schema_dao.schema_name}.cdm_source' table..")
 
 def create_cdm_schema_tasks(database_code: str,
                             data_model: str,
