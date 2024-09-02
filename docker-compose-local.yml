@@ -312,3 +312,8 @@ services:
     build:
       context: ./services/alp-perseus-backend
       dockerfile: Dockerfile
+
+  alp-perseus-files-manager:
+    build:
+      context: ./services/alp-perseus-files-manager
+      dockerfile: Dockerfile

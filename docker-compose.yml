@@ -1771,7 +1771,11 @@ services:
     image: perseushub/files-manager:latest
     container_name: files-manager
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      <<:
+            - *x-pg
+      SPRING_PROFILES_ACTIVE: docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
       alp-minerva-postgres-post-init:
         condition: service_completed_successfully
