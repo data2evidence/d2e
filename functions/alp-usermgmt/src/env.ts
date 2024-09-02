@@ -1,5 +1,7 @@
 type LoggingLevel = 'info' | 'warn' | 'error'
 
+const _env = Deno.env.toObject();
+
 export const env = {
   USER_MGMT_PATH: Deno.env.get("USER_MGMT__PATH")!,
   USER_MGMT_PORT: Number(Deno.env.get("USER_MGMT__PORT")!) || 9002,
@@ -30,7 +32,9 @@ export const env = {
   SSL_PRIVATE_KEY: Deno.env.get("TLS__INTERNAL__KEY")?.replace(/\\n/g, '\n'),
   SSL_PUBLIC_CERT: Deno.env.get("TLS__INTERNAL__CRT")?.replace(/\\n/g, '\n'),
   SSL_CA_CERT: Deno.env.get("TLS__INTERNAL__CA_CRT")?.replace(/\\n/g, '\n'),
-  SERVICE_ROUTES: Deno.env.get("SERVICE_ROUTES") || '{}'
+  SERVICE_ROUTES: Deno.env.get("SERVICE_ROUTES") || '{}',
+  NODE_ENV: _env.NODE_ENV,
+  PG_SSL: _env.PG_SSL
 }
 
 export const services = JSON.parse(env.SERVICE_ROUTES)

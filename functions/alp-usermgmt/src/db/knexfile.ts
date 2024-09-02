@@ -2,6 +2,7 @@ import '../loadDotEnv'
 import type { Knex } from '../types'
 import { env } from '../env'
 import { createLogger } from '../Logger'
+import * as path from "path";
 
 const logger = createLogger('KnexConfig')
 
@@ -37,7 +38,14 @@ const config: Knex.Config = {
   migrations: {
     schemaName: 'usermgmt',
     tableName: 'knex_migrations',
-    directory: 'migrations'
+   // extension: 'mjs',
+   // loadExtensions: ['.mjs'],
+    directory: `${path.dirname(path.fromFileUrl(import.meta.url)).replace(/\/usr\/src/, '.')}/migrations` // relative path to directory containing the migration files 
+  },
+  seeds: {
+   // extension: 'mjs',
+   // loadExtensions: ['.mjs'],
+    directory: `${path.dirname(path.fromFileUrl(import.meta.url)).replace(/\/usr\/src/, '.')}/seeds`
   }
 }
 

@@ -29,6 +29,14 @@
         "function":"/jobplugins"
       },
       {
+        "source":"/gateway/api/db",
+        "function":"/alpdb"
+      },
+      {
+        "source":"/gateway/api/dataset",
+        "function":"/dataset"
+      },
+      {
         "source":"/portalsvc",
         "function":"/alp-portal-server",
         "imports": "/alp-portal-server/import.json"
@@ -42,6 +50,11 @@
         "source":"/system-portal",
         "rmsrc": true,
         "service":"portalServer"
+      },
+      {
+        "source":"/db-credentials",
+        "rmsrc": true,
+        "service":"trex"
       },
       {
         "source":"/dataflow-mgmt",

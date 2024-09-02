@@ -7,6 +7,7 @@ services:
       - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
     ports:
       - 33000:33000
+      - 33001:33001
     volumes:
       - ./services/trex/core:/usr/src/core
       - ./services/trex/plugins:/usr/src/plugins

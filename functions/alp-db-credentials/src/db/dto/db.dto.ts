@@ -21,10 +21,10 @@ export class DbExtraDto implements IDbExtraDto {
   @IsNotEmpty()
   @IsObject()
   [SERVICE_SCOPE.INTERNAL]: object;
-  @IsOptional()
-  @IsNotEmpty()
-  @IsObject()
-  [SERVICE_SCOPE.DATA_PLATFORM]: object
+  //@IsOptional()
+  //@IsNotEmpty()
+  //@IsObject()
+  //[SERVICE_SCOPE.DATA_PLATFORM]: object
 }
 
 export class DbDto implements IDbDto {

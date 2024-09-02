@@ -10,11 +10,11 @@ const sleep = (time: number) => {
 }
 
 config.connection = async () => {
-  if (process.env.NODE_ENV === 'development') {
+  if (env.NODE_ENV === 'development') {
     await sleep(30000)
   }
 
-  let ssl: any = Boolean(process.env.PG_SSL)
+  let ssl: any = Boolean(env.PG_SSL)
   if (env.PG_CA_ROOT_CERT) {
     ssl = {
       rejectUnauthorized: true,
@@ -22,7 +22,7 @@ config.connection = async () => {
     }
   }
 
-  if (!env.PG_CA_ROOT_CERT && process.env.NODE_ENV === 'production') {
+  if (!env.PG_CA_ROOT_CERT && env.NODE_ENV === 'production') {
     logger.warn('PG_CA_ROOT_CERT is undefined')
   }
 

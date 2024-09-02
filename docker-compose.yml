@@ -305,8 +305,8 @@ services:
     depends_on:
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
-      alp-logto:
-        condition: service_healthy
+      alp-logto-post-init:
+        condition: service_completed_successfully
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: trex.${TLS__INTERNAL__DOMAIN:-alp.local}
@@ -399,15 +399,16 @@ services:
       SERVICE_ROUTES: |-
           {
           "analytics": "http://alp-minerva-analytics-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41102",
-          "bookmark": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/analytics-svc/api/services/bookmark",
-          "cdw": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/cdw",
-          "paConfig": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/pa-config-svc",
-          "queryGen": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+          "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
+          "cdw": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/cdw",
+          "paConfig": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/pa-config-svc",
+          "trex": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
+          "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
           "dataflowMgmt": "http://alp-minerva-dataflow-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
-          "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+          "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
           "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
           "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
-          "usermgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/usermgmt/api",
+          "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
           "terminology": "http://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
           "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
           "appRouter": "https://alp-mercury-approuter:41000",
@@ -539,8 +540,8 @@ services:
     depends_on:
       trex:
         condition: service_healthy
-      alp-logto:
-        condition: service_healthy
+      alp-logto-post-init:
+        condition: service_completed_successfully
     healthcheck:
       interval: 20s
       retries: 30
@@ -685,8 +686,8 @@ services:
     depends_on:
       trex:
         condition: service_healthy
-      alp-logto:
-        condition: service_healthy
+      alp-logto-post-init:
+        condition: service_completed_successfully
     healthcheck:
       interval: 600s
       retries: 1200
@@ -818,8 +819,6 @@ services:
     depends_on:
       alp-logto:
         condition: service_healthy
-      alp-minerva-postgres:
-        condition: service_healthy
     image: alpcr.azurecr.io/alp-data-node/alp-logto-post-init:${DOCKER_TAG_NAME:-develop}
     networks:
       alp:
@@ -845,8 +844,8 @@ services:
   alp-logto:
     container_name: &c8 alp-logto-${BASE_PORT:-1}
     depends_on:
-      alp-minerva-postgres:
-        condition: service_healthy
+      alp-minerva-pg-mgmt-init:
+        condition: service_completed_successfully
     healthcheck:
       interval: 20s
       retries: 30
@@ -977,8 +976,8 @@ services:
     depends_on:
       trex:
         condition: service_healthy
-      alp-minerva-postgres:
-        condition: service_healthy
+      alp-minerva-pg-mgmt-init:
+        condition: service_completed_successfully
       alp-minio-post-init:
         condition: service_completed_successfully
     healthcheck:
@@ -1063,8 +1062,8 @@ services:
 
   alp-minerva-postgres-post-init:
     depends_on:
-      alp-minerva-postgres:
-        condition: service_healthy
+      alp-minerva-pg-mgmt-init:
+        condition: service_completed_successfully
     image: postgres:15-alpine
     networks:
       alp:
@@ -1214,12 +1213,10 @@ services:
     depends_on:
       trex:
         condition: service_healthy
-      alp-logto:
-        condition: service_healthy
-      # alp-minerva-gateway:
-      #   condition: service_healthy
-      alp-minerva-postgres:
-        condition: service_healthy
+      alp-logto-post-init:
+        condition: service_completed_successfully
+      alp-minerva-pg-mgmt-init:
+        condition: service_completed_successfully
     logging:
       options:
         tag: *c30

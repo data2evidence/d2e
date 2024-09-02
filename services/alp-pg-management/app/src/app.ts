@@ -300,8 +300,8 @@ export class App {
       }
     }
     this.logger.info("Postgres Automation tasks completed.");
-    //process.exit(0);
+    process.exit(0);
   }
 }
 
-//new App().start();
+new App().start();
