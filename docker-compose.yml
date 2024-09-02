@@ -1822,7 +1822,11 @@ services:
     image: perseushub/cdm-builder:latest
     container_name: alp-perseus-cdm-builder-${BASE_PORT:-1}
     environment:
-      - ASPNETCORE_ENVIRONMENT=Docker
+      <<:
+          - *x-pg
+      ASPNETCORE_ENVIRONMENT: Docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
       alp-minerva-postgres-post-init:
         condition: service_completed_successfully

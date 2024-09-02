@@ -9,7 +9,7 @@ sed -i "s/{PG__HOST}/${PG__HOST}/g" config.py
 sed -i "s/{PG__PORT}/${PG__PORT}/g" config.py
 sed -i "s/{PG__DB_NAME}/${PG__DB_NAME}/g" config.py
 sed -i "s/{PG_SUPER_PASSWORD}/${PG_SUPER_PASSWORD}/g" config.py
-sed -i "s/{PG__SUPER_USER}/${PG__SUPER_USER}/g" config.py
+sed -i "s/{PG_SUPER_USER}/${PG_SUPER_USER}/g" config.py
 
 cp ./config/config.py ./config.py
 

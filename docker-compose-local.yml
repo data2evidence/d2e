@@ -317,3 +317,8 @@ services:
     build:
       context: ./services/alp-perseus-files-manager
       dockerfile: Dockerfile
+
+  alp-perseus-cdm-builder:
+    build:
+        context: ./services/alp-perseus-cdm-builder
+        dockerfile: Dockerfile
