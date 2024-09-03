@@ -256,5 +256,4 @@ class DuckDBConnection(Connection):
 
     def new_session(self) -> Session:
         cursor = self.db.cursor()
-        cursor.execute("SET search_path='main'")
         return DuckDBSession(cursor)

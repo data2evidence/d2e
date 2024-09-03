@@ -1,4 +1,5 @@
 import os
+import logging
 from enum import Enum
 from typing import Optional, Dict
 import duckdb
@@ -11,6 +12,8 @@ from .backends.postgres import PGConnection
 from .backends.hana import HANAConnection
 from buenavista import bv_dialects, rewrite
 from config import Env
+
+logger = logging.getLogger(__name__)
 
 
 class DBCredentialsType(BaseModel):
@@ -161,16 +164,23 @@ def _temp_workaround_get_duckdb_connection(database_code: str, schema: str, voca
     Refer to ticket issue below.
     https://github.com/duckdb/duckdb/issues/13523
     '''
+
     vocab_schema_duckdb_file_path = os.path.join(
         Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
 
     db = duckdb.connect(vocab_schema_duckdb_file_path, read_only=True)
-
     # Attach cdm schema
-    cdm_schema_duckdb_file_path = os.path.join(
-        Env.DUCKDB__DATA_FOLDER, f"{database_code}_{schema}")
-    db.execute(
-        f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
+    try:
+        cdm_schema_duckdb_file_path = os.path.join(
+            Env.DUCKDB__DATA_FOLDER, f"{database_code}_{schema}")
+        db.execute(
+            f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
+    except Exception as err:
+        if type(err) == duckdb.duckdb.BinderException and str(err).startswith("Binder Error: Unique file handle conflict: Database"):
+            logger.warn(
+                f"Ignoring error due to unique file handle conflict for {vocab_schema_duckdb_file_path} and {cdm_schema_duckdb_file_path} ")
+        else:
+            raise err
 
     return DuckDBConnection(db)
 
