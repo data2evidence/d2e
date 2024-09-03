@@ -1,4 +1,4 @@
-FROM medplum/medplum-server:3.2.2 as builder
+FROM medplum/medplum-server:3.2.2 AS builder
 
 COPY config.json .
 
