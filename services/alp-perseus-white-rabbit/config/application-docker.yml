@@ -29,8 +29,8 @@ files-manager-url: http://files-manager:10500/files-manager
 
 fake-data-db:
   db-type: PostgreSQL
-  server: shareddb
-  port: 5432
+  server: ${PG__DB_NAME}
+  port: ${PG__PORT}
   database: source
-  user: source
-  password: password
+  user:  ${PG_SUPER_USER}
+  password: ${PG_SUPER_PASSWORD}
