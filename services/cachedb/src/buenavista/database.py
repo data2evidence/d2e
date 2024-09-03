@@ -130,6 +130,19 @@ def _CreateConnectionString(dialect_driver: str, user: str, pw: str,
 def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_code: str, schema: str, vocab_schema: str):
     connection = None
 
+    # Guard clause for postgres and hana for unsupported database_codes
+    if dialect == DatabaseDialects.POSTGRES or dialect == DatabaseDialects.HANA:
+        if database_code not in clients[dialect]:
+            raise Exception(
+                f"Dialect:{dialect} has no configuration with database code:{database_code}")
+
+    # Guard clause for duckdb for unsupported database_codes
+    # For DUCKDB, check against postgres dialect to check for supported database_codes
+    if dialect == DatabaseDialects.DUCKDB:
+        if database_code not in clients[DatabaseDialects.POSTGRES]:
+            raise Exception(
+                f"Dialect:{dialect} has no configuration with database code:{database_code}")
+
     if dialect == DatabaseDialects.POSTGRES:
         connection = PGConnection(
             clients[dialect][database_code])
@@ -139,16 +152,36 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
             clients[dialect][database_code])
 
     if dialect == DatabaseDialects.DUCKDB:
-        # In order for FTS to work, vocab schema cannot be using ATTACH
-        # TODO: Revert back to using _get_duckdb_connection after issue has been fixed
-        # https://github.com/duckdb/duckdb/issues/13523
-        connection = _temp_workaround_get_duckdb_connection(
-            database_code, schema, vocab_schema)
+        '''
+        Check if both schema and vocab duckdb database files exists.
+        If both exists, continue connection with duckdb
+        Else either does not exist, fallback connection to postgres.
+        '''
+        cdm_schema_duckdb_file_path = os.path.join(
+            Env.DUCKDB__DATA_FOLDER, f"{database_code}_{schema}")
+        vocab_schema_duckdb_file_path = os.path.join(
+            Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
 
-        '''
-        connection = _get_duckdb_connection(
-            database_code, schema, vocab_schema)
-        '''
+        # Only when both duckdb files for cdm schema and vocab schema exist, connect to duckdb
+        if os.path.isfile(cdm_schema_duckdb_file_path) and os.path.isfile(vocab_schema_duckdb_file_path):
+
+            # In order for FTS to work, vocab schema cannot be using ATTACH
+            # TODO: Revert back to using _get_duckdb_connection after issue has been fixed
+            # https://github.com/duckdb/duckdb/issues/13523
+            connection = _temp_workaround_get_duckdb_connection(
+                cdm_schema_duckdb_file_path, schema, vocab_schema_duckdb_file_path)
+
+            '''
+            connection = _get_duckdb_connection(
+                cdm_schema_duckdb_file_path, schema, vocab_schema_duckdb_file_path, vocab_schema)
+            '''
+        else:
+            # Fallback connection to postgres
+            logger.warn(
+                f"Duckdb Inaccessible at following paths {cdm_schema_duckdb_file_path} OR {vocab_schema_duckdb_file_path}. Hence fallback to Postgres dialect connection"
+            )
+            connection = PGConnection(
+                clients[DatabaseDialects.POSTGRES][database_code])
 
     if connection:
         return connection
@@ -158,21 +191,27 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
 
 
-def _temp_workaround_get_duckdb_connection(database_code: str, schema: str, vocab_schema: str) -> DuckDBConnection:
+def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_schema_duckdb_file_path: str, vocab_schema: str) -> DuckDBConnection:
+    db = duckdb.connect()
+    # Attach cdm schema
+    db.execute(
+        f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
+    # Attach vocab schema
+    db.execute(
+        f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
+    connection = DuckDBConnection(db)
+
+
+def _temp_workaround_get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_schema_duckdb_file_path: str) -> DuckDBConnection:
     '''
     Temp workaround function to get duckdb connection due to issue with duckdb FTS.
     Refer to ticket issue below.
     https://github.com/duckdb/duckdb/issues/13523
     '''
 
-    vocab_schema_duckdb_file_path = os.path.join(
-        Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
-
     db = duckdb.connect(vocab_schema_duckdb_file_path, read_only=True)
     # Attach cdm schema
     try:
-        cdm_schema_duckdb_file_path = os.path.join(
-            Env.DUCKDB__DATA_FOLDER, f"{database_code}_{schema}")
         db.execute(
             f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
     except Exception as err:
@@ -183,44 +222,6 @@ def _temp_workaround_get_duckdb_connection(database_code: str, schema: str, voca
             raise err
 
     return DuckDBConnection(db)
-
-
-def _get_duckdb_connection(database_code: str, schema: str, vocab_schema: str) -> DuckDBConnection:
-    db = duckdb.connect()
-
-    # Attach cdm schema
-    cdm_schema_duckdb_file_path = os.path.join(
-        Env.DUCKDB__DATA_FOLDER, f"{database_code}_{schema}")
-    db.execute(
-        f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
-
-    # Attach vocab schema
-    vocab_schema_duckdb_file_path = os.path.join(
-        Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
-    db.execute(
-        f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
-
-    return DuckDBConnection(db)
-
-
-def parse_connection_param_database(database: str) -> tuple[str, str]:
-    '''
-    Resolves client connection database d2e format into its individual component.
-    Expects database in the format of {DIALECT}_{DATASETID}
-    '''
-    databaseComponents = database.split("_")
-    # Simple conditional check to check if database param has two compoenents separated by "_"
-    if len(databaseComponents) != 2:
-        raise Exception(
-            f"Database param:{database} is in the wrong format! Database has to be in the format of [DIALECT_DATASETID]")
-    dialect, _dataset_id = databaseComponents
-
-    # Guard clause against invalid dialects
-    if dialect not in [e.value for e in DatabaseDialects]:
-        raise Exception(
-            f"Dialect:{dialect} not support! Supported dialects are: {', '.join([e.value for e in DatabaseDialects])}")
-
-    return databaseComponents
 
 
 def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:
