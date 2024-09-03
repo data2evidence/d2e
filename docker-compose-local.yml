@@ -201,15 +201,6 @@ services:
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
 
-  alp-minerva-sqleditor:
-    build:
-      context: .
-      dockerfile: ./services/alp-sqleditor/Dockerfile
-    ports:
-      - 8888:8888
-    volumes:
-      - ./services/alp-sqleditor/init.sh:/usr/share/hue/init.sh
-
   alp-minerva-terminology-svc:
     build:
       context: .
