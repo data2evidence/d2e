@@ -52,11 +52,6 @@
         "service":"portalServer"
       },
       {
-        "source":"/db-credentials",
-        "rmsrc": true,
-        "service":"trex"
-      },
-      {
         "source":"/dataflow-mgmt",
         "rmsrc": true,
         "service":"dataflowMgmt"
@@ -67,7 +62,7 @@
         "imports": "/alp-usermgmt/import.json"
       },
       {
-        "source":"/db",
+        "source":"/db-credentials",
         "function":"/alp-db-credentials",
         "imports": "/alp-db-credentials/import.json",
         "env": "alp-db-credentials"

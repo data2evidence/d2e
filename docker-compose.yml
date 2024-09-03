@@ -9,7 +9,7 @@ volumes:
   duckdb-data-1:
   meilisearch-minerva-data-1:
   minio-data-1:
-  pg-minerva-data-1:
+  xpg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
 
@@ -357,7 +357,7 @@ services:
                 "paConfig": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/pa-config-svc",
                 "queryGen": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
                 "dataflowMgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
-                "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+                "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/db-credentials",
                 "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
                 "portalServer": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/system-portal",
                 "usermgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/usermgmt/api",
@@ -405,7 +405,7 @@ services:
           "trex": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
           "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
           "dataflowMgmt": "http://alp-minerva-dataflow-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
-          "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
+          "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
           "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
           "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
           "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
@@ -1051,7 +1051,7 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     shm_size: 1gb
     volumes:
-      - pg-minerva-data-1:/var/lib/postgresql/data
+      - xpg-minerva-data-1:/var/lib/postgresql/data
       - ./cache/pgbackup:/backup
       - ./cache/vocab:/vocab
     environment:

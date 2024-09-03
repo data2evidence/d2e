@@ -36,7 +36,7 @@ export class App {
 
   private registerRoutes() {
     const routes = Container.get(Routes)
-    this.app.use('/', routes.getRouter())//(new Routes(new DbRouter(new DbService()))).getRouter())
+    this.app.use('/db-credentials', routes.getRouter())//(new Routes(new DbRouter(new DbService()))).getRouter())
   }
 
   private registerValidatorContainer() {
