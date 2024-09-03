@@ -21,6 +21,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        default_schema: white_rabbit
     hibernate:
       ddl-auto: update
     show-sql: false
@@ -32,5 +33,5 @@ fake-data-db:
   server: ${PG__DB_NAME}
   port: ${PG__PORT}
   database: source
-  user:  ${PG_SUPER_USER}
+  user: ${PG_SUPER_USER}
   password: ${PG_SUPER_PASSWORD}

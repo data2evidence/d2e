@@ -21,6 +21,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        default_schema: files_manager
     hibernate:
       ddl-auto: update
     show-sql: false
