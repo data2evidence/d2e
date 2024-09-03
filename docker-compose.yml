@@ -29,7 +29,7 @@ x-envs:
     LB__LOG_LEVEL: ${LB__LOG_LEVEL:-FINE}
     PG__READ_ROLE: postgres_tenant_read_role
   env_converter: &x-converter
-    DB_CREDENTIALS_MGR__API_URL: https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/db/
+    DB_CREDENTIALS_MGR__API_URL: https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/db-credentials/db/
     DB_CREDENTIALS__PRIVATE_KEY: ${DB_CREDENTIALS__INTERNAL__PRIVATE_KEY}
     DB_CREDENTIALS__PRIVATE_KEY_PASSPHRASE: ${DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE}
     IDP__ALP_SVC__CLIENT_ID: ${LOGTO__ALP_SVC__CLIENT_ID}
@@ -271,7 +271,7 @@ x-envs:
        "paConfig": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/pa-config-svc",
        "queryGen": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "dataflowMgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
-       "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+       "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/db-credentials",
        "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
        "portalServer": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/system-portal",
        "usermgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/usermgmt/api",
