@@ -1,6 +1,7 @@
 const pg = require('pg');
 import { createLogger } from '../logger';
 import { Filters } from '../utils/types';
+import { env } from 'src/env';
 import { INDEX_ATTRIBUTES } from '../utils/constants';
 
 export class CachedbDAO {
@@ -317,11 +318,10 @@ export class CachedbDAO {
 }
 
 const getCachedbConnection = (jwt: string, datasetId: string) => {
-  // TODO: GET cachedb connection details from env / modularize
   try {
     const client = new pg.Client({
-      host: 'alp-cachedb',
-      port: 41191,
+      host: env.CACHEDB__HOST,
+      port: env.CACHEDB__PORT,
       user: jwt,
       database: `duckdb_${datasetId}`,
       idleTimeoutMillis: 30000,

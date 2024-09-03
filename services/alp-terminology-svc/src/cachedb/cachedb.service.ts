@@ -16,7 +16,6 @@ import {
 } from 'src/utils/types';
 import { createLogger } from '../logger';
 import { groupBy } from 'src/utils/helperUtil';
-// TODO move to NESTJS DI
 import { CachedbDAO } from './cachedb-dao';
 
 import { DUMMY_FILTER_OPTIONS_FACETS } from '../utils/constants';
@@ -38,14 +37,19 @@ export class CachedbService {
     vocab_file_name: string,
     filters: Filters,
   ) {
-    const cachedbDao = new CachedbDAO(this.token, datasetId);
-    return cachedbDao.getConcepts(
-      pageNumber,
-      Number(rowsPerPage),
-      searchText,
-      vocab_file_name,
-      filters,
-    );
+    try {
+      const cachedbDao = new CachedbDAO(this.token, datasetId);
+      const result = await cachedbDao.getConcepts(
+        pageNumber,
+        Number(rowsPerPage),
+        searchText,
+        vocab_file_name,
+        filters,
+      );
+      return this.DuckdbResultMapping(result);
+    } catch (err) {
+      this.logger.error(err);
+    }
   }
 
   async getConceptFilterOptionsFaceted(

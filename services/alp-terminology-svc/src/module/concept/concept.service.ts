@@ -25,9 +25,7 @@ import { SystemPortalAPI } from 'src/api/portal-api';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 import { GetStandardConceptsDto } from './dto/concept.dto';
 import { CachedbService } from 'src/cachedb/cachedb.service';
-
-// TODO: MOVE TO env var
-const USE_DUCKDB_FTS = true;
+import { env } from 'src/env';
 
 // Placed outside as FHIR server is unable to access
 const logger = createLogger('ConceptService');
@@ -70,10 +68,9 @@ export class ConceptService {
     const { databaseCode, vocabSchemaName, dialect } =
       await systemPortalApi.getDatasetDetails(datasetId);
 
-    if (USE_DUCKDB_FTS) {
+    if (env.USE_DUCKDB_FTS) {
       logger.info('Searching with Duckdb FTS');
-      // TODO: Create mapping for duckdbftsresult
-      const duckdbFtsResult: any = await this.cachedbService.getConcepts(
+      return await this.cachedbService.getConcepts(
         pageNumber,
         Number(rowsPerPage),
         datasetId,
@@ -81,8 +78,6 @@ export class ConceptService {
         `${databaseCode}_${vocabSchemaName}`,
         completeFilters,
       );
-
-      return this.meilisearchResultMapping(duckdbFtsResult);
     }
 
     try {
@@ -217,10 +212,8 @@ export class ConceptService {
       const searchConcepts1: number[] = [conceptId];
 
       // If USE_DUCKDB_FTS, use duckdb fts and return early
-      if (USE_DUCKDB_FTS) {
-        // TODO: move to nestjs DI
-        const cachedbService = new CachedbService(this.request);
-        return await cachedbService.getTerminologyDetailsWithRelationships(
+      if (env.USE_DUCKDB_FTS) {
+        return await this.cachedbService.getTerminologyDetailsWithRelationships(
           databaseCode,
           vocabSchemaName,
           dialect,
@@ -431,7 +424,7 @@ export class ConceptService {
         dialect === 'hana' ? 'CONCEPT' : 'concept'
       }`;
 
-      if (USE_DUCKDB_FTS) {
+      if (env.USE_DUCKDB_FTS) {
         logger.info('Searching concept filters with Duckdb FTS');
         const filterOptions =
           await this.cachedbService.getConceptFilterOptionsFaceted(
