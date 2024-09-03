@@ -6,7 +6,6 @@ import {
     TemporalQueryNode,
     Expression,
     TemporalQueryExpression,
-    JoinQueryNode,
     And,
     Or,
     Filter,
@@ -834,6 +833,8 @@ export class InternalFilterRepresentation implements Request {
                                                         Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
                                                         identicalNode.alias
                                                     ).withType("expressionOp")]})
+                        }
+                    }));
 
         // Build list of where conditions
         // Gets list of basic data attribute constraints and adds them into the where clause conditions

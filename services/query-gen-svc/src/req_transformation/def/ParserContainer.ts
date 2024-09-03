@@ -260,14 +260,9 @@ export class TemporalQueryExpression {
     constructor(public and: Expression[]) {}
 }
 
-export class JoinQueryNode {
-    constructor(public alias: string, public type: "With" | "Without") {}
-}
-
 export type Filter = (
     | Expression
     | And
     | Or
     | TemporalQueryNode
-    | JoinQueryNode
 )[];
