@@ -32,6 +32,7 @@ import { StudiesDbMetadata, StudyDbMetadata, IMRIRequest } from "./types";
 import PortalServerAPI from "./api/PortalServerAPI";
 import { CachedbDBConnectionUtil } from "./utils/cachedb/CachedbDBConnectionUtil";
 import { getDuckdbDBConnection } from "./utils/DuckdbConnection";
+import { getCachedbDatabaseFormatProtocolA } from "./utils/cachedb/helper";
 import { DB } from "./utils/DBSvcConfig";
 import { env } from "./env";
 dotenv.config();
@@ -589,10 +590,16 @@ const getCachedbDbConnections = async ({
     // Define defaults for both analytics & Vocab connections
     let analyticsConnectionPromise;
 
-    let cachedbDatabase = `${analyticsCredentials.dialect}_${studyId}`;
+    let cachedbDatabase = getCachedbDatabaseFormatProtocolA(
+        analyticsCredentials.dialect,
+        studyId
+    );
     // IF use duckdb is true change dialect from postgres -> duckdb
     if (env.USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
-        cachedbDatabase = `duckdb_${studyId}`;
+        cachedbDatabase = cachedbDatabase.replace(
+            analyticsCredentials.dialect,
+            "duckdb"
+        );
     }
 
     // Overwrite analyticsCrendential values to connect to cachedb

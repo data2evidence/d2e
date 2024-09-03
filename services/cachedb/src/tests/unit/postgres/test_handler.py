@@ -19,6 +19,10 @@ def mock_handler():
     server = MagicMock()
     server.conn = MagicMock(spec=Connection)
     server.rewriter = MagicMock(spec=Rewriter)
+    server.db_clients = {
+        "hana": {},
+        "postgresql": {"testdbcode": "dummy"}
+    }
     server.ctxts = {}
 
     handler = BuenaVistaHandler(request, client_address, server)
@@ -30,12 +34,12 @@ def mock_handler():
 
 def test_handle_startup(mock_handler):
     mock_handler.r.read_uint32.side_effect = [8, 196608]
-    mock_handler.r.read_bytes.return_value = b"user\x00test\x00database\x00duckdb_11111111-2222-3333-4444-555555555555\x00"
+    mock_handler.r.read_bytes.return_value = b"user\x00test\x00database\x00A|duckdb|11111111-2222-3333-4444-555555555555\x00"
     ctx = mock_handler.handle_startup()
     assert isinstance(ctx, BVContext)
     assert ctx.session is not None
     assert ctx.params == {"user": "test",
-                          "database": "duckdb_11111111-2222-3333-4444-555555555555"}
+                          "database": "A|duckdb|11111111-2222-3333-4444-555555555555"}
 
 
 def test_handle_query(mock_handler):
