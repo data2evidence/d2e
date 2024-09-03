@@ -143,6 +143,7 @@ export class Operator extends AstElement {
                 )
             );
         } else if (this.op.trim() === "!=" || this.name === "joinOn") {
+            //To handle != check for identical filtercards. Both with & without AND / OR operators.
             if (this.op.trim() === "!=") {
                 const parent =
                     this.name === "joinOn" ? this.parent : this.parent.parent;
@@ -185,22 +186,6 @@ export class Operator extends AstElement {
             } else {
                 throw new Error("Invalid structure for JoinOn Type");
             }
-            // this.node.operand.map((x) => {
-            //     const a = x.getSQL();
-            //     console.log(a)
-            // })
-
-            //this.node.operand[0].node.alias //drugera1
-            //this.parent.node.alias //drugera2
-
-            //this.parent.entityConfig.baseEntity //@drugera
-
-            // find((e) => {if(this.parent.joinElements[e].alias.contains(this.parent.node.alias)) return this.parent.joinElements[e]}))
-
-            // const baseTableAlias = nodelement.alias
-            //placeholdermap | column name
-
-            //patient.drugera2
         } else if (this.node.operand.length === 2) {
             let literal = this.node.operand.find((x) => x instanceof Literal);
 

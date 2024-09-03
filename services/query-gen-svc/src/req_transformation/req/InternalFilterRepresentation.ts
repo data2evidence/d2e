@@ -815,7 +815,7 @@ export class InternalFilterRepresentation implements Request {
                 return filterConditions;
             }, {});
 
-        //Detect interactions with multiple associated filtercards. Must be after Exclude is detected!!
+        //Detect interactions with multiple identical filtercards and add NotEqual check between them. Must be after isExclude is detected!
         Object.keys(patient.filter)
             .filter((e) => patient.filter[e].length > 1)
             .forEach((interaction) =>
@@ -834,61 +834,6 @@ export class InternalFilterRepresentation implements Request {
                                                         Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
                                                         identicalNode.alias
                                                     ).withType("expressionOp")]})
-                        // e.join.push(
-                        //     new BaseNode(Keys.MRITERM_JOINQUERY)
-                        //         .withAlias(e.alias)
-                        //         .withFilter([
-                        //             new Expression(
-                        //                 Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
-                        //                 identicalNode.alias
-                        //             ).withType("expressionOp"),
-                        //         ])
-                                // .withAlias(e.alias)
-                                // .withFilter([
-                                //     new JoinQueryNode(identicalNode.alias),
-                                // ])
-                        // );
-                    }
-                })
-            );
-
-        //   .reduce((whereConditions, interaction) => {
-        //       let currInteraction: FilterNode[] = (
-        //           FastUtil.deepClone(
-        //               patient.filter[interaction]
-        //           ) as FilterNode[]
-        //       ).filter((e) => !e.isExclude);
-        //       if (currInteraction.length > 1) {
-        //           currInteraction.forEach((e, i) => {
-        //                 whereConditions = whereConditions.concat(
-        //                     (
-        //                         FastUtil.deepClone(
-        //                             currInteraction
-        //                         ) as FilterNode[]
-        //                     )
-        //                         .splice(i + 1)
-        //                         .reduce((inEq, curr) => {
-        //                             inEq.push(
-        //                                 new BaseNode(
-        //                                     Keys.MRITERM_INTERACTIONID
-        //                                 )
-        //                                     .withAlias(e.alias)
-        //                                     .withFilter([
-        //                                         new Expression(
-        //                                             Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
-        //                                             curr.alias
-        //                                         ).withType(
-        //                                             "expressionOp"
-        //                                         ),
-        //                                     ])
-        //                             );
-        //                             return inEq;
-        //                         }, [])
-        //                 );
-        //           });
-        //       }
-        //       return whereConditions;
-        //   }, []);
 
         // Build list of where conditions
         // Gets list of basic data attribute constraints and adds them into the where clause conditions
@@ -1003,50 +948,6 @@ export class InternalFilterRepresentation implements Request {
                 );
                 return whereConditions;
             }, []);
-
-        // Retrieves interactions with multiple associated filtercards and adds not equal conditions to where clause
-        // let filtercardsWithIdenticalInteractions: BaseNode[] =
-        //     process.env.NOT_EQ_CHECK_FILTERCARDS === "false"
-        //         ? []
-        //         : Object.keys(patient.filter)
-        //               .filter((e, key) => patient.filter[e].length > 1)
-        //               .reduce((whereConditions, interaction) => {
-        //                   let currInteraction: FilterNode[] = (
-        //                       FastUtil.deepClone(
-        //                           patient.filter[interaction]
-        //                       ) as FilterNode[]
-        //                   ).filter((e) => !e.isExclude);
-        //                   if (currInteraction.length > 1) {
-        //                       currInteraction.forEach((e, i) => {
-        //                             whereConditions = whereConditions.concat(
-        //                                 (
-        //                                     FastUtil.deepClone(
-        //                                         currInteraction
-        //                                     ) as FilterNode[]
-        //                                 )
-        //                                     .splice(i + 1)
-        //                                     .reduce((inEq, curr) => {
-        //                                         inEq.push(
-        //                                             new BaseNode(
-        //                                                 Keys.MRITERM_INTERACTIONID
-        //                                             )
-        //                                                 .withAlias(e.alias)
-        //                                                 .withFilter([
-        //                                                     new Expression(
-        //                                                         Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
-        //                                                         curr.alias
-        //                                                     ).withType(
-        //                                                         "expressionOp"
-        //                                                     ),
-        //                                                 ])
-        //                                         );
-        //                                         return inEq;
-        //                                     }, [])
-        //                             );
-        //                       });
-        //                   }
-        //                   return whereConditions;
-        //               }, []);
 
         // Compiles all where conditions
         patient.where = [
