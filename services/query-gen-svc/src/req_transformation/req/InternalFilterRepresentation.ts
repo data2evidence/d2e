@@ -815,7 +815,8 @@ export class InternalFilterRepresentation implements Request {
             }, {});
 
         //Detect interactions with multiple identical filtercards and add NotEqual check between them. Must be after isExclude is detected!
-        Object.keys(patient.filter)
+        process.env.NOT_EQ_CHECK_FILTERCARDS === "true" && 
+            Object.keys(patient.filter)
             .filter((e) => patient.filter[e].length > 1)
             .forEach((interaction) =>
                 patient.filter[interaction].forEach((e, i) => {
