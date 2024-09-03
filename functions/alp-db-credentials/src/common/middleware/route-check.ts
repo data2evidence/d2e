@@ -43,7 +43,6 @@ export const checkServiceScope = (req: Request, res: Response, next: NextFunctio
 }
 
 export const validateDbDto = async (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body)
   const dbDto = getDtoType(req)
   const errors = await validate(dbDto, {
     skipMissingProperties: false,
