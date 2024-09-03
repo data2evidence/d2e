@@ -9,7 +9,7 @@ volumes:
   duckdb-data-1:
   meilisearch-minerva-data-1:
   minio-data-1:
-  xpg-minerva-data-1:
+  pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
 
@@ -1051,7 +1051,7 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     shm_size: 1gb
     volumes:
-      - xpg-minerva-data-1:/var/lib/postgresql/data
+      - pg-minerva-data-1:/var/lib/postgresql/data
       - ./cache/pgbackup:/backup
       - ./cache/vocab:/vocab
     environment:
