@@ -142,7 +142,49 @@ export class Operator extends AstElement {
                     this.node.operand.map((x) => x.getSQL())
                 )
             );
-        } else if (this.op.trim() === "!=" && this.name === "joinOn") {
+        } else if (this.op.trim() === "!=" || this.name === "joinOn") {
+            if (this.op.trim() === "!=") {
+                const parent =
+                    this.name === "joinOn" ? this.parent : this.parent.parent;
+                const baseTableAlias =
+                    parent.joinElements[
+                        Object.keys(parent.joinElements).find((e) => {
+                            if (
+                                parent.joinElements[e].alias.indexOf(
+                                    parent.node.alias
+                                ) > -1
+                            )
+                                return e;
+                        })
+                    ].alias;
+
+                const baseTableJoinConditionColumn =
+                    parent.entityConfig.placeholderMap[
+                        `${parent.entityConfig.baseEntity}.INTERACTION_ID`
+                    ];
+
+                let qos: QueryObject[] = this.node.operand.map(
+                    (identicalOperand) => {
+                        return QueryObject.format(
+                            ` ${baseTableAlias}.${baseTableJoinConditionColumn} != "patient.${identicalOperand.node.alias}".${baseTableJoinConditionColumn} `
+                        );
+                    }
+                );
+
+                return new QueryObject().join(qos);
+            } else if (this.op.trim() === "AND" || this.op.trim() === "OR") {
+                const sql = QueryObject.format(
+                    "(%Q)",
+                    QueryObject.format(" " + this.op + " ").join(
+                        this.node.operand.map((x) => {
+                            return QueryObject.format(x.sql.queryString);
+                        })
+                    )
+                );
+                return sql;
+            } else {
+                throw new Error("Invalid structure for JoinOn Type");
+            }
             // this.node.operand.map((x) => {
             //     const a = x.getSQL();
             //     console.log(a)
@@ -159,34 +201,6 @@ export class Operator extends AstElement {
             //placeholdermap | column name
 
             //patient.drugera2
-            const baseTableAlias =
-                this.parent.joinElements[
-                    Object.keys(this.parent.joinElements).find((e) => {
-                        if (
-                            this.parent.joinElements[e].alias.indexOf(
-                                this.parent.node.alias
-                            ) > -1
-                        )
-                            return e;
-                    })
-                ].alias;
-
-
-            const baseTableJoinConditionColumn =
-                this.parent.entityConfig.placeholderMap[
-                    `${this.parent.entityConfig.baseEntity}.INTERACTION_ID`
-                ];
-
-            let qos: QueryObject[] = this.node.operand.map(
-                (identicalOperand) => {
-                    return QueryObject.format(
-                        ` ${baseTableAlias}.${baseTableJoinConditionColumn} != "patient.${identicalOperand.node.alias}".${baseTableJoinConditionColumn} `
-                    );
-                }
-            );
-
-            return (new QueryObject()).join(qos)
-
         } else if (this.node.operand.length === 2) {
             let literal = this.node.operand.find((x) => x instanceof Literal);
 
