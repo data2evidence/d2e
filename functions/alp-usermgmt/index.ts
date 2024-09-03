@@ -6,8 +6,11 @@ import { SeedSource } from "./src/db/SeedSource.ts"
 
 
 const k = knex(config);
-const m = await k.migrate.latest({migrationSource: new MigrationSource()});
-const s = await k.seed.run({seedSource: new SeedSource()});
-console.log("migration: done")
-
+try {
+    const m = await k.migrate.latest({migrationSource: new MigrationSource()});
+    const s = await k.seed.run({seedSource: new SeedSource()});
+    console.log("migration: done")
+} catch(e) {
+    console.log(e);
+}
 start()
