@@ -26,21 +26,25 @@ export class CachedbDAO {
   ) {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
-      const duckdbFtsBaseQuery = this.getDuckdbFtsBaseQuery(
-        vocab_file_name,
-        filters,
-      );
+      const [duckdbFtsBaseQuery, duckdbFtsBaseQueryParams] =
+        this.getDuckdbFtsBaseQuery(vocab_file_name, searchText, filters);
       const conceptsSql = `
       ${duckdbFtsBaseQuery}
       select *
           from fts
-          order by score desc
-          limit $2 OFFSET $3;
+          limit ? OFFSET ?;
           `;
-      const countSql = `${duckdbFtsBaseQuery} select count(score) as count from fts`;
+      const conceptsSqlParams = [
+        ...duckdbFtsBaseQueryParams,
+        rowsPerPage,
+        pageNumber,
+      ];
+
+      const countSql = `${duckdbFtsBaseQuery} select count(concept_id) as count from fts`;
+      const countSqlParams = duckdbFtsBaseQueryParams;
       const sqlPromises = [
-        client.query(conceptsSql, [searchText, rowsPerPage, pageNumber]),
-        client.query(countSql, [searchText]),
+        client.query(conceptsSql, conceptsSqlParams),
+        client.query(countSql, countSqlParams),
       ];
       const results = await Promise.all(sqlPromises);
 
@@ -142,11 +146,10 @@ export class CachedbDAO {
     try {
       const facetPromises = Object.values(facetColumns).map(
         (column: string) => {
-          const duckdbFtsBaseQuery = this.getDuckdbFtsBaseQuery(
-            vocab_file_name,
-            filters,
-            [column],
-          );
+          const [duckdbFtsBaseQuery, duckdbFtsBaseQueryParams] =
+            this.getDuckdbFtsBaseQuery(vocab_file_name, searchText, filters, [
+              column,
+            ]);
           let facetSql;
           if (column === 'valid_end_date') {
             facetSql = getValidityFacetSql(column);
@@ -157,7 +160,8 @@ export class CachedbDAO {
             ${duckdbFtsBaseQuery}
             ${facetSql}
           `;
-          return client.query(sql, [searchText]);
+          const sqlParams = duckdbFtsBaseQueryParams;
+          return client.query(sql, sqlParams);
         },
       );
 
@@ -213,20 +217,49 @@ export class CachedbDAO {
 
   private getDuckdbFtsBaseQuery = (
     duckdb_file_name: string,
+    searchText: string,
     filters: Filters,
     columns: string[] = [],
-  ): string => {
-    const duckdbFtsWhereClause = this.generateDuckdbFtsWhereClause(filters);
+  ): [string, string[]] => {
+    const filterWhereClause = this.generateFilterWhereClause(filters);
 
     const columnsToSelect = columns.length === 0 ? '*' : columns.join(', ');
 
-    const duckdbFtsBaseQuery = `
-        with fts as ( select ${columnsToSelect}, ${duckdb_file_name}.fts_main_concept.match_bm25( concept_id, $1 ) as score from ${duckdb_file_name}.concept where score is not null ${duckdbFtsWhereClause})`;
-
-    return duckdbFtsBaseQuery;
+    if (searchText === '') {
+      return [
+        `
+      with fts as (
+        select
+          ${columnsToSelect}
+        from
+          ${duckdb_file_name}.concept
+          ${filterWhereClause}
+        )
+      `,
+        [],
+      ];
+    } else {
+      const duckdbFtsWhereClause = filterWhereClause
+        ? `${filterWhereClause} AND score is not null`
+        : 'WHERE score is not null ';
+      return [
+        `
+      with fts as (
+        select
+          ${columnsToSelect},
+          ${duckdb_file_name}.fts_main_concept.match_bm25(concept_id, ?) as score
+        from
+          ${duckdb_file_name}.concept
+          ${duckdbFtsWhereClause} 
+          order by score desc
+        )
+      `,
+        [searchText],
+      ];
+    }
   };
 
-  private generateDuckdbFtsWhereClause(filters: Filters): string {
+  private generateFilterWhereClause(filters: Filters): string {
     const conceptClassIdFilter = filters.conceptClassId.map((filterValue) => {
       return `${INDEX_ATTRIBUTES.concept.conceptClassId} = '${filterValue}'`;
     });
@@ -263,7 +296,7 @@ export class CachedbDAO {
     if (filterList.length === 0) {
       return '';
     } else {
-      return ` AND ${filterList.join(' AND ')}`;
+      return ` WHERE ${filterList.join(' AND ')}`;
     }
   }
 
