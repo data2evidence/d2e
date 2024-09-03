@@ -209,9 +209,10 @@ def _temp_workaround_get_duckdb_connection(cdm_schema_duckdb_file_path: str, sch
     https://github.com/duckdb/duckdb/issues/13523
     '''
 
+    # Attach vocab schema
     db = duckdb.connect(vocab_schema_duckdb_file_path, read_only=True)
-    # Attach cdm schema
     try:
+        # Attach cdm schema
         db.execute(
             f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
     except Exception as err:
