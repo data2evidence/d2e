@@ -815,16 +815,17 @@ export class InternalFilterRepresentation implements Request {
                 return filterConditions;
             }, {});
 
-        //Detect interactions with multiple associated filtercards
+        //Detect interactions with multiple associated filtercards. Must be after Exclude is detected!!
         Object.keys(patient.filter)
             .filter((e) => patient.filter[e].length > 1)
             .forEach((interaction) =>
                 patient.filter[interaction].forEach((e, i) => {
                     e.join = [];
-                    if (i === 0) return; //Skip the first filtercard alone
+                    if (i === 0 || e.isExclude) return; //Skip the first filtercard alone OR excluded filtercards
                     // Traverse to previous nodes and get their alias for establishing join relationship
                     for (let k = i-1; k >= 0; k--) {
                         const identicalNode = patient.filter[interaction][k]
+                        if (identicalNode.isExclude) continue; // skip excluded filtercards
                         //path, e.alias, e.filter, e.pathId
                         e.join.push({   path: null, 
                                         pathId: null,
