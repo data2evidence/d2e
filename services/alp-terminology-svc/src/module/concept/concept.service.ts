@@ -24,9 +24,6 @@ import { Request } from 'express';
 import { SystemPortalAPI } from 'src/api/portal-api';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 import { GetStandardConceptsDto } from './dto/concept.dto';
-
-// TODO move to NESTJS DI
-import { CachedbAPI } from 'src/api/cachedb-api';
 import { CachedbService } from 'src/cachedb/cachedb.service';
 
 // TODO: MOVE TO env var
@@ -39,7 +36,10 @@ export class ConceptService {
   private token: string;
   private request: Request;
 
-  constructor(@Inject(REQUEST) request: Request) {
+  constructor(
+    @Inject(REQUEST) request: Request,
+    private readonly cachedbService: CachedbService,
+  ) {
     this.token = request.headers['authorization'];
     this.request = request;
   }
@@ -72,27 +72,21 @@ export class ConceptService {
 
     if (USE_DUCKDB_FTS) {
       logger.info('Searching with Duckdb FTS');
-      const startTime = performance.now();
-      // ####### Duckdb FTS #######
-      const cachedbApi = new CachedbAPI(this.token, datasetId);
       // TODO: Create mapping for duckdbftsresult
-      const duckdbFtsResult: any = await cachedbApi.getConcepts(
+      const duckdbFtsResult: any = await this.cachedbService.getConcepts(
         pageNumber,
         Number(rowsPerPage),
+        datasetId,
         searchText,
         `${databaseCode}_${vocabSchemaName}`,
         completeFilters,
       );
-      const endTime = performance.now();
-      console.log(`Duckdb FTS took ${endTime - startTime} milliseconds`);
 
       return this.meilisearchResultMapping(duckdbFtsResult);
     }
-    // ####### Duckdb FTS #######
 
     try {
       logger.info('Searching with Meilisearch');
-      const startTime = performance.now();
       const meilisearchApi = new MeilisearchAPI();
       const hybridSearchConfig: HybridSearchConfig =
         await hybridSearchConfigService.getHybridSearchConfig();
@@ -106,8 +100,6 @@ export class ConceptService {
         completeFilters,
         hybridSearchConfig,
       );
-      const endTime = performance.now();
-      console.log(`Meilisearch took ${endTime - startTime} milliseconds`);
       return this.meilisearchResultMapping(meilisearchResult);
     } catch (err) {
       logger.error(JSON.stringify(err));
@@ -441,12 +433,13 @@ export class ConceptService {
 
       if (USE_DUCKDB_FTS) {
         logger.info('Searching concept filters with Duckdb FTS');
-        const cachedbApi = new CachedbAPI(this.token, datasetId);
-        const filterOptions = await cachedbApi.getConceptFilterOptionsFaceted(
-          `${databaseCode}_${vocabSchemaName}`,
-          searchText,
-          filters,
-        );
+        const filterOptions =
+          await this.cachedbService.getConceptFilterOptionsFaceted(
+            `${databaseCode}_${vocabSchemaName}`,
+            datasetId,
+            searchText,
+            filters,
+          );
         return { filterOptions };
       } else {
         logger.info('Searching concept filters with Meilisearch');

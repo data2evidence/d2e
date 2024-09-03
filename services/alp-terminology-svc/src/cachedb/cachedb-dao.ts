@@ -1,15 +1,9 @@
-import { InternalServerErrorException } from '@nestjs/common';
 const pg = require('pg');
 import { createLogger } from '../logger';
-import {
-  Filters,
-  HybridSearchConfig,
-  IMeilisearchConcept,
-  IMeilisearchGetMapped,
-} from '../utils/types';
+import { Filters } from '../utils/types';
 import { INDEX_ATTRIBUTES } from '../utils/constants';
 
-export class CachedbAPI {
+export class CachedbDAO {
   private readonly jwt: string;
   private readonly datasetId: string;
   private readonly logger = createLogger(this.constructor.name);
@@ -18,7 +12,7 @@ export class CachedbAPI {
     this.jwt = jwt;
     this.datasetId = datasetId;
     if (!jwt) {
-      throw new Error('No token passed for CachedbAPI!');
+      throw new Error('No token passed for CachedbDAO!');
     }
   }
 
@@ -145,13 +139,13 @@ export class CachedbAPI {
 
     const client = getCachedbConnection(this.jwt, this.datasetId);
     try {
-      const duckdbFtsBaseQuery = this.getDuckdbFtsBaseQuery(
-        vocab_file_name,
-        filters,
-      );
-
       const facetPromises = Object.values(facetColumns).map(
         (column: string) => {
+          const duckdbFtsBaseQuery = this.getDuckdbFtsBaseQuery(
+            vocab_file_name,
+            filters,
+            [column],
+          );
           let facetSql;
           if (column === 'valid_end_date') {
             facetSql = getValidityFacetSql(column);
@@ -159,9 +153,9 @@ export class CachedbAPI {
             facetSql = getFacetSql(column);
           }
           const sql = `
-          ${duckdbFtsBaseQuery}
-          ${facetSql}
-        `;
+            ${duckdbFtsBaseQuery}
+            ${facetSql}
+          `;
           return client.query(sql, [searchText]);
         },
       );
@@ -219,11 +213,14 @@ export class CachedbAPI {
   private getDuckdbFtsBaseQuery = (
     duckdb_file_name: string,
     filters: Filters,
+    columns: string[] = [],
   ): string => {
     const duckdbFtsWhereClause = this.generateDuckdbFtsWhereClause(filters);
 
+    const columnsToSelect = columns.length === 0 ? '*' : columns.join(', ');
+
     const duckdbFtsBaseQuery = `
-        with fts as ( select *, ${duckdb_file_name}.fts_main_concept.match_bm25( concept_id, $1 ) as score from ${duckdb_file_name}.concept where score is not null ${duckdbFtsWhereClause})`;
+        with fts as ( select ${columnsToSelect}, ${duckdb_file_name}.fts_main_concept.match_bm25( concept_id, $1 ) as score from ${duckdb_file_name}.concept where score is not null ${duckdbFtsWhereClause})`;
 
     return duckdbFtsBaseQuery;
   };
@@ -333,6 +330,7 @@ const getCachedbConnection = (jwt: string, datasetId: string) => {
     client.connect();
     return client;
   } catch (err) {
+    console.log(err);
     throw err;
   }
 };

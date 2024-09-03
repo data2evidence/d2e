@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import {
-  IMeilisearchConcept,
+  IDuckdbConcept,
   FhirValueSet,
   FhirValueSetExpansion,
   FhirValueSetExpansionContainsWithExt,
@@ -13,15 +13,13 @@ import {
   FhirConceptMapElementTarget,
   IConcept,
   Filters,
-  HybridSearchConfig,
-  ConceptHierarchyEdge,
-  ConceptHierarchyNodeLevel,
-  ConceptHierarchyNode,
 } from 'src/utils/types';
 import { createLogger } from '../logger';
 import { groupBy } from 'src/utils/helperUtil';
 // TODO move to NESTJS DI
-import { CachedbAPI } from 'src/api/cachedb-api';
+import { CachedbDAO } from './cachedb-dao';
+
+import { DUMMY_FILTER_OPTIONS_FACETS } from '../utils/constants';
 
 @Injectable()
 export class CachedbService {
@@ -30,6 +28,46 @@ export class CachedbService {
 
   constructor(@Inject(REQUEST) request: Request) {
     this.token = request.headers['authorization'];
+  }
+
+  async getConcepts(
+    pageNumber = 0,
+    rowsPerPage: number,
+    datasetId: string,
+    searchText = '',
+    vocab_file_name: string,
+    filters: Filters,
+  ) {
+    const cachedbDao = new CachedbDAO(this.token, datasetId);
+    return cachedbDao.getConcepts(
+      pageNumber,
+      Number(rowsPerPage),
+      searchText,
+      vocab_file_name,
+      filters,
+    );
+  }
+
+  async getConceptFilterOptionsFaceted(
+    vocab_file_name: string,
+    datasetId: string,
+    searchText: string,
+    filters: Filters,
+  ): Promise<any> {
+    // TODO: SKIP_DUCKDB_FILTER_OPTIONS_QUERY to be removed once frontend issue of sending multiple api calls upon concepts screen loading is fixed
+    // https://github.com/alp-os/internal/issues/1070
+    // Return hardcoded facet list for frontend so that dropdown can be populated to filter by facets.
+    const SKIP_DUCKDB_FILTER_OPTIONS_QUERY = true;
+    if (SKIP_DUCKDB_FILTER_OPTIONS_QUERY) {
+      return DUMMY_FILTER_OPTIONS_FACETS;
+    }
+
+    const cachedbDao = new CachedbDAO(this.token, datasetId);
+    return cachedbDao.getConceptFilterOptionsFaceted(
+      vocab_file_name,
+      searchText,
+      filters,
+    );
   }
 
   async getTerminologyDetailsWithRelationships(
@@ -44,45 +82,43 @@ export class CachedbService {
       const searchConcepts1: number[] = [conceptId];
       const vocab_file_name = `${databaseCode}_${vocabSchemaName}`;
 
-      const cachedbApi = new CachedbAPI(this.token, datasetId);
-      const meilisearchResultConcept1: any =
-        await cachedbApi.getMultipleExactConcepts(
+      const cachedbDao = new CachedbDAO(this.token, datasetId);
+      const DuckdbResultConcept1: any =
+        await cachedbDao.getMultipleExactConcepts(
           searchConcepts1,
           vocab_file_name,
           true,
         );
 
-      const conceptC1: FhirValueSet = this.meilisearchResultMapping(
-        meilisearchResultConcept1,
-      );
+      const conceptC1: FhirValueSet =
+        this.DuckdbResultMapping(DuckdbResultConcept1);
       const groups: FhirConceptMapGroup[] = [];
 
       if (conceptC1.expansion.contains.length > 0) {
         const detailsC1: FhirValueSetExpansionContainsWithExt =
           conceptC1.expansion.contains[0];
         const fhirTargetElements: FhirConceptMapElementTarget[] = [];
-        const conceptRelations = await cachedbApi.getConceptRelationships(
+        const conceptRelations = await cachedbDao.getConceptRelationships(
           detailsC1.conceptId,
           vocab_file_name,
         );
 
         for (let i = 0; i < conceptRelations.hits.length; i++) {
-          const relationships = await cachedbApi.getRelationships(
+          const relationships = await cachedbDao.getRelationships(
             conceptRelations.hits[i].relationship_id,
             vocab_file_name,
           );
           const searchConcepts2: number[] = [
             conceptRelations.hits[i].concept_id_2,
           ];
-          const meilisearchResultConcept2: any =
-            await cachedbApi.getMultipleExactConcepts(
+          const DuckdbResultConcept2: any =
+            await cachedbDao.getMultipleExactConcepts(
               searchConcepts2,
               vocab_file_name,
               true,
             );
-          const conceptC2: FhirValueSet = this.meilisearchResultMapping(
-            meilisearchResultConcept2,
-          );
+          const conceptC2: FhirValueSet =
+            this.DuckdbResultMapping(DuckdbResultConcept2);
           const detailsC2: FhirValueSetExpansionContainsWithExt =
             conceptC2.expansion.contains[0];
           if (!detailsC2) {
@@ -91,15 +127,14 @@ export class CachedbService {
           const searchConcepts3: number[] = [
             relationships.hits[0].relationship_concept_id,
           ];
-          const meilisearchResultConcept3: any =
-            await cachedbApi.getMultipleExactConcepts(
+          const DuckdbResultConcept3: any =
+            await cachedbDao.getMultipleExactConcepts(
               searchConcepts3,
               vocab_file_name,
               true,
             );
-          const conceptC3: FhirValueSet = this.meilisearchResultMapping(
-            meilisearchResultConcept3,
-          );
+          const conceptC3: FhirValueSet =
+            this.DuckdbResultMapping(DuckdbResultConcept3);
           const detailsC3: FhirValueSetExpansionContainsWithExt =
             conceptC3.expansion.contains[0];
           if (!detailsC3) {
@@ -174,16 +209,13 @@ export class CachedbService {
     return details;
   }
 
-  private meilisearchResultMapping(
-    meilisearchResult: IMeilisearchConcept,
-  ): FhirValueSet {
-    const valueSetExpansionContains = meilisearchResult.hits.map((data) => {
+  private DuckdbResultMapping(DuckdbResult: IDuckdbConcept): FhirValueSet {
+    const valueSetExpansionContains = DuckdbResult.hits.map((data) => {
       return this.mapConceptWithFhirValueSetExpansionContains(data);
     });
 
     const valueSetExpansion: FhirValueSetExpansion = {
-      total:
-        meilisearchResult.hits.length > 0 ? meilisearchResult.totalHits : 0,
+      total: DuckdbResult.hits.length > 0 ? DuckdbResult.totalHits : 0,
       offset: 1,
       timestamp: new Date(),
       contains: valueSetExpansionContains,

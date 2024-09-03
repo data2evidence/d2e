@@ -6,7 +6,7 @@ import { CachedbModule } from 'src/cachedb/cachedb.module';
 @Module({
   imports: [CachedbModule],
   controllers: [ConceptController],
-  exports: [ConceptModule],
+  exports: [ConceptService],
   providers: [ConceptService, HybridSearchConfigService],
 })
 export class ConceptModule {}
