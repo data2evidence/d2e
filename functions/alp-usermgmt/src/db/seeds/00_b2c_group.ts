@@ -53,9 +53,9 @@ const getSeeds = (): { [key: string]: any }[] => {
     }
   ]
 
-  if (process.env.NODE_ENV === 'development') {
+  if (env.NODE_ENV === 'development') {
     // LOCALDEV
-    const TENANT_ID = process.env.APP__TENANT_ID
+    const TENANT_ID = env.APP__TENANT_ID
     const STUDY_ID = '703c5d8a-a1d9-4d42-a314-5b9aad513390'
 
     return [

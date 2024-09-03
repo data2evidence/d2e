@@ -28,11 +28,15 @@ const config: Knex.Config = {
   },
   debug: Boolean(Number(_env.PG__DEBUG)),
   migrations: {
+    extension: '.ts',
+    //loadExtensions: ['.ts'],
     schemaName: _env.PG_SCHEMA, // schema used for storing the migrations. use test_schema first. switch to qe_config later
     tableName: 'knex_migrations', // table name used for storing the migration state
     directory: `${path.dirname(path.fromFileUrl(import.meta.url)).replace(/\/usr\/src/, '.')}/migrations` // relative path to directory containing the migration files 
   },
   seeds: {
+    extension: '.ts',
+    //loadExtensions: ['.ts'],
     directory: `${path.dirname(path.fromFileUrl(import.meta.url)).replace(/\/usr\/src/, '.')}/seeds`
   }
 }

@@ -1,9 +1,10 @@
 import { Knex } from "knex";
+import {env} from "../../env"
 
 export async function seed(knex: Knex): Promise<void> {
   // Inserts seed entries
   await knex
-    .withSchema(process.env.PG_SCHEMA)
+    .withSchema(env.PG_SCHEMA)
     .into("ConfigDbModels_Config")
     .insert([
       {

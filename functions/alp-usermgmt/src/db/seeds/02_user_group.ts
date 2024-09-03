@@ -1,5 +1,6 @@
 import type { Knex } from '../types'
 import { v4 as uuidv4 } from 'uuid'
+import { env} from "../../env.ts"
 
 const TABLE_NAME = 'user_group'
 
@@ -25,8 +26,8 @@ export const seed = async (knex: Knex): Promise<void> => {
 const getSeeds = (): { [key: string]: any }[] => {
   const localUserIds: string[] = []
 
-  if (process.env.IDP__INITIAL_USER__UUID && process.env.IDP__INITIAL_USER__NAME) {
-    localUserIds.push(process.env.IDP__INITIAL_USER__UUID)
+  if (env.IDP__INITIAL_USER__UUID && env.IDP__INITIAL_USER__NAME) {
+    localUserIds.push(env.IDP__INITIAL_USER__UUID)
   }
 
   let seeds: any[] = []
@@ -44,7 +45,7 @@ const getSeeds = (): { [key: string]: any }[] => {
       }
     ])
 
-    if (process.env.NODE_ENV === 'development') {
+    if (env.NODE_ENV === 'development') {
       // LOCALDEV
       seeds = seeds.concat([
         {

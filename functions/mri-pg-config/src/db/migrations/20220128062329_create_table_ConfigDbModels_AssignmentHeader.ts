@@ -1,7 +1,7 @@
 import { Knex } from "knex";
-import '../../env';
+import {env} from "../../env"
 
-const rawUp = `CREATE TABLE IF NOT EXISTS ${process.env.PG_SCHEMA}."ConfigDbModels_AssignmentHeader" (
+const rawUp = `CREATE TABLE IF NOT EXISTS ${env.PG_SCHEMA}."ConfigDbModels_AssignmentHeader" (
     "Id" VARCHAR(40) NOT NULL,
     "Name" VARCHAR(255) DEFAULT '',
     "EntityType" CHARACTER(1) NOT NULL,
@@ -13,13 +13,13 @@ const rawUp = `CREATE TABLE IF NOT EXISTS ${process.env.PG_SCHEMA}."ConfigDbMode
     PRIMARY KEY ("Id")
 );`
 
-const rawDown = `DROP TABLE IF EXISTS ${process.env.PG_SCHEMA }."ConfigDbModels_AssignmentHeader";`
+const rawDown = `DROP TABLE IF EXISTS ${env.PG_SCHEMA }."ConfigDbModels_AssignmentHeader";`
 
 export async function up(knex: Knex): Promise<void> {
-    return (knex.schema.withSchema(process.env.PG_SCHEMA).raw(rawUp))
+    return (knex.schema.withSchema(env.PG_SCHEMA).raw(rawUp))
 }
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.withSchema(process.env.PG_SCHEMA).raw(rawDown)
+    return knex.schema.withSchema(env.PG_SCHEMA).raw(rawDown)
 }
 

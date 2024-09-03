@@ -1,7 +1,7 @@
 import { Knex } from "knex";
-import '../../env';
+import {env} from "../../env"
 
-const rawUp = `CREATE FUNCTION ${process.env.PG_SCHEMA}."ConfigDbProcedures_GetAssignedConfigurations" (
+const rawUp = `CREATE FUNCTION ${env.PG_SCHEMA}."ConfigDbProcedures_GetAssignedConfigurations" (
     CONFIG_TYPE VARCHAR(20), 
     USERNAME VARCHAR(256))  
     RETURNS TABLE(
@@ -26,8 +26,8 @@ BEGIN
             config."ParentId" as DEPENDENT_CONFIG_ID, 
             config."ParentVersion" as DEPENDENT_CONFIG_VERSION,
             config."Data" as "DATA"
-        FROM   ${process.env.PG_SCHEMA}."ConfigDbModels_Assignment" as assignment
-            JOIN   ${process.env.PG_SCHEMA}."ConfigDbModels_Config" as config
+        FROM   ${env.PG_SCHEMA}."ConfigDbModels_Assignment" as assignment
+            JOIN   ${env.PG_SCHEMA}."ConfigDbModels_Config" as config
                 ON assignment."ConfigId" = config."Id"
                 AND assignment."ConfigVersion" = config."Version"
                 and assignment."EntityType" = 'U'
@@ -38,13 +38,13 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;`
 
-const rawDown = `DROP FUNCTION IF EXISTS ${process.env.PG_SCHEMA}."ConfigDbProcedures_GetAssignedConfigurations";`
+const rawDown = `DROP FUNCTION IF EXISTS ${env.PG_SCHEMA}."ConfigDbProcedures_GetAssignedConfigurations";`
 
 export async function up(knex: Knex): Promise<void> {
-    return (knex.schema.withSchema(process.env.PG_SCHEMA).raw(rawUp))
+    return (knex.schema.withSchema(env.PG_SCHEMA).raw(rawUp))
 }
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.withSchema(process.env.PG_SCHEMA).raw(rawDown)
+    return knex.schema.withSchema(env.PG_SCHEMA).raw(rawDown)
 }
 

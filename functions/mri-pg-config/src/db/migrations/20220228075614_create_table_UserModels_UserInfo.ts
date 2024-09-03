@@ -1,9 +1,9 @@
 import { Knex } from "knex";
-import "../../env";
+import {env} from "../../env"
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema
-    .withSchema(process.env.SCHEMA_NAME)
+    .withSchema(env.PG_SCHEMA)
     .createTable("UserModels_UserInfo", (table: Knex.TableBuilder) => {
       table.uuid("UserID").primary();
       table.string("FirstName");
@@ -18,6 +18,6 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   return knex.schema
-    .withSchema(process.env.SCHEMA_NAME)
+    .withSchema(env.PG_SCHEMA)
     .dropTable("UserModels_UserInfo");
 }

@@ -1,7 +1,7 @@
 import { Knex } from "knex";
-import "../../env";
+import {env} from "../../env"
 
-const rawUp = `CREATE FUNCTION ${process.env.PG_SCHEMA}."ConfigDbProcedures_DeleteConfiguration" (
+const rawUp = `CREATE FUNCTION ${env.PG_SCHEMA}."ConfigDbProcedures_DeleteConfiguration" (
     CONFIG_ID  VARCHAR(40),
     CONFIG_VERSION  VARCHAR(20),
     CONFIG_STATUS  VARCHAR(20)
@@ -17,7 +17,7 @@ create temporary table "TEMP_CONFIGS" ("CONFIG_ID" VARCHAR(40), "CONFIG_VERSION"
 create temporary table "TEMP_ASSIGNMENTS" ("ASSIGNMENT_ID" VARCHAR(40)) on commit drop;
 
 insert into "TEMP_CONFIGS" (SELECT "Id" as "CONFIG_ID", "Version" as "CONFIG_VERSION" 
-    FROM ${process.env.PG_SCHEMA}."ConfigDbModels_Config"
+    FROM ${env.PG_SCHEMA}."ConfigDbModels_Config"
     WHERE 
         "Id" = CONFIG_ID AND (
             "Version" = CONFIG_VERSION
@@ -31,7 +31,7 @@ WHILE CUR_ROWCOUNT > PREV_ROWCOUNT loop
     PREV_ROWCOUNT = CUR_ROWCOUNT;
     insert into "TEMP_CONFIGS" (
             SELECT "Id" as "CONFIG_ID", "Version" as "CONFIG_VERSION"
-            FROM ${process.env.PG_SCHEMA}."ConfigDbModels_Config" configs
+            FROM ${env.PG_SCHEMA}."ConfigDbModels_Config" configs
                 JOIN "TEMP_CONFIGS" as toDelete 
                     ON configs."ParentId" = toDelete."CONFIG_ID"
                     AND configs."ParentVersion" = toDelete."CONFIG_VERSION"
@@ -43,12 +43,12 @@ WHILE CUR_ROWCOUNT > PREV_ROWCOUNT loop
 END loop;
 
 
-DELETE FROM ${process.env.PG_SCHEMA}."ConfigDbModels_Config"
+DELETE FROM ${env.PG_SCHEMA}."ConfigDbModels_Config"
 WHERE "Id" || '-' || "Version" in (
     SELECT "CONFIG_ID" || '-' || "CONFIG_VERSION"
     FROM "TEMP_CONFIGS"
 );
-DELETE FROM ${process.env.PG_SCHEMA}."ConfigDbModels_UserDefaultConfig"
+DELETE FROM ${env.PG_SCHEMA}."ConfigDbModels_UserDefaultConfig"
 WHERE "ConfigId" || '-' || "ConfigVersion" in (
     SELECT "CONFIG_ID" || '-' || "CONFIG_VERSION"
     FROM "TEMP_CONFIGS"
@@ -56,8 +56,8 @@ WHERE "ConfigId" || '-' || "ConfigVersion" in (
 
 insert into "TEMP_ASSIGNMENTS" (
     SELECT DISTINCT header."Id" as "ASSIGNMENT_ID"
-    FROM ${process.env.PG_SCHEMA}."ConfigDbModels_AssignmentHeader" header
-    JOIN ${process.env.PG_SCHEMA}."ConfigDbModels_AssignmentDetail" detail
+    FROM ${env.PG_SCHEMA}."ConfigDbModels_AssignmentHeader" header
+    JOIN ${env.PG_SCHEMA}."ConfigDbModels_AssignmentDetail" detail
         ON header."Id" = detail."HeaderId"
     JOIN "TEMP_CONFIGS" as toDelete
         ON detail."ConfigId" = toDelete."CONFIG_ID"
@@ -66,7 +66,7 @@ insert into "TEMP_ASSIGNMENTS" (
 BEGIN
     FOR cur_row IN SELECT "ASSIGNMENT_ID" FROM "TEMP_ASSIGNMENTS" 
     LOOP
-        PERFORM ${process.env.PG_SCHEMA}."ConfigDbProcedures_DeleteAssignment"(cur_row."ASSIGNMENT_ID");
+        PERFORM ${env.PG_SCHEMA}."ConfigDbProcedures_DeleteAssignment"(cur_row."ASSIGNMENT_ID");
     END LOOP;
 
 END;
@@ -75,12 +75,12 @@ END;--
 $$ LANGUAGE plpgsql
 CALLED ON NULL INPUT;`
 
-const rawDown = `DROP FUNCTION IF EXISTS ${process.env.PG_SCHEMA}."ConfigDbProcedures_DeleteConfiguration";`
+const rawDown = `DROP FUNCTION IF EXISTS ${env.PG_SCHEMA}."ConfigDbProcedures_DeleteConfiguration";`
 
 export async function up(knex: Knex): Promise<void> {
-    return (knex.schema.withSchema(process.env.PG_SCHEMA).raw(rawUp))
+    return (knex.schema.withSchema(env.PG_SCHEMA).raw(rawUp))
 }
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.withSchema(process.env.PG_SCHEMA).raw(rawDown)
+    return knex.schema.withSchema(env.PG_SCHEMA).raw(rawDown)
 }

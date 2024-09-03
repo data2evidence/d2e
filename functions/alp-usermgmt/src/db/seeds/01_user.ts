@@ -1,4 +1,5 @@
 import type { Knex } from '../types'
+import { env} from "../../env.ts"
 
 export const seed = async (knex: Knex): Promise<void> => {
   const TABLE_NAME = 'user'
@@ -16,11 +17,11 @@ export const seed = async (knex: Knex): Promise<void> => {
 }
 
 const getSeeds = (): { [key: string]: any }[] => {
-  if (process.env.IDP__INITIAL_USER__UUID && process.env.IDP__INITIAL_USER__NAME) {
+  if (env.IDP__INITIAL_USER__UUID && env.IDP__INITIAL_USER__NAME) {
     return [
       {
-        id: process.env.IDP__INITIAL_USER__UUID,
-        username: process.env.IDP__INITIAL_USER__NAME
+        id: env.IDP__INITIAL_USER__UUID,
+        username: env.IDP__INITIAL_USER__NAME
       }
     ]
   }
