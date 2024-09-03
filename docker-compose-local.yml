@@ -15,7 +15,7 @@ services:
       LOCAL_DEBUG: "true"
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
       PLUGIN_BASE_PATH: "./plugins"
-      WATCH_FUNCTIONS: true
+      WATCH_FUNCTIONS: false
 
 
   

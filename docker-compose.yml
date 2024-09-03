@@ -311,6 +311,7 @@ services:
         condition: service_completed_successfully
     hostname: trex.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/trex:${DOCKER_TAG_NAME:-develop}
+    platform: linux/amd64
     logging:
       options:
         tag: *c84
