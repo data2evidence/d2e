@@ -24,7 +24,7 @@ export class CachedbDAO {
     vocab_file_name: string,
     filters: Filters,
   ) {
-    const client = getCachedbConnection(this.jwt, this.datasetId);
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const duckdbFtsBaseQuery = this.getDuckdbFtsBaseQuery(
         vocab_file_name,
@@ -50,7 +50,7 @@ export class CachedbDAO {
       };
       return data;
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
     } finally {
       await client.end();
     }
@@ -61,7 +61,7 @@ export class CachedbDAO {
     vocab_file_name: string,
     includeInvalid = true,
   ) {
-    const client = getCachedbConnection(this.jwt, this.datasetId);
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const searchTextWhereclause =
         searchTexts.reduce((accumulator, searchText, index: number) => {
@@ -88,7 +88,7 @@ export class CachedbDAO {
       };
       return data;
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
     } finally {
       await client.end();
     }
@@ -138,7 +138,7 @@ export class CachedbDAO {
           `;
     };
 
-    const client = getCachedbConnection(this.jwt, this.datasetId);
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const facetPromises = Object.values(facetColumns).map(
         (column: string) => {
@@ -205,7 +205,7 @@ export class CachedbDAO {
       })();
       return filterOptions;
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
     } finally {
       await client.end();
     }
@@ -271,7 +271,7 @@ export class CachedbDAO {
     conceptId: number,
     vocab_file_name: string,
   ): Promise<any> {
-    const client = getCachedbConnection(this.jwt, this.datasetId);
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const sql = `
       select *
@@ -286,7 +286,7 @@ export class CachedbDAO {
       };
       return data;
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
     } finally {
       await client.end();
     }
@@ -296,7 +296,7 @@ export class CachedbDAO {
     relationshipId: number,
     vocab_file_name: string,
   ): Promise<any> {
-    const client = getCachedbConnection(this.jwt, this.datasetId);
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const sql = `
       select *
@@ -310,27 +310,27 @@ export class CachedbDAO {
       };
       return data;
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
     } finally {
       await client.end();
     }
   }
-}
 
-const getCachedbConnection = (jwt: string, datasetId: string) => {
-  try {
-    const client = new pg.Client({
-      host: env.CACHEDB__HOST,
-      port: env.CACHEDB__PORT,
-      user: jwt,
-      database: `duckdb_${datasetId}`,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 30000,
-    });
-    client.connect();
-    return client;
-  } catch (err) {
-    console.log(err);
-    throw err;
-  }
-};
+  private getCachedbConnection = (jwt: string, datasetId: string) => {
+    try {
+      const client = new pg.Client({
+        host: env.CACHEDB__HOST,
+        port: env.CACHEDB__PORT,
+        user: jwt,
+        database: `A|duckdb|${datasetId}`,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 30000,
+      });
+      client.connect();
+      return client;
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  };
+}
