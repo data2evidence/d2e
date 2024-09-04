@@ -609,7 +609,7 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - fhir-schema-file-1:/home/docker/app/medplum/packages/definitions/dist/fhir/r4
-      - fhir-duckdb-1:/home/docker/app/duckdb
+      #- fhir-duckdb-1:/home/docker/app/duckdb
     environment:
       <<:
         - *x-pg
@@ -649,9 +649,9 @@ services:
         priority: 20
     volumes:
       - fhir-schema-file-1:/home/docker/alp-data-node/app/src/r4
-      - fhir-duckdb-1:/home/docker/alp-data-node/app/src/duckdb
+      #- fhir-duckdb-1:/home/docker/alp-data-node/app/src/duckdb
     entrypoint: yarn build-and-seed
-    environment:
+    environment: 
       <<:
         - *x-pg
         - *x-fhir
