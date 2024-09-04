@@ -13,7 +13,7 @@
     "gen:resource-limits": "scripts/gen-resource-limits.sh",
 
     "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml",
-    "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile sql",
+    "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile sql --profile perseus",
     "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local --profile sql",
 
     "build:minerva": "yarn local:minerva build --build-arg GIT_COMMIT_ARG=$(git rev-parse HEAD)",
