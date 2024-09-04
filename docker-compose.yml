@@ -1748,6 +1748,7 @@ services:
       DOCKER_TLS_CERTDIR: /certs
 
   alp-perseus-files-manager:
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
     container_name: files-manager
     environment:
       <<:
@@ -1767,6 +1768,7 @@ services:
     profiles: [perseus]
 
   alp-perseus-backend:
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-backend:${DOCKER_TAG_NAME:-develop}
     container_name: alp-perseus-backend-${BASE_PORT:-1}
     environment:
       <<:
@@ -1783,6 +1785,7 @@ services:
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-white-rabbit:${DOCKER_TAG_NAME:-develop}
     container_name: alp-perseus-white-rabbit-${BASE_PORT:-1}
     environment:
       <<:
@@ -1805,6 +1808,7 @@ services:
     profiles: [perseus]
 
   alp-perseus-cdm-builder:
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-cdm-builder:${DOCKER_TAG_NAME:-develop}
     container_name: alp-perseus-cdm-builder-${BASE_PORT:-1}
     environment:
       <<:

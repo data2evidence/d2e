@@ -195,6 +195,22 @@ jobs:
             directory: ./services/alp-fhir
             context: .
             fileName: Dockerfile.client
+          - name: alp-data-node/alp-perseus-files-manager
+            directory: ./services/alp-perseus-files-manager
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/alp-perseus-backend
+            directory: ./services/alp-perseus-backend
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/alp-perseus-white-rabbit
+            directory: ./services/alp-perseus-white-rabbit
+            context: .
+            fileName: Dockerfile
+          - name: alp-data-node/alp-perseus-cdm-builder
+            directory: ./services/alp-perseus-cdm-builder
+            context: .
+            fileName: Dockerfile
     uses: ./.github/workflows/docker-push-called.yml
     with:
       AZ_REGISTRY_REPOSITORY: ${{ matrix.name }}
