@@ -1792,6 +1792,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+    depends_on:
       alp-perseus-files-manager:
         condition: service_started
     networks:
