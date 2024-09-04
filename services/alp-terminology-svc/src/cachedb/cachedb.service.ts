@@ -46,7 +46,7 @@ export class CachedbService {
         vocab_file_name,
         filters,
       );
-      return this.DuckdbResultMapping(result);
+      return this.duckdbResultMapping(result);
     } catch (err) {
       this.logger.error(err);
     }
@@ -95,7 +95,7 @@ export class CachedbService {
         );
 
       const conceptC1: FhirValueSet =
-        this.DuckdbResultMapping(DuckdbResultConcept1);
+        this.duckdbResultMapping(DuckdbResultConcept1);
       const groups: FhirConceptMapGroup[] = [];
 
       if (conceptC1.expansion.contains.length > 0) {
@@ -122,7 +122,7 @@ export class CachedbService {
               true,
             );
           const conceptC2: FhirValueSet =
-            this.DuckdbResultMapping(DuckdbResultConcept2);
+            this.duckdbResultMapping(DuckdbResultConcept2);
           const detailsC2: FhirValueSetExpansionContainsWithExt =
             conceptC2.expansion.contains[0];
           if (!detailsC2) {
@@ -138,7 +138,7 @@ export class CachedbService {
               true,
             );
           const conceptC3: FhirValueSet =
-            this.DuckdbResultMapping(DuckdbResultConcept3);
+            this.duckdbResultMapping(DuckdbResultConcept3);
           const detailsC3: FhirValueSetExpansionContainsWithExt =
             conceptC3.expansion.contains[0];
           if (!detailsC3) {
@@ -213,7 +213,7 @@ export class CachedbService {
     return details;
   }
 
-  private DuckdbResultMapping(DuckdbResult: IDuckdbConcept): FhirValueSet {
+  private duckdbResultMapping(DuckdbResult: IDuckdbConcept): FhirValueSet {
     const valueSetExpansionContains = DuckdbResult.hits.map((data) => {
       return this.mapConceptWithFhirValueSetExpansionContains(data);
     });
