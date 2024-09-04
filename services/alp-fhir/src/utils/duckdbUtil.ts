@@ -1,13 +1,11 @@
 import { Connection, Database } from "duckdb-async";
-const path = require('path');
+// import { env } from '../env'
 
 export class DuckdbConnection{
     private connection: Connection;
     constructor(){}
     public async createConnection(duckdbPath){
         try{
-            console.log(path.join(__dirname))
-            console.log("Duckdb path: " + duckdbPath)
             const duckdDB = await Database.create(
                 `${duckdbPath}/cdmdefault.duckdb`
             );

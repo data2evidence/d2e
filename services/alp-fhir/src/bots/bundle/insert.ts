@@ -1,20 +1,17 @@
-import { DuckdbConnection } from './duckdbUtil'
+import { DuckdbConnection } from '../../utils/duckdbUtil'
 import { getFhirTableStructure } from '../../utils/fhirDataModelhelper';
-import { env } from 'src/env';
-const schemaPath = `/home/docker/app/medplum/packages/definitions/dist/fhir/r4/fhir.schema.json`
+const schemaPath = process.env.FHIR_SCHEMA_PATH+ "/" + process.env.FHIR_SCHEMA_FILE_NAME
 
 export async function createResourceInFhir(data){
-    console.log('Enter createResourceInFhir')
     let duckdb = new DuckdbConnection()
     try{
-        await duckdb.createConnection();
-        console.log('Duckdb connection created')
+        await duckdb.createConnection(process.env.DUCKDB_PATH);
         const result = await duckdb.executeQuery(`select * from read_json('${schemaPath}')`)
-        console.log(result)
         const parsedFhirDefinitions = getFhirTableStructure(result[0], data.resourceType)
         const insertStatement = getInsertStatement(data, parsedFhirDefinitions)
         await insertIntoFhirTable(duckdb, data.resourceType, insertStatement)
-        console.log('Data inserted successfully')
+        console.log('Data inserted into FHIR data model')
+        return
     }catch(err){
         console.log(err)
     }finally{

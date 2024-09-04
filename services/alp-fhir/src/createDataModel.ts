@@ -1,16 +1,16 @@
 import { DuckdbConnection } from './utils/duckdbUtil'
 import { env } from './env'
-import * as schemaPath from './fhir.schema.json'
+const schemaPath = `${env.FHIR_SCHEMA_PATH}/${env.FHIR_SCHEMA_FILE_NAME}`
 
 export async function readJsonFileAndCreateDuckdbTables(){
     let duckdb = new DuckdbConnection()
     try{
-        await duckdb.createConnection(env.DUCKDB_PATH);
-        //const result = await duckdb.executeQuery(`select * from read_json('${schemaPath}')`)
-        const fhirResources = schemaPath.discriminator.mapping
-        const duckdbDataTypes = convertFhirDataTypesToDuckdb(schemaPath)
+        await duckdb.createConnection('/home/docker/alp-data-node/app/src/duckdb');
+        const result = await duckdb.executeQuery(`select * from read_json('${schemaPath}')`)
+        const fhirResources = result[0].discriminator.mapping
+        const duckdbDataTypes = convertFhirDataTypesToDuckdb(result[0])
         for(let resource in fhirResources){
-            const parsedFhirDefinitions = getFhirTableStructure(schemaPath, resource)
+            const parsedFhirDefinitions = getFhirTableStructure(result[0], resource)
             const duckdbTableStructure = getDuckdbColumnString(duckdbDataTypes, parsedFhirDefinitions, true)
             await createFhirTable(duckdb, resource, duckdbTableStructure)
             console.log(`Fhir table created for resource ${resource}`)

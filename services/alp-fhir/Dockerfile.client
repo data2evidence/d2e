@@ -20,15 +20,9 @@ FROM ${IMAGE}
 
 RUN apt-get update && apt-get -y install openssl
 
-RUN groupadd alp \
-    && useradd docker -u 1001 \
-    && adduser docker alp
-
-USER docker
-
 WORKDIR /home/docker/
 
-COPY --chown=docker:alp --from=final-build /usr/src ./
+COPY --chown=docker:alp --chmod=711 --from=final-build /usr/src ./
 
 WORKDIR /home/docker/alp-data-node/app/
 
@@ -45,5 +39,5 @@ ARG GIT_COMMIT_ARG
 # ENV
 ENV GIT_COMMIT=$GIT_COMMIT_ARG
 
-#ENTRYPOINT ["yarn", "build-and-seed"]
+ENTRYPOINT ["yarn", "build-and-seed"]
 #CMD ["tail", "-f", "/dev/null"]

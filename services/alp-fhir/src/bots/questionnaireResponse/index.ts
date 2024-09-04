@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 export async function handler(medplum: MedplumClient, event: BotEvent): Promise<any> {
   const questionnaireResponse = event.input as QuestionnaireResponse;
   let duckdb = new DuckdbConnection()
-  await duckdb.createConnection('../');
+  await duckdb.createConnection('/home/docker/app');
   let query = `insert into gdm_questionnaire_response ("id", "person_id", "etl_source_table", "etl_source_table_record_id", "etl_source_table_record_created_at", "etl_session_id", "etl_started_at") values('${questionnaireResponse.id}', 0, 'XYZ', 789, '2024-07-23', 'avsade', now())`;
   await duckdb.executeQuery(query)
   if(questionnaireResponse.item.length > 0){

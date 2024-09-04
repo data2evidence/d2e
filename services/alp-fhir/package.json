@@ -17,9 +17,6 @@
   },
   "author": "",
   "license": "Apache-2.0",
-  "engines": {
-    "node": ">=18.20.4"
-  },
   "repository": {
     "type": "git",
     "url": "git@github.com:alp/alp-clinical-research.git"
@@ -38,7 +35,8 @@
     "@types/node": "^20.14.9",
     "@types/pg": "^8.11.6",
     "@types/uuid": "^10.0.0",
-    "esbuild": "0.21.5"
+    "dotenv": "^16.4.5",
+    "esbuild": "^0.21.5"
   },
   "dependencies": {
     "@medplum/bot-layer": "^3.2.2",
@@ -47,7 +45,6 @@
     "duckdb-async": "^1.0.0",
     "express": "^4.19.2",
     "helmet": "^7.1.0",
-    "path": "^0.12.7",
     "pg": "^8.4.2",
     "reflect-metadata": "^0.2.2",
     "ts-node": "^10.9.2",
