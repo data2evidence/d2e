@@ -1,10 +1,10 @@
 FROM perseushub/white-rabbit:latest as build
 
-FROM amazoncorretto:17-alpine-jdk as final
-RUN apk add --no-cache postgresql-client
+RUN microdnf update
+RUN microdnf module enable postgresql:13
+RUN microdnf install postgresql.x86_64
 RUN mkdir ./config
 
-COPY --from=build app.jar app.jar
 COPY ./config ./config
 COPY --chown=docker:docker --chmod=711 init.sh .
 
