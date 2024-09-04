@@ -410,7 +410,7 @@ jobs:
       - name: print logs for alp-minerva-fhir-server-post-init-1
         if: ${{ always() || cancelled() || failure() }}
         run: |
-          docker logs alp-minerva-fhir-server-post-init-1
+          docker logs alp-minerva-fhir-server-post-init
 
 
       - name: Clean Docker compose
