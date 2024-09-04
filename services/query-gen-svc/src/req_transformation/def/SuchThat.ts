@@ -40,8 +40,13 @@ export class SuchThat extends Operand {
                     this.type = Keys.SQLTERM_CAMEL_CONJUNCTIVE_AND;
                 }
             }
-        }
-        else {
+        } else if (path === Keys.MRITERM_JOINQUERY) {
+            this.operand = list.map((filterNode) => {
+                return new Operand(Keys.SQLTERM_CAMEL_CONJUNCTIVE_AND,
+                     OperandFactory.createOperand(null, null, filterNode.value, filterNode.type)
+                )
+            })
+        } else {
             list.forEach((e) => {
                 this.addOperand(OperandFactory.createOperand(path, pathId, alias, e, value, typeof axis !== Keys.TERM_UNDEFINED));
             });
