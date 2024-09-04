@@ -1747,7 +1747,6 @@ services:
       DOCKER_TLS_CERTDIR: /certs
 
   alp-perseus-files-manager:
-    # image: perseushub/files-manager:latest
     container_name: files-manager
     environment:
       <<:
@@ -1767,7 +1766,6 @@ services:
     profiles: [perseus]
 
   alp-perseus-backend:
-    image: perseushub/backend:latest
     container_name: alp-perseus-backend-${BASE_PORT:-1}
     environment:
       <<:
@@ -1784,7 +1782,6 @@ services:
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
-    image: perseushub/white-rabbit:latest
     container_name: alp-perseus-white-rabbit-${BASE_PORT:-1}
     environment:
       <<:
@@ -1807,7 +1804,6 @@ services:
     profiles: [perseus]
 
   alp-perseus-cdm-builder:
-    image: perseushub/cdm-builder:latest
     container_name: alp-perseus-cdm-builder-${BASE_PORT:-1}
     environment:
       <<:
