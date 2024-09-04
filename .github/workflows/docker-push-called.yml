@@ -176,7 +176,7 @@ jobs:
           docker system prune -af
 
       - name: Prune tagged images
-        if: needs.setup.outputs.GIT_BRANCH_NAME == 'develop' || github.event_name == 'workflow_dispatch'
+        if: inputs.GIT_BRANCH_NAME == 'develop' || github.event_name == 'workflow_dispatch' || vars.GHA_BUILD_DEBUG == 'true'
         shell: bash
         env:
           AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
