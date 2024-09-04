@@ -51,6 +51,8 @@ x-envs:
   fhir: &x-fhir
     FHIR__CLIENT_ID: db6b2304-f236-45ec-b10c-a852681e7129
     FHIR__CLIENT_SECRET: ${FHIR__CLIENT_SECRET}
+  perseus: &x-perseus
+    PERSEUS__FILES_MANAGER_HOST: alp-perseus-files-manager-${BASE_PORT:-1}
   plugins: &x-plugins |
     {
       "researcher": [
@@ -1749,7 +1751,7 @@ services:
 
   alp-perseus-files-manager:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
-    container_name: files-manager
+    container_name: &c34 alp-perseus-files-manager-${BASE_PORT:-1}
     environment:
       <<:
          - *x-pg
@@ -1769,10 +1771,11 @@ services:
 
   alp-perseus-backend:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-backend:${DOCKER_TAG_NAME:-develop}
-    container_name: alp-perseus-backend-${BASE_PORT:-1}
+    container_name: &c35 alp-perseus-backend-${BASE_PORT:-1}
     environment:
       <<:
-          - *x-pg
+        - *x-pg
+        - *x-perseus
       PERSEUS_ENV: Docker
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
@@ -1786,10 +1789,11 @@ services:
 
   alp-perseus-white-rabbit:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-white-rabbit:${DOCKER_TAG_NAME:-develop}
-    container_name: alp-perseus-white-rabbit-${BASE_PORT:-1}
+    container_name: &c36 alp-perseus-white-rabbit-${BASE_PORT:-1}
     environment:
       <<:
         - *x-pg
+        - *x-perseus
       SPRING_PROFILES_ACTIVE: docker
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
@@ -1809,10 +1813,11 @@ services:
 
   alp-perseus-cdm-builder:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-cdm-builder:${DOCKER_TAG_NAME:-develop}
-    container_name: alp-perseus-cdm-builder-${BASE_PORT:-1}
+    container_name: &c37 alp-perseus-cdm-builder-${BASE_PORT:-1}
     environment:
       <<:
-          - *x-pg
+        - *x-pg
+        - *x-perseus
       ASPNETCORE_ENVIRONMENT: Docker
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}

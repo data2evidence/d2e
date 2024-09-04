@@ -26,7 +26,7 @@ spring:
       ddl-auto: update
     show-sql: false
 
-files-manager-url: http://files-manager:10500/files-manager
+files-manager-url: http://${PERSEUS__FILES_MANAGER_HOST}:10500/files-manager
 
 fake-data-db:
   db-type: PostgreSQL

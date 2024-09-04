@@ -10,7 +10,7 @@ try:
     DB_PASSWORD = os.environ['PG_SUPER_PASSWORD']
     DB_HOST = os.environ['PG__HOST']
     DB_PORT = os.environ['PG__PORT']
-    API_URL = 'http://files-manager:10500/files-manager'
+    API_HOST = os.environ['PERSEUS__FILES_MANAGER_HOST']
 
 except KeyError as e:
     raise str(e)
@@ -30,4 +30,4 @@ class DockerConfig:
     USER_SCHEMAS_DB_HOST = DB_HOST
     USER_SCHEMAS_DB_PORT = DB_PORT
 
-    FILE_MANAGER_API_URL = API_URL
+    FILE_MANAGER_API_URL = f'http://{API_HOST}:10500/files-manager'
