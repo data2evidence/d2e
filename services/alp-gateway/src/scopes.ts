@@ -421,6 +421,11 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['POST']
   },
   {
+    path: '^/terminology/concept/getStandardConcepts$',
+    scopes: ['gateway.terminology.concept.getStandardConcepts.read'],
+    httpMethods: ['POST']
+  },
+  {
     path: '^/terminology/fhir/4_0_0/(.*)',
     scopes: ['gateway.terminology.fhir.read'],
     httpMethods: ['GET']
@@ -939,6 +944,7 @@ export const ROLE_SCOPES = {
     'gateway.db.schema.update',
     'gateway.terminology.hybridSearchConfig.read',
     'gateway.terminology.hybridSearchConfig.update',
+    'gateway.terminology.concept.getStandardConcepts.read',
     'dataflowmgmt.analysisflow.read',
     'dataflowmgmt.analysisflow.add',
     'dataflowmgmt.analysisflow.delete',

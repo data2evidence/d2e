@@ -215,6 +215,10 @@ export class OperandFactory {
                                    new BaseOperandExpression(Keys.CQLTERM_PROPERTY, path, alias, pathId, axis),
                                    new BaseOperandValue(Keys.CQLTERM_LITERAL, Keys.CQLTERM_DATATYPES_SQL_FUNCTION, filter.value));
             case Keys.TERM_OPERANDTYPE_EXPRESSION:
+                if (!pathId && !path) { //The attribute is the default joining key derieved in the next steps
+                    return new Operand(filter.op,
+                        new BaseOperandExpression(filter.type, path, alias, alias))
+                }
                 return new Operand(filter.op,
                                     new BaseOperandExpression(Keys.CQLTERM_PROPERTY, path, alias, pathId, axis),
                                     new BaseOperandExpression(Keys.CQLTERM_PROPERTY, filter.path ? filter.path : path, filter.value, pathId));

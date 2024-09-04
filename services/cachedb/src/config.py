@@ -40,6 +40,7 @@ class Env:
     TLS__INTERNAL__CA_CRT = get_env("TLS__INTERNAL__CA_CRT")
     IDP__SCOPE = get_env("IDP__SCOPE")
     IDP_SUBJECT_PROP = get_env("IDP_SUBJECT_PROP")
+    IDP__ALP_DATA_CLIENT_ID = get_env("IDP__ALP_DATA_CLIENT_ID")
     PYTHON_VERIFY_SSL = get_env("PYTHON_VERIFY_SSL")
     CACHEDB__PORT = parse_int(get_env("CACHEDB__PORT"))
     CACHEDB__POOL_SIZE = parse_int(get_env("CACHEDB__POOL_SIZE"))
