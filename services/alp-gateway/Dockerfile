@@ -3,7 +3,7 @@ ARG IMAGE=node:18.20.1-alpine
 FROM $IMAGE as development
 
 RUN apk update && apk add busybox=1.36.1-r19
-RUN apk add openssl=3.1.6-r2
+RUN apk add openssl=3.1.7-r0
 
 WORKDIR /usr/src/app
 
