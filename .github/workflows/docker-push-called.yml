@@ -181,7 +181,7 @@ jobs:
         env:
           AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
           AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
-          AZ_REGISTRY_PRUNE_ENABLE: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE }}
+          AZ_REGISTRY_PRUNE_ENABLE_TAGGED: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE_TAGGED }}
           AZ_REGISTRY_PRUNE_DAYS_TAGGED: ${{ vars.AZ_REGISTRY_PRUNE_DAYS_TAGGED }}
           AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
           AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
@@ -212,7 +212,7 @@ jobs:
           echo . INFO for deletion - single tag commitIds
           cat private2-todelete.yml | yq -P 'map(select(.lengths=="[40]") | .tags | @jsond)'
 
-          if [ "${AZ_REGISTRY_PRUNE_ENABLE}" = true ]; then
+          if [ "${AZ_REGISTRY_PRUNE_ENABLE_TAGGED}" = true ]; then
             echo ". 5 - ACTION delete tagged digests ..."
             yq '.[].digest' private2-todelete.yml | sort -u | xargs -I% az acr repository delete -u ${AZ_REGISTRY_USERNAME} -p ${AZ_REGISTRY_PASSWORD} --name ${AZ_REGISTRY_NAME} --image ${AZ_REGISTRY_REPOSITORY}@% --yes
           else
@@ -225,7 +225,7 @@ jobs:
         env:
           AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
           AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
-          AZ_REGISTRY_PRUNE_ENABLE: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE }}
+          AZ_REGISTRY_PRUNE_ENABLE_UNTAGGED: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE_UNTAGGED }}
           AZ_REGISTRY_PRUNE_DAYS_UNTAGGED: ${{ vars.AZ_REGISTRY_PRUNE_DAYS_UNTAGGED }}
           AZ_REGISTRY_REPOSITORY: ${{ inputs.AZ_REGISTRY_REPOSITORY }}
           AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
@@ -237,7 +237,14 @@ jobs:
             TODAY=$(date +%Y-%m-%d)
             AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_UNTAGGED:-1} days" +%Y-%m-%d)"
           fi
-          echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP | tee -a $GITHUB_STEP_SUMMARY
+          echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP
 
-          echo ". ACTION delete untagged digests ..."
-          az acr manifest metadata list --registry ${AZ_REGISTRY_NAME} --name ${AZ_REGISTRY_REPOSITORY} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && tags[0]==null].digest" -o tsv  | xargs -I% az acr repository delete -n ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" -t ${AZ_REGISTRY_REPOSITORY}@% -y || true
+          echo . INFO for deletion - single tag commitIds
+          az acr manifest metadata list --registry ${AZ_REGISTRY_NAME} --name ${AZ_REGISTRY_REPOSITORY} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && tags[0]==null].digest" -o tsv | tee private.tsv
+
+          if [ "${AZ_REGISTRY_PRUNE_ENABLE_UNTAGGED}" = true ]; then
+            echo ". ACTION delete untagged digests ..."
+            cat private.tsv | xargs -I% az acr repository delete -n ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" -t ${AZ_REGISTRY_REPOSITORY}@% -y || true
+          else
+            echo ". 5 - SKIPPED delete digests ..."
+          fi
