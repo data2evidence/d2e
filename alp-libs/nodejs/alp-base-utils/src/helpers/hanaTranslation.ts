@@ -169,7 +169,8 @@ const hanaCommonTranslation = (temp: string, schemaName: string, vocabSchemaName
 
   temp = temp.replace(/\$\$SCHEMA\$\$./g, `"${schemaName}".`);
   temp = temp.replace(/\$\$VOCAB_SCHEMA\$\$./g, `"${vocabSchemaName}".`);
-
+  temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, `direct_db_conn.${schemaName}.`); // Used when using cachedb connection connecting to duckdb, but requires direct connection to database instead.
+  
 
   return temp;
 };

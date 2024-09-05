@@ -171,6 +171,14 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
             # Attach vocab schema
             db.execute(
                 f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
+
+            # Attach direct postgres connection, this is used by analytics-svc for cohort/cohort_definition table queries where it requires direct connection to postgres.
+            if database_code in clients[DatabaseDialects.POSTGRES]:
+                print("Attaching postgres as direct connection ")
+                conn_details = extract_db_credentials(database_code)
+                db.execute(
+                    f"ATTACH 'host={conn_details['host']} port={conn_details['port']} dbname={conn_details['databaseName']} user={conn_details['user']} password={conn_details['password']}' AS direct_db_conn (TYPE postgres, READ_ONLY)")
+
             connection = DuckDBConnection(db)
         else:
             # Fallback connection to postgres
