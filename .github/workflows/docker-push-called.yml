@@ -239,7 +239,7 @@ jobs:
           fi
           echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP
 
-          echo . INFO for deletion - single tag commitIds
+          echo . INFO for deletion - untagged
           az acr manifest metadata list --registry ${AZ_REGISTRY_NAME} --name ${AZ_REGISTRY_REPOSITORY} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && tags[0]==null].digest" -o tsv | tee private.tsv
 
           if [ "${AZ_REGISTRY_PRUNE_ENABLE_UNTAGGED}" = true ]; then
