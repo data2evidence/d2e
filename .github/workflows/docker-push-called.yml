@@ -56,7 +56,7 @@ on:
         required: false
         type: string
       DOCKER_BUILD_PUSH_BOOL_STR:
-        default: "true"
+        default: "false"
         required: false
         type: string
       DOCKER_IMG_TAG_NAME:

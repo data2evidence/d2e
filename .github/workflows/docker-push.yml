@@ -66,7 +66,8 @@ jobs:
           docker-images: true
           swap-storage: true
 
-      - id: setup
+      - name: setup
+        id: setup
         env:
           DOCKER_BUILD_PUSH_BOOL_STR: ${{ vars.DOCKER_BUILD_PUSH_BOOL_STR || false }}
         run: |
