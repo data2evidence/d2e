@@ -240,11 +240,11 @@ jobs:
           echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP
 
           echo . INFO for deletion - untagged
-          az acr manifest metadata list --registry ${AZ_REGISTRY_NAME} --name ${AZ_REGISTRY_REPOSITORY} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && tags[0]==null].digest" -o tsv | tee private.tsv
+          az acr manifest metadata list --registry ${AZ_REGISTRY_NAME} --name ${AZ_REGISTRY_REPOSITORY} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && tags[0]==null]" -o json | yq -P | tee private.yml
 
           if [ "${AZ_REGISTRY_PRUNE_ENABLE_UNTAGGED}" = true ]; then
             echo ". ACTION delete untagged digests ..."
-            cat private.tsv | xargs -I% az acr repository delete -n ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" -t ${AZ_REGISTRY_REPOSITORY}@% -y || true
+            cat private.yml | yq '.[].digest' | xargs -I% az acr repository delete -n ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" -t ${AZ_REGISTRY_REPOSITORY}@% -y || true
           else
             echo ". 5 - SKIPPED delete digests ..."
           fi
