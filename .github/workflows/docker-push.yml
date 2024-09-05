@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Free Disk Space (Ubuntu)
-        if: ${{ vars.GHA_BUILD_DEBUG != 'true' }}
+        if: ${{ vars.DOCKER_BUILD_DEBUG != 'true' }}
         uses: jlumbroso/free-disk-space@main
         with:
           # this might remove tools that are actually needed,

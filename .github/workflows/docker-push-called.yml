@@ -142,7 +142,7 @@ jobs:
         id: builder
 
       - name: Purge docker images and cache
-        if: ${{ vars.GHA_BUILD_DEBUG != 'true' }}
+        if: ${{ vars.DOCKER_BUILD_DEBUG != 'true' }}
         run: |
           docker image prune -af
           docker buildx prune -af
@@ -171,12 +171,12 @@ jobs:
             GIT_TOKEN__PLUGINS_REPO_READ=${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
 
       - name: Post purge
-        if: ${{ vars.GHA_BUILD_DEBUG != 'true' }}
+        if: ${{ vars.DOCKER_BUILD_DEBUG != 'true' }}
         run: |
           docker system prune -af
 
       - name: Prune tagged images
-        if: inputs.GIT_BRANCH_NAME == 'develop' || github.event_name == 'workflow_dispatch' || vars.GHA_BUILD_DEBUG == 'true'
+        if: inputs.GIT_BRANCH_NAME == 'develop' || github.event_name == 'workflow_dispatch' || vars.DOCKER_BUILD_DEBUG == 'true'
         shell: bash
         env:
           AZ_REGISTRY_NAME: ${{ vars.AZ_REGISTRY_NAME }}
