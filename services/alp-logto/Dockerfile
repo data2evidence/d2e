@@ -11,7 +11,7 @@ RUN unzip experience.zip
 FROM ghcr.io/logto-io/logto:1.18
 
 WORKDIR /etc/logto
-RUN apk update && apk add openssl=3.3.1-r3
+RUN apk update && apk add openssl=3.3.2-r0
 
 RUN rm -rf packages/experience
 COPY --from=builder /etc/logto/packages/experience packages/experience
