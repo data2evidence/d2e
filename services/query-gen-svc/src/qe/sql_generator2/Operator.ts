@@ -142,6 +142,50 @@ export class Operator extends AstElement {
                     this.node.operand.map((x) => x.getSQL())
                 )
             );
+        } else if (this.op.trim() === "!=" || this.name === "joinOn") {
+            //To handle != check for identical filtercards. Both with & without AND / OR operators.
+            if (this.op.trim() === "!=") {
+                const parent =
+                    this.name === "joinOn" ? this.parent : this.parent.parent;
+                const baseTableAlias =
+                    parent.joinElements[
+                        Object.keys(parent.joinElements).find((e) => {
+                            if (
+                                parent.joinElements[e].alias.indexOf(
+                                    parent.node.alias
+                                ) > -1
+                            )
+                                return e;
+                        })
+                    ].alias;
+
+                const baseTableJoinConditionColumn =
+                    parent.entityConfig.placeholderMap[
+                        `${parent.entityConfig.baseEntity}.INTERACTION_ID`
+                    ];
+
+                let qos: QueryObject[] = this.node.operand.map(
+                    (identicalOperand) => {
+                        return QueryObject.format(
+                            ` ${baseTableAlias}.${baseTableJoinConditionColumn} != "patient.${identicalOperand.node.alias}".${baseTableJoinConditionColumn} `
+                        );
+                    }
+                );
+
+                return new QueryObject().join(qos);
+            } else if (this.op.trim() === "AND" || this.op.trim() === "OR") {
+                const sql = QueryObject.format(
+                    "(%Q)",
+                    QueryObject.format(" " + this.op + " ").join(
+                        this.node.operand.map((x) => {
+                            return QueryObject.format(x.sql.queryString);
+                        })
+                    )
+                );
+                return sql;
+            } else {
+                throw new Error("Invalid structure for JoinOn Type");
+            }
         } else if (this.node.operand.length === 2) {
             let literal = this.node.operand.find((x) => x instanceof Literal);
 
