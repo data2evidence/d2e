@@ -1,4 +1,3 @@
-
 /***************************SQL CONTEXT***************************/
 export const SQLTERM_AGGREGATE_COUNT = "Count";
 export const SQLTERM_AGGREGATE_AVG = "Avg";
@@ -9,7 +8,7 @@ export const SQLTERM_CAMEL_CONJUNCTIVE_OR = "Or";
 
 export const SQLTERM_LOWER_CONJUNCTIVE_AND = "and";
 export const SQLTERM_LOWER_CONJUNCTIVE_OR = "or";
-export const SQLTERM_LOWER_INEQUALITY_CONTAINS = "contains"
+export const SQLTERM_LOWER_INEQUALITY_CONTAINS = "contains";
 
 export const SQLTERM_INEQUALITY_SYMBOL_EQUAL = "=";
 export const SQLTERM_INEQUALITY_SYMBOL_LESSOREQUAL = "<=";
@@ -17,7 +16,6 @@ export const SQLTERM_INEQUALITY_SYMBOL_LESS = "<";
 export const SQLTERM_INEQUALITY_SYMBOL_GREATER = ">";
 export const SQLTERM_INEQUALITY_SYMBOL_GREATEROREQUAL = ">=";
 export const SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL = "<>";
-
 
 export const SQLTERM_INEQUALITY_ISNULL = "IsNull";
 export const SQLTERM_INEQUALITY_ISNOTNULL = "IsNotNull";
@@ -56,7 +54,6 @@ export const CQLTERM_CONTEXT_POPULATION = "population";
 
 //Pseudo CQL Terms
 export const CQLTERM_AGGREGATEEXPRESSION = "AggregateExpression";
-
 
 /***************************GENERAL CONTEXT***************************/
 export const TERM_CAMEL_START = "Start";
@@ -116,3 +113,4 @@ export const MRITERM_PARENTINTERACTION_REQ = "parentInteraction";
 export const MRITERM_PARENTINTERACTION = "PARENT_INTERACT_ID";
 
 export const MRITERM_TEMPORALQUERY = "_tempQ";
+export const MRITERM_JOINQUERY = "JOIN_QUERY";
