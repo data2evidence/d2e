@@ -67,16 +67,22 @@ jobs:
           swap-storage: true
 
       - id: setup
+        env:
+          DOCKER_BUILD_PUSH_BOOL_STR: ${{ vars.DOCKER_BUILD_PUSH_BOOL_STR || false }}
         run: |
-          DOCKER_BUILD_PUSH_BOOL_STR=true
+          DOCKER_BUILD_PUSH_BOOL_STR=false
           if [ $GIT_BRANCH_NAME == "develop" ]; then
             DOCKER_IMG_TAG_NAME=develop
+            DOCKER_BUILD_PUSH_BOOL_STR=true
           elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
             DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME
+            DOCKER_BUILD_PUSH_BOOL_STR=true
           else
             DOCKER_BUILD_PUSH_BOOL_STR=false
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
           fi
+          [ $DOCKER_BUILD_PUSH_BOOL_STR = "true" ] && DOCKER_BUILD_PUSH_BOOL_STR=true
+
           echo DOCKER_BUILD_PUSH_BOOL_STR=$DOCKER_BUILD_PUSH_BOOL_STR | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo GIT_BRANCH_NAME="${GIT_BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
