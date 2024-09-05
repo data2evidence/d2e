@@ -129,12 +129,14 @@ class DBUtils:
 
         match dialect:
             case DatabaseDialects.HANA:
+                connection_dialect = dialect
                 base_connection_string = f"jdbc:sap://{host}:{port}?databaseName={database_name}{extra_config}"
             case DatabaseDialects.POSTGRES:
+                connection_dialect = "postgresql"
                 base_connection_string = f"jdbc:postgresql://{host}:{port}/{database_name}"
             case _:
                 raise ValueError(f"Dialect '{dialect}' not supported!")
-        connection_string = f"connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = '{dialect}', connectionString = '{base_connection_string}', user = '{user}', password = '{password}', pathToDriver = '{DBUtils.path_to_driver}')"
+        connection_string = f"connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = '{connection_dialect}', connectionString = '{base_connection_string}', user = '{user}', password = '{password}', pathToDriver = '{DBUtils.path_to_driver}')"
         return connection_string
 
 
