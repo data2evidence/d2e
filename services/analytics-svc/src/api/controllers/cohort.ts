@@ -38,12 +38,10 @@ export async function getCohortAnalyticsConnection(req: IMRIRequest) {
         } catch (err) {
             logger.debug(`No user found in request:${err.stack}`);
         }
-        const { studyAnalyticsCredential: analyticsCredentials } =
-            req.dbCredentials;
 
         // For cohorts, when using cachedb connection, connect to postgres instead of duckdb
         const { analyticsConnection } = await getCachedbDbConnections({
-            analyticsCredentials,
+            analyticsCredentials: req.dbCredentials.studyAnalyticsCredential,
             userObj: userObj,
             token: req.headers.authorization,
             studyId: req.selectedstudyDbMetadata.id,
