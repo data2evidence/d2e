@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - develop
-
   workflow_dispatch:
     inputs:
       GIT_REPO_FULL_NAME:
