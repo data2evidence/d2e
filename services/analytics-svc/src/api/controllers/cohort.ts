@@ -1,3 +1,4 @@
+import { Response } from "express";
 import { MriConfigConnection } from "@alp/alp-config-utils";
 import {
     IMRIRequest,
@@ -41,7 +42,7 @@ export async function getCohortAnalyticsConnection(req: IMRIRequest) {
 
 async function getStudyDetails(
     studyId: string,
-    res
+    res: Response
 ): Promise<{
     databaseCode: string;
     schemaName: string;
@@ -73,7 +74,7 @@ async function getStudyDetails(
     }
 }
 
-export async function getAllCohorts(req: IMRIRequest, res, next) {
+export async function getAllCohorts(req: IMRIRequest, res: Response) {
     try {
         const analyticsConnection = await getCohortAnalyticsConnection(req);
         let cohortEndpoint = new CohortEndpoint(
@@ -97,7 +98,7 @@ export async function getAllCohorts(req: IMRIRequest, res, next) {
     }
 }
 
-export async function getFilteredCohorts(req: IMRIRequest, res, next) {
+export async function getFilteredCohorts(req: IMRIRequest, res: Response) {
     try {
         const analyticsConnection = await getCohortAnalyticsConnection(req);
         const filterColumn = req.swagger.params.filterColumn.value;
@@ -138,7 +139,7 @@ export async function getFilteredCohorts(req: IMRIRequest, res, next) {
     }
 }
 
-export async function createCohort(req: IMRIRequest, res, next) {
+export async function createCohort(req: IMRIRequest, res: Response) {
     try {
         const studyId = req.swagger.params.cohort.value.studyId;
         const analyticsConnection = await getCohortAnalyticsConnection(req);
@@ -261,7 +262,59 @@ export async function createCohort(req: IMRIRequest, res, next) {
     }
 }
 
-export async function createCohortDefinition(req: IMRIRequest, res, next) {
+export async function generateWebApiDefinition(
+    req: IMRIRequest,
+    res: Response
+) {
+    try {
+        const studyId = req.swagger.params.cohort.value.studyId;
+
+        const { vocabSchemaName } = await getStudyDetails(studyId, res);
+        const language = getUser(req).lang;
+        // Remap mriquery for use in createEndpointFromRequest
+        req.swagger.params.mriquery = {
+            value: req.swagger.params.cohort.value.mriquery,
+        };
+        const { cohortDefinition } = await createEndpointFromRequest(req);
+
+        const mriConfig = await mriConfigConnection.getStudyConfig(
+            {
+                req,
+                action: "getBackendConfig",
+                configId: cohortDefinition.configData.configId,
+                configVersion: cohortDefinition.configData.configVersion,
+                lang: language,
+                datasetId: studyId,
+            },
+            true
+        );
+        const attributes = {
+            filter: {
+                configMetadata: {
+                    id: cohortDefinition.configData.configId,
+                    version: cohortDefinition.configData.configVersion,
+                },
+                cards: cohortDefinition.cards,
+                sort: "",
+            },
+        };
+        const ohdsiCohortDefinition = await convertIFRToExtCohort(
+            attributes,
+            mriConfig.config,
+            req,
+            vocabSchemaName,
+            studyId
+        );
+
+        res.status(200).send(ohdsiCohortDefinition);
+        return;
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(MRIEndpointErrorHandler({ err, language }));
+    }
+}
+
+export async function createCohortDefinition(req: IMRIRequest, res: Response) {
     try {
         const analyticsConnection = await getCohortAnalyticsConnection(req);
 
@@ -299,7 +352,7 @@ export async function createCohortDefinition(req: IMRIRequest, res, next) {
     }
 }
 
-export async function deleteCohort(req: IMRIRequest, res, next) {
+export async function deleteCohort(req: IMRIRequest, res: Response) {
     try {
         // Delete cohort from database
         const cohortId = req.swagger.params.cohortId.value;

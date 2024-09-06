@@ -1265,6 +1265,40 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /generate-webapi-definition:
+    x-swagger-router-controller: cohort
+    post:
+      description: Generates the webapi cohort definition from mriquery
+      operationId: generateWebApiDefinition
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: cohort
+          schema:
+            type: object
+            required:
+              - studyId
+              - mriquery
+            properties:
+              studyId:
+                type: string
+                description: Id of study
+              mriquery:
+                type: string
+                description: Filtercard information in bookmark form. This is a binary string encoded in base64
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
 definitions:
   AnalyticsResponse:
     type: object
