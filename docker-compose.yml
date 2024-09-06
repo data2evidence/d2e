@@ -1168,8 +1168,8 @@ services:
     depends_on:
       alp-fhir-server:
         condition: service_started
-      alp-fhir-server-post-init:
-        condition: service_completed_successfully
+      # alp-fhir-server-post-init:
+      #   condition: service_completed_successfully
     networks:
       alp:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
