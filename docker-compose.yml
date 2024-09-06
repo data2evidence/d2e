@@ -406,6 +406,7 @@ services:
     environment:
       <<:
         - *x-converter
+        - *cachedb
         - *x-dbsvc
         - *x-minio
         - *x-pg
@@ -477,6 +478,7 @@ services:
     environment:
       <<:
         - *x-converter
+        - *cachedb
         - *x-pg
         - *x-dbsvc
         - *x-minio
