@@ -128,12 +128,6 @@ async function enableBotForSuperAdminProject(fhirApi: FhirAPI){
         superAdminProject = searchResult
     }else
         throw 'Super Admin project not found!'
-
-    if(!(superAdminProject.features.length > 0 && superAdminProject.features.indexOf('bots') > -1)){
-        superAdminProject.features = ['bots']
-        console.log(JSON.stringify(superAdminProject))
-        return await fhirApi.updateResource(superAdminProject)
-    }
-    else 
-        return
+    superAdminProject.features = ['bots']
+    return await fhirApi.updateResource(superAdminProject)
 }
