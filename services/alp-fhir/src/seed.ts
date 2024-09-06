@@ -47,11 +47,25 @@ const seed = async () => {
 
   console.log("Seeding tables");
 
-  let jsonParsedProjectContent = JSON.parse(projectContent)
-  jsonParsedProjectContent.features = ["bots"]
 
   console.log("Enable bots for Super Admin")
+  
+  let jsonParsedProjectContent = JSON.parse(projectContent)
+  jsonParsedProjectContent.features = ['bots']
+  jsonParsedProjectContent.meta.versionId = '2c8b0331-863a-432e-a5d1-ef0619acc3d2'
 
+  await queryPostgres(
+    client,
+    `INSERT INTO public."Project_History" ("versionId", id, "content", "lastUpdated")
+    values('2c8b0331-863a-432e-a5d1-ef0619acc3d2', $1, $2, $3) ON CONFLICT("versionId") \
+    DO NOTHING;` ,
+    [
+      projectId,
+      jsonParsedProjectContent,
+      "2024-06-13 14:40:48.738 +0800"
+    ]
+  );
+  
   await queryPostgres(
     client,
     `UPDATE public."Project" SET "content" = $1 WHERE name = 'Super Admin'` ,

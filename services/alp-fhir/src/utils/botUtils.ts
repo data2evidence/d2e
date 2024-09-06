@@ -1,5 +1,5 @@
 import { MedplumBotConfig } from "./types";
-import { Bot, OperationOutcome } from '@medplum/fhirtypes'
+import { Bot, OperationOutcome, Project } from '@medplum/fhirtypes'
 import * as botConfig from '../bots.config.json'
 import { FhirAPI } from "../api/FhirAPI";
 import { basename, resolve } from "path";
@@ -15,9 +15,10 @@ export async function readAndCreateBotFromConfig():Promise<void> {
             return ;
         }
         console.log(botConfig.bots.length + ' bots configured in bot config.')
+        let fhirApi = new FhirAPI()
+        await fhirApi.clientCredentialslogin()
+        await enableBotForSuperAdminProject(fhirApi)
         for (const botConfig of botConfigs) {
-            let fhirApi = new FhirAPI()
-            await fhirApi.clientCredentialslogin()
             await createBot(fhirApi, 'Project Id', botConfig, 'vmcontext');
             console.log(`Bot ${botConfig.name} saved and deployed successfully!`)
         }
@@ -118,4 +119,21 @@ function readFileContents(fileName: string): string {
         return '';
     }
     return readFileSync(path, 'utf8');
+}
+
+async function enableBotForSuperAdminProject(fhirApi: FhirAPI){
+    let searchResult = await fhirApi.getResource('name=Super Admin')
+    let superAdminProject:Project
+    if(searchResult){
+        superAdminProject = searchResult
+    }else
+        throw 'Super Admin project not found!'
+
+    if(!(superAdminProject.features.length > 0 && superAdminProject.features.indexOf('bots') > -1)){
+        superAdminProject.features = ['bots']
+        console.log(JSON.stringify(superAdminProject))
+        return await fhirApi.updateResource(superAdminProject)
+    }
+    else 
+        return
 }
