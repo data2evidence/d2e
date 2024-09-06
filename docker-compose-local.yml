@@ -288,13 +288,13 @@ services:
   #  volumes:
   #    - ./services/alp-sqleditor/init.sh:/usr/share/hue/init.sh
 
-#   alp-minerva-terminology-svc:
-# #    build:
-# #      context: .
-# #      dockerfile: ./services/alp-terminology-svc/Dockerfile
-#     container_name: alp-minerva-terminology-svc-nest-prod-${BASE_PORT:-1}
-#     environment:
-#       LOCAL_DEBUG: "false"
+  alp-minerva-terminology-svc:
+    build:
+     context: .
+     dockerfile: ./services/alp-terminology-svc/Dockerfile
+    container_name: alp-minerva-terminology-svc-nest-prod-${BASE_PORT:-1}
+    environment:
+      LOCAL_DEBUG: "false"
 
   # alp-minerva-user-mgmt:
   #   # build:

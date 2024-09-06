@@ -1118,6 +1118,58 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO__SECRET_KEY}
       MINIO_ROOT_USER: ${MINIO__ACCESS_KEY:-root}
 
+  alp-minerva-terminology-svc:
+    container_name: &c21 alp-minerva-terminology-svc-${BASE_PORT:-1}
+    init: true
+    depends_on:
+      trex:
+        condition: service_healthy
+      alp-minerva-postgres:
+        condition: service_healthy
+      alp-meilisearch-post-init:
+        condition: service_completed_successfully
+    healthcheck:
+      interval: 20s
+      retries: 30
+      start_period: 60s
+      timeout: 30s
+      test:
+        - CMD
+        - wget
+        - --no-check-certificate
+        - -O
+        - liveness
+        - https://localhost:41108/check-liveness
+    hostname: alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/alp-terminology-svc:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c21
+    networks:
+      alp:
+        priority: 20
+    platform: linux/amd64
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    environment:
+      <<:
+        - *x-converter
+        - *x-tls
+        - *x-routes
+        - *x-pg
+      FHIR_TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}11
+      LOCAL_DEBUG: "false"
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+      NODE_ENV: development
+      PG_MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
+      PG_MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
+      PG_PASSWORD: ${PG_WRITE_PASSWORD}
+      PG_SCHEMA: terminology
+      PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
+      TERMINOLOGY_SVC__LOG_LEVEL: info
+      TERMINOLOGY_SVC__PATH: terminology
+      TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
+
+
   alp-minio-post-init:
     container_name: &c23 alp-minio-post-init
     depends_on:
@@ -1755,56 +1807,7 @@ services:
   #     ## Postgres admin user for running migration and seedling
   #     PG__ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
 
-  # alp-minerva-terminology-svc:
-  #   container_name: &c21 alp-minerva-terminology-svc-${BASE_PORT:-1}
-  #   init: true
-  #   depends_on:
-  #     trex:
-  #       condition: service_healthy
-  #     alp-minerva-postgres:
-  #       condition: service_healthy
-  #     alp-meilisearch-post-init:
-  #       condition: service_completed_successfully
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 30
-  #     start_period: 60s
-  #     timeout: 30s
-  #     test:
-  #       - CMD
-  #       - wget
-  #       - --no-check-certificate
-  #       - -O
-  #       - liveness
-  #       - https://localhost:41108/check-liveness
-  #   hostname: alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/alp-terminology-svc:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c21
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   platform: linux/amd64
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   environment:
-  #     <<:
-  #       - *x-converter
-  #       - *x-tls
-  #       - *x-routes
-  #       - *x-pg
-  #     FHIR_TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}11
-  #     LOCAL_DEBUG: "false"
-  #     MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-  #     NODE_ENV: development
-  #     PG_MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
-  #     PG_MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-  #     PG_PASSWORD: ${PG_WRITE_PASSWORD}
-  #     PG_SCHEMA: terminology
-  #     PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-  #     TERMINOLOGY_SVC__LOG_LEVEL: info
-  #     TERMINOLOGY_SVC__PATH: terminology
-  #     TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
+  
 
   # alp-minerva-user-mgmt:
   #   container_name: &c22 alp-minerva-user-mgmt-${BASE_PORT:-1}
