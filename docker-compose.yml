@@ -3,7 +3,6 @@ networks:
   alp:
   data:
 
-
 volumes:
   caddy:
   duckdb-data-1:
@@ -12,12 +11,6 @@ volumes:
   pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
-
-#       "dataflowMgmt": "https://alp-minerva-dataflow-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
-# "usermgmt": "https://alp-minerva-user-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41104/usermgmt/api",
-# "https://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105",
-#       "dataflowMgmt": "https://alp-minerva-dataflow-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
-#       "dbCredentialsMgr": "https://alp-minerva-db-credentials-mgr-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41112",
 
 x-envs:
   db-svc: &x-dbsvc
@@ -341,6 +334,28 @@ services:
       SERVICE_ENV: |-
         {
           "_shared": {
+            "DB_SVC__IDP_SUBJECT_PROP": "sub",
+            "DB_SVC__LOG_LEVEL": "info",
+            "DB_SVC__PATH": "/alpdb",
+            "DISABLE_SSL": "TRUE",
+            "HANA__READ_ROLE": "TENANT_READ_ROLE",
+            "LB__LOG_LEVEL": "${LB__LOG_LEVEL:-FINE}",
+            "PG__READ_ROLE": "postgres_tenant_read_role",
+            "DB_CREDENTIALS_MGR__API_URL": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials/db/",
+            "DB_CREDENTIALS__PRIVATE_KEY_PASSPHRASE": "${DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE}",
+            "IDP__ALP_SVC__CLIENT_ID": "${LOGTO__ALP_SVC__CLIENT_ID}",
+            "IDP__ALP_SVC__CLIENT_SECRET": "${LOGTO__ALP_SVC__CLIENT_SECRET}",
+            "IDP__SCOPE": "https://alp-default",
+            "IDP_SUBJECT_PROP": "sub",
+            "MINIO__ACCESS_KEY": "${MINIO__ACCESS_KEY:-root}",
+            "MINIO__ENDPOINT": "${MINIO__ENDPOINT:-alp-minerva-s3}",
+            "MINIO__PORT": ${MINIO__PORT:-9000},
+            "MINIO__REGION": "${MINIO__REGION:-ap-southeast-1}",
+            "MINIO__SECRET_KEY": "${MINIO__SECRET_KEY}",
+            "MINIO__SSL": "${MINIO__SSL:-false}",
+            "SQL_PROXY__HOST": "alp-sql-proxy",
+            "SQL_PROXY__PORT": 41191,
+            "SQL_PROXY__POOL_SIZE": "${SQL_PROXY__POOL_SIZE:-10}",
             "NODE_ENV": "development",
             "PG__DB_NAME": "alp",
             "PG__DEBUG": "${PG_DEBUG:-1}",
@@ -352,17 +367,17 @@ services:
             "PG__DIALECT": "postgresql",
             "LOCAL_DEBUG": "false",
             "SERVICE_ROUTES": {
-                "analytics": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
-                "bookmark": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/analytics-svc/api/services/bookmark",
-                "cdw": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/cdw",
-                "paConfig": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/pa-config-svc",
-                "queryGen": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
-                "dataflowMgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
-                "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/db-credentials",
+                "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
+                "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
+                "cdw": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/cdw",
+                "paConfig": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/pa-config-svc",
+                "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
+                "dataflowMgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
+                "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
                 "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
-                "portalServer": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/system-portal",
-                "usermgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/usermgmt/api",
-                "terminology": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+                "portalServer": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/system-portal",
+                "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
+                "terminology": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
                 "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
                 "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
                 "minio": "",
@@ -370,6 +385,24 @@ services:
                 "fhirTokenUrl": "http://alp-minerva-fhir-server-1:8103/oauth2/token",
                 "dicomServer": "http://alp-dicom-server:8042"
               }
+          },
+          "analytics-svc": {
+            "ALP_GATEWAY_OAUTH__URL": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/oauth/token",
+            "ALP__SYSTEM_ID": "${ALP__SYSTEM_ID:-alp-research}",
+            "ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME": "PUBLIC-CHART_DEFAULT-ASSIGNMENT",
+            "ANALYTICS_SVC__PORT": 41${BASE_PORT:-1}02,
+            "ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS": 600,
+            "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",
+            "DUCKDB__DATA_FOLDER": "/home/docker/src/alp-data-node/app/duckdb_data",
+            "LOCAL_DEBUG": "false",
+            "SKIP_AUTH": "${SKIP_AUTH:-FALSE}",
+            "USE_DUCKDB": "false",
+            "USE_SQL_PROXY": "${USE_SQL_PROXY:-false}",
+            "USE_EXTENSION_FOR_COHORT_CREATION": "false",
+            "isHttpTestRun": "${isHttpTestRun}",
+            "isTestEnv": "${isTestEnv}",
+            "local": "${local}",
+            "TESTSCHEMA": "${TESTSCHEMA}"
           },
           "mri-pg-config": {
             "PG_ADMIN_PASSWORD": "${PG_ADMIN_PASSWORD}",
@@ -420,11 +453,10 @@ services:
           "dicomServer": "http://alp-dicom-server:8042",
           "logto": "http://alp-logto-1:3001"
           }
-      
-
       sqlOnly: false
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+      DB_CREDENTIALS__PRIVATE_KEY: ${DB_CREDENTIALS__INTERNAL__PRIVATE_KEY}
       SQL_RETURN_ON: ${SQL_RETURN_ON:-false}
       TESTSCHEMA: ${TESTSCHEMA}
       NOT_EQ_CHECK_FILTERCARDS: ${NOT_EQ_CHECK_FILTERCARDS:-true}
@@ -510,9 +542,7 @@ services:
         https://localhost:5173
         https://localhost:8081
         https://login.microsoftonline.com
-      # IDP authentication type
       GATEWAY__IDP_AUTH_TYPE: logto
-      # IDP subject property
       GATEWAY__IDP_SUBJECT_PROP: sub
       GATEWAY__LOG_LEVEL: debug
       GATEWAY__PORT: 41${BASE_PORT:-1}82

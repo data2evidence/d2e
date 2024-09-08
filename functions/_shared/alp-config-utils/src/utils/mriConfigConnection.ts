@@ -45,26 +45,9 @@ export default class MriConfigConnection {
               "rejectUnauthorized": false,
               "ca": Deno.env.get("TLS__INTERNAL__CA_CRT")?.replace(/\\n/g, '\n'),
             };
-            console.log(`${this.portalServerUrl}/dataset/${datasetId}/pa-config/${urlPath}`)
-            console.log(options)
+
             const getReq = await fetch(`${this.portalServerUrl}/dataset/${datasetId}/pa-config/${urlPath}`, options);
             resolve(await getReq.json());
-            /*https
-              .get(options, (response) => {
-                let body = "";
-                response.on("data", (d) => {
-                  body += d;
-                });
-
-                response.on("end", () => {
-                  resolve(JSON.parse(body));
-                });
-              })
-              .on("error", (err) => {
-                log.error(JSON.stringify(err));
-                reject(err);
-              });
-            getReq.end();*/
         });
     }
 
