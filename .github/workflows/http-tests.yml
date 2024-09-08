@@ -178,8 +178,8 @@ jobs:
       - name: Start system services
         run: |
           yarn start:minerva -d
-          echo "Waiting 180 secs for services to start..."
-          sleep 180
+          echo "Waiting 120 secs for services to start..."
+          sleep 120
 
       - name: Check status of docker containers
         run: |
