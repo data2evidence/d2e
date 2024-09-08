@@ -14,6 +14,7 @@ class LiquibaseAction(str, Enum):
 
 
 class DataModelBase(BaseModel):
+    use_cache_db: bool
     database_code: str = Field(...)
     data_model: str = Field(...)
     schema_name: str = Optional[str]

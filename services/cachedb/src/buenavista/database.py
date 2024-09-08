@@ -1,4 +1,5 @@
 import os
+import logging
 from enum import Enum
 from typing import Optional, Dict
 import duckdb
@@ -11,6 +12,8 @@ from .backends.postgres import PGConnection
 from .backends.hana import HANAConnection
 from buenavista import bv_dialects, rewrite
 from config import Env
+
+logger = logging.getLogger(__name__)
 
 
 class DBCredentialsType(BaseModel):
@@ -127,6 +130,19 @@ def _CreateConnectionString(dialect_driver: str, user: str, pw: str,
 def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_code: str, schema: str, vocab_schema: str):
     connection = None
 
+    # Guard clause for postgres and hana for unsupported database_codes
+    if dialect == DatabaseDialects.POSTGRES or dialect == DatabaseDialects.HANA:
+        if database_code not in clients[dialect]:
+            raise Exception(
+                f"Dialect:{dialect} has no configuration with database code:{database_code}")
+
+    # Guard clause for duckdb for unsupported database_codes
+    # For DUCKDB, check against postgres dialect to check for supported database_codes
+    if dialect == DatabaseDialects.DUCKDB:
+        if database_code not in clients[DatabaseDialects.POSTGRES]:
+            raise Exception(
+                f"Dialect:{dialect} has no configuration with database code:{database_code}")
+
     if dialect == DatabaseDialects.POSTGRES:
         connection = PGConnection(
             clients[dialect][database_code])
@@ -136,21 +152,33 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
             clients[dialect][database_code])
 
     if dialect == DatabaseDialects.DUCKDB:
-        db = duckdb.connect()
-
-        # Attach cdm schema
+        '''
+        Check if both schema and vocab duckdb database files exists.
+        If both exists, continue connection with duckdb 
+        Else either does not exist, fallback connection to postgres.
+        '''
         cdm_schema_duckdb_file_path = os.path.join(
             Env.DUCKDB__DATA_FOLDER, f"{database_code}_{schema}")
-        db.execute(
-            f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
-
-        # Attach vocab schema
         vocab_schema_duckdb_file_path = os.path.join(
             Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
-        db.execute(
-            f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
 
-        connection = DuckDBConnection(db)
+        # Only when both duckdb files for cdm schema and vocab schema exist, connect to duckdb
+        if os.path.isfile(cdm_schema_duckdb_file_path) and os.path.isfile(vocab_schema_duckdb_file_path):
+            db = duckdb.connect()
+            # Attach cdm schema
+            db.execute(
+                f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
+            # Attach vocab schema
+            db.execute(
+                f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
+            connection = DuckDBConnection(db)
+        else:
+            # Fallback connection to postgres
+            logger.warn(
+                f"Duckdb Inaccessible at following paths {cdm_schema_duckdb_file_path} OR {vocab_schema_duckdb_file_path}. Hence fallback to Postgres dialect connection"
+            )
+            connection = PGConnection(
+                clients[DatabaseDialects.POSTGRES][database_code])
 
     if connection:
         return connection
@@ -158,26 +186,6 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
         # If no connection can be found
         raise Exception(
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
-
-
-def parse_connection_param_database(database: str) -> tuple[str, str]:
-    '''
-    Resolves client connection database d2e format into its individual component.
-    Expects database in the format of {DIALECT}_{DATASETID}
-    '''
-    databaseComponents = database.split("_")
-    # Simple conditional check to check if database param has two compoenents separated by "_"
-    if len(databaseComponents) != 2:
-        raise Exception(
-            f"Database param:{database} is in the wrong format! Database has to be in the format of [DIALECT_DATASETID]")
-    dialect, _dataset_id = databaseComponents
-
-    # Guard clause against invalid dialects
-    if dialect not in [e.value for e in DatabaseDialects]:
-        raise Exception(
-            f"Dialect:{dialect} not support! Supported dialects are: {', '.join([e.value for e in DatabaseDialects])}")
-
-    return databaseComponents
 
 
 def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:
