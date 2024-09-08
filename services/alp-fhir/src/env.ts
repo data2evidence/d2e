@@ -14,7 +14,10 @@ const Env = z.object({
           ctx.addIssue({ code: "custom", message: "Invalid JSON" });
           return z.never();
       }
-  })
+  }),
+  FHIR_SCHEMA_PATH: z.string(),
+  FHIR_SCHEMA_FILE_NAME: z.string(),
+  DUCKDB_PATH: z.string()
 })
 
 const result = Env.safeParse(process.env)
