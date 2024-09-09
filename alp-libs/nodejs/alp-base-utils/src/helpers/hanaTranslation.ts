@@ -169,8 +169,6 @@ const hanaCommonTranslation = (temp: string, schemaName: string, vocabSchemaName
 
   temp = temp.replace(/\$\$SCHEMA\$\$./g, `"${schemaName}".`);
   temp = temp.replace(/\$\$VOCAB_SCHEMA\$\$./g, `"${vocabSchemaName}".`);
-  temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, `direct_db_conn.${schemaName}.`); // Used when using cachedb connection connecting to duckdb, but requires direct connection to database instead.
-  
 
   return temp;
 };
@@ -194,6 +192,9 @@ export const translateHanaToPostgres = (temp: string, schemaName: string, vocabS
 
 export const translateHanaToDuckdb = (temp: string, schemaName: string, vocabSchemaName: string): string => {
   temp = hanaCommonTranslation(temp, schemaName, vocabSchemaName);
+  
+  temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, `direct_db_conn.${schemaName}.`); // Used when using cachedb connection connecting to duckdb, but requires direct connection to database instead.
+
   temp = temp.replace(/DAYS_BETWEEN \(/gi, `date_diff ('day', `);
   temp = temp.replace(
     /select count\(\*\) as \"TABLECOUNT\" from pg_tables where schemaname=(\%s|\?|\$[0-9]) and tablename=(\%s|\?|\$[0-9])/gi,
