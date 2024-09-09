@@ -25,14 +25,12 @@ WORKDIR /usr/
 FROM ${IMAGE}
 
 RUN apt-get update && apt-get -y install openssl
-
 RUN rm -rf /usr/local/lib/node_modules/npm
 RUN groupadd alp \
     && useradd docker \
     && adduser docker alp
     
 USER docker
-
 WORKDIR /home/docker/
 
 COPY --chown=docker:alp --chmod=711 --from=final-build /usr/src ./
