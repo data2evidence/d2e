@@ -1,4 +1,4 @@
-FROM medplum/medplum-server:3.2.2 as builder
+FROM medplum/medplum-server:3.2.2 AS builder
 
 COPY config.json .
 
@@ -9,7 +9,7 @@ FROM node:18.20.4-slim
 WORKDIR /home/docker/app
 
 COPY --from=builder /usr/src/medplum ./medplum
-COPY ./src/duckdb /home/docker/app/duckdb
+# COPY ./src/duckdb /home/docker/app/duckdb
 COPY package-server.json ./package.json
 
 RUN yarn install
