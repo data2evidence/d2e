@@ -208,8 +208,8 @@ jobs:
             context: ./services/alp-perseus-white-rabbit
             fileName: Dockerfile
           - name: alp-data-node/alp-perseus-cdm-builder
-            directory: ./services/alp-perseus-white-rabbit
-            context: ./services/alp-perseus-white-rabbit
+            directory: ./services/alp-perseus-cdm-builder
+            context: Dockerfile
             fileName: Dockerfile
     uses: ./.github/workflows/docker-push-called.yml
     with:
