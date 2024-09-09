@@ -12,6 +12,8 @@ volumes:
   pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
+  fhir-schema-file-1:
+  fhir-duckdb-1:
   dind-certs:
 
 x-envs:
@@ -404,6 +406,7 @@ services:
     environment:
       <<:
         - *x-converter
+        - *cachedb
         - *x-dbsvc
         - *x-minio
         - *x-pg
@@ -475,6 +478,7 @@ services:
     environment:
       <<:
         - *x-converter
+        - *cachedb
         - *x-pg
         - *x-dbsvc
         - *x-minio
@@ -504,6 +508,7 @@ services:
       TERMINOLOGY_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/terminology/
       OHDSI__R_COHORT_DIAGNOSTICS_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortDiagnosticsModule/v0.2.0/SettingsFunctions.R
       OHDSI__R_COHORT_GENERATOR_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortGeneratorModule/v0.3.0/SettingsFunctions.R
+      STRATEGUS__KEYRING_PASSWORD: ${STRATEGUS__KEYRING_PASSWORD}
 
   alp-dataflow-gen-init:
     command:
@@ -605,6 +610,9 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    volumes:
+      - fhir-schema-file-1:/home/docker/app/medplum/packages/definitions/dist/fhir/r4
+      #- fhir-duckdb-1:/home/docker/app/duckdb
     environment:
       <<:
         - *x-pg
@@ -613,7 +621,8 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-
+      DUCKDB_PATH: /home/docker/app/duckdb
+      
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -641,7 +650,11 @@ services:
     networks:
       alp:
         priority: 20
-    environment:
+    volumes:
+      - fhir-schema-file-1:/home/docker/alp-data-node/app/src/r4
+      #- fhir-duckdb-1:/home/docker/alp-data-node/app/src/duckdb
+    entrypoint: yarn build-and-seed
+    environment: 
       <<:
         - *x-pg
         - *x-fhir
@@ -655,6 +668,9 @@ services:
       LOCAL_DEBUG: "false"
       NODE_ENV: development
       PORT: 41${BASE_PORT:-1}12
+      FHIR_SCHEMA_PATH: /home/docker/alp-data-node/app/src/r4
+      FHIR_SCHEMA_FILE_NAME: fhir.schema.json
+      DUCKDB_PATH: /home/docker/alp-data-node/app/src/duckdb
 
   alp-logto-post-init:
     container_name: alp-logto-post-init-${BASE_PORT:-1}
