@@ -2,8 +2,7 @@ from prefect import get_run_logger, task
 from functools import partial
 from datetime import datetime
 
-from utils.types import DBCredentialsType, DatabaseDialects, UserType
-from utils.DBUtils import DBUtils
+from utils.types import DatabaseDialects, UserType
 
 from dao.DBDao import DBDao
 from dao.UserDao import UserDao
@@ -14,7 +13,8 @@ from flows.alp_db_svc.const import DATAMODEL_CDM_VERSION, OMOP_DATA_MODELS, _che
 from flows.alp_db_svc.hooks import *
 
 
-def create_datamodel(database_code: str,
+def create_datamodel(use_cache_db: bool,
+                     database_code: str,
                      data_model: str,
                      schema_name: str,
                      vocab_schema: str,
@@ -24,17 +24,15 @@ def create_datamodel(database_code: str,
                      count: int = 0,
                      cleansed_schema_option: bool = False):
 
-    dbutils = DBUtils(database_code)
-    tenant_configs = dbutils.extract_database_credentials()
 
     task_status = create_schema_tasks(
+        use_cache_db=use_cache_db,
         dialect=dialect,
         database_code=database_code,
         data_model=data_model,
         changelog_file=changelog_file,
         schema_name=schema_name,
         vocab_schema=vocab_schema,
-        tenant_configs=tenant_configs,
         plugin_classpath=plugin_classpath,
         count=count
     )
@@ -48,23 +46,27 @@ def create_datamodel(database_code: str,
             changelog_file=changelog_file,
             schema_name=cleansed_schema_name,
             vocab_schema=vocab_schema,
-            tenant_configs=tenant_configs,
             plugin_classpath=plugin_classpath,
             count=count
         )
 
 
-def create_schema_tasks(dialect: str,
+def create_schema_tasks(use_cache_db: bool,
+                        dialect: str,
                         database_code: str,
                         data_model: str,
                         changelog_file: str,
                         schema_name: str,
                         vocab_schema: str,
-                        tenant_configs: DBCredentialsType,
                         plugin_classpath: str,
                         count: int) -> bool:
     try:
-        schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
+        schema_dao = DBDao(use_cache_db=use_cache_db,
+                            database_code=database_code,
+                            schema_name=schema_name
+                            )
+
+        tenant_configs = schema_dao.tenant_configs
 
 
         create_db_schema_wo = create_db_schema.with_options(
@@ -109,12 +111,14 @@ def create_schema_tasks(dialect: str,
             print("Skipping creation of Audit policy for system configuration")
             print(f"Skipping creation of new audit policy for {schema_name}")
 
-        user_dao = UserDao(database_code, schema_name, UserType.ADMIN_USER)
+        user_dao = UserDao(use_cache_db=use_cache_db, 
+                           database_code=database_code, 
+                           schema_name=schema_name)
         create_and_assign_roles_wo = create_and_assign_roles.with_options(
             on_failure=[partial(drop_schema_hook,
                                 **dict(schema_dao=schema_dao))])
         create_and_assign_roles_wo(
-            user_dao, tenant_configs, data_model, dialect, count)
+            user_dao, data_model, dialect, count)
 
         if data_model in OMOP_DATA_MODELS:
             cdm_version = DATAMODEL_CDM_VERSION.get(data_model)
@@ -132,7 +136,8 @@ def create_schema_tasks(dialect: str,
         raise e
 
 
-def update_datamodel(flow_action_type: str,
+def update_datamodel(use_cache_db: bool,
+                     flow_action_type: str,
                      database_code: str,
                      data_model: str,
                      schema_name: str,
@@ -142,12 +147,14 @@ def update_datamodel(flow_action_type: str,
                      dialect: str):
 
     logger = get_run_logger()
+
+    schema_dao = DBDao(use_cache_db=use_cache_db, 
+                        database_code=database_code, 
+                        schema_name=schema_name
+                        )
     
-    dbutils = DBUtils(database_code)
-    tenant_configs = dbutils.extract_database_credentials()
+    tenant_configs = schema_dao.tenant_configs
 
-
-    schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
     
     match flow_action_type:
         case UpdateFlowActionType.UPDATE:
@@ -195,7 +202,8 @@ def update_datamodel(flow_action_type: str,
         raise e
 
 
-def rollback_count_task(database_code: str,
+def rollback_count_task(use_cache_db: bool,
+                        database_code: str,
                         data_model: str,
                         schema_name: str,
                         vocab_schema: str,
@@ -204,8 +212,13 @@ def rollback_count_task(database_code: str,
                         dialect: str,
                         rollback_count: int):
 
-    dbutils = DBUtils(database_code)
-    tenant_configs = dbutils.extract_database_credentials()
+    schema_dao = DBDao(use_cache_db=use_cache_db, 
+                        database_code=database_code, 
+                        schema_name=schema_name
+                        )
+    
+    tenant_configs = schema_dao.tenant_configs
+
 
     try:
         rollback_count_wo = run_liquibase_update_task.with_options(
@@ -229,7 +242,8 @@ def rollback_count_task(database_code: str,
         raise e
 
 
-def rollback_tag_task(database_code: str,
+def rollback_tag_task(use_cache_db: bool,
+                      database_code: str,
                       data_model: str,
                       schema_name: str,
                       vocab_schema: str,
@@ -238,8 +252,12 @@ def rollback_tag_task(database_code: str,
                       dialect: str,
                       rollback_tag: str):
 
-    dbutils = DBUtils(database_code)
-    tenant_configs = dbutils.extract_database_credentials()
+    schema_dao = DBDao(use_cache_db=use_cache_db, 
+                        database_code=database_code, 
+                        schema_name=schema_name
+                        )
+    
+    tenant_configs = schema_dao.tenant_configs
 
     try:
         rollback_tag_wo = run_liquibase_update_task.with_options(
@@ -282,11 +300,10 @@ def enable_and_create_audit_policies(schema_dao: DBDao):
 
 
 @task(log_prints=True)
-def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType,
-                            data_model: str, dialect: str, count: int = 0):
+def create_and_assign_roles(userdao: UserDao, data_model: str, dialect: str, count: int = 0):
     logger = get_run_logger()
+    
     # Check if schema read role exists
-
     match dialect:
         case DatabaseDialects.HANA:
             schema_read_role = f"{userdao.schema_name}_READ_ROLE"
@@ -299,42 +316,39 @@ def create_and_assign_roles(userdao: UserDao, tenant_configs: DBCredentialsType,
     else:
         logger.info(f"{schema_read_role} does not exist")
         userdao.create_read_role(schema_read_role)
+
     # grant schema read role read privileges to schema
     logger.info(f"Granting read privileges to '{schema_read_role}'")
     userdao.grant_read_privileges(schema_read_role)
 
     # Check if read user exists
-    read_user = tenant_configs.get("readUser")
-
-    read_user_exists = userdao.check_user_exists(read_user)
+    read_user_exists = userdao.check_user_exists(userdao.read_user)
     if read_user_exists:
-        logger.info(f"{read_user} user already exists")
+        logger.info(f"{userdao.read_user} user already exists")
     else:
-        logger.info(f"{read_user} user does not exist")
-        read_password = tenant_configs.get("readPassword")
-        logger.info(f"Creating user '{read_user}'")
-        userdao.create_user(read_user, read_password)
+        logger.info(f"{userdao.read_user} user does not exist")
+        logger.info(f"Creating user '{userdao.read_user}'")
+        userdao.create_user(userdao.read_user)
 
     # Check if read role exists
-    read_role = tenant_configs.get("readRole")
-
-    read_role_exists = userdao.check_role_exists(read_role)
+    read_role_exists = userdao.check_role_exists(userdao.read_role)
     if read_role_exists:
-        logger.info(f"'{read_role}' role already exists")
+        logger.info(f"'{userdao.read_role}' role already exists")
     else:
-        logger.info(f"'{read_role}' role does not exist")
+        logger.info(f"'{userdao.read_role}' role does not exist")
         logger.info(
-            f"'Creating '{read_role}' role and assigning to '{read_user}' user")
-        userdao.create_and_assign_role(read_user, read_role)
+            f"'Creating '{userdao.read_role}' role and assigning to '{userdao.read_user}' user")
+        userdao.create_and_assign_role(userdao.read_user, userdao.read_role)
+
 
     # Grant read role read privileges
-    logger.info(f"'Granting read privileges to '{read_role}' role")
-    userdao.grant_read_privileges(read_role)
+    logger.info(f"'Granting read privileges to '{userdao.read_role}' role")
+    userdao.grant_read_privileges(userdao.read_role)
 
     if data_model in OMOP_DATA_MODELS and count == 0:
         # Grant write cohort and cohort_definition table privileges to read role
-        logger.info(f"'Granting cohort write privileges to '{read_role}' role")
-        userdao.grant_cohort_write_privileges(read_role)
+        logger.info(f"'Granting cohort write privileges to '{userdao.read_role}' role")
+        userdao.grant_cohort_write_privileges(userdao.read_role)
 
 
 @task(log_prints=True)
@@ -381,7 +395,8 @@ def update_cdm_version(schema_dao: DBDao, cdm_version: str):
     schema_dao.update_cdm_version(cdm_version)
     get_run_logger().info(f"Successfully updated cdm version '{cdm_version}' for '{schema_dao.schema_name}.cdm_source' table..")
 
-def create_cdm_schema_tasks(database_code: str,
+def create_cdm_schema_tasks(use_cache_db: bool,
+                            database_code: str,
                             data_model: str,
                             schema_name: str,
                             vocab_schema: str,
