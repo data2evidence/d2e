@@ -6,14 +6,13 @@
 import esbuild from 'esbuild';
 import pkg from 'glob';
 const { glob } = pkg;
-import botLayer from '@medplum/bot-layer/package.json' assert { type: 'json' };
+// import botLayer from '@medplum/bot-layer/package.json' assert { type: 'json' };
 import packageJson from './package.json' assert { type: 'json' };
-
 // Find all TypeScript files in your source directory
 const entryPoints = glob.sync('./src/bots/**/*.ts').filter((file) => !file.endsWith('test.ts'));
 
 const botLayerDeps = [
-  ...Object.keys(botLayer.dependencies),
+  // ...Object.keys(botLayer.dependencies),
   ...Object.keys(packageJson.dependencies),
   ...Object.keys(packageJson.devDependencies || {})
 ]
