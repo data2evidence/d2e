@@ -125,7 +125,6 @@ function updateEnv(service: string, databaseCredentials: any) {
         appendEnv(svcPostgres, "PG__TENANT_CONFIGS", generatedFileName);
         break;
       }
-      }
       default:
         console.log(`Service ${service} is not valid`);
         process.exit(1);
