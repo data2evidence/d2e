@@ -42,7 +42,9 @@ def hana_to_postgres(table_name: str) -> str:
 
 def get_db_dialect(options):
     if options.flow_name in InternalPluginType.values():
-        return DBUtils(options.database_code).get_database_dialect()
+        return DBUtils(use_cache_db=options.use_cache_db,
+                       database_code=options.database_code
+                       ).get_database_dialect()
     else:
         return options.dialect
 

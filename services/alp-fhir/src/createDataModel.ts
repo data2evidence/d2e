@@ -5,7 +5,7 @@ const schemaPath = `${env.FHIR_SCHEMA_PATH}/${env.FHIR_SCHEMA_FILE_NAME}`
 export async function readJsonFileAndCreateDuckdbTables(){
     let duckdb = new DuckdbConnection()
     try{
-        await duckdb.createConnection('/home/docker/alp-data-node/app/src/duckdb');
+        await duckdb.createConnection();
         const result = await duckdb.executeQuery(`select * from read_json('${schemaPath}')`)
         const fhirResources = result[0].discriminator.mapping
         const duckdbDataTypes = convertFhirDataTypesToDuckdb(result[0])

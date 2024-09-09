@@ -12,6 +12,8 @@ volumes:
   pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
+  fhir-schema-file-1:
+  fhir-duckdb-1:
   dind-certs:
   fhir-schema-file-1:
   fhir-duckdb-1:
@@ -406,6 +408,7 @@ services:
     environment:
       <<:
         - *x-converter
+        - *cachedb
         - *x-dbsvc
         - *x-minio
         - *x-pg
@@ -477,6 +480,7 @@ services:
     environment:
       <<:
         - *x-converter
+        - *cachedb
         - *x-pg
         - *x-dbsvc
         - *x-minio
@@ -506,6 +510,7 @@ services:
       TERMINOLOGY_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/terminology/
       OHDSI__R_COHORT_DIAGNOSTICS_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortDiagnosticsModule/v0.2.0/SettingsFunctions.R
       OHDSI__R_COHORT_GENERATOR_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortGeneratorModule/v0.3.0/SettingsFunctions.R
+      STRATEGUS__KEYRING_PASSWORD: ${STRATEGUS__KEYRING_PASSWORD}
 
   alp-dataflow-gen-init:
     command:
@@ -651,10 +656,9 @@ services:
         priority: 20
     volumes:
       - fhir-schema-file-1:/home/docker/alp-data-node/app/src/r4
-      - fhir-duckdb-1:/home/docker/alp-data-node/app/src/duckdb
+      #- fhir-duckdb-1:/home/docker/alp-data-node/app/src/duckdb
     entrypoint: yarn build-and-seed
-    #entrypoint: tail -f /dev/null
-    environment:
+    environment: 
       <<:
         - *x-pg
         - *x-fhir

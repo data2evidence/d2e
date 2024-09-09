@@ -1,13 +1,11 @@
 import { Connection, Database } from "duckdb-async";
-// import { env } from '../env'
-
 export class DuckdbConnection{
     private connection: Connection;
     constructor(){}
-    public async createConnection(duckdbPath){
+    public async createConnection(){
         try{
             const duckdDB = await Database.create(
-                `${duckdbPath}/cdmdefault.duckdb`
+                `${process.env.DUCKDB_PATH}/cdmdefault.duckdb`
             );
             this.connection = await duckdDB.connect();
         }catch(err){
