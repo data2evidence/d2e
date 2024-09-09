@@ -35,6 +35,7 @@ COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/pysrc pysrc
 
 COPY --chown=docker:docker ./services/alp-dataflow-gen/init.py .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/init.sh .
+COPY --chown=docker:docker ./services/alp-dataflow-gen/init.R .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/startprefectagent.sh .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/startprefectserver.sh  .
 COPY --chown=docker:docker ./services/alp-dataflow-gen/postgresql-42.3.1.jar ./inst/drivers/
