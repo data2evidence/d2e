@@ -502,6 +502,7 @@ services:
       TERMINOLOGY_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/terminology/
       OHDSI__R_COHORT_DIAGNOSTICS_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortDiagnosticsModule/v0.2.0/SettingsFunctions.R
       OHDSI__R_COHORT_GENERATOR_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortGeneratorModule/v0.3.0/SettingsFunctions.R
+      STRATEGUS__KEYRING_PASSWORD: ${STRATEGUS__KEYRING_PASSWORD}
 
   alp-dataflow-gen-init:
     command:
