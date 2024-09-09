@@ -15,8 +15,6 @@ volumes:
   fhir-schema-file-1:
   fhir-duckdb-1:
   dind-certs:
-  fhir-schema-file-1:
-  fhir-duckdb-1:
 
 x-envs:
   db-svc: &x-dbsvc

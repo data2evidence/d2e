@@ -5,7 +5,7 @@ const schemaPath = process.env.FHIR_SCHEMA_PATH+ "/" + process.env.FHIR_SCHEMA_F
 export async function createResourceInFhir(data){
     let duckdb = new DuckdbConnection()
     try{
-        await duckdb.createConnection(process.env.DUCKDB_PATH);
+        await duckdb.createConnection();
         const result = await duckdb.executeQuery(`select * from read_json('${schemaPath}')`)
         const parsedFhirDefinitions = getFhirTableStructure(result[0], data.resourceType)
         const insertStatement = getInsertStatement(data, parsedFhirDefinitions)
