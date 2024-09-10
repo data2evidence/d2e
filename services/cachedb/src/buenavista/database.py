@@ -174,10 +174,7 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
 
             # Attach direct postgres connection, this is used by analytics-svc for cohort/cohort_definition table queries where it requires direct connection to postgres.
             if database_code in clients[DatabaseDialects.POSTGRES]:
-                print("Attaching postgres as direct connection ")
-                conn_details = extract_db_credentials(database_code)
-                db.execute(
-                    f"ATTACH 'host={conn_details['host']} port={conn_details['port']} dbname={conn_details['databaseName']} user={conn_details['user']} password={conn_details['password']}' AS direct_db_conn (TYPE postgres, READ_ONLY)")
+                _attach_direct_postgres_connection_for_duckdb(db, database_code)
 
             connection = DuckDBConnection(db)
         else:
@@ -194,6 +191,14 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
         # If no connection can be found
         raise Exception(
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
+    
+
+def _attach_direct_postgres_connection_for_duckdb(db:duckdb.DuckDBPyConnection, database_code: str):
+    print("Attaching postgres as direct connection ")
+    conn_details = extract_db_credentials(database_code)
+    db.execute(
+        f"ATTACH 'host={conn_details['host']} port={conn_details['port']} dbname={conn_details['databaseName']} user={conn_details['user']} password={conn_details['password']}' AS direct_db_conn (TYPE postgres, READ_ONLY)")
+
 
 
 def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:
