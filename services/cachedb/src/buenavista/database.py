@@ -163,18 +163,9 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
             Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
 
         # Only when both duckdb files for cdm schema and vocab schema exist, connect to duckdb
-        if os.path.isfile(cdm_schema_duckdb_file_path) and os.path.isfile(vocab_schema_duckdb_file_path):
-
-            # In order for FTS to work, vocab schema cannot be using ATTACH
-            # TODO: Revert back to using _get_duckdb_connection after issue has been fixed
-            # https://github.com/duckdb/duckdb/issues/13523
-            connection = _temp_workaround_get_duckdb_connection(
-                cdm_schema_duckdb_file_path, schema, vocab_schema_duckdb_file_path)
-
-            '''
+        if os.path.isfile(cdm_schema_duckdb_file_path) and os.path.isfile(vocab_schema_duckdb_file_path):            
             connection = _get_duckdb_connection(
                 cdm_schema_duckdb_file_path, schema, vocab_schema_duckdb_file_path, vocab_schema)
-            '''
         else:
             # Fallback connection to postgres
             logger.warn(
@@ -199,30 +190,11 @@ def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_
     # Attach vocab schema
     db.execute(
         f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
-    connection = DuckDBConnection(db)
-
-
-def _temp_workaround_get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_schema_duckdb_file_path: str) -> DuckDBConnection:
-    '''
-    Temp workaround function to get duckdb connection due to issue with duckdb FTS.
-    Refer to ticket issue below.
-    https://github.com/duckdb/duckdb/issues/13523
-    '''
-
-    # Attach vocab schema
-    db = duckdb.connect(vocab_schema_duckdb_file_path, read_only=True)
-    try:
-        # Attach cdm schema
-        db.execute(
-            f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
-    except Exception as err:
-        if type(err) == duckdb.duckdb.BinderException and str(err).startswith("Binder Error: Unique file handle conflict: Database"):
-            logger.warn(
-                f"Ignoring error due to unique file handle conflict for {vocab_schema_duckdb_file_path} and {cdm_schema_duckdb_file_path} ")
-        else:
-            raise err
-
-    return DuckDBConnection(db)
+    
+    # In order for FTS to work, vocab schema has to be passed into DuckDBConnection
+    # TODO: To remove vocab_schema as an input parameter after issue has been fixed
+    # https://github.com/duckdb/duckdb/issues/13523
+    return DuckDBConnection(db, vocab_schema)
 
 
 def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:
