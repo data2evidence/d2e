@@ -193,7 +193,7 @@ export const translateHanaToPostgres = (temp: string, schemaName: string, vocabS
 export const translateHanaToDuckdb = (temp: string, schemaName: string, vocabSchemaName: string): string => {
   temp = hanaCommonTranslation(temp, schemaName, vocabSchemaName);
   
-  temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, `direct_db_conn.${schemaName}.`); // Used when using cachedb connection connecting to duckdb, but requires direct connection to database instead.
+  temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, `direct_db_conn.${schemaName}.`); // Used when using cachedb connection connecting to duckdb, but additionally requires direct connection to database schema
 
   temp = temp.replace(/DAYS_BETWEEN \(/gi, `date_diff ('day', `);
   temp = temp.replace(
