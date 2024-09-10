@@ -112,4 +112,12 @@ export class FhirAPI {
     async validateResouce(resource: Resource){
         return await this.medplumClient.validateResource(resource)
     }
+
+    async updateResource(resource: Resource){
+        return await this.medplumClient.updateResource(resource)
+    }
+
+    async getResource(query: string){
+        return await this.medplumClient.searchOne('Project', query=query)
+    }
 }
