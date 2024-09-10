@@ -27462,7 +27462,7 @@ const cdwConfigDuckdb = {
       "@RESPONSE.START": "\"AUTHORED\"",
       "@RESPONSE.END": "\"AUTHORED\"",
       "@RESPONSE.INTERACTION_TYPE": "\"VALUE_TYPE\"",
-      "@COHORT": "$$SCHEMA$$.cohort",
+      "@COHORT": "$$SCHEMA_DIRECT_CONN$$.cohort",
       "@COHORT.PATIENT_ID": "\"subject_id\"",
       "@COHORT.INTERACTION_ID": "\"cohort_definition_id\"",
       "@COHORT.CONDITION_ID": "\"cohort_definition_id\"",
