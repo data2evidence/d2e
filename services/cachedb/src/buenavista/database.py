@@ -163,9 +163,18 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
             Env.DUCKDB__DATA_FOLDER, f"{database_code}_{vocab_schema}")
 
         # Only when both duckdb files for cdm schema and vocab schema exist, connect to duckdb
-        if os.path.isfile(cdm_schema_duckdb_file_path) and os.path.isfile(vocab_schema_duckdb_file_path):            
-            connection = _get_duckdb_connection(
+        if os.path.isfile(cdm_schema_duckdb_file_path) and os.path.isfile(vocab_schema_duckdb_file_path):
+            db = _get_duckdb_connection(
                 cdm_schema_duckdb_file_path, schema, vocab_schema_duckdb_file_path, vocab_schema)
+            
+            # Attach direct postgres connection, this is used by analytics-svc for cohort/cohort_definition table queries where it requires direct connection to postgres.
+            if database_code in clients[DatabaseDialects.POSTGRES]:
+                _attach_direct_postgres_connection_for_duckdb(db, database_code)
+
+            # In order for FTS to work, vocab schema has to be passed into DuckDBConnection
+            # TODO: To remove vocab_schema as an input parameter after issue has been fixed
+            # https://github.com/duckdb/duckdb/issues/13523
+            connection = DuckDBConnection(db, vocab_schema)
         else:
             # Fallback connection to postgres
             logger.warn(
@@ -180,9 +189,20 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
         # If no connection can be found
         raise Exception(
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
+    
+
+def _attach_direct_postgres_connection_for_duckdb(db: duckdb.DuckDBPyConnection, database_code: str):
+    print("Attaching postgres as direct connection ")
+    conn_details = extract_db_credentials(database_code)
+    db.execute(
+        f"ATTACH 'host={conn_details['host']} port={conn_details['port']} dbname={conn_details['databaseName']} user={conn_details['user']} password={conn_details['password']}' AS direct_db_conn (TYPE postgres, READ_ONLY)")
 
 
-def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_schema_duckdb_file_path: str, vocab_schema: str) -> DuckDBConnection:
+
+def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_schema_duckdb_file_path: str, vocab_schema: str) -> duckdb.DuckDBPyConnection:
+    '''
+    Get duckdb connection with both cdm and vocab schema attached
+    '''
     db = duckdb.connect()
     # Attach cdm schema
     db.execute(
@@ -190,11 +210,7 @@ def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_
     # Attach vocab schema
     db.execute(
         f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
-    
-    # In order for FTS to work, vocab schema has to be passed into DuckDBConnection
-    # TODO: To remove vocab_schema as an input parameter after issue has been fixed
-    # https://github.com/duckdb/duckdb/issues/13523
-    return DuckDBConnection(db, vocab_schema)
+    return db
 
 
 def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:

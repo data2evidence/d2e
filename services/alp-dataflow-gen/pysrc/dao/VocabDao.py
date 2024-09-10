@@ -8,12 +8,19 @@ from utils.types import UserType
 from utils.DBUtils import DBUtils
 
 
-class VocabDao:
-    def __init__(self, database_code, schema_name):
-        dbutils = DBUtils(database_code)
-        self.engine = dbutils.create_database_engine(UserType.READ_USER)
+class VocabDao(DBUtils):
+    def __init__(self, use_cache_db: bool, database_code: str, schema_name: str):
+        super().__init__(use_cache_db=use_cache_db, database_code=database_code)
         self.schema_name = schema_name
-        self.metadata = MetaData(schema=schema_name)
+        self.db_dialect = self.get_database_dialect()
+        
+        if self.use_cache_db:
+            self.engine = self.create_database_engine(schema_name=self.schema_name)
+        else:
+            self.engine = self.create_database_engine(user_type=UserType.ADMIN_USER)
+
+        self.metadata = MetaData(schema_name)  # sql.MetaData()
+
 
     def get_stream_connection(self, yield_per: int) -> Connection:
         return self.engine.connect().execution_options(yield_per=yield_per)
