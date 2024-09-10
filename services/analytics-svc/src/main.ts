@@ -7,7 +7,6 @@ import {
     QueryObject,
     EnvVarUtils,
     healthCheckMiddleware,
-    Constants,
     User,
     utils,
     Connection,
@@ -30,9 +29,8 @@ import studyDbCredentialMiddleware from "./middleware/StudyDbCredential";
 import { MriConfigConnection } from "@alp/alp-config-utils";
 import { StudiesDbMetadata, StudyDbMetadata, IMRIRequest } from "./types";
 import PortalServerAPI from "./api/PortalServerAPI";
-import { CachedbDBConnectionUtil } from "./utils/cachedb/CachedbDBConnectionUtil";
 import { getDuckdbDBConnection } from "./utils/DuckdbConnection";
-import { getCachedbDatabaseFormatProtocolA } from "./utils/cachedb/helper";
+import { getCachedbDbConnections } from "./utils/cachedb/helper";
 import { DB } from "./utils/DBSvcConfig";
 import { env } from "./env";
 dotenv.config();
@@ -578,52 +576,6 @@ const getDBConnections = async ({
         analyticsConnection,
     };
 };
-
-const getCachedbDbConnections = async ({
-    analyticsCredentials,
-    userObj,
-    token,
-    studyId,
-}): Promise<{
-    analyticsConnection: Connection.ConnectionInterface;
-}> => {
-    // Define defaults for both analytics & Vocab connections
-    let analyticsConnectionPromise;
-
-    let cachedbDatabase = getCachedbDatabaseFormatProtocolA(
-        analyticsCredentials.dialect,
-        studyId
-    );
-    // IF use duckdb is true change dialect from postgres -> duckdb
-    if (env.USE_DUCKDB === "true" && analyticsCredentials.dialect !== DB.HANA) {
-        cachedbDatabase = cachedbDatabase.replace(
-            analyticsCredentials.dialect,
-            "duckdb"
-        );
-    }
-
-    // Overwrite analyticsCrendential values to connect to cachedb
-    analyticsCredentials.host = env.CACHEDB__HOST;
-    analyticsCredentials.port = env.CACHEDB__PORT;
-    analyticsCredentials.database = cachedbDatabase;
-    analyticsCredentials.user = token;
-
-    analyticsConnectionPromise = CachedbDBConnectionUtil.getDBConnection({
-        credentials: analyticsCredentials,
-        schemaName: analyticsCredentials.schema,
-        vocabSchemaName: analyticsCredentials.vocabSchema,
-        userObj,
-    });
-
-    const [analyticsConnection] = await Promise.all([
-        analyticsConnectionPromise,
-    ]);
-
-    return {
-        analyticsConnection,
-    };
-};
-
 const main = async () => {
     /**
      * Handle Environment Variables
