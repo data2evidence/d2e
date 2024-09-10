@@ -76,7 +76,7 @@ export class ConceptService {
         Number(rowsPerPage),
         datasetId,
         searchText,
-        `${databaseCode}_${vocabSchemaName}`,
+        vocabSchemaName,
         completeFilters,
       );
     }
@@ -215,9 +215,7 @@ export class ConceptService {
       // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
       if (env.USE_DUCKDB_FTS) {
         return await this.cachedbService.getTerminologyDetailsWithRelationships(
-          databaseCode,
           vocabSchemaName,
-          dialect,
           conceptId,
           datasetId,
         );
@@ -430,7 +428,7 @@ export class ConceptService {
         logger.info('Searching concept filters with Duckdb FTS');
         const filterOptions =
           await this.cachedbService.getConceptFilterOptionsFaceted(
-            `${databaseCode}_${vocabSchemaName}`,
+            vocabSchemaName,
             datasetId,
             searchText,
             filters,

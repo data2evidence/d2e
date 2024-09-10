@@ -34,7 +34,7 @@ export class CachedbService {
     rowsPerPage: number,
     datasetId: string,
     searchText = '',
-    vocab_file_name: string,
+    vocabSchemaName: string,
     filters: Filters,
   ) {
     try {
@@ -43,7 +43,7 @@ export class CachedbService {
         pageNumber,
         Number(rowsPerPage),
         searchText,
-        vocab_file_name,
+        vocabSchemaName,
         filters,
       );
       return this.duckdbResultMapping(result);
@@ -53,7 +53,7 @@ export class CachedbService {
   }
 
   async getConceptFilterOptionsFaceted(
-    vocab_file_name: string,
+    vocabSchemaName: string,
     datasetId: string,
     searchText: string,
     filters: Filters,
@@ -68,29 +68,26 @@ export class CachedbService {
 
     const cachedbDao = new CachedbDAO(this.token, datasetId);
     return cachedbDao.getConceptFilterOptionsFaceted(
-      vocab_file_name,
+      vocabSchemaName,
       searchText,
       filters,
     );
   }
 
   async getTerminologyDetailsWithRelationships(
-    databaseCode: string,
     vocabSchemaName: string,
-    dialect: string,
     conceptId: number,
     datasetId: string,
   ) {
     this.logger.info('Get list of concept details and connections');
     try {
       const searchConcepts1: number[] = [conceptId];
-      const vocab_file_name = `${databaseCode}_${vocabSchemaName}`;
 
       const cachedbDao = new CachedbDAO(this.token, datasetId);
       const DuckdbResultConcept1: any =
         await cachedbDao.getMultipleExactConcepts(
           searchConcepts1,
-          vocab_file_name,
+          vocabSchemaName,
           true,
         );
 
@@ -104,13 +101,13 @@ export class CachedbService {
         const fhirTargetElements: FhirConceptMapElementTarget[] = [];
         const conceptRelations = await cachedbDao.getConceptRelationships(
           detailsC1.conceptId,
-          vocab_file_name,
+          vocabSchemaName,
         );
 
         for (let i = 0; i < conceptRelations.hits.length; i++) {
           const relationships = await cachedbDao.getRelationships(
             conceptRelations.hits[i].relationship_id,
-            vocab_file_name,
+            vocabSchemaName,
           );
           const searchConcepts2: number[] = [
             conceptRelations.hits[i].concept_id_2,
@@ -118,7 +115,7 @@ export class CachedbService {
           const DuckdbResultConcept2: any =
             await cachedbDao.getMultipleExactConcepts(
               searchConcepts2,
-              vocab_file_name,
+              vocabSchemaName,
               true,
             );
           const conceptC2: FhirValueSet =
@@ -134,7 +131,7 @@ export class CachedbService {
           const DuckdbResultConcept3: any =
             await cachedbDao.getMultipleExactConcepts(
               searchConcepts3,
-              vocab_file_name,
+              vocabSchemaName,
               true,
             );
           const conceptC3: FhirValueSet =

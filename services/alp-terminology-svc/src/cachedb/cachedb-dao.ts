@@ -21,13 +21,13 @@ export class CachedbDAO {
     pageNumber = 0,
     rowsPerPage: number,
     searchText = '',
-    vocab_file_name: string,
+    vocabSchemaName: string,
     filters: Filters,
   ) {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const [duckdbFtsBaseQuery, duckdbFtsBaseQueryParams] =
-        this.getDuckdbFtsBaseQuery(vocab_file_name, searchText, filters);
+        this.getDuckdbFtsBaseQuery(vocabSchemaName, searchText, filters);
       const conceptsSql = `
       ${duckdbFtsBaseQuery}
       select *
@@ -62,7 +62,7 @@ export class CachedbDAO {
 
   async getMultipleExactConcepts(
     searchTexts: number[],
-    vocab_file_name: string,
+    vocabSchemaName: string,
     includeInvalid = true,
   ) {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
@@ -79,7 +79,7 @@ export class CachedbDAO {
 
       const sql = `
         select *
-        from ${vocab_file_name}.concept
+        from ${vocabSchemaName}.concept
         WHERE 
         ${searchTextWhereclause}
         ${invalidReasonWhereClause}
@@ -99,7 +99,7 @@ export class CachedbDAO {
   }
 
   async getConceptFilterOptionsFaceted(
-    vocab_file_name: string,
+    vocabSchemaName: string,
     searchText: string,
     filters: Filters,
   ): Promise<any> {
@@ -147,7 +147,7 @@ export class CachedbDAO {
       const facetPromises = Object.values(facetColumns).map(
         (column: string) => {
           const [duckdbFtsBaseQuery, duckdbFtsBaseQueryParams] =
-            this.getDuckdbFtsBaseQuery(vocab_file_name, searchText, filters, [
+            this.getDuckdbFtsBaseQuery(vocabSchemaName, searchText, filters, [
               column,
             ]);
           let facetSql;
@@ -216,7 +216,7 @@ export class CachedbDAO {
   }
 
   private getDuckdbFtsBaseQuery = (
-    duckdb_file_name: string,
+    vocabSchemaName: string,
     searchText: string,
     filters: Filters,
     columns: string[] = [],
@@ -232,7 +232,7 @@ export class CachedbDAO {
         select
           ${columnsToSelect}
         from
-          ${duckdb_file_name}.concept
+          ${vocabSchemaName}.concept
           ${filterWhereClause}
         )
       `,
@@ -247,9 +247,9 @@ export class CachedbDAO {
       with fts as (
         select
           ${columnsToSelect},
-          ${duckdb_file_name}.fts_main_concept.match_bm25(concept_id, ?) as score
+          ${vocabSchemaName}.fts_main_concept.match_bm25(concept_id, ?) as score
         from
-          ${duckdb_file_name}.concept
+          ${vocabSchemaName}.concept
           ${duckdbFtsWhereClause} 
           order by score desc
         )
@@ -302,13 +302,13 @@ export class CachedbDAO {
 
   async getConceptRelationships(
     conceptId: number,
-    vocab_file_name: string,
+    vocabSchemaName: string,
   ): Promise<any> {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const sql = `
       select *
-          from ${vocab_file_name}.concept_relationship
+          from ${vocabSchemaName}.concept_relationship
           WHERE ${INDEX_ATTRIBUTES.concept_relationship.conceptId1}=$1
           `;
       const result = await client.query(sql, [conceptId]);
@@ -327,13 +327,13 @@ export class CachedbDAO {
 
   async getRelationships(
     relationshipId: number,
-    vocab_file_name: string,
+    vocabSchemaName: string,
   ): Promise<any> {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const sql = `
       select *
-          from ${vocab_file_name}.relationship
+          from ${vocabSchemaName}.relationship
           WHERE ${INDEX_ATTRIBUTES.relationship.relationshipId}=$1
           `;
       const result = await client.query(sql, [relationshipId]);
