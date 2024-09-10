@@ -86,6 +86,7 @@ export class DatasetRouter {
         databaseCode,
         schemaName,
         dataModel: dataModelName,
+        dataModelCustom,
         paConfigId,
         visibilityStatus,
         detail,
@@ -116,7 +117,7 @@ export class DatasetRouter {
         const vocabSchema = vocabSchemaValue ? vocabSchemaValue : schemaName
 
         // Create CDM & Custom schemas with Optional Cleansed Schema
-        if (schemaOption != CDMSchemaTypes.NoCDM && schemaName) {
+        if (schemaOption != CDMSchemaTypes.NoCDM && schemaName && !dataModelCustom) {
           if (schemaOption == CDMSchemaTypes.CreateCDM || schemaOption == CDMSchemaTypes.CustomCDM) {
             try {
               this.logger.info(
@@ -162,6 +163,7 @@ export class DatasetRouter {
           schemaName,
           vocabSchemaName: vocabSchema,
           dataModel: dataModelName,
+          dataModelCustom,
           tenantId,
           paConfigId,
           visibilityStatus,
