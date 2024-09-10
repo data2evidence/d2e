@@ -15,5 +15,5 @@ This command starts perseus along with the alp services.
 yarn start:minerva:perseus
 ```
 
-- open `localhost:41000` to access the portal
+- open `localhost:41100` to access the portal
 - navigate to the admin page and click the `ETL` tab 
