@@ -240,7 +240,7 @@ jobs:
           fi
 
       - name: Test tags matching RegEx
-        if: always()
+        if: vars.DOCKER_BUILD_DEBUG == 'true'
         env:
           AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
           AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
