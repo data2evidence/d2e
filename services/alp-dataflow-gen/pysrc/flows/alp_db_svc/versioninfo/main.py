@@ -1,10 +1,6 @@
 import json
 from datetime import datetime
-from typing import List, Dict
 from prefect import task, get_run_logger
-
-from utils.types import UserType
-from utils.DBUtils import DBUtils
 
 from flows.alp_db_svc.liquibase.main import Liquibase
 from flows.alp_db_svc.const import OMOP_DATA_MODELS, NON_PERSON_ENTITIES, _check_table_case
@@ -17,10 +13,11 @@ from dao.DBDao import DBDao
 from api.PortalServerAPI import PortalServerAPI
 
 
-def get_version_info_task(changelog_filepath_list: Dict,
+def get_version_info_task(use_cache_db: bool,
+                          changelog_filepath_list: dict,
                           plugin_classpath: str,
                           token: str,
-                          dataset_list: List[PortalDatasetType]):
+                          dataset_list: list[PortalDatasetType]):
     logger = get_run_logger()
     if (dataset_list is None) or (len(dataset_list) == 0):
         logger.debug("No datasets fetched from portal")
@@ -31,12 +28,11 @@ def get_version_info_task(changelog_filepath_list: Dict,
         dataset_schema_list = extract_db_schema(dataset_list)
 
         for dataset in dataset_schema_list["datasets_with_schema"]:
-            get_and_update_attributes(
-                dataset, token, changelog_filepath_list, plugin_classpath)
+            get_and_update_attributes(use_cache_db, dataset, token, changelog_filepath_list, plugin_classpath)
 
 
 @task
-def extract_db_schema(dataset_list: List[PortalDatasetType]) -> ExtractDatasetSchemaType:
+def extract_db_schema(dataset_list: list[PortalDatasetType]) -> ExtractDatasetSchemaType:
     datasets_with_schema = []
     datasets_without_schema = []
     for _dataset in dataset_list:
@@ -56,9 +52,10 @@ def extract_db_schema(dataset_list: List[PortalDatasetType]) -> ExtractDatasetSc
 
 
 @task
-def get_and_update_attributes(dataset: PortalDatasetType,
+def get_and_update_attributes(use_cache_db: bool,
+                              dataset: PortalDatasetType,
                               token: str,
-                              changelog_filepath_list: Dict,
+                              changelog_filepath_list: dict,
                               plugin_classpath: str
                               ):
     logger = get_run_logger()
@@ -72,7 +69,9 @@ def get_and_update_attributes(dataset: PortalDatasetType,
 
     try:
         # handle case of wrong db credentials
-        dataset_dao = DBDao(database_code, schema_name, UserType.READ_USER)
+        dataset_dao = DBDao(use_cache_db=use_cache_db, 
+                            database_code=database_code, 
+                            schema_name=schema_name)
     except Exception as e:
         logger.error(f"Failed to connect to database")
         raise e
@@ -192,11 +191,9 @@ def get_and_update_attributes(dataset: PortalDatasetType,
 
             try:
                 # update with latest version or error msg
-                dbutils = DBUtils(database_code)
-                db_dialect = dbutils.get_database_dialect()
-                tenant_configs = dbutils.extract_database_credentials()
+                tenant_configs = dataset_dao.tenant_configs
 
-                latest_available_schema_version = get_latest_available_version(dialect=db_dialect,
+                latest_available_schema_version = get_latest_available_version(dialect=dataset_dao.db_dialect,
                                                                                data_model=data_model,
                                                                                changelog_file=changelog_file,
                                                                                schema_name=schema_name,
@@ -270,7 +267,7 @@ def get_patient_count(dao_obj: DBDao, is_lower_case: bool) -> str:
     return str(patient_count)
 
 
-def get_total_entity_count(entity_count_distribution: Dict) -> str:
+def get_total_entity_count(entity_count_distribution: dict) -> str:
     try:
         total_entity_count = 0
         for entity, entity_count in entity_count_distribution.items():

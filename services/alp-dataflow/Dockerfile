@@ -1,4 +1,4 @@
-ARG IMAGE=node:18.14.0-alpine
+ARG IMAGE=node:18.20.4-alpine
 
 FROM $IMAGE AS node_python
 RUN apk add --no-cache python3 py3-pip

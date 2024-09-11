@@ -15,7 +15,7 @@
     "keywords": [],
     "author": "",
     "engines": {
-        "node": ">=18.14.0"
+        "node": ">=18.20.4"
     },
     "repository": {
         "type": "git",

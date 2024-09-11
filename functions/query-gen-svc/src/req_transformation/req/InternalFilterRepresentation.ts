@@ -1,10 +1,25 @@
-import {Request} from "./RequestFactory";
-import {ParserContainer, FilterNode, BaseNode, TemporalQueryNode, Expression, TemporalQueryExpression, And, Or, Filter} from "../def/ParserContainer";
-import {IFRFilter, Expression as IFRExpression, FilterCard, ExcludeFilterCard} from "./IFR/IFRDeserialize";
+import { Request } from "./RequestFactory";
+import {
+    ParserContainer,
+    FilterNode,
+    BaseNode,
+    TemporalQueryNode,
+    Expression,
+    TemporalQueryExpression,
+    And,
+    Or,
+    Filter,
+} from "../def/ParserContainer";
+import {
+    IFRFilter,
+    Expression as IFRExpression,
+    FilterCard,
+    ExcludeFilterCard,
+} from "./IFR/IFRDeserialize";
 
 import * as Keys from "../keys";
-import {FastUtil} from "../fast_util";
-import {Config} from "../../qe/qe_config_interface/Config";
+import { FastUtil } from "../fast_util";
+import { Config } from "../../qe/qe_config_interface/Config";
 
 export class InternalFilterRepresentation implements Request {
     public censoringThreshold: string;
@@ -19,9 +34,13 @@ export class InternalFilterRepresentation implements Request {
     }
 
     public buildDefaultOrderByList(c: ParserContainer, axis: string = "x") {
-        c.orderBy = (<any[]> FastUtil.deepClone(axis === "x" ? c.groupBy : c.measure))
-                                .filter((x) => typeof x.axis !== Keys.TERM_UNDEFINED && x.axis === axis)
-                                .sort((x, y) => x.seq - y.seq );
+        c.orderBy = (<any[]>(
+            FastUtil.deepClone(axis === "x" ? c.groupBy : c.measure)
+        ))
+            .filter(
+                (x) => typeof x.axis !== Keys.TERM_UNDEFINED && x.axis === axis
+            )
+            .sort((x, y) => x.seq - y.seq);
         c.orderBy.forEach((x) => {
             if (axis === "y" && !x.isMeasure && !x.aggregation) {
                 x.aggregation = FastUtil.toAggregateFunction("avg");
@@ -44,35 +63,54 @@ export class InternalFilterRepresentation implements Request {
                     if (tail.length) {
                         traverse(tail, [...item, e]);
                     } else {
-                        matchAnyCombined.push([...this.__request.matchAll, ...item, e]);
+                        matchAnyCombined.push([
+                            ...this.__request.matchAll,
+                            ...item,
+                            e,
+                        ]);
                     }
                 });
             }
         };
         traverse(this.__request.matchAny, []);
 
-        // TODO: hack for no x-axis. Should be fixed. 
+        // TODO: hack for no x-axis. Should be fixed.
         // if there is no y axis, then this must be patient list.
-        if (matchAnyCombined.length === 1 
-            && this.__request.axes.filter((i) => i.axis === "y").length > 0
-            && this.__request.axes.filter((i) => i.axis === "x").length === 0) {
+        if (
+            matchAnyCombined.length === 1 &&
+            this.__request.axes.filter((i) => i.axis === "y").length > 0 &&
+            this.__request.axes.filter((i) => i.axis === "x").length === 0
+        ) {
             matchAnyCombined.push(matchAnyCombined[0]);
         }
 
-        let requests: ParserContainer[] = this.__request.matchAny.length > 0 ?
-                            matchAnyCombined.map((e, i) => this.buildPatient(e, i, matchAnyFiltercardList)) :
-                            [this.buildPatient(this.__request.matchAll, 0)];
+        let requests: ParserContainer[] =
+            this.__request.matchAny.length > 0
+                ? matchAnyCombined.map((e, i) =>
+                      this.buildPatient(e, i, matchAnyFiltercardList)
+                  )
+                : [this.buildPatient(this.__request.matchAll, 0)];
 
-        let population = this.buildPopulation(requests[0], matchAnyFiltercardList, leftJointFilterNodeList, additionalBaseNodeList);
+        let population = this.buildPopulation(
+            requests[0],
+            matchAnyFiltercardList,
+            leftJointFilterNodeList,
+            additionalBaseNodeList
+        );
 
         //Post handling
         requests.forEach((e) => {
             // copies measures from population context into patient context groupby clause, updating aliases accordingly for matchany requests
-            e.groupBy.push(...(FastUtil.deepClone(population.measure) as BaseNode[]).map((f) => {
-                if (f.alias === "P0") {
-                    f.alias = e.alias;
-                }
-                return f; }));
+            e.groupBy.push(
+                ...(FastUtil.deepClone(population.measure) as BaseNode[]).map(
+                    (f) => {
+                        if (f.alias === "P0") {
+                            f.alias = e.alias;
+                        }
+                        return f;
+                    }
+                )
+            );
             e.groupBy.sort((x, y) => x.seq - y.seq);
 
             /**
@@ -83,7 +121,11 @@ export class InternalFilterRepresentation implements Request {
                 if (interaction) {
                     // if interaction identifier does not match, append left join filter to interaction filter list
                     // else, filter identifier matches and there is no need to append left join criteria since filter is already a constraint
-                    if (interaction.filter((g) => !g.isExclude && g.identifier === f.identifier).length === 0) {
+                    if (
+                        interaction.filter(
+                            (g) => !g.isExclude && g.identifier === f.identifier
+                        ).length === 0
+                    ) {
                         interaction.push(f);
                     }
                 } else {
@@ -101,23 +143,34 @@ export class InternalFilterRepresentation implements Request {
             additionalBaseNodeList.forEach((f) => {
                 if (e.filter[f.dataType]) {
                     e.filter[f.dataType]
-                    .filter((g) => !g.isExclude && g.identifer === g.identifier)
-                    .forEach((h) => {
-                        if (h.attributeList.filter((i) => i.pathId === f.pathId).length === 0) {
-                            h.attributeList.push(f.withAlias(h.alias));
-                        }
-                    });
+                        .filter(
+                            (g) => !g.isExclude && g.identifer === g.identifier
+                        )
+                        .forEach((h) => {
+                            if (
+                                h.attributeList.filter(
+                                    (i) => i.pathId === f.pathId
+                                ).length === 0
+                            ) {
+                                h.attributeList.push(f.withAlias(h.alias));
+                            }
+                        });
                 }
             });
             // END
         });
 
         //add pcount to patient context groupBy list if it's not selected on the y axis
-        if (population.measure.filter((e) => e.path === Keys.MRITERM_PCOUNT).length === 0) {
+        if (
+            population.measure.filter((e) => e.path === Keys.MRITERM_PCOUNT)
+                .length === 0
+        ) {
             requests.forEach((e) => {
-                e.groupBy.push(new BaseNode(Keys.MRITERM_PCOUNT, Keys.MRITERM_PCOUNT_ALIAS)
-                                            .withAlias(e.alias)
-                                            .withTemplateId(Keys.MRITERM_PCOUNT_TEMPLATEID));
+                e.groupBy.push(
+                    new BaseNode(Keys.MRITERM_PCOUNT, Keys.MRITERM_PCOUNT_ALIAS)
+                        .withAlias(e.alias)
+                        .withTemplateId(Keys.MRITERM_PCOUNT_TEMPLATEID)
+                );
                 e.groupBy.sort((x, y) => x.seq - y.seq);
             });
         }
@@ -133,7 +186,11 @@ export class InternalFilterRepresentation implements Request {
 
     // retrieves population context, there should only be one.
     public getPopulationContext(): ParserContainer {
-        let populationContext = this.parserContainers.filter((e) => e.context === Keys.CQLTERM_CONTEXT_POPULATION && e.name === Keys.DEF_AGGREGATE);
+        let populationContext = this.parserContainers.filter(
+            (e) =>
+                e.context === Keys.CQLTERM_CONTEXT_POPULATION &&
+                e.name === Keys.DEF_AGGREGATE
+        );
         return populationContext.length === 0 ? null : populationContext[0];
     }
 
@@ -142,18 +199,27 @@ export class InternalFilterRepresentation implements Request {
         let patients = [];
 
         for (let i = 0; i < this.parserContainers.length; i++) {
-            if (this.parserContainers[i].context === Keys.CQLTERM_CONTEXT_PATIENT) {
+            if (
+                this.parserContainers[i].context ===
+                Keys.CQLTERM_CONTEXT_PATIENT
+            ) {
                 patients.push(this.parserContainers[i]);
             }
         }
         return patients;
     }
 
-    private buildPopulation(patient: ParserContainer,
-                            matchAnyFiltercardList: FilterNode[],
-                            newFilterCards: FilterNode[],
-                            newAttributes: BaseNode[]): ParserContainer {
-        let population = new ParserContainer(Keys.DEF_AGGREGATE, Keys.CQLTERM_CONTEXT_POPULATION, 0);
+    private buildPopulation(
+        patient: ParserContainer,
+        matchAnyFiltercardList: FilterNode[],
+        newFilterCards: FilterNode[],
+        newAttributes: BaseNode[]
+    ): ParserContainer {
+        let population = new ParserContainer(
+            Keys.DEF_AGGREGATE,
+            Keys.CQLTERM_CONTEXT_POPULATION,
+            0
+        );
 
         // builds measure clause
         population.measure = this.__request.axes
@@ -161,68 +227,205 @@ export class InternalFilterRepresentation implements Request {
             .reduce((measureList, e) => {
                 let baseNode: BaseNode = null;
                 if (e.id === Keys.MRITERM_PCOUNT_ALIAS) {
-                    baseNode = new BaseNode(Keys.MRITERM_PCOUNT, Keys.MRITERM_PCOUNT_ALIAS)
-                                    .withIdentifier(Keys.MRITERM_PCOUNT_ALIAS)
-                                    .withTemplateId(Keys.MRITERM_PCOUNT_TEMPLATEID)
-                                    .withDataType(Keys.MRITERM_PCOUNT)
-                                    .withAlias("P0")
-                                    .withMeasure(true);
-                }
-                else if (FastUtil.tokenizeAndJoin(e.instanceID, Keys.TERM_DELIMITER_PRD, 1) === "patient") {
-                    baseNode = new BaseNode(FastUtil.tokenizeAndJoin(e.id, Keys.TERM_DELIMITER_PRD, 1), e.id)
-                                                .withIdentifier(e.id)
-                                                .withTemplateId(e.id.replace(/\./g, Keys.TERM_DELIMITER_DASH))
-                                                .withDataType(FastUtil.tokenizeAndJoin(e.id, Keys.TERM_DELIMITER_PRD, 1))
-                                                .withAlias("P0");
-                } else if (this.isMeasure(e.id.split(Keys.TERM_DELIMITER_PRD))) {
-                    baseNode = new BaseNode(FastUtil.tokenizeAndJoin(e.id, Keys.TERM_DELIMITER_PRD, 1), e.id)
-                                    .withIdentifier(e.instanceID)
-                                    .withTemplateId(e.configPath.replace(/\./g, Keys.TERM_DELIMITER_DASH))
-                                    .withDataType(FastUtil.tokenizeAndJoin(e.configPath, Keys.TERM_DELIMITER_PRD, 1))
-                                    .withAlias(FastUtil.tokenizeAndJoin(e.instanceID, Keys.TERM_DELIMITER_PRD, 2))
-                                    .withMeasure(true);
+                    baseNode = new BaseNode(
+                        Keys.MRITERM_PCOUNT,
+                        Keys.MRITERM_PCOUNT_ALIAS
+                    )
+                        .withIdentifier(Keys.MRITERM_PCOUNT_ALIAS)
+                        .withTemplateId(Keys.MRITERM_PCOUNT_TEMPLATEID)
+                        .withDataType(Keys.MRITERM_PCOUNT)
+                        .withAlias("P0")
+                        .withMeasure(true);
+                } else if (
+                    FastUtil.tokenizeAndJoin(
+                        e.instanceID,
+                        Keys.TERM_DELIMITER_PRD,
+                        1
+                    ) === "patient"
+                ) {
+                    baseNode = new BaseNode(
+                        FastUtil.tokenizeAndJoin(
+                            e.id,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        ),
+                        e.id
+                    )
+                        .withIdentifier(e.id)
+                        .withTemplateId(
+                            e.id.replace(/\./g, Keys.TERM_DELIMITER_DASH)
+                        )
+                        .withDataType(
+                            FastUtil.tokenizeAndJoin(
+                                e.id,
+                                Keys.TERM_DELIMITER_PRD,
+                                1
+                            )
+                        )
+                        .withAlias("P0");
+                } else if (
+                    this.isMeasure(e.id.split(Keys.TERM_DELIMITER_PRD))
+                ) {
+                    baseNode = new BaseNode(
+                        FastUtil.tokenizeAndJoin(
+                            e.id,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        ),
+                        e.id
+                    )
+                        .withIdentifier(e.instanceID)
+                        .withTemplateId(
+                            e.configPath.replace(
+                                /\./g,
+                                Keys.TERM_DELIMITER_DASH
+                            )
+                        )
+                        .withDataType(
+                            FastUtil.tokenizeAndJoin(
+                                e.configPath,
+                                Keys.TERM_DELIMITER_PRD,
+                                1
+                            )
+                        )
+                        .withAlias(
+                            FastUtil.tokenizeAndJoin(
+                                e.instanceID,
+                                Keys.TERM_DELIMITER_PRD,
+                                2
+                            )
+                        )
+                        .withMeasure(true);
                 } else {
                     //Only attributes of MatchAll filtercards can be set as Y axis (except for Patient list requests)
                     this.__request.matchAny
-                    .filter((f) => f.length === 1)
+                        .filter((f) => f.length === 1)
                         .forEach((gg) => {
                             const g = gg[0];
-                        //Match axis id with filtercard attribute instanceid
-                        for (let i = 0; i < g._attributes.length; i++) {
-                            // attribute cannot be both measure and category
-                            if ((g._attributes[i]._instanceID === e.id) && (patient.groupBy.filter((i) => i.pathId === e.id).length === 0)) {
-                                baseNode = new BaseNode(FastUtil.tokenizeAndJoin(g._attributes[i]._configPath, Keys.TERM_DELIMITER_PRD, 1),
-                                                        g._attributes[i]._instanceID)
-                                                .withIdentifier(g._instanceID)
-                                                .withTemplateId(g._configPath.replace(/\./g, Keys.TERM_DELIMITER_DASH))
-                                                .withDataType(FastUtil.tokenizeAndJoin(g._configPath, Keys.TERM_DELIMITER_PRD, 1))
-                                                .withAlias(FastUtil.tokenizeAndJoin(g._configPath, Keys.TERM_DELIMITER_PRD, 1) === "patient" ?
-                                                            "P0" :
-                                                            FastUtil.tokenizeAndJoin(g._instanceID, Keys.TERM_DELIMITER_PRD, 2));
-                                if (this.isMeasure((g._attributes[i]._instanceID.split(Keys.TERM_DELIMITER_PRD)))) {
-                                    baseNode.withMeasure(true)
-                                            .withFilter(g._attributes[i]._constraints.reduce( (constraintList, constraint) => {
-                                                            if (constraint instanceof IFRExpression) {
-                                                                constraintList.push(new Expression(constraint._operator, constraint._value));
-                                                            } else if (constraint._constraints.length > 0) {
-                                                                constraintList.push(new And(constraint._constraints.map( (f) =>
-                                                                                                                    new Expression(f._operator, f._value))));
-                                                            }
-                                                            return constraintList;
-                                                        }, []));
+                            //Match axis id with filtercard attribute instanceid
+                            for (let i = 0; i < g._attributes.length; i++) {
+                                // attribute cannot be both measure and category
+                                if (
+                                    g._attributes[i]._instanceID === e.id &&
+                                    patient.groupBy.filter(
+                                        (i) => i.pathId === e.id
+                                    ).length === 0
+                                ) {
+                                    baseNode = new BaseNode(
+                                        FastUtil.tokenizeAndJoin(
+                                            g._attributes[i]._configPath,
+                                            Keys.TERM_DELIMITER_PRD,
+                                            1
+                                        ),
+                                        g._attributes[i]._instanceID
+                                    )
+                                        .withIdentifier(g._instanceID)
+                                        .withTemplateId(
+                                            g._configPath.replace(
+                                                /\./g,
+                                                Keys.TERM_DELIMITER_DASH
+                                            )
+                                        )
+                                        .withDataType(
+                                            FastUtil.tokenizeAndJoin(
+                                                g._configPath,
+                                                Keys.TERM_DELIMITER_PRD,
+                                                1
+                                            )
+                                        )
+                                        .withAlias(
+                                            FastUtil.tokenizeAndJoin(
+                                                g._configPath,
+                                                Keys.TERM_DELIMITER_PRD,
+                                                1
+                                            ) === "patient"
+                                                ? "P0"
+                                                : FastUtil.tokenizeAndJoin(
+                                                      g._instanceID,
+                                                      Keys.TERM_DELIMITER_PRD,
+                                                      2
+                                                  )
+                                        );
+                                    if (
+                                        this.isMeasure(
+                                            g._attributes[i]._instanceID.split(
+                                                Keys.TERM_DELIMITER_PRD
+                                            )
+                                        )
+                                    ) {
+                                        baseNode.withMeasure(true).withFilter(
+                                            g._attributes[
+                                                i
+                                            ]._constraints.reduce(
+                                                (
+                                                    constraintList,
+                                                    constraint
+                                                ) => {
+                                                    if (
+                                                        constraint instanceof
+                                                        IFRExpression
+                                                    ) {
+                                                        constraintList.push(
+                                                            new Expression(
+                                                                constraint._operator,
+                                                                constraint._value
+                                                            )
+                                                        );
+                                                    } else if (
+                                                        constraint._constraints
+                                                            .length > 0
+                                                    ) {
+                                                        constraintList.push(
+                                                            new And(
+                                                                constraint._constraints.map(
+                                                                    (f) =>
+                                                                        new Expression(
+                                                                            f._operator,
+                                                                            f._value
+                                                                        )
+                                                                )
+                                                            )
+                                                        );
+                                                    }
+                                                    return constraintList;
+                                                },
+                                                []
+                                            )
+                                        );
+                                    }
+                                    break;
                                 }
-                                break;
                             }
-                        }
-                    });
+                        });
                 }
 
-                if (!baseNode && typeof e.isFiltercard !== Keys.TERM_UNDEFINED) {
+                if (
+                    !baseNode &&
+                    typeof e.isFiltercard !== Keys.TERM_UNDEFINED
+                ) {
                     //Create measure baseNode nevertheless.
-                    baseNode = new BaseNode(FastUtil.tokenizeAndJoin(e.id, Keys.TERM_DELIMITER_PRD, 1), e.id)
-                                             .withIdentifier(e.instanceID)
-                                             .withTemplateId(e.configPath.replace(/\./g, Keys.TERM_DELIMITER_DASH))
-                                             .withDataType(FastUtil.tokenizeAndJoin(e.configPath, Keys.TERM_DELIMITER_PRD, 1));
+                    baseNode = new BaseNode(
+                        FastUtil.tokenizeAndJoin(
+                            e.id,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        ),
+                        e.id
+                    )
+                        .withIdentifier(e.instanceID)
+                        .withTemplateId(
+                            e.configPath.replace(
+                                /\./g,
+                                Keys.TERM_DELIMITER_DASH
+                            )
+                        )
+                        .withDataType(
+                            FastUtil.tokenizeAndJoin(
+                                e.configPath,
+                                Keys.TERM_DELIMITER_PRD,
+                                1
+                            )
+                        );
                     /**
                      * If axis is neither a pcount measure nor a measure that matches an attribute in non-exclude filtercards,
                      * check if axis property isFiltercard is false. This will indicate if axis attribute has been set
@@ -230,10 +433,22 @@ export class InternalFilterRepresentation implements Request {
                      * */
                     if (!e.isFiltercard) {
                         // check if axis interaction matches any matchAny non-negated filters
-                        let matchAnyFilter = matchAnyFiltercardList.filter((j) => !j.isExclude &&
-                                                                            j.dataType === FastUtil.tokenizeAndJoin(e.configPath, Keys.TERM_DELIMITER_PRD, 1));
+                        let matchAnyFilter = matchAnyFiltercardList.filter(
+                            (j) =>
+                                !j.isExclude &&
+                                j.dataType ===
+                                    FastUtil.tokenizeAndJoin(
+                                        e.configPath,
+                                        Keys.TERM_DELIMITER_PRD,
+                                        1
+                                    )
+                        );
                         let newFc: FilterNode;
-                        const instanceNum = FastUtil.tokenizeAndJoin(baseNode.identifier, Keys.TERM_DELIMITER_PRD, 1);
+                        const instanceNum = FastUtil.tokenizeAndJoin(
+                            baseNode.identifier,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        );
 
                         /**
                          * If axis interaction type matches one of those in matchAny filters. Clone filter. Remove existing attribute constraints.
@@ -243,20 +458,40 @@ export class InternalFilterRepresentation implements Request {
                          */
                         if (matchAnyFilter.length > 0) {
                             newFc = FastUtil.typedDeepClone(matchAnyFilter[0])
-                                            .withLeftJoin(true)
-                                            .clearAttributeList()
-                                            .withIdentifier(`${baseNode.templateId.split(Keys.TERM_DELIMITER_DASH).join(".")}.
-                                                                ${instanceNum}`)
-                                            .withAlias(`${baseNode.dataType}${instanceNum}`);
+                                .withLeftJoin(true)
+                                .clearAttributeList()
+                                .withIdentifier(
+                                    `${baseNode.templateId
+                                        .split(Keys.TERM_DELIMITER_DASH)
+                                        .join(".")}.
+                                                                ${instanceNum}`
+                                )
+                                .withAlias(
+                                    `${baseNode.dataType}${instanceNum}`
+                                );
 
-                            newFc.withAttributeList([baseNode.withAlias(newFc.alias)]);
+                            newFc.withAttributeList([
+                                baseNode.withAlias(newFc.alias),
+                            ]);
                         } else {
-                            newFc = new FilterNode(`${baseNode.templateId.split(Keys.TERM_DELIMITER_DASH).join(".")}.${instanceNum}`,
-                                                    e.configPath.replace(/\./g, Keys.TERM_DELIMITER_DASH),
-                                                    FastUtil.tokenizeAndJoin(e.configPath, Keys.TERM_DELIMITER_PRD, 1),
-                                                    `${baseNode.dataType}${instanceNum}`)
-                                                    .withLeftJoin(true);
-                            newFc.withAttributeList([baseNode.withAlias(newFc.alias)]);
+                            newFc = new FilterNode(
+                                `${baseNode.templateId
+                                    .split(Keys.TERM_DELIMITER_DASH)
+                                    .join(".")}.${instanceNum}`,
+                                e.configPath.replace(
+                                    /\./g,
+                                    Keys.TERM_DELIMITER_DASH
+                                ),
+                                FastUtil.tokenizeAndJoin(
+                                    e.configPath,
+                                    Keys.TERM_DELIMITER_PRD,
+                                    1
+                                ),
+                                `${baseNode.dataType}${instanceNum}`
+                            ).withLeftJoin(true);
+                            newFc.withAttributeList([
+                                baseNode.withAlias(newFc.alias),
+                            ]);
                         }
                         newFilterCards.push(newFc);
                         newAttributes.push(baseNode.withAlias(newFc.alias));
@@ -265,15 +500,24 @@ export class InternalFilterRepresentation implements Request {
                          * If there is a match in filtercard instanceID but attribute is not set as a constraint in the fc,
                          * we append the attribute to newAttributes list which will be used for postprocessing (See #FILLMISSINGATTRIBUTES)
                          */
-                        newAttributes.push(baseNode.withAlias(FastUtil.tokenizeAndJoin(e.instanceID, Keys.TERM_DELIMITER_PRD, 2)));
+                        newAttributes.push(
+                            baseNode.withAlias(
+                                FastUtil.tokenizeAndJoin(
+                                    e.instanceID,
+                                    Keys.TERM_DELIMITER_PRD,
+                                    2
+                                )
+                            )
+                        );
                     }
                 }
                 if (baseNode) {
-                    baseNode.withAxis(e.axis)
+                    baseNode
+                        .withAxis(e.axis)
                         .withSeq(e.seq)
                         .withBinsize(e.binsize)
                         .withAggregation(e.aggregation)
-                        .withOrder(e.order);                
+                        .withOrder(e.order);
                     measureList.push(baseNode);
                 }
 
@@ -282,223 +526,554 @@ export class InternalFilterRepresentation implements Request {
 
         //Build list of having conditions
         population.groupBy = population.groupBy.concat(patient.groupBy);
-        population.having = population.measure.filter((e) => e.isMeasure && (e.filter && e.filter.length > 0));
+        population.having = population.measure.filter(
+            (e) => e.isMeasure && e.filter && e.filter.length > 0
+        );
 
         //censoringThreshold
         if (this.censoringThreshold && population.having.length > 0) {
-            population.having.forEach((e) => {e.filter[0].value = e.filter[0].value < this.censoringThreshold ?
-                                                                this.censoringThreshold : e.filter[0].value; });
-        }
-        else {
+            population.having.forEach((e) => {
+                e.filter[0].value =
+                    e.filter[0].value < this.censoringThreshold
+                        ? this.censoringThreshold
+                        : e.filter[0].value;
+            });
+        } else {
             if (this.censoringThreshold) {
-                population.having.push(new BaseNode(Keys.MRITERM_PCOUNT, Keys.MRITERM_PCOUNT_ALIAS)
-                                            .withTemplateId(Keys.MRITERM_PCOUNT_TEMPLATEID)
-                                            .withAlias("P0")
-                                            .withFilter([new Expression(Keys.SQLTERM_INEQUALITY_SYMBOL_GREATEROREQUAL, this.censoringThreshold)]));
+                population.having.push(
+                    new BaseNode(Keys.MRITERM_PCOUNT, Keys.MRITERM_PCOUNT_ALIAS)
+                        .withTemplateId(Keys.MRITERM_PCOUNT_TEMPLATEID)
+                        .withAlias("P0")
+                        .withFilter([
+                            new Expression(
+                                Keys.SQLTERM_INEQUALITY_SYMBOL_GREATEROREQUAL,
+                                this.censoringThreshold
+                            ),
+                        ])
+                );
             }
         }
         return population;
     }
 
-    private buildPatient(x: FilterCard[], id: number, matchAnyFiltercardList?: FilterNode[]): ParserContainer {
-        let patient = new ParserContainer(Keys.DEF_PATIENTREQUEST + id, Keys.CQLTERM_CONTEXT_PATIENT, id);
+    private buildPatient(
+        x: FilterCard[],
+        id: number,
+        matchAnyFiltercardList?: FilterNode[]
+    ): ParserContainer {
+        let patient = new ParserContainer(
+            Keys.DEF_PATIENTREQUEST + id,
+            Keys.CQLTERM_CONTEXT_PATIENT,
+            id
+        );
 
         //Build list of filters
-        patient.filter =
-            x
-            .filter((e) => FastUtil.tokenizeAndJoin(e._configPath, Keys.TERM_DELIMITER_PRD, 1) !== "patient")
+        patient.filter = x
+            .filter(
+                (e) =>
+                    FastUtil.tokenizeAndJoin(
+                        e._configPath,
+                        Keys.TERM_DELIMITER_PRD,
+                        1
+                    ) !== "patient"
+            )
             .reduce((filterConditions, filtercard) => {
-                let currNode = FastUtil.tokenizeAndJoin(filtercard._configPath, Keys.TERM_DELIMITER_PRD, 1);
+                let currNode = FastUtil.tokenizeAndJoin(
+                    filtercard._configPath,
+                    Keys.TERM_DELIMITER_PRD,
+                    1
+                );
                 // create interaction filternode
-                let node = new FilterNode(filtercard._instanceID,
-                                            filtercard._configPath.replace(/\./g, Keys.TERM_DELIMITER_DASH),
-                                            currNode,
-                                            FastUtil.tokenizeAndJoin(filtercard._instanceID, Keys.TERM_DELIMITER_PRD, 2))
-                                .withExclude(filtercard instanceof ExcludeFilterCard)
-                                .withAttributeList(
-                                    filtercard._attributes.map((e) => {
-                                        return new BaseNode(FastUtil.tokenizeAndJoin(e._configPath, Keys.TERM_DELIMITER_PRD, 1), e._instanceID)
-                                                    .withFilter(e._constraints.reduce( (constraintList, constraint) => {
-                                                        if (constraint instanceof IFRExpression) {
-                                                            constraintList.push(new Expression(constraint._operator, constraint._value));
-                                                        } else if (constraint._constraints.length > 0) {
-                                                            constraintList.push(new And(constraint._constraints.map( (f) =>
-                                                                                                                    new Expression(f._operator, f._value))));
-                                                        }
-                                                        return constraintList;
-                                                    }, []));
-                                }));
+                let node = new FilterNode(
+                    filtercard._instanceID,
+                    filtercard._configPath.replace(
+                        /\./g,
+                        Keys.TERM_DELIMITER_DASH
+                    ),
+                    currNode,
+                    FastUtil.tokenizeAndJoin(
+                        filtercard._instanceID,
+                        Keys.TERM_DELIMITER_PRD,
+                        2
+                    )
+                )
+                    .withExclude(filtercard instanceof ExcludeFilterCard)
+                    .withAttributeList(
+                        filtercard._attributes.map((e) => {
+                            return new BaseNode(
+                                FastUtil.tokenizeAndJoin(
+                                    e._configPath,
+                                    Keys.TERM_DELIMITER_PRD,
+                                    1
+                                ),
+                                e._instanceID
+                            ).withFilter(
+                                e._constraints.reduce(
+                                    (constraintList, constraint) => {
+                                        if (
+                                            constraint instanceof IFRExpression
+                                        ) {
+                                            constraintList.push(
+                                                new Expression(
+                                                    constraint._operator,
+                                                    constraint._value
+                                                )
+                                            );
+                                        } else if (
+                                            constraint._constraints.length > 0
+                                        ) {
+                                            constraintList.push(
+                                                new And(
+                                                    constraint._constraints.map(
+                                                        (f) =>
+                                                            new Expression(
+                                                                f._operator,
+                                                                f._value
+                                                            )
+                                                    )
+                                                )
+                                            );
+                                        }
+                                        return constraintList;
+                                    },
+                                    []
+                                )
+                            );
+                        })
+                    );
                 if (filtercard._successor) {
-                    node.attributeList.push(new BaseNode("_succ", filtercard._instanceID + ".attributes._succ")
-                                                .withValue(filtercard._successor.id)
-                                                .withFilter([new And(Object.keys(filtercard._successor).reduce((expressions, key) => {
-                                                    if (typeof filtercard._successor[key] !== Keys.TERM_UNDEFINED && filtercard._successor[key] !== null ) {
-                                                        if (key === "minDaysBetween") {
-                                                            expressions.push(new Expression(Keys.SQLTERM_INEQUALITY_SYMBOL_GREATEROREQUAL,
-                                                                                            filtercard._successor.minDaysBetween));
-                                                        } else if (key === "maxDaysBetween") {
-                                                            expressions.push(new Expression(Keys.SQLTERM_INEQUALITY_SYMBOL_LESS,
-                                                                                            filtercard._successor.maxDaysBetween));
-                                                        }
-                                                    }
-                                                    return expressions;
-                                                }, []))]));
+                    node.attributeList.push(
+                        new BaseNode(
+                            "_succ",
+                            filtercard._instanceID + ".attributes._succ"
+                        )
+                            .withValue(filtercard._successor.id)
+                            .withFilter([
+                                new And(
+                                    Object.keys(filtercard._successor).reduce(
+                                        (expressions, key) => {
+                                            if (
+                                                typeof filtercard._successor[
+                                                    key
+                                                ] !== Keys.TERM_UNDEFINED &&
+                                                filtercard._successor[key] !==
+                                                    null
+                                            ) {
+                                                if (key === "minDaysBetween") {
+                                                    expressions.push(
+                                                        new Expression(
+                                                            Keys.SQLTERM_INEQUALITY_SYMBOL_GREATEROREQUAL,
+                                                            filtercard._successor.minDaysBetween
+                                                        )
+                                                    );
+                                                } else if (
+                                                    key === "maxDaysBetween"
+                                                ) {
+                                                    expressions.push(
+                                                        new Expression(
+                                                            Keys.SQLTERM_INEQUALITY_SYMBOL_LESS,
+                                                            filtercard._successor.maxDaysBetween
+                                                        )
+                                                    );
+                                                }
+                                            }
+                                            return expressions;
+                                        },
+                                        []
+                                    )
+                                ),
+                            ])
+                    );
                 }
                 if (filtercard._parentInteraction) {
-                    node.attributeList.push(new BaseNode(Keys.MRITERM_PARENTINTERACTION)
-                                                .withAlias(FastUtil.tokenizeAndJoin(filtercard._instanceID, Keys.TERM_DELIMITER_PRD, 2))
-                                                .withFilter([new Expression(Keys.SQLTERM_INEQUALITY_SYMBOL_EQUAL,
-                                                                            FastUtil.tokenizeAndJoin(filtercard._parentInteraction.id,
-                                                                                                     Keys.TERM_DELIMITER_PRD,
-                                                                                                     2))
-                                                                .withType("expressionOp")
-                                                                .withPath(Keys.MRITERM_INTERACTIONID)]));
+                    node.attributeList.push(
+                        new BaseNode(Keys.MRITERM_PARENTINTERACTION)
+                            .withAlias(
+                                FastUtil.tokenizeAndJoin(
+                                    filtercard._instanceID,
+                                    Keys.TERM_DELIMITER_PRD,
+                                    2
+                                )
+                            )
+                            .withFilter([
+                                new Expression(
+                                    Keys.SQLTERM_INEQUALITY_SYMBOL_EQUAL,
+                                    FastUtil.tokenizeAndJoin(
+                                        filtercard._parentInteraction.id,
+                                        Keys.TERM_DELIMITER_PRD,
+                                        2
+                                    )
+                                )
+                                    .withType("expressionOp")
+                                    .withPath(Keys.MRITERM_INTERACTIONID),
+                            ])
+                    );
                 }
                 if (filtercard._advanceTimeFilter) {
-                    node.attributeList.push(new BaseNode(Keys.MRITERM_TEMPORALQUERY, filtercard._instanceID + ".attributes." + Keys.MRITERM_TEMPORALQUERY)
-                                                .withAlias(FastUtil.tokenizeAndJoin(filtercard._instanceID, Keys.TERM_DELIMITER_PRD, 2))
-                                                .withFilter(
-                                                    filtercard._advanceTimeFilter.request.reduce((tempQFilters, request) => {
-                                                        if (request.and) {
-                                                            tempQFilters.push(new And((request.and as any[]).map((e) => {
-                                                                if (e.or) {
-                                                                    return new Or((e.or as any[]).map(
-                                                                        (f) => new TemporalQueryNode(f.value, f.filter.map((g) => {
+                    node.attributeList.push(
+                        new BaseNode(
+                            Keys.MRITERM_TEMPORALQUERY,
+                            filtercard._instanceID +
+                                ".attributes." +
+                                Keys.MRITERM_TEMPORALQUERY
+                        )
+                            .withAlias(
+                                FastUtil.tokenizeAndJoin(
+                                    filtercard._instanceID,
+                                    Keys.TERM_DELIMITER_PRD,
+                                    2
+                                )
+                            )
+                            .withFilter(
+                                filtercard._advanceTimeFilter.request.reduce(
+                                    (tempQFilters, request) => {
+                                        if (request.and) {
+                                            tempQFilters.push(
+                                                new And(
+                                                    (request.and as any[]).map(
+                                                        (e) => {
+                                                            if (e.or) {
+                                                                return new Or(
+                                                                    (
+                                                                        e.or as any[]
+                                                                    ).map(
+                                                                        (f) =>
+                                                                            new TemporalQueryNode(
+                                                                                f.value,
+                                                                                f.filter.map(
+                                                                                    (
+                                                                                        g
+                                                                                    ) => {
+                                                                                        return {
+                                                                                            and: g.and.map(
+                                                                                                (
+                                                                                                    h
+                                                                                                ) =>
+                                                                                                    new Expression(
+                                                                                                        h.op,
+                                                                                                        h.value
+                                                                                                    )
+                                                                                                        .withThis(
+                                                                                                            g.this
+                                                                                                        )
+                                                                                                        .withOther(
+                                                                                                            g.other
+                                                                                                        )
+                                                                                            ),
+                                                                                        };
+                                                                                    }
+                                                                                )
+                                                                            )
+                                                                    )
+                                                                );
+                                                            } else {
+                                                                return new TemporalQueryNode(
+                                                                    e.value,
+                                                                    e.filter.map(
+                                                                        (g) => {
                                                                             return {
                                                                                 and: g.and.map(
-                                                                                    (h) => new Expression(h.op, h.value)
-                                                                                            .withThis(g.this)
-                                                                                            .withOther(g.other))};
-                                                                            }))));
-                                                                }
-                                                                else {
-                                                                    return new TemporalQueryNode(e.value, e.filter.map((g) => {
-                                                                        return {
-                                                                            and: g.and.map(
-                                                                                (h) => new Expression(h.op, h.value)
-                                                                                        .withThis(g.this)
-                                                                                        .withOther(g.other))};
-                                                                        }));
-                                                                }
-                                                            })));
+                                                                                    (
+                                                                                        h
+                                                                                    ) =>
+                                                                                        new Expression(
+                                                                                            h.op,
+                                                                                            h.value
+                                                                                        )
+                                                                                            .withThis(
+                                                                                                g.this
+                                                                                            )
+                                                                                            .withOther(
+                                                                                                g.other
+                                                                                            )
+                                                                                ),
+                                                                            };
+                                                                        }
+                                                                    )
+                                                                );
+                                                            }
                                                         }
-                                                        return tempQFilters;
-                                                    }, [] as Filter[])),
+                                                    )
+                                                )
                                             );
+                                        }
+                                        return tempQFilters;
+                                    },
+                                    [] as Filter[]
+                                )
+                            )
+                    );
                 }
                 if (matchAnyFiltercardList && filtercard._isMatchAny) {
                     matchAnyFiltercardList.push(FastUtil.typedDeepClone(node));
                 }
 
-                filterConditions[currNode] ? filterConditions[currNode].push(node) : filterConditions[currNode] = [node];
+                filterConditions[currNode]
+                    ? filterConditions[currNode].push(node)
+                    : (filterConditions[currNode] = [node]);
                 return filterConditions;
             }, {});
 
+        //Detect interactions with multiple identical filtercards and add NotEqual check between them. Must be after isExclude is detected!
+        process.env.NOT_EQ_CHECK_FILTERCARDS === "true" &&
+            Object.keys(patient.filter)
+                .filter((e) => patient.filter[e].length > 1)
+                .forEach((interaction) =>
+                    patient.filter[interaction].forEach((e, i) => {
+                        e.join = [];
+                        if (i === 0 || e.isExclude) return; //Skip the first filtercard alone OR excluded filtercards
+                        // Traverse to previous nodes and get their alias for establishing join relationship
+                        for (let k = i - 1; k >= 0; k--) {
+                            const identicalNode =
+                                patient.filter[interaction][k];
+                            if (identicalNode.isExclude) continue; // skip excluded filtercards
+                            //path, e.alias, e.filter, e.pathId
+                            e.join.push({
+                                path: null,
+                                pathId: null,
+                                alias: identicalNode.alias,
+                                filter: [
+                                    new Expression(
+                                        Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
+                                        identicalNode.alias
+                                    ).withType("expressionOp"),
+                                ],
+                            });
+                        }
+                    })
+                );
+
         // Build list of where conditions
         // Gets list of basic data attribute constraints and adds them into the where clause conditions
-        let basicDataAttributes: BaseNode[] =
-            x
-            .filter((e) => FastUtil.tokenizeAndJoin(e._configPath, Keys.TERM_DELIMITER_PRD, 1) === "patient")
+        let basicDataAttributes: BaseNode[] = x
+            .filter(
+                (e) =>
+                    FastUtil.tokenizeAndJoin(
+                        e._configPath,
+                        Keys.TERM_DELIMITER_PRD,
+                        1
+                    ) === "patient"
+            )
             .reduce((whereConditions, filtercard) => {
                 filtercard._attributes
-                            .filter((e) => !this.isMeasure(e._instanceID.split(Keys.TERM_DELIMITER_PRD)))
-                            .forEach((e) => {
-                                whereConditions.push(new BaseNode(FastUtil.tokenizeAndJoin(e._configPath, Keys.TERM_DELIMITER_PRD, 1), e._instanceID)
-                                                        .withIdentifier(e._configPath)
-                                                        .withTemplateId(e._configPath.replace(/\./g, Keys.TERM_DELIMITER_DASH))
-                                                        .withDataType(FastUtil.tokenizeAndJoin(filtercard._configPath, Keys.TERM_DELIMITER_PRD, 1))
-                                                        .withAlias(patient.alias)
-                                                        .withFilter(e._constraints.reduce( (constraintList, constraint) => {
-                                                            if (constraint instanceof IFRExpression) {
-                                                                constraintList.push(new Expression(constraint._operator, constraint._value));
-                                                            } else if (constraint._constraints.length > 0) {
-                                                                constraintList.push(new And(constraint._constraints.map( (f) =>
-                                                                                                                    new Expression(f._operator, f._value))));
-                                                            }
-                                                            return constraintList;
-                                                        }, [])));
-                            });
+                    .filter(
+                        (e) =>
+                            !this.isMeasure(
+                                e._instanceID.split(Keys.TERM_DELIMITER_PRD)
+                            )
+                    )
+                    .forEach((e) => {
+                        whereConditions.push(
+                            new BaseNode(
+                                FastUtil.tokenizeAndJoin(
+                                    e._configPath,
+                                    Keys.TERM_DELIMITER_PRD,
+                                    1
+                                ),
+                                e._instanceID
+                            )
+                                .withIdentifier(e._configPath)
+                                .withTemplateId(
+                                    e._configPath.replace(
+                                        /\./g,
+                                        Keys.TERM_DELIMITER_DASH
+                                    )
+                                )
+                                .withDataType(
+                                    FastUtil.tokenizeAndJoin(
+                                        filtercard._configPath,
+                                        Keys.TERM_DELIMITER_PRD,
+                                        1
+                                    )
+                                )
+                                .withAlias(patient.alias)
+                                .withFilter(
+                                    e._constraints.reduce(
+                                        (constraintList, constraint) => {
+                                            if (
+                                                constraint instanceof
+                                                IFRExpression
+                                            ) {
+                                                constraintList.push(
+                                                    new Expression(
+                                                        constraint._operator,
+                                                        constraint._value
+                                                    )
+                                                );
+                                            } else if (
+                                                constraint._constraints.length >
+                                                0
+                                            ) {
+                                                constraintList.push(
+                                                    new And(
+                                                        constraint._constraints.map(
+                                                            (f) =>
+                                                                new Expression(
+                                                                    f._operator,
+                                                                    f._value
+                                                                )
+                                                        )
+                                                    )
+                                                );
+                                            }
+                                            return constraintList;
+                                        },
+                                        []
+                                    )
+                                )
+                        );
+                    });
 
                 return whereConditions;
             }, []);
 
         // Retrieves list of excluded filtercards and adds negation conditions to where clause
-        let excludedFiltercards: BaseNode[] =
-            x
+        let excludedFiltercards: BaseNode[] = x
             .filter((e) => e instanceof ExcludeFilterCard)
             .reduce((whereConditions, filtercard) => {
-                whereConditions.push(new BaseNode(Keys.MRITERM_INTERACTIONID)//todo: check if sqlGenerator requires pathId for exclude where nodes
-                                    .withIdentifier(filtercard._instanceID)
-                                        .withTemplateId(filtercard._configPath.replace(/\./g, Keys.TERM_DELIMITER_DASH))
-                                        .withAlias(FastUtil.tokenizeAndJoin(filtercard._instanceID, Keys.TERM_DELIMITER_PRD, 2))
-                                        .withPathId(filtercard._instanceID + "." + Keys.MRITERM_INTERACTIONID)
-                                        .withFilter([new Expression("=", "NoValue")]));
+                whereConditions.push(
+                    new BaseNode(Keys.MRITERM_INTERACTIONID) //todo: check if sqlGenerator requires pathId for exclude where nodes
+                        .withIdentifier(filtercard._instanceID)
+                        .withTemplateId(
+                            filtercard._configPath.replace(
+                                /\./g,
+                                Keys.TERM_DELIMITER_DASH
+                            )
+                        )
+                        .withAlias(
+                            FastUtil.tokenizeAndJoin(
+                                filtercard._instanceID,
+                                Keys.TERM_DELIMITER_PRD,
+                                2
+                            )
+                        )
+                        .withPathId(
+                            filtercard._instanceID +
+                                "." +
+                                Keys.MRITERM_INTERACTIONID
+                        )
+                        .withFilter([new Expression("=", "NoValue")])
+                );
                 return whereConditions;
             }, []);
 
-        // Retrieves interactions with multiple associated filtercards and adds not equal conditions to where clause
-        let filtercardsWithIdenticalInteractions: BaseNode[] = Deno.env.get("NOT_EQ_CHECK_FILTERCARDS") === "false" ? []:
-        Object.keys(patient.filter)
-                .filter((e, key) => patient.filter[e].length > 1)
-                .reduce((whereConditions, interaction) => {
-                    let currInteraction: FilterNode[] = (FastUtil.deepClone(patient.filter[interaction]) as FilterNode[]).filter((e) => !e.isExclude);
-                    if (currInteraction.length > 1) {
-                        currInteraction.forEach((e, i) => {
-                            whereConditions =
-                                            whereConditions.concat((FastUtil.deepClone(currInteraction) as FilterNode[]).splice(i + 1).reduce((inEq, curr) => {
-                                                        inEq.push(new BaseNode(Keys.MRITERM_INTERACTIONID)
-                                                                        .withAlias(e.alias)
-                                                                        .withFilter([new Expression(Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL, curr.alias)
-                                                                        .withType("expressionOp")]));
-                                                        return inEq;
-                                                    }, []));
-                        });
-                    }
-                    return whereConditions;
-                }, []);
-
         // Compiles all where conditions
-        patient.where = [...basicDataAttributes, ...filtercardsWithIdenticalInteractions, ...excludedFiltercards].filter((e) => e.filter.length > 0);
+        patient.where = [
+            ...basicDataAttributes,
+            // ...filtercardsWithIdenticalInteractions,
+            ...excludedFiltercards,
+        ].filter((e) => e.filter.length > 0);
 
         //Build list of groupby conditions
         patient.groupBy = this.__request.axes
             .filter((e) => e.axis === "x")
             .reduce((groupByList, e) => {
                 let baseNode: BaseNode = null;
-                x
-                .filter((f) => f instanceof FilterCard)
-                .forEach((g) => {
+                x.filter((f) => f instanceof FilterCard).forEach((g) => {
                     for (let i = 0; i < g._attributes.length; i++) {
-                        if ((g._attributes[i]._instanceID === e.id) && (patient.groupBy.filter((i) => i.pathId === e.id).length === 0)) {
-                            let isBasicData = FastUtil.tokenizeAndJoin(g._configPath, Keys.TERM_DELIMITER_PRD, 1) === "patient";
-                            baseNode = new BaseNode(FastUtil.tokenizeAndJoin(g._attributes[i]._configPath, Keys.TERM_DELIMITER_PRD, 1),
-                                                    g._attributes[i]._instanceID)
-                                            .withIdentifier( isBasicData ? g._attributes[i]._instanceID : g._instanceID)
-                                            .withTemplateId( isBasicData ? g._attributes[i]._configPath.replace(/\./g, Keys.TERM_DELIMITER_DASH)
-                                                                         : g._configPath.replace(/\./g, Keys.TERM_DELIMITER_DASH))
-                                            .withDataType( isBasicData ? FastUtil.tokenizeAndJoin(g._attributes[i]._configPath, Keys.TERM_DELIMITER_PRD, 1)
-                                                                       : FastUtil.tokenizeAndJoin(g._configPath, Keys.TERM_DELIMITER_PRD, 1))
-                                            .withAlias( isBasicData ? `P${id}` : FastUtil.tokenizeAndJoin(g._instanceID, Keys.TERM_DELIMITER_PRD, 2))
-                                            .withFilter(g._attributes[i]._constraints.reduce( (constraintList, constraint) => {
-                                                            if (constraint instanceof IFRExpression) {
-                                                                constraintList.push(new Expression(constraint._operator, constraint._value));
-                                                            } else if (constraint._constraints.length > 0) {
-                                                                constraintList.push(new And(constraint._constraints.map( (f) =>
-                                                                                                                    new Expression(f._operator, f._value))));
-                                                            }
-                                                            return constraintList;
-                                                        }, []));
+                        if (
+                            g._attributes[i]._instanceID === e.id &&
+                            patient.groupBy.filter((i) => i.pathId === e.id)
+                                .length === 0
+                        ) {
+                            let isBasicData =
+                                FastUtil.tokenizeAndJoin(
+                                    g._configPath,
+                                    Keys.TERM_DELIMITER_PRD,
+                                    1
+                                ) === "patient";
+                            baseNode = new BaseNode(
+                                FastUtil.tokenizeAndJoin(
+                                    g._attributes[i]._configPath,
+                                    Keys.TERM_DELIMITER_PRD,
+                                    1
+                                ),
+                                g._attributes[i]._instanceID
+                            )
+                                .withIdentifier(
+                                    isBasicData
+                                        ? g._attributes[i]._instanceID
+                                        : g._instanceID
+                                )
+                                .withTemplateId(
+                                    isBasicData
+                                        ? g._attributes[i]._configPath.replace(
+                                              /\./g,
+                                              Keys.TERM_DELIMITER_DASH
+                                          )
+                                        : g._configPath.replace(
+                                              /\./g,
+                                              Keys.TERM_DELIMITER_DASH
+                                          )
+                                )
+                                .withDataType(
+                                    isBasicData
+                                        ? FastUtil.tokenizeAndJoin(
+                                              g._attributes[i]._configPath,
+                                              Keys.TERM_DELIMITER_PRD,
+                                              1
+                                          )
+                                        : FastUtil.tokenizeAndJoin(
+                                              g._configPath,
+                                              Keys.TERM_DELIMITER_PRD,
+                                              1
+                                          )
+                                )
+                                .withAlias(
+                                    isBasicData
+                                        ? `P${id}`
+                                        : FastUtil.tokenizeAndJoin(
+                                              g._instanceID,
+                                              Keys.TERM_DELIMITER_PRD,
+                                              2
+                                          )
+                                )
+                                .withFilter(
+                                    g._attributes[i]._constraints.reduce(
+                                        (constraintList, constraint) => {
+                                            if (
+                                                constraint instanceof
+                                                IFRExpression
+                                            ) {
+                                                constraintList.push(
+                                                    new Expression(
+                                                        constraint._operator,
+                                                        constraint._value
+                                                    )
+                                                );
+                                            } else if (
+                                                constraint._constraints.length >
+                                                0
+                                            ) {
+                                                constraintList.push(
+                                                    new And(
+                                                        constraint._constraints.map(
+                                                            (f) =>
+                                                                new Expression(
+                                                                    f._operator,
+                                                                    f._value
+                                                                )
+                                                        )
+                                                    )
+                                                );
+                                            }
+                                            return constraintList;
+                                        },
+                                        []
+                                    )
+                                );
                             break;
                         }
                     }
                 });
 
                 if (baseNode) {
-                    baseNode.withAxis(e.axis)
-                            .withSeq(e.seq)
-                            .withBinsize(e.binsize)
-                            .withAggregation(e.aggregation)
-                            .withOrder(e.order);
+                    baseNode
+                        .withAxis(e.axis)
+                        .withSeq(e.seq)
+                        .withBinsize(e.binsize)
+                        .withAggregation(e.aggregation)
+                        .withOrder(e.order);
                     groupByList.push(baseNode);
                 }
                 return groupByList;
@@ -509,8 +1084,11 @@ export class InternalFilterRepresentation implements Request {
     }
 
     private isMeasure(pathToken: string[]) {
-        return typeof (this.__qConfig.getEntityByPath(FastUtil.getId(pathToken, true, true)).getConfig()[Keys.MRITERM_MEASUREEXPRESSION])
-                        !== Keys.TERM_UNDEFINED;
+        return (
+            typeof this.__qConfig
+                .getEntityByPath(FastUtil.getId(pathToken, true, true))
+                .getConfig()[Keys.MRITERM_MEASUREEXPRESSION] !==
+            Keys.TERM_UNDEFINED
+        );
     }
-
 }

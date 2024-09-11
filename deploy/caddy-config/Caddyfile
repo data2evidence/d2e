@@ -47,18 +47,26 @@ https://*.alp.local:55555 {
 (cors) {
 	@cors_preflight method OPTIONS
 
-	header {
-		Access-Control-Allow-Origin {args[0]}
+	@cors_origin {
+		header_regexp Origin ^https?://localhost:(4000|5173|8081|4800|4900)?$
+	}
+
+	header @cors_origin {
+		Access-Control-Allow-Origin "{http.request.header.Origin}"
 		Vary Origin
-		Access-Control-Allow-Headers "Authorization, Content-Type"
+		Access-Control-Allow-Headers "*"
 		Access-Control-Allow-Credentials "true"
 		defer
 	}
 
 	handle @cors_preflight {
 		header {
+			Access-Control-Allow-Origin "{http.request.header.Origin}"
+			Access-Control-Allow-Credentials true
 			Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE"
 			Access-Control-Max-Age "3600"
+			Vary Origin
+			defer
 		}
 		respond "" 204
 	}
@@ -71,28 +79,8 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle /* {
-		reverse_proxy http://alp-perseus-frontend-1:4200 {
-			header_up X-Real-IP {http.request.remote_host}
-		}
-	}
-
-	handle_path /user/api/is_token_valid_internal {
-		reverse_proxy http://alp-perseus-user-1:5001 {
-			header_up Content-Length ""
-			header_up X-Original-URI {http.request.uri}
-		}
-	}
-
-	handle /user/* {
-		reverse_proxy http://alp-perseus-user-1:5001 {
-			header_up X-Real-IP {http.request.remote_host}
-		}
-	}
-
 	handle /backend/* {
 		import forward_authentication
-
 		reverse_proxy http://alp-perseus-backend-1:5004 {
 			header_up X-Real-IP {http.request.remote_host}
 		}
@@ -187,15 +175,23 @@ https://*.alp.local:55555 {
 			}
 		}
 
-		handle /portal/docs/* {
-			reverse_proxy https://trex:33000 {
-				transport http {
+	handle /portal/docs/* {
+		reverse_proxy https://trex:33000 {
+			transport http {
 				tls
 				tls_insecure_skip_verify
 				read_buffer 8192
 			}
-			}
 		}
+	}
+
+	handle_path /mapping/* {
+		root * /home/docker/ui-files/mapping/
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
+	}
 
 		handle /portal/icons/* {
 			reverse_proxy https://trex:33000 {
@@ -269,6 +265,12 @@ https://*.alp.local:55555 {
 				read_buffer 8192
 			}
 			}
+	handle_path /jobs/* {
+		root * /home/docker/ui-files/jobs/
+		encode zstd gzip
+		file_server {
+			precompressed zstd br gzip
+		}
 	}
 
 	handle /mapping/* {
@@ -516,7 +518,9 @@ https://localhost:41101 {
 }
 
 https://{$CADDY__ALP__PUBLIC_FQDN} {
-	{$TLS__CADDY_DIRECTIVE}
+	{$TLS__CADDY_DIRECTIVE} 
+	{$CADDY__CORS_LOCAL_UI}
+	import perseus
 	import portal
 }
 
@@ -536,10 +540,4 @@ https://{$CADDY__FHIR_SERVER__PUBLIC_FQDN:localhost}:41130 {
 			}
 		}
 	}
-}
-
-http://localhost:41180 {
-	# Allow CORS for mapping UI local development
-	import cors http://localhost:5173
-	import perseus
 }

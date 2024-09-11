@@ -53,24 +53,18 @@ const getUser = (req) => {
 let initSettingsFromEnvVars = () => {
   xsenv.loadEnv(envVarUtils.getEnvFile("../../default-env.json"));
 
-  if (envVarUtils.isTestEnv()) {
-    // reset configDB.host to point to analyticsDB.host, schema name will be the supplied TESTSCHEMA name
-    credentials = xsenv.cfServiceCredentials("httptest");
-    console.log("TESTSCHEMA :" + credentials.schema);
-  } else {
-    credentials = {
-      database: env.PG__DB_NAME,
-      schema: env.PG_SCHEMA,
-      dialect: env.PG__DIALECT,
-      host: env.PG__HOST,
-      port: env.PG__PORT,
-      user: env.PG_USER,
-      password: env.PG_PASSWORD,
-      max: env.PG__MAX_POOL,
-      min: env.PG__MIN_POOL,
-      idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
-    } as IDBCredentialsType
-  }
+  credentials = {
+    database: env.PG__DB_NAME,
+    schema: env.PG_SCHEMA,
+    dialect: env.PG__DIALECT,
+    host: env.PG__HOST,
+    port: env.PG__PORT,
+    user: env.PG_USER,
+    password: env.PG_PASSWORD,
+    max: env.PG__MAX_POOL,
+    min: env.PG__MIN_POOL,
+    idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS,
+  } as IDBCredentialsType;
 
   if (!envVarUtils.isStageLocalDev()) {
     securityUtils.authenticateRequest(app, xsenv);

@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv'
 import { z } from 'zod'
 
-if (Deno.env.has("DOTENV_PATH")) {
-  dotenv.config({ path: Deno.env.get("DOTENV_PATH") })
+if (Deno.env.has('DOTENV_PATH')) {
+  dotenv.config({ path: Deno.env.get('DOTENV_PATH') })
 }
 
 const Env = z.object({
@@ -46,9 +46,8 @@ const Env = z.object({
   TLS__INTERNAL__CRT: z.string(),
 })
 
-let _env = Deno.env.toObject() 
-_env.PG_SCHEMA =  _env.PG_SCHEMA || 'qe_config'
-
+let _env = Deno.env.toObject()
+_env.PG_SCHEMA = _env.PG_SCHEMA || 'qe_config'
 
 const result = Env.safeParse(_env)
 
@@ -56,8 +55,8 @@ let env = _env as unknown as z.infer<typeof Env>
 if (result.success) {
   env = result.data
 } else {
-  // @ts-ignore
-  console.warn(JSON.stringify(result.error))
+  console.error(`Service Failed to Start!! ${JSON.stringify(result)}`)
+  process.exit(1)
 }
 
 export { env }

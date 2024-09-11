@@ -30,7 +30,6 @@ import {
 } from './middlewares/ensureDatasetAuthorizedMiddleware'
 import { setupGlobalErrorHandling } from './error-handler'
 
-const auth = process.env.SKIP_AUTH === 'TRUE' ? false : true
 const PORT = env.GATEWAY_PORT
 const logger = createLogger('gateway')
 const userMgmtApi = new UserMgmtAPI()
@@ -54,7 +53,7 @@ try {
 }
 
 function ensureAuthenticated(req, res, next) {
-  if (!auth || publicURLs.some(url => req.originalUrl.startsWith(url))) {
+  if (publicURLs.some(url => req.originalUrl.startsWith(url))) {
     return next()
   }
 
@@ -62,9 +61,6 @@ function ensureAuthenticated(req, res, next) {
 }
 
 async function ensureAuthorized(req, res, next) {
-  if (!auth) {
-    return next()
-  }
 
   const { originalUrl, method, user: token } = req
   const { oid, sub } = token
@@ -111,9 +107,6 @@ async function ensureAuthorized(req, res, next) {
 }
 
 async function ensureAlpSysAdminAuthorized(req, res, next) {
-  if (!auth) {
-    return next()
-  }
   const { user } = req
   if (isDev) {
     logger.info(`🚀 inside ensureAlpSysAdminAuthorized, req.headers: ${JSON.stringify(req.headers)}`)
@@ -392,6 +385,17 @@ routes.forEach((route: IRouteProp) => {
           })
         )
         break
+      case 'prefect':
+        app.use(
+          source,
+          ensureAuthenticated,
+          checkScopes,
+          createProxyMiddleware({
+            ...getCreateMiddlewareOptions(services.prefect),
+            headers: { Connection: 'keep-alive' },
+            pathRewrite: path => path.replace('/prefect', '/')
+          })
+        )
       default:
         if (plugins && Object.keys(plugins).length > 0) {
           Object.keys(plugins).forEach((type: keyof IPlugin) => {

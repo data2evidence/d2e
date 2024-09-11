@@ -424,4 +424,4 @@ export const defaultTableTypePlaceholderMap: TableTypePlaceholderMapType = {
     ],
 };
 
-export const DUCKDB_FILE_NAME = "alpdev_pg_cdmvocab"
+export const DUCKDB_FILE_NAME = "cdw_config_svc_validation"

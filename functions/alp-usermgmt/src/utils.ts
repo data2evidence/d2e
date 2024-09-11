@@ -3,8 +3,8 @@ import crypto from 'crypto'
 
 export const DateNow = () => new Date().toISOString()
 
-export const isDev = Deno.env.get("NODE_ENV") === 'development'
-export const isSkipAuth = Deno.env.get("SKIP_AUTH") && Deno.env.get("SKIP_AUTH") === 'TRUE'
+export const isDev = Deno.env.get('NODE_ENV') === 'development'
+export const isSkipAuth = Deno.env.get('SKIP_AUTH') && Deno.env.get('SKIP_AUTH') === 'TRUE'
 
 export const getRandomString = (length: number) => {
   const buff = crypto.randomBytes(length + 2)

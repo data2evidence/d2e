@@ -232,8 +232,8 @@ export function main() {
         password: env.PG_PASSWORD,
         max: env.PG__MAX_POOL,
         min: env.PG__MIN_POOL,
-        idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
-      } as IDBCredentialsType
+        idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS,
+      } as IDBCredentialsType;
     }
 
     initRoutes();

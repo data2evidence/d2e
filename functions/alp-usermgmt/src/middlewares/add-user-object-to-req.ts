@@ -15,11 +15,6 @@ export const addUserObjToReq = async (req: IAppRequest, res: Response, next: Nex
   logger.debug('Add user obj to req')
 
   try {
-    if (isSkipAuth) {
-      req.user = DEMO_USER
-      return next()
-    }
-
     const bearerToken = req.headers.authorization as string
     if (!bearerToken) {
       return next()
