@@ -53,6 +53,8 @@ x-envs:
   fhir: &x-fhir
     FHIR__CLIENT_ID: db6b2304-f236-45ec-b10c-a852681e7129
     FHIR__CLIENT_SECRET: ${FHIR__CLIENT_SECRET}
+  perseus: &x-perseus
+    PERSEUS__FILES_MANAGER_HOST: alp-perseus-files-manager-${BASE_PORT:-1}
   plugins: &x-plugins |
     {
       "researcher": [
@@ -234,11 +236,6 @@ x-envs:
           "route": "etl"
         },
         {
-          "name": "Sql",
-          "pluginPath": "plugins/SystemAdmin/Sqleditor/module",
-          "route": "sqleditor"
-        },
-        {
           "name": "Codes",
           "pluginPath": "plugins/SystemAdmin/ConceptMapping/module",
           "route": "codes"
@@ -280,7 +277,6 @@ x-envs:
        "usermgmt": "https://alp-minerva-user-mgmt-${BASE_PORT}.${TLS__INTERNAL__DOMAIN:-alp.local}:41104/usermgmt/api",
        "terminology": "https://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
        "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
-       "sqlEditor" : "http://alp-minerva-sqleditor:8888",
        "appRouter": "https://alp-mercury-approuter:41000",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT}:3001/oidc",
        "minio": "",
@@ -965,7 +961,6 @@ services:
          "Internal": "${DB_CREDENTIALS__INTERNAL__PUBLIC_KEY}"
         }
       GATEWAY__API_ALLOWED_DOMAINS: |-
-        http://alp-minerva-sqleditor:8888/
         http://localhost:8080
         https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
         https://*.alp-dev.org
@@ -1212,9 +1207,6 @@ services:
     networks:
       alp:
         priority: 20
-        aliases:
-          - shareddb
-          - vocabularydb
       data:
         priority: 10
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
@@ -1228,24 +1220,6 @@ services:
         - *x-tls
       POSTGRES_DB: ${PG_DB_NAME:-alp}
       POSTGRES_PASSWORD: ${PG_SUPER_PASSWORD}
-
-  alp-minerva-postgres-post-init:
-    depends_on:
-      alp-minerva-postgres:
-        condition: service_healthy
-    image: postgres:15-alpine
-    networks:
-      alp:
-        priority: 20
-    volumes:
-      - ./deploy/perseus:/perseus
-    entrypoint: sh perseus/seed.sh
-    environment:
-      <<:
-        - *x-pg
-      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
-      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
-    profiles: [perseus]
 
   alp-minerva-ps-config-svc:
     container_name: &c18 alp-minerva-ps-config-svc-${BASE_PORT:-1}
@@ -1328,39 +1302,6 @@ services:
         - *x-tls
       MINIO_ROOT_PASSWORD: ${MINIO__SECRET_KEY}
       MINIO_ROOT_USER: ${MINIO__ACCESS_KEY:-root}
-
-  alp-minerva-sqleditor:
-    container_name: &c20 alp-minerva-sqleditor
-    depends_on:
-      alp-db-credentials-mgr:
-        condition: service_healthy
-      alp-logto:
-        condition: service_healthy
-      alp-minerva-gateway:
-        condition: service_healthy
-      alp-minerva-postgres:
-        condition: service_healthy
-    dns: 8.8.8.8
-    hostname: alp-minerva-sqleditor.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-sqleditor:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c20
-    networks:
-      alp:
-        priority: 20
-    profiles: [sql]
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    environment:
-      <<:
-        - *x-converter
-        - *x-pg
-        - *x-tls
-        - *x-routes
-      ## Postgres admin password
-      PG__ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
-      ## Postgres admin user for running migration and seedling
-      PG__ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
 
   alp-minerva-terminology-svc:
     container_name: &c21 alp-minerva-terminology-svc-${BASE_PORT:-1}
@@ -1787,26 +1728,36 @@ services:
       DOCKER_TLS_CERTDIR: /certs
 
   alp-perseus-files-manager:
-    image: perseushub/files-manager:latest
-    container_name: files-manager
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
+    container_name: &c34 alp-perseus-files-manager-${BASE_PORT:-1}
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-    depends_on:
-      alp-minerva-postgres-post-init:
-        condition: service_completed_successfully
+      <<:
+         - *x-pg
+      SPRING_PROFILES_ACTIVE: docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     networks:
       alp:
         priority: 20
+    command:
+      - PG_SUPER_USER=${PG_SUPER_USER:-postgres}
+      - PG_SUPER_PASSWORD=${PG_SUPER_PASSWORD}
+      - PG__HOST=${PG_HOST:-alp-minerva-postgres-1}
+      - PG__PORT=${PG_PORT:-5432}
+      - PG__DB_NAME=alp
     profiles: [perseus]
 
   alp-perseus-backend:
-    image: perseushub/backend:latest
-    container_name: alp-perseus-backend-${BASE_PORT:-1}
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-backend:${DOCKER_TAG_NAME:-develop}
+    container_name: &c35 alp-perseus-backend-${BASE_PORT:-1}
     environment:
+      <<:
+        - *x-pg
+        - *x-perseus
       PERSEUS_ENV: Docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
-      alp-minerva-postgres-post-init:
-        condition: service_completed_successfully
       alp-perseus-files-manager:
         condition: service_started
     networks:
@@ -1815,28 +1766,40 @@ services:
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
-    image: perseushub/white-rabbit:latest
-    container_name: alp-perseus-white-rabbit-${BASE_PORT:-1}
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-white-rabbit:${DOCKER_TAG_NAME:-develop}
+    container_name: &c36 alp-perseus-white-rabbit-${BASE_PORT:-1}
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      <<:
+        - *x-pg
+        - *x-perseus
+      SPRING_PROFILES_ACTIVE: docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
-      alp-minerva-postgres-post-init:
-        condition: service_completed_successfully
       alp-perseus-files-manager:
         condition: service_started
     networks:
       alp:
         priority: 20
+    command:
+      - PG_SUPER_USER=${PG_SUPER_USER:-postgres}
+      - PG_SUPER_PASSWORD=${PG_SUPER_PASSWORD}
+      - PG__HOST=${PG_HOST:-alp-minerva-postgres-1}
+      - PG__PORT=${PG_PORT:-5432}
+      - PG__DB_NAME=alp
     profiles: [perseus]
 
   alp-perseus-cdm-builder:
-    image: perseushub/cdm-builder:latest
-    container_name: alp-perseus-cdm-builder-${BASE_PORT:-1}
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-cdm-builder:${DOCKER_TAG_NAME:-develop}
+    container_name: &c37 alp-perseus-cdm-builder-${BASE_PORT:-1}
     environment:
-      - ASPNETCORE_ENVIRONMENT=Docker
+      <<:
+        - *x-pg
+        - *x-perseus
+      ASPNETCORE_ENVIRONMENT: Docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
-      alp-minerva-postgres-post-init:
-        condition: service_completed_successfully
       alp-perseus-files-manager:
         condition: service_started
     networks:
