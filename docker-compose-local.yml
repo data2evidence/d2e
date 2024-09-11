@@ -354,22 +354,22 @@ services:
       dockerfile: Dockerfile
     # volumes:
     #   - ./services/alp-logto/post-init:/home/docker
-  alp-dataflow-gen-process-worker:
-    build:
-      context: .
-      dockerfile: services/alp-dataflow-gen/Dockerfile.worker
+  # alp-dataflow-gen-process-worker:
+  #   build:
+  #     context: .
+  #     dockerfile: services/alp-dataflow-gen/Dockerfile.worker
       # ssh: # Enable if GIT_CLONE_TYPE set to ssh
       #   - default=${SSH_AUTH_SOCK}
-      args:
-        GIT_COMMIT_ID__PLUGINS_REPO: ${GIT_COMMIT_ID__PLUGINS_REPO:-main}
-        GIT_CLONE_TYPE: ${GIT_CLONE_TYPE:-https} # https / ssh
-        D2E_PLUGIN_REPO: ${D2E_PLUGIN_REPO:-alp-os/d2e-plugins.git} # git@github.com:alp-os/d2e-plugins.git
-        GIT_TOKEN__PLUGINS_REPO_READ: ${GIT_TOKEN__PLUGINS_REPO_READ} #only for https
+      # args:
+      #   GIT_COMMIT_ID__PLUGINS_REPO: ${GIT_COMMIT_ID__PLUGINS_REPO:-main}
+      #   GIT_CLONE_TYPE: ${GIT_CLONE_TYPE:-https} # https / ssh
+      #   D2E_PLUGIN_REPO: ${D2E_PLUGIN_REPO:-alp-os/d2e-plugins.git} # git@github.com:alp-os/d2e-plugins.git
+      #   GIT_TOKEN__PLUGINS_REPO_READ: ${GIT_TOKEN__PLUGINS_REPO_READ} #only for https
   #     volumes:
   #       - ../d2e-plugins:/usr/src/app/d2e-plugins
 
-  alp-dataflow-gen-docker-worker:
-    extends: alp-dataflow-gen-process-worker
+  # alp-dataflow-gen-docker-worker:
+  #   extends: alp-dataflow-gen-process-worker
 
   # alp-fhir-server-post-init:
   #   build:
