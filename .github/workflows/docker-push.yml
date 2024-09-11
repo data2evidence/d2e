@@ -205,7 +205,7 @@ jobs:
             fileName: Dockerfile
           - name: alp-data-node/alp-perseus-cdm-builder
             directory: ./services/alp-perseus-cdm-builder
-            context: Dockerfile
+            context: ./services/alp-perseus-cdm-builder
             fileName: Dockerfile
     uses: ./.github/workflows/docker-push-called.yml
     with:
