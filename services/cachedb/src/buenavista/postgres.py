@@ -476,6 +476,13 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
         params = []
         for i in range(num_params):
             nb = buf.read_int32()
+
+            # nb being -1 indicates a NULL parameter value. No value bytes follow in the NULL case.
+            # Dont read buffer, append None to params and continue
+            if nb == -1:
+                params.append(None)
+                continue
+
             v = buf.read_bytes(nb)
             if formats[i] == 0:
                 decoded = v.decode("utf-8")
