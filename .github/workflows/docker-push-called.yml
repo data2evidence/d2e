@@ -176,15 +176,15 @@ jobs:
         shell: bash
         env:
           AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
-          AZ_REGISTRY_PRUNE_ENABLE_TAGGED: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE_TAGGED }}
-          AZ_REGISTRY_PRUNE_DAYS_TAGGED: ${{ vars.AZ_REGISTRY_PRUNE_DAYS_TAGGED }}
+          AZ_REGISTRY_PRUNE_ENABLE_TAGGED: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE_TAGGED || 'false' }}
+          AZ_REGISTRY_PRUNE_DAYS_TAGGED: ${{ vars.AZ_REGISTRY_PRUNE_DAYS_TAGGED || '7' }}
           AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
         run: |
-          if [ ${AZ_REGISTRY_PRUNE_DAYS_TAGGED:-20} = 0 ]; then
+          if [ ${AZ_REGISTRY_PRUNE_DAYS_TAGGED} = 0 ]; then
             AZ_REGISTRY_PRUNE_TIMESTAMP=$(date -u -Is)
           else
             TODAY=$(date +%Y-%m-%d)
-            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_TAGGED:-20} days" +%Y-%m-%d)"
+            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_TAGGED} days" +%Y-%m-%d)"
           fi
           echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP | tee -a $GITHUB_STEP_SUMMARY
 
@@ -218,14 +218,14 @@ jobs:
         env:
           AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
           AZ_REGISTRY_PRUNE_ENABLE_UNTAGGED: ${{ vars.AZ_REGISTRY_PRUNE_ENABLE_UNTAGGED }}
-          AZ_REGISTRY_PRUNE_DAYS_UNTAGGED: ${{ vars.AZ_REGISTRY_PRUNE_DAYS_UNTAGGED }}
+          AZ_REGISTRY_PRUNE_DAYS_UNTAGGED: ${{ vars.AZ_REGISTRY_PRUNE_DAYS_UNTAGGED || '7' }}
           AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
         run: |
-          if [ ${AZ_REGISTRY_PRUNE_DAYS_UNTAGGED:-1} = 0 ]; then
+          if [ ${AZ_REGISTRY_PRUNE_DAYS_UNTAGGED} = 0 ]; then
             AZ_REGISTRY_PRUNE_TIMESTAMP=$(date -u -Is)
           else
             TODAY=$(date +%Y-%m-%d)
-            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_UNTAGGED:-1} days" +%Y-%m-%d)"
+            AZ_REGISTRY_PRUNE_TIMESTAMP="$(date -d "$TODAY - ${AZ_REGISTRY_PRUNE_DAYS_UNTAGGED} days" +%Y-%m-%d)"
           fi
           echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP
 
