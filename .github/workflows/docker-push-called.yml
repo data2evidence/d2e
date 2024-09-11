@@ -189,11 +189,11 @@ jobs:
           echo AZ_REGISTRY_PRUNE_TIMESTAMP=$AZ_REGISTRY_PRUNE_TIMESTAMP | tee -a $GITHUB_STEP_SUMMARY
 
           echo ". 1 - GET manifest metadata -  deprecated warning is not relevant"
-          az acr manifest metadata list --only-show-errors --name ${AZ_REGISTRY_REPOSITORY} --registry ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && not_null(tags)]" > private.json
-          wc -l private.json
+          az acr manifest metadata list --only-show-errors --name ${AZ_REGISTRY_REPOSITORY} --registry ${AZ_REGISTRY_NAME} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?lastUpdateTime < '${AZ_REGISTRY_PRUNE_TIMESTAMP}' && not_null(tags)]" > private-tagged.json
+          wc -l private-tagged.json
 
           echo ". 2 - ANALYZE each tag as deletable True/False - show first 20"
-          cat private.json | yq -rP 'map({"digest":.digest, "tags":(.tags|@json),"count":(.tags|length),"lengths":([.tags[]|length]|@json),"deletable":(.tags|map(test(env(AZ_REGISTRY_WHITELIST_REGEX))|not)|@json)})' | tee private1-analysis.yml | yq '.[0:20]'
+          cat private-tagged.json | yq -rP 'map({"digest":.digest, "tags":(.tags|@json),"count":(.tags|length),"lengths":([.tags[]|length]|@json),"deletable":(.tags|map(test(env(AZ_REGISTRY_WHITELIST_REGEX))|not)|@json)})' | tee private1-analysis.yml | yq '.[0:20]'
 
           echo ". 3 - ACTION lock manifests with deletable False i.e. tags matching RegEx"
           cat private1-analysis.yml | yq 'map(select(.deletable|contains("false")).digest) | .[]' | xargs -I% echo az acr repository update -u ${AZ_REGISTRY_USERNAME} -p ${AZ_REGISTRY_PASSWORD} --name ${AZ_REGISTRY_NAME} --image ${AZ_REGISTRY_REPOSITORY}@% --delete-enabled false --write-enabled true --query 'tags' --output tsv || true
@@ -245,7 +245,7 @@ jobs:
           AZ_REGISTRY_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
           AZ_REGISTRY_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
         run: |
-          az acr manifest metadata list --only-show-errors --registry ${AZ_REGISTRY_NAME} --name ${AZ_REGISTRY_REPOSITORY} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?tags[0]!=null]" -o json | yq -P > private-test.yml
+          az acr manifest metadata list --only-show-errors --registry ${AZ_REGISTRY_NAME} --name ${AZ_REGISTRY_REPOSITORY} --username "${AZ_REGISTRY_USERNAME}" --password "${AZ_REGISTRY_PASSWORD}" --orderby time_asc --query "[?tags[0]!=null]" -o json > private-test.json
           echo . INFO test tags matching RegEx
-          cat private-test.yml | yq -o tsv '.[].tags | map(select(test(env(AZ_REGISTRY_WHITELIST_REGEX))))' | sort | tee private-test-tags.txt
+          cat private-test.json | yq -o tsv '.[].tags | map(select(test(env(AZ_REGISTRY_WHITELIST_REGEX))))' | sort | tee private-test-tags.txt
           cat private-test-tags.txt | xargs -I% sh -c "echo tag: % && az acr manifest show --only-show-errors ${AZ_REGISTRY_NAME}.azurecr.io/${AZ_REGISTRY_REPOSITORY}:% | yq -P && echo"
