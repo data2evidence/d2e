@@ -72,7 +72,6 @@ export class DatasetRouter {
     })
 
     this.router.post('/', generateDatasetSchema, async (req, res) => {
-        console.log(req);
       const token = req.headers.authorization!
       const portalAPI = new PortalAPI(token)
       const dataflowMgmtAPI = new DataflowMgmtAPI(token)

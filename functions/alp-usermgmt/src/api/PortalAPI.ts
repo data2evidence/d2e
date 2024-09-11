@@ -45,7 +45,6 @@ export class PortalAPI {
       const result = await axios.get(`${this.baseURL}/tenant/list/me`, options)
       return result.data
     } catch (error) {
-      //console.log(error);
       this.logger.error(`Error when get my tenant: ${JSON.stringify(error?.response?.data || error?.code)}`)
       throw new Error(`Error when get my tenant`)
       //return [{ id: "e0348e4d-2e17-43f2-a3c6-efd752d17c23", name: "Tenant" }]
