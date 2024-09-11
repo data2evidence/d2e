@@ -1381,6 +1381,7 @@ services:
         - *x-tls
         - *x-routes
         - *x-pg
+        - *cachedb
       FHIR_TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}11
       LOCAL_DEBUG: "false"
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
@@ -1393,6 +1394,7 @@ services:
       TERMINOLOGY_SVC__LOG_LEVEL: info
       TERMINOLOGY_SVC__PATH: terminology
       TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
+      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-true}
 
   alp-minerva-user-mgmt:
     container_name: &c22 alp-minerva-user-mgmt-${BASE_PORT:-1}

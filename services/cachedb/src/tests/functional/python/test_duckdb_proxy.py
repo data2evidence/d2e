@@ -10,6 +10,7 @@ import config
 from api.OpenIdAPI import OpenIdAPI
 from api.UserMgmtAPI import UserMgmtAPI
 from api.PortalServerAPI import PortalServerAPI
+from buenavista import database
 
 test_group_metadata = {
     "alp_role_system_admin": False,
@@ -31,6 +32,8 @@ def setup():
     mp.setattr(UserMgmtAPI, "get_user_group_metadata",
                _mock_get_user_group_metadata)
     mp.setattr(PortalServerAPI, "get_dataset", _mock_get_dataset)
+    
+    mp.setattr(database, "_attach_direct_postgres_connection_for_duckdb", _mock_attach_direct_postgres_connection_for_duckdb)
 
     config.Env.DUCKDB__DATA_FOLDER = "./tests/data"
 
@@ -123,3 +126,6 @@ def _mock_get_user_group_metadata(self, user_id):
 
 def _mock_get_dataset(self, dataset_id):
     return test_dataset
+
+def _mock_attach_direct_postgres_connection_for_duckdb(db, database_code):
+    pass

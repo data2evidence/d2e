@@ -5,7 +5,7 @@ import {
     CohortDefinitionTableType,
 } from "../../types";
 import MRIEndpointErrorHandler from "../../utils/MRIEndpointErrorHandler";
-import { Logger, getUser } from "@alp/alp-base-utils";
+import { Logger, getUser, User } from "@alp/alp-base-utils";
 import CreateLogger = Logger.CreateLogger;
 let logger = CreateLogger("analytics-log");
 import { CohortEndpoint } from "../../mri/endpoint/CohortEndpoint";
@@ -16,7 +16,7 @@ import PortalServerAPI from "../PortalServerAPI";
 import { convertIFRToExtCohort } from "../../ifr-to-extcohort/main";
 import { dataflowRequest } from "../../utils/DataflowMgmtProxy";
 import { getDuckdbDirectPostgresWriteConnection } from "../../utils/DuckdbConnection";
-
+import { getCachedbDbConnections } from "../../utils/cachedb/helper";
 import { env } from "../../env";
 const language = "en";
 
@@ -25,6 +25,31 @@ const mriConfigConnection = new MriConfigConnection(
 );
 
 export async function getCohortAnalyticsConnection(req: IMRIRequest) {
+    // If USE_CACHEDB is true, return early with cachedb connection
+    if (env.USE_CACHEDB === "true") {
+        let userObj: User;
+        try {
+            userObj = getUser(req);
+            logger.debug(
+                `req.headers: ${JSON.stringify(req.headers)}\n
+                    currentUser: ${JSON.stringify(userObj)}\n
+                    url is: ${req.url}`
+            );
+        } catch (err) {
+            logger.debug(`No user found in request:${err.stack}`);
+        }
+
+        // For cohorts, when using cachedb connection, connect to postgres instead of duckdb
+        const { analyticsConnection } = await getCachedbDbConnections({
+            analyticsCredentials: req.dbCredentials.studyAnalyticsCredential,
+            userObj: userObj,
+            token: req.headers.authorization,
+            studyId: req.selectedstudyDbMetadata.id,
+            replacePostgresWithDuckdb: false,
+        });
+        return analyticsConnection;
+    }
+
     const { analyticsConnection } = req.dbConnections;
     // If dialect is DUCKDB, get direct postgres write connection instead
     if (analyticsConnection.dialect === "DUCKDB") {
