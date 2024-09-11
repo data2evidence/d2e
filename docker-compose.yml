@@ -360,9 +360,9 @@ services:
             "MINIO__REGION": "${MINIO__REGION:-ap-southeast-1}",
             "MINIO__SECRET_KEY": "${MINIO__SECRET_KEY}",
             "MINIO__SSL": "${MINIO__SSL:-false}",
-            "SQL_PROXY__HOST": "alp-sql-proxy",
-            "SQL_PROXY__PORT": 41191,
-            "SQL_PROXY__POOL_SIZE": "${SQL_PROXY__POOL_SIZE:-10}",
+            "CACHEDB__HOST: alp-cachedb",
+            "CACHEDB__PORT: 41191,
+            "CACHEDB__POOL_SIZE: ${CACHEDB__POOL_SIZE:-10}",
             "NODE_ENV": "development",
             "PG__DB_NAME": "alp",
             "PG__DEBUG": "${PG_DEBUG:-1}",
@@ -609,7 +609,7 @@ services:
         - *x-minio
         - *x-tls
         - *x-routes
-        - *sql-proxy
+        - *cachedb
       ALP_GATEWAY_OAUTH__URL: https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/oauth/token
       ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
       ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT
@@ -1404,6 +1404,39 @@ services:
       - dind-certs:/certs
     environment:
       DOCKER_TLS_CERTDIR: /certs
+
+  alp-dataflow-gen-init:
+    command:
+      - sh
+      - ./init.sh
+    container_name: &c4 alp-dataflow-gen-init-${BASE_PORT:-1}
+    depends_on:
+      alp-dataflow-gen:
+        condition: service_healthy
+      alp-minio-post-init:
+        condition: service_completed_successfully
+    hostname: alp-dataflow-gen-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c4
+    networks:
+      alp:
+        priority: 20
+    platform: linux/amd64
+    environment:
+      <<:
+        - *x-minio
+        - *x-tls
+      DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_SB_NAME: dataflow-adhoc-flows-sb
+      DATAFLOW_MGMT__ADHOC_FLOWS__S3_DIR_PATH: s3://dataflow-adhoc-flows/flows
+      DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME: flow-results
+      DATAFLOW_MGMT__FLOWS__RESULTS__S3_DIR_PATH: s3://flows/results
+      PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
+      PREFECT_LOGGING_SERVER_LEVEL: WARNING
+      PREFECT__PROCESS_WORKER_POOL_NAME: process-pool
+      PREFECT__DOCKER_WORKER_POOL_NAME: docker-pool
+      R_LIBS_USER: /home/docker/plugins/R/site-library
 
   alp-perseus-files-manager:
     image: perseushub/files-manager:latest
