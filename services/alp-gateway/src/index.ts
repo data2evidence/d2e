@@ -21,7 +21,6 @@ import Routes, { DashboardGateRouter } from './routes'
 import { addSubToRequestUserMiddleware } from './middlewares/AddSubToRequestUserMiddleware'
 import { AuthcType, exchangeToken, publicURLs } from './authentication'
 import { v4 as uuidv4 } from 'uuid'
-import { addSqleditorHeaders } from './middlewares/SqleditorMiddleware'
 import { addMeilisearchHeaders } from './middlewares/MeilisearchMiddleware'
 import {
   ensureAnalyticsDatasetAuthorized,
@@ -235,19 +234,6 @@ routes.forEach((route: IRouteProp) => {
       .replace('^', '')
 
     switch (route.destination) {
-      case 'sqleditor':
-        app.use(
-          source,
-          ensureAuthenticated,
-          addSqleditorHeaders,
-          createProxyMiddleware({
-            target: services.sqlEditor,
-            pathRewrite: { '^/alp-sqleditor': '' },
-            changeOrigin: true,
-            onProxyReq
-          })
-        )
-        break
       case 'public-analytics-svc':
         app.use(
           source,

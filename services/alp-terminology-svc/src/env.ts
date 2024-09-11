@@ -29,6 +29,16 @@ const Env = z.object({
   TLS__INTERNAL__CRT: z.string(),
   TLS__INTERNAL__CA_CRT: z.string(),
 
+  CACHEDB__HOST: z.string(),
+  CACHEDB__PORT: z.string().transform(Number),
+
+  USE_DUCKDB_FTS: z
+    .string()
+    .refine((value) => value === 'true' || value === 'false', {
+      message: 'Value must be a boolean',
+    })
+    .transform((value) => value === 'true'),
+
   SERVICE_ROUTES: z
     .string()
     .transform((str, ctx): z.infer<ReturnType<typeof object>> => {

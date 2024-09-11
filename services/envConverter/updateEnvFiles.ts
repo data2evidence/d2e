@@ -3,7 +3,6 @@ import * as fs from "fs";
 import {
   filterServiceCredentials,
   processForComposeCdwSvc,
-  processForComposeSqleditor,
   serviceNames,
 } from "./processForCompose";
 import {
@@ -124,12 +123,6 @@ function updateEnv(service: string, databaseCredentials: any) {
         appendEnv(svcHana, "HANA__TENANT_CONFIGS", generatedFileName);
         const svcPostgres = dbSvcConverter(databaseCredentials).postgres;
         appendEnv(svcPostgres, "PG__TENANT_CONFIGS", generatedFileName);
-        break;
-      }
-      case serviceNames.SQLEDITOR: {
-        const iniConnText = processForComposeSqleditor(databaseCredentials);
-        const filePath = `/usr/share/hue/sqleditor.ini`;
-        fs.appendFileSync(filePath, iniConnText);
         break;
       }
       default:
