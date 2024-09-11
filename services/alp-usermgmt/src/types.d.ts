@@ -9,7 +9,6 @@ export interface Pagination {
 type RoleTypeOf<T> = {
   ALP_USER_ADMIN: boolean
   ALP_SYSTEM_ADMIN: boolean
-  ALP_SQLEDITOR_ADMIN: boolean
   ALP_NIFI_ADMIN: boolean
   ALP_DASHBOARD_VIEWER: boolean
   TENANT_ADMIN: T
@@ -39,7 +38,6 @@ export interface RoleMap {
   alp_role_tenant_viewer: string[] // list of tenant ids
   alp_role_user_admin: boolean // alp user admin
   alp_role_system_admin: boolean // alp system admin
-  alp_role_alp_sqleditor_admin: boolean // sqleditor admin
   alp_role_nifi_admin: boolean // nifi admin
   alp_role_dashboard_viewer: boolean // dashboard viewer
 }

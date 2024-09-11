@@ -146,10 +146,6 @@ jobs:
             context: .
             fileName: Dockerfile
             pull: true
-          - name: alp-data-node/alp-sqleditor
-            directory: ./services/alp-sqleditor
-            context: .
-            fileName: Dockerfile
           - name: alp-data-node/mri-pa-config
             directory: ./services/mri-pa-config
             context: .
