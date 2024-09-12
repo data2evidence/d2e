@@ -26675,12 +26675,13 @@ const cdwConfigDuckdb = {
         ],
         "type": "text",
         "expression": "@PATIENT.\"ethnicity_concept_id\"",
-        "referenceFilter": "@REF.DOMAIN_ID = 'Ethnicity' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-        "referenceExpression": "@REF.CONCEPT_NAME",
+        "referenceFilter": "@REF.DOMAIN_ID = 'Ethnicity' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.65",
+        "referenceExpression": "@REF.CONCEPT_ID",
         "order": 8,
         "domainFilter": "",
         "standardConceptCodeFilter": "",
-        "useRefValue": true
+        "useRefValue": true,
+        useRefText: true,
       },
       "locationid": {
         "name": [
