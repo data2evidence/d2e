@@ -26817,7 +26817,7 @@ const cdwConfigDuckdb = {
             visible: true,
           },
         ],
-        type: "text",
+        type: "num",
         expression: '@PATIENT."location_id"',
         order: 9,
         domainFilter: "",
