@@ -71,15 +71,13 @@ _env.PG_SCHEMA = _env.PG_SCHEMA || "cdw_config";
 
 const result = Env.safeParse(_env);
 
-let env: z.infer<typeof Env>;
+let env = _env as unknown as z.infer<typeof Env>;
 if (result.success) {
   env = result.data;
 } else {
   console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
-  process.exit(1);
 }
 
-const env = _env as unknown as z.infer<typeof Env>;
 const envVarUtils = new EnvVarUtils(_env);
 
 export { env, envVarUtils };

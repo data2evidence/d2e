@@ -20,7 +20,7 @@ import { Container } from 'typedi'
 import Routes from './routes'
 import { IMRIRequest, IDBCredentialsType } from './types'
 import { env } from './env'
-import { BookmarkRouter } from "./bookmark/bookmark.router.ts";
+import { BookmarkRouter } from './bookmark/bookmark.router.ts'
 
 dotenv.config()
 const log = Logger.CreateLogger('bookmark-log')
@@ -48,8 +48,8 @@ const initRoutes = async (app: express.Application) => {
     password: env.PG_PASSWORD,
     max: env.PG__MAX_POOL,
     min: env.PG__MIN_POOL,
-    idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS
-  } 
+    idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS,
+  }
   app.use(async (req: IMRIRequest, res, next) => {
     if (!utils.isHealthProbesReq(req)) {
       log.debug(`🚀 ~ file: main.ts ~ line 141 ~ app.use ~ req.headers: ${JSON.stringify(req.headers, null, 2)}`)
@@ -108,7 +108,7 @@ export const main = async () => {
    */
   Constants.getInstance().setEnvVar('bookmarks_table', 'bookmark')
 
-  const port = Deno.env.get("PORT") || 3005
+  const port = Deno.env.get('PORT') || 3005
 
   //initialize Express
   const app = express()
@@ -147,5 +147,4 @@ try {
   log.error(`
         Bookmark svc failed to start! Kindly fix the error and restart the application. ${err.message}
         ${err.stack}`)
-  process.exit(1)
 }

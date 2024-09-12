@@ -15,11 +15,11 @@ import noCacheMiddleware from "./middleware/NoCache";
 import timerMiddleware from "./middleware/Timer";
 import os from "node:os";
 import https from "https";
-import {generateQuery} from "./api/controllers/query.ts"
-import {generateQuery as cohortGenerateQuery} from "./api/controllers/cohort.ts"
-import {generateQuery as cohortCompareGenerateQuery} from "./api/controllers/cohortCompareQuery.ts"
-import {generateQuery as domainGenerateQuery} from "./api/controllers/domainValuesQuery.ts"
-import {generateQuery as pluginGenerateQuery} from "./api/controllers/pluginEndpointQuery.ts"
+import { generateQuery } from "./api/controllers/query.ts";
+import { generateQuery as cohortGenerateQuery } from "./api/controllers/cohort.ts";
+import { generateQuery as cohortCompareGenerateQuery } from "./api/controllers/cohortCompareQuery.ts";
+import { generateQuery as domainGenerateQuery } from "./api/controllers/domainValuesQuery.ts";
+import { generateQuery as pluginGenerateQuery } from "./api/controllers/pluginEndpointQuery.ts";
 
 dotenv.config();
 const log = Logger.CreateLogger("query-gen-log");
@@ -73,8 +73,6 @@ const initRoutes = async (app: express.Application) => {
     });
 };*/
 
-
-
 export const main = async () => {
     const port = Deno.env.get("PORT") || 3006;
 
@@ -89,27 +87,38 @@ export const main = async () => {
 
     await initRoutes(app);
     //await initSwaggerRoutes(app);
-    app.post('/analytics-svc/api/services/query', generateQuery);
-    app.post('/analytics-svc/api/services/query/cohort', cohortGenerateQuery);
-    app.post('/analytics-svc/api/services/query/generateQuery', cohortCompareGenerateQuery);
-    app.post('/analytics-svc/api/services/query/domainvalues', domainGenerateQuery);
-    app.post('/analytics-svc/api/services/query/pluginendpoint', pluginGenerateQuery);
+    app.post("/analytics-svc/api/services/query", generateQuery);
+    app.post("/analytics-svc/api/services/query/cohort", cohortGenerateQuery);
+    app.post(
+        "/analytics-svc/api/services/query/generateQuery",
+        cohortCompareGenerateQuery
+    );
+    app.post(
+        "/analytics-svc/api/services/query/domainvalues",
+        domainGenerateQuery
+    );
+    app.post(
+        "/analytics-svc/api/services/query/pluginendpoint",
+        pluginGenerateQuery
+    );
 
     utils.setupGlobalErrorHandling(app, log);
 
     if (envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun()) {
         app.listen(port);
         log.info(
-            `Test mode details: [isTestEnv: ${envVarUtils.isTestEnv()}, test schema name: ${
-                Deno.env.get("TESTSCHEMA")
-            }]`
+            `Test mode details: [isTestEnv: ${envVarUtils.isTestEnv()}, test schema name: ${Deno.env.get(
+                "TESTSCHEMA"
+            )}]`
         );
     } else {
         const server = https.createServer(
             {
                 key: Deno.env.get("TLS__INTERNAL__KEY")?.replace(/\\n/g, "\n"),
                 cert: Deno.env.get("TLS__INTERNAL__CRT")?.replace(/\\n/g, "\n"),
-                ca: Deno.env.get("TLS__INTERNAL__CA_CRT")?.replace(/\\n/g, "\n"),
+                ca: Deno.env
+                    .get("TLS__INTERNAL__CA_CRT")
+                    ?.replace(/\\n/g, "\n"),
                 maxHeaderSize: 8192 * 10,
             },
             app
@@ -129,5 +138,4 @@ try {
     log.error(`
         Query-gen svc failed to start! Kindly fix the error and restart the application. ${err.message}
         ${err.stack}`);
-    process.exit(1);
 }

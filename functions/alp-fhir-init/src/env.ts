@@ -25,6 +25,5 @@ if (result.success) {
   env = result.data;
 } else {
   console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
-  process.exit(1);
 }
 export { env };

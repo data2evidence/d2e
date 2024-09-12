@@ -96,7 +96,6 @@ export const main = () => {
 
 const handleStartupError = (err) => {
   log.error(err);
-  process.exit(1);
 };
 
 const getConnections = async ({
