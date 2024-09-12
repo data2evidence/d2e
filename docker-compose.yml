@@ -565,6 +565,7 @@ services:
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
       isHttpTestRun: ${isHttpTestRun}
       isTestEnv: ${isTestEnv}
+      PREFECT_DOCKER_VOLUMES: '["alp_duckdb-data-1:/app/duckdb_data"]'
 
   alp-minerva-analytics-svc:
     container_name: &c9 alp-minerva-analytics-${BASE_PORT:-1}
@@ -666,8 +667,9 @@ services:
             "+public": {},
             "+qe_config": {},
             "+terminology": {},
-            "+usermgmt": {}
-           }
+            "+usermgmt": {},
+            "+trex": {}
+            }
           }
          }
         }
@@ -776,7 +778,7 @@ services:
     command:
       - sh
       - -c
-      - "pip install prefect-docker && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
+      - "pip install prefect-docker==0.5.5 && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
     container_name: &c83 alp-dataflow-gen-worker
     depends_on:
       alp-minio-post-init:

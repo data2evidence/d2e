@@ -204,6 +204,7 @@
         "nifimgmt.userAdmin"
       ],
       "ALP_SYSTEM_ADMIN": [
+        "jobplugins",
         "usermgmt.dataAdmin.read",
         "usermgmt.group.read",
         "usermgmt.me",
@@ -373,6 +374,12 @@
       ]
     },
     "scopes": [
+      {
+        "path": "^/jobplugins(.*)",
+        "scopes": [
+          "jobplugins"
+        ]
+      },
       {
         "path": "^/analytics-svc/plugins/(.*)",
         "scopes": [
