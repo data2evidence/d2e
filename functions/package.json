@@ -26,25 +26,29 @@
     "api": [
       {
         "source":"/jobplugins",
-        "function":"/jobplugins"
+        "function":"/jobplugins",
+        "env": "jobplugins"
       },
       {
         "source":"/gateway/api/db",
-        "function":"/alpdb"
+        "function":"/alpdb",
+        "env": "alpdb"
       },
       {
         "source":"/gateway/api/dataset",
-        "function":"/dataset"
+        "function":"/dataset",
+        "env": "dataset"
       },
       {
         "source":"/portalsvc",
-        "function":"/alp-portal-server",
-        "imports": "/alp-portal-server/import.json"
+        "rmsrc": true,
+        "service":"portalServer"
       },
       {
         "source":"/analytics-svc/api/services/query",
         "function":"/query-gen-svc",
-        "imports": "/query-gen-svc/import.json"
+        "imports": "/query-gen-svc/import.json",
+        "env": "query-gen-svc"
       },
       {
         "source":"/system-portal",
@@ -59,7 +63,8 @@
       {
         "source":"/usermgmt",
         "function":"/alp-usermgmt",
-        "imports": "/alp-usermgmt/import.json"
+        "imports": "/alp-usermgmt/import.json",
+        "env": "alp-usermgmt"
       },
       {
         "source":"/db-credentials",
@@ -70,7 +75,8 @@
       {
         "source":"/analytics-svc/api/services/bookmark",
         "function":"/bookmark-svc",
-        "imports": "/bookmark-svc/import.json"
+        "imports": "/bookmark-svc/import.json",
+        "env": "bookmark-svc"
       },
       {  
         "source":"/analytics-svc/api/services/public",
@@ -87,12 +93,12 @@
       {
         "source":"/analytics-svc/pa/config",
         "function":"/mri-pa-config",
-        "imports": "/mri-pa-config/import.json"
+        "imports": "/mri-pa-config/import.json",
+        "env": "mri-pa-config"
       },
       {
         "source":"/terminology",
-        "function":"/alp-terminology-svc",
-        "imports": "/alp-terminology-svc/import.json"
+        "service":"terminology"
       },
       {
         "source":"/meilisearch-svc",
@@ -101,17 +107,20 @@
       {
         "source": "/pa-config-svc",
         "function":"/mri-pa-config",
-        "imports": "/mri-pa-config/import.json"
+        "imports": "/mri-pa-config/import.json",
+        "env": "mri-pa-config"
       },
       {
         "source": "/hc/hph/cdw",
         "function":"/cdw-svc",
-        "imports": "/cdw-svc/import.json"
+        "imports": "/cdw-svc/import.json",
+        "env": "cdw-svc"
       },
       {
         "source": "/hc/hph/config/services",
         "function":"/cdw-svc",
-        "imports": "/cdw-svc/import.json"
+        "imports": "/cdw-svc/import.json",
+        "env": "cdw-svc"
       },
       {
         "source":"/index.html",
