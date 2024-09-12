@@ -524,6 +524,7 @@ services:
          "DataPlatform": "",
          "Internal": "${DB_CREDENTIALS__INTERNAL__PUBLIC_KEY}"
         }
+      DB_CREDENTIALS__PRIVATE_KEY: ${DB_CREDENTIALS__INTERNAL__PRIVATE_KEY}
       GATEWAY__IDP_AUTH_TYPE: logto
       GATEWAY__IDP_SUBJECT_PROP: sub
       GATEWAY_WO_PROTOCOL_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
