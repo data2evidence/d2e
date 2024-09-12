@@ -26673,11 +26673,14 @@ const cdwConfigDuckdb = {
             "visible": true
           }
         ],
-        "type": "num",
+        "type": "text",
         "expression": "@PATIENT.\"ethnicity_concept_id\"",
+        "referenceFilter": "@REF.DOMAIN_ID = 'Ethnicity' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
+        "referenceExpression": "@REF.CONCEPT_NAME",
         "order": 8,
         "domainFilter": "",
         "standardConceptCodeFilter": "",
+        "useRefValue": true
       },
       "locationid": {
         "name": [
@@ -26718,7 +26721,7 @@ const cdwConfigDuckdb = {
             "visible": true
           }
         ],
-        "type": "num",
+        "type": "text",
         "expression": "@PATIENT.\"location_id\"",
         "order": 9,
         "domainFilter": "",
@@ -26910,11 +26913,15 @@ const cdwConfigDuckdb = {
             "visible": true
           }
         ],
-        "type": "num",
+        "type": "text",
         "expression": "@PATIENT.\"GENDER_CONCEPT_ID\"",
+        "referenceFilter": "@REF.DOMAIN_ID = 'Gender' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
+        "referenceExpression": "@REF.CONCEPT_ID",
         "order": 16,
         "domainFilter": "",
         "standardConceptCodeFilter": "",
+        "useRefValue": true,
+        "useRefText": true
       },
       "Gender_concept_name": {
         "name": [
@@ -27006,11 +27013,15 @@ const cdwConfigDuckdb = {
             "visible": true
           }
         ],
-        "type": "num",
+        "type": "text",
         "expression": "@PATIENT.\"RACE_CONCEPT_ID\"",
+        "referenceFilter": "@REF.DOMAIN_ID = 'Race' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
+        "referenceExpression": "@REF.CONCEPT_ID",
         "order": 20,
         "domainFilter": "",
         "standardConceptCodeFilter": "",
+        "useRefValue": true,
+        "useRefText": true
       },
       "Age": {
         "name": [
