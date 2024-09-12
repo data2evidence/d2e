@@ -29,6 +29,10 @@
         "function":"/jobplugins"
       },
       {
+        "source": "/prefect",
+        "function": "/prefect"
+      },
+      {
         "source":"/gateway/api/db",
         "function":"/alpdb"
       },
