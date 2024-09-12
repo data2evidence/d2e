@@ -405,12 +405,13 @@ def create_cdm_schema_tasks(use_cache_db: bool,
                             dialect: str):
     logger = get_run_logger()
     # Begin by checking if the vocab schema exists or not
-    vocab_schema_dao = DBDao(database_code, vocab_schema, UserType.ADMIN_USER)
+    vocab_schema_dao = DBDao(use_cache_db, database_code, vocab_schema)
     vocab_schema_exists = vocab_schema_dao.check_schema_exists()
     if (vocab_schema_exists == False):
         try:
             # create vocab schema
-            create_datamodel(database_code=database_code,
+            create_datamodel(use_cache_db=use_cache_db,
+                             database_code=database_code,
                              data_model=data_model,
                              schema_name=vocab_schema,
                              vocab_schema=vocab_schema,
@@ -424,12 +425,13 @@ def create_cdm_schema_tasks(use_cache_db: bool,
 
     if (schema_name != vocab_schema):
         # Check if the incoming schema_name exists or not
-        cdm_schema_dao = DBDao(database_code, schema_name, UserType.ADMIN_USER)
+        cdm_schema_dao = DBDao(use_cache_db, database_code, schema_name)
         cdm_schema_exists = cdm_schema_dao.check_schema_exists()
         if (cdm_schema_exists == False):
             try:
                 # create cdm schema
-                create_datamodel(database_code=database_code,
+                create_datamodel(use_cache_db=use_cache_db,
+                                 database_code=database_code,
                                  data_model=data_model,
                                  schema_name=schema_name,
                                  vocab_schema=vocab_schema,
