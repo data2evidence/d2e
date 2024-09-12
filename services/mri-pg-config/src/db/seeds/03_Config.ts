@@ -26681,7 +26681,7 @@ const cdwConfigDuckdb = {
         "domainFilter": "",
         "standardConceptCodeFilter": "",
         "useRefValue": true,
-        useRefText: true,
+        "useRefText": true,
       },
       "locationid": {
         "name": [
@@ -26722,11 +26722,11 @@ const cdwConfigDuckdb = {
             "visible": true
           }
         ],
-        type: "num",
-        expression: '@PATIENT."location_id"',
-        order: 9,
-        domainFilter: "",
-        standardConceptCodeFilter: "",
+        "type": "num",
+        "expression": "@PATIENT.\"location_id\"",
+        "order": 9,
+        "domainFilter": "",
+        "standardConceptCodeFilter": "",
       },
       "gendersourcevalue": {
         "name": [
