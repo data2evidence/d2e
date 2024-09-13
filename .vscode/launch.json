@@ -1,0 +1,277 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "trex",
+      "port": 9229,
+      "request": "attach",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "localRoot": "${workspaceFolder}/services/trex",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/service/trex**",
+        "${workspaceFolder}/functions/**",
+        "!**/node_modules/**"
+      ],
+      "type": "node"
+    },
+    {
+      "name": "alp-bookmark",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9205,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/bookmark-svc",
+      "remoteRoot": "/home/docker/src/alp-data-node/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-query-gen-svc",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9208,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/query-gen-svc",
+      "remoteRoot": "/home/docker/src/alp-data-node/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-gateway",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9220,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/alp-gateway",
+      "remoteRoot": "/usr/src/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-db-svc",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9221,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/alp-db-svc",
+      "remoteRoot": "/home/docker",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-analytics-svc",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9222,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/analytics-svc",
+      "remoteRoot": "/home/docker/src/alp-data-node/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-user-mgmt",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9224,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/alp-usermgmt",
+      "remoteRoot": "/home/docker",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-portal-server",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9225,
+      "address": "0.0.0.0",
+      "localRoot": "${workspaceFolder}/services/alp-portal-server",
+      "remoteRoot": "/usr/src/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-dataflow",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9227,
+      "address": "0.0.0.0",
+      "cwd": "${workspaceFolder}/services/alp-dataflow",
+      "remoteRoot": "/usr/src/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-terminology-svc",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9228,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/alp-terminology-svc",
+      "remoteRoot": "/usr/src/alp-data-node/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-db-credentials",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/alp-db-credentials",
+      "remoteRoot": "/usr/src/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-cdw-svc",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9206,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/cdw-svc",
+      "remoteRoot": "/home/docker/src/services/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-ps-config-svc",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9209,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/ps-config",
+      "remoteRoot": "/home/docker/src/services/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-pa-config-svc",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9207,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/mri-pa-config",
+      "remoteRoot": "/home/docker/src/services/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "alp-dataflow-gen-local",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 9234
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/services/alp-dataflow-gen/pysrc",
+          "remoteRoot": "./pysrc"
+        }
+      ]
+    },
+    {
+      "name": "alp-cachedb",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 9235
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/services/cachedb/src",
+          "remoteRoot": "./src"
+        }
+      ]
+    },
+    {
+      "name": "alp-fhir-client",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9226,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/alp-fhir",
+      "remoteRoot": "/usr/src/alp-data-node/app",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    }
+  ]
+}
