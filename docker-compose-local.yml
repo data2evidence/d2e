@@ -92,26 +92,26 @@ services:
       context: ./services/alp-logto
       dockerfile: Dockerfile
 
-  # alp-minerva-analytics-svc:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/analytics-svc/Dockerfile
-  #   external_links:
-  #     - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-  #     - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
-  #     - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
-  #   ports:
-  #     - 9222:9222
-  #   volumes:
-  #     - ./services/analytics-svc/target:/home/docker/src/alp-data-node/app/dist
-  #     - ./services/analytics-svc/src:/home/docker/src/alp-data-node/app/src
-  #     - ./services/analytics-svc/api:/home/docker/src/alp-data-node/app/api
-  #   environment:
-  #     INSIGHTS__LOG_LEVEL: info
-  #     LOCAL_DEBUG: "true"
-  #     MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
-  #     MINIO__SSL: false
-  #     USE_EXTENSION_FOR_COHORT_CREATION: "false"
+  alp-minerva-analytics-svc:
+    build:
+      context: .
+      dockerfile: ./services/analytics-svc/Dockerfile
+    external_links:
+      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
+      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
+      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
+    ports:
+      - 9222:9222
+    volumes:
+      - ./services/analytics-svc/target:/home/docker/src/alp-data-node/app/dist
+      - ./services/analytics-svc/src:/home/docker/src/alp-data-node/app/src
+      - ./services/analytics-svc/api:/home/docker/src/alp-data-node/app/api
+    environment:
+      INSIGHTS__LOG_LEVEL: info
+      LOCAL_DEBUG: "true"
+      MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
+      MINIO__SSL: false
+      USE_EXTENSION_FOR_COHORT_CREATION: "false"
 
   # alp-minerva-cdw-svc:
   #   build:
