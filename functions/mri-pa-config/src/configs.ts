@@ -80,6 +80,7 @@ if (result.success) {
   env = result.data;
 } else {
   console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+  throw new Error("Service Failed to Start!! Zod validation failed!");
 }
 
 const envVarUtils = new EnvVarUtils(_env);
