@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   docker-compose-up:
-    runs-on: test # Custom runner 4 cpus & 14gb ram
+    runs-on: ubuntu-latest # Custom runner 4 cpus & 14gb ram
     if: (github.ref_name == 'develop' ||  contains('rc-', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/rc/workflow_dispatch and doesnt have a PR
     steps:
       # - name: Free Disk Space (Ubuntu)
