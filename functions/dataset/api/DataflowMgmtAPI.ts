@@ -19,7 +19,7 @@ export class DataflowMgmtAPI {
       this.baseURL = services.dataflowMgmt
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
-        ca: env.GATEWAY_CA_CERT
+       // ca: env.GATEWAY_CA_CERT
       })
     } else {
       this.logger.error('No url is set for DataflowMgmtAPI')

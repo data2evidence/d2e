@@ -17,7 +17,7 @@ const Env = z.object({
                 return z.never();
             }
         }),
-    TLS__INTERNAL__CA_CRT: z.string(),
+    //TLS__INTERNAL__CA_CRT: z.string(),
 });
 
 let _env = Deno.env.toObject() 
@@ -32,6 +32,7 @@ if (result.success) {
 } else {
     // @ts-ignore
     console.warn(JSON.stringify(result.error));
+
 }
 
 export { env };

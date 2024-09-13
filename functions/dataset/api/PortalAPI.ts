@@ -55,7 +55,7 @@ export class PortalAPI {
       this.baseURL = services.portalServer
       this.httpsAgent = new https.Agent({
         rejectUnauthorized: true,
-        ca: env.GATEWAY_CA_CERT
+       // ca: env.GATEWAY_CA_CERT
       })
     } else {
       throw new Error('No url is set for PortalAPI')
