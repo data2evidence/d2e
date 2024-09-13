@@ -10,6 +10,8 @@ target
 .mypy_cache
 *.egg-info
 
+deno.lock
+services/trex
 package-lock.json
 pnpm-lock.yaml
 yarn-error.log
