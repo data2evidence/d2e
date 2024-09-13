@@ -563,7 +563,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://localhost:41102/check-liveness
+        - http://localhost:41102/check-liveness
     hostname: alp-minerva-analytics-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/analytics-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -920,7 +920,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://localhost:41107/check-liveness
+        - http://localhost:41107/check-liveness
       timeout: 30s
     hostname: alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-dataflow:${DOCKER_TAG_NAME:-develop}
