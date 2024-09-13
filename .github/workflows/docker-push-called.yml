@@ -196,7 +196,7 @@ jobs:
           cat private-tagged.json | yq -rP 'map({"digest":.digest, "tags":(.tags|@json),"count":(.tags|length),"lengths":([.tags[]|length]|@json),"deletable":(.tags|map(test(env(AZ_REGISTRY_WHITELIST_REGEX))|not)|@json)})' | tee private1-analysis.yml | yq '.[0:20]'
 
           echo ". 3 - ACTION lock manifests with deletable False i.e. tags matching RegEx"
-          cat private1-analysis.yml | yq 'map(select(.deletable|contains("false")).digest) | .[]' | xargs -I% echo az acr repository update -u ${AZ_REGISTRY_USERNAME} -p ${AZ_REGISTRY_PASSWORD} --name ${AZ_REGISTRY_NAME} --image ${AZ_REGISTRY_REPOSITORY}@% --delete-enabled false --write-enabled true --query 'tags' --output tsv || true
+          cat private1-analysis.yml | yq 'map(select(.deletable|contains("false")).digest) | .[]' | xargs -I% az acr repository update -u ${AZ_REGISTRY_USERNAME} -p ${AZ_REGISTRY_PASSWORD} --name ${AZ_REGISTRY_NAME} --image ${AZ_REGISTRY_REPOSITORY}@% --delete-enabled false --write-enabled true --query 'tags' --output tsv || true
 
           echo ". 4 - SELECT images to be deleted i.e. manifests excepting deletable False i.e. tags not matching RegEx"
           cat private1-analysis.yml | yq 'map(select(.deletable|contains("false")|not))' > private2-todelete.yml
