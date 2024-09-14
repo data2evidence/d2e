@@ -31,7 +31,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/delete-package-versions@v5
         with: 
-          package-name: 'd2e-plugins'
+          package-name: 'd2e-functions'
           package-type: 'npm'
           min-versions-to-keep: 3
           delete-only-pre-release-versions: 'true'
