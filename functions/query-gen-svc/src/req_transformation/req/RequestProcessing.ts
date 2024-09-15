@@ -3,7 +3,6 @@ import { Patient } from "./Patient";
 import * as Keys from "../keys";
 import { FastUtil } from "../fast_util";
 import { ParserContainer, BaseNode, Expression } from "../def/ParserContainer";
-import { filter } from "async";
 
 export class RequestProcessing {
     public static measuresAndCategories: any = {};

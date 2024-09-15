@@ -58,5 +58,6 @@
   "async_hooks": "node:async_hooks",
   "crypto": "node:crypto",
   "url": "node:url",
+  "tls": "node:tls",
   "querystring": "node:querystring"
 }}
