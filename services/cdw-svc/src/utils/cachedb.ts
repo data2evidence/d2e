@@ -1,6 +1,6 @@
 import { Connection } from "@alp/alp-base-utils";
 import { env } from "../configs";
-import { CachedbDBConnectionUtil } from "@alp/alp-base-utils/target/src/cachedb/CachedbDBConnectionUtil";
+import { CdwConfigCachedbDBConnectionUtil } from "./CdwConfigCachedbDBConnectionUtil";
 import { getCachedbDatabaseFormatProtocolB } from "@alp/alp-base-utils";
 import {
   DUCKDB_FILE_DATABASE_CODE,
@@ -31,9 +31,7 @@ export const getCachedbDbConnections = async ({
     password: "dummy", // Password not used for alp-cachedb connections
   };
 
-  // Overwrite analyticsCrendential values to connect to cachedb
-
-  const connection = await CachedbDBConnectionUtil.getDBConnection({
+  const connection = await CdwConfigCachedbDBConnectionUtil.getDBConnection({
     credentials: credentials,
     schemaName: DUCKDB_FILE_SCHEMA_NAME,
     vocabSchemaName: DUCKDB_FILE_SCHEMA_NAME,
