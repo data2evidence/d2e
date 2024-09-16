@@ -67,7 +67,7 @@ export class DatasetRouter {
         res.status(500).send('Error when getting cohorts')
       }
     })
-
+    // here should be updated
     this.router.post('/', generateDatasetSchema, async (req, res) => {
       const token = req.headers.authorization!
       const portalAPI = new PortalAPI(token)
@@ -85,8 +85,8 @@ export class DatasetRouter {
         dialect,
         databaseCode,
         schemaName,
-        dataModel: dataModelName,
-        dataModelCustom,
+        dataModel,
+        plugin,
         paConfigId,
         visibilityStatus,
         detail,
@@ -95,8 +95,6 @@ export class DatasetRouter {
         tags,
         fhirProjectId
       } = req.body
-
-      const dataModel = dataModelName.split(' ')[0]
 
       if (!tenantName) {
         this.logger.error(`Tenant name is not provided`)
@@ -117,7 +115,7 @@ export class DatasetRouter {
         const vocabSchema = vocabSchemaValue ? vocabSchemaValue : schemaName
 
         // Create CDM & Custom schemas with Optional Cleansed Schema
-        if (schemaOption != CDMSchemaTypes.NoCDM && schemaName && !dataModelCustom) {
+        if (schemaOption != CDMSchemaTypes.NoCDM && schemaName && plugin === 'custom') {
           if (schemaOption == CDMSchemaTypes.CreateCDM || schemaOption == CDMSchemaTypes.CustomCDM) {
             try {
               this.logger.info(
@@ -125,7 +123,7 @@ export class DatasetRouter {
               )
 
               const dataModels = await dataflowMgmtAPI.getDatamodels()
-              const dataModelInfo = dataModels.find(model => model.name === dataModelName)
+              const dataModelInfo = dataModels.find(model => model.datamodel === dataModel)
 
               const options = {
                 options: {
@@ -162,8 +160,8 @@ export class DatasetRouter {
           databaseCode: databaseCode,
           schemaName,
           vocabSchemaName: vocabSchema,
-          dataModel: dataModelName,
-          dataModelCustom,
+          dataModel,
+          plugin,
           tenantId,
           paConfigId,
           visibilityStatus,
@@ -189,16 +187,15 @@ export class DatasetRouter {
       const portalAPI = new PortalAPI(token)
       const dataflowMgmtAPI = new DataflowMgmtAPI(token)
 
-      const { sourceStudyId, newStudyName, snapshotLocation, snapshotCopyConfig, dataModel: dataModelName } = req.body
+      const { sourceStudyId, newStudyName, snapshotLocation, snapshotCopyConfig, dataModel } = req.body
       const { dialect, databaseCode, schemaName, vocabSchemaName } = await portalAPI.getDataset(sourceStudyId)
 
       const sourceHasSchema = schemaName.trim() !== ''
       const id = uuidv4()
       const newSchemaName = sourceHasSchema ? `CDM${id}`.replace(/-/g, '') : ''
 
-      const dataModel = dataModelName.split(' ')[0]
       const dataModels = await dataflowMgmtAPI.getDatamodels()
-      const dataModelInfo = dataModels.find(model => model.name === dataModelName)
+      const dataModelInfo = dataModels.find(model => model.datamodel === dataModel)
 
       try {
         const snapshotRequest = {
