@@ -18,7 +18,10 @@ export class ConceptSetService {
   private token: string;
   private request: Request;
 
-  constructor(@Inject(REQUEST) request: Request) {
+  constructor(
+    @Inject(REQUEST) request: Request,
+    private readonly conceptService: ConceptService,
+  ) {
     const decodedToken = decode(
       request.headers['authorization'].replace(/bearer /i, ''),
     ) as JwtPayload;
@@ -105,8 +108,7 @@ export class ConceptSetService {
       )
       .getOne();
     const conceptIds = conceptSet.concepts.map((c) => c.id);
-    const conceptService = new ConceptService(this.request);
-    const concepts = await conceptService.getConceptsByIds(
+    const concepts = await this.conceptService.getConceptsByIds(
       datasetId,
       conceptIds,
     );

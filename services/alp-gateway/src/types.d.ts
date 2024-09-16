@@ -2,7 +2,6 @@ type RoleTypeOf<T, ADMIN_ROLE_TYPE> = {
   ALP_USER_ADMIN: ADMIN_ROLE_TYPE
   ALP_SYSTEM_ADMIN: ADMIN_ROLE_TYPE
   ALP_NIFI_ADMIN: ADMIN_ROLE_TYPE
-  ALP_SQLEDITOR_ADMIN: ADMIN_ROLE_TYPE
   ALP_DASHBOARD_VIEWER: ADMIN_ROLE_TYPE
   ALP_ADMIN: ADMIN_ROLE_TYPE
   ALP_OWNER: ADMIN_ROLE_TYPE
@@ -32,7 +31,6 @@ export interface RoleMap {
   alp_role_user_admin: boolean // alp user admin
   alp_role_system_admin: boolean // alp system admin
   alp_role_nifi_admin: boolean // alp nifi admin
-  alp_role_alp_sqleditor_admin: boolean // alp sqleditor admin
   alp_role_alp_dashboard_viewer: boolean // alp dashboard viewer
 }
 

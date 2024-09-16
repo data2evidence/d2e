@@ -24,15 +24,22 @@ import { Request } from 'express';
 import { SystemPortalAPI } from 'src/api/portal-api';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 import { GetStandardConceptsDto } from './dto/concept.dto';
+import { CachedbService } from 'src/cachedb/cachedb.service';
+import { env } from 'src/env';
 
 // Placed outside as FHIR server is unable to access
 const logger = createLogger('ConceptService');
 @Injectable()
 export class ConceptService {
   private token: string;
+  private request: Request;
 
-  constructor(@Inject(REQUEST) request: Request) {
+  constructor(
+    @Inject(REQUEST) request: Request,
+    private readonly cachedbService: CachedbService,
+  ) {
     this.token = request.headers['authorization'];
+    this.request = request;
   }
 
   // Used by FHIR server, where request cannot be injected as it does not use nest
@@ -60,6 +67,20 @@ export class ConceptService {
     const systemPortalApi = new SystemPortalAPI(this.token);
     const { databaseCode, vocabSchemaName, dialect } =
       await systemPortalApi.getDatasetDetails(datasetId);
+
+    // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+    if (env.USE_DUCKDB_FTS) {
+      logger.info('Searching with Duckdb FTS');
+      return await this.cachedbService.getConcepts(
+        pageNumber,
+        Number(rowsPerPage),
+        datasetId,
+        searchText,
+        vocabSchemaName,
+        completeFilters,
+      );
+    }
+
     try {
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
@@ -190,6 +211,16 @@ export class ConceptService {
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
       const searchConcepts1: number[] = [conceptId];
+
+      // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+      if (env.USE_DUCKDB_FTS) {
+        return await this.cachedbService.getTerminologyDetailsWithRelationships(
+          vocabSchemaName,
+          conceptId,
+          datasetId,
+        );
+      }
+
       const meilisearchResultConcept1 =
         await meilisearchApi.getMultipleExactConcepts(
           searchConcepts1,
@@ -392,6 +423,20 @@ export class ConceptService {
         dialect === 'hana' ? 'CONCEPT' : 'concept'
       }`;
 
+      // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+      if (env.USE_DUCKDB_FTS) {
+        logger.info('Searching concept filters with Duckdb FTS');
+        const filterOptions =
+          await this.cachedbService.getConceptFilterOptionsFaceted(
+            vocabSchemaName,
+            datasetId,
+            searchText,
+            filters,
+          );
+        return { filterOptions };
+      }
+
+      logger.info('Searching concept filters with Meilisearch');
       const [
         conceptClassIdFacets,
         domainIdFacets,
@@ -441,6 +486,7 @@ export class ConceptService {
           };
         })(),
       };
+
       return { filterOptions };
     } catch (err) {
       logger.error(err);
