@@ -29,10 +29,12 @@ export const getCachedbDbConnections = async ({
         env.USE_DUCKDB === "true" &&
         analyticsCredentials.dialect !== DB.HANA
     ) {
+        const dialect = "duckdb";
         cachedbDatabase = cachedbDatabase.replace(
             analyticsCredentials.dialect,
-            "duckdb"
+            dialect
         );
+        analyticsCredentials.dialect = dialect;
     }
 
     // Overwrite analyticsCrendential values to connect to cachedb
