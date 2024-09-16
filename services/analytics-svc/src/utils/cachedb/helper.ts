@@ -1,36 +1,10 @@
-import { Connection } from "@alp/alp-base-utils";
 import { env } from "../../env";
-import { CachedbDBConnectionUtil } from "./CachedbDBConnectionUtil";
+import {
+    Connection,
+    CachedbDBConnectionUtil,
+    getCachedbDatabaseFormatProtocolA,
+} from "@alp/alp-base-utils";
 import { DB } from "../DBSvcConfig";
-
-/*
-Helepr function to get cachedb database format for protocol A
-*/
-export const getCachedbDatabaseFormatProtocolA = (
-    dialect: string,
-    datasetId
-) => {
-    return `A|${dialect}|${datasetId}`;
-};
-
-/*
-Helepr function to get cachedb database format for protocol B
-*/
-export const getCachedbDatabaseFormatProtocolB = (
-    dialect: string,
-    databaseCode: string,
-    schemaName: string = "",
-    vocabSchemaName: string = ""
-) => {
-    let cachedbDatabaseFormat = `B|${dialect}|${databaseCode}`;
-    if (schemaName) {
-        cachedbDatabaseFormat += `|${schemaName}`;
-    }
-    if (vocabSchemaName) {
-        cachedbDatabaseFormat += `|${vocabSchemaName}`;
-    }
-    return cachedbDatabaseFormat;
-};
 
 export const getCachedbDbConnections = async ({
     analyticsCredentials,
@@ -67,12 +41,13 @@ export const getCachedbDbConnections = async ({
     analyticsCredentials.database = cachedbDatabase;
     analyticsCredentials.user = token;
 
-    analyticsConnectionPromise = CachedbDBConnectionUtil.getDBConnection({
-        credentials: analyticsCredentials,
-        schemaName: analyticsCredentials.schema,
-        vocabSchemaName: analyticsCredentials.vocabSchema,
-        userObj,
-    });
+    analyticsConnectionPromise =
+        CachedbDBConnectionUtil.CachedbDBConnectionUtil.getDBConnection({
+            credentials: analyticsCredentials,
+            schemaName: analyticsCredentials.schema,
+            vocabSchemaName: analyticsCredentials.vocabSchema,
+            userObj,
+        });
 
     const [analyticsConnection] = await Promise.all([
         analyticsConnectionPromise,
