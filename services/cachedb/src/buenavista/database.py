@@ -221,7 +221,7 @@ def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_
         f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
     
     # For cases where cdm schema and vocab schema are different, attach as a separate database in duckdb
-    if (cdm_schema_duckdb_file_path != cdm_schema_duckdb_file_path):
+    if (cdm_schema_duckdb_file_path != vocab_schema_duckdb_file_path):
         # Attach vocab schema 
         db.execute(
             f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
