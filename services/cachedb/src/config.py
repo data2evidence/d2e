@@ -46,3 +46,7 @@ class Env:
     CACHEDB__POOL_SIZE = parse_int(get_env("CACHEDB__POOL_SIZE"))
     DATABASE_CREDENTIALS = parse_json(get_env("DATABASE_CREDENTIALS"))
     SERVICE_ROUTES = parse_json(get_env("SERVICE_ROUTES"))
+
+    # Constants
+    CDW_CONFIG_SVC_DATABASE_CODE = "cdw_config_svc"
+    CDW_CONFIG_SVC_DUCKDB_SCHEMA_NAME = "validation_schema"
