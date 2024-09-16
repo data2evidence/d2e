@@ -116,6 +116,10 @@ export class DuckdbConnection implements ConnectionInterface {
     }
 
     private parseSql(temp: string): string {
+        // Specifically for cdw-config-svc, duckdb does not require direct connection to database.
+        // $$$$SCHEMA$$$$ is the replacement, but will appear in the string as $$SCHEMA$$ 
+        temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, "$$$$SCHEMA$$$$.");
+
         return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName);
     }
 
