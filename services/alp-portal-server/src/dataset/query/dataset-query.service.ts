@@ -149,7 +149,7 @@ export class DatasetQueryService {
       'dataset.schemaName',
       'dataset.vocabSchemaName',
       'dataset.dataModel',
-      'dataset.dataModelCustom',
+      'dataset.plugin',
       'datasetDetail.name',
       'datasetDetail.description',
       'datasetDetail.summary',
