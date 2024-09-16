@@ -6,7 +6,6 @@ networks:
 volumes:
   caddy:
   duckdb-data-1:
-  cdw-config-duckdb-data-1:
   meilisearch-minerva-data-1:
   minio-data-1:
   pg-minerva-data-1:
@@ -469,7 +468,6 @@ services:
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/drivers/ngdbc-latest.jar
       - ./cache/drivers/ngdbc-latest.jar:/app/inst/libraries/ngdbc-latest.jar
       - duckdb-data-1:/app/duckdb_data
-      - cdw-config-duckdb-data-1:/app/cdw-config/duckdb_data
       - r-libs:/home/docker/plugins/R/site-library
     environment:
       <<:
@@ -618,7 +616,7 @@ services:
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       DUCKDB_PATH: /home/docker/app/duckdb
-      
+
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -650,7 +648,7 @@ services:
       - fhir-schema-file-1:/home/docker/alp-data-node/app/src/r4
       #- fhir-duckdb-1:/home/docker/alp-data-node/app/src/duckdb
     entrypoint: yarn build-and-seed
-    environment: 
+    environment:
       <<:
         - *x-pg
         - *x-fhir
@@ -819,8 +817,6 @@ services:
         condition: service_healthy
       alp-mri-pg-config:
         condition: service_completed_successfully
-    volumes:
-      - cdw-config-duckdb-data-1:/home/docker/duckdb_data
     healthcheck:
       interval: 20s
       retries: 30
@@ -849,6 +845,7 @@ services:
         - *x-routes
         - *x-tls
         - *x-pg
+        - *cachedb
       PG_PASSWORD: ${PG_WRITE_PASSWORD}
       PG_SCHEMA: cdw_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
@@ -856,9 +853,9 @@ services:
       NODE_ENV: development
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
+      USE_CACHEDB: ${USE_CACHEDB:-true}
       isTestEnv: ${isTestEnv}
       BUILT_IN_DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
-      DUCKDB_PATH: /home/docker/duckdb_data
 
   alp-minerva-dataflow-mgmt:
     container_name: &c11 alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
@@ -1732,7 +1729,7 @@ services:
     container_name: &c34 alp-perseus-files-manager-${BASE_PORT:-1}
     environment:
       <<:
-         - *x-pg
+        - *x-pg
       SPRING_PROFILES_ACTIVE: docker
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
