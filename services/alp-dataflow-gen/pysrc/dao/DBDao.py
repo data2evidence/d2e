@@ -13,20 +13,19 @@ from sqlalchemy.schema import CreateSchema, DropSchema
 from utils.types import *
 from utils.DBUtils import DBUtils
 
-
-class DBDao:
-    def __init__(self, database_code: str, schema_name: str, user_type: UserType):
-        self.database_code = database_code
+class DBDao(DBUtils):
+    def __init__(self, use_cache_db: bool, database_code: str, schema_name: str):        
+        super().__init__(use_cache_db=use_cache_db, database_code=database_code)
         self.schema_name = schema_name
-        dbutils = DBUtils(self.database_code)
-        self.db_dialect = dbutils.get_database_dialect()
+        self.db_dialect = self.get_database_dialect()
 
-        if (user_type == UserType.ADMIN_USER) or (user_type == UserType.READ_USER):
-            self.user = user_type
+        if self.use_cache_db:
+            self.engine = self.create_database_engine(schema_name=self.schema_name)
+            self.tenant_configs = self.get_tenant_configs(schema_name=self.schema_name)
         else:
-            raise ValueError(f"User type '{user_type}' not allowed, only '{[user.value for user in UserType]}'.")
-
-        self.engine = dbutils.create_database_engine(self.user)
+            self.engine = self.create_database_engine(user_type=UserType.ADMIN_USER)
+            self.tenant_configs = self.get_tenant_configs()
+           
         self.metadata = sql.MetaData(schema_name)  # sql.MetaData()
         self.inspector = sql.inspect(self.engine)
 
@@ -44,8 +43,7 @@ class DBDao:
         table_names = self.inspector.get_table_names(schema=self.schema_name)
         if include_views:
             view_names = self.inspector.get_view_names(schema=self.schema_name)
-        else:
-            view_names = []
+        else: view_names = []
         return table_names + view_names
     
     def get_columns(self, table: str) -> list[dict]:

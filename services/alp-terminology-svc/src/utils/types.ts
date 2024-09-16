@@ -29,6 +29,11 @@ export interface IMeilisearchConcept {
   };
 }
 
+export interface IDuckdbConcept {
+  hits: IConcept[];
+  totalHits: number;
+}
+
 export interface IRelationship {
   relationship_id: string;
   relationship_name: string;

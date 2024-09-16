@@ -30,11 +30,12 @@ const seed = async () => {
 
   const projectIdResult = await queryPostgres(
     client,
-    `SELECT "projectId" FROM public."Project" WHERE name = 'Super Admin'`,
+    `SELECT "projectId", "content" FROM public."Project" WHERE name = 'Super Admin'`,
     []
   );
 
   const projectId: string = projectIdResult.rows[0].projectId;
+  const projectContent: string = projectIdResult.rows[0].content;
 
   const practitionerResult = await queryPostgres(
     client,
@@ -45,6 +46,33 @@ const seed = async () => {
   const practitioner: string = practitionerResult.rows[0].id;
 
   console.log("Seeding tables");
+
+
+  console.log("Enable bots for Super Admin")
+  
+  let jsonParsedProjectContent = JSON.parse(projectContent)
+  jsonParsedProjectContent.features = ['bots']
+  jsonParsedProjectContent.meta.versionId = '2c8b0331-863a-432e-a5d1-ef0619acc3d2'
+
+  await queryPostgres(
+    client,
+    `INSERT INTO public."Project_History" ("versionId", id, "content", "lastUpdated")
+    values('2c8b0331-863a-432e-a5d1-ef0619acc3d2', $1, $2, $3) ON CONFLICT("versionId") \
+    DO NOTHING;` ,
+    [
+      projectId,
+      jsonParsedProjectContent,
+      "2024-06-13 14:40:48.738 +0800"
+    ]
+  );
+  
+  await queryPostgres(
+    client,
+    `UPDATE public."Project" SET "content" = $1 WHERE name = 'Super Admin'` ,
+    [
+      jsonParsedProjectContent
+    ]
+  );
 
   const ClientApplicationContent = `{"meta":{"project":"${projectId}","versionId":"7ef81144-11f4-40ef-a017-da8885a0d36e","lastUpdated":"2024-06-13T06:40:48.738Z","author":{"reference":"Practitioner/${practitioner}","display":"Medplum Admin"},"compartment":[{"reference":"Project/${projectId}"}]},"resourceType":"ClientApplication","name":"d2eClient","secret":"${FHIR_CLIENT_SECRET}","description":"d2eClient","id":"${FHIR_CLIENT_ID}"}`;
   const ProjectMembershipContent = `{"meta":{"project":"${projectId}","versionId":"6e4864a8-b1df-417c-8aa9-35a4cb660e07","lastUpdated":"2024-06-13T06:40:48.762Z","author":{"reference":"system"},"compartment":[{"reference":"Project/${projectId}"}]},"resourceType":"ProjectMembership","project":{"reference":"Project/${projectId}"},"user":{"reference":"ClientApplication/${FHIR_CLIENT_ID}","display":"d2eClient"},"profile":{"reference":"ClientApplication/${FHIR_CLIENT_ID}","display":"d2eClient"},"id":"c5e1a35d-c979-428f-81db-9e3502c3ffa3"}`;

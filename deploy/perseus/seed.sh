@@ -1,2 +1,0 @@
-PGPASSWORD=${PG_SUPER_PASSWORD} psql -h ${PG__HOST} -d shared -U ${PG_SUPER_USER} -p ${PG__PORT} -a -f ./perseus/shared.sql
-PGPASSWORD=${PG_SUPER_PASSWORD} psql -h ${PG__HOST} -d vocabulary -U ${PG_SUPER_USER} -p ${PG__PORT} -a -f ./perseus/vocabulary.sql

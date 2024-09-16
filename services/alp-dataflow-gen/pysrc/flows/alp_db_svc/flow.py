@@ -14,6 +14,7 @@ def create_cdm_schema(options: CreateSchemaType):
     db_dialect = get_db_dialect(options)
     try:
         create_cdm_schema_tasks(
+            use_cache_db=options.use_cache_db,
             database_code=options.database_code,
             data_model=options.data_model,
             schema_name=options.schema_name,
@@ -32,6 +33,7 @@ def create_datamodel_flow(options: CreateDataModelType):
     try:
         db_dialect = get_db_dialect(options)
         create_datamodel(
+            use_cache_db=options.use_cache_db,
             database_code=options.database_code,
             data_model=options.data_model,
             schema_name=options.schema_name,
@@ -53,6 +55,7 @@ def update_datamodel_flow(options: UpdateDataModelType):
         db_dialect = get_db_dialect(options)
 
         update_datamodel(
+            use_cache_db=options.use_cache_db,
             flow_action_type=options.flow_action_type,
             database_code=options.database_code,
             data_model=options.data_model,
@@ -71,6 +74,7 @@ def update_datamodel_flow(options: UpdateDataModelType):
 def get_version_info_flow(options: GetVersionInfoType):
     try:
         get_version_info_task(
+            use_cache_db=False,
             changelog_filepath_list=options.changelog_filepath_list,
             plugin_classpath=get_plugin_classpath(options.flow_name),
             token=options.token,
@@ -86,6 +90,7 @@ def rollback_count_flow(options: RollbackCountType):
         db_dialect = get_db_dialect(options)
 
         rollback_count_task(
+            use_cache_db=options.use_cache_db,
             database_code=options.database_code,
             data_model=options.data_model,
             schema_name=options.schema_name,
@@ -106,6 +111,7 @@ def rollback_tag_flow(options: RollbackTagType):
         db_dialect = get_db_dialect(options)
 
         rollback_tag_task(
+            use_cache_db=options.use_cache_db,
             database_code=options.database_code,
             data_model=options.data_model,
             schema_name=options.schema_name,

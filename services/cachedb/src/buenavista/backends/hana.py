@@ -62,6 +62,7 @@ class HANASession(Session):
         self.parent = parent
         self.conn = conn
         self._cursor = conn.connection.cursor()
+        self._cursor.connection.autocommit = True
 
     def close(self):
         self._cursor.close()
