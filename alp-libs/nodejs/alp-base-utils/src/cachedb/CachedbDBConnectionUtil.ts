@@ -104,7 +104,7 @@ export class CachedbDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil {
           }
           resolve(connection);
         });
-      if (dialect === "postgresql") {
+      if (dialect === "postgresql" || dialect === "duckdb") {
         PostgresConnection.PostgresConnection.createConnection(
           client,
           schemaName,
