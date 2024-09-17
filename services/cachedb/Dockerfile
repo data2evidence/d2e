@@ -41,6 +41,9 @@ COPY ./services/cachedb/requirements.txt .
 RUN --mount=type=cache,target=/home/docker/.cache/pip \
   pip install -r requirements.txt
 
+# Copy cdw-svc built in duckdb file into cachedb
+COPY --chown=docker:alp ./services/cdw-svc/src/duckdb/cdw_config_svc_validation_schema ./cdw_svc/built_in_duckdb_data/cdw_config_svc_validation_schema
+
 COPY ./services/cachedb/src src
 
 FROM base AS development

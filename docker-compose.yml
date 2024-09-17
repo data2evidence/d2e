@@ -618,7 +618,7 @@ services:
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       DUCKDB_PATH: /home/docker/app/duckdb
-      
+
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -650,7 +650,7 @@ services:
       - fhir-schema-file-1:/home/docker/alp-data-node/app/src/r4
       #- fhir-duckdb-1:/home/docker/alp-data-node/app/src/duckdb
     entrypoint: yarn build-and-seed
-    environment: 
+    environment:
       <<:
         - *x-pg
         - *x-fhir
@@ -849,6 +849,7 @@ services:
         - *x-routes
         - *x-tls
         - *x-pg
+        - *cachedb
       PG_PASSWORD: ${PG_WRITE_PASSWORD}
       PG_SCHEMA: cdw_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
@@ -856,6 +857,7 @@ services:
       NODE_ENV: development
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
+      USE_CACHEDB: ${USE_CACHEDB:-true}
       isTestEnv: ${isTestEnv}
       BUILT_IN_DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
       DUCKDB_PATH: /home/docker/duckdb_data
@@ -1637,6 +1639,7 @@ services:
       - 41191:41191
     volumes:
       - duckdb-data-1:/home/docker/duckdb_data
+      - cdw-config-duckdb-data-1:/home/docker/cdw_svc/duckdb_data # Volume for dynamically generated cdw-config duckdb file (refer to docs/3-configure/9-create-cdw-config-duckdb-file.md for information)
     environment:
       <<:
         - *x-converter
@@ -1646,6 +1649,8 @@ services:
         - *cachedb
         - *python-internal-ssl
       DUCKDB__DATA_FOLDER: /home/docker/duckdb_data
+      CDW_SVC_DUCKDB_DATA_FOLDER: /home/docker/cdw_svc/duckdb_data/
+      CDW_SVC_BUILT_IN_DUCKDB_DATA_FOLDER: /home/docker/cdw_svc/built_in_duckdb_data
       IDP__ALP_DATA_CLIENT_ID: ${LOGTO__ALP_DATA__CLIENT_ID}
       LOCAL_DEBUG: "false"
 
@@ -1735,7 +1740,7 @@ services:
         condition: service_healthy
     environment:
       <<:
-         - *x-pg
+        - *x-pg
       SPRING_PROFILES_ACTIVE: docker
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
