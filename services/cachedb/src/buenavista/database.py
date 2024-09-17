@@ -12,7 +12,7 @@ from .backends.postgres import PGConnection
 from .backends.hana import HANAConnection
 from buenavista import bv_dialects, rewrite
 from config import Env
-
+from .cdw_config import get_cdw_config_duckdb_connection
 
 logger = logging.getLogger(__name__)
 
@@ -131,14 +131,20 @@ def _CreateConnectionString(dialect_driver: str, user: str, pw: str,
 def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_code: str, schema: str, vocab_schema: str):
     connection = None
 
+    # Handle special case whereby cdw-config-svc is using alp-cachedb to get connection to cdw-svc duckdb file
+    if database_code == Env.CDW_CONFIG_SVC_DATABASE_CODE and schema == Env.CDW_CONFIG_SVC_DUCKDB_SCHEMA_NAME:
+        return DuckDBConnection(get_cdw_config_duckdb_connection(database_code, schema))
+
     # Guard clause for postgres and hana for unsupported database_codes
     if dialect == DatabaseDialects.POSTGRES or dialect == DatabaseDialects.HANA:
         if database_code not in clients[dialect]:
             raise Exception(
                 f"Dialect:{dialect} has no configuration with database code:{database_code}")
-
+        
+    # Guard clause for duckdb for unsupported database_codes
     if dialect == DatabaseDialects.DUCKDB:
         _validate_duckdb_database_code(clients, database_code, dialect)
+
 
     if dialect == DatabaseDialects.POSTGRES:
         connection = PGConnection(
@@ -193,11 +199,6 @@ def _validate_duckdb_database_code(clients: CachedbDatabaseClients, database_cod
         For DUCKDB, check against postgres dialect to check for supported database_codes
         '''
 
-        # cdw_config_svc database_code is used by cdw-svc for validation and does not have a corresponding POSTGRES database 
-        # Return early
-        if database_code == Env.CDW_CONFIG_SVC_DATABASE_CODE:
-            return
-
         if database_code not in clients[DatabaseDialects.POSTGRES]:
             raise Exception(
                 f"Dialect:{dialect} has no configuration with database code:{database_code}")
@@ -208,7 +209,6 @@ def _attach_direct_postgres_connection_for_duckdb(db: duckdb.DuckDBPyConnection,
     conn_details = extract_db_credentials(database_code)
     db.execute(
         f"ATTACH 'host={conn_details['host']} port={conn_details['port']} dbname={conn_details['databaseName']} user={conn_details['user']} password={conn_details['password']}' AS direct_db_conn (TYPE postgres, READ_ONLY)")
-
 
 
 def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_schema_duckdb_file_path: str, vocab_schema: str) -> duckdb.DuckDBPyConnection:
