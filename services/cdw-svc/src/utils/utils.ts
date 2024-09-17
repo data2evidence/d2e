@@ -449,7 +449,6 @@ export async function getAnalyticsConnection(userObj, token?: string) {
   let cdwService = xsenv
     .filterServices({ tag: "cdw" })
     .map((db) => db.credentials);
-  // TODO: add fallback connection to built in duckdb database file if cachedb db connection fails
   if (env.USE_DUCKDB === "true") {
     if (env.USE_CACHEDB === "true") {
       // Get duckdb db connection via alp-cachedb
