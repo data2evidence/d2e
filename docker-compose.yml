@@ -1730,6 +1730,9 @@ services:
   alp-perseus-files-manager:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
     container_name: &c34 alp-perseus-files-manager-${BASE_PORT:-1}
+    depends_on:
+      alp-minerva-postgres:
+        condition: service_healthy
     environment:
       <<:
          - *x-pg
@@ -1758,6 +1761,8 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
+      alp-minerva-postgres:
+        condition: service_healthy
       alp-perseus-files-manager:
         condition: service_started
     networks:
@@ -1776,6 +1781,8 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
+      alp-minerva-postgres:
+        condition: service_healthy
       alp-perseus-files-manager:
         condition: service_started
     networks:
@@ -1800,6 +1807,8 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
+      alp-minerva-postgres:
+        condition: service_healthy
       alp-perseus-files-manager:
         condition: service_started
     networks:
