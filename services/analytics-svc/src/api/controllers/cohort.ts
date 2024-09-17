@@ -17,7 +17,7 @@ import PortalServerAPI from "../PortalServerAPI";
 import { convertIFRToExtCohort } from "../../ifr-to-extcohort/main";
 import { dataflowRequest } from "../../utils/DataflowMgmtProxy";
 import { getDuckdbDirectPostgresWriteConnection } from "../../utils/DuckdbConnection";
-import { getCachedbDbConnections } from "../../utils/cachedb/helper";
+import { getCachedbDbConnections } from "../../utils/cachedb/cachedb";
 import { env } from "../../env";
 const language = "en";
 

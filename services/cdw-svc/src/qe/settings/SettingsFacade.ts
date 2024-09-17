@@ -42,7 +42,7 @@ export class SettingsFacade {
         callback(null, result);
         break;
       case "getColumns":
-        let analyticsConnection = await getAnalyticsConnection(this.userObj)
+        let analyticsConnection = await getAnalyticsConnection(this.userObj, request.headers.authorization)
         let dbMeta = new DbMeta(analyticsConnection);
         dbMeta.getColumns(request.dbObject, (err, result) => {
           if (err) {

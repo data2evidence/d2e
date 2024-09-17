@@ -239,6 +239,7 @@ const initRoutes = (
     (req: ICDWRequest, res) => {
       const { configConnection } = req.dbConnections;
       const user = getUser(req);
+      const token = req.headers.authorization
       const assignment = new AssignmentProxy(req.assignment); //TODO: Send http req instead of getting it from req.
       try {
         const settings = new Settings();
@@ -258,6 +259,7 @@ const initRoutes = (
             isTestEnvironment
           ),
           user,
+          token,
           isTestEnvironment
         ).invokeService(
           input,
@@ -284,8 +286,9 @@ const initRoutes = (
       const { configConnection } = req.dbConnections;
       const assignment = new AssignmentProxy(req.assignment); //TODO: Send http req instead of getting it from req.
       const user = getUser(req);
+      const token = req.headers.authorization
       const settings = new Settings();
-      let analyticsConnection = await getAnalyticsConnection(user);
+      let analyticsConnection = await getAnalyticsConnection(user, token);
       new CDWServicesFacade(
         analyticsConnection,
         new FfhQeConfig(
