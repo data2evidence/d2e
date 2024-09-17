@@ -458,7 +458,7 @@ export async function getAnalyticsConnection(userObj, token?: string) {
         token,
       });
     } else {
-      // Get duckdb db connection via direct file conneciton
+      // Get duckdb db connection via direct file connection
       analyticsConnection = await getDuckdbDBConnection();
     }
   } else {
