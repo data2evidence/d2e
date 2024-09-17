@@ -25,7 +25,6 @@ After uploading cachedb-plugin in step `docs/2-load/5-load-d2e-plugins.md`
 - Click on **JSON** tab and enter values to create a cdw-config validation duckdb database file for cdmdefault
   name | value | note
   --- | --- | ---
-  Flow run | eg. duckdb file for cdmdefault | Arbritrary name for flow run
   Flow parameters | { "options": { "schemaName": "cdmdefault", "databaseCode": "alpdev_pg", "createForCdwConfigValidation": true } } | Create cdw-config validation duckdb database file for cdmdefault schema
 
   Example:
