@@ -1265,11 +1265,11 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-  /generate-webapi-definition:
+  /generate-cohort-definition:
     x-swagger-router-controller: cohort
     post:
-      description: Generates the webapi cohort definition from mriquery
-      operationId: generateWebApiDefinition
+      description: Generates the cohort definition from mriquery
+      operationId: generateCohortDefinition
       produces:
         - application/json
       consumes:

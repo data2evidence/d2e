@@ -287,7 +287,7 @@ export async function createCohort(req: IMRIRequest, res: Response) {
     }
 }
 
-export async function generateWebApiDefinition(
+export async function generateCohortDefinition(
     req: IMRIRequest,
     res: Response
 ) {
