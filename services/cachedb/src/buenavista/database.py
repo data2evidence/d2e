@@ -142,8 +142,11 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
                 f"Dialect:{dialect} has no configuration with database code:{database_code}")
         
     # Guard clause for duckdb for unsupported database_codes
+    # For DUCKDB, check against postgres dialect to check for supported database_codes
     if dialect == DatabaseDialects.DUCKDB:
-        _validate_duckdb_database_code(clients, database_code, dialect)
+        if database_code not in clients[DatabaseDialects.POSTGRES]:
+            raise Exception(
+                f"Dialect:{dialect} has no configuration with database code:{database_code}")
 
 
     if dialect == DatabaseDialects.POSTGRES:
@@ -192,16 +195,6 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
         # If no connection can be found
         raise Exception(
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
-
-def _validate_duckdb_database_code(clients: CachedbDatabaseClients, database_code: str, dialect: str):
-        '''
-        Guard clause for duckdb for unsupported database_codes
-        For DUCKDB, check against postgres dialect to check for supported database_codes
-        '''
-
-        if database_code not in clients[DatabaseDialects.POSTGRES]:
-            raise Exception(
-                f"Dialect:{dialect} has no configuration with database code:{database_code}")
 
 
 def _attach_direct_postgres_connection_for_duckdb(db: duckdb.DuckDBPyConnection, database_code: str):
