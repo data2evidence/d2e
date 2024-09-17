@@ -1639,7 +1639,7 @@ services:
       - 41191:41191
     volumes:
       - duckdb-data-1:/home/docker/duckdb_data
-      - cdw-config-duckdb-data-1:/home/docker/cdw_svc/duckdb_data
+      - cdw-config-duckdb-data-1:/home/docker/cdw_svc/duckdb_data # Volume for dynamically generated cdw-config duckdb file (refer to docs/3-configure/9-create-cdw-config-duckdb-file.md for information)
     environment:
       <<:
         - *x-converter
