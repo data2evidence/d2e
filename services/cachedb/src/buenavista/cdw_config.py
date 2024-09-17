@@ -15,7 +15,7 @@ def get_cdw_config_duckdb_connection(database_code: str, schema: str) -> duckdb.
     '''
 
     duckdb_file_name = f"{database_code}_{schema}"
-    duckdb_file_path =_resolve_cdw_config_duckdb_file_path(duckdb_file_name)
+    duckdb_file_path = _resolve_cdw_config_duckdb_file_path(duckdb_file_name)
 
     db = duckdb.connect()
     # Attach cdm schema
