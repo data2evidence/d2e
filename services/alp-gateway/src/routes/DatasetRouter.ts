@@ -67,7 +67,7 @@ export class DatasetRouter {
         res.status(500).send('Error when getting cohorts')
       }
     })
-    // here should be updated
+
     this.router.post('/', generateDatasetSchema, async (req, res) => {
       const token = req.headers.authorization!
       const portalAPI = new PortalAPI(token)
@@ -115,7 +115,7 @@ export class DatasetRouter {
         const vocabSchema = vocabSchemaValue ? vocabSchemaValue : schemaName
 
         // Create CDM & Custom schemas with Optional Cleansed Schema
-        if (schemaOption != CDMSchemaTypes.NoCDM && schemaName && plugin === 'custom') {
+        if (schemaOption != CDMSchemaTypes.NoCDM && schemaName) {
           if (schemaOption == CDMSchemaTypes.CreateCDM || schemaOption == CDMSchemaTypes.CustomCDM) {
             try {
               this.logger.info(
