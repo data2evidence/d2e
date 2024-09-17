@@ -34,12 +34,21 @@ export const getDefaultSchemaName = () => {
 }
 
 const _resolveDuckdbDatabaseFilePath = () => {
-    /*
-      Gets built duckdb database file path from built in duckdb database file
-    */
-    logger.debug(`Using duckdb file from BUILT_IN_DUCKDB_PATH`);
+  /*
+    Checks if there is a duckdb file in DUCKDB_PATH, if there is a file there, use it.
+    Else fallback to using the built in duckdb file in BUILT_IN_DUCKDB_PATH
+  */
+
+  const defaultDuckdbFilePath = `${env.DUCKDB_PATH}/${getDefaultSchemaName()}`;
+
+  if (existsSync(defaultDuckdbFilePath)) {
+    logger.debug(`Using duckdb file from ${env.DUCKDB_PATH}`);
+    return defaultDuckdbFilePath;
+  } else {
+    logger.debug(`Using built in duckdb file from ${env.BUILT_IN_DUCKDB_PATH}`);
     return `${env.BUILT_IN_DUCKDB_PATH}/${getDefaultSchemaName()}`;
-  };
+  }
+};
 
 export class DuckdbConnection implements ConnectionInterface {
     private constructor(

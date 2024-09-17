@@ -20,6 +20,7 @@ const Env = z
 
     TLS__INTERNAL__KEY: z.string(),
     TLS__INTERNAL__CRT: z.string(),
+    DUCKDB_PATH: z.string(),
     BUILT_IN_DUCKDB_PATH: z.string(),
 
     LOCAL_DEBUG: z.string(),
