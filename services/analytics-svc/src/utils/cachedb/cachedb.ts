@@ -15,26 +15,20 @@ export const getCachedbDbConnections = async ({
 }): Promise<{
     analyticsConnection: Connection.ConnectionInterface;
 }> => {
-    // Define defaults for both analytics & Vocab connections
-    let analyticsConnectionPromise;
-
     let cachedbDatabase = getCachedbDatabaseFormatProtocolA(
         analyticsCredentials.dialect,
         studyId
     );
-
     // IF use duckdb is true change dialect from postgres -> duckdb
     if (
         replacePostgresWithDuckdb &&
         env.USE_DUCKDB === "true" &&
         analyticsCredentials.dialect !== DB.HANA
     ) {
-        const dialect = "duckdb";
         cachedbDatabase = cachedbDatabase.replace(
             analyticsCredentials.dialect,
-            dialect
+            "duckdb"
         );
-        analyticsCredentials.dialect = dialect;
     }
 
     // Overwrite analyticsCrendential values to connect to cachedb
@@ -43,17 +37,13 @@ export const getCachedbDbConnections = async ({
     analyticsCredentials.database = cachedbDatabase;
     analyticsCredentials.user = token;
 
-    analyticsConnectionPromise =
-        CachedbDBConnectionUtil.CachedbDBConnectionUtil.getDBConnection({
+    const analyticsConnection =
+        await CachedbDBConnectionUtil.CachedbDBConnectionUtil.getDBConnection({
             credentials: analyticsCredentials,
             schemaName: analyticsCredentials.schema,
             vocabSchemaName: analyticsCredentials.vocabSchema,
             userObj,
         });
-
-    const [analyticsConnection] = await Promise.all([
-        analyticsConnectionPromise,
-    ]);
 
     return {
         analyticsConnection,
