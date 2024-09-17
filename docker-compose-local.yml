@@ -9,12 +9,12 @@ services:
       - 33000:33000
       - 33001:33001
     volumes:
-      - ./services/trex/plugins:/usr/src/plugins
       - ./functions:/usr/src/plugins/d2ef
     environment:
       LOCAL_DEBUG: "true"
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
-      PLUGINS_SEED: '[]'
+      PLUGINS_SEED: '["d2e-plugins", "d2e-ui"]'
+      PLUGINS_SEED_UPDATE: true
       PLUGINS_DEV_PATH: "./plugins"
       WATCH_FUNCTIONS: false
 
@@ -52,8 +52,8 @@ services:
     ports:
       - 41120:41120
     environment:
-      PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
-      SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
+      PORTAL__API_URL: https://trex:33000/portalsvc/graphql
+      SYSTEM_PORTAL__API_URL: https://trex:33000/system-portal/
 
   # alp-dataflow-gen-agent:
   #   build:

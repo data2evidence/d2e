@@ -11,6 +11,7 @@ volumes:
   pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
+  trex:
 
 x-envs:
   db-svc: &x-dbsvc
@@ -313,6 +314,8 @@ services:
         priority: 20
       data:
         priority: 10
+    volumes:
+      - trex:/usr/src/plugin
     healthcheck:
       interval: 60s
       retries: 30
@@ -544,6 +547,7 @@ services:
       PREFECT_DOCKER_VOLUMES: '["alp_duckdb-data-1:/app/duckdb_data"]'
       GH_TOKEN: ${GH_TOKEN}
       PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
+      PLUGINS_API_VERSION: latest
 
 
   alp-minerva-analytics-svc:
