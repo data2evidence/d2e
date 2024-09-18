@@ -44,16 +44,17 @@ services:
       CADDY__CORS_LOCAL_PORTAL_UI: "import cors https://localhost:4000"
 
   alp-dataflow-gen:
-    # build:
-    #   context: .
-    #   dockerfile: ./services/alp-dataflow-gen/Dockerfile
-    # volumes:
-    #   - ./services/alp-dataflow-gen/pysrc:/app/pysrc
     ports:
       - 41120:41120
     environment:
       PORTAL__API_URL: https://trex:33000/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://trex:33000/system-portal/
+
+
+  alp-dataflow-gen-init:
+    build:
+      context: .
+      dockerfile: ./services/alp-dataflow-gen/Dockerfile
 
   # alp-dataflow-gen-agent:
   #   build:
@@ -68,14 +69,6 @@ services:
   #     PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
   #     SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
 
-  # alp-dataflow-gen-init:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/alp-dataflow-gen/Dockerfile
-  #   volumes:
-  #     - ./services/alp-dataflow-gen/init.sh:/app/init.sh
-  #     - ./services/alp-dataflow-gen/init.py:/app/init.py
-  #     - ./services/alp-dataflow-gen/pysrc:/app/pysrc
 
   # alp-db-credentials-mgr:
   #   extends:
