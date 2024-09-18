@@ -205,7 +205,11 @@ export class PluginEndpoint {
                                         );
                                         return reject(err);
                                     }
-                                    resolve({ entity, data: result.data });
+                                    resolve({
+                                        entity,
+                                        data: result.data,
+                                        sql: result.sql,
+                                    });
                                 },
                                 this.schemaName
                             );
@@ -450,27 +454,30 @@ export class PluginEndpoint {
                     // Executes query for retrieval of individual interaction datasets
                     //3
 
-                    const streamQuery = async (entity, query: QueryObject) : Promise<{
-                                    entity: any;
-                                    data: NodeJS.ReadableStream;
-                                }> =>  {
-                                        try {
-                                            log.debug(
-                                                `Plugin Endpoint Final Query: ${query.queryString}`
-                                            );
+                    const streamQuery = async (
+                        entity,
+                        query: QueryObject
+                    ): Promise<{
+                        entity: any;
+                        data: NodeJS.ReadableStream;
+                    }> => {
+                        try {
+                            log.debug(
+                                `Plugin Endpoint Final Query: ${query.queryString}`
+                            );
 
-                                            const { data } =
-                                                await query.executeStreamQuery<NodeJS.ReadableStream>(
-                                                    this.connection,
-                                                    this.schemaName
-                                                );
+                            const { data } =
+                                await query.executeStreamQuery<NodeJS.ReadableStream>(
+                                    this.connection,
+                                    this.schemaName
+                                );
 
-                                            return ({ entity, data });
-                                        } catch (err) {
-                                            log.error(err);
-                                            throw err;
-                                        }
-                                }
+                            return { entity, data };
+                        } catch (err) {
+                            log.error(err);
+                            throw err;
+                        }
+                    };
 
                     //2
                     const qeExecuteUpdateCallback = async (err, res) => {
@@ -531,7 +538,10 @@ export class PluginEndpoint {
                             }
                         };
 
-                        if (dataStream.data.constructor.prototype.toString() !== '[object AsyncGenerator]') {
+                        if (
+                            dataStream.data.constructor.prototype.toString() !==
+                            "[object AsyncGenerator]"
+                        ) {
                             dataStream.data.on("end", () => {
                                 log.debug(
                                     `total streamed rows for ${dataStream.entity}: ${rowCount}`
@@ -546,7 +556,7 @@ export class PluginEndpoint {
                         return resolve({
                             entity: dataStream.entity,
                             data: dataStream.data,
-                            rowCount: rowCount
+                            rowCount: rowCount,
                         });
                     };
 
@@ -665,7 +675,8 @@ export class PluginEndpoint {
             noDataReason: string;
         }>(async (resolve, reject) => {
             const { configId, configVersion } = cohortDefinition.configData;
-            cohortDefinition[`uniquePatientTempTableName`] = this.uniquePatientTempTableName;
+            cohortDefinition[`uniquePatientTempTableName`] =
+                this.uniquePatientTempTableName;
             const querySvcParams = {
                 queryParams: {
                     configId,
