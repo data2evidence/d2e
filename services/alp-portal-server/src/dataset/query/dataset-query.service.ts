@@ -216,9 +216,9 @@ export class DatasetQueryService {
       .getOne()
 
     return {
-      id: dashboard.id,
-      name: dashboard.name,
-      url: dashboard.url
+      id: dashboard?.id,
+      name: dashboard?.name,
+      url: dashboard?.url
     }
   }
 
