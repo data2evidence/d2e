@@ -119,7 +119,7 @@ export class PostgresConnection implements ConnectionInterface {
     }
   }
 
-  parseSql(temp: string): string {
+  public parseSql(temp: string): string {
     return translateHanaToPostgres(temp, this.schemaName, this.vocabSchemaName);
   }
 

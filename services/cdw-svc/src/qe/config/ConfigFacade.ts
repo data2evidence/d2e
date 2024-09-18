@@ -14,10 +14,12 @@ export class ConfigFacade {
     private connection: ConnectionInterface,
     private ffhQeConfig: FfhQeConfig,
     private user: User,
+    private token: string,
     testMode?: boolean
   ) {
     this.settings = new Settings();
     this.userObj = this.user;
+    this.token = this.token;
   }
 
   public getFfhQeConfig() {
@@ -76,7 +78,7 @@ export class ConfigFacade {
         );
         break;
       case "validate":
-        analyticsConn = await getAnalyticsConnection(this.userObj);
+        analyticsConn = await getAnalyticsConnection(this.userObj, this.token);
         this.ffhQeConfig.validateCDMConfigAndTableMappings(
           request.config,
           analyticsConn,
@@ -102,7 +104,7 @@ export class ConfigFacade {
         );
         break;
       case "autosave":
-        analyticsConn = await getAnalyticsConnection(this.userObj);
+        analyticsConn = await getAnalyticsConnection(this.userObj, this.token);
         this.ffhQeConfig.autoSaveConfig(
           request.configId,
           request.configVersion,
@@ -118,7 +120,7 @@ export class ConfigFacade {
         );
         break;
       case "activate":
-        analyticsConn = await getAnalyticsConnection(this.userObj);
+        analyticsConn = await getAnalyticsConnection(this.userObj, this.token);
         this.ffhQeConfig.activateConfig(
           request.configId,
           request.configVersion,
@@ -172,7 +174,7 @@ export class ConfigFacade {
         callback(null, this.settings.getDefaultAdvancedSettings());
         break;
       case "getColumns":
-        analyticsConn = await getAnalyticsConnection(this.userObj)
+        analyticsConn = await getAnalyticsConnection(this.userObj, this.token)
         let dbMeta = new DbMeta(analyticsConn);
         dbMeta.getColumnsForPlaceHolders(
           request.dbObjectList,

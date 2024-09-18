@@ -30,7 +30,7 @@ import { MriConfigConnection } from "@alp/alp-config-utils";
 import { StudiesDbMetadata, StudyDbMetadata, IMRIRequest } from "./types";
 import PortalServerAPI from "./api/PortalServerAPI";
 import { getDuckdbDBConnection } from "./utils/DuckdbConnection";
-import { getCachedbDbConnections } from "./utils/cachedb/helper";
+import { getCachedbDbConnections } from "./utils/cachedb/cachedb";
 import { DB } from "./utils/DBSvcConfig";
 import { env } from "./env";
 dotenv.config();
@@ -160,10 +160,11 @@ const initRoutes = async (app: express.Application) => {
 
                 let credentials = null;
                 if (envVarUtils.isTestEnv()) {
-                    credentials = analyticsCredentials[EnvVarUtils.getEnvs().TESTSCHEMA];
+                    credentials =
+                        analyticsCredentials[EnvVarUtils.getEnvs().TESTSCHEMA];
                 } else {
                     credentials = req.dbCredentials.studyAnalyticsCredential;
-                } 
+                }
 
                 if (env.USE_CACHEDB === "true") {
                     req.dbConnections = await getCachedbDbConnections({
