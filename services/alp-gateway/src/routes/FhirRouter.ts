@@ -33,7 +33,7 @@ export class FhirRouter {
         const response = await fhirApi.createResource(resource, req.body, projectName)
         return res.status(response.status).json(response.data)
       } catch (error) {
-        this.logger.error(`Error creating resource on fhir server: ${error}`)
+        this.logger.error(`Error creating resource on fhir server: ${JSON.stringify(error)}`)
         res.status(500).send('Error creating resource on fhir server')
       }
     })
