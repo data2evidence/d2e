@@ -34,21 +34,22 @@ export const getDefaultSchemaName = () => {
 }
 
 const _resolveDuckdbDatabaseFilePath = () => {
-    /*
-      Checks if there is a duckdb file in DUCKDB_PATH, if there is a file there, use it.
-      Else fallback to using the built in duckdb file in BUILT_IN_DUCKDB_PATH
-    */
-  
-    const defaultDuckdbFilePath = `${env.DUCKDB_PATH}/${getDefaultSchemaName()}`;
-  
-    if (existsSync(defaultDuckdbFilePath)) {
-        logger.debug(`Using duckdb file from DUCKDB_PATH`);
-        return defaultDuckdbFilePath;
-    } else {
-        logger.debug(`Using duckdb file from BUILT_IN_DUCKDB_PATH`);
-        return `${env.BUILT_IN_DUCKDB_PATH}/${getDefaultSchemaName()}`
-    }
-  };
+  /*
+    Checks if there is a duckdb file in DUCKDB_PATH, if there is a file there, use it.
+    Else fallback to using the built in duckdb file in BUILT_IN_DUCKDB_PATH
+  */
+
+  const defaultDuckdbFilePath = `${env.DUCKDB_PATH}/${getDefaultSchemaName()}`;
+
+  if (existsSync(defaultDuckdbFilePath)) {
+    logger.debug(`Using duckdb file from ${env.DUCKDB_PATH}`);
+    return defaultDuckdbFilePath;
+  } else {
+    logger.debug(`Using built in duckdb file from ${env.BUILT_IN_DUCKDB_PATH}`);
+    return `${env.BUILT_IN_DUCKDB_PATH}/${getDefaultSchemaName()}`;
+  }
+};
+
 export class DuckdbConnection implements ConnectionInterface {
     private constructor(
         public database: Database,
@@ -124,6 +125,10 @@ export class DuckdbConnection implements ConnectionInterface {
     }
 
     private parseSql(temp: string): string {
+        // Specifically for cdw-config-svc, duckdb does not require direct connection to database.
+        // $$$$SCHEMA$$$$ is the replacement, but will appear in the string as $$SCHEMA$$ 
+        temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, "$$$$SCHEMA$$$$.");
+
         return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName);
     }
 

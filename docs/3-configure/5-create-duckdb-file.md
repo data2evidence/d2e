@@ -1,6 +1,6 @@
 # Create duckdb database file
 
-After uploading duckdb-plugin in step `docs/2-load/5-load-d2e-plugins.md`
+After uploading cachedb-plugin in step `docs/2-load/5-load-d2e-plugins.md`
 
 - [D2E-Plugins/duckdb](https://github.com/alp-os/d2e-plugins/tree/main/cachedb)
 
@@ -10,21 +10,25 @@ After uploading duckdb-plugin in step `docs/2-load/5-load-d2e-plugins.md`
 - Login as primary admin as
 - Select **Admin** mode
 - Navigate to **Jobs**
-- Click **Execute** on **create-cachedb-file-plugin**
-  ![Execeute Duckdb Job](../images/duckdb/ExecuteDuckdbJob.png)
+  ![JobsPlugin](../images/duckdb/JobsPlugin.png)
+- Click on **Jobs** tab.
+  ![JobsTab](../images/duckdb/JobsTab.png)
+- Click **create-cachedb-file-plugin_deployment**
+  ![CachedbDeployment](../images/duckdb/CachedbDeployment.png)
+- Click **Run** and then **Quick Run**
+  ![DeploymentQuickRun](../images/duckdb/DeploymentQuickRun.png)
 
-- Enter values to create duckdb database file for cdmdefault
+- Click on **JSON** tab and enter values to create a duckdb database file for cdmdefault
   name | value | note
   --- | --- | ---
-  Flow run | eg. duckdb file for cdmdefault | Arbritrary name for flow run
-  Flow parameters | { "schemaName": "cdmdefault", "databaseCode": "alpdev_pg" } | Create duckdb database file for cdmdefault schema
+  Flow parameters | { "options": { "schemaName": "cdmdefault", "databaseCode": "alpdev_pg" } } | Create duckdb database file for cdmdefault schema with alpdev_pg database code
 
   Example:
-  ![Duckdb Flow Input](../images/duckdb/DuckdbFlowInput.png)
+
+  ![CachedbFlowRunJSONDialog](../images/duckdb/CachedbFlowRunJSONDialog.png)
 
 ### Repeat steps above with input a different input for **Flow parameters** to create a duckdb database file for cdmvocab
 
-| name            | value                                                     | note                                            |
-| --------------- | --------------------------------------------------------- | ----------------------------------------------- |
-| Flow run        |                                                           | Arbritrary name for flow run                    |
-| Flow parameters | { "schemaName": "cdmvocab", "databaseCode": "alpdev_pg" } | Create duckdb database file for cdmvocab schema |
+| name            | value                                                                    | note                                                                         |
+| --------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| Flow parameters | { "options": { "schemaName": "cdmvocab", "databaseCode": "alpdev_pg" } } | Create duckdb database file for cdmvocab schema with alpdev_pg database code |
