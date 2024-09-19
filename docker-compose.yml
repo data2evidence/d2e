@@ -718,7 +718,7 @@ services:
     #     - curl
     #     - -f
     #     - http://localhost:41120/api/hello
-    #  timeout: 30s
+    #   timeout: 30s
     hostname: alp-dataflow-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: prefecthq/prefect:2.20.2-python3.11 ##alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -783,7 +783,7 @@ services:
     container_name: &c4 alp-dataflow-gen-init-${BASE_PORT:-1}
     depends_on:
       alp-dataflow-gen:
-        condition: service_healthy
+        condition: service_started
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: alp-dataflow-gen-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
