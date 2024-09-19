@@ -75,7 +75,7 @@ def create_prefect_variables():
     #Set Routes
     service_routes = json.loads(os.getenv("SERVICE_ROUTES")) # Prefect variable max 255 chars
     for service, route in service_routes.items():
-        Variable.set(f"{service.lower()}_service_route", route, overwrite=True)
+        Variable.set(f"{service.lower()}_service_route", route + "/", overwrite=True)
 
         
 
