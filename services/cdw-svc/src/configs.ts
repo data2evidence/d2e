@@ -10,6 +10,14 @@ const Env = z
     PORT: z.string(),
     MRI_USER: z.string().optional(),
     USE_DUCKDB: z.string(),
+
+    USE_CACHEDB: z.string(),
+    CACHEDB__HOST: z.string(),
+    CACHEDB__PORT: z
+      .string()
+      .refine((val) => !isNaN(parseInt(val)))
+      .transform(Number),
+
     TLS__INTERNAL__KEY: z.string(),
     TLS__INTERNAL__CRT: z.string(),
     DUCKDB_PATH: z.string(),

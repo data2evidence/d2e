@@ -617,8 +617,10 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-      DUCKDB_PATH: /home/docker/app/duckdb
-      
+      DUCKDB_PATH: /home/docker/app
+      FHIR_SCHEMA_PATH: /home/docker/app/medplum/packages/definitions/dist/fhir/r4
+      FHIR_SCHEMA_FILE_NAME: fhir.schema.json
+
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -650,7 +652,7 @@ services:
       - fhir-schema-file-1:/home/docker/alp-data-node/app/src/r4
       #- fhir-duckdb-1:/home/docker/alp-data-node/app/src/duckdb
     entrypoint: yarn build-and-seed
-    environment: 
+    environment:
       <<:
         - *x-pg
         - *x-fhir
@@ -691,8 +693,8 @@ services:
       LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine"},{"name":"alp-app","description":"alp-app","type":"Traditional","oidcClientMetadata":{"redirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
       LOGTO__RESOURCE: '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
       LOGTO__USER: '{"username":"admin","initialPassword":"Updatepassword12345"}'
-      LOGTO__ROLES: '[{"name":"role.systemadmin","description":"ALP System admin","type":"User"},{"name":"role.useradmin","description":"ALP User admin","type":"User"},{"name":"role.tenantviewer","description":"ALP Tenant viewer","type":"User"}]'
-      LOGTO__SCOPES: '[{"name":"role.systemadmin","description":"ALP System admin"},{"name":"role.useradmin","description":"ALP User admin"},{"name":"role.tenantviewer","description":"ALP Tenant viewer"}]'
+      LOGTO__ROLES: '[{"name":"role.systemadmin","description":"ALP System admin","type":"User"},{"name":"role.useradmin","description":"ALP User admin","type":"User"},{"name":"role.tenantviewer","description":"ALP Tenant viewer","type":"User"},{"name":"role.dashboardviewer","description":"ALP Dashboard viewer","type":"User"}]'
+      LOGTO__SCOPES: '[{"name":"role.systemadmin","description":"ALP System admin"},{"name":"role.useradmin","description":"ALP User admin"},{"name":"role.tenantviewer","description":"ALP Tenant viewer"},{"name":"role.dashboardviewer","description":"ALP Dashboard viewer"}]'
       LOGTO__ADMIN_SERVER__FQDN_URL: "http://alp-logto-1:3002"
       LOGTO__CLIENTID_PASSWORD__BASIC_AUTH: ${LOGTO__CLIENTID_PASSWORD__BASIC_AUTH}
       LOGTO__ALP_ADMIN_APP: '{"application": {"id": "${LOGTO_API_M2M_CLIENT_ID}", "name":"alp-admin","description":"alp-admin", "secret": "${LOGTO_API_M2M_CLIENT_SECRET}"}, "role": { "name":"api-access","description":"Logto API access"}}'
@@ -739,7 +741,7 @@ services:
       ENDPOINT: https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO_API_M2M_CLIENT_ID: ${LOGTO_API_M2M_CLIENT_ID}
       LOGTO_API_M2M_CLIENT_SECRET: ${LOGTO_API_M2M_CLIENT_SECRET}
-      LOGTO_ROLES_AZ_GROUPS_MAPPING: ${LOGTO_ROLES_AZ_GROUPS_MAPPING:-{"role.systemadmin":"37b5364a-348c-494f-b67f-a59a40e52ab7","role.useradmin":"90597adc-92af-4649-8151-68c3b7feb66c","role.tenantviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5"}}
+      LOGTO_ROLES_AZ_GROUPS_MAPPING: ${LOGTO_ROLES_AZ_GROUPS_MAPPING:-{"role.systemadmin":"37b5364a-348c-494f-b67f-a59a40e52ab7","role.useradmin":"90597adc-92af-4649-8151-68c3b7feb66c","role.tenantviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5","role.dashboardviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5"}}
       NODE_ENV: test
       PORT: 3001
       TRUST_PROXY_HEADER: true
@@ -849,6 +851,7 @@ services:
         - *x-routes
         - *x-tls
         - *x-pg
+        - *cachedb
       PG_PASSWORD: ${PG_WRITE_PASSWORD}
       PG_SCHEMA: cdw_config
       PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
@@ -856,6 +859,7 @@ services:
       NODE_ENV: development
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
+      USE_CACHEDB: ${USE_CACHEDB:-true}
       isTestEnv: ${isTestEnv}
       BUILT_IN_DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
       DUCKDB_PATH: /home/docker/duckdb_data
@@ -1637,6 +1641,7 @@ services:
       - 41191:41191
     volumes:
       - duckdb-data-1:/home/docker/duckdb_data
+      - cdw-config-duckdb-data-1:/home/docker/cdw_svc/duckdb_data # Volume for dynamically generated cdw-config duckdb file (refer to docs/3-configure/9-create-cdw-config-duckdb-file.md for information)
     environment:
       <<:
         - *x-converter
@@ -1646,6 +1651,8 @@ services:
         - *cachedb
         - *python-internal-ssl
       DUCKDB__DATA_FOLDER: /home/docker/duckdb_data
+      CDW_SVC_DUCKDB_DATA_FOLDER: /home/docker/cdw_svc/duckdb_data/
+      CDW_SVC_BUILT_IN_DUCKDB_DATA_FOLDER: /home/docker/cdw_svc/built_in_duckdb_data
       IDP__ALP_DATA_CLIENT_ID: ${LOGTO__ALP_DATA__CLIENT_ID}
       LOCAL_DEBUG: "false"
 
@@ -1730,9 +1737,12 @@ services:
   alp-perseus-files-manager:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
     container_name: &c34 alp-perseus-files-manager-${BASE_PORT:-1}
+    depends_on:
+      alp-minerva-postgres:
+        condition: service_healthy
     environment:
       <<:
-         - *x-pg
+        - *x-pg
       SPRING_PROFILES_ACTIVE: docker
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
@@ -1758,6 +1768,8 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
+      alp-minerva-postgres:
+        condition: service_healthy
       alp-perseus-files-manager:
         condition: service_started
     networks:
@@ -1776,6 +1788,8 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
+      alp-minerva-postgres:
+        condition: service_healthy
       alp-perseus-files-manager:
         condition: service_started
     networks:
@@ -1800,6 +1814,8 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
+      alp-minerva-postgres:
+        condition: service_healthy
       alp-perseus-files-manager:
         condition: service_started
     networks:

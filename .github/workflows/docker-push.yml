@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - develop
-
   workflow_dispatch:
     inputs:
       GIT_REPO_FULL_NAME:
@@ -51,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Free Disk Space (Ubuntu)
-        if: ${{ vars.GHA_BUILD_DEBUG != 'true' }}
+        if: ${{ vars.DOCKER_BUILD_DEBUG != 'true' }}
         uses: jlumbroso/free-disk-space@main
         with:
           # this might remove tools that are actually needed,
@@ -66,17 +65,21 @@ jobs:
           docker-images: true
           swap-storage: true
 
-      - id: setup
+      - name: setup
+        id: setup
+        env:
+          DOCKER_BUILD_PUSH_BOOL_OVERRIDE: ${{ vars.DOCKER_BUILD_PUSH_BOOL_OVERRIDE || false }}
         run: |
           DOCKER_BUILD_PUSH_BOOL_STR=true
           if [ $GIT_BRANCH_NAME == "develop" ]; then
             DOCKER_IMG_TAG_NAME=develop
-          elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
+          elif [ $DOCKER_BUILD_PUSH_BOOL_OVERRIDE = true] || [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
             DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME
           else
             DOCKER_BUILD_PUSH_BOOL_STR=false
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
           fi
+
           echo DOCKER_BUILD_PUSH_BOOL_STR=$DOCKER_BUILD_PUSH_BOOL_STR | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo GIT_BRANCH_NAME="${GIT_BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
@@ -205,7 +208,7 @@ jobs:
             fileName: Dockerfile
           - name: alp-data-node/alp-perseus-cdm-builder
             directory: ./services/alp-perseus-cdm-builder
-            context: Dockerfile
+            context: ./services/alp-perseus-cdm-builder
             fileName: Dockerfile
     uses: ./.github/workflows/docker-push-called.yml
     with:
