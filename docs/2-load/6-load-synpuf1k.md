@@ -77,7 +77,7 @@ wc -l *
 ```
 
 # Mount cache directory to Prefect Docker container
-- Add to the `PREFECT_DOCKER_VOLUMES` environment variable list
+- Add to the `PREFECT_DOCKER_VOLUMES` environment variable list for trex service in docker-compose.yml
 - `${GIT_BASE_DIR}`/cache/synpuf1k:/app/synpuf1k
 - `${GIT_BASE_DIR}`/cache/transformed/vocab:/app/vocab
 
