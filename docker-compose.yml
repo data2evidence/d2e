@@ -228,28 +228,31 @@ x-envs:
           "route": "jobs"
         },
         {
-          "data": {
-            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
-          },
-          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/mapping/module.js",
           "name": "ETL",
-          "route": "etl"
-        },
-        {
-          "name": "Codes",
-          "pluginPath": "plugins/SystemAdmin/ConceptMapping/module",
-          "route": "codes"
+          "route": "etl",
+          "children": [
+            {
+              "name": "Concept mapping",
+              "pluginPath": "plugins/SystemAdmin/ConceptMapping/module",
+              "route": "concept-mapping"
+            },
+            {
+          "data": {
+            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
+          },
+              "name": "Data mapping",
+          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/mapping/module.js",
+              "route": "data-mapping"
         },
         {
           "data": {
             "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
           },
-          "name": "Dataflow",
+              "name": "Data transformation",
           "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/flow/module.js",
-          "route": "dataflow",
-          "type": "hidden",
-          "featureFlag": "dataflow",
-          "enabled": "true"
+              "route": "dataflow"
+            }
+          ]
         },
         {
           "name": "Setup",
