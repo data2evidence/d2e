@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - develop
-
   workflow_dispatch:
     inputs:
       GIT_REPO_FULL_NAME:
@@ -51,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Free Disk Space (Ubuntu)
-        if: ${{ vars.GHA_BUILD_DEBUG != 'true' }}
+        if: ${{ vars.DOCKER_BUILD_DEBUG != 'true' }}
         uses: jlumbroso/free-disk-space@main
         with:
           # this might remove tools that are actually needed,
@@ -66,17 +65,21 @@ jobs:
           docker-images: true
           swap-storage: true
 
-      - id: setup
+      - name: setup
+        id: setup
+        env:
+          DOCKER_BUILD_PUSH_BOOL_OVERRIDE: ${{ vars.DOCKER_BUILD_PUSH_BOOL_OVERRIDE || false }}
         run: |
           DOCKER_BUILD_PUSH_BOOL_STR=true
           if [ $GIT_BRANCH_NAME == "develop" ]; then
             DOCKER_IMG_TAG_NAME=develop
-          elif [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
+          elif [ $DOCKER_BUILD_PUSH_BOOL_OVERRIDE = true] || [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
             DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME
           else
             DOCKER_BUILD_PUSH_BOOL_STR=false
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
           fi
+
           echo DOCKER_BUILD_PUSH_BOOL_STR=$DOCKER_BUILD_PUSH_BOOL_STR | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo DOCKER_IMG_TAG_NAME=$DOCKER_IMG_TAG_NAME | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
           echo GIT_BRANCH_NAME="${GIT_BRANCH_NAME}" | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
@@ -146,10 +149,6 @@ jobs:
             context: .
             fileName: Dockerfile
             pull: true
-          - name: alp-data-node/alp-sqleditor
-            directory: ./services/alp-sqleditor
-            context: .
-            fileName: Dockerfile
           - name: alp-data-node/mri-pa-config
             directory: ./services/mri-pa-config
             context: .
@@ -195,6 +194,22 @@ jobs:
             directory: ./services/alp-fhir
             context: .
             fileName: Dockerfile.client
+          - name: alp-data-node/alp-perseus-files-manager
+            directory: ./services/alp-perseus-files-manager
+            context: ./services/alp-perseus-files-manager
+            fileName: Dockerfile
+          - name: alp-data-node/alp-perseus-backend
+            directory: ./services/alp-perseus-backend
+            context: ./services/alp-perseus-backend
+            fileName: Dockerfile
+          - name: alp-data-node/alp-perseus-white-rabbit
+            directory: ./services/alp-perseus-white-rabbit
+            context: ./services/alp-perseus-white-rabbit
+            fileName: Dockerfile
+          - name: alp-data-node/alp-perseus-cdm-builder
+            directory: ./services/alp-perseus-cdm-builder
+            context: ./services/alp-perseus-cdm-builder
+            fileName: Dockerfile
     uses: ./.github/workflows/docker-push-called.yml
     with:
       AZ_REGISTRY_REPOSITORY: ${{ matrix.name }}

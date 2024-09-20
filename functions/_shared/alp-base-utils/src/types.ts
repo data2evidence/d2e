@@ -1,4 +1,4 @@
-import { ITokenPayload } from "passport-azure-ad";
+//import { ITokenPayload } from "passport-azure-ad";
 import { Request } from "express";
 import { ConnectionInterface } from "./Connection";
 
@@ -51,7 +51,7 @@ export interface IUser {
   email?: string;
 }
 
-export type IAppTokenPayload = ITokenPayload & {
+export type IAppTokenPayload = any & {
   given_name: string;
   family_name: string;
   extension_termsOfUseConsentVersion: string;

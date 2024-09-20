@@ -13,6 +13,7 @@ volumes:
   dicom-sqlite-storage:
   r-libs:
   dind-certs:
+  trex:
 
 x-envs:
   db-svc: &x-dbsvc
@@ -310,7 +311,7 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: trex.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/trex:local #${DOCKER_TAG_NAME:-develop}
+    image: alpcr.azurecr.io/alp-data-node/trex:develop #${DOCKER_TAG_NAME:-develop}
     platform: linux/amd64
     logging:
       options:
@@ -320,6 +321,8 @@ services:
         priority: 20
       data:
         priority: 10
+    volumes:
+      - trex:/usr/src/plugin
     healthcheck:
       interval: 60s
       retries: 30
@@ -535,6 +538,7 @@ services:
       GATEWAY__IDP_AUTH_TYPE: logto
       GATEWAY__IDP_SUBJECT_PROP: sub
       GATEWAY_WO_PROTOCOL_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
+      CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       IDP__ALP_DATA_CLIENT_ID: ${LOGTO__ALP_DATA__CLIENT_ID}
       IDP__ALP_SVC_CLIENT_ID: ${LOGTO__ALP_SVC__CLIENT_ID}
       IDP__RELYING_PARTY: ${IDP__RELYING_PARTY}
@@ -549,6 +553,10 @@ services:
       LOGTO__TOKEN_URL: http://alp-logto-${BASE_PORT}:3001/oidc/token
       NODE_ENV: development
       PREFECT_DOCKER_VOLUMES: '["alp_duckdb-data-1:/app/duckdb_data"]'
+      GH_TOKEN: ${GH_TOKEN}
+      PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
+      PLUGINS_API_VERSION: latest
+
 
   alp-minerva-analytics-svc:
     container_name: &c9 alp-minerva-analytics-${BASE_PORT:-1}
@@ -567,7 +575,7 @@ services:
         - -O
         - liveness
         - --no-check-certificate
-        - https://localhost:41102/check-liveness
+        - http://localhost:41102/check-liveness
     hostname: alp-minerva-analytics-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/analytics-svc:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -700,16 +708,16 @@ services:
         condition: service_healthy
       alp-logto-post-init:
         condition: service_completed_successfully
-    healthcheck:
-      interval: 600s
-      retries: 1200
-      start_period: 1200s
-      test:
-        - CMD
-        - curl
-        - -f
-        - http://alp-dataflow-gen-${BASE_PORT:-1}:41120/api
-      timeout: 30s
+    # healthcheck:
+    #   interval: 30s
+    #   retries: 30
+    #   start_period: 30s
+    #   test:
+    #     - CMD
+    #     - curl
+    #     - -f
+    #     - http://localhost:41120/api/hello
+    #  timeout: 30s
     hostname: alp-dataflow-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: prefecthq/prefect:2.20.2-python3.11 ##alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -739,7 +747,7 @@ services:
       NODE_ENV: development
       PG__WRITE_PASSWORD: ${PG_WRITE_PASSWORD}
       PG__WRITE_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/portalsvc/graphql
+      PORTAL__API_URL: https://trex:33000/portalsvc/graphql
       PREFECT_API_DATABASE_CONNECTION_URL: postgresql+asyncpg://${PG_SUPER_USER:-postgres}:${PG_SUPER_PASSWORD}@${PG_HOST:-alp-minerva-postgres-1}:${PG_PORT:-5432}/${PG_DB_NAME:-alp}
       PREFECT_API_DEFAULT_LIMIT: 5000
       PREFECT_API_URL: http://0.0.0.0:41${BASE_PORT:-1}20/api
@@ -751,7 +759,7 @@ services:
       PREFECT_API_ENABLE_HTTP2: False
       R_LIBS_USER: /home/docker/plugins/R/site-library
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
-      SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT}:41${BASE_PORT}00/system-portal/
+      SYSTEM_PORTAL__API_URL: https://trex:33000/system-portal/
 
   alp-dataflow-gen-worker:
     command:
@@ -762,8 +770,10 @@ services:
     depends_on:
       alp-minio-post-init:
         condition: service_completed_successfully
-      alp-dataflow-gen:
+      trex:
         condition: service_healthy
+      alp-logto-post-init:
+        condition: service_completed_successfully
     hostname: alp-dataflow-gen-worker.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: prefecthq/prefect:2.20.2-python3.11
     logging:
@@ -918,7 +928,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://localhost:41107/check-liveness
+        - http://localhost:41107/check-liveness
       timeout: 30s
     hostname: alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-dataflow:${DOCKER_TAG_NAME:-develop}

@@ -407,6 +407,10 @@ jobs:
       - name: Remove Test DB
         if: ${{ always() || cancelled() || failure() }}
         run: yarn removetestdb
+      - name: print logs for alp-minerva-fhir-server-post-init
+        if: ${{ always() || cancelled() || failure() }}
+        run: |
+          docker logs alp-minerva-fhir-server-post-init -t
 
       - name: Clean Docker compose
         if: always()

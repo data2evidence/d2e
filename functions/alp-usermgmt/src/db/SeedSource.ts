@@ -13,7 +13,7 @@ export class SeedSource {
     }
   
     getSeedName(seed) {
-      return seed;
+      return seed.slice(0,-2)+"js";
     }
   
     getSeed(seed)  {

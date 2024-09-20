@@ -1,6 +1,6 @@
 {
-  "name": "d2e-functions",
-  "version": "1.0.0",
+  "name": "@alp-os/d2e-functions",
+  "version": "0.0.99",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -152,35 +152,6 @@
       }
     ],
     "roles" : {
-      "STUDY_VIEWER_ROLE": [
-        "PA.DatasetOverview.svc"
-      ],
-      "STUDY_RESEARCHER_ROLE": [
-        "PA.svc",
-        "PAConfig.i18n",
-        "PAConfig.svc/read",
-        "CDWConfig.svc/read"
-      ],
-      "ALP_ADMIN_ROLE": [
-        "PAConfig.ui",
-        "PAConfig.i18n",
-        "PAConfig.svc",
-        "PSConfig.svc",
-        "CDWConfig.ui",
-        "CDWConfig.svc",
-        "ConfigAssignment.ui",
-        "ConfigAssignment.svc"
-      ],
-      "ALP_OWNER_ROLE": [
-        "PAConfig.ui",
-        "PAConfig.i18n",
-        "PAConfig.svc",
-        "PSConfig.svc",
-        "CDWConfig.ui",
-        "CDWConfig.svc",
-        "ConfigAssignment.ui",
-        "ConfigAssignment.svc"
-      ],
       "MRI_SUPER_USER": [
         "PA.svc",
         "PAConfig.i18n",
@@ -217,6 +188,14 @@
         "nifimgmt.userAdmin"
       ],
       "ALP_SYSTEM_ADMIN": [
+        "PAConfig.ui",
+        "PAConfig.i18n",
+        "PAConfig.svc",
+        "PSConfig.svc",
+        "CDWConfig.ui",
+        "CDWConfig.svc",
+        "ConfigAssignment.ui",
+        "ConfigAssignment.svc",
         "jobplugins",
         "usermgmt.dataAdmin.read",
         "usermgmt.group.read",
@@ -327,6 +306,7 @@
         "gateway.dashboardGate.content"
       ],
       "TENANT_VIEWER": [
+        "PA.DatasetOverview.svc",
         "usermgmt.group.read",
         "usermgmt.me",
         "usermgmt.studyAccessRequest.add",
@@ -349,6 +329,10 @@
         "portal.config.read"
       ],
       "RESEARCHER": [
+        "PA.svc",
+        "PAConfig.i18n",
+        "PAConfig.svc/read",
+        "CDWConfig.svc/read",
         "portal.dataset.paConfig.read",
         "portal.dataset.resource.read",
         "portal.dataset.resource.download",

@@ -73,6 +73,7 @@
   "./src/types": "./src/types.ts",
   "./src/configs": "./src/configs.ts",
   "https": "node:https",
+  "http": "node:http",
   "path": "node:path",
   "crypto": "node:crypto",
   "url": "node:url",

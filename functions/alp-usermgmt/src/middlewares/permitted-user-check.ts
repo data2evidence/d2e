@@ -3,7 +3,7 @@ import { Container } from 'typedi'
 import { UserGroupService, UserService } from '../services'
 import { createLogger } from '../Logger'
 import { IAppRequest } from '../types'
-import get  from 'lodash/fp/get'
+import * as _  from 'lodash'
 import { ROLES } from '../const'
 
 interface RoleCheckOptions {
@@ -41,7 +41,7 @@ export const permittedUserCheck =
 
       // Generic permission check
       // Any specific permission check should be done at the route level
-      let userId = get(opts.userIdPath || 'body.userId')(req) as string
+      let userId = _.get(req, opts.userIdPath || 'body.userId') as string
       if (userId) {
         if (opts.isIdpUserId) {
           const userService = Container.get(UserService)

@@ -65,4 +65,4 @@ class Server {
 export function start() {
   new Server().start()
 }
-start()
+//start()

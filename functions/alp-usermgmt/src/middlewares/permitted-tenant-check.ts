@@ -4,7 +4,7 @@ import { UserGroupService } from '../services'
 import { AlpTenantUserRoleMapType, IAppRequest } from 'types'
 import { createLogger } from '../Logger'
 import { ROLES } from '../const'
-import  get  from 'lodash/fp/get'
+import  * as _  from 'lodash'
 
 interface TenantCheckOptions {
   tenantIdPath: string
@@ -20,7 +20,7 @@ export const permittedTenantCheck =
   (roles: (keyof AlpTenantUserRoleMapType)[], options: TenantCheckOptions = DEFAULT_TENANT_CHECK_OPTIONS) =>
   async (req: IAppRequest, res: Response, next: NextFunction) => {
     const opts = { ...DEFAULT_TENANT_CHECK_OPTIONS, ...options }
-    const tenantId = get(opts.tenantIdPath || 'params.tenantId')(req)
+    const tenantId = _.get(req, opts.tenantIdPath || 'params.tenantId')
 
     try {
       const { userId: ctxUserId } = req.user

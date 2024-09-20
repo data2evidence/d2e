@@ -5,8 +5,8 @@ const app = express();
 const env = Deno.env.toObject()
 
 const opt = {
-	user: env.PG_SUPER_USER,
-	password: env.PG_SUPER_PASSWORD,
+	user: env.PG_USER,
+	password: env.PG_PASSWORD,
 	host: env.PG__HOST,
 	port: parseInt(env.PG__PORT),
 	database: env.PG__DB_NAME,
