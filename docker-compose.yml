@@ -284,6 +284,10 @@ x-envs:
     TLS__INTERNAL__CRT: ${TLS__INTERNAL__CRT}
     TLS__INTERNAL__DOMAIN: ${TLS__INTERNAL__DOMAIN:-alp.local}
     TLS__INTERNAL__KEY: ${TLS__INTERNAL__KEY}
+  cachedb: &cachedb
+    CACHEDB__HOST: alp-cachedb
+    CACHEDB__PORT: 41191
+    CACHEDB__POOL_SIZE: ${CACHEDB__POOL_SIZE:-10}
   sql-proxy: &sql-proxy
     SQL_PROXY__HOST: alp-sql-proxy
     SQL_PROXY__PORT: 41191
@@ -545,7 +549,7 @@ services:
       LOGTO__SVC_CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
       LOGTO__TOKEN_URL: http://alp-logto-${BASE_PORT}:3001/oidc/token
       NODE_ENV: development
-      PREFECT_DOCKER_VOLUMES: '["alp_duckdb-data-1:/app/duckdb_data"]'
+      PREFECT_DOCKER_VOLUMES: '["duckdb-data-1:/app/duckdb_data", "cdw-config-duckdb-data-1:/app/cdw-config/duckdb_data", "r-libs:/home/docker/plugins/R/site-library"]'
       GH_TOKEN: ${GH_TOKEN}
       PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
       PLUGINS_API_VERSION: latest
@@ -714,7 +718,7 @@ services:
     #     - curl
     #     - -f
     #     - http://localhost:41120/api/hello
-    #  timeout: 30s
+    #   timeout: 30s
     hostname: alp-dataflow-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: prefecthq/prefect:2.20.2-python3.11 ##alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
     logging:
@@ -729,22 +733,9 @@ services:
     environment:
       <<:
         - *x-converter
-        - *x-dbsvc
-        - *x-minio
         - *x-pg
-        - *x-routes
         - *x-tls
-        - *python-internal-ssl
-      ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
-      DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_SB_NAME: dataflow-adhoc-flows-sb
-      DATAFLOW_MGMT__ADHOC_FLOWS__S3_DIR_PATH: s3://dataflow-adhoc-flows/flows
-      DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME: flow-results
-      DATAFLOW_MGMT__FLOWS__RESULTS__S3_DIR_PATH: s3://flows/results
       LOCAL_DEBUG: "false"
-      NODE_ENV: development
-      PG__WRITE_PASSWORD: ${PG_WRITE_PASSWORD}
-      PG__WRITE_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      PORTAL__API_URL: https://trex:33000/portalsvc/graphql
       PREFECT_API_DATABASE_CONNECTION_URL: postgresql+asyncpg://${PG_SUPER_USER:-postgres}:${PG_SUPER_PASSWORD}@${PG_HOST:-alp-minerva-postgres-1}:${PG_PORT:-5432}/${PG_DB_NAME:-alp}
       PREFECT_API_DEFAULT_LIMIT: 5000
       PREFECT_API_URL: http://0.0.0.0:41${BASE_PORT:-1}20/api
@@ -754,9 +745,7 @@ services:
       PREFECT_SERVER_API_HOST: 0.0.0.0
       PREFECT_SERVER_API_PORT: 41${BASE_PORT:-1}20
       PREFECT_API_ENABLE_HTTP2: False
-      R_LIBS_USER: /home/docker/plugins/R/site-library
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
-      SYSTEM_PORTAL__API_URL: https://trex:33000/system-portal/
 
   alp-dataflow-gen-worker:
     command:
@@ -784,6 +773,53 @@ services:
     environment:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT}:41${BASE_PORT}20/api
       PREFECT_API_ENABLE_HTTP2: False
+
+
+  alp-dataflow-gen-init:
+    command:
+      - sh
+      - -c
+      - "yarn generate:envs -s alp-minerva-db-mgmt-svc && . ../generated-env.sh && python ../init.py"
+    container_name: &c4 alp-dataflow-gen-init-${BASE_PORT:-1}
+    depends_on:
+      alp-dataflow-gen:
+        condition: service_started
+      alp-minio-post-init:
+        condition: service_completed_successfully
+    hostname: alp-dataflow-gen-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c4
+    networks:
+      alp:
+        priority: 20
+    platform: linux/amd64
+    volumes:
+      - ./services/alp-dataflow-gen/init.py:/opt/prefect/libs/init.py
+    environment:
+      <<:
+        - *x-minio
+        - *x-tls
+        - *x-dbsvc
+        - *x-converter
+        - *x-routes
+        - *cachedb
+        - *python-internal-ssl
+      NODE_ENV: development
+      DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME: flow-results
+      DATAFLOW_MGMT__FLOWS__RESULTS__S3_DIR_PATH: s3://flows/results
+      PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
+      R_LIBS_USER: /home/docker/plugins/R/site-library
+      DUCKDB__DATA_FOLDER: /app/duckdb_data
+      CDW_CONFIG_DUCKDB__DATA_FOLDER: /app/cdw-config/duckdb_data
+      ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
+      OHDSI__R_COHORT_GENERATOR_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortGeneratorModule/v0.3.0/SettingsFunctions.R
+      OHDSI__R_COHORT_DIAGNOSTICS_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortDiagnosticsModule/v0.2.0/SettingsFunctions.R
+      STRATEGUS__KEYRING_PASSWORD: ${STRATEGUS__KEYRING_PASSWORD}
+      IDP__ALP_DATA__CLIENT_ID: ${LOGTO__ALP_DATA__CLIENT_ID}
+      IDP__ALP_DATA__CLIENT_SECRET: ${LOGTO__ALP_DATA__CLIENT_SECRET}
+
 
   alp-fhir-server:
     container_name: &c6 alp-minerva-fhir-server-${BASE_PORT:-1}
