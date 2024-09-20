@@ -508,6 +508,11 @@ services:
       OHDSI__R_COHORT_DIAGNOSTICS_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortDiagnosticsModule/v0.2.0/SettingsFunctions.R
       OHDSI__R_COHORT_GENERATOR_MODULE_SETTINGS_URL: https://raw.githubusercontent.com/OHDSI/CohortGeneratorModule/v0.3.0/SettingsFunctions.R
       STRATEGUS__KEYRING_PASSWORD: ${STRATEGUS__KEYRING_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          cpus: ${D2E_CPU_LIMIT:-2}
+          memory: ${D2E_MEMORY_LIMIT:-7G}
 
   alp-dataflow-gen-init:
     command:
@@ -1658,6 +1663,11 @@ services:
       CDW_SVC_BUILT_IN_DUCKDB_DATA_FOLDER: /home/docker/cdw_svc/built_in_duckdb_data
       IDP__ALP_DATA_CLIENT_ID: ${LOGTO__ALP_DATA__CLIENT_ID}
       LOCAL_DEBUG: "false"
+    deploy:
+      resources:
+        limits:
+          cpus: ${D2E_CPU_LIMIT:-2}
+          memory: ${D2E_MEMORY_LIMIT:-7G}
 
   alp-dataflow-gen-process-worker:
     container_name: &c31 alp-dataflow-gen-process-worker-${BASE_PORT:-1}
