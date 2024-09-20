@@ -3,6 +3,8 @@ import { createLogger } from '../Logger'
 import { Agent } from 'https'
 import { get, post } from './request-util'
 import * as crypto from 'crypto'
+import { PortalAPI } from './PortalAPI'
+import { Dataset } from 'src/types'
 
 export class FhirAPI {
   private readonly baseURL: string
@@ -12,8 +14,13 @@ export class FhirAPI {
   private readonly httpsAgent: Agent
   private readonly clientId: string
   private readonly clientSecret: string
+  private readonly token: string
 
-  constructor() {
+  constructor(token: string) {
+    this.token = token
+    if (!token) {
+      throw new Error('No token passed for Analytics API!')
+    }
     if (services.fhir) {
       this.baseURL = services.fhir
       this.fhirTokenUrl = services.fhirTokenUrl
@@ -154,10 +161,30 @@ export class FhirAPI {
         const url = `${this.baseURL}/ClientApplication?name=${projectName}`
         const searchResult = await get(url, options)
         if (searchResult.data.entry && searchResult.data.entry.length > 0) {
+          let datasetId = ''
           const clientId = searchResult.data.entry[0].resource.id
           const clientSecret = searchResult.data.entry[0].resource.secret
           await this.authenticate(clientId, clientSecret)
           options = await this.getRequestConfig()
+
+          //Get datasets
+          const portalAPI = new PortalAPI(this.token)
+          const datasets: Dataset[] = await portalAPI.getDatasets()
+          const resourceDataset = datasets.filter(dataset => {
+            if (dataset.studyDetail.name == projectName) return dataset
+          })
+          //Get dataset Id of incoming resource
+          if (resourceDataset.length > 0) {
+            datasetId = resourceDataset[0].id
+          }
+          //Set datasetId in the metadata of the resource
+          const metaInfo = {
+            author: {
+              reference: 'ClientApplication/' + clientId
+            },
+            id: datasetId
+          }
+          resourceDetails.meta = metaInfo
         } else throw 'Dataset not found!'
       }
       const url = `${this.baseURL}/${fhirResouce}`

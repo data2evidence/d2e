@@ -93,9 +93,18 @@ export interface DatasetDashboard {
 }
 
 export interface Dataset {
+  id: string
+  studyDetail: {
+    id: string
+    name: string
+    description?: string
+    summary?: string
+    showRequestAccess: boolean
+  }
   dialect: string
   databaseCode: string
   schemaName: string
   dashboards: DatasetDashboard[]
   vocabSchemaName: string
+  databaseName?: string
 }
