@@ -26676,12 +26676,13 @@ const cdwConfigDuckdb = {
         ],
         "type": "text",
         "expression": "@PATIENT.\"ethnicity_concept_id\"",
-        "referenceFilter": "@REF.DOMAIN_ID = 'Ethnicity' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-        "referenceExpression": "@REF.CONCEPT_NAME",
+        "referenceFilter": "@REF.DOMAIN_ID = 'Ethnicity' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.65",
+        "referenceExpression": "@REF.CONCEPT_ID",
         "order": 8,
         "domainFilter": "",
         "standardConceptCodeFilter": "",
-        "useRefValue": true
+        "useRefValue": true,
+        "useRefText": true,
       },
       "locationid": {
         "name": [
@@ -26722,11 +26723,11 @@ const cdwConfigDuckdb = {
             "visible": true
           }
         ],
-        "type": "text",
+        "type": "num",
         "expression": "@PATIENT.\"location_id\"",
         "order": 9,
         "domainFilter": "",
-        "standardConceptCodeFilter": ""
+        "standardConceptCodeFilter": "",
       },
       "gendersourcevalue": {
         "name": [
@@ -27463,7 +27464,7 @@ const cdwConfigDuckdb = {
       "@RESPONSE.START": "\"AUTHORED\"",
       "@RESPONSE.END": "\"AUTHORED\"",
       "@RESPONSE.INTERACTION_TYPE": "\"VALUE_TYPE\"",
-      "@COHORT": "$$SCHEMA$$.cohort",
+      "@COHORT": "$$SCHEMA_DIRECT_CONN$$.cohort",
       "@COHORT.PATIENT_ID": "\"subject_id\"",
       "@COHORT.INTERACTION_ID": "\"cohort_definition_id\"",
       "@COHORT.CONDITION_ID": "\"cohort_definition_id\"",

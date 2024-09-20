@@ -34,7 +34,6 @@ export class UserGroupService {
       alpRoleMap: {
         ALP_USER_ADMIN: alpInfo.alp_role_user_admin,
         ALP_SYSTEM_ADMIN: alpInfo.alp_role_system_admin,
-        ALP_SQLEDITOR_ADMIN: alpInfo.alp_role_alp_sqleditor_admin,
         ALP_NIFI_ADMIN: alpInfo.alp_role_nifi_admin,
         ALP_DASHBOARD_VIEWER: alpInfo.alp_role_dashboard_viewer,
         TENANT_ADMIN: alpInfo.alp_role_tenant_admin,
@@ -190,7 +189,6 @@ export class UserGroupService {
       alp_tenant_id: tenantIds,
       alp_role_user_admin: groups.some(group => group.role === ROLES.ALP_USER_ADMIN),
       alp_role_system_admin: groups.some(group => group.role === ROLES.ALP_SYSTEM_ADMIN),
-      alp_role_alp_sqleditor_admin: groups.some(group => group.role === ROLES.ALP_SQLEDITOR_ADMIN),
       alp_role_nifi_admin: groups.some(group => group.role === ROLES.ALP_NIFI_ADMIN),
       alp_role_dashboard_viewer: groups.some(group => group.role === ROLES.ALP_DASHBOARD_VIEWER),
       alp_role_tenant_admin: fn(ROLES.TENANT_ADMIN, 'tenantId'),

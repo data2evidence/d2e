@@ -282,15 +282,6 @@ services:
   #        ]
   #       }
 
-  #alp-minerva-sqleditor:
-  #  build:
-  #    context: .
-  #    dockerfile: ./services/alp-sqleditor/Dockerfile
-  #  ports:
-  #   - 8888:8888
-  #  volumes:
-  #    - ./services/alp-sqleditor/init.sh:/usr/share/hue/init.sh
-
   alp-minerva-terminology-svc:
     build:
      context: .
@@ -395,3 +386,23 @@ services:
       - 9235:9235
     environment:
       LOCAL_DEBUG: "true"
+
+  alp-perseus-backend:
+    build:
+      context: ./services/alp-perseus-backend
+      dockerfile: Dockerfile
+
+  alp-perseus-files-manager:
+    build:
+      context: ./services/alp-perseus-files-manager
+      dockerfile: Dockerfile
+
+  alp-perseus-cdm-builder:
+    build:
+        context: ./services/alp-perseus-cdm-builder
+        dockerfile: Dockerfile
+
+  alp-perseus-white-rabbit:
+    build:
+        context: ./services/alp-perseus-white-rabbit
+        dockerfile: Dockerfile

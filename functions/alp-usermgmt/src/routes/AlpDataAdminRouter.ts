@@ -2,8 +2,8 @@ import express, { NextFunction, Response } from 'express'
 import { Service } from 'typedi'
 import { ROLES } from '../const'
 import { IAppRequest, IUserWithRolesInfo } from 'types'
-import { SystemAdminService, SqleditorAdminService, NifiAdminService } from '../services'
-import { createLogger } from '../Logger'
+import { SystemAdminService, NifiAdminService } from 'services'
+import { createLogger } from 'Logger'
 import { UserGroupExt } from 'dtos'
 import { env } from '../env'
 
@@ -14,7 +14,6 @@ export class AlpDataAdminRouter {
 
   constructor(
     private readonly systemAdminService: SystemAdminService,
-    private readonly sqleditorAdminService: SqleditorAdminService,
     private readonly nifiAdminService: NifiAdminService
   ) {
     this.registerRoutes()
@@ -26,9 +25,6 @@ export class AlpDataAdminRouter {
       this.logger.info('Get ALP data admins')
 
       try {
-        const sqleditorAdmins = await this.sqleditorAdminService.getUsers()
-        this.mergeUserWithRoles(dataAdmins, sqleditorAdmins, ROLES.ALP_SQLEDITOR_ADMIN)
-
         const nifiAdmins = await this.nifiAdminService.getUsers()
         this.mergeUserWithRoles(dataAdmins, nifiAdmins, ROLES.ALP_NIFI_ADMIN)
 
@@ -51,9 +47,6 @@ export class AlpDataAdminRouter {
       try {
         if (roles.includes(ROLES.ALP_SYSTEM_ADMIN)) {
           await this.systemAdminService.register(userId, system)
-        }
-        if (roles.includes(ROLES.ALP_SQLEDITOR_ADMIN)) {
-          await this.sqleditorAdminService.registerUser(userId, system)
         }
         if (roles.includes(ROLES.ALP_NIFI_ADMIN)) {
           await this.nifiAdminService.registerUser(userId, system)
@@ -78,9 +71,6 @@ export class AlpDataAdminRouter {
       try {
         if (roles.includes(ROLES.ALP_SYSTEM_ADMIN)) {
           await this.systemAdminService.withdraw(userId, system)
-        }
-        if (roles.includes(ROLES.ALP_SQLEDITOR_ADMIN)) {
-          await this.sqleditorAdminService.withdrawUser(userId, system)
         }
         if (roles.includes(ROLES.ALP_NIFI_ADMIN)) {
           await this.nifiAdminService.withdrawUser(userId, system)

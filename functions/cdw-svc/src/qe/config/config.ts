@@ -4,7 +4,7 @@
 //import * as async from "async";
 import * as cfg from "@alp/alp-config-utils";
 import { CreateLogger } from "../../utils/Logger";
-import { getAnalyticsConnection, isXS2 } from "../../utils/utils";
+import { isXS2 } from "../../utils/utils";
 import { CDWValidator } from "./CDWValidation";
 import * as configDefinitionLib from "./configDefinition";
 import * as configSuggestionLib from "./configSuggestion";

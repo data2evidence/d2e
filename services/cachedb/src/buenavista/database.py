@@ -12,6 +12,7 @@ from .backends.postgres import PGConnection
 from .backends.hana import HANAConnection
 from buenavista import bv_dialects, rewrite
 from config import Env
+from .cdw_config import get_cdw_config_duckdb_connection
 
 logger = logging.getLogger(__name__)
 
@@ -130,18 +131,23 @@ def _CreateConnectionString(dialect_driver: str, user: str, pw: str,
 def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_code: str, schema: str, vocab_schema: str):
     connection = None
 
+    # Handle special case whereby cdw-config-svc is using alp-cachedb to get connection to cdw-svc duckdb file
+    if database_code == Env.CDW_CONFIG_SVC_DATABASE_CODE and schema == Env.CDW_CONFIG_SVC_DUCKDB_SCHEMA_NAME:
+        return DuckDBConnection(get_cdw_config_duckdb_connection(database_code, schema))
+
     # Guard clause for postgres and hana for unsupported database_codes
     if dialect == DatabaseDialects.POSTGRES or dialect == DatabaseDialects.HANA:
         if database_code not in clients[dialect]:
             raise Exception(
                 f"Dialect:{dialect} has no configuration with database code:{database_code}")
-
+        
     # Guard clause for duckdb for unsupported database_codes
     # For DUCKDB, check against postgres dialect to check for supported database_codes
     if dialect == DatabaseDialects.DUCKDB:
         if database_code not in clients[DatabaseDialects.POSTGRES]:
             raise Exception(
                 f"Dialect:{dialect} has no configuration with database code:{database_code}")
+
 
     if dialect == DatabaseDialects.POSTGRES:
         connection = PGConnection(
@@ -154,7 +160,7 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
     if dialect == DatabaseDialects.DUCKDB:
         '''
         Check if both schema and vocab duckdb database files exists.
-        If both exists, continue connection with duckdb 
+        If both exists, continue connection with duckdb
         Else either does not exist, fallback connection to postgres.
         '''
         cdm_schema_duckdb_file_path = os.path.join(
@@ -164,17 +170,20 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
 
         # Only when both duckdb files for cdm schema and vocab schema exist, connect to duckdb
         if os.path.isfile(cdm_schema_duckdb_file_path) and os.path.isfile(vocab_schema_duckdb_file_path):
-            db = duckdb.connect()
-            # Attach cdm schema
-            db.execute(
-                f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
-            # Attach vocab schema
-            db.execute(
-                f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
-            connection = DuckDBConnection(db)
+            db = _get_duckdb_connection(
+                cdm_schema_duckdb_file_path, schema, vocab_schema_duckdb_file_path, vocab_schema)
+            
+            # Attach direct postgres connection, this is used by analytics-svc for cohort/cohort_definition table queries where it requires direct connection to postgres.
+            if database_code in clients[DatabaseDialects.POSTGRES]:
+                _attach_direct_postgres_connection_for_duckdb(db, database_code)
+
+            # In order for FTS to work, vocab schema has to be passed into DuckDBConnection
+            # TODO: To remove vocab_schema as an input parameter after issue has been fixed
+            # https://github.com/duckdb/duckdb/issues/13523
+            connection = DuckDBConnection(db, vocab_schema)
         else:
             # Fallback connection to postgres
-            logger.warn(
+            logger.warning(
                 f"Duckdb Inaccessible at following paths {cdm_schema_duckdb_file_path} OR {vocab_schema_duckdb_file_path}. Hence fallback to Postgres dialect connection"
             )
             connection = PGConnection(
@@ -186,6 +195,30 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
         # If no connection can be found
         raise Exception(
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
+
+
+def _attach_direct_postgres_connection_for_duckdb(db: duckdb.DuckDBPyConnection, database_code: str):
+    print("Attaching postgres as direct connection ")
+    conn_details = extract_db_credentials(database_code)
+    db.execute(
+        f"ATTACH 'host={conn_details['host']} port={conn_details['port']} dbname={conn_details['databaseName']} user={conn_details['user']} password={conn_details['password']}' AS direct_db_conn (TYPE postgres, READ_ONLY)")
+
+
+def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_schema_duckdb_file_path: str, vocab_schema: str) -> duckdb.DuckDBPyConnection:
+    '''
+    Get duckdb connection with both cdm and vocab schema attached
+    '''
+    db = duckdb.connect()
+    # Attach cdm schema
+    db.execute(
+        f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
+    
+    # For cases where cdm schema and vocab schema are different, attach as a separate database in duckdb
+    if (cdm_schema_duckdb_file_path != vocab_schema_duckdb_file_path):
+        # Attach vocab schema 
+        db.execute(
+            f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
+    return db
 
 
 def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:

@@ -1,18 +1,10 @@
-import { Bot, OperationOutcome } from '@medplum/fhirtypes'
-import { config as botConfig } from '../bots.config.ts'
-import { FhirAPI } from "../api/FhirAPI.ts";
+import { MedplumBotConfig } from "./types";
+import { Bot, OperationOutcome, Project } from '@medplum/fhirtypes'
+import * as botConfig from '../bots.config.json'
+import { FhirAPI } from "../api/FhirAPI";
 import { basename, resolve } from "path";
 import { existsSync, readFileSync } from "fs";
 import { ContentType } from "@medplum/core";
-
-interface MedplumBotConfig {
-    readonly name: string;
-    readonly id: string;
-    readonly description: string;
-    readonly source: string;
-    readonly dist?: string;
-    readonly subscriptionCriteria?: string;
-}
 
 //Reads bots.config.json file and creates, deploys the bots and creates subcription for 'Super Admin' project
 export async function readAndCreateBotFromConfig():Promise<void> {
@@ -23,9 +15,10 @@ export async function readAndCreateBotFromConfig():Promise<void> {
             return ;
         }
         console.log(botConfig.bots.length + ' bots configured in bot config.')
+        let fhirApi = new FhirAPI()
+        await fhirApi.clientCredentialslogin()
+        await enableBotForSuperAdminProject(fhirApi)
         for (const botConfig of botConfigs) {
-            let fhirApi = new FhirAPI()
-            await fhirApi.clientCredentialslogin()
             await createBot(fhirApi, 'Project Id', botConfig, 'vmcontext');
             console.log(`Bot ${botConfig.name} saved and deployed successfully!`)
         }
@@ -126,4 +119,15 @@ function readFileContents(fileName: string): string {
         return '';
     }
     return readFileSync(path, 'utf8');
+}
+
+async function enableBotForSuperAdminProject(fhirApi: FhirAPI){
+    let searchResult = await fhirApi.getResource('name=Super Admin')
+    let superAdminProject:Project
+    if(searchResult){
+        superAdminProject = searchResult
+    }else
+        throw 'Super Admin project not found!'
+    superAdminProject.features = ['bots']
+    return await fhirApi.updateResource(superAdminProject)
 }

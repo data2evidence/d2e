@@ -93,9 +93,6 @@ const getUserScopes = async (bearerToken: string, url: string) => {
     if (ctxUserGroups.alp_role_system_admin === true) {
       ctxRoles.push(ROLES.ALP_SYSTEM_ADMIN)
     }
-    if (ctxUserGroups.alp_role_alp_sqleditor_admin === true) {
-      ctxRoles.push(ROLES.ALP_SQLEDITOR_ADMIN)
-    }
     if (ctxUserGroups.alp_role_nifi_admin === true) {
       ctxRoles.push(ROLES.ALP_NIFI_ADMIN)
     }

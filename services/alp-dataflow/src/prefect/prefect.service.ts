@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common'
 import { join } from 'path'
-import { mkdirSync, readFileSync, rmdirSync, writeFileSync } from 'fs'
+import { mkdirSync, readFileSync, rmdirSync, writeFileSync, existsSync } from 'fs'
 import { PrefectAPI } from './prefect.api'
 import { DataflowService } from '../dataflow/dataflow.service'
 import { AnalysisflowService } from '../analysis-flow/analysis-flow.service'
@@ -547,6 +547,9 @@ export class PrefectService {
   }
 
   private async deleteDeploymentFolder(deploymentFolderPath: string) {
+    if (!existsSync(deploymentFolderPath)) {
+      return
+    }
     rmdirSync(deploymentFolderPath, { recursive: true })
     this.logger.info(`Deleted adhoc prefect deployment folder: ${deploymentFolderPath}`)
   }

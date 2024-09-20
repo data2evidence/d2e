@@ -1,6 +1,6 @@
 export const config = {
     "bots": [
-      {
+    {
         "name": "Questionnaire Response",
         "id": "",
         "description": "FHIR to GDM Questionnaire Response",

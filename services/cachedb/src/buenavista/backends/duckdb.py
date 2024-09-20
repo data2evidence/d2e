@@ -243,9 +243,13 @@ class DuckDBSession(Session):
 
 
 class DuckDBConnection(Connection):
-    def __init__(self, db):
+    # In order for FTS to work, vocab schema has to be passed into DuckDBConnection
+    # TODO: To remove vocab_schema as an input parameter after issue has been fixed
+    # https://github.com/duckdb/duckdb/issues/13523
+    def __init__(self, db, vocab_schema: str =""):
         super().__init__()
         self.db = db
+        self.vocab_schema = vocab_schema
 
     def parameters(self) -> Dict[str, str]:
         return {
@@ -256,5 +260,7 @@ class DuckDBConnection(Connection):
 
     def new_session(self) -> Session:
         cursor = self.db.cursor()
-        cursor.execute("SET search_path='main'")
+
+        if self.vocab_schema:
+            cursor.execute(f"USE {self.vocab_schema};")
         return DuckDBSession(cursor)
