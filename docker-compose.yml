@@ -557,7 +557,6 @@ services:
       PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
       PLUGINS_API_VERSION: latest
 
-
   alp-minerva-analytics-svc:
     container_name: &c9 alp-minerva-analytics-${BASE_PORT:-1}
     depends_on:
@@ -1206,49 +1205,6 @@ services:
       POSTGRES_DB: ${PG_DB_NAME:-alp}
       POSTGRES_PASSWORD: ${PG_SUPER_PASSWORD}
 
-  alp-minerva-ps-config-svc:
-    container_name: &c18 alp-minerva-ps-config-svc-${BASE_PORT:-1}
-    init: true
-    depends_on:
-      alp-minerva-postgres:
-        condition: service_healthy
-      alp-mri-pg-config:
-        condition: service_completed_successfully
-      alp-logto: # to avoid race condition and timeout in logto container
-        condition: service_healthy
-    healthcheck:
-      interval: 20s
-      retries: 20
-      start_period: 60s
-      test:
-        - CMD
-        - wget
-        - -O
-        - liveness
-        - --no-check-certificate
-        - https://localhost:41115/check-liveness
-      timeout: 30s
-    hostname: alp-minerva-ps-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/mri-ps-config:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c18
-    networks:
-      alp:
-        priority: 20
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    environment:
-      <<:
-        - *x-tls
-        - *x-pg
-      LOCAL_DEBUG: "false"
-      NODE_ENV: development
-      PORT: 41115
-      PG_PASSWORD: ${PG_WRITE_PASSWORD}
-      PG_SCHEMA: cdw_config
-      PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      __MRI_SAC_EXTENSION: ENABLED
-
   alp-minerva-s3:
     command:
       - server
@@ -1340,7 +1296,6 @@ services:
       TERMINOLOGY_SVC__PATH: terminology
       TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
       USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-true}
-
 
   alp-minio-post-init:
     container_name: &c23 alp-minio-post-init
