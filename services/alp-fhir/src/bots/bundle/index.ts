@@ -9,9 +9,10 @@ export async function handler(medplum: MedplumClient, event: BotEvent): Promise<
       console.log('No entries in the bundle')
       return;
     }
+    let datasetId = bundle.meta.id;
     for (const entry of bundle.entry) {
       console.log('Create resource for each of the entry in the bundle')
-      await createResourceInFhir(entry.resource)
+      await createResourceInFhir(entry.resource, datasetId)
       await medplum.createResource(entry.resource)
     }
   }catch(err){

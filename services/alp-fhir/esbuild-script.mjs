@@ -37,7 +37,12 @@ const esbuildOptions = {
   define: {
     'process.env.DUCKDB_PATH': `"/home/docker/app"`,
     'process.env.FHIR_SCHEMA_FILE_NAME': '"fhir.schema.json"',
-    'process.env.FHIR_SCHEMA_PATH': '"/home/docker/app/medplum/packages/definitions/dist/fhir/r4"'
+    'process.env.FHIR_SCHEMA_PATH': '"/home/docker/app/medplum/packages/definitions/dist/fhir/r4"',
+    'process.env.CACHEDB__HOST': '"alp-cachedb"',
+    'process.env.CACHEDB__PORT': '"41191"',
+    'process.env.IDP__ALP_SVC__CLIENT_ID': '"v4onv25mm3a1af6rh49f6"',
+    'process.env.IDP__ALP_SVC__CLIENT_SECRET': '"FALi5oCuah9ddgD9V1ZeMxmTnSOkVkTY"',
+    'process.env.ALP_GATEWAY_OAUTH__URL': '"https://alp-minerva-gateway-1.alp.local:41100/oauth/token"'
   }
 };
 
