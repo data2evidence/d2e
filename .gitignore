@@ -9,7 +9,7 @@ pyomopqlenv
 target
 .mypy_cache
 *.egg-info
-
+functions/alp-terminology-svc
 deno.lock
 services/trex
 package-lock.json
