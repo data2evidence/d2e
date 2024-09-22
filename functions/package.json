@@ -80,15 +80,21 @@
       },
       {  
         "source":"/analytics-svc/api/services/public",
-        "service":"analytics"
+        "function":"/analytics-svc",
+        "imports": "/analytics-svc/import.json",
+        "env": "analytics-svc"
       },
       {  
         "source":"/analytics-svc/api/services",
-        "service":"analytics"
+        "function":"/analytics-svc",
+        "imports": "/analytics-svc/import.json",
+        "env": "analytics-svc"
       },
       {  
         "source":"/analytics-svc/pa/services",
-        "service":"analytics"
+        "function":"/analytics-svc",
+        "imports": "/analytics-svc/import.json",
+        "env": "analytics-svc"
       },
       {
         "source":"/analytics-svc/pa/config",

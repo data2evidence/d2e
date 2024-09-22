@@ -4,6 +4,7 @@ import pako from "pako";
 import bcrypt from "bcryptjs";
 import { ILogger } from "./Logger";
 import { Logger } from "winston";
+import * as base64 from "jsr:@std/encoding/base64";
 
 const rm = new ResourceManager(
   path.join(`${Deno.cwd()}`, "i18n", "mri", "text.properties"),
@@ -724,16 +725,15 @@ export function replacePlaceholderWithCustomString(
 
 export function convertZlibBase64ToJson(base64String: string) {
   try {
-    return JSON.parse(
+    const ret = JSON.parse(
       pako.inflate(
-        Buffer.from(base64String, "base64")
-          .toString("binary")
-          .split("")
-          .map(x => x.charCodeAt(0)),
+        base64.decodeBase64(base64String),
         { to: "string" },
       ),
     );
+    return ret;
   } catch (err) {
+    console.log(err)
     throw new Error("There was en error converting the input to JSON");
   }
 }
