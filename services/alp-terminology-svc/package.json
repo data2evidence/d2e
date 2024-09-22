@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@asymmetrik/node-fhir-server-core": "^2.2.5",
-    "@alp/alp-base-utils": "1.1.9",
     "@nestjs/axios": "^3.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.4.3",

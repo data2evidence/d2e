@@ -12,7 +12,7 @@ RUN  --mount=type=cache,target=~/.cache/yarn \
 	yarn install --network-timeout 1000000 --frozen-lockfile
 
 COPY ./services/alp-terminology-svc alp-data-node/app
-RUN yarn workspace @alp/alp-base-utils run compile
+#RUN yarn workspace @alp/alp-base-utils run compile
 WORKDIR /usr/src/alp-data-node/app
 
 FROM development AS final-build
