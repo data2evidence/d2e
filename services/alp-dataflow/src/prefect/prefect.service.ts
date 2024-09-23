@@ -196,8 +196,8 @@ export class PrefectService {
     const { deploymentFolderPath, fileStem, modifiedFileStem, fileType } = file
       ? await this.processPipPackage(userId, { fileName: file.originalname })
       : url
-        ? await this.processPipPackage(userId, { url: url })
-        : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
+      ? await this.processPipPackage(userId, { url: url })
+      : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
     this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
 
     let flowMetadataInput
@@ -309,8 +309,8 @@ export class PrefectService {
     const { deploymentFolderPath } = file
       ? await this.processPipPackage(userId, { fileName: file.originalname })
       : url
-        ? await this.processPipPackage(userId, { url: url })
-        : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
+      ? await this.processPipPackage(userId, { url: url })
+      : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
     this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
 
     // start upload asychronously
@@ -330,8 +330,8 @@ export class PrefectService {
     const { deploymentFolderPath, fileStem, modifiedFileStem, fileType } = file
       ? await this.processPipPackage(userId, { fileName: file.originalname })
       : url
-        ? await this.processPipPackage(userId, { url: url })
-        : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
+      ? await this.processPipPackage(userId, { url: url })
+      : await this.processPipPackage(userId, { url: defaultDeploymentInfo.url })
     this.logger.info(`Deployment Folder: ${deploymentFolderPath}`)
 
     let flowMetadataInput

@@ -14,10 +14,7 @@ export class AnalyticsSvcAPI {
   private readonly httpsAgent: Agent
   private readonly logger = createLogger(this.constructor.name)
 
-  constructor(
-    @Inject(REQUEST) request: Request,
-    private readonly httpService: HttpService
-  ) {
+  constructor(@Inject(REQUEST) request: Request, private readonly httpService: HttpService) {
     this.jwt = request.headers['authorization']
     if (services.analytics) {
       this.url = `${services.analytics}/analytics-svc/api/services`

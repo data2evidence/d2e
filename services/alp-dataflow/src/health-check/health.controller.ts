@@ -3,10 +3,7 @@ import { HealthCheck, HealthCheckService, TypeOrmHealthIndicator } from '@nestjs
 
 @Controller()
 export class HealthController {
-  constructor(
-    private healthCheckService: HealthCheckService,
-    private typeOrmHealthIndicator: TypeOrmHealthIndicator
-  ) {}
+  constructor(private healthCheckService: HealthCheckService, private typeOrmHealthIndicator: TypeOrmHealthIndicator) {}
 
   @Get('/check-liveness')
   @HealthCheck()
