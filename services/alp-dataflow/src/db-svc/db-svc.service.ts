@@ -9,7 +9,10 @@ import { REQUEST } from '@nestjs/core'
 export class DBSvcService {
   private readonly logger = createLogger(this.constructor.name)
   private readonly jwt: string
-  constructor(@Inject(REQUEST) request: Request, private readonly prefectApi: PrefectAPI) {
+  constructor(
+    @Inject(REQUEST) request: Request,
+    private readonly prefectApi: PrefectAPI
+  ) {
     this.jwt = request.headers['authorization']
   }
 
