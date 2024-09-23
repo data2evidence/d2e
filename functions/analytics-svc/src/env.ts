@@ -23,10 +23,10 @@ function initEnv(__env) {
         USE_EXTENSION_FOR_COHORT_CREATION: z.string(),
 
         USE_DUCKDB: z.string(),
-        USE_SQL_PROXY: z.string(),
+        USE_CACHEDB: z.string(),
 
-        SQL_PROXY__HOST: z.string(),
-        SQL_PROXY__PORT: z
+        CACHEDB__HOST: z.string(),
+        CACHEDB__PORT: z
             .string()
             .refine((val) => !isNaN(parseInt(val)))
             .transform(Number),
@@ -34,8 +34,9 @@ function initEnv(__env) {
         SKIP_AUTH: z.string(),
         LOCAL_DEBUG: z.string(),
         SQL_RETURN_ON: z.string(),
-        isHttpTestRun: z.string(),
-        isTestEnv: z.string(),
+        isHttpTestRun: z.string().optional(),
+        isTestEnv: z.string().optional(),
+        TESTSCHEMA: z.string().optional(),
         local: z.string(),
 
         TLS__INTERNAL__KEY: z.string().optional(),
@@ -74,6 +75,21 @@ function initEnv(__env) {
                     return z.never();
                 }
             }),
+        }).superRefine(({ LOCAL_DEBUG, isHttpTestRun, isTestEnv, TESTSCHEMA }, refinementContext) => {
+            //Validate for non-prod scenarios
+            if (LOCAL_DEBUG.toLowerCase() === "true") {
+                const addError = (env) => {
+                    refinementContext.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: `No value for ${env}`,
+                        path: [env],
+                      });
+                }
+         
+                if (!isHttpTestRun) addError("isHttpTestRun")
+                if (!isTestEnv) addError("isTestEnv")
+                if (!TESTSCHEMA && (isTestEnv && isTestEnv.toLowerCase() === "true")) addError("TESTSCHEMA");
+            }
     });
 
     const result =  Env.safeParse(_env);
@@ -86,7 +102,7 @@ function initEnv(__env) {
         env['VCAP_SERVICES'] = _env['VCAP_SERVICES'];
 
     } else {
-        console.error(JSON.stringify(result));
+        console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
         throw new Error("ZOD parse failed")
     }
     return env;

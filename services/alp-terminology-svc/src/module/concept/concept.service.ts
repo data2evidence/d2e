@@ -23,15 +23,23 @@ import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { Request } from 'express';
 import { SystemPortalAPI } from 'src/api/portal-api';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
+import { GetStandardConceptsDto } from './dto/concept.dto';
+import { CachedbService } from 'src/cachedb/cachedb.service';
+import { env } from 'src/env';
 
 // Placed outside as FHIR server is unable to access
 const logger = createLogger('ConceptService');
 @Injectable()
 export class ConceptService {
   private token: string;
+  private request: Request;
 
-  constructor(@Inject(REQUEST) request: Request) {
+  constructor(
+    @Inject(REQUEST) request: Request,
+    private readonly cachedbService: CachedbService,
+  ) {
     this.token = request.headers['authorization'];
+    this.request = request;
   }
 
   // Used by FHIR server, where request cannot be injected as it does not use nest
@@ -59,6 +67,20 @@ export class ConceptService {
     const systemPortalApi = new SystemPortalAPI(this.token);
     const { databaseCode, vocabSchemaName, dialect } =
       await systemPortalApi.getDatasetDetails(datasetId);
+
+    // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+    if (env.USE_DUCKDB_FTS) {
+      logger.info('Searching with Duckdb FTS');
+      return await this.cachedbService.getConcepts(
+        pageNumber,
+        Number(rowsPerPage),
+        datasetId,
+        searchText,
+        vocabSchemaName,
+        completeFilters,
+      );
+    }
+
     try {
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
@@ -106,6 +128,76 @@ export class ConceptService {
       throw err;
     }
   }
+  async getStandardConcepts(
+    getStandardConceptsDto: GetStandardConceptsDto,
+    hybridSearchConfigService: HybridSearchConfigService,
+  ): Promise<any> {
+    const { data, datasetId } = getStandardConceptsDto;
+
+    const systemPortalApi = new SystemPortalAPI(this.token);
+    const { databaseCode, vocabSchemaName, dialect } =
+      await systemPortalApi.getDatasetDetails(datasetId);
+    const meilisearchApi = new MeilisearchAPI();
+
+    const results = await Promise.all(
+      data.map(async (dataItem) => {
+        const { domainId, searchText, index } = dataItem;
+
+        const filters: Filters = {
+          conceptClassId: [],
+          domainId: [],
+          standardConcept: ['S'],
+          vocabularyId: [],
+          validity: [],
+        };
+
+        try {
+          if (domainId) {
+            const meiliIndex = `${databaseCode}_${vocabSchemaName}_${
+              dialect === 'hana' ? 'CONCEPT' : 'concept'
+            }`;
+            const domainIdFacets =
+              await meilisearchApi.getConceptFilterOptionsFaceted(
+                meiliIndex,
+                dataItem.searchText,
+                { ...filters, domainId: [] },
+              );
+
+            const keyExists = Object.keys(domainIdFacets).some(
+              (objKey) => objKey.toUpperCase() === domainId.toUpperCase(),
+            );
+
+            if (keyExists) {
+              filters.domainId.push(domainId);
+            }
+          }
+
+          const concept = await this.getConcepts(
+            0,
+            1,
+            datasetId,
+            searchText,
+            hybridSearchConfigService,
+            filters,
+          );
+
+          const [conceptResults] = concept.expansion.contains;
+
+          return {
+            index,
+            conceptId: conceptResults.conceptId,
+            conceptName: conceptResults.display,
+            domainId: conceptResults.domainId,
+          };
+        } catch (error) {
+          logger.error(error);
+          throw error;
+        }
+      }),
+    );
+
+    return results;
+  }
 
   async getTerminologyDetailsWithRelationships(
     conceptId: number,
@@ -119,6 +211,16 @@ export class ConceptService {
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
       const searchConcepts1: number[] = [conceptId];
+
+      // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+      if (env.USE_DUCKDB_FTS) {
+        return await this.cachedbService.getTerminologyDetailsWithRelationships(
+          vocabSchemaName,
+          conceptId,
+          datasetId,
+        );
+      }
+
       const meilisearchResultConcept1 =
         await meilisearchApi.getMultipleExactConcepts(
           searchConcepts1,
@@ -320,38 +422,50 @@ export class ConceptService {
       const meiliIndex = `${databaseCode}_${vocabSchemaName}_${
         dialect === 'hana' ? 'CONCEPT' : 'concept'
       }`;
-      const conceptClassIdFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          { ...filters, conceptClassId: [] },
-        );
-      const domainIdFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          { ...filters, domainId: [] },
-        );
-      const standardConceptFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          {
-            ...filters,
-            standardConcept: [],
-          },
-        );
-      const vocabularyIdFacets =
-        await meilisearchApi.getConceptFilterOptionsFaceted(
-          meiliIndex,
-          searchText,
-          { ...filters, vocabularyId: [] },
-        );
-      const validity = await meilisearchApi.getConceptFilterOptionsValidity(
-        meiliIndex,
-        searchText,
-        { ...filters, validity: [] },
-      );
+
+      // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+      if (env.USE_DUCKDB_FTS) {
+        logger.info('Searching concept filters with Duckdb FTS');
+        const filterOptions =
+          await this.cachedbService.getConceptFilterOptionsFaceted(
+            vocabSchemaName,
+            datasetId,
+            searchText,
+            filters,
+          );
+        return { filterOptions };
+      }
+
+      logger.info('Searching concept filters with Meilisearch');
+      const [
+        conceptClassIdFacets,
+        domainIdFacets,
+        standardConceptFacets,
+        vocabularyIdFacets,
+        validity,
+      ] = await Promise.all([
+        meilisearchApi.getConceptFilterOptionsFaceted(meiliIndex, searchText, {
+          ...filters,
+          conceptClassId: [],
+        }),
+        meilisearchApi.getConceptFilterOptionsFaceted(meiliIndex, searchText, {
+          ...filters,
+          domainId: [],
+        }),
+        meilisearchApi.getConceptFilterOptionsFaceted(meiliIndex, searchText, {
+          ...filters,
+          standardConcept: [],
+        }),
+        meilisearchApi.getConceptFilterOptionsFaceted(meiliIndex, searchText, {
+          ...filters,
+          vocabularyId: [],
+        }),
+        meilisearchApi.getConceptFilterOptionsValidity(meiliIndex, searchText, {
+          ...filters,
+          validity: [],
+        }),
+      ]);
+
       const filterOptions = {
         conceptClassId: conceptClassIdFacets.facetDistribution.concept_class_id,
         domainId: domainIdFacets.facetDistribution.domain_id,
@@ -372,6 +486,7 @@ export class ConceptService {
           };
         })(),
       };
+
       return { filterOptions };
     } catch (err) {
       logger.error(err);

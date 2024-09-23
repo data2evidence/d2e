@@ -91,6 +91,7 @@ export const grantRolesByScopes = async (req: Request, res: Response, next: Next
       grantOrRevokeTenantRole(userId, tenantId, ROLES.TENANT_VIEWER, scope.includes(IDP_SCOPE_ROLE.TENANT_VIEWER))
       grantOrRevokeSystemRole(userId, ROLES.ALP_SYSTEM_ADMIN, scope.includes(IDP_SCOPE_ROLE.SYSTEM_ADMIN))
       grantOrRevokeSystemRole(userId, ROLES.ALP_USER_ADMIN, scope.includes(IDP_SCOPE_ROLE.USER_ADMIN))
+      grantOrRevokeSystemRole(userId, ROLES.ALP_DASHBOARD_VIEWER, scope.includes(IDP_SCOPE_ROLE.DASHBOARD_VIEWER))
     }
 
     next()

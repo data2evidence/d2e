@@ -1,3 +1,20 @@
+## How to switch from Basic to IDP Azure Authentication on D2E
+- Add social connector
+  - Enable admin endpoint. Update env `ADMIN_DISABLE_LOCALHOST`: `false`. Restart logto service.
+  - Port forward to logto container and access `http://localhost:3002`
+  - Follow the steps below to create the D2E social connector and configure in sign-in-experiences
+  - Disable Admin console. Update env `ADMIN_DISABLE_LOCALHOST`: `true`.  Restart logto service.
+
+- In Azure, under app registrations
+     - Add Token configuration -> Add groups claim
+     - Update redirect url with connector ID
+ 
+- Update env values
+  - IDP__RELYING_PARTY: `azure`
+  - LOGTO_ROLES_AZ_GROUPS_MAPPING - Update `Object ID from Groups` from target Azure
+  - LOGTO__SCOPE: `openid offline_access profile email role.systemadmin role.useradmin role.tenantviewer role.dashboardviewer`
+  - Restart services
+
 # Microsoft Azure AD connector
 
 The Microsoft Azure AD connector provides a succinct way for your application to use Azure’s OAuth 2.0 authentication system.

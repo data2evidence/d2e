@@ -7,10 +7,9 @@
 import { env } from "../configs";
 import { getDuckdbDBConnection } from "./DuckdbConnection";
 import * as _textLib from "./text";
+import { getCachedbDbConnections } from "./cachedb";
 import * as xsenv from "@sap/xsenv";
-import {
-  DBConnectionUtil as dbConnectionUtil
-} from "@alp/alp-base-utils";
+import { DBConnectionUtil as dbConnectionUtil } from "@alp/alp-base-utils";
 /**
  * Escapes a string to be used in a regex
  *
@@ -444,14 +443,25 @@ export function getUsername() {
   }
 }
 
-export async function getAnalyticsConnection(userObj) {
+export async function getAnalyticsConnection(userObj, token?: string) {
   let analyticsCredentials;
   let analyticsConnection;
-  let cdwService = xsenv.filterServices({ tag: "cdw" }).map(db => db.credentials);
-  if(env.USE_DUCKDB === "true"){
-    analyticsConnection =  await getDuckdbDBConnection()
-  }else{
-    cdwService = cdwService.filter((db) => db.dialect == 'hana')
+  let cdwService = xsenv
+    .filterServices({ tag: "cdw" })
+    .map((db) => db.credentials);
+  if (env.USE_DUCKDB === "true") {
+    if (env.USE_CACHEDB === "true") {
+      // Get duckdb db connection via alp-cachedb
+      analyticsConnection = await getCachedbDbConnections({
+        userObj,
+        token,
+      });
+    } else {
+      // Get duckdb db connection via direct file connection
+      analyticsConnection = await getDuckdbDBConnection();
+    }
+  } else {
+    cdwService = cdwService.filter((db) => db.dialect == "hana");
     analyticsCredentials = cdwService[0];
     analyticsConnection =
       await dbConnectionUtil.DBConnectionUtil.getDBConnection({
@@ -460,6 +470,6 @@ export async function getAnalyticsConnection(userObj) {
         vocabSchemaName: analyticsCredentials.vocabSchema,
         userObj,
       });
-    }
-    return analyticsConnection;
   }
+  return analyticsConnection;
+}

@@ -83,7 +83,7 @@ export class DatasetQueryService {
       .select(this.getDatasetsColumns(role))
 
     if (searchText) {
-      const tsQuery = this.convertToTsqueryFormat(this.sanitizeTsQueryInput(searchText))
+      const tsQuery = this.convertToTsqueryFormat(searchText)
       if (tsQuery) {
         query
           .setParameter('searchText', tsQuery)
@@ -216,9 +216,9 @@ export class DatasetQueryService {
       .getOne()
 
     return {
-      id: dashboard.id,
-      name: dashboard.name,
-      url: dashboard.url
+      id: dashboard?.id,
+      name: dashboard?.name,
+      url: dashboard?.url
     }
   }
 
@@ -252,13 +252,9 @@ export class DatasetQueryService {
     return <T>object
   }
 
-  private sanitizeTsQueryInput(input: string) {
-    return input.replace(/[^a-zA-Z0-9\s]/g, '').trim()
-  }
-
   private convertToTsqueryFormat(input: string) {
     const normalizedInput = input.replace(/\s+/g, ' ')
     const terms = normalizedInput.split(' ').filter(term => term.length > 0)
-    return terms.join(' | ')
+    return terms.map(t => `${t}:*`).join(' | ')
   }
 }

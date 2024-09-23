@@ -29,6 +29,16 @@ const Env = z.object({
   TLS__INTERNAL__CRT: z.string(),
   TLS__INTERNAL__CA_CRT: z.string(),
 
+  CACHEDB__HOST: z.string(),
+  CACHEDB__PORT: z.string().transform(Number),
+
+  USE_DUCKDB_FTS: z
+    .string()
+    .refine((value) => value === 'true' || value === 'false', {
+      message: 'Value must be a boolean',
+    })
+    .transform((value) => value === 'true'),
+
   SERVICE_ROUTES: z
     .string()
     .transform((str, ctx): z.infer<ReturnType<typeof object>> => {
@@ -43,11 +53,12 @@ const Env = z.object({
 
 const result = Env.safeParse(process.env);
 
-let env = process.env as unknown as z.infer<typeof Env>;
+let env: z.infer<typeof Env>;
 if (result.success) {
   env = result.data;
 } else {
-  console.warn(JSON.stringify(result));
+  console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+  process.exit(1);
 }
 
 export { env };

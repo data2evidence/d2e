@@ -2,8 +2,7 @@ import { NextFunction, Response } from 'express'
 import { createLogger } from '../Logger'
 import { IAppRequest, ITokenUser } from '../types'
 import jwt from 'jsonwebtoken'
-import { isSkipAuth } from '../utils'
-import { CONTAINER_KEY, DEMO_USER } from '../const'
+import { CONTAINER_KEY } from '../const'
 import { env } from '../env'
 import { Container } from 'typedi'
 import { UserService } from '../services'
@@ -15,11 +14,6 @@ export const addUserObjToReq = async (req: IAppRequest, res: Response, next: Nex
   logger.debug('Add user obj to req')
 
   try {
-    if (isSkipAuth) {
-      req.user = DEMO_USER
-      return next()
-    }
-
     const bearerToken = req.headers.authorization as string
     if (!bearerToken) {
       return next()

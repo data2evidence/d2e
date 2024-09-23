@@ -42,11 +42,6 @@ const getSeeds = (): { [key: string]: any }[] => {
       system: ALP_SYSTEM
     },
     {
-      id: '07588978-0929-44f3-bcae-2bcfab5b9497',
-      role: ROLES.ALP_SQLEDITOR_ADMIN,
-      system: ALP_SYSTEM
-    },
-    {
       id: '1792e31c-5dda-467a-9625-31f97cdfb4ec',
       role: ROLES.ALP_DASHBOARD_VIEWER,
       system: ALP_SYSTEM

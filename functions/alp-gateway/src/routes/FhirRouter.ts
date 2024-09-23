@@ -15,8 +15,8 @@ export class FhirRouter {
   private registerRoutes() {
     this.router.post('/createProject', async (req, res) => {
       const fhirApi = new FhirAPI()
-      const name = req.query.name as string
-      const description = req.query.description as string
+      const name = req.body.name as string
+      const description = req.body.description as string
       try {
         const projectId = await fhirApi.createProject(name, description)
         return res.status(200).json(projectId)
@@ -33,7 +33,7 @@ export class FhirRouter {
         const response = await fhirApi.createResource(resource, req.body, projectName)
         return res.status(response.status).json(response.data)
       } catch (error) {
-        this.logger.error(`Error creating resource on fhir server: ${error}`)
+        this.logger.error(`Error creating resource on fhir server: ${JSON.stringify(error)}`)
         res.status(500).send('Error creating resource on fhir server')
       }
     })

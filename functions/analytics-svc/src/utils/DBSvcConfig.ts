@@ -23,11 +23,6 @@ export const getProperties = (): any => {
             alp_db_base_path: String(env.DB_SVC__PATH),
             alp_system_id: String(env.ALP__SYSTEM_ID),
             sub_prop: String(env.DB_SVC__IDP_SUBJECT_PROP),
-            skip_auth:
-                env.NODE_ENV === "test" ||
-                env.NODE_ENV === "script"
-                    ? true
-                    : utils.getBoolean(env.SKIP_AUTH),
             hana_tenant_configs: isProd
                 ? readFileSync(`${k8sPathPrefix}/HANA_TENANT_CONFIGS`, "utf-8")
                 : env.HANA__TENANT_CONFIGS,

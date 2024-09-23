@@ -50,10 +50,6 @@
       "destination":"alp-terminology-svc"
     },
     {
-      "source":"^/alp-sqleditor",
-      "destination":"sqleditor"
-    },
-    {
       "source":"^/alp-ai",
       "destination":"alp-ai-svc"
     },
@@ -80,6 +76,10 @@
     {
       "source": "^/ps-config-svc/(.*)$",
       "destination": "ps-config"
+    },
+    {
+      "source": "^/prefect/(.*)$",
+      "destination": "prefect"
     }
   ]
 }

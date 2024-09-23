@@ -13,7 +13,7 @@
     "target"
   ],
   "engines": {
-    "node": ">=18.14.0"
+    "node": ">=18.20.4"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

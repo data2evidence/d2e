@@ -10,6 +10,7 @@ import { DBError } from "./DBError";
 import { CreateLogger } from "./Logger";
 import QueryStream from "pg-query-stream";
 import { translateHanaToPostgres } from "./helpers/hanaTranslation";
+import { EnvVarUtils } from "./EnvVarUtils";
 const logger = CreateLogger("Postgres Connection");
 
 function _getRows(result) {
@@ -27,7 +28,12 @@ export class PostgresConnection implements ConnectionInterface {
     public dialect = "POSTGRES",
   ) {}
 
-  public static createConnection(pool: Pool, schemaName, vocabSchemaName = schemaName, callback) {
+  public static createConnection(
+    pool: Pool,
+    schemaName,
+    vocabSchemaName = schemaName,
+    callback,
+  ) {
     try {
       const conn = new PostgresConnection(pool, schemaName, vocabSchemaName);
       callback(null, conn);
@@ -113,7 +119,7 @@ export class PostgresConnection implements ConnectionInterface {
     }
   }
 
-  parseSql(temp: string): string {
+  public parseSql(temp: string): string {
     return translateHanaToPostgres(temp, this.schemaName, this.vocabSchemaName);
   }
 
@@ -238,7 +244,13 @@ export class PostgresConnection implements ConnectionInterface {
   }
 
   public close() {
-    if (Deno.env.get("isTestEnv") === "true" && this.conn.end) {
+    const envVarUtils = new EnvVarUtils(Deno.env.toObject());
+    // Only integration tests require ending the connection as the code is run directly, and the tests will hang.
+    if (
+      envVarUtils.isTestEnv() &&
+      !envVarUtils.isHttpTestRun() &&
+      this.conn.end
+    ) {
       this.conn.end.apply(this.conn, arguments);
     } else {
       logger.debug(

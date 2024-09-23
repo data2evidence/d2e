@@ -13,6 +13,8 @@ import { translateHanaToDuckdb } from "../../../_shared/alp-base-utils/src/helpe
 
 import fs from 'node:fs';
 import { env } from "../configs";
+
+import { DUCKDB_FILE_NAME } from "../qe/settings/Defaults";
 const logger = Logger.CreateLogger("Duckdb Connection");
 
 // Helper function similar to getDBConnection implementation in alp-base-utils DBConnectionUtil.ts
@@ -31,8 +33,26 @@ export const getDuckdbDBConnection = () => {
 };
 
 export const getDefaultSchemaName = () => {
-    return `alpdev_pg_cdmvocab`;
+    return DUCKDB_FILE_NAME;
 }
+
+const _resolveDuckdbDatabaseFilePath = () => {
+  /*
+    Checks if there is a duckdb file in DUCKDB_PATH, if there is a file there, use it.
+    Else fallback to using the built in duckdb file in BUILT_IN_DUCKDB_PATH
+  */
+
+  const defaultDuckdbFilePath = `${env.DUCKDB_PATH}/${getDefaultSchemaName()}`;
+
+  if (existsSync(defaultDuckdbFilePath)) {
+    logger.debug(`Using duckdb file from ${env.DUCKDB_PATH}`);
+    return defaultDuckdbFilePath;
+  } else {
+    logger.debug(`Using built in duckdb file from ${env.BUILT_IN_DUCKDB_PATH}`);
+    return `${env.BUILT_IN_DUCKDB_PATH}/${getDefaultSchemaName()}`;
+  }
+};
+
 export class DuckdbConnection implements ConnectionInterface {
     private constructor(
         public database: any,
@@ -46,19 +66,14 @@ export class DuckdbConnection implements ConnectionInterface {
         callback
     ) {
         try {
-            let dbPathString = env.DUCKDB_PATH
-            if(fs.existsSync(dbPathString))
-            {
-                const duckdDB = new duckdb.Database(
-                    `${dbPathString}/${getDefaultSchemaName()}`, {
-                        "access_mode": "READONLY",
-                    },
-                );
-                const duckdDBconn = duckdDB.connect();
-                const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, getDefaultSchemaName());
-                callback(null, conn);
-            }
-            
+            const duckdbFilePath = _resolveDuckdbDatabaseFilePath()        
+            const duckdDB = await duckdb.Database.create(
+                duckdbFilePath,
+                duckdb.OPEN_READONLY
+            );
+            const duckdDBconn = await duckdDB.connect();
+            const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, getDefaultSchemaName());
+            callback(null, conn);
         } catch (err) {
             callback(err, null);
         }
@@ -113,6 +128,10 @@ export class DuckdbConnection implements ConnectionInterface {
     }
 
     private parseSql(temp: string): string {
+        // Specifically for cdw-config-svc, duckdb does not require direct connection to database.
+        // $$$$SCHEMA$$$$ is the replacement, but will appear in the string as $$SCHEMA$$ 
+        temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, "$$$$SCHEMA$$$$.");
+
         return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName);
     }
 

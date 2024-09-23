@@ -6,12 +6,16 @@ networks:
 volumes:
   caddy:
   duckdb-data-1:
+  cdw-config-duckdb-data-1:
   meilisearch-minerva-data-1:
   minio-data-1:
   pg-minerva-data-1:
   dicom-sqlite-storage:
   r-libs:
   trex:
+  fhir-schema-file-1:
+  fhir-duckdb-1:
+  dind-certs:
 
 x-envs:
   db-svc: &x-dbsvc
@@ -50,6 +54,8 @@ x-envs:
   fhir: &x-fhir
     FHIR__CLIENT_ID: db6b2304-f236-45ec-b10c-a852681e7129
     FHIR__CLIENT_SECRET: ${FHIR__CLIENT_SECRET}
+  perseus: &x-perseus
+    PERSEUS__FILES_MANAGER_HOST: alp-perseus-files-manager-${BASE_PORT:-1}
   plugins: &x-plugins |
     {
       "researcher": [
@@ -182,14 +188,6 @@ x-envs:
           "route": "ps-config"
         },
         {
-          "description": "Map codes from a source system into terminologies stored in OMOP Vocabulary",
-          "enabled": true,
-          "name": "Concept Mapping",
-          "notes": "",
-          "pluginPath": "plugins/Setup/ConceptMapping/module",
-          "route": "concept-mapping"
-        },
-        {
           "description": "Configure hybrid search for concepts",
           "enabled": true,
           "name": "Hybrid Search",
@@ -204,6 +202,14 @@ x-envs:
           "notes": "",
           "pluginPath": "plugins/Setup/OverviewDescription/module",
           "route": "overview-description"
+        },
+        { 
+          "description": "Upload / delete flows",
+          "enabled": true,
+          "name": "Plugins Table",
+          "notes": "",
+          "pluginPath": "plugins/Setup/PluginTable/module",
+          "route": "plugins-table"
         }
       ],
       "systemadmin": [
@@ -223,28 +229,31 @@ x-envs:
           "route": "jobs"
         },
         {
-          "data": {
-            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
-          },
-          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/mapping/module.js",
           "name": "ETL",
-          "route": "etl"
-        },
-        {
-          "name": "Sql Editor",
-          "pluginPath": "plugins/SystemAdmin/Sqleditor/module",
-          "route": "sqleditor"
+          "route": "etl",
+          "children": [
+            {
+              "name": "Concept mapping",
+              "pluginPath": "plugins/SystemAdmin/ConceptMapping/module",
+              "route": "concept-mapping"
+            },
+            {
+          "data": {
+            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
+          },
+              "name": "Data mapping",
+          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/mapping/module.js",
+              "route": "data-mapping"
         },
         {
           "data": {
             "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
           },
-          "name": "Dataflow",
+              "name": "Data transformation",
           "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/flow/module.js",
-          "route": "dataflow",
-          "type": "hidden",
-          "featureFlag": "dataflow",
-          "enabled": "true"
+              "route": "dataflow"
+            }
+          ]
         },
         {
           "name": "Setup",
@@ -288,10 +297,6 @@ x-envs:
     CACHEDB__HOST: alp-cachedb
     CACHEDB__PORT: 41191
     CACHEDB__POOL_SIZE: ${CACHEDB__POOL_SIZE:-10}
-  sql-proxy: &sql-proxy
-    SQL_PROXY__HOST: alp-sql-proxy
-    SQL_PROXY__PORT: 41191
-    SQL_PROXY__POOL_SIZE: ${SQL_PROXY__POOL_SIZE:-10}
   python-internal-ssl: &python-internal-ssl
     PYTHON_VERIFY_SSL: false # Only use this for apis calling internal docker urls
 
@@ -674,6 +679,8 @@ services:
         }
       POSTGRES_SUPERUSER: ${PG_SUPER_USER:-postgres}
       POSTGRES_SUPERUSER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PORT: 41110
+      sqlOnly: false
 
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile
@@ -743,6 +750,7 @@ services:
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       PREFECT_SERVER_ANALYTICS_ENABLED: "false"
       PREFECT_SERVER_API_HOST: 0.0.0.0
+      PREFECT_UI_STATIC_DIRECTORY: /app/ui-files
       PREFECT_SERVER_API_PORT: 41${BASE_PORT:-1}20
       PREFECT_API_ENABLE_HTTP2: False
       SKIP_AUTH: ${SKIP_AUTH:-FALSE}
@@ -847,6 +855,9 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    volumes:
+      - fhir-schema-file-1:/home/docker/app/medplum/packages/definitions/dist/fhir/r4
+      #- fhir-duckdb-1:/home/docker/app/duckdb
     environment:
       <<:
         - *x-pg
@@ -855,6 +866,9 @@ services:
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+      DUCKDB_PATH: /home/docker/app
+      FHIR_SCHEMA_PATH: /home/docker/app/medplum/packages/definitions/dist/fhir/r4
+      FHIR_SCHEMA_FILE_NAME: fhir.schema.json
 
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
@@ -890,8 +904,8 @@ services:
       LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine"},{"name":"alp-app","description":"alp-app","type":"Traditional","oidcClientMetadata":{"redirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
       LOGTO__RESOURCE: '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
       LOGTO__USER: '{"username":"admin","initialPassword":"Updatepassword12345"}'
-      LOGTO__ROLES: '[{"name":"role.systemadmin","description":"ALP System admin","type":"User"},{"name":"role.useradmin","description":"ALP User admin","type":"User"},{"name":"role.tenantviewer","description":"ALP Tenant viewer","type":"User"}]'
-      LOGTO__SCOPES: '[{"name":"role.systemadmin","description":"ALP System admin"},{"name":"role.useradmin","description":"ALP User admin"},{"name":"role.tenantviewer","description":"ALP Tenant viewer"}]'
+      LOGTO__ROLES: '[{"name":"role.systemadmin","description":"ALP System admin","type":"User"},{"name":"role.useradmin","description":"ALP User admin","type":"User"},{"name":"role.tenantviewer","description":"ALP Tenant viewer","type":"User"},{"name":"role.dashboardviewer","description":"ALP Dashboard viewer","type":"User"}]'
+      LOGTO__SCOPES: '[{"name":"role.systemadmin","description":"ALP System admin"},{"name":"role.useradmin","description":"ALP User admin"},{"name":"role.tenantviewer","description":"ALP Tenant viewer"},{"name":"role.dashboardviewer","description":"ALP Dashboard viewer"}]'
       LOGTO__ADMIN_SERVER__FQDN_URL: "http://alp-logto-1:3002"
       LOGTO__CLIENTID_PASSWORD__BASIC_AUTH: ${LOGTO__CLIENTID_PASSWORD__BASIC_AUTH}
       LOGTO__ALP_ADMIN_APP: '{"application": {"id": "${LOGTO_API_M2M_CLIENT_ID}", "name":"alp-admin","description":"alp-admin", "secret": "${LOGTO_API_M2M_CLIENT_SECRET}"}, "role": { "name":"api-access","description":"Logto API access"}}'
@@ -938,7 +952,7 @@ services:
       ENDPOINT: https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       LOGTO_API_M2M_CLIENT_ID: ${LOGTO_API_M2M_CLIENT_ID}
       LOGTO_API_M2M_CLIENT_SECRET: ${LOGTO_API_M2M_CLIENT_SECRET}
-      LOGTO_ROLES_AZ_GROUPS_MAPPING: ${LOGTO_ROLES_AZ_GROUPS_MAPPING:-{"role.systemadmin":"37b5364a-348c-494f-b67f-a59a40e52ab7","role.useradmin":"90597adc-92af-4649-8151-68c3b7feb66c","role.tenantviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5"}}
+      LOGTO_ROLES_AZ_GROUPS_MAPPING: ${LOGTO_ROLES_AZ_GROUPS_MAPPING:-{"role.systemadmin":"37b5364a-348c-494f-b67f-a59a40e52ab7","role.useradmin":"90597adc-92af-4649-8151-68c3b7feb66c","role.tenantviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5","role.dashboardviewer":"50a3b140-21eb-46dd-9d81-61a77cbc81f5"}}
       NODE_ENV: test
       PORT: 3001
       TRUST_PROXY_HEADER: true
@@ -1098,9 +1112,6 @@ services:
     networks:
       alp:
         priority: 20
-        aliases:
-          - shareddb
-          - vocabularydb
       data:
         priority: 10
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
@@ -1114,24 +1125,6 @@ services:
         - *x-tls
       POSTGRES_DB: ${PG_DB_NAME:-alp}
       POSTGRES_PASSWORD: ${PG_SUPER_PASSWORD}
-
-  alp-minerva-postgres-post-init:
-    depends_on:
-      alp-minerva-pg-mgmt-init:
-        condition: service_completed_successfully
-    image: postgres:15-alpine
-    networks:
-      alp:
-        priority: 20
-    volumes:
-      - ./deploy/perseus:/perseus
-    entrypoint: sh perseus/seed.sh
-    environment:
-      <<:
-        - *x-pg
-      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
-      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
-    profiles: [perseus]
 
   alp-minerva-s3:
     command:
@@ -1210,6 +1203,7 @@ services:
         - *x-tls
         - *x-routes
         - *x-pg
+        - *cachedb
       FHIR_TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}11
       LOCAL_DEBUG: "false"
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
@@ -1222,6 +1216,7 @@ services:
       TERMINOLOGY_SVC__LOG_LEVEL: info
       TERMINOLOGY_SVC__PATH: terminology
       TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
+      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-true}
 
 
   alp-minio-post-init:
@@ -1313,10 +1308,11 @@ services:
       MEILI_LOG_LEVEL: INFO
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
 
-  alp-sql-proxy:
-    container_name: &c30 alp-sql-proxy
-    hostname: alp-sql-proxy.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/sql-proxy:${DOCKER_TAG_NAME:-develop}
+  alp-cachedb:
+    container_name: &c30 alp-cachedb
+    hostname: alp-cachedb.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/cachedb:${DOCKER_TAG_NAME:-develop}
+    platform: linux/amd64
     depends_on:
       trex:
         condition: service_healthy
@@ -1324,641 +1320,208 @@ services:
         condition: service_completed_successfully
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
+    healthcheck:
+      interval: 20s
+      retries: 5
+      start_period: 30s
+      test: ["CMD", "python", "src/utils/healthcheck.py", "41191"]
+      timeout: 10s
     logging:
       options:
         tag: *c30
     networks:
       alp:
         priority: 20
-    platform: linux/amd64
+      data:
+        priority: 10
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     ports:
       - 41191:41191
     volumes:
       - duckdb-data-1:/home/docker/duckdb_data
+      - cdw-config-duckdb-data-1:/home/docker/cdw_svc/duckdb_data # Volume for dynamically generated cdw-config duckdb file (refer to docs/3-configure/9-create-cdw-config-duckdb-file.md for information)
     environment:
       <<:
         - *x-converter
         - *x-routes
         - *x-tls
         - *x-routes
-        - *sql-proxy
+        - *cachedb
         - *python-internal-ssl
       DUCKDB__DATA_FOLDER: /home/docker/duckdb_data
+      CDW_SVC_DUCKDB_DATA_FOLDER: /home/docker/cdw_svc/duckdb_data/
+      CDW_SVC_BUILT_IN_DUCKDB_DATA_FOLDER: /home/docker/cdw_svc/built_in_duckdb_data
+      IDP__ALP_DATA_CLIENT_ID: ${LOGTO__ALP_DATA__CLIENT_ID}
       LOCAL_DEBUG: "false"
+    deploy:
+      resources:
+        limits:
+          cpus: ${D2E_CPU_LIMIT:-2}
+          memory: ${D2E_MEMORY_LIMIT:-7G}
+
+  alp-dataflow-gen-process-worker:
+    container_name: &c31 alp-dataflow-gen-process-worker-${BASE_PORT:-1}
+    depends_on:
+      alp-dataflow-gen-init:
+        condition: service_completed_successfully
+      alp-docker-server:
+        condition: service_healthy
+    healthcheck:
+      interval: 20s
+      retries: 30
+      start_period: 60s
+      test:
+        # TODO: add healthcheck on worker
+        - CMD
+        - curl
+        - -f
+        - http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
+      timeout: 30s
+    hostname: alp-dataflow-gen-process-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen-worker:${DOCKER_TAG_NAME:-develop}
+    logging:
+      options:
+        tag: *c31
+    networks:
+      data:
+        priority: 20
+    platform: linux/amd64
+    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    volumes:
+      - dind-certs:/certs
+    environment:
+      PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
+      PREFECT_LOGGING_SERVER_LEVEL: WARNING
+      PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool}
+      PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool} # used for flow_builder deployment
+      DOCKER_HOST: "tcp://dind:2376"
+      DOCKER_CERT_PATH: /certs/client/
+      DOCKER_TLS_VERIFY: false
+
+  alp-dataflow-gen-docker-worker:
+    extends: alp-dataflow-gen-process-worker
+    container_name: &c32 alp-dataflow-gen-docker-worker-${BASE_PORT:-1}
+    hostname: alp-dataflow-gen-docker-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    networks:
+      data:
+        priority: 20
+    logging:
+      options:
+        tag: *c32
+    environment:
+      PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
+      PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
+      DOCKER_HOST: "tcp://dind:2376"
+      DOCKER_CERT_PATH: /certs/client/
+      DOCKER_TLS_VERIFY: false
+
+  alp-docker-server:
+    image: docker:dind
+    container_name: &c33 alp-docker-server-${BASE_PORT:-1}
+    hostname: dind
+    networks:
+      data:
+        priority: 20
+    healthcheck:
+      interval: 20s
+      retries: 30
+      start_period: 30s
+      test: ["CMD-SHELL", "netstat -ltn | grep -c :::2376"]
+      timeout: 10s
+    logging:
+      options:
+        tag: *c33
+    privileged: true
+    volumes:
+      - dind-certs:/certs
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
 
   alp-perseus-files-manager:
-    image: perseushub/files-manager:latest
-    container_name: files-manager
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
+    container_name: &c34 alp-perseus-files-manager-${BASE_PORT:-1}
     depends_on:
-      alp-minerva-postgres-post-init:
-        condition: service_completed_successfully
+      alp-minerva-postgres:
+        condition: service_healthy
+    environment:
+      <<:
+        - *x-pg
+      SPRING_PROFILES_ACTIVE: docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     networks:
       alp:
         priority: 20
-    profiles: [perseus]
-
-  alp-perseus-user:
-    image: perseushub/user:latest
-    container_name: alp-perseus-user-${BASE_PORT:-1}
-    environment:
-      USER_ENV: Docker
-      TOKEN_SECRET_KEY: Perseus-Arcad!a
-      EMAIL_SECRET_KEY: 8cmuh4t5xTtR1EHaojWL0aqCR3vZ48PZF5AYkTe0iqo=
-      SERVER_ADDRESS: http://localhost
-    depends_on:
-      alp-minerva-postgres-post-init:
-        condition: service_completed_successfully
-    networks:
-      alp:
-        priority: 20
+    command:
+      - PG_SUPER_USER=${PG_SUPER_USER:-postgres}
+      - PG_SUPER_PASSWORD=${PG_SUPER_PASSWORD}
+      - PG__HOST=${PG_HOST:-alp-minerva-postgres-1}
+      - PG__PORT=${PG_PORT:-5432}
+      - PG__DB_NAME=alp
     profiles: [perseus]
 
   alp-perseus-backend:
-    image: perseushub/backend:latest
-    container_name: alp-perseus-backend-${BASE_PORT:-1}
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-backend:${DOCKER_TAG_NAME:-develop}
+    container_name: &c35 alp-perseus-backend-${BASE_PORT:-1}
     environment:
+      <<:
+        - *x-pg
+        - *x-perseus
       PERSEUS_ENV: Docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
-      alp-minerva-postgres-post-init:
-        condition: service_completed_successfully
+      alp-minerva-postgres:
+        condition: service_healthy
       alp-perseus-files-manager:
         condition: service_started
-    networks:
-      alp:
-        priority: 20
-    profiles: [perseus]
-
-  alp-perseus-frontend:
-    image: perseushub/frontend:latest
-    container_name: alp-perseus-frontend-${BASE_PORT:-1}
     networks:
       alp:
         priority: 20
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
-    image: perseushub/white-rabbit:latest
-    container_name: alp-perseus-white-rabbit-${BASE_PORT:-1}
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-white-rabbit:${DOCKER_TAG_NAME:-develop}
+    container_name: &c36 alp-perseus-white-rabbit-${BASE_PORT:-1}
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      <<:
+        - *x-pg
+        - *x-perseus
+      SPRING_PROFILES_ACTIVE: docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
-      alp-minerva-postgres-post-init:
-        condition: service_completed_successfully
+      alp-minerva-postgres:
+        condition: service_healthy
       alp-perseus-files-manager:
         condition: service_started
     networks:
       alp:
         priority: 20
+    command:
+      - PG_SUPER_USER=${PG_SUPER_USER:-postgres}
+      - PG_SUPER_PASSWORD=${PG_SUPER_PASSWORD}
+      - PG__HOST=${PG_HOST:-alp-minerva-postgres-1}
+      - PG__PORT=${PG_PORT:-5432}
+      - PG__DB_NAME=alp
     profiles: [perseus]
 
   alp-perseus-cdm-builder:
-    image: perseushub/cdm-builder:latest
-    container_name: alp-perseus-cdm-builder-${BASE_PORT:-1}
+    image: alpcr.azurecr.io/alp-data-node/alp-perseus-cdm-builder:${DOCKER_TAG_NAME:-develop}
+    container_name: &c37 alp-perseus-cdm-builder-${BASE_PORT:-1}
     environment:
-      - ASPNETCORE_ENVIRONMENT=Docker
+      <<:
+        - *x-pg
+        - *x-perseus
+      ASPNETCORE_ENVIRONMENT: Docker
+      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
+      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
     depends_on:
-      alp-minerva-postgres-post-init:
-        condition: service_completed_successfully
+      alp-minerva-postgres:
+        condition: service_healthy
       alp-perseus-files-manager:
         condition: service_started
     networks:
       alp:
         priority: 20
     profiles: [perseus]
-
-
-  # alp-dicom-server:
-  #   # uses 8042 port on the container
-  #   image: orthancteam/orthanc:24.6.1
-  #   container_name: &c27 alp-dicom-server-${BASE_PORT:-1}
-  #   depends_on:
-  #     alp-minio-post-init:
-  #       condition: service_completed_successfully
-  #   logging:
-  #     options:
-  #       tag: *c27
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   networks:
-  #     alp:
-  #     data:
-  #   hostname: alp-dicom-server.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   environment:
-  #     VERBOSE_ENABLED: true
-  #     VERBOSE_STARTUP: true
-  #     ORTHANC__NAME: D2E Dicom Service
-  #     ORTHANC__AWS_S3_STORAGE__BUCKET_NAME: dicom-images
-  #     ORTHANC__AWS_S3_STORAGE__ENDPOINT: http://${MINIO__ENDPOINT:-alp-minerva-s3}:${MINIO__PORT:-9000}
-  #     ORTHANC__AWS_S3_STORAGE__ACCESS_KEY: ${MINIO__ACCESS_KEY:-root}
-  #     ORTHANC__AWS_S3_STORAGE__SECRET_KEY: ${MINIO__SECRET_KEY}
-  #     ORTHANC__AWS_S3_STORAGE__VIRTUAL_ADDRESSING: false
-  #     ORTHANC__AWS_S3_STORAGE__REGION: ${MINIO__REGION:-ap-southeast-1}
-  #     ORTHANC__AUTHENTICATION_ENABLED: false
-  #   healthcheck:
-  #     test:
-  #       [
-  #         "CMD-SHELL",
-  #         "/probes/test-aliveness.py --user=healthcheck --pwd=${DICOM__HEALTH_CHECK_PASSWORD}",
-  #       ]
-  #     start_period: 10s
-  #     interval: 20s
-  #     retries: 20
-  #     timeout: 60s
-  #   volumes:
-  #     - dicom-sqlite-storage:/var/lib/orthanc/db
-
-
-  # alp-bookmark:
-  #   container_name: &c0 alp-minerva-bookmark-svc-${BASE_PORT:-1}
-  #   depends_on:
-  #     alp-minerva-pg-mgmt-init:
-  #       condition: service_completed_successfully
-  #     alp-minerva-postgres:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 20
-  #     start_period: 60s
-  #     test:
-  #       - CMD
-  #       - wget
-  #       - -O
-  #       - liveness
-  #       - --no-check-certificate
-  #       - https://localhost:41110/check-liveness
-  #     timeout: 30s
-  #   hostname: alp-minerva-bookmark-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/bookmark-svc:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c0
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   environment:
-  #     <<:
-  #       - *x-tls
-  #       - *x-pg
-        
-
-
-  # alp-db-credentials-mgr:
-  #   container_name: &c5 alp-minerva-db-credentials-mgr-${BASE_PORT:-1}
-  #   init: true
-  #   depends_on:
-  #     alp-minerva-pg-mgmt-init:
-  #       condition: service_completed_successfully
-  #     alp-minerva-postgres:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 30
-  #     start_period: 60s
-  #     test:
-  #       - CMD
-  #       - wget
-  #       - --no-check-certificate
-  #       - -O
-  #       - liveness
-  #       - https://localhost:41112/check-liveness
-  #     timeout: 30s
-  #   hostname: alp-minerva-db-credentials-mgr-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/alp-db-credentials:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c5
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   environment:
-  #     <<:
-  #       - *x-pg
-  #       - *x-tls
-  #     DB_CREDENTIALS_MGR__PORT: 41112
-  #     NODE_ENV: production
-  #     PG__DB_CREDENTIALS_MGR__MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
-  #     PG__DB_CREDENTIALS_MGR__MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-  #     PG__DB_CREDENTIALS_MGR__PASSWORD: ${PG_WRITE_PASSWORD}
-  #     PG__DB_CREDENTIALS_MGR__SCHEMA: db_credentials_mgr
-  #     PG__DB_CREDENTIALS_MGR__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-
-
-  # alp-minerva-gateway:
-  #   container_name: &c12 alp-minerva-gateway-${BASE_PORT:-1}
-  #   init: true
-  #   depends_on:
-  #     alp-logto:
-  #       condition: service_healthy
-  #     alp-logto-post-init:
-  #       condition: service_completed_successfully
-  #     alp-minerva-portal-server:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 30
-  #     start_period: 120s
-  #     test:
-  #       - CMD
-  #       - wget
-  #       - -O
-  #       - liveness
-  #       - --no-check-certificate
-  #       - https://localhost:41${BASE_PORT:-1}00/check-liveness
-  #     timeout: 30s
-  #   hostname: alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/alp-gateway:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c12
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #     data:
-  #       priority: 10
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   environment:
-  #     <<:
-  #       - *x-tls
-  #       - *x-routes
-  #       - *x-fhir
-  #     ALP_RELEASE: ${ALP_RELEASE:-v1alpha1}
-  #     ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
-  #     APP__DEPLOY_MODE: standalone
-  #     DB_CREDENTIALS__PUBLIC_KEYS: |-
-  #       {
-  #        "DataPlatform": "",
-  #        "Internal": "${DB_CREDENTIALS__INTERNAL__PUBLIC_KEY}"
-  #       }
-  #     GATEWAY__API_ALLOWED_DOMAINS: |-
-  #       http://alp-minerva-sqleditor:8888/
-  #       http://localhost:8080
-  #       https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
-  #       https://*.alp-dev.org
-  #       https://*.azure.com
-  #       https://*.b2clogin.com
-  #       https://alp-mercury-approuter:41000/
-  #       https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00
-  #       https://alp-minerva-user-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}04/
-  #       https://cdn.jsdelivr.net
-  #       https://localhost:4000
-  #       https://localhost:4100
-  #       https://localhost:5173
-  #       https://localhost:8081
-  #       https://login.microsoftonline.com
-  #     # IDP authentication type
-  #     GATEWAY__IDP_AUTH_TYPE: logto
-  #     # IDP subject property
-  #     GATEWAY__IDP_SUBJECT_PROP: sub
-  #     GATEWAY__LOG_LEVEL: debug
-  #     GATEWAY__PORT: 41${BASE_PORT:-1}00
-  #     GATEWAY__WO_PROTOCOL__FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
-  #     IDP__ALP_DATA_CLIENT_ID: ${LOGTO__ALP_DATA__CLIENT_ID}
-  #     IDP__ALP_SVC_CLIENT_ID: ${LOGTO__ALP_SVC__CLIENT_ID}
-  #     IDP__RELYING_PARTY: ${IDP__RELYING_PARTY}
-  #     LOCAL_DEBUG: "false"
-  #     LOGTO__AUDIENCES: https://alp-default
-  #     LOGTO__CLIENT_ID: ${LOGTO__ALP_APP__CLIENT_ID}
-  #     LOGTO__CLIENT_SECRET: ${LOGTO__ALP_APP__CLIENT_SECRET}
-  #     LOGTO__ISSUER: http://alp-logto-${BASE_PORT}:3001/oidc
-  #     LOGTO__RESOURCE_API: https://alp-default
-  #     LOGTO__SCOPE: openid offline_access profile email
-  #     LOGTO__SVC_CLIENT_ID: ${LOGTO__ALP_SVC__CLIENT_ID}
-  #     LOGTO__SVC_CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
-  #     LOGTO__TOKEN_URL: http://alp-logto-${BASE_PORT}:3001/oidc/token
-  #     MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-  #     NODE_ENV: development
-  #     PLUGINS__JSON: *x-plugins
-  #     SKIP_AUTH: ${SKIP_AUTH:-FALSE}
-  #     isHttpTestRun: ${isHttpTestRun}
-  #     isTestEnv: ${isTestEnv}
-
-
-  # alp-mri-pg-config:
-  #   container_name: &c24 alp-mri-pg-config-${BASE_PORT:-1}
-  #   depends_on:
-  #     trex:
-  #       condition: service_healthy
-  #     alp-minerva-postgres:
-  #       condition: service_healthy
-  #   hostname: alp-mri-pg-config-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/mri-pg-config:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c24
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   environment:
-  #     <<:
-  #       - *x-tls
-  #       - *x-pg
-  #     NODE_ENV: development
-  #     PG_ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
-  #     PG_ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-  #     PG_PASSWORD: ${PG_WRITE_PASSWORD}
-  #     PG_SCHEMA: cdw_config
-  #     PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-
-
-  # alp-fhir-server-post-init:
-  #   container_name: &c7 alp-minerva-fhir-server-post-init
-  #   depends_on:
-  #     alp-minerva-postgres:
-  #       condition: service_healthy
-  #     alp-fhir-server:
-  #       condition: service_healthy
-  #   image: alpcr.azurecr.io/alp-data-node/alp-fhir-server-post-init:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c7
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   environment:
-  #     <<:
-  #       - *x-pg
-  #       - *x-fhir
-  #       - *x-routes
-  #     PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
-  #     PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
-  #     PG__DB_NAME: alp
-  #     PG__HOST: ${PG_HOST:-alp-minerva-postgres-1}
-  #     PG__PORT: ${PG_PORT:-5432}
-  #     FHIR__LOG_LEVEL: debug
-  #     LOCAL_DEBUG: "false"
-  #     NODE_ENV: development
-  #     PORT: 41${BASE_PORT:-1}12
-
-  # alp-minerva-cdw-svc:
-  #   container_name: &c10 alp-minerva-cdw-svc-${BASE_PORT:-1}
-  #   depends_on:
-  #     alp-db-credentials-mgr:
-  #       condition: service_healthy
-  #     alp-logto:
-  #       condition: service_healthy
-  #     alp-minerva-gateway:
-  #       condition: service_healthy
-  #     alp-minerva-postgres:
-  #       condition: service_healthy
-  #     alp-mri-pg-config:
-  #       condition: service_completed_successfully
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 30
-  #     start_period: 60s
-  #     test:
-  #       - CMD
-  #       - wget
-  #       - --no-check-certificate
-  #       - -O
-  #       - liveness
-  #       - https://localhost:41114/check-liveness
-  #     timeout: 30s
-  #   image: alpcr.azurecr.io/alp-data-node/mri-cdw-svc:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c10
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   platform: linux/amd64
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   hostname: alp-minerva-cdw-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   environment:
-  #     <<:
-  #       - *x-converter
-  #       - *x-routes
-  #       - *x-tls
-  #       - *x-pg
-  #     PG_PASSWORD: ${PG_WRITE_PASSWORD}
-  #     PG_SCHEMA: cdw_config
-  #     PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-  #     LOCAL_DEBUG: "false"
-  #     NODE_ENV: development
-  #     PORT: 41114
-  #     USE_DUCKDB: ${USE_DUCKDB:-true}
-  #     isTestEnv: ${isTestEnv}
-  #     DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
-
-  # alp-minerva-pa-config-svc:
-  #   container_name: &c14 alp-minerva-pa-config-svc-${BASE_PORT:-1}
-  #   init: true
-  #   depends_on:
-  #     alp-minerva-postgres:
-  #       condition: service_healthy
-  #     alp-mri-pg-config:
-  #       condition: service_completed_successfully
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 10
-  #     start_period: 60s
-  #     test:
-  #       - CMD
-  #       - wget
-  #       - -O
-  #       - liveness
-  #       - --no-check-certificate
-  #       - https://localhost:41113/check-liveness
-  #     timeout: 30s
-  #   hostname: alp-minerva-pa-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/mri-pa-config:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c14
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   environment:
-  #     <<:
-  #       - *x-tls
-  #       - *x-pg
-  #     LOCAL_DEBUG: "false"
-  #     NODE_ENV: development
-  #     PORT: 41113
-  #     PG_PASSWORD: ${PG_WRITE_PASSWORD}
-  #     PG_SCHEMA: cdw_config
-  #     PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-  #     __MRI_SAC_EXTENSION: ENABLED
-  #     isTestEnv: ${isTestEnv}
-
-  # alp-minerva-ps-config-svc:
-  #   container_name: &c18 alp-minerva-ps-config-svc-${BASE_PORT:-1}
-  #   init: true
-  #   depends_on:
-  #     alp-minerva-postgres:
-  #       condition: service_healthy
-  #     alp-mri-pg-config:
-  #       condition: service_completed_successfully
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 20
-  #     start_period: 60s
-  #     test:
-  #       - CMD
-  #       - wget
-  #       - -O
-  #       - liveness
-  #       - --no-check-certificate
-  #       - https://localhost:41115/check-liveness
-  #     timeout: 30s
-  #   hostname: alp-minerva-ps-config-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/mri-ps-config:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c18
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   environment:
-  #     <<:
-  #       - *x-tls
-  #       - *x-pg
-  #     LOCAL_DEBUG: "false"
-  #     NODE_ENV: development
-  #     PORT: 41115
-  #     PG_PASSWORD: ${PG_WRITE_PASSWORD}
-  #     PG_SCHEMA: cdw_config
-  #     PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-  #     __MRI_SAC_EXTENSION: ENABLED
-  #     isTestEnv: false
-
-  # alp-minerva-sqleditor:
-  #   container_name: &c20 alp-minerva-sqleditor
-  #   depends_on:
-  #     alp-db-credentials-mgr:
-  #       condition: service_healthy
-  #     alp-logto:
-  #       condition: service_healthy
-  #     alp-minerva-gateway:
-  #       condition: service_healthy
-  #     alp-minerva-postgres:
-  #       condition: service_healthy
-  #   dns: 8.8.8.8
-  #   hostname: alp-minerva-sqleditor.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/alp-sqleditor:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c20
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   profiles: [sql]
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   environment:
-  #     <<:
-  #       - *x-converter
-  #       - *x-pg
-  #       - *x-tls
-  #       - *x-routes
-  #     ## Postgres admin password
-  #     PG__ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
-  #     ## Postgres admin user for running migration and seedling
-  #     PG__ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-
-  
-
-  # alp-minerva-user-mgmt:
-  #   container_name: &c22 alp-minerva-user-mgmt-${BASE_PORT:-1}
-  #   depends_on:
-  #     alp-minerva-pg-mgmt-init:
-  #       condition: service_completed_successfully
-  #     alp-minerva-postgres:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 30
-  #     start_period: 60s
-  #     test:
-  #       - CMD
-  #       - wget
-  #       - --no-check-certificate
-  #       - -O
-  #       - liveness
-  #       - https://localhost:41104/check-liveness
-  #     timeout: 30s
-  #   hostname: alp-minerva-user-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/alp-usermgmt:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c22
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   environment:
-  #     <<:
-  #       - *x-pg
-  #       - *x-tls
-  #       - *x-routes
-  #     ALP__SYSTEM_NAME: ${ALP__SYSTEM_NAME:-Research System}
-  #     APP__TENANT_ID: ${APP__TENANT_ID:-e0348e4d-2e17-43f2-a3c6-efd752d17c23}
-  #     IDP__ALP_ADMIN__CLIENT_ID: ${LOGTO_API_M2M_CLIENT_ID}
-  #     IDP__ALP_ADMIN__CLIENT_SECRET: ${LOGTO_API_M2M_CLIENT_SECRET}
-  #     IDP__ALP_ADMIN__RESOURCE: https://default.logto.app/api
-  #     IDP__BASE_URL: http://alp-logto-${BASE_PORT}:3001
-  #     IDP__FETCH_USER_INFO_TYPE: logto
-  #     IDP__INITIAL_USER__NAME: ${IDP__INITIAL_USER__NAME:-admin}
-  #     IDP__INITIAL_USER__UUID: a6660e40-261e-4782-873e-f76b4328aecf
-  #     IDP__RELYING_PARTY: ${IDP__RELYING_PARTY}
-  #     LOCAL_DEBUG: "false"
-  #     NIFI_MGMT__BASE_URL: http://alp-minerva-nifi-mgmt-svc-${BASE_PORT:-1}:4444/alp-nifi-api/
-  #     NODE_ENV: production
-  #     ## Postgres admin password
-  #     PG__USER_MGMT__ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
-  #     ## Postgres admin user for running migration and seedling
-  #     PG__USER_MGMT__ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-  #     PG__USER_MGMT__DB_NAME: ${PG_DB_NAME:-alp}
-  #     ## Postgres password
-  #     PG__USER_MGMT__PASSWORD: ${PG_WRITE_PASSWORD}
-  #     ## Postgres db schema name
-  #     PG__USER_MGMT__SCHEMA: usermgmt
-  #     ## Postgres user name
-  #     PG__USER_MGMT__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-  #     # IDP subject property
-  #     USER_MGMT__IDP_SUBJECT_PROP: sub
-  #     USER_MGMT__LOG_LEVEL: info
-  #     USER_MGMT__PATH: /usermgmt/
-  #     USER_MGMT__PORT: 41${BASE_PORT:-1}04
-
-  # alp-query-gen:
-  #   container_name: &c25 alp-minerva-query-gen-svc-${BASE_PORT:-1}
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 20
-  #     start_period: 60s
-  #     timeout: 30s
-  #     test:
-  #       - CMD
-  #       - wget
-  #       - -O
-  #       - liveness
-  #       - --no-check-certificate
-  #       - https://localhost:41109/check-liveness
-  #   hostname: alp-minerva-query-gen-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/query-gen-svc:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c25
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   environment:
-  #     <<:
-  #       - *x-tls
-  #       - *x-routes
-  #     SQL_RETURN_ON: ${SQL_RETURN_ON:-false}
-  #     LOCAL_DEBUG: "true"
-  #     NODE_ENV: development
-  #     PORT: 41109
-  #     isHttpTestRun: ${isTestEnv}
-  #     isTestEnv: ${isTestEnv}
-  #     TESTSCHEMA: ${TESTSCHEMA}
-  #     NOT_EQ_CHECK_FILTERCARDS: ${NOT_EQ_CHECK_FILTERCARDS:-true}
-
