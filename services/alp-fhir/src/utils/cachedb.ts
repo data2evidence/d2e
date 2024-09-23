@@ -6,11 +6,7 @@ import {
 import axios, { AxiosRequestConfig } from "axios";
 import https from "https";
 
-export const getCachedbDbConnections = async ({
-    studyId
-}): Promise<{
-    duckdbConnection: Connection.ConnectionInterface;
-}> => {
+export const getCachedbDbConnections = async (studyId): Promise<Connection.ConnectionInterface> => {
     let cachedbDatabase = getCachedbDatabaseFormatProtocolA(
         'duckdb',
         studyId
@@ -41,9 +37,7 @@ export const getCachedbDbConnections = async ({
             vocabSchemaName: credentials.vocabSchema
         });
 
-    return {
-        duckdbConnection,
-    };
+    return duckdbConnection;
 };
 
 const getClientCredentialsToken = async () => {

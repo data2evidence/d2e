@@ -1,21 +1,35 @@
-import { DuckdbConnection } from '../../utils/duckdbUtil'
+import { getCachedbDbConnections } from 'src/utils/cachedb';
 import { getFhirTableStructure } from '../../utils/fhirDataModelhelper';
+import { ConnectionInterface } from '@alp/alp-base-utils/target/src/Connection';
 const schemaPath = process.env.FHIR_SCHEMA_PATH+ "/" + process.env.FHIR_SCHEMA_FILE_NAME
 
-export async function createResourceInFhir(data){
-    let duckdb = new DuckdbConnection()
+export async function createResourceInFhir(data, datasetId: string): Promise<boolean> {
+    const conn = await getCachedbDbConnections(datasetId)
+    console.log(JSON.stringify(conn))
     try{
-        await duckdb.createConnection();
-        const result = await duckdb.executeQuery(`select * from read_json('${schemaPath}')`)
-        const parsedFhirDefinitions = getFhirTableStructure(result[0], data.resourceType)
-        const insertStatement = getInsertStatement(data, parsedFhirDefinitions)
-        await insertIntoFhirTable(duckdb, data.resourceType, insertStatement)
-        console.log('Data inserted into FHIR data model')
-        return
+        return new Promise((resolve, reject) => {
+            conn.executeQuery(`select * from read_json('${schemaPath}')`, [], async (err: any, result: any) => {
+                if(err){
+                    console.log('Error loading fhir schema json: '+ JSON.stringify(err))
+                    reject(err)
+                }
+                const parsedFhirDefinitions = getFhirTableStructure(result[0], data.resourceType)
+                const insertStatement = getInsertStatement(data, parsedFhirDefinitions)
+                insertIntoFhirTable(conn, data.resourceType, insertStatement, (err, result) =>{
+                    if(err){
+                        console.log(err)
+                        reject(err)
+                    }
+                    console.log(JSON.stringify('Insert result: ' + JSON.stringify(result)))
+                    console.log('Data inserted into FHIR data model')
+                    resolve(true)
+                })
+            })
+        })
     }catch(err){
         console.log(err)
     }finally{
-        duckdb.close()
+        conn.close()
     }
 }
 
@@ -155,6 +169,8 @@ function getDuckdbStructColValue(colProperty, structDataType){
             : `"${colProperty}" := struct_pack(${colValues.join(',')})`
 }
 
-async function insertIntoFhirTable(duckdb, fhirResource, insertStatement){
-    return await duckdb.executeQuery(`INSERT INTO ${fhirResource}Fhir ${insertStatement}`)
+async function insertIntoFhirTable(conn: ConnectionInterface, fhirResource, insertStatement, callback){
+   conn.executeQuery(`INSERT INTO ${fhirResource}Fhir ${insertStatement}`, [], (err: any, result: any) =>{
+        callback(err, result)
+    })
 }
