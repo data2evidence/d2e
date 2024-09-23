@@ -136,11 +136,6 @@ jobs:
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile.frontend
-          - name: alp-data-node/alp-dataflow-gen-worker
-            directory: ./services/alp-dataflow-gen
-            context: .
-            fileName: Dockerfile.worker
-            GIT_COMMIT_ID__PLUGINS_REPO: main
           - name: alp-data-node/cachedb
             directory: ./services/cachedb
             context: .
