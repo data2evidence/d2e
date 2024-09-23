@@ -30,6 +30,9 @@
     ],
     "root": true
   },
+  "engines": {
+    "node": ">=18.20.4"
+  },
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.9",
@@ -38,6 +41,7 @@
     "esbuild": "0.21.5"
   },
   "dependencies": {
+    "@alp/alp-base-utils": "1.1.9",
     "@medplum/core": "^3.2.2",
     "@medplum/fhirtypes": "^3.2.2",
     "duckdb-async": "^1.0.0",

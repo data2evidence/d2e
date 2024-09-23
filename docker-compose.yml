@@ -660,6 +660,8 @@ services:
         - *x-pg
         - *x-fhir
         - *x-routes
+        - *cachedb
+        - *x-converter
       PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
       PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
       PG__DB_NAME: alp
@@ -672,6 +674,7 @@ services:
       FHIR_SCHEMA_PATH: /home/docker/alp-data-node/app/src/r4
       FHIR_SCHEMA_FILE_NAME: fhir.schema.json
       DUCKDB_PATH: /home/docker/alp-data-node/app/src/duckdb
+      ALP_GATEWAY_OAUTH__URL: https://alp-minerva-gateway-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41${BASE_PORT:-1}00/oauth/token
 
   alp-logto-post-init:
     container_name: alp-logto-post-init-${BASE_PORT:-1}
