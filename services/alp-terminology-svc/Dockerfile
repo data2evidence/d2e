@@ -4,16 +4,16 @@ FROM ${IMAGE} AS development
 
 WORKDIR /usr/src
 
-COPY ./alp-libs/nodejs/alp-base-utils ./libs/alp-base-utils
-COPY ./alp-libs/nodejs/package.json .
-COPY ./services/alp-terminology-svc/package.json alp-data-node/app/package.json
-
-RUN  --mount=type=cache,target=~/.cache/yarn \
-	yarn install --network-timeout 1000000 --frozen-lockfile
-
+#COPY ./alp-libs/nodejs/alp-base-utils ./libs/alp-base-utils
+#COPY ./alp-libs/nodejs/package.json .
+#COPY ./services/alp-terminology-svc/package.json alp-data-node/app/package.json
 COPY ./services/alp-terminology-svc alp-data-node/app
-#RUN yarn workspace @alp/alp-base-utils run compile
 WORKDIR /usr/src/alp-data-node/app
+
+#RUN  --mount=type=cache,target=~/.cache/yarn \
+RUN	yarn install --network-timeout 1000000 --frozen-lockfile
+
+#RUN yarn workspace @alp/alp-base-utils run compile
 
 FROM development AS final-build
 

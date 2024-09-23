@@ -86,10 +86,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "workspaces": {
-    "packages": [
-      "../../alp-libs/nodejs/alp-base-utils"
-    ]
   }
 }

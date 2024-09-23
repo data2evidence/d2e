@@ -3,8 +3,8 @@ import {
   CallBackInterface,
   flattenParameter,
 } from "../Connection";
-import { PostgresConnection } from "../";
-import { Pool } from "pg";
+import { PostgresConnection } from "../index.ts";
+//import { Pool } from "pg";
 import QueryStream from "pg-query-stream";
 import { DBError } from "../DBError";
 import { CreateLogger } from "../Logger";
@@ -23,7 +23,7 @@ Overwrites parseSql to remove translation from postgres->hana and adds some pars
 */
 export class CachedbNodeHDBConnection extends PostgresConnection.PostgresConnection {
   public static createConnection(
-    pool: Pool,
+    pool: any,
     schemaName,
     vocabSchemaName = schemaName,
     callback,

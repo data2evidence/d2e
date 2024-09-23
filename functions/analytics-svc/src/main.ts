@@ -32,7 +32,7 @@ import { MriConfigConnection } from "@alp/alp-config-utils";
 import { StudiesDbMetadata, StudyDbMetadata, IMRIRequest } from "./types";
 import PortalServerAPI from "./api/PortalServerAPI";
 import { getDuckdbDBConnection } from "./utils/DuckdbConnection";
-import { getCachedbDbConnections } from "./utils/cachedb/cachedb";
+import { getCachedbDbConnections } from "./utils/cachedb/cachedb.ts";
 import { DB } from "./utils/DBSvcConfig";
 import { env } from "./env";
 dotenv.config();

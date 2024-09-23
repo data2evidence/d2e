@@ -17,8 +17,8 @@ const Env = z
     __MRI_FEDERATED_QUERY: z.string().optional(),
     __MRI_FEDERATED_QUERY_SYSTEM_NAME: z.string().optional(),
     __MRI_SAC_EXTENSION: z.string().optional(),
-    TLS__INTERNAL__KEY: z.string(),
-    TLS__INTERNAL__CRT: z.string(),
+    TLS__INTERNAL__KEY: z.string().optional(),
+    TLS__INTERNAL__CRT: z.string().optional(),
 
     LOCAL_DEBUG: z.string(),
     isHttpTestRun: z.string().optional(),

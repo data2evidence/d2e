@@ -1,19 +1,19 @@
-import { Pool } from "pg";
+import * as pg from "pg";
 // Setting MAX_PACKET_SIZE in node-hdb prevents failure of large sql statements https://github.com/SAP/node-hdb/issues/19
 /* tslint:disable no-var-requires */
-require("hdb/lib/protocol/common/Constants").MAX_PACKET_SIZE = Math.pow(2, 30);
-import { PostgresConnection, User } from "../";
+//require("hdb/lib/protocol/common/Constants").MAX_PACKET_SIZE = Math.pow(2, 30);
+import { PostgresConnection, User } from "../index.ts";
 import { CreateLogger } from "../Logger";
 import { ConnectionInterface } from "../Connection";
 import { IDBCredentialsType } from "../types";
-import { DBConnectionUtil } from "../";
+import { DBConnectionUtil } from "../index.ts";
 import { NodeCleanup } from "../NodeCleanup";
 import { QueryObject } from "../QueryObject";
 import { CachedbNodeHDBConnection } from "./CachedbNodeHDBConnection";
 const logger = CreateLogger("CachedbDBConnectionUtil");
 
 export class CachedbDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil {
-  static pool: Pool;
+  static pool: pg.Pool;
 
   public static getDBConnection({
     credentials,
@@ -50,7 +50,7 @@ export class CachedbDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil {
    */
   public static async getDbClient(credentials: IDBCredentialsType, cb?) {
     return new Promise((resolve, reject) => {
-      CachedbDBConnectionUtil.pool = new Pool(credentials);
+      CachedbDBConnectionUtil.pool = new pg.Pool(credentials);
       CachedbDBConnectionUtil.pool.on("connect", client => {
         if (credentials.dialect === "postgresql") {
           const sql = `SET search_path TO ${credentials.schema};`;

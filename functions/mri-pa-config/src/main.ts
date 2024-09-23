@@ -232,5 +232,5 @@ export function main() {
   initRoutes();
 } catch (err) {
   log.error(err);
-  process.exit(1);
-}
+  throw new Error(err);
+}}

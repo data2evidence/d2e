@@ -9,7 +9,7 @@ const Env = z
         PORT: z
             .string()
             .refine((val) => !isNaN(parseInt(val)))
-            .transform(Number),
+            .transform(Number).optional(),
         isHttpTestRun: z.string().optional(),
         isTestEnv: z.string().optional(),
         TESTSCHEMA: z.string().optional(),
