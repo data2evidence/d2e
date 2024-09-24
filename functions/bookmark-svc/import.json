@@ -20,6 +20,7 @@
   "graphql": "npm:graphql@^15.3.0",
   "graphql-request": "npm:graphql-request@^3.7.0",
   "node-fetch": "npm:node-fetch@^2.6",
+  "base64": "jsr:@std/encoding/base64",
   "../_shared/alp-base-utils/src/PostgresConnection": "../_shared/alp-base-utils/src/PostgresConnection.ts",
   "../_shared/alp-base-utils/src/EnvVarUtils": "../_shared/alp-base-utils/src/EnvVarUtils.ts",
   "../_shared/alp-base-utils/src/DBConnectionUtil": "../_shared/alp-base-utils/src/DBConnectionUtil.ts",

@@ -10,8 +10,8 @@ WORKDIR /usr/src
 COPY ./services/alp-terminology-svc alp-data-node/app
 WORKDIR /usr/src/alp-data-node/app
 
-#RUN  --mount=type=cache,target=~/.cache/yarn \
-RUN	yarn install --network-timeout 1000000 --frozen-lockfile
+RUN  --mount=type=cache,target=~/.cache/yarn \
+	yarn install --network-timeout 1000000 --frozen-lockfile
 
 #RUN yarn workspace @alp/alp-base-utils run compile
 
