@@ -1815,23 +1815,4 @@ services:
       - PG__PORT=${PG_PORT:-5432}
       - PG__DB_NAME=alp
     profiles: [perseus]
-
-  alp-perseus-cdm-builder:
-    image: alpcr.azurecr.io/alp-data-node/alp-perseus-cdm-builder:${DOCKER_TAG_NAME:-develop}
-    container_name: &c37 alp-perseus-cdm-builder-${BASE_PORT:-1}
-    environment:
-      <<:
-        - *x-pg
-        - *x-perseus
-      ASPNETCORE_ENVIRONMENT: Docker
-      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
-      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
-    depends_on:
-      alp-minerva-postgres:
-        condition: service_healthy
-      alp-perseus-files-manager:
-        condition: service_started
-    networks:
-      alp:
-        priority: 20
-    profiles: [perseus]
+    
