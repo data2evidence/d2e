@@ -87,7 +87,8 @@
        "addToCohorts": true,
        "domainValuesLimit": 200,
        "calcViewAccessPoint": true,
-       "externalAccessPoints": true
+       "externalAccessPoints": true,
+        "cohortEntryExit": false
     },
     "configInformations": {
         "note": ""
