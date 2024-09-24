@@ -441,7 +441,10 @@ services:
             "FHIR__LOG_LEVEL": "debug",
             "PORT": 41${BASE_PORT:-1}12,
             "FHIR__CLIENT_ID": "db6b2304-f236-45ec-b10c-a852681e7129",
-            "FHIR__CLIENT_SECRET": "${FHIR__CLIENT_SECRET}"
+            "FHIR__CLIENT_SECRET": "${FHIR__CLIENT_SECRET}",
+            "FHIR_SCHEMA_PATH": "/home/docker/alp-data-node/app/src/r4",
+            "FHIR_SCHEMA_FILE_NAME": "fhir.schema.json",
+            "DUCKDB_PATH": "/home/docker/alp-data-node/app/src/duckdb"
           },
           "query-gen-svc": {
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",

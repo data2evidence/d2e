@@ -13,11 +13,11 @@ const opt = {
   }
 const pgclient = new pg.Client(opt);
 await pgclient.connect()
-const r = await pgclient.query(`SELECT name,url,type,payload::JSON FROM trex.plugins where type = 'flow'`);
+const r = await pgclient.query(`SELECT name,url,payload::JSON FROM trex.plugins where payload->'flow' is not null`);
 let flows = []
 for (const row of r.rows) {
-	if(row.payload.flows)
-		flows = flows.concat(row.payload.flows);
+	if(row.payload.flow.flows)
+		flows = flows.concat(row.payload.flow.flows);
 }
 
 if(!env.PREFECT_API_URL) {
@@ -50,7 +50,11 @@ async function callPrefect(name) {
 }
 
 app.get('/jobplugins', (req, res) => {
-	res.send(JSON.stringify(flows));
+	res.send(JSON.stringify(flows.map(f => {return {name: f["name"], type: f["type"]}})));
+});
+
+app.get('/jobplugins/test', (req, res) => {
+	res.send(req.query.dsid);
 });
 
 app.get('/jobplugins/exec/:name', (req, res) => {

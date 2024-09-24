@@ -383,6 +383,13 @@
     },
     "scopes": [
       {
+        "path": "^/jobplugins/test(.*)",
+        "scopes": [
+          "PA.svc"
+        ],
+        "datasetId":  "dsid"
+      },
+      {
         "path": "^/jobplugins(.*)",
         "scopes": [
           "jobplugins"
