@@ -53,14 +53,7 @@ https://*.alp.local:55555 {
 
 	header @cors_origin {
 		Access-Control-Allow-Origin "{http.request.header.Origin}"
-	@cors_origin {
-		header_regexp Origin ^https?://localhost:(4000|5173|8081|4800|4900)?$
-	}
-
-	header @cors_origin {
-		Access-Control-Allow-Origin "{http.request.header.Origin}"
 		Vary Origin
-		Access-Control-Allow-Headers "*"
 		Access-Control-Allow-Headers "*"
 		Access-Control-Allow-Credentials "true"
 		defer
@@ -70,12 +63,8 @@ https://*.alp.local:55555 {
 		header {
 			Access-Control-Allow-Origin "{http.request.header.Origin}"
 			Access-Control-Allow-Credentials true
-			Access-Control-Allow-Origin "{http.request.header.Origin}"
-			Access-Control-Allow-Credentials true
 			Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE"
 			Access-Control-Max-Age "3600"
-			Vary Origin
-			defer
 			Vary Origin
 			defer
 		}
@@ -164,9 +153,6 @@ https://localhost:41101 {
 }
 
 https://{$CADDY__ALP__PUBLIC_FQDN} {
-	{$TLS__CADDY_DIRECTIVE} 
-	{$CADDY__CORS_LOCAL_UI}
-	import perseus
 	{$TLS__CADDY_DIRECTIVE} 
 	{$CADDY__CORS_LOCAL_UI}
 	import perseus
