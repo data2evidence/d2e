@@ -35,15 +35,15 @@ const Env = z.object({
     .transform(Number),
 
   PG__DEBUG: z.string().transform(val => val === '1' || /true/i.test(val)),
-  sqlOnly: z.string().transform(val => val === '1' || /true/i.test(val)),
+  sqlOnly: z.string().transform(val => val === '1' || /true/i.test(val)).optional(),
 
   PG_SSL: z
     .string()
     .transform(val => val === '1' || /true/i.test(val))
     .optional(),
 
-  TLS__INTERNAL__KEY: z.string(),
-  TLS__INTERNAL__CRT: z.string(),
+  TLS__INTERNAL__KEY: z.string().optional(),
+  TLS__INTERNAL__CRT: z.string().optional(),
 })
 
 let _env = Deno.env.toObject() 
@@ -54,10 +54,10 @@ const result = Env.safeParse(_env)
 
 let env = _env as unknown as z.infer<typeof Env>
 if (result.success) {
-  env = result.data
+  env = result.data;
 } else {
-  // @ts-ignore
-  console.warn(JSON.stringify(result.error))
+  console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+  throw new Error(`Service Failed to Start!! ${JSON.stringify(result)}`)
 }
 
 export { env }

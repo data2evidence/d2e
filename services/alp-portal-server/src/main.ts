@@ -5,8 +5,8 @@ import { runMigrations } from './common/data-source/db-migration'
 import { getLogLevels } from './logger'
 import { env } from './env'
 import { useContainer } from 'class-validator'
-import * as express from "express";
-import {ExpressAdapter} from "@nestjs/platform-express";
+import * as express from 'express'
+import { ExpressAdapter } from '@nestjs/platform-express'
 import * as http from 'http'
 import * as https from 'https'
 
@@ -16,22 +16,20 @@ const httpsOptions = {
 }
 
 async function bootstrap() {
-  const server = express();
+  const server = express()
 
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server),{
-    logger: getLogLevels()//,
-    //httpsOptions
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
+    logger: getLogLevels()
   })
 
-  
   app.useGlobalPipes(new ValidationPipe())
 
   await runMigrations()
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
 
   await app.init()
-  const httpServer = http.createServer(server).listen(33002);
-  const httpsServer = https.createServer(httpsOptions, server).listen(env.PORT);
-  console.log("started https ${env.PORT}");
+  http.createServer(server).listen(33002)
+  https.createServer(httpsOptions, server).listen(env.PORT)
+  console.log('started https ${env.PORT}')
 }
 bootstrap()

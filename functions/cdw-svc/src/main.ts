@@ -46,34 +46,25 @@ export const main = () => {
   let configCredentials;
   let isTestEnvironment = false;
 
-  if (envVarUtils.isTestEnv()) {
-    // reset configDB.host to point to analyticsDB.host, schema name will be the supplied TESTSCHEMA name
-    analyticsCredential = xsenv.cfServiceCredentials({ tag: "httptest" });
-    configCredentials = xsenv.cfServiceCredentials({ tag: "httptest" });
-    isTestEnvironment = true;
-    // set default cdw config path
-    log.info("TESTSCHEMA :" + configCredentials.schema);
-  } else {
-    let cdwService = xsenv
-      .filterServices({ tag: "cdw" })
-      .map((db) => db.credentials);
-    if (env.USE_DUCKDB !== "true") {
-      cdwService = cdwService.filter((db) => db.dialect == "hana");
-      analyticsCredential = cdwService[0];
-    }
-    configCredentials = {
-      database: env.PG__DB_NAME,
-      schema: env.PG_SCHEMA,
-      dialect: env.PG__DIALECT,
-      host: env.PG__HOST,
-      port: env.PG__PORT,
-      user: env.PG_USER,
-      password: env.PG_PASSWORD,
-      max: env.PG__MAX_POOL,
-      min: env.PG__MIN_POOL,
-      idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS,
-    } as IDBCredentialsType;
+  let cdwService = xsenv
+    .filterServices({ tag: "cdw" })
+    .map((db) => db.credentials);
+  if (env.USE_DUCKDB !== "true") {
+    cdwService = cdwService.filter((db) => db.dialect == "hana");
+    analyticsCredential = cdwService[0];
   }
+  configCredentials = {
+    database: env.PG__DB_NAME,
+    schema: env.PG_SCHEMA,
+    dialect: env.PG__DIALECT,
+    host: env.PG__HOST,
+    port: env.PG__PORT,
+    user: env.PG_USER,
+    password: env.PG_PASSWORD,
+    max: env.PG__MAX_POOL,
+    min: env.PG__MIN_POOL,
+    idleTimeoutMillis: env.PG__IDLE_TIMEOUT_IN_MS,
+  } as IDBCredentialsType;
 
   EnvVarUtils.loadDevSettings();
 
@@ -248,6 +239,7 @@ const initRoutes = (
     (req: ICDWRequest, res) => {
       const { configConnection } = req.dbConnections;
       const user = getUser(req);
+      const token = req.headers.authorization
       const assignment = new AssignmentProxy(req.assignment); //TODO: Send http req instead of getting it from req.
       try {
         const settings = new Settings();
@@ -267,6 +259,7 @@ const initRoutes = (
             isTestEnvironment
           ),
           user,
+          token,
           isTestEnvironment
         ).invokeService(
           input,
@@ -293,8 +286,9 @@ const initRoutes = (
       const { configConnection } = req.dbConnections;
       const assignment = new AssignmentProxy(req.assignment); //TODO: Send http req instead of getting it from req.
       const user = getUser(req);
+      const token = req.headers.authorization
       const settings = new Settings();
-      let analyticsConnection = await getAnalyticsConnection(user);
+      let analyticsConnection = await getAnalyticsConnection(user, token);
       new CDWServicesFacade(
         analyticsConnection,
         new FfhQeConfig(

@@ -4,6 +4,7 @@ import pako from "pako";
 import bcrypt from "bcryptjs";
 import { ILogger } from "./Logger";
 import { Logger } from "winston";
+import * as base64 from "base64";
 
 const rm = new ResourceManager(
   path.join(`${Deno.cwd()}`, "i18n", "mri", "text.properties"),
@@ -724,16 +725,15 @@ export function replacePlaceholderWithCustomString(
 
 export function convertZlibBase64ToJson(base64String: string) {
   try {
-    return JSON.parse(
+    const ret = JSON.parse(
       pako.inflate(
-        Buffer.from(base64String, "base64")
-          .toString("binary")
-          .split("")
-          .map(x => x.charCodeAt(0)),
+        base64.decodeBase64(base64String),
         { to: "string" },
       ),
     );
+    return ret;
   } catch (err) {
+    console.log(err)
     throw new Error("There was en error converting the input to JSON");
   }
 }
@@ -844,4 +844,33 @@ export const setupGlobalErrorHandling = (app: any, log: ILogger | Logger) => {
     log.error(err.stack);
     res.status(500).json(err.message);
   });
+};
+
+/*
+Helepr function to get cachedb database format for protocol A
+*/
+export const getCachedbDatabaseFormatProtocolA = (
+  dialect: string,
+  datasetId,
+) => {
+  return `A|${dialect}|${datasetId}`;
+};
+
+/*
+Helepr function to get cachedb database format for protocol B
+*/
+export const getCachedbDatabaseFormatProtocolB = (
+  dialect: string,
+  databaseCode: string,
+  schemaName: string = "",
+  vocabSchemaName: string = "",
+) => {
+  let cachedbDatabaseFormat = `B|${dialect}|${databaseCode}`;
+  if (schemaName) {
+    cachedbDatabaseFormat += `|${schemaName}`;
+  }
+  if (vocabSchemaName) {
+    cachedbDatabaseFormat += `|${vocabSchemaName}`;
+  }
+  return cachedbDatabaseFormat;
 };

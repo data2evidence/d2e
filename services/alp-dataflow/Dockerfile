@@ -1,7 +1,9 @@
-ARG IMAGE=node:18.14.0-alpine
+ARG IMAGE=node:18.20.4-alpine
 
 FROM $IMAGE AS node_python
-RUN apk add --no-cache python3 py3-pip
+RUN apk add "python3~=3.10" --repository http://dl-cdn.alpinelinux.org/alpine/v3.17/main/
+# Add pip version associated with python3.10
+RUN python3 -m ensurepip
 # To support pip install from git repo
 RUN apk add --no-cache git
 # To fix pendulum timezone bug with prefect in node alpine image

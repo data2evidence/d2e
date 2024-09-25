@@ -1,0 +1,75 @@
+ARG GIT_CLONE_TYPE=https
+ARG GIT_COMMIT_ID__PLUGINS_REPO=main
+ARG D2E_PLUGIN_REPO=alp-os/d2e-plugins.git
+ARG NODE_VERSION=18.19.1
+ARG ARCH=x64
+
+FROM python:3.12-alpine3.20 AS git-https
+
+RUN apk add --no-cache git bash
+
+WORKDIR /usr/src/app
+
+ARG GIT_TOKEN__PLUGINS_REPO_READ
+ARG GIT_COMMIT_ID__PLUGINS_REPO
+ARG D2E_PLUGIN_REPO
+
+RUN git clone -b $GIT_COMMIT_ID__PLUGINS_REPO https://${GIT_TOKEN__PLUGINS_REPO_READ}@github.com/${D2E_PLUGIN_REPO} d2e-plugins
+RUN cd d2e-plugins && git rev-parse HEAD > .git_commit_id
+
+
+FROM python:3.12-alpine3.20 AS git-ssh
+
+RUN apk add --no-cache git bash openssh-client
+
+ENV GIT_SSH_COMMAND='ssh -Tvv'
+ARG GIT_COMMIT_ID__PLUGINS_REPO
+ARG D2E_PLUGIN_REPO
+
+WORKDIR /usr/src/app
+RUN --mount=type=ssh mkdir -p -m 700 ~/.ssh/ &&  \
+    ssh-keyscan github.com >> ~/.ssh/known_hosts && git clone -b $GIT_COMMIT_ID__PLUGINS_REPO github.com/$D2E_PLUGIN_REPO d2e-plugins
+RUN cd d2e-plugins && git rev-parse HEAD > .git_commit_id
+
+
+FROM git-${GIT_CLONE_TYPE}
+
+ARG NODE_VERSION
+ARG ARCH
+
+# To fix pendulum timezone bug with prefect in node alpine image
+RUN echo UTC > /etc/timezone
+
+RUN apk add --no-cache python3-dev bash \
+    g++ gcc libxslt-dev libffi-dev cargo musl-dev \
+    py3-setuptools curl docker docker-compose
+
+RUN mkdir /tmp/node && cd /tmp/node && curl -fsSLO --compressed "https://unofficial-builds.nodejs.org/download/release/v$NODE_VERSION/node-v$NODE_VERSION-linux-$ARCH-musl.tar.xz" \
+    && tar -xJf "node-v$NODE_VERSION-linux-$ARCH-musl.tar.xz" --strip-components=1 --no-same-owner \
+    && cp -r /tmp/node/bin/* /usr/local/bin/ \
+    && cp -r /tmp/node/lib/* /usr/local/lib/ \
+    && cp -r /tmp/node/share/* /usr/local/share/ \
+    && cp -r /tmp/node/include/* /usr/local/include/
+RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs && \
+    rm -f "node-v$NODE_VERSION-linux-$ARCH-musl.tar.xz" \
+    rm -rf node
+
+RUN node -v
+RUN npm --version
+RUN npm add --location=global pnpm
+
+WORKDIR /usr/src/app
+
+RUN python -m venv /usr/src/app/venv
+ENV PATH="$PATH:/usr/src/app/venv/bin"
+
+ARG PREFECT__WORKER_POOL_NAME
+
+COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/worker.requirements.txt requirements.txt
+COPY --chown=docker:docker ./services/alp-dataflow-gen/init-worker.sh .
+
+RUN cd d2e-plugins
+
+RUN . /usr/src/app/venv/bin/activate && pip install --no-cache-dir -r requirements.txt
+
+ENTRYPOINT sh ./init-worker.sh

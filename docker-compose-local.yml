@@ -38,10 +38,9 @@ services:
       - 41100:41100
       - 41000:41000
       - 41130:41130
-      - 41180:41180
     environment:
       CADDY__FHIR_SERVER__PUBLIC_FQDN: ${CADDY__FHIR_SERVER__PUBLIC_FQDN:-localhost}
-      CADDY__CORS_LOCAL_PORTAL_UI: "import cors https://localhost:4000"
+      CADDY__CORS_LOCAL_UI: "import cors"
 
   alp-dataflow-gen:
     ports:
@@ -85,26 +84,26 @@ services:
       context: ./services/alp-logto
       dockerfile: Dockerfile
 
-  alp-minerva-analytics-svc:
-    build:
-      context: .
-      dockerfile: ./services/analytics-svc/Dockerfile
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
-      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
-    ports:
-      - 9222:9222
-    volumes:
-      - ./services/analytics-svc/target:/home/docker/src/alp-data-node/app/dist
-      - ./services/analytics-svc/src:/home/docker/src/alp-data-node/app/src
-      - ./services/analytics-svc/api:/home/docker/src/alp-data-node/app/api
-    environment:
-      INSIGHTS__LOG_LEVEL: info
-      LOCAL_DEBUG: "true"
-      MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
-      MINIO__SSL: false
-      USE_EXTENSION_FOR_COHORT_CREATION: "false"
+  # alp-minerva-analytics-svc:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/analytics-svc/Dockerfile
+  #   external_links:
+  #     - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
+  #     - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
+  #     - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
+  #   ports:
+  #     - 9222:9222
+  #   volumes:
+  #     - ./services/analytics-svc/target:/home/docker/src/alp-data-node/app/dist
+  #     - ./services/analytics-svc/src:/home/docker/src/alp-data-node/app/src
+  #     - ./services/analytics-svc/api:/home/docker/src/alp-data-node/app/api
+  #   environment:
+  #     INSIGHTS__LOG_LEVEL: info
+  #     LOCAL_DEBUG: "true"
+  #     MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
+  #     MINIO__SSL: false
+  #     USE_EXTENSION_FOR_COHORT_CREATION: "false"
 
   # alp-minerva-cdw-svc:
   #   build:
@@ -338,7 +337,7 @@ services:
       context: ./services/alp-fhir/
       dockerfile: Dockerfile.frontend
     volumes:
-    - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
+      - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
 
   alp-logto-post-init:
     build:
@@ -359,14 +358,34 @@ services:
   #   ports:
   #     - 9226:9226
 
-  alp-sql-proxy:
+  alp-cachedb:
     build:
       context: .
-      dockerfile: ./services/sql-proxy/Dockerfile
+      dockerfile: ./services/cachedb/Dockerfile
       target: development
     volumes:
-      - ./services/sql-proxy/src:/home/docker/src
+      - ./services/cachedb/src:/home/docker/src
     ports:
       - 9235:9235
     environment:
       LOCAL_DEBUG: "true"
+
+  alp-perseus-backend:
+    build:
+      context: ./services/alp-perseus-backend
+      dockerfile: Dockerfile
+
+  alp-perseus-files-manager:
+    build:
+      context: ./services/alp-perseus-files-manager
+      dockerfile: Dockerfile
+
+  alp-perseus-cdm-builder:
+    build:
+        context: ./services/alp-perseus-cdm-builder
+        dockerfile: Dockerfile
+
+  alp-perseus-white-rabbit:
+    build:
+        context: ./services/alp-perseus-white-rabbit
+        dockerfile: Dockerfile

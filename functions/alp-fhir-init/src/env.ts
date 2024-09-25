@@ -14,7 +14,10 @@ const Env = z.object({
           ctx.addIssue({ code: "custom", message: "Invalid JSON" });
           return z.never();
       }
-  })
+  }),
+  FHIR_SCHEMA_PATH: z.string(),
+  FHIR_SCHEMA_FILE_NAME: z.string(),
+  DUCKDB_PATH: z.string()
 })
 
 const _env = Deno.env.toObject()
@@ -22,9 +25,9 @@ const result = Env.safeParse(_env)
 
 let env = _env as unknown as z.infer<typeof Env>
 if (result.success) {
-  env = result.data
+  env = result.data;
 } else {
-  // @ts-ignore
-  console.warn(JSON.stringify(result.error))
+  console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+  throw new Error(`Service Failed to Start!! ${JSON.stringify(result)}`);
 }
 export { env }

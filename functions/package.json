@@ -30,6 +30,10 @@
         "env": "jobplugins"
       },
       {
+        "source": "/prefect",
+        "function": "/prefect"
+      },
+      {
         "source":"/gateway/api/db",
         "function":"/alpdb",
         "env": "alpdb"
@@ -80,15 +84,21 @@
       },
       {  
         "source":"/analytics-svc/api/services/public",
-        "service":"analytics"
+        "function":"/analytics-svc",
+        "imports": "/analytics-svc/import.json",
+        "env": "analytics-svc"
       },
       {  
         "source":"/analytics-svc/api/services",
-        "service":"analytics"
+        "function":"/analytics-svc",
+        "imports": "/analytics-svc/import.json",
+        "env": "analytics-svc"
       },
       {  
         "source":"/analytics-svc/pa/services",
-        "service":"analytics"
+        "function":"/analytics-svc",
+        "imports": "/analytics-svc/import.json",
+        "env": "analytics-svc"
       },
       {
         "source":"/analytics-svc/pa/config",
@@ -287,11 +297,16 @@
         "gateway.db.schema.update",
         "gateway.terminology.hybridSearchConfig.read",
         "gateway.terminology.hybridSearchConfig.update",
+        "gateway.terminology.concept.getStandardConcepts.read",
         "dataflowmgmt.analysisflow.read",
         "dataflowmgmt.analysisflow.add",
         "dataflowmgmt.analysisflow.delete",
         "dataflowmgmt.analysisflow.revision.delete",
-        "gateway.fhir.create"
+        "gateway.fhir.create",
+        "prefect.read",
+        "prefect.delete",
+        "prefect.post",
+        "prefect.update"
       ],
       "ALP_DASHBOARD_VIEWER": [
         "gateway.dashboardGate.content"
@@ -367,6 +382,13 @@
       ]
     },
     "scopes": [
+      {
+        "path": "^/jobplugins/test(.*)",
+        "scopes": [
+          "PA.svc"
+        ],
+        "datasetId":  "dsid"
+      },
       {
         "path": "^/jobplugins(.*)",
         "scopes": [
@@ -1183,6 +1205,15 @@
         ]
       },
       {
+        "path": "^/terminology/concept/getStandardConcepts$",
+        "scopes": [
+          "gateway.terminology.concept.getStandardConcepts.read"
+        ],
+        "httpMethods": [
+          "POST"
+        ]
+      },
+      {
         "path": "^/terminology/fhir/4_0_0/(.*)",
         "scopes": [
           "gateway.terminology.fhir.read"
@@ -1867,6 +1898,26 @@
         "httpMethods": [
           "POST"
         ]
+      },
+      {
+        "path": "^/prefect",
+        "scopes": ["prefect.read"],
+        "httpMethods": ["GET"]
+      },
+      {
+        "path": "^/prefect",
+        "scopes": ["prefect.post"],
+        "httpMethods": ["POST"]
+      },
+      {
+        "path": "^/prefect",
+        "scopes": ["prefect.update"],
+        "httpMethods": ["PUT", "PATCH"]
+      },
+      {
+        "path": "^/prefect",
+        "scopes": ["prefect.delete"],
+        "httpMethods": ["DELETE"]
       }
     ] 
   }

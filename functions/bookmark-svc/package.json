@@ -18,7 +18,7 @@
   "keywords": [],
   "author": "",
   "engines": {
-    "node": ">=18.14.0"
+    "node": ">=18.20.4"
   },
   "repository": {
     "type": "git",
@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@types/express": "4.17.13",
-    "@types/fs-extra": "^9.0.13",  
+    "@types/fs-extra": "^9.0.13",
     "@types/jest": "^29.5.11",
     "@types/node": "^18",
     "fs-extra": "^10.1.0",
