@@ -8,6 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN mkdir -p /usr/local/node
 ENV NVM_DIR /usr/local/node
 ENV NODE_VERSION 18.20.4
+ENV NODE_VERSION 18.20.4
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 RUN . $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm use $NODE_VERSION
@@ -45,9 +46,13 @@ RUN --mount=type=cache,target=/home/docker/.cache/pip \
 COPY --chown=docker:alp ./functions/cdw-svc/src/duckdb/cdw_config_svc_validation_schema ./cdw_svc/built_in_duckdb_data/cdw_config_svc_validation_schema
 
 COPY ./services/cachedb/src src
+COPY ./services/cachedb/src src
 
 FROM base AS development
 
+COPY ./services/cachedb/requirements-dev.txt .
+RUN --mount=type=cache,target=/home/docker/.cache/pip \
+  pip install -r requirements-dev.txt
 COPY ./services/cachedb/requirements-dev.txt .
 RUN --mount=type=cache,target=/home/docker/.cache/pip \
   pip install -r requirements-dev.txt

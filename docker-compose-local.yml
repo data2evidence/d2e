@@ -41,6 +41,7 @@ services:
     environment:
       CADDY__FHIR_SERVER__PUBLIC_FQDN: ${CADDY__FHIR_SERVER__PUBLIC_FQDN:-localhost}
       CADDY__CORS_LOCAL_UI: "import cors"
+      CADDY__CORS_LOCAL_UI: "import cors"
 
   alp-dataflow-gen:
     ports:
@@ -338,6 +339,7 @@ services:
       dockerfile: Dockerfile.frontend
     volumes:
       - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
+      - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
 
   alp-logto-post-init:
     build:
@@ -359,17 +361,39 @@ services:
   #     - 9226:9226
 
   alp-cachedb:
+  alp-cachedb:
     build:
       context: .
       dockerfile: ./services/cachedb/Dockerfile
+      dockerfile: ./services/cachedb/Dockerfile
       target: development
     volumes:
+      - ./services/cachedb/src:/home/docker/src
       - ./services/cachedb/src:/home/docker/src
     ports:
       - 9235:9235
     environment:
       LOCAL_DEBUG: "true"
 
+  alp-perseus-backend:
+    build:
+      context: ./services/alp-perseus-backend
+      dockerfile: Dockerfile
+
+  alp-perseus-files-manager:
+    build:
+      context: ./services/alp-perseus-files-manager
+      dockerfile: Dockerfile
+
+  alp-perseus-cdm-builder:
+    build:
+        context: ./services/alp-perseus-cdm-builder
+        dockerfile: Dockerfile
+
+  alp-perseus-white-rabbit:
+    build:
+        context: ./services/alp-perseus-white-rabbit
+        dockerfile: Dockerfile
   alp-perseus-backend:
     build:
       context: ./services/alp-perseus-backend
