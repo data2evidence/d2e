@@ -84,6 +84,9 @@ export class With extends AstElement {
     }
 
     public getAttributeConfig() {
+        if (this.node.expression && this.node.expression.getType() === "ExpressionRef") {
+            return
+        }
         let self = this;
         let defaultFilter: string = this.getDefaultFilter();
         if (defaultFilter) {
@@ -158,10 +161,13 @@ export class With extends AstElement {
             if (queryNode instanceof Query) {
                 let joinState = queryNode.joinState;
                 if (
-                    this.getType() === "With" ||
+                    (this.getType() === "With") ||
                     this.node.joinUsingConditionId
                 ) {
-                    if (joinState.getConditionId(this.getConditionName())) {
+                    if(tableObj.baseEntity === "@EXPRESSIONREF") {
+                        parentJoinCondition = joinState.getPatientId() +
+                        " = " + `"patient.${tableObj.table}"."patient.attributes.pid"`;
+                    } else if (joinState.getConditionId(this.getConditionName())) {
                         parentJoinCondition =
                             joinState.getConditionId(this.getConditionName()) +
                             " = " +
@@ -171,6 +177,12 @@ export class With extends AstElement {
                             joinState.getPatientId() +
                             " = " +
                             this.getPatientIdColumn(tableObj.baseEntity);
+
+                        const dimPlaceHolderTableMap = this.entityConfig.getTableTypePlaceholderMap(tableObj.baseEntity)
+
+                        if(dimPlaceHolderTableMap?.time) {
+                            parentJoinCondition += ` AND "patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.START`]} >= ifnull("patient.PatientRequestEntryExit"."entry", '01-01-1900') AND "patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.END`]} <= ifnull("patient.PatientRequestEntryExit"."exit", current_date)`
+                        }
                         joinState.setConditionId(this);
                     }
                 } else {

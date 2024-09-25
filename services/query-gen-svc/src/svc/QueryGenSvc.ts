@@ -12,6 +12,8 @@ import {
     formSelectedAttributesRequest,
 } from "../qe/query_builder/PluginQueryBuilder";
 import * as queryEngine from "../qe/sql_generator2/SqlGenerator";
+const logger = Logger.CreateLogger("query-gen-log");
+
 
 export class QueryGenSvc {
     private isNormalizedCsv: boolean = false;
@@ -142,6 +144,7 @@ export class QueryGenSvc {
                 };
                 resolve(finalResults);
             } catch (err) {
+                logger.error(err);
                 reject(err);
             }
         });

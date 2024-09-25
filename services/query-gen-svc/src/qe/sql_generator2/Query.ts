@@ -1,9 +1,8 @@
 import { AstElement } from "./AstElement";
 import { JoinState } from "./JoinState";
 import { Operator } from "./Operator";
-import { QueryObject as qo, assert } from "@alp/alp-base-utils";
+import { QueryObject as qo, assert, isPropExists } from "@alp/alp-base-utils";
 import QueryObject = qo.QueryObject;
-import { isPropExists, sqlFormat } from "@alp/alp-base-utils";
 import { Statement } from "./Statement";
 
 export class Query extends AstElement {

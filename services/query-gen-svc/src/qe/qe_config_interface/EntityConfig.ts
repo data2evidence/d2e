@@ -243,4 +243,8 @@ export class EntityConfig extends ConfigEntity {
 
         return tmp;
     }
+
+    public getTableTypePlaceholderMap(dimPlaceholder): any {
+        return this.settings.getDimPlaceholder(dimPlaceholder)
+    }
 }
