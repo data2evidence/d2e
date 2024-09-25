@@ -47,12 +47,12 @@ async function retrieveDataset(
     const fileName = req.fileName;
     const language = getUser(req).lang;
     let query;
-    if (req.swagger.params.query.value) {
-        query = (req.swagger.params.query.value as string).split(",");
+    if (req.query.query) {
+        query = (req.query.query as string).split(",");
     }
-    let releaseDate: string = req.swagger.params.mriquery.releaseDate;
-    let patientId: string = req.swagger.params.patientId
-        ? req.swagger.params.patientId.value
+    let releaseDate: string = req.query.mriquery.releaseDate;
+    let patientId: string = req.query.patientId
+        ? req.query.patientId
         : null;
     const { analyticsConnection } = req.dbConnections;
 
@@ -88,11 +88,11 @@ async function retrieveDataset(
 }
 
 async function streamDataset(req: IMRIRequest, callback: CallBackInterface) {
-    let releaseDate: string = req.swagger.params.releaseDate.value;
+    let releaseDate: string = req.query.releaseDate;
     const { analyticsConnection } = req.dbConnections;
 
     let { selectedStudyEntityValue }: PluginEndpointRequestType = {
-        ...convertZlibBase64ToJson(req.swagger.params.mriquery.value),
+        ...convertZlibBase64ToJson(req.query.mriquery),
     };
 
     analyticsConnection.setTemporalSystemTimeToDbSession(
@@ -146,8 +146,8 @@ async function getParquetSchema(tableMetadata: []) {
  */
 export function retrieveDatasetInFormat(req: IMRIRequest, res) {
     const language = getUser(req).lang;
-    let format = req.swagger.params.dataFormat.value
-        ? req.swagger.params.dataFormat.value
+    let format = req.query.dataFormat
+        ? req.query.dataFormat
         : "json";
     let sendResponse;
 
@@ -183,11 +183,11 @@ export function retrieveDatasetInFormat(req: IMRIRequest, res) {
  */
 export function retrieveDatasetStream(req: IMRIRequest, res) {
     const language = getUser(req).lang;
-    let format = req.swagger.params.dataFormat.value
-        ? req.swagger.params.dataFormat.value
+    let format = req.query.dataFormat
+        ? req.query.dataFormat
         : "csv";
-    let returnOnlyCount = req.swagger.params.returnOnlyPatientCount.value
-        ? JSON.parse(req.swagger.params.returnOnlyPatientCount.value.toLowerCase())
+    let returnOnlyCount = req.query.returnOnlyPatientCount
+        ? JSON.parse(req.query.returnOnlyPatientCount.toLowerCase())
         : false;
 
     const sendPatientCountResponse = async (result: PluginEndpointStreamResultType) => {
@@ -360,7 +360,7 @@ export async function getRecontactPatientList(req: IMRIRequest, res) {
     let format = "json";
     let response;
     let body: RecontactPatientListRequestType = {
-        ...convertZlibBase64ToJson(req.swagger.params.mriquery.value),
+        ...convertZlibBase64ToJson(req.query.mriquery),
     };
     let cohortName = body.name;
     try {
@@ -650,13 +650,13 @@ function encryptData(data) {
  * @param {any} res
  */
 export async function getSinglePatientRoute(req, res) {
-    const dataFormat = req.swagger.params.dataFormat.value ? req.swagger.params.dataFormat.value : "json";
-    const requestInteractionTypes: string[] = req.swagger.params.interactionTypes.value
-        ? req.swagger.params.interactionTypes.value : null;
-    const patientId = req.swagger.params.patientId.value;
-    const configId = req.swagger.params.configId.value;
-    const configVersion = req.swagger.params.configVersion.value;
-    const datasetId =  req.swagger.params.datasetId.value;
+    const dataFormat = req.query.dataFormat ? req.query.dataFormat : "json";
+    const requestInteractionTypes: string[] = req.query.interactionTypes
+        ? req.query.interactionTypes : null;
+    const patientId = req.params.patientId;
+    const configId = req.query.configId;
+    const configVersion = req.query.configVersion;
+    const datasetId =  req.query.datasetId;
     const { analyticsConnection } = req.dbConnections;
     const lang = getUser(req).lang;
 

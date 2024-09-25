@@ -9,11 +9,11 @@ export function getStandardConcept(req: IMRIRequest, res) {
     const { analyticsConnection  } = req.dbConnections;
     let conceptCode: string;
     let vocabularyId: string;
-    if (req.swagger.params.conceptCode.value) {
-        conceptCode = req.swagger.params.conceptCode.value;
+    if (req.query.conceptCode) {
+        conceptCode = req.query.conceptCode;
     }
-    if (req.swagger.params.vocabularyId.value) {
-        vocabularyId = req.swagger.params.vocabularyId.value;
+    if (req.query.vocabularyId) {
+        vocabularyId = req.query.vocabularyId;
     }
     conceptRepository.getStandardConcept(
         analyticsConnection,
@@ -38,8 +38,8 @@ export function getDescendantConcepts(req: IMRIRequest, res) {
     log.addRequestCorrelationID(req);
     const { analyticsConnection } = req.dbConnections;
     let conceptId: string;
-    if (req.swagger.params.conceptId.value) {
-        conceptId = req.swagger.params.conceptId.value;
+    if (req.query.conceptId) {
+        conceptId = req.query.conceptId;
     }
     conceptRepository.getDescendantConcepts(
         analyticsConnection,

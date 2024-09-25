@@ -6,9 +6,9 @@ import { DBDAO } from "../../dao/DBDAO";
 const logger = Logger.CreateLogger("analytics-log");
 
 export async function getCDMVersion(req, res, next) {
-    let dialect: string = req.swagger.params.databaseType.value;
-    let tenant: string = req.swagger.params.tenant.value;
-    let schema: string = req.swagger.params.schemaName.value;
+    let dialect: string = req.params.databaseType;
+    let tenant: string = req.params.tenant;
+    let schema: string = req.params.schemaName;
 
     try {
         let dbDao = new DBDAO(dialect, tenant);
@@ -38,9 +38,9 @@ export async function getCDMVersion(req, res, next) {
 }
 
 export async function checkIfSchemaExists(req, res, next) {
-    let dialect: string = req.swagger.params.databaseType.value;
-    let tenant: string = req.swagger.params.tenant.value;
-    let schema: string = req.swagger.params.schemaName.value;
+    let dialect: string = req.params.databaseType;
+    let tenant: string = req.params.tenant;
+    let schema: string = req.params.schemaName;
 
     try {
         let dbDao = new DBDAO(dialect, tenant);
@@ -66,9 +66,9 @@ export async function checkIfSchemaExists(req, res, next) {
 }
 
 export async function getSnapshotSchemaMetadata(req, res, next) {
-    let dialect: string = req.swagger.params.databaseType.value;
-    let tenant: string = req.swagger.params.tenant.value;
-    let schema = req.swagger.params.schemaName.value;
+    let dialect: string = req.params.databaseType;
+    let tenant: string = req.params.tenant;
+    let schema = req.params.schemaName;
 
     try {
 
