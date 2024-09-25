@@ -4,7 +4,7 @@ import { UserGroupService } from '../services'
 import { AlpTenantUserRoleMapType, IAppRequest } from 'types'
 import { createLogger } from '../Logger'
 import { ROLES } from '../const'
-import  * as _  from 'lodash'
+import  * as _  from 'lodash-es'
 
 interface TenantCheckOptions {
   tenantIdPath: string
