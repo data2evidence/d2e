@@ -1,4 +1,4 @@
-import { ParserContainer } from "./ParserContainer";
+import { ParserContainer, BaseNode } from "./ParserContainer";
 import { Definition } from "./Definition";
 import { Source } from "./Source";
 import {
@@ -10,6 +10,7 @@ import { Query } from "./Query";
 import { Union } from "./Union";
 import { Expression } from "./Expression";
 import { Relationship } from "./Relationship";
+import { Measure } from "./Measure";
 import * as Keys from "../keys";
 import { FastUtil } from "../fast_util";
 
@@ -49,13 +50,14 @@ export class Statement extends Node {
                         )
                     )
                 );
+                //TODO: Check for config boolean
                 qry.addRelationship(new Relationship("PatientRequestEntryExit",
                     Keys.CQLTERM_WITH,
                     // new DataModelTypeExpression("entryexit", "patient", Keys.CQLTERM_RETRIEVE),
                     new BaseOperandExpressionRef(
                     "PatientRequestEntryExit",
                     Keys.CQLTERM_EXPRESSIONREF
-                ),
+                    ),
                     [],
                     [],
                     false))
@@ -87,18 +89,48 @@ export class Statement extends Node {
             }
         });
 
+        this.createEntryExit();
+
+        if (names.length > 1) {
+            this.addDefinition(
+                new Union(
+                    Keys.DEF_PATIENTREQUESTS,
+                    Keys.CQLTERM_CONTEXT_PATIENT,
+                    Keys.CQLTERM_PUBLIC,
+                    new Expression(
+                        Keys.SQLTERM_SET_OP_UNION,
+                        this.__action,
+                        undefined,
+                        names.map(
+                            (z) =>
+                                new BaseOperandExpressionRef(
+                                    z.toString(),
+                                    Keys.CQLTERM_EXPRESSIONREF
+                                )
+                        )
+                    )
+                )
+            );
+        }
+    }
+
+    private createEntryExit() {
+        //TODO: Check for config boolean
         const entryExitEvent: ParserContainer = structuredClone(this.__parserContainers.find(e => e.name === "PatientRequest0"));
-        const measureEvent: ParserContainer = structuredClone(this.__parserContainers.find(e => e.name === "MeasurePopulation"));
+        // const measureEvent: ParserContainer = structuredClone(this.__parserContainers.find(e => e.name === "MeasurePopulation"));
 
         entryExitEvent.alias = "PEE";
         entryExitEvent.name = "PatientRequestEntryExit";
         entryExitEvent.groupBy[0].alias = "PEE";
         entryExitEvent.groupBy[1].alias = "PEE";
-        entryExitEvent.measure = structuredClone(measureEvent.measure)
-        entryExitEvent.measure[0].alias = "PEE";
-        entryExitEvent.measure[0].pathId = "patient.attributes.pid";
-        entryExitEvent.measure[0].path = "pid";
-        entryExitEvent.measure[0].templateId = "patient-attributes-pid";
+        entryExitEvent.measure =  [new BaseNode(
+                                        "pid",
+                                        "patient.attributes.pid"
+                                        ).withIdentifier("patient.attributes.pid")
+                                        .withTemplateId("patient-attributes-pid")
+                                        .withDataType(Keys.CQLTERM_PROPERTY)
+                                        .withAlias("PEE")
+                                        .withMeasure(true)];
 
         this.addDefinition(
             new Definition(
@@ -122,28 +154,6 @@ export class Statement extends Node {
                 )
             )
         );
-
-        if (names.length > 1) {
-            this.addDefinition(
-                new Union(
-                    Keys.DEF_PATIENTREQUESTS,
-                    Keys.CQLTERM_CONTEXT_PATIENT,
-                    Keys.CQLTERM_PUBLIC,
-                    new Expression(
-                        Keys.SQLTERM_SET_OP_UNION,
-                        this.__action,
-                        undefined,
-                        names.map(
-                            (z) =>
-                                new BaseOperandExpressionRef(
-                                    z.toString(),
-                                    Keys.CQLTERM_EXPRESSIONREF
-                                )
-                        )
-                    )
-                )
-            );
-        }
     }
 
     print() {
