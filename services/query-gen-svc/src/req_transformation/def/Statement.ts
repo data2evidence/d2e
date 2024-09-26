@@ -142,6 +142,15 @@ export class Statement extends Node {
                 .withDataType("obsperiod")
                 .withAlias("obsperiod0")
                 .withMeasure(true),
+            new BaseNode(
+                "exit",
+                "patient.interactions.obsperiod.0.attributes.enddate"
+                )
+                .withIdentifier("patient.interactions.obsperiod.0")
+                .withTemplateId("patient-interactions-obsperiod")
+                .withDataType("obsperiod")
+                .withAlias("obsperiod0")
+                .withMeasure(true),
         ];
         entryExitEvent.filter = {} //TODO: Enable when FC marked as start/end from UI
 
