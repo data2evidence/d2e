@@ -305,6 +305,7 @@ export class With extends AstElement {
     }
 
     public getSQL() {
+        this.handleEntryExitJoin(this)
         let that = this;
         let nonBaseTablesJoinCount = 0;
         let nonBaseTablesJoin = QueryObject.format("").join(
@@ -382,5 +383,22 @@ export class With extends AstElement {
                 }
             })
         );
+    }
+
+    private handleEntryExitJoin(node: With){
+        //Detect if its PatientEntryExitRequest
+        if(node.parent.joinState["patientId"].indexOf("PEE") > -1) {
+            Object.keys(node.joinElements).forEach((interaction) => {
+                node.joinElements[interaction].on.forEach((queryObject) => {
+                    if(queryObject.queryString.indexOf("entry") > -1 || queryObject.queryString.indexOf("exit") > -1){
+                        let conditionTokens = queryObject.queryString.split(" AND ")
+                        conditionTokens = conditionTokens.filter((condition) => {
+                            return (condition.indexOf("entry") === -1 && condition.indexOf("exit") === -1)
+                        })
+                        queryObject.queryString =  conditionTokens.join(" AND ")
+                    }
+                })
+            })
+        }
     }
 }

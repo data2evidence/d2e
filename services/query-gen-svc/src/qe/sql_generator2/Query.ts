@@ -93,6 +93,17 @@ export class Query extends AstElement {
                 );
             }
         }
+        
+        if (this.joinState && this.joinState["patientId"].indexOf("PEE") > -1 && this.node.measure?.length > 0) {
+            queryObjects.push(
+                QueryObject.format(
+                    ", %Q",
+                    QueryObject.format(", ").join(
+                        this.node.measure.map((x) => x.getSQLWithAlias())
+                    )
+                )
+            );
+        }
 
         queryObjects.push(
             QueryObject.format(
