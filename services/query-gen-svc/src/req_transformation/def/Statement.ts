@@ -11,7 +11,6 @@ import { Query } from "./Query";
 import { Union } from "./Union";
 import { Expression } from "./Expression";
 import { Relationship } from "./Relationship";
-import { Measure } from "./Measure";
 import * as Keys from "../keys";
 import { FastUtil } from "../fast_util";
 
@@ -55,12 +54,14 @@ export class Statement extends Node {
                 );
 
                 if (e.name === Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) {
-                    qry.addRelationship(
-                        new Relationship("obsperiod0",
-                            Keys.CQLTERM_WITH,
-                            new DataModelTypeExpression("obsperiod", "patient-interactions-obsperiod", Keys.CQLTERM_RETRIEVE),
-                            []
-                        ))
+                    e.measure.forEach(e => {
+                        qry.addRelationship(
+                            new Relationship(e.alias,
+                                Keys.CQLTERM_WITH,
+                                new DataModelTypeExpression(e.dataType, e.templateId, Keys.CQLTERM_RETRIEVE),
+                                []
+                            ))
+                    })
                 } else if (isEntryExitApplied) {
                     qry.insertRelationship(
                         new Relationship(

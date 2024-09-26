@@ -184,6 +184,7 @@ export class InternalFilterRepresentation implements Request {
 
     private createEntryExitCriteria() {
         if (this.__qConfig.__config.panelOptions.cohortEntryExit) {
+            // If enabled in PA config
             const entryExitEvent: ParserContainer = structuredClone(
                 this.parserContainers.find((e) => e.name === "PatientRequest0")
             );
@@ -193,26 +194,68 @@ export class InternalFilterRepresentation implements Request {
                 //TODO: Remove excess groupby and fix alias for interactions
                 e.alias = "PEE";
             });
+            // entryExitEvent.measure = [
+            //     new BaseNode(
+            //         "entry",
+            //         "patient.interactions.obsperiod.0.attributes.startdate"
+            //     )
+            //         .withIdentifier("patient.interactions.obsperiod.0")
+            //         .withTemplateId("patient-interactions-obsperiod")
+            //         .withDataType("obsperiod")
+            //         .withAlias("obsperiod0")
+            //         .withMeasure(true),
+            //     new BaseNode(
+            //         "exit",
+            //         "patient.interactions.obsperiod.0.attributes.enddate"
+            //     )
+            //         .withIdentifier("patient.interactions.obsperiod.0")
+            //         .withTemplateId("patient-interactions-obsperiod")
+            //         .withDataType("obsperiod")
+            //         .withAlias("obsperiod0")
+            //         .withMeasure(true),
+            // ];
+
+            entryExitEvent.measure = []
+            const entryExitOverride = { entryDataType: "obsperiod", exitDataType: "obsperiod" };
+
+            this.__request.matchAny.forEach((fcArray) => {
+                fcArray.forEach((fc) => {
+                    if (fc._isEntry) entryExitOverride.entryDataType = FastUtil.tokenizeAndJoin(
+                        fc._configPath,
+                        Keys.TERM_DELIMITER_PRD,
+                        1
+                    );
+                    else if (fc._isExit) entryExitOverride.exitDataType = FastUtil.tokenizeAndJoin(
+                        fc._configPath,
+                        Keys.TERM_DELIMITER_PRD,
+                        1
+                    );
+                });
+            });
+
+
             entryExitEvent.measure = [
+
                 new BaseNode(
                     "entry",
-                    "patient.interactions.obsperiod.0.attributes.startdate"
-                )
-                    .withIdentifier("patient.interactions.obsperiod.0")
-                    .withTemplateId("patient-interactions-obsperiod")
-                    .withDataType("obsperiod")
-                    .withAlias("obsperiod0")
+                    `patient.interactions.${entryExitOverride.entryDataType}.0.attributes.startdate`
+                    )
+                    .withIdentifier(`patient.interactions.${entryExitOverride.entryDataType}.0`)
+                    .withTemplateId(`patient-interactions-${entryExitOverride.entryDataType}`)
+                    .withDataType(entryExitOverride.entryDataType)
+                    .withAlias(`${entryExitOverride.entryDataType}0`)
                     .withMeasure(true),
                 new BaseNode(
                     "exit",
-                    "patient.interactions.obsperiod.0.attributes.enddate"
-                )
-                    .withIdentifier("patient.interactions.obsperiod.0")
-                    .withTemplateId("patient-interactions-obsperiod")
-                    .withDataType("obsperiod")
-                    .withAlias("obsperiod0")
+                    `patient.interactions.${entryExitOverride.exitDataType}.0.attributes.enddate`
+                    )
+                    .withIdentifier(`patient.interactions.${entryExitOverride.exitDataType}.0`)
+                    .withTemplateId(`patient-interactions-${entryExitOverride.exitDataType}`)
+                    .withDataType(entryExitOverride.exitDataType)
+                    .withAlias(`${entryExitOverride.exitDataType}0`)
                     .withMeasure(true),
             ];
+
             entryExitEvent.filter = {}; //TODO: Enable when FC marked as start/end from UI
             this.parserContainers.push(entryExitEvent);
         }
