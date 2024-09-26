@@ -183,38 +183,39 @@ export class InternalFilterRepresentation implements Request {
     }
 
     private createEntryExitCriteria() {
-        //TODO: Check for config boolean
-        const entryExitEvent: ParserContainer = structuredClone(
-            this.parserContainers.find((e) => e.name === "PatientRequest0")
-        );
-        entryExitEvent.alias = "PEE";
-        entryExitEvent.name = Keys.DEF_PATIENT_REQUEST_ENTRYEXIT;
-        entryExitEvent.groupBy.forEach((e) => {
-            //TODO: Remove excess groupby and fix alias for interactions
-            e.alias = "PEE";
-        });
-        entryExitEvent.measure = [
-            new BaseNode(
-                "entry",
-                "patient.interactions.obsperiod.0.attributes.startdate"
-            )
-                .withIdentifier("patient.interactions.obsperiod.0")
-                .withTemplateId("patient-interactions-obsperiod")
-                .withDataType("obsperiod")
-                .withAlias("obsperiod0")
-                .withMeasure(true),
-            new BaseNode(
-                "exit",
-                "patient.interactions.obsperiod.0.attributes.enddate"
-            )
-                .withIdentifier("patient.interactions.obsperiod.0")
-                .withTemplateId("patient-interactions-obsperiod")
-                .withDataType("obsperiod")
-                .withAlias("obsperiod0")
-                .withMeasure(true),
-        ];
-        entryExitEvent.filter = {}; //TODO: Enable when FC marked as start/end from UI
-        this.parserContainers.push(entryExitEvent)
+        if (this.__qConfig.__config.panelOptions.cohortEntryExit) {
+            const entryExitEvent: ParserContainer = structuredClone(
+                this.parserContainers.find((e) => e.name === "PatientRequest0")
+            );
+            entryExitEvent.alias = "PEE";
+            entryExitEvent.name = Keys.DEF_PATIENT_REQUEST_ENTRYEXIT;
+            entryExitEvent.groupBy.forEach((e) => {
+                //TODO: Remove excess groupby and fix alias for interactions
+                e.alias = "PEE";
+            });
+            entryExitEvent.measure = [
+                new BaseNode(
+                    "entry",
+                    "patient.interactions.obsperiod.0.attributes.startdate"
+                )
+                    .withIdentifier("patient.interactions.obsperiod.0")
+                    .withTemplateId("patient-interactions-obsperiod")
+                    .withDataType("obsperiod")
+                    .withAlias("obsperiod0")
+                    .withMeasure(true),
+                new BaseNode(
+                    "exit",
+                    "patient.interactions.obsperiod.0.attributes.enddate"
+                )
+                    .withIdentifier("patient.interactions.obsperiod.0")
+                    .withTemplateId("patient-interactions-obsperiod")
+                    .withDataType("obsperiod")
+                    .withAlias("obsperiod0")
+                    .withMeasure(true),
+            ];
+            entryExitEvent.filter = {}; //TODO: Enable when FC marked as start/end from UI
+            this.parserContainers.push(entryExitEvent);
+        }
     }
 
     public getConfig(): any {

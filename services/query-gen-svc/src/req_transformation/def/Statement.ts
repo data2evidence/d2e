@@ -34,6 +34,8 @@ export class Statement extends Node {
         let names: String[] = [];
         let union = FastUtil.isUnion(this.__parserContainers);
 
+        const isEntryExitApplied = this.__parserContainers.some(e => { if (e.name === Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) return true })
+
         this.__parserContainers.forEach((e) => {
             if (e.context === Keys.CQLTERM_CONTEXT_PATIENT) {
                 let qry = new Query(
@@ -53,22 +55,17 @@ export class Statement extends Node {
                 );
 
                 if (e.name === Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) {
-
                     qry.addRelationship(
                         new Relationship("obsperiod0",
                             Keys.CQLTERM_WITH,
                             new DataModelTypeExpression("obsperiod", "patient-interactions-obsperiod", Keys.CQLTERM_RETRIEVE),
                             []
                         ))
-
-                } else {
-                    
-                    //TODO: Check for config boolean
+                } else if (isEntryExitApplied) {
                     qry.insertRelationship(
                         new Relationship(
                             Keys.DEF_PATIENT_REQUEST_ENTRYEXIT,
                             Keys.CQLTERM_WITH,
-                            // new DataModelTypeExpression("entryexit", "patient", Keys.CQLTERM_RETRIEVE),
                             new BaseOperandExpressionRef(
                                 Keys.DEF_PATIENT_REQUEST_ENTRYEXIT,
                                 Keys.CQLTERM_EXPRESSIONREF
