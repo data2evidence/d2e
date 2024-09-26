@@ -83,11 +83,12 @@
         },
         "minCohortSize": 10
     },
-    "panelOptions": {       
-       "addToCohorts": true,
-       "domainValuesLimit": 200,
-       "calcViewAccessPoint": true,
-       "externalAccessPoints": true
+    "panelOptions": {
+        "addToCohorts": true,
+        "domainValuesLimit": 200,
+        "calcViewAccessPoint": true,
+        "externalAccessPoints": true,
+        "cohortEntryExit": false
     },
     "configInformations": {
         "note": ""

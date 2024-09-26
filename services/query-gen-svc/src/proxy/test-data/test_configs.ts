@@ -3478,6 +3478,7 @@ export const httptest_acme_mri_cdw_config = {
             maxFiltercardCount: 10,
             calcViewAccessPoint: true,
             externalAccessPoints: true,
+            cohortEntryExit: false,
         },
         configInformations: {
             note: "MRI configuration for HTTP integration tests",
@@ -4141,6 +4142,7 @@ export const httptest_groupedinteraction_mri_cdw_config = {
             maxFiltercardCount: 10,
             calcViewAccessPoint: true,
             externalAccessPoints: true,
+            cohortEntryExit: false,
         },
         configInformations: {
             note: "MRI configuration for HTTP integration tests",
@@ -5611,6 +5613,7 @@ export const httptest_test_mri_cdw_config = {
             maxFiltercardCount: 10,
             calcViewAccessPoint: true,
             externalAccessPoints: true,
+            cohortEntryExit: false,
         },
     },
     meta: {
