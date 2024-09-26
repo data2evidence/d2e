@@ -144,6 +144,7 @@ export class Settings extends oldSettings.Settings {
       settings,
       shared,
       schemaVersion: "3",
+      extCohortDefinitionTableMapping: {},
     };
 
     return returnObj;
