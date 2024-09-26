@@ -707,61 +707,66 @@ function _getValidDefinition(cdwConfig) {
     };
 
     const panelOptions = {
-        name: "panelOptions",
-        type: "object",
-        strict: true,
-        children: [
-            {
-                name: "addToCohorts",
-                type: "boolean",
-                strict: false,
-            },
-            {
-                name: "domainValuesLimit",
-                type: "number",
-                strict: false,
-            },
-            {
-                name: "maxFiltercardCount",
-                type: "number",
-                strict: false,
-            },
-            {
-                name: "calcViewAccessPoint",
-                type: "boolean",
-                strict: false,
-            },
-            {
-                name: "externalAccessPoints",
-                type: "boolean",
-                strict: false,
-            },
-            // deprecated
-            {
-                name: "afp",
-                type: "object",
-                strict: false,
-                mandatory: false,
-            },
-            {
-                name: "advancedTimeFiltering",
-                type: "object",
-                strict: false,
-                mandatory: false,
-            },
-            {
-                name: "absoluteTimeFiltering",
-                type: "object",
-                strict: false,
-                mandatory: false,
-            },
-            {
-                name: "noValueText",
-                type: "object",
-                strict: false,
-                mandatory: false,
-            },
-        ],
+      name: "panelOptions",
+      type: "object",
+      strict: true,
+      children: [
+        {
+          name: "addToCohorts",
+          type: "boolean",
+          strict: false,
+        },
+        {
+          name: "domainValuesLimit",
+          type: "number",
+          strict: false,
+        },
+        {
+          name: "maxFiltercardCount",
+          type: "number",
+          strict: false,
+        },
+        {
+          name: "calcViewAccessPoint",
+          type: "boolean",
+          strict: false,
+        },
+        {
+          name: "externalAccessPoints",
+          type: "boolean",
+          strict: false,
+        },
+        {
+          name: "cohortEntryExit",
+          type: "boolean",
+          strict: false,
+        },
+        // deprecated
+        {
+          name: "afp",
+          type: "object",
+          strict: false,
+          mandatory: false,
+        },
+        {
+          name: "advancedTimeFiltering",
+          type: "object",
+          strict: false,
+          mandatory: false,
+        },
+        {
+          name: "absoluteTimeFiltering",
+          type: "object",
+          strict: false,
+          mandatory: false,
+        },
+        {
+          name: "noValueText",
+          type: "object",
+          strict: false,
+          mandatory: false,
+        },
+      ],
     };
 
     const configInformations = {
