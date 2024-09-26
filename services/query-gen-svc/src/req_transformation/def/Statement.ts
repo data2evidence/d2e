@@ -51,21 +51,34 @@ export class Statement extends Node {
                         )
                     )
                 );
-                //TODO: Check for config boolean
-                qry.insertRelationship(
-                    new Relationship(
-                        "PatientRequestEntryExit",
-                        Keys.CQLTERM_WITH,
-                        // new DataModelTypeExpression("entryexit", "patient", Keys.CQLTERM_RETRIEVE),
-                        new BaseOperandExpressionRef(
-                            "PatientRequestEntryExit",
-                            Keys.CQLTERM_EXPRESSIONREF
-                        ),
-                        [],
-                        [],
-                        false
-                    )
-                );
+
+                if (e.name === Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) {
+
+                    qry.addRelationship(
+                        new Relationship("obsperiod0",
+                            Keys.CQLTERM_WITH,
+                            new DataModelTypeExpression("obsperiod", "patient-interactions-obsperiod", Keys.CQLTERM_RETRIEVE),
+                            []
+                        ))
+
+                } else {
+                    
+                    //TODO: Check for config boolean
+                    qry.insertRelationship(
+                        new Relationship(
+                            Keys.DEF_PATIENT_REQUEST_ENTRYEXIT,
+                            Keys.CQLTERM_WITH,
+                            // new DataModelTypeExpression("entryexit", "patient", Keys.CQLTERM_RETRIEVE),
+                            new BaseOperandExpressionRef(
+                                Keys.DEF_PATIENT_REQUEST_ENTRYEXIT,
+                                Keys.CQLTERM_EXPRESSIONREF
+                            ),
+                            [],
+                            [],
+                            false
+                        )
+                    );
+                }
 
                 let def = new Definition(
                     e.name,
@@ -75,6 +88,7 @@ export class Statement extends Node {
                 );
                 this.addDefinition(def);
                 names.push(e.name);
+                
             } else if (e.context === Keys.CQLTERM_CONTEXT_POPULATION) {
                 this.addDefinition(
                     new Definition(
@@ -94,8 +108,6 @@ export class Statement extends Node {
             }
         });
 
-        this.createEntryExit();
-
         if (names.length > 1) {
             this.addDefinition(
                 new Union(
@@ -106,85 +118,19 @@ export class Statement extends Node {
                         Keys.SQLTERM_SET_OP_UNION,
                         this.__action,
                         undefined,
-                        names.map(
-                            (z) =>
-                                new BaseOperandExpressionRef(
-                                    z.toString(),
-                                    Keys.CQLTERM_EXPRESSIONREF
-                                )
-                        )
+                        names.map((z) => 
+                                {
+                                    if (z.toString() !== Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) {
+                                        return new BaseOperandExpressionRef(
+                                            z.toString(),
+                                            Keys.CQLTERM_EXPRESSIONREF
+                                        )
+                                }
+                            }).filter(z => { if(z){ return z } }) //filter for false boolean values
                     )
                 )
             );
         }
-    }
-
-    private createEntryExit() {
-        //TODO: Check for config boolean
-        const entryExitEvent: ParserContainer = structuredClone(
-            this.__parserContainers.find((e) => e.name === "PatientRequest0")
-        );
-        entryExitEvent.alias = "PEE";
-        entryExitEvent.name = "PatientRequestEntryExit";
-        entryExitEvent.groupBy[0].alias = "PEE";
-        entryExitEvent.groupBy[1].alias = "PEE";
-        entryExitEvent.groupBy.forEach((e) => {
-            //TODO: Remove excess groupby and fix alias for interactions
-            e.alias = "PEE";
-        });
-        entryExitEvent.measure = [
-            new BaseNode(
-                "entry",
-                "patient.interactions.obsperiod.0.attributes.startdate"
-            )
-                .withIdentifier("patient.interactions.obsperiod.0")
-                .withTemplateId("patient-interactions-obsperiod")
-                .withDataType("obsperiod")
-                .withAlias("obsperiod0")
-                .withMeasure(true),
-            new BaseNode(
-                "exit",
-                "patient.interactions.obsperiod.0.attributes.enddate"
-                )
-                .withIdentifier("patient.interactions.obsperiod.0")
-                .withTemplateId("patient-interactions-obsperiod")
-                .withDataType("obsperiod")
-                .withAlias("obsperiod0")
-                .withMeasure(true),
-        ];
-        entryExitEvent.filter = {} //TODO: Enable when FC marked as start/end from UI
-
-        const entryExitQuery: Query = new Query(
-            entryExitEvent,
-            this.__action,
-            Keys.CQLTERM_QUERY,
-            new Source(
-                undefined,
-                undefined,
-                entryExitEvent.alias,
-                new DataModelTypeExpression(
-                    entryExitEvent.context,
-                    entryExitEvent.context.toLowerCase(),
-                    Keys.CQLTERM_RETRIEVE
-                )
-            )
-        )
-
-        entryExitQuery.addRelationship(
-            new Relationship("obsperiod0",
-                Keys.CQLTERM_WITH,
-                new DataModelTypeExpression("obsperiod", "patient-interactions-obsperiod", Keys.CQLTERM_RETRIEVE),
-                []
-            ))
-
-        this.addDefinition(
-            new Definition(
-                "PatientRequestEntryExit",
-                Keys.CQLTERM_CONTEXT_PATIENT,
-                Keys.CQLTERM_PUBLIC,
-                entryExitQuery
-            )
-        );
     }
 
     print() {

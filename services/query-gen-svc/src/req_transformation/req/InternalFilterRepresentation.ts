@@ -178,6 +178,43 @@ export class InternalFilterRepresentation implements Request {
         this.buildDefaultOrderByList(population);
 
         this.parserContainers = [...requests, population];
+
+        this.createEntryExitCriteria();
+    }
+
+    private createEntryExitCriteria() {
+        //TODO: Check for config boolean
+        const entryExitEvent: ParserContainer = structuredClone(
+            this.parserContainers.find((e) => e.name === "PatientRequest0")
+        );
+        entryExitEvent.alias = "PEE";
+        entryExitEvent.name = Keys.DEF_PATIENT_REQUEST_ENTRYEXIT;
+        entryExitEvent.groupBy.forEach((e) => {
+            //TODO: Remove excess groupby and fix alias for interactions
+            e.alias = "PEE";
+        });
+        entryExitEvent.measure = [
+            new BaseNode(
+                "entry",
+                "patient.interactions.obsperiod.0.attributes.startdate"
+            )
+                .withIdentifier("patient.interactions.obsperiod.0")
+                .withTemplateId("patient-interactions-obsperiod")
+                .withDataType("obsperiod")
+                .withAlias("obsperiod0")
+                .withMeasure(true),
+            new BaseNode(
+                "exit",
+                "patient.interactions.obsperiod.0.attributes.enddate"
+            )
+                .withIdentifier("patient.interactions.obsperiod.0")
+                .withTemplateId("patient-interactions-obsperiod")
+                .withDataType("obsperiod")
+                .withAlias("obsperiod0")
+                .withMeasure(true),
+        ];
+        entryExitEvent.filter = {}; //TODO: Enable when FC marked as start/end from UI
+        this.parserContainers.push(entryExitEvent)
     }
 
     public getConfig(): any {
@@ -815,27 +852,33 @@ export class InternalFilterRepresentation implements Request {
             }, {});
 
         //Detect interactions with multiple identical filtercards and add NotEqual check between them. Must be after isExclude is detected!
-        process.env.NOT_EQ_CHECK_FILTERCARDS === "true" && 
+        process.env.NOT_EQ_CHECK_FILTERCARDS === "true" &&
             Object.keys(patient.filter)
-            .filter((e) => patient.filter[e].length > 1)
-            .forEach((interaction) =>
-                patient.filter[interaction].forEach((e, i) => {
-                    e.join = [];
-                    if (i === 0 || e.isExclude) return; //Skip the first filtercard alone OR excluded filtercards
-                    // Traverse to previous nodes and get their alias for establishing join relationship
-                    for (let k = i-1; k >= 0; k--) {
-                        const identicalNode = patient.filter[interaction][k]
-                        if (identicalNode.isExclude) continue; // skip excluded filtercards
-                        //path, e.alias, e.filter, e.pathId
-                        e.join.push({   path: null, 
-                                        pathId: null,
-                                        alias: identicalNode.alias, 
-                                        filter: [new Expression(
-                                                        Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
-                                                        identicalNode.alias
-                                                    ).withType("expressionOp")]})
+                .filter((e) => patient.filter[e].length > 1)
+                .forEach((interaction) =>
+                    patient.filter[interaction].forEach((e, i) => {
+                        e.join = [];
+                        if (i === 0 || e.isExclude) return; //Skip the first filtercard alone OR excluded filtercards
+                        // Traverse to previous nodes and get their alias for establishing join relationship
+                        for (let k = i - 1; k >= 0; k--) {
+                            const identicalNode =
+                                patient.filter[interaction][k];
+                            if (identicalNode.isExclude) continue; // skip excluded filtercards
+                            //path, e.alias, e.filter, e.pathId
+                            e.join.push({
+                                path: null,
+                                pathId: null,
+                                alias: identicalNode.alias,
+                                filter: [
+                                    new Expression(
+                                        Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
+                                        identicalNode.alias
+                                    ).withType("expressionOp"),
+                                ],
+                            });
                         }
-                    }));
+                    })
+                );
 
         // Build list of where conditions
         // Gets list of basic data attribute constraints and adds them into the where clause conditions
