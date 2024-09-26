@@ -202,10 +202,6 @@ jobs:
             directory: ./services/alp-perseus-backend
             context: ./services/alp-perseus-backend
             fileName: Dockerfile
-          - name: alp-data-node/alp-perseus-white-rabbit
-            directory: ./services/alp-perseus-white-rabbit
-            context: ./services/alp-perseus-white-rabbit
-            fileName: Dockerfile
     uses: ./.github/workflows/docker-push-called.yml
     with:
       AZ_REGISTRY_REPOSITORY: ${{ matrix.name }}
