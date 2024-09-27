@@ -33,7 +33,9 @@ export class Statement extends Node {
         let names: String[] = [];
         let union = FastUtil.isUnion(this.__parserContainers);
 
-        const isEntryExitApplied = this.__parserContainers.some(e => { if (e.name === Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) return true })
+        const isEntryExitApplied = this.__parserContainers.some((e) => {
+            if (e.name === Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) return true;
+        });
 
         this.__parserContainers.forEach((e) => {
             if (e.context === Keys.CQLTERM_CONTEXT_PATIENT) {
@@ -55,17 +57,33 @@ export class Statement extends Node {
 
                 if (e.name === Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) {
                     const existingRelationShips = new Set<string>();
-                    e.measure.forEach(e => {
-                        if (!existingRelationShips.has(e.alias)) { //Only add unique relationships for entry and exit
+
+                    //Check if the With Relationship already filters, if yes avoid adding additional relationship for the measure below
+                    Object.keys(e.filter).forEach(fcType => {
+                        const fcArray = e.filter[fcType];
+                        fcArray.forEach(fc => {
+                            if(fc.isEntryExit) existingRelationShips.add(fc.alias)
+                        })
+                    })
+
+                    e.measure.forEach((e) => {
+                        if (!existingRelationShips.has(e.alias)) {
+                            //Only add unique relationships for entry and exit
                             qry.addRelationship(
-                                new Relationship(e.alias,
+                                new Relationship(
+                                    e.alias,
                                     Keys.CQLTERM_WITH,
-                                    new DataModelTypeExpression(e.dataType, e.templateId, Keys.CQLTERM_RETRIEVE),
+                                    new DataModelTypeExpression(
+                                        e.dataType,
+                                        e.templateId,
+                                        Keys.CQLTERM_RETRIEVE
+                                    ),
                                     []
-                                ));
+                                )
+                            );
                             existingRelationShips.add(e.alias);
                         }
-                    })
+                    });
                 } else if (isEntryExitApplied) {
                     qry.insertRelationship(
                         new Relationship(
@@ -90,7 +108,6 @@ export class Statement extends Node {
                 );
                 this.addDefinition(def);
                 names.push(e.name);
-                
             } else if (e.context === Keys.CQLTERM_CONTEXT_POPULATION) {
                 this.addDefinition(
                     new Definition(
@@ -120,15 +137,23 @@ export class Statement extends Node {
                         Keys.SQLTERM_SET_OP_UNION,
                         this.__action,
                         undefined,
-                        names.map((z) => 
-                                {
-                                    if (z.toString() !== Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) {
-                                        return new BaseOperandExpressionRef(
-                                            z.toString(),
-                                            Keys.CQLTERM_EXPRESSIONREF
-                                        )
+                        names
+                            .map((z) => {
+                                if (
+                                    z.toString() !==
+                                    Keys.DEF_PATIENT_REQUEST_ENTRYEXIT
+                                ) {
+                                    return new BaseOperandExpressionRef(
+                                        z.toString(),
+                                        Keys.CQLTERM_EXPRESSIONREF
+                                    );
                                 }
-                            }).filter(z => { if(z){ return z } }) //filter for false boolean values
+                            })
+                            .filter((z) => {
+                                if (z) {
+                                    return z;
+                                }
+                            }) //filter for false boolean values
                     )
                 )
             );

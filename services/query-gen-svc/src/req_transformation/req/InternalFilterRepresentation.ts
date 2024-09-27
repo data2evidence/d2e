@@ -190,53 +190,94 @@ export class InternalFilterRepresentation implements Request {
             );
             entryExitEvent.alias = "PEE";
             entryExitEvent.name = Keys.DEF_PATIENT_REQUEST_ENTRYEXIT;
-            entryExitEvent.groupBy.forEach((e) => {
-                //TODO: Remove excess groupby and fix alias for interactions
+            entryExitEvent.where.forEach((e) => {
                 e.alias = "PEE";
             });
 
             entryExitEvent.measure = []
-            const entryExitOverride = { entryDataType: "obsperiod", exitDataType: "obsperiod" };
-
+            entryExitEvent.groupBy = []
+            const entryExitOverride = { entry: {dataType: "obsperiod", instanceID: "0"}, exit: {dataType: "obsperiod", instanceID: "0"} };
             this.__request.matchAny.forEach((fcArray) => {
                 fcArray.forEach((fc) => {
-                    if (fc._isEntry) entryExitOverride.entryDataType = FastUtil.tokenizeAndJoin(
-                        fc._configPath,
-                        Keys.TERM_DELIMITER_PRD,
-                        1
-                    );
-                    else if (fc._isExit) entryExitOverride.exitDataType = FastUtil.tokenizeAndJoin(
-                        fc._configPath,
-                        Keys.TERM_DELIMITER_PRD,
-                        1
-                    );
+                    if (fc._isEntry) {
+                        entryExitOverride.entry.dataType = FastUtil.tokenizeAndJoin(
+                            fc._configPath,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        );
+
+                        entryExitOverride.entry.instanceID = FastUtil.tokenizeAndJoin(
+                            fc._instanceID,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        );
+                    }
+                    else if (fc._isExit) {
+                        entryExitOverride.exit.dataType = FastUtil.tokenizeAndJoin(
+                            fc._configPath,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        );
+
+                        entryExitOverride.exit.instanceID = FastUtil.tokenizeAndJoin(
+                            fc._instanceID,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        );
+                    }
                 });
             });
 
 
             entryExitEvent.measure = [
-
                 new BaseNode(
                     "entry",
-                    `patient.interactions.${entryExitOverride.entryDataType}.0.attributes.startdate`
+                    `patient.interactions.${entryExitOverride.entry.dataType}.${entryExitOverride.entry.instanceID}.attributes.startdate`
                     )
-                    .withIdentifier(`patient.interactions.${entryExitOverride.entryDataType}.0`)
-                    .withTemplateId(`patient-interactions-${entryExitOverride.entryDataType}`)
-                    .withDataType(entryExitOverride.entryDataType)
-                    .withAlias(`${entryExitOverride.entryDataType}0`)
+                    .withIdentifier(`patient.interactions.${entryExitOverride.entry.dataType}.${entryExitOverride.entry.instanceID}`)
+                    .withTemplateId(`patient-interactions-${entryExitOverride.entry.dataType}`)
+                    .withDataType(entryExitOverride.entry.dataType)
+                    .withAlias(`${entryExitOverride.entry.dataType}${entryExitOverride.entry.instanceID}`)
                     .withMeasure(true),
                 new BaseNode(
                     "exit",
-                    `patient.interactions.${entryExitOverride.exitDataType}.0.attributes.enddate`
+                    `patient.interactions.${entryExitOverride.exit.dataType}.${entryExitOverride.exit.instanceID}.attributes.enddate`
                     )
-                    .withIdentifier(`patient.interactions.${entryExitOverride.exitDataType}.0`)
-                    .withTemplateId(`patient-interactions-${entryExitOverride.exitDataType}`)
-                    .withDataType(entryExitOverride.exitDataType)
-                    .withAlias(`${entryExitOverride.exitDataType}0`)
+                    .withIdentifier(`patient.interactions.${entryExitOverride.exit.dataType}.${entryExitOverride.exit.instanceID}`)
+                    .withTemplateId(`patient-interactions-${entryExitOverride.exit.dataType}`)
+                    .withDataType(entryExitOverride.exit.dataType)
+                    .withAlias(`${entryExitOverride.exit.dataType}${entryExitOverride.exit.instanceID}`)
                     .withMeasure(true),
             ];
 
-            entryExitEvent.filter = {}; //TODO: Enable when FC marked as start/end from UI
+            //Keep With Relationships only if they have a attribute filter and are marked as either entry / exit
+            Object.keys(entryExitEvent.filter).forEach(fcType => {
+                const toKeep = new Set<string>();
+                toKeep.add(`${entryExitOverride.entry.dataType}${entryExitOverride.entry.instanceID}`)
+                toKeep.add(`${entryExitOverride.exit.dataType}${entryExitOverride.exit.instanceID}`)
+                const toDelete = new Set<string>();
+                const fcArray = entryExitEvent.filter[fcType];
+                fcArray.forEach(fc => {
+                    if (!toKeep.has(fc.alias)) {
+                        toDelete.add(fc.alias);
+                        return;
+                    } else {
+                        fc.isEntryExit = true;
+                    }
+                    let filterExists = false
+                    fc.attributeList.forEach(e => {
+                        if(e.filter?.length > 0 && toKeep.has(fc.alias)) {
+                            filterExists = true;
+                        }
+                    })
+                    if(!filterExists) toDelete.add(fc.alias); // Even though its marked as entry/exit, if no filters still remove. Because will be handled by BaseNode from Measure
+                })
+
+                //Prune unwanted filtercards for PatientEntryExitRequest
+                entryExitEvent.filter[fcType] = fcArray.filter((fc) => !toDelete.has(fc.alias))
+            })
+
+         
             this.parserContainers.push(entryExitEvent);
         }
     }
