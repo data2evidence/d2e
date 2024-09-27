@@ -1,6 +1,5 @@
-import { createProject, createResourceInProject } from './services';
+import { createProject, createResourceInCacheDB, createResourceInProject } from './services';
 import express from 'npm:express'
-
 export class FhirRouter {
   public router = express.Router();
   private readonly logger = console
@@ -25,7 +24,8 @@ export class FhirRouter {
     this.router.post('/:resource/:projectName?', async (req, res) => {
         try {
           const { resource, projectName } = req.params
-          const response = await createResourceInProject(resource, req.body, projectName)
+          const token = req.headers.authorization!
+          const response = await createResourceInProject(token, resource, req.body, projectName)
           if(response)
             return res.status(200).json('FHIR Resource successfully created!')
           else
@@ -34,6 +34,19 @@ export class FhirRouter {
           this.logger.error(`Error creating resource on fhir server: ${JSON.stringify(error)}`)
           res.status(500).send('Error creating resource on fhir server')
         }
+    })
+
+    this.router.post('./:resource', async(req, res) =>{
+      try{
+        const response = await createResourceInCacheDB(req.body)
+        if(response)
+          return res.status(200).json('FHIR Resource successfully created!')
+        else
+        return res.status(500).json('Failed to create FHIR Resource')
+      }catch(error){
+        this.logger.error(`Error creating resource in cachedb:  ${JSON.stringify(error)}`)
+        res.status(500).send('Error creating resource in cachedb')
+      }
     })
   }
 }
