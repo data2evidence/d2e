@@ -22,14 +22,28 @@ export const getConceptByName = async ({
     conceptName: string;
     req: IMRIRequest;
     datasetId: string;
-}): Promise<ExtCohortConcept> => {
+}): Promise<ExtCohortConcept | null> => {
     const concept = await terminologyRequest(
         req,
         "POST",
         `concept/searchByName`,
         { conceptName, datasetId }
     );
-    return concept.data[0];
+
+    function upperCaseKeys(obj: ExtCohortConcept): ExtCohortConcept {
+        const result = {};
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                const upperKey = key.toUpperCase() as keyof ExtCohortConcept; // Convert the key to uppercase
+                result[upperKey as keyof ExtCohortConcept] =
+                    obj[key as keyof ExtCohortConcept];
+            }
+        }
+
+        return result as ExtCohortConcept;
+    }
+
+    return concept[0] ? upperCaseKeys(concept[0]) : null;
 };
 
 export const getExtCohortKeyForEvent = (
@@ -285,6 +299,9 @@ export const createDemographicCriteriaList = async (
                     req,
                     datasetId,
                 });
+                if (!concept) {
+                    continue;
+                }
                 demographicCriteriaList[attributeInfo.key] = [
                     {
                         CONCEPT_CODE: concept.CONCEPT_CODE,
