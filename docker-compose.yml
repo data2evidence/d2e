@@ -435,6 +435,15 @@ services:
             "PG__DB_CREDENTIALS_MGR__SCHEMA": "db_credentials_mgr",
             "PG__DB_CREDENTIALS_MGR__USER": "${PG_WRITE_USER:-alp_pg_write_user}"
           },
+          "alp-fhir-svc": {
+            "FHIR__LOG_LEVEL": "debug",
+            "PORT": 41${BASE_PORT:-1}12,
+            "FHIR__CLIENT_ID": "db6b2304-f236-45ec-b10c-a852681e7129",
+            "FHIR__CLIENT_SECRET": "${FHIR__CLIENT_SECRET}",
+            "FHIR_SCHEMA_PATH": "/home/docker/alp-data-node/app/src/r4",
+            "FHIR_SCHEMA_FILE_NAME": "fhir.schema.json",
+            "DUCKDB_PATH": "/home/docker/alp-data-node/app/src/duckdb"
+          },
           "alp-fhir-init": {
             "PG_SUPER_PASSWORD": "${PG_SUPER_PASSWORD}",
             "PG_SUPER_USER": "${PG_SUPER_USER:-postgres}",
@@ -560,7 +569,7 @@ services:
       LOGTO__TOKEN_URL: http://alp-logto-${BASE_PORT}:3001/oidc/token
       NODE_ENV: development
       PREFECT_DOCKER_VOLUMES: '["duckdb-data-1:/app/duckdb_data", "cdw-config-duckdb-data-1:/app/cdw-config/duckdb_data", "r-libs:/home/docker/plugins/R/site-library"]'
-      GH_TOKEN: ${GH_TOKEN}
+      GH_TOKEN: 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
       PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
       PLUGINS_API_VERSION: latest
 

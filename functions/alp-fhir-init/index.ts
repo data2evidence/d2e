@@ -1,5 +1,5 @@
 import {seed} from "./src/seed.ts"
-import {readAndCreateBotFromConfig} from "./src/utils/botUtils.ts"
+import {readAndCreateBotFromConfig} from "./src/loadBots.ts"
 
-seed()
+await seed()
 readAndCreateBotFromConfig()

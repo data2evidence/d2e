@@ -12,7 +12,6 @@ export async function handler(medplum: MedplumClient, event: BotEvent): Promise<
     for (const entry of bundle.entry) {
       console.log('Create resource for each of the entry in the bundle')
       await createResourceInFhir(entry.resource)
-      await medplum.createResource(entry.resource)
     }
   }catch(err){
     console.log(err)
