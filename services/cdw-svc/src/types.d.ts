@@ -158,7 +158,7 @@ declare global {
     ["@TEXT.VALUE"]: string;
     ["@COHORT"]: string;
     ["@COHORT.PATIENT_ID"]: string;
-    ["@COHORT.INTERACTION_TYPE"] : string;
+    ["@COHORT.INTERACTION_TYPE"]: string;
   }
 
   type PlaceholderMapType = {
@@ -189,6 +189,7 @@ declare global {
     shared: any;
     others: any;
     schemaVersion: string;
+    extCohortDefinitionTableMapping: { [key: string]: string };
   }
 
   export interface ValidationMessageType {
