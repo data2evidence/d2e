@@ -17197,7 +17197,8 @@ const paConfig = {
     domainValuesLimit: 200,
     maxFiltercardCount: 10,
     calcViewAccessPoint: true,
-    externalAccessPoints: true
+    externalAccessPoints: true,
+    cohortEntryExit: false
   },
 };
 
@@ -31608,7 +31609,8 @@ const paConfigDuckdb = {
       "addToCohorts": true,
       "domainValuesLimit": 5000,
       "calcViewAccessPoint": true,
-      "externalAccessPoints": true
+      "externalAccessPoints": true,
+      "cohortEntryExit": false
   }
 };
 
@@ -33235,6 +33237,7 @@ const paI2b2ConfigDuckdb = {
     domainValuesLimit: 200,
     maxFiltercardCount: 10,
     calcViewAccessPoint: true,
-    externalAccessPoints: true
+    externalAccessPoints: true,
+    cohortEntryExit: false
   },
 };

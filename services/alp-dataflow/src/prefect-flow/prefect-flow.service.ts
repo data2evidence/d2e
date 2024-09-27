@@ -75,7 +75,7 @@ export class PrefectFlowService {
       const newDatamodels = []
       flows.forEach(flow => {
         flow.datamodels.forEach(d => {
-          newDatamodels.push({ name: `${d} [${flow.name}]`, datamodel: d, flowId: flow.flowId })
+          newDatamodels.push({ flowName: `${flow.name}`, datamodel: d, flowId: flow.flowId })
         })
       })
       return newDatamodels

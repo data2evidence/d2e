@@ -3,7 +3,6 @@
 Runs [perseus](https://github.com/OHDSI/Perseus) within the alp network.
 
 The currently supported perseus services are
-- cdm-builder
 - white-rabbit
 - backend
 - files-manager
