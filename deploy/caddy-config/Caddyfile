@@ -93,13 +93,6 @@ https://*.alp.local:55555 {
 		}
 	}
 
-	handle /cdm-builder/* {
-		import forward_authentication
-		reverse_proxy http://alp-perseus-cdm-builder-1:9000 {
-			header_up X-Real-IP {http.request.remote_host}
-		}
-	}
-
 	handle /files-manager/* {
 		import forward_authentication
 		reverse_proxy http://files-manager:10500 {
