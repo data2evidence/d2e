@@ -54,13 +54,17 @@ export class Statement extends Node {
                 );
 
                 if (e.name === Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) {
+                    const existingRelationShips = new Set<string>();
                     e.measure.forEach(e => {
-                        qry.addRelationship(
-                            new Relationship(e.alias,
-                                Keys.CQLTERM_WITH,
-                                new DataModelTypeExpression(e.dataType, e.templateId, Keys.CQLTERM_RETRIEVE),
-                                []
-                            ))
+                        if (!existingRelationShips.has(e.alias)) { //Only add unique relationships for entry and exit
+                            qry.addRelationship(
+                                new Relationship(e.alias,
+                                    Keys.CQLTERM_WITH,
+                                    new DataModelTypeExpression(e.dataType, e.templateId, Keys.CQLTERM_RETRIEVE),
+                                    []
+                                ));
+                            existingRelationShips.add(e.alias);
+                        }
                     })
                 } else if (isEntryExitApplied) {
                     qry.insertRelationship(

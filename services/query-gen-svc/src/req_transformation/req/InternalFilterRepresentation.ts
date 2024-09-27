@@ -194,26 +194,6 @@ export class InternalFilterRepresentation implements Request {
                 //TODO: Remove excess groupby and fix alias for interactions
                 e.alias = "PEE";
             });
-            // entryExitEvent.measure = [
-            //     new BaseNode(
-            //         "entry",
-            //         "patient.interactions.obsperiod.0.attributes.startdate"
-            //     )
-            //         .withIdentifier("patient.interactions.obsperiod.0")
-            //         .withTemplateId("patient-interactions-obsperiod")
-            //         .withDataType("obsperiod")
-            //         .withAlias("obsperiod0")
-            //         .withMeasure(true),
-            //     new BaseNode(
-            //         "exit",
-            //         "patient.interactions.obsperiod.0.attributes.enddate"
-            //     )
-            //         .withIdentifier("patient.interactions.obsperiod.0")
-            //         .withTemplateId("patient-interactions-obsperiod")
-            //         .withDataType("obsperiod")
-            //         .withAlias("obsperiod0")
-            //         .withMeasure(true),
-            // ];
 
             entryExitEvent.measure = []
             const entryExitOverride = { entryDataType: "obsperiod", exitDataType: "obsperiod" };
