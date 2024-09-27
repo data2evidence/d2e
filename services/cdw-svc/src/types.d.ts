@@ -189,7 +189,6 @@ declare global {
     shared: any;
     others: any;
     schemaVersion: string;
-    extCohortDefinitionTableMapping: { [key: string]: string };
   }
 
   export interface ValidationMessageType {

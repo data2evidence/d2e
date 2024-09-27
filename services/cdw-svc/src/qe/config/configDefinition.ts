@@ -414,6 +414,11 @@ export function getDefinition(tableMapping: any) {
             type: "string",
           },
           {
+            name: "cohortDefinitionKey",
+            mandatory: false,
+            type: "string",
+          },
+          {
             name: "useRefValue",
             mandatory: false,
             type: "boolean",

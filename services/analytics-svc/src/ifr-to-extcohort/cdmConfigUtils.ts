@@ -39,16 +39,9 @@ export const getExtCohortKeyForEvent = (
     if (!path) {
         return null;
     }
-    const extCohortMapping =
-        cdmConfig?.advancedSettings?.extCohortDefinitionTableMapping;
-    const defaultPlaceholderPath = `${path}.defaultPlaceholder`;
-    const keyToResolve: string | null =
-        _.get(cdmConfig, defaultPlaceholderPath) || null;
-    if (!keyToResolve) {
-        return null;
-    }
-    const key = extCohortMapping?.[keyToResolve];
-    return key ?? null;
+    const cohortDefinitionKey = `${path}.cohortDefinitionKey`;
+    const key: string | null = _.get(cdmConfig, cohortDefinitionKey) || null;
+    return key;
 };
 
 export const getExtCohortInfoForAttribute = (
@@ -58,16 +51,10 @@ export const getExtCohortInfoForAttribute = (
     if (!path) {
         return null;
     }
-    const extCohortMapping =
-        cdmConfig?.advancedSettings?.extCohortDefinitionTableMapping;
-    const keyPath = `${path}.expression`;
+    const keyPath = `${path}.cohortDefinitionKey`;
     const typePath = `${path}.type`;
     const type: CdmAttributeType | null = _.get(cdmConfig, typePath) || null;
-    const keyToResolve: string | null = _.get(cdmConfig, keyPath) || null;
-    if (!keyToResolve) {
-        return null;
-    }
-    const key = extCohortMapping?.[keyToResolve] ?? null;
+    const key: string | null = _.get(cdmConfig, keyPath) || null;
     return { key, type };
 };
 
@@ -287,7 +274,7 @@ export const createDemographicCriteriaList = async (
             continue;
         }
         const constraintContent = filterCard.constraints.content[0];
-        if ("operator" in constraintContent) {
+        if (constraintContent && "operator" in constraintContent) {
             const valueOrConceptName =
                 constraintContent && "value" in constraintContent
                     ? constraintContent.value
