@@ -61,11 +61,19 @@ export class Utils {
                 let unionQuery = "";
                 for (let i = 0; i < count; i++) {
                     if (i === 0) {
-                        unionQuery = `SELECT * FROM ${name}${i}`;
+                        unionQuery = `SELECT 
+                                "PatientListRequests"."patient.attributes.pcount.0" AS "patient.attributes.pcount.0", 
+                                "PatientRequestEntryExit"."entry" AS "entry", 
+                                "PatientRequestEntryExit"."exit" AS "exit" 
+                                FROM (SELECT * FROM ${name}${i}`;
                     } else {
                         unionQuery += ` UNION SELECT * FROM ${name}${i}`;
                     }
                 }
+
+                unionQuery += `) AS "PatientListRequests" INNER JOIN "PatientRequestEntryExit" 
+                                    ON "PatientListRequests"."patient.attributes.pcount.0" = "PatientRequestEntryExit"."patient.attributes.pid"`
+
                 query = new QueryObject(`${query} ${unionQuery}`, [...Array.from(parsSet)], true);
                 return query;
             };
