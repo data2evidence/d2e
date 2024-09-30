@@ -808,7 +808,7 @@ services:
       DUCKDB__DATA_FOLDER: /home/docker/src/alp-data-node/app/duckdb_data
       LOCAL_DEBUG: "false"
       USE_DUCKDB: ${USE_DUCKDB:-true}
-      USE_CACHEDB: ${USE_CACHEDB:-true}
+      USE_CACHEDB: ${USE_CACHEDB:-false}
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
     deploy:
       resources:
@@ -867,7 +867,7 @@ services:
       NODE_ENV: development
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
-      USE_CACHEDB: ${USE_CACHEDB:-true}
+      USE_CACHEDB: ${USE_CACHEDB:-false}
       isTestEnv: ${isTestEnv}
       BUILT_IN_DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
       DUCKDB_PATH: /home/docker/duckdb_data
@@ -1366,7 +1366,7 @@ services:
       TERMINOLOGY_SVC__LOG_LEVEL: info
       TERMINOLOGY_SVC__PATH: terminology
       TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
-      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-true}
+      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-false}
 
   alp-minerva-user-mgmt:
     container_name: &c22 alp-minerva-user-mgmt-${BASE_PORT:-1}
@@ -1674,8 +1674,8 @@ services:
     depends_on:
       alp-dataflow-gen-init:
         condition: service_completed_successfully
-      alp-docker-server:
-        condition: service_healthy
+      # alp-docker-server:
+      #   condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 30
@@ -1708,44 +1708,44 @@ services:
       DOCKER_CERT_PATH: /certs/client/
       DOCKER_TLS_VERIFY: false
 
-  alp-dataflow-gen-docker-worker:
-    extends: alp-dataflow-gen-process-worker
-    container_name: &c32 alp-dataflow-gen-docker-worker-${BASE_PORT:-1}
-    hostname: alp-dataflow-gen-docker-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    networks:
-      data:
-        priority: 20
-    logging:
-      options:
-        tag: *c32
-    environment:
-      PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
-      PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
-      DOCKER_HOST: "tcp://dind:2376"
-      DOCKER_CERT_PATH: /certs/client/
-      DOCKER_TLS_VERIFY: false
+  # alp-dataflow-gen-docker-worker:
+  #   extends: alp-dataflow-gen-process-worker
+  #   container_name: &c32 alp-dataflow-gen-docker-worker-${BASE_PORT:-1}
+  #   hostname: alp-dataflow-gen-docker-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+  #   networks:
+  #     data:
+  #       priority: 20
+  #   logging:
+  #     options:
+  #       tag: *c32
+  #   environment:
+  #     PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
+  #     PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
+  #     DOCKER_HOST: "tcp://dind:2376"
+  #     DOCKER_CERT_PATH: /certs/client/
+  #     DOCKER_TLS_VERIFY: false
 
-  alp-docker-server:
-    image: docker:dind
-    container_name: &c33 alp-docker-server-${BASE_PORT:-1}
-    hostname: dind
-    networks:
-      data:
-        priority: 20
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 30s
-      test: ["CMD-SHELL", "netstat -ltn | grep -c :::2376"]
-      timeout: 10s
-    logging:
-      options:
-        tag: *c33
-    privileged: true
-    volumes:
-      - dind-certs:/certs
-    environment:
-      DOCKER_TLS_CERTDIR: /certs
+  # alp-docker-server:
+  #   image: docker:dind
+  #   container_name: &c33 alp-docker-server-${BASE_PORT:-1}
+  #   hostname: dind
+  #   networks:
+  #     data:
+  #       priority: 20
+  #   healthcheck:
+  #     interval: 20s
+  #     retries: 30
+  #     start_period: 30s
+  #     test: ["CMD-SHELL", "netstat -ltn | grep -c :::2376"]
+  #     timeout: 10s
+  #   logging:
+  #     options:
+  #       tag: *c33
+  #   privileged: true
+  #   volumes:
+  #     - dind-certs:/certs
+  #   environment:
+  #     DOCKER_TLS_CERTDIR: /certs
 
   alp-perseus-files-manager:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
