@@ -24,7 +24,7 @@ export class CohortEndpoint {
     private getInsertSyntaxQuery(): string {
         return `JOIN
         (SELECT DISTINCT * FROM 
-        (SELECT TO_NVARCHAR(COHORT_DEFINITION_SYNTAX) AS syntax FROM ${this.schemaName}.COHORT_DEFINITION cd) as cd_syntax
+        (SELECT TO_NVARCHAR(COHORT_DEFINITION_SYNTAX) AS syntax FROM $$SCHEMA$$.COHORT_DEFINITION cd) as cd_syntax
         WHERE syntax LIKE %s AND syntax LIKE %s) as cdd
         ON syntax=TO_NVARCHAR(COHORT_DEFINITION_SYNTAX)`;
     }
@@ -89,7 +89,7 @@ export class CohortEndpoint {
         COHORT_MODIFICATION_DATE AS "COHORT_MODIFICATION_DATE",
         TO_NVARCHAR(COHORT_DEFINITION_SYNTAX) AS "COHORT_DEFINITION_SYNTAX",
         OWNER AS "OWNER"
-        FROM ${this.schemaName}.COHORT_DEFINITION
+        FROM $$SCHEMA$$.COHORT_DEFINITION
         `;
 
         let cohortArray = [];
@@ -132,7 +132,7 @@ export class CohortEndpoint {
 
     // Get count of cohort definitions
     public async queryCohortDefinitionCount(queryParams: Object) {
-        let selectQueryString = `SELECT COUNT(*) as count FROM ${this.schemaName}.COHORT_DEFINITION
+        let selectQueryString = `SELECT COUNT(*) as count FROM $$SCHEMA$$.COHORT_DEFINITION
         `;
 
         try {
@@ -156,7 +156,7 @@ export class CohortEndpoint {
         cohortDefinition: CohortDefinitionTableType
     ) {
         let queryString = `
-        INSERT INTO ${this.schemaName}.COHORT_DEFINITION (
+        INSERT INTO $$SCHEMA$$.COHORT_DEFINITION (
             COHORT_DEFINITION_NAME,
             COHORT_DEFINITION_DESCRIPTION,
             COHORT_INITIATION_DATE,
@@ -222,7 +222,7 @@ export class CohortEndpoint {
 
     public async deleteCohortDefinitionFromDb(cohortId: number) {
         // Delete from cohort definition table
-        let queryString = `DELETE FROM ${this.schemaName}.COHORT_DEFINITION WHERE COHORT_DEFINITION_ID = %s`;
+        let queryString = `DELETE FROM $$SCHEMA$$.COHORT_DEFINITION WHERE COHORT_DEFINITION_ID = %s`;
 
         try {
             const query = QueryObject.format(queryString, cohortId);
@@ -236,7 +236,7 @@ export class CohortEndpoint {
 
     public async deleteCohortFromDb(cohortId: number) {
         // Delete from cohort table
-        let queryString = `DELETE FROM ${this.schemaName}.COHORT WHERE COHORT_DEFINITION_ID = %s`;
+        let queryString = `DELETE FROM $$SCHEMA$$.COHORT WHERE COHORT_DEFINITION_ID = %s`;
 
         try {
             const query = QueryObject.format(queryString, cohortId);
@@ -250,7 +250,7 @@ export class CohortEndpoint {
 
     // Get patient list based on cohort definition ID
     async queryPatientIds(cohortDefinitionId: string): Promise<string[]> {
-        let selectQueryString = `SELECT SUBJECT_ID FROM ${this.schemaName}.COHORT
+        let selectQueryString = `SELECT SUBJECT_ID FROM $$SCHEMA$$.COHORT
         WHERE COHORT_DEFINITION_ID=%s
         `;
         try {
@@ -285,7 +285,7 @@ export class CohortEndpoint {
     public async queryCohortDefinitionId(
         cohortDefinition: CohortDefinitionTableType
     ): Promise<number> {
-        let selectQueryString = `SELECT COHORT_DEFINITION_ID AS "COHORT_DEFINITION_ID" FROM ${this.schemaName}.COHORT_DEFINITION 
+        let selectQueryString = `SELECT COHORT_DEFINITION_ID AS "COHORT_DEFINITION_ID" FROM $$SCHEMA$$.COHORT_DEFINITION 
         WHERE COHORT_DEFINITION_NAME=%s AND 
         TO_VARCHAR(COHORT_DEFINITION_DESCRIPTION)=%s AND 
         TO_TIMESTAMP(TO_VARCHAR(COHORT_INITIATION_DATE, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD HH24:MI:SS')=TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS') AND
