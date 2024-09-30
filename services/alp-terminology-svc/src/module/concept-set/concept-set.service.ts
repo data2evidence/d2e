@@ -122,6 +122,9 @@ export class ConceptSetService {
         return {
           ...concept,
           ...conceptFromSet,
+          conceptCode: concept.code,
+          conceptName: concept.display,
+          vocabularyId: concept.system,
         };
       }),
     };
