@@ -190,9 +190,6 @@ export class InternalFilterRepresentation implements Request {
             );
             entryExitEvent.alias = "PEE";
             entryExitEvent.name = Keys.DEF_PATIENT_REQUEST_ENTRYEXIT;
-            entryExitEvent.where.forEach((e) => {
-                e.alias = "PEE";
-            });
 
             entryExitEvent.measure = []
             entryExitEvent.groupBy = []
@@ -270,12 +267,23 @@ export class InternalFilterRepresentation implements Request {
                             filterExists = true;
                         }
                     })
-                    if(!filterExists) toDelete.add(fc.alias); // Even though its marked as entry/exit, if no filters still remove. Because will be handled by BaseNode from Measure
+                    if(!filterExists) toDelete.add(fc.alias); // Even though its marked as entry/exit, if no attribute filters exists for them, still remove. Because it will be handled by BaseNode from Measure
                 })
 
                 //Prune unwanted filtercards for PatientEntryExitRequest
                 entryExitEvent.filter[fcType] = fcArray.filter((fc) => !toDelete.has(fc.alias))
             })
+
+            //handle where
+            //Remove those associated with exclude specifically when where clause is defined to be null. Only keep basic data and those marked as either entry/exit
+            entryExitEvent.where = entryExitEvent.where.filter(e => 
+                                    (e.alias === `${entryExitOverride.entry.dataType}${entryExitOverride.entry.instanceID}` || 
+                                     e.alias === `${entryExitOverride.exit.dataType}${entryExitOverride.exit.instanceID}` || 
+                                     e.alias === "P0")) 
+            //Associated with PEE
+            entryExitEvent.where.forEach((e) => {
+                e.alias = "PEE";
+            });
 
          
             this.parserContainers.push(entryExitEvent);
