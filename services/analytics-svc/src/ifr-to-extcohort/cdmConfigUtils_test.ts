@@ -15,6 +15,9 @@ import sampleConcepts from "./samples/sample-concepts";
 
 const req = {} as IMRIRequest;
 
+jest.mock("../utils/TerminologySvcProxy", () => ({
+    terminologyRequest: jest.fn(),
+}));
 jest.spyOn(cdmConfigUtils, "getConceptByName").mockImplementation(
     ({ conceptName }: { conceptName: string }) => {
         return new Promise((resolve, reject) => {
