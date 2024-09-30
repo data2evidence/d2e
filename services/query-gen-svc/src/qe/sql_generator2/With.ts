@@ -178,11 +178,13 @@ export class With extends AstElement {
                             " = " +
                             this.getPatientIdColumn(tableObj.baseEntity);
 
-                            // CAST(CURRENT_DATE AS DATE)
+                        // Add Entry Exit CAST(CURRENT_DATE AS DATE)
                         if(Object.keys(this.parent.parent.aliasEntityMap).includes("PatientRequestEntryExit")) {
                             const dimPlaceHolderTableMap = this.entityConfig.getTableTypePlaceholderMap(tableObj.baseEntity)
                             if(dimPlaceHolderTableMap?.time) {
-                                parentJoinCondition += ` AND CAST("patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.START`]} AS DATE) >= CAST(ifnull("patient.PatientRequestEntryExit"."entry", '1900-01-01') AS DATE) AND CAST("patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.END`]} AS DATE) <= CAST(ifnull("patient.PatientRequestEntryExit"."exit", current_date) AS DATE)`
+                                parentJoinCondition += ` AND 
+                                                            CAST("patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.START`]} AS DATE) >= CAST("patient.PatientRequestEntryExit"."entry" AS DATE) AND 
+                                                            CAST("patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.END`]} AS DATE) <= CAST("patient.PatientRequestEntryExit"."exit" AS DATE)`
                             }
                         }
                         joinState.setConditionId(this);
@@ -192,6 +194,16 @@ export class With extends AstElement {
                         joinState.getPatientId() +
                         " = " +
                         this.getPatientIdColumn(tableObj.baseEntity);
+
+                    // Add Entry Exit CAST(CURRENT_DATE AS DATE)
+                    if(Object.keys(this.parent.parent.aliasEntityMap).includes("PatientRequestEntryExit")) {
+                        const dimPlaceHolderTableMap = this.entityConfig.getTableTypePlaceholderMap(tableObj.baseEntity)
+                        if(dimPlaceHolderTableMap?.time) {
+                            parentJoinCondition += ` AND 
+                                                        CAST("patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.START`]} AS DATE) >= CAST("patient.PatientRequestEntryExit"."entry" AS DATE) AND 
+                                                        CAST("patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.END`]} AS DATE) <= CAST("patient.PatientRequestEntryExit"."exit" AS DATE)`
+                        }
+                    }
                 }
             }
             this.joinElements[tableObj.table].on.push(
