@@ -1674,8 +1674,8 @@ services:
     depends_on:
       alp-dataflow-gen-init:
         condition: service_completed_successfully
-      # alp-docker-server:
-      #   condition: service_healthy
+      alp-docker-server:
+        condition: service_healthy
     healthcheck:
       interval: 20s
       retries: 30
@@ -1708,44 +1708,44 @@ services:
       DOCKER_CERT_PATH: /certs/client/
       DOCKER_TLS_VERIFY: false
 
-  # alp-dataflow-gen-docker-worker:
-  #   extends: alp-dataflow-gen-process-worker
-  #   container_name: &c32 alp-dataflow-gen-docker-worker-${BASE_PORT:-1}
-  #   hostname: alp-dataflow-gen-docker-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   networks:
-  #     data:
-  #       priority: 20
-  #   logging:
-  #     options:
-  #       tag: *c32
-  #   environment:
-  #     PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
-  #     PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
-  #     DOCKER_HOST: "tcp://dind:2376"
-  #     DOCKER_CERT_PATH: /certs/client/
-  #     DOCKER_TLS_VERIFY: false
+  alp-dataflow-gen-docker-worker:
+    extends: alp-dataflow-gen-process-worker
+    container_name: &c32 alp-dataflow-gen-docker-worker-${BASE_PORT:-1}
+    hostname: alp-dataflow-gen-docker-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
+    networks:
+      data:
+        priority: 20
+    logging:
+      options:
+        tag: *c32
+    environment:
+      PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
+      PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
+      DOCKER_HOST: "tcp://dind:2376"
+      DOCKER_CERT_PATH: /certs/client/
+      DOCKER_TLS_VERIFY: false
 
-  # alp-docker-server:
-  #   image: docker:dind
-  #   container_name: &c33 alp-docker-server-${BASE_PORT:-1}
-  #   hostname: dind
-  #   networks:
-  #     data:
-  #       priority: 20
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 30
-  #     start_period: 30s
-  #     test: ["CMD-SHELL", "netstat -ltn | grep -c :::2376"]
-  #     timeout: 10s
-  #   logging:
-  #     options:
-  #       tag: *c33
-  #   privileged: true
-  #   volumes:
-  #     - dind-certs:/certs
-  #   environment:
-  #     DOCKER_TLS_CERTDIR: /certs
+  alp-docker-server:
+    image: docker:dind
+    container_name: &c33 alp-docker-server-${BASE_PORT:-1}
+    hostname: dind
+    networks:
+      data:
+        priority: 20
+    healthcheck:
+      interval: 20s
+      retries: 30
+      start_period: 30s
+      test: ["CMD-SHELL", "netstat -ltn | grep -c :::2376"]
+      timeout: 10s
+    logging:
+      options:
+        tag: *c33
+    privileged: true
+    volumes:
+      - dind-certs:/certs
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
 
   alp-perseus-files-manager:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
