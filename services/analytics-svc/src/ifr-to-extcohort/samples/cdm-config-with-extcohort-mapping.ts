@@ -48,6 +48,7 @@ export default {
                 order: 15,
                 parentInteraction: [],
                 parentInteractionLabel: "parent",
+                cohortDefinitionKey: "ConditionEra",
                 attributes: {
                     conditionname: {
                         name: [
@@ -448,6 +449,7 @@ export default {
                 order: 14,
                 parentInteraction: [],
                 parentInteractionLabel: "parent",
+                cohortDefinitionKey: "ConditionOccurrence",
                 attributes: {
                     visitoccurrenceid: {
                         name: [
@@ -534,6 +536,7 @@ export default {
                         type: "time",
                         expression: '@COND."CONDITION_END_DATE"',
                         order: 12,
+                        cohortDefinitionKey: "OccurrenceEndDate",
                     },
                     startdate: {
                         name: [
@@ -577,6 +580,7 @@ export default {
                         type: "time",
                         expression: '@COND."CONDITION_START_DATE"',
                         order: 11,
+                        cohortDefinitionKey: "OccurrenceStartDate",
                     },
                     pid: {
                         name: [
@@ -1119,6 +1123,7 @@ export default {
                 order: 13,
                 parentInteraction: [],
                 parentInteractionLabel: "parent",
+                cohortDefinitionKey: "Death",
                 attributes: {
                     deathtypeconceptcode: {
                         name: [
@@ -1340,6 +1345,7 @@ export default {
                             "@REF.\"DOMAIN_ID\" = 'Type Concept' AND @REF.\"CONCEPT_CLASS_ID\" = 'Death Type' AND (@REF.\"CONCEPT_NAME\") LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
                         referenceExpression: '@REF."CONCEPT_NAME"',
                         order: 4,
+                        cohortDefinitionKey: "DeathType",
                     },
                 },
             },
@@ -2282,6 +2288,7 @@ export default {
                 order: 10,
                 parentInteraction: [],
                 parentInteractionLabel: "parent",
+                cohortDefinitionKey: "DrugEra",
                 attributes: {
                     enddate: {
                         name: [
@@ -2325,6 +2332,7 @@ export default {
                         type: "time",
                         expression: '@DRUGERA."DRUG_ERA_END_DATE"',
                         order: 7,
+                        cohortDefinitionKey: "EraEndDate",
                     },
                     startdate: {
                         name: [
@@ -2368,6 +2376,7 @@ export default {
                         type: "time",
                         expression: '@DRUGERA."DRUG_ERA_START_DATE"',
                         order: 6,
+                        cohortDefinitionKey: "EraStartDate",
                     },
                     drugname: {
                         name: [
@@ -9603,6 +9612,7 @@ export default {
                     "@REF.\"DOMAIN_ID\" = 'Gender' AND @REF.\"STANDARD_CONCEPT\" = 'S' AND (@REF.\"CONCEPT_NAME\") LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
                 referenceExpression: '@REF."CONCEPT_NAME"',
                 order: 8,
+                cohortDefinitionKey: "Gender",
             },
             Ethnicity: {
                 name: [
@@ -10136,6 +10146,7 @@ export default {
                 type: "num",
                 expression: 'YEAR(CURRENT_DATE) - @PATIENT."YEAR_OF_BIRTH"',
                 order: 0,
+                cohortDefinitionKey: "Age",
             },
             groupID: {
                 name: [
@@ -10523,22 +10534,6 @@ export default {
         },
         guardedTableMapping: {
             "@PATIENT": "$$SCHEMA$$.person",
-        },
-        // This mapping could be added into each attribute as a key/value,
-        // however it was easier to develop with clear view of what was mapped.
-        // To do this will require some refactoring to target the new value.
-        extCohortDefinitionTableMapping: {
-            "@COND": "ConditionOccurrence",
-            '@COND."CONDITION_START_DATE"': "OccurrenceStartDate",
-            '@COND."CONDITION_END_DATE"': "OccurrenceEndDate",
-            '@PATIENT."GENDER"': "Gender",
-            'YEAR(CURRENT_DATE) - @PATIENT."YEAR_OF_BIRTH"': "Age",
-            "@CONDERA": "ConditionEra",
-            "@DEATH": "Death",
-            '@DEATH."DEATH_TYPE_NAME"': "DeathType",
-            "@DRUGERA": "DrugEra",
-            '@DRUGERA."DRUG_ERA_START_DATE"': "EraStartDate",
-            '@DRUGERA."DRUG_ERA_END_DATE"': "EraEndDate",
         },
         language: ["en", "de", "fr", "es", "pt", "zh"],
         others: {},

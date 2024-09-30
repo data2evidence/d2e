@@ -69,6 +69,9 @@ export const getExtCohortInfoForAttribute = (
     const typePath = `${path}.type`;
     const type: CdmAttributeType | null = _.get(cdmConfig, typePath) || null;
     const key: string | null = _.get(cdmConfig, keyPath) || null;
+    if (!key) {
+        return null;
+    }
     return { key, type };
 };
 
