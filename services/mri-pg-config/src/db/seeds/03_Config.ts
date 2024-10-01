@@ -31609,7 +31609,7 @@ const paConfigDuckdb = {
       "domainValuesLimit": 5000,
       "calcViewAccessPoint": true,
       "externalAccessPoints": true,
-      "cohortEntryExit": false
+      "cohortEntryExit": true
   }
 };
 

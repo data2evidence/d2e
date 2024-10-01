@@ -31,6 +31,10 @@ export class Query extends Expression {
         this.__relationship.push(rel);
     }
 
+    insertRelationship(rel: Relationship) {
+        this.__relationship.unshift(rel);
+    }
+
     addGroupBy(grpBy: GroupBy) {
         this.__groupBy.push(grpBy);
     }
