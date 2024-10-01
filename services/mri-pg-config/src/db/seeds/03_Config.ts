@@ -95,7 +95,7 @@ export async function seed(knex: Knex): Promise<void> {
     .ignore();
 }
 
-const cdwConfig = {
+export const cdwConfig = {
   patient: {
     conditions: {},
     interactions: {
@@ -218,6 +218,7 @@ const cdwConfig = {
             type: "time",
             expression: '@CONDERA."CONDITION_ERA_START_DATE"',
             order: 1,
+            cohortDefinitionKey: "EraStartDate",
           },
           enddate: {
             name: "End Date",
@@ -256,6 +257,7 @@ const cdwConfig = {
             type: "time",
             expression: '@CONDERA."CONDITION_ERA_END_DATE"',
             order: 2,
+            cohortDefinitionKey: "EraEndDate",
           },
           count: {
             name: "Condition Occurrence Count",
@@ -498,6 +500,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "ConditionEra",
       },
       conditionoccurrence: {
         name: "Condition Occurrence",
@@ -614,6 +617,7 @@ const cdwConfig = {
             type: "time",
             expression: '@COND."CONDITION_END_DATE"',
             order: 1,
+            cohortDefinitionKey: "OccurrenceEndDate",
           },
           startdate: {
             name: "Start Date",
@@ -652,6 +656,7 @@ const cdwConfig = {
             type: "time",
             expression: '@COND."CONDITION_START_DATE"',
             order: 2,
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           pid: {
             name: "Patient Id",
@@ -732,6 +737,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 4,
             useRefValue: true,
+            cohortDefinitionKey: "ConditionStatus",
           },
           conditionsource: {
             name: "Condition Source",
@@ -812,6 +818,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 6,
             useRefValue: true,
+            cohortDefinitionKey: "ConditionType",
           },
           conditionname: {
             name: "Condition Name",
@@ -1381,6 +1388,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "ConditionOccurrence",
       },
       death: {
         name: "Death",
@@ -1618,6 +1626,7 @@ const cdwConfig = {
             type: "time",
             expression: '@DEATH."DEATH_DATE"',
             order: 4,
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           deathtype: {
             name: "Death Type",
@@ -1660,6 +1669,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 5,
             useRefValue: true,
+            cohortDefinitionKey: "DeathType",
           },
           deathtypeconceptid: {
             name: "Death Type concept id",
@@ -1702,6 +1712,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "Death",
       },
       deviceexposure: {
         name: "Device Exposure",
@@ -1818,6 +1829,7 @@ const cdwConfig = {
             type: "time",
             expression: '@DEVEXP."DEVICE_EXPOSURE_START_DATE"',
             order: 1,
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           devicename: {
             name: "Device Name",
@@ -1860,6 +1872,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 2,
             useRefValue: true,
+            cohortDefinitionKey: "OccurrenceEndDate",
           },
           pid: {
             name: "Patient Id",
@@ -1978,6 +1991,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 5,
             useRefValue: true,
+            cohortDefinitionKey: "DeviceType",
           },
           deviceconceptcode: {
             name: "Device concept code",
@@ -2229,6 +2243,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "DeviceExposure",
       },
       doseera: {
         name: "Dose Era",
@@ -2311,6 +2326,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 0,
             useRefValue: true,
+            cohortDefinitionKey: "Unit",
           },
           drug: {
             name: "Drug",
@@ -2429,6 +2445,7 @@ const cdwConfig = {
             type: "time",
             expression: '@DOSEERA."DOSE_ERA_END_DATE"',
             order: 3,
+            cohortDefinitionKey: "EraEndDate",
           },
           startdate: {
             name: "Start Date",
@@ -2467,6 +2484,7 @@ const cdwConfig = {
             type: "time",
             expression: '@DOSEERA."DOSE_ERA_START_DATE"',
             order: 4,
+            cohortDefinitionKey: "EraStartDate",
           },
           dosevalue: {
             name: "Dose Value",
@@ -2505,6 +2523,7 @@ const cdwConfig = {
             type: "num",
             expression: '@DOSEERA."DOSE_VALUE"',
             order: 5,
+            cohortDefinitionKey: "DoseValue",
           },
           doseeraid: {
             name: "Dose Era Id",
@@ -2791,6 +2810,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "DoseEra",
       },
       drugera: {
         name: "Drug Era",
@@ -2869,6 +2889,7 @@ const cdwConfig = {
             type: "time",
             expression: '@DRUGERA."DRUG_ERA_END_DATE"',
             order: 0,
+            cohortDefinitionKey: "EraEndDate",
           },
           startdate: {
             name: "Start Date",
@@ -2907,6 +2928,7 @@ const cdwConfig = {
             type: "time",
             expression: '@DRUGERA."DRUG_ERA_START_DATE"',
             order: 1,
+            cohortDefinitionKey: "EraStartDate",
           },
           drugname: {
             name: "Drug Name",
@@ -3226,6 +3248,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "DrugEra",
       },
       drugexposure: {
         name: "Drug Exposure",
@@ -3342,6 +3365,7 @@ const cdwConfig = {
             type: "num",
             expression: 'CAST (@DRUGEXP."REFILLS" AS VARCHAR)',
             order: 1,
+            cohortDefinitionKey: "Refills",
           },
           startdatetime: {
             name: "Start Date/Time",
@@ -3456,6 +3480,7 @@ const cdwConfig = {
             type: "time",
             expression: '@DRUGEXP."DRUG_EXPOSURE_END_DATE"',
             order: 4,
+            cohortDefinitionKey: "OccurrenceEndDate",
           },
           drugtype: {
             name: "Drug Type",
@@ -3498,6 +3523,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 5,
             useRefValue: true,
+            cohortDefinitionKey: "DrugType",
           },
           startdate: {
             name: "Start Date",
@@ -3536,6 +3562,7 @@ const cdwConfig = {
             type: "time",
             expression: '@DRUGEXP."DRUG_EXPOSURE_START_DATE"',
             order: 6,
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           drugname: {
             name: "Drug Name",
@@ -3848,6 +3875,7 @@ const cdwConfig = {
             type: "num",
             expression: 'CAST (@DRUGEXP."DAYS_SUPPLY" AS VARCHAR)',
             order: 14,
+            cohortDefinitionKey: "DaysSupply",
           },
           drugconceptcode: {
             name: "Drug concept code",
@@ -4228,6 +4256,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "DrugExposure",
       },
       measurement: {
         name: "Measurement",
@@ -4306,6 +4335,7 @@ const cdwConfig = {
             type: "num",
             expression: '@MEAS."VALUE_AS_NUMBER"',
             order: 0,
+            cohortDefinitionKey: "ValueAsNumber",
           },
           measurementname: {
             name: "Measurement name",
@@ -4384,6 +4414,7 @@ const cdwConfig = {
               "@REF.CONCEPT_CLASS_ID = 'Measurement' AND (@REF.CONCEPT_NAME) LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 2,
+            cohortDefinitionKey: "MeasurementType",
           },
           measurementdate: {
             name: "Measurement date",
@@ -4422,6 +4453,7 @@ const cdwConfig = {
             type: "time",
             expression: '@MEAS."MEASUREMENT_DATE"',
             order: 3,
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           pid: {
             name: "Patient Id",
@@ -4536,6 +4568,7 @@ const cdwConfig = {
             type: "text",
             expression: '@MEAS."MEASUREMENT_VALUE_NAME"',
             order: 6,
+            cohortDefinitionKey: "ValueAsConcept",
           },
           measurementconceptcode: {
             name: "Measurement concept code",
@@ -5018,6 +5051,7 @@ const cdwConfig = {
             order: 18,
           },
         },
+        cohortDefinitionKey: "Measurement",
       },
       observation: {
         name: "Observation",
@@ -5100,6 +5134,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 0,
             useRefValue: true,
+            cohortDefinitionKey: "Unit",
           },
           obsdatetime: {
             name: "Observation Date/Time",
@@ -5214,6 +5249,7 @@ const cdwConfig = {
             type: "time",
             expression: '@OBS."OBSERVATION_DATE"',
             order: 3,
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           observationid: {
             name: "Observation Id",
@@ -5374,6 +5410,7 @@ const cdwConfig = {
             type: "text",
             expression: '@OBS."VALUE_NAME"',
             order: 7,
+            cohortDefinitionKey: "ValueAsString",
           },
           verbatimtext: {
             name: "Value (verbatim)",
@@ -5450,6 +5487,7 @@ const cdwConfig = {
             type: "num",
             expression: '@OBS."VALUE_AS_NUMBER"',
             order: 9,
+            cohortDefinitionKey: "ValueAsNumber",
           },
           obstype: {
             name: "Observation type",
@@ -6109,6 +6147,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "Observation",
       },
       obsperiod: {
         name: "Observation Period",
@@ -6187,6 +6226,7 @@ const cdwConfig = {
             type: "time",
             expression: '@OBSPER."OBSERVATION_PERIOD_END_DATE"',
             order: 0,
+            cohortDefinitionKey: "PeriodEndDate",
           },
           startdate: {
             name: "Start Date",
@@ -6225,6 +6265,7 @@ const cdwConfig = {
             type: "time",
             expression: '@OBSPER."OBSERVATION_PERIOD_START_DATE"',
             order: 1,
+            cohortDefinitionKey: "PeriodStartDate",
           },
           pid: {
             name: "Patient Id",
@@ -6305,6 +6346,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 3,
             useRefValue: true,
+            cohortDefinitionKey: "PeriodType",
           },
           obsperiodid: {
             name: "Observation period Id",
@@ -6471,6 +6513,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "ObservationPeriod",
       },
       ppperiod: {
         name: "Payer Plan Period",
@@ -6549,6 +6592,7 @@ const cdwConfig = {
             type: "time",
             expression: '@PPPER."PAYER_PLAN_PERIOD_END_DATE"',
             order: 0,
+            cohortDefinitionKey: "PeriodEndDate",
           },
           startdate: {
             name: "Start Date",
@@ -6587,6 +6631,7 @@ const cdwConfig = {
             type: "time",
             expression: '@PPPER."PAYER_PLAN_PERIOD_START_DATE"',
             order: 1,
+            cohortDefinitionKey: "PeriodStartDate",
           },
           pid: {
             name: "Patient Id",
@@ -6665,6 +6710,7 @@ const cdwConfig = {
             order: 3,
           },
         },
+        cohortDefinitionKey: "PayerPlanPeriod",
       },
       proc: {
         name: "Procedure Occurrence",
@@ -6743,6 +6789,7 @@ const cdwConfig = {
             type: "datetime",
             expression: '@PROC."PROCEDURE_DATETIME"',
             order: 0,
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           procconceptid: {
             name: "Procedure Occurrence Id",
@@ -6857,6 +6904,7 @@ const cdwConfig = {
             type: "time",
             expression: '@PROC."PROCEDURE_DATE"',
             order: 3,
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           qty: {
             name: "Quantity",
@@ -6895,6 +6943,7 @@ const cdwConfig = {
             type: "num",
             expression: 'CAST (@PROC."QUANTITY" AS VARCHAR)',
             order: 4,
+            cohortDefinitionKey: "Quantity",
           },
           procname: {
             name: "Procedure name",
@@ -6976,6 +7025,7 @@ const cdwConfig = {
             type: "text",
             expression: '@PROC."MODIFIER_NAME"',
             order: 6,
+            cohortDefinitionKey: "Modifier",
           },
           pid: {
             name: "Patient Id",
@@ -7057,6 +7107,7 @@ const cdwConfig = {
             order: 8,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ProcedureType",
           },
           procconceptcode: {
             name: "Procedure concept code",
@@ -7342,6 +7393,7 @@ const cdwConfig = {
             order: 15,
           },
         },
+        cohortDefinitionKey: "ProcedureOccurrence",
       },
       specimen: {
         name: "Specimen",
@@ -7424,6 +7476,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 0,
             useRefValue: true,
+            cohortDefinitionKey: "SpecimenType",
           },
           diseasestatus: {
             name: "Disease status",
@@ -7466,6 +7519,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 1,
             useRefValue: true,
+            cohortDefinitionKey: "DiseaseStatus",
           },
           specimenname: {
             name: "Specimen name",
@@ -7550,6 +7604,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 3,
             useRefValue: true,
+            cohortDefinitionKey: "AnatomicSite",
           },
           pid: {
             name: "Patient Id",
@@ -7668,6 +7723,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 6,
             useRefValue: true,
+            cohortDefinitionKey: "Unit",
           },
           quantity: {
             name: "Quantity",
@@ -7706,6 +7762,7 @@ const cdwConfig = {
             type: "num",
             expression: '@SPEC."QUANTITY"',
             order: 7,
+            cohortDefinitionKey: "Quantity",
           },
           specimendatetime: {
             name: "Specimen Date/Time",
@@ -7744,6 +7801,7 @@ const cdwConfig = {
             type: "datetime",
             expression: '@SPEC."SPECIMEN_DATETIME"',
             order: 8,
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           specimendate: {
             name: "Specimen Date",
@@ -7782,6 +7840,7 @@ const cdwConfig = {
             type: "time",
             expression: '@SPEC."SPECIMEN_DATE"',
             order: 9,
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           specimenconceptcode: {
             name: "Specimen concept code",
@@ -8414,6 +8473,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "Specimen",
       },
       visit: {
         name: "Visit",
@@ -8492,6 +8552,7 @@ const cdwConfig = {
             type: "time",
             expression: '@VISIT."VISIT_END_DATE"',
             order: 0,
+            cohortDefinitionKey: "VisitDetailEndDate",
           },
           startdate: {
             name: "Start Date",
@@ -8530,6 +8591,7 @@ const cdwConfig = {
             type: "time",
             expression: '@VISIT."VISIT_START_DATE"',
             order: 1,
+            cohortDefinitionKey: "VisitDetailStartDate",
           },
           pid: {
             name: "Patient Id",
@@ -8610,6 +8672,7 @@ const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 3,
             useRefValue: true,
+            cohortDefinitionKey: "VisitDetailTypeCS",
           },
           visitname: {
             name: "Visit name",
@@ -8941,6 +9004,7 @@ const cdwConfig = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "VisitDetail",
       },
       Consent_74db26d2_bb75_489a_a841_051c85dc897b: {
         name: "Consent",
