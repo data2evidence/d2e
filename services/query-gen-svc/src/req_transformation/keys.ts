@@ -87,6 +87,7 @@ export const TERM_OPERANDTYPE_SQLFUNCTION = "sqlFunction";
 /***************************DEFINITION NAMES***************************/
 export const DEF_PATIENTREQUEST = "PatientRequest";
 export const DEF_PATIENTREQUESTS = "PatientRequests";
+export const DEF_PATIENT_REQUEST_ENTRYEXIT = "PatientRequestEntryExit";
 export const DEF_AGGREGATE = "MeasurePopulation";
 
 /***************************MRI CONTEXT***************************/
