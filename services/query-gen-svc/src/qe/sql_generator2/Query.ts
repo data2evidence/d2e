@@ -1,9 +1,8 @@
 import { AstElement } from "./AstElement";
 import { JoinState } from "./JoinState";
 import { Operator } from "./Operator";
-import { QueryObject as qo, assert } from "@alp/alp-base-utils";
+import { QueryObject as qo, assert, isPropExists } from "@alp/alp-base-utils";
 import QueryObject = qo.QueryObject;
-import { isPropExists, sqlFormat } from "@alp/alp-base-utils";
 import { Statement } from "./Statement";
 
 export class Query extends AstElement {
@@ -93,6 +92,17 @@ export class Query extends AstElement {
                     )
                 );
             }
+        }
+        
+        if (this.joinState && this.joinState["patientId"].indexOf("PEE") > -1 && this.node.measure?.length > 0) {
+            queryObjects.push(
+                QueryObject.format(
+                    ", %Q",
+                    QueryObject.format(", ").join(
+                        this.node.measure.map((x) => x.getSQLWithAlias())
+                    )
+                )
+            );
         }
 
         queryObjects.push(
