@@ -1791,6 +1791,7 @@ export const cdwConfig = {
             type: "time",
             expression: '@DEVEXP."DEVICE_EXPOSURE_END_DATE"',
             order: 0,
+            cohortDefinitionKey: "OccurrenceEndDate",
           },
           startdate: {
             name: "Start Date",
@@ -4695,6 +4696,7 @@ export const cdwConfig = {
             order: 9,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "MeasurementType",
           },
           valueasconceptcode: {
             name: "Value as concept code",
@@ -8222,6 +8224,7 @@ export const cdwConfig = {
             order: 18,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "SpecimenType",
           },
           anatomicsiteconceptid: {
             name: "Anatomic site concept id",
@@ -8388,6 +8391,7 @@ export const cdwConfig = {
             order: 22,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DiseaseStatus",
           },
           unitconceptid: {
             name: "Unit concept id",
@@ -8471,6 +8475,7 @@ export const cdwConfig = {
             order: 24,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
           },
         },
         cohortDefinitionKey: "Specimen",
@@ -10614,6 +10619,7 @@ export const cdwConfig = {
         referenceExpression: "@REF.CONCEPT_NAME",
         order: 6,
         useRefValue: true,
+        cohortDefinitionKey: "Race",
       },
       Gender: {
         name: "Gender",
@@ -10656,6 +10662,7 @@ export const cdwConfig = {
         referenceExpression: "@REF.CONCEPT_NAME",
         order: 7,
         useRefValue: true,
+        cohortDefinitionKey: "Gender",
       },
       Ethnicity: {
         name: "Ethnicity",
@@ -10698,6 +10705,7 @@ export const cdwConfig = {
         referenceExpression: "@REF.CONCEPT_NAME",
         order: 8,
         useRefValue: true,
+        cohortDefinitionKey: "Ethnicity",
       },
       State: {
         name: "State",
@@ -11255,6 +11263,7 @@ export const cdwConfig = {
         type: "num",
         expression: 'YEAR(CURRENT_DATE) - @PATIENT."YEAR_OF_BIRTH"',
         order: 22,
+        cohortDefinitionKey: "Age",
       },
       groupID: {
         name: "Group ID",
@@ -18746,6 +18755,7 @@ export const cdwConfigDuckdb = {
             order: 0,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "DeathType",
           },
         },
         cohortDefinitionKey: "Death",
@@ -18839,6 +18849,7 @@ export const cdwConfigDuckdb = {
             order: 1,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceEndDate",
           },
           startdate: {
             name: [
@@ -21316,6 +21327,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "MeasurementType",
           },
           valueasconceptset: {
             name: [
@@ -22441,6 +22453,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
           },
           obsconceptid: {
             name: [
@@ -23516,6 +23529,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ProcedureType",
           },
           modifierconceptid: {
             name: [
@@ -24176,6 +24190,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "SpecimenType",
           },
           anatomicsiteconceptid: {
             name: [
@@ -24273,6 +24288,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "AnatomicSite",
           },
           diseasestatusconceptid: {
             name: [
@@ -24370,6 +24386,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DiseaseStatus",
           },
           unitconceptid: {
             name: [
@@ -24467,6 +24484,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
           },
           specimen_concept_name: {
             name: [
@@ -27184,6 +27202,7 @@ export const cdwConfigDuckdb = {
         standardConceptCodeFilter: "",
         useRefValue: true,
         useRefText: true,
+        cohortDefinitionKey: "Gender",
       },
       raceconceptid: {
         name: [
@@ -27278,6 +27297,7 @@ export const cdwConfigDuckdb = {
         order: 24,
         domainFilter: "",
         standardConceptCodeFilter: "",
+        cohortDefinitionKey: "Age",
       },
       raceName: {
         name: [
@@ -27330,6 +27350,7 @@ export const cdwConfigDuckdb = {
         standardConceptCodeFilter: "",
         useRefValue: true,
         useRefText: true,
+        cohortDefinitionKey: "Race",
       },
       ethnicityName: {
         name: [
@@ -27382,6 +27403,7 @@ export const cdwConfigDuckdb = {
         standardConceptCodeFilter: "",
         useRefValue: true,
         useRefText: true,
+        cohortDefinitionKey: "Ethnicity",
       },
     },
   },
