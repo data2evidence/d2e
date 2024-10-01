@@ -56,7 +56,7 @@ on:
         default: true
 
 env:
-  DOCKER_TAG_NAME: ${{ inputs.docker-tag-textbox || 'develop' }}
+  DOCKER_TAG_NAME: ${{ inputs.docker-tag-textbox || 'rc-v0.4.0-beta' }}
   ENV_NAME: ${{ inputs.env }}
   ENV_TYPE: remote
 
