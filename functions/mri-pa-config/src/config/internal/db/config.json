@@ -2554,7 +2554,8 @@
     "domainValuesLimit": 50,
     "maxFiltercardCount": 10,
     "calcViewAccessPoint": true,
-    "externalAccessPoints": true
+    "externalAccessPoints": true,
+    "cohortEntryExit": false
   },
   "configInformations": {
     "note": "This is a demo configuration for Patient Analytics, and should be replaced with a proper configuration."
