@@ -1,18 +1,18 @@
 import { Node } from "./Node";
 import { With } from "./With";
 import { Where } from "./Where";
-import { DataModelTypeExpression } from "./OperandFactory";
+import { DataModelTypeExpression, BaseOperandExpressionRef } from "./OperandFactory";
 import { FastUtil } from "../fast_util";
 
 export class Relationship extends Node {
     private __alias: string;
     private __type: string;
-    private __expression: DataModelTypeExpression;
+    private __expression: DataModelTypeExpression | BaseOperandExpressionRef;
     private __with: With;
     private __join: any[];
     private __joinUsingConditionId: boolean;
 
-    constructor(alias: string, type: string, expression: DataModelTypeExpression, relList: any[], join?: any[], __joinUsingConditionId?: boolean) {
+    constructor(alias: string, type: string, expression: DataModelTypeExpression | BaseOperandExpressionRef, relList: any[], join?: any[], __joinUsingConditionId?: boolean) {
         super();
         this.__alias = alias;
         this.__type = type;
