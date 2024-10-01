@@ -17337,7 +17337,7 @@ const paConfig = {
   },
 };
 
-const cdwConfigDuckdb = {
+export const cdwConfigDuckdb = {
   patient: {
     conditions: {},
     interactions: {
@@ -17430,6 +17430,7 @@ const cdwConfigDuckdb = {
             order: 1,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "EraStartDate",
           },
           enddate: {
             name: [
@@ -17475,6 +17476,7 @@ const cdwConfigDuckdb = {
             order: 2,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "EraEndDate",
           },
           count: {
             name: [
@@ -17712,6 +17714,7 @@ const cdwConfigDuckdb = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "ConditionEra",
       },
       conditionoccurrence: {
         name: [
@@ -17847,6 +17850,7 @@ const cdwConfigDuckdb = {
             order: 2,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceEndDate",
           },
           startdate: {
             name: [
@@ -17892,6 +17896,7 @@ const cdwConfigDuckdb = {
             order: 3,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           pid: {
             name: [
@@ -18415,6 +18420,7 @@ const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
           },
         },
+        cohortDefinitionKey: "ConditionOccurrence",
       },
       death: {
         name: [
@@ -18642,6 +18648,7 @@ const cdwConfigDuckdb = {
             order: 5,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           deathtypeconceptid: {
             name: [
@@ -18741,6 +18748,7 @@ const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
           },
         },
+        cohortDefinitionKey: "Death",
       },
       deviceexposure: {
         name: [
@@ -18876,6 +18884,7 @@ const cdwConfigDuckdb = {
             order: 2,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           pid: {
             name: [
@@ -19212,6 +19221,7 @@ const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
           },
         },
+        cohortDefinitionKey: "DeviceExposure",
       },
       doseera: {
         name: [
@@ -19347,6 +19357,7 @@ const cdwConfigDuckdb = {
             order: 3,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "EraEndDate",
           },
           startdate: {
             name: [
@@ -19392,6 +19403,7 @@ const cdwConfigDuckdb = {
             order: 4,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "EraStartDate",
           },
           dosevalue: {
             name: [
@@ -19437,6 +19449,7 @@ const cdwConfigDuckdb = {
             order: 5,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "DoseValue",
           },
           doseeraid: {
             name: [
@@ -19678,6 +19691,7 @@ const cdwConfigDuckdb = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "DoseEra",
       },
       drugera: {
         name: [
@@ -19768,6 +19782,7 @@ const cdwConfigDuckdb = {
             order: 0,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "EraEndDate",
           },
           startdate: {
             name: [
@@ -19813,6 +19828,7 @@ const cdwConfigDuckdb = {
             order: 1,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "EraStartDate",
           },
           pid: {
             name: [
@@ -20092,6 +20108,7 @@ const cdwConfigDuckdb = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "DrugEra",
       },
       drugexposure: {
         name: [
@@ -20227,6 +20244,7 @@ const cdwConfigDuckdb = {
             order: 2,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "Refills",
           },
           startdatetime: {
             name: [
@@ -20362,6 +20380,7 @@ const cdwConfigDuckdb = {
             order: 5,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceEndDate",
           },
           startdate: {
             name: [
@@ -20407,6 +20426,7 @@ const cdwConfigDuckdb = {
             order: 7,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           lotnumber: {
             name: [
@@ -20677,6 +20697,7 @@ const cdwConfigDuckdb = {
             order: 15,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "DaysSupply",
           },
           drugconceptid: {
             name: [
@@ -21020,6 +21041,7 @@ const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
           },
         },
+        cohortDefinitionKey: "DrugExposure",
       },
       measurement: {
         name: [
@@ -21110,6 +21132,7 @@ const cdwConfigDuckdb = {
             order: 1,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "ValueAsNumber",
           },
           measurementdate: {
             name: [
@@ -21155,6 +21178,7 @@ const cdwConfigDuckdb = {
             order: 4,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           pid: {
             name: [
@@ -21671,6 +21695,7 @@ const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
           },
         },
+        cohortDefinitionKey: "Measurement",
       },
       observation: {
         name: [
@@ -21851,6 +21876,7 @@ const cdwConfigDuckdb = {
             order: 4,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           observationid: {
             name: [
@@ -21986,6 +22012,7 @@ const cdwConfigDuckdb = {
             order: 10,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "ValueAsNumber",
           },
           obsconceptset: {
             name: [
@@ -22516,6 +22543,7 @@ const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
           },
         },
+        cohortDefinitionKey: "Observation",
       },
       obsperiod: {
         name: [
@@ -22606,6 +22634,7 @@ const cdwConfigDuckdb = {
             order: 0,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "PeriodEndDate",
           },
           startdate: {
             name: [
@@ -22651,6 +22680,7 @@ const cdwConfigDuckdb = {
             order: 1,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "PeriodStartDate",
           },
           pid: {
             name: [
@@ -22840,6 +22870,7 @@ const cdwConfigDuckdb = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "ObservationPeriod",
       },
       ppperiod: {
         name: [
@@ -22930,6 +22961,7 @@ const cdwConfigDuckdb = {
             order: 0,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "PeriodEndDate",
           },
           startdate: {
             name: [
@@ -22975,6 +23007,7 @@ const cdwConfigDuckdb = {
             order: 1,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "PeriodStartDate",
           },
           pid: {
             name: [
@@ -23067,6 +23100,7 @@ const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
           },
         },
+        cohortDefinitionKey: "PayerPlanPeriod",
       },
       proc: {
         name: [
@@ -23157,6 +23191,7 @@ const cdwConfigDuckdb = {
             order: 1,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           procconceptid: {
             name: [
@@ -23292,6 +23327,7 @@ const cdwConfigDuckdb = {
             order: 4,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           qty: {
             name: [
@@ -23337,6 +23373,7 @@ const cdwConfigDuckdb = {
             order: 5,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "Quantity",
           },
           pid: {
             name: [
@@ -23671,6 +23708,7 @@ const cdwConfigDuckdb = {
             useRefText: true,
           },
         },
+        cohortDefinitionKey: "ProcedureOccurrence",
       },
       specimen: {
         name: [
@@ -23851,6 +23889,7 @@ const cdwConfigDuckdb = {
             order: 8,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "Quantity",
           },
           specimendatetime: {
             name: [
@@ -23896,6 +23935,7 @@ const cdwConfigDuckdb = {
             order: 9,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           specimendate: {
             name: [
@@ -23941,6 +23981,7 @@ const cdwConfigDuckdb = {
             order: 10,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "OccurrenceStartDate",
           },
           specimenconceptid: {
             name: [
@@ -24478,6 +24519,7 @@ const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
           },
         },
+        cohortDefinitionKey: "Specimen",
       },
       visit: {
         name: [
@@ -24568,6 +24610,7 @@ const cdwConfigDuckdb = {
             order: 1,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "VisitDetailEndDate",
           },
           startdate: {
             name: [
@@ -24613,6 +24656,7 @@ const cdwConfigDuckdb = {
             order: 2,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "VisitDetailStartDate",
           },
           pid: {
             name: [
@@ -24949,6 +24993,7 @@ const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
           },
         },
+        cohortDefinitionKey: "VisitDetail",
       },
       Consent_74db26d2_bb75_489a_a841_051c85dc897b: {
         name: [
