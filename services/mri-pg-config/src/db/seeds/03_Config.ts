@@ -860,7 +860,7 @@ export const cdwConfig = {
               "@REF.DOMAIN_ID = 'Condition' AND @REF.STANDARD_CONCEPT = 'S' AND (@REF.CONCEPT_NAME) LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 7,
-            conceptSetType: "name",
+            conceptIdentifierType: "name",
             useRefValue: true,
           },
           conditionoccurrenceid: {

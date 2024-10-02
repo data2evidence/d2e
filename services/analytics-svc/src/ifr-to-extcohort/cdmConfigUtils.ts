@@ -168,10 +168,10 @@ const extractConceptSets = async (
                 continue;
             }
 
-            const conceptSetType: "name" | "code" | "id" | null =
+            const conceptIdentifierType: "name" | "code" | "id" | null =
                 _.get(
                     cdmConfig,
-                    `${filter.attributes?.content?.[0].configPath}.conceptSetType`
+                    `${filter.attributes?.content?.[0].configPath}.conceptIdentifierType`
                 ) || null;
             const type:
                 | "text"
@@ -188,19 +188,19 @@ const extractConceptSets = async (
             if (type === "conceptSet") {
                 // TODO: get all the concepts and use them
             }
-            // TODO: Handle getting concept values for different types of conceptSetTypes
-            // Only interactions with conceptSetType use concept sets in ATLAS.
+            // TODO: Handle getting concept values for different types of conceptIdentifierTypes
+            // Only interactions with conceptIdentifierType use concept sets in ATLAS.
             // Other string type attributes may use concepts, but do not use concept sets.
-            // conceptSetTypes include "name", "code", "id", to specify which column of concept to select from.
+            // conceptIdentifierTypes include "name", "code", "id", to specify which column of concept to select from.
             // Sole example found in cdm-config-with-extCohort-mapping.ts:804
-            if (!conceptSetType) {
+            if (!conceptIdentifierType) {
                 continue;
             }
-            if (conceptSetType === "name") {
+            if (conceptIdentifierType === "name") {
             }
-            if (conceptSetType === "code") {
+            if (conceptIdentifierType === "code") {
             }
-            if (conceptSetType === "id") {
+            if (conceptIdentifierType === "id") {
             }
             const concept = await getConceptByName({
                 conceptName,

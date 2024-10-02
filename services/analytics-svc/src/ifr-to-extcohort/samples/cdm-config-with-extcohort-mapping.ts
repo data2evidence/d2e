@@ -805,7 +805,7 @@ export default {
                             "@REF.\"DOMAIN_ID\" = 'Condition' AND @REF.\"STANDARD_CONCEPT\" = 'S' AND (@REF.\"CONCEPT_NAME\") LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
                         referenceExpression: '@REF."CONCEPT_NAME"',
                         order: 3,
-                        conceptSetType: "name",
+                        conceptIdentifierType: "name",
                     },
                     conditionoccurrenceid: {
                         name: [
@@ -2422,7 +2422,7 @@ export default {
                         referenceFilter:
                             "@REF.\"DOMAIN_ID\" = 'Drug' AND @REF.\"STANDARD_CONCEPT\" = 'S' AND (@REF.\"CONCEPT_NAME\") LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
                         referenceExpression: '@REF."CONCEPT_NAME"',
-                        conceptSetType: "name",
+                        conceptIdentifierType: "name",
                         order: 5,
                     },
                     pid: {

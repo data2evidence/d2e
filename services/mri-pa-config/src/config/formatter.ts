@@ -304,6 +304,7 @@ export class Formatter {
                 domainFilter: cdwConfigAttributeObj.domainFilter,
                 standardConceptCodeFilter: cdwConfigAttributeObj.standardConceptCodeFilter,
                 cohortDefinitionKey: cdwConfigAttributeObj.cohortDefinitionKey,
+                conceptIdentifierType: cdwConfigAttributeObj.conceptIdentifierType,
                 category: attribute.category,
                 measure: attribute.measure,
                 aggregated: Boolean(cdwConfigAttributeObj.measureExpression),

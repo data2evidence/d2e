@@ -323,6 +323,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     Condition_era_concept_set: {
                         name: [
@@ -373,6 +375,7 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
                     },
                 },
                 cohortDefinitionKey: "ConditionEra",
@@ -9579,7 +9582,7 @@ const he = {
                 useRefValue: true,
                 useRefText: true,
                 cohortDefinitionKey: "Ethnicity",
-                conceptSetType: "id",
+                conceptIdentifierType: "id",
             },
             locationid: {
                 name: [
@@ -9826,7 +9829,7 @@ const he = {
                 useRefValue: true,
                 useRefText: true,
                 cohortDefinitionKey: "Gender",
-                conceptSetType: "id",
+                conceptIdentifierType: "id",
             },
             Gender_concept_name: {
                 name: [
@@ -9880,7 +9883,7 @@ const he = {
                 useRefValue: true,
                 useRefText: true,
                 cohortDefinitionKey: "Gender",
-                conceptSetType: "name",
+                conceptIdentifierType: "name",
             },
             raceconceptid: {
                 name: [
@@ -9932,7 +9935,7 @@ const he = {
                 useRefValue: true,
                 useRefText: true,
                 cohortDefinitionKey: "Race",
-                conceptSetType: "id",
+                conceptIdentifierType: "id",
             },
             Age: {
                 name: [
@@ -10031,7 +10034,7 @@ const he = {
                 useRefValue: true,
                 useRefText: true,
                 cohortDefinitionKey: "Race",
-                conceptSetType: "name",
+                conceptIdentifierType: "name",
             },
             ethnicityName: {
                 name: [
@@ -10086,7 +10089,7 @@ const he = {
                 useRefValue: true,
                 useRefText: true,
                 cohortDefinitionKey: "Ethnicity",
-                conceptSetType: "name",
+                conceptIdentifierType: "name",
             },
         },
     },

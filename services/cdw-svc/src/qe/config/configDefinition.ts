@@ -428,11 +428,12 @@ export function getDefinition(tableMapping: any) {
             mandatory: false,
             type: "boolean",
           },
+          ,
           {
-            name: "conceptSetType",
+            name: "conceptIdentifierType",
             mandatory: false,
             type: "string",
-          }
+          },
         ],
       },
     ],
