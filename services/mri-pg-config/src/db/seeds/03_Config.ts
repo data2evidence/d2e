@@ -415,6 +415,8 @@ export const cdwConfig = {
             order: 6,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "code",
           },
           conditionconceptid: {
             name: "Condition concept id",
@@ -458,6 +460,8 @@ export const cdwConfig = {
             order: 7,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
           conditionconceptset: {
             name: "Condition concept set",
@@ -498,6 +502,8 @@ export const cdwConfig = {
             order: 8,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
         },
         cohortDefinitionKey: "ConditionEra",
@@ -819,6 +825,7 @@ export const cdwConfig = {
             order: 6,
             useRefValue: true,
             cohortDefinitionKey: "ConditionType",
+            conceptIdentifierType: "id",
           },
           conditionname: {
             name: "Condition Name",
@@ -860,8 +867,9 @@ export const cdwConfig = {
               "@REF.DOMAIN_ID = 'Condition' AND @REF.STANDARD_CONCEPT = 'S' AND (@REF.CONCEPT_NAME) LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 7,
-            conceptIdentifierType: "name",
             useRefValue: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "name",
           },
           conditionoccurrenceid: {
             name: "Condition Occurrence Id",
@@ -986,6 +994,8 @@ export const cdwConfig = {
             order: 10,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ConditionType",
+            conceptIdentifierType: "code",
           },
           conditiontypeconceptset: {
             name: "Condition Type concept set",
@@ -1026,6 +1036,8 @@ export const cdwConfig = {
             order: 11,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ConditionType",
+            conceptIdentifierType: "",
           },
           conditionsourceconceptcode: {
             name: "Condition Source concept code",
@@ -1228,6 +1240,8 @@ export const cdwConfig = {
             order: 16,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
           conditionconceptset: {
             name: "Condition concept set",
@@ -1268,6 +1282,8 @@ export const cdwConfig = {
             order: 17,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
           conditiontypeconceptid: {
             name: "Condition Type concept id",
@@ -1386,6 +1402,8 @@ export const cdwConfig = {
             order: 20,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ConditionStatus",
+            conceptIdentifierType: "id",
           },
         },
         cohortDefinitionKey: "ConditionOccurrence",
@@ -1472,6 +1490,8 @@ export const cdwConfig = {
             order: 0,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DeathType",
+            conceptIdentifierType: "code",
           },
           deathtypeconceptset: {
             name: "Death Type concept set",
@@ -1512,6 +1532,8 @@ export const cdwConfig = {
             order: 1,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DeathType",
+            conceptIdentifierType: "",
           },
           pid: {
             name: "Patient Id",
@@ -1670,6 +1692,7 @@ export const cdwConfig = {
             order: 5,
             useRefValue: true,
             cohortDefinitionKey: "DeathType",
+            conceptIdentifierType: "name",
           },
           deathtypeconceptid: {
             name: "Death Type concept id",
@@ -1993,6 +2016,7 @@ export const cdwConfig = {
             order: 5,
             useRefValue: true,
             cohortDefinitionKey: "DeviceType",
+            conceptIdentifierType: "name",
           },
           deviceconceptcode: {
             name: "Device concept code",
@@ -2036,6 +2060,8 @@ export const cdwConfig = {
             order: 6,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "code",
           },
           devicetypeconceptcode: {
             name: "Device Type concept code",
@@ -2079,6 +2105,8 @@ export const cdwConfig = {
             order: 7,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DeviceType",
+            conceptIdentifierType: "code",
           },
           devicetypeconceptset: {
             name: "Device Type concept set",
@@ -2119,6 +2147,8 @@ export const cdwConfig = {
             order: 8,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DeviceType",
+            conceptIdentifierType: "",
           },
           deviceconceptid: {
             name: "Device concept id",
@@ -2162,6 +2192,8 @@ export const cdwConfig = {
             order: 9,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
           deviceconceptset: {
             name: "Device concept set",
@@ -2202,6 +2234,8 @@ export const cdwConfig = {
             order: 10,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
           devicetypeconceptid: {
             name: "Device Type concept id",
@@ -2242,6 +2276,8 @@ export const cdwConfig = {
             order: 11,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DeviceType",
+            conceptIdentifierType: "id",
           },
         },
         cohortDefinitionKey: "DeviceExposure",
@@ -2370,6 +2406,8 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 1,
             useRefValue: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "name",
           },
           pid: {
             name: "Patient Id",
@@ -2606,6 +2644,8 @@ export const cdwConfig = {
             order: 7,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "code",
           },
           drugconceptset: {
             name: "Drug concept set",
@@ -2646,6 +2686,8 @@ export const cdwConfig = {
             order: 8,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
           unitconceptcode: {
             name: "Unit concept code",
@@ -2689,6 +2731,8 @@ export const cdwConfig = {
             order: 9,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "code",
           },
           unitconceptset: {
             name: "Unit concept set",
@@ -2729,6 +2773,8 @@ export const cdwConfig = {
             order: 10,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "",
           },
           drugconceptid: {
             name: "Drug concept id",
@@ -2769,6 +2815,8 @@ export const cdwConfig = {
             order: 11,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
           unitconceptid: {
             name: "Unit concept id",
@@ -2809,6 +2857,8 @@ export const cdwConfig = {
             order: 12,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "id",
           },
         },
         cohortDefinitionKey: "DoseEra",
@@ -2972,6 +3022,8 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 2,
             useRefValue: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "name",
           },
           pid: {
             name: "Patient Id",
@@ -3167,6 +3219,8 @@ export const cdwConfig = {
             order: 7,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "code",
           },
           drugconceptset: {
             name: "Drug concept set",
@@ -3207,6 +3261,8 @@ export const cdwConfig = {
             order: 8,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
           drugconceptid: {
             name: "Drug concept id",
@@ -3247,6 +3303,8 @@ export const cdwConfig = {
             order: 9,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
         },
         cohortDefinitionKey: "DrugEra",
@@ -3525,6 +3583,7 @@ export const cdwConfig = {
             order: 5,
             useRefValue: true,
             cohortDefinitionKey: "DrugType",
+            conceptIdentifierType: "name",
           },
           startdate: {
             name: "Start Date",
@@ -3606,6 +3665,8 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 7,
             useRefValue: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "name",
           },
           lotnumber: {
             name: "Lot Number",
@@ -3686,6 +3747,8 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 9,
             useRefValue: true,
+            cohortDefinitionKey: "RouteConcept",
+            conceptIdentifierType: "name",
           },
           drugexposureid: {
             name: "Drug Exposure Id",
@@ -3920,6 +3983,8 @@ export const cdwConfig = {
             order: 15,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "code",
           },
           drugtypeconceptcode: {
             name: "Drug Type concept code",
@@ -3963,6 +4028,8 @@ export const cdwConfig = {
             order: 16,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DrugType",
+            conceptIdentifierType: "code",
           },
           routeconceptcode: {
             name: "Route concept code",
@@ -4006,6 +4073,8 @@ export const cdwConfig = {
             order: 17,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "RouteConcept",
+            conceptIdentifierType: "code",
           },
           drugconceptid: {
             name: "Drug concept id",
@@ -4049,6 +4118,8 @@ export const cdwConfig = {
             order: 18,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
           drugconceptset: {
             name: "Drug concept set",
@@ -4089,6 +4160,8 @@ export const cdwConfig = {
             order: 19,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
           routeconceptid: {
             name: "Route concept id",
@@ -4132,6 +4205,8 @@ export const cdwConfig = {
             order: 20,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "RouteConcept",
+            conceptIdentifierType: "id",
           },
           routeconceptset: {
             name: "Route concept set",
@@ -4172,6 +4247,8 @@ export const cdwConfig = {
             order: 21,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "RouteConcept",
+            conceptIdentifierType: "",
           },
           drugtypeconceptid: {
             name: "Drug type concept id",
@@ -4215,6 +4292,8 @@ export const cdwConfig = {
             order: 22,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DrugType",
+            conceptIdentifierType: "id",
           },
           drugtypeconceptset: {
             name: "Drug type concept set",
@@ -4255,6 +4334,8 @@ export const cdwConfig = {
             order: 23,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DrugType",
+            conceptIdentifierType: "",
           },
         },
         cohortDefinitionKey: "DrugExposure",
@@ -4374,6 +4455,8 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 1,
             useRefValue: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "name",
           },
           measurementtype: {
             name: "Measurement type",
@@ -4416,6 +4499,7 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 2,
             cohortDefinitionKey: "MeasurementType",
+            conceptIdentifierType: "name",
           },
           measurementdate: {
             name: "Measurement date",
@@ -4613,6 +4697,8 @@ export const cdwConfig = {
             order: 7,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "code",
           },
           measurementtypeconceptcode: {
             name: "Measurement type concept code",
@@ -4656,6 +4742,8 @@ export const cdwConfig = {
             order: 8,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "MeasurementType",
+            conceptIdentifierType: "code",
           },
           measurementtypeconceptset: {
             name: "Measurement type concept set",
@@ -4697,6 +4785,7 @@ export const cdwConfig = {
             useRefValue: true,
             useRefText: true,
             cohortDefinitionKey: "MeasurementType",
+            conceptIdentifierType: "",
           },
           valueasconceptcode: {
             name: "Value as concept code",
@@ -4735,6 +4824,8 @@ export const cdwConfig = {
             type: "text",
             expression: '@MEAS."VALUE_AS_CONCEPT_CODE"',
             order: 10,
+            cohortDefinitionKey: "ValueAsConcept",
+            conceptIdentifierType: "code",
           },
           valueasconceptset: {
             name: "Value as concept set",
@@ -4773,6 +4864,8 @@ export const cdwConfig = {
             type: "conceptSet",
             expression: 'CAST (@MEAS."VALUE_AS_CONCEPT_ID" AS VARCHAR)',
             order: 11,
+            cohortDefinitionKey: "ValueAsConcept",
+            conceptIdentifierType: "",
           },
           unitconceptcode: {
             name: "Unit concept code",
@@ -4814,6 +4907,8 @@ export const cdwConfig = {
               "@REF.DOMAIN_ID = 'Unit' AND @REF.STANDARD_CONCEPT = 'S' AND (@REF.CONCEPT_CODE) LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
             referenceExpression: "@REF.CONCEPT_CODE",
             order: 12,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "code",
           },
           unitconceptset: {
             name: "Unit concept set",
@@ -4852,6 +4947,8 @@ export const cdwConfig = {
             type: "conceptSet",
             expression: 'CAST (@MEAS."UNIT_CONCEPT_ID" AS VARCHAR)',
             order: 13,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "",
           },
           measurementconceptid: {
             name: "Measurement concept id",
@@ -4895,6 +4992,8 @@ export const cdwConfig = {
             order: 14,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
           measurementconceptset: {
             name: "Measurement concept set",
@@ -4935,6 +5034,8 @@ export const cdwConfig = {
             order: 15,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
           measurementtypeconceptid: {
             name: "Measurement type concept id",
@@ -4975,6 +5076,8 @@ export const cdwConfig = {
             order: 16,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "MeasurementType",
+            conceptIdentifierType: "id",
           },
           valueasconceptid: {
             name: "Value as concept id",
@@ -5013,6 +5116,8 @@ export const cdwConfig = {
             type: "text",
             expression: 'CAST (@MEAS."VALUE_AS_CONCEPT_ID" AS VARCHAR)',
             order: 17,
+            cohortDefinitionKey: "ValueAsConcept",
+            conceptIdentifierType: "id",
           },
           unitconceptid: {
             name: "Unit concept id",
@@ -5051,6 +5156,8 @@ export const cdwConfig = {
             type: "text",
             expression: 'CAST (@MEAS."UNIT_CONCEPT_ID" AS VARCHAR)',
             order: 18,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "id",
           },
         },
         cohortDefinitionKey: "Measurement",
@@ -5137,6 +5244,7 @@ export const cdwConfig = {
             order: 0,
             useRefValue: true,
             cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "name",
           },
           obsdatetime: {
             name: "Observation Date/Time",
@@ -5332,6 +5440,8 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 5,
             useRefValue: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "name",
           },
           qualifier: {
             name: "Qualifier",
@@ -5374,6 +5484,8 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 6,
             useRefValue: true,
+            cohortDefinitionKey: "Qualifier",
+            conceptIdentifierType: "name",
           },
           textval: {
             name: "Value (text)",
@@ -5532,6 +5644,8 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 10,
             useRefValue: true,
+            cohortDefinitionKey: "ObservationType",
+            conceptIdentifierType: "name",
           },
           obsconceptcode: {
             name: "Observation concept code",
@@ -5575,6 +5689,8 @@ export const cdwConfig = {
             order: 11,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "code",
           },
           obsconceptset: {
             name: "Observation concept set",
@@ -5615,6 +5731,8 @@ export const cdwConfig = {
             order: 12,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
           obstypeconceptcode: {
             name: "Observation type concept code",
@@ -5658,6 +5776,8 @@ export const cdwConfig = {
             order: 13,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ObservationType",
+            conceptIdentifierType: "code",
           },
           valueasconceptcode: {
             name: "Value as concept code",
@@ -5696,6 +5816,8 @@ export const cdwConfig = {
             type: "text",
             expression: '@OBS."VALUE_AS_CONCEPT_CODE"',
             order: 14,
+            cohortDefinitionKey: "ValueAsConcept",
+            conceptIdentifierType: "code",
           },
           qualifierconceptcode: {
             name: "Qualifier concept code",
@@ -5739,6 +5861,8 @@ export const cdwConfig = {
             order: 15,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Qualifier",
+            conceptIdentifierType: "code",
           },
           unitconceptcode: {
             name: "Unit concept code",
@@ -5782,6 +5906,8 @@ export const cdwConfig = {
             order: 16,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "code",
           },
           observationtypeconceptid: {
             name: "Observation type concept id",
@@ -5825,6 +5951,8 @@ export const cdwConfig = {
             order: 17,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ObservationType",
+            conceptIdentifierType: "id",
           },
           observationtypeconceptset: {
             name: "Observation type concept set",
@@ -5865,6 +5993,8 @@ export const cdwConfig = {
             order: 18,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ObservationType",
+            conceptIdentifierType: "",
           },
           valueasconceptid: {
             name: "Value as concept id",
@@ -5903,6 +6033,8 @@ export const cdwConfig = {
             type: "text",
             expression: 'CAST (@OBS."VALUE_AS_CONCEPT_ID" AS VARCHAR)',
             order: 19,
+            cohortDefinitionKey: "ValueAsConcept",
+            conceptIdentifierType: "id",
           },
           valueasconceptset: {
             name: "Value as concept set",
@@ -5941,6 +6073,8 @@ export const cdwConfig = {
             type: "conceptSet",
             expression: 'CAST (@OBS."VALUE_AS_CONCEPT_ID" AS VARCHAR)',
             order: 20,
+            cohortDefinitionKey: "ValueAsConcept",
+            conceptIdentifierType: "",
           },
           qualifierconceptid: {
             name: "Qualifier concept id",
@@ -5984,6 +6118,8 @@ export const cdwConfig = {
             order: 21,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Qualifier",
+            conceptIdentifierType: "id",
           },
           qualifierconceptset: {
             name: "Qualifier concept set",
@@ -6024,6 +6160,8 @@ export const cdwConfig = {
             order: 22,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Qualifier",
+            conceptIdentifierType: "",
           },
           unitconceptid: {
             name: "Unit concept id",
@@ -6067,6 +6205,8 @@ export const cdwConfig = {
             order: 23,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "id",
           },
           unitconceptset: {
             name: "Unit concept set",
@@ -6107,6 +6247,8 @@ export const cdwConfig = {
             order: 24,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "",
           },
           obsconceptid: {
             name: "Observation concept id",
@@ -6147,6 +6289,8 @@ export const cdwConfig = {
             order: 25,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
         },
         cohortDefinitionKey: "Observation",
@@ -6349,6 +6493,7 @@ export const cdwConfig = {
             order: 3,
             useRefValue: true,
             cohortDefinitionKey: "PeriodType",
+            conceptIdentifierType: "name",
           },
           obsperiodid: {
             name: "Observation period Id",
@@ -6430,6 +6575,8 @@ export const cdwConfig = {
             order: 5,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "PeriodType",
+            conceptIdentifierType: "code",
           },
           periodtypeconceptid: {
             name: "Period type concept id",
@@ -6473,6 +6620,8 @@ export const cdwConfig = {
             order: 6,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "PeriodType",
+            conceptIdentifierType: "id",
           },
           periodtypeconceptset: {
             name: "Period type concept set",
@@ -6513,6 +6662,8 @@ export const cdwConfig = {
             order: 7,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "PeriodType",
+            conceptIdentifierType: "",
           },
         },
         cohortDefinitionKey: "ObservationPeriod",
@@ -6830,6 +6981,8 @@ export const cdwConfig = {
             type: "text",
             expression: 'CAST (@PROC."PROCEDURE_OCCURRENCE_ID" AS VARCHAR)',
             order: 1,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
           procconceptset: {
             name: "Procedure Occurrence Concept Set",
@@ -6868,6 +7021,8 @@ export const cdwConfig = {
             type: "conceptSet",
             expression: 'CAST (@PROC."PROCEDURE_OCCURRENCE_ID" AS VARCHAR)',
             order: 2,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
           procdate: {
             name: "Procedure Date",
@@ -6989,6 +7144,8 @@ export const cdwConfig = {
             order: 5,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "name",
           },
           modifier: {
             name: "Modifier",
@@ -7028,6 +7185,7 @@ export const cdwConfig = {
             expression: '@PROC."MODIFIER_NAME"',
             order: 6,
             cohortDefinitionKey: "Modifier",
+            conceptIdentifierType: "name",
           },
           pid: {
             name: "Patient Id",
@@ -7110,6 +7268,7 @@ export const cdwConfig = {
             useRefValue: true,
             useRefText: true,
             cohortDefinitionKey: "ProcedureType",
+            conceptIdentifierType: "name",
           },
           procconceptcode: {
             name: "Procedure concept code",
@@ -7153,6 +7312,8 @@ export const cdwConfig = {
             order: 9,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "code",
           },
           proctypeconceptcode: {
             name: "Procedure type concept code",
@@ -7196,6 +7357,8 @@ export const cdwConfig = {
             order: 10,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ProcedureType",
+            conceptIdentifierType: "code",
           },
           modifierconceptcode: {
             name: "Modifier concept code",
@@ -7234,6 +7397,8 @@ export const cdwConfig = {
             type: "text",
             expression: '@PROC."MODIFIER_CONCEPT_CODE"',
             order: 11,
+            cohortDefinitionKey: "Modifier",
+            conceptIdentifierType: "code",
           },
           proctypeconceptid: {
             name: "Procedure type concept id",
@@ -7277,6 +7442,8 @@ export const cdwConfig = {
             order: 12,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ProcedureType",
+            conceptIdentifierType: "id",
           },
           proctypeconceptset: {
             name: "Procedure type concept set",
@@ -7317,6 +7484,8 @@ export const cdwConfig = {
             order: 13,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "ProcedureType",
+            conceptIdentifierType: "",
           },
           modifierconceptid: {
             name: "Modifier concept id",
@@ -7355,6 +7524,8 @@ export const cdwConfig = {
             type: "text",
             expression: 'CAST (@PROC."MODIFIER_CONCEPT_ID" AS VARCHAR)',
             order: 14,
+            cohortDefinitionKey: "Modifier",
+            conceptIdentifierType: "id",
           },
           modifierconceptset: {
             name: "Modifier concept set",
@@ -7393,6 +7564,8 @@ export const cdwConfig = {
             type: "conceptSet",
             expression: 'CAST (@PROC."MODIFIER_CONCEPT_ID" AS VARCHAR)',
             order: 15,
+            cohortDefinitionKey: "Modifier",
+            conceptIdentifierType: "",
           },
         },
         cohortDefinitionKey: "ProcedureOccurrence",
@@ -7479,6 +7652,7 @@ export const cdwConfig = {
             order: 0,
             useRefValue: true,
             cohortDefinitionKey: "SpecimenType",
+            conceptIdentifierType: "name",
           },
           diseasestatus: {
             name: "Disease status",
@@ -7522,6 +7696,7 @@ export const cdwConfig = {
             order: 1,
             useRefValue: true,
             cohortDefinitionKey: "DiseaseStatus",
+            conceptIdentifierType: "name",
           },
           specimenname: {
             name: "Specimen name",
@@ -7564,6 +7739,8 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 2,
             useRefValue: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "name",
           },
           anatomicsite: {
             name: "Anatomic site",
@@ -7607,6 +7784,7 @@ export const cdwConfig = {
             order: 3,
             useRefValue: true,
             cohortDefinitionKey: "AnatomicSite",
+            conceptIdentifierType: "name",
           },
           pid: {
             name: "Patient Id",
@@ -7886,6 +8064,8 @@ export const cdwConfig = {
             order: 10,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "code",
           },
           specimentypeconceptcode: {
             name: "Specimen type concept code",
@@ -7929,6 +8109,8 @@ export const cdwConfig = {
             order: 11,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "SpecimenType",
+            conceptIdentifierType: "code",
           },
           unitconceptcode: {
             name: "Unit concept code",
@@ -7972,6 +8154,8 @@ export const cdwConfig = {
             order: 12,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "code",
           },
           anatomicsiteconceptcode: {
             name: "Anatomic site concept code",
@@ -8015,6 +8199,8 @@ export const cdwConfig = {
             order: 13,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "AnatomicSite",
+            conceptIdentifierType: "code",
           },
           diseasestatusconceptcode: {
             name: "Disease status concept code",
@@ -8058,6 +8244,8 @@ export const cdwConfig = {
             order: 14,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DiseaseStatus",
+            conceptIdentifierType: "code",
           },
           specimenconceptid: {
             name: "Specimen concept id",
@@ -8101,6 +8289,8 @@ export const cdwConfig = {
             order: 15,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
           specimenconceptset: {
             name: "Specimen concept set",
@@ -8141,6 +8331,8 @@ export const cdwConfig = {
             order: 16,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
           specimentypeconceptid: {
             name: "Specimen type concept id",
@@ -8184,6 +8376,8 @@ export const cdwConfig = {
             order: 17,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "SpecimenType",
+            conceptIdentifierType: "id",
           },
           specimentypeconceptset: {
             name: "Specimen type concept set",
@@ -8225,6 +8419,7 @@ export const cdwConfig = {
             useRefValue: true,
             useRefText: true,
             cohortDefinitionKey: "SpecimenType",
+            conceptIdentifierType: "",
           },
           anatomicsiteconceptid: {
             name: "Anatomic site concept id",
@@ -8268,6 +8463,8 @@ export const cdwConfig = {
             order: 19,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "AnatomicSite",
+            conceptIdentifierType: "id",
           },
           anatomicsiteconceptset: {
             name: "Anatomic site concept set",
@@ -8308,6 +8505,8 @@ export const cdwConfig = {
             order: 20,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "AnatomicSite",
+            conceptIdentifierType: "",
           },
           diseasestatusconceptid: {
             name: "Disease status concept id",
@@ -8351,6 +8550,8 @@ export const cdwConfig = {
             order: 21,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "DiseaseStatus",
+            conceptIdentifierType: "id",
           },
           diseasestatusconceptset: {
             name: "Disease status concept set",
@@ -8392,6 +8593,7 @@ export const cdwConfig = {
             useRefValue: true,
             useRefText: true,
             cohortDefinitionKey: "DiseaseStatus",
+            conceptIdentifierType: "",
           },
           unitconceptid: {
             name: "Unit concept id",
@@ -8435,6 +8637,8 @@ export const cdwConfig = {
             order: 23,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "id",
           },
           unitconceptset: {
             name: "Unit concept set",
@@ -8476,6 +8680,7 @@ export const cdwConfig = {
             useRefValue: true,
             useRefText: true,
             cohortDefinitionKey: "Unit",
+            conceptIdentifierType: "",
           },
         },
         cohortDefinitionKey: "Specimen",
@@ -8677,7 +8882,8 @@ export const cdwConfig = {
             referenceExpression: "@REF.CONCEPT_NAME",
             order: 3,
             useRefValue: true,
-            cohortDefinitionKey: "VisitDetailTypeCS",
+            cohortDefinitionKey: "VisitType",
+            conceptIdentifierType: "name",
           },
           visitname: {
             name: "Visit name",
@@ -8801,6 +9007,8 @@ export const cdwConfig = {
             order: 6,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "code",
           },
           visittypeconceptcode: {
             name: "Visit type concept code",
@@ -8844,6 +9052,8 @@ export const cdwConfig = {
             order: 7,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "VisitType",
+            conceptIdentifierType: "code",
           },
           visittypeconceptset: {
             name: "Visit type concept set",
@@ -8884,6 +9094,8 @@ export const cdwConfig = {
             order: 8,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "VisitType",
+            conceptIdentifierType: "",
           },
           visitconceptid: {
             name: "Visit concept Id",
@@ -8927,6 +9139,8 @@ export const cdwConfig = {
             order: 9,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "id",
           },
           visitconceptset: {
             name: "Visit concept set",
@@ -8967,6 +9181,8 @@ export const cdwConfig = {
             order: 10,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "",
           },
           visittypeconceptid: {
             name: "Visit type concept id",
@@ -9007,6 +9223,8 @@ export const cdwConfig = {
             order: 11,
             useRefValue: true,
             useRefText: true,
+            cohortDefinitionKey: "VisitType",
+            conceptIdentifierType: "id",
           },
         },
         cohortDefinitionKey: "VisitDetail",
@@ -10620,6 +10838,7 @@ export const cdwConfig = {
         order: 6,
         useRefValue: true,
         cohortDefinitionKey: "Race",
+        conceptIdentifierType: "name",
       },
       Gender: {
         name: "Gender",
@@ -10663,6 +10882,7 @@ export const cdwConfig = {
         order: 7,
         useRefValue: true,
         cohortDefinitionKey: "Gender",
+        conceptIdentifierType: "name",
       },
       Ethnicity: {
         name: "Ethnicity",
@@ -10706,6 +10926,7 @@ export const cdwConfig = {
         order: 8,
         useRefValue: true,
         cohortDefinitionKey: "Ethnicity",
+        conceptIdentifierType: "name",
       },
       State: {
         name: "State",
@@ -10824,6 +11045,8 @@ export const cdwConfig = {
         order: 11,
         useRefValue: true,
         useRefText: true,
+        cohortDefinitionKey: "Gender",
+        conceptIdentifierType: "code",
       },
       raceconceptcode: {
         name: "Race concept code",
@@ -10867,6 +11090,8 @@ export const cdwConfig = {
         order: 12,
         useRefValue: true,
         useRefText: true,
+        cohortDefinitionKey: "Race",
+        conceptIdentifierType: "code",
       },
       ethnicityconceptcode: {
         name: "Ethnicity concept code",
@@ -10910,6 +11135,8 @@ export const cdwConfig = {
         order: 13,
         useRefValue: true,
         useRefText: true,
+        cohortDefinitionKey: "Ethnicity",
+        conceptIdentifierType: "code",
       },
       ethnicityconceptset: {
         name: "Ethnicity concept set",
@@ -10950,6 +11177,8 @@ export const cdwConfig = {
         order: 14,
         useRefValue: true,
         useRefText: true,
+        cohortDefinitionKey: "Ethnicity",
+        conceptIdentifierType: "",
       },
       lastAuthoredDate: {
         name: "Last authored date",
@@ -11031,6 +11260,8 @@ export const cdwConfig = {
         order: 16,
         useRefValue: true,
         useRefText: true,
+        cohortDefinitionKey: "Gender",
+        conceptIdentifierType: "id",
       },
       genderconceptset: {
         name: "Gender concept set",
@@ -11071,6 +11302,8 @@ export const cdwConfig = {
         order: 17,
         useRefValue: true,
         useRefText: true,
+        cohortDefinitionKey: "Gender",
+        conceptIdentifierType: "",
       },
       raceconceptid: {
         name: "Race concept id",
@@ -24263,7 +24496,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
-            cohortDefinitionKey: "SpecimenType_id",
+            cohortDefinitionKey: "SpecimenType",
             conceptIdentifierType: "id",
           },
           specimentypeconceptset: {
@@ -24312,7 +24545,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
-            cohortDefinitionKey: "SpecimenType_id",
+            cohortDefinitionKey: "SpecimenType",
             conceptIdentifierType: "",
           },
           anatomicsiteconceptid: {
@@ -24364,7 +24597,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
-            cohortDefinitionKey: "AnatomicSite_id",
+            cohortDefinitionKey: "AnatomicSite",
             conceptIdentifierType: "id",
           },
           anatomicsiteconceptset: {
@@ -24413,7 +24646,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
-            cohortDefinitionKey: "AnatomicSite_id",
+            cohortDefinitionKey: "AnatomicSite",
             conceptIdentifierType: "",
           },
           diseasestatusconceptid: {
@@ -24465,7 +24698,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
-            cohortDefinitionKey: "DiseaseStatus_id",
+            cohortDefinitionKey: "DiseaseStatus",
             conceptIdentifierType: "id",
           },
           diseasestatusconceptset: {
@@ -24514,7 +24747,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
-            cohortDefinitionKey: "DiseaseStatus_id",
+            cohortDefinitionKey: "DiseaseStatus",
             conceptIdentifierType: "",
           },
           unitconceptid: {
@@ -24566,7 +24799,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
-            cohortDefinitionKey: "Unit_id",
+            cohortDefinitionKey: "Unit",
             conceptIdentifierType: "id",
           },
           unitconceptset: {
@@ -24615,7 +24848,7 @@ export const cdwConfigDuckdb = {
             standardConceptCodeFilter: "",
             useRefValue: true,
             useRefText: true,
-            cohortDefinitionKey: "Unit_id",
+            cohortDefinitionKey: "Unit",
             conceptIdentifierType: "",
           },
           specimen_concept_name: {

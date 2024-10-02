@@ -6930,7 +6930,7 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "SpecimenType_id",
+                        cohortDefinitionKey: "SpecimenType",
                         conceptIdentifierType: "id",
                     },
                     specimentypeconceptset: {
@@ -6979,7 +6979,7 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "SpecimenType_id",
+                        cohortDefinitionKey: "SpecimenType",
                         conceptIdentifierType: "",
                     },
                     anatomicsiteconceptid: {
@@ -7032,7 +7032,7 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "AnatomicSite_id",
+                        cohortDefinitionKey: "AnatomicSite",
                         conceptIdentifierType: "id",
                     },
                     anatomicsiteconceptset: {
@@ -7081,7 +7081,7 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "AnatomicSite_id",
+                        cohortDefinitionKey: "AnatomicSite",
                         conceptIdentifierType: "",
                     },
                     diseasestatusconceptid: {
@@ -7134,7 +7134,7 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "DiseaseStatus_id",
+                        cohortDefinitionKey: "DiseaseStatus",
                         conceptIdentifierType: "id",
                     },
                     diseasestatusconceptset: {
@@ -7183,7 +7183,7 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "DiseaseStatus_id",
+                        cohortDefinitionKey: "DiseaseStatus",
                         conceptIdentifierType: "",
                     },
                     unitconceptid: {
@@ -7236,7 +7236,7 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "Unit_id",
+                        cohortDefinitionKey: "Unit",
                         conceptIdentifierType: "id",
                     },
                     unitconceptset: {
@@ -7285,7 +7285,7 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "Unit_id",
+                        cohortDefinitionKey: "Unit",
                         conceptIdentifierType: "",
                     },
                     specimen_concept_name: {

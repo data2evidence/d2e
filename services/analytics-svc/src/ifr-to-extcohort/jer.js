@@ -319,6 +319,8 @@ const d = {
                         order: 6,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "code",
                     },
                     conditionconceptid: {
                         name: "Condition concept id",
@@ -362,6 +364,8 @@ const d = {
                         order: 7,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     conditionconceptset: {
                         name: "Condition concept set",
@@ -403,6 +407,8 @@ const d = {
                         order: 8,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                 },
                 cohortDefinitionKey: "ConditionEra",
@@ -725,6 +731,7 @@ const d = {
                         order: 6,
                         useRefValue: true,
                         cohortDefinitionKey: "ConditionType",
+                        conceptIdentifierType: "id",
                     },
                     conditionname: {
                         name: "Condition Name",
@@ -766,8 +773,9 @@ const d = {
                             "@REF.DOMAIN_ID = 'Condition' AND @REF.STANDARD_CONCEPT = 'S' AND (@REF.CONCEPT_NAME) LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 7,
-                        conceptIdentifierType: "name",
                         useRefValue: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                     conditionoccurrenceid: {
                         name: "Condition Occurrence Id",
@@ -893,6 +901,8 @@ const d = {
                         order: 10,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ConditionType",
+                        conceptIdentifierType: "code",
                     },
                     conditiontypeconceptset: {
                         name: "Condition Type concept set",
@@ -934,6 +944,8 @@ const d = {
                         order: 11,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ConditionType",
+                        conceptIdentifierType: "",
                     },
                     conditionsourceconceptcode: {
                         name: "Condition Source concept code",
@@ -1138,6 +1150,8 @@ const d = {
                         order: 16,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     conditionconceptset: {
                         name: "Condition concept set",
@@ -1179,6 +1193,8 @@ const d = {
                         order: 17,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     conditiontypeconceptid: {
                         name: "Condition Type concept id",
@@ -1300,6 +1316,8 @@ const d = {
                         order: 20,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ConditionStatus",
+                        conceptIdentifierType: "id",
                     },
                 },
                 cohortDefinitionKey: "ConditionOccurrence",
@@ -1386,6 +1404,8 @@ const d = {
                         order: 0,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DeathType",
+                        conceptIdentifierType: "code",
                     },
                     deathtypeconceptset: {
                         name: "Death Type concept set",
@@ -1427,6 +1447,8 @@ const d = {
                         order: 1,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DeathType",
+                        conceptIdentifierType: "",
                     },
                     pid: {
                         name: "Patient Id",
@@ -1585,6 +1607,7 @@ const d = {
                         order: 5,
                         useRefValue: true,
                         cohortDefinitionKey: "DeathType",
+                        conceptIdentifierType: "name",
                     },
                     deathtypeconceptid: {
                         name: "Death Type concept id",
@@ -1910,6 +1933,7 @@ const d = {
                         order: 5,
                         useRefValue: true,
                         cohortDefinitionKey: "DeviceType",
+                        conceptIdentifierType: "name",
                     },
                     deviceconceptcode: {
                         name: "Device concept code",
@@ -1953,6 +1977,8 @@ const d = {
                         order: 6,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "code",
                     },
                     devicetypeconceptcode: {
                         name: "Device Type concept code",
@@ -1996,6 +2022,8 @@ const d = {
                         order: 7,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DeviceType",
+                        conceptIdentifierType: "code",
                     },
                     devicetypeconceptset: {
                         name: "Device Type concept set",
@@ -2037,6 +2065,8 @@ const d = {
                         order: 8,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DeviceType",
+                        conceptIdentifierType: "",
                     },
                     deviceconceptid: {
                         name: "Device concept id",
@@ -2080,6 +2110,8 @@ const d = {
                         order: 9,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     deviceconceptset: {
                         name: "Device concept set",
@@ -2121,6 +2153,8 @@ const d = {
                         order: 10,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     devicetypeconceptid: {
                         name: "Device Type concept id",
@@ -2162,6 +2196,8 @@ const d = {
                         order: 11,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DeviceType",
+                        conceptIdentifierType: "id",
                     },
                 },
                 cohortDefinitionKey: "DeviceExposure",
@@ -2290,6 +2326,8 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 1,
                         useRefValue: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                     pid: {
                         name: "Patient Id",
@@ -2526,6 +2564,8 @@ const d = {
                         order: 7,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "code",
                     },
                     drugconceptset: {
                         name: "Drug concept set",
@@ -2567,6 +2607,8 @@ const d = {
                         order: 8,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     unitconceptcode: {
                         name: "Unit concept code",
@@ -2610,6 +2652,8 @@ const d = {
                         order: 9,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "code",
                     },
                     unitconceptset: {
                         name: "Unit concept set",
@@ -2651,6 +2695,8 @@ const d = {
                         order: 10,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "",
                     },
                     drugconceptid: {
                         name: "Drug concept id",
@@ -2692,6 +2738,8 @@ const d = {
                         order: 11,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     unitconceptid: {
                         name: "Unit concept id",
@@ -2733,6 +2781,8 @@ const d = {
                         order: 12,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "id",
                     },
                 },
                 cohortDefinitionKey: "DoseEra",
@@ -2896,6 +2946,8 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 2,
                         useRefValue: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                     pid: {
                         name: "Patient Id",
@@ -3092,6 +3144,8 @@ const d = {
                         order: 7,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "code",
                     },
                     drugconceptset: {
                         name: "Drug concept set",
@@ -3133,6 +3187,8 @@ const d = {
                         order: 8,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     drugconceptid: {
                         name: "Drug concept id",
@@ -3174,6 +3230,8 @@ const d = {
                         order: 9,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                 },
                 cohortDefinitionKey: "DrugEra",
@@ -3452,6 +3510,7 @@ const d = {
                         order: 5,
                         useRefValue: true,
                         cohortDefinitionKey: "DrugType",
+                        conceptIdentifierType: "name",
                     },
                     startdate: {
                         name: "Start Date",
@@ -3533,6 +3592,8 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 7,
                         useRefValue: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                     lotnumber: {
                         name: "Lot Number",
@@ -3613,6 +3674,8 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 9,
                         useRefValue: true,
+                        cohortDefinitionKey: "RouteConcept",
+                        conceptIdentifierType: "name",
                     },
                     drugexposureid: {
                         name: "Drug Exposure Id",
@@ -3848,6 +3911,8 @@ const d = {
                         order: 15,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "code",
                     },
                     drugtypeconceptcode: {
                         name: "Drug Type concept code",
@@ -3891,6 +3956,8 @@ const d = {
                         order: 16,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DrugType",
+                        conceptIdentifierType: "code",
                     },
                     routeconceptcode: {
                         name: "Route concept code",
@@ -3934,6 +4001,8 @@ const d = {
                         order: 17,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "RouteConcept",
+                        conceptIdentifierType: "code",
                     },
                     drugconceptid: {
                         name: "Drug concept id",
@@ -3978,6 +4047,8 @@ const d = {
                         order: 18,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     drugconceptset: {
                         name: "Drug concept set",
@@ -4019,6 +4090,8 @@ const d = {
                         order: 19,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     routeconceptid: {
                         name: "Route concept id",
@@ -4062,6 +4135,8 @@ const d = {
                         order: 20,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "RouteConcept",
+                        conceptIdentifierType: "id",
                     },
                     routeconceptset: {
                         name: "Route concept set",
@@ -4103,6 +4178,8 @@ const d = {
                         order: 21,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "RouteConcept",
+                        conceptIdentifierType: "",
                     },
                     drugtypeconceptid: {
                         name: "Drug type concept id",
@@ -4146,6 +4223,8 @@ const d = {
                         order: 22,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DrugType",
+                        conceptIdentifierType: "id",
                     },
                     drugtypeconceptset: {
                         name: "Drug type concept set",
@@ -4187,6 +4266,8 @@ const d = {
                         order: 23,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DrugType",
+                        conceptIdentifierType: "",
                     },
                 },
                 cohortDefinitionKey: "DrugExposure",
@@ -4306,6 +4387,8 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 1,
                         useRefValue: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                     measurementtype: {
                         name: "Measurement type",
@@ -4348,6 +4431,7 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 2,
                         cohortDefinitionKey: "MeasurementType",
+                        conceptIdentifierType: "name",
                     },
                     measurementdate: {
                         name: "Measurement date",
@@ -4545,6 +4629,8 @@ const d = {
                         order: 7,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "code",
                     },
                     measurementtypeconceptcode: {
                         name: "Measurement type concept code",
@@ -4588,6 +4674,8 @@ const d = {
                         order: 8,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "MeasurementType",
+                        conceptIdentifierType: "code",
                     },
                     measurementtypeconceptset: {
                         name: "Measurement type concept set",
@@ -4630,6 +4718,7 @@ const d = {
                         useRefValue: true,
                         useRefText: true,
                         cohortDefinitionKey: "MeasurementType",
+                        conceptIdentifierType: "",
                     },
                     valueasconceptcode: {
                         name: "Value as concept code",
@@ -4668,6 +4757,8 @@ const d = {
                         type: "text",
                         expression: '@MEAS."VALUE_AS_CONCEPT_CODE"',
                         order: 10,
+                        cohortDefinitionKey: "ValueAsConcept",
+                        conceptIdentifierType: "code",
                     },
                     valueasconceptset: {
                         name: "Value as concept set",
@@ -4707,6 +4798,8 @@ const d = {
                         expression:
                             'CAST (@MEAS."VALUE_AS_CONCEPT_ID" AS VARCHAR)',
                         order: 11,
+                        cohortDefinitionKey: "ValueAsConcept",
+                        conceptIdentifierType: "",
                     },
                     unitconceptcode: {
                         name: "Unit concept code",
@@ -4748,6 +4841,8 @@ const d = {
                             "@REF.DOMAIN_ID = 'Unit' AND @REF.STANDARD_CONCEPT = 'S' AND (@REF.CONCEPT_CODE) LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
                         referenceExpression: "@REF.CONCEPT_CODE",
                         order: 12,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "code",
                     },
                     unitconceptset: {
                         name: "Unit concept set",
@@ -4786,6 +4881,8 @@ const d = {
                         type: "conceptSet",
                         expression: 'CAST (@MEAS."UNIT_CONCEPT_ID" AS VARCHAR)',
                         order: 13,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "",
                     },
                     measurementconceptid: {
                         name: "Measurement concept id",
@@ -4829,6 +4926,8 @@ const d = {
                         order: 14,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     measurementconceptset: {
                         name: "Measurement concept set",
@@ -4870,6 +4969,8 @@ const d = {
                         order: 15,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     measurementtypeconceptid: {
                         name: "Measurement type concept id",
@@ -4911,6 +5012,8 @@ const d = {
                         order: 16,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "MeasurementType",
+                        conceptIdentifierType: "id",
                     },
                     valueasconceptid: {
                         name: "Value as concept id",
@@ -4950,6 +5053,8 @@ const d = {
                         expression:
                             'CAST (@MEAS."VALUE_AS_CONCEPT_ID" AS VARCHAR)',
                         order: 17,
+                        cohortDefinitionKey: "ValueAsConcept",
+                        conceptIdentifierType: "id",
                     },
                     unitconceptid: {
                         name: "Unit concept id",
@@ -4988,6 +5093,8 @@ const d = {
                         type: "text",
                         expression: 'CAST (@MEAS."UNIT_CONCEPT_ID" AS VARCHAR)',
                         order: 18,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "id",
                     },
                 },
                 cohortDefinitionKey: "Measurement",
@@ -5074,6 +5181,7 @@ const d = {
                         order: 0,
                         useRefValue: true,
                         cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "name",
                     },
                     obsdatetime: {
                         name: "Observation Date/Time",
@@ -5269,6 +5377,8 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 5,
                         useRefValue: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                     qualifier: {
                         name: "Qualifier",
@@ -5311,6 +5421,8 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 6,
                         useRefValue: true,
+                        cohortDefinitionKey: "Qualifier",
+                        conceptIdentifierType: "name",
                     },
                     textval: {
                         name: "Value (text)",
@@ -5469,6 +5581,8 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 10,
                         useRefValue: true,
+                        cohortDefinitionKey: "ObservationType",
+                        conceptIdentifierType: "name",
                     },
                     obsconceptcode: {
                         name: "Observation concept code",
@@ -5512,6 +5626,8 @@ const d = {
                         order: 11,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "code",
                     },
                     obsconceptset: {
                         name: "Observation concept set",
@@ -5553,6 +5669,8 @@ const d = {
                         order: 12,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     obstypeconceptcode: {
                         name: "Observation type concept code",
@@ -5596,6 +5714,8 @@ const d = {
                         order: 13,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ObservationType",
+                        conceptIdentifierType: "code",
                     },
                     valueasconceptcode: {
                         name: "Value as concept code",
@@ -5634,6 +5754,8 @@ const d = {
                         type: "text",
                         expression: '@OBS."VALUE_AS_CONCEPT_CODE"',
                         order: 14,
+                        cohortDefinitionKey: "ValueAsConcept",
+                        conceptIdentifierType: "code",
                     },
                     qualifierconceptcode: {
                         name: "Qualifier concept code",
@@ -5677,6 +5799,8 @@ const d = {
                         order: 15,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Qualifier",
+                        conceptIdentifierType: "code",
                     },
                     unitconceptcode: {
                         name: "Unit concept code",
@@ -5720,6 +5844,8 @@ const d = {
                         order: 16,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "code",
                     },
                     observationtypeconceptid: {
                         name: "Observation type concept id",
@@ -5764,6 +5890,8 @@ const d = {
                         order: 17,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ObservationType",
+                        conceptIdentifierType: "id",
                     },
                     observationtypeconceptset: {
                         name: "Observation type concept set",
@@ -5805,6 +5933,8 @@ const d = {
                         order: 18,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ObservationType",
+                        conceptIdentifierType: "",
                     },
                     valueasconceptid: {
                         name: "Value as concept id",
@@ -5844,6 +5974,8 @@ const d = {
                         expression:
                             'CAST (@OBS."VALUE_AS_CONCEPT_ID" AS VARCHAR)',
                         order: 19,
+                        cohortDefinitionKey: "ValueAsConcept",
+                        conceptIdentifierType: "id",
                     },
                     valueasconceptset: {
                         name: "Value as concept set",
@@ -5883,6 +6015,8 @@ const d = {
                         expression:
                             'CAST (@OBS."VALUE_AS_CONCEPT_ID" AS VARCHAR)',
                         order: 20,
+                        cohortDefinitionKey: "ValueAsConcept",
+                        conceptIdentifierType: "",
                     },
                     qualifierconceptid: {
                         name: "Qualifier concept id",
@@ -5926,6 +6060,8 @@ const d = {
                         order: 21,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Qualifier",
+                        conceptIdentifierType: "id",
                     },
                     qualifierconceptset: {
                         name: "Qualifier concept set",
@@ -5967,6 +6103,8 @@ const d = {
                         order: 22,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Qualifier",
+                        conceptIdentifierType: "",
                     },
                     unitconceptid: {
                         name: "Unit concept id",
@@ -6011,6 +6149,8 @@ const d = {
                         order: 23,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "id",
                     },
                     unitconceptset: {
                         name: "Unit concept set",
@@ -6051,6 +6191,8 @@ const d = {
                         order: 24,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "",
                     },
                     obsconceptid: {
                         name: "Observation concept id",
@@ -6092,6 +6234,8 @@ const d = {
                         order: 25,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                 },
                 cohortDefinitionKey: "Observation",
@@ -6294,6 +6438,7 @@ const d = {
                         order: 3,
                         useRefValue: true,
                         cohortDefinitionKey: "PeriodType",
+                        conceptIdentifierType: "name",
                     },
                     obsperiodid: {
                         name: "Observation period Id",
@@ -6375,6 +6520,8 @@ const d = {
                         order: 5,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "PeriodType",
+                        conceptIdentifierType: "code",
                     },
                     periodtypeconceptid: {
                         name: "Period type concept id",
@@ -6419,6 +6566,8 @@ const d = {
                         order: 6,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "PeriodType",
+                        conceptIdentifierType: "id",
                     },
                     periodtypeconceptset: {
                         name: "Period type concept set",
@@ -6460,6 +6609,8 @@ const d = {
                         order: 7,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "PeriodType",
+                        conceptIdentifierType: "",
                     },
                 },
                 cohortDefinitionKey: "ObservationPeriod",
@@ -6779,6 +6930,8 @@ const d = {
                         expression:
                             'CAST (@PROC."PROCEDURE_OCCURRENCE_ID" AS VARCHAR)',
                         order: 1,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     procconceptset: {
                         name: "Procedure Occurrence Concept Set",
@@ -6818,6 +6971,8 @@ const d = {
                         expression:
                             'CAST (@PROC."PROCEDURE_OCCURRENCE_ID" AS VARCHAR)',
                         order: 2,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     procdate: {
                         name: "Procedure Date",
@@ -6939,6 +7094,8 @@ const d = {
                         order: 5,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                     modifier: {
                         name: "Modifier",
@@ -6978,6 +7135,7 @@ const d = {
                         expression: '@PROC."MODIFIER_NAME"',
                         order: 6,
                         cohortDefinitionKey: "Modifier",
+                        conceptIdentifierType: "name",
                     },
                     pid: {
                         name: "Patient Id",
@@ -7060,6 +7218,7 @@ const d = {
                         useRefValue: true,
                         useRefText: true,
                         cohortDefinitionKey: "ProcedureType",
+                        conceptIdentifierType: "name",
                     },
                     procconceptcode: {
                         name: "Procedure concept code",
@@ -7103,6 +7262,8 @@ const d = {
                         order: 9,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "code",
                     },
                     proctypeconceptcode: {
                         name: "Procedure type concept code",
@@ -7146,6 +7307,8 @@ const d = {
                         order: 10,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ProcedureType",
+                        conceptIdentifierType: "code",
                     },
                     modifierconceptcode: {
                         name: "Modifier concept code",
@@ -7184,6 +7347,8 @@ const d = {
                         type: "text",
                         expression: '@PROC."MODIFIER_CONCEPT_CODE"',
                         order: 11,
+                        cohortDefinitionKey: "Modifier",
+                        conceptIdentifierType: "code",
                     },
                     proctypeconceptid: {
                         name: "Procedure type concept id",
@@ -7228,6 +7393,8 @@ const d = {
                         order: 12,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ProcedureType",
+                        conceptIdentifierType: "id",
                     },
                     proctypeconceptset: {
                         name: "Procedure type concept set",
@@ -7269,6 +7436,8 @@ const d = {
                         order: 13,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ProcedureType",
+                        conceptIdentifierType: "",
                     },
                     modifierconceptid: {
                         name: "Modifier concept id",
@@ -7308,6 +7477,8 @@ const d = {
                         expression:
                             'CAST (@PROC."MODIFIER_CONCEPT_ID" AS VARCHAR)',
                         order: 14,
+                        cohortDefinitionKey: "Modifier",
+                        conceptIdentifierType: "id",
                     },
                     modifierconceptset: {
                         name: "Modifier concept set",
@@ -7347,6 +7518,8 @@ const d = {
                         expression:
                             'CAST (@PROC."MODIFIER_CONCEPT_ID" AS VARCHAR)',
                         order: 15,
+                        cohortDefinitionKey: "Modifier",
+                        conceptIdentifierType: "",
                     },
                 },
                 cohortDefinitionKey: "ProcedureOccurrence",
@@ -7433,6 +7606,7 @@ const d = {
                         order: 0,
                         useRefValue: true,
                         cohortDefinitionKey: "SpecimenType",
+                        conceptIdentifierType: "name",
                     },
                     diseasestatus: {
                         name: "Disease status",
@@ -7476,6 +7650,7 @@ const d = {
                         order: 1,
                         useRefValue: true,
                         cohortDefinitionKey: "DiseaseStatus",
+                        conceptIdentifierType: "name",
                     },
                     specimenname: {
                         name: "Specimen name",
@@ -7518,6 +7693,8 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 2,
                         useRefValue: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                     anatomicsite: {
                         name: "Anatomic site",
@@ -7561,6 +7738,7 @@ const d = {
                         order: 3,
                         useRefValue: true,
                         cohortDefinitionKey: "AnatomicSite",
+                        conceptIdentifierType: "name",
                     },
                     pid: {
                         name: "Patient Id",
@@ -7840,6 +8018,8 @@ const d = {
                         order: 10,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "code",
                     },
                     specimentypeconceptcode: {
                         name: "Specimen type concept code",
@@ -7883,6 +8063,8 @@ const d = {
                         order: 11,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "SpecimenType",
+                        conceptIdentifierType: "code",
                     },
                     unitconceptcode: {
                         name: "Unit concept code",
@@ -7926,6 +8108,8 @@ const d = {
                         order: 12,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "code",
                     },
                     anatomicsiteconceptcode: {
                         name: "Anatomic site concept code",
@@ -7969,6 +8153,8 @@ const d = {
                         order: 13,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "AnatomicSite",
+                        conceptIdentifierType: "code",
                     },
                     diseasestatusconceptcode: {
                         name: "Disease status concept code",
@@ -8012,6 +8198,8 @@ const d = {
                         order: 14,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DiseaseStatus",
+                        conceptIdentifierType: "code",
                     },
                     specimenconceptid: {
                         name: "Specimen concept id",
@@ -8056,6 +8244,8 @@ const d = {
                         order: 15,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     specimenconceptset: {
                         name: "Specimen concept set",
@@ -8097,6 +8287,8 @@ const d = {
                         order: 16,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     specimentypeconceptid: {
                         name: "Specimen type concept id",
@@ -8141,6 +8333,8 @@ const d = {
                         order: 17,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "SpecimenType",
+                        conceptIdentifierType: "id",
                     },
                     specimentypeconceptset: {
                         name: "Specimen type concept set",
@@ -8183,6 +8377,7 @@ const d = {
                         useRefValue: true,
                         useRefText: true,
                         cohortDefinitionKey: "SpecimenType",
+                        conceptIdentifierType: "",
                     },
                     anatomicsiteconceptid: {
                         name: "Anatomic site concept id",
@@ -8227,6 +8422,8 @@ const d = {
                         order: 19,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "AnatomicSite",
+                        conceptIdentifierType: "id",
                     },
                     anatomicsiteconceptset: {
                         name: "Anatomic site concept set",
@@ -8268,6 +8465,8 @@ const d = {
                         order: 20,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "AnatomicSite",
+                        conceptIdentifierType: "",
                     },
                     diseasestatusconceptid: {
                         name: "Disease status concept id",
@@ -8312,6 +8511,8 @@ const d = {
                         order: 21,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DiseaseStatus",
+                        conceptIdentifierType: "id",
                     },
                     diseasestatusconceptset: {
                         name: "Disease status concept set",
@@ -8354,6 +8555,7 @@ const d = {
                         useRefValue: true,
                         useRefText: true,
                         cohortDefinitionKey: "DiseaseStatus",
+                        conceptIdentifierType: "",
                     },
                     unitconceptid: {
                         name: "Unit concept id",
@@ -8398,6 +8600,8 @@ const d = {
                         order: 23,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "id",
                     },
                     unitconceptset: {
                         name: "Unit concept set",
@@ -8439,6 +8643,7 @@ const d = {
                         useRefValue: true,
                         useRefText: true,
                         cohortDefinitionKey: "Unit",
+                        conceptIdentifierType: "",
                     },
                 },
                 cohortDefinitionKey: "Specimen",
@@ -8640,7 +8845,8 @@ const d = {
                         referenceExpression: "@REF.CONCEPT_NAME",
                         order: 3,
                         useRefValue: true,
-                        cohortDefinitionKey: "VisitDetailTypeCS",
+                        cohortDefinitionKey: "VisitType",
+                        conceptIdentifierType: "name",
                     },
                     visitname: {
                         name: "Visit name",
@@ -8765,6 +8971,8 @@ const d = {
                         order: 6,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "code",
                     },
                     visittypeconceptcode: {
                         name: "Visit type concept code",
@@ -8808,6 +9016,8 @@ const d = {
                         order: 7,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "VisitType",
+                        conceptIdentifierType: "code",
                     },
                     visittypeconceptset: {
                         name: "Visit type concept set",
@@ -8849,6 +9059,8 @@ const d = {
                         order: 8,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "VisitType",
+                        conceptIdentifierType: "",
                     },
                     visitconceptid: {
                         name: "Visit concept Id",
@@ -8893,6 +9105,8 @@ const d = {
                         order: 9,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     visitconceptset: {
                         name: "Visit concept set",
@@ -8934,6 +9148,8 @@ const d = {
                         order: 10,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     visittypeconceptid: {
                         name: "Visit type concept id",
@@ -8975,6 +9191,8 @@ const d = {
                         order: 11,
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "VisitType",
+                        conceptIdentifierType: "id",
                     },
                 },
                 cohortDefinitionKey: "VisitDetail",
