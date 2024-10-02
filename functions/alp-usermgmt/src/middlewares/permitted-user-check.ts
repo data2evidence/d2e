@@ -3,7 +3,7 @@ import { Container } from 'typedi'
 import { UserGroupService, UserService } from '../services'
 import { createLogger } from '../Logger'
 import { IAppRequest } from '../types'
-import * as _  from 'lodash'
+import * as _  from 'lodash-es'
 import { ROLES } from '../const'
 
 interface RoleCheckOptions {

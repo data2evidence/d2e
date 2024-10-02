@@ -14,7 +14,7 @@ services:
       LOCAL_DEBUG: "true"
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
       PLUGINS_SEED: '["d2e-plugins", "d2e-ui"]'
-      PLUGINS_SEED_UPDATE: true
+      PLUGINS_SEED_UPDATE: false
       PLUGINS_DEV_PATH: "./plugins"
       WATCH_FUNCTIONS: false
 
@@ -379,13 +379,3 @@ services:
     build:
       context: ./services/alp-perseus-files-manager
       dockerfile: Dockerfile
-
-  alp-perseus-cdm-builder:
-    build:
-        context: ./services/alp-perseus-cdm-builder
-        dockerfile: Dockerfile
-
-  alp-perseus-white-rabbit:
-    build:
-        context: ./services/alp-perseus-white-rabbit
-        dockerfile: Dockerfile

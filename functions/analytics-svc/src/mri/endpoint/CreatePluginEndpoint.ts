@@ -17,7 +17,7 @@ export async function createEndpointFromRequest(req: IMRIRequest): Promise<{
     const user = getUser(req);
     const lang = user.lang;
     let body: PluginEndpointRequestType = {
-        ...convertZlibBase64ToJson(req.swagger.params.mriquery.value),
+        ...convertZlibBase64ToJson(req.body.mriquery),
     };
 
     if (!body.cohortDefinition.configData) {
@@ -38,8 +38,8 @@ export async function createEndpointFromRequest(req: IMRIRequest): Promise<{
         } else {
             cohortDefinition = body.cohortDefinition;
             //Inject cohort id if exists into cohortDefinition
-            if (req.swagger?.params?.cohortId) {
-                cohortDefinition["cohortId"] = req.swagger.params.cohortId.value;
+            if (req.body?.cohortId) {
+                cohortDefinition["cohortId"] = req.body.cohortId;
                 if (analyticsConnection.dialect === "DUCKDB") {
                     analyticsConnection.conn["studyAnalyticsCredential"] = req.dbCredentials.studyAnalyticsCredential;
                     analyticsConnection.conn["duckdbNativeDBName"] = await analyticsConnection.activate_nativedb_communication(analyticsConnection.conn["studyAnalyticsCredential"]);

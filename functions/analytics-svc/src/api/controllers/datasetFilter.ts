@@ -44,7 +44,7 @@ const DisplayDomainRequirements = {
 export async function getFilterScopes(req: IMRIRequest, res, next: any) {
     try {
         const encodedDatasetsWithSchema =
-            req.swagger.params.datasetsWithSchema.value;
+            req.query.datasetsWithSchema;
 
         const datasetsWithSchema = JSON.parse(
             decodeURIComponent(encodedDatasetsWithSchema)
@@ -125,13 +125,13 @@ export async function getDatabaseSchemaFilterResults(
 ) {
     try {
         const encodedDatasetsWithSchema =
-            req.swagger.params.datasetsWithSchema.value;
+            req.query.datasetsWithSchema;
 
         const datasetsWithSchema = JSON.parse(
             decodeURIComponent(encodedDatasetsWithSchema)
         );
 
-        const encodedFilterParams = req.swagger.params.filterParams.value;
+        const encodedFilterParams = req.query.filterParams;
 
         const filterParams: IDatasetFilterParamsDto = JSON.parse(
             decodeURIComponent(encodedFilterParams)

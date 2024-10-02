@@ -107,8 +107,8 @@ export async function getAllCohorts(req: IMRIRequest, res: Response) {
             analyticsConnection.schemaName
         );
 
-        const offset = req.swagger.params.offset.value;
-        const limit = req.swagger.params.limit.value;
+        const offset = req.query.offset;
+        const limit = req.query.limit;
 
         // Send empty object to query all cohorts
         let result = await cohortEndpoint.queryCohorts({}, offset, limit);
@@ -126,11 +126,11 @@ export async function getAllCohorts(req: IMRIRequest, res: Response) {
 export async function getFilteredCohorts(req: IMRIRequest, res: Response) {
     try {
         const analyticsConnection = await getCohortAnalyticsConnection(req);
-        const filterColumn = req.swagger.params.filterColumn.value;
-        const filterValue = req.swagger.params.filterValue.value;
-        const offset = req.swagger.params.offset.value;
-        const limit = req.swagger.params.limit.value;
-        const studyId = req.swagger.params.studyId.value;
+        const filterColumn = req.params.filterColumn;
+        const filterValue = req.params.filterValue;
+        const offset = req.query.offset;
+        const limit = req.query.limit;
+        const studyId = req.query.studyId;
 
         let cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
@@ -166,17 +166,17 @@ export async function getFilteredCohorts(req: IMRIRequest, res: Response) {
 
 export async function createCohort(req: IMRIRequest, res: Response) {
     try {
-        const studyId = req.swagger.params.cohort.value.studyId;
+        const studyId = req.body.cohort.studyId;
         const analyticsConnection = await getCohortAnalyticsConnection(req);
 
         const { schemaName, databaseCode, vocabSchemaName } =
             await getStudyDetails(studyId, res);
         const language = getUser(req).lang;
         const requestQuery: string[] | undefined =
-            req.swagger.params?.query?.value?.split(",");
+            req.body?.query?.split(",");
         // Remap mriquery for use in createEndpointFromRequest
-        req.swagger.params.mriquery = {
-            value: req.swagger.params.cohort.value.mriquery,
+        req.body.mriquery = {
+            value: req.body.cohort.mriquery,
         };
         const { cohortDefinition } = await createEndpointFromRequest(req);
 
@@ -211,16 +211,16 @@ export async function createCohort(req: IMRIRequest, res: Response) {
             );
             const now = +new Date();
             const { bookmarkId } = JSON.parse(
-                req.swagger.params.cohort.value.syntax
+                req.body.cohort.syntax
             );
             await dataflowRequest(req, "POST", `cohort/flow-run`, {
                 options: {
-                    owner: req.swagger.params.cohort.value.owner,
+                    owner: req.body.cohort.owner,
                     token: req.headers.authorization,
                     datasetId: studyId,
                     cohortJson: {
                         id: 1, // Not used by us
-                        name: req.swagger.params.cohort.value.name,
+                        name: req.body.cohort.name,
                         tags: [],
                         expression: {
                             datasetId: studyId, // required for cohort filtering
@@ -232,7 +232,7 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                         expressionType: "SIMPLE_EXPRESSION",
                         hasWriteAccess: false,
                     },
-                    description: req.swagger.params.cohort.value.description,
+                    description: req.body.cohort.description,
                     schemaName,
                     databaseCode,
                     vocabSchemaName,
@@ -292,13 +292,13 @@ export async function generateCohortDefinition(
     res: Response
 ) {
     try {
-        const studyId = req.swagger.params.cohort.value.studyId;
+        const studyId = req.body.cohort.tudyId;
 
         const { vocabSchemaName } = await getStudyDetails(studyId, res);
         const language = getUser(req).lang;
         // Remap mriquery for use in createEndpointFromRequest
-        req.swagger.params.mriquery = {
-            value: req.swagger.params.cohort.value.mriquery,
+        req.body.mriquery = {
+            value: req.body.cohort.mriquery,
         };
         const { cohortDefinition } = await createEndpointFromRequest(req);
 
@@ -349,17 +349,17 @@ export async function createCohortDefinition(req: IMRIRequest, res: Response) {
         );
 
         const cohortDefiniton = <CohortDefinitionTableType>{
-            name: req.swagger.params.cohortDefinition.value.name,
-            description: req.swagger.params.cohortDefinition.value.description,
-            owner: req.swagger.params.cohortDefinition.value.owner,
+            name: req.body.cohortDefinition.name,
+            description: req.body.cohortDefinition.description,
+            owner: req.body.cohortDefinition.owner,
             creationTimestamp: new Date(),
             modificationTimestamp: null,
             definitionTypeConceptId:
-                req.swagger.params.cohortDefinition.value
+                req.body.cohortDefinition
                     .definitionTypeConceptId,
             subjectConceptId:
-                req.swagger.params.cohortDefinition.value.subjectConceptId,
-            syntax: req.swagger.params.cohortDefinition.value.syntax,
+                req.body.cohortDefinition.subjectConceptId,
+            syntax: req.body.cohortDefinition.syntax,
         };
 
         await cohortEndpoint.saveCohortDefinitionToDb(cohortDefiniton);
@@ -380,7 +380,7 @@ export async function createCohortDefinition(req: IMRIRequest, res: Response) {
 export async function deleteCohort(req: IMRIRequest, res: Response) {
     try {
         // Delete cohort from database
-        const cohortId = req.swagger.params.cohortId.value;
+        const cohortId = req.query.cohortId;
         const analyticsConnection = await getCohortAnalyticsConnection(req);
 
         let cohortEndpoint = new CohortEndpoint(
@@ -407,7 +407,7 @@ export async function deleteCohort(req: IMRIRequest, res: Response) {
 async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
     try {
         // Extract mriquery and use pluginEndpoint.retrieveData to get patient list
-        let mriquery = req.swagger.params.cohort.value.mriquery;
+        let mriquery = req.body.cohort.mriquery;
         const { cohortDefinition, studyId, pluginEndpoint } =
             await createEndpointFromRequest(req);
         pluginEndpoint.setRequest(req);
@@ -430,15 +430,15 @@ async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
         // Create cohort object
         let cohort = <CohortType>{
             patientIds,
-            name: req.swagger.params.cohort.value.name,
-            description: req.swagger.params.cohort.value.description,
+            name: req.body.cohort.name,
+            description: req.body.cohort.description,
             creationTimestamp: new Date(),
             modificationTimestamp: null,
-            owner: req.swagger.params.cohort.value.owner,
+            owner: req.body.cohort.owner,
             definitionTypeConceptId:
-                req.swagger.params.cohort.value.definitionTypeConceptId,
-            subjectConceptId: req.swagger.params.cohort.value.subjectConceptId,
-            syntax: req.swagger.params.cohort.value.syntax,
+                req.body.cohort.definitionTypeConceptId,
+            subjectConceptId: req.body.cohort.subjectConceptId,
+            syntax: req.body.cohort.syntax,
         };
 
         return cohort;

@@ -7,8 +7,8 @@ import { env } from "../../env";
 const log = Logger.CreateLogger("analytics-log");
 
 export async function retrieveParquetStream(req: IMRIRequest, res) {
-    const studyId = req.swagger.params.studyId.value;
-    const tableName = req.swagger.params.tableName.value;
+    const studyId = req.params.studyId;
+    const tableName = req.params.tableName;
     try {
         const studies = await new PortalServerAPI().getStudies(
             req.headers.authorization

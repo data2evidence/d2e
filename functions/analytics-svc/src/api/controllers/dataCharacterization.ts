@@ -133,10 +133,10 @@ export async function getDataCharacterizationResult(
     next
 ) {
     try {
-        const databaseName = req.swagger.params.databaseName.value;
-        const resultsSchema = req.swagger.params.resultsSchema.value;
-        const vocabSchema = req.swagger.params.vocabSchema.value;
-        const sourceKey = req.swagger.params.sourceKey.value;
+        const databaseName = req.params.databaseName;
+        const resultsSchema = req.params.resultsSchema;
+        const vocabSchema = req.params.vocabSchema;
+        const sourceKey = req.params.sourceKey;
         const { studyAnalyticsCredential } = req.dbCredentials;
 
         const analyticsConnection =
@@ -197,11 +197,11 @@ export async function getDataCharacterizationDrilldownResult(
     next
 ) {
     try {
-        const databaseName = req.swagger.params.databaseName.value;
-        const resultsSchema = req.swagger.params.resultsSchema.value;
-        const vocabSchema = req.swagger.params.vocabSchema.value;
-        const sourceKey = req.swagger.params.sourceKey.value;
-        const conceptId = req.swagger.params.conceptId.value;
+        const databaseName = req.params.databaseName;
+        const resultsSchema = req.params.resultsSchema;
+        const vocabSchema = req.params.vocabSchema;
+        const sourceKey = req.params.sourceKey;
+        const conceptId = req.params.conceptId;
         const { studyAnalyticsCredential } = req.dbCredentials;
 
         const analyticsConnection =

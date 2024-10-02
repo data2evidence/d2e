@@ -19,14 +19,14 @@ export function values(req: IMRIRequest, res, next) {
     const { analyticsConnection } = req.dbConnections;
     const user = getUser(req);
     const language = user.lang;
-    const attributePath = req.swagger.params.attributePath.value;
-    const attributeType = req.swagger.params.attributeType.value;
-    const configId = req.swagger.params.configId.value;
-    const configVersion = req.swagger.params.configVersion.value;
-    const suggestionLimit = req.swagger.params.suggestionLimit.value;
+    const attributePath = req.query.attributePath;
+    const attributeType = req.query.attributeType;
+    const configId = req.query.configId;
+    const configVersion = req.query.configVersion;
+    const suggestionLimit = req.query.suggestionLimit;
     const selectedStudyEntityValue =
-        req.swagger.params.selectedStudyEntityValue.value;
-    const searchQuery = req.swagger.params.searchQuery?.value || "";
+        req.query.selectedStudyEntityValue;
+    const searchQuery = req.query.searchQuery? || "";
     const studies: StudyDbMetadata[] = req.studiesDbMetadata.studies;
     if (studies && studies.length > 0) {
         const studyMetadata: StudyDbMetadata = studies.find(

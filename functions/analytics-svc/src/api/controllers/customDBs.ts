@@ -5,7 +5,7 @@ import { CustomDBsEndpoint } from "../../mri/endpoint/CustomDBsEndpoint";
 const language = 'en';
 let regex = new RegExp(/^[a-zA-Z0-9_]+$/);
 export async function customDBTableNames(req: IMRIRequest, res, next) {
-    const schemaName = req.swagger.params.schemaName.value;
+    const schemaName = req.params.schemaName;
     const { analyticsConnection } = req.dbConnections;
 
     if (!regex.test(schemaName)) {
@@ -30,8 +30,8 @@ export async function customDBTableNames(req: IMRIRequest, res, next) {
 }
 
 export async function customDBTable(req: IMRIRequest, res, next) {
-    const schemaName = req.swagger.params.schemaName.value;
-    const tableName = req.swagger.params.tableName.value;
+    const schemaName = req.params.schemaName;
+    const tableName = req.params.tableName;
     const { analyticsConnection } = req.dbConnections;
 
     if (!regex.test(schemaName)) {

@@ -46,16 +46,16 @@ export async function getmultiplecohortdata(req: IMRIRequest, res) {
     let configVersion: string;
     let userSelectedAttributes: PluginColumnType[] = [];
 
-    let chartType: string = req.swagger.params.chartType.value;
-    let yaxis: string = req.swagger.params.yaxis.value;
-    let bmkIds: string = req.swagger.params.ids.value;
-    let studyId: string = req.swagger.params.selectedStudyEntityValue.value;
+    let chartType: string = req.params.chartType;
+    let yaxis: string = req.query.yaxis;
+    let bmkIds: string = req.query.ids;
+    let studyId: string = req.query.selectedStudyEntityValue;
 
     if (
-        req.swagger.params.xaxis.value &&
-        req.swagger.params.xaxis.value !== "undefined"
+        req.query.xaxis &&
+        req.query.xaxis !== "undefined"
     ) {
-        userSelectedAttributes = (req.swagger.params.xaxis.value as string)
+        userSelectedAttributes = (req.query.xaxis as string)
             .split(",")
             .map((configPath) => ({
                 configPath,
@@ -64,11 +64,11 @@ export async function getmultiplecohortdata(req: IMRIRequest, res) {
             }));
     }
     if (
-        req.swagger.params.configId.value &&
-        req.swagger.params.configVersion.value
+        req.query.configId &&
+        req.query.configVersion
     ) {
-        configId = req.swagger.params.configId.value;
-        configVersion = req.swagger.params.configVersion.value;
+        configId = req.query.configId;
+        configVersion = req.query.configVersion;
     }
 
     let schemaName = await getSchemaName(studyId, lang, res);

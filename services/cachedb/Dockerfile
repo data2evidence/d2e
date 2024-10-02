@@ -60,4 +60,3 @@ FROM base AS production
 ENTRYPOINT ["/tini", "--"]
 CMD cd ./envConverter && yarn generate:envs -s alp-minerva-analytics-svc && cd - && . ./generated-env.sh && python ./src/main.py
 
-
