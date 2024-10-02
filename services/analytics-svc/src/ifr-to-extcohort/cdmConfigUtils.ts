@@ -16,6 +16,7 @@ import {
     getConceptByCode,
     getConceptById,
     getConceptByName,
+    getConceptsFromConceptSet,
 } from "./conceptGetters";
 
 export const getExtCohortKeyForEvent = (
@@ -122,7 +123,11 @@ const extractConceptSets = async (
     req: IMRIRequest,
     datasetId: string
 ) => {
-    const conceptsForSet: { concept: ExtCohortConcept }[] = [];
+    const conceptsForSet: {
+        concept: ExtCohortConcept;
+        includeDescendants?: boolean;
+        includeMapped?: boolean;
+    }[] = [];
     for (
         let attributesContentIndex = 0;
         attributesContentIndex < filter.attributes?.content.length;
@@ -169,13 +174,19 @@ const extractConceptSets = async (
                 continue;
             }
             if (type === "conceptSet") {
-                // TODO: get all the concepts and use them
+                const concepts = await getConceptsFromConceptSet({
+                    conceptSetId: String(conceptValue),
+                    req,
+                    datasetId,
+                });
+                concepts.forEach((concept) => {
+                    conceptsForSet.push({
+                        concept,
+                        includeDescendants: concept.USEDESCENDANTS,
+                        includeMapped: concept.USEMAPPED,
+                    });
+                });
             }
-            // TODO: Handle getting concept values for different types of conceptIdentifierTypes
-            // Only interactions with conceptIdentifierType use concept sets in ATLAS.
-            // Other string type attributes may use concepts, but do not use concept sets.
-            // conceptIdentifierTypes include "name", "code", "id", to specify which column of concept to select from.
-            // Sole example found in cdm-config-with-extCohort-mapping.ts:804
             if (!conceptIdentifierType) {
                 continue;
             }

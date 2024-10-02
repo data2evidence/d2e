@@ -71,3 +71,24 @@ export const getConceptByCode = async ({
 
     return concept[0] ? upperCaseKeys(concept[0]) : null;
 };
+
+export const getConceptsFromConceptSet = async ({
+    conceptSetId,
+    req,
+    datasetId,
+}: {
+    conceptSetId: string;
+    req: IMRIRequest;
+    datasetId: string;
+}): Promise<ExtCohortConcept[] | null> => {
+    const { concepts } = await terminologyRequest(
+        req,
+        "GET",
+        `concept-set/${conceptSetId}?datasetId=${datasetId}`,
+        null
+    );
+
+    return concepts.length
+        ? concepts.map((concept) => upperCaseKeys(concept))
+        : null;
+};
