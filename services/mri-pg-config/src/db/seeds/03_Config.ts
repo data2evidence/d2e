@@ -18443,6 +18443,8 @@ export const cdwConfigDuckdb = {
             order: 0,
             domainFilter: "",
             standardConceptCodeFilter: "",
+            cohortDefinitionKey: "CodesetId",
+            conceptIdentifierType: "name",
           },
         },
         cohortDefinitionKey: "ConditionOccurrence",
