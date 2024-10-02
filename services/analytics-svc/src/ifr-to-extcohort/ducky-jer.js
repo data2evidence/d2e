@@ -376,6 +376,7 @@ const he = {
                         useRefValue: true,
                         useRefText: true,
                         cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                 },
                 cohortDefinitionKey: "ConditionEra",
@@ -698,6 +699,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ConditionType_list",
+                        conceptIdentifierType: "",
                     },
                     conditionsourceconceptset: {
                         name: [
@@ -790,6 +793,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ConditionStatus_list",
+                        conceptIdentifierType: "",
                     },
                     conditionconceptid: {
                         name: [
@@ -840,6 +845,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     conditionconceptset: {
                         name: [
@@ -887,6 +894,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     conditiontypeconceptid: {
                         name: [
@@ -937,6 +946,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ConditionType_list",
+                        conceptIdentifierType: "id",
                     },
                     conditionsourceconceptid: {
                         name: [
@@ -1032,6 +1043,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ConditionStatus_list",
+                        conceptIdentifierType: "id",
                     },
                     condition_occ_concept_name: {
                         name: [
@@ -1178,6 +1191,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DeathType_list",
+                        conceptIdentifierType: "",
                     },
                     pid: {
                         name: [
@@ -1364,6 +1379,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DeathType_list",
+                        conceptIdentifierType: "id",
                     },
                     death_type_concept_name: {
                         name: [
@@ -1412,7 +1429,8 @@ const he = {
                         order: 0,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
-                        cohortDefinitionKey: "DeathType",
+                        cohortDefinitionKey: "DeathType_list",
+                        conceptIdentifierType: "name",
                     },
                 },
                 cohortDefinitionKey: "Death",
@@ -1690,6 +1708,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DeviceType_list",
+                        conceptIdentifierType: "",
                     },
                     deviceconceptid: {
                         name: [
@@ -1740,6 +1760,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     deviceconceptset: {
                         name: [
@@ -1787,6 +1809,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     devicetypeconceptid: {
                         name: [
@@ -1837,6 +1861,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DeviceType_list",
+                        conceptIdentifierType: "id",
                     },
                     device_concept_name: {
                         name: [
@@ -1888,6 +1914,8 @@ const he = {
                         order: 0,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                 },
                 cohortDefinitionKey: "DeviceExposure",
@@ -2211,6 +2239,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     unitconceptset: {
                         name: [
@@ -2258,6 +2288,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit_list",
+                        conceptIdentifierType: "",
                     },
                     drugconceptid: {
                         name: [
@@ -2308,6 +2340,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     unitconceptid: {
                         name: [
@@ -2358,6 +2392,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit_list",
+                        conceptIdentifierType: "id",
                     },
                 },
                 cohortDefinitionKey: "DoseEra",
@@ -2725,6 +2761,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     drugconceptid: {
                         name: [
@@ -2775,6 +2813,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                 },
                 cohortDefinitionKey: "DrugEra",
@@ -3418,6 +3458,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     drugconceptset: {
                         name: [
@@ -3465,6 +3507,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     routeconceptid: {
                         name: [
@@ -3515,6 +3559,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "RouteConcept_list",
+                        conceptIdentifierType: "id",
                     },
                     routeconceptset: {
                         name: [
@@ -3562,6 +3608,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "RouteConcept_list",
+                        conceptIdentifierType: "",
                     },
                     drugtypeconceptid: {
                         name: [
@@ -3612,6 +3660,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DrugType_list",
+                        conceptIdentifierType: "id",
                     },
                     drugtypeconceptset: {
                         name: [
@@ -3659,6 +3709,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DrugType_list",
+                        conceptIdentifierType: "",
                     },
                     drug_concept_name: {
                         name: [
@@ -3710,6 +3762,8 @@ const he = {
                         order: 0,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                 },
                 cohortDefinitionKey: "DrugExposure",
@@ -3987,7 +4041,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "MeasurementType",
+                        cohortDefinitionKey: "MeasurementType_list",
+                        conceptIdentifierType: "",
                     },
                     valueasconceptset: {
                         name: [
@@ -4033,6 +4088,8 @@ const he = {
                         order: 12,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "ValueAsConcept_list",
+                        conceptIdentifierType: "",
                     },
                     unitconceptset: {
                         name: [
@@ -4078,6 +4135,8 @@ const he = {
                         order: 14,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "Unit_list",
+                        conceptIdentifierType: "",
                     },
                     measurementconceptid: {
                         name: [
@@ -4128,6 +4187,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     measurementconceptset: {
                         name: [
@@ -4175,6 +4236,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     measurementtypeconceptid: {
                         name: [
@@ -4225,6 +4288,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "MeasurementType_list",
+                        conceptIdentifierType: "id",
                     },
                     valueasconceptid: {
                         name: [
@@ -4270,6 +4335,8 @@ const he = {
                         order: 18,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "ValueAsConcept_list",
+                        conceptIdentifierType: "id",
                     },
                     unitconceptid: {
                         name: [
@@ -4315,6 +4382,8 @@ const he = {
                         order: 19,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "Unit_list",
+                        conceptIdentifierType: "id",
                     },
                     meas_concept_name: {
                         name: [
@@ -4366,6 +4435,8 @@ const he = {
                         order: 0,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                 },
                 cohortDefinitionKey: "Measurement",
@@ -4733,6 +4804,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     observationtypeconceptid: {
                         name: [
@@ -4784,6 +4857,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ObservationType_list",
+                        conceptIdentifierType: "id",
                     },
                     observationtypeconceptset: {
                         name: [
@@ -4831,6 +4906,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ObservationType_list",
+                        conceptIdentifierType: "",
                     },
                     valueasconceptid: {
                         name: [
@@ -4876,6 +4953,8 @@ const he = {
                         order: 20,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "ValueAsConcept_list",
+                        conceptIdentifierType: "id",
                     },
                     valueasconceptset: {
                         name: [
@@ -4921,6 +5000,8 @@ const he = {
                         order: 21,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "ValueAsConcept_list",
+                        conceptIdentifierType: "",
                     },
                     qualifierconceptid: {
                         name: [
@@ -4971,6 +5052,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Qualifier_list",
+                        conceptIdentifierType: "id",
                     },
                     qualifierconceptset: {
                         name: [
@@ -5018,6 +5101,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Qualifier_list",
+                        conceptIdentifierType: "",
                     },
                     unitconceptid: {
                         name: [
@@ -5069,6 +5154,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit_list",
+                        conceptIdentifierType: "id",
                     },
                     unitconceptset: {
                         name: [
@@ -5116,7 +5203,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "Unit",
+                        cohortDefinitionKey: "Unit_list",
+                        conceptIdentifierType: "id",
                     },
                     obsconceptid: {
                         name: [
@@ -5167,6 +5255,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     obs_concept_name: {
                         name: [
@@ -5218,6 +5308,8 @@ const he = {
                         order: 0,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                 },
                 cohortDefinitionKey: "Observation",
@@ -5498,6 +5590,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "PeriodType_list",
+                        conceptIdentifierType: "id",
                     },
                     periodtypeconceptset: {
                         name: [
@@ -5545,6 +5639,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "PeriodType_list",
+                        conceptIdentifierType: "",
                     },
                 },
                 cohortDefinitionKey: "ObservationPeriod",
@@ -5914,6 +6010,8 @@ const he = {
                         order: 2,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     procconceptset: {
                         name: [
@@ -5959,6 +6057,8 @@ const he = {
                         order: 3,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     procdate: {
                         name: [
@@ -6147,6 +6247,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "ProcedureType_list",
+                        conceptIdentifierType: "id",
                     },
                     proctypeconceptset: {
                         name: [
@@ -6194,7 +6296,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "ProcedureType",
+                        cohortDefinitionKey: "ProcedureType_list",
+                        conceptIdentifierType: "",
                     },
                     modifierconceptid: {
                         name: [
@@ -6240,6 +6343,8 @@ const he = {
                         order: 16,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "Modifier_list",
+                        conceptIdentifierType: "id",
                     },
                     modifierconceptset: {
                         name: [
@@ -6285,6 +6390,8 @@ const he = {
                         order: 17,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "Modifier_list",
+                        conceptIdentifierType: "",
                     },
                     proc_occ_concept_name: {
                         name: [
@@ -6336,6 +6443,8 @@ const he = {
                         order: 0,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                     Procedure_concept_id_copy_cf2468c2_0849_4d67_8fa7_e876aef757a1:
                         {
@@ -6388,6 +6497,8 @@ const he = {
                             standardConceptCodeFilter: "",
                             useRefValue: true,
                             useRefText: true,
+                            cohortDefinitionKey: "CodesetId",
+                            conceptIdentifierType: "id",
                         },
                 },
                 cohortDefinitionKey: "ProcedureOccurrence",
@@ -6715,6 +6826,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     specimenconceptset: {
                         name: [
@@ -6762,6 +6875,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     specimentypeconceptid: {
                         name: [
@@ -6813,6 +6928,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "SpecimenType_id",
+                        conceptIdentifierType: "id",
                     },
                     specimentypeconceptset: {
                         name: [
@@ -6860,7 +6977,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "SpecimenType",
+                        cohortDefinitionKey: "SpecimenType_id",
+                        conceptIdentifierType: "",
                     },
                     anatomicsiteconceptid: {
                         name: [
@@ -6912,6 +7030,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "AnatomicSite_id",
+                        conceptIdentifierType: "id",
                     },
                     anatomicsiteconceptset: {
                         name: [
@@ -6959,7 +7079,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "AnatomicSite",
+                        cohortDefinitionKey: "AnatomicSite_id",
+                        conceptIdentifierType: "",
                     },
                     diseasestatusconceptid: {
                         name: [
@@ -7011,6 +7132,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "DiseaseStatus_id",
+                        conceptIdentifierType: "id",
                     },
                     diseasestatusconceptset: {
                         name: [
@@ -7058,7 +7181,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "DiseaseStatus",
+                        cohortDefinitionKey: "DiseaseStatus_id",
+                        conceptIdentifierType: "",
                     },
                     unitconceptid: {
                         name: [
@@ -7110,6 +7234,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "Unit_id",
+                        conceptIdentifierType: "id",
                     },
                     unitconceptset: {
                         name: [
@@ -7157,7 +7283,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
-                        cohortDefinitionKey: "Unit",
+                        cohortDefinitionKey: "Unit_id",
+                        conceptIdentifierType: "",
                     },
                     specimen_concept_name: {
                         name: [
@@ -7209,6 +7336,8 @@ const he = {
                         order: 0,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                 },
                 cohortDefinitionKey: "Specimen",
@@ -7486,6 +7615,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "VisitType_list",
+                        conceptIdentifierType: "",
                     },
                     visitconceptid: {
                         name: [
@@ -7537,6 +7668,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "id",
                     },
                     visitconceptset: {
                         name: [
@@ -7584,6 +7717,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "",
                     },
                     visittypeconceptid: {
                         name: [
@@ -7634,6 +7769,8 @@ const he = {
                         standardConceptCodeFilter: "",
                         useRefValue: true,
                         useRefText: true,
+                        cohortDefinitionKey: "VisitType_list",
+                        conceptIdentifierType: "id",
                     },
                     visit_occ_concept_name: {
                         name: [
@@ -7685,9 +7822,11 @@ const he = {
                         order: 0,
                         domainFilter: "",
                         standardConceptCodeFilter: "",
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                 },
-                cohortDefinitionKey: "VisitDetail",
+                cohortDefinitionKey: "VisitOccurrence",
             },
             Consent_74db26d2_bb75_489a_a841_051c85dc897b: {
                 name: [
@@ -9581,7 +9720,7 @@ const he = {
                 standardConceptCodeFilter: "",
                 useRefValue: true,
                 useRefText: true,
-                cohortDefinitionKey: "Ethnicity",
+                cohortDefinitionKey: "Ethnicity_list",
                 conceptIdentifierType: "id",
             },
             locationid: {
@@ -9828,7 +9967,7 @@ const he = {
                 standardConceptCodeFilter: "",
                 useRefValue: true,
                 useRefText: true,
-                cohortDefinitionKey: "Gender",
+                cohortDefinitionKey: "Gender_list",
                 conceptIdentifierType: "id",
             },
             Gender_concept_name: {
@@ -9882,7 +10021,7 @@ const he = {
                 standardConceptCodeFilter: "",
                 useRefValue: true,
                 useRefText: true,
-                cohortDefinitionKey: "Gender",
+                cohortDefinitionKey: "Gender_list",
                 conceptIdentifierType: "name",
             },
             raceconceptid: {
@@ -9934,7 +10073,7 @@ const he = {
                 standardConceptCodeFilter: "",
                 useRefValue: true,
                 useRefText: true,
-                cohortDefinitionKey: "Race",
+                cohortDefinitionKey: "Race_list",
                 conceptIdentifierType: "id",
             },
             Age: {
@@ -10033,7 +10172,7 @@ const he = {
                 standardConceptCodeFilter: "",
                 useRefValue: true,
                 useRefText: true,
-                cohortDefinitionKey: "Race",
+                cohortDefinitionKey: "Race_list",
                 conceptIdentifierType: "name",
             },
             ethnicityName: {
@@ -10088,7 +10227,7 @@ const he = {
                 standardConceptCodeFilter: "",
                 useRefValue: true,
                 useRefText: true,
-                cohortDefinitionKey: "Ethnicity",
+                cohortDefinitionKey: "Ethnicity_list",
                 conceptIdentifierType: "name",
             },
         },
