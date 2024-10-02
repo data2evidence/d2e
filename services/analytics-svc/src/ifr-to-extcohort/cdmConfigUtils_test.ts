@@ -79,7 +79,6 @@ describe("convertEventAttributesToConceptSets", () => {
                 cdmConfig,
                 ifr.filter.cards.content,
                 req,
-                "",
                 ""
             )
         ).toEqual(expected);

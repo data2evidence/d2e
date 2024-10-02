@@ -23,7 +23,6 @@ export const convertIFRToExtCohort = async (
         cdmConfig,
         ifrDefinition.filter.cards.content,
         req,
-        vocabSchemaName,
         datasetId
     );
     const demography = ifrDefinition.filter.cards.content.shift() as
