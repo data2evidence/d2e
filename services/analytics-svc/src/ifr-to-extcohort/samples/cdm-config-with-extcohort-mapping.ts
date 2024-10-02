@@ -2422,8 +2422,9 @@ export default {
                         referenceFilter:
                             "@REF.\"DOMAIN_ID\" = 'Drug' AND @REF.\"STANDARD_CONCEPT\" = 'S' AND (@REF.\"CONCEPT_NAME\") LIKE_REGEXPR '@SEARCH_QUERY' FLAG 'i'",
                         referenceExpression: '@REF."CONCEPT_NAME"',
-                        conceptIdentifierType: "name",
                         order: 5,
+                        cohortDefinitionKey: "CodesetId",
+                        conceptIdentifierType: "name",
                     },
                     pid: {
                         name: [
@@ -9613,6 +9614,7 @@ export default {
                 referenceExpression: '@REF."CONCEPT_NAME"',
                 order: 8,
                 cohortDefinitionKey: "Gender",
+                conceptIdentifierType: "name",
             },
             Ethnicity: {
                 name: [

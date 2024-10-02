@@ -143,6 +143,11 @@ const extractConceptSets = async (
                     ? constraintContent.value
                     : undefined;
 
+            const cohortDefinitionKey: string | null =
+                _.get(
+                    cdmConfig,
+                    `${filter.attributes?.content?.[attributesContentIndex].configPath}.cohortDefinitionKey`
+                ) || null;
             const conceptIdentifierType: "name" | "code" | "id" | null =
                 _.get(
                     cdmConfig,
@@ -160,7 +165,7 @@ const extractConceptSets = async (
                     `${filter.attributes?.content?.[attributesContentIndex].configPath}.type`
                 ) || null;
 
-            if (!conceptValue) {
+            if (!conceptValue || cohortDefinitionKey !== "CodesetId") {
                 continue;
             }
             if (type === "conceptSet") {
