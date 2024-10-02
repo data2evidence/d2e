@@ -1,4 +1,4 @@
-FROM prefecthq/prefect:2.20.2-python3.11 
+FROM prefecthq/prefect:3.0.3-python3.11
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl
 
