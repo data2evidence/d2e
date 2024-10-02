@@ -53,7 +53,7 @@ export const convertEventAttributesToConceptSets = async (
     req: IMRIRequest,
     datasetId: string
 ) => {
-    const nonBasicInfoFilterCards = filterCards;
+    const [, ...nonBasicInfoFilterCards] = filterCards;
     const conceptSets: ExtCohortConceptSet[] = [];
     for (let i = 0; i < nonBasicInfoFilterCards.length; i += 1) {
         const filterCard = nonBasicInfoFilterCards[i];
@@ -174,24 +174,13 @@ const extractConceptSets = async (
             if (!conceptIdentifierType) {
                 continue;
             }
-            const concept =
-                conceptIdentifierType === "name"
-                    ? await getConceptByName({
-                          conceptName: conceptValue as string,
-                          req,
-                          datasetId,
-                      })
-                    : conceptIdentifierType === "code"
-                    ? await getConceptByCode({
-                          conceptCode: conceptValue as string,
-                          req,
-                          datasetId,
-                      })
-                    : await getConceptById({
-                          conceptId: conceptValue as number,
-                          req,
-                          datasetId,
-                      });
+
+            const concept = await getConcept(
+                conceptValue,
+                req,
+                datasetId,
+                conceptIdentifierType
+            );
 
             if (!concept) {
                 continue;
@@ -296,18 +285,27 @@ export const createDemographicCriteriaList = async (
         if (!(attributeInfo?.key && attributeInfo?.type)) {
             continue;
         }
+
+        const conceptIdentifierType: "name" | "code" | "id" | null =
+            _.get(
+                cdmConfig,
+                `${filterCard.configPath}.conceptIdentifierType`
+            ) || null;
         const constraintContent = filterCard.constraints.content[0];
         if (constraintContent && "operator" in constraintContent) {
             const valueOrConceptName =
                 constraintContent && "value" in constraintContent
                     ? constraintContent.value
                     : undefined;
-            if (typeof valueOrConceptName === "string") {
-                const concept = await getConceptByName({
-                    conceptName: valueOrConceptName,
+
+            if (conceptIdentifierType) {
+                const concept = await getConcept(
+                    constraintContent.value,
                     req,
                     datasetId,
-                });
+                    conceptIdentifierType
+                );
+
                 if (!concept) {
                     continue;
                 }
@@ -488,15 +486,22 @@ export const createCriteriaList = async (
                                 }
                                 attributesForFilter[attributeInfo.key] =
                                     conceptSet.id;
-                            } else if (
-                                attributeInfo.type === "text" &&
-                                typeof constraintContent.value === "string"
-                            ) {
-                                const concept = await getConceptByName({
-                                    conceptName: constraintContent.value,
+                            } else {
+                                const conceptIdentifierType:
+                                    | "name"
+                                    | "code"
+                                    | "id"
+                                    | null =
+                                    _.get(
+                                        cdmConfig,
+                                        `${attribute.configPath}.conceptIdentifierType`
+                                    ) || null;
+                                const concept = await getConcept(
+                                    constraintContent.value,
                                     req,
                                     datasetId,
-                                });
+                                    conceptIdentifierType
+                                );
                                 attributesForFilter[attributeInfo.key] =
                                     attributesForFilter[attributeInfo.key] ||
                                     [];
@@ -602,4 +607,33 @@ const getOccurrence = (isExcluded: boolean) => {
         Type: 2, // The criteria container always allows any (Type 2) criteria
         Count: 1,
     };
+};
+const getConcept = async (
+    value: number | string,
+    req: IMRIRequest,
+    datasetId: string,
+    conceptIdentifierType: "name" | "code" | "id" | null
+) => {
+    if (!conceptIdentifierType) {
+        return null;
+    }
+    const concept =
+        conceptIdentifierType === "name"
+            ? await getConceptByName({
+                  conceptName: value as string,
+                  req,
+                  datasetId,
+              })
+            : conceptIdentifierType === "code"
+            ? await getConceptByCode({
+                  conceptCode: value as string,
+                  req,
+                  datasetId,
+              })
+            : await getConceptById({
+                  conceptId: value as unknown as number,
+                  req,
+                  datasetId,
+              });
+    return concept;
 };
