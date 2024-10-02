@@ -1,5 +1,5 @@
 name: Docker Build, Push, Prune
-run-name: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
+run-name: ${{ inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
 
 on:
   pull_request:
@@ -38,12 +38,12 @@ on:
         type: string
 
 concurrency:
-  group: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build-push-prune
+  group: ${{ inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}-${{ github.event_name }}-docker-build-push-prune
   cancel-in-progress: true
 
 env:
-  GIT_BRANCH_NAME: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
-  GIT_REPO_FULL_NAME: ${{ github.event.inputs.GIT_REPO_FULL_NAME || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
+  GIT_BRANCH_NAME: ${{ inputs.GIT_BRANCH_NAME || github.head_ref || github.ref_name }}
+  GIT_REPO_FULL_NAME: ${{ inputs.GIT_REPO_FULL_NAME || github.event.pull_request.head.repo.full_name || github.event.repository.full_name }} # workflow_dispatch || pull_request || push
 
 jobs:
   setup:

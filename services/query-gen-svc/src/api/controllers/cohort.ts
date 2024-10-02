@@ -85,37 +85,64 @@ export async function generateQuery(req: IMRIRequest, res, next) {
             censoringThreshold
         ).generateQuery();
 
-        const queryString = `
-        INSERT
-            INTO
-            $$SCHEMA$$.COHORT (COHORT_DEFINITION_ID,
-            SUBJECT_ID,
-            COHORT_START_DATE,
-            COHORT_END_DATE)
-        WITH cohortdata AS (
-            SELECT 
-            "pTable".${placeholderMap["@PATIENT.PATIENT_ID"]} AS SUBJECT_ID,
-            %(cohortDefinitionId)f AS COHORT_DEFINITION_ID
-        ${queryResponse.queryObject.queryString}
-        ), obsdata AS (
-            SELECT
-                COALESCE(op.${placeholderMap["@OBSPER.START"]}, '1970-01-01') AS COHORT_START_DATE,
-                COALESCE(op.${placeholderMap["@OBSPER.END"]}, '2099-12-31') AS COHORT_END_DATE,
-                op.${placeholderMap["@OBSPER.PATIENT_ID"]} AS PATIENT_ID
-            FROM
-                ${placeholderMap["@OBSPER"]} op
-        )
-		SELECT
-            COHORT_DEFINITION_ID,
-            SUBJECT_ID,
-            COHORT_START_DATE,
-            COHORT_END_DATE
-        FROM
-		    cohortdata
-        JOIN
-            obsdata ON cohortdata.SUBJECT_ID = obsdata.PATIENT_ID;
-        `;
-
+        let queryString;
+        if(config.panelOptions.cohortEntryExit) {
+            queryString = `
+                INSERT
+                    INTO
+                    $$SCHEMA$$.COHORT (COHORT_DEFINITION_ID,
+                    SUBJECT_ID,
+                    COHORT_START_DATE,
+                    COHORT_END_DATE)
+                WITH cohortdata AS (
+                    SELECT 
+                    "pTable".${placeholderMap["@PATIENT.PATIENT_ID"]} AS SUBJECT_ID,
+                    %(cohortDefinitionId)f AS COHORT_DEFINITION_ID,
+                    "entry" AS COHORT_START_DATE,
+                    "exit" AS COHORT_END_DATE 
+                ${queryResponse.queryObject.queryString}
+                ) 
+                SELECT
+                    COHORT_DEFINITION_ID,
+                    SUBJECT_ID,
+                    COHORT_START_DATE,
+                    COHORT_END_DATE
+                FROM
+                    cohortdata;
+                `;
+        } else {
+            queryString = `
+                INSERT
+                    INTO
+                    $$SCHEMA$$.COHORT (COHORT_DEFINITION_ID,
+                    SUBJECT_ID,
+                    COHORT_START_DATE,
+                    COHORT_END_DATE)
+                WITH cohortdata AS (
+                    SELECT 
+                    "pTable".${placeholderMap["@PATIENT.PATIENT_ID"]} AS SUBJECT_ID,
+                    %(cohortDefinitionId)f AS COHORT_DEFINITION_ID
+                ${queryResponse.queryObject.queryString}
+                ), obsdata AS (
+                    SELECT
+                        COALESCE(op.${placeholderMap["@OBSPER.START"]}, '1900-01-01') AS COHORT_START_DATE,
+                        COALESCE(op.${placeholderMap["@OBSPER.END"]}, '2099-12-31') AS COHORT_END_DATE,
+                        op.${placeholderMap["@OBSPER.PATIENT_ID"]} AS PATIENT_ID
+                    FROM
+                        ${placeholderMap["@OBSPER"]} op
+                )
+                SELECT
+                    COHORT_DEFINITION_ID,
+                    SUBJECT_ID,
+                    COHORT_START_DATE,
+                    COHORT_END_DATE
+                FROM
+                    cohortdata
+                JOIN
+                    obsdata ON cohortdata.SUBJECT_ID = obsdata.PATIENT_ID;
+                `;
+        }
+        
         const response = {
             queryObject: {
                 queryString,

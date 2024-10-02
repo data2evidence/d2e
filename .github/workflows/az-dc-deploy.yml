@@ -1,5 +1,5 @@
 name: DockerCompose AzureDev Deploy
-run-name: ${{ github.event.inputs.env }} ${{ github.event.inputs.repo_full_name }}
+run-name: ${{ inputs.env }} ${{ inputs.repo_full_name }}
 
 on:
   workflow_dispatch:
@@ -56,30 +56,30 @@ on:
         default: true
 
 env:
-  DOCKER_TAG_NAME: ${{ github.event.inputs.docker-tag-textbox || 'develop' }}
-  ENV_NAME: ${{ github.event.inputs.env }}
+  DOCKER_TAG_NAME: ${{ inputs.docker-tag-textbox || 'rc-v0.4.0-beta' }}
+  ENV_NAME: ${{ inputs.env }}
   ENV_TYPE: remote
 
 concurrency:
-  group: az-dc-deploy-${{ github.event.inputs.env }}
+  group: az-dc-deploy-${{ inputs.env }}
   cancel-in-progress: true
 
 jobs:
   deploy:
-    environment: ${{ github.event.inputs.env }}
-    name: ${{ github.event.inputs.env }}
-    runs-on: ["${{ github.event.inputs.env }}", self-hosted, Linux, X64]
+    environment: ${{ inputs.env }}
+    name: ${{ inputs.env }}
+    runs-on: ["${{ inputs.env }}", self-hosted, Linux, X64]
     steps:
       - uses: actions/checkout@v4.1.1
         name: checkout d2e repo
         with:
           clean: false
           ref: ${{ env.DOCKER_TAG_NAME }}
-          repository: ${{ github.event.inputs.repo_full_name }}
+          repository: ${{ inputs.repo_full_name }}
           token: ${{ secrets.CI_PAT }}
 
       - name: Force cleanup containers
-        if: github.event.inputs.force-cleanup-containers
+        if: inputs.force-cleanup-containers
         continue-on-error: true
         run: docker rm -v -f $(docker ps -qa)
 
@@ -95,7 +95,7 @@ jobs:
           ./internal/scripts/get-op-ratelimit.sh
 
           # get env yml from 1password
-          if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
+          if [ ${{ inputs.dotenv-boolean }} = true ]
           then
             yarn --cwd internal op:get:$ENV_TYPE
           else
@@ -111,10 +111,10 @@ jobs:
 
           cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 
-          [ "${{ github.event.inputs.docker-tag-develop }}" = true ] && DOCKER_TAG_NAME=develop
+          [ "${{ inputs.docker-tag-develop }}" = true ] && DOCKER_TAG_NAME=develop
           UI_DOCKER_TAG_NAME=$DOCKER_TAG_NAME
-          [ "${{ github.event.inputs.ui-docker-tag-develop }}" = true ] && UI_DOCKER_TAG_NAME=develop
-          [ "${{ github.event.inputs.ui-docker-tag-textbox }}" != '' ] && UI_DOCKER_TAG_NAME=${{ github.event.inputs.ui-docker-tag-textbox }}
+          [ "${{ inputs.ui-docker-tag-develop }}" = true ] && UI_DOCKER_TAG_NAME=develop
+          [ "${{ inputs.ui-docker-tag-textbox }}" != '' ] && UI_DOCKER_TAG_NAME=${{ inputs.ui-docker-tag-textbox }}
 
           echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
           echo UI_DOCKER_TAG_NAME=$UI_DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
