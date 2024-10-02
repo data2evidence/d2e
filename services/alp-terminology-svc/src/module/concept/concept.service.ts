@@ -358,10 +358,20 @@ export class ConceptService {
         false,
       );
       return meilisearchResult
-        .map(
-          (result) =>
-            this.meilisearchResultMapping(result).expansion.contains[0],
-        )
+        .map((result) => {
+          const mappedResult =
+            this.meilisearchResultMapping(result).expansion.contains[0];
+
+          if (mappedResult) {
+            return {
+              ...mappedResult,
+              conceptCode: mappedResult.code,
+              conceptName: mappedResult.display,
+              vocabularyId: mappedResult.system,
+            };
+          }
+          return null;
+        })
         .filter((result) => result != null);
     } catch (err) {
       logger.error(err);
