@@ -25,7 +25,7 @@ def create_flow_results_dir():
 
 def create_secrets():
     # From envConverter
-    Secret(value=os.getenv('DATABASE_CREDENTIALS')).save(name="database-credentials", overwrite=True)
+    Secret(value=json.loads(os.getenv('DATABASE_CREDENTIALS'))).save(name="database-credentials", overwrite=True)
     
     Secret(value=os.getenv('TLS__INTERNAL__CA_CRT')).save(name="tls-internal-ca-cert", overwrite=True)
     Secret(value=os.getenv('IDP__ALP_DATA__CLIENT_ID')).save(name="idp-alp-data-client-id", overwrite=True)
@@ -74,8 +74,7 @@ def create_prefect_variables():
 
     #Set Routes
     service_routes = json.loads(os.getenv("SERVICE_ROUTES")) # Prefect variable max 255 chars
-    for service, route in service_routes.items():
-        Variable.set(f"{service.lower()}_service_route", route + "/", overwrite=True)
+    Variable.set(f"service_routes", service_routes, overwrite=True)
 
         
 
