@@ -6,7 +6,7 @@ This tool uses the `seeds/03_Config` file as reference
 
 ## Steps
 
-- cd to `utils/cohortDefinitionKeyUpdater` folder
+- `cd services/mri-pg-config/src/db/utils/cohortDefinitionKeyUpdater`
 - run `ts-node getAttributesFromConfig.ts` which will generate `cdwConfigMapping.ts` and `cdwConfigDuckdbMapping.ts`
 - make mapping changes to `cdwConfigMapping.ts` and `cdwConfigDuckdbMapping.ts`
 - run `ts-node generateConfigWithCohortDefKey.ts` which will generate `cdwConfig.json` and `cdwConfigDuckdb.json`
