@@ -12,7 +12,11 @@ import {
     ExtCohortConceptSet,
 } from "./types";
 import { IMRIRequest } from "../types";
-import { getConceptByName } from "./conceptGetters";
+import {
+    getConceptByCode,
+    getConceptById,
+    getConceptByName,
+} from "./conceptGetters";
 
 export const getExtCohortKeyForEvent = (
     cdmConfig: CdmConfig,
@@ -134,18 +138,15 @@ const extractConceptSets = async (
             const constraintContent =
                 filter.attributes?.content?.[attributesContentIndex]
                     ?.constraints?.content?.[constraintContentIndex];
-            const conceptName =
+            const conceptValue =
                 constraintContent && "value" in constraintContent
                     ? constraintContent.value
                     : undefined;
-            if (!conceptName || typeof conceptName !== "string") {
-                continue;
-            }
 
             const conceptIdentifierType: "name" | "code" | "id" | null =
                 _.get(
                     cdmConfig,
-                    `${filter.attributes?.content?.[0].configPath}.conceptIdentifierType`
+                    `${filter.attributes?.content?.[attributesContentIndex].configPath}.conceptIdentifierType`
                 ) || null;
             const type:
                 | "text"
@@ -156,9 +157,12 @@ const extractConceptSets = async (
                 | null =
                 _.get(
                     cdmConfig,
-                    `${filter.attributes?.content?.[0].configPath}.type`
+                    `${filter.attributes?.content?.[attributesContentIndex].configPath}.type`
                 ) || null;
 
+            if (!conceptValue) {
+                continue;
+            }
             if (type === "conceptSet") {
                 // TODO: get all the concepts and use them
             }
@@ -170,17 +174,25 @@ const extractConceptSets = async (
             if (!conceptIdentifierType) {
                 continue;
             }
-            if (conceptIdentifierType === "name") {
-            }
-            if (conceptIdentifierType === "code") {
-            }
-            if (conceptIdentifierType === "id") {
-            }
-            const concept = await getConceptByName({
-                conceptName,
-                req,
-                datasetId,
-            });
+            const concept =
+                conceptIdentifierType === "name"
+                    ? await getConceptByName({
+                          conceptName: conceptValue as string,
+                          req,
+                          datasetId,
+                      })
+                    : conceptIdentifierType === "code"
+                    ? await getConceptByCode({
+                          conceptCode: conceptValue as string,
+                          req,
+                          datasetId,
+                      })
+                    : await getConceptById({
+                          conceptId: conceptValue as number,
+                          req,
+                          datasetId,
+                      });
+
             if (!concept) {
                 continue;
             }
@@ -264,7 +276,6 @@ export const createDemographicCriteriaList = async (
     demography: IFRFilterCard | undefined,
     cdmConfig: CdmConfig,
     req: IMRIRequest,
-    vocabSchemaName: string,
     datasetId: string
 ): Promise<{ [key: string]: Criteria }[]> => {
     // For bookmarks, we only have a fixed section for basic data
@@ -342,7 +353,6 @@ export const createCriteriaList = async (
     ifrDefinition: IFRDefinition,
     conceptSets: ExtCohortConceptSet[],
     req: IMRIRequest,
-    vocabSchemaName: string,
     datasetId: string
 ) => {
     const nonBasicFilterCards = ifrDefinition.filter.cards.content;

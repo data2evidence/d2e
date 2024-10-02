@@ -189,7 +189,7 @@ describe("createDemographicCriteriaList", () => {
             },
         ];
         expect(
-            await createDemographicCriteriaList(input, cdmConfig, req, "", "")
+            await createDemographicCriteriaList(input, cdmConfig, req, "")
         ).toEqual(expected);
     });
 });
