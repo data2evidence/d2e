@@ -32,6 +32,8 @@ export type ExtCohortConceptSet = {
     expression: {
         items: {
             concept: ExtCohortConcept;
+            includeDescendants?: boolean;
+            includeMapped?: boolean;
         }[];
     };
 };

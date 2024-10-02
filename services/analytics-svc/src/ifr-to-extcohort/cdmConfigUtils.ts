@@ -114,7 +114,16 @@ export const convertEventAttributesToConceptSets = async (
             }
         }
     }
-    return conceptSets;
+    return conceptSets.map((cset) => {
+        cset.expression.items = cset.expression.items.map((item) => {
+            return {
+                concept: item.concept,
+                includeDescendants: !!item.concept.USEDESCENDANTS,
+                includeMapped: !!item.concept.USEMAPPED,
+            };
+        });
+        return cset;
+    });
 };
 
 const extractConceptSets = async (

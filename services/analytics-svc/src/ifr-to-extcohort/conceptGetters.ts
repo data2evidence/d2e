@@ -89,6 +89,23 @@ export const getConceptsFromConceptSet = async ({
     );
 
     return concepts.length
-        ? concepts.map((concept) => upperCaseKeys(concept))
+        ? concepts
+              .map((concept) => upperCaseKeys(concept))
+              .map((concept) => {
+                  return {
+                      CONCEPT_ID: concept.CONCEPTID,
+                      CONCEPT_NAME: concept.DISPLAY,
+                      DOMAIN_ID: concept.DOMAINID,
+                      VOCABULARY_ID: concept.SYSTEM,
+                      CONCEPT_CLASS_ID: concept.CONCEPTCLASSID,
+                      STANDARD_CONCEPT: concept.STANDARDCONCEPT,
+                      CONCEPT_CODE: concept.CODE,
+                      VALID_START_DATE: concept.VALIDSTARTDATE,
+                      VALID_END_DATE: concept.VALIDENDDATE,
+                      INVALID_REASON: concept.VALIDITY,
+                      USEMAPPED: concept.USEMAPPED,
+                      USEDESCENDANTS: concept.USEDESCENDANTS,
+                  };
+              })
         : null;
 };
