@@ -7,6 +7,8 @@ import { callStudyMRIConfig } from "../../proxy/ConfigSvcProxy";
 import { MRIEndpointResultType } from "../../types";
 import * as utilsLib from "@alp/alp-base-utils";
 import { bookmarkToIFRBackend } from "../../utils/formatter/BookmarkFormatter";
+import { updateIfrWithConcepts } from "../../utils/formatter/ConceptSetToConceptConverter";
+
 
 const log = utilsLib.Logger.CreateLogger("query-gen-log");
 const { utils } = utilsLib;
@@ -75,9 +77,16 @@ export async function generateQuery(req: IMRIRequest, res, next) {
             ...convertedFilter,
         };
 
+        const ifrWithConceptSetConcepts = await updateIfrWithConcepts(
+            config,
+            ifrRequest,
+            studyId,
+            req.headers.authorization
+        );
+
         const queryResponse = await new QueryGenSvc(
             queryType,
-            ifrRequest,
+            ifrWithConceptSetConcepts,
             config,
             userSpecificSettings,
             placeholderMap,
