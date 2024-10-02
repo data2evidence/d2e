@@ -96,30 +96,34 @@ export const convertEventAttributesToConceptSets = async (
                 filterContent["op"] === "NOT"
             ) {
                 for (const c of filterContent["content"]) {
-                    conceptsForSet.push(
-                        ...(await extractConceptSets(
-                            c,
-                            cdmConfig,
-                            req,
-                            vocabSchemaName,
-                            datasetId
-                        ))
+                    const concepts = await extractConceptSets(
+                        c,
+                        cdmConfig,
+                        req,
+                        vocabSchemaName,
+                        datasetId
                     );
+                    concepts.forEach((data) => {
+                        data.concept.STANDARD_CONCEPT_CAPTION = "";
+                    });
+                    conceptsForSet.push(...concepts);
                 }
                 conceptSetName =
                     filterContent["content"][0].attributes?.content?.[0]
                         ?.instanceID;
             } else {
                 const filter = filterContent as IFRFilterCardContent;
-                conceptsForSet.push(
-                    ...(await extractConceptSets(
-                        filterContent as IFRFilterCardContent,
-                        cdmConfig,
-                        req,
-                        vocabSchemaName,
-                        datasetId
-                    ))
+                const concepts = await extractConceptSets(
+                    filterContent as IFRFilterCardContent,
+                    cdmConfig,
+                    req,
+                    vocabSchemaName,
+                    datasetId
                 );
+                concepts.forEach((data) => {
+                    data.concept.STANDARD_CONCEPT_CAPTION = "";
+                });
+                conceptsForSet.push(...concepts);
                 conceptSetName = filter.attributes?.content?.[0]?.instanceID;
             }
 
@@ -134,6 +138,7 @@ export const convertEventAttributesToConceptSets = async (
             }
         }
     }
+    conceptSets[0].expression.items[0].concept;
     return conceptSets;
 };
 
