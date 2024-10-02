@@ -79,7 +79,6 @@ export const convertEventAttributesToConceptSets = async (
     cdmConfig: CdmConfig,
     filterCards: (IFRFilterCard | IFRExcludedFilterCard)[],
     req: IMRIRequest,
-    vocabSchemaName: string,
     datasetId: string
 ) => {
     const nonBasicInfoFilterCards = filterCards;
@@ -100,7 +99,6 @@ export const convertEventAttributesToConceptSets = async (
                         c,
                         cdmConfig,
                         req,
-                        vocabSchemaName,
                         datasetId
                     );
                     concepts.forEach((data) => {
@@ -120,7 +118,6 @@ export const convertEventAttributesToConceptSets = async (
                     filterContent as IFRFilterCardContent,
                     cdmConfig,
                     req,
-                    vocabSchemaName,
                     datasetId
                 );
                 concepts.forEach((data) => {
@@ -151,7 +148,6 @@ const extractConceptSets = async (
     filter: IFRFilterCardContent,
     cdmConfig: CdmConfig,
     req: IMRIRequest,
-    vocabSchemaName: string,
     datasetId: string
 ) => {
     const conceptsForSet: { concept: ExtCohortConcept }[] = [];
