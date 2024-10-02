@@ -104,7 +104,10 @@ export const convertEventAttributesToConceptSets = async (
                         datasetId
                     );
                     concepts.forEach((data) => {
-                        data.concept.STANDARD_CONCEPT_CAPTION = "";
+                        data.concept.STANDARD_CONCEPT_CAPTION =
+                            data.concept.STANDARD_CONCEPT === "S"
+                                ? "Standard"
+                                : "Non-standard";
                     });
                     conceptsForSet.push(...concepts);
                 }
@@ -121,7 +124,10 @@ export const convertEventAttributesToConceptSets = async (
                     datasetId
                 );
                 concepts.forEach((data) => {
-                    data.concept.STANDARD_CONCEPT_CAPTION = "";
+                    data.concept.STANDARD_CONCEPT_CAPTION =
+                        data.concept.STANDARD_CONCEPT === "S"
+                            ? "Standard"
+                            : "Non-standard";
                 });
                 conceptsForSet.push(...concepts);
                 conceptSetName = filter.attributes?.content?.[0]?.instanceID;
@@ -138,7 +144,6 @@ export const convertEventAttributesToConceptSets = async (
             }
         }
     }
-    conceptSets[0].expression.items[0].concept;
     return conceptSets;
 };
 
@@ -498,7 +503,18 @@ export const createCriteriaList = async (
                                 }
                             }
                         } else {
-                            if (
+                            // Some filters in cohort definition are directly set in the item's root
+                            // e.g. Condition Occurrence has Condition set in the root, and that uses CodesetId
+                            if (attributeInfo.key === "CodesetId") {
+                                const conceptSet = conceptSets.find(
+                                    (cset) => cset.name === attribute.configPath
+                                );
+                                if (!conceptSet) {
+                                    continue;
+                                }
+                                attributesForFilter[attributeInfo.key] =
+                                    conceptSet.id;
+                            } else if (
                                 attributeInfo.type === "text" &&
                                 typeof constraintContent.value === "string"
                             ) {
