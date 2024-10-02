@@ -34,19 +34,6 @@ export class FhirAPI {
         }
     }
 
-    async createResource_Project(name: string, description: string) {
-        try {
-            return await this.medplumClient.createResource<Project>({
-                resourceType: 'Project',
-                name: name,
-                description: description,
-                features: ['bots']
-            })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     async readResource_bot(id: string){
         try{
             return await this.medplumClient.readResource('Bot', id);
@@ -103,14 +90,6 @@ export class FhirAPI {
     
     async searchResource_subscription(query: string){
         return await this.medplumClient.search('Subscription', query=query)
-    }
-
-    async createResource(resource: Resource, options?: MedplumRequestOptions){
-        await this.medplumClient.createResource(resource, options)
-    }
-
-    async validateResouce(resource: Resource){
-        return await this.medplumClient.validateResource(resource)
     }
 
     async updateResource(resource: Resource){

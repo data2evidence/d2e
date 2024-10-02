@@ -22,7 +22,7 @@
         "env": "alp-fhir-init",
         "waitfor": "http://alp-minerva-fhir-server-1:8103/healthcheck"
       }
-      ],
+    ],
     "api": [
       {
         "source":"/jobplugins",
@@ -155,6 +155,12 @@
       {
         "source":"/callback",
         "service":"logto"
+      },
+      {
+        "source":"/gateway/api/fhir",
+        "function":"/alp-fhir-svc",
+        "env": "alp-fhir-svc",
+        "imports": "/alp-fhir-svc/import.json"
       }
     ],
     "roles" : {
