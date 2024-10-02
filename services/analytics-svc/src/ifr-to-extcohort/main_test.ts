@@ -21,15 +21,15 @@ import oxygenAndNoDeathExtCohort from "./samples/009-extcohort";
 import vitaminB6OrB12AndNoOxygenAndDeathIFR from "./samples/010-ifr";
 import vitaminB6OrB12AndNoOxygenAndDeathExtCohort from "./samples/010-extcohort";
 import cdmConfig from "./samples/cdm-config-with-extcohort-mapping";
-import * as cdmConfigUtils from "./cdmConfigUtils";
 import sampleConcepts from "./samples/sample-concepts";
+import * as conceptGetters from "./conceptGetters";
 
 const req = {} as IMRIRequest;
 
 jest.mock("../utils/TerminologySvcProxy", () => ({
     terminologyRequest: jest.fn(),
 }));
-jest.spyOn(cdmConfigUtils, "getConceptByName").mockImplementation(
+jest.spyOn(conceptGetters, "getConceptByName").mockImplementation(
     ({ conceptName }: { conceptName: string }) => {
         return new Promise((resolve, reject) => {
             const concept = sampleConcepts.filter(
