@@ -1,0 +1,57 @@
+{
+  "name": "alp-fhir-client",
+  "version": "1.0.0-dev",
+  "description": "fhir-client",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc",
+    "bundleFiles": "node --no-warnings esbuild-script.mjs",
+    "seed": "node ./dist/seed.js",
+    "load-bots": "node ./dist/loadBots.js",
+    "create-data-model": "node ./dist/createDataModel.js",
+    "build-and-seed": "tsc && yarn run seed && yarn run load-bots",
+    "lint": "eslint src/",
+    "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./index.ts"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:alp/alp-clinical-research.git"
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "extends": [
+      "@medplum/eslint-config"
+    ],
+    "root": true
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.9",
+    "@types/pg": "^8.11.6",
+    "@types/uuid": "^10.0.0",
+    "esbuild": "0.21.5"
+  },
+  "dependencies": {
+    "@alp/alp-base-utils": "1.1.9",
+    "@medplum/bot-layer": "3.2.2",
+    "@medplum/core": "3.2.2",
+    "@medplum/fhirtypes": "3.2.2",
+    "duckdb-async": "^1.0.0",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "pg": "^8.4.2",
+    "reflect-metadata": "^0.2.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typedi": "^0.10.0",
+    "typescript": "^5.5.4",
+    "uuid": "^10.0.0",
+    "winston": "^3.13.1",
+    "zod": "^3.23.8"
+  }
+}

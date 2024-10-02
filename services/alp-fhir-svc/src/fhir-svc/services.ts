@@ -1,6 +1,6 @@
 import { createLogger } from '../logger'
 import { FhirAPI } from '../api/FhirAPI'
-import { v4 as uuidv4 } from 'npm:uuid'
+import { v4 as uuidv4 } from 'uuid'
 import { PortalAPI } from '../api/PortalAPI'
 import { Dataset } from '../utils/types'
 import { Bundle } from '@medplum/fhirtypes'
@@ -112,7 +112,7 @@ export const createResourceInProject = async (token: string, fhirResouce: string
 }
 
 export const createResourceInCacheDB = async(fhirResouce: string) => {
-    let bundle: Bundle = fhirResouce
+    let bundle: Bundle = JSON.parse(fhirResouce)
     if (bundle.entry === undefined){
       console.log('No entries in the bundle')
       return;
