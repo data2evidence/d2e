@@ -9578,6 +9578,8 @@ const he = {
                 standardConceptCodeFilter: "",
                 useRefValue: true,
                 useRefText: true,
+                cohortDefinitionKey: "Ethnicity",
+                conceptSetType: "id",
             },
             locationid: {
                 name: [
@@ -9823,6 +9825,8 @@ const he = {
                 standardConceptCodeFilter: "",
                 useRefValue: true,
                 useRefText: true,
+                cohortDefinitionKey: "Gender",
+                conceptSetType: "id",
             },
             Gender_concept_name: {
                 name: [
@@ -9876,6 +9880,7 @@ const he = {
                 useRefValue: true,
                 useRefText: true,
                 cohortDefinitionKey: "Gender",
+                conceptSetType: "name",
             },
             raceconceptid: {
                 name: [
@@ -9926,6 +9931,8 @@ const he = {
                 standardConceptCodeFilter: "",
                 useRefValue: true,
                 useRefText: true,
+                cohortDefinitionKey: "Race",
+                conceptSetType: "id",
             },
             Age: {
                 name: [
@@ -10024,6 +10031,7 @@ const he = {
                 useRefValue: true,
                 useRefText: true,
                 cohortDefinitionKey: "Race",
+                conceptSetType: "name",
             },
             ethnicityName: {
                 name: [
@@ -10078,6 +10086,7 @@ const he = {
                 useRefValue: true,
                 useRefText: true,
                 cohortDefinitionKey: "Ethnicity",
+                conceptSetType: "name",
             },
         },
     },
