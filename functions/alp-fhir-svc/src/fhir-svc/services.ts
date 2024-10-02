@@ -1,6 +1,11 @@
 import { createLogger } from '../logger'
 import { FhirAPI } from '../api/FhirAPI'
 import { v4 as uuidv4 } from 'npm:uuid'
+import { PortalAPI } from '../api/PortalAPI'
+import { Dataset } from '../utils/types'
+import { Bundle } from '@medplum/fhirtypes'
+import { createResourceInFhir } from '../utils/fhirDataModelUtil'
+
 const logger = createLogger()
 
 export const createProject = async (name: string, description: string) => {
@@ -67,13 +72,33 @@ export const createProject = async (name: string, description: string) => {
     }
 }
 
-export const createResourceInProject = async (fhirResouce: string, resourceDetails: any, projectName: string) => {
+export const createResourceInProject = async (token: string, fhirResouce: string, resourceDetails: any, projectName: string) => {
     try{
         let fhirApi = new FhirAPI()
+        let datasetId = ''
+        await fhirApi.clientCredentialslogin()
         const searchResult = await fhirApi.getResource('ClientApplication', `name=${projectName}`) 
         if (searchResult) {
             const clientId = searchResult.id
             const clientSecret = searchResult.secret
+            //Get datasets
+            const portalAPI = new PortalAPI(token)
+            const datasets: Dataset[] = await portalAPI.getDatasets()
+            const resourceDataset = datasets.filter(dataset => {
+                if (dataset.studyDetail.name == projectName) return dataset
+            })
+            //Get dataset Id of incoming resource
+            if (resourceDataset.length > 0) {
+                datasetId = resourceDataset[0].id
+            }
+            //Set datasetId in the metadata of the resource
+            const metaInfo = {
+                author: {
+                reference: 'ClientApplication/' + clientId
+                },
+                id: datasetId
+            }
+            resourceDetails.meta = metaInfo
             await fhirApi.clientCredentialslogin(clientId, clientSecret)
             await fhirApi.post(fhirResouce, resourceDetails)
             return true
@@ -84,4 +109,17 @@ export const createResourceInProject = async (fhirResouce: string, resourceDetai
         logger.error(JSON.stringify(error))
         return false
     }
+}
+
+export const createResourceInCacheDB = async(fhirResouce: string) => {
+    let bundle: Bundle = fhirResouce
+    if (bundle.entry === undefined){
+      console.log('No entries in the bundle')
+      return;
+    }
+    for (const entry of bundle.entry) {
+      console.log('Create resource for each of the entry in the bundle')
+      await createResourceInFhir(entry.resource)
+    }
+    return true
 }
