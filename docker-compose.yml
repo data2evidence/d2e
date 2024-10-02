@@ -714,7 +714,7 @@ services:
     command:
       - sh
       - -c
-      - "prefect server database upgrade -y && prefect server start"
+      - "prefect server start"
     container_name: &c2 alp-dataflow-gen-${BASE_PORT:-1}
     depends_on:
       trex:
@@ -732,7 +732,7 @@ services:
     #     - http://localhost:41120/api/hello
     #   timeout: 30s
     hostname: alp-dataflow-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: prefecthq/prefect:3.0.3-python3.11 ##alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
+    image: prefecthq/prefect:3.0.3-python3.11
     logging:
       options:
         tag: *c2
@@ -764,7 +764,7 @@ services:
     command:
       - sh
       - -c
-      - "pip install prefect-docker==0.5.5 && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
+      - "pip install prefect-docker==0.6.1 && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
     container_name: &c83 alp-dataflow-gen-worker
     depends_on:
       alp-minio-post-init:
