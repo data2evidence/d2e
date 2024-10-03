@@ -205,7 +205,6 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                 attributes,
                 mriConfig.config,
                 req,
-                vocabSchemaName,
                 studyId
             );
             const now = +new Date();
@@ -326,7 +325,6 @@ export async function generateCohortDefinition(
             attributes,
             mriConfig.config,
             req,
-            vocabSchemaName,
             studyId
         );
 

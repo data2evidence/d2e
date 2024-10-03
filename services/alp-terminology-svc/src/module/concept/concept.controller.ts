@@ -47,6 +47,28 @@ export class ConceptController {
     return await this.appService.searchConceptByName(body);
   }
 
+  @Post('searchById')
+  async searchConceptById(
+    @Body()
+    body: {
+      conceptId: number;
+      datasetId: string;
+    },
+  ): Promise<any> {
+    return await this.appService.searchConceptById(body);
+  }
+
+  @Post('searchByCode')
+  async searchConceptByCode(
+    @Body()
+    body: {
+      conceptCode: string;
+      datasetId: string;
+    },
+  ): Promise<any> {
+    return await this.appService.searchConceptByCode(body);
+  }
+
   @Post('recommended/list')
   async getRecommendedConcepts(
     @Body()

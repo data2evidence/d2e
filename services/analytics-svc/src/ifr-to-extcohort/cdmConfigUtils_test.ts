@@ -2,7 +2,6 @@ import cdmConfig from "./samples/cdm-config-with-extcohort-mapping";
 import oxygenIFR from "./samples/002-ifr_oxygen";
 import oxygenExtCohort from "./samples/002-extcohort_oxygen";
 import { deepCopy } from "./utils";
-import * as cdmConfigUtils from "./cdmConfigUtils";
 import {
     getExtCohortKeyForEvent,
     getExtCohortInfoForAttribute,
@@ -12,10 +11,14 @@ import {
 } from "./cdmConfigUtils";
 import { IMRIRequest } from "../types";
 import sampleConcepts from "./samples/sample-concepts";
+import * as conceptGetters from "./conceptGetters";
 
 const req = {} as IMRIRequest;
 
-jest.spyOn(cdmConfigUtils, "getConceptByName").mockImplementation(
+jest.mock("../utils/TerminologySvcProxy", () => ({
+    terminologyRequest: jest.fn(),
+}));
+jest.spyOn(conceptGetters, "getConceptByName").mockImplementation(
     ({ conceptName }: { conceptName: string }) => {
         return new Promise((resolve, reject) => {
             const concept = sampleConcepts.filter(
@@ -76,7 +79,6 @@ describe("convertEventAttributesToConceptSets", () => {
                 cdmConfig,
                 ifr.filter.cards.content,
                 req,
-                "",
                 ""
             )
         ).toEqual(expected);
@@ -187,7 +189,7 @@ describe("createDemographicCriteriaList", () => {
             },
         ];
         expect(
-            await createDemographicCriteriaList(input, cdmConfig, req, "", "")
+            await createDemographicCriteriaList(input, cdmConfig, req, "")
         ).toEqual(expected);
     });
 });
