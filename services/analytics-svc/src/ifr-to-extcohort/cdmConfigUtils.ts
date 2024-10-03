@@ -11,26 +11,13 @@ import {
     ExtCohortConcept,
     ExtCohortConceptSet,
 } from "./types";
-import { terminologyRequest } from "../utils/TerminologySvcProxy";
 import { IMRIRequest } from "../types";
-
-export const getConceptByName = async ({
-    conceptName,
-    req,
-    datasetId,
-}: {
-    conceptName: string;
-    req: IMRIRequest;
-    datasetId: string;
-}): Promise<ExtCohortConcept> => {
-    const concept = await terminologyRequest(
-        req,
-        "POST",
-        `concept/searchByName`,
-        { conceptName, datasetId }
-    );
-    return concept.data[0];
-};
+import {
+    getConceptByCode,
+    getConceptById,
+    getConceptByName,
+    getConceptsFromConceptSet,
+} from "./conceptGetters";
 
 export const getExtCohortKeyForEvent = (
     cdmConfig: CdmConfig,
@@ -39,16 +26,9 @@ export const getExtCohortKeyForEvent = (
     if (!path) {
         return null;
     }
-    const extCohortMapping =
-        cdmConfig?.advancedSettings?.extCohortDefinitionTableMapping;
-    const defaultPlaceholderPath = `${path}.defaultPlaceholder`;
-    const keyToResolve: string | null =
-        _.get(cdmConfig, defaultPlaceholderPath) || null;
-    if (!keyToResolve) {
-        return null;
-    }
-    const key = extCohortMapping?.[keyToResolve];
-    return key ?? null;
+    const cohortDefinitionKey = `${path}.cohortDefinitionKey`;
+    const key: string | null = _.get(cdmConfig, cohortDefinitionKey) || null;
+    return key;
 };
 
 export const getExtCohortInfoForAttribute = (
@@ -58,16 +38,13 @@ export const getExtCohortInfoForAttribute = (
     if (!path) {
         return null;
     }
-    const extCohortMapping =
-        cdmConfig?.advancedSettings?.extCohortDefinitionTableMapping;
-    const keyPath = `${path}.expression`;
+    const keyPath = `${path}.cohortDefinitionKey`;
     const typePath = `${path}.type`;
     const type: CdmAttributeType | null = _.get(cdmConfig, typePath) || null;
-    const keyToResolve: string | null = _.get(cdmConfig, keyPath) || null;
-    if (!keyToResolve) {
+    const key: string | null = _.get(cdmConfig, keyPath) || null;
+    if (!key) {
         return null;
     }
-    const key = extCohortMapping?.[keyToResolve] ?? null;
     return { key, type };
 };
 
@@ -75,10 +52,9 @@ export const convertEventAttributesToConceptSets = async (
     cdmConfig: CdmConfig,
     filterCards: (IFRFilterCard | IFRExcludedFilterCard)[],
     req: IMRIRequest,
-    vocabSchemaName: string,
     datasetId: string
 ) => {
-    const nonBasicInfoFilterCards = filterCards;
+    const [, ...nonBasicInfoFilterCards] = filterCards;
     const conceptSets: ExtCohortConceptSet[] = [];
     for (let i = 0; i < nonBasicInfoFilterCards.length; i += 1) {
         const filterCard = nonBasicInfoFilterCards[i];
@@ -92,30 +68,38 @@ export const convertEventAttributesToConceptSets = async (
                 filterContent["op"] === "NOT"
             ) {
                 for (const c of filterContent["content"]) {
-                    conceptsForSet.push(
-                        ...(await extractConceptSets(
-                            c,
-                            cdmConfig,
-                            req,
-                            vocabSchemaName,
-                            datasetId
-                        ))
+                    const concepts = await extractConceptSets(
+                        c,
+                        cdmConfig,
+                        req,
+                        datasetId
                     );
+                    concepts.forEach((data) => {
+                        data.concept.STANDARD_CONCEPT_CAPTION =
+                            data.concept.STANDARD_CONCEPT === "S"
+                                ? "Standard"
+                                : "Non-standard";
+                    });
+                    conceptsForSet.push(...concepts);
                 }
                 conceptSetName =
                     filterContent["content"][0].attributes?.content?.[0]
                         ?.instanceID;
             } else {
                 const filter = filterContent as IFRFilterCardContent;
-                conceptsForSet.push(
-                    ...(await extractConceptSets(
-                        filterContent as IFRFilterCardContent,
-                        cdmConfig,
-                        req,
-                        vocabSchemaName,
-                        datasetId
-                    ))
+                const concepts = await extractConceptSets(
+                    filterContent as IFRFilterCardContent,
+                    cdmConfig,
+                    req,
+                    datasetId
                 );
+                concepts.forEach((data) => {
+                    data.concept.STANDARD_CONCEPT_CAPTION =
+                        data.concept.STANDARD_CONCEPT === "S"
+                            ? "Standard"
+                            : "Non-standard";
+                });
+                conceptsForSet.push(...concepts);
                 conceptSetName = filter.attributes?.content?.[0]?.instanceID;
             }
 
@@ -130,17 +114,29 @@ export const convertEventAttributesToConceptSets = async (
             }
         }
     }
-    return conceptSets;
+    return conceptSets.map((cset) => {
+        cset.expression.items = cset.expression.items.map((item) => {
+            return {
+                concept: item.concept,
+                includeDescendants: !!item.concept.USEDESCENDANTS,
+                includeMapped: !!item.concept.USEMAPPED,
+            };
+        });
+        return cset;
+    });
 };
 
 const extractConceptSets = async (
     filter: IFRFilterCardContent,
     cdmConfig: CdmConfig,
     req: IMRIRequest,
-    vocabSchemaName: string,
     datasetId: string
 ) => {
-    const conceptsForSet: { concept: ExtCohortConcept }[] = [];
+    const conceptsForSet: {
+        concept: ExtCohortConcept;
+        includeDescendants?: boolean;
+        includeMapped?: boolean;
+    }[] = [];
     for (
         let attributesContentIndex = 0;
         attributesContentIndex < filter.attributes?.content.length;
@@ -156,32 +152,61 @@ const extractConceptSets = async (
             const constraintContent =
                 filter.attributes?.content?.[attributesContentIndex]
                     ?.constraints?.content?.[constraintContentIndex];
-            const conceptName =
+            const conceptValue =
                 constraintContent && "value" in constraintContent
                     ? constraintContent.value
                     : undefined;
-            if (!conceptName || typeof conceptName !== "string") {
+
+            const cohortDefinitionKey: string | null =
+                _.get(
+                    cdmConfig,
+                    `${filter.attributes?.content?.[attributesContentIndex].configPath}.cohortDefinitionKey`
+                ) || null;
+            const conceptIdentifierType: "name" | "code" | "id" | null =
+                _.get(
+                    cdmConfig,
+                    `${filter.attributes?.content?.[attributesContentIndex].configPath}.conceptIdentifierType`
+                ) || null;
+            const type:
+                | "text"
+                | "time"
+                | "datetime"
+                | "conceptSet"
+                | "num"
+                | null =
+                _.get(
+                    cdmConfig,
+                    `${filter.attributes?.content?.[attributesContentIndex].configPath}.type`
+                ) || null;
+
+            if (!conceptValue || cohortDefinitionKey !== "CodesetId") {
+                continue;
+            }
+            if (type === "conceptSet") {
+                const concepts = await getConceptsFromConceptSet({
+                    conceptSetId: String(conceptValue),
+                    req,
+                    datasetId,
+                });
+                concepts.forEach((concept) => {
+                    conceptsForSet.push({
+                        concept,
+                        includeDescendants: concept.USEDESCENDANTS,
+                        includeMapped: concept.USEMAPPED,
+                    });
+                });
+            }
+            if (!conceptIdentifierType) {
                 continue;
             }
 
-            const conceptSetType: string | null =
-                _.get(
-                    cdmConfig,
-                    `${filter.attributes?.content?.[0].configPath}.conceptSetType`
-                ) || null;
-            // TODO: Handle getting concept values for different types of conceptSetTypes
-            // Only interactions with conceptSetType use concept sets in ATLAS.
-            // Other string type attributes may use concepts, but do not use concept sets.
-            // conceptSetTypes include "name", "code", "id", to specify which column of concept to select from.
-            // Sole example found in cdm-config-with-extCohort-mapping.ts:804
-            if (!conceptSetType) {
-                continue;
-            }
-            const concept = await getConceptByName({
-                conceptName,
+            const concept = await getConcept(
+                conceptValue,
                 req,
                 datasetId,
-            });
+                conceptIdentifierType
+            );
+
             if (!concept) {
                 continue;
             }
@@ -265,7 +290,6 @@ export const createDemographicCriteriaList = async (
     demography: IFRFilterCard | undefined,
     cdmConfig: CdmConfig,
     req: IMRIRequest,
-    vocabSchemaName: string,
     datasetId: string
 ): Promise<{ [key: string]: Criteria }[]> => {
     // For bookmarks, we only have a fixed section for basic data
@@ -286,18 +310,30 @@ export const createDemographicCriteriaList = async (
         if (!(attributeInfo?.key && attributeInfo?.type)) {
             continue;
         }
+
+        const conceptIdentifierType: "name" | "code" | "id" | null =
+            _.get(
+                cdmConfig,
+                `${filterCard.configPath}.conceptIdentifierType`
+            ) || null;
         const constraintContent = filterCard.constraints.content[0];
-        if ("operator" in constraintContent) {
+        if (constraintContent && "operator" in constraintContent) {
             const valueOrConceptName =
                 constraintContent && "value" in constraintContent
                     ? constraintContent.value
                     : undefined;
-            if (typeof valueOrConceptName === "string") {
-                const concept = await getConceptByName({
-                    conceptName: valueOrConceptName,
+
+            if (conceptIdentifierType) {
+                const concept = await getConcept(
+                    constraintContent.value,
                     req,
                     datasetId,
-                });
+                    conceptIdentifierType
+                );
+
+                if (!concept) {
+                    continue;
+                }
                 demographicCriteriaList[attributeInfo.key] = [
                     {
                         CONCEPT_CODE: concept.CONCEPT_CODE,
@@ -340,7 +376,6 @@ export const createCriteriaList = async (
     ifrDefinition: IFRDefinition,
     conceptSets: ExtCohortConceptSet[],
     req: IMRIRequest,
-    vocabSchemaName: string,
     datasetId: string
 ) => {
     const nonBasicFilterCards = ifrDefinition.filter.cards.content;
@@ -465,15 +500,33 @@ export const createCriteriaList = async (
                                 }
                             }
                         } else {
-                            if (
-                                attributeInfo.type === "text" &&
-                                typeof constraintContent.value === "string"
-                            ) {
-                                const concept = await getConceptByName({
-                                    conceptName: constraintContent.value,
+                            // Some filters in cohort definition are directly set in the item's root
+                            // e.g. Condition Occurrence has Condition set in the root, and that uses CodesetId
+                            if (attributeInfo.key === "CodesetId") {
+                                const conceptSet = conceptSets.find(
+                                    (cset) => cset.name === attribute.configPath
+                                );
+                                if (!conceptSet) {
+                                    continue;
+                                }
+                                attributesForFilter[attributeInfo.key] =
+                                    conceptSet.id;
+                            } else {
+                                const conceptIdentifierType:
+                                    | "name"
+                                    | "code"
+                                    | "id"
+                                    | null =
+                                    _.get(
+                                        cdmConfig,
+                                        `${attribute.configPath}.conceptIdentifierType`
+                                    ) || null;
+                                const concept = await getConcept(
+                                    constraintContent.value,
                                     req,
                                     datasetId,
-                                });
+                                    conceptIdentifierType
+                                );
                                 attributesForFilter[attributeInfo.key] =
                                     attributesForFilter[attributeInfo.key] ||
                                     [];
@@ -579,4 +632,33 @@ const getOccurrence = (isExcluded: boolean) => {
         Type: 2, // The criteria container always allows any (Type 2) criteria
         Count: 1,
     };
+};
+const getConcept = async (
+    value: number | string,
+    req: IMRIRequest,
+    datasetId: string,
+    conceptIdentifierType: "name" | "code" | "id" | null
+) => {
+    if (!conceptIdentifierType) {
+        return null;
+    }
+    const concept =
+        conceptIdentifierType === "name"
+            ? await getConceptByName({
+                  conceptName: value as string,
+                  req,
+                  datasetId,
+              })
+            : conceptIdentifierType === "code"
+            ? await getConceptByCode({
+                  conceptCode: value as string,
+                  req,
+                  datasetId,
+              })
+            : await getConceptById({
+                  conceptId: value as unknown as number,
+                  req,
+                  datasetId,
+              });
+    return concept;
 };
