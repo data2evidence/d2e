@@ -14,7 +14,6 @@ volumes:
   r-libs:
   fhir-schema-file-1:
   fhir-duckdb-1:
-  dind-certs:
 
 x-envs:
   db-svc: &x-dbsvc
@@ -1666,28 +1665,6 @@ services:
         limits:
           cpus: ${D2E_CPU_LIMIT:-2}
           memory: ${D2E_MEMORY_LIMIT:-7G}
-
-  alp-docker-server:
-    image: docker:dind
-    container_name: &c33 alp-docker-server-${BASE_PORT:-1}
-    hostname: dind
-    networks:
-      data:
-        priority: 20
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 30s
-      test: ["CMD-SHELL", "netstat -ltn | grep -c :::2376"]
-      timeout: 10s
-    logging:
-      options:
-        tag: *c33
-    privileged: true
-    volumes:
-      - dind-certs:/certs
-    environment:
-      DOCKER_TLS_CERTDIR: /certs
 
   alp-perseus-files-manager:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
