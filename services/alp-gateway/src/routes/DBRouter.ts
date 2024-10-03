@@ -26,13 +26,14 @@ export class DBRouter {
     })
 
     this.router.put('/schema', async (req, res) => {
-      const { schemaName, dataModel, databaseCode, vocabSchemaValue } = req.body
+      const { schemaName, dataModel: dataModelName, databaseCode, vocabSchemaValue } = req.body
       try {
         const token = req.headers.authorization!
         const dataflowMgmtAPI = new DataflowMgmtAPI(token)
 
+        const dataModel = dataModelName.split(' ')[0]
         const datamodels = await dataflowMgmtAPI.getDatamodels()
-        const dmInfo = datamodels.find(model => model.datamodel === dataModel)
+        const dmInfo = datamodels.find(model => model.name === dataModelName)
 
         const options = {
           options: {
