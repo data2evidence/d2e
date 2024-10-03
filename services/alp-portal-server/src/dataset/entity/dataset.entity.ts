@@ -35,9 +35,6 @@ export class Dataset extends Audit {
   @Column({ name: 'data_model', nullable: true })
   dataModel: string
 
-  @Column({ name: 'plugin', nullable: true })
-  plugin: string
-
   @Column({ name: 'source_dataset_id', type: 'uuid', nullable: true })
   sourceDatasetId: string
 
