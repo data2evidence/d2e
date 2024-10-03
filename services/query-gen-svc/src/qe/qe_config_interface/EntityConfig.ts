@@ -162,6 +162,28 @@ export class EntityConfig extends ConfigEntity {
                 this.placeholderMap,
                 this.settings
             );
+        } else if (attribute.toLowerCase() === "entry") {
+            return new AttributeConfig(
+                {
+                    attributes: [],
+                    expression: `min(${this.baseEntity}.${this.getColumn("START")})`,
+                    name: "id",
+                    type: "time",
+                },
+                this.placeholderMap,
+                this.settings
+            );
+        } else if (attribute.toLowerCase() === "exit") {
+            return new AttributeConfig(
+                {
+                    attributes: [],
+                    expression: `max(${this.baseEntity}.${this.getColumn("END")})`,
+                    name: "id",
+                    type: "time",
+                },
+                this.placeholderMap,
+                this.settings
+            );
         } else if (attribute in this.__config.attributes) {
             let tmp = this.__config.attributes[attribute];
             let tmpPlaceholderMap = JSON.parse(
@@ -242,5 +264,9 @@ export class EntityConfig extends ConfigEntity {
         }
 
         return tmp;
+    }
+
+    public getTableTypePlaceholderMap(dimPlaceholder): any {
+        return this.settings.getDimPlaceholder(dimPlaceholder)
     }
 }

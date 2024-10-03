@@ -84,6 +84,9 @@ export class With extends AstElement {
     }
 
     public getAttributeConfig() {
+        if (this.node.expression && this.node.expression.getType() === "ExpressionRef") {
+            return
+        }
         let self = this;
         let defaultFilter: string = this.getDefaultFilter();
         if (defaultFilter) {
@@ -158,10 +161,13 @@ export class With extends AstElement {
             if (queryNode instanceof Query) {
                 let joinState = queryNode.joinState;
                 if (
-                    this.getType() === "With" ||
+                    (this.getType() === "With") ||
                     this.node.joinUsingConditionId
                 ) {
-                    if (joinState.getConditionId(this.getConditionName())) {
+                    if(tableObj.baseEntity === "@EXPRESSIONREF") {
+                        parentJoinCondition = joinState.getPatientId() +
+                        " = " + `"patient.${tableObj.table}"."patient.attributes.pid"`;
+                    } else if (joinState.getConditionId(this.getConditionName())) {
                         parentJoinCondition =
                             joinState.getConditionId(this.getConditionName()) +
                             " = " +
@@ -171,6 +177,16 @@ export class With extends AstElement {
                             joinState.getPatientId() +
                             " = " +
                             this.getPatientIdColumn(tableObj.baseEntity);
+
+                        // Add Entry Exit CAST(CURRENT_DATE AS DATE)
+                        if(Object.keys(this.parent.parent.aliasEntityMap).includes("PatientRequestEntryExit")) {
+                            const dimPlaceHolderTableMap = this.entityConfig.getTableTypePlaceholderMap(tableObj.baseEntity)
+                            if(dimPlaceHolderTableMap?.time) {
+                                parentJoinCondition += ` AND 
+                                                            CAST("patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.START`]} AS DATE) >= CAST("patient.PatientRequestEntryExit"."entry" AS DATE) AND 
+                                                            CAST("patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.END`]} AS DATE) <= CAST("patient.PatientRequestEntryExit"."exit" AS DATE)`
+                            }
+                        }
                         joinState.setConditionId(this);
                     }
                 } else {
@@ -178,6 +194,16 @@ export class With extends AstElement {
                         joinState.getPatientId() +
                         " = " +
                         this.getPatientIdColumn(tableObj.baseEntity);
+
+                    // Add Entry Exit CAST(CURRENT_DATE AS DATE)
+                    if(Object.keys(this.parent.parent.aliasEntityMap).includes("PatientRequestEntryExit")) {
+                        const dimPlaceHolderTableMap = this.entityConfig.getTableTypePlaceholderMap(tableObj.baseEntity)
+                        if(dimPlaceHolderTableMap?.time) {
+                            parentJoinCondition += ` AND 
+                                                        CAST("patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.START`]} AS DATE) >= CAST("patient.PatientRequestEntryExit"."entry" AS DATE) AND 
+                                                        CAST("patient.${this.node.alias}".${this.entityConfig.placeholderMap[`${tableObj.baseEntity}.END`]} AS DATE) <= CAST("patient.PatientRequestEntryExit"."exit" AS DATE)`
+                        }
+                    }
                 }
             }
             this.joinElements[tableObj.table].on.push(
@@ -293,6 +319,7 @@ export class With extends AstElement {
     }
 
     public getSQL() {
+        this.handleEntryExitJoin(this)
         let that = this;
         let nonBaseTablesJoinCount = 0;
         let nonBaseTablesJoin = QueryObject.format("").join(
@@ -370,5 +397,22 @@ export class With extends AstElement {
                 }
             })
         );
+    }
+
+    private handleEntryExitJoin(node: With){
+        //Detect if its PatientEntryExitRequest
+        if(node.parent.joinState["patientId"].indexOf("PEE") > -1) {
+            Object.keys(node.joinElements).forEach((interaction) => {
+                node.joinElements[interaction].on.forEach((queryObject) => {
+                    if(queryObject.queryString.indexOf("entry") > -1 || queryObject.queryString.indexOf("exit") > -1){
+                        let conditionTokens = queryObject.queryString.split(" AND ")
+                        conditionTokens = conditionTokens.filter((condition) => {
+                            return (condition.indexOf("entry") === -1 && condition.indexOf("exit") === -1)
+                        })
+                        queryObject.queryString =  conditionTokens.join(" AND ")
+                    }
+                })
+            })
+        }
     }
 }

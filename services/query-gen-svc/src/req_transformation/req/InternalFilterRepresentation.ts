@@ -178,6 +178,116 @@ export class InternalFilterRepresentation implements Request {
         this.buildDefaultOrderByList(population);
 
         this.parserContainers = [...requests, population];
+
+        this.createEntryExitCriteria();
+    }
+
+    private createEntryExitCriteria() {
+        if (this.__qConfig.__config.panelOptions.cohortEntryExit) {
+            // If enabled in PA config
+            const entryExitEvent: ParserContainer = structuredClone(
+                this.parserContainers.find((e) => e.name === "PatientRequest0")
+            );
+            entryExitEvent.alias = "PEE";
+            entryExitEvent.name = Keys.DEF_PATIENT_REQUEST_ENTRYEXIT;
+
+            entryExitEvent.measure = []
+            entryExitEvent.groupBy = []
+            const entryExitOverride = { entry: {dataType: "obsperiod", instanceID: "0"}, exit: {dataType: "obsperiod", instanceID: "0"} };
+            this.__request.matchAny.forEach((fcArray) => {
+                fcArray.forEach((fc) => {
+                    if (fc._isEntry) {
+                        entryExitOverride.entry.dataType = FastUtil.tokenizeAndJoin(
+                            fc._configPath,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        );
+
+                        entryExitOverride.entry.instanceID = FastUtil.tokenizeAndJoin(
+                            fc._instanceID,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        );
+                    }
+                    else if (fc._isExit) {
+                        entryExitOverride.exit.dataType = FastUtil.tokenizeAndJoin(
+                            fc._configPath,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        );
+
+                        entryExitOverride.exit.instanceID = FastUtil.tokenizeAndJoin(
+                            fc._instanceID,
+                            Keys.TERM_DELIMITER_PRD,
+                            1
+                        );
+                    }
+                });
+            });
+
+
+            entryExitEvent.measure = [
+                new BaseNode(
+                    "entry",
+                    `patient.interactions.${entryExitOverride.entry.dataType}.${entryExitOverride.entry.instanceID}.attributes.startdate`
+                    )
+                    .withIdentifier(`patient.interactions.${entryExitOverride.entry.dataType}.${entryExitOverride.entry.instanceID}`)
+                    .withTemplateId(`patient-interactions-${entryExitOverride.entry.dataType}`)
+                    .withDataType(entryExitOverride.entry.dataType)
+                    .withAlias(`${entryExitOverride.entry.dataType}${entryExitOverride.entry.instanceID}`)
+                    .withMeasure(true),
+                new BaseNode(
+                    "exit",
+                    `patient.interactions.${entryExitOverride.exit.dataType}.${entryExitOverride.exit.instanceID}.attributes.enddate`
+                    )
+                    .withIdentifier(`patient.interactions.${entryExitOverride.exit.dataType}.${entryExitOverride.exit.instanceID}`)
+                    .withTemplateId(`patient-interactions-${entryExitOverride.exit.dataType}`)
+                    .withDataType(entryExitOverride.exit.dataType)
+                    .withAlias(`${entryExitOverride.exit.dataType}${entryExitOverride.exit.instanceID}`)
+                    .withMeasure(true),
+            ];
+
+            //Keep With Relationships only if they have a attribute filter and are marked as either entry / exit
+            Object.keys(entryExitEvent.filter).forEach(fcType => {
+                const toKeep = new Set<string>();
+                toKeep.add(`${entryExitOverride.entry.dataType}${entryExitOverride.entry.instanceID}`)
+                toKeep.add(`${entryExitOverride.exit.dataType}${entryExitOverride.exit.instanceID}`)
+                const toDelete = new Set<string>();
+                const fcArray = entryExitEvent.filter[fcType];
+                fcArray.forEach(fc => {
+                    if (!toKeep.has(fc.alias)) {
+                        toDelete.add(fc.alias);
+                        return;
+                    } else {
+                        fc.isEntryExit = true;
+                    }
+                    let filterExists = false
+                    fc.attributeList.forEach(e => {
+                        if(e.filter?.length > 0 && toKeep.has(fc.alias)) {
+                            filterExists = true;
+                        }
+                    })
+                    if(!filterExists) toDelete.add(fc.alias); // Even though its marked as entry/exit, if no attribute filters exists for them, still remove. Because it will be handled by BaseNode from Measure
+                })
+
+                //Prune unwanted filtercards for PatientEntryExitRequest
+                entryExitEvent.filter[fcType] = fcArray.filter((fc) => !toDelete.has(fc.alias))
+            })
+
+            //handle where
+            //Remove those associated with exclude specifically when where clause is defined to be null. Only keep basic data and those marked as either entry/exit
+            entryExitEvent.where = entryExitEvent.where.filter(e => 
+                                    (e.alias === `${entryExitOverride.entry.dataType}${entryExitOverride.entry.instanceID}` || 
+                                     e.alias === `${entryExitOverride.exit.dataType}${entryExitOverride.exit.instanceID}` || 
+                                     e.alias === "P0")) 
+            //Associated with PEE
+            entryExitEvent.where.forEach((e) => {
+                e.alias = "PEE";
+            });
+
+         
+            this.parserContainers.push(entryExitEvent);
+        }
     }
 
     public getConfig(): any {
@@ -815,27 +925,33 @@ export class InternalFilterRepresentation implements Request {
             }, {});
 
         //Detect interactions with multiple identical filtercards and add NotEqual check between them. Must be after isExclude is detected!
-        process.env.NOT_EQ_CHECK_FILTERCARDS === "true" && 
+        process.env.NOT_EQ_CHECK_FILTERCARDS === "true" &&
             Object.keys(patient.filter)
-            .filter((e) => patient.filter[e].length > 1)
-            .forEach((interaction) =>
-                patient.filter[interaction].forEach((e, i) => {
-                    e.join = [];
-                    if (i === 0 || e.isExclude) return; //Skip the first filtercard alone OR excluded filtercards
-                    // Traverse to previous nodes and get their alias for establishing join relationship
-                    for (let k = i-1; k >= 0; k--) {
-                        const identicalNode = patient.filter[interaction][k]
-                        if (identicalNode.isExclude) continue; // skip excluded filtercards
-                        //path, e.alias, e.filter, e.pathId
-                        e.join.push({   path: null, 
-                                        pathId: null,
-                                        alias: identicalNode.alias, 
-                                        filter: [new Expression(
-                                                        Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
-                                                        identicalNode.alias
-                                                    ).withType("expressionOp")]})
+                .filter((e) => patient.filter[e].length > 1)
+                .forEach((interaction) =>
+                    patient.filter[interaction].forEach((e, i) => {
+                        e.join = [];
+                        if (i === 0 || e.isExclude) return; //Skip the first filtercard alone OR excluded filtercards
+                        // Traverse to previous nodes and get their alias for establishing join relationship
+                        for (let k = i - 1; k >= 0; k--) {
+                            const identicalNode =
+                                patient.filter[interaction][k];
+                            if (identicalNode.isExclude) continue; // skip excluded filtercards
+                            //path, e.alias, e.filter, e.pathId
+                            e.join.push({
+                                path: null,
+                                pathId: null,
+                                alias: identicalNode.alias,
+                                filter: [
+                                    new Expression(
+                                        Keys.SQLTERM_INEQUALITY_SYMBOL_NOTEQUAL,
+                                        identicalNode.alias
+                                    ).withType("expressionOp"),
+                                ],
+                            });
                         }
-                    }));
+                    })
+                );
 
         // Build list of where conditions
         // Gets list of basic data attribute constraints and adds them into the where clause conditions

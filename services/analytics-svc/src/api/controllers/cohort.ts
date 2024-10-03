@@ -168,7 +168,6 @@ export async function createCohort(req: IMRIRequest, res: Response) {
     try {
         const studyId = req.swagger.params.cohort.value.studyId;
         const analyticsConnection = await getCohortAnalyticsConnection(req);
-
         const { schemaName, databaseCode, vocabSchemaName } =
             await getStudyDetails(studyId, res);
         const language = getUser(req).lang;
@@ -254,6 +253,7 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                 insert: false,
             },
         };
+
         // Request query string from query-gen-svc for inserting the cohort patients.
         // In query-gen-svc, it uses the same logic used in patient list to deal with the filters
         const queryResponse = await generateQuery(
@@ -292,7 +292,6 @@ export async function generateCohortDefinition(
 ) {
     try {
         const studyId = req.swagger.params.cohort.value.studyId;
-
         const { vocabSchemaName } = await getStudyDetails(studyId, res);
         const language = getUser(req).lang;
         // Remap mriquery for use in createEndpointFromRequest
@@ -404,26 +403,7 @@ export async function deleteCohort(req: IMRIRequest, res: Response) {
 // Takes in req object to use pluginEndpoint get patient list, extract patient ids then build and return cohort object
 async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
     try {
-        // Extract mriquery and use pluginEndpoint.retrieveData to get patient list
-        let mriquery = req.swagger.params.cohort.value.mriquery;
-        const { cohortDefinition, studyId, pluginEndpoint } =
-            await createEndpointFromRequest(req);
-        pluginEndpoint.setRequest(req);
-        const pluginResult = (await pluginEndpoint.retrieveData({
-            cohortDefinition,
-            studyId,
-            language,
-            dataFormat: "json",
-            requestQuery: mriquery,
-            patientId: null,
-            auditLogChannelName:
-                req.usage === "EXPORT" ? "MRI Pt. List Exp" : "MRI Pt. List",
-        })) as PluginEndpointResultType;
-
-        // Extract patient id from patient list
-        let patientIds = pluginResult.data[0].data.map(
-            (obj) => obj["patient.attributes.pid"]
-        );
+        const patientIds = []
 
         // Create cohort object
         let cohort = <CohortType>{
