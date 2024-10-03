@@ -161,7 +161,6 @@ export interface IDatasetResponseDto {
   tags: IDatasetTag[]
   totalSubjects?: number
   dataModel: string
-  plugin: string
 }
 
 export interface IDatasetSearchDto {
