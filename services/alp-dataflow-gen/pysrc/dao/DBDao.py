@@ -140,9 +140,12 @@ class DBDao(DBUtils):
             updated_date = connection.execute(select_stmt).scalar()
             return updated_date
 
-
+    def __validate_schema_name(self, schema_name: str):
+        if len(schema_name.encode('utf-8')) > 63:
+            raise ValueError(f"Schema name '{schema_name}' exceeds 63 bytes")
 
     def create_schema(self):
+        self.__validate_schema_name(self.schema_name)
         with self.engine.connect() as connection:
             connection.execute(CreateSchema(self.schema_name))
             connection.commit()
