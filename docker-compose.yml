@@ -808,7 +808,7 @@ services:
       DUCKDB__DATA_FOLDER: /home/docker/src/alp-data-node/app/duckdb_data
       LOCAL_DEBUG: "false"
       USE_DUCKDB: ${USE_DUCKDB:-true}
-      USE_CACHEDB: ${USE_CACHEDB:-true}
+      USE_CACHEDB: ${USE_CACHEDB:-false}
       USE_EXTENSION_FOR_COHORT_CREATION: "false"
     deploy:
       resources:
@@ -867,7 +867,7 @@ services:
       NODE_ENV: development
       PORT: 41114
       USE_DUCKDB: ${USE_DUCKDB:-true}
-      USE_CACHEDB: ${USE_CACHEDB:-true}
+      USE_CACHEDB: ${USE_CACHEDB:-false}
       isTestEnv: ${isTestEnv}
       BUILT_IN_DUCKDB_PATH: /home/docker/src/services/app/src/duckdb
       DUCKDB_PATH: /home/docker/duckdb_data
@@ -1366,7 +1366,7 @@ services:
       TERMINOLOGY_SVC__LOG_LEVEL: info
       TERMINOLOGY_SVC__PATH: terminology
       TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
-      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-true}
+      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-false}
 
   alp-minerva-user-mgmt:
     container_name: &c22 alp-minerva-user-mgmt-${BASE_PORT:-1}
@@ -1791,8 +1791,9 @@ services:
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
-    image: alpcr.azurecr.io/alp-data-node/alp-perseus-white-rabbit:${DOCKER_TAG_NAME:-develop}
+    image: alpcr.azurecr.io/whiterabbit:master
     container_name: &c36 alp-perseus-white-rabbit-${BASE_PORT:-1}
+    platform: linux/amd64
     environment:
       <<:
         - *x-pg
@@ -1808,11 +1809,6 @@ services:
     networks:
       alp:
         priority: 20
-    command:
-      - PG_SUPER_USER=${PG_SUPER_USER:-postgres}
-      - PG_SUPER_PASSWORD=${PG_SUPER_PASSWORD}
-      - PG__HOST=${PG_HOST:-alp-minerva-postgres-1}
-      - PG__PORT=${PG_PORT:-5432}
-      - PG__DB_NAME=alp
+    entrypoint: ["sh", "-c", "./init.sh"]
     profiles: [perseus]
     
