@@ -1,4 +1,4 @@
-FROM alpcr.azurecr.io/alp-dataflow-gen-base:develop as dbsvc-build
+FROM alpcr.azurecr.io/alp-dataflow-gen-base:v0.4.0-beta as dbsvc-build
 
 # Required for RPostgres R package
 RUN apt-get update && apt-get install libpq5 libpq-dev -y --no-install-recommends && apt-get clean
