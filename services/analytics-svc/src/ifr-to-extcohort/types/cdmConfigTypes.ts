@@ -104,7 +104,4 @@ export type CdmAdvancedSettings = {
     shared: {};
     schemaVersion: string;
     tableMapping: CdmTableMapping;
-    extCohortDefinitionTableMapping?: {
-        [key: string]: string;
-    };
 };
