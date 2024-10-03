@@ -19,81 +19,81 @@ export async function processRequest(
             domainValuesRequest.attributePath,
             'The request must contain a property "attributePath"'
         );
-    } catch (err) {
-        callback(err, null);
-        return;
-    }
-    if (domainValuesRequest.attributeType === "conceptSet") {
-        const conceptSets = await terminologyRequest(
-            req,
-            "GET",
-            "concept-set",
-            null
-        );
-        callback(null, {
-            results: {
-                data: conceptSets.map((set) => {
-                    return { value: set.id, text: set.name };
-                }),
-            },
-            httpStatus: 200,
-        });
-        return;
-    }
+        if (domainValuesRequest.attributeType === "conceptSet") {
+            const conceptSets = await terminologyRequest(
+                req,
+                "GET",
+                "concept-set",
+                null
+            );
+            callback(null, {
+                results: {
+                    data: conceptSets.map((set) => {
+                        return { value: set.id, text: set.name };
+                    }),
+                },
+                httpStatus: 200,
+            });
+            return;
+        }
 
-    // generate the query here and then execute the query
-    const queryResponse = await generateQuery(
-        req,
-        {
-            attributePath: domainValuesRequest.attributePath, // assert this
-            suggestionLimit: domainValuesRequest.suggestionLimit,
-            configParams: domainValuesRequest.configParams,
-            searchQuery: domainValuesRequest.searchQuery,
-        },
-        "domainvalues"
-    );
-    const { queryString, config } = queryResponse;
-    const domainValuesLimit = config.panelOptions.domainValuesLimit || 200;
-    const countQueryObject = new QueryObject(
-        `WITH DATA_QUERY AS (${queryString}) SELECT COUNT(*) AS "valueCount" FROM DATA_QUERY`
-    );
-    countQueryObject.executeQuery(
-        connection,
-        (err, results) => {
-            if (err) {
-                return;
-            }
-            if (results?.data?.[0].valueCount) {
-                // fetch actual data if the count is less than the threshold, else return emtry array
-                if (results.data[0].valueCount <= domainValuesLimit) {
-                    // fetch actual data if the count is less than the threshold
-                    let queryObject = new QueryObject(queryString);
-                    queryObject.executeQuery(
-                        connection,
-                        (err, results) => {
-                            if (err) {
-                                return;
-                            }
-                            callback(err, {
-                                results,
-                                httpStatus: 200,
-                            });
-                        },
-                        connection.schemaName
-                    );
+        // generate the query here and then execute the query
+        const queryResponse = await generateQuery(
+            req,
+            {
+                attributePath: domainValuesRequest.attributePath, // assert this
+                suggestionLimit: domainValuesRequest.suggestionLimit,
+                configParams: domainValuesRequest.configParams,
+                searchQuery: domainValuesRequest.searchQuery,
+            },
+            "domainvalues"
+        );
+        const { queryString, config } = queryResponse;
+        const domainValuesLimit = config.panelOptions.domainValuesLimit || 200;
+        const countQueryObject = new QueryObject(
+            `WITH DATA_QUERY AS (${queryString}) SELECT COUNT(*) AS "valueCount" FROM DATA_QUERY`
+        );
+        countQueryObject.executeQuery(
+            connection,
+            (err, results) => {
+                if (err) {
+                    return;
+                }
+                if (results?.data?.[0].valueCount) {
+                    // fetch actual data if the count is less than the threshold, else return emtry array
+                    if (results.data[0].valueCount <= domainValuesLimit) {
+                        // fetch actual data if the count is less than the threshold
+                        let queryObject = new QueryObject(queryString);
+                        queryObject.executeQuery(
+                            connection,
+                            (err, results) => {
+                                if (err) {
+                                    return;
+                                }
+                                callback(err, {
+                                    results,
+                                    httpStatus: 200,
+                                });
+                            },
+                            connection.schemaName
+                        );
+                    } else {
+                        callback(err, {
+                            results: [],
+                            httpStatus: 204,
+                        });
+                    }
                 } else {
                     callback(err, {
-                        results: [],
-                        httpStatus: 204,
+                        results: { data: [] },
+                        httpStatus: 200,
                     });
                 }
-            } else {
-                callback(err, {
-                    results: { data: [] },
-                    httpStatus: 200,
-                });
-            }
-        },
-        connection.schemaName
-    );
+            },
+            connection.schemaName
+        );
+
+    } catch (err) {
+        callback(err, null);
+    }
 }
