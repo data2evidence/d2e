@@ -358,10 +358,20 @@ export class ConceptService {
         false,
       );
       return meilisearchResult
-        .map(
-          (result) =>
-            this.meilisearchResultMapping(result).expansion.contains[0],
-        )
+        .map((result) => {
+          const mappedResult =
+            this.meilisearchResultMapping(result).expansion.contains[0];
+
+          if (mappedResult) {
+            return {
+              ...mappedResult,
+              conceptCode: mappedResult.code,
+              conceptName: mappedResult.display,
+              vocabularyId: mappedResult.system,
+            };
+          }
+          return null;
+        })
         .filter((result) => result != null);
     } catch (err) {
       logger.error(err);
@@ -388,20 +398,61 @@ export class ConceptService {
         }`,
       );
       const fhirValueSet = this.meilisearchResultMapping(meilisearchResult);
-      const concepts = fhirValueSet.expansion.contains.map((fhirconcept) => {
-        return {
-          concept_id: fhirconcept.conceptId,
-          concept_name: fhirconcept.display,
-          domain_id: fhirconcept.domainId,
-          vocabulary_id: fhirconcept.system,
-          concept_class_id: fhirconcept.conceptClassId,
-          standard_concept: fhirconcept.standardConcept,
-          concept_code: fhirconcept.code,
-          valid_start_date: fhirconcept.validStartDate,
-          valid_end_date: fhirconcept.validEndDate,
-          invalid_reason: fhirconcept.validity,
-        };
-      });
+      const concepts = this.mapFhirToConcept(fhirValueSet);
+      return concepts;
+    } catch (err) {
+      logger.error(err);
+      throw err;
+    }
+  }
+
+  async searchConceptById({
+    conceptId,
+    datasetId,
+  }: {
+    conceptId: number;
+    datasetId: string;
+  }) {
+    try {
+      const systemPortalApi = new SystemPortalAPI(this.token);
+      const { databaseCode, vocabSchemaName, dialect } =
+        await systemPortalApi.getDatasetDetails(datasetId);
+      const meilisearchApi = new MeilisearchAPI();
+      const meilisearchResult = await meilisearchApi.getConceptById(
+        conceptId,
+        `${databaseCode}_${vocabSchemaName}_${
+          dialect === 'hana' ? 'CONCEPT' : 'concept'
+        }`,
+      );
+      const fhirValueSet = this.meilisearchResultMapping(meilisearchResult);
+      const concepts = this.mapFhirToConcept(fhirValueSet);
+      return concepts;
+    } catch (err) {
+      logger.error(err);
+      throw err;
+    }
+  }
+
+  async searchConceptByCode({
+    conceptCode,
+    datasetId,
+  }: {
+    conceptCode: string;
+    datasetId: string;
+  }) {
+    try {
+      const systemPortalApi = new SystemPortalAPI(this.token);
+      const { databaseCode, vocabSchemaName, dialect } =
+        await systemPortalApi.getDatasetDetails(datasetId);
+      const meilisearchApi = new MeilisearchAPI();
+      const meilisearchResult = await meilisearchApi.getConceptByCode(
+        conceptCode,
+        `${databaseCode}_${vocabSchemaName}_${
+          dialect === 'hana' ? 'CONCEPT' : 'concept'
+        }`,
+      );
+      const fhirValueSet = this.meilisearchResultMapping(meilisearchResult);
+      const concepts = this.mapFhirToConcept(fhirValueSet);
       return concepts;
     } catch (err) {
       logger.error(err);
@@ -499,9 +550,9 @@ export class ConceptService {
     conceptId: number,
     depth: number,
   ) {
-    let edges: ConceptHierarchyEdge[] = [];
-    let nodeLevels: ConceptHierarchyNodeLevel[] = [];
-    let conceptIds: Set<number> = new Set<number>().add(conceptId);
+    const edges: ConceptHierarchyEdge[] = [];
+    const nodeLevels: ConceptHierarchyNodeLevel[] = [];
+    const conceptIds: Set<number> = new Set<number>().add(conceptId);
     nodeLevels.push({ conceptId: conceptId, level: 0 });
 
     const systemPortalApi = new SystemPortalAPI(this.token);
@@ -641,5 +692,23 @@ export class ConceptService {
       expansion: valueSetExpansion,
     };
     return result;
+  }
+
+  private mapFhirToConcept(fhirValueSet: FhirValueSet) {
+    const concepts = fhirValueSet.expansion.contains.map((fhirconcept) => {
+      return {
+        concept_id: fhirconcept.conceptId,
+        concept_name: fhirconcept.display,
+        domain_id: fhirconcept.domainId,
+        vocabulary_id: fhirconcept.system,
+        concept_class_id: fhirconcept.conceptClassId,
+        standard_concept: fhirconcept.standardConcept,
+        concept_code: fhirconcept.code,
+        valid_start_date: fhirconcept.validStartDate,
+        valid_end_date: fhirconcept.validEndDate,
+        invalid_reason: fhirconcept.validity,
+      };
+    });
+    return concepts;
   }
 }
