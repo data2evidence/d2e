@@ -71,6 +71,17 @@ export class Settings extends oldSettings.Settings {
             : new Error("Dim Table Placeholder not found");
     }
 
+    public getDimPlaceholder(dimPlaceholder) {
+        let dimTablePlaceholder = this.getTableTypePlaceholderMap().dimTables.filter(
+            (dimTable) => {
+                    return dimTable.placeholder === dimPlaceholder;
+            }
+        );
+        return dimTablePlaceholder.length === 1
+            ? dimTablePlaceholder[0]
+            : new Error("Dim Table Placeholder not found");
+    }
+
     public getAllPlaceholders() {
         let ttpm = this.getTableTypePlaceholderMap();
         let placeholders = [];
