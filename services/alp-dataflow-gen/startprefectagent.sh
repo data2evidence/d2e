@@ -5,4 +5,6 @@ yarn generate:envs -s alp-minerva-db-mgmt-svc
 cd ../
 . generated-env.sh
 cd ../
-prefect agent start --pool default-agent-pool
+# prefect agent start --pool default-pool
+
+prefect agent start --match "default"
