@@ -14,7 +14,6 @@ volumes:
   r-libs:
   fhir-schema-file-1:
   fhir-duckdb-1:
-  dind-certs:
 
 x-envs:
   db-svc: &x-dbsvc
@@ -543,8 +542,6 @@ services:
       DATAFLOW_MGMT__FLOWS__RESULTS__S3_DIR_PATH: s3://flows/results
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
-      PREFECT__PROCESS_WORKER_POOL_NAME: process-pool
-      PREFECT__DOCKER_WORKER_POOL_NAME: docker-pool
       R_LIBS_USER: /home/docker/plugins/R/site-library
 
   alp-db-credentials-mgr:
@@ -1668,84 +1665,6 @@ services:
         limits:
           cpus: ${D2E_CPU_LIMIT:-2}
           memory: ${D2E_MEMORY_LIMIT:-7G}
-
-  alp-dataflow-gen-process-worker:
-    container_name: &c31 alp-dataflow-gen-process-worker-${BASE_PORT:-1}
-    depends_on:
-      alp-dataflow-gen-init:
-        condition: service_completed_successfully
-      alp-docker-server:
-        condition: service_healthy
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 60s
-      test:
-        # TODO: add healthcheck on worker
-        - CMD
-        - curl
-        - -f
-        - http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
-      timeout: 30s
-    hostname: alp-dataflow-gen-process-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen-worker:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c31
-    networks:
-      data:
-        priority: 20
-    platform: linux/amd64
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    volumes:
-      - dind-certs:/certs
-    environment:
-      PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
-      PREFECT_LOGGING_SERVER_LEVEL: WARNING
-      PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool}
-      PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-process-pool} # used for flow_builder deployment
-      DOCKER_HOST: "tcp://dind:2376"
-      DOCKER_CERT_PATH: /certs/client/
-      DOCKER_TLS_VERIFY: false
-
-  alp-dataflow-gen-docker-worker:
-    extends: alp-dataflow-gen-process-worker
-    container_name: &c32 alp-dataflow-gen-docker-worker-${BASE_PORT:-1}
-    hostname: alp-dataflow-gen-docker-worker-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    networks:
-      data:
-        priority: 20
-    logging:
-      options:
-        tag: *c32
-    environment:
-      PREFECT__WORKER_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
-      PREFECT_DEFAULT_WORK_POOL_NAME: ${PREFECT__PROCESS_WORKER_POOL_NAME:-docker-pool}
-      DOCKER_HOST: "tcp://dind:2376"
-      DOCKER_CERT_PATH: /certs/client/
-      DOCKER_TLS_VERIFY: false
-
-  alp-docker-server:
-    image: docker:dind
-    container_name: &c33 alp-docker-server-${BASE_PORT:-1}
-    hostname: dind
-    networks:
-      data:
-        priority: 20
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 30s
-      test: ["CMD-SHELL", "netstat -ltn | grep -c :::2376"]
-      timeout: 10s
-    logging:
-      options:
-        tag: *c33
-    privileged: true
-    volumes:
-      - dind-certs:/certs
-    environment:
-      DOCKER_TLS_CERTDIR: /certs
 
   alp-perseus-files-manager:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
