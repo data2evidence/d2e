@@ -83,7 +83,7 @@ export class DuckdbConnection implements ConnectionInterface {
                 duckdDBconn,
                 duckdDB,
                 duckdbSchemaFileName,
-                duckdbVocabSchemaFileName,
+                duckdbVocabSchemaFileName
             );
 
             callback(null, conn);
@@ -169,7 +169,7 @@ export class DuckdbConnection implements ConnectionInterface {
                 `parameters: ${JSON.stringify(flattenParameter(parameters))}`
             );
             let temp = sql;
-            temp = this.parseSql(temp);
+            temp = this.parseSql(temp, parameters);
             logger.debug("Duckdb client created");
             const result = await this.conn.all(
                 temp,
@@ -182,9 +182,35 @@ export class DuckdbConnection implements ConnectionInterface {
         }
     }
 
-    private parseSql(temp: string): string {
+    private parseSql(temp: string, parameters?: ParameterInterface[]): string {
         temp = this.getSqlStatementWithSchemaName(this.schemaName, temp);
-        return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName);
+        let sql = translateHanaToDuckdb(
+            temp,
+            this.schemaName,
+            this.vocabSchemaName
+        );
+        if (parameters) {
+            const isoDatetimeRegex =
+                /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/;
+            const isIsoDates = parameters.map((param) =>
+                isoDatetimeRegex.test(String(param.value))
+            );
+            // Matches instances like 'DATE" <= $1'
+            // Using the 'DATE' in the column name to match to avoid affecting datetime
+            const dateWordBeforeParamRegex = /(".*?DATE".{0,8})\$(\d+)/gi;
+            sql = sql.replace(
+                dateWordBeforeParamRegex,
+                (match: string, beforeDate: string, paramNumber: string) => {
+                    // paramNumber index starts at 1 instead of 0
+                    if (isIsoDates[Number(paramNumber) - 1]) {
+                        // Replace $n with CAST($n AS TIMESTAMP)::DATE
+                        return `${beforeDate}CAST($${paramNumber} AS TIMESTAMP)::DATE`;
+                    }
+                    return match;
+                }
+            );
+        }
+        return sql;
     }
 
     public getTranslatedSql(sql: string): string {
@@ -371,12 +397,11 @@ export class DuckdbConnection implements ConnectionInterface {
         schemaName: string,
         sql: string
     ): string {
-
         let duckdbNativeSchemName = null;
-        
+
         //TODO: Unify implementation between patient list and Add to cohort
-        if(this.conn["duckdbNativeDBName"]) {
-            duckdbNativeSchemName = `${this.conn["duckdbNativeDBName"]}.${this.conn["studyAnalyticsCredential"].schema}`
+        if (this.conn["duckdbNativeDBName"]) {
+            duckdbNativeSchemName = `${this.conn["duckdbNativeDBName"]}.${this.conn["studyAnalyticsCredential"].schema}`;
         } else {
             duckdbNativeSchemName = this["duckdbNativeDBName"];
         }
