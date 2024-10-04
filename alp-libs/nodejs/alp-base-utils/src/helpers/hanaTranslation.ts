@@ -1,3 +1,8 @@
+interface ParameterInterface {
+  value: string | number;
+  type?: string;
+}
+
 // Translation function containing regex that are shared between DUCKDB and POSTGRES dialects
 const hanaCommonTranslation = (temp: string, schemaName: string, vocabSchemaName: string): string => {
   // The first few queries to replace are very specific query which does not require further string replacements
@@ -190,7 +195,12 @@ export const translateHanaToPostgres = (temp: string, schemaName: string, vocabS
   return temp;
 };
 
-export const translateHanaToDuckdb = (temp: string, schemaName: string, vocabSchemaName: string): string => {
+export const translateHanaToDuckdb = (
+  temp: string,
+  schemaName: string,
+  vocabSchemaName: string,
+  parameters?: ParameterInterface[],
+): string => {
   temp = hanaCommonTranslation(temp, schemaName, vocabSchemaName);
   
   temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, `direct_db_conn.${schemaName}.`); // Used when using cachedb connection connecting to duckdb, but additionally requires direct connection to database schema
@@ -210,6 +220,28 @@ export const translateHanaToDuckdb = (temp: string, schemaName: string, vocabSch
   temp = temp.replace(/\%[s]{1}(?![a-zA-Z0-9%])|%UNSAFE|\?/g, () => {
     return "$" + ++n;
   });
+
+  // Should be placed at the end after ? is replaced with $n
+  if (parameters?.length) {
+    const isoDatetimeRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/;
+    const isIsoDates = parameters.map(param =>
+      isoDatetimeRegex.test(String(param.value)),
+    );
+    // Matches instances like 'DATE" <= $1'
+    // Using the 'DATE' in the column name to match to avoid affecting datetime
+    const dateWordBeforeParamRegex = /(".*?DATE".{0,8})\$(\d+)/gi;
+    temp = temp.replace(
+      dateWordBeforeParamRegex,
+      (match: string, beforeDate: string, paramNumber: string) => {
+        // paramNumber index starts at 1 instead of 0
+        if (isIsoDates[Number(paramNumber) - 1]) {
+          // Replace $n with CAST($n AS TIMESTAMP)::DATE
+          return `${beforeDate}CAST($${paramNumber} AS TIMESTAMP)::DATE`;
+        }
+        return match;
+      },
+    );
+  }
 
   return temp;
 };
