@@ -132,7 +132,7 @@ export class DuckdbConnection implements ConnectionInterface {
         return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName);
     }
 
-    public getTranslatedSql(sql: string): string {
+    public getTranslatedSql(sql: string, schemaName: string, parameters: ParameterInterface[]): string {
         return this.parseSql(sql);
     }
 
