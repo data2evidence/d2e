@@ -291,21 +291,22 @@ const initRoutes = async (app: express.Application) => {
                         // Handle error from mriConfigConnection.getMriConfig
                         if (configResults.statusCode) {
                             const statusCode = configResults.statusCode;
+                            const message = configResults.message;
                             if (statusCode >= 400 && statusCode < 600) {
-                                log.error(configResults.message);
+                                log.error(message);
                                 res.status(statusCode).send(
                                     MRIEndpointErrorHandler({
                                         err: {
                                             name: "mri-pa",
-                                            message: `Error in getting the list of configs!`,
+                                            message: message,
                                         },
                                         language,
                                     })
                                 );
                             }
+                        } else {
+                            res.status(200).json(configResults);
                         }
-
-                        res.status(200).json(configResults);
                     }
                     break;
                 case "getFrontendConfig":
@@ -337,13 +338,14 @@ const initRoutes = async (app: express.Application) => {
                         // Handle error from mriConfigConnection.getMriConfig
                         if (configResults.statusCode) {
                             const statusCode = configResults.statusCode;
+                            const message = configResults.message;
                             if (statusCode >= 400 && statusCode < 600) {
-                                log.error(configResults.message);
+                                log.error(message);
                                 res.status(statusCode).send(
                                     MRIEndpointErrorHandler({
                                         err: {
                                             name: "mri-pa",
-                                            message: `Error in clearing default config!`,
+                                            message: message,
                                         },
                                         language,
                                     })
