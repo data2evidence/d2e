@@ -1710,7 +1710,7 @@ services:
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
-    image: alpcr.azurecr.io/whiterabbit:master
+    image: alpcr.azurecr.io/whiterabbit:v0.4.0-beta
     container_name: &c36 alp-perseus-white-rabbit-${BASE_PORT:-1}
     platform: linux/amd64
     environment:
