@@ -9,15 +9,15 @@ services:
       - 33000:33000
       - 33001:33001
     volumes:
+      - ./services/trex/plugins:/usr/src/plugins
       - ./functions:/usr/src/plugins/d2ef
     environment:
       LOCAL_DEBUG: "true"
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
-      PLUGINS_SEED: '["d2e-plugins", "d2e-ui"]'
-      PLUGINS_SEED_UPDATE: false
+      PLUGINS_SEED: '["d2e-ui"]'
+      PLUGINS_SEED_UPDATE: true
       PLUGINS_DEV_PATH: "./plugins"
       WATCH_FUNCTIONS: false
-
 
   
   # alp-bookmark:
