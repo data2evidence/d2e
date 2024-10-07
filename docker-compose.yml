@@ -362,7 +362,7 @@ services:
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
-      INSTANCE_SPECIFIC_CONFIG: ${INSTANCE_SPECIFIC_CONFIG:-}
+      CADDY_INSTANCE_SPECIFIC_DIRECTIVES: ${CADDY_INSTANCE_SPECIFIC_DIRECTIVES:-}
       CADDY__ALP__ALIAS_PUBLIC_FQDN: ${CADDY__ALP__ALIAS_PUBLIC_FQDN:-}
 
   alp-dataflow-gen:
@@ -1732,4 +1732,3 @@ services:
         priority: 20
     entrypoint: ["sh", "-c", "./init.sh"]
     profiles: [perseus]
-    
