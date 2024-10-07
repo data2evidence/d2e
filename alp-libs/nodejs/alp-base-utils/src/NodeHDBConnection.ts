@@ -73,7 +73,7 @@ export class NodeHDBConnection implements ConnectionInterface {
     }
   }
 
-  public getTranslatedSql(sql: string, schemaName: string = ""): string {
+  public getTranslatedSql(sql: string, schemaName: string, parameters: ParameterInterface[]): string {
     return this.getSqlStatementWithSchemaName(schemaName, sql);
   }
 
