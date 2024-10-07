@@ -282,11 +282,24 @@ const initRoutes = async (app: express.Application) => {
                             MRIEndpointErrorHandler({
                                 err: {
                                     name: "mri-pa",
-                                    message: `Error is getting the list of configs!`,
+                                    message: `Error in getting the list of configs!`,
                                 },
                                 language,
                             })
                         );
+                    } else if (configResults.statusCode) {
+                        if (configResults.statusCode === 500) {
+                            log.error(configResults.message);
+                            res.status(500).send(
+                                MRIEndpointErrorHandler({
+                                    err: {
+                                        name: "mri-pa",
+                                        message: `Error in getting the list of configs!`,
+                                    },
+                                    language,
+                                })
+                            );
+                        }
                     } else {
                         res.status(200).json(configResults);
                     }
@@ -311,11 +324,24 @@ const initRoutes = async (app: express.Application) => {
                             MRIEndpointErrorHandler({
                                 err: {
                                     name: "mri-pa",
-                                    message: `Error is clearing default config!`,
+                                    message: `Error in clearing default config!`,
                                 },
                                 language,
                             })
                         );
+                    } else if (configResults.statusCode) {
+                        if (configResults.statusCode === 500) {
+                            log.error(configResults.message);
+                            res.status(500).send(
+                                MRIEndpointErrorHandler({
+                                    err: {
+                                        name: "mri-pa",
+                                        message: `Error in clearing default config!`,
+                                    },
+                                    language,
+                                })
+                            );
+                        }
                     } else {
                         res.status(200).json(configResults);
                     }
