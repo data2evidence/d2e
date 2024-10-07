@@ -1,3 +1,8 @@
+interface ParameterInterface {
+  value: string | number;
+  type?: string;
+}
+
 // Translation function containing regex that are shared between DUCKDB and POSTGRES dialects
 const hanaCommonTranslation = (temp: string, schemaName: string, vocabSchemaName: string): string => {
   // The first few queries to replace are very specific query which does not require further string replacements
@@ -190,7 +195,12 @@ export const translateHanaToPostgres = (temp: string, schemaName: string, vocabS
   return temp;
 };
 
-export const translateHanaToDuckdb = (temp: string, schemaName: string, vocabSchemaName: string): string => {
+export const translateHanaToDuckdb = (
+  temp: string,
+  schemaName: string,
+  vocabSchemaName: string,
+  parameters?: ParameterInterface[],
+): string => {
   temp = hanaCommonTranslation(temp, schemaName, vocabSchemaName);
   
   temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, `direct_db_conn.${schemaName}.`); // Used when using cachedb connection connecting to duckdb, but additionally requires direct connection to database schema
@@ -210,6 +220,21 @@ export const translateHanaToDuckdb = (temp: string, schemaName: string, vocabSch
   temp = temp.replace(/\%[s]{1}(?![a-zA-Z0-9%])|%UNSAFE|\?/g, () => {
     return "$" + ++n;
   });
+
+  // Should be placed at the end after ? is replaced with $n
+  if (parameters?.length) {
+    const paramsRegex = /\$(\d+)/g;
+    temp = temp.replace(paramsRegex, (match: string, paramNumber: string) => {
+      const paramIndex = Number(paramNumber) - 1;
+      if (parameters[paramIndex].type === "time") {
+        return `CAST($${paramNumber} AS DATE)`;
+      }
+      if (parameters[paramIndex].type === "datetime") {
+        return `CAST($${paramNumber} AS TIMESTAMP)`;
+      }
+      return match;
+    });
+  }
 
   return temp;
 };
