@@ -12,26 +12,13 @@ import {
 import {
     PluginColumnType,
     CohortQueryType,
-    StudyMriConfigMetaDataType,
+    IMRIRequest,
     BarcharCohortQueryType,
 } from "../../types";
 import { QueryObject as qo } from "@alp/alp-base-utils";
 import QueryObject = qo.QueryObject;
 
 export class StackedBarChartCohortSvc extends BaseCohortSvc {
-    constructor(
-        public props: {
-            userSelectedAttributes: PluginColumnType[];
-            yaxis: string;
-            user: string;
-            lang: string;
-            backendConfig: any;
-            bookmarks: any;
-        }
-    ) {
-        super(props);
-    }
-
     /* 
         This method is to actually get the alias of selected columns from a generated query. 
         Which alias to pick is based on the measure expression defined consisting of placeholders and db column names.
