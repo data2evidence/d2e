@@ -68,13 +68,13 @@ jobs:
           ACTIONS_STEP_DEBUG=false
 
           # get env yml from 1password
-          yarn --cwd internal op:get:$ENV_TYPE
+          npm run internal op:get:$ENV_TYPE
 
           # mask sensitive values
-          internal/scripts/gha-mask.sh
+          internal/scripts/mask-gha.sh
 
           # generate dotenv
-          yarn --cwd internal gen:env
+          npm run internal gen:env
 
           cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 
@@ -82,7 +82,7 @@ jobs:
           echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
           echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
 
-      - name: Load dotenv from 1password
+      - name: Load registry creds
         uses: 1password/load-secrets-action@v2
         id: op-load-secret
         with:
@@ -98,7 +98,7 @@ jobs:
         run: |
           ./internal/scripts/get-op-ratelimit.sh
 
-      - name: Upload stats.yml artifact
+      - name: Upload stats.yml artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:

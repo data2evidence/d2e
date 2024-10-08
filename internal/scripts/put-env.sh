@@ -7,13 +7,14 @@ set -o errexit
 [ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1
 ENV_NAME=${ENV_NAME:-local}
 OVERWRITE=${OVERWRITE:-false}
+ENV_PREFIX=${ENV_PREFIX:-env}
 
 # echo ENV_NAME=$ENV_NAME
 
 # vars
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 CACHE_DIR=$GIT_BASE_DIR/cache/op
-DOTENV_NAME=.env.$ENV_NAME.yml
+DOTENV_NAME=.$ENV_PREFIX.$ENV_NAME.yml
 DOTENV_PATH=$GIT_BASE_DIR/$DOTENV_NAME
 if [ ! -f $DOTENV_PATH ]; then echo FATAL $DOTENV_PATH not found; exit 1; fi
 CACHE_DOTENV_PATH=$CACHE_DIR/$DOTENV_NAME
@@ -25,7 +26,7 @@ op read --no-newline op://$OP_VAULT_NAME/$DOTENV_NAME/notesPlain --out-file $CAC
 # accept non successful exit code where files differ
 set +o errexit
 
-if diff -q --ignore-space-change --ignore-blank-lines --ignore-all-space $CACHE_DOTENV_PATH $DOTENV_PATH > /dev/null; then 
+if diff -q --ignore-space-change --ignore-blank-lines --ignore-all-space $CACHE_DOTENV_PATH $DOTENV_PATH > /dev/null; then
     echo INFO: no changes
 else
     echo INFO: diff
@@ -41,7 +42,7 @@ else
         yq 'sort_keys(..)' $DOTENV_PATH > $CACHE_DOTENV_PATH
         # op item edit --format json --vault $OP_VAULT_NAME ${DOTENV_NAME} --template=$CACHE_DOTENV_PATH.json
         op item edit --format json --vault $OP_VAULT_NAME ${DOTENV_NAME} "notesPlain[text]=$(cat $CACHE_DOTENV_PATH)" | yq '{"reference": .fields[0].reference, "updated_at": .updated_at}'
-    else 
+    else
         echo INFO skipped
     fi
 fi

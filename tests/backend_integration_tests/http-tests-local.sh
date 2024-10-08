@@ -21,8 +21,8 @@ eval $(op signin)
 
 yarn --cwd internal get:drivers
 
-ENV_NAME="base-all" OVERWRITE=true ./internal/scripts/get-op.sh
-ENV_NAME="base-local" OVERWRITE=true ./internal/scripts/get-op.sh
+ENV_NAME="base-all" OVERWRITE=true ./internal/scripts/get-env.sh
+ENV_NAME="base-local" OVERWRITE=true ./internal/scripts/get-env.sh
 wc -l .env.base-all.yml .env.base-local.yml
 OVERWRITE=true yarn --cwd internal gen:env
 

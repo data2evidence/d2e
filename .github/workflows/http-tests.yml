@@ -112,7 +112,7 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          yarn --cwd internal get:drivers
+          npm run internal get:drivers
 
       - uses: actions/setup-node@v4
         with:
@@ -126,7 +126,7 @@ jobs:
           echo "${DOCKER_COMPOSE_DN_BASE_ALL_ENV}" > .env.base-all.yml
           echo "${DOCKER_COMPOSE_DN_BASE_LOCAL_ENV}" > .env.base-local.yml
           wc -l .env.base-all.yml .env.base-local.yml
-          yarn --cwd internal gen:env
+          npm run internal gen:env
           sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
 
       - name: Setup Test DB

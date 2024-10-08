@@ -6,13 +6,14 @@ set -o errexit
 # inputs
 [ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1
 ENV_NAME=${ENV_NAME:-local}
+ENV_PREFIX=${ENV_PREFIX:-env}
 OVERWRITE=${OVERWRITE:-false}
 
 # echo ENV_NAME=$ENV_NAME
 
 # vars
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
-DOTENV_NAME=.env.$ENV_NAME.yml
+DOTENV_NAME=.$ENV_PREFIX.$ENV_NAME.yml
 DOTENV_PATH=$GIT_BASE_DIR/$DOTENV_NAME
 CACHE_PATH=$GIT_BASE_DIR/cache/op
 CACHE_DOTENV_PATH=$CACHE_PATH/$DOTENV_NAME
@@ -20,7 +21,7 @@ CACHE_DOTENV_PATH=$CACHE_PATH/$DOTENV_NAME
 # get latest for comparison
 op read --no-newline op://$OP_VAULT_NAME/$DOTENV_NAME/notesPlain --out-file $CACHE_DOTENV_PATH --force | sed -e "s#$GIT_BASE_DIR/##g"
 
-if [ ! -s $CACHE_DOTENV_PATH ]; then 
+if [ ! -s $CACHE_DOTENV_PATH ]; then
     echo ERROR empty/failed $CACHE_DOTENV_PATH
     exit 1
 fi
@@ -34,7 +35,7 @@ fi
 # accept non successful exit code where files differ
 set +o errexit
 
-if diff -q --ignore-space-change --ignore-blank-lines --ignore-all-space $CACHE_DOTENV_PATH $DOTENV_PATH > /dev/null; then 
+if diff -q --ignore-space-change --ignore-blank-lines --ignore-all-space $CACHE_DOTENV_PATH $DOTENV_PATH > /dev/null; then
     echo INFO: no diff
 else
     echo INFO: diff

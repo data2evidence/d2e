@@ -59,13 +59,13 @@ jobs:
           ./internal/scripts/get-op-ratelimit.sh
 
           # get env yml from 1password
-          yarn --cwd internal op:get:$ENV_TYPE
+          npm run internal op:get:$ENV_TYPE
 
           # mask sensitive values
-          internal/scripts/gha-mask.sh
+          internal/scripts/mask-gha.sh
 
           # generate dotenv
-          yarn --cwd internal gen:env
+          npm run internal gen:env
 
           echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
 
@@ -113,7 +113,7 @@ jobs:
       - name: Docker compose build
         run: |
           # Build DataNode services
-          yarn build:minerva   --builder ${{ steps.builder1.outputs.name }}
+          yarn build:minerva --builder ${{ steps.builder1.outputs.name }}
 
       - name: Builder cache cleanup
         run: |

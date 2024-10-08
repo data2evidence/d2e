@@ -97,16 +97,16 @@ jobs:
           # get env yml from 1password
           if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
           then
-            yarn --cwd internal op:get:$ENV_TYPE
+            npm run internal op:get:$ENV_TYPE
           else
             echo dotenv-boolean=false | tee -a $GITHUB_STEP_SUMMARY
           fi
 
           # mask sensitive values
-          internal/scripts/gha-mask.sh
+          internal/scripts/mask-gha.sh
 
           # generate dotenv
-          yarn --cwd internal gen:env
+          npm run internal gen:env
           echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
 
           cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
@@ -175,7 +175,7 @@ jobs:
           # Run ALP services
           yarn remote:minerva up --remove-orphans --force-recreate --wait
           EXIT_CODE=$?
-            
+
           if [ "$( docker container inspect -f '{{.State.Status}}' $GATEWAY_NAME )" = "running" ]; then
             echo open https://$CADDY__ALP__PUBLIC_FQDN/portal/index.html | tee -a $GITHUB_STEP_SUMMARY
             echo | tee -a $GITHUB_STEP_SUMMARY
