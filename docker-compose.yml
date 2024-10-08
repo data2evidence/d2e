@@ -1812,4 +1812,3 @@ services:
         priority: 20
     entrypoint: ["sh", "-c", "./init.sh"]
     profiles: [perseus]
-    
