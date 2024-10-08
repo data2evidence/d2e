@@ -55,54 +55,90 @@ async function callPrefect(name) {
   return await res2.json();
 }
 
-app.get("/jobplugins", (req, res) => {
-  res.send(
-    JSON.stringify(
-      flows.map((f) => {
-        return { name: f["name"], type: f["type"] };
-      })
-    )
-  );
+// Get list of job plugins
+app.get("/jobplugins", async (req, res) => {
+  try {
+    const plugins = flows.map((f) => ({ name: f["name"], type: f["type"] }));
+    res.send(JSON.stringify(plugins));
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
 });
 
+// Test endpoint
 app.get("/jobplugins/test", (req, res) => {
-  res.send(req.query.dsid);
+  try {
+    res.send(req.query.dsid);
+    console.log("test avoid callback, to use async");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
 });
 
-app.get("/jobplugins/exec/:name", (req, res) => {
-  const _flows = flows.filter((flow) => {
-    return flow["name"] == req.params.name;
-  });
-  callPrefect(_flows[0]["name"])
-    .then((r) => {
-      res.send(r);
-    })
-    .catch((e) => console.log(e));
+// Execute job plugin by name
+app.get("/jobplugins/exec/:name", async (req, res) => {
+  try {
+    const _flows = flows.filter((flow) => flow["name"] === req.params.name);
+    console.log("test avoid callback, to use async");
+
+    if (_flows.length === 0) {
+      return res.status(404).send({ message: "Flow not found" });
+    }
+
+    const result = await callPrefect(_flows[0]["name"]);
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
 });
 
-app.get("/jobplugins/exec_type/:type", (req, res) => {
-  const _flows = flows.filter((flow) => {
-    return flow["type"] == req.params.type;
-  });
-  callPrefect(_flows[0]["name"])
-    .then((r) => {
-      res.send(r);
-    })
-    .catch((e) => console.log(e));
+// Execute job plugin by type
+app.get("/jobplugins/exec_type/:type", async (req, res) => {
+  try {
+    const _flows = flows.filter((flow) => flow["type"] === req.params.type);
+
+    if (_flows.length === 0) {
+      return res.status(404).send({ message: "Flow not found" });
+    }
+
+    const result = await callPrefect(_flows[0]["name"]);
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
 });
 
-app.get("/jobplugins/exec_datamodel/:datamodel", (req, res) => {
-  const _flows = flows.filter((flow) => {
-    return (
-      flow["type"] == "datamodel" &&
-      flow["datamodels"]?.indexOf(req.params.datamodel) > -1
-    );
-  });
-  callPrefect(_flows[0]["name"])
-    .then((r) => {
-      res.send(r);
-    })
-    .catch((e) => console.log(e));
+app.get("/jobplugins/exec_datamodel/:datamodel", async (req, res) => {
+  try {
+    const _flows = flows.filter((flow) => {
+      return (
+        flow["type"] === "datamodel" &&
+        flow["datamodels"]?.indexOf(req.params.datamodel) > -1
+      );
+    });
+
+    if (_flows.length === 0) {
+      return res
+        .status(404)
+        .send({ message: "No flows found for the datamodel" });
+    }
+
+    // Get the flow name
+    const flowName = _flows[0]["name"];
+
+    // Call Prefect to create the flow run
+    const result = await callPrefect(flowName);
+
+    // Send the result back to the client
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
 });
 
 app.listen(8000);
