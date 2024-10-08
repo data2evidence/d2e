@@ -1,4 +1,4 @@
-# Issue: nodejs segmentation fault on MacOS x86_64 with Virtualization Framework enabled
+# ssue: nodejs segmentation fault on MacOS x86_64 with Virtualization Framework enabled
 
 ## Symptoms
 - https://github.com/docker/for-mac/issues/6824

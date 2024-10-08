@@ -2,7 +2,7 @@
 
 Look for the below Logto App Client IDs & Secrets in 
 - Local / `.env.local`: copy over to `.env.private.yml`
-- Remote / `.env.remote`: copy over to `.env.<respecitve-vm>.yml`
+- Remote / `.env.remote`: copy over to `.env.<respective-vm>.yml`
 - When porting over, <b>Replace</b> `key=value` -> `key: value` format
 
 ```

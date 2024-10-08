@@ -10,7 +10,7 @@ Run the following commands to create the duckdb files programatically.
 
 Before running, replace ${BEARER_TOKEN} with user jwt token with admin role
 
-```
+```bash
 docker exec alp-minerva-gateway-1 wget --header="accept: application/json, text/plain, */*" \
   --header="authorization: ${BEARER_TOKEN}" \
   --header="content-type: application/json" \

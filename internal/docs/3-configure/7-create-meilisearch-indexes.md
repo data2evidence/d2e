@@ -22,9 +22,9 @@ After uploading meilisearch-plugin in step `docs/2-load/5-load-d2e-plugins.md`
 
 Run the following commands to create the search indexes programatically.
 
-Before running, replace ${BEARER_TOKEN} with user jwt token with admin role
+Before running, replace `${BEARER_TOKEN}` with user jwt token with admin role
 
-```
+```bash
 docker exec alp-minerva-gateway-1 wget --header="accept: application/json, text/plain, */*" \
   --header="authorization: ${BEARER_TOKEN}" \
   --header="content-type: application/json" \
