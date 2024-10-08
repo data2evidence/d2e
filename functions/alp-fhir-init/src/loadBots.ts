@@ -1,6 +1,6 @@
 import { Bot, OperationOutcome } from '@medplum/fhirtypes'
 import { config as botConfig } from './bots.config.ts'
-import { FhirAPI } from "./api/FhirAPI.ts";
+import { FhirAPI } from "./api/FhirServerAPI.ts";
 import { basename, resolve } from "path";
 import { existsSync, readFileSync } from "fs";
 import { ContentType } from "@medplum/core";
@@ -50,7 +50,7 @@ async function createBot(
     };
     try{
         //Check if the bot exists
-        console.log(`Check if bot ${botConfig.id} already exists in DB`)
+        console.log(`Check if bot ${botConfig.name} already exists in DB`)
         let bot:Bot
         let searchResult = await fhirApi.searchResource_bot('name='+botConfig.name);
         if(searchResult){
@@ -60,9 +60,15 @@ async function createBot(
             let newBot = await fhirApi.post('admin/projects/' + projectId + '/bot', body)
             bot = await fhirApi.readResource_bot(newBot.id);
         }
-        await saveBot(fhirApi, botConfig as MedplumBotConfig, bot);
-        await deployBot(fhirApi, botConfig as MedplumBotConfig, bot);
-        await createSubscription(fhirApi, botConfig as MedplumBotConfig, bot)
+        let saveBotResult = await saveBot(fhirApi, botConfig as MedplumBotConfig, bot);
+        if(saveBotResult){
+            let deployBotResult = await deployBot(fhirApi, botConfig as MedplumBotConfig, bot);
+            if(deployBotResult)
+                await createSubscription(fhirApi, botConfig as MedplumBotConfig, bot)
+            else
+                console.log(`Failed to deploy bot: ${botConfig.name}`)
+        }else
+            console.log(`Failed to save bot: ${botConfig.name}`)
         console.log(`Success! Bot created: ${bot.id}`);
     }catch(err){
         console.log('Failed to create bot: ' + botConfig.name);
@@ -70,12 +76,12 @@ async function createBot(
     }
 }
 
-async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<void> {
+async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<boolean> {
     try{
         const codePath = botConfig.source;
         const code = readFileContents(codePath);
         if (!code) {
-          return;
+          return false;
         }
         console.log('Saving source code...');
         const sourceCode = await fhirApi.createAttachment_bot(basename(codePath), code, ContentType.TYPESCRIPT);
@@ -83,17 +89,18 @@ async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot):
         console.log('Updating bot...');
         const updateResult = await fhirApi.updateResource_bot(bot, sourceCode);
         console.log('Success! New bot version: ' + updateResult.meta?.versionId);
+        return true
     }catch(err){
         console.log('Failed to save bot: ' + botConfig.name);
         throw err;
     }
 }
 
-async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<void> {
-    const codePath = botConfig.dist ?? botConfig.source;
+async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<boolean> {
+    const codePath = botConfig.source;
     try{
         const code = readFileContents(codePath);
-        if (!code) return;
+        if (!code) return false;
         console.log('Deploying bot...');
         console.log(fhirApi.fhirUrl_bot('$deploy', bot.id).toString())
         const deployResult = (await fhirApi.post(
@@ -104,6 +111,7 @@ async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot
             }
         )) as OperationOutcome;
         console.log('Deploy result: ' + deployResult.issue?.[0]?.details?.text);
+        return true
     }catch(err){
         console.log(JSON.stringify(err))
         console.log('Failed to deploy bot: ' + botConfig.name);
@@ -121,12 +129,14 @@ async function createSubscription(fhirApi: FhirAPI, botConfig: MedplumBotConfig,
     }
 }
 
-function readFileContents(fileName: string): string {
-    const path = resolve(fileName);
-    if (!existsSync(path)) {
-        return '';
-    }
-    return readFileSync(path, 'utf8');
+function readFileContents(filePath: string): string {
+    // const path = resolve(fileName);
+    // console.log(path)
+    // if (!existsSync(path)) {
+    //     return '';
+    // }
+    console.log(filePath)
+    return readFileSync('/usr/src/plugins/d2ef/alp-fhir-init/' + filePath, 'utf8');
 }
 
 async function enableBotForSuperAdminProject(fhirApi: FhirAPI){

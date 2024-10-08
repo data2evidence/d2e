@@ -36,7 +36,7 @@ export class FhirRouter {
         }
     })
 
-    this.router.post('./:resource', async(req, res) =>{
+    this.router.post('/fhirDataModel/:resource', async(req, res) =>{
       try{
         const response = await createResourceInCacheDB(req.body)
         if(response)
