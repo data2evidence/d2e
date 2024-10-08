@@ -38,14 +38,56 @@ export class Utils {
         }
 
         e.node.def.forEach((x) => traverse(x));
+        
+        const entryExitExist = this.isEntryExitExists(contextList);
+        if (entryExitExist) {
+            const formMultipleEntryExit = (localContextList: QueryObject[]) => {
+                let count = 0;
+                const name = "PatientRequest";
+                const parsSet = new Set<string>();
+                localContextList.forEach((queryObject) => {
+                    if (queryObject.queryString.indexOf("PEE") > -1) {
+                        query = `WITH PatientRequestEntryExit AS ${
+                            this.wrapBrackets(queryObject).queryString
+                        } `;
+                    } else {
+                        query += `, ${name}${count} AS ( ${queryObject.queryString} ) `;
+                        count++;
+                    }
+                    queryObject.parameterPlaceholders.forEach((p) =>
+                        parsSet.add(p)
+                    );
+                });
+                let unionQuery = "";
+                for (let i = 0; i < count; i++) {
+                    if (i === 0) {
+                        unionQuery = `SELECT 
+                                "PatientListRequests"."patient.attributes.pcount.0" AS "patient.attributes.pcount.0", 
+                                "PatientRequestEntryExit"."entry" AS "entry", 
+                                "PatientRequestEntryExit"."exit" AS "exit" 
+                                FROM (SELECT * FROM ${name}${i}`;
+                    } else {
+                        unionQuery += ` UNION SELECT * FROM ${name}${i}`;
+                    }
+                }
 
-        if (contextList.length > 1) {
-            contextList.forEach((queryObject) => {
-                this.wrapBrackets(queryObject);
-            });
-            query = QueryObject.format(" UNION ").join(contextList);
+                unionQuery += `) AS "PatientListRequests" INNER JOIN "PatientRequestEntryExit" 
+                                    ON "PatientListRequests"."patient.attributes.pcount.0" = "PatientRequestEntryExit"."patient.attributes.pid"`
+
+                query = new QueryObject(`${query} ${unionQuery}`, [...Array.from(parsSet)], true);
+                return query;
+            };
+
+            query = formMultipleEntryExit(contextList);
         } else {
-            query = contextList[0];
+            if (contextList.length > 1) {
+                contextList.forEach((queryObject) => {
+                    this.wrapBrackets(queryObject);
+                });
+                query = QueryObject.format(" UNION ").join(contextList);
+            } else {
+                query = contextList[0];
+            }
         }
 
         return query;
@@ -54,5 +96,11 @@ export class Utils {
     static wrapBrackets(qo: QueryObject) {
         qo.queryString = "(" + qo.queryString + ")";
         return qo;
+    }
+
+    static isEntryExitExists(contextList: QueryObject[]) {
+        return contextList.some((queryObject) => {
+            return queryObject.queryString.indexOf("PEE") > -1;
+        });
     }
 }

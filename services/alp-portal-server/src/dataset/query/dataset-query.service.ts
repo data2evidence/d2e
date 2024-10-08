@@ -149,6 +149,7 @@ export class DatasetQueryService {
       'dataset.schemaName',
       'dataset.vocabSchemaName',
       'dataset.dataModel',
+      'dataset.plugin',
       'datasetDetail.name',
       'datasetDetail.description',
       'datasetDetail.summary',
@@ -216,9 +217,9 @@ export class DatasetQueryService {
       .getOne()
 
     return {
-      id: dashboard.id,
-      name: dashboard.name,
-      url: dashboard.url
+      id: dashboard?.id,
+      name: dashboard?.name,
+      url: dashboard?.url
     }
   }
 

@@ -12,6 +12,8 @@ import {
     formSelectedAttributesRequest,
 } from "../qe/query_builder/PluginQueryBuilder";
 import * as queryEngine from "../qe/sql_generator2/SqlGenerator";
+const logger = Logger.CreateLogger("query-gen-log");
+
 
 export class QueryGenSvc {
     private isNormalizedCsv: boolean = false;
@@ -142,6 +144,7 @@ export class QueryGenSvc {
                 };
                 resolve(finalResults);
             } catch (err) {
+                logger.error(err);
                 reject(err);
             }
         });
@@ -351,7 +354,7 @@ export class QueryGenSvc {
 
         const sql = `${startOfQuery}
                         FROM (
-                            SELECT "patient.attributes.pcount.0" FROM (%(subquery)Q ${
+                            SELECT ${createCohort ? `*` : `"patient.attributes.pcount.0"`} FROM (%(subquery)Q ${
                                 limit ? limitOffsetQueryString : ""
                             }) AS alias2
                         ) AS alias1

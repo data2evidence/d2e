@@ -205,7 +205,11 @@ export class PluginEndpoint {
                                         );
                                         return reject(err);
                                     }
-                                    resolve({ entity, data: result.data });
+                                    resolve({
+                                        entity,
+                                        data: result.data,
+                                        sql: result.sql,
+                                    });
                                 },
                                 this.schemaName
                             );
@@ -450,27 +454,30 @@ export class PluginEndpoint {
                     // Executes query for retrieval of individual interaction datasets
                     //3
 
-                    const streamQuery = async (entity, query: QueryObject) : Promise<{
-                                    entity: any;
-                                    data: NodeJS.ReadableStream;
-                                }> =>  {
-                                        try {
-                                            log.debug(
-                                                `Plugin Endpoint Final Query: ${query.queryString}`
-                                            );
+                    const streamQuery = async (
+                        entity,
+                        query: QueryObject
+                    ): Promise<{
+                        entity: any;
+                        data: NodeJS.ReadableStream;
+                    }> => {
+                        try {
+                            log.debug(
+                                `Plugin Endpoint Final Query: ${query.queryString}`
+                            );
 
-                                            const { data } =
-                                                await query.executeStreamQuery<NodeJS.ReadableStream>(
-                                                    this.connection,
-                                                    this.schemaName
-                                                );
+                            const { data } =
+                                await query.executeStreamQuery<NodeJS.ReadableStream>(
+                                    this.connection,
+                                    this.schemaName
+                                );
 
-                                            return ({ entity, data });
-                                        } catch (err) {
-                                            log.error(err);
-                                            throw err;
-                                        }
-                                }
+                            return { entity, data };
+                        } catch (err) {
+                            log.error(err);
+                            throw err;
+                        }
+                    };
 
                     //2
                     const qeExecuteUpdateCallback = async (err, res) => {
@@ -531,7 +538,10 @@ export class PluginEndpoint {
                             }
                         };
 
-                        if (dataStream.data.constructor.prototype.toString() !== '[object AsyncGenerator]') {
+                        if (
+                            dataStream.data.constructor.prototype.toString() !==
+                            "[object AsyncGenerator]"
+                        ) {
                             dataStream.data.on("end", () => {
                                 log.debug(
                                     `total streamed rows for ${dataStream.entity}: ${rowCount}`
@@ -546,7 +556,7 @@ export class PluginEndpoint {
                         return resolve({
                             entity: dataStream.entity,
                             data: dataStream.data,
-                            rowCount: rowCount
+                            rowCount: rowCount,
                         });
                     };
 
@@ -664,67 +674,72 @@ export class PluginEndpoint {
             nql: any;
             noDataReason: string;
         }>(async (resolve, reject) => {
-            const { configId, configVersion } = cohortDefinition.configData;
-            cohortDefinition[`uniquePatientTempTableName`] = this.uniquePatientTempTableName;
-            const querySvcParams = {
-                queryParams: {
-                    configId,
-                    configVersion,
-                    studyId,
-                    queryType: "plugin",
-                    ifrRequest: cohortDefinition,
-                    language,
-                    requestQuery,
-                    metadataType,
-                    annotated,
-                    postFilters,
-                    insert,
-                },
-            };
-            const queryResponse: QuerySvcResultType = await generateQuery(
-                this.request,
-                querySvcParams
-            );
-            const finalQueryObject = queryResponse.queryObject;
-            const pCountQueryObject = queryResponse.pCountQueryObject;
-            const nql: QueryObject = new QueryObject(
-                finalQueryObject.queryString,
-                finalQueryObject.parameterPlaceholders,
-                finalQueryObject.sqlReturnOn
-            );
-            const pCountNql: QueryObject = new QueryObject(
-                pCountQueryObject.queryString,
-                pCountQueryObject.parameterPlaceholders,
-                pCountQueryObject.sqlReturnOn
-            );
-            const fast: any = queryResponse.fast;
-            this.config = queryResponse.config;
-            const measures: MRIEndpointResultMeasureType[] =
-                queryResponse.measures;
-            const categories: MRIEndpointResultCategoryType[] =
-                queryResponse.categories;
-            const cdmConfigMetaData = queryResponse.cdmConfigMetaData;
+                try{
+                    const { configId, configVersion } = cohortDefinition.configData;
+                    cohortDefinition[`uniquePatientTempTableName`] =
+                        this.uniquePatientTempTableName;
+                    const querySvcParams = {
+                        queryParams: {
+                            configId,
+                            configVersion,
+                            studyId,
+                            queryType: "plugin",
+                            ifrRequest: cohortDefinition,
+                            language,
+                            requestQuery,
+                            metadataType,
+                            annotated,
+                            postFilters,
+                            insert,
+                        },
+                    };
+                    const queryResponse: QuerySvcResultType = await generateQuery(
+                        this.request,
+                        querySvcParams
+                    );
+                    const finalQueryObject = queryResponse.queryObject;
+                    const pCountQueryObject = queryResponse.pCountQueryObject;
+                    const nql: QueryObject = new QueryObject(
+                        finalQueryObject.queryString,
+                        finalQueryObject.parameterPlaceholders,
+                        finalQueryObject.sqlReturnOn
+                    );
+                    const pCountNql: QueryObject = new QueryObject(
+                        pCountQueryObject.queryString,
+                        pCountQueryObject.parameterPlaceholders,
+                        pCountQueryObject.sqlReturnOn
+                    );
+                    const fast: any = queryResponse.fast;
+                    this.config = queryResponse.config;
+                    const measures: MRIEndpointResultMeasureType[] =
+                        queryResponse.measures;
+                    const categories: MRIEndpointResultCategoryType[] =
+                        queryResponse.categories;
+                    const cdmConfigMetaData = queryResponse.cdmConfigMetaData;
 
-            this.settingsObj = new Settings().initAdvancedSettings(
-                this.config.advancedSettings
-            );
-            this.pholderTableMap = this.settingsObj.getGuardedPlaceholderMap();
-            this.cdmConfigMetaData = cdmConfigMetaData;
-            this.selectedAttributes = queryResponse.selectedAttributes;
-            this.entityQueryMap = queryResponse.entityQueryMap;
+                    this.settingsObj = new Settings().initAdvancedSettings(
+                        this.config.advancedSettings
+                    );
+                    this.pholderTableMap = this.settingsObj.getGuardedPlaceholderMap();
+                    this.cdmConfigMetaData = cdmConfigMetaData;
+                    this.selectedAttributes = queryResponse.selectedAttributes;
+                    this.entityQueryMap = queryResponse.entityQueryMap;
 
-            // Generate Local temp table creation query
-            this.createTempTableQuery = this.genLocalTempTableCreationQuery(
-                this.pholderTableMap[this.settingsObj.getFactTablePlaceholder()]
-            );
-            cohortDefinition = this._addInteractionId(cohortDefinition);
+                    // Generate Local temp table creation query
+                    this.createTempTableQuery = this.genLocalTempTableCreationQuery(
+                        this.pholderTableMap[this.settingsObj.getFactTablePlaceholder()]
+                    );
+                    cohortDefinition = this._addInteractionId(cohortDefinition);
 
-            resolve({
-                query: nql,
-                pCountQuery: pCountNql,
-                nql: null,
-                noDataReason: fast.message.noDataReason,
-            });
+                    resolve({
+                        query: nql,
+                        pCountQuery: pCountNql,
+                        nql: null,
+                        noDataReason: fast.message.noDataReason,
+                    });
+            } catch(err) {
+                reject(err)
+            }
         });
     };
 

@@ -37,6 +37,8 @@ def parse_json(var):
 class Env:
     LOCAL_DEBUG = get_env("LOCAL_DEBUG")
     DUCKDB__DATA_FOLDER = get_env("DUCKDB__DATA_FOLDER")
+    CDW_SVC_DUCKDB_DATA_FOLDER = get_env("CDW_SVC_DUCKDB_DATA_FOLDER")
+    CDW_SVC_BUILT_IN_DUCKDB_DATA_FOLDER = get_env("CDW_SVC_BUILT_IN_DUCKDB_DATA_FOLDER")
     TLS__INTERNAL__CA_CRT = get_env("TLS__INTERNAL__CA_CRT")
     IDP__SCOPE = get_env("IDP__SCOPE")
     IDP_SUBJECT_PROP = get_env("IDP_SUBJECT_PROP")
@@ -46,3 +48,7 @@ class Env:
     CACHEDB__POOL_SIZE = parse_int(get_env("CACHEDB__POOL_SIZE"))
     DATABASE_CREDENTIALS = parse_json(get_env("DATABASE_CREDENTIALS"))
     SERVICE_ROUTES = parse_json(get_env("SERVICE_ROUTES"))
+
+    # Constants
+    CDW_CONFIG_SVC_DATABASE_CODE = "cdw_config_svc"
+    CDW_CONFIG_SVC_DUCKDB_SCHEMA_NAME = "validation_schema"
