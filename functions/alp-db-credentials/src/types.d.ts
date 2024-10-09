@@ -18,6 +18,9 @@ export interface IDbDto {
 
 export interface IDbUpdateDto {
   id: string
+  name: string
+  host: string
+  port: number
   vocabSchemas?: string[]
   extra?: IDbExtraDto
 }
