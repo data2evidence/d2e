@@ -58,6 +58,7 @@ WORKDIR /usr/src/app
 COPY --chown=docker:alp --chmod=711 --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=docker:alp --chmod=711 --from=build /usr/src/app/dist ./dist
 
-ENTRYPOINT ["node", "dist/index.js"]
+# ENTRYPOINT ["node", "dist/index.js"]
+ENTRYPOINT ["/bin/sh", "-c" , "sleep 100 && node dist/index.js"]
 EXPOSE ${PORT}
 
