@@ -1041,6 +1041,7 @@ services:
       MEILI_HTTP_ADDR: 0.0.0.0:41${BASE_PORT:-1}11
       MEILI_LOG_LEVEL: INFO
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+      MEILI_NO_ANALYTICS: ${MEILI_NO_ANALYTICS:-true}
 
   alp-minerva-pa-config-svc:
     container_name: &c14 alp-minerva-pa-config-svc-${BASE_PORT:-1}
