@@ -83,7 +83,7 @@ export class DuckdbConnection implements ConnectionInterface {
                 duckdDBconn,
                 duckdDB,
                 duckdbSchemaFileName,
-                duckdbVocabSchemaFileName,
+                duckdbVocabSchemaFileName
             );
 
             callback(null, conn);
@@ -169,7 +169,7 @@ export class DuckdbConnection implements ConnectionInterface {
                 `parameters: ${JSON.stringify(flattenParameter(parameters))}`
             );
             let temp = sql;
-            temp = this.parseSql(temp);
+            temp = this.parseSql(temp, parameters);
             logger.debug("Duckdb client created");
             const result = await this.conn.all(
                 temp,
@@ -182,13 +182,22 @@ export class DuckdbConnection implements ConnectionInterface {
         }
     }
 
-    private parseSql(temp: string): string {
+    private parseSql(temp: string, parameters?: ParameterInterface[]): string {
         temp = this.getSqlStatementWithSchemaName(this.schemaName, temp);
-        return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName);
+        return translateHanaToDuckdb(
+            temp,
+            this.schemaName,
+            this.vocabSchemaName,
+            parameters
+        );
     }
 
-    public getTranslatedSql(sql: string): string {
-        return this.parseSql(sql);
+    public getTranslatedSql(
+        sql: string,
+        schemaName: string,
+        parameters: ParameterInterface[]
+    ): string {
+        return this.parseSql(sql, parameters);
     }
 
     public executeQuery(
@@ -371,12 +380,11 @@ export class DuckdbConnection implements ConnectionInterface {
         schemaName: string,
         sql: string
     ): string {
-
         let duckdbNativeSchemName = null;
-        
+
         //TODO: Unify implementation between patient list and Add to cohort
-        if(this.conn["duckdbNativeDBName"]) {
-            duckdbNativeSchemName = `${this.conn["duckdbNativeDBName"]}.${this.conn["studyAnalyticsCredential"].schema}`
+        if (this.conn["duckdbNativeDBName"]) {
+            duckdbNativeSchemName = `${this.conn["duckdbNativeDBName"]}.${this.conn["studyAnalyticsCredential"].schema}`;
         } else {
             duckdbNativeSchemName = this["duckdbNativeDBName"];
         }
