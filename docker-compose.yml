@@ -1814,4 +1814,5 @@ services:
     networks:
       alp:
         priority: 20
+    entrypoint: ["sh", "-c", "./init.sh"]
     profiles: [perseus]

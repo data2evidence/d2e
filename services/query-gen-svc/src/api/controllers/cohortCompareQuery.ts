@@ -63,6 +63,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
             lang: "en",
             backendConfig: config,
             bookmarks,
+            req
         }).generateQuery();
 
         log.debug(`Query response:\n${JSON.stringify(stackedBarchartQuery)}`);

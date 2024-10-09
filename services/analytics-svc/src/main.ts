@@ -282,13 +282,31 @@ const initRoutes = async (app: express.Application) => {
                             MRIEndpointErrorHandler({
                                 err: {
                                     name: "mri-pa",
-                                    message: `Error is getting the list of configs!`,
+                                    message: `Error in getting the list of configs!`,
                                 },
                                 language,
                             })
                         );
                     } else {
-                        res.status(200).json(configResults);
+                        // Handle error from mriConfigConnection.getMriConfig
+                        if (configResults.statusCode) {
+                            const statusCode = configResults.statusCode;
+                            const message = configResults.message;
+                            if (statusCode >= 400 && statusCode < 600) {
+                                log.error(message);
+                                res.status(statusCode).send(
+                                    MRIEndpointErrorHandler({
+                                        err: {
+                                            name: "mri-pa",
+                                            message: message,
+                                        },
+                                        language,
+                                    })
+                                );
+                            }
+                        } else {
+                            res.status(200).json(configResults);
+                        }
                     }
                     break;
                 case "getFrontendConfig":
@@ -311,12 +329,30 @@ const initRoutes = async (app: express.Application) => {
                             MRIEndpointErrorHandler({
                                 err: {
                                     name: "mri-pa",
-                                    message: `Error is clearing default config!`,
+                                    message: `Error in clearing default config!`,
                                 },
                                 language,
                             })
                         );
                     } else {
+                        // Handle error from mriConfigConnection.getMriConfig
+                        if (configResults.statusCode) {
+                            const statusCode = configResults.statusCode;
+                            const message = configResults.message;
+                            if (statusCode >= 400 && statusCode < 600) {
+                                log.error(message);
+                                res.status(statusCode).send(
+                                    MRIEndpointErrorHandler({
+                                        err: {
+                                            name: "mri-pa",
+                                            message: message,
+                                        },
+                                        language,
+                                    })
+                                );
+                            }
+                        }
+
                         res.status(200).json(configResults);
                     }
                     break;
