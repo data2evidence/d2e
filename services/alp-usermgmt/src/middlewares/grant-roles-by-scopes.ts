@@ -88,10 +88,17 @@ export const grantRolesByScopes = async (req: Request, res: Response, next: Next
         return res.status(500).send({ message: `Tenant not found` })
       }
 
-      grantOrRevokeTenantRole(userId, tenantId, ROLES.TENANT_VIEWER, scope.includes(IDP_SCOPE_ROLE.TENANT_VIEWER))
       grantOrRevokeSystemRole(userId, ROLES.ALP_SYSTEM_ADMIN, scope.includes(IDP_SCOPE_ROLE.SYSTEM_ADMIN))
       grantOrRevokeSystemRole(userId, ROLES.ALP_USER_ADMIN, scope.includes(IDP_SCOPE_ROLE.USER_ADMIN))
       grantOrRevokeSystemRole(userId, ROLES.ALP_DASHBOARD_VIEWER, scope.includes(IDP_SCOPE_ROLE.DASHBOARD_VIEWER))
+      
+      //Temporary fix to grant tenant viewer automatically if either of the 3 above scopes are present
+      let grant_tenant_viewer = false;
+      if (scope.includes(IDP_SCOPE_ROLE.SYSTEM_ADMIN) || scope.includes(IDP_SCOPE_ROLE.USER_ADMIN) || scope.includes(IDP_SCOPE_ROLE.DASHBOARD_VIEWER)) {
+        grant_tenant_viewer = true
+      }
+      grantOrRevokeTenantRole(userId, tenantId, ROLES.TENANT_VIEWER, grant_tenant_viewer)
+
     }
 
     next()
