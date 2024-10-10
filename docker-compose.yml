@@ -78,14 +78,14 @@ x-envs:
           ],
           "route": "cohort"
         },
-        { 
+        {
           "enabled": false,
           "featureFlag": "cohorts",
-          "name": "Cohorts M", 
+          "name": "Cohorts M",
           "pluginPath": "plugins/Cohort/module",
-          "requiredRoles": [ 
-            "RESEARCHER" 
-          ], 
+          "requiredRoles": [
+            "RESEARCHER"
+          ],
           "route": "cohorts"
         },
         {
@@ -202,7 +202,7 @@ x-envs:
           "pluginPath": "plugins/Setup/OverviewDescription/module",
           "route": "overview-description"
         },
-        { 
+        {
           "description": "Upload / delete flows",
           "enabled": true,
           "name": "Plugins Table",
@@ -1558,6 +1558,11 @@ services:
       ORTHANC__AWS_S3_STORAGE__VIRTUAL_ADDRESSING: false
       ORTHANC__AWS_S3_STORAGE__REGION: ${MINIO__REGION:-ap-southeast-1}
       ORTHANC__AUTHENTICATION_ENABLED: false
+      ORTHANC__REGISTERED_USERS: |
+        {
+          "healthcheck": "${DICOM__HEALTH_CHECK_PASSWORD}"
+        }
+      ORTHANC__EXECUTE_LUA_ENABLED: "true"
     healthcheck:
       test:
         [
@@ -1812,4 +1817,3 @@ services:
         priority: 20
     entrypoint: ["sh", "-c", "./init.sh"]
     profiles: [perseus]
-    

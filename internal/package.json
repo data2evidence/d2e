@@ -10,7 +10,7 @@
   "scripts": {
     "env:create:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do yarn env:create $ENV_NAME; done",
     "env:create": "scripts/create-op.sh",
-    "env:flatten:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do echo OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn env:flatten; done",
+    "env:flatten:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn env:flatten; done",
     "env:flatten": "scripts/flatten-env.sh",
     "env:get:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_PREFIX=$ENV_PREFIX ENV_NAME=$ENV_NAME yarn env:get; done",
     "env:get:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_PREFIX=$ENV_PREFIX ENV_NAME=$ENV_NAME yarn env:get; done",

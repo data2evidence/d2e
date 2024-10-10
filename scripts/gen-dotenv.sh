@@ -13,7 +13,7 @@ default_password_length=30
 x509_subject="/C=SG/O=ALP Dev"
 
 # vars
-echo '' > $tmp_file 
+echo '' > $tmp_file
 echo '' > $env_file
 
 # passwords
@@ -26,7 +26,7 @@ function set-password {
     echo ${password_name}=${password_value} >> $tmp_file
 }
 
-password_keys=($(cat $example_file | grep password$ | awk -F= '{print $1}')) # echo ${password_keys[@]}; 
+password_keys=($(cat $example_file | grep password$ | awk -F= '{print $1}')) # echo ${password_keys[@]};
 password_name=${password_keys[1]}
 for password_name in ${password_keys[@]}; do
     length=$default_password_length
