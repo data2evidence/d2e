@@ -103,7 +103,8 @@ export class DatasetRouter {
         dialect,
         databaseCode,
         schemaName,
-        dataModel: dataModelName,
+        dataModel,
+        plugin,
         paConfigId,
         visibilityStatus,
         detail,
@@ -112,8 +113,6 @@ export class DatasetRouter {
         tags,
         fhirProjectId,
       } = req.body;
-
-      const dataModel = dataModelName.split(" ")[0];
 
       if (!tenantName) {
         this.logger.error(`Tenant name is not provided`);
@@ -150,7 +149,7 @@ export class DatasetRouter {
 
               const dataModels = await dataflowMgmtAPI.getDatamodels();
               const dataModelInfo = dataModels.find(
-                (model) => model.name === dataModelName
+                (model) => model.datamodel === dataModel
               );
 
               const options = {
@@ -190,7 +189,8 @@ export class DatasetRouter {
           databaseCode: databaseCode,
           schemaName,
           vocabSchemaName: vocabSchema,
-          dataModel: dataModelName,
+          dataModel,
+          plugin,
           tenantId,
           paConfigId,
           visibilityStatus,
@@ -223,7 +223,7 @@ export class DatasetRouter {
         newStudyName,
         snapshotLocation,
         snapshotCopyConfig,
-        dataModel: dataModelName,
+        dataModel,
       } = req.body;
       const { dialect, databaseCode, schemaName, vocabSchemaName } =
         await portalAPI.getDataset(sourceStudyId);
@@ -232,10 +232,9 @@ export class DatasetRouter {
       const id = uuidv4();
       const newSchemaName = sourceHasSchema ? `CDM${id}`.replace(/-/g, "") : "";
 
-      const dataModel = dataModelName.split(" ")[0];
       const dataModels = await dataflowMgmtAPI.getDatamodels();
       const dataModelInfo = dataModels.find(
-        (model) => model.name === dataModelName
+        (model) => model.datamodel === dataModel
       );
 
       try {
