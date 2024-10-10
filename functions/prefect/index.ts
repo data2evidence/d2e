@@ -27,7 +27,6 @@ app.all("/prefect/api/*", async (req, res) => {
       options.body = JSON.stringify(req.body);
     }
 
-    // Make the fetch call
     const response = await fetch(url, options);
     // Check if the request was successful
     if (!response.ok) {
@@ -46,4 +45,4 @@ app.all("/prefect/api/*", async (req, res) => {
   }
 });
 
-app.listen(8120);
+app.listen(8000);

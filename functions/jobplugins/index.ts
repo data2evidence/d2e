@@ -1,8 +1,10 @@
 import express from "npm:express@4.18.2";
 import pg from "npm:pg";
+import { DeploymentRouter } from "./src/routes/DeploymentRouter.ts";
 
 const app = express();
 const env = Deno.env.toObject();
+const deploymentRouter = new DeploymentRouter();
 
 const opt = {
   user: env.PG_USER,
@@ -56,7 +58,7 @@ async function callPrefect(name) {
 }
 
 // Get list of job plugins
-app.get("/jobplugins", async (req, res) => {
+app.get("/jobplugins", (req, res) => {
   try {
     const plugins = flows.map((f) => ({ name: f["name"], type: f["type"] }));
     res.send(JSON.stringify(plugins));
@@ -127,18 +129,15 @@ app.get("/jobplugins/exec_datamodel/:datamodel", async (req, res) => {
         .send({ message: "No flows found for the datamodel" });
     }
 
-    // Get the flow name
     const flowName = _flows[0]["name"];
-
-    // Call Prefect to create the flow run
     const result = await callPrefect(flowName);
-
-    // Send the result back to the client
     res.send(result);
   } catch (error) {
     console.error(error);
     res.status(500).send({ error: "Internal Server Error" });
   }
 });
+
+app.use("/jobplugins/deployment", deploymentRouter.router);
 
 app.listen(8000);
