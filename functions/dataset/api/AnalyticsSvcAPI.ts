@@ -15,8 +15,8 @@ export class AnalyticsSvcAPI {
     if (!token) {
       throw new Error("No token passed for Analytics API!");
     }
-    if (env.SERVICE_ROUTES.analytics) {
-      this.baseURL = env.SERVICE_ROUTES.analytics + this.endpoint;
+    if (env.GATEWAY_WO_PROTOCOL_FQDN) {
+      this.baseURL = `https://${env.GATEWAY_WO_PROTOCOL_FQDN}` + this.endpoint;
       this.httpsAgent = new https.Agent({
         rejectUnauthorized: true,
         // ca: env.GATEWAY_CA_CERT
