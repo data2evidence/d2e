@@ -15,16 +15,24 @@ app.all("/prefect/api/*", async (req, res) => {
     const url = `${env.PREFECT_API_URL}${path}`;
 
     // Prepare the fetch options
-    const options = {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
+    let options;
 
     // Only set body for POST, PUT, or PATCH requests
     if (["POST", "PUT", "PATCH"].includes(method)) {
-      options.body = JSON.stringify(req.body);
+      options = {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req.body),
+      };
+    } else {
+      options = {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
     }
 
     const response = await fetch(url, options);

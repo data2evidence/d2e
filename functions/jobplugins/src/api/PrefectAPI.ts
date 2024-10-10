@@ -20,11 +20,11 @@ export class PrefectAPI {
     const options = {
       method: "GET",
       headers: {
-        // Authorization: this.token,
+        Authorization: this.token,
         "Content-Type": "application/json",
       },
     };
-    const url = `${this.baseURL}/flow-runs/${flowId}`;
+    const url = `${this.baseURL}/flow_runs/${flowId}`;
     const result = await fetch(url, options);
     const jsonResponse = await result.json();
     return jsonResponse;

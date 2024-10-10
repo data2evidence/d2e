@@ -6,6 +6,8 @@ const app = express();
 const env = Deno.env.toObject();
 const deploymentRouter = new DeploymentRouter();
 
+app.use("/jobplugins/deployment", deploymentRouter.router);
+
 const opt = {
   user: env.PG_USER,
   password: env.PG_PASSWORD,
@@ -137,7 +139,5 @@ app.get("/jobplugins/exec_datamodel/:datamodel", async (req, res) => {
     res.status(500).send({ error: "Internal Server Error" });
   }
 });
-
-app.use("/jobplugins/deployment", deploymentRouter.router);
 
 app.listen(8000);

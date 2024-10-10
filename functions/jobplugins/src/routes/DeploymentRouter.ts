@@ -10,7 +10,7 @@ export class DeploymentRouter {
 
   private registerRoutes() {
     this.router.get("/flow-run/:id", async (req, res) => {
-      const { flowId } = req.params;
+      const flowId = req.params.id;
       try {
         const token = req.headers.authorization!;
         const prefectApi = new PrefectAPI(token);
@@ -20,12 +20,9 @@ export class DeploymentRouter {
         flowRun.parameters = this.redactSensitivePrefectParameters(
           flowRun.parameters
         );
-
         res.send(flowRun);
       } catch (error) {
-        // this.logger.error(`Error when getting dashboards: ${JSON.stringify(error)}`)
-        console.log("sss");
-        res.status(500).send("Error when getting dashboards");
+        res.status(500).send(`Error occurs: ${error}`);
       }
     });
   }
