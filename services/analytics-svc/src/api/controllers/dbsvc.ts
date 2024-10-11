@@ -71,20 +71,24 @@ export async function checkIfSchemaExists(req, res, next) {
 }
 
 export async function getSnapshotSchemaMetadata(req, res, next) {
-    let dialect: string = req.swagger.params.databaseType.value;
-    let tenant: string = req.swagger.params.tenant.value;
-    let schema = req.swagger.params.schemaName.value;
+    const datasetId = req.swagger.params.datasetId.value;
+
+    const { dialect, databaseCode, schemaName } =
+        await new PortalServerAPI().getStudy(
+            req.headers.authorization,
+            datasetId
+        );
 
     try {
-        let dbDao = new DBDAO(dialect, tenant);
+        let dbDao = new DBDAO(dialect, databaseCode);
         const dbConnection = await dbDao.getDBConnectionByTenantPromise(
-            tenant,
+            databaseCode,
             req,
             res
         );
         const results = await dbDao.getSnapshotSchemaMetadata(
             dbConnection,
-            schema
+            schemaName
         );
         res.status(200).json(results);
     } catch (err: any) {

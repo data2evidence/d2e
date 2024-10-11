@@ -696,7 +696,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
-    path: '^/alpdb/[a-zA-Z]+/database/[a-zA-Z0-9_]+/metadata/schemasnapshot/schema/[a-zA-Z0-9_]+',
+    path: '^/alpdb/metadata/schemasnapshot/schema',
     scopes: ['dbSvc.schema.snapshot.metadata.read'],
     httpMethods: ['GET']
   },
