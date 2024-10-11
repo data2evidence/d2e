@@ -18,6 +18,6 @@
     "@types/uuid": "^10.0.0"
   },
   "dependencies": {
-    "duckdb-async": "^1.0.0"
+    "duckdb-async": "^1.1.1"
   }
 }

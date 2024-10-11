@@ -40,7 +40,7 @@
   "dependencies": {
     "@medplum/core": "^3.2.2",
     "@medplum/fhirtypes": "^3.2.2",
-    "duckdb-async": "^1.0.0",
+    "duckdb-async": "^1.1.1",
     "express": "^4.19.2",
     "helmet": "^7.1.0",
     "pg": "^8.4.2",
