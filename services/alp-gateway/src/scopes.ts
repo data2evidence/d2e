@@ -681,7 +681,7 @@ export const REQUIRED_URL_SCOPES: { path: string; scopes: string[]; httpMethods?
     httpMethods: ['GET']
   },
   {
-    path: '^/alpdb/[a-zA-Z]+/database/[a-zA-Z0-9_]+/cdmversion/schema/[a-zA-Z0-9_]+',
+    path: '^/alpdb/cdmversion',
     scopes: ['dbSvc.schema.cdmVersion.read'],
     httpMethods: ['GET']
   },
