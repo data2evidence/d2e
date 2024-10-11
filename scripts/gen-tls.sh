@@ -2,6 +2,7 @@
 # get internal wildcard certificate "*.alp.local" from Caddy
 set -o nounset
 set -o errexit
+echo ${0} ...
 
 # inputs
 ENV_TYPE=${ENV_TYPE:-local}

@@ -2,6 +2,7 @@
 # generate GitHubActions mask text
 set -o nounset
 set -o errexit
+echo ${0} ...
 
 DC_YMLS=($(ls $GIT_BASE_DIR/docker-compose*.yml))
 ENV_PREFIX=${ENV_PREFIX:-env}

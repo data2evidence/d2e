@@ -2,6 +2,7 @@
 # generate dotenv file
 set -o nounset
 set -o errexit
+echo ${0} ...
 
 # inputs
 GIT_BASE_DIR=$(git rev-parse --show-toplevel)

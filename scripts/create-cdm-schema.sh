@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+echo ${0} ...
+
 # inputs
 DB_CODE=${1:-alpdev_pg}
 SCHEMA_NAME=${2:-cdmdefault}

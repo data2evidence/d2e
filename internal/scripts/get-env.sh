@@ -2,6 +2,7 @@
 # get 1password item
 set -o nounset
 set -o errexit
+echo ${0} ...
 
 # inputs
 [ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1

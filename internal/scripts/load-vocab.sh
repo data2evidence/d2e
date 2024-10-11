@@ -4,6 +4,7 @@
 set -o nounset
 set -o errexit
 set -o pipefail
+echo ${0} ...
 
 # inputs
 [ -z "${GOOGLE_DRIVE_DATA_DIR}" ] && echo "FATAL GOOGLE_DRIVE_DATA_DIR is not set" && exit 1
@@ -37,13 +38,13 @@ echo . Truncate
 docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "truncate cdmvocab.concept, cdmvocab.concept_ancestor, cdmvocab.concept_class, cdmvocab.concept_relationship, cdmvocab.concept_synonym, cdmvocab.domain, cdmvocab.drug_strength, cdmvocab.relationship, cdmvocab.vocabulary;" || true
 
 echo . Load tables
-for CSV_FILE in *.csv; do 
-	echo load $CSV_FILE ...; 
+for CSV_FILE in *.csv; do
+	echo load $CSV_FILE ...;
 	TABLE_NAME=${CSV_FILE/.csv/}
-	if [ "$CSV_FILE" = "DRUG_STRENGTH.csv" ]; then 
+	if [ "$CSV_FILE" = "DRUG_STRENGTH.csv" ]; then
 		docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "\\copy cdmvocab.${TABLE_NAME} FROM '$CONTAINER_DIR/${CSV_FILE}' WITH (FORMAT CSV, HEADER, DELIMITER E'\t', FORCE_NULL (amount_value, amount_unit_concept_id, denominator_value, box_size, numerator_value, numerator_unit_concept_id, denominator_unit_concept_id), ENCODING 'UTF8', QUOTE '\"', ESCAPE E'\\\\');"
 	else
-		docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "\\copy cdmvocab.${TABLE_NAME} FROM '$CONTAINER_DIR/${CSV_FILE}' WITH (FORMAT CSV, HEADER, DELIMITER E'\t', ENCODING 'UTF8', QUOTE '\"', ESCAPE E'\\\\');"; 
+		docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "\\copy cdmvocab.${TABLE_NAME} FROM '$CONTAINER_DIR/${CSV_FILE}' WITH (FORMAT CSV, HEADER, DELIMITER E'\t', ENCODING 'UTF8', QUOTE '\"', ESCAPE E'\\\\');";
 	fi
 done
 

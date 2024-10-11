@@ -5,6 +5,7 @@
 set -o nounset
 set -o errexit
 set -o pipefail
+echo ${0} ...
 
 # inputs
 ENV_TYPE=${ENV_TYPE:-local}

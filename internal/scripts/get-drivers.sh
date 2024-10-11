@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # get drivers
 set -o pipefail
+echo ${0} ...
 
 # inputs
 [ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required => set e.g. in .zshrc' && exit 1

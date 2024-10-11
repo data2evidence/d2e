@@ -34,10 +34,35 @@ Untested platforms:
 sudo snap install docker
 ```
 
-#### macOS
+### macOS
 
 ```bash
 brew install --cask docker
+```
+
+### Configure
+
+- Virtual disk limit
+
+### GUI
+
+- https://docs.docker.com/desktop/settings/#advanced
+
+#### cli
+
+- expected yq version 4
+
+```bash
+JSON_FILE="$HOME/Library/Group Containers/group.com.docker/settings.json"
+yq -i '.diskSizeMiB=289917' $JSON_FILE
+yq '.diskSizeMiB' $JSON_FILE
+```
+
+- restart Docker Desktop - tested on apple silicon
+  - caveat - kills running containers
+
+```bash
+curl -X POST -H 'Content-Type: application/json' -d '{ "openContainerView": true }' -kiv --unix-socket ~/Library/Containers/com.docker.docker/Data/backend.sock http://localhost/engine/restart
 ```
 
 ## nodejs
@@ -69,7 +94,18 @@ npm install --global yarn
 
 ## openssl
 
-- openssl version 3 is required
+- openssl version 3 is expected for troubleshooting
+
+```bash
+openssl version
+```
+
+### ubuntu
+
+```bash
+apt list -a openssl
+sudo apt install openssl=3.0.13-0ubuntu3
+```
 
 ### macOS
 
@@ -79,12 +115,12 @@ npm install --global yarn
 brew install openssl@3
 ```
 
-# DBeaver
+## DBeaver
 
 - Universal database tool and SQL client
 - https://dbeaver.io/
 
-## macOS
+### macOS
 
 - https://formulae.brew.sh/cask/dbeaver-community
 
@@ -92,7 +128,7 @@ brew install openssl@3
 brew install --cask dbeaver-community
 ```
 
-## Connection settings
+### Connection settings
 
 - password is ${PG_SUPER_PASSWORD} from `.env.local`
 

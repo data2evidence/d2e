@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+echo ${0} ...
 
 # inputs
 D2E_RESOURCE_LIMIT=${D2E_RESOURCE_LIMIT:-0.7}

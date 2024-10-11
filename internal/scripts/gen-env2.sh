@@ -2,10 +2,11 @@
 # generate dotenv file
 set -o nounset
 set -o errexit
+echo ${0} ...
 
 # inputs
 ENV_NAME=${ENV_NAME:-local}
-ENV_PREFIX=${ENV_PREFIX:-env}
+ENV_PREFIX=${ENV_PREFIX:-env2}
 ENV_TYPE=${ENV_TYPE:-local}
 GIT_BASE_DIR=$(git rev-parse --show-toplevel)
 
@@ -13,8 +14,8 @@ echo ENV_NAME=$ENV_NAME
 echo ENV_TYPE=$ENV_TYPE
 
 # vars
-DOTENV_FILE_OUT=$GIT_BASE_DIR/.env.$ENV_TYPE
-DOTENV_YAML_IN=$GIT_BASE_DIR/.env.$ENV_NAME.yml
+DOTENV_FILE_OUT=$GIT_BASE_DIR/.${ENV_PREFIX}.$ENV_TYPE
+DOTENV_YAML_IN=$GIT_BASE_DIR/.${ENV_PREFIX}.$ENV_NAME.yml
 
 cd $GIT_BASE_DIR
 
@@ -31,5 +32,7 @@ yq -o sh $DOTENV_YAML_IN | envsubst >> $DOTENV_FILE_OUT
 yq 'keys | .[]' $DOTENV_YAML_IN > $DOTENV_FILE_OUT.keys
 
 wc -l $DOTENV_FILE_OUT
-
 $GIT_BASE_DIR/scripts/gen-tls.sh
+wc -l $DOTENV_FILE_OUT
+$GIT_BASE_DIR/scripts/gen-resource-limits.sh
+wc -l $DOTENV_FILE_OUT
