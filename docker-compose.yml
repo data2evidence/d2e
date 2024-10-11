@@ -1558,11 +1558,6 @@ services:
       ORTHANC__AWS_S3_STORAGE__VIRTUAL_ADDRESSING: false
       ORTHANC__AWS_S3_STORAGE__REGION: ${MINIO__REGION:-ap-southeast-1}
       ORTHANC__AUTHENTICATION_ENABLED: false
-      ORTHANC__REGISTERED_USERS: |
-        {
-          "healthcheck": "${DICOM__HEALTH_CHECK_PASSWORD}"
-        }
-      ORTHANC__EXECUTE_LUA_ENABLED: "true"
     healthcheck:
       test:
         [
