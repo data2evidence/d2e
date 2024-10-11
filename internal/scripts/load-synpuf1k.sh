@@ -32,9 +32,9 @@ if [ -f $CACHE_ZIP_PATH ]; then
 	unzip -o $CACHE_DIR/$ZIP_NAME -d .
 
 	CMD=(yarn create-postgres-cdm-schemas alpdev_pg cdmdefault)
-	echo . INFO CMD ${CMD} ...
+	echo . INFO CMD ${CMD[@]} ...
 	cd $GIT_BASE_DIR
-	${CMD}
+	${CMD[@]}
 else
 	echo FATAL zip not found in $CACHE_DIR
 fi
