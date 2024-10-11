@@ -1,0 +1,49 @@
+export interface IPrefectFlowRunDto {
+  id: string;
+  parameters: {
+    options: {
+      releaseId: string;
+      cohortDefinitionId: string;
+    };
+  };
+}
+
+export interface IDataQualityResult {
+  Overview: {
+    countOverallFailed: number;
+    countFailedPlausibility: number;
+    countFailedConformance: number;
+    countFailedCompleteness: number;
+  };
+  Metadata: {
+    cdmReleaseDate: string;
+  };
+  CheckResults: IDataQualityCheckResult[];
+}
+
+export interface IDataQualityCheckResult {
+  numViolatedRows?: number;
+  pctViolatedRows?: number;
+  numDenominatorRows?: number;
+  executionTime?: string;
+  queryText: string;
+  checkName: string;
+  checkLevel: string;
+  checkDescription: string;
+  cdmTableName: string;
+  cdmFieldName?: string;
+  sqlFile: string;
+  category: string;
+  subcategory?: string;
+  context: string;
+  checkId: string;
+  failed: number;
+  passed: number;
+  thresholdValue?: number;
+  notesValue?: string;
+  conceptId?: string;
+  unitConceptId?: string;
+  notApplicable?: number;
+  isError?: number;
+  error?: string;
+}
