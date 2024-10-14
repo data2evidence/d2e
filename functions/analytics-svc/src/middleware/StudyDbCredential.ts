@@ -21,14 +21,16 @@ export default async (req: IMRIRequest, res, next) => {
             : "";
     };
 
-    const getSelectedStudyIdFromRequest = (): string => {
+    const getDatasetIdFromRequest = (): string => {
         // Try to find studyId from request query
         // If not found, try to find from request body
         // If still not found, return empty string
         if (req.query.studyId) {
             return req.query.studyId.toString();
-        } else if (req.query.selectedStudyId) {
-            return req.query.selectedStudyId.toString();
+
+            // TODO: ONLY THIS SHOULD REMAIN AT THE END
+        } else if (req.query.datasetId) {
+            return req.query.datasetId.toString();
         } else if (req.body.studyId) {
             return req.body.studyId.toString();
         } else if (req.query.selectedStudyEntityValue) {
@@ -134,7 +136,7 @@ export default async (req: IMRIRequest, res, next) => {
                 getSelectedStudyEntityValueFromRequest();
             // If selectedStudyEntityValue is not found from mriquery, try and find studyId from request query or body
             if (!selectedStudyEntityValue) {
-                selectedStudyEntityValue = getSelectedStudyIdFromRequest();
+                selectedStudyEntityValue = getDatasetIdFromRequest();
             }
             const studyMetadata: StudyDbMetadata =
                 req.studiesDbMetadata.studies.find(

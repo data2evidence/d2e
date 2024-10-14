@@ -30,7 +30,7 @@ export const ensureAnalyticsDatasetAuthorized = async (req, res: Response, next:
         dataset = convertZlibBase64ToJson(req.query.mriquery).selectedStudyEntityValue
       } else {
         const datasetKey = Object.keys(req.query)
-          .filter(query => ['selectedStudyId', 'selectedStudyEntityValue', 'studyId'].includes(query))
+          .filter(query => ['datasetId', 'selectedStudyEntityValue', 'studyId'].includes(query))
           .toString()
         dataset = req.query[datasetKey]
       }
