@@ -6,6 +6,7 @@ import { DqdRouter } from "./src/routes/DqdRouter.ts";
 const app = express();
 const env = Deno.env.toObject();
 
+app.use(express.json());
 app.use("/jobplugins/deployment", new DeploymentRouter().router);
 app.use("/jobplugins/dqd", new DqdRouter().router);
 

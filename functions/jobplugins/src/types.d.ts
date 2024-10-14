@@ -47,3 +47,23 @@ export interface IDataQualityCheckResult {
   isError?: number;
   error?: string;
 }
+
+export interface IDataCharacterizationResult {
+  exportToAres: {
+    cdmReleaseDate: string;
+    "records-by-domain": { domain: string; countRecords: number }[];
+  };
+}
+
+export interface IDomainContinuityResult {
+  domain: string;
+  records: {
+    cdmReleaseDate: string;
+    count: number;
+  }[];
+}
+
+export interface IDqdResultDto {
+  flowRunId?: string;
+  flowRunIds?: string[];
+}
