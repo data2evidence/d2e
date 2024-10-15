@@ -22,17 +22,15 @@ export default async (req: IMRIRequest, res, next) => {
     };
 
     const getDatasetIdFromRequest = (): string => {
-        // Try to find studyId from request query
+        // Try to find datasetId from request query
         // If not found, try to find from request body
         // If still not found, return empty string
-        if (req.query.studyId) {
-            return req.query.studyId.toString();
 
-            // TODO: ONLY THIS SHOULD REMAIN AT THE END
-        } else if (req.query.datasetId) {
+        // TODO: ONLY DATASETID SHOULD REMAIN AT THE END
+        if (req.query.datasetId) {
             return req.query.datasetId.toString();
-        } else if (req.body.studyId) {
-            return req.body.studyId.toString();
+        } else if (req.body.datasetId) {
+            return req.body.datasetId.toString();
         } else if (req.query.selectedStudyEntityValue) {
             return req.query.selectedStudyEntityValue.toString();
         } else {
@@ -106,8 +104,8 @@ export default async (req: IMRIRequest, res, next) => {
         if (req.url === "/check-readiness") {
             getDefaultDbConnection();
         } else if (utils.isClientCredReq(req)) {
-            if (req.query.studyID) {
-                const studyTokenCode: string = String(req.query.studyID);
+            if (req.query.datasetId) {
+                const studyTokenCode: string = String(req.query.datasetId);
                 log.info(`Selected study ID ${studyTokenCode}`);
 
                 const portalServerAPI = new PortalServerAPI();
@@ -134,7 +132,7 @@ export default async (req: IMRIRequest, res, next) => {
             // TODO: check for selected study is in user jwt token for authorisation
             let selectedStudyEntityValue: string =
                 getSelectedStudyEntityValueFromRequest();
-            // If selectedStudyEntityValue is not found from mriquery, try and find studyId from request query or body
+            // If selectedStudyEntityValue is not found from mriquery, try and find datasetId from request query or body
             if (!selectedStudyEntityValue) {
                 selectedStudyEntityValue = getDatasetIdFromRequest();
             }

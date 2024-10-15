@@ -175,7 +175,7 @@ const initRoutes = async (app: express.Application) => {
                         analyticsCredentials: credentials,
                         userObj: userObj,
                         token: req.headers.authorization,
-                        studyId: req.selectedstudyDbMetadata.id,
+                        datasetId: req.selectedstudyDbMetadata.id,
                     });
                 } else {
                     req.dbConnections = await getDBConnections({
@@ -265,17 +265,18 @@ const initRoutes = async (app: express.Application) => {
             const { analyticsConnection } = req.dbConnections;
 
             let configResults;
+            let datasetId;
             switch (action) {
                 case "getMyConfig":
                 case "getMyConfigList":
                 case "getMyStudyConfigList":
-                    let specificStudyId =
+                    datasetId =
                         typeof req.query?.datasetId === "string"
                             ? req.query.datasetId
                             : null;
                     let queryParams = {
                         action: "getMyConfig",
-                        datasetId: specificStudyId,
+                        datasetId,
                     };
 
                     configResults = await mriConfigConnection.getMriConfig(
@@ -300,13 +301,13 @@ const initRoutes = async (app: express.Application) => {
                 case "getFrontendConfig":
                 case "setDefault":
                 case "clearDefault":
-                    let studyId =
-                        typeof req.query?.studyId === "string"
-                            ? req.query.studyId
+                    datasetId =
+                        typeof req.query?.datasetId === "string"
+                            ? req.query.datasetId
                             : null;
                     let qParams = {
                         action: "getMyConfig",
-                        datasetId: studyId,
+                        datasetId,
                     };
                     configResults = await mriConfigConnection.getMriConfig(
                         req,
@@ -342,7 +343,7 @@ const initRoutes = async (app: express.Application) => {
                         }
                         const configId = configData.configId;
                         const configVersion = configData.configVersion;
-                        const studyId = req.body.selectedStudyEntityValue;
+                        const datasetId = req.body.selectedStudyEntityValue;
                         const mriConfig =
                             await mriConfigConnection.getStudyConfig(
                                 {
@@ -351,7 +352,7 @@ const initRoutes = async (app: express.Application) => {
                                     configId,
                                     configVersion,
                                     lang: language,
-                                    datasetId: studyId,
+                                    datasetId,
                                 },
                                 true
                             );
@@ -409,7 +410,7 @@ const initRoutes = async (app: express.Application) => {
                                 req,
                                 configId,
                                 configVersion,
-                                studyId,
+                                datasetId,
                                 body,
                                 language,
                                 analyticsConnection,
@@ -437,7 +438,7 @@ const initRoutes = async (app: express.Application) => {
                                 action,
                                 configId,
                                 configVersion,
-                                studyId,
+                                datasetId,
                                 body,
                                 language,
                                 mriConfig.config,

@@ -744,7 +744,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-  /parquet/{studyId}/{tableName}:
+  /parquet/{datasetId}/{tableName}:
     x-swagger-router-controller: parquet
     get:
       description: Returns data parquet stream
@@ -752,9 +752,10 @@ paths:
       produces:
         - parquet
       parameters:
-        - name: studyId
+        # TODO: ADD DATASETID IN QUERY PARAM INSTEAD
+        - name: datasetId
           in: path
-          description: studyId that maps to schema name in database
+          description: datasetId that maps to schema name in database
           required: true
           type: string
         - name: tableName
@@ -779,9 +780,9 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: studyId
+        - name: datasetId
           in: query
-          description: Id of study
+          description: Id of dataset
           required: true
           type: string
         - name: offset
@@ -815,16 +816,17 @@ paths:
           name: cohort
           schema:
             type: object
+            # TODO: TBD MOVE DATASETID TO QUERY PARAM
             required:
-              - studyId
+              - datasetId
               - mriquery
               - name
               - description
               - owner
             properties:
-              studyId:
+              datasetId:
                 type: string
-                description: Id of study
+                description: Id of dataset
               mriquery:
                 type: string
                 description: Filtercard information in bookmark form. This is a binary string encoded in base64
@@ -861,9 +863,9 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: studyId
+        - name: datasetId
           in: query
-          description: Id of study
+          description: Id of dataset
           required: true
           type: string
         - name: cohortId
@@ -898,9 +900,9 @@ paths:
           description: Filter value to filter based on filter column
           required: true
           type: string      
-        - name: studyId
+        - name: datasetId
           in: query
-          description: Id of study
+          description: Id of dataset
           required: true
           type: string
         - name: offset
@@ -932,19 +934,20 @@ paths:
       consumes:
         - application/json
       parameters:
+        - in: 
         - in: body
           name: cohortDefinition
           schema:
             type: object
             required:
-              - studyId
+              - datasetId
               - name
               - description
               - owner
             properties:
-              studyId:
+              datasetId:
                 type: string
-                description: Id of study
+                description: Id of dataset
               name:
                 type: string
                 description: Cohort Name
@@ -985,9 +988,9 @@ paths:
           description: ID of flow run used to generated the graph data
           required: true
           type: string
-        - name: studyId
+        - name: datasetId
           in: query
-          description: ID of study
+          description: Id of dataset
           required: true
           type: string
       responses:
@@ -1005,9 +1008,9 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: studyId
+        - name: datasetId
           in: query
-          description: ID of study
+          description: Id of dataset
           required: true
           type: string
         - in: body
@@ -1062,7 +1065,7 @@ paths:
           description: Value corresponding to data characterization result report type
           required: true
           type: string
-        - name: studyId
+        - name: datasetId
           in: query
           description: Dataset ID
           required: true
@@ -1109,7 +1112,7 @@ paths:
           description: Value corresponding to data characterization result conceptId used for drilldown results
           required: true
           type: string
-        - name: studyId
+        - name: datasetId
           in: query
           description: Dataset ID
           required: true
@@ -1275,17 +1278,18 @@ paths:
       consumes:
         - application/json
       parameters:
+      # TODO: ADD DATASETID IN QUERY PARAM INSTEAD
         - in: body
           name: cohort
           schema:
             type: object
             required:
-              - studyId
+              - datasetId
               - mriquery
             properties:
-              studyId:
+              datasetId:
                 type: string
-                description: Id of study
+                description: Id of dataset
               mriquery:
                 type: string
                 description: Filtercard information in bookmark form. This is a binary string encoded in base64

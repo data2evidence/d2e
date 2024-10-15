@@ -147,7 +147,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request),
         "en",
         null, //config only required for domain_values_service & freetext_search_service
@@ -193,7 +193,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config_min_cohort_size_2", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request),
         "en",
         null, //config only required for domain_values_service & freetext_search_service
@@ -239,7 +239,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request),
         "en",
         null, //config only required for domain_values_service & freetext_search_service
@@ -285,7 +285,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config_fillMissingValuesEnabled_true", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request1),
         "en",
         null, //config only required for domain_values_service & freetext_search_service
@@ -331,7 +331,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config_fillMissingValuesEnabled_false", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request1),
         "en",
         null, //config only required for domain_values_service & freetext_search_service
@@ -378,7 +378,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config_fillMissingValuesEnabled_false", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request1),
         "en",
         null, //config only required for domain_values_service & freetext_search_service
@@ -430,7 +430,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request2),
         "en",
         null, //config only required for domain_values_service & freetext_search_service
