@@ -192,7 +192,7 @@ jobs:
       - name: Logs minerva
         if: success() || failure()
         run: |
-          yarn logs:minerva
+          yarn logs:minerva:startup
 
       - name: Post cleanup
         if: always()
