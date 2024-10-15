@@ -3,18 +3,14 @@ import { env, services } from "../env.ts";
 export class PortalServerAPI {
   private readonly baseURL: string;
   private readonly token: string;
-  // private readonly httpClient: Deno.HttpClient;
 
   constructor(token: string) {
     this.token = token;
     if (!token) {
       throw new Error("No token passed for PortalServerAPI!");
     }
-    if (services.prefect) {
+    if (services.portalServer) {
       this.baseURL = services.portalServer;
-      // this.httpClient = Deno.createHttpClient({
-      //   caCerts: [env.SSL_CA_CERT!]
-      // })
     } else {
       throw new Error("No url is set for PortalServerAPI");
     }

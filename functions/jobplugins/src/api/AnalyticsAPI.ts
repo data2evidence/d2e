@@ -15,23 +15,14 @@ export class AnalyticsSvcAPI {
       throw new Error("No token passed for Analytics API!");
     }
 
-    // if (services.analytics) {
-    //   this.baseURL = services.analytics + this.endpoint;
-    //   this.httpsAgent = new https.Agent({
-    //     rejectUnauthorized: true,
-    //     // ca: env.GATEWAY_CA_CERT
-    //   });
-    // } else {
-    //   console.error("No url is set for AnalyticsSvcAPI");
-    //   throw new Error("No url is set for AnalyticsSvcAPI");
-    // }
     if (services.analytics) {
-      this.baseURL = `https://trex.alp.local:33000/analytics-svc/api/services`;
+      this.baseURL = services.analytics + this.endpoint;
       this.httpsAgent = new https.Agent({
         rejectUnauthorized: true,
         ca: env.GATEWAY_CA_CERT,
       });
     } else {
+      console.error("No url is set for AnalyticsSvcAPI");
       throw new Error("No url is set for AnalyticsAPI");
     }
   }
@@ -97,6 +88,7 @@ export class AnalyticsSvcAPI {
     }
   }
 
+  // TODO: Fix Invalid CA cert error
   // Fetch CDM version
   async getCdmVersion(dialect: string, databaseCode: string, schema: string) {
     try {
