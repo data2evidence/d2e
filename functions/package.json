@@ -856,7 +856,7 @@
           ]
         },
         {
-          "path": "^/system-portal/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resource/list$",
+          "path": "^/system-portal/dataset/resource/list$",
           "scopes": [
             "portal.dataset.resource.read"
           ],
@@ -865,7 +865,7 @@
           ]
         },
         {
-          "path": "^/system-portal/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resource/(.*)/download$",
+          "path": "^/system-portal/dataset/resource/(.*)/download$",
           "scopes": [
             "portal.dataset.resource.download"
           ],
@@ -874,7 +874,7 @@
           ]
         },
         {
-          "path": "^/system-portal/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resource$",
+          "path": "^/system-portal/dataset/resource$",
           "scopes": [
             "portal.dataset.resource.add"
           ],
@@ -883,7 +883,7 @@
           ]
         },
         {
-          "path": "^/system-portal/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resource/(.*)",
+          "path": "^/system-portal/dataset/resource/(.*)",
           "scopes": [
             "portal.dataset.resource.delete"
           ],
@@ -901,7 +901,7 @@
           ]
         },
         {
-          "path": "^/system-portal/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/release/list",
+          "path": "^/system-portal/dataset/release/list",
           "scopes": [
             "portal.dataset.release.list.read"
           ],
@@ -937,7 +937,7 @@
           ]
         },
         {
-          "path": "^/system-portal/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/pa-config/(backend|me)$",
+          "path": "^/system-portal/dataset/pa-config/(backend|me)$",
           "scopes": [
             "portal.dataset.paConfig.read"
           ],

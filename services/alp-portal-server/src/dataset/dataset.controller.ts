@@ -90,8 +90,8 @@ export class DatasetController {
     return await this.datasetCommandService.createRelease(datasetReleaseDto)
   }
 
-  @Get(':datasetId/release/list')
-  async getReleases(@Param('datasetId', ParseUUIDPipe) datasetId: string) {
+  @Get('release/list')
+  async getReleases(@Query('datasetId', ParseUUIDPipe) datasetId: string) {
     return await this.datasetQueryService.getDatasetReleases(datasetId)
   }
 

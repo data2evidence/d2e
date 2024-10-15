@@ -3,6 +3,7 @@ import {
   Delete,
   Get,
   Param,
+  Query,
   ParseUUIDPipe,
   Post,
   Res,
@@ -20,7 +21,7 @@ export class ResourceController {
   constructor(private readonly resourceService: ResourceService) {}
 
   @Get('list')
-  async getResources(@Param('datasetId', ParseUUIDPipe) datasetId) {
+  async getResources(@Query('datasetId', ParseUUIDPipe) datasetId) {
     return await this.resourceService.getResources(datasetId)
   }
 
@@ -40,7 +41,7 @@ export class ResourceController {
     })
   )
   async uploadResource(
-    @Param('datasetId', ParseUUIDPipe) datasetId: string,
+    @Query('datasetId', ParseUUIDPipe) datasetId: string,
     @UploadedFile()
     file: Express.Multer.File
   ) {
@@ -49,7 +50,7 @@ export class ResourceController {
 
   @Get(':fileName/download')
   async downloadResource(
-    @Param('datasetId', ParseUUIDPipe) datasetId: string,
+    @Query('datasetId', ParseUUIDPipe) datasetId: string,
     @Param('fileName') fileName: string,
     @Res({ passthrough: true }) res: Response
   ) {
@@ -62,7 +63,7 @@ export class ResourceController {
   }
 
   @Delete(':fileName')
-  async deleteResource(@Param('datasetId', ParseUUIDPipe) datasetId: string, @Param('fileName') fileName: string) {
+  async deleteResource(@Query('datasetId', ParseUUIDPipe) datasetId: string, @Param('fileName') fileName: string) {
     return await this.resourceService.deleteResource(datasetId, fileName)
   }
 }
