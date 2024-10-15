@@ -1,4 +1,5 @@
 import express from "npm:express";
+import { Request, Response } from "express";
 import { CDMSchemaTypes, DbDialect } from "./const.ts";
 //import { Service } from 'typedi'
 //import { createLogger } from '../Logger'
@@ -41,15 +42,22 @@ export class DatasetRouter {
 
   private registerRoutes() {
     this.router.get(
-      "/:sourceDatasetId/cdm-schema/snapshot/metadata",
-      async (req, res) => {
+      "/cdm-schema/snapshot/metadata",
+      async (req: Request, res: Response) => {
+        const { datasetId } = req.query || {};
+
+        if (!datasetId) {
+          return res.status(400).send(`datasetId is required`);
+        } else if (typeof datasetId !== "string") {
+          return res.status(400).send(`datasetId query param is invalid`);
+        }
+
         const token = req.headers.authorization!;
         const portalAPI = new PortalAPI(token);
         const analyticsSvcAPI = new AnalyticsSvcAPI(token);
 
-        const { sourceDatasetId } = req.params;
         const { dialect, databaseCode, schemaName } =
-          await portalAPI.getDataset(sourceDatasetId);
+          await portalAPI.getDataset(datasetId);
 
         try {
           const metadata = await analyticsSvcAPI.getCdmSchemaSnapshotMetadata(
@@ -71,12 +79,18 @@ export class DatasetRouter {
       }
     );
 
-    this.router.get("/:sourceDatasetId/cohorts", async (req, res) => {
-      const { sourceDatasetId } = req.params;
+    this.router.get("/cohorts", async (req: Request, res: Response) => {
+      const { datasetId } = req.query || {};
+
+      if (!datasetId) {
+        return res.status(400).send(`datasetId is required`);
+      } else if (typeof datasetId !== "string") {
+        return res.status(400).send(`datasetId query param is invalid`);
+      }
 
       try {
         const analyticsSvcAPI = new AnalyticsSvcAPI(req.headers.authorization!);
-        const result = await analyticsSvcAPI.getAllCohorts(sourceDatasetId);
+        const result = await analyticsSvcAPI.getAllCohorts(datasetId);
         return res.status(200).json(result);
       } catch (error) {
         this.logger.error(
@@ -86,134 +100,138 @@ export class DatasetRouter {
       }
     });
 
-    this.router.post("/", generateDatasetSchema, async (req, res) => {
-      const token = req.headers.authorization!;
-      const portalAPI = new PortalAPI(token);
-      const dataflowMgmtAPI = new DataflowMgmtAPI(token);
+    this.router.post(
+      "/",
+      generateDatasetSchema,
+      async (req: Request, res: Response) => {
+        const token = req.headers.authorization!;
+        const portalAPI = new PortalAPI(token);
+        const dataflowMgmtAPI = new DataflowMgmtAPI(token);
 
-      const id = uuidv4();
-      const {
-        type,
-        tokenStudyCode,
-        tenantId,
-        schemaOption,
-        vocabSchemaValue,
-        cleansedSchemaOption,
-        tenantName,
-        dialect,
-        databaseCode,
-        schemaName,
-        dataModel,
-        plugin,
-        paConfigId,
-        visibilityStatus,
-        detail,
-        dashboards,
-        attributes,
-        tags,
-        fhirProjectId,
-      } = req.body;
-
-      if (!tenantName) {
-        this.logger.error(`Tenant name is not provided`);
-        return res.status(400).send("Tenant name is not provided");
-      }
-      // Token study code validation
-      const tokenFormat = /^[a-zA-Z0-9_]{1,80}$/;
-      if (!tokenStudyCode.match(tokenFormat)) {
-        this.logger.error(
-          `Token dataset code ${tokenStudyCode} has invalid format`
-        );
-        return res.status(400).send("Token dataset code format is invalid");
-      } else if (await portalAPI.hasDataset(tokenStudyCode)) {
-        this.logger.error(
-          `Provided token dataset code ${tokenStudyCode} is already used`
-        );
-        return res.status(400).send("Token dataset code is already used");
-      }
-
-      try {
-        this.logger.info(`Create dataset ${id}`);
-        const vocabSchema = vocabSchemaValue ? vocabSchemaValue : schemaName;
-
-        // Create CDM & Custom schemas with Optional Cleansed Schema
-        if (schemaOption != CDMSchemaTypes.NoCDM && schemaName) {
-          if (
-            schemaOption == CDMSchemaTypes.CreateCDM ||
-            schemaOption == CDMSchemaTypes.CustomCDM
-          ) {
-            try {
-              this.logger.info(
-                `Create CDM schema ${schemaName} with ${dataModel} on ${databaseCode} with cleansed schema option set to ${cleansedSchemaOption}`
-              );
-
-              const dataModels = await dataflowMgmtAPI.getDatamodels();
-              const dataModelInfo = dataModels.find(
-                (model) => model.datamodel === dataModel
-              );
-
-              const options = {
-                options: {
-                  flow_action_type: "create_datamodel",
-
-                  database_code: databaseCode,
-                  data_model: dataModel,
-                  schema_name: schemaName,
-                  cleansed_schema_option: cleansedSchemaOption,
-                  vocab_schema: vocabSchema,
-                },
-              };
-
-              await dataflowMgmtAPI.createFlowRunByMetadata(
-                options,
-                "datamodel",
-                dataModelInfo.flowId,
-                `datamodel-create-${schemaName}`
-              );
-            } catch (error) {
-              this.logger.error(
-                `Error while creating new CDM schema! ${error}`
-              );
-              return res.status(500).send("Error while creating CDM schema");
-            }
-          }
-        }
-
-        this.logger.info("Creating new dataset in Portal");
-        const newDatasetInput = {
-          id,
+        const id = uuidv4();
+        const {
           type,
-          tokenDatasetCode: tokenStudyCode,
+          tokenStudyCode,
+          tenantId,
           schemaOption,
+          vocabSchemaValue,
+          cleansedSchemaOption,
+          tenantName,
           dialect,
-          databaseCode: databaseCode,
+          databaseCode,
           schemaName,
-          vocabSchemaName: vocabSchema,
           dataModel,
           plugin,
-          tenantId,
           paConfigId,
           visibilityStatus,
           detail,
           dashboards,
           attributes,
           tags,
-          fhir_project_id: fhirProjectId,
-        };
-        const newDataset = await portalAPI.createDataset(newDatasetInput);
-        if (newDataset.error) {
-          return res.status(400).json(newDataset);
-        }
-        return res.status(200).json(newDataset);
-      } catch (error) {
-        this.logger.error(
-          `Error while creating dataset: ${JSON.stringify(error)}`
-        );
-        res.status(500).send("Error while creating dataset");
-      }
-    });
+          fhirProjectId,
+        } = req.body;
 
-    this.router.post("/snapshot", async (req, res) => {
+        if (!tenantName) {
+          this.logger.error(`Tenant name is not provided`);
+          return res.status(400).send("Tenant name is not provided");
+        }
+        // Token study code validation
+        const tokenFormat = /^[a-zA-Z0-9_]{1,80}$/;
+        if (!tokenStudyCode.match(tokenFormat)) {
+          this.logger.error(
+            `Token dataset code ${tokenStudyCode} has invalid format`
+          );
+          return res.status(400).send("Token dataset code format is invalid");
+        } else if (await portalAPI.hasDataset(tokenStudyCode)) {
+          this.logger.error(
+            `Provided token dataset code ${tokenStudyCode} is already used`
+          );
+          return res.status(400).send("Token dataset code is already used");
+        }
+
+        try {
+          this.logger.info(`Create dataset ${id}`);
+          const vocabSchema = vocabSchemaValue ? vocabSchemaValue : schemaName;
+
+          // Create CDM & Custom schemas with Optional Cleansed Schema
+          if (schemaOption != CDMSchemaTypes.NoCDM && schemaName) {
+            if (
+              schemaOption == CDMSchemaTypes.CreateCDM ||
+              schemaOption == CDMSchemaTypes.CustomCDM
+            ) {
+              try {
+                this.logger.info(
+                  `Create CDM schema ${schemaName} with ${dataModel} on ${databaseCode} with cleansed schema option set to ${cleansedSchemaOption}`
+                );
+
+                const dataModels = await dataflowMgmtAPI.getDatamodels();
+                const dataModelInfo = dataModels.find(
+                  (model) => model.datamodel === dataModel
+                );
+
+                const options = {
+                  options: {
+                    flow_action_type: "create_datamodel",
+
+                    database_code: databaseCode,
+                    data_model: dataModel,
+                    schema_name: schemaName,
+                    cleansed_schema_option: cleansedSchemaOption,
+                    vocab_schema: vocabSchema,
+                  },
+                };
+
+                await dataflowMgmtAPI.createFlowRunByMetadata(
+                  options,
+                  "datamodel",
+                  dataModelInfo.flowId,
+                  `datamodel-create-${schemaName}`
+                );
+              } catch (error) {
+                this.logger.error(
+                  `Error while creating new CDM schema! ${error}`
+                );
+                return res.status(500).send("Error while creating CDM schema");
+              }
+            }
+          }
+
+          this.logger.info("Creating new dataset in Portal");
+          const newDatasetInput = {
+            id,
+            type,
+            tokenDatasetCode: tokenStudyCode,
+            schemaOption,
+            dialect,
+            databaseCode: databaseCode,
+            schemaName,
+            vocabSchemaName: vocabSchema,
+            dataModel,
+            plugin,
+            tenantId,
+            paConfigId,
+            visibilityStatus,
+            detail,
+            dashboards,
+            attributes,
+            tags,
+            fhir_project_id: fhirProjectId,
+          };
+          const newDataset = await portalAPI.createDataset(newDatasetInput);
+          if (newDataset.error) {
+            return res.status(400).json(newDataset);
+          }
+          return res.status(200).json(newDataset);
+        } catch (error) {
+          this.logger.error(
+            `Error while creating dataset: ${JSON.stringify(error)}`
+          );
+          res.status(500).send("Error while creating dataset");
+        }
+      }
+    );
+
+    this.router.post("/snapshot", async (req: Request, res: Response) => {
       const token = req.headers.authorization!;
       const portalAPI = new PortalAPI(token);
       const dataflowMgmtAPI = new DataflowMgmtAPI(token);
@@ -295,8 +313,15 @@ export class DatasetRouter {
       }
     });
 
-    this.router.get("/:datasetId/dashboard/list", async (req, res) => {
-      const { datasetId } = req.params;
+    this.router.get("/dashboard/list", async (req: Request, res: Response) => {
+      const { datasetId } = req.query || {};
+
+      if (!datasetId) {
+        return res.status(400).send(`datasetId is required`);
+      } else if (typeof datasetId !== "string") {
+        return res.status(400).send(`datasetId query param is invalid`);
+      }
+
       try {
         const token = req.headers.authorization!;
         const portalAPI = new PortalAPI(token);

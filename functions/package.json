@@ -1816,7 +1816,7 @@
           ]
         },
         {
-          "path": "^/gateway/api/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/cdm-schema/snapshot/metadata$",
+          "path": "^/gateway/api/dataset/cdm-schema/snapshot/metadata$",
           "scopes": [
             "gateway.dataset.dashboards.read"
           ],
@@ -1825,7 +1825,7 @@
           ]
         },
         {
-          "path": "^/gateway/api/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/cohorts$",
+          "path": "^/gateway/api/dataset/cohorts$",
           "scopes": [
             "gateway.dataset.cohorts.read"
           ],
@@ -1852,7 +1852,7 @@
           ]
         },
         {
-          "path": "^/gateway/api/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/dashboard/list$",
+          "path": "^/gateway/api/dataset/dashboard/list$",
           "scopes": [
             "gateway.dataset.dashboards.read"
           ],
