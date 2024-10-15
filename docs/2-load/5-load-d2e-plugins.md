@@ -4,23 +4,21 @@ The following plugins are currently available:
 
 - [D2E-Plugins](https://github.com/alp-os/d2e-plugins)
 
-## 1-Step Upload
+## Initialize all default plugins
 
-### Initialize the default plugins
+- Switch to `setup` page.
 
-Switch to `setup` page.
-
-Click the `initialize` button under `Plugin` .
+- Click the `initialize` button under `Plugin` .
 
 > ![](../images/dataflow/PluginSetUp.png)
 
-Confirm the upload by clicking `Yes, install` at the dialog.
+- Confirm the upload by clicking `Yes, install` at the dialog.
 
 > ![](../images/dataflow/PluginSetUpDialog.png)
 
 This will initialize all the plugins available.
 
-## Upload from zipfile
+## Upload from individual zipfile
 
 ### Create Plugin zipfile
 
@@ -74,9 +72,10 @@ done
 - After approx 5 minutes select Jobs tab to confirm flow has uploaded successfully
   > ![](../images/dataflow/JobsTable.png)
 
-## Upload from git url
+## Upload from individual git url
 
-- **n.b.: git repository must be public accessible**
+### Public Repo
+
 - Enter git url (e.g. https://github.com/alp-os/d2e-plugins)
 
 - Optionally specify branch (e.g. https://github.com/alp-os/d2e-plugins@branch-name)
@@ -87,7 +86,39 @@ done
 
   > ![](../images/dataflow/JobsPageURL.png)
 
-- If repo is private
+### Private Repo
+
 - Enter git url `https://<access_token>@github.com/<username>/<repository>.git`
+
 - If it has subdirectories: `https://<access_token>@github.com/<username>/<repository>.git#subdirectory=<subdir>`
+  
   > ![](../images/dataflow/AddFlowURLPrivate.png)
+
+## Troubleshooting
+
+- Logs are in the `alp-minerva-dataflow-mgmt` container
+
+```bash
+% yarn logs:minerva:follow alp-minerva-dataflow-mgmt
+```
+
+> yarn run v1.22.22
+> $ yarn base:minerva logs -t --follow --since 1s alp-minerva-dataflow-mgmt
+> $ BASE_PORT=1 docker compose --file docker-compose.yml logs -t --follow --since 1s alp-minerva-dataflow-mgmt
+> [PrefectService] [32minfo[39m: Deployment Folder: prefect_python_module/kha304p37227/data_load
+> [PrefectExecutionClient] [32minfo[39m: creating python virtual environment...
+> [PrefectExecutionClient] [32minfo[39m: Running python...
+> [PrefectExecutionClient] [32minfo[39m: Requirement already satisfied: aiobotocore==2.4.2 in /tmp/python_venv/lib/python3.10/site-packages (from -r /tmp/requirements.txt (line 1)) (2.4.2)
+> ...
+> [PrefectExecutionClient] [32minfo[39m: Python child process completed!
+> [PrefectExecutionClient] [32minfo[39m: python virtual environment created
+> [PrefectExecutionClient] [32minfo[39m: zip file to install: data-load.zip
+> [PrefectExecutionClient] [32minfo[39m: Installing pip package...
+> [PrefectExecutionClient] [32minfo[39m: Running python...
+> [PrefectExecutionClient] [32minfo[39m: Processing ./data-load.zip
+> [PrefectExecutionClient] [32minfo[39m:   Preparing metadata (setup.py): started
+> [PrefectExecutionClient] [32minfo[39m:   Preparing metadata (setup.py): finished with status 'done'
+> [PrefectExecutionClient] [32minfo[39m: Successfully installed Mako-1.3.5 MarkupSafe-3.0.1 aiobotocore-2.4.2 ...
+> [PrefectExecutionClient] [32minfo[39m: Python child process completed!
+> [PrefectExecutionClient] [32minfo[39m: pip install finished
+> [PrefectService] [32minfo[39m: Deleted adhoc prefect deployment folder: prefect_python_module/kha304p37227/data_load

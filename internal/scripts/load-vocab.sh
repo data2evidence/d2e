@@ -26,16 +26,13 @@ else
 	echo ". INFO GOOGLE_DRIVE_DATA_DIR unset"
 fi
 
-ZIP_PATH=$(find $ZIP_DIR . -name "${ZIP_GLOB}.zip" | tail -n 1)
+ZIP_PATH=$(find $ZIP_DIR -name "${ZIP_GLOB}.zip" | tail -n 1)
 if [ ! -f "${ZIP_PATH}" ]; then
 	echo . INFO $ZIP_DIR/$ZIP_GLOB not found
 	exit 1
 fi
 
 # action
-echo . INFO clear $CACHE_DIR
-rm -rf $CACHE_DIR
-mkdir $CACHE_DIR
 cd $CACHE_DIR
 echo . INFO unzip $ZIP_PATH ...
 unzip -o $ZIP_PATH -d .

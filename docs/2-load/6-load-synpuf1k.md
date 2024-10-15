@@ -96,9 +96,12 @@ yarn create-postgres-cdm-schemas alpdev_pg cdmdefault cdmvocab
 ```bash
 docker exec -it alp-dataflow-gen-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options='{"files":[{"name": "Location","path": "/app/synpuf1k/002_LOCATION.csv", "truncate": "True", "table_name": "location"},{"name": "CARE_SITE","path": "/app/synpuf1k/003_CARE_SITE.csv", "truncate": "True", "table_name": "care_site"},{"name": "Provider","path": "/app/synpuf1k/004_PROVIDER.csv", "truncate": "True", "table_name": "provider"},{"name": "Cost","path": "/app/synpuf1k/005_COST.csv", "truncate": "True", "table_name": "cost"},{"name": "Person","path": "/app/synpuf1k/006_PERSON.csv", "truncate": "True", "table_name": "person"},{"name": "Death","path": "/app/synpuf1k/007_DEATH.csv", "truncate": "True", "table_name": "death"},{"name": "Condition_Occirence","path": "/app/synpuf1k/008_CONDITION_OCCURRENCE.csv", "truncate": "True", "table_name": "condition_occurrence"},{"name": "Condition_Era","path": "/app/synpuf1k/009_CONDITION_ERA.csv", "truncate": "True", "table_name": "condition_era"},{"name": "Device_Exposure","path": "/app/synpuf1k/010_DEVICE_EXPOSURE.csv", "truncate": "True", "table_name": "device_exposure"},{"name": "Drug_Exposure","path": "/app/synpuf1k/011_DRUG_EXPOSURE.csv", "truncate": "True", "table_name": "drug_exposure"},{"name": "Drug_Era","path": "/app/synpuf1k/012_DRUG_ERA.csv", "truncate": "True", "table_name": "drug_era"},{"name": "Measurement","path": "/app/synpuf1k/013_MEASUREMENT.csv", "truncate": "True", "table_name": "measurement"},{"name": "Observation","path": "/app/synpuf1k/014_OBSERVATION.csv", "truncate": "True", "table_name": "observation"},{"name": "Observation_Period","path": "/app/synpuf1k/015_OBSERVATION_PERIOD.csv", "truncate": "True", "table_name": "observation_period"},{"name": "Payer_Plan_Period","path": "/app/synpuf1k/016_PAYER_PLAN_PERIOD.csv", "truncate": "True", "table_name": "payer_plan_period"},{"name": "Procedure_Occurrence","path": "/app/synpuf1k/017_PROCEDURE_OCCURRENCE.csv", "truncate": "True", "table_name": "procedure_occurrence"},{"name": "Visit_Occurrence","path": "/app/synpuf1k/018_VISIT_OCCURRENCE.csv", "truncate": "True", "table_name": "visit_occurrence"}],"schema_name":"cdmdefault","header":"true","delimiter":",","database_code": "alpdev_pg", "chunksize": "50000", "encoding": "utf_8"}'
 ```
-- Docker container logs can be checked with the bash command `docker logs --tail 100 alp-dataflow-gen-agent-1`
-- Once the flow is completed, the container logs the message "Finished in state Completed()"
+- Docker container logs can be checked with the command 
+```bash
+docker logs --tail 100 alp-dataflow-gen-agent-1
 ```
+- Once the flow is completed, the container logs the message 
+> "Finished in state Completed()"
 - Confirm data loaded with 
 ```
 docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "SELECT schemaname as table_schema,relname as table_name,n_live_tup as table_rows FROM pg_stat_user_tables where schemaname='cdmdefault' ORDER BY n_live_tup DESC limit 17;"
@@ -134,12 +137,14 @@ docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d 
   - alp-minerva-postgres-1, alp-data-flow-gen-1, alp-data-flow-gen-agent-1
 - If not running then check container logs
 
-## data flows
-- To check job logs, open https://localhost:41100/portal/systemadmin/jobs & select **View** in Logs column
+## Data flow logs
+- open 
+  - https://localhost:41100/portal/systemadmin/jobs/flow-runs
+
 
 ## Repeat seed
 - To repeat, run "Load data to cdmdefault" commands in the sequence given
 
+## Knowledge-base Articles
 
-see: 
-- [load-synpuf1k](../knowledgebase/dbcreds/missing-db-creds.md)
+- [missing-db-creds](../knowledgebase/dbcreds/missing-db-creds.md)

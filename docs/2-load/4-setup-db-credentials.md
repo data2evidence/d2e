@@ -27,9 +27,7 @@ notes:
 
 - `*` - schema/usernames are the values expected for sample data load steps - do not change
 - `@` - create a random password
-- make a secure note of these passwords as they are required for the sample data load steps
-  - [load-synpuf1k](5-load-synpuf1k.md)
-  - [load-vocabd](6-load-vocab.md)
+- make a secure note of these passwords as they are required for the subsequent data load steps: synpuf1k & vocab
 
 > ![alt text](../images/db-creds/AddDatabase.png)
 
