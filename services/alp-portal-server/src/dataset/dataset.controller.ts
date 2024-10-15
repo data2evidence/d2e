@@ -55,8 +55,8 @@ export class DatasetController {
     return await this.datasetFilterService.getFilterScopes()
   }
 
-  @Get(':id')
-  async getDataset(@Param('id', ParseUUIDPipe) id): Promise<IDataset> {
+  @Get()
+  async getDataset(@Query('datasetId', ParseUUIDPipe) id): Promise<IDataset> {
     return await this.datasetQueryService.getDataset(id)
   }
 
@@ -75,8 +75,8 @@ export class DatasetController {
     return await this.datasetCommandService.createDataset(datasetDto)
   }
 
-  @Delete(':id')
-  async offboardDataset(@Param('id', ParseUUIDPipe) id) {
+  @Delete()
+  async offboardDataset(@Query('datasetId', ParseUUIDPipe) id) {
     return await this.datasetCommandService.offboardDataset(id)
   }
 

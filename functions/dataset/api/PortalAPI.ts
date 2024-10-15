@@ -102,7 +102,8 @@ export class PortalAPI {
   async getDataset(id: string): Promise<Dataset> {
     try {
       const options = await this.getRequestConfig();
-      const url = `${this.baseURL}/dataset/${id}`;
+      options.params = { datasetId: id };
+      const url = `${this.baseURL}/dataset`;
       const result = await axios.get(url, options);
       return result.data;
     } catch (error) {

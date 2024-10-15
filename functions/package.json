@@ -766,7 +766,7 @@
           ]
         },
         {
-          "path": "^/system-portal/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "path": "^/system-portal/dataset$",
           "scopes": [
             "portal.dataset.read"
           ],
@@ -847,7 +847,7 @@
           ]
         },
         {
-          "path": "^/system-portal/dataset/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "path": "^/system-portal/dataset$",
           "scopes": [
             "portal.dataset.delete"
           ],
