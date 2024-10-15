@@ -53,7 +53,7 @@ export class DqdRouter {
 
     // GET /latest-flow-run-with-cohort/:datasetId/:cohortDefinitionId
     this.router.get(
-      "/latest-flow-run-with-cohort/:datasetId/:cohortDefinitionId",
+      "/data-quality/dataset/:datasetId/cohort/:cohortDefinitionId/flow-run/latest",
       async (req: Request, res: Response) => {
         try {
           const dto = new DqdQueryParamsDto(req.params);
