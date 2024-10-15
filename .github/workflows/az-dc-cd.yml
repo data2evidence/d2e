@@ -4,7 +4,7 @@ run-name: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || inputs.
 on:
   push:
     branches:
-      - rc-v0.4.0-beta
+      - develop
 
   workflow_dispatch:
     inputs:
@@ -24,7 +24,7 @@ on:
         default: true
 
 env:
-  DOCKER_TAG_NAME: ${{ inputs.docker_tag_name || 'rc-v0.4.0-beta' }}
+  DOCKER_TAG_NAME: ${{ inputs.docker_tag_name }}
   ENV_NAME: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || inputs.env }}
   ENV_TYPE: remote
 
