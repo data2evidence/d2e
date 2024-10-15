@@ -1,35 +1,44 @@
 #!/usr/bin/env bash
-# Get Athena Vocab from D4L Singapore Google Drive
-# GIT_BASE_DIR set by ay alias
+# Load Athena Vocab
+# if GOOGLE_DRIVE_DATA_DIR is set then attempt to copy latest zip from google drive
+# otherwise use zip from $ZIP_DIR
 set -o nounset
 set -o errexit
 set -o pipefail
 echo ${0} ...
 
-# inputs
-[ -z "${GOOGLE_DRIVE_DATA_DIR}" ] && echo "FATAL GOOGLE_DRIVE_DATA_DIR is not set" && exit 1
-
 # vars
-CONTAINER_DIR=/vocab
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 CACHE_DIR=$GIT_BASE_DIR/cache/vocab
-ZIP_DIR=$GIT_BASE_DIR/cache/zip
-GOOGLE_DRIVE_BASE_DIR=$(ls -d ~/Library/CloudStorage/GoogleDrive* | head -1)
-SRC_DIR="$GOOGLE_DRIVE_BASE_DIR/$GOOGLE_DRIVE_DATA_DIR/Athena_OMOP_Vocabulary"
-ls -1 "${SRC_DIR}" | grep zip
+CONTAINER_DIR=/vocab
+
+# inputs
+ZIP_DIR=${ZIP_DIR:-$GIT_BASE_DIR/cache/zip}
+ZIP_GLOB=${ZIP_GLOB:-*vocab*}
+
+if [ -v GOOGLE_DRIVE_DATA_DIR ]; then
+	echo GOOGLE_DRIVE_DATA_DIR=$GOOGLE_DRIVE_DATA_DIR
+	GOOGLE_DRIVE_BASE_DIR=$(ls -d ~/Library/CloudStorage/GoogleDrive* | head -1)
+	SRC_DIR="$GOOGLE_DRIVE_BASE_DIR/$GOOGLE_DRIVE_DATA_DIR/Athena_OMOP_Vocabulary"; # echo SRC_DIR=$SRC_DIR
+	SRC_ZIP_PATH=$(find "$SRC_DIR" -name ${ZIP_GLOB}.zip | tail -n 1); # echo SRC_ZIP_PATH=$SRC_ZIP_PATH
+	cp -v "$SRC_ZIP_PATH" $ZIP_DIR
+else
+	echo ". INFO GOOGLE_DRIVE_DATA_DIR unset"
+fi
+
+ZIP_PATH=$(find $ZIP_DIR . -name "${ZIP_GLOB}.zip" | tail -n 1)
+if [ ! -f "${ZIP_PATH}" ]; then
+	echo . INFO $ZIP_DIR/$ZIP_GLOB not found
+	exit 1
+fi
 
 # action
-echo . clear $CACHE_DIR
+echo . INFO clear $CACHE_DIR
+rm -rf $CACHE_DIR
+mkdir $CACHE_DIR
 cd $CACHE_DIR
-rm -fv *
-echo . get latest Athena_OMOP_Vocabulary zip
-# ls $SRC_DIR
-ZIPFILE_PATH=$(find "$SRC_DIR" -depth 1 -name "*.zip" | tail -n 1)
-ZIPFILE_NAME="${ZIPFILE_PATH##*/}"
-# echo ZIPFILE_PATH=$ZIPFILE_PATH
-# echo ZIPFILE_NAME=$ZIPFILE_NAME
-cp -v "$ZIPFILE_PATH" $ZIP_DIR
-unzip -o $ZIP_DIR/$ZIPFILE_NAME -d . # -n
+echo . INFO unzip $ZIP_PATH ...
+unzip -o $ZIP_PATH -d .
 
 echo . wc -l
 wc -l *.csv | sort -nr
@@ -38,7 +47,9 @@ echo . Truncate
 docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "truncate cdmvocab.concept, cdmvocab.concept_ancestor, cdmvocab.concept_class, cdmvocab.concept_relationship, cdmvocab.concept_synonym, cdmvocab.domain, cdmvocab.drug_strength, cdmvocab.relationship, cdmvocab.vocabulary;" || true
 
 echo . Load tables
-for CSV_FILE in *.csv; do
+CSV_FILES=($(ls *.csv))
+CSV_FILE=${CSV_FILES[1]}
+for CSV_FILE in ${CSV_FILES[@]}; do
 	echo load $CSV_FILE ...;
 	TABLE_NAME=${CSV_FILE/.csv/}
 	if [ "$CSV_FILE" = "DRUG_STRENGTH.csv" ]; then

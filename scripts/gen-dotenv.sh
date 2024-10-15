@@ -26,6 +26,7 @@ function set-password {
     echo ${password_name}=${password_value} >> $tmp_file
 }
 
+# end with word password in example_file
 password_keys=($(cat $example_file | grep password$ | awk -F= '{print $1}')) # echo ${password_keys[@]};
 password_name=${password_keys[1]}
 for password_name in ${password_keys[@]}; do
@@ -37,9 +38,9 @@ for password_name in ${password_keys[@]}; do
 done
 echo
 
-echo set-openssl ...
 # https://www.openssl.org/docs/man3.0/man1/openssl-passphrase-options.html
 function set-openssl {
+    echo set-openssl ...
     echo INFO set DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE DB_CREDENTIALS__INTERNAL__PRIVATE_KEY DB_CREDENTIALS__INTERNAL__PUBLIC_KEY ...
     export PASSPHRASE=$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c $passphrase_length)
     export PRIVATE_KEY=$(openssl genpkey -algorithm RSA -aes-256-cbc -pkeyopt rsa_keygen_bits:4096 -pass env:PASSPHRASE -quiet)
@@ -51,8 +52,8 @@ function set-openssl {
 set-openssl
 echo
 
-echo encode-basic-auth ...
 encode-basic-auth() {
+    echo encode-basic-auth ...
     echo INFO set LOGTO__CLIENTID_PASSWORD__BASIC_AUTH ...
     client_id=$(grep '^LOGTO_API_M2M_CLIENT_ID=' "$tmp_file" | cut -d"=" -f2)
     client_secret=$(grep '^LOGTO_API_M2M_CLIENT_SECRET=' "$tmp_file" | cut -d"=" -f2)
