@@ -6,12 +6,12 @@ import { updateDb } from './db/runner';
 
 const logger = createLogger('Terminology');
 
-import https from 'https';
+// import https from 'https';
 
-const httpsOptions = {
-  key: env.TLS__INTERNAL__KEY,
-  cert: env.TLS__INTERNAL__CRT,
-};
+// const httpsOptions = {
+//   key: env.TLS__INTERNAL__KEY,
+//   cert: env.TLS__INTERNAL__CRT,
+// };
 
 async function runNestApp() {
   await updateDb();
