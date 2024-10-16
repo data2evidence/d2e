@@ -1,5 +1,9 @@
 import { Request, Response, Router } from "npm:express";
-import { DqdQueryParamsDto } from "../dtos/DqdQueryParams.dto.ts";
+import { param, validationResult } from "npm:express-validator";
+import {
+  validateDataQualityDatasetId,
+  validateDataQualityFlowRunDto,
+} from "../middlewares/DqdRequestValidatorMiddlewares.ts";
 import { DqdService } from "../services/DqdService.ts";
 
 export class DqdController {
@@ -15,12 +19,11 @@ export class DqdController {
     // GET /data-quality/flow-run/:flowRunId/results
     this.router.get(
       "/data-quality/flow-run/:flowRunId/results",
+      param("flowRunId").isUUID(),
       async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params);
-          dto.validateParams();
-        } catch (error) {
-          res.status(400).send(error.message);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          res.status(400).json({ errors: errors.array() });
         }
         await this.getDataQualityResults(req, res);
       }
@@ -29,54 +32,50 @@ export class DqdController {
     // GET /data-quality/flow-run/:flowRunId/overview
     this.router.get(
       "/data-quality/flow-run/:flowRunId/overview",
+      param("flowRunId").isUUID(),
       async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params);
-          dto.validateParams();
-        } catch (error) {
-          res.status(400).send(error.message);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          res.status(400).json({ errors: errors.array() });
         }
         await this.getDataQualityOverview(req, res);
       }
     );
 
-    // GET /data-quality/dataset/:datasetId/flow-run/latest
+    // GET /data-quality/flow-run/latest?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/dataset/:datasetId/flow-run/latest",
+      "/data-quality/flow-run/latest",
+      validateDataQualityDatasetId(),
       async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params);
-          dto.validateParams();
-        } catch (error) {
-          res.status(400).send(error.message);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
         }
         await this.getLatestFlowRunWithoutCohort(req, res);
       }
     );
 
-    // GET /latest-flow-run-with-cohort/:datasetId/:cohortDefinitionId
+    // GET /data-quality/cohort/:cohortDefinitionId/flow-run/latest?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/dataset/:datasetId/cohort/:cohortDefinitionId/flow-run/latest",
+      "/data-quality/cohort/:cohortDefinitionId/flow-run/latest",
+      [param("cohortDefinitionId").isString(), validateDataQualityDatasetId()],
       async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params);
-          dto.validateParams();
-        } catch (error) {
-          res.status(400).send(error.message);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
         }
         await this.getLatestFlowRunWithCohort(req, res);
       }
     );
 
-    // GET /flow-run-by-release/:datasetId/:releaseId
+    // GET /data-quality/release/:releaseId/flow-run?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/dataset/:datasetId/release/:releaseId/flow-run",
+      "/data-quality/release/:releaseId/flow-run",
+      [param("releaseId").isInt(), validateDataQualityDatasetId()],
       async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params);
-          dto.validateParams();
-        } catch (error) {
-          res.status(400).send(error.message);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
         }
         await this.getFlowRunByReleaseId(req, res);
       }
@@ -85,80 +84,63 @@ export class DqdController {
     // POST /data-quality/flow-run
     this.router.post(
       "/data-quality/flow-run",
+      validateDataQualityFlowRunDto(),
       async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params, req.body);
-          dto.validateRequestBody();
-        } catch (error) {
-          res.status(400).send(error.message);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
         }
+
         await this.createDataQualityFlowRun(req, res);
       }
     );
-    // GET /data-quality/dataset/:datasetId/category/history
+    // GET /data-quality/dataset/:datasetId/category/history?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/dataset/:datasetId/category/history",
+      "/data-quality/category/history",
+      validateDataQualityDatasetId(),
       async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params);
-          dto.validateParams();
-        } catch (error) {
-          res.status(400).send(error.message);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
         }
         await this.getDataQualityHistoryByCategory(req, res);
       }
     );
 
-    // GET /data-quality/dataset/:datasetId/history
+    // GET /data-quality/domain/history?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/dataset/:datasetId/history",
+      "/data-quality/domain/history",
+      validateDataQualityDatasetId(),
       async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params);
-          dto.validateParams();
-        } catch (error) {
-          res.status(400).send(error.message);
-        }
-        await this.getDataQualityHistory(req, res);
-      }
-    );
-
-    // GET /data-quality/dataset/:datasetId/domain/history
-    this.router.get(
-      "/data-quality/dataset/:datasetId/domain/history",
-      async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params);
-          dto.validateParams();
-        } catch (error) {
-          res.status(400).send(error.message);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
         }
         await this.getDataQualityHistoryByDomain(req, res);
       }
     );
-    // GET /data-quality/dataset/:datasetId/history
+
+    // GET /data-quality/history?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/dataset/:datasetId/history",
+      "/data-quality/history",
+      validateDataQualityDatasetId(),
       async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params);
-          dto.validateParams();
-        } catch (error) {
-          res.status(400).send(error.message);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
         }
         await this.getDataQualityHistory(req, res);
       }
     );
 
-    // GET /data-quality/dataset/:datasetId/domain/continuity
+    // GET /data-quality/domain/continuity?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/dataset/:datasetId/domain/continuity",
+      "/data-quality/domain/continuity",
+      validateDataQualityDatasetId(),
       async (req: Request, res: Response) => {
-        try {
-          const dto = new DqdQueryParamsDto(req.params);
-          dto.validateParams();
-        } catch (error) {
-          res.status(400).send(error.message);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
         }
         await this.getDatasetDomainContinuity(req, res);
       }
@@ -207,7 +189,7 @@ export class DqdController {
 
   private async getLatestFlowRunWithoutCohort(req: Request, res: Response) {
     try {
-      const datasetId = req.params.datasetId;
+      const datasetId = req.query.datasetId;
       const token = req.headers.authorization!;
       const flowRun = await this.dqdService.getLatestFlowRunWithoutCohort(
         datasetId,
@@ -227,7 +209,7 @@ export class DqdController {
 
   private async getLatestFlowRunWithCohort(req: Request, res: Response) {
     try {
-      const datasetId = req.params.datasetId;
+      const datasetId = req.query.datasetId;
       const cohortDefinitionId = req.params.cohortDefinitionId;
       const token = req.headers.authorization!;
       const flowRun = await this.dqdService.getLatestFlowRunWithCohort(
@@ -253,7 +235,7 @@ export class DqdController {
 
   private async getFlowRunByReleaseId(req: Request, res: Response) {
     try {
-      const datasetId = req.params.datasetId;
+      const datasetId = req.query.datasetId;
       const releaseId = req.params.releaseId;
       const token = req.headers.authorization!;
       const flowRun = await this.dqdService.getFlowRunByReleaseId(
@@ -294,7 +276,7 @@ export class DqdController {
 
   private async getDataQualityHistoryByCategory(req: Request, res: Response) {
     try {
-      const datasetId = req.params.datasetId;
+      const datasetId = req.query.datasetId;
       const token = req.headers.authorization!;
       const history = await this.dqdService.getDataQualityHistoryByCategory(
         datasetId,
@@ -309,7 +291,7 @@ export class DqdController {
 
   private async getDataQualityHistory(req: Request, res: Response) {
     try {
-      const datasetId = req.params.datasetId;
+      const datasetId = req.query.datasetId;
       const token = req.headers.authorization!;
       const history = await this.dqdService.getDataQualityHistory(
         datasetId,
@@ -324,7 +306,7 @@ export class DqdController {
 
   private async getDataQualityHistoryByDomain(req: Request, res: Response) {
     try {
-      const datasetId = req.params.datasetId;
+      const datasetId = req.query.datasetId;
       const token = req.headers.authorization!;
       const history = await this.dqdService.getDataQualityHistoryByDomain(
         datasetId,
@@ -339,7 +321,7 @@ export class DqdController {
 
   private async getDatasetDomainContinuity(req: Request, res: Response) {
     try {
-      const datasetId = req.params.datasetId;
+      const datasetId = req.query.datasetId;
       const token = req.headers.authorization!;
       const history = await this.dqdService.getDatasetDomainContinuity(
         datasetId,
