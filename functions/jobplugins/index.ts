@@ -29,7 +29,7 @@ if (!env.PREFECT_API_URL) {
   console.error("Prefect URL not defined: skipping flow plugins");
 }
 
-async function callPrefect(name) {
+async function callPrefect(name: string) {
   const res = await fetch(
     `${env.PREFECT_API_URL}/deployments/name/${name}/${name}`,
     {
@@ -41,8 +41,7 @@ async function callPrefect(name) {
     console.log(res);
   }
   const flow = await res.json();
-  console.log(flow);
-  const res2 = await fetch(
+  const createFlowRes = await fetch(
     `${env.PREFECT_API_URL}/deployments/${flow["id"]}/create_flow_run`,
     {
       method: "POST",
@@ -52,13 +51,14 @@ async function callPrefect(name) {
       body: JSON.stringify({}),
     }
   );
-  if (res2.status != 200) {
+  if (createFlowRes.status != 200) {
     console.log(`Error creating flow run`);
-    console.log(res2);
+    console.log(createFlowRes);
   }
-  return await res2.json();
+  return await createFlowRes.json();
 }
 
+// TODO: Migrate to controller
 // Get list of job plugins
 app.get("/jobplugins", (req, res) => {
   try {
