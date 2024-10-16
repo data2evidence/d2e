@@ -1,14 +1,12 @@
 import express from "npm:express@4.18.2";
 import pg from "npm:pg";
-import { DeploymentRouter } from "./src/routes/DeploymentRouter.ts";
-import { DqdRouter } from "./src/routes/DqdRouter.ts";
+import { DqdController } from "./src/controllers/DqdController.ts";
 
 const app = express();
 const env = Deno.env.toObject();
 
 app.use(express.json());
-app.use("/jobplugins/deployment", new DeploymentRouter().router);
-app.use("/jobplugins/dqd", new DqdRouter().router);
+app.use("/jobplugins/dqd", new DqdController().router);
 
 const opt = {
   user: env.PG_USER,
