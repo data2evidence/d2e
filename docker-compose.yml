@@ -49,7 +49,7 @@ x-envs:
     PG__MAX_POOL: 10
     PG__MIN_POOL: 0
     PG__PORT: ${PG_PORT:-5432}
-    PG__IDLE_TIMEOUT_IN_MS: 300000
+    PG__IDLE_TIMEOUT_IN_MS: 1000
     PG__DIALECT: postgresql
   fhir: &x-fhir
     FHIR__CLIENT_ID: db6b2304-f236-45ec-b10c-a852681e7129
@@ -375,7 +375,7 @@ services:
             "PG__MAX_POOL": 10,
             "PG__MIN_POOL": 0,
             "PG__PORT": ${PG_PORT:-5432},
-            "PG__IDLE_TIMEOUT_IN_MS": 300000,
+            "PG__IDLE_TIMEOUT_IN_MS": 1000,
             "PG__DIALECT": "postgresql",
             "LOCAL_DEBUG": "false",
             "SERVICE_ROUTES": {

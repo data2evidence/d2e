@@ -16,7 +16,7 @@ export const env = {
   PG_ADMIN_USER: Deno.env.get("PG__USER_MGMT__ADMIN_USER")!,
   PG_ADMIN_PASSWORD: Deno.env.get("PG__USER_MGMT__ADMIN_PASSWORD")!,
   PG_CA_ROOT_CERT: Deno.env.get("PG__CA_ROOT_CERT"),
-  PG_MIN_POOL: Number(Deno.env.get("PG__MIN_POOL")) || 2,
+  PG_MIN_POOL: Number(Deno.env.get("PG__MIN_POOL")),
   PG_MAX_POOL: Number(Deno.env.get("PG__MAX_POOL")) || 10,
   PG_DEBUG: Boolean(Number(Deno.env.get("PG_DEBUG"))) || false,
   PG__IDLE_TIMEOUT_IN_MS: Number(Deno.env.get("PG__IDLE_TIMEOUT_IN_MS")) || 30000,
