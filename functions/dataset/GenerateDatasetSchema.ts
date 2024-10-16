@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'npm:express'
-import { v4 as uuidv4 } from 'npm:uuid'
 import { CDMSchemaTypes, DbDialect } from './const.ts'
 import { PortalAPI }from './api/PortalAPI.ts'
 import { AnalyticsSvcAPI }from './api/AnalyticsSvcAPI.ts'
@@ -11,10 +10,6 @@ export const generateDatasetSchema = async (req: Request, res: Response, next: N
   const token = req.headers.authorization!
   const portalAPI = new PortalAPI(token)
   const analyticsSvcAPI = new AnalyticsSvcAPI(token)
-
-  const id = uuidv4()
-
-  req.body.id = id
 
   //CDM Schema preparation
   logger.info('Option for schema: ' + schemaOption + ' with the value: ' + cdmSchemaValue)
@@ -38,7 +33,14 @@ export const generateDatasetSchema = async (req: Request, res: Response, next: N
     req.body.schemaName = getSchemaCase(cdmSchemaValue, dialect)
   } else if (schemaOption == CDMSchemaTypes.CreateCDM) {
     const formattedTokenDatasetCode = tokenStudyCode.toUpperCase().replace(/_/g, '')
-    req.body.schemaName = getSchemaCase(`CDM_${formattedTokenDatasetCode}_${id}`.replace(/-/g, ''), dialect)
+    if (formattedTokenDatasetCode.length > 48)
+      return badRequest(res, 'Token study code must not greater than 48 characters')
+
+    const suffix = Math.floor(Date.now() / 1000)
+    let schemaName = getSchemaCase(`CDM_${formattedTokenDatasetCode}_${suffix}`.replace(/-/g, ''), dialect)
+    schemaName = schemaName.substring(0, 63) // truncate to 63 characters
+
+    req.body.schemaName = schemaName
   }
 
   next()
