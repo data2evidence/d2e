@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "npm:express@4.18.2";
+import { Request, Response, Router } from "npm:express";
 import { DqdQueryParamsDto } from "../dtos/DqdQueryParams.dto.ts";
 import { DqdService } from "../services/DqdService.ts";
 

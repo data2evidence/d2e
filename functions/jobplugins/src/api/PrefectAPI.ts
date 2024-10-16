@@ -1,4 +1,4 @@
-import dayjs from "npm:dayjs@^1.11.13";
+import dayjs from "npm:dayjs";
 import { services } from "../env.ts";
 import { IPrefectFlowRunDto } from "../types.d.ts";
 

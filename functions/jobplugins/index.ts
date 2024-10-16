@@ -1,4 +1,4 @@
-import express from "npm:express@4.18.2";
+import express from "npm:express";
 import pg from "npm:pg";
 import { DqdController } from "./src/controllers/DqdController.ts";
 
