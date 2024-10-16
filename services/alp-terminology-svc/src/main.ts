@@ -15,7 +15,7 @@ const httpsOptions = {
 
 async function runNestApp() {
   await updateDb();
-  const nestApp = await NestFactory.create(AppModule, { httpsOptions });
+  const nestApp = await NestFactory.create(AppModule);
   await nestApp.listen(env.TERMINOLOGY_SVC__PORT || 41108);
   logger.info(
     `Terminology service started on port ${env.TERMINOLOGY_SVC__PORT || 41108}`,
