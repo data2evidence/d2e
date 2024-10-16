@@ -1,5 +1,4 @@
-import express from 'express'
-import { Request, Response } from 'express'
+import express, { Request, Response } from 'express'
 import { CDMSchemaTypes, DbDialect } from '../const'
 import { Service } from 'typedi'
 import { createLogger } from '../Logger'

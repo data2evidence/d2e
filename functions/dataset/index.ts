@@ -1,8 +1,6 @@
 import express from "npm:express";
 import { Request, Response } from "express";
 import { CDMSchemaTypes, DbDialect } from "./const.ts";
-//import { Service } from 'typedi'
-//import { createLogger } from '../Logger'
 import { v4 as uuidv4 } from "npm:uuid";
 import { PortalAPI } from "./api/PortalAPI.ts";
 import { AnalyticsSvcAPI } from "./api/AnalyticsSvcAPI.ts";
