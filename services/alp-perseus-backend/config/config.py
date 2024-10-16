@@ -6,8 +6,8 @@ VERSION = 0.4
 
 try:
     DB_NAME = os.environ['PG__DB_NAME']
-    DB_USER = os.environ['PG_SUPER_USER']
-    DB_PASSWORD = os.environ['PG_SUPER_PASSWORD']
+    DB_USER = os.environ['PG_ADMIN_USER']
+    DB_PASSWORD = os.environ['PG_ADMIN_PASSWORD']
     DB_HOST = os.environ['PG__HOST']
     DB_PORT = os.environ['PG__PORT']
     API_HOST = os.environ['PERSEUS__FILES_MANAGER_HOST']
