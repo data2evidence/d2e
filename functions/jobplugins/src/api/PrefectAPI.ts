@@ -26,6 +26,32 @@ export class PrefectAPI {
     }
   }
 
+  async getFlowRun(flowRunId: string) {
+    const errorMessage = "Error while getting prefect flow run by id";
+    try {
+      const url = `${this.baseURL}/flow_runs/filter`;
+      const data = {
+        flow_runs: {
+          id: {
+            any_: [flowRunId],
+          },
+        },
+      };
+
+      const options = this.createOptions("POST", data);
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(`${errorMessage}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result[0];
+    } catch (error) {
+      console.error(`${errorMessage}: ${error}`);
+      throw new Error(errorMessage);
+    }
+  }
+
   async getFlowRunById(flowId: string) {
     const options = {
       method: "GET",

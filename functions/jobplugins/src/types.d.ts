@@ -67,3 +67,15 @@ export interface IDqdResultDto {
   flowRunId?: string;
   flowRunIds?: string[];
 }
+
+export interface CohortSurvivalFlowRunDto {
+  options: CohortSurvivalFlowRunOptions;
+}
+
+interface CohortSurvivalFlowRunOptions {
+  databaseCode: string;
+  schemaName: string;
+  datasetId: string;
+  targetCohortDefinitionId: number;
+  outcomeCohortDefinitionId: number;
+}
