@@ -12,7 +12,14 @@ import {
   MaxLength,
   IsObject
 } from 'class-validator'
-import type { DbDialect, IDbCredentialDto, IDbCredentialUpdateDto, IDbDto, IDbExtraDto, IDbUpdateDto } from '../../types'
+import type {
+  DbDialect,
+  IDbCredentialDto,
+  IDbCredentialUpdateDto,
+  IDbDto,
+  IDbExtraDto,
+  IDbUpdateDto
+} from '../../types'
 import { SERVICE_SCOPES, DB_DIALECTS, SERVICE_SCOPE, USER_SCOPES } from '../../common/const'
 import { IsExistingDb, IsValidSchema, IsValidSchemaUpdate } from '../../common/validator'
 
@@ -20,11 +27,7 @@ export class DbExtraDto implements IDbExtraDto {
   @IsOptional()
   @IsNotEmpty()
   @IsObject()
-  [SERVICE_SCOPE.INTERNAL]: object;
-  //@IsOptional()
-  //@IsNotEmpty()
-  //@IsObject()
-  //[SERVICE_SCOPE.DATA_PLATFORM]: object
+  [SERVICE_SCOPE.INTERNAL]: object
 }
 
 export class DbDto implements IDbDto {
@@ -69,6 +72,17 @@ export class DbUpdateDto implements IDbUpdateDto {
   @IsUUID()
   @IsExistingDb()
   id: string
+
+  @IsNotEmpty()
+  @IsString()
+  name: string
+
+  @IsNotEmpty()
+  @IsString()
+  host: string
+
+  @IsNumber()
+  port: number
 
   @IsOptional()
   @IsArray()
