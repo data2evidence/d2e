@@ -30,7 +30,7 @@ class PortalServerAPI:
         }
 
         result = requests.get(
-            f"{self.url}/dataset/{dataset_id}",
+            f"{self.url}/dataset",
             headers=self.get_options(),
             verify=self.verifySsl,
             params=params
