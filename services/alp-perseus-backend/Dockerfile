@@ -1,7 +1,5 @@
 FROM perseushub/backend:latest
 
-RUN apt update && apt install -y postgresql-client
-
 WORKDIR /app
 RUN mkdir ./config
 
