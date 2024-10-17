@@ -1200,7 +1200,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://localhost:41108/check-liveness
+        - http://localhost:41108/check-liveness
     hostname: alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-terminology-svc:${DOCKER_TAG_NAME:-develop}
     logging:
