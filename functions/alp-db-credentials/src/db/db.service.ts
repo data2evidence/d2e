@@ -101,7 +101,8 @@ export class DbService {
   }
 
   async update(dbDto: IDbUpdateDto) {
-    const { id, vocabSchemas, extra } = dbDto
+    const { id, name, port, host, vocabSchemas, extra } = dbDto
+
     const existingDb = await this.dbRepo
       .createQueryBuilder('db')
       .leftJoinAndSelect('db.vocabSchemas', 'vocabSchema')
@@ -109,7 +110,18 @@ export class DbService {
       .where('db.id = :id', { id })
       .getOne()
 
-    const { vocabSchemas: existingVocabSchemaEntities, extra: existingExtraEntities } = existingDb
+    const {
+      vocabSchemas: existingVocabSchemaEntities,
+      extra: existingExtraEntities,
+      name: existingName,
+      host: existingHost,
+      port: existingPort
+    } = existingDb
+
+    if (name !== existingName || host !== existingHost || port !== existingPort) {
+      await this.dbRepo.update({ id: id }, { name: name, host: host, port: port })
+    }
+
     if (vocabSchemas) {
       const vocabSchemaEntities = this.mapVocabSchemasToEntity(vocabSchemas, dbDto.id)
       await this.vocabSchemaRepo.upsert(vocabSchemaEntities, ['name', 'dbId'])
