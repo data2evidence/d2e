@@ -15,7 +15,7 @@ export class CohortController {
   private registerRoutes() {
     // POST /cohort/flow-run
     this.router.post(
-      "/cohort/flow-run",
+      "/flow-run",
       validateCohortGeneratorFlowRunDto(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -37,7 +37,7 @@ export class CohortController {
       );
       res.send(result);
     } catch (error) {
-      console.error(`Error creating cohort survival flow run: ${error}`);
+      console.error(`Error creating cohort-generator flow run: ${error}`);
       res.status(500).send(`Error occurs: ${error}`);
     }
   }

@@ -103,3 +103,16 @@ interface CohortJson {
   tags: string[];
   expressionType: object;
 }
+
+export interface DBSvcFlowRunDto {
+  dbSvcOperation: string;
+  requestType: string;
+  requestUrl: string;
+  requestBody?: object; // Optional property
+}
+
+export interface DatasetAttributesFlowRunDto {
+  token: string;
+  versionInfo: object;
+  datasetSchemaMapping: any[];
+}

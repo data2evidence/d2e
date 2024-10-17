@@ -15,7 +15,7 @@ export class CohortSurvivalController {
   private registerRoutes() {
     // POST /cohort-survival/flow-run
     this.router.post(
-      "/cohort-survival/flow-run",
+      "/flow-run",
       validateCohortSurvivalFlowRunOptions(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -28,7 +28,7 @@ export class CohortSurvivalController {
 
     // GET /cohort-survival/results/:flowRunId
     this.router.get(
-      "/cohort-survival/results/:flowRunId",
+      "/results/:flowRunId",
       param("flowRunId").isUUID(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
