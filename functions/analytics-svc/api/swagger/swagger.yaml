@@ -12,16 +12,6 @@ schemes:
 produces:
   - application/json
 paths:
-  /config/:
-    x-swagger-router-controller: config
-    get:
-      description: The assigned config
-      operationId: getMyConfig
-      responses:
-        "200":
-          description: Success
-          schema:
-            type: string
   /values/:
     x-swagger-router-controller: values
     get:
