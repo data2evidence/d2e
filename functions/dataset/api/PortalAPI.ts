@@ -2,7 +2,7 @@
 import axios, { AxiosRequestConfig } from "npm:axios";
 //import { createLogger } from '../Logger'
 import https from "node:https";
-import { env } from "../env.ts";
+import { env, services } from "../env.ts";
 import type { Dataset } from "../types.d.ts";
 
 interface CreateDatasetInput {
@@ -51,8 +51,8 @@ export class PortalAPI {
     if (!token) {
       throw new Error("No token passed for Portal API!");
     }
-    if (env.SERVICE_ROUTES.portalServer) {
-      this.baseURL = env.SERVICE_ROUTES.portalServer;
+    if (services.portalServer) {
+      this.baseURL = services.portalServer;
       this.httpsAgent = new https.Agent({
         rejectUnauthorized: true,
         // ca: env.GATEWAY_CA_CERT
