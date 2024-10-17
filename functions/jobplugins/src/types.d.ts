@@ -172,13 +172,34 @@ export enum FlowRunState {
 //   filter: "dqd" | "all";
 // }
 
-// export interface IFlowRunQueryDto {
-//   startDate?: Date;
-//   endDate?: Date;
-//   states?: FlowRunState[];
-//   tags?: string[];
-//   flowIds?: string[];
-//   deploymentIds?: string[];
-//   deploymentNames?: string[];
-//   workPools?: string[];
-// }
+export interface IFlowRunQueryDto {
+  startDate?: Date;
+  endDate?: Date;
+  states?: FlowRunState[];
+  tags?: string[];
+  flowIds?: string[];
+  deploymentIds?: string[];
+  deploymentNames?: string[];
+  workPools?: string[];
+}
+
+export interface DataCharacterizationOptions {
+  comment: string;
+  datasetId: string;
+  releaseId: string;
+  schemaName: string;
+  releaseDate: string;
+  databaseCode: string;
+  resultsSchema: string;
+  vocabSchemaName: string;
+  cdmVersionNumber: string;
+}
+
+export interface DataCharacterizationFlowRunDto {
+  datasetId: string;
+  deploymentName: string;
+  flowName: string;
+  comment?: string;
+  releaseId?: string;
+  excludeAnalysisIds?: string;
+}

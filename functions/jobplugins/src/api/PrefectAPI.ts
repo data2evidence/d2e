@@ -1,6 +1,6 @@
 import dayjs from "npm:dayjs";
 import { services } from "../env.ts";
-import { IPrefectFlowRunDto } from "../types.d.ts";
+import { IFlowRunQueryDto, IPrefectFlowRunDto } from "../types.d.ts";
 
 interface FlowRunParams {
   name: string;
@@ -213,6 +213,104 @@ export class PrefectAPI {
 
     const result = await response.json();
     return result.id;
+  }
+
+  async getFlowRunsByDeploymentNames(
+    deploymentNames: string[],
+    extraFilter?: IFlowRunQueryDto
+  ) {
+    const errorMessage =
+      "Error while getting prefect flow runs by deployment names";
+    try {
+      const method = "POST";
+      const url = `${this.baseURL}/flow_runs/filter`;
+
+      const data: Record<string, string | object> = {
+        sort: "START_TIME_DESC",
+        ...this.getFilters({ ...extraFilter, deploymentNames }),
+      };
+
+      const options = this.createOptions(method, data);
+
+      const response = await fetch(url, options);
+
+      if (!response.ok) {
+        throw new Error(`${errorMessage}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      console.error(`${errorMessage}: ${error}`);
+      throw error;
+    }
+  }
+
+  private getFilters(filter?: IFlowRunQueryDto) {
+    if (filter == null) {
+      return {};
+    }
+
+    const flowRuns: Record<string, string | object> = {};
+
+    if (filter.startDate || filter.endDate) {
+      flowRuns["expected_start_time"] = {
+        after_: filter.startDate,
+        before_: filter.endDate,
+      };
+    }
+
+    if (filter.states) {
+      flowRuns["state"] = {
+        name: {
+          any_: filter.states,
+        },
+      };
+    }
+
+    if (filter.tags) {
+      flowRuns["tags"] = {
+        all_: filter.tags,
+      };
+    }
+
+    const flows: Record<string, string | object> = {};
+
+    if (filter.flowIds) {
+      flows["id"] = {
+        any_: filter.flowIds,
+      };
+    }
+
+    const deployments: Record<string, string | object> = {};
+
+    if (filter.deploymentIds) {
+      deployments["id"] = {
+        any_: filter.deploymentIds,
+      };
+    }
+
+    if (filter.deploymentNames) {
+      deployments["name"] = {
+        any_: filter.deploymentNames,
+      };
+    }
+
+    const workPools: Record<string, string | object> = {};
+
+    if (filter.workPools) {
+      workPools["name"] = {
+        any_: filter.workPools,
+      };
+    }
+
+    return {
+      flows,
+      flow_runs: flowRuns,
+      deployments,
+      work_pools: workPools,
+    };
   }
 
   private createOptions(method: string, data?: object): RequestInit {
