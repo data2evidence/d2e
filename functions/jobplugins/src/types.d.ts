@@ -79,3 +79,27 @@ interface CohortSurvivalFlowRunOptions {
   targetCohortDefinitionId: number;
   outcomeCohortDefinitionId: number;
 }
+
+export interface CohortGeneratorFlowRunDto {
+  options: CohortGeneratorFlowRunOptions;
+}
+
+interface CohortGeneratorFlowRunOptions {
+  databaseCode: string;
+  schemaName: string;
+  stringvocabSchemaName: string;
+  cohortJson: CohortJson;
+  datasetId: string;
+  description: string;
+  owner: string;
+  token: string;
+}
+interface CohortJson {
+  id: number;
+  name: string;
+  createdDate: number;
+  modifiedDate: number;
+  hasWriteAccess: boolean;
+  tags: string[];
+  expressionType: object;
+}
