@@ -1,4 +1,4 @@
-import { Container ,  Service } from 'typedi'
+import { Container, Service } from 'typedi'
 import axios, { AxiosRequestConfig } from 'axios'
 import { createLogger } from '../Logger'
 import { CONTAINER_KEY } from '../const'
@@ -54,12 +54,12 @@ export class PortalAPI {
   async getDataset(id: string) {
     try {
       const options = await this.getRequestConfig()
-      const result = await axios.get(`${this.baseURL}/dataset/${id}`, options)
+      options.params = { datasetId: id }
+      const result = await axios.get(`${this.baseURL}/dataset`, options)
       return result.data
     } catch (error) {
       this.logger.error(`Error when get study ${id}: ${JSON.stringify(error?.response?.data || error?.code)}`)
       throw new Error(`Error when get study ${id}`)
-    
     }
   }
 
