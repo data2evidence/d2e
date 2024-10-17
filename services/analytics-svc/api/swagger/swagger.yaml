@@ -1169,7 +1169,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-  /alpdb/{databaseType}/database/{tenant}/cdmversion/schema/{schemaName}:
+  /alpdb/cdmversion:
     x-swagger-router-controller: dbsvc
     get:
       description: Get CDM Version
@@ -1177,19 +1177,9 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: databaseType
-          in: path
-          description: Dialect of database (Hana or Postgres)
-          required: true
-          type: string
-        - name: tenant
-          in: path
-          description: Tenant database name
-          required: true
-          type: string
-        - name: schemaName
-          in: path
-          description: Name of schema to retrieve CDM version from 
+        - name: datasetId
+          in: query
+          description: ID of dataset
           required: true
           type: string
       responses:
@@ -1233,7 +1223,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-  /alpdb/{databaseType}/database/{tenant}/metadata/schemasnapshot/schema/{schemaName}:
+  /alpdb/metadata/schemasnapshot:
     x-swagger-router-controller: dbsvc
     get:
       description: Get schema metadata for snapshot
@@ -1241,20 +1231,10 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: databaseType
-          in: path
-          description: Dialect of database (Hana only)
+        - name: datasetId
+          in: query
+          description: ID of dataset
           required: true
-          type: string
-        - name: tenant
-          in: path
-          description: Tenant database name
-          required: true
-          type: string
-        - name: schemaName
-          required: true
-          description: Name of schema to retrieve schema metadata from
-          in: path
           type: string
       responses:
         "200":

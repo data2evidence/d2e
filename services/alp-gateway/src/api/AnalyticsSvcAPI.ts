@@ -63,14 +63,16 @@ export class AnalyticsSvcAPI {
     }
   }
 
-  async getCdmSchemaSnapshotMetadata(databaseDialect: string, databaseCode: string, schemaName: string) {
-    this.logger.info(`Getting CDM schema snapshot metadata for ${schemaName} in ${databaseCode}`)
+  async getCdmSchemaSnapshotMetadata(datasetId: string) {
+    this.logger.info(`Getting CDM schema snapshot metadata for ${datasetId}`)
     const options = await this.getRequestConfig()
-    const url = `${this.baseURL}api/services/alpdb/${databaseDialect}/database/${databaseCode}/metadata/schemasnapshot/schema/${schemaName}`
-    const result = await get(url, options)
+    const params = new URLSearchParams()
+    params.append('datasetId', datasetId)
+    const url = `${this.baseURL}api/services/alpdb/metadata/schemasnapshot`
+    const result = await get(url, { ...options, params })
     if (result.data) {
       return result.data
     }
-    throw new Error(`Failed to get CDM schema snapshot metadata for ${schemaName} in ${databaseCode}`)
+    throw new Error(`Failed to get CDM schema snapshot metadata for ${datasetId}`)
   }
 }
