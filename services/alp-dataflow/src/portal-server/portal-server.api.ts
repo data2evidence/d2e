@@ -50,7 +50,8 @@ export class PortalServerAPI {
     const errorMessage = 'Error while getting dataset by datasetId'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}/dataset/${datasetId}`
+      const url = `${this.url}/dataset`
+      options.params = { datasetId: datasetId }
       const obs = this.httpService.get(url, options)
       return firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
