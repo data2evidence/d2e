@@ -18,7 +18,7 @@ export class DqdController {
   private registerRoutes() {
     // GET /data-quality/flow-run/:flowRunId/results
     this.router.get(
-      "/data-quality/flow-run/:flowRunId/results",
+      "/flow-run/:flowRunId/results",
       param("flowRunId").isUUID(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -31,7 +31,7 @@ export class DqdController {
 
     // GET /data-quality/flow-run/:flowRunId/overview
     this.router.get(
-      "/data-quality/flow-run/:flowRunId/overview",
+      "/flow-run/:flowRunId/overview",
       param("flowRunId").isUUID(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -44,7 +44,7 @@ export class DqdController {
 
     // GET /data-quality/flow-run/latest?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/flow-run/latest",
+      "/flow-run/latest",
       validateDataQualityDatasetId(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -57,7 +57,7 @@ export class DqdController {
 
     // GET /data-quality/cohort/:cohortDefinitionId/flow-run/latest?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/cohort/:cohortDefinitionId/flow-run/latest",
+      "/cohort/:cohortDefinitionId/flow-run/latest",
       [param("cohortDefinitionId").isString(), validateDataQualityDatasetId()],
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -70,7 +70,7 @@ export class DqdController {
 
     // GET /data-quality/release/:releaseId/flow-run?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/release/:releaseId/flow-run",
+      "/release/:releaseId/flow-run",
       [param("releaseId").isInt(), validateDataQualityDatasetId()],
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -83,7 +83,7 @@ export class DqdController {
 
     // POST /data-quality/flow-run
     this.router.post(
-      "/data-quality/flow-run",
+      "/flow-run",
       validateDataQualityFlowRunDto(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -96,7 +96,7 @@ export class DqdController {
     );
     // GET /data-quality/dataset/:datasetId/category/history?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/category/history",
+      "/category/history",
       validateDataQualityDatasetId(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -109,7 +109,7 @@ export class DqdController {
 
     // GET /data-quality/domain/history?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/domain/history",
+      "/domain/history",
       validateDataQualityDatasetId(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -122,7 +122,7 @@ export class DqdController {
 
     // GET /data-quality/history?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/history",
+      "/history",
       validateDataQualityDatasetId(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -135,7 +135,7 @@ export class DqdController {
 
     // GET /data-quality/domain/continuity?datasetId=${datasetId}
     this.router.get(
-      "/data-quality/domain/continuity",
+      "/domain/continuity",
       validateDataQualityDatasetId(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);

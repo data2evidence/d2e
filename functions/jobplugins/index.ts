@@ -10,7 +10,7 @@ const app = express();
 const env = Deno.env.toObject();
 
 app.use(express.json());
-app.use("/jobplugins/dqd", new DqdController().router);
+app.use("/jobplugins/dqd/data-quality", new DqdController().router);
 app.use("/jobplugins/cohort", new CohortController().router);
 app.use("/jobplugins/cohort-survival", new CohortSurvivalController().router);
 app.use("/jobplugins/db-svc", new DbSvcController().router);
