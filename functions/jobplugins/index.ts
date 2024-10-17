@@ -4,6 +4,7 @@ import { CohortController } from "./src/controllers/CohortController.ts";
 import { CohortSurvivalController } from "./src/controllers/CohortSurvivalController.ts";
 import { DbSvcController } from "./src/controllers/DbSvcController.ts";
 import { DqdController } from "./src/controllers/DqdController.ts";
+import { MeilisearchController } from "./src/controllers/MeilisearchController.ts";
 
 const app = express();
 const env = Deno.env.toObject();
@@ -13,6 +14,7 @@ app.use("/jobplugins/dqd", new DqdController().router);
 app.use("/jobplugins/cohort", new CohortController().router);
 app.use("/jobplugins/cohort-survival", new CohortSurvivalController().router);
 app.use("/jobplugins/db-svc", new DbSvcController().router);
+app.use("/jobplugins/meilisearch", new MeilisearchController().router);
 
 const opt = {
   user: env.PG_USER,

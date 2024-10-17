@@ -116,3 +116,69 @@ export interface DatasetAttributesFlowRunDto {
   versionInfo: object;
   datasetSchemaMapping: any[];
 }
+
+export interface MeilisearchAddIndexFlowRunDto {
+  databaseCode: string;
+  vocabSchemaName: string;
+  tableName: string;
+}
+
+export enum FlowRunState {
+  SCHEDULED = "Scheduled",
+  LATE = "Late",
+  RESUMING = "Resuming",
+  AWAITING_RETRY = "AwaitingRetry",
+  PENDING = "Pending",
+  PAUSED = "Paused",
+  RUNNING = "Running",
+  RETRYING = "Retrying",
+  COMPLETED = "Completed",
+  CANCELLED = "Cancelled",
+  CANCELLING = "Cancelling",
+  CRASHED = "Crashed",
+  FAILED = "Failed",
+  TIMED_OUT = "TimedOut",
+}
+
+// export interface JobHistoryQueryDto {
+//   filter: "dqd" | "all";
+//   startDate?: Date;
+//   endDate?: Date;
+//   states?: FlowRunState[];
+//   tags?: string[];
+//   flowIds?: string[];
+//   deploymentIds?: string[];
+//   deploymentNames?: string[];
+//   workPools?: string[];
+// }
+
+// export interface IHistoryJob {
+//   flowRunId: string;
+//   flowRunName: string;
+//   schemaName: string;
+//   dataCharacterizationSchema: string;
+//   cohortDefinitionId: string;
+//   type: string;
+//   createdAt: string;
+//   completedAt: string;
+//   status: string;
+//   error: string | null;
+//   datasetId: string | null;
+//   comment: string | null;
+//   databaseCode: string;
+// }
+
+// export interface IJobHistoryQueryDto extends IFlowRunQueryDto {
+//   filter: "dqd" | "all";
+// }
+
+// export interface IFlowRunQueryDto {
+//   startDate?: Date;
+//   endDate?: Date;
+//   states?: FlowRunState[];
+//   tags?: string[];
+//   flowIds?: string[];
+//   deploymentIds?: string[];
+//   deploymentNames?: string[];
+//   workPools?: string[];
+// }
