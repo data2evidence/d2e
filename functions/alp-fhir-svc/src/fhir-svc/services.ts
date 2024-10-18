@@ -5,6 +5,7 @@ import { PortalAPI } from '../api/PortalAPI'
 import { Dataset } from '../utils/types'
 import { Bundle } from '@medplum/fhirtypes'
 import { createResourceInFhir } from '../utils/fhirDataModelUtil'
+const logger1 = console
 
 const logger = createLogger()
 
@@ -74,9 +75,14 @@ export const createProject = async (name: string, description: string) => {
 
 export const createResourceInProject = async (token: string, fhirResouce: string, resourceDetails: any, projectName: string) => {
     try{
+        logger1.info('createResourceInProject')
         let fhirApi = new FhirAPI()
         let datasetId = ''
         await fhirApi.clientCredentialslogin()
+        let getSubscription = await fhirApi.getResource('Subscription', `criteria=${fhirResouce}&`)
+        //Update Subscription resource with Authorization header
+        getSubscription.channel.header = [`Authorization: ${token}`]
+        await fhirApi.updateResource(getSubscription)
         const searchResult = await fhirApi.getResource('ClientApplication', `name=${projectName}`) 
         if (searchResult) {
             const clientId = searchResult.id
@@ -94,7 +100,7 @@ export const createResourceInProject = async (token: string, fhirResouce: string
             //Set datasetId in the metadata of the resource
             const metaInfo = {
                 author: {
-                reference: 'ClientApplication/' + clientId
+                    reference: 'ClientApplication/' + clientId
                 },
                 id: datasetId
             }
@@ -111,14 +117,55 @@ export const createResourceInProject = async (token: string, fhirResouce: string
     }
 }
 
-export const createResourceInCacheDB = async(fhirResouce: string) => {
+export const createResource = async (fhirResouce: string, resourceDetails: any) => {
+    try{
+        let fhirApi = new FhirAPI()
+        // let datasetId = ''
+        await fhirApi.clientCredentialslogin()
+        await fhirApi.post(fhirResouce, resourceDetails)
+        // const searchResult = await fhirApi.getResource('ClientApplication', `name=${projectName}`) 
+        // if (searchResult) {
+        //     const clientId = searchResult.id
+        //     const clientSecret = searchResult.secret
+        //     //Get datasets
+        //     const portalAPI = new PortalAPI(token)
+        //     const datasets: Dataset[] = await portalAPI.getDatasets()
+        //     const resourceDataset = datasets.filter(dataset => {
+        //         if (dataset.studyDetail.name == projectName) return dataset
+        //     })
+        //     //Get dataset Id of incoming resource
+        //     if (resourceDataset.length > 0) {
+        //         datasetId = resourceDataset[0].id
+        //     }
+        //     //Set datasetId in the metadata of the resource
+        //     const metaInfo = {
+        //         author: {
+        //             reference: 'ClientApplication/' + clientId
+        //         },
+        //         id: datasetId
+        //     }
+        //     resourceDetails.meta = metaInfo
+        //     await fhirApi.clientCredentialslogin(clientId, clientSecret)
+        //     await fhirApi.post(fhirResouce, resourceDetails)
+        //     return true
+        // } else {
+        //     throw 'Dataset not found!'
+        // }
+    }catch(error){
+        logger.error(JSON.stringify(error))
+        return false
+    }
+}
+
+export const createResourceInCacheDB = async (fhirResouce: string) => {
+    console.info(`Received request to create resources in CacheDb`)
     let bundle: Bundle = fhirResouce
     if (bundle.entry === undefined){
       console.log('No entries in the bundle')
       return;
     }
     for (const entry of bundle.entry) {
-      console.log('Create resource for each of the entry in the bundle')
+      console.info('Create resource for each of the entry in the bundle')
       await createResourceInFhir(entry.resource)
     }
     return true

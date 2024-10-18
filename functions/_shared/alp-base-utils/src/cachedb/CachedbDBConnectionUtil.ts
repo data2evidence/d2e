@@ -1,4 +1,5 @@
-import * as pg from "pg";
+import pg from 'pg'
+const { Pool } = pg
 // Setting MAX_PACKET_SIZE in node-hdb prevents failure of large sql statements https://github.com/SAP/node-hdb/issues/19
 /* tslint:disable no-var-requires */
 //require("hdb/lib/protocol/common/Constants").MAX_PACKET_SIZE = Math.pow(2, 30);
@@ -13,7 +14,7 @@ import { CachedbNodeHDBConnection } from "./CachedbNodeHDBConnection";
 const logger = CreateLogger("CachedbDBConnectionUtil");
 
 export class CachedbDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil {
-  static pool: pg.Pool;
+  static pool: Pool;
 
   public static getDBConnection({
     credentials,
@@ -28,6 +29,7 @@ export class CachedbDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil {
   }) {
     return new Promise<ConnectionInterface>(async (resolve, reject) => {
       try {
+        console.info(credentials)
         const client = await this.getDbClient(credentials);
         const connection = await this.getConnection(
           credentials.dialect,
@@ -50,7 +52,7 @@ export class CachedbDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil {
    */
   public static async getDbClient(credentials: IDBCredentialsType, cb?) {
     return new Promise((resolve, reject) => {
-      CachedbDBConnectionUtil.pool = new pg.Pool(credentials);
+      CachedbDBConnectionUtil.pool = new Pool(credentials);
       CachedbDBConnectionUtil.pool.on("connect", client => {
         if (credentials.dialect === "postgresql") {
           const sql = `SET search_path TO ${credentials.schema};`;

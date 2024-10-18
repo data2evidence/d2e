@@ -19,8 +19,8 @@ const Env = z.object({
   FHIR_SCHEMA_FILE_NAME: z.string(),
   DUCKDB_PATH: z.string(),
   TLS__INTERNAL__CA_CRT: z.string().optional(),
-  IDP__ALP_SVC__CLIENT_ID: z.string(),
-  IDP__ALP_SVC__CLIENT_SECRET: z.string(),
+  IDP__ALP_DATA_CLIENT_ID: z.string(),
+  IDP__ALP_DATA__CLIENT_SECRET: z.string(),
   ALP_GATEWAY_OAUTH__URL: z.string(),
   CACHEDB__HOST: z.string(),
   CACHEDB__PORT: z.string()

@@ -1,4 +1,4 @@
-import { createProject, createResourceInCacheDB, createResourceInProject } from './services';
+import { createProject, createResource, createResourceInCacheDB, createResourceInProject } from './services';
 import express from 'npm:express'
 export class FhirRouter {
   public router = express.Router();
@@ -36,8 +36,23 @@ export class FhirRouter {
         }
     })
 
-    this.router.post('/fhirDataModel/:resource', async(req, res) =>{
+    this.router.post('/abc/notProject/:resource', async(req, res) => {
+      try {
+        const { resource } = req.params
+        const response = await createResource(resource, req.body)
+        if(response)
+          return res.status(200).json('FHIR Resource successfully created!')
+        else
+        return res.status(500).json('Failed to create FHIR Resource')
+      } catch (error) {
+        this.logger.error(`Error creating resource on fhir server: ${JSON.stringify(error)}`)
+        res.status(500).send('Error creating resource on fhir server')
+      }
+    })
+
+    this.router.post('/add/fhirDataModel/:resource', async(req, res) =>{
       try{
+        console.info('Insert into FHIR Data model')
         const response = await createResourceInCacheDB(req.body)
         if(response)
           return res.status(200).json('FHIR Resource successfully created!')

@@ -43,4 +43,8 @@ export class FhirAPI {
     async getResource(searchResource, query: string){
         return await this.medplumClient.searchOne(searchResource, query=query)
     }
+
+    async updateResource(options){
+        return await this.medplumClient.updateResource(options)
+    }
 }

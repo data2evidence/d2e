@@ -17,11 +17,14 @@ const Env = z.object({
   }),
   FHIR_SCHEMA_PATH: z.string(),
   FHIR_SCHEMA_FILE_NAME: z.string(),
-  DUCKDB_PATH: z.string()
+  DUCKDB_PATH: z.string(),
+  PLUGIN_PATH: z.string(),
+  TLS__INTERNAL__CA_CRT: z.string().optional(),
 })
 
 const _env = Deno.env.toObject()
 const result = Env.safeParse(_env)
+_env.GATEWAY_CA_CERT = _env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
 
 let env = _env as unknown as z.infer<typeof Env>
 if (result.success) {

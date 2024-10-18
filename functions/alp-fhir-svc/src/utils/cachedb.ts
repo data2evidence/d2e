@@ -2,52 +2,54 @@ import {
     Connection,
     CachedbDBConnectionUtil,
     getCachedbDatabaseFormatProtocolA,
+    getCachedbDatabaseFormatProtocolB
 } from "@alp/alp-base-utils";
 import axios, { AxiosRequestConfig } from "axios";
 import https from "https";
 import { env } from "../env";
-
+import pg from 'pg'
+import { password } from "pg/lib/defaults";
+const { Pool } = pg
 export const getCachedbDbConnections = async (studyId): Promise<Connection.ConnectionInterface> => {
-    let cachedbDatabase = getCachedbDatabaseFormatProtocolA(
-        'duckdb',
-        studyId
-    );
-    interface IDBCredentialsType {
-        schema?: string;
-        dialect: string;
-        host: string;
-        port: number;
-        user: string;
-        password: string;
-        database: string;
-        vocabSchema: string;
-      }
+    try{
+        let dialect = 'duckdb'
+        let cachedbDatabase = getCachedbDatabaseFormatProtocolB(
+            dialect,
+            'alpdev_pg',
+            'cdmdefault',
+            'cdmdefault'
+          );
+        
+        const accessToken = await getClientCredentialsToken()
+        let credentials = {
+            dialect,
+            host: env.CACHEDB__HOST? env.CACHEDB__HOST: "",
+            port: Number(env.CACHEDB__PORT),
+            database: cachedbDatabase,
+            user: accessToken,
+            schema: 'cdmdefault',
+            vocabSchema: 'cdmvocab',
+            password: 'dummy'
+        }
 
-    const accessToken = await getClientCredentialsToken()
-    let credentials: IDBCredentialsType = {
-        host: env.CACHEDB__HOST? env.CACHEDB__HOST: "",
-        port: Number(env.CACHEDB__PORT),
-        database: cachedbDatabase,
-        user: accessToken,
-        dialect: 'duckdb',
-        password: '',
-        vocabSchema: ''
+        const duckdbConnection =
+            await CachedbDBConnectionUtil.CachedbDBConnectionUtil.getDBConnection({
+                credentials: credentials,
+                schemaName: 'cdmdefault',
+                vocabSchemaName: 'cdmvocab'
+            });    
+        return duckdbConnection;
+    }catch(e){
+        console.error(e)
+        throw e
     }
-    const duckdbConnection =
-        await CachedbDBConnectionUtil.CachedbDBConnectionUtil.getDBConnection({
-            credentials: credentials,
-            schemaName: credentials.schema,
-            vocabSchemaName: credentials.vocabSchema
-        });
-
-    return duckdbConnection;
 };
 
 const getClientCredentialsToken = async () => {
     const params = {
         grant_type: "client_credentials",
-        client_id: env.IDP__ALP_SVC__CLIENT_ID,
-        client_secret: env.IDP__ALP_SVC__CLIENT_SECRET,
+        client_id: env.IDP__ALP_DATA_CLIENT_ID,
+        client_secret: env.IDP__ALP_DATA__CLIENT_SECRET,
     };
 
     const options: AxiosRequestConfig = {
@@ -67,6 +69,6 @@ const getClientCredentialsToken = async () => {
         .join("&");
 
     const result = await axios.post(env.ALP_GATEWAY_OAUTH__URL, data, options);
-
+    
     return result.data.access_token;
 }
