@@ -161,6 +161,11 @@
           "function": "/alp-fhir-svc",
           "env": "alp-fhir-svc",
           "imports": "/alp-fhir-svc/import.json"
+        },
+        {
+          "source": "/concept-mapping",
+          "function": "/concept-mapping",
+          "env": "concept-mapping"
         }
       ],
       "roles": {
@@ -312,7 +317,8 @@
           "prefect.read",
           "prefect.delete",
           "prefect.post",
-          "prefect.update"
+          "prefect.update",
+          "conceptMapping"
         ],
         "ALP_DASHBOARD_VIEWER": [
           "gateway.dashboardGate.content"
@@ -388,6 +394,12 @@
         ]
       },
       "scopes": [
+        {
+          "path": "^/concept-mapping",
+          "scopes": [
+            "conceptMapping"
+          ]
+        },
         {
           "path": "^/jobplugins/test(.*)",
           "scopes": [

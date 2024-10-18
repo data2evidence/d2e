@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "express": "npm:express@^4.19.2",
+    "pg": "npm:pg@^8.4.2"
+  }
+}
