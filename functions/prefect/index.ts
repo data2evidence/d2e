@@ -1,4 +1,4 @@
-import express from "npm:express@4.18.2";
+import express from "npm:express";
 
 const app = express();
 const env = Deno.env.toObject();
