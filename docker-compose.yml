@@ -513,7 +513,8 @@ services:
           "dataset": {
             "GATEWAY_WO_PROTOCOL_FQDN": "${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}"
           },
-          "alpdb": {}
+          "alpdb": {},
+          "concept-mapping": {}
         }
       SERVICE_ROUTES: |-
           {
