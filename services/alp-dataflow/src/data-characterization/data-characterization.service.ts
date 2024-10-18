@@ -76,7 +76,7 @@ export class DataCharacterizationService {
 
     const releaseDate = (await this.getReleaseDate(releaseId)).split('T')[0]
 
-    const cdmVersionNumber = await this.analyticsSvcApi.getCdmVersion(dialect, databaseCode, schemaName)
+    const cdmVersionNumber = await this.analyticsSvcApi.getCdmVersion(datasetId)
 
     const name = `${databaseCode}.${schemaName}`
     const parameters = {

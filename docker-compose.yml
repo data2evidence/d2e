@@ -1128,7 +1128,11 @@ services:
             "+public": {},
             "+qe_config": {},
             "+terminology": {},
-            "+usermgmt": {}
+            "+usermgmt": {},
+            "+files_manager": {},
+            "+perseus": {},
+            "+source": {},
+            "+white_rabbit": {}
            }
           }
          }
@@ -1754,21 +1758,17 @@ services:
     depends_on:
       alp-minerva-postgres:
         condition: service_healthy
+      alp-minerva-pg-mgmt-init:
+        condition: service_completed_successfully
     environment:
       <<:
         - *x-pg
       SPRING_PROFILES_ACTIVE: docker
-      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
-      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+      PG_ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
+      PG_ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
     networks:
       alp:
         priority: 20
-    command:
-      - PG_SUPER_USER=${PG_SUPER_USER:-postgres}
-      - PG_SUPER_PASSWORD=${PG_SUPER_PASSWORD}
-      - PG__HOST=${PG_HOST:-alp-minerva-postgres-1}
-      - PG__PORT=${PG_PORT:-5432}
-      - PG__DB_NAME=alp
     profiles: [perseus]
 
   alp-perseus-backend:
@@ -1779,11 +1779,13 @@ services:
         - *x-pg
         - *x-perseus
       PERSEUS_ENV: Docker
-      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
-      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+      PG_ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
+      PG_ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
     depends_on:
       alp-minerva-postgres:
         condition: service_healthy
+      alp-minerva-pg-mgmt-init:
+        condition: service_completed_successfully
       alp-perseus-files-manager:
         condition: service_started
     networks:
@@ -1800,11 +1802,13 @@ services:
         - *x-pg
         - *x-perseus
       SPRING_PROFILES_ACTIVE: docker
-      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
-      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
+      PG_ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
+      PG_ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
     depends_on:
       alp-minerva-postgres:
         condition: service_healthy
+      alp-minerva-pg-mgmt-init:
+        condition: service_completed_successfully
       alp-perseus-files-manager:
         condition: service_started
     networks:
@@ -1812,4 +1816,3 @@ services:
         priority: 20
     entrypoint: ["sh", "-c", "./init.sh"]
     profiles: [perseus]
-    

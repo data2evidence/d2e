@@ -158,6 +158,18 @@ const initRoutes = async (app: express.Application) => {
                     log.debug(`No user found in request:${err.stack}`);
                 }
 
+                // Skip getting db connections if request starts with "/analytics-svc/api/services/alpdb/", as these requests are all in dbsvc.ts and uses a separate implementation for database connection
+                if (
+                    req.originalUrl.startsWith(
+                        "/analytics-svc/api/services/alpdb/"
+                    )
+                ) {
+                    log.info(
+                        "Skipping middleware to get req.dbConnections for /alpdb/* requests"
+                    );
+                    return next();
+                }
+
                 let credentials = null;
                 if (envVarUtils.isTestEnv()) {
                     credentials =
@@ -188,6 +200,12 @@ const initRoutes = async (app: express.Application) => {
     });
 
     app.use((req: IMRIRequest, res, next) => {
+        // Skip getting cleanupMiddleware if request starts with "/analytics-svc/api/services/alpdb/", as these requests are all in dbsvc.ts and has a separate implementation for database connection cleanups
+        if (req.originalUrl.startsWith("/analytics-svc/api/services/alpdb/")) {
+            log.info("Skipping cleanupMiddleware for /alpdb/* requests");
+            return next();
+        }
+
         if (!utils.isHealthProbesReq(req)) {
             dbConnectionUtil.DBConnectionUtil.cleanupMiddleware()(
                 req as any,
@@ -282,13 +300,31 @@ const initRoutes = async (app: express.Application) => {
                             MRIEndpointErrorHandler({
                                 err: {
                                     name: "mri-pa",
-                                    message: `Error is getting the list of configs!`,
+                                    message: `Error in getting the list of configs!`,
                                 },
                                 language,
                             })
                         );
                     } else {
-                        res.status(200).json(configResults);
+                        // Handle error from mriConfigConnection.getMriConfig
+                        if (configResults.statusCode) {
+                            const statusCode = configResults.statusCode;
+                            const message = configResults.message;
+                            if (statusCode >= 400 && statusCode < 600) {
+                                log.error(message);
+                                res.status(statusCode).send(
+                                    MRIEndpointErrorHandler({
+                                        err: {
+                                            name: "mri-pa",
+                                            message: message,
+                                        },
+                                        language,
+                                    })
+                                );
+                            }
+                        } else {
+                            res.status(200).json(configResults);
+                        }
                     }
                     break;
                 case "getFrontendConfig":
@@ -311,12 +347,30 @@ const initRoutes = async (app: express.Application) => {
                             MRIEndpointErrorHandler({
                                 err: {
                                     name: "mri-pa",
-                                    message: `Error is clearing default config!`,
+                                    message: `Error in clearing default config!`,
                                 },
                                 language,
                             })
                         );
                     } else {
+                        // Handle error from mriConfigConnection.getMriConfig
+                        if (configResults.statusCode) {
+                            const statusCode = configResults.statusCode;
+                            const message = configResults.message;
+                            if (statusCode >= 400 && statusCode < 600) {
+                                log.error(message);
+                                res.status(statusCode).send(
+                                    MRIEndpointErrorHandler({
+                                        err: {
+                                            name: "mri-pa",
+                                            message: message,
+                                        },
+                                        language,
+                                    })
+                                );
+                            }
+                        }
+
                         res.status(200).json(configResults);
                     }
                     break;
