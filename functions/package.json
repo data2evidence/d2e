@@ -165,7 +165,8 @@
         {
           "source": "/concept-mapping",
           "function": "/concept-mapping",
-          "env": "concept-mapping"
+          "env": "concept-mapping",
+          "imports": "/concept-mapping/import.json"
         }
       ],
       "roles": {

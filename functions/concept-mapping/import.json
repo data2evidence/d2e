@@ -1,6 +1,11 @@
 {
   "imports": {
     "express": "npm:express@^4.19.2",
-    "pg": "npm:pg@^8.4.2"
+    "zod": "npm:zod@^3.23.8",
+    "pg": "npm:pg@^8.4.2",
+    "./src/env": "./src/env.ts",
+    "./src/concept-mapping/routes": "./src/concept-mapping/routes.ts",
+    "./src/concept-mapping/services": "./src/concept-mapping/services.ts",
+    "../_shared/alp-base-utils/src/utils": "../_shared/alp-base-utils/src/utils.ts"
   }
 }

@@ -1,23 +1,21 @@
-import express, { Request, Response } from "npm:express";
+import express, { Application } from "express";
+import { ConceptMappingRouter } from "./src/concept-mapping/routes";
 
-const app = express();
-
-export class ConceptMappingRouter {
-  public router = express.Router();
+export class App {
+  private app: Application;
   private readonly logger = console;
 
   constructor() {
-    this.registerRoutes();
+    this.app = express();
   }
 
-  private registerRoutes() {
-    this.router.get("/", async (req: Request, res: Response) => {
-      this.logger.log("concept mapping route triggered");
-      res.status(200).send("success");
-    });
+  async start() {
+    this.app.use(express.json());
+    this.app.use("/concept-mapping", new ConceptMappingRouter().router);
+    this.app.listen(8000);
+    this.logger.info(`🚀 ALP FHIR Service started successfully!`);
   }
 }
 
-app.use(express.json());
-app.use("/concept-mapping", new ConceptMappingRouter().router);
-app.listen(8000);
+let app = new App();
+app.start();
