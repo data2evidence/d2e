@@ -1,4 +1,0 @@
-prefect==2.19.9
-prefect-docker==0.5.3
-urllib3==2.2.2
-docker==7.1.0
