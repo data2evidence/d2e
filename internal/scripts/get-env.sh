@@ -7,14 +7,13 @@ echo ${0} ...
 # inputs
 [ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1
 ENV_NAME=${ENV_NAME:-local}
-ENV_PREFIX=${ENV_PREFIX:-env}
 OVERWRITE=${OVERWRITE:-false}
 
 # echo ENV_NAME=$ENV_NAME
 
 # vars
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
-DOTENV_NAME=.$ENV_PREFIX.$ENV_NAME.yml
+DOTENV_NAME=.env.$ENV_NAME.yml
 DOTENV_PATH=$GIT_BASE_DIR/$DOTENV_NAME
 CACHE_PATH=$GIT_BASE_DIR/cache/op
 CACHE_DOTENV_PATH=$CACHE_PATH/$DOTENV_NAME

@@ -7,14 +7,14 @@ set -o errexit
 [ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1
 ENV_NAME=${ENV_NAME:-local}
 OVERWRITE=${OVERWRITE:-false}
-ENV_PREFIX=${ENV_PREFIX:-env}
+
 
 # echo ENV_NAME=$ENV_NAME
 
 # vars
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 CACHE_DIR=$GIT_BASE_DIR/cache/op
-DOTENV_NAME=.$ENV_PREFIX.$ENV_NAME.yml
+DOTENV_NAME=.env.$ENV_NAME.yml
 DOTENV_PATH=$GIT_BASE_DIR/$DOTENV_NAME
 if [ ! -f $DOTENV_PATH ]; then echo FATAL $DOTENV_PATH not found; exit 1; fi
 CACHE_DOTENV_PATH=$CACHE_DIR/$DOTENV_NAME

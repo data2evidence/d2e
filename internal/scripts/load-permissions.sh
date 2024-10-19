@@ -9,11 +9,11 @@ echo ${0} ...
 
 # inputs
 ENV_TYPE=${ENV_TYPE:-local}
-ENV_PREFIX=${ENV_PREFIX:-env}
+
 
 # vars
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
-DOTENV_PATH=$GIT_BASE_DIR/.$ENV_PREFIX.$ENV_TYPE
+DOTENV_PATH=$GIT_BASE_DIR/.env.$ENV_TYPE
 ls $DOTENV_PATH
 
 if [ -f $DOTENV_PATH ]; then

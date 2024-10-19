@@ -6,7 +6,7 @@ echo ${0} ...
 
 # inputs
 ENV_NAME=${ENV_NAME:-local}
-ENV_PREFIX=${ENV_PREFIX:-env2}
+
 ENV_TYPE=${ENV_TYPE:-local}
 GIT_BASE_DIR=$(git rev-parse --show-toplevel)
 
@@ -14,8 +14,9 @@ echo ENV_NAME=$ENV_NAME
 echo ENV_TYPE=$ENV_TYPE
 
 # vars
-DOTENV_FILE_OUT=$GIT_BASE_DIR/.${ENV_PREFIX}.$ENV_TYPE
-DOTENV_YAML_IN=$GIT_BASE_DIR/.${ENV_PREFIX}.$ENV_NAME.yml
+DOTENV_YAML_IN=$GIT_BASE_DIR/.env.$ENV_NAME.yml
+DOTENV_FILE_OUT=$GIT_BASE_DIR/.env.$ENV_TYPE
+DOTENV_KEYS_OUT=$GIT_BASE_DIR/.env.$ENV_NAME.keys
 
 cd $GIT_BASE_DIR
 
@@ -29,7 +30,7 @@ rm .env.tmp
 echo "# ${DOTENV_FILE_OUT##*/} $ENV_NAME" > $DOTENV_FILE_OUT
 [ ! -z ${GITHUB_REPOSITORY+x} ] && echo "# https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $DOTENV_FILE_OUT
 yq -o sh $DOTENV_YAML_IN | envsubst >> $DOTENV_FILE_OUT
-yq 'keys | .[]' $DOTENV_YAML_IN > $DOTENV_FILE_OUT.keys
+yq 'keys | .[]' $DOTENV_YAML_IN > $DOTENV_KEYS_OUT
 
 wc -l $DOTENV_FILE_OUT
 $GIT_BASE_DIR/scripts/gen-tls.sh
