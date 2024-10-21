@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from "npm:axios";
 import { get, post, put } from "./request-util.ts";
-import { env, services } from "../env.ts";
+import { services } from "../env.ts";
 //import { createLogger } from '../Logger'
 import { Agent } from "node:https";
 
@@ -15,7 +15,7 @@ export class DataflowMgmtAPI {
     if (!token) {
       throw new Error("No token passed for DataflowMgmtAPI");
     }
-    if (env.SERVICE_ROUTES.dataflowMgmt) {
+    if (services.dataflowMgmt) {
       this.baseURL = services.dataflowMgmt;
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
