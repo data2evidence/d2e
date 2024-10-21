@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-# convert yaml xref to json
+# convert yaml pivot to json
 GIT_BASE_DIR=$(git rev-parse --show-toplevel)
 cd $GIT_BASE_DIR
 DIR=private-json
