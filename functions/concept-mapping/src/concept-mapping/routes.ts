@@ -1,6 +1,10 @@
 import express, { Request, Response } from "express";
-import pg from "pg";
+import {
+  getSourceToConceptMappings,
+  saveSourceToConceptMappings,
+} from "./services";
 import { env } from "../env";
+import { DatabaseOptions } from "../types";
 
 export class ConceptMappingRouter {
   public router = express.Router();
@@ -15,18 +19,21 @@ export class ConceptMappingRouter {
       this.logger.log("concept mapping route triggered");
       const user = req.headers["authorization"];
 
-      const options = {
-        host: env.CACHEDB__HOST,
-        port: env.CACHEDB__PORT,
-        max: 20,
-        user: user,
-        database: "A|postgresql|a29c196e-4357-4cb9-8a0b-6da85afb0a05",
-      };
-      const pgclient = new pg.Client(options);
-      await pgclient.connect();
-      console.log("OK");
-      this.logger.log(JSON.stringify(env));
-      res.status(200).send("success");
+      try {
+        if (!user) {
+          return;
+        }
+        const options: DatabaseOptions = {
+          host: env.CACHEDB__HOST,
+          port: env.CACHEDB__PORT,
+          user: user,
+          database: "A|postgresql|a29c196e-4357-4cb9-8a0b-6da85afb0a05",
+        };
+        await getSourceToConceptMappings(options);
+        res.status(200).send("success");
+      } catch (error) {
+        res.status(500).send(error);
+      }
     });
   }
 }
