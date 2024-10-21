@@ -47,7 +47,7 @@ export default class MriConfigConnection {
               "params": { "datasetId":datasetId }
             };
 
-            const getReq = await fetch(`${this.portalServerUrl}/pa-config/${urlPath}`, options);
+            const getReq = await fetch(`${this.portalServerUrl}/dataset/pa-config/${urlPath}`, options);
             resolve(await getReq.json());
         });
     }
