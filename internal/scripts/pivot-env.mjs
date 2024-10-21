@@ -65,9 +65,11 @@ if (envKeys.includes(credsKey)) {
 		let credsOut = readYmlFile(credsOutPath)
 		const credKeys = Object.keys(creds[i])
 		// credKey = credKeys[0] // debug
-		credsOut[envName] = {}
 		credKeys.map(credKey => {
-			credsOut[envName][credKey] = creds[i][credKey]
+			if (credsOut[credKey] === undefined) {
+				credsOut[credKey] = {}
+			}
+			credsOut[credKey][envName] = creds[i][credKey]
 		})
 		writeYmlFile(credsOutPath, credsOut)
 		// await $`code ${credsOutPath}`

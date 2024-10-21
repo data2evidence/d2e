@@ -35,7 +35,7 @@
     "sort:dc1": "scripts/sort-dc.mjs --backup --force",
     "sort:dc2": "scripts/sort-dc.mjs --update",
     "sort:env": "scripts/sort-env.sh",
-    "convert:env:json": "scripts/convert-env-json.sh",
+    "json:env": "scripts/json-env.sh",
     "pivot:env": "scripts/pivot-env.mjs",
     "pivot:env:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do ENV_NAME=$ENV_NAME yarn pivot:env; done"
   }
