@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# generate dotenv file
+# set dotenv from yaml
 set -o nounset
 set -o errexit
 echo ${0} ...
