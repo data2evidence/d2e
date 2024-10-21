@@ -568,7 +568,7 @@ services:
       LOGTO__SVC_CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
       LOGTO__TOKEN_URL: http://alp-logto-${BASE_PORT}:3001/oidc/token
       NODE_ENV: development
-      PREFECT_DOCKER_VOLUMES: '["duckdb-data-1:/app/duckdb_data", "cdw-config-duckdb-data-1:/app/cdw-config/duckdb_data", "r-libs:/home/docker/plugins/R/site-library", "${GIT_BASE_DIR}/cache/synpuf1k:/app/synpuf1k", "${GIT_BASE_DIR}/cache/vocab:/app/vocab"]'
+      PREFECT_DOCKER_VOLUMES: '["duckdb-data-1:/app/duckdb_data", "cdw-config-duckdb-data-1:/app/cdw-config/duckdb_data", "r-libs:/home/docker/plugins/R/site-library"]'
       GH_TOKEN: ${GH_TOKEN}
       PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
       PLUGINS_API_VERSION: latest

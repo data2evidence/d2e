@@ -9,7 +9,6 @@ services:
       - 33000:33000
       - 33001:33001
     volumes:
-      - ./services/trex/plugins:/usr/src/plugins
       - ./functions:/usr/src/plugins/d2ef
     environment:
       LOCAL_DEBUG: "true"
