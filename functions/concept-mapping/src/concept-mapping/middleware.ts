@@ -1,6 +1,6 @@
-import { query } from "express-validator";
+import { query, body } from "express-validator";
 
-export const ConceptMappingDto = () => [
+export const GetConceptMappingDto = () => [
   query("datasetId")
     .isUUID()
     .notEmpty()
@@ -9,4 +9,13 @@ export const ConceptMappingDto = () => [
     .isString()
     .notEmpty()
     .withMessage("dialect is required and must be a valid string"),
+];
+
+export const ConceptMappingDto = () => [
+  ...GetConceptMappingDto(),
+  body("sourceVocabularyId"),
+  body("conceptMappings")
+    .isString()
+    .notEmpty()
+    .withMessage("concept mappings is required"),
 ];
