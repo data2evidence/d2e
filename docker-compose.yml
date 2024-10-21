@@ -379,7 +379,7 @@ services:
             "PG__DIALECT": "postgresql",
             "LOCAL_DEBUG": "false",
             "SERVICE_ROUTES": {
-              "analytics": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+              "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
               "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
               "cdw": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/cdw",
               "paConfig": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/pa-config-svc",
