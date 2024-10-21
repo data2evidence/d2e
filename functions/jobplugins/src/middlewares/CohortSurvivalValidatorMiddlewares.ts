@@ -1,7 +1,7 @@
 import { body } from "npm:express-validator";
 
 // Validation rules for CohortSurvivalFlowRunOptions
-export const validateCohortSurvivalFlowRunOptions = () => [
+export const validateCohortSurvivalFlowRunDto = () => [
   body("options.databaseCode")
     .isString()
     .withMessage("databaseCode must be a string"),

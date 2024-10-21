@@ -26,7 +26,7 @@ const validateCohortJson = () => [
 ];
 
 // Validation rules for CohortGeneratorFlowRunOptions
-export const validateCohortGeneratorFlowRunOptions = () => [
+export const validateCohortGeneratorFlowRunDto = () => [
   body("options.databaseCode")
     .isString()
     .withMessage("databaseCode must be a string"),
@@ -45,9 +45,4 @@ export const validateCohortGeneratorFlowRunOptions = () => [
     .withMessage("description must be a string"),
   body("options.owner").isString().withMessage("owner must be a string"),
   body("options.token").isString().withMessage("token must be a string"),
-];
-
-// Validation rules for CohortGeneratorFlowRunDto
-export const validateCohortGeneratorFlowRunDto = () => [
-  ...validateCohortGeneratorFlowRunOptions(),
 ];

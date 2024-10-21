@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "npm:express";
 import { param, validationResult } from "npm:express-validator";
-import { validateCohortSurvivalFlowRunOptions } from "../middlewares/CohortSurvivalValidatorMiddlewares.ts";
+import { validateCohortSurvivalFlowRunDto } from "../middlewares/CohortSurvivalValidatorMiddlewares.ts";
 import { CohortSurvivalService } from "../services/CohortSurvivalService.ts";
 
 export class CohortSurvivalController {
@@ -16,7 +16,7 @@ export class CohortSurvivalController {
     // POST /cohort-survival/flow-run
     this.router.post(
       "/flow-run",
-      validateCohortSurvivalFlowRunOptions(),
+      validateCohortSurvivalFlowRunDto(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
