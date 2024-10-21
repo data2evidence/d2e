@@ -475,9 +475,15 @@ const initSwaggerRoutes = async (app: express.Application) => {
     const swaggerFile = yaml.parse(await Deno.readTextFile(path.dirname(pathx.fromFileUrl(import.meta.url)).slice(0, -3)+'api/swagger/swagger.yaml'));
     const basePath = swaggerFile["basePath"];
     for(const [path, value] of Object.entries(swaggerFile["paths"])) {
+
+        // Skip swagger route
+        if (path === "/swagger") {
+            log.info("Skipping '/swagger' route as it is not linked to a x-swagger-router-controller file")
+            break;
+        }
+
         const controllerFile = value["x-swagger-router-controller"];
         try {
-
             const controller = await import(`./api/controllers/${controllerFile}.ts`)
             const url = `${basePath}${path.slice(1)}`.replace(/\{(.+?)\}/g, ":$1")
             for(const [k,v] of Object.entries(value)) {
