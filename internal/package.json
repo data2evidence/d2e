@@ -9,6 +9,7 @@
     "env_names_dev": "alp-dev-sg-3"
   },
   "scripts": {
+    "edit": "code package.json",
     "create:env": "scripts/create-op.sh",
     "create:env:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do yarn create:env $ENV_NAME; done",
     "flatten:env": "scripts/flatten-env.sh",
@@ -32,6 +33,10 @@
     "put:env:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn put:env; done",
     "set:env": "scripts/set-env.sh",
     "sort:dc1": "scripts/sort-dc.mjs --backup --force",
-    "sort:dc2": "scripts/sort-dc.mjs --update"
+    "sort:dc2": "scripts/sort-dc.mjs --update",
+    "sort:env": "scripts/sort-env.sh",
+    "convert:env:json": "scripts/convert-env-json.sh",
+    "xref:env": "scripts/xref-env.mjs",
+    "xref:env:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do ENV_NAME=$ENV_NAME yarn xref:env; done"
   }
 }

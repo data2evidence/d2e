@@ -8,6 +8,7 @@
     "env_names_dev": "local remote base-all base-local base-remote alp-dev-sg-3"
   },
   "scripts": {
+    "edit": "code package.json",
     "gen:dotenv": "scripts/gen-dotenv.sh && yarn gen:tls && yarn gen:resource-limits",
     "gen:tls": "scripts/gen-tls.sh",
     "gen:resource-limits": "scripts/gen-resource-limits.sh",
