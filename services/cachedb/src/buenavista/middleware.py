@@ -3,7 +3,7 @@ from enum import Enum
 from api.OpenIdAPI import OpenIdAPI
 from api.UserMgmtAPI import UserMgmtAPI
 from api.PortalServerAPI import PortalServerAPI
-from .database import DatabaseDialects
+from .database import DatabaseDialects, ConnectionTypes
 from config import Env
 
 logger = logging.getLogger(__name__)
@@ -14,8 +14,8 @@ class DatabaseProtocols(str, Enum):
     B = "B"
 
 
-PROTOCOL_A_FORMAT = "[PROTOCOL|DIALECT|DATASETID]"
-PROTOCOL_B_FORMAT = "[PROTOCOL|DIALECT|DATABASE_CODE|SCHEMA_NAME|VOCAB_SCHEMA_NAME]"
+PROTOCOL_A_FORMAT = "[PROTOCOL|DIALECT|CONNECTION_TYPE|DATASETID]"
+PROTOCOL_B_FORMAT = "[PROTOCOL|DIALECT|CONNECTION_TYPE|DATABASE_CODE|SCHEMA_NAME|VOCAB_SCHEMA_NAME]"
 
 
 def d2e_database_format_validation(d2e_database_format: str):
@@ -34,16 +34,16 @@ def parse_d2e_database_format(token: str, d2e_database_format: str) -> tuple[str
     protocol = _get_protocol_from_d2e_database_format(d2e_database_format)
 
     if protocol == DatabaseProtocols.A:
-        dialect, dataset_id = _parse_d2e_database_format_A_protocol(
+        dialect, connection_type, dataset_id = _parse_d2e_database_format_A_protocol(
             d2e_database_format)
         database_code, schema, vocab_schema = _get_dataset_info(
             token, dataset_id)
 
     if protocol == DatabaseProtocols.B:
-        dialect, database_code, schema, vocab_schema = _parse_d2e_database_format_B_protocol(
+        dialect, connection_type, database_code, schema, vocab_schema = _parse_d2e_database_format_B_protocol(
             d2e_database_format)
 
-    return dialect, database_code, schema, vocab_schema
+    return dialect, connection_type, database_code, schema, vocab_schema
 
 
 def auth_check(token: str, d2e_database_format: str):
@@ -69,6 +69,7 @@ def auth_check(token: str, d2e_database_format: str):
 def _client_credentials_flow(user_id, d2e_database_format) -> bool:
     '''
     Check if user_id is in list of application client ids
+    Allows both read and write connection to db for client credentials flow
     '''
     APPLICATION_CLIENT_IDS = [Env.IDP__ALP_DATA_CLIENT_ID]
 
@@ -83,6 +84,7 @@ def _client_credentials_flow(user_id, d2e_database_format) -> bool:
 def _authorization_code_flow(token, user_id, d2e_database_format) -> bool:
     '''
     Gets user_id from token, then sends a requets to user mgmt to get user group metadata.
+    Only allows write connection if user is a system admin
     If user is a system admin, allow access by returning early
     Else check if user has access to dataset
     Raise error if user is not allowed
@@ -94,12 +96,20 @@ def _authorization_code_flow(token, user_id, d2e_database_format) -> bool:
     # Guard clause against non-existent user_id
     if user_group_metadata == None:
         raise Exception(f"User with id:{user_id} does not exist")
+    
+    connection_type = _get_connection_type_from_d2e_database_format(d2e_database_format)
 
     # Allow access by returning early if user is a system admin
     if user_group_metadata["alp_role_system_admin"]:
         logger.debug(
             f"User: {user_id} allowed access for {d2e_database_format} via system admin access")
         return True
+
+    # If user is not system admin, and requesting write connection, reject access.
+    if connection_type == ConnectionTypes.WRITE:
+        raise Exception(
+            "Write access to database is only allowed for system admins")
+
 
     protocol = _get_protocol_from_d2e_database_format(d2e_database_format)
 
@@ -109,7 +119,7 @@ def _authorization_code_flow(token, user_id, d2e_database_format) -> bool:
             "Access to database via Protocol B is only allowed for system admins")
 
     if protocol == DatabaseProtocols.A:
-        _dialect, dataset_id = _parse_d2e_database_format_A_protocol(
+        _dialect, _connection_type, dataset_id = _parse_d2e_database_format_A_protocol(
             d2e_database_format)
         # Check if user is authorized to access dataset
         allowed_dataset_ids = user_group_metadata["alp_role_study_researcher"]
@@ -135,6 +145,16 @@ def _get_protocol_from_d2e_database_format(d2e_database_format: str):
 
     return protocol
 
+def _get_connection_type_from_d2e_database_format(d2e_database_format: str):
+    connection_type = d2e_database_format.split("|")[2]
+    
+    if connection_type not in [e.value for e in ConnectionTypes]:
+        error_msg = f"Connection type:{connection_type} is invalid! Supported database connection types are:{ConnectionTypes}"
+        logger.exception(error_msg)
+        raise Exception(error_msg)
+
+    return connection_type
+
 
 def _get_dialect_from_d2e_database_format(d2e_database_format: str):
     dialect = d2e_database_format.split("|")[1]
@@ -149,7 +169,7 @@ def _get_dialect_from_d2e_database_format(d2e_database_format: str):
 def _parse_d2e_database_format_A_protocol(d2e_database_format) -> tuple[str, str]:
     databaseComponents = d2e_database_format.split("|")[1:]
     # Simple conditional check to check if database param has two components separated by "|" excluding protocol
-    if len(databaseComponents) != 2:
+    if len(databaseComponents) != 3:
         raise Exception(
             f"Database param:{d2e_database_format} for protocol A is invalid! Database has to be in the format of {PROTOCOL_A_FORMAT}")
     return databaseComponents
@@ -161,19 +181,19 @@ def _parse_d2e_database_format_B_protocol(d2e_database_format) -> tuple[str, str
     dialect = _get_dialect_from_d2e_database_format(d2e_database_format)
 
     if dialect == DatabaseDialects.DUCKDB:
-        # Simple conditional check to check if database param has four compoenents separated by "|" excluding protocol
-        if len(databaseComponents) != 4:
+        # Simple conditional check to check if database param has four components separated by "|" excluding protocol
+        if len(databaseComponents) != 5:
             raise Exception(
                 f"Database param:{d2e_database_format} for protocol B is invalid! Database has to be in the format of {PROTOCOL_B_FORMAT}")
 
     if dialect == DatabaseDialects.POSTGRES or dialect == DatabaseDialects.HANA:
         # When dialect is postgresql or hana, SCHEMA_NAME and VOCAB_SCHEMA_NAME are optional.
-        if len(databaseComponents) < 2 or len(databaseComponents) > 4:
+        if len(databaseComponents) < 3 or len(databaseComponents) > 5:
             raise Exception(
                 f"Database param:{d2e_database_format} for protocol B is invalid! Database has to be in the format of {PROTOCOL_B_FORMAT}")
 
-    # Pad databaseComponents with empty strings until it is a list of length 4
-    databaseComponents += [''] * (4 - len(databaseComponents))
+    # Pad databaseComponents with empty strings until it is a list of length 5
+    databaseComponents += [''] * (5 - len(databaseComponents))
     return databaseComponents
 
 

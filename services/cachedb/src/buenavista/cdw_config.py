@@ -1,28 +1,9 @@
 import os
 import logging
-import duckdb
 
 from config import Env
 
-
 logger = logging.getLogger(__name__)
-
-
-def get_cdw_config_duckdb_connection(database_code: str, schema: str) -> duckdb.DuckDBPyConnection:
-    '''
-    Get duckdb connection for cdw-config-svc
-    First check if dynamically generated duckdb file is available, if not fallback to using built in duckdb file for cdw-config
-    '''
-
-    duckdb_file_name = f"{database_code}_{schema}"
-    duckdb_file_path = _resolve_cdw_config_duckdb_file_path(duckdb_file_name)
-
-    db = duckdb.connect()
-    # Attach cdm schema
-    db.execute(
-        f"ATTACH '{duckdb_file_path}' AS {schema} (READ_ONLY);")
-    return db
-
 
 def _resolve_cdw_config_duckdb_file_path(duckdb_file_name: str) -> str:
     '''
