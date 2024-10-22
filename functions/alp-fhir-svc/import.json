@@ -51,7 +51,7 @@
   "jsonwebtoken": "npm:jsonwebtoken@^9.0.0",
   "pg-query-stream": "npm:pg-query-stream@^4.2.4",
   "./src/utils/types": "./src/utils/types.ts",
-  "./src/utils/cachedb": "./src/utils/cachedb.ts",
+  "./src/utils/dbUtils": "./src/utils/dbUtils.ts",
   "./src/utils/fhirDataModelUtil": "./src/utils/fhirDataModelUtil.ts",
   "./src/logger": "./src/logger.ts",
   "./src/api/FhirAPI": "./src/api/FhirAPI.ts",

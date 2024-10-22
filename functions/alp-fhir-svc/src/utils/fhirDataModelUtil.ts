@@ -1,14 +1,18 @@
+import { PortalAPI } from '../api/PortalAPI';
 import { env } from '../env';
-import { getCachedbDbConnections } from './cachedb'
+import { getCachedbDbConnections } from './dbUtils'
 import { ConnectionInterface } from '@alp/alp-base-utils/target/src/Connection';
 
 const schemaPath = env.FHIR_SCHEMA_PATH + '/' + env.FHIR_SCHEMA_FILE_NAME 
 
-export async function createResourceInFhir(data){
+export async function createResourceInFhir(token, data){
     let datasetId = data.meta.id
-    console.info(`DatasetId: ${datasetId}`)
-    let conn = await getCachedbDbConnections(datasetId)
-    console.info(conn)
+    console.info(`Incoming DatasetId: ${datasetId}`)
+    //Get dataset details to connect to cachedb
+    let portalApi = new PortalAPI(token)
+    let datasetDetails = await portalApi.getDatasetById(datasetId)
+    console.info(JSON.stringify(datasetDetails))
+    let conn = await getCachedbDbConnections(token, datasetDetails.databaseCode, datasetDetails.schemaName, datasetDetails.vocabSchemaName)
     try{
         return new Promise((resolve, reject) => {
             conn.executeQuery(`select * from read_json('${schemaPath}')`, [], async (err: any, result: any) => {
@@ -16,7 +20,6 @@ export async function createResourceInFhir(data){
                     console.log('Error loading fhir schema json: '+ JSON.stringify(err))
                     reject(err)
                 }
-                console.info(result)
                 const parsedFhirDefinitions = getFhirTableStructure(result[0], data.resourceType)
                 const insertStatement = getInsertStatement(data, parsedFhirDefinitions)
                 insertIntoFhirTable(conn, data.resourceType, insertStatement, (err, result) =>{

@@ -7,33 +7,32 @@ import axios, { AxiosRequestConfig } from "axios";
 import https from "https";
 import { env } from "../env";
 
-export const getCachedbDbConnections = async (studyId): Promise<Connection.ConnectionInterface> => {
+export const getCachedbDbConnections = async (token, databaseCode, schemaName, vocabSchema): Promise<Connection.ConnectionInterface> => {
     try{
         let dialect = 'duckdb'
         let cachedbDatabase = getCachedbDatabaseFormatProtocolB(
             dialect,
-            'alpdev_pg',
-            'cdmdefault',
-            'cdmdefault'
+            databaseCode,
+            schemaName,
+            vocabSchema
           );
-        
-        const accessToken = await getClientCredentialsToken()
+    
         let credentials = {
             dialect,
             host: env.CACHEDB__HOST? env.CACHEDB__HOST: "",
             port: Number(env.CACHEDB__PORT),
             database: cachedbDatabase,
-            user: accessToken,
-            schema: 'cdmdefault',
-            vocabSchema: 'cdmvocab',
+            user: token,
+            schema: schemaName,
+            vocabSchema: vocabSchema,
             password: 'dummy'
         }
 
         const duckdbConnection =
             await CachedbDBConnectionUtil.CachedbDBConnectionUtil.getDBConnection({
                 credentials: credentials,
-                schemaName: 'cdmdefault',
-                vocabSchemaName: 'cdmvocab'
+                schemaName: schemaName,
+                vocabSchemaName: vocabSchema
             });    
         return duckdbConnection;
     }catch(e){
@@ -42,7 +41,7 @@ export const getCachedbDbConnections = async (studyId): Promise<Connection.Conne
     }
 };
 
-const getClientCredentialsToken = async () => {
+export const getClientCredentialsToken = async () => {
     const params = {
         grant_type: "client_credentials",
         client_id: env.IDP__ALP_DATA_CLIENT_ID,

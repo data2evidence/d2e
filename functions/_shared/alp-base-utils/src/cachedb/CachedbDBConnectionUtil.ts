@@ -29,7 +29,6 @@ export class CachedbDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil {
   }) {
     return new Promise<ConnectionInterface>(async (resolve, reject) => {
       try {
-        console.info(credentials)
         const client = await this.getDbClient(credentials);
         const connection = await this.getConnection(
           credentials.dialect,

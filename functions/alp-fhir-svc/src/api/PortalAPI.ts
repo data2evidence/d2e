@@ -52,4 +52,16 @@ export class PortalAPI {
       throw new Error('Error while getting datasets')
     }
   }
+
+  async getDatasetById(datasetId: string): Promise<Dataset>{
+    try {
+      const options = await this.getRequestConfig()
+      const url = `${this.baseURL}/dataset/${datasetId}`
+      const result = await axios.get(url, options)
+      return result.data
+    } catch (error) {
+      this.logger.error('Error while getting dataset')
+      throw new Error('Error while getting dataset')
+    }
+  }
 }
