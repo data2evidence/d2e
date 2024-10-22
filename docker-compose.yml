@@ -49,7 +49,7 @@ x-envs:
     PG__MAX_POOL: 10
     PG__MIN_POOL: 0
     PG__PORT: ${PG_PORT:-5432}
-    PG__IDLE_TIMEOUT_IN_MS: 300000
+    PG__IDLE_TIMEOUT_IN_MS: 1000
     PG__DIALECT: postgresql
   fhir: &x-fhir
     FHIR__CLIENT_ID: db6b2304-f236-45ec-b10c-a852681e7129
@@ -376,7 +376,7 @@ services:
             "PG__MAX_POOL": 10,
             "PG__MIN_POOL": 0,
             "PG__PORT": ${PG_PORT:-5432},
-            "PG__IDLE_TIMEOUT_IN_MS": 300000,
+            "PG__IDLE_TIMEOUT_IN_MS": 1000,
             "PG__DIALECT": "postgresql",
             "LOCAL_DEBUG": "false",
             "SERVICE_ROUTES": {
@@ -745,7 +745,7 @@ services:
     #     - http://localhost:41120/api/hello
     #   timeout: 30s
     hostname: alp-dataflow-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: prefecthq/prefect:2.20.2-python3.11 ##alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
+    image: prefecthq/prefect:3.0.3-python3.11
     logging:
       options:
         tag: *c2
@@ -777,7 +777,7 @@ services:
     command:
       - sh
       - -c
-      - "pip install prefect-docker==0.5.5 && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
+      - "pip install prefect[docker]==3.0.3 && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
     container_name: &c83 alp-dataflow-gen-worker
     depends_on:
       alp-minio-post-init:
@@ -787,7 +787,7 @@ services:
       alp-logto-post-init:
         condition: service_completed_successfully
     hostname: alp-dataflow-gen-worker.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: prefecthq/prefect:2.20.2-python3.11
+    image: prefecthq/prefect:3.0.3-python3.11
     logging:
       options:
         tag: *c83
@@ -1203,7 +1203,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://localhost:41108/check-liveness
+        - http://localhost:41108/check-liveness
     hostname: alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-terminology-svc:${DOCKER_TAG_NAME:-develop}
     logging:

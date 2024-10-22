@@ -39,7 +39,8 @@ export class SystemPortalAPI {
     const errorMessage = `Error while getting dataset info for id : ${datasetId}`;
     try {
       const options = await this.createOptions();
-      const url = `${this.url}/dataset/${datasetId}`;
+      const url = `${this.url}/dataset`;
+      options.params = { datasetId: datasetId };
       const result = await axios.get(url, options);
       return result.data;
     } catch (error) {

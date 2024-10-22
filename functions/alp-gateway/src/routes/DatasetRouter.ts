@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Request, Response } from 'express'
 import { CDMSchemaTypes, DbDialect } from '../const'
 import { Service } from 'typedi'
 import { createLogger } from '../Logger'
@@ -38,13 +38,20 @@ export class DatasetRouter {
   }
 
   private registerRoutes() {
-    this.router.get('/:sourceDatasetId/cdm-schema/snapshot/metadata', async (req, res) => {
+    this.router.get('/cdm-schema/snapshot/metadata', async (req: Request, res: Response) => {
+      const { datasetId } = req.query || {}
+
+      if (!datasetId) {
+        return res.status(400).send(`datasetId is required`)
+      } else if (typeof datasetId !== 'string') {
+        return res.status(400).send(`datasetId query param is invalid`)
+      }
+
       const token = req.headers.authorization!
       const portalAPI = new PortalAPI(token)
       const analyticsSvcAPI = new AnalyticsSvcAPI(token)
 
-      const { sourceDatasetId } = req.params
-      const { dialect, databaseCode, schemaName } = await portalAPI.getDataset(sourceDatasetId)
+      const { dialect, databaseCode, schemaName } = await portalAPI.getDataset(datasetId)
 
       try {
         const metadata = await analyticsSvcAPI.getCdmSchemaSnapshotMetadata(dialect, databaseCode, schemaName)
@@ -55,12 +62,18 @@ export class DatasetRouter {
       }
     })
 
-    this.router.get('/:sourceDatasetId/cohorts', async (req, res) => {
-      const { sourceDatasetId } = req.params
+    this.router.get('/cohorts', async (req: Request, res: Response) => {
+      const { datasetId } = req.query || {}
+
+      if (!datasetId) {
+        return res.status(400).send(`datasetId is required`)
+      } else if (typeof datasetId !== 'string') {
+        return res.status(400).send(`datasetId query param is invalid`)
+      }
 
       try {
         const analyticsSvcAPI = new AnalyticsSvcAPI(req.headers.authorization!)
-        const result = await analyticsSvcAPI.getAllCohorts(sourceDatasetId)
+        const result = await analyticsSvcAPI.getAllCohorts(datasetId)
         return res.status(200).json(result)
       } catch (error) {
         this.logger.error(`Error when getting cohorts: ${JSON.stringify(error)}`)
@@ -68,7 +81,7 @@ export class DatasetRouter {
       }
     })
 
-    this.router.post('/', generateDatasetSchema, async (req, res) => {
+    this.router.post('/', generateDatasetSchema, async (req: Request, res: Response) => {
       const token = req.headers.authorization!
       const portalAPI = new PortalAPI(token)
       const dataflowMgmtAPI = new DataflowMgmtAPI(token)
@@ -182,7 +195,7 @@ export class DatasetRouter {
       }
     })
 
-    this.router.post('/snapshot', async (req, res) => {
+    this.router.post('/snapshot', async (req: Request, res: Response) => {
       const token = req.headers.authorization!
       const portalAPI = new PortalAPI(token)
       const dataflowMgmtAPI = new DataflowMgmtAPI(token)
@@ -246,8 +259,15 @@ export class DatasetRouter {
       }
     })
 
-    this.router.get('/:datasetId/dashboard/list', async (req, res) => {
-      const { datasetId } = req.params
+    this.router.get('/dashboard/list', async (req: Request, res: Response) => {
+      const { datasetId } = req.query || {}
+
+      if (!datasetId) {
+        return res.status(400).send(`datasetId is required`)
+      } else if (typeof datasetId !== 'string') {
+        return res.status(400).send(`datasetId query param is invalid`)
+      }
+
       try {
         const token = req.headers.authorization!
         const portalAPI = new PortalAPI(token)
