@@ -9,9 +9,10 @@ const Env = z.object({
     .transform(Number),
 });
 
-let env = {};
 const _env = Deno.env.toObject();
 const result = Env.safeParse(_env);
+
+let env = _env as unknown as z.infer<typeof Env>;
 
 if (result.success) {
   env = result.data;
