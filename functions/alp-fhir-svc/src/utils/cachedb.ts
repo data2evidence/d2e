@@ -1,15 +1,12 @@
 import {
     Connection,
     CachedbDBConnectionUtil,
-    getCachedbDatabaseFormatProtocolA,
     getCachedbDatabaseFormatProtocolB
 } from "@alp/alp-base-utils";
 import axios, { AxiosRequestConfig } from "axios";
 import https from "https";
 import { env } from "../env";
-import pg from 'pg'
-import { password } from "pg/lib/defaults";
-const { Pool } = pg
+
 export const getCachedbDbConnections = async (studyId): Promise<Connection.ConnectionInterface> => {
     try{
         let dialect = 'duckdb'

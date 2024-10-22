@@ -1,16 +1,17 @@
 import { Bot, OperationOutcome } from '@medplum/fhirtypes'
 import { config as botConfig } from './bots.config.ts'
 import { FhirAPI } from "./api/FhirServerAPI.ts";
-import { basename, resolve } from "path";
-import { existsSync, readFileSync } from "fs";
+import { basename } from "path";
+import { readFileSync } from "fs";
 import { ContentType } from "@medplum/core";
+import { env } from './env.ts';
 
 interface MedplumBotConfig {
     readonly name: string;
     readonly id: string;
     readonly description: string;
     readonly source: string;
-    readonly dist?: string;
+    readonly dist: string;
     readonly subscriptionCriteria?: string;
 }
 
@@ -97,7 +98,7 @@ async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot):
 }
 
 async function deployBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot): Promise<boolean> {
-    const codePath = botConfig.source;
+    const codePath = botConfig.dist;
     try{
         const code = readFileContents(codePath);
         if (!code) return false;
@@ -135,8 +136,8 @@ function readFileContents(filePath: string): string {
     // if (!existsSync(path)) {
     //     return '';
     // }
-    console.log(filePath)
-    return readFileSync('/usr/src/plugins/d2ef/alp-fhir-init/' + filePath, 'utf8');
+    console.log(`Plugins path: ${env.PLUGIN_PATH + '/' + filePath}`)
+    return readFileSync(env.PLUGIN_PATH + '/' + filePath, 'utf8');
 }
 
 async function enableBotForSuperAdminProject(fhirApi: FhirAPI){

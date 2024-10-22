@@ -15,8 +15,6 @@ const Env = z.object({
           return z.never();
       }
   }),
-  FHIR_SCHEMA_PATH: z.string(),
-  FHIR_SCHEMA_FILE_NAME: z.string(),
   DUCKDB_PATH: z.string(),
   PLUGIN_PATH: z.string(),
   TLS__INTERNAL__CA_CRT: z.string().optional(),

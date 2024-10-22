@@ -442,9 +442,8 @@ services:
             "PORT": 41${BASE_PORT:-1}12,
             "FHIR__CLIENT_ID": "db6b2304-f236-45ec-b10c-a852681e7129",
             "FHIR__CLIENT_SECRET": "${FHIR__CLIENT_SECRET}",
-            "FHIR_SCHEMA_PATH": "/home/docker/alp-data-node/app/src/r4",
+            "FHIR_SCHEMA_PATH": "/home/docker/fhir",
             "FHIR_SCHEMA_FILE_NAME": "fhir.schema.json",
-            "DUCKDB_PATH": "/home/docker/alp-data-node/app/src/duckdb",
             "ALP_GATEWAY_OAUTH__URL": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/oauth/token",
             "IDP__ALP_DATA_CLIENT_ID": "${LOGTO__ALP_DATA__CLIENT_ID}",
             "IDP__ALP_DATA__CLIENT_SECRET": "${LOGTO__ALP_DATA__CLIENT_SECRET}"
@@ -456,11 +455,8 @@ services:
             "PORT": 41${BASE_PORT:-1}12,
             "FHIR__CLIENT_ID": "db6b2304-f236-45ec-b10c-a852681e7129",
             "FHIR__CLIENT_SECRET": "${FHIR__CLIENT_SECRET}",
-            "FHIR_SCHEMA_PATH": "/home/docker/alp-data-node/app/src/r4",
-            "FHIR_SCHEMA_FILE_NAME": "fhir.schema.json",
             "DUCKDB_PATH": "/home/docker/alp-data-node/app/src/duckdb",
-            "PLUGIN_PATH": "/usr/src/plugins/d2ef/alp-fhir-init",
-            "ALP_GATEWAY_OAUTH__URL": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/oauth/token"
+            "PLUGIN_PATH": "/usr/src/plugins/d2ef/alp-fhir-init"
           },
           "query-gen-svc": {
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",
@@ -879,7 +875,6 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - fhir-schema-file-1:/home/docker/app/medplum/packages/definitions/dist/fhir/r4
-      #- fhir-duckdb-1:/home/docker/app/duckdb
     environment:
       <<:
         - *x-pg
@@ -1362,6 +1357,7 @@ services:
     volumes:
       - duckdb-data-1:/home/docker/duckdb_data
       - cdw-config-duckdb-data-1:/home/docker/cdw_svc/duckdb_data # Volume for dynamically generated cdw-config duckdb file (refer to docs/3-configure/9-create-cdw-config-duckdb-file.md for information)
+      - fhir-schema-file-1:/home/docker/fhir
     environment:
       <<:
         - *x-converter

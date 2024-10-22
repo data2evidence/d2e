@@ -2,7 +2,7 @@ import { env } from '../env';
 import { getCachedbDbConnections } from './cachedb'
 import { ConnectionInterface } from '@alp/alp-base-utils/target/src/Connection';
 
-const schemaPath = '/home/docker/fhir/fhir.schema.json'
+const schemaPath = env.FHIR_SCHEMA_PATH + '/' + env.FHIR_SCHEMA_FILE_NAME 
 
 export async function createResourceInFhir(data){
     let datasetId = data.meta.id
@@ -11,8 +11,7 @@ export async function createResourceInFhir(data){
     console.info(conn)
     try{
         return new Promise((resolve, reject) => {
-            console.info(`select * from '${schemaPath}'`)
-            conn.executeQuery(`select * from '${schemaPath}'`, [], async (err: any, result: any) => {
+            conn.executeQuery(`select * from read_json('${schemaPath}')`, [], async (err: any, result: any) => {
                 if(err){
                     console.log('Error loading fhir schema json: '+ JSON.stringify(err))
                     reject(err)
