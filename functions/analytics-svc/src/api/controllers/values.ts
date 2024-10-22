@@ -26,7 +26,7 @@ export function values(req: IMRIRequest, res, next) {
     const suggestionLimit = req.query.suggestionLimit;
     const selectedStudyEntityValue =
         req.query.selectedStudyEntityValue;
-    const searchQuery = req.query.searchQuery? || "";
+    const searchQuery = req.query.searchQuery ? req.query.searchQuery : "";
     const studies: StudyDbMetadata[] = req.studiesDbMetadata.studies;
     if (studies && studies.length > 0) {
         const studyMetadata: StudyDbMetadata = studies.find(

@@ -68,11 +68,11 @@ const imports: Array<DynamicModule | Type<any>> = [
       module: DatasetModule,
       children: [
         {
-          path: ':datasetId/resource',
+          path: '/resource',
           module: ResourceModule
         },
         {
-          path: ':datasetId/pa-config',
+          path: '/pa-config',
           module: DatasetPaConfigModule
         },
         {
