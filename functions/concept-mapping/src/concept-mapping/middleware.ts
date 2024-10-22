@@ -5,12 +5,6 @@ export const GetConceptMappingDto = () => [
     .isUUID()
     .notEmpty()
     .withMessage("datasetId is required and must be a valid UUID"),
-  query("dialect")
-    .isString()
-    .notEmpty()
-    .withMessage("dialect is required and must be a valid string")
-    .isIn(["postgres", "hana"])
-    .withMessage("dialect is not valid"),
 ];
 
 export const ConceptMappingDto = () => [

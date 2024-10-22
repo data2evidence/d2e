@@ -12,18 +12,16 @@ const convert = (stringToConvert: string) =>
   btoa(pako.deflate(stringToConvert, { to: "string" }));
 
 export const getSourceToConceptMappings = async (
-  DatabaseConfig: DatabaseConfig
+  user: string,
+  datasetId: string
 ) => {
   try {
-    // const pgclient: typeof Client = new pg.Client(DatabaseConfig);
-    // await pgclient.connect();
-    // const test = [{ a: "b" }, { c: "d" }];
-    // console.log(convertZlibBase64ToJson(convert(JSON.stringify(test))));
-    console.log("ok");
+    const dataset: Dataset = await new PortalAPI(user).getDataset(datasetId);
+    const client = new DAO(user, dataset);
+
+    return await client.getAllRecords(SOURCE_TO_CONCEPT_MAP_TABLE);
   } catch (error) {
-    throw new Error(
-      `Failed to retrieve source to concept mappings for ${DatabaseConfig.database}: ${Error}`
-    );
+    throw new Error(`Failed to retrieve source to concept mappings:s ${Error}`);
   }
 };
 

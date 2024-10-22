@@ -27,6 +27,22 @@ export default class DAO {
     this.dataset = dataset;
   }
 
+  public getAllRecords = async (table: string) => {
+    const client = await this.getCachedbConnection();
+
+    try {
+      const queryString = `SELECT * FROM ${this.dataset.schemaName}.${table}`;
+      const result = await client.query(queryString);
+
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      await client.end();
+    }
+  };
+
   public insertRecords = async (
     table: string,
     columns: Array<String>,

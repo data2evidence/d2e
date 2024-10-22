@@ -5,8 +5,6 @@ import {
   saveSourceToConceptMappings,
 } from "./services";
 import { GetConceptMappingDto, ConceptMappingDto } from "./middleware";
-import { env } from "../env";
-import { DatabaseConfig } from "../types";
 
 export class ConceptMappingRouter {
   public router = express.Router();
@@ -30,18 +28,12 @@ export class ConceptMappingRouter {
 
         try {
           const user = req.headers["authorization"]!;
-          const { datasetId, dialect } = matchedData(req, {
+          const { datasetId } = matchedData(req, {
             locations: ["query"],
           });
 
-          // const options: DatabaseConfig = {
-          //   host: env.CACHEDB__HOST,
-          //   port: env.CACHEDB__PORT,
-          //   user: user,
-          //   database: getCachedbDatabaseFormatProtocolA(dialect, datasetId),
-          // };
-          // await getSourceToConceptMappings(options);
-          res.status(200).send("success");
+          const response = await getSourceToConceptMappings(user, datasetId);
+          res.status(200).json(response);
         } catch (error) {
           res.status(500).send(error);
         }
@@ -76,7 +68,9 @@ export class ConceptMappingRouter {
             conceptMappings
           );
 
-          res.status(200).send(`Inserted ${rows} to ${dialect}|${datasetId}`);
+          res
+            .status(200)
+            .send(`Inserted ${rows} rows to ${dialect}|${datasetId}`);
         } catch (error) {
           res.status(500).send(error);
         }
