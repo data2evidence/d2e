@@ -8,7 +8,9 @@ export const GetConceptMappingDto = () => [
   query("dialect")
     .isString()
     .notEmpty()
-    .withMessage("dialect is required and must be a valid string"),
+    .withMessage("dialect is required and must be a valid string")
+    .isIn(["postgres", "hana"])
+    .withMessage("dialect is not valid"),
 ];
 
 export const ConceptMappingDto = () => [
