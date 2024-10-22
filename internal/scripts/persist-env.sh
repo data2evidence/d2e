@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# persist select env from dotenv file
+# persist selected env from dotenv file
 set -o nounset
 set -o errexit
 

@@ -12,6 +12,8 @@ passphrase_length=10
 default_password_length=30
 x509_subject="/C=SG/O=ALP Dev"
 
+password_keys=(MEILI_MASTER_KEY MINIO__SECRET_KEY PG_ADMIN_PASSWORD PG_SUPER_PASSWORD PG_WRITE_PASSWORD REDIS_PASSWORD LOGTO_API_M2M_CLIENT_ID LOGTO_API_M2M_CLIENT_SECRET STRATEGUS__KEYRING_PASSWORD)
+
 # vars
 echo '' > $tmp_file
 echo '' > $env_file
@@ -26,8 +28,7 @@ function set-password {
     echo ${password_name}=${password_value} >> $tmp_file
 }
 
-# end with word password in example_file
-password_keys=($(cat $example_file | grep password$ | awk -F= '{print $1}')) # echo ${password_keys[@]};
+# set random passwords
 password_name=${password_keys[1]}
 for password_name in ${password_keys[@]}; do
     length=$default_password_length
