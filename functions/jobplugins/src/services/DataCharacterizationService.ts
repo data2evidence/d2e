@@ -25,7 +25,7 @@ export class DataCharacterizationService {
     const { resultsSchema, databaseCode, vocabSchemaName, datasetId } =
       dcFlowRunOptions;
 
-    return analyticsSvcApi.getDataCharacterizationResults(
+    return await analyticsSvcApi.getDataCharacterizationResults(
       databaseCode,
       resultsSchema,
       sourceKey,
@@ -48,7 +48,7 @@ export class DataCharacterizationService {
     const { resultsSchema, databaseCode, vocabSchemaName, datasetId } =
       dcFlowRunOptions;
 
-    return analyticsSvcApi.getDataCharacterizationResultsDrilldown(
+    return await analyticsSvcApi.getDataCharacterizationResultsDrilldown(
       databaseCode,
       resultsSchema,
       sourceKey,
@@ -155,7 +155,7 @@ export class DataCharacterizationService {
       },
     };
 
-    return prefectApi.createFlowRun(
+    return await prefectApi.createFlowRun(
       name,
       dcDeploymentName,
       dcFlowName,
