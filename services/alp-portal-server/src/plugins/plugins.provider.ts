@@ -10,7 +10,7 @@ export const PluginsProvider = {
   provide: 'PLUGINS_JSON_PROVIDER',
   useFactory: async (request, httpService: HttpService) => {
     try {
-      let res = httpService.get(`${env.PORTAL_API_URL}/portal/plugin.json`, {
+      const res = httpService.get(`${env.PORTAL_API_URL}/portal/plugin.json`, {
         headers: {
           Authorization: request.headers['authorization']
         },
