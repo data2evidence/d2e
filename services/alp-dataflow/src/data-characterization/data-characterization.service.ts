@@ -66,7 +66,7 @@ export class DataCharacterizationService {
 
     const { dialect, databaseCode, schemaName, vocabSchemaName } = await this.portalServerApi.getDataset(datasetId)
 
-    let dataCharacterizationResultsSchema = `${schemaName}_DATA_CHARACTERIZATION_${Date.now()}`
+    let dataCharacterizationResultsSchema = `${schemaName}_DC_${Date.now()}`
 
     if (dialect === 'hana') {
       dataCharacterizationResultsSchema = dataCharacterizationResultsSchema.toUpperCase()
