@@ -319,7 +319,8 @@
           "prefect.delete",
           "prefect.post",
           "prefect.update",
-          "conceptMapping"
+          "conceptmapping.read",
+          "conceptmapping.post"
         ],
         "ALP_DASHBOARD_VIEWER": [
           "gateway.dashboardGate.content"
@@ -398,7 +399,12 @@
         {
           "path": "^/concept-mapping",
           "scopes": [
-            "conceptMapping"
+            "conceptmapping.read",
+            "conceptmapping.post"
+          ],
+          "httpMethods": [
+            "GET", 
+            "POST"
           ]
         },
         {
