@@ -3,9 +3,6 @@ export default {
   description: "",
   analyticsSvcValues: {
     autoCommit: true,
-    credentials: {
-      adminPassword: "",
-    },
   },
   dbSvcValues: {
     autoCommit: true,

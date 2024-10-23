@@ -9,6 +9,7 @@ from buenavista.postgres import (
     TransactionStatus,
 )
 from buenavista.rewrite import Rewriter
+from buenavista.database import ConnectionTypes
 
 # Add any necessary setup or helper methods here, e.g., creating a test server and client
 
@@ -21,7 +22,7 @@ def mock_handler():
     server.rewriter = MagicMock(spec=Rewriter)
     server.db_clients = {
         "hana": {},
-        "postgresql": {"testdbcode": "dummy"}
+        "postgresql": {"testdbcode": {ConnectionTypes.READ.value: "dummy_read", ConnectionTypes.WRITE: "dummy_write"}}
     }
     server.ctxts = {}
 
@@ -34,12 +35,12 @@ def mock_handler():
 
 def test_handle_startup(mock_handler):
     mock_handler.r.read_uint32.side_effect = [8, 196608]
-    mock_handler.r.read_bytes.return_value = b"user\x00test\x00database\x00A|duckdb|11111111-2222-3333-4444-555555555555\x00"
+    mock_handler.r.read_bytes.return_value = b"user\x00test\x00database\x00A|duckdb|read|11111111-2222-3333-4444-555555555555\x00"
     ctx = mock_handler.handle_startup()
     assert isinstance(ctx, BVContext)
     assert ctx.session is not None
     assert ctx.params == {"user": "test",
-                          "database": "A|duckdb|11111111-2222-3333-4444-555555555555"}
+                          "database": f"A|duckdb|{ConnectionTypes.READ.value}|11111111-2222-3333-4444-555555555555"}
 
 
 def test_handle_query(mock_handler):
