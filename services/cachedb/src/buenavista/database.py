@@ -220,15 +220,15 @@ def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_
     '''
     duckdb_connection_type = "(READ_ONLY)" if connection_type == ConnectionTypes.READ else ""
     db = duckdb.connect()
-    # Attach cdm schema
+    # Attach cdm schema in READ or WRITE connection depending on duckdb_connection_type
     db.execute(
         f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} {duckdb_connection_type};")
     
     # For cases where cdm schema and vocab schema are different, attach as a separate database in duckdb
     if (cdm_schema_duckdb_file_path != vocab_schema_duckdb_file_path):
-        # Attach vocab schema 
+        # Attach vocab schema as READ_ONLY in all cases
         db.execute(
-            f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} {duckdb_connection_type};")
+            f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
     return db
 
 def get_cdw_config_duckdb_connection(database_code: str, schema: str, connection_type: ConnectionTypes) -> duckdb.DuckDBPyConnection:
