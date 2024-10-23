@@ -344,12 +344,12 @@ class BuenaVistaHandler(socketserver.StreamRequestHandler):
             auth_check(token, d2e_database_format)
 
             # Resolve database param in connection params
-            dialect, database_code, schema, vocab_schema = parse_d2e_database_format(token,
+            dialect, connection_type, database_code, schema, vocab_schema = parse_d2e_database_format(token,
                                                                                      d2e_database_format)
 
             # Get database connection and rewriter
             conn = get_db_connection(
-                self.server.db_clients, dialect, database_code, schema, vocab_schema)
+                self.server.db_clients, dialect, connection_type, database_code, schema, vocab_schema)
             rewriter = get_rewriter_from_dialect(dialect)
 
             logger.info("Client connection params: %s", params)
