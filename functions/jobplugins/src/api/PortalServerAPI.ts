@@ -42,9 +42,10 @@ export class PortalServerAPI {
 
   async getDataset(datasetId: string) {
     try {
-      const url = `${this.baseURL}/dataset/${datasetId}`;
+      const url = `${this.baseURL}/dataset`;
+      const queryParams = new URLSearchParams({ datasetId });
       const options = this.createOptions("GET");
-      const result = await fetch(url, options);
+      const result = await fetch(`${url}?${queryParams.toString()}`, options);
       if (!result.ok) {
         throw new Error("Error while getting dataset by datasetId");
       }
