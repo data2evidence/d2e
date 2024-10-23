@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# create cdm schema
 echo ${0} ...
 
 # inputs

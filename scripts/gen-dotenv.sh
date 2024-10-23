@@ -1,54 +1,56 @@
 #!/usr/bin/env bash
-# generate dotenv file
+# generate dotenv file with passwords, certificates,
 set -o nounset
 set -o errexit
 
-# constants
-env_file=.env.local
-example_file=env.example
-tmp_file=.env.tmp
-
-passphrase_length=10
-default_password_length=30
-x509_subject="/C=SG/O=ALP Dev"
-
-password_keys=(MEILI_MASTER_KEY MINIO__SECRET_KEY PG_ADMIN_PASSWORD PG_SUPER_PASSWORD PG_WRITE_PASSWORD REDIS_PASSWORD LOGTO_API_M2M_CLIENT_ID LOGTO_API_M2M_CLIENT_SECRET STRATEGUS__KEYRING_PASSWORD)
+# inputs
+DEFAULT_PASSWORD_LENGTH=30
+ENV_FILE=.env.local
+EXAMPLE_FILE=env.example
+PASSPHRASE_LENGTH=10
+PASSWORD_NAMES_FILE=scripts/list-passwords.txt
+TMP_FILE=.env.tmp
+X509_SUBJECT="/C=SG/O=ALP Dev"
 
 # vars
-echo '' > $tmp_file
-echo '' > $env_file
+GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+
+# action
+cd $GIT_BASE_DIR
+PASSWORD_NAMES=($(cat $PASSWORD_NAMES_FILE))
+echo '' > $TMP_FILE
+echo '' > $ENV_FILE
 
 # passwords
-echo set-passwords ...
+echo set random passwords ...
 function set-password {
-    export password_name=$1
-    export password_length=$2
-    echo INFO set password:$password_name ...
-    export password_value=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c $password_length)
-    echo ${password_name}=${password_value} >> $tmp_file
+    export PASSWORD_NAME=$1
+    export PASSWORD_LENGTH=$2
+    echo INFO set password:$PASSWORD_NAME ...
+    export PASSWORD_VALUE=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c $PASSWORD_LENGTH)
+    echo ${PASSWORD_NAME}=${PASSWORD_VALUE} >> $TMP_FILE
 }
 
-# set random passwords
-password_name=${password_keys[1]}
-for password_name in ${password_keys[@]}; do
-    length=$default_password_length
-    if [ $password_name = "LOGTO_API_M2M_CLIENT_ID" ]; then
-        length=21
+PASSWORD_NAME=${PASSWORD_NAMES[1]}
+for PASSWORD_NAME in ${PASSWORD_NAMES[@]}; do
+    PASSWORD_LENGTH=$DEFAULT_PASSWORD_LENGTH
+    if [ $PASSWORD_NAME = "LOGTO_API_M2M_CLIENT_ID" ]; then
+        PASSWORD_LENGTH=21
     fi
-    set-password $password_name $length
+    set-password $PASSWORD_NAME $PASSWORD_LENGTH
 done
 echo
 
 # https://www.openssl.org/docs/man3.0/man1/openssl-passphrase-options.html
 function set-openssl {
-    echo set-openssl ...
+    echo "set openssl DB_CREDENTIALS public, private key, passphrase ..."
     echo INFO set DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE DB_CREDENTIALS__INTERNAL__PRIVATE_KEY DB_CREDENTIALS__INTERNAL__PUBLIC_KEY ...
-    export PASSPHRASE=$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c $passphrase_length)
+    export PASSPHRASE=$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c $PASSPHRASE_LENGTH)
     export PRIVATE_KEY=$(openssl genpkey -algorithm RSA -aes-256-cbc -pkeyopt rsa_keygen_bits:4096 -pass env:PASSPHRASE -quiet)
     export PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | openssl rsa -pubout -passin env:PASSPHRASE)
-    echo DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE=\"${PASSPHRASE}\" >> $tmp_file
-    echo DB_CREDENTIALS__INTERNAL__PRIVATE_KEY=\'"${PRIVATE_KEY}"\' >> $tmp_file
-    echo DB_CREDENTIALS__INTERNAL__PUBLIC_KEY=\'"${PUBLIC_KEY}"\' >> $tmp_file
+    echo DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE=\"${PASSPHRASE}\" >> $TMP_FILE
+    echo DB_CREDENTIALS__INTERNAL__PRIVATE_KEY=\'"${PRIVATE_KEY}"\' >> $TMP_FILE
+    echo DB_CREDENTIALS__INTERNAL__PUBLIC_KEY=\'"${PUBLIC_KEY}"\' >> $TMP_FILE
 }
 set-openssl
 echo
@@ -56,16 +58,16 @@ echo
 encode-basic-auth() {
     echo encode-basic-auth ...
     echo INFO set LOGTO__CLIENTID_PASSWORD__BASIC_AUTH ...
-    client_id=$(grep '^LOGTO_API_M2M_CLIENT_ID=' "$tmp_file" | cut -d"=" -f2)
-    client_secret=$(grep '^LOGTO_API_M2M_CLIENT_SECRET=' "$tmp_file" | cut -d"=" -f2)
-    encoded_basic_auth=$(echo -n "${client_id}:${client_secret}" | base64)
-    echo LOGTO__CLIENTID_PASSWORD__BASIC_AUTH=${encoded_basic_auth} >> $tmp_file
+    source $TMP_FILE
+    encoded_basic_auth=$(echo -n "${LOGTO_API_M2M_CLIENT_ID}:${LOGTO_API_M2M_CLIENT_SECRET}" | base64)
+    echo LOGTO__CLIENTID_PASSWORD__BASIC_AUTH=${encoded_basic_auth} >> $TMP_FILE
 }
 encode-basic-auth
 echo
 
-bash -c "set -a; source $tmp_file; cat $example_file | envsubst > $env_file"
-echo >> $env_file
+# Substitute shell variables in EXAMPLE_FILE. Variables exported in sub-shell.
+bash -c "set -a; source $TMP_FILE; cat $EXAMPLE_FILE | envsubst > $ENV_FILE"
+echo >> $ENV_FILE
 
 # finish
-wc -l $env_file
+wc -l $ENV_FILE
