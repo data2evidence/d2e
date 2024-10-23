@@ -158,6 +158,18 @@ const initRoutes = async (app: express.Application) => {
                     log.debug(`No user found in request:${err.stack}`);
                 }
 
+                // Skip getting db connections if request starts with "/analytics-svc/api/services/alpdb/", as these requests are all in dbsvc.ts and uses a separate implementation for database connection
+                if (
+                    req.originalUrl.startsWith(
+                        "/analytics-svc/api/services/alpdb/"
+                    )
+                ) {
+                    log.info(
+                        "Skipping middleware to get req.dbConnections for /alpdb/* requests"
+                    );
+                    return next();
+                }
+
                 let credentials = null;
                 if (envVarUtils.isTestEnv()) {
                     credentials =
@@ -188,6 +200,12 @@ const initRoutes = async (app: express.Application) => {
     });
 
     app.use((req: IMRIRequest, res, next) => {
+        // Skip getting cleanupMiddleware if request starts with "/analytics-svc/api/services/alpdb/", as these requests are all in dbsvc.ts and has a separate implementation for database connection cleanups
+        if (req.originalUrl.startsWith("/analytics-svc/api/services/alpdb/")) {
+            log.info("Skipping cleanupMiddleware for /alpdb/* requests");
+            return next();
+        }
+
         if (!utils.isHealthProbesReq(req)) {
             dbConnectionUtil.DBConnectionUtil.cleanupMiddleware()(
                 req as any,
