@@ -85,7 +85,7 @@ async function saveBot(fhirApi: FhirAPI, botConfig: MedplumBotConfig, bot: Bot):
           return false;
         }
         console.log('Saving source code...');
-        const sourceCode = await fhirApi.createAttachment_bot(basename(codePath), code, ContentType.TYPESCRIPT);
+        const sourceCode = await fhirApi.createAttachment_bot(basename(codePath), code, ContentType.JAVASCRIPT);
       
         console.log('Updating bot...');
         const updateResult = await fhirApi.updateResource_bot(bot, sourceCode);

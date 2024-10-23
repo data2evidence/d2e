@@ -455,7 +455,10 @@ services:
             "FHIR__CLIENT_ID": "db6b2304-f236-45ec-b10c-a852681e7129",
             "FHIR__CLIENT_SECRET": "${FHIR__CLIENT_SECRET}",
             "DUCKDB_PATH": "/home/docker/alp-data-node/app/src/duckdb",
-            "PLUGIN_PATH": "/usr/src/plugins/d2ef/alp-fhir-init"
+            "PLUGIN_PATH": "/usr/src/plugins/d2ef/alp-fhir-init",
+            "IDP__ALP_DATA_CLIENT_ID": "${LOGTO__ALP_DATA__CLIENT_ID}",
+            "IDP__ALP_DATA__CLIENT_SECRET": "${LOGTO__ALP_DATA__CLIENT_SECRET}",
+            "ALP_GATEWAY_OAUTH__URL": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/oauth/token"
           },
           "query-gen-svc": {
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",

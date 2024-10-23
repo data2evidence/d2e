@@ -18,6 +18,9 @@ const Env = z.object({
   DUCKDB_PATH: z.string(),
   PLUGIN_PATH: z.string(),
   TLS__INTERNAL__CA_CRT: z.string().optional(),
+  IDP__ALP_DATA_CLIENT_ID: z.string(),
+  IDP__ALP_DATA__CLIENT_SECRET: z.string(),
+  ALP_GATEWAY_OAUTH__URL: z.string(),
 })
 
 const _env = Deno.env.toObject()
