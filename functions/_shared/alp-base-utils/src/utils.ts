@@ -37,7 +37,7 @@ export class TextLib {
       const bundle = rm.getTextBundle(locale || "en_EN");
       const text = bundle.getText(key, parameters);
       return text;
-    } catch(e) {
+    } catch (e) {
       console.log("MSG>> " + e);
     }
     return key;
@@ -726,14 +726,11 @@ export function replacePlaceholderWithCustomString(
 export function convertZlibBase64ToJson(base64String: string) {
   try {
     const ret = JSON.parse(
-      pako.inflate(
-        base64.decodeBase64(base64String),
-        { to: "string" },
-      ),
+      pako.inflate(base64.decodeBase64(base64String), { to: "string" }),
     );
     return ret;
   } catch (err) {
-    console.log(err)
+    console.log(err);
     throw new Error("There was en error converting the input to JSON");
   }
 }
@@ -846,14 +843,20 @@ export const setupGlobalErrorHandling = (app: any, log: ILogger | Logger) => {
   });
 };
 
+export enum CachedbConnectionType {
+  READ = "read",
+  WRITE = "write",
+}
+
 /*
 Helepr function to get cachedb database format for protocol A
 */
 export const getCachedbDatabaseFormatProtocolA = (
   dialect: string,
   datasetId,
+  connectionType: CachedbConnectionType = CachedbConnectionType.READ,
 ) => {
-  return `A|${dialect}|${datasetId}`;
+  return `A|${dialect}|${connectionType}|${datasetId}`;
 };
 
 /*
@@ -862,10 +865,11 @@ Helepr function to get cachedb database format for protocol B
 export const getCachedbDatabaseFormatProtocolB = (
   dialect: string,
   databaseCode: string,
+  connectionType: CachedbConnectionType = CachedbConnectionType.READ,
   schemaName: string = "",
   vocabSchemaName: string = "",
 ) => {
-  let cachedbDatabaseFormat = `B|${dialect}|${databaseCode}`;
+  let cachedbDatabaseFormat = `B|${dialect}|${connectionType}|${databaseCode}`;
   if (schemaName) {
     cachedbDatabaseFormat += `|${schemaName}`;
   }

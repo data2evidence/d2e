@@ -1,5 +1,5 @@
-import pg from 'pg'
-const { Pool } = pg
+import pg from "pg";
+const { Pool } = pg;
 // Setting MAX_PACKET_SIZE in node-hdb prevents failure of large sql statements https://github.com/SAP/node-hdb/issues/19
 /* tslint:disable no-var-requires */
 //require("hdb/lib/protocol/common/Constants").MAX_PACKET_SIZE = Math.pow(2, 30);
