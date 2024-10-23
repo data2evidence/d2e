@@ -32,7 +32,6 @@ export const env = {
   TENANT_ID: process.env.APP__TENANT_ID,
   TENANT_NAME: process.env.APP__TENANT_NAME,
   SYSTEM_NAME: process.env.ALP__SYSTEM_NAME,
-  PORTAL_PLUGINS: process.env.PLUGINS__JSON,
 
   SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
   SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
