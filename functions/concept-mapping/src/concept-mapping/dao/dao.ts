@@ -1,7 +1,10 @@
 import pg from "pg";
 import pgPromise from "pg-promise";
 import { DatabaseConfig, Dataset } from "../../types";
-import { getCachedbDatabaseFormatProtocolA } from "../../../../_shared/alp-base-utils/src/utils";
+import {
+  getCachedbDatabaseFormatProtocolA,
+  CachedbConnectionType,
+} from "../../../../_shared/alp-base-utils/src/utils";
 import { env } from "../../env";
 
 const pgp = pgPromise({
@@ -48,7 +51,7 @@ export default class DAO {
     columns: Array<String>,
     data: object | object[]
   ) => {
-    const client = await this.getCachedbConnection();
+    const client = await this.getCachedbConnection(CachedbConnectionType.WRITE);
     console.log("client connected");
     try {
       const columnSet = new ColumnSet(columns, {
@@ -70,7 +73,9 @@ export default class DAO {
     }
   };
 
-  private getCachedbConnection = async () => {
+  private getCachedbConnection = async (
+    cachedbConnection: CachedbConnectionType = CachedbConnectionType.READ
+  ) => {
     try {
       const config: DatabaseConfig = {
         host: env.CACHEDB__HOST,
@@ -80,7 +85,8 @@ export default class DAO {
           this.dataset.dialect === "postgres"
             ? "postgresql"
             : this.dataset.dialect,
-          this.dataset.id
+          this.dataset.id,
+          cachedbConnection
         ),
       };
 
