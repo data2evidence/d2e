@@ -410,8 +410,8 @@ services:
             "DUCKDB__DATA_FOLDER": "/home/docker/src/alp-data-node/app/duckdb_data",
             "LOCAL_DEBUG": "false",
             "SKIP_AUTH": "${SKIP_AUTH:-FALSE}",
-            "USE_DUCKDB": "false",
-            "USE_CACHEDB": "false",
+            "USE_DUCKDB": "${USE_DUCKDB:-true}",
+            "USE_CACHEDB": "${USE_CACHEDB:-true}",
 
             "USE_SQL_PROXY": "${USE_SQL_PROXY:-false}",
             "USE_EXTENSION_FOR_COHORT_CREATION": "false",
