@@ -481,6 +481,14 @@ const initSwaggerRoutes = async (app: express.Application) => {
     );
     const basePath = swaggerFile["basePath"];
     for (const [path, value] of Object.entries(swaggerFile["paths"])) {
+        // Skip swagger route
+        if (path === "/swagger") {
+            log.info(
+                "Skipping '/swagger' route as it is not linked to a x-swagger-router-controller file"
+            );
+            break;
+        }
+
         const controllerFile = value["x-swagger-router-controller"];
         try {
             const controller = await import(

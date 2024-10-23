@@ -68,10 +68,8 @@ export default class PortalServerAPI {
 
     async getStudy(token: string, datasetId: string) {
         const options = await this.getRequestConfig(token);
-        const result = await axios.get(
-            `${this.baseUrl}/dataset/${datasetId}`,
-            options
-        );
+        options.params = { datasetId };
+        const result = await axios.get(`${this.baseUrl}/dataset`, options);
         return result.data;
     }
 
