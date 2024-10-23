@@ -13,7 +13,7 @@ export class App {
     this.app.use(express.json());
     this.app.use("/concept-mapping", new ConceptMappingRouter().router);
     this.app.listen(8000);
-    this.logger.info(`🚀 ALP FHIR Service started successfully!`);
+    this.logger.info(`Concept Mapping service started successfully!`);
   }
 }
 
