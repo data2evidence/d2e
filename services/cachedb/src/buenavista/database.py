@@ -12,7 +12,7 @@ from .backends.postgres import PGConnection
 from .backends.hana import HANAConnection
 from buenavista import bv_dialects, rewrite
 from config import Env
-from .cdw_config import get_cdw_config_duckdb_connection
+from .cdw_config import _resolve_cdw_config_duckdb_file_path
 
 logger = logging.getLogger(__name__)
 
@@ -35,11 +35,14 @@ class DatabaseDialects(str, Enum):
     HANA = "hana"
     POSTGRES = "postgresql"
     DUCKDB = "duckdb"
+class ConnectionTypes(str, Enum):
+    READ = "read"
+    WRITE = "write"
 
 
 class CachedbDatabaseClients(BaseModel):
-    hana: Optional[Dict[str, Engine]] = {}
-    postgresql: Optional[Dict[str, Engine]] = {}
+    hana: Optional[Dict[ConnectionTypes, Dict[str, Engine]]] = {}
+    postgresql: Optional[Dict[ConnectionTypes, Dict[str, Engine]]] = {}
 
     class Config:
         arbitrary_types_allowed = True
@@ -93,7 +96,7 @@ class DatabaseCredentials:
         return values
 
 
-def GetDBConnection(database_code: str):
+def GetDBConnection(database_code: str, connection_type: ConnectionTypes):
     try:
         conn_details = extract_db_credentials(database_code)
     except Exception as e:
@@ -112,8 +115,14 @@ def GetDBConnection(database_code: str):
             db = database_name
         host = conn_details["host"]
         port = conn_details["port"]
-        user = conn_details["user"]
-        password = conn_details["password"]
+        if connection_type == ConnectionTypes.WRITE:
+            # Get admin user credentials if connection type is write
+            user = conn_details["adminUser"]
+            password = conn_details["adminPassword"]
+        else: 
+            # Get read user credentials by default
+            user = conn_details["user"]
+            password = conn_details["password"]
         conn_string = _CreateConnectionString(
             dialect_driver, user, password, host, port, db)
         engine = create_engine(
@@ -128,12 +137,12 @@ def _CreateConnectionString(dialect_driver: str, user: str, pw: str,
     return conn_string
 
 
-def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_code: str, schema: str, vocab_schema: str):
+def get_db_connection(clients: CachedbDatabaseClients, dialect: str, connection_type: ConnectionTypes, database_code: str, schema: str, vocab_schema: str):
     connection = None
 
     # Handle special case whereby cdw-config-svc is using alp-cachedb to get connection to cdw-svc duckdb file
     if database_code == Env.CDW_CONFIG_SVC_DATABASE_CODE and schema == Env.CDW_CONFIG_SVC_DUCKDB_SCHEMA_NAME:
-        return DuckDBConnection(get_cdw_config_duckdb_connection(database_code, schema))
+        return DuckDBConnection(get_cdw_config_duckdb_connection(database_code, schema, connection_type))
 
     # Guard clause for postgres and hana for unsupported database_codes
     if dialect == DatabaseDialects.POSTGRES or dialect == DatabaseDialects.HANA:
@@ -151,11 +160,11 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
 
     if dialect == DatabaseDialects.POSTGRES:
         connection = PGConnection(
-            clients[dialect][database_code])
+            clients[dialect][database_code][connection_type])
 
     if dialect == DatabaseDialects.HANA:
         connection = HANAConnection(
-            clients[dialect][database_code])
+            clients[dialect][database_code][connection_type])
 
     if dialect == DatabaseDialects.DUCKDB:
         '''
@@ -171,11 +180,11 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
         # Only when both duckdb files for cdm schema and vocab schema exist, connect to duckdb
         if os.path.isfile(cdm_schema_duckdb_file_path) and os.path.isfile(vocab_schema_duckdb_file_path):
             db = _get_duckdb_connection(
-                cdm_schema_duckdb_file_path, schema, vocab_schema_duckdb_file_path, vocab_schema)
+                cdm_schema_duckdb_file_path, schema, vocab_schema_duckdb_file_path, vocab_schema, connection_type)
             
             # Attach direct postgres connection, this is used by analytics-svc for cohort/cohort_definition table queries where it requires direct connection to postgres.
             if database_code in clients[DatabaseDialects.POSTGRES]:
-                _attach_direct_postgres_connection_for_duckdb(db, database_code)
+                _attach_direct_postgres_connection_for_duckdb(db, database_code, connection_type)
 
             # In order for FTS to work, vocab schema has to be passed into DuckDBConnection
             # TODO: To remove vocab_schema as an input parameter after issue has been fixed
@@ -187,7 +196,7 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
                 f"Duckdb Inaccessible at following paths {cdm_schema_duckdb_file_path} OR {vocab_schema_duckdb_file_path}. Hence fallback to Postgres dialect connection"
             )
             connection = PGConnection(
-                clients[DatabaseDialects.POSTGRES][database_code])
+                clients[DatabaseDialects.POSTGRES][database_code][connection_type])
 
     if connection:
         return connection
@@ -197,27 +206,44 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, database_co
             f"Database connection not found for connection with dialect:{dialect}, database_code:{database_code}, schema:{schema}, ")
 
 
-def _attach_direct_postgres_connection_for_duckdb(db: duckdb.DuckDBPyConnection, database_code: str):
+def _attach_direct_postgres_connection_for_duckdb(db: duckdb.DuckDBPyConnection, database_code: str, connection_type: ConnectionTypes):
+    duckdb_pg_connection_type = "(TYPE postgres, READ_ONLY)" if connection_type == ConnectionTypes.READ else "(TYPE postgres)"
     print("Attaching postgres as direct connection ")
     conn_details = extract_db_credentials(database_code)
     db.execute(
-        f"ATTACH 'host={conn_details['host']} port={conn_details['port']} dbname={conn_details['databaseName']} user={conn_details['user']} password={conn_details['password']}' AS direct_db_conn (TYPE postgres, READ_ONLY)")
+        f"ATTACH 'host={conn_details['host']} port={conn_details['port']} dbname={conn_details['databaseName']} user={conn_details['user']} password={conn_details['password']}' AS direct_db_conn {duckdb_pg_connection_type}")
 
 
-def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_schema_duckdb_file_path: str, vocab_schema: str) -> duckdb.DuckDBPyConnection:
+def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_schema_duckdb_file_path: str, vocab_schema: str, connection_type: ConnectionTypes) -> duckdb.DuckDBPyConnection:
     '''
     Get duckdb connection with both cdm and vocab schema attached
     '''
+    duckdb_connection_type = "(READ_ONLY)" if connection_type == ConnectionTypes.READ else ""
     db = duckdb.connect()
-    # Attach cdm schema
+    # Attach cdm schema in READ or WRITE connection depending on duckdb_connection_type
     db.execute(
-        f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} (READ_ONLY);")
+        f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} {duckdb_connection_type};")
     
     # For cases where cdm schema and vocab schema are different, attach as a separate database in duckdb
     if (cdm_schema_duckdb_file_path != vocab_schema_duckdb_file_path):
-        # Attach vocab schema 
+        # Attach vocab schema as READ_ONLY in all cases
         db.execute(
             f"ATTACH '{vocab_schema_duckdb_file_path}' AS {vocab_schema} (READ_ONLY);")
+    return db
+
+def get_cdw_config_duckdb_connection(database_code: str, schema: str, connection_type: ConnectionTypes) -> duckdb.DuckDBPyConnection:
+    '''
+    Get duckdb connection for cdw-config-svc
+    First check if dynamically generated duckdb file is available, if not fallback to using built in duckdb file for cdw-config
+    '''
+    duckdb_connection_type = "(READ_ONLY)" if connection_type == ConnectionTypes.READ else ""
+    duckdb_file_name = f"{database_code}_{schema}"
+    duckdb_file_path = _resolve_cdw_config_duckdb_file_path(duckdb_file_name)
+
+    db = duckdb.connect()
+    # Attach cdm schema
+    db.execute(
+        f"ATTACH '{duckdb_file_path}' AS {schema} {duckdb_connection_type};")
     return db
 
 
@@ -253,7 +279,8 @@ def initialize_db_clients() -> CachedbDatabaseClients:
 
     for database_code, dialect in database_codes_and_dialects:
         if dialect == DatabaseDialects.HANA or dialect == DatabaseDialects.POSTGRES:
-            cachedb_database_clients[dialect] = {
-                database_code: GetDBConnection(database_code)}
-
+            cachedb_database_clients[dialect][database_code] = {}
+            # Create read and write engines
+            cachedb_database_clients[dialect][database_code][ConnectionTypes.READ] = GetDBConnection(database_code, ConnectionTypes.READ)
+            cachedb_database_clients[dialect][database_code][ConnectionTypes.WRITE] = GetDBConnection(database_code, ConnectionTypes.WRITE)
     return cachedb_database_clients
