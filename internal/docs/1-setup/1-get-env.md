@@ -3,17 +3,18 @@
 ## Get env-var yaml files from 1password
 
 - Hints
-  - `export OVERWRITE=true`
-  - `alias ni='npm run internal'`
+  - `export OVERWRITE=true` - to overwrite existing
+  - `alias ni='npm run internal'` - shortcut
+  - `alias yi='yarn internal'` - shortcut
 
 ```bash
-npm run internal get:env:dev
+yarn internal get:env:all
 ```
 
-## Generate dotenv file by flatten - new
+## Generate dotenv file by flatten
 
-- merge relevant `.env.*.yml` to flat `.env2.*.yml`
+- merge relevant cache env yml to flat yml in git_dir
 
 ```bash
-npm run internal flatten:env:dev
+yarn internal flatten:env:all
 ```

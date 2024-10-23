@@ -14,7 +14,7 @@
     "create:env:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do yarn create:env $ENV_NAME; done",
     "flatten:env": "scripts/flatten-env.sh",
     "flatten:env:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn flatten:env; done",
-    "gen:env": "scripts/gen-env.mjs",
+    "gen:env": "scripts/gen-env.sh",
     "gen:tls": "scripts/gen-tls.sh",
     "get:drivers": "scripts/get-drivers.sh",
     "get:env": "scripts/get-env.sh",

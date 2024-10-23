@@ -59,13 +59,13 @@ jobs:
           ./internal/scripts/get-op-ratelimit.sh
 
           # get env yml from 1password
-          npm run internal op:get:$ENV_TYPE
+          yarn internal op:get:$ENV_TYPE
 
           # mask sensitive values
           internal/scripts/mask-gha.sh
 
           # generate dotenv
-          npm run internal gen:env
+          yarn internal gen:env
 
           echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
 

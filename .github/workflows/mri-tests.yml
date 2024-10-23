@@ -100,7 +100,7 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
         run: |
-          npm run internal get:drivers
+          yarn internal get:drivers
 
       - uses: actions/setup-node@v4
         with:

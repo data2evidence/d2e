@@ -68,13 +68,13 @@ jobs:
           ACTIONS_STEP_DEBUG=false
 
           # get env yml from 1password
-          npm run internal op:get:$ENV_TYPE
+          yarn internal op:get:$ENV_TYPE
 
           # mask sensitive values
           internal/scripts/mask-gha.sh
 
           # generate dotenv
-          npm run internal gen:env
+          yarn internal gen:env
 
           cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 

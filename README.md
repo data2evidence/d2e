@@ -29,6 +29,8 @@ yarn gen:dotenv
 
 #### Initalize Logto Apps
 
+- note: [clean-up](README.md#clean-up) first to re-initialize
+
 ```bash
 yarn init:logto
 ```

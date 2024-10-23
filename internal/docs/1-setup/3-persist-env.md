@@ -1,18 +1,8 @@
 # Persist Environment Variables
 
-## Initalize Logto Apps
-
-- sets `LOGTO__ALP_*`
-
-```bash
-yarn init:logto
-```
-
-## Persist Environment Variables
-
-- Run after `yarn init:logto` step
-- Persists `LOGTO__ALP_*` written to `.env.${ENV_TYPE}`
+- Persists env from .env.$ENV_TYPE file to .env.$ENV_TYPE.private.yml
+- Typically run after `yarn init:logto` step
 
 ```bash
-npm run internal persist:env
+yarn internal persist:env
 ```

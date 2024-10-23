@@ -1,21 +1,15 @@
 # Generate DotEnv file
 
-- generate `.env.${ENV_TYPE}`
+- generate DotEnv filename `.env.${ENV_TYPE}` where ENV_TYPE:
 
-<!-- ## Generate dotenv file by merge - old
+  - local - local macos
+  - remote - with FQDN
 
-- generate `.env.${ENV_TYPE}` by merge relevant `.env.*.yml`
-
-```bash
-npm run internal gen:env
-``` -->
-
-## Convert env-var yaml to dotenv
-
-- add env-vars from relevant `.env2.${ENV_NAME}.yml`
-- auto-generate `TLS__INTERNAL_*` certificates
+- convert env yaml to dotenv
+- generate wildcard certificate `*.alp.local` with Caddy for TLS inter-service communications
+- generate docker resource limits based on available system resources
 
 ```bash
-npm run internal gen:env2
+yarn internal gen:env
 wc -l .env.local
 ```

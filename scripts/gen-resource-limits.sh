@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
+set -o nounset
+set -o errexit
 echo ${0} ...
+echo . INFO generate docker resource limits based on available system resources
 
 # inputs
 D2E_RESOURCE_LIMIT=${D2E_RESOURCE_LIMIT:-0.7}
 ENV_TYPE=${ENV_TYPE:-local}
 
+echo D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT
+echo ENV_TYPE=$ENV_TYPE
+
 # vars
 OS="$(uname -s)"
-DOTENV_FILE=.env.$ENV_TYPE
-touch ${DOTENV_FILE}
+DOTENV_FILE_OUT=.env.$ENV_TYPE
+touch ${DOTENV_FILE_OUT}
 
-echo D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT
-
+# functions
 get_cpu_count() {
     if [ "$OS" = "Linux" ]; then
         NPROCS="$(nproc --all)"
@@ -27,9 +32,9 @@ get_cpu_count() {
     echo D2E_CPU_LIMIT=$D2E_CPU_LIMIT
 
     # remove existing env var from dotenv
-    sed -i.bak "/D2E_CPU_LIMIT=/,//d" $DOTENV_FILE
+    sed -i.bak "/D2E_CPU_LIMIT=/,//d" $DOTENV_FILE_OUT
     # set env var
-    echo D2E_CPU_LIMIT=\'"$D2E_CPU_LIMIT"\' >> $DOTENV_FILE
+    echo D2E_CPU_LIMIT=\'"$D2E_CPU_LIMIT"\' >> $DOTENV_FILE_OUT
 }
 
 get_memory() {
@@ -47,11 +52,14 @@ get_memory() {
     echo D2E_MEMORY_LIMIT=$D2E_MEMORY_LIMIT
 
     # remove existing env var from dotenv
-    sed -i.bak "/D2E_MEMORY_LIMIT=/,//d" $DOTENV_FILE
+    sed -i.bak "/D2E_MEMORY_LIMIT=/,//d" $DOTENV_FILE_OUT
     # set env var
-    echo D2E_MEMORY_LIMIT=\'"$D2E_MEMORY_LIMIT"\' >> $DOTENV_FILE
+    echo D2E_MEMORY_LIMIT=\'"$D2E_MEMORY_LIMIT"\' >> $DOTENV_FILE_OUT
 
 }
 
+# action
 get_cpu_count
 get_memory
+wc -l $DOTENV_FILE_OUT
+echo

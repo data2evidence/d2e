@@ -71,3 +71,4 @@ echo >> $ENV_FILE
 
 # finish
 wc -l $ENV_FILE
+echo
