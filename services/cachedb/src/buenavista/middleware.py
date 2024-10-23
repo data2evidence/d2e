@@ -181,7 +181,7 @@ def _parse_d2e_database_format_B_protocol(d2e_database_format) -> tuple[str, str
     dialect = _get_dialect_from_d2e_database_format(d2e_database_format)
 
     if dialect == DatabaseDialects.DUCKDB:
-        # Simple conditional check to check if database param has four components separated by "|" excluding protocol
+        # Simple conditional check to check if database param has 5 components separated by "|" excluding protocol
         if len(databaseComponents) != 5:
             raise Exception(
                 f"Database param:{d2e_database_format} for protocol B is invalid! Database has to be in the format of {PROTOCOL_B_FORMAT}")
