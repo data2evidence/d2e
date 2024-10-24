@@ -96,7 +96,6 @@ export enum USER_SCOPE {
           },
         };
       });
-      console.log(databaseCredentials)
       const databaseCredentialsStr = createDbCredentialsStr(databaseCredentials);
       const serviceDatabaseCredentials = filterServiceCredentials(
         databaseCredentialsStr,
