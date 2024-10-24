@@ -508,7 +508,6 @@ paths:
       produces:
         - parquet
       parameters:
-        # TODO: ADD DATASETID IN QUERY PARAM INSTEAD
         - name: datasetId
           in: path
           description: datasetId that maps to schema name in database
@@ -572,7 +571,6 @@ paths:
           name: cohort
           schema:
             type: object
-            # TODO: TBD MOVE DATASETID TO QUERY PARAM
             required:
               - datasetId
               - mriquery
@@ -1034,7 +1032,6 @@ paths:
       consumes:
         - application/json
       parameters:
-      # TODO: ADD DATASETID IN QUERY PARAM INSTEAD
         - in: body
           name: cohort
           schema:

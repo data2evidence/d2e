@@ -27,6 +27,7 @@ export default async (req: IMRIRequest, res, next) => {
         // If still not found, return empty string
 
         // TODO: ONLY DATASETID SHOULD REMAIN AT THE END
+        // TODO: RENAME all selectedStudyEntityValue to datasetId
         if (req.query.datasetId) {
             return req.query.datasetId.toString();
         } else if (req.body.datasetId) {
