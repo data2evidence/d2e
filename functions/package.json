@@ -31,7 +31,8 @@
         },
         {
           "source": "/prefect",
-          "function": "/prefect"
+          "function": "/prefect",
+          "env": "jobplugins"
         },
         {
           "source": "/gateway/api/db",
@@ -419,6 +420,10 @@
           "scopes": [
             "jobplugins"
           ]
+        },
+        {
+          "path": "^/prefect(.*)",
+          "scopes": ["prefect.read", "prefect.delete", "prefect.post", "prefect.update"]
         },
         {
           "path": "^/analytics-svc/plugins/(.*)",
