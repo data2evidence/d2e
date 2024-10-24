@@ -6,6 +6,7 @@ const env = Deno.env.toObject();
 
 if (!env.PREFECT_API_URL) {
   console.error("Prefect URL not defined: skipping flow plugins");
+  throw new Error("No baseUrl is set for Prefect API");
 }
 
 function getCreateMiddlewareOptions(serviceUrl: string) {
