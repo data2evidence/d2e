@@ -479,7 +479,7 @@ const initSwaggerRoutes = async (app: express.Application) => {
         // Skip swagger route
         if (path === "/swagger") {
             log.info("Skipping '/swagger' route as it is not linked to a x-swagger-router-controller file")
-            break;
+            continue;
         }
 
         const controllerFile = value["x-swagger-router-controller"];
