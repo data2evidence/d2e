@@ -372,6 +372,9 @@ export interface StudyAnalyticsCredential {
     vocabSchema: string;
     dialect: string;
     schema: string;
+    max?: number;
+    min?: number;
+    idleTimeoutMillis?: number;
 }
 
 export interface StudyDbMetadata {

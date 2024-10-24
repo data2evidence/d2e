@@ -7,6 +7,7 @@ import {
 import { DB } from "../utils/DBSvcConfig";
 import { convertZlibBase64ToJson } from "@alp/alp-base-utils";
 import PortalServerAPI from "../api/PortalServerAPI";
+import { env } from "../env";
 const log = Logger.CreateLogger("analytics-log");
 
 export default async (req: IMRIRequest, res, next) => {
@@ -91,6 +92,11 @@ export default async (req: IMRIRequest, res, next) => {
             studyAnalyticsCredential.vocabSchema =
                 studyAnalyticsCredential.vocabSchema.toUpperCase();
         }
+
+        // Add database pool related configs to studyAnalyticsCredential
+        studyAnalyticsCredential.max = env.PG__MIN_POOL;
+        studyAnalyticsCredential.min = env.PG__MAX_POOL;
+        studyAnalyticsCredential.idleTimeoutMillis = env.PG__IDLE_TIMEOUT_IN_MS;
 
         req.dbCredentials = {
             ...req.dbCredentials,
