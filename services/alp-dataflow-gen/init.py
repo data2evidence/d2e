@@ -39,6 +39,7 @@ def create_prefect_variables():
     
     Variable.set("duckdb_data_folder", os.getenv("DUCKDB__DATA_FOLDER"), overwrite=True)
     Variable.set("cdw_config_duckdb_data_folder", os.getenv("CDW_CONFIG_DUCKDB__DATA_FOLDER"), overwrite=True)
+    Variable.set("fhir_schema_file", os.getenv("FHIR_SCHEMA_JSON_PATH"), overwrite=True)
     
     Variable.set("flows_results_sb_name", os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME"), overwrite=True)
     Variable.set("flows_results_s3_dir_path", os.getenv("DATAFLOW_MGMT__FLOWS__RESULTS__S3_DIR_PATH"), overwrite=True)
