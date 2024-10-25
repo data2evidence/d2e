@@ -45,7 +45,7 @@ const insertIntoFhirDataModel = async (resourceType, inputData) => {
         const options = await getRequestConfig(token);
         const baseUrl = 'http://trex.alp.local:33001/gateway/api/fhir';
         if (baseUrl) {
-            const url = `${baseUrl}/createResource/${resourceType}`;
+            const url = `${baseUrl}/ingestResource/${resourceType}`;
             const result = await axios_1.default.post(url, inputData, options);
             console.log(result.data);
             return result.data;
