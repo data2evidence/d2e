@@ -135,11 +135,14 @@ export const ingestResourceInCacheDB = async (fhirResouce: string) => {
     try{
         //Get fhir.schema.json
         const jsonSchema = await getFhirJsonSchema(conn)
+        let results: any = []
+        console.info('Create resource for each of the entry in the bundle')
         for (const entry of bundle.entry) {
-            console.info('Create resource for each of the entry in the bundle')
-            await ingestResourceInFhir(conn, datasetDetails.schemaName, jsonSchema, entry.resource, entry.request)
+            let result = await ingestResourceInFhir(conn, datasetDetails.schemaName, jsonSchema, entry.resource, entry.request)
+            if(result !== true)
+                results.push(result)
         }
-        return true
+        return results
     }catch(err){
         console.error(`Error ingesting resource: ${err}`)
         throw err

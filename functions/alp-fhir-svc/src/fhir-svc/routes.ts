@@ -1,4 +1,4 @@
-import { createProject, createResourceInProject, getResource, ingestResourceInCacheDB, updateResource } from './services';
+import { createProject, createResourceInProject, createSubscriptionInFhirServer, getResource, ingestResourceInCacheDB, updateResource } from './services';
 import express from 'npm:express'
 export class FhirRouter {
   public router = express.Router();
@@ -29,7 +29,7 @@ export class FhirRouter {
           const token = req.headers.authorization!
           const response = await createResourceInProject(token, resource, req.body, projectName)
           if(response)
-            return res.status(200).json('FHIR Resource successfully created!')
+            return res.status(200).json(response)
           else
           return res.status(500).json('Failed to create FHIR Resource')
         } catch (error) {
@@ -44,7 +44,7 @@ export class FhirRouter {
         this.logger.info('Ingest into FHIR Data model')
         const response = await ingestResourceInCacheDB(req.body)
         if(response)
-          return res.status(200).json('FHIR Resource successfully ingested!')
+          return res.status(200).json(response)
         else
         return res.status(500).json('Failed to ingest FHIR Resource')
       }catch(error){
@@ -53,6 +53,7 @@ export class FhirRouter {
       }
     })
 
+    //Test
     //Endpoint to ingest data into fhir data model in cachedb
     this.router.post('/getResource/:resource/:datasetId', async(req, res) =>{
       try{
@@ -70,6 +71,7 @@ export class FhirRouter {
       }
     })
 
+    //Test
     this.router.post('/update/:resource', async(req, res) => {
       try{
         this.logger.info('Update resource')

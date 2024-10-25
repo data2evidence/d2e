@@ -36,7 +36,7 @@ export async function ingestResourceInFhir(conn, schemaName, jsonSchema, data, r
             //Do not create resource if already exists
             if(recordExistsResult.length > 0){
                 console.log(`Resource ${data.resourceType} with id ${data.id} already exists!`)
-                reject(`Resource ${data.resourceType} with id ${data.id} already exists!`)
+                resolve(`Resource ${data.resourceType} with id ${data.id} already exists!`)
             }else{
                 let result = await parseAndInsertData(conn, schemaName, jsonSchema, data)
                 console.log(`Resource ${data.resourceType} with id ${data.id} inserted successfully!`)
@@ -52,7 +52,7 @@ export async function ingestResourceInFhir(conn, schemaName, jsonSchema, data, r
                 resolve(result)
             }else{
                 console.log(`Cannot update resource ${data.resourceType} with id ${data.id} as it doesn't exist in DB!`)
-                reject(`Cannot update resource ${data.resourceType} with id ${data.id} as it doesn't exist in DB!`)
+                resolve(`Cannot update resource ${data.resourceType} with id ${data.id} as it doesn't exist in DB!`)
             }
         }
         else if(requestType.method == 'DELETE'){
@@ -62,7 +62,7 @@ export async function ingestResourceInFhir(conn, schemaName, jsonSchema, data, r
                 resolve(true)
             }else{
                 console.log(`Cannot delete resource ${data.resourceType} with id ${data.id} as it doesn't exist in DB!`)
-                reject(`Cannot delete resource ${data.resourceType} with id ${data.id} as it doesn't exist in DB!`)
+                resolve(`Cannot delete resource ${data.resourceType} with id ${data.id} as it doesn't exist in DB!`)
             }
         }
         else{
