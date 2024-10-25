@@ -1,43 +1,87 @@
-import { PortalAPI } from '../api/PortalAPI';
+import moment from 'moment'
 import { env } from '../env';
-import { getCachedbDbConnections } from './dbUtils'
 import { ConnectionInterface } from '@alp/alp-base-utils/target/src/Connection';
 
 const schemaPath = env.FHIR_SCHEMA_PATH + '/' + env.FHIR_SCHEMA_FILE_NAME 
 
-export async function createResourceInFhir(token, data){
-    let datasetId = data.meta.id
-    console.info(`Incoming DatasetId: ${datasetId}`)
-    //Get dataset details to connect to cachedb
-    let portalApi = new PortalAPI(token)
-    let datasetDetails = await portalApi.getDatasetById(datasetId)
-    console.info(JSON.stringify(datasetDetails))
-    let conn = await getCachedbDbConnections(token, datasetDetails.databaseCode, datasetDetails.schemaName, datasetDetails.vocabSchemaName)
-    try{
-        return new Promise((resolve, reject) => {
-            conn.executeQuery(`select * from read_json('${schemaPath}')`, [], async (err: any, result: any) => {
-                if(err){
-                    console.log('Error loading fhir schema json: '+ JSON.stringify(err))
-                    reject(err)
-                }
-                const parsedFhirDefinitions = getFhirTableStructure(result[0], data.resourceType)
-                const insertStatement = getInsertStatement(data, parsedFhirDefinitions)
-                insertIntoFhirTable(conn, data.resourceType, insertStatement, (err, result) =>{
-                    if(err){
-                        console.log(err)
-                        reject(err)
-                    }
-                    console.log(JSON.stringify('Insert result: ' + JSON.stringify(result)))
-                    console.log('Data inserted into FHIR data model')
-                    resolve(true)
-                })
-            })
+export async function getFhirJsonSchema(conn:ConnectionInterface){
+    return new Promise((resolve, reject) => {
+        conn.executeQuery(`select * from read_json('${schemaPath}')`, [], (err: any, result: any) => {
+            if(err){
+                console.log('Error loading fhir schema json: '+ JSON.stringify(err))
+                reject(err)
+            }
+            resolve(result[0])
         })
-    }catch(err){
-        console.error(err)
-    }finally{
-        conn.close()
-    }
+    })
+}
+
+export async function getFhirData(conn:ConnectionInterface, fhirResource){
+    return new Promise((resolve, reject) => {
+        conn.executeQuery(`select * from ${fhirResource}Fhir`, [], (err: any, result: any) => {
+            if(err){
+                console.log('Error loading fhir schema json: '+ JSON.stringify(err))
+                reject(err)
+            }
+            resolve(result)
+        })
+    })
+}
+
+export async function ingestResourceInFhir(conn, schemaName, jsonSchema, data, requestType){
+    return new Promise(async (resolve, reject) => {
+        //Check if record exists
+        let recordExistsResult: any = await checkIfRecordExists(conn, schemaName, data.resourceType, data.id)
+        if(requestType.method == 'POST'){
+            //Do not create resource if already exists
+            if(recordExistsResult.length > 0){
+                console.log(`Resource ${data.resourceType} with id ${data.id} already exists!`)
+                reject(`Resource ${data.resourceType} with id ${data.id} already exists!`)
+            }else{
+                let result = await parseAndInsertData(conn, schemaName, jsonSchema, data)
+                console.log(`Resource ${data.resourceType} with id ${data.id} inserted successfully!`)
+                resolve(result)
+            }
+        } else if(requestType.method == 'PUT'){
+            if(recordExistsResult.length > 0){
+                //Set current record to inactive
+                await updateResourceStatus(conn, schemaName, data.resourceType, data.id)
+                //Insert new record for the resource
+                let result = await parseAndInsertData(conn, schemaName, jsonSchema, data)
+                console.log(`Resource ${data.resourceType} with id ${data.id} updated successfully!`)
+                resolve(result)
+            }else{
+                console.log(`Cannot update resource ${data.resourceType} with id ${data.id} as it doesn't exist in DB!`)
+                reject(`Cannot update resource ${data.resourceType} with id ${data.id} as it doesn't exist in DB!`)
+            }
+        }
+        else if(requestType.method == 'DELETE'){
+            if(recordExistsResult.length > 0){
+                await updateResourceStatus(conn, schemaName, data.resourceType, data.id)
+                console.log(`Resource ${data.resourceType} with id ${data.id} deleted successfully!`)
+                resolve(true)
+            }else{
+                console.log(`Cannot delete resource ${data.resourceType} with id ${data.id} as it doesn't exist in DB!`)
+                reject(`Cannot delete resource ${data.resourceType} with id ${data.id} as it doesn't exist in DB!`)
+            }
+        }
+        else{
+            return false
+        }
+    })
+}
+
+async function parseAndInsertData(conn, schemaName, jsonSchema, data){
+    return new Promise(async (resolve, reject) => {
+        try{
+            const parsedFhirDefinitions = getFhirTableStructure(jsonSchema, data.resourceType)
+            const insertStatement = getInsertStatement(data, parsedFhirDefinitions)
+            await insertIntoFhirTable(conn, schemaName, data.resourceType, insertStatement)
+            resolve(true)
+        }catch(err){
+            reject(err)
+        }
+    })
 }
 
 function getInsertStatement(data, parsedFhirDefinitions){
@@ -124,6 +168,13 @@ function getDuckdbInsertColumValues(data){
             insertColValues.push(`${temp}`)
         }
     }
+    let formattedDate = (moment(Date.now())).format('YYYY-MM-DD HH:mm:ss')
+    insertColNames.push('isActive')
+    insertColNames.push('createAt')
+    insertColNames.push('lastUpdateAt')
+    insertColValues.push(`'True'`)
+    insertColValues.push(`'${formattedDate}'`)
+    insertColValues.push(`'${formattedDate}'`)
     return `(${insertColNames.join(',')})VALUES(${insertColValues.join(',')})`
 }
 
@@ -176,7 +227,7 @@ function getDuckdbStructColValue(colProperty, structDataType){
             : `"${colProperty}" := struct_pack(${colValues.join(',')})`
 }
 
-export function getFhirTableStructure(jsonSchema, fhirDefinitionName){
+function getFhirTableStructure(jsonSchema, fhirDefinitionName){
     try{
         let fhirDefinition = jsonSchema.definitions[fhirDefinitionName]
         fhirDefinition.parsedProperties = {}
@@ -283,7 +334,10 @@ function getNestedProperty(jsonschema, propertyPath, propertyDetails, heirarchy)
 }
 
 function isResource(schema, resourceDefinition: any) {
-    return schema.discriminator.mapping[resourceDefinition] !== undefined
+    for(let i=0; i<schema.discriminator.mapping.length; i++){
+        if(schema.discriminator.mapping[i][0] == resourceDefinition)
+            return true
+    }
 }
 
 function getPropertyPath(fhirDefinitionProperties){
@@ -299,8 +353,38 @@ function isCustomType(properyPath){
         return true 
 }
 
-async function insertIntoFhirTable(conn: ConnectionInterface, fhirResource, insertStatement, callback){
-    conn.executeQuery(`INSERT INTO ${fhirResource}Fhir ${insertStatement}`, [], (err: any, result: any) =>{
-         callback(err, result)
-     })
- }
+function insertIntoFhirTable(conn: ConnectionInterface, schemaName, fhirResource, insertStatement){
+    return new Promise((resolve, reject) => {
+        conn.executeQuery(`INSERT INTO ${schemaName}.${fhirResource}Fhir ${insertStatement}`, [], (err: any, result: any) =>{
+            if(err)
+                reject(err)
+            resolve(result)
+        })
+    })
+}
+
+function checkIfRecordExists(conn:ConnectionInterface, schemaName, fhirResource, fhirResourceId){
+    console.info(`Check if record exists in DB: ${fhirResourceId}`)
+    return new Promise((resolve, reject) => {
+        conn.executeQuery(`SELECT * FROM ${schemaName}.${fhirResource}Fhir WHERE id = ${fhirResourceId}`, [], (err: any, result: any) => {
+            if(err){
+                console.log('Error while checking if the resource exists in DB: '+ JSON.stringify(err))
+                reject(err)
+            }
+            resolve(result)
+        })
+    })
+}
+
+function updateResourceStatus(conn:ConnectionInterface, schemaName, fhirResource, fhirResourceId){
+    let formattedDate = (moment(Date.now())).format('YYYY-MM-DD HH:mm:ss')
+    return new Promise((resolve, reject) => {
+        conn.executeQuery(`UPDATE ${schemaName}.${fhirResource}Fhir SET isActive = 'False', lastUpdateAt = '${formattedDate}' WHERE id = ${fhirResourceId}`, [], (err: any, result: any) =>{
+            if(err){
+                console.log(`Error updating resource status: ${JSON.stringify(err)}`)
+                reject(err)
+            }
+            resolve(result)
+        })
+    })
+}

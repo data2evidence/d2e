@@ -13,8 +13,9 @@ export const getCachedbDbConnections = async (token, databaseCode, schemaName, v
         let cachedbDatabase = getCachedbDatabaseFormatProtocolB(
             dialect,
             databaseCode,
+            'write',
             schemaName,
-            vocabSchema
+            schemaName
           );
     
         let credentials = {
@@ -24,7 +25,7 @@ export const getCachedbDbConnections = async (token, databaseCode, schemaName, v
             database: cachedbDatabase,
             user: token,
             schema: schemaName,
-            vocabSchema: vocabSchema,
+            vocabSchema: schemaName,
             password: 'dummy'
         }
 
@@ -32,8 +33,8 @@ export const getCachedbDbConnections = async (token, databaseCode, schemaName, v
             await CachedbDBConnectionUtil.CachedbDBConnectionUtil.getDBConnection({
                 credentials: credentials,
                 schemaName: schemaName,
-                vocabSchemaName: vocabSchema
-            });    
+                vocabSchemaName: schemaName
+            });
         return duckdbConnection;
     }catch(e){
         console.error(e)

@@ -1009,6 +1009,7 @@ export const ROLE_SCOPES = {
     'portal.dataset.read',
     'meilisearchSvc.index.add',
     'meilisearchSvc.index.setting.update',
-    'meilisearchSvc.document.add'
+    'meilisearchSvc.document.add',
+    'gateway.fhir.create'
   ]
 }
