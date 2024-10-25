@@ -86,9 +86,6 @@ export const createResourceInProject = async (token: string, fhirResouce: string
             clientSecret = searchResult.secret
         }else
             throw "Dataset not found!"
-        // let getSubscription = await fhirApi.getResource('Subscription', `criteria=${fhirResouce}`)
-        // getSubscription.channel.header = [`Authorization: ${token}`]
-        // await fhirApi.updateResource(getSubscription)
         //Get datasets
         const portalAPI = new PortalAPI(token)
         const datasets: Dataset[] = await portalAPI.getDatasets()
@@ -109,7 +106,6 @@ export const createResourceInProject = async (token: string, fhirResouce: string
         }
         resourceDetails.meta = metaInfo
         await fhirApi.clientCredentialslogin(clientId, clientSecret)
-        console.info(JSON.stringify(resourceDetails))
         await fhirApi.post(fhirResouce, resourceDetails)
         return true
     }catch(error){
