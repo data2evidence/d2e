@@ -80,17 +80,14 @@ export const createResourceInProject = async (token: string, fhirResouce: string
         let fhirApi = new FhirAPI()
         let datasetId = '', clientId = '', clientSecret = ''
         await fhirApi.clientCredentialslogin()
-        const searchResult = await fhirApi.getResource('ClientApplication', `name=${projectName}`) 
+        const searchResult = await fhirApi.getOneResource('ClientApplication', `name=${projectName}`) 
         if (searchResult) {
             clientId = searchResult.id
             clientSecret = searchResult.secret
         }else
             throw "Dataset not found!"
         // let getSubscription = await fhirApi.getResource('Subscription', `criteria=${fhirResouce}`)
-        // //Update Subscription resource with Authorization header
         // getSubscription.channel.header = [`Authorization: ${token}`]
-        // console.info(token)
-        // console.info(getSubscription)
         // await fhirApi.updateResource(getSubscription)
         //Get datasets
         const portalAPI = new PortalAPI(token)
@@ -114,10 +111,6 @@ export const createResourceInProject = async (token: string, fhirResouce: string
         await fhirApi.clientCredentialslogin(clientId, clientSecret)
         console.info(JSON.stringify(resourceDetails))
         await fhirApi.post(fhirResouce, resourceDetails)
-        // let updatedSubscription = await fhirApi.getResource('Subscription', `criteria=${fhirResouce}`)
-        // //Clear Authorization header
-        // updatedSubscription.channel.header = ''
-        // await fhirApi.updateResource(updatedSubscription)
         return true
     }catch(error){
         logger.error(JSON.stringify(error))
@@ -155,6 +148,45 @@ export const ingestResourceInCacheDB = async (fhirResouce: string) => {
     }
 }
 
+//Create subscription for each dataset to trigger endpoint
+export async function createSubscriptionInFhirServer(fhirApi: FhirAPI, clientId: string, projectId: string){
+    //Get all subscription thats configured for Super Admin - db6b2304-f236-45ec-b10c-a852681e7129
+    let superAdminClientId = env.FHIR__CLIENT_ID
+    let getSubscriptions = await fhirApi.searchResource('Subscription', `author=ClientApplication/${superAdminClientId}`)
+    if(getSubscriptions && getSubscriptions.entry.length > 0){
+        for(const item of getSubscriptions.entry){
+            let endpoint = item.resource.channel.endpoint
+            let criteria = item.resource.criteria
+            const subscriptionDetails = {
+                "resourceType": "Subscription",
+                "status": "active",
+                "reason": `Rest hook subscription for ${criteria}`,
+                "channel": {
+                    "type": "rest-hook",
+                    "endpoint": `${endpoint}`
+                },
+                "criteria": `${criteria}`,
+                "meta": {
+                    "author": {
+                        "reference": `ClientApplication/${clientId}`,
+                        "display": "d2eClient"
+                        },
+                    "project": `${projectId}`,
+                    "compartment": [{
+                        "reference": `Project/${projectId}`
+                    }]
+                }
+            }
+            console.info(subscriptionDetails)
+            await fhirApi.post('Subscription', subscriptionDetails)
+        }
+    }else{
+        console.info('No bots configured for project')
+    }
+    return true
+}
+
+//Test
 export async function getResource(fhirResource: string, datasetId: string){
     let token = await getClientCredentialsToken()
     //Get dataset details to connect to cachedb
@@ -165,35 +197,7 @@ export async function getResource(fhirResource: string, datasetId: string){
     return await getFhirData(conn, fhirResource)
 }
 
-//Create subscription for each dataset to trigger endpoint
-async function createSubscriptionInFhirServer(fhirApi: FhirAPI, clientId: string, projectId: string){
-    const baseUrl = env.SERVICE_ROUTES.fhirSvc
-    const subscriptionDetails = {
-            "resourceType": "Subscription",
-            "status": "active",
-            "reason": "Rest hook subscription for Bundle",
-            "channel": {
-              "type": "rest-hook",
-              "endpoint": `Bot/5a45d742-c5f8-4f10-9bab-0db2182dd58e`
-            },
-            "criteria": "Bundle",
-            "meta": {
-              "author": {
-                "reference": `ClientApplication/${clientId}`,
-                "display": "d2eClient"
-              },
-              "project": `${projectId}`,
-              "compartment": [
-                {
-                  "reference": `Project/${projectId}`
-                }
-              ]
-            }
-          }
-    const result = await fhirApi.post('Subscription', subscriptionDetails)
-    return result
-}
-
+//Test
 export const updateResource = async(clientId, projectId, botId) => {
     let fhirAPi = new FhirAPI()
     const subscriptionDetails = {
@@ -218,5 +222,5 @@ export const updateResource = async(clientId, projectId, botId) => {
           ]
         }
     }
-    return await fhirAPi.updateResource(subscriptionDetails)
-  }
+return await fhirAPi.updateResource(subscriptionDetails)
+}
