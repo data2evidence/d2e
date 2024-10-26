@@ -1,16 +1,18 @@
 // Setting MAX_PACKET_SIZE in node-hdb prevents failure of large sql statements https://github.com/SAP/node-hdb/issues/19
 /* tslint:disable no-var-requires */
 require("hdb/lib/protocol/common/Constants").MAX_PACKET_SIZE = Math.pow(2, 30);
-import { User } from "@alp/alp-base-utils";
-import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
-import { ConnectionInterface } from "@alp/alp-base-utils/target/src/Connection";
-import { QueryObject } from "@alp/alp-base-utils/target/src/QueryObject";
-import { CachedbNodeHDBConnection } from "@alp/alp-base-utils";
-import { CachedbDBConnectionUtil } from "@alp/alp-base-utils";
+import {
+  Logger,
+  Connection,
+  QueryObject,
+  CachedbNodeHDBConnection,
+  CachedbDBConnectionUtil,
+  User,
+} from "@alp/alp-base-utils";
 
 import { CdwConfigCachedbPostgresConnection } from "./CdwConfigCachedbPostgresConnection";
 
-const logger = CreateLogger("CdwConfigCachedbDBConnectionUtil");
+const logger = Logger.CreateLogger("CdwConfigCachedbDBConnectionUtil");
 
 export class CdwConfigCachedbDBConnectionUtil extends CachedbDBConnectionUtil.CachedbDBConnectionUtil {
   public static getConnection(
@@ -20,7 +22,7 @@ export class CdwConfigCachedbDBConnectionUtil extends CachedbDBConnectionUtil.Ca
     vocabSchemaName?: string,
     cb?,
     userObj?: User
-  ): Promise<ConnectionInterface> {
+  ): Promise<Connection.ConnectionInterface> {
     return new Promise((resolve, reject) => {
       const callback =
         cb ||
@@ -42,7 +44,7 @@ export class CdwConfigCachedbDBConnectionUtil extends CachedbDBConnectionUtil.Ca
           client,
           schemaName,
           vocabSchemaName,
-          async (err, connection: ConnectionInterface) => {
+          async (err, connection: Connection.ConnectionInterface) => {
             if (err) {
               return callback(err);
             }
@@ -61,7 +63,7 @@ export class CdwConfigCachedbDBConnectionUtil extends CachedbDBConnectionUtil.Ca
             }
 
             try {
-              await QueryObject.format(
+              await QueryObject.QueryObject.format(
                 `SET 'APPLICATIONUSER' = '${currentUser}'`
               ).executeUpdateAsync(connection);
 

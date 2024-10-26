@@ -88,7 +88,7 @@ if (result.success) {
   process.exit(1);
 }
 
-const env = _env as unknown as z.infer<typeof Env>;
+env = _env as unknown as z.infer<typeof Env>;
 const envVarUtils = new EnvVarUtils(_env);
 
 export { env, envVarUtils };

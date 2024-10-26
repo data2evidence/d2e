@@ -502,7 +502,11 @@ services:
             "PORT": 41114,
             "USE_DUCKDB": "${USE_DUCKDB:-true}",
             "isTestEnv": "${isTestEnv}",
-            "DUCKDB_PATH": "/home/docker/src/services/app/src/duckdb"
+            "DUCKDB_PATH": "/home/docker/src/services/app/src/duckdb",
+            "BUILT_IN_DUCKDB_PATH": "/usr/src/plugins/d2ef/cdw-svc/src/duckdb",
+            "TLS__INTERNAL__KEY": "PLACEHOLDER",
+            "TLS__INTERNAL__CRT": "PLACEHOLDER",
+            "USE_CACHEDB": "${USE_CACHEDB:-true}"
           },
           "jobplugins": {
             "PREFECT_API_URL": "http://alp-dataflow-gen-${BASE_PORT}:41${BASE_PORT}20/api",
