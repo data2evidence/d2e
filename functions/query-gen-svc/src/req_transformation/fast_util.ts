@@ -12,7 +12,7 @@ import { uniqueSeparatorString } from "@alp/alp-base-utils";
 
 export class FastUtil {
     static getOperandType(attributeName: string, operandPair: any): string {
-        if (operandPair.hasOwnProperty("type")) {
+        if (operandPair.hasOwnProperty("type") && operandPair.type) {
             return operandPair.type.toString();
         }
         if (
