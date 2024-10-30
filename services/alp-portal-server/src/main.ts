@@ -28,8 +28,8 @@ async function bootstrap() {
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
 
   await app.init()
-  http.createServer(server).listen(33002)
-  https.createServer(httpsOptions, server).listen(env.PORT)
+  http.createServer(server).listen(env.PORT)
+  // https.createServer(httpsOptions, server).listen(env.PORT)
   console.log('started https ${env.PORT}')
 }
 bootstrap()
