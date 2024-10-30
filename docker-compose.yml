@@ -1333,7 +1333,7 @@ services:
     healthcheck:
       interval: 20s
       retries: 5
-      start_period: 30s
+      start_period: 120s
       test: ["CMD", "python", "src/utils/healthcheck.py", "41191"]
       timeout: 10s
     logging:
