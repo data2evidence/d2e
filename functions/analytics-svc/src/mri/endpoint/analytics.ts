@@ -29,7 +29,7 @@ export async function processRequest(
     req,
     configId,
     configVersion,
-    studyId,
+    datasetId,
     body,
     language,
     config,
@@ -53,7 +53,7 @@ export async function processRequest(
                     req,
                     configId,
                     configVersion,
-                    studyId,
+                    datasetId,
                     bookmarkInputStr,
                     language
                 )
@@ -66,7 +66,7 @@ export async function processRequest(
                     req,
                     configId,
                     configVersion,
-                    studyId,
+                    datasetId,
                     bookmarkInputStr,
                     language
                 )
@@ -80,7 +80,7 @@ export async function processRequest(
                         req,
                         configId,
                         configVersion,
-                        studyId,
+                        datasetId,
                         bookmarkInputStr,
                         language
                     )
@@ -92,7 +92,7 @@ export async function processRequest(
                         req,
                         configId,
                         configVersion,
-                        studyId,
+                        datasetId,
                         bookmarkInputStr,
                         language
                     )
@@ -118,7 +118,7 @@ export async function processRequestCsv(
     req,
     configId,
     configVersion,
-    studyId,
+    datasetId,
     body,
     language,
     connection: ConnectionInterface,
@@ -142,7 +142,7 @@ export async function processRequestCsv(
                     req,
                     configId,
                     configVersion,
-                    studyId,
+                    datasetId,
                     bookmarkInputStr,
                     language
                 )

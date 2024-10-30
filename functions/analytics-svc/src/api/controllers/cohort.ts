@@ -45,7 +45,7 @@ export async function getCohortAnalyticsConnection(req: IMRIRequest) {
             analyticsCredentials: req.dbCredentials.studyAnalyticsCredential,
             userObj: userObj,
             token: req.headers.authorization,
-            studyId: req.selectedstudyDbMetadata.id,
+            datasetId: req.selectedstudyDbMetadata.id,
             replacePostgresWithDuckdb: false,
         });
         return analyticsConnection;
@@ -66,7 +66,7 @@ export async function getCohortAnalyticsConnection(req: IMRIRequest) {
 }
 
 async function getStudyDetails(
-    studyId: string,
+    datasetId: string,
     res: Response
 ): Promise<{
     databaseCode: string;
@@ -79,13 +79,13 @@ async function getStudyDetails(
         const studies = await portalServerAPI.getStudies(accessToken);
 
         // find the matching element and get the study schema name
-        const studyMatch = studies.find((el) => el.id === studyId);
+        const studyMatch = studies.find((el) => el.id === datasetId);
         if (!studyMatch) {
             res.status(500).send(
                 MRIEndpointErrorHandler({
                     err: {
                         name: "mri-pa",
-                        message: `Study metadata not found for the the given studyID(${studyId})!`,
+                        message: `Study metadata not found for the the given datasetId(${datasetId})!`,
                     },
                     language,
                 })
@@ -130,8 +130,7 @@ export async function getFilteredCohorts(req: IMRIRequest, res: Response) {
         const filterValue = req.params.filterValue;
         const offset = req.query.offset;
         const limit = req.query.limit;
-        const studyId = req.query.studyId;
-
+        const datasetId = req.query.datasetId;
         let cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
             analyticsConnection.schemaName
@@ -166,18 +165,12 @@ export async function getFilteredCohorts(req: IMRIRequest, res: Response) {
 
 export async function createCohort(req: IMRIRequest, res: Response) {
     try {
-        const studyId = req.body.cohort.studyId;
+        const studyId = req.body.datasetId;
         const analyticsConnection = await getCohortAnalyticsConnection(req);
-
-        const { schemaName, databaseCode, vocabSchemaName } =
-            await getStudyDetails(studyId, res);
+        const { schemaName, databaseCode, vocabSchemaName } = await getStudyDetails(datasetId, res);
         const language = getUser(req).lang;
-        const requestQuery: string[] | undefined =
-            req.body?.query?.split(",");
+        const requestQuery: string[] | undefined = req.body?.query?.split(",");
         // Remap mriquery for use in createEndpointFromRequest
-        req.body.mriquery = {
-            value: req.body.cohort.mriquery,
-        };
         const { cohortDefinition } = await createEndpointFromRequest(req);
 
         if (env.USE_EXTENSION_FOR_COHORT_CREATION === "true") {
@@ -188,7 +181,7 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                     configId: cohortDefinition.configData.configId,
                     configVersion: cohortDefinition.configData.configVersion,
                     lang: language,
-                    datasetId: studyId,
+                    datasetId,
                 },
                 true
             );
@@ -207,23 +200,21 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                 mriConfig.config,
                 req,
                 vocabSchemaName,
-                studyId
+                datasetId
             );
             const now = +new Date();
-            const { bookmarkId } = JSON.parse(
-                req.body.cohort.syntax
-            );
+            const { bookmarkId } = JSON.parse(req.body.syntax);
             await dataflowRequest(req, "POST", `cohort/flow-run`, {
                 options: {
-                    owner: req.body.cohort.owner,
+                    owner: req.body.owner,
                     token: req.headers.authorization,
-                    datasetId: studyId,
+                    datasetId,
                     cohortJson: {
                         id: 1, // Not used by us
-                        name: req.body.cohort.name,
+                        name: req.body.name,
                         tags: [],
                         expression: {
-                            datasetId: studyId, // required for cohort filtering
+                            datasetId, // required for cohort filtering
                             bookmarkId, // required for cohort filtering
                             ...ohdsiCohortDefinition,
                         },
@@ -232,7 +223,7 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                         expressionType: "SIMPLE_EXPRESSION",
                         hasWriteAccess: false,
                     },
-                    description: req.body.cohort.description,
+                    description: req.body.description,
                     schemaName,
                     databaseCode,
                     vocabSchemaName,
@@ -247,7 +238,7 @@ export async function createCohort(req: IMRIRequest, res: Response) {
             queryParams: {
                 configId: cohortDefinition.configData.configId,
                 configVersion: cohortDefinition.configData.configVersion,
-                studyId,
+                datasetId,
                 queryType: "plugin",
                 ifrRequest: cohortDefinition,
                 language,
@@ -292,24 +283,20 @@ export async function generateCohortDefinition(
     res: Response
 ) {
     try {
-        const studyId = req.body.cohort.tudyId;
-
-        const { vocabSchemaName } = await getStudyDetails(studyId, res);
+        const studyId = req.body.datasetId;
+        const { vocabSchemaName } = await getStudyDetails(datasetId, res);
         const language = getUser(req).lang;
         // Remap mriquery for use in createEndpointFromRequest
-        req.body.mriquery = {
-            value: req.body.cohort.mriquery,
-        };
         const { cohortDefinition } = await createEndpointFromRequest(req);
 
         const mriConfig = await mriConfigConnection.getStudyConfig(
             {
-                req,
+                req,    
                 action: "getBackendConfig",
                 configId: cohortDefinition.configData.configId,
                 configVersion: cohortDefinition.configData.configVersion,
                 lang: language,
-                datasetId: studyId,
+                datasetId,
             },
             true
         );
@@ -328,7 +315,7 @@ export async function generateCohortDefinition(
             mriConfig.config,
             req,
             vocabSchemaName,
-            studyId
+            datasetId
         );
 
         res.status(200).send(ohdsiCohortDefinition);
@@ -349,17 +336,14 @@ export async function createCohortDefinition(req: IMRIRequest, res: Response) {
         );
 
         const cohortDefiniton = <CohortDefinitionTableType>{
-            name: req.body.cohortDefinition.name,
-            description: req.body.cohortDefinition.description,
-            owner: req.body.cohortDefinition.owner,
+            name: req.body.name,
+            description: req.body.description,
+            owner: req.body.owner,
             creationTimestamp: new Date(),
             modificationTimestamp: null,
-            definitionTypeConceptId:
-                req.body.cohortDefinition
-                    .definitionTypeConceptId,
-            subjectConceptId:
-                req.body.cohortDefinition.subjectConceptId,
-            syntax: req.body.cohortDefinition.syntax,
+            definitionTypeConceptId: req.body.definitionTypeConceptId,
+            subjectConceptId: req.body.subjectConceptId,
+            syntax: req.body.syntax,
         };
 
         await cohortEndpoint.saveCohortDefinitionToDb(cohortDefiniton);
@@ -408,12 +392,12 @@ async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
     try {
         // Extract mriquery and use pluginEndpoint.retrieveData to get patient list
         let mriquery = req.body.cohort.mriquery;
-        const { cohortDefinition, studyId, pluginEndpoint } =
+        const { cohortDefinition, datasetId, pluginEndpoint } =
             await createEndpointFromRequest(req);
         pluginEndpoint.setRequest(req);
         const pluginResult = (await pluginEndpoint.retrieveData({
             cohortDefinition,
-            studyId,
+            datasetId,
             language,
             dataFormat: "json",
             requestQuery: mriquery,
@@ -430,15 +414,14 @@ async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
         // Create cohort object
         let cohort = <CohortType>{
             patientIds,
-            name: req.body.cohort.name,
-            description: req.body.cohort.description,
+            name: req.body.name,
+            description: req.body.description,
             creationTimestamp: new Date(),
             modificationTimestamp: null,
-            owner: req.body.cohort.owner,
-            definitionTypeConceptId:
-                req.body.cohort.definitionTypeConceptId,
-            subjectConceptId: req.body.cohort.subjectConceptId,
-            syntax: req.body.cohort.syntax,
+            owner: req.body.owner,
+            definitionTypeConceptId: req.body.definitionTypeConceptId,
+            subjectConceptId: req.body.subjectConceptId,
+            syntax: req.body.syntax,
         };
 
         return cohort;

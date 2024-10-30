@@ -52,7 +52,7 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
         req,
         configId,
         configVersion,
-        studyId,
+        datasetId,
         bookmarkInputStr: string,
         language
     ) {
@@ -62,7 +62,7 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
                 queryParams: {
                     configId,
                     configVersion,
-                    studyId,
+                    datasetId,
                     queryType: "totalpcount",
                     bookmarkInputStr,
                     language,
@@ -103,7 +103,7 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
     // Theres a chance that this might be done by unauth user
     public async processMultipleStudyRequest(
         req,
-        studyIds: string[],
+        datasetIds: string[],
         bookmarkInputStr: string,
         language
     ) {
@@ -146,17 +146,17 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
         const configId = selectedConfig.meta.configId;
         const configVersion = selectedConfig.meta.configVersion;
 
-        // Generate DB Credentials for each studyID
+        // Generate DB Credentials for each datasetId
         const dbCreds = {};
         const analyticsCredentials = req.dbCredentials.analyticsCredentials;
 
         let userObj: User;
         userObj = getUser(req);
 
-        studyIds.forEach(async (studyId) => {
-            // Get metadata for studyID
+        datasetIds.forEach(async (datasetId) => {
+            // Get metadata for datasetId
             const currMetadata = req.studiesDbMetadata.studies.find(
-                (metadata) => metadata.id === studyId
+                (metadata) => metadata.id === datasetId
             );
             // Retrieve dbName from metadata or default to first db
             const currStudyDBname: string =
@@ -176,18 +176,18 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
                 ? currStudySchemaName.toUpperCase()
                 : studyAnalyticsCredential.probeSchema.toUpperCase();
 
-            dbCreds[studyId] = studyAnalyticsCredential;
+            dbCreds[datasetId] = studyAnalyticsCredential;
         });
 
         // Get Config
-        studyIds.forEach((studyId) => {
+        datasetIds.forEach((datasetId) => {
             promises.push(
                 new Promise(async (resolve, reject) => {
                     const querySvcParams = {
                         queryParams: {
                             configId,
                             configVersion,
-                            studyId,
+                            datasetId,
                             queryType: "totalpcount",
                             bookmarkInputStr,
                             language,
@@ -206,7 +206,7 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
                     );
 
                     let fast: any = queryResponse.fast;
-                    const ac = dbCreds[studyId];
+                    const ac = dbCreds[datasetId];
                     const analyticsConnection =
                         await dbConnectionUtil.DBConnectionUtil.getDBConnection(
                             {
@@ -234,8 +234,8 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
                                 nql,
                             });
 
-                            // Attach studyID to result
-                            result.studyId = studyId;
+                            // Attach datasetId to result
+                            result.datasetId = datasetId;
 
                             resolve(result);
                         }

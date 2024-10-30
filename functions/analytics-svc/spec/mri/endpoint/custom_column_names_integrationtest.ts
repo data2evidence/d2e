@@ -157,7 +157,7 @@ describe("TEST SUITE TO DEFINE THE BEHAVIOR OF THE processRequestCSV ENDPOINT Us
         mockReq,
         "dw_views_config", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request1),
         "en",
         connection,
@@ -240,7 +240,7 @@ describe("TEST SUITE TO DEFINE THE BEHAVIOR OF THE processRequestCSV ENDPOINT Us
         mockReq,
         "dw_views_config", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request1),
         "en",
         connection,

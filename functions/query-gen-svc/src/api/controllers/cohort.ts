@@ -27,7 +27,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
         const queryParams = body.queryParams;
         log.debug(`Input params:\n${JSON.stringify(queryParams)}`);
 
-        const { configId, configVersion, studyId, queryType, insert } =
+        const { configId, configVersion, datasetId, queryType, insert } =
             body.queryParams;
 
         let ifrRequest = queryParams.ifrRequest;
@@ -39,14 +39,14 @@ export async function generateQuery(req: IMRIRequest, res, next) {
             createCohort: true,
         };
 
-        // get backend config for the given configId, configVersion & studyId
+        // get backend config for the given configId, configVersion & datasetId
         const configParams = {
             req,
             action: "getBackendConfig",
             configId,
             configVersion,
             lang: language,
-            datasetId: studyId,
+            datasetId,
         };
         const configResponse = await callStudyMRIConfig(configParams);
         const config = configResponse.config;

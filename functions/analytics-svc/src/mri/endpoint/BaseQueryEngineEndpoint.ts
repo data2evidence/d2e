@@ -163,7 +163,7 @@ export class BaseQueryEngineEndpoint {
         request,
         configId: string,
         configVersion: string,
-        studyId: string,
+        datasetId: string,
         ifrRequest,
         language
     ) {
@@ -174,7 +174,7 @@ export class BaseQueryEngineEndpoint {
         req,
         configId,
         configVersion,
-        studyId,
+        datasetId,
         ifrRequest,
         language,
         auditLogChannel?: string,
