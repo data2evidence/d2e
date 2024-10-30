@@ -30,6 +30,6 @@ async function bootstrap() {
   await app.init()
   http.createServer(server).listen(env.PORT)
   // https.createServer(httpsOptions, server).listen(env.PORT)
-  console.log('started https ${env.PORT}')
+  console.log('started http ${env.PORT}')
 }
 bootstrap()
