@@ -1071,7 +1071,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://localhost:41105/check-liveness
+        - https://localhost:33002/check-liveness
       timeout: 30s
     hostname: alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-portal-server:${DOCKER_TAG_NAME:-develop}
@@ -1102,7 +1102,7 @@ services:
       PG__PORTAL_SERVER__USER: ${PG_WRITE_USER:-alp_pg_write_user}
       PLUGINS__JSON: *x-plugins
       PORTAL_SERVER__LOG_LEVEL: info
-      PORTAL_SERVER__PORT: 41${BASE_PORT:-1}05
+      PORTAL_SERVER__PORT: 33002
 
   alp-minerva-postgres:
     container_name: &c17 alp-minerva-postgres-${BASE_PORT:-1}
