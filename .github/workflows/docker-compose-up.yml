@@ -62,10 +62,12 @@ jobs:
           yarn --cwd internal op:get:$ENV_TYPE
 
           # mask sensitive values
-          internal/scripts/gha-mask.sh
+          # internal/scripts/gha-mask.sh
 
           # generate dotenv
           yarn --cwd internal gen:env
+
+          cat .env.local
 
           echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
 
