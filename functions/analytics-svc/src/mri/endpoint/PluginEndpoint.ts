@@ -114,7 +114,7 @@ export class PluginEndpoint {
      */
     public async retrieveData({
         cohortDefinition,
-        studyId,
+        datasetId,
         language,
         dataFormat = "json",
         requestQuery,
@@ -125,7 +125,7 @@ export class PluginEndpoint {
         postFilters,
     }: {
         cohortDefinition?: CohortDefinitionType;
-        studyId: string;
+        datasetId: string;
         language: string;
         dataFormat: PluginEndpointFormatType;
         requestQuery?: string[];
@@ -152,7 +152,7 @@ export class PluginEndpoint {
                     let { query, pCountQuery, noDataReason } =
                         await this.buildTempTableQuery({
                             cohortDefinition,
-                            studyId,
+                            datasetId,
                             language,
                             insert: true,
                             requestQuery,
@@ -383,7 +383,7 @@ export class PluginEndpoint {
         patientId,
         auditLogChannelName,
         postFilters,
-        studyId,
+        datasetId,
     }: {
         cohortDefinition?: CohortDefinitionType;
         metadataType?: string;
@@ -391,7 +391,7 @@ export class PluginEndpoint {
         patientId?: string;
         auditLogChannelName: string;
         postFilters?: FilterType;
-        studyId: string;
+        datasetId: string;
     }): Promise<PluginEndpointStreamResultType> {
         return new Promise<PluginEndpointStreamResultType>(
             async (resolve, reject) => {
@@ -413,7 +413,7 @@ export class PluginEndpoint {
                     let { query, noDataReason } =
                         await this.buildTempTableQuery({
                             cohortDefinition,
-                            studyId: studyId,
+                            datasetId: datasetId,
                             language: "",
                         });
                     if (!query) {
@@ -605,7 +605,7 @@ export class PluginEndpoint {
         const endpointResult = emptyResult();
         const { query } = await this.buildTempTableQuery({
             cohortDefinition,
-            studyId: "",
+            datasetId: "",
             language: "",
             insert: false,
         });
@@ -645,7 +645,7 @@ export class PluginEndpoint {
 
     private buildTempTableQuery = async ({
         cohortDefinition,
-        studyId, //
+        datasetId, //
         language, //
         insert = true, //
         requestQuery,
@@ -654,7 +654,7 @@ export class PluginEndpoint {
         postFilters,
     }: {
         cohortDefinition: CohortDefinitionType;
-        studyId; //
+        datasetId; //
         language; //
         insert?: boolean; //
         requestQuery?: string[];
@@ -681,7 +681,7 @@ export class PluginEndpoint {
                 queryParams: {
                     configId,
                     configVersion,
-                    studyId,
+                    datasetId,
                     queryType: "plugin",
                     ifrRequest: cohortDefinition,
                     language,

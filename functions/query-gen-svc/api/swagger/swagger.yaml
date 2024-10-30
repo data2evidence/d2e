@@ -22,7 +22,7 @@ paths:
       parameters:
         - name: queryParams
           in: body
-          description: all query parameters (i.e.configId, configVersion, studyId, queryType, language, ifrRequest)
+          description: all query parameters (i.e.configId, configVersion, datasetId, queryType, language, ifrRequest)
           required: true
           schema:
             type: object
@@ -45,7 +45,7 @@ paths:
       parameters:
         - name: queryParams
           in: body
-          description: all query parameters (i.e.configId, configVersion, studyId, queryType, language, ifrRequest)
+          description: all query parameters (i.e.configId, configVersion, datasetId, queryType, language, ifrRequest)
           required: true
           schema:
             type: object
