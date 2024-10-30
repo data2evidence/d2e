@@ -132,7 +132,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request1),
         "en",
         null, //config only required for domain_values_service & freetext_search_service
@@ -189,7 +189,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request2),
         "en",
         null, //config only required for domain_values_service & freetext_search_service
@@ -246,7 +246,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request3),
         "en",
         null, //config only required for domain_values_service & freetext_search_service
@@ -304,7 +304,7 @@ describe(testSuiteName, () => {
         mockReq,
         "mock_config", // configId
         "0", // configVersion
-        "studyId_1", // studyId
+        "datasetId_1", // datasetId
         request2Bookmark(request4),
         "en",
         null, //config only required for domain_values_service & freetext_search_service

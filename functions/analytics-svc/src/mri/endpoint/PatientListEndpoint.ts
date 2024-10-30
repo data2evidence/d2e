@@ -35,7 +35,7 @@ export class PatientListEndpoint extends BaseQueryEngineEndpoint {
         req,
         configId,
         configVersion,
-        studyId,
+        datasetId,
         ifrRequest,
         language
     ) {
@@ -97,7 +97,7 @@ export class PatientListEndpoint extends BaseQueryEngineEndpoint {
         httpReq,
         configId,
         configVersion,
-        studyId,
+        datasetId,
         bookmarkInputStr,
         language,
         auditLogChannel?: string,
@@ -122,7 +122,7 @@ export class PatientListEndpoint extends BaseQueryEngineEndpoint {
                     queryParams: {
                         configId,
                         configVersion,
-                        studyId,
+                        datasetId,
                         queryType: "patientdetail",
                         bookmarkInputStr,
                         language,
