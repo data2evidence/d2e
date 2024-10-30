@@ -238,7 +238,7 @@ describe("--- TESTS SUITE FOR PLUGIN ENDPOINT ---", () => {
               ],
             })
           ),
-          studyId: "studyId_1",
+          datasetId: "datasetId_1",
           language: "en",
           dataFormat: "json",
           auditLogChannelName: undefined,
@@ -274,7 +274,7 @@ describe("--- TESTS SUITE FOR PLUGIN ENDPOINT ---", () => {
               ],
             })
           ),
-          studyId: "studyId_1",
+          datasetId: "datasetId_1",
           language: "en",
           dataFormat: "json",
           auditLogChannelName: undefined,
@@ -290,7 +290,7 @@ describe("--- TESTS SUITE FOR PLUGIN ENDPOINT ---", () => {
         cohortDefinition: JSON.parse(
           JSON.stringify(cohortDefinitionWithSelected)
         ),
-        studyId: "studyId_1",
+        datasetId: "datasetId_1",
         language: "en",
         dataFormat: "json",
         auditLogChannelName: undefined,
@@ -322,7 +322,7 @@ describe("--- TESTS SUITE FOR PLUGIN ENDPOINT ---", () => {
               ],
             })
           ),
-          studyId: "studyId_1",
+          datasetId: "datasetId_1",
           language: "en",
           dataFormat: "csv",
           auditLogChannelName: undefined,

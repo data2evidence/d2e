@@ -34,7 +34,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
 
         const configId = queryParams.configId;
         const configVersion = queryParams.configVersion;
-        const studyId = queryParams.studyId;
+        const datasetId = queryParams.datasetId;
 
         const configParams = {
             req,
@@ -42,7 +42,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
             configId,
             configVersion,
             lang: "en",
-            datasetId: studyId,
+            datasetId,
         };
 
         const configResponse: StudyMriConfigMetaDataType =
