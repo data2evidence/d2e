@@ -17,6 +17,12 @@ pat=$(op read "op://$OP_VAULT_NAME/pmdwdnpwrtgmvlh5ojt53p6wki/password")
 docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "UPDATE dataflow.default_plugins SET url = regexp_replace(url, '^(https://)', 'https://${pat}@') WHERE url LIKE 'https://%' AND url NOT LIKE 'https://github_pat%' ;"
 ```
 
+- validate
+
+```bash
+docker exec alp-minerva-postgres-1 psql -t -h localhost -U postgres -p 5432 -d alp -c "select url from dataflow.default_plugins" | tee private-dataflow.default_plugins.txt
+```
+
 ### Initialize the default plugins
 
 Switch to `setup` page.

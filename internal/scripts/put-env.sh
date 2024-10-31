@@ -7,8 +7,6 @@ set -o errexit
 [ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1
 ENV_NAME=${ENV_NAME:-local}
 OVERWRITE=${OVERWRITE:-false}
-
-
 # echo ENV_NAME=$ENV_NAME
 
 # vars

@@ -29,7 +29,7 @@ function merge-yml () {
 # action - merge relevant cache env yml to flat yml in git_dir
 cd $CACHE_PATH
 for file in ${DOTENV_YMLS_IN[@]}; do touch $file; done
-echo "# $DOTENV_YML_OUT" > $DOTENV_YML_OUT
+echo "# ${DOTENV_YML_OUT##*/}" > $DOTENV_YML_OUT
 merge-yml ${DOTENV_YMLS_IN[@]} | sed '/^# .env/ d' >> $DOTENV_YML_OUT
 yq 'keys | sort | .[]' $DOTENV_YML_OUT > $DOTENV_KEYS_OUT
 
