@@ -14,7 +14,7 @@ echo ENV_NAME=$ENV_NAME OVERWRITE=$OVERWRITE
 # vars
 DOTENV_YMLS_IN=(.env.base-all.yml .env.base-$ENV_TYPE.yml .env.$ENV_NAME.yml)
 DOTENV_YML_OUT=$GIT_BASE_DIR/.env.$ENV_NAME.yml
-DOTENV_KEYS_OUT=$GIT_BASE_DIR/.env.$ENV_NAME.keys
+DOTENV_KEYS_OUT=${DOTENV_YML_OUT}.keys
 CACHE_PATH=$GIT_BASE_DIR/cache/op
 
 cd $GIT_BASE_DIR
@@ -31,7 +31,7 @@ cd $CACHE_PATH
 for file in ${DOTENV_YMLS_IN[@]}; do touch $file; done
 echo "# ${DOTENV_YML_OUT##*/}" > $DOTENV_YML_OUT
 merge-yml ${DOTENV_YMLS_IN[@]} | sed '/^# .env/ d' >> $DOTENV_YML_OUT
-yq 'keys | sort | .[]' $DOTENV_YML_OUT > $DOTENV_KEYS_OUT
+cat $DOTENV_YML_OUT | yq 'keys | .[]' | sort > $DOTENV_KEYS_OUT
 
-echo INFO created $DOTENV_YML_OUT
-wc -l $DOTENV_KEYS_OUT
+wc -l $DOTENV_YML_OUT $DOTENV_KEYS_OUT | sed '$d'
+echo

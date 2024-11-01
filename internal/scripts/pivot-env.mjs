@@ -16,8 +16,8 @@ const gitBaseDir = (await $`git rev-parse --show-toplevel`).stdout.trim()
 
 const credsKey = "DATABASE_CREDENTIALS"
 const envInPath = `${gitBaseDir}/.env.${envName}.yml`
-const envOutPath = `${gitBaseDir}/.env.pivot.yml`
-const docOutPath = `${gitBaseDir}/.env.doc.yml`
+const envOutPath = `${gitBaseDir}/.env_pivot.yml`
+const docOutPath = `${gitBaseDir}/.env_doc.yml`
 
 // functions
 
@@ -137,7 +137,7 @@ if (envKeys.includes(credsKey)) {
 	const creds = YAML.parse(envIn[credsKey])
 	// i = 0 // debug
 	for (const i in creds) {
-		let credsOutPath = `${gitBaseDir}/.env.pivot.creds.${creds[i].name}.yml`
+		let credsOutPath = `${gitBaseDir}/.env_pivot.creds.${creds[i].name}.yml`
 		let credsOut = readYmlFile(credsOutPath)
 		const credKeys = Object.keys(creds[i])
 		// credKey = credKeys[0] // debug

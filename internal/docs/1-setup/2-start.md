@@ -2,7 +2,7 @@
 
 ## Clean - optional
 
-- clean if PG creds changed
+- e.g. if PostgreSQL credentials changed
 
 ```bash
 yarn clean:minerva

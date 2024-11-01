@@ -1,11 +1,14 @@
-# Get Development Environment Variables
+# Set Environment Variables
 
-## Get env-var yaml files from 1password
-
-- Hints
-  - `export OVERWRITE=true` - to overwrite existing
+  - `export OVERWRITE=true` - to overwrite existing `.env.${ENV_NAME}.yml`
   - `alias ni='npm run internal'` - shortcut
   - `alias yi='yarn internal'` - shortcut
+
+- ENV_TYPE
+  - local - local macos
+  - remote - VM with FQDN
+
+## Get env-var yaml files from 1password
 
 ```bash
 yarn internal get:env:all
@@ -19,43 +22,52 @@ yarn internal get:env:all
 yarn internal flatten:env:all
 ```
 
-# Generate DotEnv file
+## Generate DotEnv file
 
-- generate DotEnv filename `.env.${ENV_TYPE}` where ENV_TYPE:
+- Invokes 3 scripts
 
-  - local - local macos
-  - remote - with FQDN
+## set:env
 
-- convert env yaml to dotenv
+- convert `.env.$ENV_NAME.yml` & `.env.$ENV_TYPE.private.yml` to `.env.${ENV_TYPE}`
+
+## gen:tls
+
 - generate wildcard certificate `*.alp.local` with Caddy for TLS inter-service communications
+
+## gen:resource-limits
+
 - generate docker resource limits based on available system resources
 
 ```bash
 yarn internal gen:env
-wc -l .env.local
 ```
 
-# Set plugins repo branch/CommitId - optional
-
-- defaults to main
+## Randomize Environment Variables - optional
 
 ```bash
-echo >> .env.local
-echo GIT_COMMIT_ID__PLUGINS_REPO=rc-v0.4.0-beta >> .env.local
-grep GIT_COMMIT_ID__PLUGINS_REPO .env.local
+yarn gen:dotenv
 ```
 
-# Randomize Environment Variables - optional
+### Clean
+
+- Needed if randomize variables
+- removes all volumes
 
 ```bash
-yarn gen:env
+yarn clean:minerva
 ```
 
-# Persist Environment Variables - optional
+### Persist Environment Variables
 
-- Persists env from .env.$ENV_TYPE file to .env.$ENV_TYPE.private.yml
-- Typically run after `yarn init:logto` step
+- Needed if randomize variables
+- Persists env from `.env.$ENV_TYPE` file to `.env.$ENV_TYPE.private.yml`
 
 ```bash
 yarn internal persist:env
+```
+
+## Initalize Logto Apps
+
+```bash
+yarn init:logto
 ```

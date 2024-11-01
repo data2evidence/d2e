@@ -5,7 +5,8 @@ set -o errexit
 
 # inputs
 DEFAULT_PASSWORD_LENGTH=30
-ENV_FILE=.env.local
+DOTENV_FILE_OUT=.env.local
+DOTENV_KEYS_OUT=.env.local.keys
 EXAMPLE_FILE=env.example
 PASSPHRASE_LENGTH=10
 PASSWORD_NAMES_FILE=scripts/list-passwords.txt
@@ -19,7 +20,7 @@ GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 cd $GIT_BASE_DIR
 PASSWORD_NAMES=($(cat $PASSWORD_NAMES_FILE))
 echo '' > $TMP_FILE
-echo '' > $ENV_FILE
+echo '' > $DOTENV_FILE_OUT
 
 # passwords
 echo set random passwords ...
@@ -66,9 +67,10 @@ encode-basic-auth
 echo
 
 # Substitute shell variables in EXAMPLE_FILE. Variables exported in sub-shell.
-bash -c "set -a; source $TMP_FILE; cat $EXAMPLE_FILE | envsubst > $ENV_FILE"
-echo >> $ENV_FILE
+bash -c "set -a; source $TMP_FILE; cat $EXAMPLE_FILE | envsubst > $DOTENV_FILE_OUT"
+echo >> $DOTENV_FILE_OUT
 
 # finish
-wc -l $ENV_FILE
+cat $DOTENV_FILE_OUT | grep = | awk -F= '{print $1}' | grep _ | sort -u > $DOTENV_KEYS_OUT
+wc -l $DOTENV_FILE_OUT $DOTENV_KEYS_OUT | sed '$d'
 echo

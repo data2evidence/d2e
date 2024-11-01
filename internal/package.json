@@ -25,7 +25,7 @@
     "load:all": "yarn load:permissions && yarn load:synpuf1k && yarn load:vocab",
     "load:permissions": "scripts/load-permissions.sh",
     "load:synpuf1k": "scripts/load-synpuf1k.sh",
-    "load:vocab": "scripts/load-vocab.sh",
+    "load:vocab": "scripts/load-vocab.mjs",
     "persist:env": "scripts/persist-env.sh",
     "put:env": "scripts/put-env.sh",
     "put:env:all": "for ENV_NAME in ${npm_package_config_env_names_all[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn put:env; done",
