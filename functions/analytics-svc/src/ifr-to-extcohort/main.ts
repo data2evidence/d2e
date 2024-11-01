@@ -16,14 +16,12 @@ export const convertIFRToExtCohort = async (
     ifrDefinition: IFRDefinition,
     cdmConfig: CdmConfig,
     req: IMRIRequest,
-    vocabSchemaName: string,
     datasetId: string
 ): Promise<ExtCohortDefinition> => {
     const conceptSets = await convertEventAttributesToConceptSets(
         cdmConfig,
         ifrDefinition.filter.cards.content,
         req,
-        vocabSchemaName,
         datasetId
     );
     const demography = ifrDefinition.filter.cards.content.shift() as
@@ -33,7 +31,6 @@ export const convertIFRToExtCohort = async (
         demography,
         cdmConfig,
         req,
-        vocabSchemaName,
         datasetId
     );
     const criteriaList = await createCriteriaList(
@@ -41,7 +38,6 @@ export const convertIFRToExtCohort = async (
         ifrDefinition,
         conceptSets,
         req,
-        vocabSchemaName,
         datasetId
     );
     return {

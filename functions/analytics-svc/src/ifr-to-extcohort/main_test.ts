@@ -21,12 +21,15 @@ import oxygenAndNoDeathExtCohort from "./samples/009-extcohort";
 import vitaminB6OrB12AndNoOxygenAndDeathIFR from "./samples/010-ifr";
 import vitaminB6OrB12AndNoOxygenAndDeathExtCohort from "./samples/010-extcohort";
 import cdmConfig from "./samples/cdm-config-with-extcohort-mapping";
-import * as cdmConfigUtils from "./cdmConfigUtils";
 import sampleConcepts from "./samples/sample-concepts";
+import * as conceptGetters from "./conceptGetters";
 
 const req = {} as IMRIRequest;
 
-jest.spyOn(cdmConfigUtils, "getConceptByName").mockImplementation(
+jest.mock("../utils/TerminologySvcProxy", () => ({
+    terminologyRequest: jest.fn(),
+}));
+jest.spyOn(conceptGetters, "getConceptByName").mockImplementation(
     ({ conceptName }: { conceptName: string }) => {
         return new Promise((resolve, reject) => {
             const concept = sampleConcepts.filter(
@@ -40,7 +43,7 @@ jest.spyOn(cdmConfigUtils, "getConceptByName").mockImplementation(
 describe("001 - Empty definition", () => {
     it("", async () => {
         expect(
-            await convertIFRToExtCohort(emptyIFR, cdmConfig, req, "", "")
+            await convertIFRToExtCohort(emptyIFR, cdmConfig, req, "")
         ).toEqual(emptyExtCohort);
     });
 });
@@ -51,7 +54,7 @@ describe("002 - Oxygen", () => {
         expected.ConceptSets[0].name =
             "patient.interactions.drugera.1.attributes.drugname";
         expect(
-            await convertIFRToExtCohort(oxygenIFR, cdmConfig, req, "", "")
+            await convertIFRToExtCohort(oxygenIFR, cdmConfig, req, "")
         ).toEqual(expected);
     });
 });
@@ -60,13 +63,7 @@ describe("003 - Drug era Or death", () => {
     it("", async () => {
         const expected = drugEraOrDeathExtCohort;
         expect(
-            await convertIFRToExtCohort(
-                drugEraOrDeathIFR,
-                cdmConfig,
-                req,
-                "",
-                ""
-            )
+            await convertIFRToExtCohort(drugEraOrDeathIFR, cdmConfig, req, "")
         ).toEqual(expected);
     });
 });
@@ -75,13 +72,7 @@ describe("004 - Drug era with start date", () => {
     it("", async () => {
         const expected = drugEraStartDateExtCohort;
         expect(
-            await convertIFRToExtCohort(
-                drugEraStartDateIFR,
-                cdmConfig,
-                req,
-                "",
-                ""
-            )
+            await convertIFRToExtCohort(drugEraStartDateIFR, cdmConfig, req, "")
         ).toEqual(expected);
     });
 });
@@ -90,13 +81,7 @@ describe("005 - Basic demography", () => {
     it("", async () => {
         const expected = basicDemographyExtCohort;
         expect(
-            await convertIFRToExtCohort(
-                basicDemographyIFR,
-                cdmConfig,
-                req,
-                "",
-                ""
-            )
+            await convertIFRToExtCohort(basicDemographyIFR, cdmConfig, req, "")
         ).toEqual(expected);
     });
 });
@@ -109,7 +94,7 @@ describe("006 - Mix usage of AND and OR", () => {
         expected.ConceptSets[1].name =
             "patient.interactions.drugera.2.attributes.drugname";
         expect(
-            await convertIFRToExtCohort(mixAndOrIFR, cdmConfig, req, "", "")
+            await convertIFRToExtCohort(mixAndOrIFR, cdmConfig, req, "")
         ).toEqual(expected);
     });
 });
@@ -121,9 +106,9 @@ describe("007 - start and end dates, and multiple text attribute values", () => 
             "patient.interactions.drugera.1.attributes.drugname";
         expected.ConceptSets[1].name =
             "patient.interactions.drugera.2.attributes.drugname";
-        expect(
-            await convertIFRToExtCohort(ifr007, cdmConfig, req, "", "")
-        ).toEqual(expected);
+        expect(await convertIFRToExtCohort(ifr007, cdmConfig, req, "")).toEqual(
+            expected
+        );
     });
 });
 
@@ -136,9 +121,9 @@ describe("008 - multiple codesets", () => {
             "patient.interactions.drugera.2.attributes.drugname";
         expected.ConceptSets[2].name =
             "patient.interactions.drugera.3.attributes.drugname";
-        expect(
-            await convertIFRToExtCohort(ifr008, cdmConfig, req, "", "")
-        ).toEqual(expected);
+        expect(await convertIFRToExtCohort(ifr008, cdmConfig, req, "")).toEqual(
+            expected
+        );
     });
 });
 
@@ -148,13 +133,7 @@ describe("009 - Oxygen and excluding death", () => {
         expected.ConceptSets[0].name =
             "patient.interactions.drugera.1.attributes.drugname";
         expect(
-            await convertIFRToExtCohort(
-                oxygenAndNoDeathIFR,
-                cdmConfig,
-                req,
-                "",
-                ""
-            )
+            await convertIFRToExtCohort(oxygenAndNoDeathIFR, cdmConfig, req, "")
         ).toEqual(expected);
     });
 });
@@ -171,7 +150,6 @@ describe("010 - Vitamin B6 or B12 and excluding oxygen and death", () => {
                 vitaminB6OrB12AndNoOxygenAndDeathIFR,
                 cdmConfig,
                 req,
-                "",
                 ""
             )
         ).toEqual(expected);

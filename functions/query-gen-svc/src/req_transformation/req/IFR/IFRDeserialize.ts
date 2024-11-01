@@ -146,6 +146,9 @@ export class FilterCard implements ISerializable<FilterCard> {
     public _attributes: Attribute[];
     public _inactive: boolean;
     public _isMatchAny: boolean;
+    public _isEntry: boolean;
+    public _isExit: boolean;
+
 
     public deserialize(input, isMatchAny: boolean = false) {
         this._configPath = input._configPath;
@@ -154,6 +157,8 @@ export class FilterCard implements ISerializable<FilterCard> {
         this._name = input._name;
         this._configPath = input._configPath;
         this._isMatchAny = isMatchAny;
+        this._isEntry = input._isEntry;
+        this._isExit = input._isExit;
         if (input._successor) {
             this._successor = new Successor().deserialize(input._successor);
         }

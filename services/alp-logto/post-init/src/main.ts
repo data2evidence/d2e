@@ -368,10 +368,13 @@ async function main() {
   }
 
   // Create Sign-in Experiences
+  console.log(
+    "*********************************** SIGN-IN EXPERIENCES **********************************************"
+  );
   let signinExperience = {
     branding: {
-      favicon: `https://${process.env.PUBLIC__FQDN}/portal/assets/favicon.ico`,
-      logoUrl: `https://${process.env.PUBLIC__FQDN}/portal/assets/d2e.svg`,
+      favicon: `https://${process.env.CADDY__ALP__PUBLIC_FQDN}/portal/assets/favicon.ico`,
+      logoUrl: `https://${process.env.CADDY__ALP__PUBLIC_FQDN}/portal/assets/d2e.svg`,
     },
     color: {
       primaryColor: "#000080",
@@ -380,12 +383,11 @@ async function main() {
     },
     customCss: 'a[aria-label="Powered By Logto"] { display: none; }',
     signInMode: "SignIn", //Disable user registration At Login screen
-    signUp: {
-      password: false,
-      verify: false,
-    },
   };
-  await logto.patch("sign-in-exp", headers, signinExperience);
+  await update("sign-in-exp", headers, signinExperience);
+  console.log(
+    "*********************************************************************************\n"
+  );
 
   console.log(
     "*********************************** SUMMARY **********************************\n"
