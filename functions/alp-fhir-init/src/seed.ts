@@ -1,5 +1,6 @@
 import pg from "pg";
 const _env = Deno.env.toObject();
+import { env } from './env.ts'
 
 const queryPostgres = async (
     client: pg.Client,
@@ -54,6 +55,36 @@ export const seed = async () => {
   let jsonParsedProjectContent = JSON.parse(projectContent)
   jsonParsedProjectContent.features = ['bots']
   jsonParsedProjectContent.meta.versionId = '2c8b0331-863a-432e-a5d1-ef0619acc3d2'
+  //const SERVICE_ROUTES = _env.SERVICE_ROUTES || "{}";
+  // console.log(_env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n'))
+  // console.log(env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n'))
+
+  // console.log(env.GATEWAY_CA_CERT)
+
+  // console.log(_env.GATEWAY_CA_CERT)
+
+  // jsonParsedProjectContent.secret = [
+  //     {
+  //     "name": "gateway_crt",
+  //     "valueString": env.GATEWAY_CA_CERT
+  //   },
+  //   {
+  //     "name": "client_id",
+  //     "valueString": env.IDP__ALP_DATA_CLIENT_ID
+  //   },
+  //   {
+  //     "name": "client_secret",
+  //     "valueString": env.IDP__ALP_DATA__CLIENT_SECRET
+  //   },
+  //   {
+  //     "name": "fhir_route_auth",
+  //     "valueString": env.ALP_GATEWAY_OAUTH__URL
+  //   },
+  //   {
+  //     "name": "fhir_svc_route",
+  //     "valueString": JSON.parse(SERVICE_ROUTES).fhirSvc
+  //   }
+  // ]
 
   await queryPostgres(
     client,

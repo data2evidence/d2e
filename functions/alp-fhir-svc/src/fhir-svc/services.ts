@@ -86,6 +86,13 @@ export const createResourceInProject = async (token: string, fhirResouce: string
             clientSecret = searchResult.secret
         }else
             throw "Dataset not found!"
+
+        let getSubscription = await fhirApi.getOneResource('Subscription', `criteria=${fhirResouce}&author=ClientApplication/${clientId}`)
+        //Update Subscription resource with Authorization header
+        getSubscription.channel.header = [`Authorization: ${token}`]
+        console.info(token)
+        console.info(getSubscription)
+        await fhirApi.updateResource(getSubscription)
         //Get datasets
         const portalAPI = new PortalAPI(token)
         const datasets: Dataset[] = await portalAPI.getDatasets()

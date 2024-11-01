@@ -1,5 +1,8 @@
 import {seed} from "./src/seed.ts"
-import {readAndCreateBotFromConfig} from "./src/loadBots.ts"
+import {createSubscription} from "./src/loadBots.ts"
+import { replaceEnvVariablesInBot } from "./src/parseEnv.ts" 
 
 await seed()
-readAndCreateBotFromConfig()
+await createSubscription()
+//await replaceEnvVariablesInBot()
+//readAndCreateBotFromConfig()
