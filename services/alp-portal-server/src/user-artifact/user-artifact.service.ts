@@ -33,6 +33,10 @@ export class UserArtifactService {
     [ServiceName.BOOKMARKS]: []
   }
 
+  private sharedConditionMap = {
+    [ServiceName.NOTEBOOKS]: 'isShared'
+  }
+
   async getServiceArtifact(userId: string, serviceName: ServiceName): Promise<any> {
     const artifact = await this.userArtifactRepository.findOne({
       where: { userId }
@@ -106,17 +110,19 @@ export class UserArtifactService {
   }
 
   async getAllServiceArtifacts(serviceName: ServiceName): Promise<any[]> {
-    console.log('we are here')
-
     const artifacts = await this.userArtifactRepository.find()
     return artifacts.map(artifact => artifact.artifacts[serviceName]).flat()
   }
 
   async getAllUserServiceArtifacts(serviceName: ServiceName, userId?: string): Promise<any[]> {
-    const artifacts = await this.userArtifactRepository.find({
-      where: [{ userId: userId ? userId : this.userId }, { [`artifacts.${serviceName}.isShared`]: true }]
+    const userArtifacts = await this.userArtifactRepository.findOne({
+      where: { userId: userId || this.userId }
     })
-    return artifacts.map(artifact => artifact.artifacts[serviceName]).flat()
+
+    const sharedArtifactsFromOthers = await this.getAllSharedServiceArtifacts(serviceName, userId || this.userId)
+
+    const userArtifactsList = userArtifacts?.artifacts[serviceName] || []
+    return [...userArtifactsList, ...sharedArtifactsFromOthers]
   }
 
   async deleteServiceArtifact(userId: string, serviceName: ServiceName, id: string): Promise<void> {
@@ -128,6 +134,24 @@ export class UserArtifactService {
     } else {
       throw new NotFoundException(`Artifact with id ${id} for user ${userId} not found in ${serviceName}`)
     }
+  }
+
+  private async getAllSharedServiceArtifacts(serviceName: ServiceName, userId: string): Promise<any[]> {
+    const sharedArtifactsFromOthers = await this.userArtifactRepository
+      .createQueryBuilder('userArtifact')
+      .where('userArtifact.userId != :userId', { userId })
+      .andWhere(`userArtifact.artifacts ? :serviceName`, { serviceName })
+      .getMany()
+
+    if (!sharedArtifactsFromOthers.length) {
+      return []
+    }
+
+    const sharedConditionKey = this.sharedConditionMap[serviceName]
+
+    return sharedArtifactsFromOthers
+      .flatMap(artifact => artifact.artifacts[serviceName] || [])
+      .filter(artifact => artifact[sharedConditionKey] === true)
   }
 
   private isArtifactExists<T extends { id: string }>(artifactArray: T[], serviceArtifact: T) {
