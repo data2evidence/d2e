@@ -64,7 +64,7 @@ export const seed = async () => {
       "valueString": env.IDP__ALP_DATA__CLIENT_SECRET
     },
     {
-      "name": "alp_route_auth",
+      "name": "alp_auth_route",
       "valueString": env.ALP_GATEWAY_OAUTH__URL
     },
     {

@@ -63,7 +63,7 @@ async function handler(medplum, event) {
         let bundle = event.input;
         let secret_client_id = event.secrets['client_id'].valueString;
         let secret_client_secret = event.secrets['client_secret'].valueString;
-        let secret_alp_route_auth = event.secrets['alp_route_auth'].valueString;
+        let secret_alp_route_auth = event.secrets['alp_auth_route'].valueString;
         let secret_fhir_svc_route = event.secrets['fhir_svc_route'].valueString;
 
         console.log('Entered bundle bot handler');
