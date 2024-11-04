@@ -1071,7 +1071,7 @@ services:
         - --no-check-certificate
         - -O
         - liveness
-        - https://localhost:33002/check-liveness
+        - http://localhost:33002/check-liveness
       timeout: 30s
     hostname: alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: alpcr.azurecr.io/alp-data-node/alp-portal-server:${DOCKER_TAG_NAME:-develop}
