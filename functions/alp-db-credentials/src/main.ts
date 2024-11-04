@@ -19,11 +19,6 @@ export class App {
 
   constructor() {
     this.app = express()
-
-    this.initialiseDataSource()
-    this.registerMiddlewares()
-    this.registerRoutes()
-    this.registerValidatorContainer()
   }
 
   private registerMiddlewares() {
@@ -46,37 +41,40 @@ export class App {
     })
   }
 
-  private initialiseDataSource() {
-    dataSource
-      .initialize()
-      .then(() => {
-        logger.info('Datasource is initialised')
-        if (env.NODE_ENV === 'development') {
-          loadLocalDatabaseCredentials(logger)
-        }
-      })
-      .catch(error => {
-        //console.log(env.PG_HOST)
-        logger.error(`Error while initialising datasource: ${error}`)
-        process.exit(0)
-      })
+  private async initialiseDataSource() {
+    try {
+      await dataSource.initialize()
+      logger.info('Datasource is initialised')
+      await runMigrations()
+      if (env.NODE_ENV === 'development') {
+        loadLocalDatabaseCredentials(logger)
+      }
+    } catch (error) {
+      //console.log(env.PG_HOST)
+      logger.error(`Error while initialising datasource: ${error}`)
+      process.exit(0)
+    }
   }
 
   async start() {
 
-    await runMigrations();
-    
-    /*const server = https.createServer(
-      {
-        key: env.SSL_PRIVATE_KEY,
-        cert: env.SSL_PUBLIC_CERT,
-        maxHeaderSize: 8192 * 10
-      },
-      this.app
-    )*/
+    await this.initialiseDataSource()
+    this.registerMiddlewares()
+    this.registerRoutes()
+    this.registerValidatorContainer()
+
+     /*const server = https.createServer(
+    //   {
+    //     key: env.SSL_PRIVATE_KEY,
+    //     cert: env.SSL_PUBLIC_CERT,
+    //     maxHeaderSize: 8192 * 10
+    //   },
+    //   this.app
+    // )*/
+
     this.app.listen(PORT)
     logger.info(`🚀 ALP DB Credentials Manager started successfully!. Server listening on port ${PORT}`)
-    
+
   }
 }
 

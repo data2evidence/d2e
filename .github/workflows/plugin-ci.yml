@@ -9,6 +9,9 @@ on:
       - develop
       - trex
 
+env:
+  GIT_CI_BRANCH_NAME: ${{ github.ref_name }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,18 +23,24 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@alp-os'
+          node-version: "18.x"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@alp-os"
       - name: Update version
         run: jq --arg v "-$(date +%s)-$GITHUB_SHA" '.version+=$v' package.json > tmppkg; mv tmppkg package.json
       - name: Publish
-        run: npm publish
+        run: |
+          if [[ $GIT_CI_BRANCH_NAME == 'trex' || $GIT_CI_BRANCH_NAME == 'develop' ]]; then 
+            npm publish
+          else 
+            npm publish --dry-run
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/delete-package-versions@v5
-        with: 
-          package-name: 'd2e-functions'
-          package-type: 'npm'
+        if: github.ref_name == 'trex' || github.ref_name == 'develop'
+        with:
+          package-name: "d2e-functions"
+          package-type: "npm"
           min-versions-to-keep: 3
-          delete-only-pre-release-versions: 'true'
+          delete-only-pre-release-versions: "true"
