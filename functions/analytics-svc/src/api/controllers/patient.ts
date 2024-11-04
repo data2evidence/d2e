@@ -51,9 +51,7 @@ async function retrieveDataset(
         query = (req.query.query as string).split(",");
     }
     let releaseDate: string = req.query.mriquery.releaseDate;
-    let patientId: string = req.query.patientId
-        ? req.query.patientId
-        : null;
+    let patientId: string = req.query.patientId ? req.query.patientId : null;
     const { analyticsConnection } = req.dbConnections;
 
     analyticsConnection.setTemporalSystemTimeToDbSession(
@@ -63,12 +61,12 @@ async function retrieveDataset(
                 return console.error(err);
             }
             try {
-                const { cohortDefinition, studyId, pluginEndpoint } =
+                const { cohortDefinition, datasetId, pluginEndpoint } =
                     await createEndpointFromRequest(req);
                 pluginEndpoint.setRequest(req);
                 const pluginResult = await pluginEndpoint.retrieveData({
                     cohortDefinition,
-                    studyId,
+                    datasetId,
                     language,
                     dataFormat: format,
                     requestQuery: query,
@@ -108,7 +106,7 @@ async function streamDataset(req: IMRIRequest, callback: CallBackInterface) {
                 const pluginResult = await pluginEndpoint.retrieveDataStream({
                     cohortDefinition,
                     auditLogChannelName: "MRI Pt. List Stream",
-                    studyId: selectedStudyEntityValue,
+                    datasetId: selectedStudyEntityValue,
                 });
 
                 callback(null, pluginResult);
@@ -146,9 +144,7 @@ async function getParquetSchema(tableMetadata: []) {
  */
 export function retrieveDatasetInFormat(req: IMRIRequest, res) {
     const language = getUser(req).lang;
-    let format = req.query.dataFormat
-        ? req.query.dataFormat
-        : "json";
+    let format = req.query.dataFormat ? req.query.dataFormat : "json";
     let sendResponse;
 
     if (format.toUpperCase() === "CSV") {
@@ -183,30 +179,37 @@ export function retrieveDatasetInFormat(req: IMRIRequest, res) {
  */
 export function retrieveDatasetStream(req: IMRIRequest, res) {
     const language = getUser(req).lang;
-    let format = req.query.dataFormat
-        ? req.query.dataFormat
-        : "csv";
+    let format = req.query.dataFormat ? req.query.dataFormat : "csv";
     let returnOnlyCount = req.query.returnOnlyPatientCount
         ? JSON.parse(req.query.returnOnlyPatientCount.toLowerCase())
         : false;
 
-    const sendPatientCountResponse = async (result: PluginEndpointStreamResultType) => {
+    const sendPatientCountResponse = async (
+        result: PluginEndpointStreamResultType
+    ) => {
         if (result.noDataReason) {
             return res.status(200).json(result);
         } else {
-            let rowCount = 0
+            let rowCount = 0;
             let rows = [];
 
-            if (result.data.constructor.prototype.toString() === '[object AsyncGenerator]') {
+            if (
+                result.data.constructor.prototype.toString() ===
+                "[object AsyncGenerator]"
+            ) {
                 for await (const data of result.data) {
-                    rowCount ++; //Seems to return 1 object at a time
+                    rowCount++; //Seems to return 1 object at a time
                 }
                 //Detach Native DB
-                await req.dbConnections.analyticsConnection.deactivate_nativedb_communication(req.dbConnections.analyticsConnection.conn["duckdbNativeDBName"]);
+                await req.dbConnections.analyticsConnection.deactivate_nativedb_communication(
+                    req.dbConnections.analyticsConnection.conn[
+                        "duckdbNativeDBName"
+                    ]
+                );
                 let response = {
-                     entity: result.entity,
-                     rowCount: rowCount
-                 }
+                    entity: result.entity,
+                    rowCount: rowCount,
+                };
                 res.status(200).send(response);
             } else {
                 result.data.on("readable", () => {
@@ -229,13 +232,13 @@ export function retrieveDatasetStream(req: IMRIRequest, res) {
                     );
                     let response = {
                         entity: result.entity,
-                        rowCount: rowCount
-                    }
+                        rowCount: rowCount,
+                    };
                     res.status(200).send(response);
                 });
             }
         }
-    }
+    };
     const sendCSVResponse = (result: PluginEndpointStreamResultType) => {
         if (result.noDataReason) {
             return res.status(200).json(result);
@@ -268,7 +271,10 @@ export function retrieveDatasetStream(req: IMRIRequest, res) {
             });
 
             //Exception for duckdb
-            if (result.data.constructor.prototype.toString() !== '[object AsyncGenerator]') {
+            if (
+                result.data.constructor.prototype.toString() !==
+                "[object AsyncGenerator]"
+            ) {
                 result.data.on("error", (err) => {
                     log.error(
                         `${req.fileName}==========data2 finish error=========`
@@ -283,7 +289,10 @@ export function retrieveDatasetStream(req: IMRIRequest, res) {
             });
 
             pipeline(result.data, csvStreamWriter, res, async (err) => {
-                if (result.data.constructor.prototype.toString() === '[object AsyncGenerator]') {
+                if (
+                    result.data.constructor.prototype.toString() ===
+                    "[object AsyncGenerator]"
+                ) {
                     //Detach Native DB -> At this point duckdb complains connection is closed already (Since res.end might have been called already)
                 }
                 if (err) {
@@ -337,10 +346,9 @@ export function retrieveDatasetStream(req: IMRIRequest, res) {
                 .status(500)
                 .send(MRIEndpointErrorHandler({ err, language }));
         }
-        if(returnOnlyCount){
+        if (returnOnlyCount) {
             await sendPatientCountResponse(result);
-        }
-        else if (format.toUpperCase() === "PARQUET") {
+        } else if (format.toUpperCase() === "PARQUET") {
             sendParquetResponse(result);
         } else {
             sendCSVResponse(result);
@@ -652,11 +660,12 @@ function encryptData(data) {
 export async function getSinglePatientRoute(req, res) {
     const dataFormat = req.query.dataFormat ? req.query.dataFormat : "json";
     const requestInteractionTypes: string[] = req.query.interactionTypes
-        ? req.query.interactionTypes : null;
+        ? req.query.interactionTypes
+        : null;
     const patientId = req.params.patientId;
     const configId = req.query.configId;
     const configVersion = req.query.configVersion;
-    const datasetId =  req.query.datasetId;
+    const datasetId = req.query.datasetId;
     const { analyticsConnection } = req.dbConnections;
     const lang = getUser(req).lang;
 
@@ -664,7 +673,6 @@ export async function getSinglePatientRoute(req, res) {
         return res.status(500).send("patient id is required");
     }
     try {
-
         const result = await getSinglePatient({
             req,
             dataFormat,
@@ -674,11 +682,10 @@ export async function getSinglePatientRoute(req, res) {
             configVersion,
             lang,
             analyticsConnection,
-            datasetId
+            datasetId,
         });
 
         return res.status(200).json(result);
-
     } catch (err) {
         log.debug(err);
         return res.status(500).send(err);
@@ -694,33 +701,41 @@ export async function getSinglePatient({
     configVersion,
     lang,
     analyticsConnection,
-    datasetId
-}): Promise < PluginEndpointResultType > {
-    return new Promise < PluginEndpointResultType > (async (resolve, reject) => {
-        try{
+    datasetId,
+}): Promise<PluginEndpointResultType> {
+    return new Promise<PluginEndpointResultType>(async (resolve, reject) => {
+        try {
             const configData = {
                 configId,
                 configVersion,
             };
             const psConfigServerAPI = new PsConfigServerAPI();
-            const accessToken = await psConfigServerAPI.getClientCredentialsToken();
-            const cdmConfig = await psConfigServerAPI.getCDWConfig({action: "getCDWConfig", configId, configVersion, lang}, accessToken);
-            
+            const accessToken =
+                await psConfigServerAPI.getClientCredentialsToken();
+            const cdmConfig = await psConfigServerAPI.getCDWConfig(
+                { action: "getCDWConfig", configId, configVersion, lang },
+                accessToken
+            );
+
             let requestWalker = getJsonWalkFunction(cdmConfig);
-            const masterData = requestWalker("patient.attributes.*")
-                .map(({ path }) => path);
-    
+            const masterData = requestWalker("patient.attributes.*").map(
+                ({ path }) => path
+            );
+
             // get interaction types from request or get from dependent config
-            const interactionTypes = Array.isArray(requestInteractionTypes) ?
-                requestInteractionTypes.reduce(
-                    (list, interaction) => {
-                        list.push(...requestWalker(`${interaction}.attributes.*`).map(({ path }) => path));
-                        return list;
-                    }, [],
-                ) : requestWalker(
-                    "**.interactions.**.attributes.*",
-                ).map(({ path }) => path);
-    
+            const interactionTypes = Array.isArray(requestInteractionTypes)
+                ? requestInteractionTypes.reduce((list, interaction) => {
+                      list.push(
+                          ...requestWalker(`${interaction}.attributes.*`).map(
+                              ({ path }) => path
+                          )
+                      );
+                      return list;
+                  }, [])
+                : requestWalker("**.interactions.**.attributes.*").map(
+                      ({ path }) => path
+                  );
+
             let cohortDefinition: CohortDefinitionType = {
                 cards: { content: [{ content: [] }, { content: [] }] },
                 axes: [],
@@ -733,27 +748,33 @@ export async function getSinglePatient({
                 })),
                 configData,
             };
-            const studyMetadata: StudyDbMetadata = req.studiesDbMetadata.studies.find((o) => o.id === datasetId);
+            const studyMetadata: StudyDbMetadata =
+                req.studiesDbMetadata.studies.find((o) => o.id === datasetId);
             const studySchemaName = studyMetadata?.schemaName;
-            if(studySchemaName){
+            if (studySchemaName) {
                 //Use schemaname from analyticsConnection, since duckdb doesnt follow the same naming convention as other dbs
-                let pluginEndpoint = new PluginEndpoint(analyticsConnection, analyticsConnection.schemaName)
+                let pluginEndpoint = new PluginEndpoint(
+                    analyticsConnection,
+                    analyticsConnection.schemaName
+                );
                 pluginEndpoint.setRequest(req);
-                let pluginResult: PluginEndpointResultType = < PluginEndpointResultType > await pluginEndpoint.retrieveData({
+                let pluginResult: PluginEndpointResultType = <
+                    PluginEndpointResultType
+                >await pluginEndpoint.retrieveData({
                     cohortDefinition,
-                    studyId: datasetId,
-                    language : lang,
+                    datasetId,
+                    language: lang,
                     dataFormat: dataFormat,
                     patientId: patientId,
                     auditLogChannelName: "Patient Summary",
                 });
                 return resolve(pluginResult);
             } else {
-                throw "Invalid dataset Id"
+                throw "Invalid dataset Id";
             }
-        }catch (err) {
+        } catch (err) {
             log.debug(err);
             return reject(err);
-        };
+        }
     });
 }

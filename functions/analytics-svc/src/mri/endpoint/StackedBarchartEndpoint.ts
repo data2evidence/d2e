@@ -44,7 +44,7 @@ export class StackedBarchartEndpoint extends BaseQueryEngineEndpoint {
         req,
         configId,
         configVersion,
-        studyId,
+        datasetId,
         bookmarkInputStr,
         language
     ): Promise<MRIEndpointResultType> {
@@ -61,7 +61,7 @@ export class StackedBarchartEndpoint extends BaseQueryEngineEndpoint {
                     queryParams: {
                         configId,
                         configVersion,
-                        studyId,
+                        datasetId,
                         queryType: "aggquery",
                         bookmarkInputStr,
                         language,
@@ -153,7 +153,7 @@ export class StackedBarchartEndpoint extends BaseQueryEngineEndpoint {
         req,
         configId,
         configVersion,
-        studyId,
+        datasetId,
         bookmarkInputStr,
         language
     ) {
@@ -163,7 +163,7 @@ export class StackedBarchartEndpoint extends BaseQueryEngineEndpoint {
                 req,
                 configId,
                 configVersion,
-                studyId,
+                datasetId,
                 bookmarkInputStr,
                 language
             )

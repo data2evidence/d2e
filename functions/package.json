@@ -31,7 +31,8 @@
         },
         {
           "source": "/prefect",
-          "function": "/prefect"
+          "function": "/prefect",
+          "env": "jobplugins"
         },
         {
           "source": "/gateway/api/db",
@@ -161,6 +162,12 @@
           "function": "/alp-fhir-svc",
           "env": "alp-fhir-svc",
           "imports": "/alp-fhir-svc/import.json"
+        },
+        {
+          "source": "/concept-mapping",
+          "function": "/concept-mapping",
+          "env": "concept-mapping",
+          "imports": "/concept-mapping/import.json"
         }
       ],
       "roles": {
@@ -312,7 +319,9 @@
           "prefect.read",
           "prefect.delete",
           "prefect.post",
-          "prefect.update"
+          "prefect.update",
+          "conceptmapping.read",
+          "conceptmapping.post"
         ],
         "ALP_DASHBOARD_VIEWER": [
           "gateway.dashboardGate.content"
@@ -389,6 +398,17 @@
       },
       "scopes": [
         {
+          "path": "^/concept-mapping",
+          "scopes": [
+            "conceptmapping.read",
+            "conceptmapping.post"
+          ],
+          "httpMethods": [
+            "GET", 
+            "POST"
+          ]
+        },
+        {
           "path": "^/jobplugins/test(.*)",
           "scopes": [
             "PA.svc"
@@ -400,6 +420,10 @@
           "scopes": [
             "jobplugins"
           ]
+        },
+        {
+          "path": "^/prefect(.*)",
+          "scopes": ["prefect.read", "prefect.delete", "prefect.post", "prefect.update"]
         },
         {
           "path": "^/analytics-svc/plugins/(.*)",
