@@ -1,7 +1,7 @@
 import axios from 'axios';
 import https from 'https';
 
-const getRequestConfig = async (token: any, ca_crt: any) => {
+const getRequestConfig = async (token: any) => {
     let options = {};
 
     options = {
@@ -10,7 +10,7 @@ const getRequestConfig = async (token: any, ca_crt: any) => {
         },
         httpsAgent: new https.Agent({
             rejectUnauthorized: true,
-            ca: ca_crt
+            //ca: ca_crt
         })
 };
 
@@ -48,11 +48,11 @@ const getClientCredentialsToken = async(clientId, clientSecret, authUrl) => {
     return result.data.access_token;
 }
 
-const insertIntoFhirDataModel = async (resourceType, inputData, secret_gateway_crt, secret_client_id, secret_client_secret, secret_fhir_route_auth, secret_fhir_svc_route) => {
+const insertIntoFhirDataModel = async (resourceType, inputData, secret_client_id, secret_client_secret, secret_fhir_route_auth, secret_fhir_svc_route) => {
     try {
         console.log('Entered insertIntoFhirDataModel');
         const token = await getClientCredentialsToken(secret_client_id, secret_client_secret, secret_fhir_route_auth);
-        const options = await getRequestConfig(token, secret_gateway_crt);
+        const options = await getRequestConfig(token);
         const baseUrl = secret_fhir_svc_route;
         if (baseUrl) {
             const url = `${baseUrl}/ingestResource/${resourceType}`;
@@ -73,13 +73,11 @@ const insertIntoFhirDataModel = async (resourceType, inputData, secret_gateway_c
 export async function handler(medplum, event) {
     try {
         let bundle = event.input;
-        let secret_gateway_crt = event.secrets['gateway_crt'].valueString.replace(/\\n/g, '\n');
-        console.log(secret_gateway_crt)
+
         let secret_client_id = event.secrets['client_id'].valueString;
         let secret_client_secret = event.secrets['client_secret'].valueString;
         let secret_fhir_route_auth = event.secrets['fhir_route_auth'].valueString;
         let secret_fhir_svc_route = event.secrets['fhir_svc_route'].valueString;
-        console.log(`${secret_gateway_crt}, ${secret_client_id}, ${secret_client_secret}, ${secret_fhir_route_auth}, ${secret_fhir_svc_route}`)
 
         console.log('Entered bundle bot handler');
         if (bundle.entry === undefined) {
@@ -87,7 +85,7 @@ export async function handler(medplum, event) {
             return;
         }
         console.log('Create resource for each of the entry in the bundle');
-        await insertIntoFhirDataModel('Bundle', bundle, secret_gateway_crt, secret_client_id, secret_client_secret, secret_fhir_route_auth, secret_fhir_svc_route);
+        await insertIntoFhirDataModel('Bundle', bundle, secret_client_id, secret_client_secret, secret_fhir_route_auth, secret_fhir_svc_route);
     }
     catch (err) {
         console.log(err);
