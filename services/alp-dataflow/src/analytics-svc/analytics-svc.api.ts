@@ -38,10 +38,10 @@ export class AnalyticsSvcAPI {
     try {
       this.logger.info(`vocabSchema ${vocabSchema} datasetId ${datasetId}`)
       const options = await this.createOptions()
-      //add studyid
+      //add datasetId
       const url = `${
         this.url
-      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?studyId=${datasetId}`
+      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?datasetId=${datasetId}`
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
@@ -63,7 +63,7 @@ export class AnalyticsSvcAPI {
       const options = await this.createOptions()
       const url = `${
         this.url
-      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}/${conceptId}?studyId=${datasetId}`
+      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}/${conceptId}?datasetId=${datasetId}`
       const obs = this.httpService.get(url, options)
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
