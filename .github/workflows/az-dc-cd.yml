@@ -4,12 +4,12 @@ run-name: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.
 on:
   push:
     branches:
-      - rc-v0.4.0-beta
+      - develop
 
   workflow_dispatch:
     inputs:
       docker_tag_name:
-        default: rc-v0.4.0-beta
+        default: develop
         description: Enter BranchName / Release Tag Name
         required: true
         type: string
