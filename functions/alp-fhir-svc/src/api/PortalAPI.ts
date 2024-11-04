@@ -2,7 +2,7 @@ import { Service } from 'typedi'
 import axios, { AxiosRequestConfig } from 'axios'
 import { createLogger } from '../logger'
 import https from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
 import { Dataset } from '../utils/types'
 
 @Service()
@@ -17,8 +17,8 @@ export class PortalAPI {
     if (!token) {
       throw new Error('No token passed for Portal API!')
     }
-    if ( env.SERVICE_ROUTES.portalServer) {
-      this.baseURL =  env.SERVICE_ROUTES.portalServer
+    if (services.portalServer) {
+      this.baseURL =  services.portalServer
       this.httpsAgent = new https.Agent({
         rejectUnauthorized: true,
         ca: env.GATEWAY_CA_CERT

@@ -2,7 +2,7 @@ import { Service } from 'typedi'
 import axios, { AxiosRequestConfig } from 'axios'
 import { createLogger } from '../logger'
 import https from 'https'
-import { env } from '../env'
+import { env, services } from '../env'
 
 @Service()
 export class FhirSvcAPI {
@@ -13,7 +13,7 @@ export class FhirSvcAPI {
 
   constructor() {
     if ( env.SERVICE_ROUTES.fhirSvc) {
-      this.baseURL =  env.SERVICE_ROUTES.fhirSvc
+      this.baseURL =  services.fhirSvc
       this.httpsAgent = new https.Agent({
         rejectUnauthorized: true,
         ca: env.GATEWAY_CA_CERT

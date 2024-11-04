@@ -25,7 +25,6 @@ export async function readAndCreateBotFromConfig():Promise<void> {
         }
         console.log(botConfig.bots.length + ' bots configured in bot config.')
         let fhirApi = new FhirAPI()
-        console.log('Auth: Client credentials token')
         await fhirApi.clientCredentialslogin()
         await enableBotForSuperAdminProject(fhirApi)
         for (const botConfig of botConfigs) {

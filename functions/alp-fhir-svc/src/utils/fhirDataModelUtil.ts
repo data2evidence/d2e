@@ -16,17 +16,18 @@ export async function getFhirJsonSchema(conn:ConnectionInterface){
     })
 }
 
-export async function getFhirData(conn:ConnectionInterface, fhirResource){
-    return new Promise((resolve, reject) => {
-        conn.executeQuery(`select * from ${fhirResource}Fhir`, [], (err: any, result: any) => {
-            if(err){
-                console.log('Error loading fhir schema json: '+ JSON.stringify(err))
-                reject(err)
-            }
-            resolve(result)
-        })
-    })
-}
+//Test
+// export async function getFhirData(conn:ConnectionInterface, fhirResource){
+//     return new Promise((resolve, reject) => {
+//         conn.executeQuery(`select * from ${fhirResource}Fhir`, [], (err: any, result: any) => {
+//             if(err){
+//                 console.log('Error loading fhir schema json: '+ JSON.stringify(err))
+//                 reject(err)
+//             }
+//             resolve(result)
+//         })
+//     })
+// }
 
 export async function ingestResourceInFhir(conn, schemaName, jsonSchema, data, requestType){
     return new Promise(async (resolve, reject) => {

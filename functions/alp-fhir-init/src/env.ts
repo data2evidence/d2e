@@ -1,5 +1,5 @@
 const _env = Deno.env.toObject();
-console.log(JSON.stringify(_env))
+
 export const env = {
   FHIR__CLIENT_ID: _env.FHIR__CLIENT_ID,
   FHIR__CLIENT_SECRET: _env.FHIR__CLIENT_SECRET,
@@ -18,4 +18,5 @@ export const env = {
   PG__PORT: _env.PG__PORT,
   PG__DB_NAME: _env.PG__DB_NAME
 }
+
 export const services = JSON.parse(env.SERVICE_ROUTES)

@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'npm:uuid'
 import { PortalAPI } from '../api/PortalAPI'
 import { Dataset } from '../utils/types'
 import { Bundle } from '@medplum/fhirtypes'
-import { getFhirData, getFhirJsonSchema, ingestResourceInFhir } from '../utils/fhirDataModelUtil'
+import { getFhirJsonSchema, ingestResourceInFhir } from '../utils/fhirDataModelUtil'
 import { getCachedbDbConnections, getClientCredentialsToken } from '../utils/dbUtils'
 import { env } from '../env'
 
@@ -192,43 +192,44 @@ export async function createSubscriptionInFhirServer(fhirApi: FhirAPI, clientId:
     return true
 }
 
+//Need the following for testing
 //Test
-export async function getResource(fhirResource: string, datasetId: string){
-    let token = await getClientCredentialsToken()
-    //Get dataset details to connect to cachedb
-    let portalApi = new PortalAPI(token)
-    let datasetDetails = await portalApi.getDatasetById(datasetId)
-    //Connect to cachedb of the incoming dataset
-    let conn = await getCachedbDbConnections(token, datasetDetails.databaseCode, datasetDetails.schemaName, datasetDetails.vocabSchemaName)
-    return await getFhirData(conn, fhirResource)
-}
+// export async function getResource(fhirResource: string, datasetId: string){
+//     let token = await getClientCredentialsToken()
+//     //Get dataset details to connect to cachedb
+//     let portalApi = new PortalAPI(token)
+//     let datasetDetails = await portalApi.getDatasetById(datasetId)
+//     //Connect to cachedb of the incoming dataset
+//     let conn = await getCachedbDbConnections(token, datasetDetails.databaseCode, datasetDetails.schemaName, datasetDetails.vocabSchemaName)
+//     return await getFhirData(conn, fhirResource)
+// }
 
-//Test
-export const updateResource = async(clientId, projectId, botId) => {
-    let fhirAPi = new FhirAPI()
-    let getSubscription = await fhirAPi.getOneResource('Subscription', `criteria=Bundle&author=ClientApplication/${clientId}`)
-    getSubscription.channel.endpoint = `Bot/${botId}`
-    // const subscriptionDetails = {
-    //     "resourceType": "Subscription",
-    //     "status": "active",
-    //     "reason": "Rest hook subscription for Bundle",
-    //     "channel": {
-    //       "type": "rest-hook",
-    //       "endpoint": `Bot/${botId}`
-    //     },
-    //     "criteria": "Bundle",
-    //     "meta": {
-    //       "author": {
-    //         "reference": `ClientApplication/${clientId}`,
-    //         "display": "d2eClient"
-    //       },
-    //       "project": `${projectId}`,
-    //       "compartment": [
-    //         {
-    //           "reference": `Project/${projectId}`
-    //         }
-    //       ]
-    //     }
-    // }
-    return await fhirAPi.updateResource(getSubscription)
-}
+// //Test
+// export const updateResource = async(clientId, projectId, botId) => {
+//     let fhirAPi = new FhirAPI()
+//     let getSubscription = await fhirAPi.getOneResource('Subscription', `criteria=Bundle&author=ClientApplication/${clientId}`)
+//     getSubscription.channel.endpoint = `Bot/${botId}`
+//     // const subscriptionDetails = {
+//     //     "resourceType": "Subscription",
+//     //     "status": "active",
+//     //     "reason": "Rest hook subscription for Bundle",
+//     //     "channel": {
+//     //       "type": "rest-hook",
+//     //       "endpoint": `Bot/${botId}`
+//     //     },
+//     //     "criteria": "Bundle",
+//     //     "meta": {
+//     //       "author": {
+//     //         "reference": `ClientApplication/${clientId}`,
+//     //         "display": "d2eClient"
+//     //       },
+//     //       "project": `${projectId}`,
+//     //       "compartment": [
+//     //         {
+//     //           "reference": `Project/${projectId}`
+//     //         }
+//     //       ]
+//     //     }
+//     // }
+//     return await fhirAPi.updateResource(getSubscription)
+// }
