@@ -7,7 +7,7 @@ import { env } from "../../env";
 const log = Logger.CreateLogger("analytics-log");
 
 export async function retrieveParquetStream(req: IMRIRequest, res) {
-    const studyId = req.params.studyId;
+    const datasetId = req.params.datasetId;
     const tableName = req.params.tableName;
     try {
         const studies = await new PortalServerAPI().getStudies(
@@ -16,10 +16,10 @@ export async function retrieveParquetStream(req: IMRIRequest, res) {
 
         log.debug(`All study details from portal: ${JSON.stringify(studies)}`);
 
-        const studyFound = studies.find((study) => study.id === studyId);
+        const studyFound = studies.find((study) => study.id === datasetId);
         if (!studyFound) {
             const httpResponse = {
-                message: `Study metadata not found for given studyID(${studyId})`,
+                message: `Study metadata not found for given datasetId(${datasetId})`,
             };
             res.status(500).send(JSON.stringify(httpResponse));
         }
@@ -31,7 +31,7 @@ export async function retrieveParquetStream(req: IMRIRequest, res) {
         const schemaName = studyFound.schemaName;
         if (schemaName === "") {
             const httpResponse = {
-                message: `Study schema not found for given studyID(${studyId})`,
+                message: `Study schema not found for given datasetId(${datasetId})`,
             };
             res.status(500).send(JSON.stringify(httpResponse));
         }
@@ -80,7 +80,7 @@ export async function retrieveParquetStream(req: IMRIRequest, res) {
         return res
             .status(400)
             .send(
-                `Parquet not found in table ${tableName} for study ID ${studyId}`
+                `Parquet not found in table ${tableName} for study ID ${datasetId}`
             );
     } catch (e) {
         log.enrichErrorWithRequestCorrelationID(e, req);

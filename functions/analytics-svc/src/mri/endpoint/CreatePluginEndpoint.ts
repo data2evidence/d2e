@@ -10,7 +10,7 @@ import { PluginEndpoint } from "./PluginEndpoint";
 
 export async function createEndpointFromRequest(req: IMRIRequest): Promise<{
     cohortDefinition: CohortDefinitionType;
-    studyId: string;
+    datasetId: string;
     pluginEndpoint: PluginEndpoint;
 }> {
     const { analyticsConnection } = req.dbConnections;
@@ -41,17 +41,21 @@ export async function createEndpointFromRequest(req: IMRIRequest): Promise<{
             if (req.body?.cohortId) {
                 cohortDefinition["cohortId"] = req.body.cohortId;
                 if (analyticsConnection.dialect === "DUCKDB") {
-                    analyticsConnection.conn["studyAnalyticsCredential"] = req.dbCredentials.studyAnalyticsCredential;
-                    analyticsConnection.conn["duckdbNativeDBName"] = await analyticsConnection.activate_nativedb_communication(analyticsConnection.conn["studyAnalyticsCredential"]);
+                    analyticsConnection.conn["studyAnalyticsCredential"] =
+                        req.dbCredentials.studyAnalyticsCredential;
+                    analyticsConnection.conn["duckdbNativeDBName"] =
+                        await analyticsConnection.activate_nativedb_communication(
+                            analyticsConnection.conn["studyAnalyticsCredential"]
+                        );
                 }
             }
         }
-        let studyId = body.selectedStudyEntityValue;
+        let datasetId = body.selectedStudyEntityValue;
         const studyMetadata: StudyDbMetadata =
-            req.studiesDbMetadata.studies.find((o) => o.id === studyId);
+            req.studiesDbMetadata.studies.find((o) => o.id === datasetId);
         const studySchemaName = studyMetadata?.schemaName;
 
-        if(studySchemaName) {
+        if (studySchemaName) {
             //Use schemaname from analyticsConnection, since duckdb doesnt follow the same naming convention as other dbs
             const pluginEndpoint = new PluginEndpoint(
                 analyticsConnection,
@@ -61,16 +65,15 @@ export async function createEndpointFromRequest(req: IMRIRequest): Promise<{
 
             return Promise.resolve({
                 cohortDefinition,
-                studyId,
+                datasetId,
                 pluginEndpoint,
             });
         } else {
-            throw new Error(`Schema name undefined for dataset id ${studyId}`)
+            throw new Error(
+                `Schema name undefined for dataset id ${datasetId}`
+            );
         }
-        
     } catch (err) {
         return Promise.reject(err);
     }
-
-
 }

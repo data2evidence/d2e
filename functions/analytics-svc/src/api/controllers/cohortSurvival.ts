@@ -20,7 +20,7 @@ const minioClient = new Minio.Client({
 });
 
 async function getStudyDetails(
-    studyId: string,
+    datasetId: string,
     res
 ): Promise<{
     databaseCode: string;
@@ -33,13 +33,13 @@ async function getStudyDetails(
         const studies = await portalServerAPI.getStudies(accessToken);
 
         // find the matching element and get the study schema name
-        const studyMatch = studies.find((el) => el.id === studyId);
+        const studyMatch = studies.find((el) => el.id === datasetId);
         if (!studyMatch) {
             res.status(500).send(
                 MRIEndpointErrorHandler({
                     err: {
                         name: "mri-pa",
-                        message: `Study metadata not found for the the given studyID(${studyId})!`,
+                        message: `Study metadata not found for the the given datasetId(${datasetId})!`,
                     },
                     language,
                 })
@@ -74,7 +74,7 @@ export async function getKmData(req: IMRIRequest, res) {
                 `cohort-survival/results/${req.query.flowRunId}`,
                 {}
             );
-            if (result.parameters.options.datasetId !== req.query.studyId) {
+            if (result.parameters.options.datasetId !== req.query.datasetId) {
                 throw new Error("Not authorized to view this flow run.");
             }
             if (
@@ -143,8 +143,8 @@ export async function getKmData(req: IMRIRequest, res) {
 }
 
 export async function analyzeCohortsKm(req: IMRIRequest, res) {
-    const studyId = req.query.studyId as string;
-    const { schemaName, databaseCode } = await getStudyDetails(studyId, res);
+    const datasetId = req.query.datasetId as string;
+    const { schemaName, databaseCode } = await getStudyDetails(datasetId, res);
     const result = await dataflowRequest(
         req,
         "POST",
@@ -155,7 +155,7 @@ export async function analyzeCohortsKm(req: IMRIRequest, res) {
                 databaseCode,
                 targetCohortDefinitionId: req.body.targetCohortId,
                 outcomeCohortDefinitionId: req.body.outcomeCohortId,
-                datasetId: req.query.studyId,
+                datasetId: datasetId,
             },
         }
     );

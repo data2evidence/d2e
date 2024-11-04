@@ -72,7 +72,7 @@ export async function populationStudyQuery(req: IMRIRequest, res, next) {
                             return console.error(err);
                         }
                         try {
-                            const studyIds = body.studies;
+                            const datasetIds = body.studies;
                             function _sendResult(err, result) {
                                 if (err) {
                                     return res.status(500).send(
@@ -89,7 +89,7 @@ export async function populationStudyQuery(req: IMRIRequest, res, next) {
                                 new PatientCountEndpoint(analyticsConnection)
                                     .processMultipleStudyRequest(
                                         req,
-                                        studyIds,
+                                        datasetIds,
                                         bookmarkInputStr,
                                         language
                                     )
@@ -99,7 +99,7 @@ export async function populationStudyQuery(req: IMRIRequest, res, next) {
                                 new PatientCountEndpoint(analyticsConnection)
                                     .processMultipleStudyRequest(
                                         req,
-                                        studyIds,
+                                        datasetIds,
                                         body,
                                         language
                                     )
@@ -182,7 +182,7 @@ export async function populationQuery(req: IMRIRequest, res, next) {
                         try {
                             const configId = configData.configId;
                             const configVersion = configData.configVersion;
-                            const studyId = body.selectedStudyEntityValue;
+                            const datasetId = body.selectedStudyEntityValue;
 
                             let sFilename: string =
                                 <string>req.query.name ||
@@ -236,7 +236,7 @@ export async function populationQuery(req: IMRIRequest, res, next) {
                                                     req,
                                                     configId,
                                                     configVersion,
-                                                    studyId,
+                                                    datasetId,
                                                     bookmarkInputStr,
                                                     language
                                                 )
@@ -269,7 +269,7 @@ export async function populationQuery(req: IMRIRequest, res, next) {
                                                     req,
                                                     configId,
                                                     configVersion,
-                                                    studyId,
+                                                    datasetId,
                                                     bookmarkInputStr,
                                                     language
                                                 )
@@ -289,7 +289,7 @@ export async function populationQuery(req: IMRIRequest, res, next) {
                                                     req,
                                                     configId,
                                                     configVersion,
-                                                    studyId,
+                                                    datasetId,
                                                     bookmarkInputStr,
                                                     language
                                                 )
@@ -309,7 +309,7 @@ export async function populationQuery(req: IMRIRequest, res, next) {
                                                         req,
                                                         configId,
                                                         configVersion,
-                                                        studyId,
+                                                        datasetId,
                                                         bookmarkInputStr,
                                                         language
                                                     )
@@ -327,7 +327,7 @@ export async function populationQuery(req: IMRIRequest, res, next) {
                                                         req,
                                                         configId,
                                                         configVersion,
-                                                        studyId,
+                                                        datasetId,
                                                         body,
                                                         language
                                                     )
