@@ -366,7 +366,7 @@ function insertIntoFhirTable(conn: ConnectionInterface, schemaName, fhirResource
 function checkIfRecordExists(conn:ConnectionInterface, schemaName, fhirResource, fhirResourceId){
     console.info(`Check if record exists in DB: ${fhirResourceId}`)
     return new Promise((resolve, reject) => {
-        conn.executeQuery(`SELECT * FROM ${schemaName}.${fhirResource}Fhir WHERE id = ${fhirResourceId}`, [], (err: any, result: any) => {
+        conn.executeQuery(`SELECT * FROM ${schemaName}.${fhirResource}Fhir WHERE id = '${fhirResourceId}'`, [], (err: any, result: any) => {
             if(err){
                 console.log('Error while checking if the resource exists in DB: '+ JSON.stringify(err))
                 reject(err)

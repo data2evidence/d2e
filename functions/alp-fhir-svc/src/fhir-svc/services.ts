@@ -206,27 +206,29 @@ export async function getResource(fhirResource: string, datasetId: string){
 //Test
 export const updateResource = async(clientId, projectId, botId) => {
     let fhirAPi = new FhirAPI()
-    const subscriptionDetails = {
-        "resourceType": "Subscription",
-        "status": "active",
-        "reason": "Rest hook subscription for Bundle",
-        "channel": {
-          "type": "rest-hook",
-          "endpoint": `Bot/${botId}`
-        },
-        "criteria": "Bundle",
-        "meta": {
-          "author": {
-            "reference": `ClientApplication/${clientId}`,
-            "display": "d2eClient"
-          },
-          "project": `${projectId}`,
-          "compartment": [
-            {
-              "reference": `Project/${projectId}`
-            }
-          ]
-        }
-    }
-return await fhirAPi.updateResource(subscriptionDetails)
+    let getSubscription = await fhirAPi.getOneResource('Subscription', `criteria=Bundle&author=ClientApplication/${clientId}`)
+    getSubscription.channel.endpoint = `Bot/${botId}`
+    // const subscriptionDetails = {
+    //     "resourceType": "Subscription",
+    //     "status": "active",
+    //     "reason": "Rest hook subscription for Bundle",
+    //     "channel": {
+    //       "type": "rest-hook",
+    //       "endpoint": `Bot/${botId}`
+    //     },
+    //     "criteria": "Bundle",
+    //     "meta": {
+    //       "author": {
+    //         "reference": `ClientApplication/${clientId}`,
+    //         "display": "d2eClient"
+    //       },
+    //       "project": `${projectId}`,
+    //       "compartment": [
+    //         {
+    //           "reference": `Project/${projectId}`
+    //         }
+    //       ]
+    //     }
+    // }
+    return await fhirAPi.updateResource(getSubscription)
 }
