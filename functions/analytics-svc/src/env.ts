@@ -25,6 +25,19 @@ function initEnv(__env) {
         USE_DUCKDB: z.string(),
         USE_CACHEDB: z.string(),
 
+        PG__IDLE_TIMEOUT_IN_MS: z
+            .string()
+            .refine((val) => !isNaN(parseInt(val)))
+            .transform(Number),
+        PG__MAX_POOL: z
+            .string()
+            .refine((val) => !isNaN(parseInt(val)))
+            .transform(Number),
+        PG__MIN_POOL: z
+            .string()
+            .refine((val) => !isNaN(parseInt(val)))
+            .transform(Number),
+
         CACHEDB__HOST: z.string(),
         CACHEDB__PORT: z
             .string()
