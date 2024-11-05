@@ -202,14 +202,6 @@ x-envs:
           "pluginPath": "plugins/Setup/OverviewDescription/module",
           "route": "overview-description"
         },
-        { 
-          "description": "Upload / delete flows",
-          "enabled": true,
-          "name": "Plugins Table",
-          "notes": "",
-          "pluginPath": "plugins/Setup/PluginTable/module",
-          "route": "plugins-table"
-        },
         {
           "description": "Manage trex plugins",
           "enabled": true,
