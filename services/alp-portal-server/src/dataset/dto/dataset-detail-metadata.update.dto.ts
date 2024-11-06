@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsUUID, ValidateNested, IsNotEmptyObject } from 'class-validator'
+import { IsArray, IsNotEmpty, IsUUID, ValidateNested, IsNotEmptyObject, IsOptional } from 'class-validator'
 import { Type } from 'class-transformer'
 import { IDatasetDetailMetadataUpdateDto } from '../../types'
 import { DatasetCustomAttribute, DatasetDashboardBaseDto, DatasetDetailDto } from './dataset.dto'
@@ -34,7 +34,8 @@ export class DatasetDetailMetadataUpdateDto implements IDatasetDetailMetadataUpd
   @IsNotEmpty()
   visibilityStatus: string
 
-  @IsNotEmpty()
+  // @IsNotEmpty()
   @IsUUID()
+  @IsOptional()
   paConfigId: string
 }
