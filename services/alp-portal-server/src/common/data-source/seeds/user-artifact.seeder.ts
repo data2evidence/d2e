@@ -1,8 +1,7 @@
 import { Seeder } from 'typeorm-extension'
-import { DataSource, Repository } from 'typeorm'
+import { DataSource } from 'typeorm'
 import { notebookContents } from './notebooks'
 import { UserArtifact } from '../../../user-artifact/entity'
-import { Notebook } from '../../../notebook/entity'
 
 export default class UserArtifactSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {
