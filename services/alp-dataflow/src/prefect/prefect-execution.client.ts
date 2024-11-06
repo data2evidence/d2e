@@ -1,9 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { execSync, spawn } from 'child_process'
 import { join } from 'path'
-import { createLogger } from '../logger'
+import { PrefectDeploymentPythonFiles, PREFECT_ADHOC_FLOW_FOLDER_PATH } from '../common/const'
 import { env } from '../env'
-import { PREFECT_ADHOC_FLOW_FOLDER_PATH, PrefectDeploymentPythonFiles } from '../common/const'
+import { createLogger } from '../logger'
 
 @Injectable()
 export class PrefectExecutionClient {
@@ -19,7 +19,7 @@ export class PrefectExecutionClient {
           cwd: join(PREFECT_ADHOC_FLOW_FOLDER_PATH, userId, folderName)
         })
       } else {
-        command = spawn('/tmp/python_venv/bin/python', [`${fileName}`], {
+        command = spawn('/usr/src/app/venv/bin/python', [`${fileName}`], {
           cwd: join(PREFECT_ADHOC_FLOW_FOLDER_PATH, userId, folderName)
         })
       }
@@ -116,7 +116,7 @@ subprocess.run(system_packages_cmd)
     const installCmd = url ? url : fileStem.concat(fileExt)
     return `import subprocess
 import os
-install_cmd = ["/tmp/python_venv/bin/pip", "install", "${installCmd}", "--target", "."]
+install_cmd = ["/usr/src/app/venv/bin/pip", "install", "${installCmd}", "--target", ".", "--no-build-isolation"]
 subprocess.run(install_cmd)
     `
   }
