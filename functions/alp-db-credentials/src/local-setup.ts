@@ -1,6 +1,6 @@
 import { Logger } from 'winston'
 import { v4 as uuidv4 } from 'uuid'
-import Container from 'typedi'
+import { Container } from 'typedi'
 import { env } from './env'
 import { DbCredentialRepository, DbExtraRepository, DbRepository, DbVocabSchemaRepository } from './db/repository'
 import { SERVICE_SCOPE, USER_SCOPE } from './common/const'

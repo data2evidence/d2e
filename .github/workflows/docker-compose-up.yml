@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - develop
+      - trex
   workflow_dispatch:
 
 env:
@@ -14,6 +15,7 @@ env:
   ENV_NAME: local
   ENV_TYPE: local
   GIT_COMMIT_ARG: ${{ github.sha }}
+  D2E_RESOURCE_LIMIT: 1 # Use all the resources for GHA
 
 # Run only one job per branch
 concurrency:
@@ -24,7 +26,7 @@ jobs:
   docker-compose-up:
     runs-on: ubuntu-latest # Custom runner 4 cpus & 14gb ram
 
-    if: (github.ref_name == 'develop' ||  contains('rc-', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/rc/workflow_dispatch and doesnt have a PR
+    if: (github.ref_name == 'develop' || github.ref_name == 'trex' || contains('rc-', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/rc/workflow_dispatch and doesnt have a PR
     steps:
       # - name: Free Disk Space (Ubuntu)
       #   uses: jlumbroso/free-disk-space@main
@@ -62,7 +64,7 @@ jobs:
           yarn --cwd internal op:get:$ENV_TYPE
 
           # mask sensitive values
-          internal/scripts/gha-mask.sh
+          # internal/scripts/gha-mask.sh
 
           # generate dotenv
           yarn --cwd internal gen:env
