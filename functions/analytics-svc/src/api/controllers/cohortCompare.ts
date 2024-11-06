@@ -9,20 +9,20 @@ import { getCohortAnalyticsConnection } from "./cohort";
 
 let logger = CreateLogger("mri-log: conhortCompare");
 
-async function getSchemaName(studyId: string, language: string, res) {
+async function getSchemaName(datasetId: string, language: string, res) {
     try {
         const portalServerAPI = new PortalServerAPI();
         const accessToken = await portalServerAPI.getClientCredentialsToken();
         const studies = await portalServerAPI.getStudies(accessToken);
 
         // find the matching element and get the study schema name
-        const studyMatch = studies.find((el) => el.id === studyId);
+        const studyMatch = studies.find((el) => el.id === datasetId);
         if (!studyMatch) {
             res.status(500).send(
                 MRIEndpointErrorHandler({
                     err: {
                         name: "mri-pa",
-                        message: `Study metadata not found for the the given studyID(${studyId})!`,
+                        message: `Study metadata not found for the the given datasetId(${datasetId})!`,
                     },
                     language,
                 })
@@ -49,12 +49,9 @@ export async function getmultiplecohortdata(req: IMRIRequest, res) {
     let chartType: string = req.params.chartType;
     let yaxis: string = req.query.yaxis;
     let bmkIds: string = req.query.ids;
-    let studyId: string = req.query.selectedStudyEntityValue;
+    let datasetId: string = req.query.selectedStudyEntityValue;
 
-    if (
-        req.query.xaxis &&
-        req.query.xaxis !== "undefined"
-    ) {
+    if (req.query.xaxis && req.query.xaxis !== "undefined") {
         userSelectedAttributes = (req.query.xaxis as string)
             .split(",")
             .map((configPath) => ({
@@ -63,20 +60,17 @@ export async function getmultiplecohortdata(req: IMRIRequest, res) {
                 order: null,
             }));
     }
-    if (
-        req.query.configId &&
-        req.query.configVersion
-    ) {
+    if (req.query.configId && req.query.configVersion) {
         configId = req.query.configId;
         configVersion = req.query.configVersion;
     }
 
-    let schemaName = await getSchemaName(studyId, lang, res);
+    let schemaName = await getSchemaName(datasetId, lang, res);
 
     const querySvcParams = {
         queryParams: {
             bmkIds,
-            studyId,
+            datasetId,
             userSelectedAttributes,
             user,
             yaxis,

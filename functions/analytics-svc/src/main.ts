@@ -36,7 +36,7 @@ import { getCachedbDbConnections } from "./utils/cachedb/cachedb.ts";
 import { DB } from "./utils/DBSvcConfig";
 import { env } from "./env";
 dotenv.config();
-const log = console;//Logger.CreateLogger("analytics-log");
+const log = console; //Logger.CreateLogger("analytics-log");
 const mriConfigConnection = new MriConfigConnection(
     env.SERVICE_ROUTES?.portalServer
 );
@@ -67,10 +67,12 @@ const initRoutes = async (app: express.Application) => {
     if (envVarUtils.isStageLocalDev()) {
         app.use(timerMiddleware());
     }
-    
-    alpPortalStudiesDbMetadataCacheTTLSeconds = env.ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS || 600;
 
-    analyticsCredentials = env.VCAP_SERVICES["mridb"].filter( x => x['tags']?.indexOf("analytics") > -1)
+    alpPortalStudiesDbMetadataCacheTTLSeconds =
+        env.ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS || 600;
+
+    analyticsCredentials = env.VCAP_SERVICES["mridb"]
+        .filter((x) => x["tags"]?.indexOf("analytics") > -1)
         //.filterServices({ tag: "analytics" })
         .reduce((acc, item) => {
             // Reduce credentials so that key of object is databaseCode
@@ -173,10 +175,9 @@ const initRoutes = async (app: express.Application) => {
                         analyticsCredentials: credentials,
                         userObj: userObj,
                         token: req.headers.authorization,
-                        studyId: req.selectedstudyDbMetadata.id,
+                        datasetId: req.selectedstudyDbMetadata.id,
                     });
                 } else {
-
                     req.dbConnections = await getDBConnections({
                         analyticsCredentials: credentials,
                         userObj,
@@ -242,8 +243,7 @@ const initRoutes = async (app: express.Application) => {
     app.use(
         "/analytics-svc/pa/services/analytics.xsjs",
         async (req: IMRIRequest, res, next) => {
-
-            console.log("ana.xsjs")
+            console.log("ana.xsjs");
             // get user from request
             const user = getUser(req);
             const language = user.lang;
@@ -265,17 +265,18 @@ const initRoutes = async (app: express.Application) => {
             const { analyticsConnection } = req.dbConnections;
 
             let configResults;
+            let datasetId;
             switch (action) {
                 case "getMyConfig":
                 case "getMyConfigList":
                 case "getMyStudyConfigList":
-                    let specificStudyId =
-                        typeof req.query?.selectedStudyId === "string"
-                            ? req.query.selectedStudyId
+                    datasetId =
+                        typeof req.query?.datasetId === "string"
+                            ? req.query.datasetId
                             : null;
                     let queryParams = {
                         action: "getMyConfig",
-                        datasetId: specificStudyId,
+                        datasetId,
                     };
 
                     configResults = await mriConfigConnection.getMriConfig(
@@ -300,13 +301,13 @@ const initRoutes = async (app: express.Application) => {
                 case "getFrontendConfig":
                 case "setDefault":
                 case "clearDefault":
-                    let studyId =
-                        typeof req.query?.studyId === "string"
-                            ? req.query.studyId
+                    datasetId =
+                        typeof req.query?.datasetId === "string"
+                            ? req.query.datasetId
                             : null;
                     let qParams = {
                         action: "getMyConfig",
-                        datasetId: studyId,
+                        datasetId,
                     };
                     configResults = await mriConfigConnection.getMriConfig(
                         req,
@@ -342,7 +343,7 @@ const initRoutes = async (app: express.Application) => {
                         }
                         const configId = configData.configId;
                         const configVersion = configData.configVersion;
-                        const studyId = req.body.selectedStudyEntityValue;
+                        const datasetId = req.body.selectedStudyEntityValue;
                         const mriConfig =
                             await mriConfigConnection.getStudyConfig(
                                 {
@@ -351,7 +352,7 @@ const initRoutes = async (app: express.Application) => {
                                     configId,
                                     configVersion,
                                     lang: language,
-                                    datasetId: studyId,
+                                    datasetId,
                                 },
                                 true
                             );
@@ -409,7 +410,7 @@ const initRoutes = async (app: express.Application) => {
                                 req,
                                 configId,
                                 configVersion,
-                                studyId,
+                                datasetId,
                                 body,
                                 language,
                                 analyticsConnection,
@@ -437,7 +438,7 @@ const initRoutes = async (app: express.Application) => {
                                 action,
                                 configId,
                                 configVersion,
-                                studyId,
+                                datasetId,
                                 body,
                                 language,
                                 mriConfig.config,
@@ -472,52 +473,61 @@ const initRoutes = async (app: express.Application) => {
 };
 
 const initSwaggerRoutes = async (app: express.Application) => {
-    const swaggerFile = yaml.parse(await Deno.readTextFile(path.dirname(pathx.fromFileUrl(import.meta.url)).slice(0, -3)+'api/swagger/swagger.yaml'));
+    const swaggerFile = yaml.parse(
+        await Deno.readTextFile(
+            path.dirname(pathx.fromFileUrl(import.meta.url)).slice(0, -3) +
+                "api/swagger/swagger.yaml"
+        )
+    );
     const basePath = swaggerFile["basePath"];
-    for(const [path, value] of Object.entries(swaggerFile["paths"])) {
-
+    for (const [path, value] of Object.entries(swaggerFile["paths"])) {
         // Skip swagger route
         if (path === "/swagger") {
-            log.info("Skipping '/swagger' route as it is not linked to a x-swagger-router-controller file")
-            break;
+            log.info(
+                "Skipping '/swagger' route as it is not linked to a x-swagger-router-controller file"
+            );
+            continue;
         }
 
         const controllerFile = value["x-swagger-router-controller"];
         try {
-            const controller = await import(`./api/controllers/${controllerFile}.ts`)
-            const url = `${basePath}${path.slice(1)}`.replace(/\{(.+?)\}/g, ":$1")
-            for(const [k,v] of Object.entries(value)) {
-
-                switch(k) {
+            const controller = await import(
+                `./api/controllers/${controllerFile}.ts`
+            );
+            const url = `${basePath}${path.slice(1)}`.replace(
+                /\{(.+?)\}/g,
+                ":$1"
+            );
+            for (const [k, v] of Object.entries(value)) {
+                switch (k) {
                     case "get":
-                        app.get(url, controller[v["operationId"]])
+                        app.get(url, controller[v["operationId"]]);
                         //console.log("add" + url)
                         break;
                     case "post":
-                        app.post(url, controller[v["operationId"]])
+                        app.post(url, controller[v["operationId"]]);
                         //console.log("add" + url)
 
                         break;
                     case "put":
-                        app.put(url, controller[v["operationId"]])
+                        app.put(url, controller[v["operationId"]]);
                         //console.log("add" + url)
 
                         break;
                     case "delete":
-                        app.delete(url, controller[v["operationId"]])
+                        app.delete(url, controller[v["operationId"]]);
                         //console.log("add" + url)
 
                         break;
                     default:
-                        if(k != "x-swagger-router-controller")
-                            console.log("unknown method "+k);
+                        if (k != "x-swagger-router-controller")
+                            console.log("unknown method " + k);
                 }
             }
         } catch (e) {
-            console.log(controllerFile)
+            console.log(controllerFile);
             console.log(e);
         }
-
     }
 
     /*swagger.create(config, (err, swaggerRunner) => {
@@ -626,9 +636,7 @@ const main = async () => {
      * Handle Environment Variables
      */
     const mountPath =
-        env.NODE_ENV === "production"
-            ? env.ENV_MOUNT_PATH
-            : "../../";
+        env.NODE_ENV === "production" ? env.ENV_MOUNT_PATH : "../../";
     const envFile = `${mountPath}default-env.json`;
     xsenv.loadEnv(envVarUtils.getEnvFile(envFile));
     const port = env.ANALYTICS_SVC__PORT || 3000;

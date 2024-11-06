@@ -13,6 +13,7 @@ env:
   ENV_NAME: local
   ENV_TYPE: local
   REGISTRY_URL: "alpcr.azurecr.io"
+  D2E_RESOURCE_LIMIT: 1 # Use all the resources for GHA
 
 # Run only one job per branch
 concurrency:
