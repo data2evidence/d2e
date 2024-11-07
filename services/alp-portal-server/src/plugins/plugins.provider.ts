@@ -10,7 +10,7 @@ export const PluginsProvider = {
   provide: 'PLUGINS_JSON_PROVIDER',
   useFactory: async (request, httpService: HttpService) => {
     try {
-      const res = httpService.get(`${env.PORTAL_API_URL}/portal/plugin.json`, {
+      const res = httpService.get(`${env.TREX_API_URL}/portal/plugin.json`, {
         headers: {
           Authorization: request.headers['authorization']
         },
