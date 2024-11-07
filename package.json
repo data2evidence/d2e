@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "edit": "code package.json",
-    "gen:dotenv": "scripts/gen-dotenv.sh && yarn gen:tls && yarn gen:resource-limits",
+    "gen:env": "scripts/gen-env.sh && ENV_TYPE=$ENV_TYPE TLS_REGENERATE=$TLS_REGENERATE yarn gen:tls && D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT ENV_TYPE=$ENV_TYPE yarn gen:resource-limits",
     "gen:tls": "scripts/gen-tls.sh",
     "gen:resource-limits": "scripts/gen-resource-limits.sh",
     "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml",
