@@ -1,5 +1,5 @@
 import { Express } from 'express'
-import Container from 'typedi'
+import { Container } from 'typedi'
 import { env } from '../env'
 import { Authc } from './Authc'
 import { AuthcType } from './authc-config'
