@@ -30,7 +30,7 @@ export class DataQualityService {
     const releaseId = dataQualityFlowRunDto.releaseId
     const cohortDefinitionId = dataQualityFlowRunDto.cohortDefinitionId
 
-    const { dialect, databaseCode, schemaName, vocabSchemaName } = await this.portalServerApi.getDataset(datasetId)
+    const { databaseCode, schemaName, vocabSchemaName } = await this.portalServerApi.getDataset(datasetId)
 
     const releaseDate = (await this.getReleaseDate(releaseId)).split('T')[0]
 
@@ -38,7 +38,7 @@ export class DataQualityService {
       vocabSchema = vocabSchemaName
     }
 
-    const cdmVersionNumber = await this.analyticsSvcApi.getCdmVersion(dialect, databaseCode, schemaName)
+    const cdmVersionNumber = await this.analyticsSvcApi.getCdmVersion(datasetId)
 
     const name = `${databaseCode}.${schemaName}`
     const parameters = {

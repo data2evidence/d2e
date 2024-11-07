@@ -67,15 +67,49 @@ export class RequestProcessing {
                 order: col.order === "A" ? "ASC" : "DESC",
             }));
 
-            patientCtx.groupBy = [
-                ...patientCtx.groupBy.filter((grpByElement) => {
-                    return (
-                        typeof grpByElement.pathId !== Keys.TERM_UNDEFINED &&
-                        grpByElement.pathId === Keys.MRITERM_PCOUNT_ALIAS
-                    );
-                }),
-                ...patientCtx.orderBy,
-            ];
+            if(patientCtx.name === Keys.DEF_PATIENT_REQUEST_ENTRYEXIT) {
+                const e = patientCtx;
+                if (
+                    e.groupBy.filter((f) => f.pathId === Keys.MRITERM_PID_ALIAS)
+                        .length === 0
+                ) {
+                    e.groupBy.push({
+                        path: Keys.MRITERM_PID,
+                        alias: e.alias,
+                        pathId: Keys.MRITERM_PID_ALIAS,
+                        templateId: Keys.MRITERM_PID_TEMPLATEID,
+                        axis: "y",
+                        seq: 100,
+                        order: "ASC",
+                    });
+                }
+    
+                if (
+                    e.groupBy.filter((f) => f.pathId === Keys.MRITERM_PCOUNT_ALIAS)
+                        .length === 0
+                ) {
+                    e.groupBy.push({
+                        path: Keys.MRITERM_PCOUNT,
+                        alias: e.alias,
+                        pathId: Keys.MRITERM_PCOUNT_ALIAS,
+                        templateId: Keys.MRITERM_PCOUNT_TEMPLATEID,
+                        axis: "y",
+                        seq: 2,
+                        order: "ASC",
+                    });
+                }
+               
+            } else {
+                patientCtx.groupBy = [
+                    ...patientCtx.groupBy.filter((grpByElement) => {
+                        return (
+                            typeof grpByElement.pathId !== Keys.TERM_UNDEFINED &&
+                            grpByElement.pathId === Keys.MRITERM_PCOUNT_ALIAS
+                        );
+                    }),
+                    ...patientCtx.orderBy,
+                ];
+            }
         });
 
         (<Patient>req).buildDefaultOrderByList(

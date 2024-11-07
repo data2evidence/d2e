@@ -32,6 +32,8 @@ export type ExtCohortConceptSet = {
     expression: {
         items: {
             concept: ExtCohortConcept;
+            includeDescendants?: boolean;
+            includeMapped?: boolean;
         }[];
     };
 };
@@ -49,6 +51,8 @@ export type ExtCohortConcept = {
     VOCABULARY_ID: string;
     VALID_START_DATE: string;
     VALID_END_DATE: string;
+    USEDESCENDANTS?: boolean;
+    USEMAPPED?: boolean;
 };
 
 export type InclusionRules = {

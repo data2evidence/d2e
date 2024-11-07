@@ -2,6 +2,7 @@ import { Logger } from "@alp/alp-base-utils";
 import * as config from "../../utils/DBSvcConfig";
 import * as dbUtils from "../../utils/DBSvcDBUtils";
 import { DBDAO } from "../../dao/DBDAO";
+import PortalServerAPI from "../PortalServerAPI";
 
 const logger = Logger.CreateLogger("analytics-log");
 
@@ -9,16 +10,22 @@ export async function getCDMVersion(req, res, next) {
     let dialect: string = req.params.databaseType;
     let tenant: string = req.params.tenant;
     let schema: string = req.params.schemaName;
+    const datasetId = req.params.datasetId;
 
+    const {  databaseCode, schemaName } =
+        await new PortalServerAPI().getStudy(
+            req.headers.authorization,
+            datasetId
+        );
     try {
-        let dbDao = new DBDAO(dialect, tenant);
+        let dbDao = new DBDAO(dialect, databaseCode);
         const dbConnection = await dbDao.getDBConnectionByTenantPromise(
-            tenant,
+            databaseCode,
             req,
             res
         );
 
-        const cdmVersion = await dbDao.getCDMVersion(dbConnection, schema);
+        const cdmVersion = await dbDao.getCDMVersion(dbConnection, schemaName);
 
         let hanaKey = "CDM_VERSION";
         let cdmVersionKey =
@@ -33,7 +40,7 @@ export async function getCDMVersion(req, res, next) {
             message: "Something went wrong when retrieving data",
             data: [],
         };
-        res.status(200).json(httpResponse);
+        res.status(500).json(httpResponse);
     }
 }
 
@@ -69,18 +76,24 @@ export async function getSnapshotSchemaMetadata(req, res, next) {
     let dialect: string = req.params.databaseType;
     let tenant: string = req.params.tenant;
     let schema = req.params.schemaName;
+    const datasetId = req.params.datasetId;
+
+    const {  databaseCode, schemaName } =
+        await new PortalServerAPI().getStudy(
+            req.headers.authorization,
+            datasetId
+        );
 
     try {
-
-        let dbDao = new DBDAO(dialect, tenant);
+        let dbDao = new DBDAO(dialect, databaseCode);
         const dbConnection = await dbDao.getDBConnectionByTenantPromise(
-            tenant,
+            databaseCode,
             req,
             res
         );
         const results = await dbDao.getSnapshotSchemaMetadata(
             dbConnection,
-            schema
+            schemaName
         );
         res.status(200).json(results);
     } catch (err: any) {
