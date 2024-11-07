@@ -1154,7 +1154,7 @@
             "portal.userArtifact.group.delete"
           ],
           "httpMethods": [
-            "POST"
+            "DELETE"
           ]
         },
         {
