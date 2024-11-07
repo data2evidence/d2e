@@ -17,6 +17,7 @@ import { PrefectModule } from './prefect/prefect.module'
 import { ConfigModule } from './config/config.module'
 import { SeedService } from './common/data-source/seeds/seed.service'
 import { UserArtifactModule } from './user-artifact/user-artifact.module'
+import { GroupModule } from './user-artifact/group/group.module'
 
 const tenantRoutes: RouteTree = {
   path: 'tenant',
@@ -46,7 +47,12 @@ const overviewDescriptionRoutes: RouteTree = {
 const userArtifactRoutes: RouteTree = {
   path: 'user-artifact',
   module: UserArtifactModule,
-  children: []
+  children: [
+    {
+      path: '/group',
+      module: GroupModule
+    }
+  ]
 }
 
 const imports: Array<DynamicModule | Type<any>> = [

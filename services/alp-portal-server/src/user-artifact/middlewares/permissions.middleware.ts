@@ -2,10 +2,13 @@ import { Injectable, NestMiddleware, HttpException, HttpStatus } from '@nestjs/c
 import { Request, Response, NextFunction } from 'express'
 import { JwtPayload, decode } from 'jsonwebtoken'
 import { ServiceName } from '../enums'
+import { GroupService } from '../group/group.service'
 
 @Injectable()
 export class PermissionsMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
+  constructor(private readonly groupsService: GroupService) {}
+
+  async use(req: Request, res: Response, next: NextFunction) {
     const permissions = {
       [ServiceName.DATAFLOW]: '777',
       [ServiceName.DATAFLOW_REVISION]: '777',
@@ -42,11 +45,16 @@ export class PermissionsMiddleware implements NestMiddleware {
     return token.sub
   }
 
-  private determinePermissionLevel(userIdFromToken: string, userIdFromParam: string): number {
+  private async determinePermissionLevel(userIdFromToken: string, userIdFromParam: string): Promise<number> {
     if (userIdFromToken === userIdFromParam) {
       return 0
     }
-    // TODO: Add logic for group check
+
+    const isInGroup = await this.groupsService.userExists(userIdFromToken)
+    if (isInGroup) {
+      return 1
+    }
+
     return 2
   }
 
