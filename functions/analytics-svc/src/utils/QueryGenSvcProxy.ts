@@ -92,6 +92,12 @@ export async function generateQuery(
                         reject(err);
                     }
                 });
+
+                response.on("error", (err) => {
+                    log.enrichErrorWithRequestCorrelationID(err, req);
+                    log.error(JSON.stringify(err));
+                    reject(err);
+                });
             })
             .on("error", (err) => {
                 log.enrichErrorWithRequestCorrelationID(err, req);

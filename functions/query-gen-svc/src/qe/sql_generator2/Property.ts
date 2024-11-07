@@ -261,6 +261,12 @@ export class Property extends AstElement {
                 }
 
                 return QueryObject.format(", ").join(queryObjArray);
+            } if(this.name === "measure" && (this.path === "entry" || this.path === "exit")) {
+                return QueryObject.format(
+                    '%Q AS "%UNSAFE"',
+                    tmp[0],
+                    this.path
+                );
             } else {
                 return QueryObject.format(
                     '%Q AS "%UNSAFE"',
