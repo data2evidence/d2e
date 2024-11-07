@@ -4,6 +4,7 @@ import {
   IsIn,
   IsNotEmpty,
   IsNotEmptyObject,
+  IsOptional,
   IsString,
   IsUUID,
   Validate,
@@ -97,8 +98,9 @@ export class DatasetDto implements IDatasetDto {
   @IsNotEmpty()
   dataModel: string
 
-  @IsNotEmpty()
+  // @IsNotEmpty()
   @IsUUID()
+  @IsOptional()
   paConfigId: string
 
   @IsNotEmpty()
