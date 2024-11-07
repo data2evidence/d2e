@@ -25,3 +25,4 @@ POSTGRES_TENANT_ADMIN_PASSWORD | password | set in admin>setup>databases>configu
 POSTGRES_TENANT_READ_PASSWORD | password | set in admin>setup>databases>configure but not in env.example
 REDIS_PASSWORD | password | all permissions
 DICOM__HEALTH_CHECK_PASSWORD | password | static secret to be generated later
+STRATEGUS__KEYRING_PASSWORD | password | default Keyring password

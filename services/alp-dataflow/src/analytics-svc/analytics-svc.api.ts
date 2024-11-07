@@ -72,12 +72,14 @@ export class AnalyticsSvcAPI {
     }
   }
 
-  async getCdmVersion(dialect: string, databaseCode: string, schema: string) {
+  async getCdmVersion(datasetId: string) {
     const errorMessage = 'Error while getting cdm version'
     try {
       const options = await this.createOptions()
-      const url = `${this.url}/alpdb/${dialect}/database/${databaseCode}/cdmversion/schema/${schema}`
-      const obs = this.httpService.get(url, options)
+      const url = `${this.url}/alpdb/cdmversion`
+      const params = new URLSearchParams()
+      params.append('datasetId', datasetId)
+      const obs = this.httpService.get(url, { ...options, params })
       return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
       this.logger.error(`${errorMessage}: ${error}`)

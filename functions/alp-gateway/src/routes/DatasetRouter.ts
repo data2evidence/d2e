@@ -48,13 +48,12 @@ export class DatasetRouter {
       }
 
       const token = req.headers.authorization!
-      const portalAPI = new PortalAPI(token)
       const analyticsSvcAPI = new AnalyticsSvcAPI(token)
 
-      const { dialect, databaseCode, schemaName } = await portalAPI.getDataset(datasetId)
+      const { sourceDatasetId } = req.params
 
       try {
-        const metadata = await analyticsSvcAPI.getCdmSchemaSnapshotMetadata(dialect, databaseCode, schemaName)
+        const metadata = await analyticsSvcAPI.getCdmSchemaSnapshotMetadata(sourceDatasetId)
         return res.status(200).json(metadata)
       } catch (error) {
         this.logger.error(`Error when getting CDM schema snapshot metadata: ${JSON.stringify(error)}`)
