@@ -259,6 +259,8 @@
           "portal.dataset.metadataConfig.attribute.delete",
           "portal.config.read",
           "portal.config.write",
+          "portal.userArtifact.group.write",
+          "portal.userArtifact.group.delete",
           "terminology.user.read",
           "dataflowmgmt.dataflow.read",
           "dataflowmgmt.dataflow.add",
@@ -404,7 +406,7 @@
             "conceptmapping.post"
           ],
           "httpMethods": [
-            "GET", 
+            "GET",
             "POST"
           ]
         },
@@ -423,7 +425,12 @@
         },
         {
           "path": "^/prefect(.*)",
-          "scopes": ["prefect.read", "prefect.delete", "prefect.post", "prefect.update"]
+          "scopes": [
+            "prefect.read",
+            "prefect.delete",
+            "prefect.post",
+            "prefect.update"
+          ]
         },
         {
           "path": "^/analytics-svc/plugins/(.*)",
@@ -1130,6 +1137,24 @@
           ],
           "httpMethods": [
             "PUT"
+          ]
+        },
+        {
+          "path": "^/system-portal/user-artifact/group$",
+          "scopes": [
+            "portal.userArtifact.group.write"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/system-portal/user-artifact/group//[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "scopes": [
+            "portal.userArtifact.group.delete"
+          ],
+          "httpMethods": [
+            "POST"
           ]
         },
         {
