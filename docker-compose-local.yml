@@ -1,18 +1,27 @@
 services:
-  alp-bookmark:
-    build:
-      context: .
-      dockerfile: ./services/bookmark-svc/Dockerfile
+  trex:
+    command: npm run startdev
+    external_links:
+      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
+      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
+      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
     ports:
-      - 9205:9205
+      - 33000:33000
+      - 33001:33001
     volumes:
-      - ./services/bookmark-svc/src:/home/docker/src/alp-data-node/app/src
+      - ./functions:/usr/src/plugins/d2ef
     environment:
       LOCAL_DEBUG: "true"
+      DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
+      PLUGINS_SEED: '["d2e-plugins", "d2e-ui"]'
+      PLUGINS_SEED_UPDATE: false
+      PLUGINS_DEV_PATH: "./plugins"
+      WATCH_FUNCTIONS: false
+
 
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile --watch
-    image: alpcr.azurecr.io/alp-data-node/alp-caddy:${GIT_HEAD_COMMIT_ALP_UI_REPO:-develop}
+    image:  caddy:2.8-alpine
     ports:
       - 41100:41100
       - 41000:41000
@@ -22,92 +31,23 @@ services:
       CADDY__CORS_LOCAL_UI: "import cors"
 
   alp-dataflow-gen:
-    build:
-      context: .
-      dockerfile: ./services/alp-dataflow-gen/Dockerfile
-    volumes:
-      - ./services/alp-dataflow-gen/pysrc:/app/pysrc
     ports:
       - 41120:41120
     environment:
-      PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
-      SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
+      PORTAL__API_URL: https://trex:33000/portalsvc/graphql
+      SYSTEM_PORTAL__API_URL: https://trex:33000/system-portal/
 
-  alp-dataflow-gen-agent:
-    build:
-      context: .
-      dockerfile: ./services/alp-dataflow-gen/Dockerfile
-    volumes:
-      - ./services/alp-dataflow-gen/pysrc:/app/pysrc
-    ports:
-      - 9234:9234
-    environment:
-      ANALYTICS_SVC__API_BASE_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/analytics-svc/
-      PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/portalsvc/graphql
-      SYSTEM_PORTAL__API_URL: https://alp-minerva-gateway-${BASE_PORT:-1}:41${BASE_PORT:-1}00/system-portal/
 
   alp-dataflow-gen-init:
     build:
       context: .
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
-    volumes:
-      - ./services/alp-dataflow-gen/init.sh:/app/init.sh
-      - ./services/alp-dataflow-gen/init.py:/app/init.py
-      - ./services/alp-dataflow-gen/pysrc:/app/pysrc
 
-  alp-db-credentials-mgr:
-    extends:
-      file: ./services/alp-db-credentials/docker-compose.yml
-      service: db-credentials-mgr
-    ports:
-      - 9229:9229
-    environment:
-      DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
-      NODE_ENV: development
 
   alp-logto:
     build:
       context: ./services/alp-logto
       dockerfile: Dockerfile
-
-  alp-minerva-analytics-svc:
-    build:
-      context: .
-      dockerfile: ./services/analytics-svc/Dockerfile
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
-      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
-    ports:
-      - 9222:9222
-    volumes:
-      - ./services/analytics-svc/target:/home/docker/src/alp-data-node/app/dist
-      - ./services/analytics-svc/src:/home/docker/src/alp-data-node/app/src
-      - ./services/analytics-svc/api:/home/docker/src/alp-data-node/app/api
-    environment:
-      INSIGHTS__LOG_LEVEL: info
-      LOCAL_DEBUG: "true"
-      MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
-      MINIO__SSL: false
-      USE_EXTENSION_FOR_COHORT_CREATION: "false"
-      isHttpTestRun: ${isHttpTestRun:-false}
-      isTestEnv: ${isTestEnv:-false}
-      TESTSCHEMA: ${TESTSCHEMA}
-
-  alp-minerva-cdw-svc:
-    build:
-      context: .
-      dockerfile: ./services/cdw-svc/Dockerfile
-    ports:
-      - 9206:9206
-    volumes:
-      - ./services/cdw-svc/src:/home/docker/src/services/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-      NODE_ENV: development
-      isHttpTestRun: ${isHttpTestRun:-false}
-      isTestEnv: ${isTestEnv:-false}
-      TESTSCHEMA: ${TESTSCHEMA}
 
   alp-minerva-dataflow-mgmt:
     build:
@@ -119,41 +59,10 @@ services:
     environment:
       NODE_ENV: development
 
-  alp-minerva-gateway:
-    build:
-      context: ./services/alp-gateway
-      dockerfile: Dockerfile
-      target: development
-    command: yarn dev
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
-      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
-    ports:
-      - 9220:9220
-    volumes:
-      - ./services/alp-gateway/src:/usr/src/app/src
-    environment:
-      LOCAL_DEBUG: "true"
 
   alp-minerva-meilisearch-svc:
     ports:
       - 41111:41111
-
-  alp-minerva-pa-config-svc:
-    build:
-      context: .
-      dockerfile: services/mri-pa-config/Dockerfile
-    ports:
-      - 9207:9207
-    volumes:
-      - ./services/mri-pa-config/src:/home/docker/src/services/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-      NODE_ENV: development
-      isHttpTestRun: ${isHttpTestRun:-false}
-      isTestEnv: ${isTestEnv:-false}
-      TESTSCHEMA: ${TESTSCHEMA}
 
   alp-minerva-pg-mgmt-init:
     build:
@@ -179,66 +88,18 @@ services:
       - 41190:5432
       - 5432:5432
 
-  alp-minerva-ps-config-svc:
-    build:
-      context: .
-      dockerfile: services/ps-config/Dockerfile
-    ports:
-      - 9209:9209
-    volumes:
-      - ./services/ps-config/src:/home/docker/src/services/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-      NODE_ENV: development
-
   alp-minerva-terminology-svc:
     build:
-      context: .
-      dockerfile: ./services/alp-terminology-svc/Dockerfile
+     context: .
+     dockerfile: ./services/alp-terminology-svc/Dockerfile
     container_name: alp-minerva-terminology-svc-nest-prod-${BASE_PORT:-1}
     environment:
       LOCAL_DEBUG: "false"
 
-  alp-minerva-user-mgmt:
-    build:
-      context: ./services/alp-usermgmt
-      target: development
-    command:
-      - sh
-      - start.sh
-    ports:
-      - 9224:9224
-    volumes:
-      - ./services/alp-usermgmt/src:/usr/src/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-      NODE_ENV: development
-
-  alp-mri-pg-config:
-    build: ./services/mri-pg-config
-
-  alp-query-gen:
-    build:
-      context: .
-      dockerfile: services/query-gen-svc/Dockerfile
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
-    ports:
-      - 9208:9208
-    volumes:
-      - ./services/query-gen-svc/src:/home/docker/src/alp-data-node/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-      NODE_ENV: development
-      isHttpTestRun: ${isHttpTestRun:-false}
-      isTestEnv: ${isTestEnv:-false}
-      TESTSCHEMA: ${TESTSCHEMA}
-
-  alp-dicom-server:
+  #alp-dicom-server:
     # uses 8042 port on the container
-    ports:
-      - 8042:8042
+  #  ports:
+  #    - 8042:8042
 
   alp-fhir-server:
     build:
@@ -258,34 +119,18 @@ services:
       dockerfile: Dockerfile
     # volumes:
     #   - ./services/alp-logto/post-init:/home/docker
-  alp-dataflow-gen-process-worker:
-    build:
-      context: .
-      dockerfile: services/alp-dataflow-gen/Dockerfile.worker
-      # ssh: # Enable if GIT_CLONE_TYPE set to ssh
-      #   - default=${SSH_AUTH_SOCK}
-      args:
-        GIT_COMMIT_ID__PLUGINS_REPO: ${GIT_COMMIT_ID__PLUGINS_REPO:-main}
-        GIT_CLONE_TYPE: ${GIT_CLONE_TYPE:-https} # https / ssh
-        D2E_PLUGIN_REPO: ${D2E_PLUGIN_REPO:-alp-os/d2e-plugins.git} # git@github.com:alp-os/d2e-plugins.git
-        GIT_TOKEN__PLUGINS_REPO_READ: ${GIT_TOKEN__PLUGINS_REPO_READ} #only for https
-  #     volumes:
-  #       - ../d2e-plugins:/usr/src/app/d2e-plugins
 
-  alp-dataflow-gen-docker-worker:
-    extends: alp-dataflow-gen-process-worker
-
-  alp-fhir-server-post-init:
-    build:
-      context: .
-      dockerfile: ./services/alp-fhir/Dockerfile.client
-    volumes:
-      - ./services/alp-fhir/dist:/home/docker/src/alp-data-node/app/dist
-      - ./services/alp-fhir/src:/home/docker/src/alp-data-node/app/src
-    environment:
-      LOCAL_DEBUG: "true"
-    ports:
-      - 9226:9226
+  # alp-fhir-server-post-init:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/alp-fhir/Dockerfile.client
+  #   volumes:
+  #     - ./services/alp-fhir/dist:/home/docker/src/alp-data-node/app/dist
+  #     - ./services/alp-fhir/src:/home/docker/src/alp-data-node/app/src
+  #   environment:
+  #     LOCAL_DEBUG: "true"
+  #   ports:
+  #     - 9226:9226
 
   alp-cachedb:
     build:

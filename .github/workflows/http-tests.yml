@@ -13,6 +13,7 @@ env:
   ENV_NAME: local
   ENV_TYPE: local
   REGISTRY_URL: "alpcr.azurecr.io"
+  D2E_RESOURCE_LIMIT: 1 # Use all the resources for GHA
 
 # Run only one job per branch
 concurrency:
@@ -360,42 +361,14 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-minerva-portal-server-nest-prod-1 -t
-      - name: print logs for user-mgmt
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-user-mgmt-1 -t
       - name: print logs for alp-minerva-postgres-1
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-minerva-postgres-1 -t
-      - name: print logs for alp-minerva-db-credentials-mgr-1
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-db-credentials-mgr-1 -t
-      - name: print logs for gateway
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-gateway-1 -t
       - name: print logs for analytics
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-minerva-analytics-1 -t
-      - name: print logs for query-gen
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-query-gen-svc-1 -t
-      - name: print logs for bookmarks
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-bookmark-svc-1 -t
-      - name: print logs for pa-config
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-pa-config-svc-1 -t
-      - name: print logs for cdw
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-cdw-svc-1 -t
       - name: print logs for alp-minerva-s3
         if: ${{ always() || cancelled() || failure() }}
         run: |

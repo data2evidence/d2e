@@ -1,5 +1,6 @@
 !.vscode/settings.json
 node_modules
+**/.clj-kondo
 npm-debug.log
 *.tmp*
 pyqeenv
@@ -8,7 +9,9 @@ pyomopqlenv
 target
 .mypy_cache
 *.egg-info
-
+functions/alp-terminology-svc
+deno.lock
+services/trex
 package-lock.json
 pnpm-lock.yaml
 yarn-error.log
