@@ -8,12 +8,12 @@ echo . INFO generate docker resource limits based on available system resources
 D2E_RESOURCE_LIMIT=${D2E_RESOURCE_LIMIT:-0.7}
 ENV_TYPE=${ENV_TYPE:-local}
 
-echo D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT
-echo ENV_TYPE=$ENV_TYPE
+echo . inputs: D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT ENV_TYPE=$ENV_TYPE
 
 # vars
 OS="$(uname -s)"
 DOTENV_FILE_OUT=.env.$ENV_TYPE
+DOTENV_KEYS_OUT=.env.$ENV_TYPE.keys
 touch ${DOTENV_FILE_OUT}
 
 # functions
@@ -29,12 +29,11 @@ get_cpu_count() {
     D2E_CPU_LIMIT=$(echo "scale=2;$NPROCS*$D2E_RESOURCE_LIMIT" | bc)
     # Strip decimal numbers
     D2E_CPU_LIMIT=${D2E_CPU_LIMIT%%.*}
-    echo D2E_CPU_LIMIT=$D2E_CPU_LIMIT
 
     # remove existing env var from dotenv
     sed -i.bak "/D2E_CPU_LIMIT=/d" $DOTENV_FILE_OUT
     # set env var
-    echo D2E_CPU_LIMIT=\'"$D2E_CPU_LIMIT"\' >> $DOTENV_FILE_OUT
+    echo D2E_CPU_LIMIT=\'"$D2E_CPU_LIMIT"\' | tee -a $DOTENV_FILE_OUT
 }
 
 get_memory() {
@@ -49,17 +48,19 @@ get_memory() {
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT%%.*}
     # Add G suffix for gigabyte
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT}G
-    echo D2E_MEMORY_LIMIT=$D2E_MEMORY_LIMIT
 
     # remove existing env var from dotenv
     sed -i.bak "/D2E_MEMORY_LIMIT=/d" $DOTENV_FILE_OUT
     # set env var
-    echo D2E_MEMORY_LIMIT=\'"$D2E_MEMORY_LIMIT"\' >> $DOTENV_FILE_OUT
+    echo D2E_MEMORY_LIMIT=\'"$D2E_MEMORY_LIMIT"\' | tee -a $DOTENV_FILE_OUT
 
 }
 
 # action
 get_cpu_count
 get_memory
-wc -l $DOTENV_FILE_OUT
+
+# finalize
+cat $DOTENV_FILE_OUT | grep = | awk -F= '{print $1}' | grep _ | sort -u > $DOTENV_KEYS_OUT
+wc -l --total never $DOTENV_FILE_OUT $DOTENV_KEYS_OUT
 echo

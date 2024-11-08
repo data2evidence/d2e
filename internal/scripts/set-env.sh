@@ -39,5 +39,5 @@ merge-yml $DOTENV_YAML_IN $DOTENV_YAML_IN_PRIVATE | yq -o sh | envsubst >> $DOTE
 cat $DOTENV_YAML_IN | yq 'keys | .[]' | sort > $DOTENV_YAML_IN.keys
 cat $DOTENV_YAML_IN_PRIVATE | yq 'keys | .[]' 2> /dev/null | sort > $DOTENV_YAML_IN_PRIVATE.keys
 cat $DOTENV_YAML_IN  | yq 'keys | .[]' | sort > $DOTENV_KEYS_OUT
-wc -l $DOTENV_YAML_IN.keys $DOTENV_YAML_IN_PRIVATE.keys $DOTENV_KEYS_OUT $DOTENV_FILE_OUT | sed '$d'
+wc -l --total never $DOTENV_YAML_IN.keys $DOTENV_YAML_IN_PRIVATE.keys $DOTENV_KEYS_OUT $DOTENV_FILE_OUT
 echo

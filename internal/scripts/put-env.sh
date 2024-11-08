@@ -6,7 +6,7 @@ set -o errexit
 # inputs
 [ -z "${OP_VAULT_NAME}" ] && echo 'FATAL ${OP_VAULT_NAME} is required' && exit 1
 ENV_NAME=${ENV_NAME:-local}
-OVERWRITE=${OVERWRITE:-false}
+OVERWRITE_OP=${OVERWRITE_OP:-false}
 # echo ENV_NAME=$ENV_NAME
 
 # vars
@@ -32,11 +32,11 @@ else
     diff $CACHE_DOTENV_PATH $DOTENV_PATH
     echo
     code --diff $CACHE_DOTENV_PATH $DOTENV_PATH
-    if [ $OVERWRITE != true ]; then
+    if [ $OVERWRITE_OP != true ]; then
         read -p "Put $DOTENV_NAME [YyNn]? " -n 1 yn
     fi
     echo
-    if [ $OVERWRITE = true ] || [[ $yn =~ ^[Yy]$ ]]; then
+    if [ $OVERWRITE_OP = true ] || [[ $yn =~ ^[Yy]$ ]]; then
         yq 'sort_keys(..)' $DOTENV_PATH > $CACHE_DOTENV_PATH
         # op item edit --format json --vault $OP_VAULT_NAME ${DOTENV_NAME} --template=$CACHE_DOTENV_PATH.json
         op item edit --format json --vault $OP_VAULT_NAME ${DOTENV_NAME} "notesPlain[text]=$(cat $CACHE_DOTENV_PATH)" | yq '{"reference": .fields[0].reference, "updated_at": .updated_at}'

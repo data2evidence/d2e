@@ -8,8 +8,7 @@ echo . 'INFO generate wildcard certificate `*.alp.local` with Caddy for TLS inte
 ENV_TYPE=${ENV_TYPE:-local}
 TLS_REGENERATE=${TLS_REGENERATE:-false}
 
-echo ENV_NAME=$ENV_NAME
-echo TLS_REGENERATE=$TLS_REGENERATE
+echo . inputs: ENV_NAME=$ENV_NAME TLS_REGENERATE=$TLS_REGENERATE
 
 # vars
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
@@ -17,6 +16,7 @@ CACHE_DIR=$GIT_BASE_DIR/cache/tls
 CONTAINER_NAME=alp-caddy-certs-mgmt
 DOMAIN_NAME=alp.local
 DOTENV_FILE_OUT=.env.$ENV_TYPE
+DOTENV_KEYS_OUT=.env.$ENV_TYPE.keys
 TLS_CA_NAME=alp-internal
 VOLUME_NAME=alp_caddy
 touch ${DOTENV_FILE_OUT}
@@ -63,5 +63,8 @@ echo TLS__INTERNAL__KEY=\'"$(cat $TLS__INTERNAL__KEY_PATH)"\' >> $DOTENV_FILE_OU
 echo added $(grep TLS__INTERNAL $DOTENV_FILE_OUT | grep -c -- '---')xTLS__INTERNAL to $DOTENV_FILE_OUT
 
 docker rm -f $CONTAINER_NAME
-wc -l $DOTENV_FILE_OUT
+
+# finalize
+cat $DOTENV_FILE_OUT | grep = | awk -F= '{print $1}' | grep _ | sort -u > $DOTENV_KEYS_OUT
+wc -l --total never $DOTENV_FILE_OUT $DOTENV_KEYS_OUT
 echo

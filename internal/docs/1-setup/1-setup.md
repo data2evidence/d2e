@@ -1,8 +1,9 @@
 # Set Environment Variables
 
-  - `export OVERWRITE=true` - to overwrite existing `.env.${ENV_NAME}.yml`
-  - `alias ni='npm run internal'` - shortcut
-  - `alias yi='yarn internal'` - shortcut
+- `export OVERWRITE=true` - to overwrite `.env.${ENV_NAME}.yml` on local filesystem `get:env` action
+- `export OVERWRITE_OP=true` - to overwrite `.env.${ENV_NAME}.yml` on 1password during `put:env` action
+- `alias ni='npm run internal'` - shortcut
+- `alias yi='yarn internal'` - shortcut
 
 - ENV_TYPE
   - local - local macos

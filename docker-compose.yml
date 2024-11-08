@@ -51,7 +51,7 @@ x-envs:
     PG__IDLE_TIMEOUT_IN_MS: 1000
     PG__DIALECT: postgresql
   fhir: &x-fhir
-    FHIR__CLIENT_ID: db6b2304-f236-45ec-b10c-a852681e7129
+    FHIR__CLIENT_ID: ${FHIR__CLIENT_ID}
     FHIR__CLIENT_SECRET: ${FHIR__CLIENT_SECRET}
   perseus: &x-perseus
     PERSEUS__FILES_MANAGER_HOST: alp-perseus-files-manager-${BASE_PORT:-1}
@@ -438,7 +438,7 @@ services:
           "alp-fhir-svc": {
             "FHIR__LOG_LEVEL": "debug",
             "PORT": 41${BASE_PORT:-1}12,
-            "FHIR__CLIENT_ID": "db6b2304-f236-45ec-b10c-a852681e7129",
+            "FHIR__CLIENT_ID": "${FHIR__CLIENT_ID}",
             "FHIR__CLIENT_SECRET": "${FHIR__CLIENT_SECRET}",
             "FHIR_SCHEMA_PATH": "/home/docker/alp-data-node/app/src/r4",
             "FHIR_SCHEMA_FILE_NAME": "fhir.schema.json",
@@ -449,7 +449,7 @@ services:
             "PG_SUPER_USER": "${PG_SUPER_USER:-postgres}",
             "FHIR__LOG_LEVEL": "debug",
             "PORT": 41${BASE_PORT:-1}12,
-            "FHIR__CLIENT_ID": "db6b2304-f236-45ec-b10c-a852681e7129",
+            "FHIR__CLIENT_ID": "${FHIR__CLIENT_ID}",
             "FHIR__CLIENT_SECRET": "${FHIR__CLIENT_SECRET}",
             "FHIR_SCHEMA_PATH": "/home/docker/alp-data-node/app/src/r4",
             "FHIR_SCHEMA_FILE_NAME": "fhir.schema.json",
