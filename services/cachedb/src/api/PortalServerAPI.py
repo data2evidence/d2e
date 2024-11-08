@@ -25,9 +25,14 @@ class PortalServerAPI:
         Returns dataset from input dataset_id
         '''
 
+        params = {
+            'datasetId': dataset_id
+        }
+
         result = requests.get(
-            f"{self.url}/dataset/{dataset_id}",
+            f"{self.url}/dataset",
             headers=self.get_options(),
             verify=self.verifySsl,
+            params=params
         )
         return result.json()

@@ -1,9 +1,10 @@
 import crypto from "crypto";
-import PGUserDAO from "./dao/PGUserDAO";
-import PGDBDAO from "./dao/PGDBDAO";
-import * as config from "./utils/config";
-const { Client } = require("pg");
-require("dotenv");
+import PGUserDAO from "./dao/PGUserDAO.js";
+import PGDBDAO from "./dao/PGDBDAO.js";
+import * as config from "./utils/config.js";
+//import { Client } from "pg";
+
+//require("dotenv");
 
 type pgUsers = {
   reader: string;
@@ -14,7 +15,7 @@ type pgUsers = {
   managerPassword: string;
 };
 
-class App {
+export class App {
   private logger = config.getLogger();
   private properties = config.getProperties();
   private dbDao;

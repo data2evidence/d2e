@@ -10,8 +10,12 @@
     "seed": "node ./dist/seed.js",
     "load-bots": "node ./dist/loadBots.js",
     "create-data-model": "node ./dist/createDataModel.js",
+    "load-bots": "node ./dist/loadBots.js",
+    "create-data-model": "node ./dist/createDataModel.js",
     "build-and-seed": "tsc && yarn run seed && yarn run load-bots",
     "lint": "eslint src/",
+    "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/loadBots.ts",
+    "start": "node ./dist/loadBots.js"
     "dev": "tsnd --inspect=0.0.0.0:9226 --respawn ./src/loadBots.ts",
     "start": "node ./dist/loadBots.js"
   },
@@ -38,8 +42,9 @@
     "esbuild": "0.21.5"
   },
   "dependencies": {
-    "@medplum/core": "^3.2.2",
-    "@medplum/fhirtypes": "^3.2.2",
+    "@medplum/bot-layer": "3.2.2",
+    "@medplum/core": "3.2.2",
+    "@medplum/fhirtypes": "3.2.2",
     "duckdb-async": "^1.1.1",
     "express": "^4.19.2",
     "helmet": "^7.1.0",

@@ -5,6 +5,21 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "trex",
+      "port": 9229,
+      "request": "attach",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "localRoot": "${workspaceFolder}/services/trex",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/service/trex**",
+        "${workspaceFolder}/functions/**",
+        "!**/node_modules/**"
+      ],
+      "type": "node"
+    },
+    {
       "name": "alp-bookmark",
       "type": "node",
       "request": "attach",

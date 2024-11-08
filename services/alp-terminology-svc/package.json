@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@asymmetrik/node-fhir-server-core": "^2.2.5",
-    "@alp/alp-base-utils": "1.1.9",
     "@nestjs/axios": "^3.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.4.3",
@@ -41,6 +40,7 @@
     "jsonwebtoken": "^9.0.0",
     "nodemon": "^3.0.1",
     "path": "^0.12.7",
+    "pg": "^8.9.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "typeorm": "0.3.17",
@@ -87,10 +87,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "workspaces": {
-    "packages": [
-      "../../alp-libs/nodejs/alp-base-utils"
-    ]
   }
 }
