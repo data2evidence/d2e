@@ -283,7 +283,7 @@ x-envs:
        "minio": "",
        "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}:8103/fhir/R4",
        "fhirTokenUrl": "http://alp-minerva-fhir-server-1:8103/oauth2/token",
-       "dicomServer": "http://alp-dicom-server:8042"
+       "dicomServer": "http://alp-dicom-server:8042",
        "fhirSvc": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/gateway/api/fhir"
       }
 
