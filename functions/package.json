@@ -801,7 +801,7 @@
           ]
         },
         {
-          "path": "^/system-portal/dataset$",
+          "path": "^/system-portal/dataset",
           "scopes": [
             "portal.dataset.read"
           ],
@@ -981,7 +981,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.read"
           ],
@@ -990,7 +990,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.add"
           ],
@@ -999,7 +999,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.update"
           ],
@@ -1174,7 +1174,7 @@
           ]
         },
         {
-          "path": "^/terminology/concept-set$",
+          "path": "^/terminology/concept-set",
           "scopes": [
             "gateway.terminology.conceptSet.read"
           ],
