@@ -49,7 +49,6 @@ for PLUGIN_PACKAGE_NAME in $(find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d ! 
     rm $ZIPFILE
   fi
   zip -q -r $ZIPFILE . -x ".git*" -x "*/.*"
-  ls -lh $ZIPFILE
 done
 ```
 
@@ -91,7 +90,7 @@ done
 - Enter git url `https://<access_token>@github.com/<username>/<repository>.git`
 
 - If it has subdirectories: `https://<access_token>@github.com/<username>/<repository>.git#subdirectory=<subdir>`
-  
+
   > ![](../images/dataflow/AddFlowURLPrivate.png)
 
 ## Troubleshooting
@@ -116,8 +115,8 @@ done
 > [PrefectExecutionClient] [32minfo[39m: Installing pip package...
 > [PrefectExecutionClient] [32minfo[39m: Running python...
 > [PrefectExecutionClient] [32minfo[39m: Processing ./data-load.zip
-> [PrefectExecutionClient] [32minfo[39m:   Preparing metadata (setup.py): started
-> [PrefectExecutionClient] [32minfo[39m:   Preparing metadata (setup.py): finished with status 'done'
+> [PrefectExecutionClient] [32minfo[39m: Preparing metadata (setup.py): started
+> [PrefectExecutionClient] [32minfo[39m: Preparing metadata (setup.py): finished with status 'done'
 > [PrefectExecutionClient] [32minfo[39m: Successfully installed Mako-1.3.5 MarkupSafe-3.0.1 aiobotocore-2.4.2 ...
 > [PrefectExecutionClient] [32minfo[39m: Python child process completed!
 > [PrefectExecutionClient] [32minfo[39m: pip install finished

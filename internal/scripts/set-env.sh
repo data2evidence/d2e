@@ -19,7 +19,7 @@ echo ". INFO ${DOTENV_YAML_IN} + ${DOTENV_YAML_IN_PRIVATE} => $DOTENV_FILE_OUT"
 
 # action
 cd $GIT_BASE_DIR
-[ ! -e $DOTENV_YAML_IN ] && echo FATAL $DOTENV_YAML_IN missing
+[ ! -e $DOTENV_YAML_IN ] && echo FATAL $DOTENV_YAML_IN missing && exit 1
 [ ! -e $DOTENV_YAML_IN_PRIVATE ] && touch $DOTENV_YAML_IN_PRIVATE
 
 # export vars for envsubst

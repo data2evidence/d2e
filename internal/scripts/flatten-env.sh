@@ -11,12 +11,13 @@ GIT_BASE_DIR=$(git rev-parse --show-toplevel)
 [ $ENV_NAME=local ] && ENV_TYPE=local || ENV_TYPE=remote
 
 # vars
-DOTENV_YMLS_IN=(.env.base-all.yml .env.base-$ENV_TYPE.yml .env.$ENV_NAME.yml)
-DOTENV_YML_OUT=.env.$ENV_NAME.yml
-DOTENV_KEYS_OUT=${DOTENV_YML_OUT}.keys
-CACHE_PATH=cache/op
+DOTENV_YML_OUT=$GIT_BASE_DIR/.env.$ENV_NAME.yml
+DOTENV_KEYS_OUT=$DOTENV_YML_OUT.keys
+CACHE_PATH=$GIT_BASE_DIR/cache/op
 
-echo ". INFO flatten ${DOTENV_YMLS_IN[@]} => ${DOTENV_YML_OUT}"
+DOTENV_YMLS_IN=($CACHE_PATH/.env.base-all.yml $CACHE_PATH/.env.base-$ENV_TYPE.yml $CACHE_PATH/.env.$ENV_NAME.yml)
+
+echo ". INFO flatten cache/op:$(echo ${DOTENV_YMLS_IN[@]} | sed -e "s#${CACHE_PATH}/##g") => ${DOTENV_YML_OUT}"
 
 # action
 cd $GIT_BASE_DIR
@@ -55,8 +56,8 @@ yq -i '.[2].values.credentials.readPasswordSalt="${HANA__TENANT_READ_PASSWORD_SA
 yq -i --output-format json 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' $JSON_FILE # sort
 yq -i '.DATABASE_CREDENTIALS = loadstr(env(JSON_FILE))' $DOTENV_YML_OUT # insert
 
-yq -i 'del(.DICOM__HEALTH_CHECK_PASSWORD)' $DOTENV_YML_OUT
-yq -i 'del(.DB_CREDENTIALS__INTERNAL__PRIVATE_KEY)' $DOTENV_YML_OUT
+# yq -i 'del(.DICOM__HEALTH_CHECK_PASSWORD)' $DOTENV_YML_OUT
+# yq -i 'del(.DB_CREDENTIALS__INTERNAL__PRIVATE_KEY)' $DOTENV_YML_OUT
 
 # finalize
 cat $DOTENV_YML_OUT | yq 'keys | .[]' | sort > $DOTENV_KEYS_OUT

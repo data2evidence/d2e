@@ -9,6 +9,7 @@
 ## Background
 
 - Rosetta cache /var/db/oah is cleared on reboot
+- There does not seem to be any other secure way to clear the rosetta cache as /var/db is protected
 
 ## Workaround
 
