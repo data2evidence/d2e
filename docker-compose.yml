@@ -678,7 +678,8 @@ services:
             "+files_manager": {},
             "+perseus": {},
             "+source": {},
-            "+white_rabbit": {}
+            "+white_rabbit": {},
+            "+trex": {}
            }
           }
          }
