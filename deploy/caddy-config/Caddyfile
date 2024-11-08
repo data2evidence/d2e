@@ -127,6 +127,20 @@ https://*.alp.local:55555 {
 		}
 	}
 
+	@portalpath {
+		path /
+		path /portal/researcher/*
+		path /portal/systemadmin/*
+	}
+
+	handle @portalpath {
+		rewrite * /portal/index.html
+		reverse_proxy https://trex:33000 {
+			transport http {
+				tls_insecure_skip_verify
+			}
+		}
+	}
 
 	## call gateway if there are no matched files
 	handle {
