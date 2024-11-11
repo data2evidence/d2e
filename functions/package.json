@@ -977,7 +977,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.read"
           ],
@@ -986,7 +986,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.add"
           ],
@@ -995,7 +995,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.update"
           ],
