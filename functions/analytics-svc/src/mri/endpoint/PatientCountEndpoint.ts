@@ -58,45 +58,49 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
     ) {
         log.addRequestCorrelationID(req);
         return new Promise(async (resolve, reject) => {
-            const querySvcParams = {
-                queryParams: {
-                    configId,
-                    configVersion,
-                    datasetId,
-                    queryType: "totalpcount",
-                    bookmarkInputStr,
-                    language,
-                },
-            };
-            let queryResponse: QuerySvcResultType = await generateQuery(
-                req,
-                querySvcParams
-            );
-            let finalQueryObject = queryResponse.queryObject;
-            let nql: QueryObject = new QueryObject(
-                finalQueryObject.queryString,
-                finalQueryObject.parameterPlaceholders,
-                finalQueryObject.sqlReturnOn
-            );
-            let fast: any = queryResponse.fast;
+                try {
+                    const querySvcParams = {
+                        queryParams: {
+                            configId,
+                            configVersion,
+                            datasetId,
+                            queryType: "totalpcount",
+                            bookmarkInputStr,
+                            language,
+                        },
+                    };
+                    let queryResponse: QuerySvcResultType = await generateQuery(
+                        req,
+                        querySvcParams
+                    );
+                    let finalQueryObject = queryResponse.queryObject;
+                    let nql: QueryObject = new QueryObject(
+                        finalQueryObject.queryString,
+                        finalQueryObject.parameterPlaceholders,
+                        finalQueryObject.sqlReturnOn
+                    );
+                    let fast: any = queryResponse.fast;
 
-            nql.executeQuery(this.connection, (err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    // if nothing is returned set the result to 0
-                    if (result.data.length !== 1) {
-                        result.data = [{ "patient.attributes.pcount": 0 }];
-                    }
+                    nql.executeQuery(this.connection, (err, result) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            // if nothing is returned set the result to 0
+                            if (result.data.length !== 1) {
+                                result.data = [{ "patient.attributes.pcount": 0 }];
+                            }
 
-                    this.responseDbgInfo(result, {
-                        FAST: fast.statement,
-                        nql,
+                            this.responseDbgInfo(result, {
+                                FAST: fast.statement,
+                                nql,
+                            });
+
+                            resolve(result);
+                        }
                     });
-
-                    resolve(result);
-                }
-            });
+            } catch(err) {
+                reject(err);
+            }
         });
     }
 
@@ -183,63 +187,67 @@ export class PatientCountEndpoint extends BaseQueryEngineEndpoint {
         datasetIds.forEach((datasetId) => {
             promises.push(
                 new Promise(async (resolve, reject) => {
-                    const querySvcParams = {
-                        queryParams: {
-                            configId,
-                            configVersion,
-                            datasetId,
-                            queryType: "totalpcount",
-                            bookmarkInputStr,
-                            language,
-                        },
-                    };
+                    try{
+                            const querySvcParams = {
+                                queryParams: {
+                                    configId,
+                                    configVersion,
+                                    datasetId,
+                                    queryType: "totalpcount",
+                                    bookmarkInputStr,
+                                    language,
+                                },
+                            };
 
-                    let queryResponse: QuerySvcResultType = await generateQuery(
-                        req,
-                        querySvcParams
-                    );
-                    let finalQueryObject = queryResponse.queryObject;
-                    let nql: QueryObject = new QueryObject(
-                        finalQueryObject.queryString,
-                        finalQueryObject.parameterPlaceholders,
-                        finalQueryObject.sqlReturnOn
-                    );
+                            let queryResponse: QuerySvcResultType = await generateQuery(
+                                req,
+                                querySvcParams
+                            );
+                            let finalQueryObject = queryResponse.queryObject;
+                            let nql: QueryObject = new QueryObject(
+                                finalQueryObject.queryString,
+                                finalQueryObject.parameterPlaceholders,
+                                finalQueryObject.sqlReturnOn
+                            );
 
-                    let fast: any = queryResponse.fast;
-                    const ac = dbCreds[datasetId];
-                    const analyticsConnection =
-                        await dbConnectionUtil.DBConnectionUtil.getDBConnection(
-                            {
-                                credentials: ac,
-                                schemaName: ac.schemaName,
-                                vocabSchemaName: ac.vocabSchemaName,
-                                userObj,
-                            }
-                        );
+                            let fast: any = queryResponse.fast;
+                            const ac = dbCreds[datasetId];
+                            const analyticsConnection =
+                                await dbConnectionUtil.DBConnectionUtil.getDBConnection(
+                                    {
+                                        credentials: ac,
+                                        schemaName: ac.schemaName,
+                                        vocabSchemaName: ac.vocabSchemaName,
+                                        userObj,
+                                    }
+                                );
 
-                    nql.executeQuery(analyticsConnection, (err, result) => {
-                        if (err) {
-                            log.enrichErrorWithRequestCorrelationID(err, req);
-                            reject(err);
-                        } else {
-                            // if nothing is returned set the result to 0
-                            if (result.data.length !== 1) {
-                                result.data = [
-                                    { "patient.attributes.pcount": 0 },
-                                ];
-                            }
+                            nql.executeQuery(analyticsConnection, (err, result) => {
+                                if (err) {
+                                    log.enrichErrorWithRequestCorrelationID(err, req);
+                                    reject(err);
+                                } else {
+                                    // if nothing is returned set the result to 0
+                                    if (result.data.length !== 1) {
+                                        result.data = [
+                                            { "patient.attributes.pcount": 0 },
+                                        ];
+                                    }
 
-                            this.responseDbgInfo(result, {
-                                FAST: fast.statement,
-                                nql,
+                                    this.responseDbgInfo(result, {
+                                        FAST: fast.statement,
+                                        nql,
+                                    });
+
+                                    // Attach studyID to result
+                                    result.datasetId = datasetId;
+
+                                    resolve(result);
+                                }
                             });
-
-                            // Attach datasetId to result
-                            result.datasetId = datasetId;
-
-                            resolve(result);
-                        }
-                    });
+                    } catch(err) {
+                        reject(err)
+                    }
                 })
             );
         });

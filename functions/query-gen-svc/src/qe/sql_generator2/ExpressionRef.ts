@@ -5,9 +5,22 @@ import { sqlFormat } from "@alp/alp-base-utils";
 import { Def } from "./Def";
 import { Statement } from "./Statement";
 
+
 export class ExpressionRef extends AstElement {
+
     constructor(public node, public path, public name, public parent) {
         super(node, path, name, parent);
+    }
+
+
+    public getScopeConfigAndAliasEntityMapping() {
+        if (
+            (this.parent.getType() === "With" ||
+            this.parent.getType() === "Without" ||
+            this.parent.getType() === "LeftJoin") 
+        ) {
+            this.parent.addTableAlias({ baseEntity: "@EXPRESSIONREF", table: this.node.name }, true)
+        }
     }
 
     public resolveDefChild(cur_parent): Def {
