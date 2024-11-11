@@ -32,8 +32,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # caddy's volume is not unique, so handled differently
     sed -i '' 's/^  caddy:$/  http-test-volume-1:/' "docker-compose.yml"
     sed -i '' 's/- caddy:/- http-test-volume-1:/' "docker-compose.yml"
-    sed -i '' 's/duckdb-data-1:/http-test-volume-2:/' "docker-compose.yml"
     sed -i '' 's/cdw-config-duckdb-data-1:/http-test-volume-cdw-config:/' "docker-compose.yml"
+    sed -i '' 's/duckdb-data-1:/http-test-volume-2:/' "docker-compose.yml"
     sed -i '' 's/meilisearch-minerva-data-1:/http-test-volume-3:/' "docker-compose.yml"
     sed -i '' 's/minio-data-1:/http-test-volume-4:/' "docker-compose.yml"
     sed -i '' 's/pg-minerva-data-1:/http-test-volume-5:/' "docker-compose.yml"
@@ -48,8 +48,8 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # caddy's volume is not unique, so handled differently
     sed -i 's/^  caddy:$/  http-test-volume-1:/' "docker-compose.yml"
     sed -i 's/- caddy:/- http-test-volume-1:/' "docker-compose.yml"
-    sed -i 's/duckdb-data-1:/http-test-volume-2:/' "docker-compose.yml"
     sed -i 's/cdw-config-duckdb-data-1:/http-test-volume-cdw-config:/' "docker-compose.yml"
+    sed -i 's/duckdb-data-1:/http-test-volume-2:/' "docker-compose.yml"
     sed -i 's/meilisearch-minerva-data-1:/http-test-volume-3:/' "docker-compose.yml"
     sed -i 's/minio-data-1:/http-test-volume-4:/' "docker-compose.yml"
     sed -i 's/pg-minerva-data-1:/http-test-volume-5:/' "docker-compose.yml"
