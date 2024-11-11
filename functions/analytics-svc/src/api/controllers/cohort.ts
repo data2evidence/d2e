@@ -165,7 +165,7 @@ export async function getFilteredCohorts(req: IMRIRequest, res: Response) {
 
 export async function createCohort(req: IMRIRequest, res: Response) {
     try {
-        const studyId = req.body.datasetId;
+        const datasetId = req.body.datasetId;
         const analyticsConnection = await getCohortAnalyticsConnection(req);
         const { schemaName, databaseCode, vocabSchemaName } = await getStudyDetails(datasetId, res);
         const language = getUser(req).lang;
@@ -199,7 +199,6 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                 attributes,
                 mriConfig.config,
                 req,
-                vocabSchemaName,
                 datasetId
             );
             const now = +new Date();
@@ -246,6 +245,7 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                 insert: false,
             },
         };
+
         // Request query string from query-gen-svc for inserting the cohort patients.
         // In query-gen-svc, it uses the same logic used in patient list to deal with the filters
         const queryResponse = await generateQuery(
@@ -283,7 +283,7 @@ export async function generateCohortDefinition(
     res: Response
 ) {
     try {
-        const studyId = req.body.datasetId;
+        const datasetId = req.body.datasetId;
         const { vocabSchemaName } = await getStudyDetails(datasetId, res);
         const language = getUser(req).lang;
         // Remap mriquery for use in createEndpointFromRequest
@@ -314,7 +314,6 @@ export async function generateCohortDefinition(
             attributes,
             mriConfig.config,
             req,
-            vocabSchemaName,
             datasetId
         );
 

@@ -442,4 +442,48 @@ export class MeilisearchAPI {
       throw new InternalServerErrorException(errorMessage);
     }
   }
+
+  async getConceptById(
+    conceptId: number,
+    index: string,
+  ): Promise<IMeilisearchConcept> {
+    const errorMessage = 'Error while getting concepts';
+    try {
+      const options = await this.createOptions();
+      const url = `${this.url}/indexes/${index}/search`;
+      const data = {
+        filter: [
+          [`${INDEX_ATTRIBUTES.concept.conceptId} = '${conceptId}'`],
+          [`${INDEX_ATTRIBUTES.concept.standardConcept} = 'S'`],
+        ],
+      };
+      const result = await axios.post<IMeilisearchConcept>(url, data, options);
+      return result.data;
+    } catch (error) {
+      this.logger.error(`${errorMessage}: ${error}`);
+      throw new InternalServerErrorException(errorMessage);
+    }
+  }
+
+  async getConceptByCode(
+    conceptCode: string,
+    index: string,
+  ): Promise<IMeilisearchConcept> {
+    const errorMessage = 'Error while getting concepts';
+    try {
+      const options = await this.createOptions();
+      const url = `${this.url}/indexes/${index}/search`;
+      const data = {
+        filter: [
+          [`${INDEX_ATTRIBUTES.concept.conceptCode} = '${conceptCode}'`],
+          [`${INDEX_ATTRIBUTES.concept.standardConcept} = 'S'`],
+        ],
+      };
+      const result = await axios.post<IMeilisearchConcept>(url, data, options);
+      return result.data;
+    } catch (error) {
+      this.logger.error(`${errorMessage}: ${error}`);
+      throw new InternalServerErrorException(errorMessage);
+    }
+  }
 }
