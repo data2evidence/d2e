@@ -6,6 +6,7 @@ import { DataCharacterizationController } from "./src/controllers/DataCharacteri
 import { DbSvcController } from "./src/controllers/DbSvcController.ts";
 import { DqdController } from "./src/controllers/DqdController.ts";
 import { MeilisearchController } from "./src/controllers/MeilisearchController.ts";
+import { PrefectFlowController } from "./src/controllers/PrefectFlowController.ts";
 
 const app = express();
 const env = Deno.env.toObject();
@@ -20,6 +21,7 @@ app.use(
   "/jobplugins/dqd/data-characterization",
   new DataCharacterizationController().router
 );
+app.use("/jobplugins/prefect", new PrefectFlowController().router);
 
 const opt = {
   user: env.PG_USER,
