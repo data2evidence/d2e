@@ -40,14 +40,6 @@ on:
         description: tag:fromTextbox (precedence)
         type: string
         required: false
-      ui-docker-tag-develop:
-        description: tag:ui:develop
-        type: boolean
-        default: true
-      ui-docker-tag-textbox:
-        description: tag:ui:fromTextbox (precedence)
-        type: string
-        required: false
       dotenv-boolean:
         description: boolean:dotenv
         type: boolean
@@ -161,7 +153,6 @@ jobs:
           command: |
             # customize dc.yml
             yq -i '.services.alp-minerva-postgres.ports=["41190:5432"]' docker-compose.yml # expose PG port
-            yq -i '.services.alp-caddy.image="alpcr.azurecr.io/alp-data-node/alp-caddy:$UI_DOCKER_TAG_NAME"' docker-compose.yml # override alp-ui docker tag
             yarn remote:minerva pull
 
       - name: docker compose up
