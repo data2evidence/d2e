@@ -27,10 +27,10 @@ export const ensureAnalyticsDatasetAuthorized = async (req, res: Response, next:
   switch (req.method) {
     case 'GET':
       if (req.query && req.query.mriquery) {
-        dataset = convertZlibBase64ToJson(req.query.mriquery).selectedStudyEntityValue
+        dataset = convertZlibBase64ToJson(req.query.mriquery).datasetId
       } else {
         const datasetKey = Object.keys(req.query)
-          .filter(query => ['selectedStudyId', 'selectedStudyEntityValue', 'studyId', 'datasetId'].includes(query))
+          .filter(query => ['datasetId'].includes(query))
           .toString()
         dataset = req.query[datasetKey]
       }
@@ -38,7 +38,7 @@ export const ensureAnalyticsDatasetAuthorized = async (req, res: Response, next:
 
     case 'POST':
       if (req.body.mriquery) {
-        dataset = convertZlibBase64ToJson(req.body.mriquery).selectedStudyEntityValue
+        dataset = convertZlibBase64ToJson(req.body.mriquery).datasetId
       } else if (req.query.datasetId) {
         dataset = req.query.datasetId
       }

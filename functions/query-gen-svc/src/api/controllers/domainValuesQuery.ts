@@ -10,7 +10,6 @@ export const generateQuery = async (req: IMRIRequest, res, next) => {
     try {
         const { attributePath, suggestionLimit, searchQuery } = req.body;
         const configParams = { req, ...req.body.configParams };
-        configParams["datasetId"] = configParams["selectedStudyEntityValue"];
         const configResponse = await callStudyMRIConfig(configParams);
         const config = configResponse.config;
         const sQuery = await new DomainValuesSvc(
