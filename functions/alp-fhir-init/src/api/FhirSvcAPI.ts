@@ -39,7 +39,7 @@ export class FhirSvcAPI {
   public async insertIntoFhirDataModel(resourceType: string, inputData: string): Promise<void> {
     try {
       const options = await this.getRequestConfig()
-      const url = `${this.baseURL}/fhirDataModel/${resourceType}`
+      const url = `${this.baseURL}/ingestResource/${resourceType}`
       const result = await axios.post(url, inputData, options)
       return result.data
     } catch (error) {
