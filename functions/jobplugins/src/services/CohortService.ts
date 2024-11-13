@@ -17,6 +17,13 @@ export class CohortService {
       flowName,
       parameters
     );
+
+    await prefectApi.createInputAuthToken(flowRunId);
+    setTimeout(
+      async () => await prefectApi.deleteInputAuthToken(flowRunId),
+      5000
+    );
+
     return { flowRunId };
   }
 }

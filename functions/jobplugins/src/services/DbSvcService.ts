@@ -41,16 +41,23 @@ export class DbSvcService {
 
     const parameters = {
       options: {
-        token: token,
         versionInfo: versionInfo,
         datasetSchemaMapping: datasetSchemaMapping,
       },
     };
-    return await prefectApi.createFlowRun(
+    let flowrunId = await prefectApi.createFlowRun(
       "update_dataset_attributes",
       deploymentName,
       flowName,
       parameters
     );
+
+    await prefectApi.createInputAuthToken(flowrunId);
+    setTimeout(
+      async () => await prefectApi.deleteInputAuthToken(flowrunId),
+      5000
+    );
+
+    return flowrunId;
   }
 }

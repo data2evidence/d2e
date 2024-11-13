@@ -330,4 +330,37 @@ export class PrefectAPI {
       body: method !== "GET" && data ? JSON.stringify(data) : undefined,
     };
   }
+
+  async createInputAuthToken(flowrunId: string) {
+    const key = "authtoken"; // keyword "authtoken" must match the object name in Python flow
+    const options = this.createOptions("POST", {
+      key,
+      value: { token: this.token },
+    });
+
+    const errorMessage =
+      "Error occurred while passing user token to the flow run";
+    const url = `${this.baseURL}/flow_runs/${flowrunId}/input`;
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(`${errorMessage}: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.id;
+  }
+
+  async deleteInputAuthToken(flowrunId: string) {
+    const errorMessage =
+      'Error occurred while deleting "authtoken" flowrun input';
+    const key = "authtoken"; // keyword "authtoken" must match the object name in Python flow
+    const options = this.createOptions("DELETE");
+    const url = `${this.baseURL}/api/flow_runs/${flowrunId}/input/${key}`;
+
+    const r = await fetch(url, options);
+    if (!r.ok) {
+      throw new Error(`${errorMessage}: ${r.statusText}`);
+    }
+  }
 }
