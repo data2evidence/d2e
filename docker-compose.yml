@@ -269,7 +269,7 @@ x-envs:
       {
        "analytics": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "bookmark": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/analytics-svc/api/services/bookmark",
-       "cdw": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/cdw",
+       "cdw": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "paConfig": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/pa-config-svc",
        "queryGen": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "dataflowMgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
@@ -379,9 +379,9 @@ services:
             "PG__DIALECT": "postgresql",
             "LOCAL_DEBUG": "false",
             "SERVICE_ROUTES": {
-              "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+              "analytics": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
               "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
-              "cdw": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/cdw",
+              "cdw": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "paConfig": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/pa-config-svc",
               "trex": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
@@ -392,7 +392,6 @@ services:
               "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
               "terminology": "http://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
               "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
-              "appRouter": "https://alp-mercury-approuter:41000",
               "idIssuerUrl": "http://alp-logto-${BASE_PORT:-1}:3001/oidc",
               "minio": "",
               "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}:8103/fhir/R4",
@@ -413,8 +412,6 @@ services:
             "SKIP_AUTH": "${SKIP_AUTH:-FALSE}",
             "USE_DUCKDB": "${USE_DUCKDB:-true}",
             "USE_CACHEDB": "${USE_CACHEDB:-true}",
-
-            "USE_SQL_PROXY": "${USE_SQL_PROXY:-false}",
             "USE_EXTENSION_FOR_COHORT_CREATION": "false",
             "isHttpTestRun": "${isHttpTestRun}",
             "isTestEnv": "${isTestEnv}",
@@ -521,9 +518,9 @@ services:
         }
       SERVICE_ROUTES: |-
         {
-        "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:41102",
+        "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
         "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
-        "cdw": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/cdw",
+        "cdw": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
         "paConfig": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/pa-config-svc",
         "trex": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
         "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
@@ -576,65 +573,6 @@ services:
       GH_TOKEN: ${GH_TOKEN}
       PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
       PLUGINS_API_VERSION: latest
-
-  # alp-minerva-analytics-svc:
-  #   container_name: &c9 alp-minerva-analytics-${BASE_PORT:-1}
-  #   depends_on:
-  #     trex:
-  #       condition: service_healthy
-  #     alp-logto-post-init:
-  #       condition: service_completed_successfully
-  #   healthcheck:
-  #     interval: 20s
-  #     retries: 30
-  #     start_period: 60s
-  #     test:
-  #       - CMD
-  #       - wget
-  #       - -O
-  #       - liveness
-  #       - --no-check-certificate
-  #       - http://localhost:41102/check-liveness
-  #   hostname: alp-minerva-analytics-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-  #   image: alpcr.azurecr.io/alp-data-node/analytics-svc:${DOCKER_TAG_NAME:-develop}
-  #   logging:
-  #     options:
-  #       tag: *c9
-  #   networks:
-  #     alp:
-  #       priority: 20
-  #   restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-  #   volumes:
-  #     - duckdb-data-1:/home/docker/src/alp-data-node/app/duckdb_data
-  #   environment:
-  #     <<:
-  #       - *x-converter
-  #       - *x-dbsvc
-  #       - *x-minio
-  #       - *x-tls
-  #       - *x-routes
-  #       - *sql-proxy
-  #     ALP_GATEWAY_OAUTH__URL: https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/oauth/token
-  #     ALP__SYSTEM_ID: ${ALP__SYSTEM_ID:-alp-research}
-  #     ANALYTICS_SVC__DEFAULT_ASSIGNMENT_NAME: PUBLIC-CHART_DEFAULT-ASSIGNMENT
-  #     ANALYTICS_SVC__PORT: 41${BASE_PORT:-1}02
-  #     ANALYTICS_SVC__STUDIES_METADATA__TTL_IN_SECONDS: 600
-  #     SQL_RETURN_ON: ${SQL_RETURN_ON:-false}
-  #     DUCKDB__DATA_FOLDER: /home/docker/src/alp-data-node/app/duckdb_data
-  #     LOCAL_DEBUG: "false"
-  #     SKIP_AUTH: ${SKIP_AUTH:-FALSE}
-  #     USE_DUCKDB: false #${USE_DUCKDB:-true}
-  #     USE_SQL_PROXY: ${USE_SQL_PROXY:-false}
-  #     USE_EXTENSION_FOR_COHORT_CREATION: "false"
-  #     isHttpTestRun: ${isHttpTestRun}
-  #     isTestEnv: ${isTestEnv}
-  #     local: ${local}
-  #     TESTSCHEMA: ${TESTSCHEMA}
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: ${D2E_CPU_LIMIT:-2}
-  #         memory: ${D2E_MEMORY_LIMIT:-7G}
 
   alp-minerva-pg-mgmt-init:
     container_name: &c15 alp-minerva-pg-mgmt-init-${BASE_PORT:-1}
@@ -730,23 +668,23 @@ services:
     command:
       - sh
       - -c
-      - "prefect server start"
+      - "apt-get update && apt-get install -y curl && prefect server start"
     container_name: &c2 alp-dataflow-gen-${BASE_PORT:-1}
     depends_on:
       trex:
         condition: service_healthy
       alp-logto-post-init:
         condition: service_completed_successfully
-    # healthcheck:
-    #   interval: 30s
-    #   retries: 30
-    #   start_period: 30s
-    #   test:
-    #     - CMD
-    #     - curl
-    #     - -f
-    #     - http://localhost:41120/api/hello
-    #   timeout: 30s
+    healthcheck:
+      interval: 30s
+      retries: 30
+      start_period: 30s
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:41120/api/health
+      timeout: 30s
     hostname: alp-dataflow-gen-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: prefecthq/prefect:3.0.3-python3.11
     logging:
@@ -780,7 +718,7 @@ services:
     command:
       - sh
       - -c
-      - "pip install prefect[docker]==3.0.3 && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
+      - "apt-get update && apt-get install -y curl && pip install prefect[docker]==3.0.3 && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
     container_name: &c83 alp-dataflow-gen-worker
     depends_on:
       alp-minio-post-init:
@@ -789,6 +727,20 @@ services:
         condition: service_healthy
       alp-logto-post-init:
         condition: service_completed_successfully
+      alp-dataflow-gen-init:
+        condition: service_completed_successfully
+      alp-dataflow-gen:
+        condition: service_healthy
+    healthcheck:
+      interval: 30s
+      retries: 30
+      start_period: 30s
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://alp-dataflow-gen-1:41120/api/health
+      timeout: 30s
     hostname: alp-dataflow-gen-worker.${TLS__INTERNAL__DOMAIN:-alp.local}
     image: prefecthq/prefect:3.0.3-python3.11
     logging:
@@ -811,7 +763,9 @@ services:
     container_name: &c4 alp-dataflow-gen-init-${BASE_PORT:-1}
     depends_on:
       alp-dataflow-gen:
-        condition: service_started
+        condition: service_healthy
+      trex:
+        condition: service_healthy
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: alp-dataflow-gen-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
