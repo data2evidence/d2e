@@ -31,6 +31,7 @@ for KEY in ${KEYS[@]}; do
 	export KEY
 	yq -i '.[env(KEY)]=("$"+ strenv(KEY)|envsubst)' $DOTENV_YML_OUT
 done
+
 yq -i -P 'sort_keys(..)' $DOTENV_YML_OUT
 cat $DOTENV_YML_OUT | yq 'keys | .[]' | sort > $DOTENV_KEYS_OUT
 wc -l --total never $DOTENV_YML_OUT $DOTENV_KEYS_OUT

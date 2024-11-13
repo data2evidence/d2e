@@ -51,11 +51,7 @@ yarn build:minerva
 yarn start:ui --wait
 ```
 
-note:
-
-- image tag/build chosen from
-  - folder `../d2e-ui` commit id, if present
-  - /or/ develop tag
+- ui & plugins image tags are calculated based on folder `../d2e-{ui|plugins}` If folder is not present then defaults to ui: develop, plugins: main
 
 ## (Re)Start App
 

@@ -23,8 +23,8 @@ for PLUGIN_PACKAGE_NAME in $(find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d ! 
     rm $ZIPFILE
   fi
   zip -q -r $ZIPFILE . -x ".git*" -x "*/.*"
-  # echo $ZIPFILE
 done
 cd $ZIPFILE_DIR
 du --summarize --human-readable  *
+echo $ZIPFILE_DIR
 cd $BASE_DIR

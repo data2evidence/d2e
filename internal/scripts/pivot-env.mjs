@@ -1,10 +1,15 @@
 #!/usr/bin/env zx
-//generate env yaml pivot & update internal/docs/env-vars.yml
-// .env.doc.yml - update with sample values
-// .env.pivot.yml - show values for all environments
-// .env.pivot.creds.ALPDEV.yml - DATABASE_CREDENTIALS>ALPDEV
-// .env.pivot.creds.postgres-cdm-minerva.yml - DATABASE_CREDENTIALS>postgres-cdm-minerva
-// .env.pivot.creds.OMOP.yml - DATABASE_CREDENTIALS>OMOP
+// pivot/analyze env to ensure consistency
+// Seed:
+// cp -v internal/docs/env-doc.yml .env_doc.yml
+// Writes:
+// .env_doc.yml - update with sample values
+// .env_pivot.yml - show values for all environments
+// .env_pivot.creds.ALPDEV.yml - DATABASE_CREDENTIALS>ALPDEV
+// .env_pivot.creds.postgres-cdm-minerva.yml - DATABASE_CREDENTIALS>postgres-cdm-minerva
+// .env_pivot.creds.OMOP.yml - DATABASE_CREDENTIALS>OMOP
+// Remove values & update git internal env doc with:
+// cat .env_doc.yml | yq '.*.envNames.* = "xxx"' | yq 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' | tee internal/docs/env-doc.yml
 
 //inputs
 const envName = $.env.ENV_NAME || "local"
@@ -16,7 +21,7 @@ const gitBaseDir = (await $`git rev-parse --show-toplevel`).stdout.trim()
 
 const credsKey = "DATABASE_CREDENTIALS"
 const envInPath = `${gitBaseDir}/.env.${envName}.yml`
-const envOutPath = `${gitBaseDir}/.env_pivot.yml`
+const pvtOutPath = `${gitBaseDir}/.env_pivot.yml`
 const docOutPath = `${gitBaseDir}/.env_doc.yml`
 
 // functions
@@ -78,7 +83,7 @@ function cleanBool(bool) {
 //////////////////////////////////////////////////////////////////////
 cd(gitBaseDir)
 const envIn = readYmlFile(envInPath)
-let envOut = readYmlFile(envOutPath)
+let pvtOut = readYmlFile(pvtOutPath)
 
 const envKeys = Object.keys(envIn)
 
@@ -100,8 +105,8 @@ envKeys.map(envKey => {
 	docOut[envKey].envNames = cleanObj(docOut[envKey].envNames)
 	docOut[envKey].type = cleanStr(docOut[envKey].type, "string")
 	docOut[envKey].comment = cleanStr(docOut[envKey].comment)
-	docOut[envKey].scriptAuto = cleanBool(docOut[envKey].scriptAuto)
 
+	// show sample data if <100 chars
 	if ((docOut[envKey].type === "string") || docOut[envKey].type === "boolean" || (envIn[envKey].length < 100)) {
 		docOut[envKey].envNames[envName] = envIn[envKey]
 	} else {
@@ -110,7 +115,6 @@ envKeys.map(envKey => {
 })
 writeYmlFile(docOutPath, docOut)
 
-
 // write env yml pivot
 // .env.pivot.yml - show values for all environments
 //////////////////////////////////////////////////////////////////////
@@ -118,15 +122,15 @@ writeYmlFile(docOutPath, docOut)
 envKeys.map(envKey => {
 	if (envKey !== credsKey) {
 		// let key = envOut[envKey]
-		envOut[envKey] = cleanObj(envOut[envKey])
-		envOut[envKey].envNames = cleanObj(envOut[envKey].envNames)
+		pvtOut[envKey] = cleanObj(pvtOut[envKey])
+		pvtOut[envKey].envNames = cleanObj(pvtOut[envKey].envNames)
 
-		envOut[envKey].comment = docOut[envKey].comment
-		envOut[envKey].type = docOut[envKey].type
-		envOut[envKey].envNames[envName] = envIn[envKey]
+		pvtOut[envKey].comment = docOut[envKey].comment
+		pvtOut[envKey].type = docOut[envKey].type
+		pvtOut[envKey].envNames[envName] = envIn[envKey]
 	}
 })
-writeYmlFile(envOutPath, envOut)
+writeYmlFile(pvtOutPath, pvtOut)
 
 // write db creds yml pivots
 // .env.pivot.creds.ALPDEV.yml - DATABASE_CREDENTIALS>ALPDEV

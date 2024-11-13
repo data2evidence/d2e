@@ -1,8 +1,10 @@
 # pg_dump restore single DB to existing docker volume
+
 - https://www.postgresql.org/docs/current/app-pgrestore.html
 - https://dbdeveloper.medium.com/easy-steps-to-backup-your-postgresql-database-in-2024-15a25a232c7f
 
 - create PG volume, if needed
+
 ```bash
 COMPOSE_PROJECT_NAME=alp-data-node
 # COMPOSE_PROJECT_NAME=alp
@@ -13,6 +15,7 @@ docker volume inspect $COMPOSE_VOLUME_NAME
 ```
 
 - Start PG container with logs to stdout
+
 ```bash
 cd ~/backups
 CONTAINER_NAME=alp-minerva-postgres-1
@@ -21,10 +24,13 @@ docker container run --publish 41190:5432 --workdir /backup -v ./:$CONTAINER_BAC
 ```
 
 - exec to container
+
 ```bash
-docker exec -it $CONTAINER_NAME sh 
+docker exec -t $CONTAINER_NAME sh
 ```
+
 - Restore
+
 ```bash
 DB_NAME=alpdev_pg
 DB_NAME=alp

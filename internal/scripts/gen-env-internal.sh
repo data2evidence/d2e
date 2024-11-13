@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# generate internal dotenv file
+# generate random dotenv secrets - internal
 set -o nounset
 set -o errexit
 
@@ -47,7 +47,7 @@ echo TLS__CADDY_DIRECTIVE=\'tls internal\' >> $DOTENV_FILE_OUT
 
 # add non-randomized
 cat $DOTENV_YML_IN | yq -o sh 'with_entries(select(.key|test("CADDY__ALP__PUBLIC_FQDN|DATABASE_CREDENTIALS|GH_TOKEN|GIT_TOKEN__PLUGINS_REPO_READ|HANA__CRT|HANA__HOSTNAME|HANA__TENANT_ADMIN_PASSWORD|HANA__TENANT_ADMIN_PASSWORD_SALT|HANA__TENANT_READ_PASSWORD|HANA__TENANT_READ_PASSWORD_SALT|DICOM__HEALTH_CHECK_PASSWORD")))' >> $DOTENV_FILE_OUT
-# remove DICOM__HEALTH_CHECK_PASSWORD with next rc (already removed from develop)
+# todo: remove DICOM__HEALTH_CHECK_PASSWORD upon new release candidate version, DICOM__HEALTH_CHECK_PASSWORD already removed from develop
 
 # finalize
 cat $DOTENV_FILE_OUT | grep = | awk -F= '{print $1}' | grep _ | sort -u > $DOTENV_KEYS_OUT
