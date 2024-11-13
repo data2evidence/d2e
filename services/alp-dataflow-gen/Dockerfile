@@ -28,6 +28,52 @@ FROM dbsvc-build AS final-build
 
 WORKDIR /app
 
+# To support offline installation
+# Create folder to store R packages installed during runtime for plugins which require custom R packages
+ENV R_LIBS_USER_DIR /home/docker/plugins/R/site-library
+RUN mkdir -p $R_LIBS_USER_DIR
+RUN chown -R docker:docker $R_LIBS_USER_DIR
+
+# Common Data Model
+RUN Rscript -e "remotes::install_github('OHDSI/CommonDataModel@v5.4.1', quiet=FALSE, upgrade='never', force=TRUE, dependencies=FALSE, lib='$R_LIBS_USER_DIR')"
+
+# Data Characterization
+RUN Rscript -e "remotes::install_github('OHDSI/Achilles@v1.7.2',quiet=FALSE, upgrade='never', force=TRUE, dependencies=FALSE, lib='$R_LIBS_USER_DIR')"
+
+# Cohort Generator
+RUN Rscript -e "remotes::install_github('OHDSI/CohortGenerator@0.8.1',quiet=FALSE,upgrade='never',force=TRUE, dependencies=TRUE, lib='$R_LIBS_USER_DIR')"
+
+# Cohort Survival
+RUN Rscript -e "remotes::install_version('snakecase', quiet=TRUE, upgrade='never', force=FALSE, dependencies=TRUE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
+RUN Rscript -e "remotes::install_version('broom', quiet=TRUE, upgrade='never', force=FALSE, dependencies=TRUE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
+RUN Rscript -e "remotes::install_version('visOmopResults', quiet=TRUE, upgrade='never', force=FALSE, dependencies=TRUE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
+RUN Rscript -e "remotes::install_version('dbplyr', version='2.4.0', quiet=TRUE, upgrade='never', force=FALSE, dependencies=FALSE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
+RUN Rscript -e "remotes::install_version('rjson', quiet=TRUE, upgrade='never', force=FALSE, dependencies=FALSE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
+RUN Rscript -e "remotes::install_version('omopgenerics', version='0.2.1', quiet=TRUE, upgrade='never', force=FALSE, dependencies=FALSE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
+RUN Rscript -e "remotes::install_version('CDMConnector', version='1.4.0', quiet=TRUE, upgrade='never', force=FALSE, dependencies=TRUE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
+RUN Rscript -e "remotes::install_version('PatientProfiles', version='1.1.1', quiet=TRUE, upgrade='never', force=FALSE, dependencies=TRUE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
+RUN Rscript -e "remotes::install_version('CohortSurvival', version='0.5.1', quiet=TRUE, upgrade='never', force=FALSE, dependencies=FALSE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
+RUN Rscript -e "remotes::install_version('RPostgres', version='1.4.5', quiet=TRUE, upgrade='never', force=FALSE, dependencies=FALSE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
+
+
+# Add Apache Ant for i2b2 data model creation
+ENV ANT_VERSION=1.9.6
+ENV I2B2_TAG_NAME 1.8.1.0001
+
+RUN wget http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz \
+    && tar xvfvz apache-ant-${ANT_VERSION}-bin.tar.gz -C /opt \
+    && ln -sfn /opt/apache-ant-${ANT_VERSION} /opt/ant \
+    && sh -c 'echo ANT_HOME=/opt/ant >> /etc/environment' \
+    && ln -sfn /opt/ant/bin/ant /usr/bin/ant \
+    && rm apache-ant-${ANT_VERSION}-bin.tar.gz
+
+# Download i2b2 source code
+RUN wget https://github.com/i2b2/i2b2-data/archive/refs/tags/v$I2B2_TAG_NAME.tar.gz
+RUN tar -xzf v$I2B2_TAG_NAME.tar.gz
+# Change ownership to overwrite db.properties in flow definition
+RUN chown -R docker:docker /app/i2b2-data-$I2B2_TAG_NAME
+
+
 COPY --chown=docker:docker --chmod=711 ./services/alp-dataflow-gen/requirements.txt .
 RUN pip install -r requirements.txt
 
@@ -47,18 +93,6 @@ RUN yarn install
 RUN mkdir /output
 RUN chown -R docker:docker /output
 
-# Create folder to store R packages installed during runtime for plugins which require custom R packages
-RUN mkdir -p /home/docker/plugins/R/site-library
-RUN chown -R docker:docker /home/docker/plugins/R/site-library
-
-# Add Apache Ant for i2b2 data model creation
-ENV ANT_VERSION=1.9.6
-RUN wget http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz \
-    && tar xvfvz apache-ant-${ANT_VERSION}-bin.tar.gz -C /opt \
-    && ln -sfn /opt/apache-ant-${ANT_VERSION} /opt/ant \
-    && sh -c 'echo ANT_HOME=/opt/ant >> /etc/environment' \
-    && ln -sfn /opt/ant/bin/ant /usr/bin/ant \
-    && rm apache-ant-${ANT_VERSION}-bin.tar.gz
 
 WORKDIR /app
 
