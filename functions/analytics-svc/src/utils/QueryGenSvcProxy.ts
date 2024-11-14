@@ -34,8 +34,10 @@ export async function generateQuery(
     protocol = urlParams.protocol;
 
     // Add datasetId to body as toplevel key for trex authz
-    if (payload.queryParams.datasetId) {
+    if (payload.queryParams?.datasetId) {
         payload["datasetId"] = payload.queryParams.datasetId;
+    } else if (payload.configParams?.datasetId) {
+        payload["datasetId"] = payload.configParams.datasetId;
     }
     const data = JSON.stringify(payload);
 
