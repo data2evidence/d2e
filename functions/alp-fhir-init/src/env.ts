@@ -1,33 +1,22 @@
-import { object, z } from 'zod'
+const _env = Deno.env.toObject();
 
-const Env = z.object({
-  FHIR__CLIENT_ID: z.string(),
-  FHIR__CLIENT_SECRET: z.string(),
-  FHIR__LOG_LEVEL: z.string(),
-  PORT: z.string(),
-  SERVICE_ROUTES: z
-  .string()
-  .transform((str: any, ctx: any): z.infer<ReturnType<typeof object>> => {
-      try {
-          return JSON.parse(str);
-      } catch (e) {
-          ctx.addIssue({ code: "custom", message: "Invalid JSON" });
-          return z.never();
-      }
-  }),
-  FHIR_SCHEMA_PATH: z.string(),
-  FHIR_SCHEMA_FILE_NAME: z.string(),
-  DUCKDB_PATH: z.string()
-})
-
-const _env = Deno.env.toObject()
-const result = Env.safeParse(_env)
-
-let env = _env as unknown as z.infer<typeof Env>
-if (result.success) {
-  env = result.data;
-} else {
-  console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
-  throw new Error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+export const env = {
+  FHIR__CLIENT_ID: _env.FHIR__CLIENT_ID,
+  FHIR__CLIENT_SECRET: _env.FHIR__CLIENT_SECRET,
+  FHIR__LOG_LEVEL: _env.FHIR__LOG_LEVEL,
+  PORT: Number(_env.PORT!),
+  DUCKDB_PATH: _env.DUCKDB_PATH,
+  PLUGIN_PATH: _env.PLUGIN_PATH,
+  GATEWAY_CA_CERT: _env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n'),
+  IDP__ALP_DATA_CLIENT_ID: _env.IDP__ALP_DATA_CLIENT_ID,
+  IDP__ALP_DATA__CLIENT_SECRET: _env.IDP__ALP_DATA__CLIENT_SECRET,
+  ALP_GATEWAY_OAUTH__URL: _env.ALP_GATEWAY_OAUTH__URL,
+  SERVICE_ROUTES: _env.SERVICE_ROUTES || '{}',
+  PG_SUPER_USER: _env.PG_SUPER_USER,
+  PG_SUPER_PASSWORD: _env.PG_SUPER_PASSWORD,
+  PG__HOST: _env.PG__HOST,
+  PG__PORT: _env.PG__PORT,
+  PG__DB_NAME: _env.PG__DB_NAME
 }
-export { env }
+
+export const services = JSON.parse(env.SERVICE_ROUTES)
