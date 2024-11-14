@@ -7,6 +7,8 @@ import { PluginColumnType } from "../../types";
 import { Utils } from "../../qe/sql_generator2/Utils";
 import { Config } from "../../qe/qe_config_interface/Config";
 import { bookmarkToIFRBackend } from "../../utils/formatter/BookmarkFormatter";
+import { IMRIRequest } from "../../types";
+import { updateIfrWithConcepts } from "../../utils/formatter/ConceptSetToConceptConverter";
 const utils = utilsLib.utils;
 
 export class BaseCohortSvc {
@@ -18,6 +20,7 @@ export class BaseCohortSvc {
             lang: string;
             backendConfig: any;
             bookmarks: any;
+            req: IMRIRequest;
         }
     ) {}
 
@@ -29,12 +32,20 @@ export class BaseCohortSvc {
 
         let queryList = await Promise.all(
             this.props.bookmarks.map(async (bmk) => {
-                let bookmark = await bookmarkToIFRBackend(
+                let convertedIFR = await bookmarkToIFRBackend(
                     JSON.parse(bmk.bookmark)
                 );
+
+                const ifrWithConceptSetConcepts = await updateIfrWithConcepts(
+                    this.props.backendConfig,
+                    convertedIFR,
+                    JSON.parse(bmk.bookmark).selectedStudyEntityValue,
+                    this.props.req.headers.authorization
+                );
+
                 let f = new Fast(
                     "plugin",
-                    bookmark,
+                    ifrWithConceptSetConcepts,
                     this.props.backendConfig,
                     pholderTableMap
                 );

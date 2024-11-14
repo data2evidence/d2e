@@ -87,6 +87,7 @@
     "./src/middleware/NoCache": "./src/middleware/NoCache.ts",
     "./src/main": "./src/main.ts",
     "./src/terminology/concept": "./src/terminology/concept.ts",
+    "./src/ifr-to-extcohort/conceptGetters": "./src/ifr-to-extcohort/conceptGetters.ts",
     "./src/dao/DBDAO": "./src/dao/DBDAO.ts",
     "./src/utils/TerminologySvcProxy": "./src/utils/TerminologySvcProxy.ts",
     "./src/utils/DBSvcConnection": "./src/utils/DBSvcConnection.ts",

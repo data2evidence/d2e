@@ -83,7 +83,7 @@ export class DuckdbConnection implements ConnectionInterface {
                 duckdDBconn,
                 duckdDB,
                 duckdbSchemaFileName,
-                duckdbVocabSchemaFileName,
+                duckdbVocabSchemaFileName
             );
 
             callback(null, conn);
@@ -111,16 +111,21 @@ export class DuckdbConnection implements ConnectionInterface {
                 `ATTACH 'host=${credentials.host} port=${credentials.port} dbname=${credentials.databaseName} user=${credentials.user} password=${credentials.password}' AS ${randomDBName} (TYPE postgres)`
             );
 
-            // Load vocab schema into duckdb connection
+            // Load CDM schema into duckdb connection
+            await duckdDBconn.all(
+                `ATTACH '${env.DUCKDB__DATA_FOLDER}/${credentials.code}_${credentials.schema}' (READ_ONLY);`
+            );
             await duckdDBconn.all(
                 `ATTACH '${env.DUCKDB__DATA_FOLDER}/${credentials.code}_${credentials.vocabSchema}' (READ_ONLY);`
             );
             const conn: DuckdbConnection = new DuckdbConnection(
                 duckdDBconn,
                 duckdDB,
-                `${randomDBName}.${schema}`,
+                `${credentials.code}_${credentials.schema}`,
                 `${credentials.code}_${credentials.vocabSchema}`
             );
+
+            conn["duckdbNativeDBName"] = `${randomDBName}.${schema}`;
 
             callback(null, conn);
         } catch (err) {
@@ -164,7 +169,7 @@ export class DuckdbConnection implements ConnectionInterface {
                 `parameters: ${JSON.stringify(flattenParameter(parameters))}`
             );
             let temp = sql;
-            temp = this.parseSql(temp);
+            temp = this.parseSql(temp, parameters);
             logger.debug("Duckdb client created");
             const result = await this.conn.all(
                 temp,
@@ -177,13 +182,18 @@ export class DuckdbConnection implements ConnectionInterface {
         }
     }
 
-    private parseSql(temp: string): string {
+    private parseSql(temp: string, parameters?: ParameterInterface[]): string {
         temp = this.getSqlStatementWithSchemaName(this.schemaName, temp);
-        return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName);
+        return translateHanaToDuckdb(
+            temp,
+            this.schemaName,
+            this.vocabSchemaName,
+            parameters
+        );
     }
 
-    public getTranslatedSql(sql: string): string {
-        return this.parseSql(sql);
+    public getTranslatedSql(sql: string, schemaName: string, parameters: ParameterInterface[]): string {
+        return this.parseSql(sql, parameters);
     }
 
     public executeQuery(
@@ -366,11 +376,23 @@ export class DuckdbConnection implements ConnectionInterface {
         schemaName: string,
         sql: string
     ): string {
-        //If inner join is happening between duckdb and native database for ex: postgres, then the replaced example would be <ALIAS_NATIVE_DBNAME>.<SCHEMANAME>.COHORT
+        let duckdbNativeSchemName = null;
+
+        //TODO: Unify implementation between patient list and Add to cohort
         if (this.conn["duckdbNativeDBName"]) {
+            duckdbNativeSchemName = `${this.conn["duckdbNativeDBName"]}.${this.conn["studyAnalyticsCredential"].schema}`;
+        } else {
+            duckdbNativeSchemName = this["duckdbNativeDBName"];
+        }
+        //If inner join is happening between duckdb and native database for ex: postgres, then the replaced example would be <ALIAS_NATIVE_DBNAME>.<SCHEMANAME>.COHORT
+        if (duckdbNativeSchemName) {
+            sql = sql.replace(
+                /\$\$SCHEMA\$\$.COHORT_DEFINITION/g,
+                `${duckdbNativeSchemName}.COHORT_DEFINITION`
+            );
             sql = sql.replace(
                 /\$\$SCHEMA\$\$.COHORT/g,
-                `${this.conn["duckdbNativeDBName"]}.${this.conn["studyAnalyticsCredential"].schema}.COHORT`
+                `${duckdbNativeSchemName}.COHORT`
             );
         }
         const replacement = schemaName === "" ? "" : `${schemaName}.`;
