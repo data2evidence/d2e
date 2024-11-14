@@ -40,21 +40,6 @@ RUN Rscript -e "remotes::install_github('OHDSI/CommonDataModel@v5.4.1', quiet=FA
 # Data Characterization
 RUN Rscript -e "remotes::install_github('OHDSI/Achilles@v1.7.2',quiet=FALSE, upgrade='never', force=TRUE, dependencies=FALSE, lib='$R_LIBS_USER_DIR')"
 
-# Cohort Generator
-RUN Rscript -e "remotes::install_github('OHDSI/CohortGenerator@0.8.1',quiet=FALSE,upgrade='never',force=TRUE, dependencies=TRUE, lib='$R_LIBS_USER_DIR')"
-
-# Cohort Survival
-RUN Rscript -e "remotes::install_version('snakecase', quiet=TRUE, upgrade='never', force=FALSE, dependencies=TRUE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
-RUN Rscript -e "remotes::install_version('broom', quiet=TRUE, upgrade='never', force=FALSE, dependencies=TRUE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
-RUN Rscript -e "remotes::install_version('visOmopResults', quiet=TRUE, upgrade='never', force=FALSE, dependencies=TRUE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
-RUN Rscript -e "remotes::install_version('dbplyr', version='2.4.0', quiet=TRUE, upgrade='never', force=FALSE, dependencies=FALSE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
-RUN Rscript -e "remotes::install_version('rjson', quiet=TRUE, upgrade='never', force=FALSE, dependencies=FALSE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
-RUN Rscript -e "remotes::install_version('omopgenerics', version='0.2.1', quiet=TRUE, upgrade='never', force=FALSE, dependencies=FALSE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
-RUN Rscript -e "remotes::install_version('CDMConnector', version='1.4.0', quiet=TRUE, upgrade='never', force=FALSE, dependencies=TRUE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
-RUN Rscript -e "remotes::install_version('PatientProfiles', version='1.1.1', quiet=TRUE, upgrade='never', force=FALSE, dependencies=TRUE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
-RUN Rscript -e "remotes::install_version('CohortSurvival', version='0.5.1', quiet=TRUE, upgrade='never', force=FALSE, dependencies=FALSE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
-RUN Rscript -e "remotes::install_version('RPostgres', version='1.4.5', quiet=TRUE, upgrade='never', force=FALSE, dependencies=FALSE, repos='https://cloud.r-project.org', lib='$R_LIBS_USER_DIR')"
-
 
 # Add Apache Ant for i2b2 data model creation
 ENV ANT_VERSION=1.9.6
