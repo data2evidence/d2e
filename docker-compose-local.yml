@@ -151,7 +151,7 @@ services:
 
   alp-perseus-white-rabbit:
     environment:
-      JAVA_OPTs: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      JAVA_OPTS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     # mapping debug port 5005 for local development
     ports:
       - 5005:5005
