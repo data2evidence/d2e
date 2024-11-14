@@ -83,50 +83,21 @@ jobs:
         continue-on-error: true
         run: docker rm -v -f $(docker ps -qa)
 
-      - name: Generate dotenv
+      - name: 1password ratelimit start
         env:
-          DOTENV_FILE: .env.${{ env.ENV_TYPE }}
-          DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
-          OVERWRITE: true
         run: |
-          ACTIONS_STEP_DEBUG=false
           ./internal/scripts/get-op-ratelimit.sh
 
-          # get env yml from 1password
-          if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
-          then
-            yarn internal op:get:$ENV_TYPE
-          else
-            echo dotenv-boolean=false | tee -a $GITHUB_STEP_SUMMARY
-          fi
-
-          # mask sensitive values
-          internal/scripts/mask-gha.sh
-
-          # generate dotenv
-          yarn internal gen:env
-          echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-
-          cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
-
-          [ "${{ github.event.inputs.docker-tag-develop }}" = true ] && DOCKER_TAG_NAME=develop
-          UI_DOCKER_TAG_NAME=$DOCKER_TAG_NAME
-          [ "${{ github.event.inputs.ui-docker-tag-develop }}" = true ] && UI_DOCKER_TAG_NAME=develop
-          [ "${{ github.event.inputs.ui-docker-tag-textbox }}" != '' ] && UI_DOCKER_TAG_NAME=${{ github.event.inputs.ui-docker-tag-textbox }}
-
-          echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-          echo UI_DOCKER_TAG_NAME=$UI_DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
-          echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
-          echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
-
-      - name: Load dotenv from 1password
+      - name: Load secrets from 1password
         uses: 1password/load-secrets-action@v2
         id: op-load-secret
         with:
           export-env: true
         env:
+          ENV__BASE_All__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain # deprecate once 1password updated with flat yml
+          ENV__BASE_REMOTE__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-remote.yml/notesPlain # deprecate once 1password updated with flat yml
+          ENV__NAME__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.${{ env.ENV_NAME }}.yml/notesPlain
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
           REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
@@ -145,6 +116,51 @@ jobs:
           retention-days: 30
           path: |
             ${{ github.job }}*.yml
+
+      - name: Generate dotenv
+        env:
+          CACHE_DIR: cache/op
+          DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+          DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+          OVERWRITE: true
+        run: |
+          ACTIONS_STEP_DEBUG=false
+          if [ ${{ github.event.inputs.dotenv-boolean }} = true ]
+          then
+            # echo dot env yml files with env-vars from 1password
+            echo "${ENV__BASE_All__YML}" > $CACHE_DIR/.env.base-all.yml # deprecate once 1password updated with flat yml
+            echo "${ENV__BASE_REMOTE__YML}" > $CACHE_DIR/.env.base-remote.yml # deprecate once 1password updated with flat yml
+            echo "${ENV__NAME__YML}" > $CACHE_DIR/.env.$ENV_NAME.yml # remove $CACHE_DIR/ once 1password updated with flat yml
+          else
+            # expect env yml on-disk from a previous deploy
+            echo dotenv-boolean=false | tee -a $GITHUB_STEP_SUMMARY
+          fi
+
+          # cache: .env.base-all.yml .env.base-$ENV_TYPE.yml .env.$ENV_NAME.yml => .env.$ENV_NAME.yml
+          yarn internal flatten:env # deprecate once 1password updated with flat yml
+
+          # convert .env.${ENV_NAME}.yml to .env.${ENV_TYPE}
+          yarn internal set:env
+
+          # additional mask sensitive values
+          internal/scripts/mask-env-gha.sh
+
+          # action
+          echo CADDY__ALP__PUBLIC_FQDN=$(yq '.CADDY__ALP__PUBLIC_FQDN' $DOTENV_YML) | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+
+          cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
+
+          [ "${{ github.event.inputs.docker-tag-develop }}" = true ] && DOCKER_TAG_NAME=develop
+          UI_DOCKER_TAG_NAME=$DOCKER_TAG_NAME
+          [ "${{ github.event.inputs.ui-docker-tag-develop }}" = true ] && UI_DOCKER_TAG_NAME=develop
+          [ "${{ github.event.inputs.ui-docker-tag-textbox }}" != '' ] && UI_DOCKER_TAG_NAME=${{ github.event.inputs.ui-docker-tag-textbox }}
+
+          echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+          echo UI_DOCKER_TAG_NAME=$UI_DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_ENV | tee -a $GITHUB_STEP_SUMMARY
+          echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
+          echo GITHUB_SHA_SHORT=$(git rev-parse --short HEAD) | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Login to ACR
         uses: docker/login-action@v3.1.0

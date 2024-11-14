@@ -75,17 +75,17 @@ jobs:
         with:
           export-env: true
         env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          DOCKER_COMPOSE_DN_BASE_ALL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain
-          DOCKER_COMPOSE_DN_BASE_LOCAL_ENV: op://${{ secrets.OP_VAULT_NAME }}/.env.base-local.yml/notesPlain
+          ENV__BASE_All__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain
+          ENV__BASE_LOCAL__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-local.yml/notesPlain
           HANASERVER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/SG_FQDN"
-          HDIUSER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin user"
           HDIPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
           HDIPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
-          TESTSYSTEMPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
-          TESTPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
-          REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+          HDIUSER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin user"
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
+          REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
+          TESTPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
+          TESTSYSTEMPW: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/Admin password"
 
       - name: Print env vars
         run: |
@@ -124,10 +124,10 @@ jobs:
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
           OVERWRITE: true
         run: |
-          echo "${DOCKER_COMPOSE_DN_BASE_ALL_ENV}" > .env.base-all.yml
-          echo "${DOCKER_COMPOSE_DN_BASE_LOCAL_ENV}" > .env.base-local.yml
+          echo "${ENV__BASE_All__YML}" > .env.base-all.yml
+          echo "${ENV__BASE_LOCAL__YML}" > .env.base-local.yml
           wc -l .env.base-all.yml .env.base-local.yml
-          yarn internal gen:env
+          yarn internal set:env
           sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
 
       - name: Setup Test DB

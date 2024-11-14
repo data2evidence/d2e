@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# .env.$ENV_NAME.yml + .env.$ENV_TYPE.private.yml => .env.$ENV_TYPE
 set -o nounset
 set -o errexit
 echo ${0} ...

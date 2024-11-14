@@ -4,9 +4,11 @@ set -o nounset
 set -o errexit
 echo ${0} ...
 
+# vars
 DC_YMLS=($(ls $GIT_BASE_DIR/docker-compose*.yml))
-
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+
+# action
 
 # allow level-1 FQDN yml keys as non-sensitive
 export KEYS_ALLOW="CADDY__ALP__PUBLIC_FQDN|CADDY__CFUAA_IDP__PUBLIC_FQDN|IDP__BASE_URL"

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# create flat dotenv yml file for 1password cache files, recursive sort & generalize
+# cache: .env.base-all.yml .env.base-$ENV_TYPE.yml .env.$ENV_NAME.yml => .env.$ENV_NAME.yml
+# then generalize & recurive sort .env.$ENV_NAME.yml
 set -o nounset
 set -o errexit
 

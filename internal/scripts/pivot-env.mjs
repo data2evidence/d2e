@@ -1,15 +1,15 @@
 #!/usr/bin/env zx
 // pivot/analyze env to ensure consistency
 // Seed:
-// cp -v internal/docs/env-doc.yml .env_doc.yml
+// cp -v internal/docs/env-doc.yml .env-doc.yml
 // Writes:
-// .env_doc.yml - update with sample values
-// .env_pivot.yml - show values for all environments
-// .env_pivot.creds.ALPDEV.yml - DATABASE_CREDENTIALS>ALPDEV
-// .env_pivot.creds.postgres-cdm-minerva.yml - DATABASE_CREDENTIALS>postgres-cdm-minerva
-// .env_pivot.creds.OMOP.yml - DATABASE_CREDENTIALS>OMOP
+// .env-doc.yml - update with sample values
+// .env-pivot.yml - show values for all environments
+// .env-pivot.creds.ALPDEV.yml - DATABASE_CREDENTIALS>ALPDEV
+// .env-pivot.creds.postgres-cdm-minerva.yml - DATABASE_CREDENTIALS>postgres-cdm-minerva
+// .env-pivot.creds.OMOP.yml - DATABASE_CREDENTIALS>OMOP
 // Remove values & update git internal env doc with:
-// cat .env_doc.yml | yq '.*.envNames.* = "xxx"' | yq 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' | tee internal/docs/env-doc.yml
+// cat .env-doc.yml | yq '.*.envNames.* = "xxx"' | yq 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' | tee internal/docs/env-doc.yml
 
 //inputs
 const envName = $.env.ENV_NAME || "local"
@@ -21,8 +21,8 @@ const gitBaseDir = (await $`git rev-parse --show-toplevel`).stdout.trim()
 
 const credsKey = "DATABASE_CREDENTIALS"
 const envInPath = `${gitBaseDir}/.env.${envName}.yml`
-const pvtOutPath = `${gitBaseDir}/.env_pivot.yml`
-const docOutPath = `${gitBaseDir}/.env_doc.yml`
+const pvtOutPath = `${gitBaseDir}/.env-pivot.yml`
+const docOutPath = `${gitBaseDir}/.env-doc.yml`
 
 // functions
 
@@ -138,18 +138,23 @@ writeYmlFile(pvtOutPath, pvtOut)
 // .env.pivot.creds.OMOP.yml - DATABASE_CREDENTIALS>OMOP
 //////////////////////////////////////////////////////////////////////
 if (envKeys.includes(credsKey)) {
-	const creds = YAML.parse(envIn[credsKey])
-	// i = 0 // debug
-	for (const i in creds) {
-		let credsOutPath = `${gitBaseDir}/.env_pivot.creds.${creds[i].name}.yml`
-		let credsOut = readYmlFile(credsOutPath)
-		const credKeys = Object.keys(creds[i])
-		// credKey = credKeys[0] // debug
-		credKeys.map(credKey => {
-			credsOut[credKey] = cleanObj(credsOut[credKey])
-			credsOut[credKey][envName] = creds[i][credKey]
-		})
-		writeYmlFile(credsOutPath, credsOut)
-		// await $`code ${credsOutPath}`
+	const credsStr = envIn[credsKey]
+	if (credsStr.length === 0) {
+		echo(`ALERT: ${credsKey} is blank`)
+	} else {
+		const creds = YAML.parse(credsStr)
+		// i = 0 // debug
+		for (const i in creds) {
+			let credsOutPath = `${gitBaseDir}/.env-pivot.creds.${creds[i].name}.yml`
+			let credsOut = readYmlFile(credsOutPath)
+			const credKeys = Object.keys(creds[i])
+			// credKey = credKeys[0] // debug
+			credKeys.map(credKey => {
+				credsOut[credKey] = cleanObj(credsOut[credKey])
+				credsOut[credKey][envName] = creds[i][credKey]
+			})
+			writeYmlFile(credsOutPath, credsOut)
+			// await $`code ${credsOutPath}`
+		}
 	}
 }

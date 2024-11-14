@@ -49,34 +49,21 @@ jobs:
       - name: Install 1Password CLI
         uses: 1Password/install-cli-action@v1.0.0
 
-      - name: Generate dotenv
+      - name: 1password ratelimit start
         env:
-          DOTENV_FILE: .env.${{ env.ENV_TYPE }}
-          DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
-          OVERWRITE: true
         run: |
-          ACTIONS_STEP_DEBUG=false
           ./internal/scripts/get-op-ratelimit.sh
 
-          # get env yml from 1password
-          yarn internal op:get:$ENV_TYPE
-
-          # mask sensitive values
-          internal/scripts/mask-gha.sh
-
-          # generate dotenv
-          yarn internal gen:env
-
-          echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
-
-      - name: Load dotenv from 1password
+      - name: Load secrets from 1password
         uses: 1password/load-secrets-action@v2
         id: op-load-secret
         with:
           export-env: true
         env:
+          ENV__BASE_All__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain # deprecate once 1password updated with flat yml
+          ENV__BASE_LOCAL__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-local.yml/notesPlain # deprecate once 1password updated with flat yml
+          ENV__NAME__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.${{ env.ENV_NAME }}.yml/notesPlain
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           REGISTRY_USERNAME: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/username"
           REGISTRY_PASSWORD: "op://${{ secrets.OP_VAULT_NAME }}/az-alpCR/password"
@@ -95,6 +82,33 @@ jobs:
           retention-days: 30
           path: |
             ${{ github.job }}*.yml
+
+      # once 1password updated with unique flattened yml per environment switch get to 1password/load-secrets-action@v2 action for simpler security
+      - name: Generate dotenv
+        env:
+          CACHE_DIR: cache/op
+          DOTENV_FILE: .env.${{ env.ENV_TYPE }}
+          DOTENV_YML: .env.${{ env.ENV_NAME }}.yml
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
+          OVERWRITE: true
+        run: |
+          ACTIONS_STEP_DEBUG=false
+          # echo dot env yml files with env-vars from 1password
+          echo "${ENV__BASE_All__YML}" > $CACHE_DIR/.env.base-all.yml # deprecate once 1password updated with flat yml
+          echo "${ENV__BASE_LOCAL__YML}" > $CACHE_DIR/.env.base-local.yml # deprecate once 1password updated with flat yml
+          echo "${ENV__NAME__YML}" > $CACHE_DIR/.env.$ENV_NAME.yml # remove $CACHE_DIR/ once 1password updated with flat yml
+
+          # cache: .env.base-all.yml .env.base-$ENV_TYPE.yml .env.$ENV_NAME.yml => .env.$ENV_NAME.yml
+          yarn internal flatten:env # deprecate once 1password updated with flat yml
+
+          # convert .env.${ENV_NAME}.yml to .env.${ENV_TYPE}
+          yarn internal set:env
+
+          # additional mask sensitive values
+          internal/scripts/mask-env-gha.sh
+
+          echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Login to ACR
         uses: docker/login-action@v3.1.0
