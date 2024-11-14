@@ -17,6 +17,7 @@ export const getCachedbDbConnections = async ({
   let cachedbDatabase = getCachedbDatabaseFormatProtocolB(
     dialect,
     DUCKDB_FILE_DATABASE_CODE,
+    "read",
     DUCKDB_FILE_SCHEMA_NAME,
     DUCKDB_FILE_SCHEMA_NAME
   );
