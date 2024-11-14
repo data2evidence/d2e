@@ -6,12 +6,12 @@ type CallBackInterface = c.CallBackInterface;
 type ParameterInterface = c.ParameterInterface;
 const flattenParameter = c.flattenParameter;
 const DBValues = c.DBValues;
-import duckdb from "npm:duckdb";
+// import duckdb from "npm:duckdb";
 import { DBError } from "@alp/alp-base-utils";
 import { Logger } from "@alp/alp-base-utils";
 import { translateHanaToDuckdb } from "../../../_shared/alp-base-utils/src/helpers/hanaTranslation.ts";
 
-import fs from 'node:fs';
+import { existsSync } from "fs";
 import { env } from "../configs";
 
 import { DUCKDB_FILE_NAME } from "../qe/settings/Defaults";
