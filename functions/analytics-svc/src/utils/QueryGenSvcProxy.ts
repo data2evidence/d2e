@@ -33,6 +33,10 @@ export async function generateQuery(
     port = urlParams.port;
     protocol = urlParams.protocol;
 
+    // Add datasetId to body as toplevel key for trex authz
+    if (payload.queryParams.datasetId) {
+        payload["datasetId"] = payload.queryParams.datasetId;
+    }
     const data = JSON.stringify(payload);
 
     let accessToken = "Bearer DUMMY_TOKEN";
