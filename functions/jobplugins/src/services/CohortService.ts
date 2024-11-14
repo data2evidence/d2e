@@ -11,12 +11,16 @@ export class CohortService {
     const deploymentName = PrefectDeploymentName.COHORT;
     const parameters = cohortGeneratorFlowRunDto;
     const prefectApi = new PrefectAPI(token);
-    const flowRunId = await prefectApi.createFlowRun(
-      `Generate Cohort ${parameters.options.cohortJson.name}`,
-      deploymentName,
-      flowName,
-      parameters
-    );
+    // TODO: uncomment
+    // const flowRunId = await prefectApi.createFlowRun(
+    //   `Generate Cohort ${parameters.options.cohortJson.name}`,
+    //   deploymentName,
+    //   flowName,
+    //   parameters
+    // );
+
+    // TODO: remove below
+    const flowRunId = "";
 
     await prefectApi.createInputAuthToken(flowRunId);
     setTimeout(
