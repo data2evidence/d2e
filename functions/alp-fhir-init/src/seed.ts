@@ -1,5 +1,5 @@
 import pg from "pg";
-const _env = Deno.env.toObject();
+import { env, services } from './env.ts'
 
 const queryPostgres = async (
     client: pg.Client,
@@ -10,19 +10,19 @@ const queryPostgres = async (
   };
   
 export const seed = async () => {
-  const FHIR_CLIENT_ID = _env.FHIR__CLIENT_ID
-  const FHIR_CLIENT_SECRET = _env.FHIR__CLIENT_SECRET;
+  const FHIR_CLIENT_ID = env.FHIR__CLIENT_ID
+  const FHIR_CLIENT_SECRET = env.FHIR__CLIENT_SECRET;
 
   if (!FHIR_CLIENT_ID || !FHIR_CLIENT_SECRET) {
     throw new Error("No client credentials are set for Fhir");
   }
 
   let client = new pg.Client({
-    user: _env.PG_SUPER_USER,
-    password: _env.PG_SUPER_PASSWORD,
-    host: _env.PG__HOST,
-    port: parseInt(_env.PG__PORT),
-    database: _env.PG__DB_NAME,
+    user: env.PG_SUPER_USER,
+    password: env.PG_SUPER_PASSWORD,
+    host: env.PG__HOST,
+    port: parseInt(env.PG__PORT),
+    database: env.PG__DB_NAME,
   });
 
   await client.connect();
@@ -54,6 +54,24 @@ export const seed = async () => {
   let jsonParsedProjectContent = JSON.parse(projectContent)
   jsonParsedProjectContent.features = ['bots']
   jsonParsedProjectContent.meta.versionId = '2c8b0331-863a-432e-a5d1-ef0619acc3d2'
+  jsonParsedProjectContent.secret = [
+    {
+      "name": "client_id",
+      "valueString": env.IDP__ALP_DATA_CLIENT_ID
+    },
+    {
+      "name": "client_secret",
+      "valueString": env.IDP__ALP_DATA__CLIENT_SECRET
+    },
+    {
+      "name": "alp_auth_route",
+      "valueString": env.ALP_GATEWAY_OAUTH__URL
+    },
+    {
+      "name": "fhir_svc_route",
+      "valueString": services.fhirSvc
+    }
+  ]
 
   await queryPostgres(
     client,
