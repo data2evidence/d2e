@@ -5,8 +5,9 @@ set -o errexit
 echo ${0} ...
 
 # vars
-DC_YMLS=($(ls $GIT_BASE_DIR/docker-compose*.yml))
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+
+DC_YMLS=($(ls $GIT_BASE_DIR/docker-compose*.yml))
 
 # action
 
