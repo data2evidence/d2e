@@ -394,7 +394,7 @@ function updateResourceStatus(conn:ConnectionInterface, schemaName, fhirResource
 
 export async function ingestQRResourceInCacheDB(conn, schemaName, data): Promise<any> {
     const questionnaireResponse = data as QuestionnaireResponse;
-    let query = `insert into gdm_questionnaire_response ("id", "person_id", "etl_source_table", "etl_source_table_record_id", "etl_source_table_record_created_at", "etl_session_id", "etl_started_at") values('${questionnaireResponse.id}', 0, 'XYZ', 789, '2024-07-23', 'avsade', now())`;
+    let query = `insert into ${schemaName}.gdm_questionnaire_response ("id", "person_id", "etl_source_table", "etl_source_table_record_id", "etl_source_table_record_created_at", "etl_session_id", "etl_started_at") values('${questionnaireResponse.id}', 0, 'XYZ', 789, '2024-07-23', 'avsade', now())`;
     await executeQuery(conn, query)
     if(questionnaireResponse.item.length > 0){
       await handleItems(questionnaireResponse.item, questionnaireResponse.id, conn, schemaName)
