@@ -1,15 +1,12 @@
 // Setting MAX_PACKET_SIZE in node-hdb prevents failure of large sql statements https://github.com/SAP/node-hdb/issues/19
 /* tslint:disable no-var-requires */
-require("hdb/lib/protocol/common/Constants").MAX_PACKET_SIZE = Math.pow(2, 30);
-import { User } from "@alp/alp-base-utils";
-import { CreateLogger } from "@alp/alp-base-utils/target/src/Logger";
-import { ConnectionInterface } from "@alp/alp-base-utils/target/src/Connection";
-import { QueryObject } from "@alp/alp-base-utils/target/src/QueryObject";
-import { CachedbNodeHDBConnection } from "@alp/alp-base-utils";
+// require("hdb/lib/protocol/common/Constants").MAX_PACKET_SIZE = Math.pow(2, 30);
+import { Logger, User, Connection, QueryObject } from "@alp/alp-base-utils";
+// import { CachedbNodeHDBConnection } from "@alp/alp-base-utils";
 import { CachedbDBConnectionUtil } from "@alp/alp-base-utils";
-
 import { CdwConfigCachedbPostgresConnection } from "./CdwConfigCachedbPostgresConnection";
-
+import CreateLogger = Logger.CreateLogger;
+import ConnectionInterface = Connection.ConnectionInterface;
 const logger = CreateLogger("CdwConfigCachedbDBConnectionUtil");
 
 export class CdwConfigCachedbDBConnectionUtil extends CachedbDBConnectionUtil.CachedbDBConnectionUtil {
@@ -38,39 +35,39 @@ export class CdwConfigCachedbDBConnectionUtil extends CachedbDBConnectionUtil.Ca
           callback
         );
       } else {
-        CachedbNodeHDBConnection.CachedbNodeHDBConnection.createConnection(
-          client,
-          schemaName,
-          vocabSchemaName,
-          async (err, connection: ConnectionInterface) => {
-            if (err) {
-              return callback(err);
-            }
+        // CachedbNodeHDBConnection.CachedbNodeHDBConnection.createConnection(
+        //   client,
+        //   schemaName,
+        //   vocabSchemaName,
+        //   async (err, connection: ConnectionInterface) => {
+        //     if (err) {
+        //       return callback(err);
+        //     }
 
-            let currentUser;
+        //     let currentUser;
 
-            if (userObj) {
-              currentUser = userObj.getUser();
-            }
+        //     if (userObj) {
+        //       currentUser = userObj.getUser();
+        //     }
 
-            if (!currentUser) {
-              logger.debug(
-                "No user supplied. Cannot set HANA Connection APPLICATIONUSER"
-              );
-              return callback(null, connection);
-            }
+        //     if (!currentUser) {
+        //       logger.debug(
+        //         "No user supplied. Cannot set HANA Connection APPLICATIONUSER"
+        //       );
+        //       return callback(null, connection);
+        //     }
 
-            try {
-              await QueryObject.format(
-                `SET 'APPLICATIONUSER' = '${currentUser}'`
-              ).executeUpdateAsync(connection);
+        //     try {
+        //       await QueryObject.format(
+        //         `SET 'APPLICATIONUSER' = '${currentUser}'`
+        //       ).executeUpdateAsync(connection);
 
-              return callback(null, connection);
-            } catch (err) {
-              callback(err);
-            }
-          }
-        );
+        //       return callback(null, connection);
+        //     } catch (err) {
+        //       callback(err);
+        //     }
+        //   }
+        // );
       }
     });
   }

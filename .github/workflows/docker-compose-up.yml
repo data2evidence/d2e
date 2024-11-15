@@ -126,17 +126,23 @@ jobs:
           yarn init:logto
 
       - name: Docker compose up Local Mode without UI Container
-        run: |
-          # Run DataNode services without sql-editor
-          BASE_PORT=1 docker compose --file docker-compose.yml --file docker-compose-local.yml --env-file .env.local up --wait
-          EXIT_CODE=$?
+        uses: nick-fields/retry@v3
+        with:
+          timeout_seconds: 1800
+          retry_wait_seconds: 100
+          max_attempts: 3
+          retry_on: any
+          command: |
+            # Run DataNode services without sql-editor
+            yarn local:minerva up --wait
+            EXIT_CODE=$?
 
-          docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
-          echo | tee -a $GITHUB_STEP_SUMMARY
+            docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
+            echo | tee -a $GITHUB_STEP_SUMMARY
 
-          if [ $EXIT_CODE != 0 ]; then
-            echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-          fi
+            if [ $EXIT_CODE != 0 ]; then
+              echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
+            fi
 
       - name: Logs minerva
         if: success() || failure()
