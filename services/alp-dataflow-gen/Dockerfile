@@ -40,8 +40,18 @@ RUN Rscript -e "remotes::install_github('OHDSI/CommonDataModel@v5.4.1', quiet=FA
 # Data Characterization
 RUN Rscript -e "remotes::install_github('OHDSI/Achilles@v1.7.2',quiet=FALSE, upgrade='never', force=TRUE, dependencies=FALSE, lib='$R_LIBS_USER_DIR')"
 
+# Create folder to store duckdb extensions for offline plugins
+ENV duckdb_version 1.0.0
+RUN mkdir -p /app/duckdb_extensions
+WORKDIR /app/duckdb_extensions
+RUN wget https://extensions.duckdb.org/v${duckdb_version}/linux_amd64_gcc4/postgres_scanner.duckdb_extension.gz \
+    && wget https://extensions.duckdb.org/v${duckdb_version}/linux_amd64_gcc4/fts.duckdb_extension.gz \
+    && gzip -d postgres_scanner.duckdb_extension.gz \
+    && gzip -d fts.duckdb_extension.gz
+
 
 # Add Apache Ant for i2b2 data model creation
+WORKDIR /app
 ENV ANT_VERSION=1.9.6
 ENV I2B2_TAG_NAME 1.8.1.0001
 
