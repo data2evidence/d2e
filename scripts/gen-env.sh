@@ -45,5 +45,5 @@ echo >> $DOTENV_FILE_OUT
 
 # finalize
 cat $DOTENV_FILE_OUT | grep = | awk -F= '{print $1}' | grep _ | sort -u > $DOTENV_KEYS_OUT
-wc -l --total never $DOTENV_FILE_OUT $DOTENV_KEYS_OUT
+wc -l $DOTENV_FILE_OUT $DOTENV_KEYS_OUT | sed '$d'
 echo

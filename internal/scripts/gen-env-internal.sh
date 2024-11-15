@@ -51,5 +51,5 @@ cat $DOTENV_YML_IN | yq -o sh 'with_entries(select(.key|test("CADDY__ALP__PUBLIC
 
 # finalize
 cat $DOTENV_FILE_OUT | grep = | awk -F= '{print $1}' | grep _ | sort -u > $DOTENV_KEYS_OUT
-wc -l --total never $DOTENV_FILE_OUT $DOTENV_KEYS_OUT
+wc -l $DOTENV_FILE_OUT $DOTENV_KEYS_OUT | sed '$d'
 echo

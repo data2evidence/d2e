@@ -62,5 +62,5 @@ yq -i '.DATABASE_CREDENTIALS = loadstr(env(JSON_FILE))' $DOTENV_YML_OUT # insert
 
 # finalize
 cat $DOTENV_YML_OUT | yq 'keys | .[]' | sort > $DOTENV_KEYS_OUT
-wc -l --total never $DOTENV_YML_OUT $DOTENV_KEYS_OUT
+wc -l $DOTENV_YML_OUT $DOTENV_KEYS_OUT | sed '$d'
 echo

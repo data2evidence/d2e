@@ -34,5 +34,5 @@ done
 
 yq -i -P 'sort_keys(..)' $DOTENV_YML_OUT
 cat $DOTENV_YML_OUT | yq 'keys | .[]' | sort > $DOTENV_KEYS_OUT
-wc -l --total never $DOTENV_YML_OUT $DOTENV_KEYS_OUT
+wc -l $DOTENV_YML_OUT $DOTENV_KEYS_OUT | sed '$d'
 echo

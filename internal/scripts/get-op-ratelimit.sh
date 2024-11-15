@@ -12,7 +12,7 @@ if [ -z "${GITHUB_JOB}" ]; then
 	PREFIX=private
 else
 	DATETIME_STAMP=$(date -I)
-	PREFIX=${GITHUB_JOB}_${GITHUB_RUN_ID}
+	PREFIX=private-${GITHUB_JOB}_${GITHUB_RUN_ID}
 fi
 START_YML=${PREFIX}-start.yml
 END_YML=${PREFIX}-end.yml
