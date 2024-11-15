@@ -75,7 +75,7 @@ jobs:
         with:
           export-env: true
         env:
-          ENV__BASE_All__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain
+          ENV__BASE_ALL__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain
           ENV__BASE_LOCAL__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-local.yml/notesPlain
           HANASERVER: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/SG_FQDN"
           HDIPORT: "op://${{ secrets.OP_VAULT_NAME }}/az-hn-db/DB Port"
@@ -124,7 +124,7 @@ jobs:
           OP_VAULT_NAME: ${{ secrets.OP_VAULT_NAME }}
           OVERWRITE: true
         run: |
-          echo "${ENV__BASE_All__YML}" > .env.base-all.yml
+          echo "${ENV__BASE_ALL__YML}" > .env.base-all.yml
           echo "${ENV__BASE_LOCAL__YML}" > .env.base-local.yml
           wc -l .env.base-all.yml .env.base-local.yml
           yarn internal set:env

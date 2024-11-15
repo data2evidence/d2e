@@ -68,7 +68,7 @@ jobs:
         with:
           export-env: true
         env:
-          ENV__BASE_All__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain # deprecate once 1password updated with flat yml
+          ENV__BASE_ALL__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-all.yml/notesPlain # deprecate once 1password updated with flat yml
           ENV__BASE_REMOTE__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.base-remote.yml/notesPlain # deprecate once 1password updated with flat yml
           ENV__NAME__YML: op://${{ secrets.OP_VAULT_NAME }}/.env.${{ env.ENV_NAME }}.yml/notesPlain
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
@@ -102,7 +102,7 @@ jobs:
           ACTIONS_STEP_DEBUG=false
 
           # echo dot env yml files from 1password
-          echo "${ENV__BASE_All__YML}" > $CACHE_DIR/.env.base-all.yml # deprecate once 1password updated with flat yml
+          echo "${ENV__BASE_ALL__YML}" > $CACHE_DIR/.env.base-all.yml # deprecate once 1password updated with flat yml
           echo "${ENV__BASE_REMOTE__YML}" > $CACHE_DIR/.env.base-remote.yml # deprecate once 1password updated with flat yml
           echo "${ENV__NAME__YML}" > $CACHE_DIR/.env.$ENV_NAME.yml # remove $CACHE_DIR/ once 1password updated with flat yml
 
