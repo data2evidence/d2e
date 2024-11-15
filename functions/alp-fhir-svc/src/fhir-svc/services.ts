@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'npm:uuid'
 import { PortalAPI } from '../api/PortalAPI'
 import { Dataset } from '../utils/types'
 import { Bundle } from '@medplum/fhirtypes'
-import { getFhirJsonSchema, ingestResourceInFhir } from '../utils/fhirDataModelUtil'
+import { getFhirData, getFhirJsonSchema, ingestQRResourceInCacheDB, ingestResourceInFhir } from '../utils/fhirDataModelUtil'
 import { getCachedbDbConnections, getClientCredentialsToken } from '../utils/dbUtils'
 import { env } from '../env'
 
@@ -139,9 +139,14 @@ export const ingestResourceInCacheDB = async (fhirResouce: string) => {
         let results: any = []
         console.info('Create resource for each of the entry in the bundle')
         for (const entry of bundle.entry) {
-            let result = await ingestResourceInFhir(conn, datasetDetails.schemaName, jsonSchema, entry.resource, entry.request)
-            if(result !== true)
-                results.push(result)
+            let result
+            if(entry.resource.resourceType == 'QuestionnaireResponse'){
+                result = await ingestQRResourceInCacheDB(conn, datasetDetails.schemaName, entry.resource)
+            }else{
+                result = await ingestResourceInFhir(conn, datasetDetails.schemaName, jsonSchema, entry.resource, entry.request)
+                if(result !== true)
+                    results.push(result)
+            }
         }
         return results
     }catch(err){
@@ -192,15 +197,15 @@ export async function createSubscriptionInFhirServer(fhirApi: FhirAPI, clientId:
 
 //Need the following for testing
 //Test
-// export async function getResource(fhirResource: string, datasetId: string){
-//     let token = await getClientCredentialsToken()
-//     //Get dataset details to connect to cachedb
-//     let portalApi = new PortalAPI(token)
-//     let datasetDetails = await portalApi.getDatasetById(datasetId)
-//     //Connect to cachedb of the incoming dataset
-//     let conn = await getCachedbDbConnections(token, datasetDetails.databaseCode, datasetDetails.schemaName, datasetDetails.vocabSchemaName)
-//     return await getFhirData(conn, fhirResource)
-// }
+export async function getResource(datasetId: string, query: string){
+    let token = await getClientCredentialsToken()
+    //Get dataset details to connect to cachedb
+    let portalApi = new PortalAPI(token)
+    let datasetDetails = await portalApi.getDatasetById(datasetId)
+    //Connect to cachedb of the incoming dataset
+    let conn = await getCachedbDbConnections(token, datasetDetails.databaseCode, datasetDetails.schemaName, datasetDetails.vocabSchemaName)
+    return await getFhirData(conn, query)
+}
 
 // //Test
 // export const updateResource = async(clientId, projectId, botId) => {

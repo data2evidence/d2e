@@ -1,4 +1,4 @@
-import { createProject, createResourceInProject, ingestResourceInCacheDB } from './services';
+import { createProject, createResourceInProject, getResource, ingestResourceInCacheDB } from './services';
 import express from 'npm:express'
 export class FhirRouter {
   public router = express.Router();
@@ -56,21 +56,21 @@ export class FhirRouter {
     //Need the following for testing
     //Test
     //Endpoint to ingest data into fhir data model in cachedb
-    // this.router.post('/getResource/:resource/:datasetId', async(req, res) =>{
-    //   try{
-    //     this.logger.info('Ingest into FHIR Data model')
-    //     let resource = req.params.resource
-    //     let datasetId = req.params.datasetId
-    //     const response = await getResource(resource, datasetId)
-    //     if(response)
-    //       return res.status(200).json(response)
-    //     else
-    //     return res.status(500).json('Failed to ingest FHIR Resource')
-    //   }catch(error){
-    //     this.logger.error(`Error ingesting resource in cachedb:  ${JSON.stringify(error)}`)
-    //     res.status(500).send('Error ingesting resource')
-    //   }
-    // })
+    this.router.post('/getResource/:datasetId', async(req, res) =>{
+      try{
+        this.logger.info('Execute query on FHIR')
+        let query = req.body.query
+        let datasetId = req.params.datasetId
+        const response = await getResource(datasetId, query)
+        if(response)
+          return res.status(200).json(response)
+        else
+        return res.status(500).json('Failed to ingest FHIR Resource')
+      }catch(error){
+        this.logger.error(`Error executing query:  ${JSON.stringify(error)}`)
+        res.status(500).send('Error executing query')
+      }
+    })
 
     //Test
   //   this.router.post('/update/:resource', async(req, res) => {

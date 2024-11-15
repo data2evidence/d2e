@@ -1,6 +1,8 @@
 import moment from 'moment'
 import { env } from '../env';
 import { ConnectionInterface } from '@alp/alp-base-utils/target/src/Connection';
+import { QuestionnaireResponse, QuestionnaireResponseItem, QuestionnaireResponseItemAnswer } from '@medplum/fhirtypes';
+import { v4 as uuidv4 } from 'npm:uuid'
 
 const schemaPath = env.FHIR_SCHEMA_PATH + '/' + env.FHIR_SCHEMA_FILE_NAME 
 
@@ -17,17 +19,17 @@ export async function getFhirJsonSchema(conn:ConnectionInterface){
 }
 
 //Test
-// export async function getFhirData(conn:ConnectionInterface, fhirResource){
-//     return new Promise((resolve, reject) => {
-//         conn.executeQuery(`select * from ${fhirResource}Fhir`, [], (err: any, result: any) => {
-//             if(err){
-//                 console.log('Error loading fhir schema json: '+ JSON.stringify(err))
-//                 reject(err)
-//             }
-//             resolve(result)
-//         })
-//     })
-// }
+export async function getFhirData(conn:ConnectionInterface, query){
+    return new Promise((resolve, reject) => {
+        conn.executeQuery(query, [], (err: any, result: any) => {
+            if(err){
+                console.log('Error executing query: '+ JSON.stringify(err))
+                reject(err)
+            }
+            resolve(result)
+        })
+    })
+}
 
 export async function ingestResourceInFhir(conn, schemaName, jsonSchema, data, requestType){
     return new Promise(async (resolve, reject) => {
@@ -386,6 +388,94 @@ function updateResourceStatus(conn:ConnectionInterface, schemaName, fhirResource
                 reject(err)
             }
             resolve(result)
+        })
+    })
+}
+
+export async function ingestQRResourceInCacheDB(conn, schemaName, data): Promise<any> {
+    const questionnaireResponse = data as QuestionnaireResponse;
+    let query = `insert into gdm_questionnaire_response ("id", "person_id", "etl_source_table", "etl_source_table_record_id", "etl_source_table_record_created_at", "etl_session_id", "etl_started_at") values('${questionnaireResponse.id}', 0, 'XYZ', 789, '2024-07-23', 'avsade', now())`;
+    await executeQuery(conn, query)
+    if(questionnaireResponse.item.length > 0){
+      await handleItems(questionnaireResponse.item, questionnaireResponse.id, conn, schemaName)
+      console.log('Items inserted successfully!')
+    }
+    console.log('FHIR QuestionnaireResponse resource successfully inserted into OMOP GDM tables')
+    return true
+}
+  
+async function handleItems(items: QuestionnaireResponseItem[], questionnaireResponseId: string, conn: ConnectionInterface, schemaName: string) {
+    for(var item of items){
+        let itemId = uuidv4();
+        let query = `insert into ${schemaName}.gdm_item ("id", "gdm_questionnaire_response_id", "link_id", "text", "definition", "etl_started_at") values('${itemId}', '${questionnaireResponseId}', '${item.linkId}', '${item.text}', '${item.definition}', now())`
+        await executeQuery(conn, query)
+        if(item.answer && item.answer.length > 0){
+            await handleAnswers(item.answer, itemId, conn, schemaName)
+            console.log('Answers inserted successfully!')
+        }
+        if(item.item && item.item.length > 0){
+            await handleItems(item.item, questionnaireResponseId, conn, schemaName)
+        }
+    }
+    return
+}
+  
+async function handleAnswers(answers: QuestionnaireResponseItemAnswer[], itemId: string, conn: ConnectionInterface, schemaName: string) {
+    for(var answer of answers){
+        let answerValue = ""
+        let answerType = ""
+        let answerId = uuidv4();
+        if(answer.valueBoolean){
+            answerValue = answer.valueBoolean.toString()
+            answerType = "valueBoolean"
+        } else if(answer.valueDecimal){
+            answerValue = answer.valueDecimal.toString()
+            answerType = "valueDecimal"
+        } else if (answer.valueInteger){
+            answerValue = answer.valueInteger.toString()
+            answerType = "valueInteger"
+        }else if(answer.valueDate){
+            answerValue = answer.valueDate.toString()
+            answerType = "valueDate"
+        } else if(answer.valueDateTime){
+            answerValue = answer.valueDateTime.toString()
+            answerType = "valueDateTime"
+        } else if(answer.valueTime){
+            answerValue = answer.valueTime.toString()
+            answerType = "valueTime"
+        } else if(answer.valueString != ""){
+            answerValue = answer.valueString
+            answerType = "valueString"
+        } else if(answer.valueUri != ""){
+            answerValue = answer.valueUri
+            answerType = "valueUri"
+        } else if(answer.valueAttachment !== undefined && answer.valueAttachment.contentType != ""){
+            answerType = "valueAttachment"
+        } else if(answer.valueCoding !== undefined && answer.valueCoding.code != ""){
+            answerType = "valueCoding"
+        }else if(answer.valueQuantity !== undefined && answer.valueQuantity?.value){
+            answerType = "valueQuantity"
+        }
+        else{
+            answerType = "valueReference"
+        }
+        let query = `INSERT INTO ${schemaName}.gdm_answer
+            (id, gdm_item_id, value_type, value, valueattachment_contenttype, valueattachment_language, valueattachment_data, valueattachment_url, valueattachment_size, valueattachment_hash, valueattachment_title, valueattachment_creation, valuecoding_system, valuecoding_version, valuecoding_code, valuecoding_display, valuecoding_userselected, valuequantity_value, valuequantity_comparator, valuequantity_unit, valuequantity_system, valuequantity_code, valuereference_reference, valuereference_type, valuereference_identifier, valuereference_display, etl_started_at)
+            VALUES('${answerId}', '${itemId}', '${answerType}', '${answerValue}', '${answer.valueAttachment!== undefined?answer.valueAttachment.contentType: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.language:''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.data: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.url: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.size: ''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.hash:''}', '${answer.valueAttachment!== undefined?answer.valueAttachment.title:''}','${answer.valueAttachment!== undefined?answer.valueAttachment.creation:'1900-01-01 00:00:00'}', '${answer.valueCoding!== undefined?answer.valueCoding.system:''}', '${answer.valueCoding!== undefined?answer.valueCoding.version:''}', '${answer.valueCoding!== undefined?answer.valueCoding.code:''}', '${answer.valueCoding!== undefined?answer.valueCoding.display:''}', '${answer.valueCoding!== undefined?answer.valueCoding.userSelected:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.value: ''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.comparator:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.unit:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.system:''}', '${answer.valueQuantity!== undefined?answer.valueQuantity.code:''}', '${answer.valueReference!== undefined?answer.valueReference.reference:''}', '${answer.valueReference!== undefined?answer.valueReference.type:''}', '${answer.valueReference!== undefined?answer.valueReference.identifier:''}', '${answer.valueReference!== undefined?answer.valueReference.display:''}', now())`
+
+        await executeQuery(conn, query)
+    }
+    return
+}
+
+async function executeQuery(conn: ConnectionInterface, query: string) {
+    return new Promise((resolve, reject) => {
+        conn.executeQuery(query, [], (err: any, result: any) => {
+            if(err){
+                console.log('Error executing query: '+ JSON.stringify(err))
+                reject(err)
+            }
+            resolve(result[0])
         })
     })
 }
