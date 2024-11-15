@@ -1,6 +1,6 @@
 import pg from "npm:pg";
 
-export class PrefectFlowService {
+export class DataModelFlowService {
   private env = Deno.env.toObject();
   private opt = {
     user: this.env.PG_USER,
@@ -18,7 +18,7 @@ export class PrefectFlowService {
     await this.pgclient.connect();
   }
 
-  public async getDatamodels() {
+  public async getDataModels() {
     const plugins = await this.pgclient.query(
       `SELECT payload::JSON FROM trex.plugins WHERE "name" = 'd2e-plugins';`
     );

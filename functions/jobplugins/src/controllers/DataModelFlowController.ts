@@ -1,15 +1,15 @@
 import { Request, Response, Router } from "npm:express";
 import { validationResult } from "npm:express-validator";
-import { PrefectFlowService } from "../services/PrefectFlowService.ts";
+import { DataModelFlowService } from "../services/DataModelFlowService.ts";
 
-export class PrefectFlowController {
-  private prefectFlowService: PrefectFlowService;
+export class DataModelFlowController {
+  private DataModelFlowService: DataModelFlowService;
   public router = Router();
 
   constructor() {
     this.registerRoutes();
-    this.prefectFlowService = new PrefectFlowService();
-    this.prefectFlowService.initialize();
+    this.DataModelFlowService = new DataModelFlowService();
+    this.DataModelFlowService.initialize();
   }
 
   private registerRoutes() {
@@ -21,14 +21,14 @@ export class PrefectFlowController {
         if (!errors.isEmpty()) {
           res.status(400).json({ errors: errors.array() });
         }
-        await this.getDatamodels(req, res);
+        await this.getDataModels(req, res);
       }
     );
   }
 
-  private async getDatamodels(req: Request, res: Response) {
+  private async getDataModels(req: Request, res: Response) {
     try {
-      const result = await this.prefectFlowService.getDatamodels();
+      const result = await this.DataModelFlowService.getDataModels();
       res.send(result);
     } catch (error) {
       console.error(`Error getting datamodels: ${error}`);

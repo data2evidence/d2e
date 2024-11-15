@@ -3,10 +3,10 @@ import pg from "npm:pg";
 import { CohortController } from "./src/controllers/CohortController.ts";
 import { CohortSurvivalController } from "./src/controllers/CohortSurvivalController.ts";
 import { DataCharacterizationController } from "./src/controllers/DataCharacterizationController.ts";
+import { DataModelFlowController } from "./src/controllers/DataModelFlowController.ts";
 import { DbSvcController } from "./src/controllers/DbSvcController.ts";
 import { DqdController } from "./src/controllers/DqdController.ts";
 import { MeilisearchController } from "./src/controllers/MeilisearchController.ts";
-import { PrefectFlowController } from "./src/controllers/PrefectFlowController.ts";
 
 const app = express();
 const env = Deno.env.toObject();
@@ -21,7 +21,7 @@ app.use(
   "/jobplugins/dqd/data-characterization",
   new DataCharacterizationController().router
 );
-app.use("/jobplugins/prefect", new PrefectFlowController().router);
+app.use("/jobplugins/prefect", new DataModelFlowController().router);
 
 const opt = {
   user: env.PG_USER,
