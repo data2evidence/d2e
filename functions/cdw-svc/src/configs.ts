@@ -18,8 +18,8 @@ const Env = z
       .refine((val) => !isNaN(parseInt(val)))
       .transform(Number),
 
-    TLS__INTERNAL__KEY: z.string(),
-    TLS__INTERNAL__CRT: z.string(),
+    TLS__INTERNAL__KEY: z.string().optional(),
+    TLS__INTERNAL__CRT: z.string().optional(),
     DUCKDB_PATH: z.string(),
     BUILT_IN_DUCKDB_PATH: z.string(),
 
@@ -58,11 +58,11 @@ const Env = z
     ) => {
       //Validate for non-prod scenarios
       if (LOCAL_DEBUG.toLowerCase() === "true") {
-        const addError = (env) => {
+        const addError = (envVariable) => {
           refinementContext.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `No value for ${env}`,
-            path: [env],
+            message: `No value for ${envVariable}`,
+            path: [envVariable],
           });
         };
 
@@ -75,20 +75,16 @@ const Env = z
   );
 
 let _env = Deno.env.toObject();
-_env.PG_SCHEMA = _env.PG_SCHEMA || 'cdw_config';
-
+_env.PG_SCHEMA = _env.PG_SCHEMA || "cdw_config";
 
 const result = Env.safeParse(_env);
 
-let env: z.infer<typeof Env>;
-if (result.success) {
-  env = result.data;
-} else {
+if (!result.success) {
   console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
-  process.exit(1);
+  throw new Error("ZOD parse failed");
 }
 
-env = _env as unknown as z.infer<typeof Env>;
-const envVarUtils = new EnvVarUtils(_env);
+let env = _env as unknown as z.infer<typeof Env>;
+const envVarUtils = new EnvVarUtils(env);
 
 export { env, envVarUtils };

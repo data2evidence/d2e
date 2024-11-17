@@ -1,7 +1,7 @@
 
 import { CreateBinaryOptions, MedplumClient, MedplumRequestOptions, OperationOutcomeError } from '@medplum/core'
 import { Resource, Attachment, Bot, Subscription, Project, ResourceType } from '@medplum/fhirtypes'
-import { env } from '../env.ts'
+import { env, services } from '../env.ts'
 import { createLogger } from '../logger.ts'
 
 export class FhirAPI {
@@ -19,7 +19,7 @@ export class FhirAPI {
             throw new Error('No client credentials are set for Fhir')
         }
         this.medplumClient = new MedplumClient({
-            baseUrl: env.SERVICE_ROUTES.fhir.replace('/fhir/R4', '/'),
+            baseUrl: services.fhir.replace('/fhir/R4', '/'),
             clientId: this.clientId,
             clientSecret: this.clientSecret
         })
