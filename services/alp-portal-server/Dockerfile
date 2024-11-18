@@ -39,7 +39,7 @@ USER node
 FROM $IMAGE AS production
 
 RUN apk update && apk add busybox=1.36.1-r19 \
-    openssl=3.1.7-r0
+    openssl>3
 
 RUN rm -rf /usr/local/lib/node_modules/npm
 
