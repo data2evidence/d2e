@@ -167,7 +167,8 @@ export async function createCohort(req: IMRIRequest, res: Response) {
     try {
         const datasetId = req.body.datasetId;
         const analyticsConnection = await getCohortAnalyticsConnection(req);
-        const { schemaName, databaseCode, vocabSchemaName } = await getStudyDetails(datasetId, res);
+        const { schemaName, databaseCode, vocabSchemaName } =
+            await getStudyDetails(datasetId, res);
         const language = getUser(req).lang;
         const requestQuery: string[] | undefined = req.body?.query?.split(",");
         // Remap mriquery for use in createEndpointFromRequest
@@ -291,7 +292,7 @@ export async function generateCohortDefinition(
 
         const mriConfig = await mriConfigConnection.getStudyConfig(
             {
-                req,    
+                req,
                 action: "getBackendConfig",
                 configId: cohortDefinition.configData.configId,
                 configVersion: cohortDefinition.configData.configVersion,
@@ -390,7 +391,7 @@ export async function deleteCohort(req: IMRIRequest, res: Response) {
 async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
     try {
         // Extract mriquery and use pluginEndpoint.retrieveData to get patient list
-        let mriquery = req.body.cohort.mriquery;
+        let mriquery = req.body.mriquery;
         const { cohortDefinition, datasetId, pluginEndpoint } =
             await createEndpointFromRequest(req);
         pluginEndpoint.setRequest(req);

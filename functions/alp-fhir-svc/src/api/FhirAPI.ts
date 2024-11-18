@@ -1,7 +1,6 @@
 
-import { CreateBinaryOptions, MedplumClient, MedplumRequestOptions, OperationOutcomeError } from '@medplum/core'
-import { Resource, Attachment, Bot, Subscription, Project, ClientApplication, ProjectMembership } from '@medplum/fhirtypes'
-import { env } from '../env.ts'
+import { MedplumClient } from '@medplum/core'
+import { env, services } from '../env.ts'
 import { createLogger } from '../logger.ts'
 
 export class FhirAPI {
@@ -15,7 +14,7 @@ export class FhirAPI {
         if (env.FHIR__CLIENT_ID && env.FHIR__CLIENT_SECRET) {
             this.clientId = env.FHIR__CLIENT_ID
             this.clientSecret = env.FHIR__CLIENT_SECRET
-            this.baseUrl = env.SERVICE_ROUTES.fhir
+            this.baseUrl = services.fhir
         } else {
             this.logger.error('No client credentials are set for Fhir')
             throw new Error('No client credentials are set for Fhir')
@@ -41,7 +40,15 @@ export class FhirAPI {
        return await this.medplumClient.post(this.baseUrl + '/' + resourceType, body, contentType, options)
     }
 
-    async getResource(searchResource, query: string){
+    async getOneResource(searchResource, query: string){
         return await this.medplumClient.searchOne(searchResource, query=query)
+    }
+
+    async updateResource(options){
+        return await this.medplumClient.updateResource(options)
+    }
+
+    async searchResource(searchResource, query: string){
+        return await this.medplumClient.search(searchResource, query=query)
     }
 }

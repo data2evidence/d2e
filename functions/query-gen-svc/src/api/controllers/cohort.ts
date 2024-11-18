@@ -9,7 +9,6 @@ import * as utilsLib from "@alp/alp-base-utils";
 import { bookmarkToIFRBackend } from "../../utils/formatter/BookmarkFormatter";
 import { updateIfrWithConcepts } from "../../utils/formatter/ConceptSetToConceptConverter";
 
-
 const log = utilsLib.Logger.CreateLogger("query-gen-log");
 const { utils } = utilsLib;
 
@@ -80,7 +79,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
         const ifrWithConceptSetConcepts = await updateIfrWithConcepts(
             config,
             ifrRequest,
-            studyId,
+            datasetId,
             req.headers.authorization
         );
 
@@ -95,7 +94,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
         ).generateQuery();
 
         let queryString;
-        if(config.panelOptions.cohortEntryExit) {
+        if (config.panelOptions.cohortEntryExit) {
             queryString = `
                 INSERT
                     INTO
@@ -151,7 +150,6 @@ export async function generateQuery(req: IMRIRequest, res, next) {
                     obsdata ON cohortdata.SUBJECT_ID = obsdata.PATIENT_ID;
                 `;
         }
-        
         const response = {
             queryObject: {
                 queryString,

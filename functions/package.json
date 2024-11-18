@@ -122,7 +122,13 @@
           "env": "mri-pa-config"
         },
         {
-          "source": "/hc/hph/cdw",
+          "source": "/hc/hph/cdw/services",
+          "function": "/cdw-svc",
+          "imports": "/cdw-svc/import.json",
+          "env": "cdw-svc"
+        },
+        {
+          "source": "/hc/hph/cdw/config/services",
           "function": "/cdw-svc",
           "imports": "/cdw-svc/import.json",
           "env": "cdw-svc"
@@ -395,7 +401,8 @@
           "portal.dataset.read",
           "meilisearchSvc.index.add",
           "meilisearchSvc.index.setting.update",
-          "meilisearchSvc.document.add"
+          "meilisearchSvc.document.add",
+          "gateway.fhir.create"
         ]
       },
       "scopes": [
