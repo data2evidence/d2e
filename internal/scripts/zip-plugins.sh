@@ -16,6 +16,7 @@ GIT_BRANCH_NAME=$(git symbolic-ref --short HEAD 2> /dev/null)
 echo GIT_BRANCH_NAME=$GIT_BRANCH_NAME
 
 BASE_DIR=$PWD
+rm $ZIPFILE_DIR/*.zip
 for PLUGIN_PACKAGE_NAME in $(find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d ! -name ".*" -exec basename {} \;); do
   cd $BASE_DIR/$PLUGIN_PACKAGE_NAME
   ZIPFILE=$ZIPFILE_DIR/$PLUGIN_PACKAGE_NAME.zip

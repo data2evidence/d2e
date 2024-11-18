@@ -13,6 +13,13 @@ DOTENV_KEYS_OUT=.env.local.keys
 DOTENV_YML_IN=$GIT_BASE_DIR/.env.$ENV_NAME.yml
 GIT_BASE_DIR=$(git rev-parse --show-toplevel)
 
+# functions
+function count {
+	cat $DOTENV_FILE_OUT | grep = | awk -F= '{print $1}' | grep _ | sort -u > $DOTENV_KEYS_OUT
+	wc -l $DOTENV_FILE_OUT $DOTENV_KEYS_OUT | sed '$d'
+	echo
+}
+
 # action
 cd $GIT_BASE_DIR
 
@@ -44,12 +51,13 @@ echo POSTGRES_TENANT_READ_PASSWORD_SALT=$POSTGRES_TENANT_READ_PASSWORD_SALT >> $
 echo POSTGRES_TENANT_READ_PASSWORD=$POSTGRES_TENANT_READ_PASSWORD >> $DOTENV_FILE_OUT
 echo SQL_RETURN_ON=true >> $DOTENV_FILE_OUT
 echo TLS__CADDY_DIRECTIVE=\'tls internal\' >> $DOTENV_FILE_OUT
+count
 
-# add non-randomized
-cat $DOTENV_YML_IN | yq -o sh 'with_entries(select(.key|test("CADDY__ALP__PUBLIC_FQDN|DATABASE_CREDENTIALS|GH_TOKEN|GIT_TOKEN__PLUGINS_REPO_READ|HANA__CRT|HANA__HOSTNAME|HANA__TENANT_ADMIN_PASSWORD|HANA__TENANT_ADMIN_PASSWORD_SALT|HANA__TENANT_READ_PASSWORD|HANA__TENANT_READ_PASSWORD_SALT|DICOM__HEALTH_CHECK_PASSWORD")))' >> $DOTENV_FILE_OUT
-# todo: remove DICOM__HEALTH_CHECK_PASSWORD upon new release candidate version, DICOM__HEALTH_CHECK_PASSWORD already removed from develop
+echo ". INFO add non-randomized - internal"
+set -a && source $DOTENV_FILE_OUT && set +a # export vars for envsubst
+cat $DOTENV_YML_IN | yq -o sh 'with_entries(select(.key|test("CADDY__ALP__PUBLIC_FQDN|DATABASE_CREDENTIALS|GH_TOKEN|GIT_TOKEN__PLUGINS_REPO_READ|HANA__CRT|HANA__HOSTNAME|HANA__TENANT_ADMIN_PASSWORD|HANA__TENANT_ADMIN_PASSWORD_SALT|HANA__TENANT_READ_PASSWORD|HANA__TENANT_READ_PASSWORD_SALT|DICOM__HEALTH_CHECK_PASSWORD")))' | envsubst >> $DOTENV_FILE_OUT
+# todo: remove DICOM__HEALTH_CHECK_PASSWORD upon new release candidate version. it has already removed from develop
+# cat $DOTENV_YML_IN | yq 'with_entries(select(.key|test("CADDY__ALP__PUBLIC_FQDN|DATABASE_CREDENTIALS|GH_TOKEN|GIT_TOKEN__PLUGINS_REPO_READ|HANA__CRT|HANA__HOSTNAME|HANA__TENANT_ADMIN_PASSWORD|HANA__TENANT_ADMIN_PASSWORD_SALT|HANA__TENANT_READ_PASSWORD|HANA__TENANT_READ_PASSWORD_SALT|DICOM__HEALTH_CHECK_PASSWORD")))' | yq '.DATABASE_CREDENTIALS' | yq '.[1].values.credentials.adminPassword' | envsubst # test
 
-# finalize
-cat $DOTENV_FILE_OUT | grep = | awk -F= '{print $1}' | grep _ | sort -u > $DOTENV_KEYS_OUT
-wc -l $DOTENV_FILE_OUT $DOTENV_KEYS_OUT | sed '$d'
+count
 echo

@@ -6,3 +6,7 @@ function random-password {
     PASSWORD_LENGTH=${1}
     LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c ${PASSWORD_LENGTH}
 }
+
+function random-uuid {
+    uuidgen | tr 'A-Z' 'a-z' | tr -d '\n'
+}

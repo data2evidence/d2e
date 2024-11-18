@@ -13,14 +13,10 @@ ENV_TYPE=${ENV_TYPE:-local}
 # vars
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 DOTENV_PATH=$GIT_BASE_DIR/.env.$ENV_TYPE
-ls $DOTENV_PATH
 
-if [ -f $DOTENV_PATH ]; then
-	source $DOTENV_PATH
-else
-	echo "FATAL $DOTENV_PATH not found"
-	exit 1
-fi
+# action
+[ ! -f $DOTENV_PATH ] && echo "FATAL $DOTENV_PATH not found" && exit 1
+source $DOTENV_PATH
 
 [ -z "${POSTGRES_TENANT_READ_PASSWORD_PLAIN}" ] && echo "FATAL POSTGRES_TENANT_READ_PASSWORD_PLAIN not set" && exit 1
 [ -z "${POSTGRES_TENANT_ADMIN_PASSWORD_PLAIN}" ] && echo "FATAL POSTGRES_TENANT_ADMIN_PASSWORD_PLAIN not set" && exit 1

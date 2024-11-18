@@ -39,7 +39,8 @@ merge-yml ${DOTENV_YMLS_IN[@]} | sed '/^# .env/ d' >> $DOTENV_YML_OUT
 
 # echo . INFO generalize DATABASE_CREDENTIALS to reference env-var
 DATABASE_CREDENTIALS="$(cat $DOTENV_YML_OUT | yq .DATABASE_CREDENTIALS)"
-if [ ${DATABASE_CREDENTIALS} = null ] || [ "${DATABASE_CREDENTIALS}" = '[]' ]; then
+
+if [ "${DATABASE_CREDENTIALS}" = null ] || [ "${DATABASE_CREDENTIALS}" = '[]' ]; then
     echo "INFO DATABASE_CREDENTIALS empty"
     sed -i.bak "/DATABASE_CREDENTIALS/ s/\[\]/'\[\]'/" $DOTENV_YML_OUT
 else

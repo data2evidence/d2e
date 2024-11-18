@@ -24,9 +24,8 @@ touch ${DOTENV_FILE_OUT}
 CONTAINER_CRT_DIR=/data/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
 CONTAINER_CA_DIR=/data/caddy/pki/authorities/$TLS_CA_NAME
 
-cd $GIT_BASE_DIR
-
 # action
+cd $GIT_BASE_DIR
 if [ ${TLS_REGENERATE} = true ]; then
 	echo ". TLS_REGENERATE remove existing"
 	docker volume inspect $VOLUME_NAME > /dev/null && docker run --rm -v $VOLUME_NAME:/volume -w /volume busybox rm -rf /volume/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
@@ -38,7 +37,7 @@ docker run -d -v $VOLUME_NAME:/data -v ./deploy/caddy-config:/srv/caddy-config -
 sleep 5
 
 # remove existing certs from dotenv
-for VAR_NAME in TLS__INTERNAL__CA_CRT TLS__INTERNAL__CRT TLS__INTERNAL__KEY; do sed -i.bak "/$VAR_NAME=/,/END CERTIFICATE-----'/d" $DOTENV_FILE_OUT; done
+for VAR_NAME in TLS__INTERNAL__CA_CRT TLS__INTERNAL__CRT TLS__INTERNAL__KEY; do sed -E -i.bak "/$VAR_NAME=/,/-----'/d" $DOTENV_FILE_OUT; done
 
 # add certs from caddy to dotenv
 TLS__INTERNAL__CA_CRT_FILE=tls__internal__ca.crt
