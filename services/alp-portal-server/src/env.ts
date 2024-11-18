@@ -7,7 +7,7 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV,
   PORT: parseInt(process.env.PORTAL_SERVER__PORT) || 3000,
   PORTAL_SERVER_LOG_LEVEL: (process.env.PORTAL_SERVER__LOG_LEVEL as LoggingLevel) || 'info',
-  PORTAL_API_URL: process.env.PORTAL__API_URL,
+  TREX_API_URL: process.env.TREX__API_URL,
   APP_DEPLOY_MODE: process.env.APP__DEPLOY_MODE,
 
   MINIO_REGION: process.env.MINIO__REGION,
@@ -32,7 +32,6 @@ export const env = {
   TENANT_ID: process.env.APP__TENANT_ID,
   TENANT_NAME: process.env.APP__TENANT_NAME,
   SYSTEM_NAME: process.env.ALP__SYSTEM_NAME,
-  PORTAL_PLUGINS: process.env.PLUGINS__JSON,
 
   SSL_PRIVATE_KEY: process.env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
   SSL_PUBLIC_CERT: process.env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
