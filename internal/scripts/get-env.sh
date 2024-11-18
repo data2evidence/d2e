@@ -15,8 +15,8 @@ OVERWRITE=${OVERWRITE:-false}
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 DOTENV_NAME=.env.$ENV_NAME.yml
 DOTENV_PATH=$GIT_BASE_DIR/$DOTENV_NAME
-CACHE_PATH=$GIT_BASE_DIR/cache/op
-CACHE_DOTENV_PATH=$CACHE_PATH/$DOTENV_NAME
+CACHE_DIR=$GIT_BASE_DIR/cache/op
+CACHE_DOTENV_PATH=$CACHE_DIR/$DOTENV_NAME
 
 # get latest for comparison
 op read --no-newline op://$OP_VAULT_NAME/$DOTENV_NAME/notesPlain --out-file $CACHE_DOTENV_PATH --force | sed -e "s#$GIT_BASE_DIR/##g"

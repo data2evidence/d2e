@@ -8,6 +8,8 @@ echo ${0} ...
 ENV_NAME=${ENV_NAME:-local}
 ENV_TYPE=${ENV_TYPE:-local}
 
+[ $ENV_TYPE != local ] && [ $ENV_TYPE != remote ] && echo FATAL: ENV_TYPE=local|remote && exit 1
+
 # vars
 GIT_BASE_DIR=$(git rev-parse --show-toplevel)
 
@@ -24,8 +26,7 @@ cd $GIT_BASE_DIR
 [ ! -e $DOTENV_YAML_IN_PRIVATE ] && touch $DOTENV_YAML_IN_PRIVATE
 
 # export vars for envsubst
-yq -o shell $DOTENV_YAML_IN > .env.tmp; set -a; source .env.tmp; set +a
-rm .env.tmp
+yq -o shell $DOTENV_YAML_IN > .env.tmp && set -a && source .env.tmp && set +a && rm .env.tmp
 
 # functions
 function merge-yml () {
@@ -37,6 +38,7 @@ function merge-yml () {
 echo "# ${DOTENV_FILE_OUT##*/} $ENV_NAME" > $DOTENV_FILE_OUT
 [ ! -z ${GITHUB_REPOSITORY+x} ] && echo "# https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $DOTENV_FILE_OUT
 merge-yml $DOTENV_YAML_IN $DOTENV_YAML_IN_PRIVATE | yq -o sh | envsubst >> $DOTENV_FILE_OUT
+
 cat $DOTENV_YAML_IN | yq 'keys | .[]' | sort > $DOTENV_YAML_IN.keys
 cat $DOTENV_YAML_IN_PRIVATE | yq 'keys | .[]' 2> /dev/null | sort > $DOTENV_YAML_IN_PRIVATE.keys
 cat $DOTENV_YAML_IN  | yq 'keys | .[]' | sort > $DOTENV_KEYS_OUT
