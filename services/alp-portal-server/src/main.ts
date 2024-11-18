@@ -8,12 +8,12 @@ import { useContainer } from 'class-validator'
 import * as express from 'express'
 import { ExpressAdapter } from '@nestjs/platform-express'
 import * as http from 'http'
-import * as https from 'https'
+// import * as https from 'https'
 
-const httpsOptions = {
-  key: env.SSL_PRIVATE_KEY,
-  cert: env.SSL_PUBLIC_CERT
-}
+// const httpsOptions = {
+//   key: env.SSL_PRIVATE_KEY,
+//   cert: env.SSL_PUBLIC_CERT
+// }
 
 async function bootstrap() {
   const server = express()
