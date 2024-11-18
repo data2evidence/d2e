@@ -41,6 +41,7 @@ FROM $IMAGE AS production
 
 RUN apk update && apk add busybox=1.36.1-r19
 RUN apk add openssl>3
+
 RUN rm -rf /usr/local/lib/node_modules/npm
 
 RUN addgroup -S alp -g 3000 && adduser --uid 3000 -S docker -G alp
