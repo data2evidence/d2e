@@ -27,7 +27,38 @@ unzip -o -d . "${ZIP_FILE}"
 rm CONCEPT_CPT4.csv
 ```
 
-## Confirm Line Count Before Ingestion
+## Confirm Line Count Before Transformation
+- Run command to output line count for each CSV file 
+```
+wc -l *.csv | sort -nr
+```
+- Output should be:
+```
+  130981848 total
+  72754470 CONCEPT_ANCESTOR.csv
+  47212425 CONCEPT_RELATIONSHIP.csv
+   5975393 CONCEPT.csv
+   2980116 DRUG_STRENGTH.csv
+   2058224 CONCEPT_SYNONYM.csv
+       691 RELATIONSHIP.csv
+       418 CONCEPT_CLASS.csv
+        60 VOCABULARY.csv
+        51 DOMAIN.csv
+```
+- Note that unzipped CSV file from Athena contains an extra new line that is empty.
+
+## Transform csv files to expected format
+- Escape existing double quotes
+- Add double quotes around each value
+- This transformation is done in case there is a literal string character e.g. `\t` or `\n` in the value.
+- Enclosing the values in double quotes would prevent interpretation as a tab or newline.
+- Move files to a folder named `transformed`
+```
+mkdir transformed
+for CSV_FILE in *.csv; do sed "s/\"/\"\"/g;s/\t/\"\t\"/g;s/\(.*\)/\"\1\"/" $CSV_FILE >> ./transformed/$CSV_FILE; done
+```
+
+## Confirm Line Count of Transformed CSVs before ingestion
 - Run command to output line count for each CSV file 
 ```bash
 wc -l *.csv | sort
