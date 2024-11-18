@@ -1,37 +1,37 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common'
+import { REQUEST } from '@nestjs/core'
+import { existsSync, mkdirSync, readFileSync, rmdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import { mkdirSync, readFileSync, rmdirSync, writeFileSync, existsSync } from 'fs'
-import { PrefectAPI } from './prefect.api'
-import { DataflowService } from '../dataflow/dataflow.service'
+import { DataCharacterizationFlowRunDto } from 'src/data-characterization/dto'
 import { AnalysisflowService } from '../analysis-flow/analysis-flow.service'
-import { PrefectParamsTransformer } from './prefect-params.transformer'
-import { PrefectAnalysisParamsTransformer } from './prefect-analysis-params.transformer'
-import {
-  IPrefectAdhocFlowDto,
-  IPrefectFlowRunByDeploymentDto,
-  ITestDataflowDto,
-  IPrefectFlowRunByMetadataDto,
-  IPluginUploadStatusDetail,
-  IPluginUploadStatusDto
-} from '../types'
-import { PrefectExecutionClient } from './prefect-execution.client'
-import { env } from '../env'
-import { createLogger } from '../logger'
 import {
   FLOW_METADATA,
   FLOW_METADATA_FOLDER_PATH,
   FLOW_METADATA_JSON_FILENAME,
-  PREFECT_ADHOC_FLOW_FOLDER_PATH,
   PluginUploadStatus,
   PluginUploadStatusText,
-  PrefectDeploymentPythonFiles
+  PrefectDeploymentPythonFiles,
+  PREFECT_ADHOC_FLOW_FOLDER_PATH
 } from '../common/const'
-import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
+import { DataCharacterizationService } from '../data-characterization/data-characterization.service'
 import { DataQualityService } from '../data-quality/data-quality.service'
 import { DataQualityFlowRunDto } from '../data-quality/dto'
-import { DataCharacterizationService } from '../data-characterization/data-characterization.service'
-import { DataCharacterizationFlowRunDto } from 'src/data-characterization/dto'
-import { REQUEST } from '@nestjs/core'
+import { DataflowService } from '../dataflow/dataflow.service'
+import { env } from '../env'
+import { createLogger } from '../logger'
+import { PrefectFlowService } from '../prefect-flow/prefect-flow.service'
+import {
+  IPluginUploadStatusDetail,
+  IPluginUploadStatusDto,
+  IPrefectAdhocFlowDto,
+  IPrefectFlowRunByDeploymentDto,
+  IPrefectFlowRunByMetadataDto,
+  ITestDataflowDto
+} from '../types'
+import { PrefectAnalysisParamsTransformer } from './prefect-analysis-params.transformer'
+import { PrefectExecutionClient } from './prefect-execution.client'
+import { PrefectParamsTransformer } from './prefect-params.transformer'
+import { PrefectAPI } from './prefect.api'
 
 @Injectable()
 export class PrefectService {
@@ -205,10 +205,6 @@ export class PrefectService {
       if (defaultPluginId) {
         await this.prefectFlowService.updateDefaultPluginStatus(defaultPluginId, PluginUploadStatus.INSTALLING)
       }
-      // create python virtual environment with exisiting dependencies
-      const dependencyScriptPath = join(deploymentFolderPath, PrefectDeploymentPythonFiles['SCRIPT'])
-      writeFileSync(dependencyScriptPath, this.prefectExecutionClient.createInstallDependenciesScript())
-      await this.prefectExecutionClient.executeCreateVirtualEnvironment(userId, modifiedFileStem)
 
       // install pip package
       const pipInstallPath = join(deploymentFolderPath, PrefectDeploymentPythonFiles['PIP_INSTALL'])
