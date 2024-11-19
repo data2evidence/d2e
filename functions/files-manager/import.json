@@ -1,0 +1,12 @@
+{
+    "imports": {
+        "express": "npm:express@^4.19.2",
+        "reflect-metadata": "npm:reflect-metadata@^0.2.2",
+        "typedi": "npm:typedi@^0.10.0",
+        "class-validator": "npm:class-validator@^0.14.0",
+        "path": "node:path",
+        "./src/main": "./src/main.ts",
+        "./src/routes": "./src/routes.ts",
+        "./src/files-manager/files-manager.router": "./src/files-manager/files-manager.router.ts"
+    }
+}
