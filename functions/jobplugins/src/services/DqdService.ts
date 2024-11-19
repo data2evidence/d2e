@@ -7,7 +7,7 @@ import {
   IDataQualityResult,
   IDomainContinuityResult,
 } from "../types.d.ts";
-import { DataQualityOverviewParser } from "../utils/dataQualityOverviewParser.ts";
+import { DataQualityOverviewParser } from "../utils/DataQualityOverviewParser.ts";
 
 export class DqdService {
   private dataQualityOverviewParser = new DataQualityOverviewParser();

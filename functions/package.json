@@ -122,7 +122,13 @@
           "env": "mri-pa-config"
         },
         {
-          "source": "/hc/hph/cdw",
+          "source": "/hc/hph/cdw/services",
+          "function": "/cdw-svc",
+          "imports": "/cdw-svc/import.json",
+          "env": "cdw-svc"
+        },
+        {
+          "source": "/hc/hph/cdw/config/services",
           "function": "/cdw-svc",
           "imports": "/cdw-svc/import.json",
           "env": "cdw-svc"
@@ -259,6 +265,8 @@
           "portal.dataset.metadataConfig.attribute.delete",
           "portal.config.read",
           "portal.config.write",
+          "portal.userArtifact.group.write",
+          "portal.userArtifact.group.delete",
           "terminology.user.read",
           "dataflowmgmt.dataflow.read",
           "dataflowmgmt.dataflow.add",
@@ -393,7 +401,8 @@
           "portal.dataset.read",
           "meilisearchSvc.index.add",
           "meilisearchSvc.index.setting.update",
-          "meilisearchSvc.document.add"
+          "meilisearchSvc.document.add",
+          "gateway.fhir.create"
         ]
       },
       "scopes": [
@@ -404,7 +413,7 @@
             "conceptmapping.post"
           ],
           "httpMethods": [
-            "GET", 
+            "GET",
             "POST"
           ]
         },
@@ -423,7 +432,12 @@
         },
         {
           "path": "^/prefect(.*)",
-          "scopes": ["prefect.read", "prefect.delete", "prefect.post", "prefect.update"]
+          "scopes": [
+            "prefect.read",
+            "prefect.delete",
+            "prefect.post",
+            "prefect.update"
+          ]
         },
         {
           "path": "^/analytics-svc/plugins/(.*)",
@@ -970,7 +984,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.read"
           ],
@@ -979,7 +993,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.add"
           ],
@@ -988,7 +1002,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.update"
           ],
@@ -1130,6 +1144,24 @@
           ],
           "httpMethods": [
             "PUT"
+          ]
+        },
+        {
+          "path": "^/system-portal/user-artifact/group$",
+          "scopes": [
+            "portal.userArtifact.group.write"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/system-portal/user-artifact/group/[a-zA-Z0-9_]+$",
+          "scopes": [
+            "portal.userArtifact.group.delete"
+          ],
+          "httpMethods": [
+            "DELETE"
           ]
         },
         {
