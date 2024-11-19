@@ -7,7 +7,7 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV,
   PORT: parseInt(process.env.PORTAL_SERVER__PORT) || 3000,
   PORTAL_SERVER_LOG_LEVEL: (process.env.PORTAL_SERVER__LOG_LEVEL as LoggingLevel) || 'info',
-  TREX_API_URL: process.env.TREX__API_URL,
+  TREX_API_URL: JSON.parse(process.env.SERVICE_ROUTES).trex || '',
   APP_DEPLOY_MODE: process.env.APP__DEPLOY_MODE,
 
   MINIO_REGION: process.env.MINIO__REGION,
