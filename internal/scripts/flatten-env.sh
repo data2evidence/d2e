@@ -65,12 +65,6 @@ else
     yq -i '.DATABASE_CREDENTIALS = loadstr(env(DATABASE_CREDENTIALS_JSON_FILE))' $DOTENV_YML_OUT # insert
 fi
 
-yq -i '.DICOM__HEALTH_CHECK_PASSWORD="GASKEajSaz5f6j"' $DOTENV_YML_OUT # remove once DICOM__HEALTH_CHECK_PASSWORD deprecated from latest release candidate
-yq -i '.FHIR__CLIENT_SECRET="d64bff124d11f1e2a852b1076bacd081fefffa82e2db2711509b88a3397c2f3d"' $DOTENV_YML_OUT # remove once random FHIR__CLIENT_SECRET confirmed working
-
-# yq -i 'del(.DICOM__HEALTH_CHECK_PASSWORD)' $DOTENV_YML_OUT
-# yq -i 'del(.DB_CREDENTIALS__INTERNAL__PRIVATE_KEY)' $DOTENV_YML_OUT
-
 # finalize
 yq -i 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' $DOTENV_YML_OUT
 cat $DOTENV_YML_OUT | yq 'keys | .[]' | sort > $DOTENV_KEYS_OUT
