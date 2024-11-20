@@ -1,17 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing'
+import { GroupService } from './group.service'
 import { REQUEST } from '@nestjs/core'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { NotebookService } from './notebook.service'
-import { repositoryMockFactory } from '../../test/repository.mock'
-import { UserArtifactService } from '../user-artifact/user-artifact.service'
-import { UserArtifact } from '../user-artifact/entity'
+import { repositoryMockFactory } from '../../../test/repository.mock'
+import { UserArtifactGroup } from '../entity'
 
 jest.mock('jsonwebtoken', () => ({
   decode: jest.fn().mockReturnValue({ sub: 'mock-sub' })
 }))
 
-describe('NotebookService', () => {
-  let service: NotebookService
+describe('GroupService', () => {
+  let service: GroupService
 
   beforeEach(async () => {
     const req = {
@@ -21,14 +20,13 @@ describe('NotebookService', () => {
     }
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        NotebookService,
-        UserArtifactService,
+        GroupService,
         { provide: REQUEST, useValue: req },
-        { provide: getRepositoryToken(UserArtifact), useFactory: repositoryMockFactory }
+        { provide: getRepositoryToken(UserArtifactGroup), useFactory: repositoryMockFactory }
       ]
     }).compile()
 
-    service = await module.resolve<NotebookService>(NotebookService)
+    service = module.get<GroupService>(GroupService)
   })
 
   it('should be defined', () => {

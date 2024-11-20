@@ -16,6 +16,8 @@ import { FeatureModule } from './feature/feature.module'
 import { PrefectModule } from './prefect/prefect.module'
 import { ConfigModule } from './config/config.module'
 import { SeedService } from './common/data-source/seeds/seed.service'
+import { UserArtifactModule } from './user-artifact/user-artifact.module'
+import { GroupModule } from './user-artifact/group/group.module'
 
 const tenantRoutes: RouteTree = {
   path: 'tenant',
@@ -42,6 +44,17 @@ const overviewDescriptionRoutes: RouteTree = {
   module: ConfigModule
 }
 
+const userArtifactRoutes: RouteTree = {
+  path: 'user-artifact',
+  module: UserArtifactModule,
+  children: [
+    {
+      path: '/group',
+      module: GroupModule
+    }
+  ]
+}
+
 const imports: Array<DynamicModule | Type<any>> = [
   TypeOrmModule.forRoot(dataSourceOptions),
   DatasetModule,
@@ -57,12 +70,14 @@ const imports: Array<DynamicModule | Type<any>> = [
   NotebookModule,
   PrefectModule,
   ConfigModule,
+  UserArtifactModule,
   RouterModule.register([
     tenantRoutes,
     featureRoutes,
     notebookRoutes,
     prefectRoutes,
     overviewDescriptionRoutes,
+    userArtifactRoutes,
     {
       path: 'dataset',
       module: DatasetModule,
