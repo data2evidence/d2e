@@ -193,12 +193,12 @@ export type PluginEndpointFormatType = "csv" | "json";
 export type RecontactPatientListRequestType = {
     name: string;
     cohortDefinition: CohortDefinitionType;
-    selectedStudyEntityValue: string;
+    datasetId: string;
 };
 
 export type PluginEndpointRequestType = {
     cohortDefinition: CohortDefinitionType;
-    selectedStudyEntityValue: string;
+    datasetId: string;
 };
 
 export type PluginSelectedAttributeType = {

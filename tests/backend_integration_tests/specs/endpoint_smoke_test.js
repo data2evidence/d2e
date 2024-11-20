@@ -198,7 +198,7 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
               }
             ]
           },
-          selectedStudyEntityValue: 'cd13fd3e-9f35-4812-b2a1-497b232a8771'
+          datasetId: 'cd13fd3e-9f35-4812-b2a1-497b232a8771'
         }
         var setQuery = {
           method: 'GET',
@@ -241,7 +241,7 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
           attributeType: 'text',
           configId: '4321DCBAB',
           configVersion: 'A',
-          selectedStudyEntityValue: 'cd13fd3e-9f35-4812-b2a1-497b232a8771',
+          datasetId: 'cd13fd3e-9f35-4812-b2a1-497b232a8771',
           searchQuery: 'testSearchQuery'
         }
         var setQuery = {
