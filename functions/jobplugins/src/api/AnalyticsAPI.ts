@@ -90,18 +90,14 @@ export class AnalyticsSvcAPI {
 
   // TODO: Fix Invalid CA cert error
   // Fetch CDM version
-  async getCdmVersion(dialect: string, databaseCode: string, schema: string) {
+  async getCdmVersion(datasetId: string) {
     try {
-      const url = `${this.baseURL}/alpdb/${dialect}/database/${databaseCode}/cdmversion/schema/${schema}`;
+      const url = `${this.baseURL}/alpdb/cdmversion`;
       console.log(`Calling ${url} to fetch CDM version`);
-      // const options = this.createOptions("GET");
       const options = this.getRequestConfig();
-      // const result = await fetch(url, options);
-      const result = await get(url, options);
-      // if (!result.ok) {
-      //   throw new Error("Error while getting cdm version");
-      // }
-      // return await result.json();
+      const params = new URLSearchParams();
+      params.append("datasetId", datasetId);
+      const result = await get(url, { ...options, params });
       return result.data;
     } catch (error) {
       console.error(`Error while getting cdm version: ${error}`);
