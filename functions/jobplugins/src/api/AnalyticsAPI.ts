@@ -46,10 +46,10 @@ export class AnalyticsSvcAPI {
       console.log(`vocabSchema ${vocabSchema} datasetId ${datasetId}`);
       // const options = await this.getRequestConfig();
       const options = await this.createOptions("GET");
-      //add studyid
+      //add datasetId
       const url = `${
         this.baseURL
-      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?studyId=${datasetId}`;
+      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?datasetId=${datasetId}`;
       const response = await fetch(url, options);
       return await response.json();
     } catch (error) {
@@ -70,7 +70,7 @@ export class AnalyticsSvcAPI {
     try {
       const url = `${
         this.baseURL
-      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}/${conceptId}?studyId=${datasetId}`;
+      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}/${conceptId}?datasetId=${datasetId}`;
       console.log(`Calling ${url} for conceptId ${conceptId}`);
       const options = this.createOptions("GET");
       const result = await fetch(url, options);
