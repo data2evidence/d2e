@@ -1,12 +1,12 @@
 import { Router, NextFunction, Request, Response } from "express";
 import { Service } from "typedi";
-
+import { FilesManagerService } from "./files-manager.service";
 @Service()
 export class FilesManagerRouter {
   private readonly router = Router();
   private readonly logger = console;
 
-  constructor() {
+  constructor(private readonly filesManagerService: FilesManagerService) {
     this.registerRoutes();
   }
 
@@ -22,6 +22,7 @@ export class FilesManagerRouter {
         this.logger.info("Download file by userDataId: ");
 
         try {
+          this.filesManagerService.get();
           res.status(200).send("works");
         } catch (err) {
           this.logger.error(

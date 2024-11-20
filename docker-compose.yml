@@ -520,7 +520,12 @@ services:
             "GATEWAY_WO_PROTOCOL_FQDN": "${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}"
           },
           "alpdb": {},
-          "concept-mapping": {}
+          "concept-mapping": {},
+          "files-manager": {
+            "PG_ADMIN_PASSWORD": "${PG_ADMIN_PASSWORD}",
+            "PG_ADMIN_USER": "${PG_ADMIN_USER:-alp_pg_admin_user}",
+            "PG_SCHEMA": "files_manager"
+          }
         }
       SERVICE_ROUTES: |-
         {

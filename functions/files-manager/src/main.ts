@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import { Container } from "typedi";
 import { useContainer } from "class-validator";
 import "reflect-metadata";
+import dataSource from "./common/data-source/data-source";
 import { Routes } from "./routes";
 
 const PORT = 10500;
@@ -31,7 +32,18 @@ export class App {
     });
   }
 
+  private async initialiseDataSource() {
+    try {
+      await dataSource.initialize();
+      this.logger.info("Datasource is initialised");
+    } catch (error) {
+      this.logger.error(`Error while initialising datasource: ${error}`);
+      process.exit(0);
+    }
+  }
+
   async start() {
+    await this.initialiseDataSource();
     this.registerMiddlewares();
     this.registerRoutes();
     this.registerValidatorContainer();
