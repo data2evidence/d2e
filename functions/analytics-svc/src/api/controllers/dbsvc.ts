@@ -78,12 +78,6 @@ export async function getSnapshotSchemaMetadata(req, res, next) {
             datasetId
         );
 
-    console.log(
-        "findme, dialect, databaseCode, schemaName",
-        dialect,
-        databaseCode,
-        schemaName
-    );
     try {
         let dbDao = new DBDAO(dialect, databaseCode);
         const dbConnection = await dbDao.getDBConnectionByTenantPromise(
@@ -91,7 +85,6 @@ export async function getSnapshotSchemaMetadata(req, res, next) {
             req,
             res
         );
-        console.log("findme, done getting dbConnection");
         const results = await dbDao.getSnapshotSchemaMetadata(
             dbConnection,
             schemaName
