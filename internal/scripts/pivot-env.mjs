@@ -11,18 +11,26 @@
 // Remove values & update git internal env doc with:
 // cat .env-doc.yml | yq '.*.envNames.* = "xxx"' | yq 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' | tee internal/docs/env-doc.yml
 
-//inputs
+// inputs
 const envName = $.env.ENV_NAME || "local"
 console.info(`envName=${envName}`)
 const resetDocEnvNameBool = $.env.RESET_DOC_ENV_NAME_BOOL === "true" ? true : false
 
-//vars
+// vars
 const gitBaseDir = (await $`git rev-parse --show-toplevel`).stdout.trim()
 
 const credsKey = "DATABASE_CREDENTIALS"
-const envInPath = `${gitBaseDir}/.env.${envName}.yml`
-const pvtOutPath = `${gitBaseDir}/.env-pivot.yml`
-const docOutPath = `${gitBaseDir}/.env-doc.yml`
+const docPath = `.env-doc.yml`
+const envInPath = `.env.${envName}.yml`
+const pvtOutPath = `.env-pivot.yml`
+const srcDocPath = `internal/docs/env-doc.yml`
+
+if ((!fs.existsSync(docPath)) && fs.existsSync(srcDocPath)) {
+	fs.copyFile(srcDocPath, docPath, (err) => {
+		if (err) throw err;
+		console.log(`. ${srcDocPath} was copied to ${docPath} as seed`);
+	});
+}
 
 // functions
 
@@ -90,10 +98,11 @@ const envKeys = Object.keys(envIn)
 // update env doc yml
 // .env.doc.yml - update with sample values
 //////////////////////////////////////////////////////////////////////
-let docOut = readYmlFile(docOutPath)
+
+let docInOut = readYmlFile(docPath)
 
 if (resetDocEnvNameBool) {
-	envKeys.map(envKey => delete docOut[envKey].envNames)
+	envKeys.map(envKey => delete docInOut[envKey].envNames)
 }
 
 // let envKey = envKeys[0] // debug
@@ -101,19 +110,19 @@ if (resetDocEnvNameBool) {
 // envKey = "AZURE__IDP__CLIENT_SECRET" // debug
 envKeys.map(envKey => {
 	// console.debug(`envKey = ${envKey}`)
-	docOut[envKey] = cleanObj(docOut[envKey])
-	docOut[envKey].envNames = cleanObj(docOut[envKey].envNames)
-	docOut[envKey].type = cleanStr(docOut[envKey].type, "string")
-	docOut[envKey].comment = cleanStr(docOut[envKey].comment)
+	docInOut[envKey] = cleanObj(docInOut[envKey])
+	docInOut[envKey].envNames = cleanObj(docInOut[envKey].envNames)
+	docInOut[envKey].type = cleanStr(docInOut[envKey].type, "string")
+	docInOut[envKey].comment = cleanStr(docInOut[envKey].comment)
 
 	// show sample data if <100 chars
-	if ((docOut[envKey].type === "string") || docOut[envKey].type === "boolean" || (envIn[envKey].length < 100)) {
-		docOut[envKey].envNames[envName] = envIn[envKey]
+	if ((docInOut[envKey].type === "string") || docInOut[envKey].type === "boolean" || (envIn[envKey].length < 100)) {
+		docInOut[envKey].envNames[envName] = envIn[envKey]
 	} else {
-		docOut[envKey].envNames[envName] = `see pivot`
+		docInOut[envKey].envNames[envName] = `see pivot`
 	}
 })
-writeYmlFile(docOutPath, docOut)
+writeYmlFile(docPath, docInOut)
 
 // write env yml pivot
 // .env.pivot.yml - show values for all environments
@@ -125,8 +134,8 @@ envKeys.map(envKey => {
 		pvtOut[envKey] = cleanObj(pvtOut[envKey])
 		pvtOut[envKey].envNames = cleanObj(pvtOut[envKey].envNames)
 
-		pvtOut[envKey].comment = docOut[envKey].comment
-		pvtOut[envKey].type = docOut[envKey].type
+		pvtOut[envKey].comment = docInOut[envKey].comment
+		pvtOut[envKey].type = docInOut[envKey].type
 		pvtOut[envKey].envNames[envName] = envIn[envKey]
 	}
 })
@@ -145,7 +154,7 @@ if (envKeys.includes(credsKey)) {
 		const creds = YAML.parse(credsStr)
 		// i = 0 // debug
 		for (const i in creds) {
-			let credsOutPath = `${gitBaseDir}/.env-pivot.creds.${creds[i].name}.yml`
+			let credsOutPath = `.env-pivot.creds.${creds[i].name}.yml`
 			let credsOut = readYmlFile(credsOutPath)
 			const credKeys = Object.keys(creds[i])
 			// credKey = credKeys[0] // debug

@@ -66,7 +66,7 @@ const optionsStr = JSON.stringify({
 })
 
 echo(`. INFO Load tables`)
-await $`docker exec -t alp-dataflow-gen-agent-1 prefect deployment run data-load-plugin/data-load-plugin_deployment --param options=${optionsStr}`
+await $`docker exec -t alp-dataflow-gen-worker prefect deployment run data-load-plugin/data-load-plugin_deployment --param options=${optionsStr}`
 
 echo(`. INFO validation`)
 echo(`open https://localhost:41100/portal/systemadmin/jobs/deployments # for logs`)
