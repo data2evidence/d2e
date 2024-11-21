@@ -22,7 +22,7 @@ export class App {
 
   private registerRoutes() {
     const routes = Container.get(Routes);
-    this.app.use("/files-manager", routes.getRouter());
+    this.app.use("/files-manager/api", routes.getRouter());
   }
 
   private registerValidatorContainer() {

@@ -32,7 +32,7 @@ export class FilesManagerRouter {
       }
     );
 
-    this.router.get(
+    this.router.post(
       "/",
       async (_req: Request, res: Response, next: NextFunction) => {
         this.logger.info(`Save file with username and data-key `);

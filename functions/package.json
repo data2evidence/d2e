@@ -176,7 +176,7 @@
           "imports": "/concept-mapping/import.json"
         },
         {
-          "source": "/files-manager",
+          "source": "/files-manager/api",
           "function": "/files-manager",
           "env": "files-manager",
           "imports": "/files-manager/import.json"
@@ -414,7 +414,7 @@
       },
       "scopes": [
         {
-          "path": "^/files-manager",
+          "path": "^/files-manager/api",
           "scopes": [
             "filesmanager.read"
           ],
