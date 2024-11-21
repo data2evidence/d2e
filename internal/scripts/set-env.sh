@@ -14,7 +14,7 @@ ENV_TYPE=${ENV_TYPE:-local}
 GIT_BASE_DIR=$(git rev-parse --show-toplevel)
 
 DOTENV_FILE_OUT=.env.$ENV_TYPE
-DOTENV_KEYS_OUT=.env.$ENV_NAME.keys
+DOTENV_KEYS_OUT=.env.$ENV_TYPE.keys
 DOTENV_YAML_IN_PRIVATE=.env.$ENV_TYPE.private.yml
 DOTENV_YML_IN=.env.$ENV_NAME.yml
 
