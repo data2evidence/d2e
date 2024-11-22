@@ -267,11 +267,12 @@ x-envs:
   service: &x-routes
     SERVICE_ROUTES: |-
       {
-       "analytics": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+       "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
        "bookmark": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/analytics-svc/api/services/bookmark",
        "cdw": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "paConfig": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/pa-config-svc",
        "queryGen": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+       "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
        "dataflowMgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/db-credentials",
        "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
@@ -380,13 +381,14 @@ services:
             "PG__DIALECT": "postgresql",
             "LOCAL_DEBUG": "false",
             "SERVICE_ROUTES": {
-              "analytics": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+              "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
               "cdw": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "paConfig": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/pa-config-svc",
               "trex": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "dataflowMgmt": "http://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
+              "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001"
               "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
               "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
               "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
