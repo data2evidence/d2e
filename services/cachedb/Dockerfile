@@ -35,8 +35,17 @@ COPY ./services/envConverter .
 RUN yarn install
 ### End env converter ###
 
-WORKDIR /home/docker
 
+# Create folder to store duckdb extensions for offline plugins
+# version must match duckdb in requirements.txt
+ENV duckdb_version 1.1.1
+WORKDIR /home/docker/duckdb_extensions
+RUN wget https://extensions.duckdb.org/v${duckdb_version}/linux_amd64_gcc4/postgres_scanner.duckdb_extension.gz \
+  && wget https://extensions.duckdb.org/v${duckdb_version}/linux_amd64_gcc4/fts.duckdb_extension.gz \
+  && gzip -d postgres_scanner.duckdb_extension.gz \
+  && gzip -d fts.duckdb_extension.gz
+
+WORKDIR /home/docker
 COPY ./services/cachedb/requirements.txt .
 RUN --mount=type=cache,target=/home/docker/.cache/pip \
   pip install -r requirements.txt
