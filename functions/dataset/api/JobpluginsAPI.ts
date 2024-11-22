@@ -1,6 +1,8 @@
 import https from "node:https";
 import { AxiosRequestConfig } from "npm:axios";
-import { env } from "../env.ts";
+import { ICreateDatamodelFlowRunDto } from "../../jobplugins/src/types.d.ts";
+import { services } from "../env.ts";
+import { get, post } from "./request-util.ts";
 
 export class JobPluginsAPI {
   private readonly baseURL: string;
@@ -13,8 +15,8 @@ export class JobPluginsAPI {
     if (!token) {
       throw new Error("No token passed for Jobplugins API!");
     }
-    if (env.GATEWAY_WO_PROTOCOL_FQDN) {
-      this.baseURL = `https://${env.GATEWAY_WO_PROTOCOL_FQDN}` + this.endpoint;
+    if (services.jobplugins) {
+      this.baseURL = services.jobplugins + this.endpoint;
       this.httpsAgent = new https.Agent({
         rejectUnauthorized: true,
         // ca: env.GATEWAY_CA_CERT
@@ -39,9 +41,25 @@ export class JobPluginsAPI {
     return options;
   }
 
-  async createDatamodelFlowRun() {
-    return;
+  async createDatamodelFlowRun(data: ICreateDatamodelFlowRunDto) {
+    this.logger.info("Running create datamodel flow run");
+    const options = await this.getRequestConfig();
+    const url = `${this.baseURL}datamodel/create_datamodel_run`;
+    const result = await post(url, data, options);
+    if (result.data) {
+      return result.data;
+    }
+    throw new Error("Failed create datamodel flow run");
   }
 
-  async getDatamodelList();
+  async getDatamodels() {
+    this.logger.info("Running get datamodel list");
+    const options = await this.getRequestConfig();
+    const url = `${this.baseURL}datamodel/list`;
+    const result = await get(url, options);
+    if (result.data) {
+      return result.data;
+    }
+    throw new Error("Failed get datamodels");
+  }
 }

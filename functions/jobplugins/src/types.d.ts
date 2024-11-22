@@ -161,6 +161,11 @@ export interface IGetVersionInfoFlowRunDto {
   options: object;
 }
 
+export interface ICreateDatamodelFlowRunDto {
+  flowRunName: string;
+  options: object;
+}
+
 // export interface JobHistoryQueryDto {
 //   filter: "dqd" | "all";
 //   startDate?: Date;

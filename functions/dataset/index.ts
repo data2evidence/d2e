@@ -1,12 +1,13 @@
-import express from "npm:express";
 import { Request, Response } from "express";
-import { CDMSchemaTypes, DbDialect } from "./const.ts";
+import express from "npm:express";
 import { v4 as uuidv4 } from "npm:uuid";
-import { PortalAPI } from "./api/PortalAPI.ts";
 import { AnalyticsSvcAPI } from "./api/AnalyticsSvcAPI.ts";
 import { DataflowMgmtAPI } from "./api/DataflowMgmtAPI.ts";
-import { generateDatasetSchema } from "./GenerateDatasetSchema.ts";
+import { JobPluginsAPI } from "./api/JobpluginsAPI.ts";
+import { PortalAPI } from "./api/PortalAPI.ts";
+import { CDMSchemaTypes, DbDialect } from "./const.ts";
 import { env } from "./env.ts";
+import { generateDatasetSchema } from "./GenerateDatasetSchema.ts";
 
 const GATEWAY_WO_PROTOCOL_FQDN = env.GATEWAY_WO_PROTOCOL_FQDN!;
 const app = express();
@@ -104,7 +105,7 @@ export class DatasetRouter {
       async (req: Request, res: Response) => {
         const token = req.headers.authorization!;
         const portalAPI = new PortalAPI(token);
-        const dataflowMgmtAPI = new DataflowMgmtAPI(token);
+        const jobpluginsAPI = new JobPluginsAPI(token);
 
         const id = uuidv4();
         const {
@@ -162,15 +163,9 @@ export class DatasetRouter {
                   `Create CDM schema ${schemaName} with ${dataModel} on ${databaseCode} with cleansed schema option set to ${cleansedSchemaOption}`
                 );
 
-                const dataModels = await dataflowMgmtAPI.getDatamodels();
-                const dataModelInfo = dataModels.find(
-                  (model) => model.datamodel === dataModel
-                );
-
                 const options = {
                   options: {
                     flow_action_type: "create_datamodel",
-
                     database_code: databaseCode,
                     data_model: dataModel,
                     schema_name: schemaName,
@@ -178,13 +173,11 @@ export class DatasetRouter {
                     vocab_schema: vocabSchema,
                   },
                 };
-
-                await dataflowMgmtAPI.createFlowRunByMetadata(
-                  options,
-                  "datamodel",
-                  dataModelInfo.flowId,
-                  `datamodel-create-${schemaName}`
-                );
+                const datamodelFlowRunDto = {
+                  flowRunName: `datamodel-create-${schemaName}`,
+                  options: options,
+                };
+                await jobpluginsAPI.createDatamodelFlowRun(datamodelFlowRunDto);
               } catch (error) {
                 this.logger.error(
                   `Error while creating new CDM schema! ${error}`

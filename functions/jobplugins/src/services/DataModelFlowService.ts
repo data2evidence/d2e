@@ -3,6 +3,7 @@ import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { PrefectDeploymentName, PrefectFlowName } from "../const.ts";
 import {
   DataModel,
+  ICreateDatamodelFlowRunDto,
   IGetVersionInfoFlowRunDto,
   PluginFlow,
 } from "../types.d.ts";
@@ -58,6 +59,22 @@ export class DataModelFlowService {
     const prefectApi = new PrefectAPI(token);
     const flowRunName = getVersionInfoFlowRunDto.flowRunName;
     const options = getVersionInfoFlowRunDto.options;
+    const result = await prefectApi.createFlowRun(
+      flowRunName,
+      PrefectDeploymentName.DATA_MANAGEMENT,
+      PrefectFlowName.DATA_MANAGEMENT,
+      options
+    );
+    return result;
+  }
+
+  public async createDatamodelFlowRun(
+    createDatamodelFlowRunDto: ICreateDatamodelFlowRunDto,
+    token: string
+  ) {
+    const prefectApi = new PrefectAPI(token);
+    const flowRunName = createDatamodelFlowRunDto.flowRunName;
+    const options = createDatamodelFlowRunDto.options;
     const result = await prefectApi.createFlowRun(
       flowRunName,
       PrefectDeploymentName.DATA_MANAGEMENT,

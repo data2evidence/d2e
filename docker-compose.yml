@@ -388,7 +388,7 @@ services:
               "trex": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "dataflowMgmt": "http://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
-              "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001"
+              "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
               "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
               "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
