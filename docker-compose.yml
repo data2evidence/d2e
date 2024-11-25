@@ -1096,6 +1096,7 @@ services:
         priority: 20
       data:
         priority: 10
+    pull_policy: never
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     shm_size: 1gb
     volumes:

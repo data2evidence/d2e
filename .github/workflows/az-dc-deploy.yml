@@ -60,7 +60,7 @@ jobs:
     name: ${{ github.event.inputs.env }}
     runs-on: ["${{ github.event.inputs.env }}", self-hosted, Linux, X64]
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
         name: checkout d2e repo
         with:
           clean: false
@@ -105,7 +105,7 @@ jobs:
           name: stats
           retention-days: 30
           path: |
-            ${{ github.job }}*.yml
+            *${{ github.job }}*.yml
 
       - name: Generate dotenv
         env:
