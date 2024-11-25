@@ -31,7 +31,7 @@ export class App {
 
   private registerRoutes() {
     const routes = Container.get(Routes)
-    this.app.use('/db-credentials', routes.getRouter())//(new Routes(new DbRouter(new DbService()))).getRouter())
+    this.app.use('/db-credentials', routes.getRouter()) //(new Routes(new DbRouter(new DbService()))).getRouter())
   }
 
   private registerValidatorContainer() {
@@ -57,13 +57,12 @@ export class App {
   }
 
   async start() {
-
     await this.initialiseDataSource()
     this.registerMiddlewares()
     this.registerRoutes()
     this.registerValidatorContainer()
 
-     /*const server = https.createServer(
+    /*const server = https.createServer(
     //   {
     //     key: env.SSL_PRIVATE_KEY,
     //     cert: env.SSL_PUBLIC_CERT,
@@ -74,7 +73,6 @@ export class App {
 
     this.app.listen(PORT)
     logger.info(`🚀 ALP DB Credentials Manager started successfully!. Server listening on port ${PORT}`)
-
   }
 }
 
