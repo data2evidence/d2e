@@ -21,6 +21,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Create folder to store duckdb extensions for offline plugins
+      run: |
+        mkdir $DUCKDB_EXTENSIONS_FOLDER
+
     - uses: dorny/paths-filter@v3.0.2
       id: check_file_changed
       with:
@@ -49,8 +53,8 @@ jobs:
       if: env.BRANCH_NAME == 'develop' || steps.check_file_changed.outputs.cachedb_changed == 'True'
       working-directory: ./services/cachedb/duckdb_extensions
       run: |
-        wget https://extensions.duckdb.org/v${DUCKDB_VERSION}/linux_amd64_gcc4/postgres_scanner.duckdb_extension.gz && 
-        wget https://extensions.duckdb.org/v${DUCKDB_VERSION}/linux_amd64_gcc4/fts.duckdb_extension.gz && 
+        wget https://extensions.duckdb.org/v$DUCKDB_VERSION/linux_amd64_gcc4/postgres_scanner.duckdb_extension.gz && 
+        wget https://extensions.duckdb.org/v$DUCKDB_VERSION/linux_amd64_gcc4/fts.duckdb_extension.gz && 
         gzip -d postgres_scanner.duckdb_extension.gz && 
         gzip -d fts.duckdb_extension.gz
 
