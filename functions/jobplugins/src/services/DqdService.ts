@@ -132,7 +132,6 @@ export class DqdService {
     } = dataQualityFlowRunDto;
 
     const {
-      dialect,
       databaseCode,
       schemaName,
       vocabSchemaName: vocabSchema,
@@ -141,11 +140,7 @@ export class DqdService {
       await this.getReleaseDate(releaseId, portalServerApi)
     ).split("T")[0];
 
-    const cdmVersionNumber = await analyticsSvcApi.getCdmVersion(
-      dialect,
-      databaseCode,
-      schemaName
-    );
+    const cdmVersionNumber = await analyticsSvcApi.getCdmVersion(datasetId);
 
     const name = `${databaseCode}.${schemaName}`;
     const parameters = {

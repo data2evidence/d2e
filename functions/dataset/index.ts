@@ -51,17 +51,11 @@ export class DatasetRouter {
         }
 
         const token = req.headers.authorization!;
-        const portalAPI = new PortalAPI(token);
         const analyticsSvcAPI = new AnalyticsSvcAPI(token);
-
-        const { dialect, databaseCode, schemaName } =
-          await portalAPI.getDataset(datasetId);
 
         try {
           const metadata = await analyticsSvcAPI.getCdmSchemaSnapshotMetadata(
-            dialect,
-            databaseCode,
-            schemaName
+            datasetId
           );
           return res.status(200).json(metadata);
         } catch (error) {
