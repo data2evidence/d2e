@@ -150,6 +150,7 @@ jobs:
           else
             echo "INFO . manifests delete skipped"
           fi
+          echo AZ_REG_ARTIFACTS_NAME=${AZ_REG_REPOSITORY/\//--} | tee -a $GITHUB_ENV | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Upload ACR manifests artifacts
         if: steps.prune.outcome == 'success'
