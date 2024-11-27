@@ -44,11 +44,13 @@ jobs:
     env:
       AZ_REG_FQDN: ${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
       AZ_REG_NAME: ${{ vars.AZ_REGISTRY_NAME }}
+      AZ_REG_PASSWORD: ${{ secrets.AZ_REG_PASSWORD }}
       AZ_REG_PRUNE_DAYS: ${{ vars.AZ_REG_PRUNE_DAYS || '20' }}
       AZ_REG_PRUNE_ENABLE_DELETE: ${{ vars.AZ_REG_PRUNE_ENABLE_DELETE || 'false' }}
       AZ_REG_PRUNE_FORCE_ANALYZE: ${{ vars.AZ_REG_PRUNE_FORCE_ANALYZE || 'false' }}
       AZ_REG_PRUNE_KEEP_REGEX: ${{ vars.AZ_REG_PRUNE_KEEP_REGEX }}
       AZ_REG_REPOSITORY: ${{ inputs.AZ_REG_REPOSITORY }}
+      AZ_REG_USERNAME: ${{ secrets.AZ_REG_USERNAME }}
       DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
       DOCKER_BUILD_DISABLE: ${{ vars.DOCKER_BUILD_DISABLE || 'false' }}
       DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
@@ -77,8 +79,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.AZ_REG_FQDN }}
-          username: ${{ secrets.AZ_REG_USERNAME }}
-          password: ${{ secrets.AZ_REG_PASSWORD }}
+          username: ${{ env.AZ_REG_USERNAME }}
+          password: ${{ env.AZ_REG_PASSWORD }}
 
       - name: SSH_AUTH_SOCK if GIT_SSH_PRIVATE_KEYS is null
         shell: bash
@@ -140,15 +142,6 @@ jobs:
         if: env.AZ_REG_PRUNE_FORCE_ANALYZE == 'true' || env.GIT_BRANCH_NAME == 'develop'
         id: prune-images
         continue-on-error: true
-        env:
-          AZ_REG_FQDN: ${{ env.AZ_REG_FQDN }}
-          AZ_REG_KEEP_REGEX: ${{ env.AZ_REG_KEEP_REGEX }}
-          AZ_REG_NAME: ${{ env.AZ_REG_NAME }}
-          AZ_REG_PASSWORD: ${{ env.AZ_REG_PASSWORD }}
-          AZ_REG_PRUNE_DAYS: ${{ env.AZ_REG_PRUNE_DAYS }}
-          AZ_REG_PRUNE_KEEP_REGEX: ${{ env.AZ_REG_PRUNE_KEEP_REGEX }}
-          AZ_REG_REPOSITORY: ${{ env.AZ_REG_REPOSITORY }}
-          AZ_REG_USERNAME: ${{ env.AZ_REG_USERNAME }}
         run: |
           npx --suppess-warnings zx scripts/analyze-acr.mjs
           if [ $AZ_REG_PRUNE_ENABLE_DELETE = true ]; then
@@ -165,4 +158,4 @@ jobs:
           name: acr-manifests
           retention-days: 30
           path: |
-            private-manifests*
+            private*manifests*

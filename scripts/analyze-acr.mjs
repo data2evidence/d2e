@@ -2,13 +2,15 @@
 // Analyze Azure Container Registry Image Manifests images created before vars.AZ_REG_PRUNE_DAYS
 // Output YAML file with analysis images matching env.AZ_REG_WHITELIST_REGEX to keep and shell script to
 
+const prefix = `acr_${process.env.AZ_REG_REPOSITORY.replace("/", "-")}_manifests`
 const timeStamp = (new Date()).toISOString().replace(/[-:]/g, '').split(".")[0]
-const acrManifestsDeleteScript = `./private-acr-manifests-delete.sh`
-const acrManifestsDeleteScriptArchive = `../acr-manifests-delete-${timeStamp}.sh`
-const acrManifestsOrigJsonFile = `./private-acr-manifests-orig.json`
-const acrManifestsOrigJsonFileArchive = `../acr-manifests-orig-${timeStamp}.json`
-const acrManifestsProcessedYmlFile = `./private-acr-manifests-analyzed.yml`
-const acrManifestsProcessedYmlFileArchive = `../acr-manifests-analyzed-${timeStamp}.yml`
+
+const acrManifestsDeleteScript = `./private-${prefix}-delete.sh`
+const acrManifestsDeleteScriptArchive = `../${prefix}-delete-${timeStamp}.sh`
+const acrManifestsOrigJsonFile = `./private-${prefix}-orig.json`
+const acrManifestsOrigJsonFileArchive = `../${prefix}-orig-${timeStamp}.json`
+const acrManifestsProcessedYmlFile = `./private-${prefix}-analyzed.yml`
+const acrManifestsProcessedYmlFileArchive = `../${prefix}-analyzed-${timeStamp}.yml`
 
 const daysAgo = n => {
 	let d = new Date();
@@ -37,7 +39,7 @@ if (fs.existsSync(acrManifestsOrigJsonFile) && (process.env.MJS_DEVELOP == 'true
 const manifests = JSON.parse(manifestsStr)
 const manifestsTagged = manifests.filter(e => e.tags)
 
-const regEx = new RegExp(process.env.AZ_REG_WHITELIST_REGEX);
+const regEx = new RegExp(process.env.AZ_REG_KEEP_REGEX);
 const keepTags = manifestsTagged.flatMap(e => e.tags).filter(e => e.match(regEx)).sort()
 const keepManifests = manifestsTagged.filter(e => includesAny(e.tags, keepTags))
 const keepDigests = keepManifests.flatMap(keepDigest => keepDigest.digest)
@@ -54,7 +56,7 @@ const showMetadatas = await Promise.all(keepManifests.map(async keepManifest => 
 	}
 }))
 
-const referencedDigests = showMetadatas.flatMap(e => e.references).map(e => e.digest)
+const referencedDigests = showMetadatas.flatMap(e => e.references).filter(e => e).map(e => e.digest)
 
 // manifest = manifests[manifests.length - 1] // debug
 const analyzedManifests = manifests.map(manifest => {
