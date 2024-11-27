@@ -44,13 +44,13 @@ jobs:
     env:
       AZ_REG_FQDN: ${{ vars.AZ_REGISTRY_NAME }}.azurecr.io
       AZ_REG_NAME: ${{ vars.AZ_REGISTRY_NAME }}
-      AZ_REG_PASSWORD: ${{ secrets.AZ_REG_PASSWORD }}
+      AZ_REG_PASSWORD: ${{ secrets.AZ_REGISTRY_PASSWORD }}
       AZ_REG_PRUNE_DAYS: ${{ vars.AZ_REG_PRUNE_DAYS || '20' }}
       AZ_REG_PRUNE_ENABLE_DELETE: ${{ vars.AZ_REG_PRUNE_ENABLE_DELETE || 'false' }}
       AZ_REG_PRUNE_FORCE_ANALYZE: ${{ vars.AZ_REG_PRUNE_FORCE_ANALYZE || 'false' }}
       AZ_REG_PRUNE_KEEP_REGEX: ${{ vars.AZ_REG_PRUNE_KEEP_REGEX }}
       AZ_REG_REPOSITORY: ${{ inputs.AZ_REG_REPOSITORY }}
-      AZ_REG_USERNAME: ${{ secrets.AZ_REG_USERNAME }}
+      AZ_REG_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
       DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
       DOCKER_BUILD_DISABLE: ${{ vars.DOCKER_BUILD_DISABLE || 'false' }}
       DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
