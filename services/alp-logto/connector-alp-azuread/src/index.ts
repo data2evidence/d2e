@@ -88,7 +88,6 @@ const getAccessToken = async (
   redirectUri: string
 ) => {
   const codeRequest: AuthorizationCodeRequest = {
-    ...authCodeRequest,
     redirectUri,
     scopes: ["User.Read"],
     code,
