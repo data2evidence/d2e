@@ -5,12 +5,12 @@
 const prefix = `acr_${process.env.AZ_REG_REPOSITORY.replace("/", "-")}_manifests`
 const timeStamp = (new Date()).toISOString().replace(/[-:]/g, '').split(".")[0]
 
-const acrManifestsDeleteScript = `./private-${prefix}-delete.sh`
-const acrManifestsDeleteScriptArchive = `../${prefix}-delete-${timeStamp}.sh`
-const acrManifestsOrigJsonFile = `./private-${prefix}-orig.json`
-const acrManifestsOrigJsonFileArchive = `../${prefix}-orig-${timeStamp}.json`
-const acrManifestsProcessedYmlFile = `./private-${prefix}-analyzed.yml`
-const acrManifestsProcessedYmlFileArchive = `../${prefix}-analyzed-${timeStamp}.yml`
+const acrManifestsDeleteScript = `./private_${prefix}_delete.sh`
+const acrManifestsDeleteScriptArchive = `../${prefix}_delete_${timeStamp}.sh`
+const acrManifestsOrigJsonFile = `./private_${prefix}_orig.json`
+const acrManifestsOrigJsonFileArchive = `../${prefix}_orig_${timeStamp}.json`
+const acrManifestsProcessedYmlFile = `./private_${prefix}_analyzed.yml`
+const acrManifestsProcessedYmlFileArchive = `../${prefix}_analyzed_${timeStamp}.yml`
 
 const daysAgo = n => {
 	let d = new Date();

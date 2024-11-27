@@ -140,7 +140,7 @@ jobs:
 
       - name: Prune ACR Images created before vars.AZ_REG_PRUNE_DAYS_TAGGED
         if: env.AZ_REG_PRUNE_FORCE_ANALYZE == 'true' || env.GIT_BRANCH_NAME == 'develop'
-        id: prune-images
+        id: prune
         continue-on-error: true
         run: |
           npx --suppess-warnings zx scripts/analyze-acr.mjs
@@ -152,10 +152,10 @@ jobs:
           fi
 
       - name: Upload ACR manifests artifacts
-        if: env.AZ_REG_PRUNE_FORCE_ANALYZE == 'true' || env.GIT_BRANCH_NAME == 'develop'
+        if: steps.prune.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: acr-manifests
+          name: ${{ env.AZ_REG_ARTIFACTS_NAME }}
           retention-days: 30
           path: |
             private*manifests*
