@@ -12,7 +12,7 @@ RUN cd app && yarn install --network-timeout 1000000 && yarn postinstall
 
 FROM $IMAGE as final
 
-RUN apk update && apk add busybox=1.36.1-r19
+RUN apk update && apk add busybox>~1
 RUN apk add --update --upgrade bash yarn zlib
 
 RUN rm -rf /usr/local/lib/node_modules/npm

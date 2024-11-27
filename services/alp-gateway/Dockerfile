@@ -2,8 +2,8 @@ ARG IMAGE=node:18.20.1-alpine
 
 FROM $IMAGE as development
 
-RUN apk update && apk add busybox=1.36.1-r19
-RUN apk add openssl=3.1.6-r2
+RUN apk update && apk add busybox>~1
+RUN apk add openssl>3
 
 WORKDIR /usr/src/app
 
@@ -39,8 +39,8 @@ RUN yarn install --production &&\
 
 FROM $IMAGE AS production
 
-RUN apk update && apk add busybox=1.36.1-r19
-RUN apk add openssl=3.1.6-r2
+RUN apk update && apk add busybox>~1
+RUN apk add openssl>3
 
 RUN rm -rf /usr/local/lib/node_modules/npm
 
