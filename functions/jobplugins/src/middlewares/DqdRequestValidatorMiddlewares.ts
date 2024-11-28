@@ -3,10 +3,6 @@ import { body, query } from "npm:express-validator";
 // Define validation rules for DataQualityFlowRunDto
 export const validateDataQualityFlowRunDto = () => [
   body("datasetId").isUUID().withMessage("datasetId must be a valid UUID"),
-  body("deploymentName")
-    .isString()
-    .withMessage("deploymentName must be a string"),
-  body("flowName").isString().withMessage("flowName must be a string"),
   body("comment").optional().isString().withMessage("comment must be a string"),
   body("vocabSchemaName")
     .optional()

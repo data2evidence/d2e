@@ -137,38 +137,31 @@ export enum FlowRunState {
   FAILED = "Failed",
   TIMED_OUT = "TimedOut",
 }
+export interface ICreateDqdFlowRunDto {
+  datasetId: string;
+  comment?: string;
+  vocabSchemaName?: string;
+}
+export interface DataModel {
+  flowName: string;
+  datamodel: string;
+  flowId: string;
+}
 
-// export interface JobHistoryQueryDto {
-//   filter: "dqd" | "all";
-//   startDate?: Date;
-//   endDate?: Date;
-//   states?: FlowRunState[];
-//   tags?: string[];
-//   flowIds?: string[];
-//   deploymentIds?: string[];
-//   deploymentNames?: string[];
-//   workPools?: string[];
-// }
+export interface PluginFlow {
+  name: string;
+  tags: string[];
+  type: string;
+  volumes?: string[];
+  datamodels: string[];
+  entrypoint: string;
+  parameter_openapi_schema: object;
+}
 
-// export interface IHistoryJob {
-//   flowRunId: string;
-//   flowRunName: string;
-//   schemaName: string;
-//   dataCharacterizationSchema: string;
-//   cohortDefinitionId: string;
-//   type: string;
-//   createdAt: string;
-//   completedAt: string;
-//   status: string;
-//   error: string | null;
-//   datasetId: string | null;
-//   comment: string | null;
-//   databaseCode: string;
-// }
-
-// export interface IJobHistoryQueryDto extends IFlowRunQueryDto {
-//   filter: "dqd" | "all";
-// }
+export interface IGetVersionInfoFlowRunDto {
+  flowRunName: string;
+  options: object;
+}
 
 export interface IFlowRunQueryDto {
   startDate?: Date;
@@ -195,8 +188,6 @@ export interface DataCharacterizationOptions {
 
 export interface DataCharacterizationFlowRunDto {
   datasetId: string;
-  deploymentName: string;
-  flowName: string;
   comment?: string;
   releaseId?: string;
   excludeAnalysisIds?: string;

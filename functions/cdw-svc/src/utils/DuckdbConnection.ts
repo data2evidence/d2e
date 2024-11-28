@@ -6,15 +6,15 @@ type CallBackInterface = c.CallBackInterface;
 type ParameterInterface = c.ParameterInterface;
 const flattenParameter = c.flattenParameter;
 const DBValues = c.DBValues;
-import duckdb from "npm:duckdb";
+// import duckdb from "npm:duckdb";
 import { DBError } from "@alp/alp-base-utils";
 import { Logger } from "@alp/alp-base-utils";
 import { translateHanaToDuckdb } from "../../../_shared/alp-base-utils/src/helpers/hanaTranslation.ts";
 
-import fs from 'node:fs';
+import { existsSync } from "fs";
 import { env } from "../configs";
 
-import { DUCKDB_FILE_NAME } from "../qe/settings/Defaults";
+import { DUCKDB_FILE_NAME, DUCKDB_FILE_SCHEMA_NAME } from "../qe/settings/Defaults";
 const logger = Logger.CreateLogger("Duckdb Connection");
 
 // Helper function similar to getDBConnection implementation in alp-base-utils DBConnectionUtil.ts
@@ -32,8 +32,16 @@ export const getDuckdbDBConnection = () => {
     });
 };
 
-export const getDefaultSchemaName = () => {
+export const getDuckdbFileName = () => {
     return DUCKDB_FILE_NAME;
+}
+
+export const getDuckdbSchemaName = () => {
+    return DUCKDB_FILE_SCHEMA_NAME;
+}
+
+export const getDefaultSchemaName = () => {
+    return "main";
 }
 
 const _resolveDuckdbDatabaseFilePath = () => {
@@ -42,14 +50,14 @@ const _resolveDuckdbDatabaseFilePath = () => {
     Else fallback to using the built in duckdb file in BUILT_IN_DUCKDB_PATH
   */
 
-  const defaultDuckdbFilePath = `${env.DUCKDB_PATH}/${getDefaultSchemaName()}`;
+  const defaultDuckdbFilePath = `${env.DUCKDB_PATH}/${getDuckdbFileName()}`;
 
   if (existsSync(defaultDuckdbFilePath)) {
     logger.debug(`Using duckdb file from ${env.DUCKDB_PATH}`);
     return defaultDuckdbFilePath;
   } else {
     logger.debug(`Using built in duckdb file from ${env.BUILT_IN_DUCKDB_PATH}`);
-    return `${env.BUILT_IN_DUCKDB_PATH}/${getDefaultSchemaName()}`;
+    return `${env.BUILT_IN_DUCKDB_PATH}/${getDuckdbFileName()}`;
   }
 };
 
@@ -72,7 +80,7 @@ export class DuckdbConnection implements ConnectionInterface {
                 duckdb.OPEN_READONLY
             );
             const duckdDBconn = await duckdDB.connect();
-            const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, getDefaultSchemaName());
+            const conn: DuckdbConnection = new DuckdbConnection(duckdDB, duckdDBconn, getDuckdbSchemaName());
             callback(null, conn);
         } catch (err) {
             callback(err, null);

@@ -22,11 +22,9 @@ on:
           - alp-os/d2e-dev-hengxian
           - alp-os/d2e-dev-jerome
           - alp-os/d2e-dev-khairul
-          - alp-os/d2e-dev-karthik
-          - alp-os/d2e-dev-nadirah
+          - alp-os/d2e-dev-mwaiyee
           - alp-os/d2e-dev-nicholas
           - alp-os/d2e-dev-peter
-          - alp-os/d2e-dev-qiya
           - alp-os/d2e-dev-ragavan
           - alp-os/d2e-dev-santan
           - alp-os/d2e-dev-satish
@@ -112,6 +110,11 @@ jobs:
             directory: ./services/alp-dataflow
             context: ./services/alp-dataflow
             fileName: Dockerfile
+          - name: alp-data-node/alp-dataflow-gen
+            directory: ./services/alp-dataflow-gen
+            context: .
+            fileName: Dockerfile
+            pull: true
           - name: alp-data-node/alp-pg-mgmt-init
             directory: ./services/alp-pg-management
             context: ./services/alp-pg-management

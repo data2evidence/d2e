@@ -3,7 +3,8 @@ import { REQUEST } from '@nestjs/core'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { NotebookService } from './notebook.service'
 import { repositoryMockFactory } from '../../test/repository.mock'
-import { Notebook } from './entity'
+import { UserArtifactService } from '../user-artifact/user-artifact.service'
+import { UserArtifact } from '../user-artifact/entity'
 
 jest.mock('jsonwebtoken', () => ({
   decode: jest.fn().mockReturnValue({ sub: 'mock-sub' })
@@ -21,8 +22,9 @@ describe('NotebookService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotebookService,
+        UserArtifactService,
         { provide: REQUEST, useValue: req },
-        { provide: getRepositoryToken(Notebook), useFactory: repositoryMockFactory }
+        { provide: getRepositoryToken(UserArtifact), useFactory: repositoryMockFactory }
       ]
     }).compile()
 

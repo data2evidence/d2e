@@ -182,7 +182,7 @@ export async function populationQuery(req: IMRIRequest, res, next) {
                         try {
                             const configId = configData.configId;
                             const configVersion = configData.configVersion;
-                            const datasetId = body.selectedStudyEntityValue;
+                            const datasetId = body.datasetId;
 
                             let sFilename: string =
                                 <string>req.query.name ||
