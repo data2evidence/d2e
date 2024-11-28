@@ -44,9 +44,7 @@ export class AnalyticsSvcAPI {
     const errorMessage = "Error while getting data characterization results";
     try {
       console.log(`vocabSchema ${vocabSchema} datasetId ${datasetId}`);
-      // const options = await this.getRequestConfig();
       const options = await this.createOptions("GET");
-      //add datasetId
       const url = `${
         this.baseURL
       }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?datasetId=${datasetId}`;
@@ -88,7 +86,6 @@ export class AnalyticsSvcAPI {
     }
   }
 
-  // TODO: Fix Invalid CA cert error
   // Fetch CDM version
   async getCdmVersion(datasetId: string) {
     try {
@@ -105,17 +102,6 @@ export class AnalyticsSvcAPI {
     }
   }
 
-  // Helper method to generate options for fetch
-  private createOptions(method: string): RequestInit {
-    return {
-      method,
-      headers: {
-        Authorization: this.token,
-        "Content-Type": "application/json",
-      },
-    };
-  }
-
   private getRequestConfig() {
     let options: AxiosRequestConfig = {};
 
@@ -128,5 +114,15 @@ export class AnalyticsSvcAPI {
     };
 
     return options;
+  }
+
+  private createOptions(method: string): RequestInit {
+    return {
+      method,
+      headers: {
+        Authorization: this.token,
+        "Content-Type": "application/json",
+      },
+    };
   }
 }
