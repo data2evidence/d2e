@@ -526,7 +526,7 @@ services:
         }
       SERVICE_ROUTES: |-
         {
-        "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+        "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
         "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
         "cdw": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
         "paConfig": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/pa-config-svc",

@@ -86,5 +86,5 @@ export default {
         { attributeId: "patient.attributes.pcount", categoryId: "y1" },
     ],
     metadata: { version: 3 },
-    selectedStudyEntityValue: "703c5d8a-a1d9-4d42-a314-5b9aad513390",
+    datasetId: "703c5d8a-a1d9-4d42-a314-5b9aad513390",
 };

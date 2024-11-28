@@ -43,7 +43,7 @@ paths:
           description: limit result to this number
           required: false
           type: number
-        - name: selectedStudyEntityValue
+        - name: datasetId
           in: query
           description: study to use
           required: true
@@ -388,7 +388,7 @@ paths:
           in: query
           type: string
           description: Which occurrence for end event. first or last?
-        - name: selectedStudyEntityValue
+        - name: datasetId
           required: false
           in: query
           type: string

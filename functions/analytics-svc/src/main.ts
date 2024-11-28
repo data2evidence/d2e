@@ -397,7 +397,7 @@ const initRoutes = async (app: express.Application) => {
                         }
                         const configId = configData.configId;
                         const configVersion = configData.configVersion;
-                        const datasetId = req.body.selectedStudyEntityValue;
+                        const datasetId = req.body.datasetId;
                         const mriConfig =
                             await mriConfigConnection.getStudyConfig(
                                 {
