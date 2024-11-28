@@ -1,5 +1,4 @@
 spec/
-src/
 src_ui/*
 !src_ui/mri/
 !src_ui/mri_config/
