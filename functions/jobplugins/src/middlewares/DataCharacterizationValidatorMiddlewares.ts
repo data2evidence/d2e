@@ -3,13 +3,6 @@ import { body } from "npm:express-validator";
 // Validation rules for DataCharacterizationFlowRunDto
 export const validateDataCharacterizationFlowRunDto = () => [
   body("datasetId").isUUID().withMessage("datasetId must be a valid UUID"),
-
-  body("deploymentName")
-    .isString()
-    .withMessage("deploymentName must be a string"),
-
-  body("flowName").isString().withMessage("flowName must be a string"),
-
   body("comment")
     .optional()
     .isString()
