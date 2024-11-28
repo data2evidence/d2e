@@ -140,6 +140,27 @@ export enum FlowRunState {
   TIMED_OUT = "TimedOut",
 }
 
+export interface DataModel {
+  flowName: string;
+  datamodel: string;
+  flowId: string;
+}
+
+export interface PluginFlow {
+  name: string;
+  tags: string[];
+  type: string;
+  volumes?: string[];
+  datamodels: string[];
+  entrypoint: string;
+  parameter_openapi_schema: object;
+}
+
+export interface IGetVersionInfoFlowRunDto {
+  flowRunName: string;
+  options: object;
+}
+
 // export interface JobHistoryQueryDto {
 //   filter: "dqd" | "all";
 //   startDate?: Date;

@@ -1,6 +1,8 @@
 import { Request, Response, Router } from "npm:express";
 import { validationResult } from "npm:express-validator";
+import { validateDatamodelFlowRunDto } from "../middlewares/DataModelValidatorMiddlewares.ts";
 import { DataModelFlowService } from "../services/DataModelFlowService.ts";
+import { IGetVersionInfoFlowRunDto } from "../types.d.ts";
 
 export class DataModelFlowController {
   private DataModelFlowService: DataModelFlowService;
@@ -13,15 +15,25 @@ export class DataModelFlowController {
   }
 
   private registerRoutes() {
-    // GET /flow/datamodels/list
-    this.router.get(
-      "/flow/datamodels/list",
+    // GET /datamodel/list
+    this.router.get("/list", async (req: Request, res: Response) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+      }
+      await this.getDataModels(req, res);
+    });
+
+    // POST /datamodel/get_version_info
+    this.router.post(
+      "/get_version_info",
+      validateDatamodelFlowRunDto(),
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
           res.status(400).json({ errors: errors.array() });
         }
-        await this.getDataModels(req, res);
+        await this.createGetVersionInfoFlowRun(req, res);
       }
     );
   }
@@ -32,6 +44,24 @@ export class DataModelFlowController {
       res.send(result);
     } catch (error) {
       console.error(`Error getting datamodels: ${error}`);
+      res.status(500).send(`Error occurs: ${error}`);
+    }
+  }
+
+  private async createGetVersionInfoFlowRun(req: Request, res: Response) {
+    try {
+      const token = req.headers.authorization;
+      const getVersionInfoFlowRunDto: IGetVersionInfoFlowRunDto = req.body;
+      const result =
+        await this.DataModelFlowService.createGetVersionInfoFlowRun(
+          getVersionInfoFlowRunDto,
+          token
+        );
+      res.send(result);
+    } catch (error) {
+      console.error(
+        `Error creating data model get version info flow run: ${error}`
+      );
       res.status(500).send(`Error occurs: ${error}`);
     }
   }
