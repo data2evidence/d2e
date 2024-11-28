@@ -98,9 +98,7 @@ export const getTenantConfigs = (dialect: string) => {
         );
     }
     if (input) {
-        const a = JSON.parse(input);
-        return a;
-        //return JSON.parse(String(input));
+        return input;
     } else {
         throw new Error("Invalid JSON string");
     }

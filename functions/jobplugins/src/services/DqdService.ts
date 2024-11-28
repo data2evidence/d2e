@@ -1,13 +1,18 @@
 import { AnalyticsSvcAPI } from "../api/AnalyticsAPI.ts";
 import { PortalServerAPI } from "../api/PortalServerAPI.ts";
 import { PrefectAPI } from "../api/PrefectAPI.ts";
-import { DATA_QUALITY_DOMAINS, PrefectTagNames } from "../const.ts";
+import {
+  DATA_QUALITY_DOMAINS,
+  PrefectDeploymentName,
+  PrefectFlowName,
+  PrefectTagNames,
+} from "../const.ts";
 import {
   IDataCharacterizationResult,
   IDataQualityResult,
   IDomainContinuityResult,
 } from "../types.d.ts";
-import { DataQualityOverviewParser } from "../utils/dataQualityOverviewParser.ts";
+import { DataQualityOverviewParser } from "../utils/DataQualityOverviewParser.ts";
 
 export class DqdService {
   private dataQualityOverviewParser = new DataQualityOverviewParser();
@@ -122,8 +127,6 @@ export class DqdService {
     const analyticsSvcApi = new AnalyticsSvcAPI(token);
 
     const {
-      flowName,
-      deploymentName,
       datasetId,
       comment,
       vocabSchemaName,
@@ -132,7 +135,6 @@ export class DqdService {
     } = dataQualityFlowRunDto;
 
     const {
-      dialect,
       databaseCode,
       schemaName,
       vocabSchemaName: vocabSchema,
@@ -141,11 +143,7 @@ export class DqdService {
       await this.getReleaseDate(releaseId, portalServerApi)
     ).split("T")[0];
 
-    const cdmVersionNumber = await analyticsSvcApi.getCdmVersion(
-      dialect,
-      databaseCode,
-      schemaName
-    );
+    const cdmVersionNumber = await analyticsSvcApi.getCdmVersion(datasetId);
 
     const name = `${databaseCode}.${schemaName}`;
     const parameters = {
@@ -164,8 +162,8 @@ export class DqdService {
 
     return await prefectApi.createFlowRun(
       name,
-      deploymentName,
-      flowName,
+      PrefectDeploymentName.DQD,
+      PrefectFlowName.DQD,
       parameters
     );
   }

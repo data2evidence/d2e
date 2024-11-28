@@ -21,6 +21,11 @@
           "imports": "/alp-fhir-init/import.json",
           "env": "alp-fhir-init",
           "waitfor": "http://alp-minerva-fhir-server-1:8103/healthcheck"
+        },
+        {
+          "function": "/alp-db-credentials/src/init",
+          "imports": "/alp-db-credentials/import.json",
+          "env": "alp-db-credentials"
         }
       ],
       "api": [
@@ -265,6 +270,8 @@
           "portal.dataset.metadataConfig.attribute.delete",
           "portal.config.read",
           "portal.config.write",
+          "portal.userArtifact.group.write",
+          "portal.userArtifact.group.delete",
           "terminology.user.read",
           "dataflowmgmt.dataflow.read",
           "dataflowmgmt.dataflow.add",
@@ -982,7 +989,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.read"
           ],
@@ -991,7 +998,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.add"
           ],
@@ -1000,7 +1007,7 @@
           ]
         },
         {
-          "path": "^/system-portal/notebook$",
+          "path": "^/system-portal/notebook",
           "scopes": [
             "portal.notebook.update"
           ],
@@ -1142,6 +1149,24 @@
           ],
           "httpMethods": [
             "PUT"
+          ]
+        },
+        {
+          "path": "^/system-portal/user-artifact/group$",
+          "scopes": [
+            "portal.userArtifact.group.write"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/system-portal/user-artifact/group/[a-zA-Z0-9_]+$",
+          "scopes": [
+            "portal.userArtifact.group.delete"
+          ],
+          "httpMethods": [
+            "DELETE"
           ]
         },
         {
