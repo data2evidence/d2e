@@ -14,6 +14,8 @@ import {
   HPHConfigMetaType,
   AssignedConfigType,
 } from "../types";
+import { Buffer } from 'node:buffer';
+
 const log = logLib.CreateLogger("config-utils");
 
 export const CONFIG_FORMATTER_SETTINGS: ConfigFormatterSettingsType = {
@@ -819,7 +821,7 @@ export class FFHConfig {
     params.push(settings.configName);
     params.push(
       utilsLib.isXS2()
-        ? new Buffer(JSON.stringify(config), "utf8")
+        ? Buffer.from(JSON.stringify(config), "utf8")
         : JSON.stringify(config),
     );
     params.push(settings.configStatus);
@@ -902,7 +904,7 @@ export class FFHConfig {
     );
     params.push(
       utilsLib.isXS2()
-        ? new Buffer(JSON.stringify(config), "utf8")
+        ? Buffer.from(JSON.stringify(config), "utf8")
         : JSON.stringify(config),
     );
 

@@ -443,12 +443,31 @@ export function getUsername() {
   }
 }
 
+const filterVcapByTag = (
+  vcapServices: {
+    mridb: {
+      name: string;
+      tags: string[];
+      credentials: { dialect: string };
+    }[];
+  },
+  tag: string
+) => {
+  const dbs: typeof vcapServices.mridb = [];
+  for (const db of vcapServices.mridb) {
+    if (db.tags.includes(tag)) {
+      dbs.push(db);
+    }
+  }
+  return dbs;
+};
+
 export async function getAnalyticsConnection(userObj, token?: string) {
   let analyticsCredentials;
   let analyticsConnection;
-  let cdwService = xsenv
-    .filterServices({ tag: "cdw" })
-    .map((db) => db.credentials);
+  let cdwService = filterVcapByTag(env.VCAP_SERVICES, "cdw").map(
+    (db) => db.credentials
+  );
   if (env.USE_DUCKDB === "true") {
     if (env.USE_CACHEDB === "true") {
       // Get duckdb db connection via alp-cachedb
