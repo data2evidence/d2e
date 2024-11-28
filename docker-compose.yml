@@ -369,7 +369,7 @@ services:
             "CACHEDB__PORT": 41191,
             "CACHEDB__HOST": "alp-cachedb",
             "CACHEDB__POOL_SIZE": "${CACHEDB__POOL_SIZE:-10}",
-            "NODE_ENV": "development",
+            "NODE_ENV": "${NODE_ENV:-development}",
             "PG__DB_NAME": "alp",
             "PG__DEBUG": "${PG_DEBUG:-1}",
             "PG__HOST": "${PG_HOST:-alp-minerva-postgres-1}",
