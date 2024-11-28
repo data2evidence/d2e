@@ -210,6 +210,9 @@ def _attach_direct_postgres_connection_for_duckdb(db: duckdb.DuckDBPyConnection,
     duckdb_pg_connection_type = "(TYPE postgres, READ_ONLY)" if connection_type == ConnectionTypes.READ else "(TYPE postgres)"
     print("Attaching postgres as direct connection ")
     conn_details = extract_db_credentials(database_code)
+
+    # Load postgres_scanner extension when attaching postgres as direct connection
+    db.load_extension(Env.DUCKDB_POSTGRES_SCANNER_EXTENSION)
     db.execute(
         f"ATTACH 'host={conn_details['host']} port={conn_details['port']} dbname={conn_details['databaseName']} user={conn_details['user']} password={conn_details['password']}' AS direct_db_conn {duckdb_pg_connection_type}")
 
@@ -220,6 +223,10 @@ def _get_duckdb_connection(cdm_schema_duckdb_file_path: str, schema: str, vocab_
     '''
     duckdb_connection_type = "(READ_ONLY)" if connection_type == ConnectionTypes.READ else ""
     db = duckdb.connect()
+
+    # Load FTS extension for all duckdb connections
+    db.load_extension(Env.DUCKDB_FTS_EXTENSION)
+
     # Attach cdm schema in READ or WRITE connection depending on duckdb_connection_type
     db.execute(
         f"ATTACH '{cdm_schema_duckdb_file_path}' AS {schema} {duckdb_connection_type};")
