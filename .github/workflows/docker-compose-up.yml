@@ -151,11 +151,14 @@ jobs:
             yarn local:minerva up --wait
             EXIT_CODE=$?
 
-            docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
+            CMD=(docker ps --format "{{.Names}} {{.Status}}")
+            ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
             echo | tee -a $GITHUB_STEP_SUMMARY
 
             if [ $EXIT_CODE != 0 ]; then
               echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
+              FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy"); echo FAIL_COUNT=$FAIL_COUNT
+              [ $FAIL_COUNT != 0 ] && echo exit $EXIT_CODE
             fi
 
       - name: Logs minerva
