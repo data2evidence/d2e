@@ -4,6 +4,7 @@ import { PrefectAPI } from "../api/PrefectAPI.ts";
 import {
   FLOW_RUN_STATE_TYPES,
   PrefectDeploymentName,
+  PrefectFlowName,
   PrefectTagNames,
 } from "../const.ts";
 import {
@@ -108,8 +109,6 @@ export class DataCharacterizationService {
     const analyticsSvcApi = new AnalyticsSvcAPI(token);
     const prefectApi = new PrefectAPI(token);
     const portalServerApi = new PortalServerAPI(token);
-    const dcFlowName = dataCharacterizationFlowRunDto.flowName;
-    const dcDeploymentName = dataCharacterizationFlowRunDto.deploymentName;
     const datasetId = dataCharacterizationFlowRunDto.datasetId;
     const comment = dataCharacterizationFlowRunDto.comment;
     const releaseId = dataCharacterizationFlowRunDto.releaseId;
@@ -133,11 +132,7 @@ export class DataCharacterizationService {
       "T"
     )[0];
 
-    const cdmVersionNumber = await analyticsSvcApi.getCdmVersion(
-      dialect,
-      databaseCode,
-      schemaName
-    );
+    const cdmVersionNumber = await analyticsSvcApi.getCdmVersion(datasetId);
 
     const name = `${databaseCode}.${schemaName}`;
     const parameters = {
@@ -157,8 +152,8 @@ export class DataCharacterizationService {
 
     return await prefectApi.createFlowRun(
       name,
-      dcDeploymentName,
-      dcFlowName,
+      PrefectDeploymentName.DATA_CHARACTERIZATION,
+      PrefectFlowName.DATA_CHARACTERIZATION,
       parameters
     );
   }
