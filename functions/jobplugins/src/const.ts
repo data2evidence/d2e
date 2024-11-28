@@ -19,25 +19,27 @@ export const DATA_QUALITY_DOMAINS = [
 ];
 
 export enum PrefectDeploymentName {
-  DQD = "alp_dqd",
-  DATA_CHARACTERIZATION = "alp_data_characterization",
+  DQD = "dqd_plugin",
+  DATA_CHARACTERIZATION = "data_characterization_plugin",
   COHORT = "cohort_generator",
   DB_SVC = "alp-db-svc",
   MEILISEARCH_ADD_INDEX = "add_search_index",
   DATASET_ATTRIBUTE = "update-dataset-attributes",
   FETCH_VERSION_INFO = "fetch-version-info",
   COHORT_SURVIVAL = "cohort-survival-plugin_deployment",
+  DATA_MANAGEMENT = "data_management_plugin",
 }
 
 export enum PrefectFlowName {
-  DQD = "execute-dqd",
-  DATA_CHARACTERIZATION = "execute-data-characterization",
+  DQD = "dqd_plugin",
+  DATA_CHARACTERIZATION = "data_characterization_plugin",
   COHORT = "execute-cohort-generator-flow",
   DB_SVC = "execute-alp-db-svc-flow",
   MEILISEARCH_ADD_INDEX = "execute-add-search-index-flow",
   DATASET_ATTRIBUTE = "update-dataset-attributes-flow",
   FETCH_VERSION_INFO = "fetch-version-info-flow",
   COHORT_SURVIVAL = "cohort-survival-plugin",
+  DATA_MANAGEMENT = "data_management_plugin",
 }
 
 export enum FLOW_RUN_STATE_TYPES {
