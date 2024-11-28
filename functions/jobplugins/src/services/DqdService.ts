@@ -135,7 +135,6 @@ export class DqdService {
     } = dataQualityFlowRunDto;
 
     const {
-      dialect,
       databaseCode,
       schemaName,
       vocabSchemaName: vocabSchema,

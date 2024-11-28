@@ -139,11 +139,30 @@ export enum FlowRunState {
   FAILED = "Failed",
   TIMED_OUT = "TimedOut",
 }
-
 export interface ICreateDqdFlowRunDto {
   datasetId: string;
   comment?: string;
   vocabSchemaName?: string;
+}
+export interface DataModel {
+  flowName: string;
+  datamodel: string;
+  flowId: string;
+}
+
+export interface PluginFlow {
+  name: string;
+  tags: string[];
+  type: string;
+  volumes?: string[];
+  datamodels: string[];
+  entrypoint: string;
+  parameter_openapi_schema: object;
+}
+
+export interface IGetVersionInfoFlowRunDto {
+  flowRunName: string;
+  options: object;
 }
 
 export interface IFlowRunQueryDto {

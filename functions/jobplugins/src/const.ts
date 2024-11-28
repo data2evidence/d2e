@@ -27,6 +27,7 @@ export enum PrefectDeploymentName {
   DATASET_ATTRIBUTE = "update-dataset-attributes",
   FETCH_VERSION_INFO = "fetch-version-info",
   COHORT_SURVIVAL = "cohort-survival-plugin_deployment",
+  DATA_MANAGEMENT = "data_management_plugin",
 }
 
 export enum PrefectFlowName {
@@ -38,6 +39,7 @@ export enum PrefectFlowName {
   DATASET_ATTRIBUTE = "update-dataset-attributes-flow",
   FETCH_VERSION_INFO = "fetch-version-info-flow",
   COHORT_SURVIVAL = "cohort-survival-plugin",
+  DATA_MANAGEMENT = "data_management_plugin",
 }
 
 export enum FLOW_RUN_STATE_TYPES {

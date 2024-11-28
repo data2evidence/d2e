@@ -1,5 +1,7 @@
 import https from "node:https";
+import { AxiosRequestConfig } from "npm:axios";
 import { env, services } from "../env.ts";
+import { get } from "./request-util.ts";
 
 export class AnalyticsSvcAPI {
   private readonly baseURL: string;
@@ -42,9 +44,7 @@ export class AnalyticsSvcAPI {
     const errorMessage = "Error while getting data characterization results";
     try {
       console.log(`vocabSchema ${vocabSchema} datasetId ${datasetId}`);
-      // const options = await this.getRequestConfig();
       const options = await this.createOptions("GET");
-      //add datasetId
       const url = `${
         this.baseURL
       }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?datasetId=${datasetId}`;
@@ -86,27 +86,36 @@ export class AnalyticsSvcAPI {
     }
   }
 
-  // TODO: Fix Invalid CA cert error
   // Fetch CDM version
   async getCdmVersion(datasetId: string) {
     try {
-      const url = `${this.baseURL}/alpdb/cdmversion?datasetId=${datasetId}`;
+      const url = `${this.baseURL}/alpdb/cdmversion`;
       console.log(`Calling ${url} to fetch CDM version`);
-      const options = this.createOptions("GET");
-      const result = await fetch(url, options);
-      if (!result.ok) {
-        throw new Error(
-          `Error while getting cdm version for datasetId: ${datasetId}`
-        );
-      }
-      return await result.json();
+      const options = this.getRequestConfig();
+      const params = new URLSearchParams();
+      params.append("datasetId", datasetId);
+      const result = await get(url, { ...options, params });
+      return result.data;
     } catch (error) {
       console.error(`Error while getting cdm version: ${error}`);
       throw error;
     }
   }
 
-  // Helper method to generate options for fetch
+  private getRequestConfig() {
+    let options: AxiosRequestConfig = {};
+
+    options = {
+      headers: {
+        Authorization: this.token,
+      },
+      httpsAgent: this.httpsAgent,
+      timeout: 20000,
+    };
+
+    return options;
+  }
+
   private createOptions(method: string): RequestInit {
     return {
       method,

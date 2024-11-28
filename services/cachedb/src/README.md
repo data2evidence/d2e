@@ -45,7 +45,7 @@ of the [Postgres wire protocol (PDF)](https://beta.pgcon.org/2014/schedule/attac
 
       Connection URL would be
 
-      > "postgresql://jwt_token@alp-cachedb:41191/B|duckdb|alpdev_pg|cdmdefault|cdmvocab"
+      > "postgresql://jwt_token@alp-cachedb:41191/B|postgresql|read|alpdev_pg"
 
 ### Extra info:
 
