@@ -3,7 +3,11 @@ run-name: ${{ github.event.inputs.GIT_BRANCH_NAME || github.head_ref || github.r
 
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review, synchronize]
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
   push:
     branches:
       - develop
@@ -47,22 +51,6 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Free Disk Space (Ubuntu)
-        if: ${{ vars.DOCKER_BUILD_DEBUG != 'true' }}
-        uses: jlumbroso/free-disk-space@main
-        with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
-          tool-cache: false
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: false
-          docker-images: true
-          swap-storage: true
-
       - name: setup
         id: setup
         env:

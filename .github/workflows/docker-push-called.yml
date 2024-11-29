@@ -6,8 +6,12 @@ on:
       AZ_REG_REPOSITORY:
         required: true
         type: string
+      DOCKER_BUILD_ARG1:
+        default: ""
+        required: false
+        type: string
       DOCKER_BUILD_CONTEXT_PATH:
-        default: "."
+        default: .
         required: false
         type: string
       DOCKER_BUILD_FILE_PATH:
@@ -53,6 +57,7 @@ jobs:
       AZ_REG_PRUNE_KEEP_REGEX: ${{ vars.AZ_REG_PRUNE_KEEP_REGEX }}
       AZ_REG_REPOSITORY: ${{ inputs.AZ_REG_REPOSITORY }}
       AZ_REG_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
+      DOCKER_BUILD_ARG1: ${{ inputs.DOCKER_BUILD_ARG1 }}
       DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
       DOCKER_BUILD_DISABLE: ${{ vars.DOCKER_BUILD_DISABLE || 'false' }}
       DOCKER_BUILD_FILE_PATH: ${{ inputs.DOCKER_BUILD_FILE_PATH }}
@@ -66,10 +71,21 @@ jobs:
       GIT_SSH_PRIVATE_KEY2: ${{ inputs.GIT_SSH_PRIVATE_KEY2 }}
 
     steps:
-      - name: inputs
-        shell: bash
-        run: |
-          echo AZ_REG_REPOSITORY=$AZ_REG_REPOSITORY | tee -a $GITHUB_STEP_SUMMARY
+      - name: Free Disk Space (Ubuntu)
+        if: ${{ env.DOCKER_BUILD_DISABLE != 'true' }}
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: true
+          swap-storage: true
 
       - uses: actions/checkout@v4
         with:
