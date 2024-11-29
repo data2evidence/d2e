@@ -86,6 +86,7 @@ jobs:
   bld:
     needs: setup
     if: vars.DOCKER_BUILD_FORCE == 'true' || needs.setup.outputs.GIT_BRANCH_NAME == 'develop' ||  contains('release', needs.setup.outputs.GIT_BRANCH_NAME) || github.event_name == 'workflow_dispatch' || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # run if branch is develop|release|workflow_dispatch OR any non-draft pull_request
+
     strategy:
       fail-fast: false
       matrix:
