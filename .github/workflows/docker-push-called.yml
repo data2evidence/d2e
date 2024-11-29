@@ -84,13 +84,13 @@ jobs:
           username: ${{ env.AZ_REG_USERNAME }}
           password: ${{ env.AZ_REG_PASSWORD }}
 
-      - name: SSH_AUTH_SOCK if GIT_SSH_PRIVATE_KEYS is null
+      - name: SSH_AUTH_SOCK if GIT_SSH_PRIVATE_KEYS are set
         shell: bash
         if: ${{ env.GIT_SSH_PRIVATE_KEY1 == '' && env.GIT_SSH_PRIVATE_KEY2 == '' }}
         run: |
           ssh-agent -s | sed -e 's/;.*//' -e '/^echo/d' | tee -a $GITHUB_ENV
 
-      - name: SSH_AUTH_SOCK if GIT_SSH_PRIVATE_KEYS is not null
+      - name: SSH_AUTH_SOCK if GIT_SSH_PRIVATE_KEYS are not set
         uses: webfactory/ssh-agent@v0.9.0
         if: ${{ env.GIT_SSH_PRIVATE_KEY1 != '' || env.GIT_SSH_PRIVATE_KEY2 != '' }}
         with:
