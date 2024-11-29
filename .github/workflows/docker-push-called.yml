@@ -31,11 +31,11 @@ on:
         required: true
         type: string
       GIT_SSH_PRIVATE_KEY1:
-        default: "null"
+        default: ""
         required: false
         type: string
       GIT_SSH_PRIVATE_KEY2:
-        default: "null"
+        default: ""
         required: false
         type: string
 
@@ -62,8 +62,8 @@ jobs:
       DOCKER_IMG_TAG_NAME: ${{ inputs.DOCKER_IMG_TAG_NAME }}
       GIT_BRANCH_NAME: ${{ inputs.GIT_BRANCH_NAME }}
       GIT_REPO_FULL_NAME: ${{ inputs.GIT_REPO_FULL_NAME }}
-      GIT_SSH_PRIVATE_KEY1: "" # ${{ inputs.GIT_SSH_PRIVATE_KEY1 }}
-      GIT_SSH_PRIVATE_KEY2: "" # ${{ inputs.GIT_SSH_PRIVATE_KEY2 }}
+      GIT_SSH_PRIVATE_KEY1: ${{ inputs.GIT_SSH_PRIVATE_KEY1 }}
+      GIT_SSH_PRIVATE_KEY2: ${{ inputs.GIT_SSH_PRIVATE_KEY2 }}
 
     steps:
       - name: inputs
