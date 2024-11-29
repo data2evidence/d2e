@@ -6,6 +6,7 @@ import { createLogger } from './logger'
 import { env } from './env'
 import { Routes } from './routes'
 import { setupReqContext, healthCheck } from './common/middleware'
+import dataSource from './common/data-source/data-source'
 import https from 'https'
 
 const PORT = env.PORT || 8000
@@ -38,7 +39,17 @@ export class App {
     })
   }
 
+  private async initialiseDataSource() {
+    try {
+      await dataSource.initialize()
+    } catch (error) {
+      logger.error(`Error while initialising datasource: ${error}`)
+      process.exit(0)
+    }
+  }
+
   async start() {
+    await this.initialiseDataSource()
     this.registerMiddlewares()
     this.registerRoutes()
     this.registerValidatorContainer()
