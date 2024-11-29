@@ -142,7 +142,6 @@ jobs:
     uses: ./.github/workflows/docker-push-called.yml
     with:
       AZ_REG_REPOSITORY: ${{ matrix.name }}
-      BUILD_ARG1: ${{ format('{0}{1}{2}', 'docker_image_prefix=', vars.AZ_REGISTRY_NAME, '.azurecr.io') }}
       DOCKER_BUILD_CONTEXT_PATH: ${{ matrix.context }}
       DOCKER_BUILD_FILE_PATH: ${{ matrix.directory }}/${{ matrix.fileName }}
       DOCKER_BUILD_PUSH_BOOL_STR: ${{ needs.setup.outputs.DOCKER_BUILD_PUSH_BOOL_STR }}
