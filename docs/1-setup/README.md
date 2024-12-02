@@ -59,3 +59,17 @@ npm install --global yarn
 ```
 brew install openssl@3
 ```
+
+## git
+### ubuntu
+```
+sudo apt-get update
+sudo apt-get install git-all
+```
+
+### macos 
+```
+brew install git
+```
+
+For more information, refer to: https://github.com/git-guides/install-git
