@@ -10,6 +10,8 @@ import { QueryObject as qo } from '@alp/alp-base-utils'
 import QueryObject = qo.QueryObject
 import * as utils from '@alp/alp-base-utils'
 import { IBookmark, QueryObjectResultType, BookmarkQueryResultType } from '../types'
+import { PortalAPI } from '../api/PortalAPI'
+
 /**
  * This method was created so it can be spied on during testing (without affecting utils)
  */
@@ -22,6 +24,36 @@ export function _createGuid() {
  */
 export function createBookmarkId(bookmarkName: string) {
   return `${bookmarkName.replace(/[^a-zA-Z0-9]/g, '')}_${crypto.randomBytes(4).toString('hex')}`.substr(-40)
+}
+/**
+ * Generate an DTO for creating a new bookmark entity
+ */
+export function createBookmarkDto(
+  bookmarkName: string,
+  bookmark: string,
+  paConfigId: string,
+  cdmConfigId: string,
+  cdmConfigVersion: number,
+  shareBookmark: boolean,
+  userId: string
+) {
+  const bmkId = createBookmarkId(bookmarkName)
+
+  const defaultBookmark = {
+    id: bmkId,
+    bookmark_name: bookmarkName,
+    bookmark: bookmark,
+    type: null, // Set this if needed
+    view_name: null, // Set this if needed
+    modified: new Date().toISOString(), // Set the current timestamp
+    study_id: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', // Default study ID
+    version: 1, // Default version
+    pa_config_id: paConfigId,
+    cdm_config_id: cdmConfigId,
+    cdm_config_version: cdmConfigVersion,
+    userId: userId,
+    shared: shareBookmark.toString(),
+  }
 }
 
 /**
@@ -82,34 +114,51 @@ export function getSingleBookmarkQuery(table) {
  * @returns {object[]} Updated bookmaks, ordered by bookmark name
  */
 
-export function _loadAllBookmarks(
+export async function _loadAllBookmarks(
   userId,
+  userName,
+  token,
   paConfigId,
   table,
   connection: ConnectionInterface,
   callback: CallBackInterface
 ) {
-  let query: QueryObject = QueryObject.format(getAllBookmarksQuery(table), paConfigId)
-  query.executeQuery(connection, (err, result) => {
-    if (err) {
-      callback(err, null)
-      return
-    }
-    connection.commit()
+  // let query: QueryObject = QueryObject.format(getAllBookmarksQuery(table), paConfigId)
+  // query.executeQuery(connection, (err, result) => {
+  //   if (err) {
+  //     callback(err, null)
+  //     return
+  //   }
+  //   connection.commit()
 
-    // TODO: this is a temp code, will be used until ViewName column added to the CI DB.
-    result.data.forEach(el => {
-      if (el.ViewName && el.ViewName === 'NoValue') {
-        el.ViewName = null
-      }
-    })
+  //   // TODO: this is a temp code, will be used until ViewName column added to the CI DB.
+  //   result.data.forEach(el => {
+  //     if (el.ViewName && el.ViewName === 'NoValue') {
+  //       el.ViewName = null
+  //     }
+  //   })
+
+  //   let returnValue = {
+  //     schemaName: connection.schemaName,
+  //     bookmarks: result.data,
+  //   }
+  //   callback(err, _convertBookmarkIFR(returnValue))
+  // })
+  const portalAPI = new PortalAPI(token, userId)
+  try {
+    const result = await portalAPI.getBookmarks()
+    console.log({ result })
 
     let returnValue = {
       schemaName: connection.schemaName,
       bookmarks: result.data,
     }
-    callback(err, _convertBookmarkIFR(returnValue))
-  })
+    callback(null, _convertBookmarkIFR(returnValue))
+    // return result
+  } catch (error) {
+    console.error(error)
+    callback(error, null)
+  }
 }
 
 /**
@@ -453,9 +502,11 @@ export async function loadBookmarks({
  * @returns {object} Always return new Bookmark list to keep the frontend
  *          up-to-date.
  */
-export function queryBookmarks(
+export async function queryBookmarks(
   requestParameters,
   userId,
+  userName,
+  token,
   table,
   configConnection: ConnectionInterface,
   callback: CallBackInterface
@@ -538,7 +589,7 @@ export function queryBookmarks(
         })
         break
       case 'loadAll':
-        _loadAllBookmarks(userId, paConfigId, table, configConnection, callback)
+        await _loadAllBookmarks(userId, userName, token, paConfigId, table, configConnection, callback)
         break
       default:
         throw new Error('unknown command: ' + cmd)
