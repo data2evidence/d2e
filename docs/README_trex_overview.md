@@ -32,7 +32,12 @@ The following documentation outlines the basic setup of D2E for users who requir
 7. Starting Application User Interface (UI): ```yarn start:ui --wait```
 8. Start/Restarting application: ```yarn local:minerva up```
 
-> **Note**: Pointers 1 & 2 are required if you are starting the application for first time and if docker volume resources have been completely removed. If you have setup the application before, please run point 7 & 8.
+> **Note:**
+>
+> Pointers 1 - 4 are required if you are starting the application for first time and if docker volume resources have been completely removed. 
+>
+> If you have setup the application before, only pointers 7 & 8 is required.
+
 
 # D2E Guide 
 ## Authentication Portal
