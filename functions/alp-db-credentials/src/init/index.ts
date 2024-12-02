@@ -9,7 +9,7 @@ class Init {
   private readonly logger = createLogger('alp-db-credentials-init')
 
   private async initialiseDataSource() {
-    this.logger.info('Initialising')
+    this.logger.info('Initialising alp db credentials')
 
     try {
       await dataSource.initialize()
