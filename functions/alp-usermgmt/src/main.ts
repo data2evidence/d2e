@@ -17,7 +17,7 @@ const PATH = env.USER_MGMT_PATH
 const PORT = env.USER_MGMT_PORT
 const logger = createLogger()
 
-class Server {
+export class Server {
   private app: Application
 
   constructor() {
@@ -62,7 +62,3 @@ class Server {
     })
   }
 }
-export function start() {
-  new Server().start()
-}
-//start()
