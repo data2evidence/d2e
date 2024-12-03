@@ -334,8 +334,8 @@ export class PrefectAPI {
   async createInputAuthToken(flowrunId: string) {
     const key = "authtoken"; // keyword "authtoken" must match the object name in Python flow
     const options = this.createOptions("POST", {
-      key,
-      value: { token: this.token },
+      key: key,
+      value: JSON.stringify({ token: this.token }), // 'value' must be a string always. Convert the json object to a string
     });
 
     const errorMessage =
@@ -346,9 +346,6 @@ export class PrefectAPI {
     if (!response.ok) {
       throw new Error(`${errorMessage}: ${response.statusText}`);
     }
-
-    const result = await response.json();
-    return result.id;
   }
 
   async deleteInputAuthToken(flowrunId: string) {
@@ -356,7 +353,7 @@ export class PrefectAPI {
       'Error occurred while deleting "authtoken" flowrun input';
     const key = "authtoken"; // keyword "authtoken" must match the object name in Python flow
     const options = this.createOptions("DELETE");
-    const url = `${this.baseURL}/api/flow_runs/${flowrunId}/input/${key}`;
+    const url = `${this.baseURL}/flow_runs/${flowrunId}/input/${key}`;
 
     const r = await fetch(url, options);
     if (!r.ok) {

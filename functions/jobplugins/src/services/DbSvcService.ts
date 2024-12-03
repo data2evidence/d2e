@@ -53,10 +53,14 @@ export class DbSvcService {
     );
 
     await prefectApi.createInputAuthToken(flowrunId);
-    setTimeout(
-      async () => await prefectApi.deleteInputAuthToken(flowrunId),
-      5000
-    );
+    await Promise.any([
+      new Promise((resolve) => {
+        setTimeout(async () => {
+          await prefectApi.deleteInputAuthToken(flowrunId);
+          resolve(`Deleted the input of ${flowrunId}`);
+        }, 5000);
+      }),
+    ]);
 
     return flowrunId;
   }

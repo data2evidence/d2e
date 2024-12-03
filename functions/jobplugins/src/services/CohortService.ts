@@ -11,22 +11,22 @@ export class CohortService {
     const deploymentName = PrefectDeploymentName.COHORT;
     const parameters = cohortGeneratorFlowRunDto;
     const prefectApi = new PrefectAPI(token);
-    // TODO: uncomment
-    // const flowRunId = await prefectApi.createFlowRun(
-    //   `Generate Cohort ${parameters.options.cohortJson.name}`,
-    //   deploymentName,
-    //   flowName,
-    //   parameters
-    // );
-
-    // TODO: remove below
-    const flowRunId = "";
+    const flowRunId = await prefectApi.createFlowRun(
+      `Generate Cohort ${parameters.options.cohortJson.name}`,
+      deploymentName,
+      flowName,
+      parameters
+    );
 
     await prefectApi.createInputAuthToken(flowRunId);
-    setTimeout(
-      async () => await prefectApi.deleteInputAuthToken(flowRunId),
-      5000
-    );
+    await Promise.any([
+      new Promise((resolve) => {
+        setTimeout(async () => {
+          await prefectApi.deleteInputAuthToken(flowRunId);
+          resolve(`Deleted the input of ${flowRunId}`);
+        }, 5000);
+      }),
+    ]);
 
     return { flowRunId };
   }
