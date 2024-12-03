@@ -13,7 +13,7 @@ config.connection = async () => {
     user: _env.PG_ADMIN_USER!,
     password: _env.PG_ADMIN_PASSWORD!,
     ssl:
-      _env.NODE_ENV === "development"
+      _env.NODE_ENV === "development" || _env.isHttpTestRun
         ? Boolean(_env.PG_SSL)
         : {
             rejectUnauthorized: true,

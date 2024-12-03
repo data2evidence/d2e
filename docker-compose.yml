@@ -379,6 +379,7 @@ services:
             "PG__IDLE_TIMEOUT_IN_MS": 1000,
             "PG__DIALECT": "postgresql",
             "LOCAL_DEBUG": "false",
+            "isHttpTestRun": "${isHttpTestRun}"
             "SERVICE_ROUTES": {
               "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
@@ -415,7 +416,6 @@ services:
             "USE_DUCKDB": "${USE_DUCKDB:-true}",
             "USE_CACHEDB": "${USE_CACHEDB:-true}",
             "USE_EXTENSION_FOR_COHORT_CREATION": "false",
-            "isHttpTestRun": "${isHttpTestRun}",
             "isTestEnv": "${isTestEnv}",
             "local": "${local}",
             "TESTSCHEMA": "${TESTSCHEMA}"
@@ -425,8 +425,7 @@ services:
             "PG_ADMIN_USER": "${PG_ADMIN_USER:-alp_pg_admin_user}",
             "PG_PASSWORD": "${PG_WRITE_PASSWORD}",
             "PG_SCHEMA": "cdw_config",
-            "PG_USER": "${PG_WRITE_USER:-alp_pg_write_user}",
-            "NODE_ENV": "development"
+            "PG_USER": "${PG_WRITE_USER:-alp_pg_write_user}"
           },
           "alp-db-credentials": {
             "PG__DB_CREDENTIALS_MGR__MANAGE_PASSWORD": "${PG_ADMIN_PASSWORD}",
@@ -462,7 +461,6 @@ services:
           },
           "query-gen-svc": {
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",
-            "isHttpTestRun": "${isHttpTestRun}",
             "isTestEnv": "${isTestEnv}",
             "TESTSCHEMA": "${TESTSCHEMA}",
             "NOT_EQ_CHECK_FILTERCARDS": "${NOT_EQ_CHECK_FILTERCARDS:-true}"
@@ -508,7 +506,6 @@ services:
             "PORT": 41114,
             "USE_CACHEDB": "${USE_CACHEDB:-true}",
             "USE_DUCKDB": "${USE_DUCKDB:-true}",
-            "isHttpTestRun": "${isHttpTestRun}",
             "isTestEnv": "${isTestEnv}",
             "DUCKDB_PATH": "/home/docker/src/services/app/src/duckdb",
             "BUILT_IN_DUCKDB_PATH": "/home/docker/src/services/app/src/duckdb"
