@@ -727,7 +727,7 @@ services:
     command:
       - sh
       - -c
-      - "apt-get update && apt-get install -y curl && pip install prefect[docker]==3.0.3 && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
+      - "apt-get update && apt-get install -y curl && pip install prefect[docker]==3.0.3 && prefect work-pool create 'docker-pool' --type docker --base-job-template ./custom-docker-workpool.json --overwrite; prefect worker start --pool 'docker-pool' --type  docker"
     container_name: &c83 alp-dataflow-gen-worker
     depends_on:
       alp-minio-post-init:
@@ -759,6 +759,7 @@ services:
       data:
         priority: 20
     volumes:
+      - ./services/alp-dataflow-gen/custom-docker-workpool.json:/opt/prefect/custom-work-pool.json
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
