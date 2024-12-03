@@ -39,7 +39,7 @@ export class BaseCohortSvc {
                 const ifrWithConceptSetConcepts = await updateIfrWithConcepts(
                     this.props.backendConfig,
                     convertedIFR,
-                    JSON.parse(bmk.bookmark).selectedStudyEntityValue,
+                    JSON.parse(bmk.bookmark).datasetId,
                     this.props.req.headers.authorization
                 );
 

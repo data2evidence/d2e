@@ -12,13 +12,13 @@ const log = Logger.CreateLogger("analytics-log");
 
 export default async (req: IMRIRequest, res, next) => {
     log.addRequestCorrelationID(req);
-    const getSelectedStudyEntityValueFromRequest = (): string => {
+    const getDatasetIdFromMriquery = (): string => {
         const base64EncodedMriQuery = req.query.mriquery;
         const base64DecodedMriQueryJson = base64EncodedMriQuery
             ? convertZlibBase64ToJson(base64EncodedMriQuery.toString())
             : "";
         return base64DecodedMriQueryJson
-            ? base64DecodedMriQueryJson.selectedStudyEntityValue
+            ? base64DecodedMriQueryJson.datasetId
             : "";
     };
 
@@ -26,15 +26,10 @@ export default async (req: IMRIRequest, res, next) => {
         // Try to find datasetId from request query
         // If not found, try to find from request body
         // If still not found, return empty string
-
-        // TODO: ONLY DATASETID SHOULD REMAIN AT THE END
-        // TODO: RENAME all selectedStudyEntityValue to datasetId
         if (req.query.datasetId) {
             return req.query.datasetId.toString();
         } else if (req.body.datasetId) {
             return req.body.datasetId.toString();
-        } else if (req.query.selectedStudyEntityValue) {
-            return req.query.selectedStudyEntityValue.toString();
         } else {
             return "";
         }
@@ -137,16 +132,13 @@ export default async (req: IMRIRequest, res, next) => {
         } else {
             // TODO: throw exact error for missing db metadata later on once mri sends in selected study entity value
             // TODO: check for selected study is in user jwt token for authorisation
-            let selectedStudyEntityValue: string =
-                getSelectedStudyEntityValueFromRequest();
-            // If selectedStudyEntityValue is not found from mriquery, try and find datasetId from request query or body
-            if (!selectedStudyEntityValue) {
-                selectedStudyEntityValue = getDatasetIdFromRequest();
+            let datasetId: string = getDatasetIdFromMriquery();
+            // If datasetId is not found from mriquery, try and find datasetId from request query or body
+            if (!datasetId) {
+                datasetId = getDatasetIdFromRequest();
             }
             const studyMetadata: StudyDbMetadata =
-                req.studiesDbMetadata.studies.find(
-                    (o) => o.id === selectedStudyEntityValue
-                );
+                req.studiesDbMetadata.studies.find((o) => o.id === datasetId);
             // Set req.selectedstudyDbMetadata if it does not already exist
             if (!req.selectedstudyDbMetadata) {
                 req.selectedstudyDbMetadata = studyMetadata;

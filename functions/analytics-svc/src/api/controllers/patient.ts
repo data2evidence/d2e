@@ -89,7 +89,7 @@ async function streamDataset(req: IMRIRequest, callback: CallBackInterface) {
     let releaseDate: string = req.query.releaseDate;
     const { analyticsConnection } = req.dbConnections;
 
-    let { selectedStudyEntityValue }: PluginEndpointRequestType = {
+    let { datasetId }: PluginEndpointRequestType = {
         ...convertZlibBase64ToJson(req.query.mriquery),
     };
 
@@ -106,7 +106,7 @@ async function streamDataset(req: IMRIRequest, callback: CallBackInterface) {
                 const pluginResult = await pluginEndpoint.retrieveDataStream({
                     cohortDefinition,
                     auditLogChannelName: "MRI Pt. List Stream",
-                    datasetId: selectedStudyEntityValue,
+                    datasetId,
                 });
 
                 callback(null, pluginResult);
@@ -374,7 +374,7 @@ export async function getRecontactPatientList(req: IMRIRequest, res) {
     try {
         const study = await new PortalServerAPI().getStudy(
             req.headers.authorization,
-            body.selectedStudyEntityValue
+            body.datasetId
         );
         const { attributes } = study;
         let queryParams = formatQueryParams(

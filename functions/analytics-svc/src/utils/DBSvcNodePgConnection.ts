@@ -364,11 +364,11 @@ export class NodePgConnection implements DBSvcConnectionInterface {
         // Replace TABLES, VIEWS with PG_TABLES and PG_VIEWS
         temp = temp.replace(
             /SELECT COUNT\(\*\) AS tableCount from tables where schema_name=(\%s|\?) and table_name=(\%s|\?)/gi,
-            'select count(*) as "TABLECOUNT" from pg_tables where schemaname=%s and tablename=%s'
+            'select count(*) as "tableCount" from pg_tables where schemaname=%s and tablename=%s'
         );
         temp = temp.replace(
             /SELECT COUNT\(\*\) AS tableCount from views where schema_name=(\%s|\?) and view_name=(\%s|\?)/gi,
-            'select count(*) as "TABLECOUNT" from pg_views where schemaname=%s and viewname=%s'
+            'select count(*) as "tableCount" from pg_views where schemaname=%s and viewname=%s'
         );
 
         // Replace Upsert with Insert On Conflict

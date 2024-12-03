@@ -49,7 +49,7 @@ export async function getmultiplecohortdata(req: IMRIRequest, res) {
     let chartType: string = req.params.chartType;
     let yaxis: string = req.query.yaxis;
     let bmkIds: string = req.query.ids;
-    let datasetId: string = req.query.selectedStudyEntityValue;
+    let datasetId: string = req.query.datasetId;
 
     if (req.query.xaxis && req.query.xaxis !== "undefined") {
         userSelectedAttributes = (req.query.xaxis as string)
