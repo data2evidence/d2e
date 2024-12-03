@@ -69,9 +69,8 @@ fi
 
 ########################
 # Setup Test DB
-########################
 yarn --prefer-offline
-# yarn inittestdb
+yarn inittestdb
 
 ########################
 # Build system services
