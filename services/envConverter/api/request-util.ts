@@ -1,12 +1,12 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError} from "axios";
 
 axios.defaults.timeout = 30000;
 
 axios.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     return response;
   },
-  (error) => {
+  (error: AxiosError) => {
     console.error(
       `${error?.config?.method} ${error?.config?.url} ${error?.response?.status} ${error?.response?.statusText}`
     );
