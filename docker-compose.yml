@@ -462,7 +462,7 @@ services:
           },
           "query-gen-svc": {
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",
-            "isHttpTestRun": "${isTestEnv}",
+            "isHttpTestRun": "${isHttpTestRun}",
             "isTestEnv": "${isTestEnv}",
             "TESTSCHEMA": "${TESTSCHEMA}",
             "NOT_EQ_CHECK_FILTERCARDS": "${NOT_EQ_CHECK_FILTERCARDS:-true}"
@@ -508,6 +508,7 @@ services:
             "PORT": 41114,
             "USE_CACHEDB": "${USE_CACHEDB:-true}",
             "USE_DUCKDB": "${USE_DUCKDB:-true}",
+            "isHttpTestRun": "${isHttpTestRun}",
             "isTestEnv": "${isTestEnv}",
             "DUCKDB_PATH": "/home/docker/src/services/app/src/duckdb",
             "BUILT_IN_DUCKDB_PATH": "/home/docker/src/services/app/src/duckdb"
