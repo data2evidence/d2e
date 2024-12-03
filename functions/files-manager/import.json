@@ -1,23 +1,23 @@
 {
-    "imports": {
-        "express": "npm:express@^4.19.2",
-        "reflect-metadata": "npm:reflect-metadata@^0.2.2",
-        "typedi": "npm:typedi@^0.10.0",
-        "class-validator": "npm:class-validator@^0.14.0",
-        "typeorm": "npm:typeorm@0.3.20",
-        "zod": "npm:zod@^3.23.8",
-        "pg": "npm:pg@^8.11.3",
-        "path": "node:path",
-        "./src/main": "./src/main.ts",
-        "./src/routes": "./src/routes.ts",
-        "./src/env": "./src/env.ts",
-        "./src/files-manager/files-manager.router": "./src/files-manager/files-manager.router.ts",
-        "./src/files-manager/files-manager.service": "./src/files-manager/files-manager.service.ts",
-        "./src/files-manager/repository/blob-data.repository": "./src/files-manager/repository/blob-data.repository.ts",
-        "./src/files-manager/repository/user-data.repository": "./src/files-manager/repository/user-data.repository.ts",
-        "./src/files-manager/entity/blob-data.entity": "./src/files-manager/entity/blob-data.entity.ts",
-        "./src/files-manager/entity/user-data.entity": "./src/files-manager/entity/user-data.entity.ts",
-        "./src/common/data-source/data-source": "./src/common/data-source/data-source.ts"
-
-    }
+  "imports": {
+    "express": "npm:express@^4.19.2",
+    "reflect-metadata": "npm:reflect-metadata@^0.2.2",
+    "typedi": "npm:typedi@^0.10.0",
+    "class-validator": "npm:class-validator@^0.14.0",
+    "typeorm": "npm:typeorm@0.3.20",
+    "zod": "npm:zod@^3.23.8",
+    "pg": "npm:pg@^8.11.3",
+    "path": "node:path",
+    "./src/main": "./src/main.ts",
+    "./src/routes": "./src/routes.ts",
+    "./src/env": "./src/env.ts",
+    "./src/files-manager/files-manager.router": "./src/files-manager/files-manager.router.ts",
+    "./src/files-manager/files-manager.service": "./src/files-manager/files-manager.service.ts",
+    "./src/files-manager/repository/blob-data.repository": "./src/files-manager/repository/blob-data.repository.ts",
+    "./src/files-manager/repository/user-data.repository": "./src/files-manager/repository/user-data.repository.ts",
+    "./src/files-manager/entity/blob-data.entity": "./src/files-manager/entity/blob-data.entity.ts",
+    "./src/files-manager/entity/user-data.entity": "./src/files-manager/entity/user-data.entity.ts",
+    "./src/common/data-source/data-source": "./src/common/data-source/data-source.ts",
+    "./src/common/middleware/route-check": "./src/common/middleware/route-check.ts"
+  }
 }

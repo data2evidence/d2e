@@ -1,6 +1,7 @@
 import { Router, NextFunction, Request, Response } from "express";
 import { Service } from "typedi";
 import { FilesManagerService } from "./files-manager.service";
+import { checkUserDataId } from "../common/middleware/route-check";
 @Service()
 export class FilesManagerRouter {
   private readonly router = Router();
@@ -15,11 +16,13 @@ export class FilesManagerRouter {
   }
 
   private registerRoutes() {
-    // reference datacontroller here
     this.router.get(
-      "/",
-      async (_req: Request, res: Response, next: NextFunction) => {
-        this.logger.info("Download file by userDataId: ");
+      "/:userDataId",
+      checkUserDataId,
+      async (req: Request, res: Response, next: NextFunction) => {
+        const { userDataId } = req.params;
+
+        this.logger.info("Download file by userDataId: ", userDataId);
 
         try {
           this.filesManagerService.get();
@@ -32,9 +35,10 @@ export class FilesManagerRouter {
       }
     );
 
+    // username, datakey and the file
     this.router.post(
-      "/",
-      async (_req: Request, res: Response, next: NextFunction) => {
+      "/:userDataId",
+      async (req: Request, res: Response, next: NextFunction) => {
         this.logger.info(`Save file with username and data-key `);
 
         try {
@@ -46,9 +50,12 @@ export class FilesManagerRouter {
     );
 
     this.router.delete(
-      "/",
-      async (_req: Request, res: Response, next: NextFunction) => {
-        this.logger.info(`Delete file by userDataId: `);
+      "/:userDataId",
+      checkUserDataId,
+      async (req: Request, res: Response, next: NextFunction) => {
+        const { userDataId } = req.params;
+
+        this.logger.info(`Delete file by userDataId: `, userDataId);
 
         try {
           res.status(200).send("works");
@@ -60,8 +67,11 @@ export class FilesManagerRouter {
 
     this.router.get(
       "/user-data/:userDataId",
-      async (_req: Request, res: Response, next: NextFunction) => {
-        this.logger.info(`get user data by userDataId: `);
+      checkUserDataId,
+      async (req: Request, res: Response, next: NextFunction) => {
+        const { userDataId } = req.params;
+
+        this.logger.info(`get user data by userDataId: `, userDataId);
 
         try {
           res.status(200).send("works");
