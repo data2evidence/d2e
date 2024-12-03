@@ -25,7 +25,7 @@ import {
   IDatasetDashboardBaseDto,
   IStudyDto
 } from '../../types'
-import { Dataset, DatasetDetail, DatasetTag } from '../entity'
+import { Dataset, DatasetDashboard, DatasetDetail, DatasetTag } from '../entity'
 import { createLogger } from '../../logger'
 import { env } from '../../env'
 import { TransactionRunner } from '../../common/data-source/transaction-runner'
@@ -313,7 +313,10 @@ export class DatasetCommandService {
     datasetId: string,
     dashboards: IDatasetDashboardBaseDto[]
   ) {
-    const { deletedDashboards, newDashboards } = await this.filterDashboardChanges(datasetId, dashboards)
+    const { deletedDashboards, newDashboards, existingDashboards } = await this.filterDashboardChanges(
+      datasetId,
+      dashboards
+    )
     for (const dashboard of deletedDashboards) {
       const { name, url, basePath } = dashboard
       this.logger.debug(`Delete dataset ${datasetId} dashboard: ${name}`)
@@ -323,6 +326,11 @@ export class DatasetCommandService {
       const entity = this.dashboardRepo.create({ datasetId, ...dashboard, id: uuidv4() })
       this.logger.debug(`Create dataset ${datasetId} dashboard ${JSON.stringify(entity)}`)
       await this.dashboardRepo.insertDashboard(entityMgr, this.addOwner(entity, true))
+    }
+    for (const dashboard of existingDashboards) {
+      const entity = { datasetId, ...dashboard } as DatasetDashboard
+      this.logger.debug(`Update dataset ${datasetId} dashboard ${JSON.stringify(entity)}`)
+      await this.dashboardRepo.updateDashboard(entityMgr, dashboard.id, this.addOwner(entity, false))
     }
   }
 
@@ -464,16 +472,24 @@ export class DatasetCommandService {
   ): Promise<{ [key: string]: IDatasetDashboardBaseDto[] }> {
     const currDashboards = await this.dashboardRepo.find({ where: { datasetId } })
 
-    const isSameDashboard = (a: IDatasetDashboardBaseDto, b: IDatasetDashboardBaseDto) =>
-      a.name === b.name && a.url === b.url && a.basePath === b.basePath
+    const isSameDashboard = (a: IDatasetDashboardBaseDto, b: IDatasetDashboardBaseDto) => a.id === b.id
 
     const deletedDashboards =
       this.onlyInLeft<IDatasetDashboardBaseDto>(currDashboards, dashboards, isSameDashboard) || []
     const newDashboards = this.onlyInLeft<IDatasetDashboardBaseDto>(dashboards, currDashboards, isSameDashboard) || []
 
+    const hasChanges = (a: IDatasetDashboardBaseDto, b: IDatasetDashboardBaseDto) =>
+      a.name !== b.name || a.url !== b.url || a.basePath !== b.basePath
+
+    const existingDashboards = dashboards.filter(dashboard => {
+      const currDashboard = currDashboards.find(curr => curr.id === dashboard.id)
+      return currDashboard && hasChanges(dashboard, currDashboard)
+    })
+
     return {
       deletedDashboards,
-      newDashboards
+      newDashboards,
+      existingDashboards
     }
   }
 

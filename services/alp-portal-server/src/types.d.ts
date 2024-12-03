@@ -85,6 +85,7 @@ export interface IStudyDetailDto extends IDatasetDetailBaseDto {
 }
 
 interface IDatasetDashboardBaseDto {
+  id?: string
   name: string
   url: string
   basePath: string
