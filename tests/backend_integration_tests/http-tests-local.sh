@@ -9,7 +9,6 @@ export isTestEnv="true"
 export isHttpTestRun="true"
 export DOCKER_TAG_NAME="local"
 export OP_VAULT_NAME=Singapore
-export USE_CACHEDB="false"
 
 export HANASERVER="$HANASERVER"
 export HDIUSER="$HDIUSER"
@@ -72,7 +71,7 @@ fi
 # Setup Test DB
 ########################
 yarn --prefer-offline
-yarn inittestdb
+# yarn inittestdb
 
 ########################
 # Build system services
@@ -90,10 +89,8 @@ yq -i '.networks.alp.external=true' docker-compose.yml
 docker network create alp
 
 ########################
-# Get logto values
+# Get and set logto values
 ########################
-echo "USE_DUCKDB=false" >>.env.local
-echo "USE_CACHEDB=false" >>.env.local
 echo "NODE_ENV=production" >>.env.local
 yarn init:logto
 export LOGTO__ALP_APP__CLIENT_ID=$(cat .env.local | grep LOGTO__ALP_APP__CLIENT_ID | cut -d'=' -f2 | head -n 1)
