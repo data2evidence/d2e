@@ -1,5 +1,5 @@
 {
-  "imports":{
+  "imports": {
     "@alp/alp-base-utils": "../_shared/alp-base-utils/src/index.ts",
     "@alp/alp-config-utils": "../_shared/alp-config-utils/src/index.ts",
     "@alp/alp-metadata": "../_shared/alp-metadata/src/index.ts",
@@ -200,6 +200,8 @@
     "crypto": "node:crypto",
     "fs": "node:fs",
     "url": "node:url",
-    "querystring": "node:querystring"
+    "querystring": "node:querystring",
+    "tls": "node:tls",
+    "net": "node:net"
   }
 }

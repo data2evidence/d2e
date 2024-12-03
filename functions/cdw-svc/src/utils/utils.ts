@@ -482,6 +482,14 @@ export async function getAnalyticsConnection(userObj, token?: string) {
   } else {
     cdwService = cdwService.filter((db) => db.dialect == "hana");
     analyticsCredentials = cdwService[0];
+    // node hdb library checks for these to use TLS
+    // TLS does not work with deno for self signed certs
+    if (!analyticsCredentials.useTLS) {
+      delete analyticsCredentials.key;
+      delete analyticsCredentials.cert;
+      delete analyticsCredentials.ca;
+      delete analyticsCredentials.pfx;
+    }
     analyticsConnection =
       await dbConnectionUtil.DBConnectionUtil.getDBConnection({
         credentials: analyticsCredentials,

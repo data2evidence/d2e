@@ -668,6 +668,14 @@ const getDBConnections = async ({
 
     if (!analyticsConnectionPromise) {
         //Initialize if not yet until this point
+        // node hdb library checks for these to use TLS
+        // TLS does not work with deno for self signed certs
+        if (!analyticsCredentials.useTLS) {
+            delete analyticsCredentials.key;
+            delete analyticsCredentials.cert;
+            delete analyticsCredentials.ca;
+            delete analyticsCredentials.pfx;
+        }
         analyticsConnectionPromise =
             dbConnectionUtil.DBConnectionUtil.getDBConnection({
                 credentials: analyticsCredentials,

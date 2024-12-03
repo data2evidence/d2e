@@ -251,13 +251,6 @@ echo $USER_MGMT_ID
 ########################
 # Seed db credentials
 ########################
-# Trigger db credentials function run to get migrations to run first
-curl -ik 'https://localhost:41100/db-credentials/db/list' \
-    -H "authorization: Bearer $BEARER_TOKEN"
-
-echo "Waiting 180 secs for db cred function to start and run migrations..."
-sleep 180
-
 echo . create read role
 docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "INSERT INTO db_credentials_mgr.db (id,host,port,name,dialect,created_by,created_date,modified_by,modified_date,code) VALUES
 ('9addef8a-56d1-42c2-bcad-3c10035d540b','${HANASERVER}',${HDIPORT},'ALPDEV','hana','local','2024-05-20 02:02:08.102165','local','2024-05-20 02:02:08.102165','${TESTSCHEMA}') ON CONFLICT DO NOTHING"
