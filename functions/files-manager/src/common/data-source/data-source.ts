@@ -24,4 +24,5 @@ export const dataSourceOptions: DataSourceOptions = {
 };
 
 const dataSource = new DataSource(dataSourceOptions);
+dataSource.driver.supportedDataTypes.push("oid");
 export default dataSource;
