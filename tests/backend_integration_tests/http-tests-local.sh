@@ -90,6 +90,10 @@ docker network create alp
 ########################
 # Get and set logto values
 ########################
+# HTTP tests use hana db, hence USE_DUCKDB and USE_CACHEDB must be false
+# due to logic in analytics service getDBConnections
+echo "USE_DUCKDB=false" >>.env.local
+echo "USE_CACHEDB=false" >>.env.local
 echo "NODE_ENV=production" >>.env.local
 yarn init:logto
 export LOGTO__ALP_APP__CLIENT_ID=$(cat .env.local | grep LOGTO__ALP_APP__CLIENT_ID | cut -d'=' -f2 | head -n 1)

@@ -150,6 +150,10 @@ jobs:
         env:
           ENV_TYPE: "local"
         run: |
+          # HTTP tests use hana db, hence USE_DUCKDB and USE_CACHEDB must be false
+          # due to logic in analytics service getDBConnections
+          echo "USE_DUCKDB=false" >>.env.local
+          echo "USE_CACHEDB=false" >>.env.local
           echo "NODE_ENV=production" >>.env.local
           yarn init:logto
           export LOGTO__ALP_APP__CLIENT_ID=$(cat .env.local | grep LOGTO__ALP_APP__CLIENT_ID | cut -d'=' -f2 | head -n 1)
@@ -368,10 +372,10 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-minerva-portal-server-nest-prod-1 -t
-      - name: print logs for alp-minerva-postgres
+      - name: print logs for alp-minerva-postgres-1
         if: ${{ always() || cancelled() || failure() }}
         run: |
-          docker logs alp-minerva-postgres -t
+          docker logs alp-minerva-postgres-1 -t
       - name: print logs for alp-minerva-redis-1
         if: ${{ always() || cancelled() || failure() }}
         run: |
