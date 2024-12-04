@@ -336,7 +336,8 @@
           "prefect.update",
           "conceptmapping.read",
           "conceptmapping.post",
-          "filesmanager.read"
+          "filesmanager.read",
+          "filesmanager.post"
         ],
         "ALP_DASHBOARD_VIEWER": [
           "gateway.dashboardGate.content"
@@ -416,10 +417,12 @@
         {
           "path": "^/files-manager/api",
           "scopes": [
-            "filesmanager.read"
+            "filesmanager.read",
+            "filesmanager.post"
           ],
           "httpMethods": [
-            "GET"
+            "GET",
+            "POST"
           ]
         },
         {
