@@ -333,6 +333,16 @@ export class ConceptService {
       const systemPortalApi = new SystemPortalAPI(this.token);
       const { databaseCode, vocabSchemaName, dialect } =
         await systemPortalApi.getDatasetDetails(datasetId);
+
+      // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+      if (env.USE_DUCKDB_FTS) {
+        return await this.cachedbService.getRecommendedConcepts(
+          conceptIds,
+          datasetId,
+          vocabSchemaName,
+        );
+      }
+
       logger.info('Searching with Meilisearch');
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResultCR = await meilisearchApi.getRecommendedConcepts(
@@ -390,6 +400,18 @@ export class ConceptService {
       const systemPortalApi = new SystemPortalAPI(this.token);
       const { databaseCode, vocabSchemaName, dialect } =
         await systemPortalApi.getDatasetDetails(datasetId);
+
+      // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+      if (env.USE_DUCKDB_FTS) {
+        logger.info('searchConceptByName with Duckdb FTS');
+        return await this.cachedbService.getExactConcept(
+          conceptName,
+          datasetId,
+          vocabSchemaName,
+          'concept_name',
+        );
+      }
+
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResult = await meilisearchApi.getConceptByName(
         conceptName,
@@ -417,6 +439,18 @@ export class ConceptService {
       const systemPortalApi = new SystemPortalAPI(this.token);
       const { databaseCode, vocabSchemaName, dialect } =
         await systemPortalApi.getDatasetDetails(datasetId);
+
+      // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+      if (env.USE_DUCKDB_FTS) {
+        logger.info('searchConceptByName with Duckdb FTS');
+        return await this.cachedbService.getExactConcept(
+          conceptId,
+          datasetId,
+          vocabSchemaName,
+          'concept_id',
+        );
+      }
+
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResult = await meilisearchApi.getConceptById(
         conceptId,
@@ -444,6 +478,18 @@ export class ConceptService {
       const systemPortalApi = new SystemPortalAPI(this.token);
       const { databaseCode, vocabSchemaName, dialect } =
         await systemPortalApi.getDatasetDetails(datasetId);
+
+      // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+      if (env.USE_DUCKDB_FTS) {
+        logger.info('searchConceptByName with Duckdb FTS');
+        return await this.cachedbService.getExactConcept(
+          conceptCode,
+          datasetId,
+          vocabSchemaName,
+          'concept_code',
+        );
+      }
+
       const meilisearchApi = new MeilisearchAPI();
       const meilisearchResult = await meilisearchApi.getConceptByCode(
         conceptCode,

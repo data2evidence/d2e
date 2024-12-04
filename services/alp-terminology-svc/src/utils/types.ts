@@ -105,7 +105,7 @@ export interface IMeilisearchFacet {
   facetHits: { value: string; count: number };
 }
 export interface IConceptRecommended {
-  meilisearch_id: number;
+  meilisearch_id?: number;
   concept_id_1: number;
   concept_id_2: number;
   relationship_id: string;

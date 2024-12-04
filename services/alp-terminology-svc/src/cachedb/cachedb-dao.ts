@@ -3,15 +3,18 @@ import { createLogger } from '../logger';
 import { Filters } from '../utils/types';
 import { env } from 'src/env';
 import { INDEX_ATTRIBUTES } from '../utils/constants';
+import { IDuckdbConcept, IConceptRecommended } from '../utils/types';
 
 export class CachedbDAO {
   private readonly jwt: string;
   private readonly datasetId: string;
+  private readonly vocabSchemaName: string;
   private readonly logger = createLogger(this.constructor.name);
 
-  constructor(jwt: string, datasetId: string) {
+  constructor(jwt: string, datasetId: string, vocabSchemaName: string) {
     this.jwt = jwt;
     this.datasetId = datasetId;
+    this.vocabSchemaName = vocabSchemaName;
     if (!jwt) {
       throw new Error('No token passed for CachedbDAO!');
     }
@@ -21,13 +24,12 @@ export class CachedbDAO {
     pageNumber = 0,
     rowsPerPage: number,
     searchText = '',
-    vocabSchemaName: string,
     filters: Filters,
   ) {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const [duckdbFtsBaseQuery, duckdbFtsBaseQueryParams] =
-        this.getDuckdbFtsBaseQuery(vocabSchemaName, searchText, filters);
+        this.getDuckdbFtsBaseQuery(searchText, filters);
       const conceptsSql = `
       ${duckdbFtsBaseQuery}
       select *
@@ -62,9 +64,8 @@ export class CachedbDAO {
 
   async getMultipleExactConcepts(
     searchTexts: number[],
-    vocabSchemaName: string,
     includeInvalid = true,
-  ) {
+  ): Promise<IDuckdbConcept> {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const searchTextWhereclause =
@@ -79,18 +80,22 @@ export class CachedbDAO {
 
       const sql = `
         select *
-        from ${vocabSchemaName}.concept
+        from ${this.vocabSchemaName}.concept
         WHERE 
         ${searchTextWhereclause}
         ${invalidReasonWhereClause}
         `;
 
       const result = await client.query(sql, [...searchTexts]);
-      const data = {
-        hits: result.rows,
-        totalHits: result.rowCount,
-      };
-      return data;
+      if (result) {
+        const data = {
+          hits: result.rows,
+          totalHits: result.rowCount,
+        };
+        return data;
+      } else {
+        return null;
+      }
     } catch (error) {
       this.logger.error(error);
     } finally {
@@ -99,7 +104,6 @@ export class CachedbDAO {
   }
 
   async getConceptFilterOptionsFaceted(
-    vocabSchemaName: string,
     searchText: string,
     filters: Filters,
   ): Promise<any> {
@@ -147,9 +151,7 @@ export class CachedbDAO {
       const facetPromises = Object.values(facetColumns).map(
         (column: string) => {
           const [duckdbFtsBaseQuery, duckdbFtsBaseQueryParams] =
-            this.getDuckdbFtsBaseQuery(vocabSchemaName, searchText, filters, [
-              column,
-            ]);
+            this.getDuckdbFtsBaseQuery(searchText, filters, [column]);
           let facetSql;
           if (column === 'valid_end_date') {
             facetSql = getValidityFacetSql(column);
@@ -216,7 +218,6 @@ export class CachedbDAO {
   }
 
   private getDuckdbFtsBaseQuery = (
-    vocabSchemaName: string,
     searchText: string,
     filters: Filters,
     columns: string[] = [],
@@ -232,7 +233,7 @@ export class CachedbDAO {
         select
           ${columnsToSelect}
         from
-          ${vocabSchemaName}.concept
+          ${this.vocabSchemaName}.concept
           ${filterWhereClause}
         )
       `,
@@ -247,9 +248,9 @@ export class CachedbDAO {
       with fts as (
         select
           ${columnsToSelect},
-          ${vocabSchemaName}.fts_main_concept.match_bm25(concept_id, ?) as score
+          ${this.vocabSchemaName}.fts_main_concept.match_bm25(concept_id, ?) as score
         from
-          ${vocabSchemaName}.concept
+          ${this.vocabSchemaName}.concept
           ${duckdbFtsWhereClause} 
           order by score desc
         )
@@ -300,15 +301,12 @@ export class CachedbDAO {
     }
   }
 
-  async getConceptRelationships(
-    conceptId: number,
-    vocabSchemaName: string,
-  ): Promise<any> {
+  async getConceptRelationships(conceptId: number): Promise<any> {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const sql = `
       select *
-          from ${vocabSchemaName}.concept_relationship
+          from ${this.vocabSchemaName}.concept_relationship
           WHERE ${INDEX_ATTRIBUTES.concept_relationship.conceptId1}=$1
           `;
       const result = await client.query(sql, [conceptId]);
@@ -325,15 +323,12 @@ export class CachedbDAO {
     }
   }
 
-  async getRelationships(
-    relationshipId: number,
-    vocabSchemaName: string,
-  ): Promise<any> {
+  async getRelationships(relationshipId: number): Promise<any> {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
       const sql = `
       select *
-          from ${vocabSchemaName}.relationship
+          from ${this.vocabSchemaName}.relationship
           WHERE ${INDEX_ATTRIBUTES.relationship.relationshipId}=$1
           `;
       const result = await client.query(sql, [relationshipId]);
@@ -349,13 +344,73 @@ export class CachedbDAO {
     }
   }
 
+  // async getConceptByName(conceptName: string): Promise<any> {
+  //   const client = this.getCachedbConnection(this.jwt, this.datasetId);
+  //   const filters: Filters = {
+  //     conceptClassId: [],
+  //     domainId: [],
+  //     standardConcept: ['S'],
+  //     vocabularyId: [],
+  //     validity: ['Valid'],
+  //   };
+  //   try {
+  //     const [duckdbFtsBaseQuery, duckdbFtsBaseQueryParams] =
+  //       this.getDuckdbFtsBaseQuery(conceptName, filters);
+  //     const sql = `
+  //       ${duckdbFtsBaseQuery}
+  //       select concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code, valid_start_date, valid_end_date, invalid_reason from fts
+  //           `;
+  //     const result = await client.query(sql, [...duckdbFtsBaseQueryParams]);
+  //     return result.rows;
+  //   } catch (error) {
+  //     this.logger.error(error);
+  //   } finally {
+  //     await client.end();
+  //   }
+  // }
+
+  async getExactConcept(
+    conceptName: string | number,
+    conceptColumnName: 'concept_name' | 'concept_id' | 'concept_code',
+  ): Promise<any> {
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
+    try {
+      const sql = `
+        select concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code, valid_start_date, valid_end_date, invalid_reason from ${this.vocabSchemaName}.concept WHERE ${conceptColumnName}=? AND standard_concept='S';
+            `;
+      const result = await client.query(sql, [conceptName]);
+      return result.rows;
+    } catch (error) {
+      this.logger.error(error);
+    } finally {
+      await client.end();
+    }
+  }
+
+  async getExactConceptRecommended(
+    searchConceptIds: number[],
+  ): Promise<IConceptRecommended[]> {
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
+    try {
+      const sql = `
+        select concept_id_1, concept_id_2, relationship_id from ${this.vocabSchemaName}.concept_recommended WHERE concept_id_1 IN (?);
+            `;
+      const result = await client.query(sql, [searchConceptIds.join(', ')]);
+      return result.rows;
+    } catch (error) {
+      this.logger.error(error);
+    } finally {
+      await client.end();
+    }
+  }
+
   private getCachedbConnection = (jwt: string, datasetId: string) => {
     try {
       const client = new pg.Client({
         host: env.CACHEDB__HOST,
         port: env.CACHEDB__PORT,
         user: jwt,
-        database: `A|duckdb|${datasetId}`,
+        database: `A|duckdb|read|${datasetId}`,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 30000,
       });

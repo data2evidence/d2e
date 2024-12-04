@@ -38,15 +38,32 @@ export class CachedbService {
     filters: Filters,
   ) {
     try {
-      const cachedbDao = new CachedbDAO(this.token, datasetId);
+      const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
       const result = await cachedbDao.getConcepts(
         pageNumber,
         Number(rowsPerPage),
         searchText,
-        vocabSchemaName,
         filters,
       );
       return this.duckdbResultMapping(result);
+    } catch (err) {
+      this.logger.error(err);
+    }
+  }
+
+  async getExactConcept(
+    conceptName: string | number,
+    datasetId: string,
+    vocabSchemaName: string,
+    conceptColumnName: 'concept_name' | 'concept_id' | 'concept_code',
+  ) {
+    try {
+      const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+      const result = await cachedbDao.getExactConcept(
+        conceptName,
+        conceptColumnName,
+      );
+      return result;
     } catch (err) {
       this.logger.error(err);
     }
@@ -66,12 +83,8 @@ export class CachedbService {
       return DUMMY_FILTER_OPTIONS_FACETS;
     }
 
-    const cachedbDao = new CachedbDAO(this.token, datasetId);
-    return cachedbDao.getConceptFilterOptionsFaceted(
-      vocabSchemaName,
-      searchText,
-      filters,
-    );
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+    return cachedbDao.getConceptFilterOptionsFaceted(searchText, filters);
   }
 
   async getTerminologyDetailsWithRelationships(
@@ -83,13 +96,9 @@ export class CachedbService {
     try {
       const searchConcepts1: number[] = [conceptId];
 
-      const cachedbDao = new CachedbDAO(this.token, datasetId);
+      const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
       const DuckdbResultConcept1: any =
-        await cachedbDao.getMultipleExactConcepts(
-          searchConcepts1,
-          vocabSchemaName,
-          true,
-        );
+        await cachedbDao.getMultipleExactConcepts(searchConcepts1, true);
 
       const conceptC1: FhirValueSet =
         this.duckdbResultMapping(DuckdbResultConcept1);
@@ -101,23 +110,17 @@ export class CachedbService {
         const fhirTargetElements: FhirConceptMapElementTarget[] = [];
         const conceptRelations = await cachedbDao.getConceptRelationships(
           detailsC1.conceptId,
-          vocabSchemaName,
         );
 
         for (let i = 0; i < conceptRelations.hits.length; i++) {
           const relationships = await cachedbDao.getRelationships(
             conceptRelations.hits[i].relationship_id,
-            vocabSchemaName,
           );
           const searchConcepts2: number[] = [
             conceptRelations.hits[i].concept_id_2,
           ];
           const DuckdbResultConcept2: any =
-            await cachedbDao.getMultipleExactConcepts(
-              searchConcepts2,
-              vocabSchemaName,
-              true,
-            );
+            await cachedbDao.getMultipleExactConcepts(searchConcepts2, true);
           const conceptC2: FhirValueSet =
             this.duckdbResultMapping(DuckdbResultConcept2);
           const detailsC2: FhirValueSetExpansionContainsWithExt =
@@ -129,11 +132,7 @@ export class CachedbService {
             relationships.hits[0].relationship_concept_id,
           ];
           const DuckdbResultConcept3: any =
-            await cachedbDao.getMultipleExactConcepts(
-              searchConcepts3,
-              vocabSchemaName,
-              true,
-            );
+            await cachedbDao.getMultipleExactConcepts(searchConcepts3, true);
           const conceptC3: FhirValueSet =
             this.duckdbResultMapping(DuckdbResultConcept3);
           const detailsC3: FhirValueSetExpansionContainsWithExt =
@@ -177,6 +176,48 @@ export class CachedbService {
     } catch (err) {
       this.logger.error(err);
       throw err;
+    }
+  }
+
+  async getRecommendedConcepts(
+    conceptIds: number[],
+    datasetId: string,
+    vocabSchemaName: string,
+  ): Promise<any> {
+    try {
+      const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+      const recommendedConcepts = await cachedbDao.getExactConceptRecommended(
+        conceptIds,
+      );
+
+      if (recommendedConcepts.length === 0) {
+        return [];
+      }
+
+      const mappedConceptIds = recommendedConcepts.map((e) => e.concept_id_2);
+
+      const duckdbResult = await cachedbDao.getMultipleExactConcepts(
+        mappedConceptIds,
+      );
+
+      if (duckdbResult === null) {
+        return [];
+      }
+
+      const mappedResult =
+        this.duckdbResultMapping(duckdbResult).expansion.contains[0];
+      // Result has to be mapped like this due to expected response from frontend
+      const mappedResult2 = [
+        {
+          ...mappedResult,
+          conceptCode: mappedResult.code,
+          conceptName: mappedResult.display,
+          vocabularyId: mappedResult.system,
+        },
+      ];
+      return mappedResult2;
+    } catch (err) {
+      this.logger.error(err);
     }
   }
 
