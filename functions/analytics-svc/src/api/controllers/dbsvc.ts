@@ -7,12 +7,9 @@ import PortalServerAPI from "../PortalServerAPI";
 const logger = Logger.CreateLogger("analytics-log");
 
 export async function getCDMVersion(req, res, next) {
-    let dialect: string = req.params.databaseType;
-    let tenant: string = req.params.tenant;
-    let schema: string = req.params.schemaName;
-    const datasetId = req.params.datasetId;
+    const datasetId = req.query.datasetId;
 
-    const {  databaseCode, schemaName } =
+    const { dialect, databaseCode, schemaName } =
         await new PortalServerAPI().getStudy(
             req.headers.authorization,
             datasetId
@@ -73,12 +70,9 @@ export async function checkIfSchemaExists(req, res, next) {
 }
 
 export async function getSnapshotSchemaMetadata(req, res, next) {
-    let dialect: string = req.params.databaseType;
-    let tenant: string = req.params.tenant;
-    let schema = req.params.schemaName;
-    const datasetId = req.params.datasetId;
+    const datasetId = req.query.datasetId;
 
-    const {  databaseCode, schemaName } =
+    const { dialect, databaseCode, schemaName } =
         await new PortalServerAPI().getStudy(
             req.headers.authorization,
             datasetId

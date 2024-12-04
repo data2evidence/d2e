@@ -44,12 +44,10 @@ export class AnalyticsSvcAPI {
     const errorMessage = "Error while getting data characterization results";
     try {
       console.log(`vocabSchema ${vocabSchema} datasetId ${datasetId}`);
-      // const options = await this.getRequestConfig();
       const options = await this.createOptions("GET");
-      //add studyid
       const url = `${
         this.baseURL
-      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?studyId=${datasetId}`;
+      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?datasetId=${datasetId}`;
       const response = await fetch(url, options);
       return await response.json();
     } catch (error) {
@@ -70,7 +68,7 @@ export class AnalyticsSvcAPI {
     try {
       const url = `${
         this.baseURL
-      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}/${conceptId}?studyId=${datasetId}`;
+      }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}/${conceptId}?datasetId=${datasetId}`;
       console.log(`Calling ${url} for conceptId ${conceptId}`);
       const options = this.createOptions("GET");
       const result = await fetch(url, options);
@@ -88,36 +86,20 @@ export class AnalyticsSvcAPI {
     }
   }
 
-  // TODO: Fix Invalid CA cert error
   // Fetch CDM version
-  async getCdmVersion(dialect: string, databaseCode: string, schema: string) {
+  async getCdmVersion(datasetId: string) {
     try {
-      const url = `${this.baseURL}/alpdb/${dialect}/database/${databaseCode}/cdmversion/schema/${schema}`;
+      const url = `${this.baseURL}/alpdb/cdmversion`;
       console.log(`Calling ${url} to fetch CDM version`);
-      // const options = this.createOptions("GET");
       const options = this.getRequestConfig();
-      // const result = await fetch(url, options);
-      const result = await get(url, options);
-      // if (!result.ok) {
-      //   throw new Error("Error while getting cdm version");
-      // }
-      // return await result.json();
+      const params = new URLSearchParams();
+      params.append("datasetId", datasetId);
+      const result = await get(url, { ...options, params });
       return result.data;
     } catch (error) {
       console.error(`Error while getting cdm version: ${error}`);
       throw error;
     }
-  }
-
-  // Helper method to generate options for fetch
-  private createOptions(method: string): RequestInit {
-    return {
-      method,
-      headers: {
-        Authorization: this.token,
-        "Content-Type": "application/json",
-      },
-    };
   }
 
   private getRequestConfig() {
@@ -132,5 +114,15 @@ export class AnalyticsSvcAPI {
     };
 
     return options;
+  }
+
+  private createOptions(method: string): RequestInit {
+    return {
+      method,
+      headers: {
+        Authorization: this.token,
+        "Content-Type": "application/json",
+      },
+    };
   }
 }

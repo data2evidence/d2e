@@ -24,21 +24,19 @@ export function values(req: IMRIRequest, res, next) {
     const configId = req.query.configId;
     const configVersion = req.query.configVersion;
     const suggestionLimit = req.query.suggestionLimit;
-    const selectedStudyEntityValue =
-        req.query.selectedStudyEntityValue;
+    const datasetId = req.query.datasetId;
     const searchQuery = req.query.searchQuery ? req.query.searchQuery : "";
     const studies: StudyDbMetadata[] = req.studiesDbMetadata.studies;
     if (studies && studies.length > 0) {
         const studyMetadata: StudyDbMetadata = studies.find(
-            (o) => o.id === selectedStudyEntityValue
+            (o) => o.id === datasetId
         );
         if (studyMetadata && studyMetadata.vocabSchemaName) {
             analyticsConnection.schemaName = studyMetadata.vocabSchemaName;
         } else {
-            throw new Error(`Vocab schema undefined for Dataset ${selectedStudyEntityValue}`)
+            throw new Error(`Vocab schema undefined for Dataset ${datasetId}`);
         }
     }
-    
 
     analyticsConnection.setCurrentUserToDbSession(
         user.getUser(),
@@ -71,7 +69,7 @@ export function values(req: IMRIRequest, res, next) {
                             configId,
                             configVersion,
                             lang: language,
-                            selectedStudyEntityValue,
+                            datasetId,
                         },
                     },
                     analyticsConnection,

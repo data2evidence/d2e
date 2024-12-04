@@ -21,7 +21,7 @@ app.use(
   "/jobplugins/dqd/data-characterization",
   new DataCharacterizationController().router
 );
-app.use("/jobplugins/prefect", new DataModelFlowController().router);
+app.use("/jobplugins/datamodel", new DataModelFlowController().router);
 
 const opt = {
   user: env.PG_USER,
