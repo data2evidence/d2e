@@ -247,7 +247,7 @@ echo $USER_MGMT_ID
 ########################
 # Seed db credentials
 ########################
-echo . create read role
+echo "Seed db credentials"
 docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alp -c "INSERT INTO db_credentials_mgr.db (id,host,port,name,dialect,created_by,created_date,modified_by,modified_date,code) VALUES
 ('9addef8a-56d1-42c2-bcad-3c10035d540b','${HANASERVER}',${HDIPORT},'ALPDEV','hana','local','2024-05-20 02:02:08.102165','local','2024-05-20 02:02:08.102165','${TESTSCHEMA}') ON CONFLICT DO NOTHING"
 
