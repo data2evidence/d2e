@@ -6,9 +6,9 @@ export class BlobData {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  data: string;
+  @Column({ type: "oid" })
+  data: Buffer;
 
-  @OneToMany(() => UserData, (userData) => userData.blob_data)
+  @OneToMany(() => UserData, (userData) => userData.blobData)
   userData: UserData[];
 }

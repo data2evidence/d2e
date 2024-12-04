@@ -27,9 +27,13 @@ export class UserData {
   @Column({ name: "file_name" })
   fileName: string;
 
+  @Column({ name: "blob_id" })
+  blobId: string;
+
   @ManyToOne(() => BlobData, (db) => db, {
     onDelete: "CASCADE",
+    eager: true,
   })
   @JoinColumn({ name: "blob_id" })
-  blobId: Relation<BlobData>;
+  blobData: Relation<BlobData>;
 }

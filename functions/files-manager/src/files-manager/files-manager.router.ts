@@ -1,7 +1,12 @@
 import { Router, NextFunction, Request, Response } from "express";
 import { Service } from "typedi";
+import multer from "multer";
+import { validationResult, matchedData } from "express-validator";
 import { FilesManagerService } from "./files-manager.service";
 import { checkUserDataId } from "../common/middleware/route-check";
+import { SaveFileDto } from "./dto/save-file.dto";
+
+const upload = multer({ storage: multer.memoryStorage() });
 @Service()
 export class FilesManagerRouter {
   private readonly router = Router();
@@ -37,11 +42,24 @@ export class FilesManagerRouter {
 
     // username, datakey and the file
     this.router.post(
-      "/:userDataId",
+      "/",
+      upload.single("file"),
+      SaveFileDto(),
       async (req: Request, res: Response, next: NextFunction) => {
-        this.logger.info(`Save file with username and data-key `);
+        this.logger.info(`Save file with username and data-key`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          res.status(400).json({ errors: errors.array() });
+        }
 
         try {
+          const { username, dataKey } = matchedData(req, {
+            locations: ["body"],
+          });
+          const file: Express.Multer.File = req.file;
+
+          this.filesManagerService.saveFile(username, dataKey, file);
           res.status(200).send("works");
         } catch (err) {
           this.logger.error(`Error when saving file: ${JSON.stringify(err)}`);
