@@ -49,8 +49,6 @@ export class App {
     this.registerValidatorContainer();
 
     this.app.listen(PORT);
-    this.logger.info(
-      `📁 Files Manager started successfully!. Server listening on port ${PORT}`
-    );
+    this.logger.info(`📁 Files Manager started successfully!.`);
   }
 }
