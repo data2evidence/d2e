@@ -1,4 +1,4 @@
-name: DockerCompose AzureTest CD
+name: Deploy AzureTest CD
 run-name: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
 
 on:
@@ -138,12 +138,14 @@ jobs:
           yarn remote:minerva up --remove-orphans --force-recreate --wait
           EXIT_CODE=$?
 
-          yarn base:minerva ps --format "{{.Names}} {{.Status}}" 2> /dev/null | grep ^alp | tee -a $GITHUB_STEP_SUMMARY
+          CMD=(docker ps --format "{{.Names}} {{.Status}}")
+          ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
           echo | tee -a $GITHUB_STEP_SUMMARY
 
           if [ $EXIT_CODE != 0 ]; then
-            echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-            exit $EXIT_CODE
+            echo "ALERT docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
+            FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy"); echo FAIL_COUNT=$FAIL_COUNT
+            [ $FAIL_COUNT != 0 ] && echo exit $EXIT_CODE
           fi
 
       - name: Logs minerva

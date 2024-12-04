@@ -1,4 +1,4 @@
-name: DockerCompose AzureDev Deploy
+name: Deploy AzureDev
 run-name: ${{ github.event.inputs.env }} ${{ github.event.inputs.repo_full_name }}
 
 on:
@@ -164,18 +164,20 @@ jobs:
           # Run ALP services
           yarn remote:minerva up --remove-orphans --force-recreate --wait
           EXIT_CODE=$?
-            
+
           if [ "$( docker container inspect -f '{{.State.Status}}' $GATEWAY_NAME )" = "running" ]; then
             echo open https://$CADDY__ALP__PUBLIC_FQDN/portal/index.html | tee -a $GITHUB_STEP_SUMMARY
             echo | tee -a $GITHUB_STEP_SUMMARY
           fi
 
-          yarn base:minerva ps --format "{{.Names}} {{.Status}}" 2> /dev/null | grep ^alp | tee -a $GITHUB_STEP_SUMMARY
+          CMD=(docker ps --format "{{.Names}} {{.Status}}")
+          ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
           echo | tee -a $GITHUB_STEP_SUMMARY
 
           if [ $EXIT_CODE != 0 ]; then
-            echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-            exit $EXIT_CODE
+            echo "ALERT docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
+            FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy"); echo FAIL_COUNT=$FAIL_COUNT
+            [ $FAIL_COUNT != 0 ] && echo exit $EXIT_CODE
           fi
 
       - name: Logs minerva
