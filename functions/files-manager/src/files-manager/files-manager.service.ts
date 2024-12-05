@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { UserDataRepository } from "./repository/user-data.repository";
 import { BlobDataRepository } from "./repository/blob-data.repository";
 import { FileSaveResponse } from "../types";
+import { UserData } from "./entity/user-data.entity";
 
 @Service()
 export class FilesManagerService {
@@ -15,26 +16,18 @@ export class FilesManagerService {
   ) {}
 
   async getFile(userDataId: string) {
-    const userData = await this.userDataRepo.findOne({
+    const userData: UserData = await this.userDataRepo.findOne({
       where: {
         id: userDataId,
       },
       relations: ["blobData"],
     });
 
-    if (!userData) {
-      throw new Error(`User ${userDataId} does not exist`);
-    }
-
     const blobId = userData.blobData.data;
     const query = `SELECT convert_from(lo_get($1)::bytea, 'UTF8') AS data FROM "files_manager"."blob_data"`;
     const result = await this.blobDataRepo.query(query, [blobId]);
 
-    if (result && result.length > 0) {
-      return Buffer.from(result[0].data, "hex");
-    } else {
-      throw new Error(`No data found for userid ${userDataId}`);
-    }
+    return Buffer.from(result[0].data, "hex");
   }
 
   async saveFile(
@@ -64,7 +57,6 @@ export class FilesManagerService {
     });
 
     if (byAllParameters) {
-      console.log("called here");
       return {
         id: byAllParameters.id,
         username: byAllParameters.username,
@@ -109,5 +101,21 @@ export class FilesManagerService {
       fileName: file.originalname,
     };
     return fileSaveResponse;
+  }
+
+  async deleteData(userDataId: string): Promise<void> {
+    await this.userDataRepo.delete({
+      id: userDataId,
+    });
+    this.logger.info("deleted");
+  }
+
+  async getUser(userDataId: string): Promise<UserData> {
+    return await this.userDataRepo.findOne({
+      where: {
+        id: userDataId,
+      },
+      relations: ["blobData"],
+    });
   }
 }

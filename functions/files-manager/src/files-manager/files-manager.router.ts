@@ -31,6 +31,14 @@ export class FilesManagerRouter {
         this.logger.info("Download file by userDataId: ", userDataId);
 
         try {
+          const user = this.filesManagerService.getUser(userDataId);
+
+          if (!user) {
+            return res
+              .status(404)
+              .send(`userDataId ${userDataId} does not exist`);
+          }
+
           const result = await this.filesManagerService.getFile(userDataId);
           res.status(200).send(result);
         } catch (err) {
