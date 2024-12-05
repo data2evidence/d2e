@@ -26,6 +26,11 @@
           "function": "/alp-db-credentials/src/init",
           "imports": "/alp-db-credentials/import.json",
           "env": "alp-db-credentials"
+        },
+        {
+          "function": "/files-manager/src/init",
+          "imports": "/files-manager/import.json",
+          "env": "files-manager"
         }
       ],
       "api": [

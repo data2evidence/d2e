@@ -13,6 +13,8 @@
     "path": "node:path",
     "crypto": "node:crypto",
     "buffer": "node:buffer",
+    "@types/multer": "^1.4.7",
+    "./src/types": "./src/types.d.ts",
     "./src/main": "./src/main.ts",
     "./src/routes": "./src/routes.ts",
     "./src/env": "./src/env.ts",
@@ -25,7 +27,9 @@
     "./src/files-manager/dto/save-file.dto": "./src/files-manager/dto/save-file.dto.ts",
     "./src/common/data-source/data-source": "./src/common/data-source/data-source.ts",
     "./src/common/middleware/route-check": "./src/common/middleware/route-check.ts",
-    "./src/types": "./src/types.d.ts",
-    "@types/multer": "^1.4.7"
+    "./src/common/data-source/db-migration": "./src/common/data-source/db-migration.ts",
+    "./src/common/data-source/migration-data-source": "./src/common/data-source/migration-data-source.ts",
+    "./src/common/data-source/migrations/1733383345129-create-blob-data": "./src/common/data-source/migrations/1733383345129-create-blob-data.ts",
+    "./src/common/data-source/migrations/1733383366413-create-user-data": "./src/common/data-source/migrations/1733383366413-create-user-data.ts"
   }
 }
