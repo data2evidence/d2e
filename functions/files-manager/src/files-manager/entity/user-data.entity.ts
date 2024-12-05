@@ -30,7 +30,7 @@ export class UserData {
   @Column({ name: "blob_id" })
   blobId: string;
 
-  @ManyToOne(() => BlobData, (db) => db, {
+  @ManyToOne(() => BlobData, (blobData) => blobData.userData, {
     onDelete: "CASCADE",
     eager: true,
   })
