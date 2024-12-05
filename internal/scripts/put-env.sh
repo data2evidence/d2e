@@ -37,7 +37,7 @@ else
     fi
     echo
     if [ $OVERWRITE_OP = true ] || [[ $yn =~ ^[Yy]$ ]]; then
-        yq 'sort_keys(..)' $DOTENV_PATH > $CACHE_DOTENV_PATH
+        yq 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' $DOTENV_PATH > $CACHE_DOTENV_PATH
         # op item edit --format json --vault $OP_VAULT_NAME ${DOTENV_NAME} --template=$CACHE_DOTENV_PATH.json
         op item edit --format json --vault $OP_VAULT_NAME ${DOTENV_NAME} "notesPlain[text]=$(cat $CACHE_DOTENV_PATH)" | yq '{"reference": .fields[0].reference, "updated_at": .updated_at}'
     else

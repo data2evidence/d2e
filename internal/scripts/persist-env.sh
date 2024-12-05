@@ -32,7 +32,7 @@ for KEY in ${KEYS[@]}; do
 	yq -i '.[env(KEY)]=("$"+ strenv(KEY)|envsubst)' $DOTENV_YML_OUT
 done
 
-yq -i -P 'sort_keys(..)' $DOTENV_YML_OUT
+yq -i -P 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' $DOTENV_YML_OUT
 cat $DOTENV_YML_OUT | yq 'keys | .[]' | sort > $DOTENV_KEYS_OUT
 wc -l $DOTENV_YML_OUT $DOTENV_KEYS_OUT | sed '$d'
 echo

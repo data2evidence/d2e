@@ -13,7 +13,7 @@ $.verbose = false;
 
 const domain = "${TLS__INTERNAL__DOMAIN:-alp.local}";
 
-let git_base_dir=(await $`git rev-parse --show-toplevel`).stdout.trim()
+let git_base_dir = (await $`git rev-parse --show-toplevel`).stdout.trim()
 cd(git_base_dir)
 
 let dcFiles = await glob(["docker-compose*.yml"], { ignore: ["**/*private*"] });
@@ -88,7 +88,7 @@ if (argv.update) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // stage 1: recursive sorts
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    let srcDocString = (await $`yq -P 'sort_keys(..)' ${bakFile}`).stdout;
+    let srcDocString = (await $`yq -P 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' ${bakFile}`).stdout;
     let srcDoc = YAML.parseDocument(srcDocString);
     // const { anchors, contents } = srcDoc
     // anchors.setAnchor(contents.items[0].value)
@@ -145,9 +145,9 @@ if (argv.update) {
             if (envKey == "plugins") {
               console.debug(envValue);
             }
-            /* 
-            issue: https://github.com/alp-os/alp/pull/160#discussion_r1510655218 
-            exception: DB_CREDENTIALS__PUBLIC_KEYS must not be re-formatted until code fix 
+            /*
+            issue: https://github.com/alp-os/alp/pull/160#discussion_r1510655218
+            exception: DB_CREDENTIALS__PUBLIC_KEYS must not be re-formatted until code fix
             code: envKey != "DB_CREDENTIALS__PUBLIC_KEYS"
             fix: https://github.com/alp-os/d2e/pull/31/files
             */
