@@ -5,6 +5,7 @@ import { validationResult, matchedData } from "express-validator";
 import { FilesManagerService } from "./files-manager.service";
 import { checkUserDataId } from "../common/middleware/route-check";
 import { SaveFileDto } from "./dto/save-file.dto";
+import { FileSaveResponse } from "../types";
 
 const upload = multer({ storage: multer.memoryStorage() });
 @Service()
@@ -30,17 +31,17 @@ export class FilesManagerRouter {
         this.logger.info("Download file by userDataId: ", userDataId);
 
         try {
-          this.filesManagerService.get();
-          res.status(200).send("works");
+          const result = await this.filesManagerService.getFile(userDataId);
+          res.status(200).send(result);
         } catch (err) {
           this.logger.error(
             `Error when downloading file: ${JSON.stringify(err)}`
           );
+          next(err);
         }
       }
     );
 
-    // username, datakey and the file
     this.router.post(
       "/",
       upload.single("file"),
@@ -58,11 +59,13 @@ export class FilesManagerRouter {
             locations: ["body"],
           });
           const file: Express.Multer.File = req.file;
+          const response: FileSaveResponse =
+            await this.filesManagerService.saveFile(username, dataKey, file);
 
-          this.filesManagerService.saveFile(username, dataKey, file);
-          res.status(200).send("works");
+          res.status(200).send(response);
         } catch (err) {
           this.logger.error(`Error when saving file: ${JSON.stringify(err)}`);
+          next(err);
         }
       }
     );

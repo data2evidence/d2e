@@ -1,8 +1,9 @@
 import { Service } from "typedi";
+import { Buffer } from "buffer";
+import crypto from "crypto";
 import { UserDataRepository } from "./repository/user-data.repository";
 import { BlobDataRepository } from "./repository/blob-data.repository";
-import crypto from "crypto";
-import { Buffer } from "buffer";
+import { FileSaveResponse } from "../types";
 
 @Service()
 export class FilesManagerService {
@@ -13,65 +14,100 @@ export class FilesManagerService {
     private readonly blobDataRepo: BlobDataRepository
   ) {}
 
-  async get() {
-    console.log("get");
-    const result = await this.blobDataRepo.createQueryBuilder().getMany();
-    console.log(result);
+  async getFile(userDataId: string) {
+    const userData = await this.userDataRepo.findOne({
+      where: {
+        id: userDataId,
+      },
+      relations: ["blobData"],
+    });
 
-    // const res = await this.userDataRepo.createQueryBuilder().getMany();
-    // console.log(res);
+    if (!userData) {
+      throw new Error(`User ${userDataId} does not exist`);
+    }
+
+    const blobId = userData.blobData.data;
+    const query = `SELECT convert_from(lo_get($1)::bytea, 'UTF8') AS data FROM "files_manager"."blob_data"`;
+    const result = await this.blobDataRepo.query(query, [blobId]);
+
+    if (result && result.length > 0) {
+      return Buffer.from(result[0].data, "hex");
+    } else {
+      throw new Error(`No data found for userid ${userDataId}`);
+    }
   }
 
-  async saveFile(username: string, dataKey: string, file: Express.Multer.File) {
+  async saveFile(
+    username: string,
+    dataKey: string,
+    file: Express.Multer.File
+  ): Promise<FileSaveResponse> {
     this.logger.info("saving file");
 
     const filename = file.originalname;
     const hash = crypto.createHash("md5").update(file.buffer).digest("hex");
 
-    // const byAllParameters = await this.userDataRepo.findOneBy({
-    //   hash: hash,
-    //   username: username,
-    //   dataKey: dataKey,
-    //   fileName: filename,
-    // });
-
-    // if byAllParameter is not null, return the data
-
-    console.log("creating blob 2");
-    const blobData = await this.userDataRepo
-      .findOneBy({
+    // return file response if data exists in the user repository
+    const byAllParameters = await this.userDataRepo.findOne({
+      select: {
+        id: true,
+        username: true,
+        dataKey: true,
+        fileName: true,
+      },
+      where: {
         hash: hash,
+        username: username,
+        dataKey: dataKey,
+        fileName: filename,
+      },
+    });
+
+    if (byAllParameters) {
+      console.log("called here");
+      return {
+        id: byAllParameters.id,
+        username: byAllParameters.username,
+        dataKey: byAllParameters.dataKey,
+        fileName: byAllParameters.fileName,
+      };
+    }
+
+    // return blobId if file already exists, else create new blob
+    const blobData = await this.userDataRepo
+      .findOne({
+        where: {
+          hash: hash,
+        },
+        relations: ["blobData"],
       })
       .then(async (db) => {
         if (db) {
           return db.blob_data;
         } else {
-          console.log("blob does not exist, save here");
           const hexString = file.buffer.toString("hex");
-
           const query = `INSERT INTO "files_manager"."blob_data"("data") VALUES (lo_from_bytea(0, $1)) RETURNING "id"`;
-
-          const result = await this.blobDataRepo.query(query, [hexString]);
-          console.log(result);
-          // return this.blobDataRepo.save(entity);
+          return await this.blobDataRepo.query(query, [hexString]);
         }
-
-        return;
       });
 
-    console.log("done");
-    console.log(blobData);
-    // console.log("creating userdata");
-    // console.log(blobData);
-    // // return id, username, dataKey and filename
-    // const userData = this.userDataRepo.create({
-    //   dataKey: dataKey,
-    //   username: username,
-    //   file_name: filename,
-    //   hash: hash,
-    //   blobData: blobData,
-    // });
-    // console.log("??");
-    // return this.userDataRepo.save(userData);
+    // finally insert into user
+    const entity = this.userDataRepo.create({
+      hash: hash,
+      username: username,
+      dataKey: dataKey,
+      fileName: filename,
+      blobId: blobData[0].id,
+    });
+
+    await this.userDataRepo.save(entity);
+
+    const fileSaveResponse: FileSaveResponse = {
+      id: entity.id,
+      username: username,
+      dataKey: dataKey,
+      fileName: file.originalname,
+    };
+    return fileSaveResponse;
   }
 }
