@@ -107,15 +107,13 @@ export class FilesManagerService {
     await this.userDataRepo.delete({
       id: userDataId,
     });
-    this.logger.info("deleted");
   }
 
-  async getUser(userDataId: string): Promise<UserData> {
+  async getUserById(userDataId: string): Promise<UserData> {
     return await this.userDataRepo.findOne({
       where: {
         id: userDataId,
       },
-      relations: ["blobData"],
     });
   }
 }

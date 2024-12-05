@@ -28,10 +28,10 @@ export class FilesManagerRouter {
       async (req: Request, res: Response, next: NextFunction) => {
         const { userDataId } = req.params;
 
-        this.logger.info("Download file by userDataId: ", userDataId);
+        this.logger.info(`Download file by userDataId: ${userDataId}`);
 
         try {
-          const user = this.filesManagerService.getUser(userDataId);
+          const user = this.filesManagerService.getUserById(userDataId);
 
           if (!user) {
             return res
@@ -55,7 +55,13 @@ export class FilesManagerRouter {
       upload.single("file"),
       SaveFileDto(),
       async (req: Request, res: Response, next: NextFunction) => {
-        this.logger.info(`Save file with username and data-key`);
+        const { username, dataKey } = matchedData(req, {
+          locations: ["body"],
+        });
+
+        this.logger.info(
+          `Save file with username ${username} and data-key ${dataKey}`
+        );
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -63,9 +69,6 @@ export class FilesManagerRouter {
         }
 
         try {
-          const { username, dataKey } = matchedData(req, {
-            locations: ["body"],
-          });
           const file: Express.Multer.File = req.file;
           const response: FileSaveResponse =
             await this.filesManagerService.saveFile(username, dataKey, file);
@@ -83,11 +86,20 @@ export class FilesManagerRouter {
       checkUserDataId,
       async (req: Request, res: Response, next: NextFunction) => {
         const { userDataId } = req.params;
-
-        this.logger.info(`Delete file by userDataId: `, userDataId);
+        this.logger.info(`Delete file by userDataId: ${userDataId}`);
 
         try {
-          res.status(200).send("works");
+          const user = this.filesManagerService.getUserById(userDataId);
+
+          if (!user) {
+            return res
+              .status(404)
+              .send(`userDataId ${userDataId} does not exist`);
+          }
+
+          await this.filesManagerService.deleteData(userDataId);
+
+          res.status(200).send();
         } catch (err) {
           this.logger.error(`Error when deleting file: ${JSON.stringify(err)}`);
         }
@@ -100,10 +112,18 @@ export class FilesManagerRouter {
       async (req: Request, res: Response, next: NextFunction) => {
         const { userDataId } = req.params;
 
-        this.logger.info(`get user data by userDataId: `, userDataId);
+        this.logger.info(`get user data by userDataId: ${userDataId}`);
 
         try {
-          res.status(200).send("works");
+          const user = this.filesManagerService.getUserById;
+
+          if (!user) {
+            return res
+              .status(404)
+              .send(`userDataId ${userDataId} does not exist`);
+          }
+
+          res.status(200).send(user);
         } catch (err) {
           this.logger.error(
             `Error when getting user data: ${JSON.stringify(err)}`
