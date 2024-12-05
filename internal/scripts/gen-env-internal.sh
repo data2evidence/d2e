@@ -24,7 +24,7 @@ function count {
 cd $GIT_BASE_DIR
 
 echo ". INFO generate random secrets - public"
-ENV_NAME=$ENV_NAME ENV_TYPE=$ENV_TYPE yarn --cwd .. gen:env:all
+ENV_NAME=$ENV_NAME ENV_TYPE=$ENV_TYPE yarn --cwd .. gen:env
 echo "" >> $DOTENV_FILE_OUT
 
 echo ". INFO generate random secrets - internal"

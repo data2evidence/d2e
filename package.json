@@ -5,10 +5,7 @@
   "license": "MIT",
   "scripts": {
     "edit": "code package.json",
-    "gen:env": "ENV_NAME=$ENV_NAME ENV_TYPE=$ENV_TYPE DOTENV_APPEND=$DOTENV_APPEND scripts/gen-env.sh",
-    "gen:env:all": "ENV_NAME=$ENV_NAME ENV_TYPE=$ENV_TYPE DOTENV_APPEND=$DOTENV_APPEND yarn gen:env && ENV_TYPE=$ENV_TYPE TLS_REGENERATE=$TLS_REGENERATE yarn gen:tls && D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT ENV_TYPE=$ENV_TYPE yarn gen:resource-limits",
-    "gen:tls": "ENV_TYPE=$ENV_TYPE TLS_REGENERATE=$TLS_REGENERATE scripts/gen-tls.sh",
-    "gen:resource-limits": "D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT ENV_TYPE=$ENV_TYPE scripts/gen-resource-limits.sh",
+    "gen:env": "ENV_NAME=$ENV_NAME ENV_TYPE=$ENV_TYPE DOTENV_APPEND=$DOTENV_APPEND scripts/gen-env.sh && ENV_TYPE=$ENV_TYPE TLS_REGENERATE=$TLS_REGENERATE scripts/gen-tls.sh && D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT ENV_TYPE=$ENV_TYPE scripts/gen-resource-limits.sh",
     "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml --file docker-compose-atlas.yml ",
     "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile perseus",
     "local:minerva": "ENV_TYPE=local GIT__COMMIT_ID__PLUGINS=${GIT__COMMIT_ID__PLUGINS:-main} yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local",
