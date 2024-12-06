@@ -347,7 +347,8 @@
           "conceptmapping.read",
           "conceptmapping.post",
           "filesmanager.read",
-          "filesmanager.post"
+          "filesmanager.post",
+          "filesmanager.delete"
         ],
         "ALP_DASHBOARD_VIEWER": [
           "gateway.dashboardGate.content"
@@ -428,11 +429,13 @@
           "path": "^/files-manager/api",
           "scopes": [
             "filesmanager.read",
-            "filesmanager.post"
+            "filesmanager.post",
+            "filesmanager.delete"
           ],
           "httpMethods": [
             "GET",
-            "POST"
+            "POST",
+            "DELETE"
           ]
         },
         {
