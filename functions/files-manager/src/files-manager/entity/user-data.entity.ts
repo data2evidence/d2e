@@ -30,9 +30,7 @@ export class UserData {
   @Column({ name: "blob_id" })
   blobId: number;
 
-  @ManyToOne(() => BlobData, (blobData) => blobData.userData, {
-    onDelete: "CASCADE",
-  })
+  @ManyToOne(() => BlobData, (blobData) => blobData.userData)
   @JoinColumn({ name: "blob_id" })
   blobData: Relation<BlobData>;
 }
