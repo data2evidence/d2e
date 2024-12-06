@@ -43,7 +43,7 @@ export class FilesManagerService {
     const hash = crypto.createHash("md5").update(file.buffer).digest("hex");
 
     // return file response if data exists in the user repository
-    const byAllParameters = await this.userDataRepo.findOne({
+    const existingUserData: UserData = await this.userDataRepo.findOne({
       select: {
         id: true,
         username: true,
@@ -58,12 +58,12 @@ export class FilesManagerService {
       },
     });
 
-    if (byAllParameters) {
+    if (existingUserData) {
       return {
-        id: byAllParameters.id,
-        username: byAllParameters.username,
-        dataKey: byAllParameters.dataKey,
-        fileName: byAllParameters.fileName,
+        id: existingUserData.id,
+        username: existingUserData.username,
+        dataKey: existingUserData.dataKey,
+        fileName: existingUserData.fileName,
       };
     }
 
@@ -86,7 +86,7 @@ export class FilesManagerService {
       });
 
     // finally insert into user
-    const entity = this.userDataRepo.create({
+    const userData: UserData = this.userDataRepo.create({
       hash: hash,
       username: username,
       dataKey: dataKey,
@@ -94,10 +94,10 @@ export class FilesManagerService {
       blobId: blobData[0].id,
     });
 
-    await this.userDataRepo.save(entity);
+    await this.userDataRepo.save(userData);
 
     const fileSaveResponse: FileSaveResponse = {
-      id: entity.id,
+      id: userData.id,
       username: username,
       dataKey: dataKey,
       fileName: file.originalname,
