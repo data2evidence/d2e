@@ -64,7 +64,7 @@ export class UserArtifactController {
   @Put(':serviceName')
   updateServiceArtifactEntity<T>(
     @Param('serviceName', new ParseEnumPipe(ServiceName)) serviceName: ServiceName,
-    @Body() updateArtifactDto: any
+    @Body() updateArtifactDto: Record<string, any>
   ) {
     return this.userArtifactService.updateServiceArtifactEntity(serviceName, updateArtifactDto)
   }

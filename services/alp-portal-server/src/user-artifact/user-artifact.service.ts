@@ -125,7 +125,7 @@ export class UserArtifactService {
     updateArtifactDto: UpdateArtifactDto<T>
   ): Promise<UserArtifact> {
     const { userId, id, serviceArtifact } = updateArtifactDto
-    
+
     if (!updateArtifactDto.serviceArtifact) {
       throw new ConflictException('UpdateArtifactDto is missing serviceArtifact')
     }
@@ -146,7 +146,7 @@ export class UserArtifactService {
     throw new NotFoundException(`Service ${serviceName} not found for user ${userId}`)
   }
 
-  async updateServiceArtifactEntity(serviceName: string, updatedEntity: any): Promise<UserArtifact> {
+  async updateServiceArtifactEntity(serviceName: string, updatedEntity: Record<string, any>): Promise<UserArtifact> {
     const userArtifacts = await this.userArtifactRepository.find()
 
     if (!userArtifacts || userArtifacts.length === 0) {
