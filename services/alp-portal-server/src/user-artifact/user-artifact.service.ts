@@ -41,6 +41,9 @@ export class UserArtifactService {
     const artifact = await this.userArtifactRepository.findOne({
       where: { userId }
     })
+    if (!artifact?.artifacts?.[serviceName]) {
+      throw new NotFoundException(`Artifacts for userId ${userId} not found in ${serviceName}`)
+    }
     const result = artifact?.artifacts[serviceName]
     if (!result) {
       throw new NotFoundException(`Artifact for userId ${userId} not found in ${serviceName}`)
@@ -52,6 +55,9 @@ export class UserArtifactService {
     const artifact = await this.userArtifactRepository.findOne({
       where: { userId }
     })
+    if (!artifact?.artifacts?.[serviceName]) {
+      throw new NotFoundException(`Artifacts for userId ${userId} not found in ${serviceName}`)
+    }
     const result = artifact?.artifacts[serviceName].find(art => art.id === id)
     if (!result) {
       throw new NotFoundException(`Artifact with id ${id} not found in ${serviceName}`)
@@ -106,7 +112,12 @@ export class UserArtifactService {
         )
       )
     }
-    return this.userArtifactRepository.save(artifact)
+
+    try {
+      return await this.userArtifactRepository.save(artifact)
+    } catch (error) {
+      throw new ConflictException('Error creating service artifact', error.message)
+    }
   }
 
   async updateUserServiceArtifact<T>(
@@ -114,6 +125,10 @@ export class UserArtifactService {
     updateArtifactDto: UpdateArtifactDto<T>
   ): Promise<UserArtifact> {
     const { userId, id, serviceArtifact } = updateArtifactDto
+    
+    if (!updateArtifactDto.serviceArtifact) {
+      throw new ConflictException('UpdateArtifactDto is missing serviceArtifact')
+    }
     const artifact = await this.userArtifactRepository.findOne({ where: { userId } })
 
     if (artifact && artifact.artifacts[serviceName]) {
