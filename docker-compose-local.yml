@@ -144,11 +144,6 @@ services:
       context: ./services/alp-perseus-backend
       dockerfile: Dockerfile
 
-  alp-perseus-files-manager:
-    build:
-      context: ./services/alp-perseus-files-manager
-      dockerfile: Dockerfile
-
   alp-perseus-white-rabbit:
     environment:
       JAVA_OPTs: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
