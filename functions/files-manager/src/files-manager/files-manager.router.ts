@@ -102,6 +102,7 @@ export class FilesManagerRouter {
           res.status(200).send();
         } catch (err) {
           this.logger.error(`Error when deleting file: ${JSON.stringify(err)}`);
+          next(err);
         }
       }
     );
@@ -128,6 +129,7 @@ export class FilesManagerRouter {
           this.logger.error(
             `Error when getting user data: ${JSON.stringify(err)}`
           );
+          next(err);
         }
       }
     );

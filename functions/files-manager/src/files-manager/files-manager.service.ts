@@ -1,10 +1,12 @@
 import { Service } from "typedi";
 import { Buffer } from "buffer";
 import crypto from "crypto";
+import { LessThan } from "typeorm";
 import { UserDataRepository } from "./repository/user-data.repository";
 import { BlobDataRepository } from "./repository/blob-data.repository";
 import { FileSaveResponse } from "../types";
 import { UserData } from "./entity/user-data.entity";
+import { BlobData } from "./entity/blob-data.entity";
 
 @Service()
 export class FilesManagerService {
@@ -104,9 +106,33 @@ export class FilesManagerService {
   }
 
   async deleteData(userDataId: string): Promise<void> {
-    await this.userDataRepo.delete({
-      id: userDataId,
-    });
+    try {
+      const userData: UserData = await this.userDataRepo.findOne({
+        where: {
+          id: userDataId,
+        },
+        relations: ["blobData"],
+      });
+
+      await this.userDataRepo.delete(userData);
+
+      const blobData: BlobData = await this.blobDataRepo.findOne({
+        where: {
+          id: userData.blobId,
+        },
+        relations: ["userData"],
+      });
+
+      if (blobData.userData.length < 2) {
+        await this.blobDataRepo.delete({ id: blobData.id });
+        await this.blobDataRepo.query("SELECT lo_unlink($1)", [blobData.data]);
+      }
+    } catch (error) {
+      this.logger.error(error);
+      throw new Error(error);
+    }
+
+    return;
   }
 
   async getUserById(userDataId: string): Promise<UserData> {
