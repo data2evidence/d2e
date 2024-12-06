@@ -28,11 +28,10 @@ export class UserData {
   fileName: string;
 
   @Column({ name: "blob_id" })
-  blobId: string;
+  blobId: number;
 
   @ManyToOne(() => BlobData, (blobData) => blobData.userData, {
     onDelete: "CASCADE",
-    eager: true,
   })
   @JoinColumn({ name: "blob_id" })
   blobData: Relation<BlobData>;

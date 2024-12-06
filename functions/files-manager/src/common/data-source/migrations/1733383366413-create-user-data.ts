@@ -14,7 +14,7 @@ export class CreateUserData1733383366413 implements MigrationInterface {
         "blob_id" integer not null,
         PRIMARY KEY ("id"),
         UNIQUE ("hash","username", "data_key", "file_name"),
-        CONSTRAINT fk_blob_id foreign key (blob_id) references "files_manager"."blob_data" (id)
+        CONSTRAINT fk_blob_id foreign key (blob_id) references "files_manager"."blob_data" (id) ON DELETE CASCADE ON UPDATE NO ACTION
         )`
     );
   }
