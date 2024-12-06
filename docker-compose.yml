@@ -759,7 +759,7 @@ services:
       data:
         priority: 20
     volumes:
-      - ./services/alp-dataflow-gen/custom-docker-workpool.json:/opt/prefect/custom-work-pool.json
+      - ./services/alp-dataflow-gen/custom-docker-workpool.json:/opt/prefect/custom-docker-workpool.json
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
