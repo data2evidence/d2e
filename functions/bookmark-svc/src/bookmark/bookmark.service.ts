@@ -2,14 +2,11 @@
  * Backend functionality for the bookmark functionality
  */
 import * as crypto from 'crypto'
-import * as npmasync from 'npm:async'
 import { Connection as connLib } from '@alp/alp-base-utils'
 import ConnectionInterface = connLib.ConnectionInterface
 import CallBackInterface = connLib.CallBackInterface
-import { QueryObject as qo } from '@alp/alp-base-utils'
-import QueryObject = qo.QueryObject
 import * as utils from '@alp/alp-base-utils'
-import { IBookmark, QueryObjectResultType, BookmarkQueryResultType } from '../types'
+import { BookmarkDto } from '../types'
 import { PortalAPI } from '../api/PortalAPI'
 
 /**
@@ -35,71 +32,42 @@ export function createBookmarkDto(
   cdmConfigId: string,
   cdmConfigVersion: number,
   shareBookmark: boolean,
-  userId: string
-) {
-  const bmkId = createBookmarkId(bookmarkName)
-
-  const defaultBookmark = {
-    id: bmkId,
+  userName: string
+): BookmarkDto {
+  return {
+    id: createBookmarkId(bookmarkName),
     bookmark_name: bookmarkName,
     bookmark: bookmark,
-    type: null, // Set this if needed
-    view_name: null, // Set this if needed
-    modified: new Date().toISOString(), // Set the current timestamp
-    study_id: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', // Default study ID
-    version: 1, // Default version
+    type: null,
+    view_name: null,
+    modified: new Date().toISOString(),
+    study_id: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+    version: 1,
     pa_config_id: paConfigId,
     cdm_config_id: cdmConfigId,
     cdm_config_version: cdmConfigVersion,
-    userId: userId,
-    shared: shareBookmark.toString(),
+    user_id: userName,
+    shared: shareBookmark,
   }
 }
 
-/**
- * Get the SQL query for fetching all bookmarks.
- *
- * @private
- * @param {string}
- *            table Name of table to use
- * @returns {string} complete SQL query
- */
-export function getAllBookmarksQuery(table) {
-  return `SELECT 
-  user_id,
-  bookmark_name as bookmarkname, 
-  bookmark, 
-  id as "bmkId", 
-  view_name as viewname, 
-  modified, 
-  shared,
-  version
-  FROM ${table} 
-  WHERE pa_config_id = %s
-  ORDER BY bookmark_name`
-}
-
-/**
- * Get the SQL query for fetching a single bookmark.
- *
- * @private
- * @param {string}
- *            table Name of table to use
- * @returns {string} complete SQL query
- */
-export function getSingleBookmarkQuery(table) {
-  return `SELECT 
-       bookmark_name as "bookmarkname", 
-       bookmark as "bookmark", 
-       id as "bmkId",
-       user_id as "userId",
-       view_name as "viewname",
-       modified as "modified", 
-       version as "version"
-     FROM ${table} 
-     WHERE id = %s 
-       AND pa_config_id = %s
-       AND (type = 'BOOKMARK' OR type IS NULL)`
+export function formatUserArtifactData(paConfigId: string, data: any[], userName: string): any[] {
+  return data
+    .filter(
+      row =>
+        row.pa_config_id === paConfigId &&
+        (row.user_id === userName || (userName && row.user_id !== userName && row.shared))
+    )
+    .map(row => ({
+      bmkId: row.id,
+      bookmarkname: row.bookmark_name,
+      bookmark: row.bookmark,
+      viewname: row.view_name || null,
+      modified: row.modified,
+      version: row.version,
+      user_id: row.user_id,
+      shared: row.shared,
+    }))
 }
 
 /**
@@ -108,53 +76,28 @@ export function getSingleBookmarkQuery(table) {
  * @param {string}
  *            userid userid
  * @param {string}
- *            table Name of table to use
+ *            token user token
  * @param {object}
  *            dbConnection DB connection to be used
  * @returns {object[]} Updated bookmaks, ordered by bookmark name
  */
 
 export async function _loadAllBookmarks(
-  userId,
   userName,
   token,
   paConfigId,
-  table,
   connection: ConnectionInterface,
   callback: CallBackInterface
 ) {
-  // let query: QueryObject = QueryObject.format(getAllBookmarksQuery(table), paConfigId)
-  // query.executeQuery(connection, (err, result) => {
-  //   if (err) {
-  //     callback(err, null)
-  //     return
-  //   }
-  //   connection.commit()
-
-  //   // TODO: this is a temp code, will be used until ViewName column added to the CI DB.
-  //   result.data.forEach(el => {
-  //     if (el.ViewName && el.ViewName === 'NoValue') {
-  //       el.ViewName = null
-  //     }
-  //   })
-
-  //   let returnValue = {
-  //     schemaName: connection.schemaName,
-  //     bookmarks: result.data,
-  //   }
-  //   callback(err, _convertBookmarkIFR(returnValue))
-  // })
-  const portalAPI = new PortalAPI(token, userId)
   try {
+    const portalAPI = new PortalAPI(token)
     const result = await portalAPI.getBookmarks()
-    console.log({ result })
-
-    let returnValue = {
+    const formattedRows = formatUserArtifactData(paConfigId, result, userName)
+    const returnValue = {
       schemaName: connection.schemaName,
-      bookmarks: result.data,
+      bookmarks: formattedRows,
     }
     callback(null, _convertBookmarkIFR(returnValue))
-    // return result
   } catch (error) {
     console.error(error)
     callback(error, null)
@@ -168,48 +111,27 @@ export async function _loadAllBookmarks(
  *            bookmarkId Bookmark Id
  * @param {string}
  *            userId userid
- * @param {string}
- *            table Name of table to use
  * @param {object}
  *            dbConnection DB connection to be used
  * @returns {object[]} Updated bookmakrs, ordered by bookmark name
  */
-export async function loadSingleBookmark(
-  bookmarkId,
-  paConfigId,
-  table,
-  connection: ConnectionInterface,
-  callback?: CallBackInterface
-) {
-  let query: QueryObject = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, paConfigId)
-
-  return new Promise<{ bookmarks: IBookmark[] }>(async (resolve, reject) => {
-    try {
-      const result: QueryObjectResultType<Array<BookmarkQueryResultType>> = await query.executeQuery(connection)
-
-      // TODO: this is a temp code, will be used until ViewName column added to the CI DB.
-      if (result && result.data && result.data.length > 0) {
-        result.data.forEach(el => {
-          if (el.viewname && el.viewname === 'NoValue') {
-            el.viewname = null
-          }
-        })
-      }
-
-      let returnValue = _convertBookmarkIFR({
-        bookmarks: result.data,
-      })
-      if (callback) {
-        return callback(null, returnValue)
-      }
-      resolve(returnValue)
-    } catch (err) {
-      if (callback) {
-        return callback(err, null)
-      }
-      reject(err)
+export async function loadSingleBookmark(userName, bookmarkId, paConfigId, token, callback?: CallBackInterface) {
+  try {
+    const portalAPI = new PortalAPI(token)
+    const result = await portalAPI.getBookmarkById(bookmarkId)
+    const formattedRows = formatUserArtifactData(paConfigId, result, userName)
+    const returnValue = _convertBookmarkIFR({
+      bookmarks: formattedRows,
+    })
+    if (callback) {
+      callback(null, _convertBookmarkIFR(returnValue))
+    } else {
+      return returnValue
     }
-  })
+  } catch (error) {
+    console.error(error)
+    callback(error, null)
+  }
 }
 
 /**
@@ -228,42 +150,34 @@ export async function loadSingleBookmark(
  * @param {object}
  *            dbConnection DB connection to be used
  */
-export function _insertBookmark(
+export async function _insertBookmark(
   bookmarkName,
   bookmark,
-  userId,
+  userName,
   paConfigId,
   cdmConfigId,
   cdmConfigVersion,
   shareBookmark,
-  table,
-  connection: ConnectionInterface,
+  token,
   callback: CallBackInterface
 ) {
-  let INSERT_BOOKMARKS = `INSERT INTO ${table} (id, user_id, bookmark_name, bookmark, pa_config_id, cdm_config_id, cdm_config_version, shared, modified) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)`
-
-  let bmkId = createBookmarkId(bookmarkName)
-
-  let query: QueryObject = QueryObject.format(
-    INSERT_BOOKMARKS,
-    bmkId,
-    userId,
-    bookmarkName,
-    bookmark,
-    paConfigId,
-    cdmConfigId,
-    cdmConfigVersion,
-    shareBookmark.toString()
-  )
-
-  query.executeUpdate(connection, (err, result) => {
-    if (err) {
-      callback(err, null)
-      return
-    }
-    connection.commit()
-    callback(err, result)
-  })
+  try {
+    const bookmarkDto = createBookmarkDto(
+      bookmarkName,
+      bookmark,
+      paConfigId,
+      cdmConfigId,
+      cdmConfigVersion,
+      shareBookmark,
+      userName
+    )
+    const portalAPI = new PortalAPI(token)
+    const result = await portalAPI.createBookmark({ serviceArtifact: bookmarkDto })
+    callback(null, result)
+  } catch (error) {
+    console.error(error)
+    callback(error, null)
+  }
 }
 
 /**
@@ -280,61 +194,18 @@ export function _insertBookmark(
  * @param {object}
  *            dbConnection DB connection to be used
  */
-export function _deleteBookmark(
-  bookmarkId,
-  userId,
-  paConfigId,
-  table,
-  configConnection: ConnectionInterface,
-  callback: CallBackInterface
-) {
+export async function _deleteBookmark(bookmarkId, userId, token, callback: CallBackInterface) {
   if (!bookmarkId || !userId || bookmarkId === '' || userId === '') {
     callback(null, null)
   }
-  // first get the bookmark record for the given params
-  let fnGetBookmark = cb => {
-    let qry: QueryObject = QueryObject.format(getSingleBookmarkQuery(table), bookmarkId, paConfigId)
-    qry.executeQuery(configConnection, (err, bookmarks) => {
-      if (err) {
-        cb(err)
-      } else {
-        cb(null, bookmarks)
-      }
-    })
+  try {
+    const portalAPI = new PortalAPI(token)
+    const result = await portalAPI.deleteBookmark(bookmarkId)
+    callback(null, result)
+  } catch (error) {
+    console.error(error)
+    callback(error, null)
   }
-
-  // lastly, delete the bookmark record
-  let fnDeleteBookmark = (bookmarks, cb) => {
-    if (bookmarks && bookmarks.data && bookmarks.data.length > 0) {
-      let DELETE_BOOKMARK = `DELETE FROM ${table} WHERE user_id = %s AND id = %s AND pa_config_id = %s AND(type = 'BOOKMARK' OR type IS NULL)`
-
-      let query: QueryObject = QueryObject.format(
-        DELETE_BOOKMARK,
-        bookmarks.data[0].userId,
-        bookmarks.data[0].bmkId,
-        paConfigId
-      )
-
-      query.executeUpdate(configConnection, (err, result) => {
-        if (err) {
-          cb(err)
-        } else {
-          configConnection.commit()
-          cb(null, result)
-        }
-      })
-    } else {
-      cb(null, null)
-    }
-  }
-
-  npmasync.waterfall([fnGetBookmark, fnDeleteBookmark], (err, result) => {
-    if (err) {
-      callback(err, null)
-    } else {
-      callback(null, result)
-    }
-  })
 }
 
 /**
@@ -359,37 +230,32 @@ export function _deleteBookmark(
  *  @param {object}
  *            callback
  */
-export function _renameBookmark(
+export async function _renameBookmark(
   bookmarkId,
   newBookmarkName,
-  userId,
   paConfigId,
   cdmConfigId,
   cdmConfigVersion,
-  table,
-  connection: ConnectionInterface,
+  token,
   callback: CallBackInterface
 ) {
-  let UPDATE_BOOKMARK = `UPDATE ${table} SET bookmark_name = %s, modified = CURRENT_TIMESTAMP, version = version + 1, pa_config_id = %s, cdm_config_id = %s, cdm_config_version = %s WHERE user_id = %s AND id = %s AND (type = 'BOOKMARK' OR type IS NULL)`
-
-  let query: QueryObject = QueryObject.format(
-    UPDATE_BOOKMARK,
-    newBookmarkName,
-    paConfigId,
-    cdmConfigId,
-    cdmConfigVersion,
-    userId,
-    bookmarkId
-  )
-
-  query.executeUpdate(connection, (err, result) => {
-    if (err) {
-      callback(err, null)
-      return
+  try {
+    const updateBookmarkDto = {
+      id: bookmarkId,
+      bookmark_name: newBookmarkName,
+      pa_config_id: paConfigId,
+      cdm_config_id: cdmConfigId,
+      cdm_config_version: cdmConfigVersion,
+      modified: new Date().toISOString(),
     }
-    connection.commit()
-    callback(err, result)
-  })
+    const portalAPI = new PortalAPI(token)
+    const result = await portalAPI.updateBookmark(updateBookmarkDto)
+
+    callback(null, result)
+  } catch (error) {
+    console.error(error)
+    callback(error, null)
+  }
 }
 
 /**
@@ -416,39 +282,37 @@ export function _renameBookmark(
  * @param {object}
  *            callback
  */
-export function _updateBookmark( //TODO remove user input
+export async function _updateBookmark( //TODO remove user input
   bookmarkId,
   bookmark,
-  userId,
   paConfigId,
   cdmConfigId,
   cdmConfigVersion,
   shareBookmark,
-  table,
-  connection: ConnectionInterface,
+  token,
   callback: CallBackInterface
 ) {
-  let UPDATE_BOOKMARK = `UPDATE ${table} SET bookmark = %s, modified = CURRENT_TIMESTAMP, version = version + 1, shared = %s, pa_config_id = %s, cdm_config_id = %s, cdm_config_version = %s WHERE user_id = %s AND  id = %s AND (type = 'BOOKMARK' OR type IS NULL)`
+  try {
+    const portalAPI = new PortalAPI(token)
+    const currentBookmark = await portalAPI.getBookmarkById(bookmarkId)
 
-  let query: QueryObject = QueryObject.format(
-    UPDATE_BOOKMARK,
-    bookmark,
-    shareBookmark.toString(),
-    paConfigId,
-    cdmConfigId,
-    cdmConfigVersion,
-    userId,
-    bookmarkId
-  )
-
-  query.executeUpdate(connection, (err, result) => {
-    if (err) {
-      callback(err, null)
-      return
+    const updateBookmarkDto = {
+      id: bookmarkId,
+      bookmark: bookmark,
+      pa_config_id: paConfigId,
+      cdm_config_id: cdmConfigId,
+      cdm_config_version: cdmConfigVersion,
+      modified: new Date().toISOString(),
+      shared: shareBookmark,
+      version: currentBookmark.version + 1,
     }
-    connection.commit()
-    callback(err, result)
-  })
+
+    const result = await portalAPI.updateBookmark(updateBookmarkDto)
+    callback(null, result)
+  } catch (error) {
+    console.error(error)
+    callback(error, null)
+  }
 }
 
 /**
@@ -463,20 +327,18 @@ export function _updateBookmark( //TODO remove user input
  */
 export async function loadBookmarks({
   bookmarkIds,
-  table,
   paConfigId,
-  configConnection,
+  token,
   callback,
 }: {
   bookmarkIds: string[]
-  table: string
   paConfigId: string
-  configConnection: ConnectionInterface
+  token: string
   callback: CallBackInterface
 }) {
   const list = await Promise.all(
     bookmarkIds.map(bookmarkid =>
-      loadSingleBookmark(bookmarkid, paConfigId, table, configConnection, null).then(result => result.bookmarks[0])
+      loadSingleBookmark(bookmarkid, paConfigId, token, null).then(result => result.bookmarks[0])
     )
   )
     .then(data => {
@@ -504,10 +366,8 @@ export async function loadBookmarks({
  */
 export async function queryBookmarks(
   requestParameters,
-  userId,
   userName,
   token,
-  table,
   configConnection: ConnectionInterface,
   callback: CallBackInterface
 ) {
@@ -536,60 +396,37 @@ export async function queryBookmarks(
         _insertBookmark(
           requestParameters.bookmarkname,
           bookmark,
-          userId,
+          userName,
           paConfigId,
           cdmConfigId,
           cdmConfigVersion,
           shareBookmark,
-          table,
-          configConnection,
+          token,
           cb
         )
         break
       case 'delete':
-        _deleteBookmark(bookmarkId, userId, paConfigId, table, configConnection, cb)
+        _deleteBookmark(bookmarkId, userName, token, cb)
         break
       case 'update':
-        _updateBookmark(
-          bookmarkId,
-          bookmark,
-          userId,
-          paConfigId,
-          cdmConfigId,
-          cdmConfigVersion,
-          shareBookmark,
-          table,
-          configConnection,
-          cb
-        )
+        _updateBookmark(bookmarkId, bookmark, paConfigId, cdmConfigId, cdmConfigVersion, shareBookmark, token, cb)
         break
       case 'rename':
-        _renameBookmark(
-          bookmarkId,
-          requestParameters.newName,
-          userId,
-          paConfigId,
-          cdmConfigId,
-          cdmConfigVersion,
-          table,
-          configConnection,
-          cb
-        )
+        _renameBookmark(bookmarkId, requestParameters.newName, paConfigId, cdmConfigId, cdmConfigVersion, token, cb)
         break
       case 'loadSingle':
-        loadSingleBookmark(bookmarkId, paConfigId, table, configConnection, callback)
+        loadSingleBookmark(userName, bookmarkId, paConfigId, token, callback)
         break
       case 'loadByIDs':
         loadBookmarks({
           bookmarkIds,
-          table,
           paConfigId,
-          configConnection,
+          token,
           callback,
         })
         break
       case 'loadAll':
-        await _loadAllBookmarks(userId, userName, token, paConfigId, table, configConnection, callback)
+        await _loadAllBookmarks(userName, token, paConfigId, configConnection, callback)
         break
       default:
         throw new Error('unknown command: ' + cmd)
