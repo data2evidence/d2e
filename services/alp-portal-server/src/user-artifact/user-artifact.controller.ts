@@ -17,37 +17,72 @@ export class UserArtifactController {
     @Param('userId') userId: string,
     @Param('serviceName', new ParseEnumPipe(ServiceName)) serviceName: ServiceName
   ) {
-    return this.userArtifactService.getServiceArtifact(userId, serviceName)
+    return this.userArtifactService.getUserServiceArtifact(userId, serviceName)
+  }
+
+  @Get(':userId/:serviceName/shared/list')
+  getAllUserServiceArtifacts(
+    @Param('userId') userId: string,
+    @Param('serviceName', new ParseEnumPipe(ServiceName)) serviceName: ServiceName
+  ) {
+    return this.userArtifactService.getAllUserServiceArtifacts(serviceName, userId)
   }
 
   @Get(':userId/:serviceName/:id')
-  getServiceArtifactById(
+  getUserServiceArtifactById(
     @Param('userId') userId: string,
     @Param('serviceName', new ParseEnumPipe(ServiceName)) serviceName: ServiceName,
     @Param('id') id: string
   ) {
-    return this.userArtifactService.getServiceArtifactById(userId, serviceName, id)
+    return this.userArtifactService.getUserServiceArtifactById(userId, serviceName, id)
   }
 
-  @Post('/')
-  createServiceArtifact<T>(@Body() createArtifactDto: CreateArtifactDto<T>) {
-    return this.userArtifactService.createServiceArtifact(createArtifactDto)
+  @Get(':serviceName/:id')
+  getServiceArtifactById(
+    @Param('serviceName', new ParseEnumPipe(ServiceName)) serviceName: ServiceName,
+    @Param('id') id: string
+  ) {
+    return this.userArtifactService.getServiceArtifactById(serviceName, id)
   }
 
-  @Put(':serviceName')
-  updateServiceArtifact<T>(
+  @Post(':serviceName')
+  createServiceArtifact<T extends { id: string }>(
+    @Param('serviceName', new ParseEnumPipe(ServiceName)) serviceName: ServiceName,
+    @Body() createArtifactDto: CreateArtifactDto<T>
+  ) {
+    return this.userArtifactService.createServiceArtifact(serviceName, createArtifactDto)
+  }
+
+  @Put(':serviceName/user')
+  updateUserServiceArtifact<T>(
     @Param('serviceName') serviceName: ServiceName,
     @Body() updateArtifactDto: UpdateArtifactDto<T>
   ) {
-    return this.userArtifactService.updateServiceArtifact(serviceName, updateArtifactDto)
+    return this.userArtifactService.updateUserServiceArtifact(serviceName, updateArtifactDto)
+  }
+
+  @Put(':serviceName')
+  updateServiceArtifactEntity<T>(
+    @Param('serviceName', new ParseEnumPipe(ServiceName)) serviceName: ServiceName,
+    @Body() updateArtifactDto: any
+  ) {
+    return this.userArtifactService.updateServiceArtifactEntity(serviceName, updateArtifactDto)
   }
 
   @Delete(':userId/:serviceName/:id')
-  deleteServiceArtifact(
+  deleteUserServiceArtifact(
     @Param('userId') userId: string,
     @Param('serviceName', new ParseEnumPipe(ServiceName)) serviceName: ServiceName,
     @Param('id') id: string
   ) {
-    return this.userArtifactService.deleteServiceArtifact(userId, serviceName, id)
+    return this.userArtifactService.deleteUserServiceArtifact(userId, serviceName, id)
+  }
+
+  @Delete(':serviceName/:id')
+  deleteServiceArtifactEntity(
+    @Param('serviceName', new ParseEnumPipe(ServiceName)) serviceName: ServiceName,
+    @Param('id') id: string
+  ) {
+    return this.userArtifactService.deleteServiceArtifactEntity(serviceName, id)
   }
 }
