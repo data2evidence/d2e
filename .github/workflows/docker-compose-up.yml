@@ -135,14 +135,6 @@ jobs:
           command: |
             # Run DataNode services without sql-editor
             yarn local:minerva up --wait
-            EXIT_CODE=$?
-
-            docker ps --format "{{.Names}} {{.Status}}" | sort | tee -a $GITHUB_STEP_SUMMARY
-            echo | tee -a $GITHUB_STEP_SUMMARY
-
-            if [ $EXIT_CODE != 0 ]; then
-              echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-            fi
 
       - name: Logs minerva
         if: success() || failure()
