@@ -127,6 +127,7 @@ jobs:
 
       - name: Docker compose up Local Mode without UI Container
         uses: nick-fields/retry@v3
+        id: retry
         with:
           timeout_seconds: 1800
           retry_wait_seconds: 100
@@ -135,17 +136,25 @@ jobs:
           command: |
             # Run DataNode services without sql-editor
             yarn local:minerva up --wait
-            EXIT_CODE=$?
+            DC_EXIT_CODE=$?
+            echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_ENV
+            docker ps --format "{{.Names}} {{.Status}}" | sort
 
-            CMD=(docker ps --format "{{.Names}} {{.Status}}")
-            ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
-            echo | tee -a $GITHUB_STEP_SUMMARY
+      - name: Check Container Health
+        run: |
+          CMD=(docker ps --format "{{.Names}} {{.Status}}")
+          DC_FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy")
 
-            if [ $EXIT_CODE != 0 ]; then
-              echo "ALERT docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-              FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy"); echo FAIL_COUNT=$FAIL_COUNT
-              [ $FAIL_COUNT != 0 ] && echo exit $EXIT_CODE
-            fi
+          echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
+          echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
+          echo RETRY_EXIT_CODE=${{ steps.retry.outputs.exit_code }} | tee -a $GITHUB_STEP_SUMMARY
+          echo RETRY_OUTCOME=${{ steps.retry.outcome }} | tee -a $GITHUB_STEP_SUMMARY
+          echo RETRY_TOTAL_ATTEMPTS=${{ steps.retry.outputs.total_attempts }} | tee -a $GITHUB_STEP_SUMMARY
+
+          echo | tee -a $GITHUB_STEP_SUMMARY
+          ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
+
+          [ $DC_FAIL_COUNT != 0 ] && exit $DC_FAIL_COUNT
 
       - name: Logs minerva
         if: success() || failure()
