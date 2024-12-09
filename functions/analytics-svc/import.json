@@ -1,5 +1,5 @@
 {
-  "imports":{
+  "imports": {
     "@alp/alp-base-utils": "../_shared/alp-base-utils/src/index.ts",
     "@alp/alp-config-utils": "../_shared/alp-config-utils/src/index.ts",
     "@alp/alp-metadata": "../_shared/alp-metadata/src/index.ts",
@@ -22,6 +22,7 @@
     "graphql-request": "npm:graphql-request@^3.7.0",
     "node-fetch": "npm:node-fetch@^2.6",
     "base64": "jsr:@std/encoding/base64",
+    "uuid": "npm:uuid@^10.0.0",
     "../_shared/alp-base-utils/src/PostgresConnection": "../_shared/alp-base-utils/src/PostgresConnection.ts",
     "../_shared/alp-base-utils/src/EnvVarUtils": "../_shared/alp-base-utils/src/EnvVarUtils.ts",
     "../_shared/alp-base-utils/src/DBConnectionUtil": "../_shared/alp-base-utils/src/DBConnectionUtil.ts",
