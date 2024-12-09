@@ -1,13 +1,13 @@
 const pg = require('pg');
-import { createLogger } from '../logger';
-import { Filters } from '../utils/types';
+import { createLogger } from '../../logger';
+import { Filters } from '../../utils/types';
 import { env } from 'src/env';
-import { INDEX_ATTRIBUTES } from '../utils/constants';
+import { INDEX_ATTRIBUTES } from '../../utils/constants';
 import {
   IDuckdbConcept,
   IConceptRecommended,
   IConceptAncestor,
-} from '../utils/types';
+} from '../../utils/types';
 
 export class CachedbDAO {
   private readonly jwt: string;

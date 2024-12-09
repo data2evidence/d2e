@@ -15,7 +15,7 @@ import {
   Filters,
   IDuckdbFacet,
 } from 'src/utils/types';
-import { createLogger } from '../logger';
+import { createLogger } from '../../logger';
 import { groupBy } from 'src/utils/helperUtil';
 import { CachedbDAO } from './cachedb-dao';
 

@@ -7,7 +7,7 @@ import { env } from './env';
 import { SeedService } from './db/seeds/seed.service';
 import { FhirModule } from './module/concept/fhir.module';
 import { HealthModule } from './health-check/health.module';
-import { CachedbModule } from './cachedb/cachedb.module';
+import { CachedbModule } from './module/cachedb/cachedb.module';
 
 const routes: Routes = [
   {

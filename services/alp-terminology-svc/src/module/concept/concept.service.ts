@@ -24,7 +24,7 @@ import { Request } from 'express';
 import { SystemPortalAPI } from 'src/api/portal-api';
 import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 import { GetStandardConceptsDto } from './dto/concept.dto';
-import { CachedbService } from 'src/cachedb/cachedb.service';
+import { CachedbService } from 'src/module/cachedb/cachedb.service';
 import { env } from 'src/env';
 
 // Placed outside as FHIR server is unable to access

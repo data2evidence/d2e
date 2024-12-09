@@ -7,9 +7,11 @@ import { ConceptSet } from '../../entity';
 import { randomUUID } from 'crypto';
 import { Request } from 'express';
 import { ConceptService } from '../concept/concept.service';
+import { CachedbService } from '../cachedb/cachedb.service';
 import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { SystemPortalAPI } from 'src/api/portal-api';
 import { Brackets } from 'typeorm';
+import { env } from 'src/env';
 
 @Injectable()
 export class ConceptSetService {
@@ -21,6 +23,7 @@ export class ConceptSetService {
   constructor(
     @Inject(REQUEST) request: Request,
     private readonly conceptService: ConceptService,
+    private readonly cachedbService: CachedbService,
   ) {
     const decodedToken = decode(
       request.headers['authorization'].replace(/bearer /i, ''),
@@ -107,11 +110,29 @@ export class ConceptSetService {
         }),
       )
       .getOne();
+
     const conceptIds = conceptSet.concepts.map((c) => c.id);
-    const concepts = await this.conceptService.getConceptsByIds(
-      datasetId,
-      conceptIds,
-    );
+
+    let concepts;
+    // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch
+    if (env.USE_DUCKDB_FTS) {
+      this.logger.info('Searching with Duckdb FTS');
+      const systemPortalApi = new SystemPortalAPI(this.token);
+      const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
+        datasetId,
+      );
+      concepts = await this.cachedbService.getConceptsByIds(
+        conceptIds,
+        datasetId,
+        vocabSchemaName,
+      );
+    } else {
+      this.logger.info('Searching with Meilisearch');
+      concepts = await this.conceptService.getConceptsByIds(
+        datasetId,
+        conceptIds,
+      );
+    }
 
     const conceptSetWithConceptDetails = {
       ...conceptSet,
