@@ -3,7 +3,11 @@ import { createLogger } from '../logger';
 import { Filters } from '../utils/types';
 import { env } from 'src/env';
 import { INDEX_ATTRIBUTES } from '../utils/constants';
-import { IDuckdbConcept, IConceptRecommended } from '../utils/types';
+import {
+  IDuckdbConcept,
+  IConceptRecommended,
+  IConceptAncestor,
+} from '../utils/types';
 
 export class CachedbDAO {
   private readonly jwt: string;
@@ -396,6 +400,44 @@ export class CachedbDAO {
         select concept_id_1, concept_id_2, relationship_id from ${this.vocabSchemaName}.concept_recommended WHERE concept_id_1 IN (?);
             `;
       const result = await client.query(sql, [searchConceptIds.join(', ')]);
+      return result.rows;
+    } catch (error) {
+      this.logger.error(error);
+    } finally {
+      await client.end();
+    }
+  }
+
+  async getExactConceptDescendants(
+    searchConceptIds: number[],
+  ): Promise<IConceptAncestor[]> {
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
+    try {
+      const sql = `
+        select ancestor_concept_id, descendant_concept_id, min_levels_of_separation, max_levels_of_separation from ${this.vocabSchemaName}.concept_ancestor WHERE ancestor_concept_id IN (?);
+            `;
+      const result = await client.query(sql, [searchConceptIds.join(', ')]);
+      return result.rows;
+    } catch (error) {
+      this.logger.error(error);
+    } finally {
+      await client.end();
+    }
+  }
+
+  async getExactConceptAncestors(
+    searchConceptIds: number[],
+    level: number,
+  ): Promise<IConceptAncestor[]> {
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
+    try {
+      const sql = `
+        select ancestor_concept_id, descendant_concept_id, min_levels_of_separation, max_levels_of_separation from ${this.vocabSchemaName}.concept_ancestor WHERE descendant_concept_id IN (?) AND min_levels_of_separation = (?);
+            `;
+      const result = await client.query(sql, [
+        searchConceptIds.join(', '),
+        level,
+      ]);
       return result.rows;
     } catch (error) {
       this.logger.error(error);

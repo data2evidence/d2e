@@ -221,6 +221,37 @@ export class CachedbService {
     }
   }
 
+  async getDescendants(
+    conceptId: number[],
+    datasetId: string,
+    vocabSchemaName: string,
+  ) {
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+    const result = await cachedbDao.getExactConceptDescendants(conceptId);
+    return result;
+  }
+
+  async getAncestors(
+    conceptId: number[],
+    datasetId: string,
+    vocabSchemaName: string,
+    depth: number,
+  ) {
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+    const result = await cachedbDao.getExactConceptAncestors(conceptId, depth);
+    return result;
+  }
+
+  async getConceptsByIds(
+    conceptIds: number[],
+    datasetId: string,
+    vocabSchemaName: string,
+  ) {
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+    const result = await cachedbDao.getMultipleExactConcepts(conceptIds);
+    return this.duckdbResultMapping(result).expansion.contains;
+  }
+
   private mapConceptWithFhirValueSetExpansionContains(item: IConcept) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

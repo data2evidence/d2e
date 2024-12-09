@@ -58,7 +58,7 @@ export interface IMeilisearchRelationship {
 }
 
 export interface IConceptAncestor {
-  meilisearch_id: number;
+  meilisearch_id?: number;
   ancestor_concept_id: number;
   descendant_concept_id: number;
   min_levels_of_separation: number;

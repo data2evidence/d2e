@@ -604,6 +604,92 @@ export class ConceptService {
     const systemPortalApi = new SystemPortalAPI(this.token);
     const { databaseCode, vocabSchemaName, dialect } =
       await systemPortalApi.getDatasetDetails(datasetId);
+
+    // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch and return early
+    if (env.USE_DUCKDB_FTS) {
+      logger.info('Searching with Duckdb FTS');
+      const conceptDescendants = await this.cachedbService.getDescendants(
+        [conceptId],
+        datasetId,
+        vocabSchemaName,
+      );
+      conceptDescendants.forEach((concept_ancestor) => {
+        if (concept_ancestor.descendant_concept_id !== conceptId) {
+          edges.push({
+            source: conceptId,
+            target: concept_ancestor.descendant_concept_id,
+          });
+          conceptIds.add(concept_ancestor.descendant_concept_id);
+          nodeLevels.push({
+            conceptId: concept_ancestor.descendant_concept_id,
+            level: -1,
+          });
+        }
+      });
+
+      // recursively get the ancestors of the specified conceptId
+      const getAllAncestors = async (
+        conceptId: number,
+        depth: number,
+        maxDepth: number,
+      ) => {
+        const conceptAncestors = await this.cachedbService.getAncestors(
+          [conceptId],
+          datasetId,
+          vocabSchemaName,
+          1,
+        );
+
+        if (conceptAncestors.length == 0 || depth <= 0) {
+          return;
+        }
+        conceptAncestors.forEach((concept_ancestor) => {
+          if (concept_ancestor.ancestor_concept_id !== conceptId) {
+            edges.push({
+              source: concept_ancestor.ancestor_concept_id,
+              target: conceptId,
+            });
+            conceptIds.add(concept_ancestor.ancestor_concept_id);
+            nodeLevels.push({
+              conceptId: concept_ancestor.ancestor_concept_id,
+              level: maxDepth - depth + 1,
+            });
+            getAllAncestors(
+              concept_ancestor.ancestor_concept_id,
+              depth - 1,
+              maxDepth,
+            );
+          }
+        });
+      };
+
+      await getAllAncestors(conceptId, depth, depth);
+
+      const concepts = await this.cachedbService.getConceptsByIds(
+        Array.from(conceptIds),
+        datasetId,
+        vocabSchemaName,
+      );
+
+      const nodes: ConceptHierarchyNode[] = nodeLevels.reduce(
+        (acc: ConceptHierarchyNode[], current: ConceptHierarchyNodeLevel) => {
+          const conceptNode = concepts.find(
+            (concept) => concept.conceptId === current.conceptId,
+          );
+          acc.push({
+            conceptId: current.conceptId,
+            display: conceptNode?.display,
+            level: current.level,
+          });
+          return acc;
+        },
+        [],
+      );
+
+      return { edges, nodes };
+    }
+
+    logger.info('Searching with Meilisearch');
     const meilisearchApi = new MeilisearchAPI();
     const conceptAncestorName =
       dialect === 'hana' ? 'CONCEPT_ANCESTOR' : 'concept_ancestor';
@@ -614,7 +700,6 @@ export class ConceptService {
       [conceptId],
       conceptAncestorIndex,
     );
-
     conceptDescendants.forEach((concept) => {
       concept.hits.forEach((hit) => {
         if (hit.descendant_concept_id !== conceptId) {
