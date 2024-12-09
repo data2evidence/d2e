@@ -13,12 +13,11 @@ import {
   FhirConceptMapElementTarget,
   IConcept,
   Filters,
+  IDuckdbFacet,
 } from 'src/utils/types';
 import { createLogger } from '../logger';
 import { groupBy } from 'src/utils/helperUtil';
 import { CachedbDAO } from './cachedb-dao';
-
-import { DUMMY_FILTER_OPTIONS_FACETS } from '../utils/constants';
 
 @Injectable()
 export class CachedbService {
@@ -70,19 +69,11 @@ export class CachedbService {
   }
 
   async getConceptFilterOptionsFaceted(
-    vocabSchemaName: string,
     datasetId: string,
+    vocabSchemaName: string,
     searchText: string,
     filters: Filters,
-  ): Promise<any> {
-    // TODO: SKIP_DUCKDB_FILTER_OPTIONS_QUERY to be removed once frontend issue of sending multiple api calls upon concepts screen loading is fixed
-    // https://github.com/alp-os/internal/issues/1070
-    // Return hardcoded facet list for frontend so that dropdown can be populated to filter by facets.
-    const SKIP_DUCKDB_FILTER_OPTIONS_QUERY = true;
-    if (SKIP_DUCKDB_FILTER_OPTIONS_QUERY) {
-      return DUMMY_FILTER_OPTIONS_FACETS;
-    }
-
+  ): Promise<IDuckdbFacet> {
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
     return cachedbDao.getConceptFilterOptionsFaceted(searchText, filters);
   }

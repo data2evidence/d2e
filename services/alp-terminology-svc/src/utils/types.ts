@@ -29,6 +29,27 @@ export interface IMeilisearchConcept {
   };
 }
 
+export interface IDuckdbFacet {
+  conceptClassId: {
+    [key: string]: number;
+  };
+  domainId: {
+    [key: string]: number;
+  };
+  standardConcept: {
+    [key: string]: number;
+  };
+  vocabularyId: {
+    [key: string]: number;
+  };
+  validity: {
+    [key: string]: number;
+  };
+  concept: {
+    [key: string]: number;
+  };
+}
+
 export interface IDuckdbConcept {
   hits: IConcept[];
   totalHits: number;

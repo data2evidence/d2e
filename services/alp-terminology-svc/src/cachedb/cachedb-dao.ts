@@ -40,10 +40,12 @@ export class CachedbDAO {
           from fts
           limit ? OFFSET ?;
           `;
+
+      const offset = pageNumber * rowsPerPage;
       const conceptsSqlParams = [
         ...duckdbFtsBaseQueryParams,
         rowsPerPage,
-        pageNumber,
+        offset,
       ];
 
       const countSql = `${duckdbFtsBaseQuery} select count(concept_id) as count from fts`;

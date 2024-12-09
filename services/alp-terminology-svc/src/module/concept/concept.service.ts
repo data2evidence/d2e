@@ -156,12 +156,28 @@ export class ConceptService {
             const meiliIndex = `${databaseCode}_${vocabSchemaName}_${
               dialect === 'hana' ? 'CONCEPT' : 'concept'
             }`;
-            const domainIdFacets =
-              await meilisearchApi.getConceptFilterOptionsFaceted(
-                meiliIndex,
-                dataItem.searchText,
-                { ...filters, domainId: [] },
-              );
+
+            let domainIdFacets;
+            // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch
+            if (env.USE_DUCKDB_FTS) {
+              logger.info('Searching with Duckdb FTS');
+              domainIdFacets = (
+                await this.cachedbService.getConceptFilterOptionsFaceted(
+                  datasetId,
+                  vocabSchemaName,
+                  dataItem.searchText,
+                  filters,
+                )
+              ).domainId;
+            } else {
+              logger.info('Searching with Meilisearch');
+              domainIdFacets =
+                await meilisearchApi.getConceptFilterOptionsFaceted(
+                  meiliIndex,
+                  dataItem.searchText,
+                  { ...filters, domainId: [] },
+                );
+            }
 
             const keyExists = Object.keys(domainIdFacets).some(
               (objKey) => objKey.toUpperCase() === domainId.toUpperCase(),
@@ -525,8 +541,8 @@ export class ConceptService {
         logger.info('Searching concept filters with Duckdb FTS');
         const filterOptions =
           await this.cachedbService.getConceptFilterOptionsFaceted(
-            vocabSchemaName,
             datasetId,
+            vocabSchemaName,
             searchText,
             filters,
           );
