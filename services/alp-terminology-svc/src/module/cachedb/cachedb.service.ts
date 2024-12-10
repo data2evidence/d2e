@@ -99,8 +99,10 @@ export class CachedbService {
 
       const vocabSchemaName = await this.getVocabSchemaName(datasetId);
       const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
-      const DuckdbResultConcept1: any =
-        await cachedbDao.getMultipleExactConcepts(searchConcepts1, true);
+      const DuckdbResultConcept1 = await cachedbDao.getMultipleExactConcepts(
+        searchConcepts1,
+        true,
+      );
 
       const conceptC1: FhirValueSet =
         this.duckdbResultMapping(DuckdbResultConcept1);
@@ -121,7 +123,7 @@ export class CachedbService {
           const searchConcepts2: number[] = [
             conceptRelations.hits[i].concept_id_2,
           ];
-          const DuckdbResultConcept2: any =
+          const DuckdbResultConcept2 =
             await cachedbDao.getMultipleExactConcepts(searchConcepts2, true);
           const conceptC2: FhirValueSet =
             this.duckdbResultMapping(DuckdbResultConcept2);
@@ -133,7 +135,7 @@ export class CachedbService {
           const searchConcepts3: number[] = [
             relationships.hits[0].relationship_concept_id,
           ];
-          const DuckdbResultConcept3: any =
+          const DuckdbResultConcept3 =
             await cachedbDao.getMultipleExactConcepts(searchConcepts3, true);
           const conceptC3: FhirValueSet =
             this.duckdbResultMapping(DuckdbResultConcept3);
@@ -181,10 +183,7 @@ export class CachedbService {
     }
   }
 
-  async getRecommendedConcepts(
-    conceptIds: number[],
-    datasetId: string,
-  ): Promise<any> {
+  async getRecommendedConcepts(conceptIds: number[], datasetId: string) {
     try {
       const vocabSchemaName = await this.getVocabSchemaName(datasetId);
       const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
