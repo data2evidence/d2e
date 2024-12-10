@@ -1198,7 +1198,7 @@ services:
       TERMINOLOGY_SVC__LOG_LEVEL: info
       TERMINOLOGY_SVC__PATH: terminology
       TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
-      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-false}
+      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-true}
 
   alp-minio-post-init:
     container_name: &c23 alp-minio-post-init
