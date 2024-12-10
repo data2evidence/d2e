@@ -1,6 +1,3 @@
-import { config } from 'dotenv'
-config()
-
 type LoggingLevel = 'info' | 'warn' | 'error'
 
 const _env = Deno.env.toObject();

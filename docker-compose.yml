@@ -367,7 +367,7 @@ services:
             "CACHEDB__PORT": 41191,
             "CACHEDB__HOST": "alp-cachedb",
             "CACHEDB__POOL_SIZE": "${CACHEDB__POOL_SIZE:-10}",
-            "NODE_ENV": "development",
+            "NODE_ENV": "${NODE_ENV:-development}",
             "PG__DB_NAME": "alp",
             "PG__DEBUG": "${PG_DEBUG:-1}",
             "PG__HOST": "${PG_HOST:-alp-minerva-postgres-1}",
@@ -377,6 +377,7 @@ services:
             "PG__IDLE_TIMEOUT_IN_MS": 1000,
             "PG__DIALECT": "postgresql",
             "LOCAL_DEBUG": "false",
+            "isHttpTestRun": "${isHttpTestRun}",
             "SERVICE_ROUTES": {
               "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
@@ -412,7 +413,6 @@ services:
             "USE_DUCKDB": "${USE_DUCKDB:-true}",
             "USE_CACHEDB": "${USE_CACHEDB:-true}",
             "USE_EXTENSION_FOR_COHORT_CREATION": "false",
-            "isHttpTestRun": "${isHttpTestRun}",
             "isTestEnv": "${isTestEnv}",
             "local": "${local}",
             "TESTSCHEMA": "${TESTSCHEMA}"
@@ -458,7 +458,6 @@ services:
           },
           "query-gen-svc": {
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",
-            "isHttpTestRun": "${isTestEnv}",
             "isTestEnv": "${isTestEnv}",
             "TESTSCHEMA": "${TESTSCHEMA}",
             "NOT_EQ_CHECK_FILTERCARDS": "${NOT_EQ_CHECK_FILTERCARDS:-true}"

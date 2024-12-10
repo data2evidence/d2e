@@ -41,12 +41,9 @@ export async function generateQuery(
     }
     const data = JSON.stringify(payload);
 
-    let accessToken = "Bearer DUMMY_TOKEN";
-    if (!envVarUtils.isTestEnv()) {
-        accessToken = req.headers.authorization;
-        if (log.getRequestCorrelationID(req)) {
-            reqCorrelationId = log.getRequestCorrelationID(req);
-        }
+    const accessToken = req.headers.authorization;
+    if (log.getRequestCorrelationID(req)) {
+        reqCorrelationId = log.getRequestCorrelationID(req);
     }
 
     const defaultPath = `/analytics-svc/api/services/query`;
