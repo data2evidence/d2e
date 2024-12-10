@@ -2,7 +2,6 @@ const pg = require('pg');
 import { createLogger } from '../../logger';
 import { Filters, IConceptRelationship } from '../../utils/types';
 import { env } from 'src/env';
-import { INDEX_ATTRIBUTES } from '../../utils/constants';
 import {
   IDuckdbConcept,
   IConceptRecommended,
@@ -78,11 +77,11 @@ export class CachedbDAO {
         searchTexts.reduce((accumulator, searchText, index: number) => {
           accumulator += `$${index + 1},`;
           return accumulator;
-        }, `${INDEX_ATTRIBUTES.concept.conceptId} IN (`) + ') ';
+        }, `concept_id IN (`) + ') ';
 
       const invalidReasonWhereClause = includeInvalid
         ? ''
-        : `AND ${INDEX_ATTRIBUTES.concept.invalidReason} = '' `;
+        : `AND invalid_reason = '' `;
 
       const sql = `
         select *
@@ -268,27 +267,26 @@ export class CachedbDAO {
 
   private generateFilterWhereClause(filters: Filters): string {
     const conceptClassIdFilter = filters.conceptClassId.map((filterValue) => {
-      return `${INDEX_ATTRIBUTES.concept.conceptClassId} = '${filterValue}'`;
+      return `concept_class_id = '${filterValue}'`;
     });
     const domainIdFilter = filters.domainId.map((filterValue) => {
-      return `${INDEX_ATTRIBUTES.concept.domainId} = '${filterValue}'`;
+      return `domain_id = '${filterValue}'`;
     });
     const standardConceptFilter = filters.standardConcept.map((filterValue) => {
-      if (filterValue === 'S')
-        return `${INDEX_ATTRIBUTES.concept.standardConcept} = 'S'`;
-      else return `${INDEX_ATTRIBUTES.concept.standardConcept} != 'S'`;
+      if (filterValue === 'S') return `standard_concept = 'S'`;
+      else return `standard_concept != 'S'`;
     });
     const vocabularyIdFilter = filters.vocabularyId.map((filterValue) => {
-      return `${INDEX_ATTRIBUTES.concept.vocabularyId} = '${filterValue}'`;
+      return `vocabulary_id = '${filterValue}'`;
     });
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todaySeconds = Math.floor(Number(today) / 1000);
     const validityFilter = filters.validity.map((filterValue) => {
       if (filterValue === 'Valid') {
-        return `${INDEX_ATTRIBUTES.concept.validEndDate} >= ${todaySeconds}`;
+        return `valid_end_date >= ${todaySeconds}`;
       } else {
-        return `${INDEX_ATTRIBUTES.concept.validEndDate} < ${todaySeconds}`;
+        return `valid_end_date < ${todaySeconds}`;
       }
     });
 
@@ -313,7 +311,7 @@ export class CachedbDAO {
       const sql = `
       select *
           from ${this.vocabSchemaName}.concept_relationship
-          WHERE ${INDEX_ATTRIBUTES.concept_relationship.conceptId1}=$1
+          WHERE concept_id_1=$1
           `;
       const result = await client.query(sql, [conceptId]);
 
@@ -335,7 +333,7 @@ export class CachedbDAO {
       const sql = `
       select *
           from ${this.vocabSchemaName}.relationship
-          WHERE ${INDEX_ATTRIBUTES.relationship.relationshipId}=$1
+          WHERE relationship_id=$1
           `;
       const result = await client.query(sql, [relationshipId]);
       const data = {
