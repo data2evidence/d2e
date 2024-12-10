@@ -25,13 +25,12 @@
     "rollback": "yarn typeorm migration:revert"
   },
   "dependencies": {
-    "@asymmetrik/node-fhir-server-core": "^2.2.5",
     "@nestjs/axios": "^3.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.4.3",
     "@nestjs/platform-express": "^9.0.0",
-    "@nestjs/typeorm": "^9.0.1",
     "@nestjs/terminus": "^9.2.1",
+    "@nestjs/typeorm": "^9.0.1",
     "axios": "^1.4.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
