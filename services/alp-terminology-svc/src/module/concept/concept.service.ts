@@ -1,5 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Injectable } from '@nestjs/common';
 import { createLogger } from '../../logger';
 import {
   Filters,
@@ -7,7 +6,6 @@ import {
   ConceptHierarchyNodeLevel,
   ConceptHierarchyNode,
 } from '../../utils/types';
-import { Request } from 'express';
 import { GetStandardConceptsDto } from './dto/concept.dto';
 import { CachedbService } from 'src/module/cachedb/cachedb.service';
 
@@ -15,19 +13,7 @@ import { CachedbService } from 'src/module/cachedb/cachedb.service';
 const logger = createLogger('ConceptService');
 @Injectable()
 export class ConceptService {
-  private token: string;
-
-  constructor(
-    @Inject(REQUEST) request: Request,
-    private readonly cachedbService: CachedbService,
-  ) {
-    this.token = request.headers['authorization'];
-  }
-
-  // Used by FHIR server, where request cannot be injected as it does not use nest
-  setToken(token: string) {
-    this.token = token;
-  }
+  constructor(private readonly cachedbService: CachedbService) {}
 
   async getConcepts(
     offset: number,
