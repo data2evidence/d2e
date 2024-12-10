@@ -173,14 +173,6 @@ export type Filters = {
   validity: ('Valid' | 'Invalid')[];
 };
 
-export type HybridSearchConfig = {
-  id: number;
-  isEnabled: boolean;
-  semanticRatio: number;
-  source: string;
-  model: string;
-};
-
 export type ConceptHierarchyEdge = {
   source: number;
   target: number;
