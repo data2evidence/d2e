@@ -197,13 +197,16 @@ export class ConceptSetService {
         dialect === 'hana' ? 'CONCEPT_ANCESTOR' : 'concept_ancestor';
       const conceptRelationshipName =
         dialect === 'hana' ? 'CONCEPT_RELATIONSHIP' : 'concept_relationship';
+
       const conceptIndex = `${databaseCode}_${vocabSchemaName}_${conceptName}`;
       const conceptAncestorIndex = `${databaseCode}_${vocabSchemaName}_${conceptAncestorName}`;
       const conceptRelationshipIndex = `${databaseCode}_${vocabSchemaName}_${conceptRelationshipName}`;
+
       const promises = conceptSetIds.map((conceptSetId) =>
         this.getConceptSet(conceptSetId, datasetId),
       );
       const conceptSets = await Promise.all(promises);
+
       const conceptIds: number[] = [];
       const conceptIdsToIncludeDescendant: number[] = [];
       const conceptIdsToIncludeMapped: number[] = [];
@@ -228,23 +231,40 @@ export class ConceptSetService {
         return [];
       }
 
-      const includedConceptIds = await this.getConceptsAndDescendantIds(
-        meilisearchApi,
-        conceptIndex,
-        conceptAncestorIndex,
-        conceptIds,
-        conceptIdsToIncludeDescendant,
-      );
-
-      const mappedConceptsAndDescendantIds =
-        await this.getConceptsAndDescendantIds(
+      let includedConceptIds;
+      let mappedConceptsAndDescendantIds;
+      // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch
+      if (env.USE_DUCKDB_FTS) {
+        includedConceptIds =
+          await this.cachedbService.getConceptsAndDescendantIds(
+            conceptIds,
+            conceptIdsToIncludeDescendant,
+            datasetId,
+            vocabSchemaName,
+          );
+        mappedConceptsAndDescendantIds =
+          await this.cachedbService.getConceptsAndDescendantIds(
+            conceptIdsToIncludeMapped,
+            conceptIdsToIncludeMappedAndDescendant,
+            datasetId,
+            vocabSchemaName,
+          );
+      } else {
+        includedConceptIds = await this.getConceptsAndDescendantIds(
+          meilisearchApi,
+          conceptIndex,
+          conceptAncestorIndex,
+          conceptIds,
+          conceptIdsToIncludeDescendant,
+        );
+        mappedConceptsAndDescendantIds = await this.getConceptsAndDescendantIds(
           meilisearchApi,
           conceptIndex,
           conceptAncestorIndex,
           conceptIdsToIncludeMapped,
           conceptIdsToIncludeMappedAndDescendant,
         );
-
+      }
       const mappedConceptIds = await meilisearchApi.getMapped(
         mappedConceptsAndDescendantIds,
         conceptRelationshipIndex,

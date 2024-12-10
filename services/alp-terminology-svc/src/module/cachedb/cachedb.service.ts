@@ -243,6 +243,54 @@ export class CachedbService {
     return this.duckdbResultMapping(result).expansion.contains;
   }
 
+  async getConceptRelationshipMapsTo(
+    conceptIds: number[],
+    datasetId: string,
+    vocabSchemaName: string,
+  ) {
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+    const result = await cachedbDao.getConceptRelationship(
+      conceptIds,
+      'Maps to',
+    );
+    return result;
+  }
+
+  async getConceptsAndDescendantIds(
+    conceptIds: number[],
+    descendantIds: number[],
+    datasetId: string,
+    vocabSchemaName: string,
+  ): Promise<number[]> {
+    if (!conceptIds.length) {
+      return [];
+    }
+    const conceptsAndDescendantIds: number[] = [];
+
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+
+    // Ensures included concept IDs are present in vocab schema and valid
+    const validConcepts = await cachedbDao.getMultipleExactConcepts(
+      conceptIds,
+      false,
+    );
+    validConcepts.hits.forEach((concept) => {
+      conceptsAndDescendantIds.push(concept.concept_id);
+    });
+
+    if (!descendantIds.length) {
+      return conceptsAndDescendantIds;
+    }
+
+    const conceptDescendants = await cachedbDao.getExactConceptDescendants(
+      descendantIds,
+    );
+    conceptDescendants.forEach((concept) => {
+      conceptsAndDescendantIds.push(concept.descendant_concept_id);
+    });
+    return conceptsAndDescendantIds;
+  }
+
   private mapConceptWithFhirValueSetExpansionContains(item: IConcept) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

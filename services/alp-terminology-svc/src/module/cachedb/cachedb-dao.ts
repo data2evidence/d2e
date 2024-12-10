@@ -1,6 +1,6 @@
 const pg = require('pg');
 import { createLogger } from '../../logger';
-import { Filters } from '../../utils/types';
+import { Filters, IConceptRelationship } from '../../utils/types';
 import { env } from 'src/env';
 import { INDEX_ATTRIBUTES } from '../../utils/constants';
 import {
@@ -350,31 +350,6 @@ export class CachedbDAO {
     }
   }
 
-  // async getConceptByName(conceptName: string): Promise<any> {
-  //   const client = this.getCachedbConnection(this.jwt, this.datasetId);
-  //   const filters: Filters = {
-  //     conceptClassId: [],
-  //     domainId: [],
-  //     standardConcept: ['S'],
-  //     vocabularyId: [],
-  //     validity: ['Valid'],
-  //   };
-  //   try {
-  //     const [duckdbFtsBaseQuery, duckdbFtsBaseQueryParams] =
-  //       this.getDuckdbFtsBaseQuery(conceptName, filters);
-  //     const sql = `
-  //       ${duckdbFtsBaseQuery}
-  //       select concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code, valid_start_date, valid_end_date, invalid_reason from fts
-  //           `;
-  //     const result = await client.query(sql, [...duckdbFtsBaseQueryParams]);
-  //     return result.rows;
-  //   } catch (error) {
-  //     this.logger.error(error);
-  //   } finally {
-  //     await client.end();
-  //   }
-  // }
-
   async getExactConcept(
     conceptName: string | number,
     conceptColumnName: 'concept_name' | 'concept_id' | 'concept_code',
@@ -385,7 +360,7 @@ export class CachedbDAO {
         select concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code, valid_start_date, valid_end_date, invalid_reason from ${this.vocabSchemaName}.concept WHERE ${conceptColumnName}=? AND standard_concept='S';
             `;
       const result = await client.query(sql, [conceptName]);
-      return result.rows;
+      return result.rows ?? [];
     } catch (error) {
       this.logger.error(error);
     } finally {
@@ -398,11 +373,18 @@ export class CachedbDAO {
   ): Promise<IConceptRecommended[]> {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
+      // TODO: Move searchConceptIds as a sql parameter instead of being in the sql statement itself.
+      // searchConceptIds has to be in sql statement now as cachedb does not support array sql parameter types
+      // https://github.com/alp-os/internal/issues/1411
       const sql = `
-        select concept_id_1, concept_id_2, relationship_id from ${this.vocabSchemaName}.concept_recommended WHERE concept_id_1 IN (?);
+        select concept_id_1, concept_id_2, relationship_id from ${
+          this.vocabSchemaName
+        }.concept_recommended WHERE concept_id_1 IN (${searchConceptIds.join(
+        ', ',
+      )});
             `;
-      const result = await client.query(sql, [searchConceptIds.join(', ')]);
-      return result.rows;
+      const result = await client.query(sql);
+      return result.rows ?? [];
     } catch (error) {
       this.logger.error(error);
     } finally {
@@ -414,12 +396,19 @@ export class CachedbDAO {
     searchConceptIds: number[],
   ): Promise<IConceptAncestor[]> {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
+    // TODO: Move searchConceptIds as a sql parameter instead of being in the sql statement itself.
+    // searchConceptIds has to be in sql statement now as cachedb does not support array sql parameter types
+    // https://github.com/alp-os/internal/issues/1411
     try {
       const sql = `
-        select ancestor_concept_id, descendant_concept_id, min_levels_of_separation, max_levels_of_separation from ${this.vocabSchemaName}.concept_ancestor WHERE ancestor_concept_id IN (?);
-            `;
-      const result = await client.query(sql, [searchConceptIds.join(', ')]);
-      return result.rows;
+      select ancestor_concept_id, descendant_concept_id, min_levels_of_separation, max_levels_of_separation from ${
+        this.vocabSchemaName
+      }.concept_ancestor WHERE ancestor_concept_id IN (${searchConceptIds.join(
+        ', ',
+      )});
+      `;
+      const result = await client.query(sql);
+      return result.rows ?? [];
     } catch (error) {
       this.logger.error(error);
     } finally {
@@ -433,13 +422,42 @@ export class CachedbDAO {
   ): Promise<IConceptAncestor[]> {
     const client = this.getCachedbConnection(this.jwt, this.datasetId);
     try {
+      // TODO: Move searchConceptIds as a sql parameter instead of being in the sql statement itself.
+      // searchConceptIds has to be in sql statement now as cachedb does not support array sql parameter types
+      // https://github.com/alp-os/internal/issues/1411
       const sql = `
-        select ancestor_concept_id, descendant_concept_id, min_levels_of_separation, max_levels_of_separation from ${this.vocabSchemaName}.concept_ancestor WHERE descendant_concept_id IN (?) AND min_levels_of_separation = (?);
+        select ancestor_concept_id, descendant_concept_id, min_levels_of_separation, max_levels_of_separation from ${
+          this.vocabSchemaName
+        }.concept_ancestor WHERE descendant_concept_id IN (${searchConceptIds.join(
+        ', ',
+      )}) AND min_levels_of_separation = (?);
             `;
-      const result = await client.query(sql, [
-        searchConceptIds.join(', '),
-        level,
-      ]);
+      const result = await client.query(sql, [level]);
+      return result.rows;
+    } catch (error) {
+      this.logger.error(error);
+    } finally {
+      await client.end();
+    }
+  }
+
+  async getConceptRelationship(
+    searchConceptIds: number[],
+    conceptRelationshipType: 'Maps to',
+  ): Promise<IConceptRelationship[]> {
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
+    try {
+      // TODO: Move searchConceptIds as a sql parameter instead of being in the sql statement itself.
+      // searchConceptIds has to be in sql statement now as cachedb does not support array sql parameter types
+      // https://github.com/alp-os/internal/issues/1411
+      const sql = `
+        select concept_id_1, concept_id_2, relationship_id, valid_start_date, valid_end_date, invalid_reason from ${
+          this.vocabSchemaName
+        }.concept_relationship WHERE concept_id_2 IN (${searchConceptIds.join(
+        ', ',
+      )}) AND relationship_id = ? AND invalid_reason IS NOT NULL;
+            `;
+      const result = await client.query(sql, [conceptRelationshipType]);
       return result.rows;
     } catch (error) {
       this.logger.error(error);

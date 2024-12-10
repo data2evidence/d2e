@@ -100,7 +100,7 @@ export interface IMeilisearchGetDescendants {
 }
 
 export interface IConceptRelationship {
-  meilisearch_id: number;
+  meilisearch_id?: number;
   concept_id_1: number;
   concept_id_2: number;
   relationship_id: string;
