@@ -35,6 +35,7 @@ import { getDuckdbDBConnection } from "./utils/DuckdbConnection";
 import { getCachedbDbConnections } from "./utils/cachedb/cachedb.ts";
 import { DB } from "./utils/DBSvcConfig";
 import { env } from "./env";
+import addCorrelationIDToHeader from "./middleware/AddCorrelationId.ts";
 dotenv.config();
 const log = console; //Logger.CreateLogger("analytics-log");
 const mriConfigConnection = new MriConfigConnection(
@@ -57,10 +58,7 @@ const initRoutes = async (app: express.Application) => {
     app.use(noCacheMiddleware);
 
     // set request correlation ID to logger (if available)
-    /*app.use((req, res, next) => {
-        log.addRequestCorrelationID(req);
-        next();
-    });*/
+    app.use(addCorrelationIDToHeader);
 
     let analyticsCredentials;
 
@@ -668,6 +666,14 @@ const getDBConnections = async ({
 
     if (!analyticsConnectionPromise) {
         //Initialize if not yet until this point
+        // node hdb library checks for these to use TLS
+        // TLS does not work with deno for self signed certs
+        if (!analyticsCredentials.useTLS) {
+            delete analyticsCredentials.key;
+            delete analyticsCredentials.cert;
+            delete analyticsCredentials.ca;
+            delete analyticsCredentials.pfx;
+        }
         analyticsConnectionPromise =
             dbConnectionUtil.DBConnectionUtil.getDBConnection({
                 credentials: analyticsCredentials,
