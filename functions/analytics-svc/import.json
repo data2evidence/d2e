@@ -201,6 +201,8 @@
     "crypto": "node:crypto",
     "fs": "node:fs",
     "url": "node:url",
-    "querystring": "node:querystring"
+    "querystring": "node:querystring",
+    "tls": "node:tls",
+    "net": "node:net"
   }
 }
