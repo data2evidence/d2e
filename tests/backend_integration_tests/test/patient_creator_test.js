@@ -452,7 +452,7 @@
         patientCreator.insertIntoTable('fakeTable', fakeJsonData, function (err) {
           expect(err).to.not.be.defined
           var paramArray = sqlStub.getCall(0).args[1]
-          var first32Chars = new Buffer(fakeJsonData['a'], 'hex')
+          var first32Chars = Buffer.from(fakeJsonData['a'], 'hex')
           expect(paramArray).to.eql([first32Chars])
           done()
         })
