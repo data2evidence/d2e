@@ -6,7 +6,7 @@ set -o errexit
 GIT_BASE_DIR=$(git rev-parse --show-toplevel)
 ENV_NAME=${ENV_NAME:-local}
 ENV_TYPE=${ENV_TYPE:-local}
-KEYS_EXCLUDE_REGEX=${KEYS_EXCLUDE_REGEX:-TLS__INTERNAL__|LOGTO__ALP|D2E_CPU_LIMIT|D2E_MEMORY_LIMIT} # ignore system specific keys
+KEYS_EXCLUDE_REGEX=${KEYS_EXCLUDE_REGEX:-TLS__INTERNAL__|LOGTO__ALP|D2E_CPU_LIMIT|D2E_MEMORY_LIMIT|RELATIVE_PATH__PLUGINS_REPO|RELATIVE_PATH__UI_REPO|PREFECT_DOCKER_VOLUMES} # ignore system specific keys
 
 echo ". INFO Persist keys from .env.${ENV_TYPE} to .env.$ENV_TYPE.private.yml ignoring keys $KEYS_EXCLUDE_REGEX"
 
