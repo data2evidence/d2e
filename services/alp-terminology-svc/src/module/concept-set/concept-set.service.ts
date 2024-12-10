@@ -8,7 +8,6 @@ import { randomUUID } from 'crypto';
 import { Request } from 'express';
 import { ConceptService } from '../concept/concept.service';
 import { CachedbService } from '../cachedb/cachedb.service';
-import { MeilisearchAPI } from '../../api/meilisearch-api';
 import { SystemPortalAPI } from 'src/api/portal-api';
 import { Brackets } from 'typeorm';
 import { env } from 'src/env';
@@ -113,26 +112,15 @@ export class ConceptSetService {
 
     const conceptIds = conceptSet.concepts.map((c) => c.id);
 
-    let concepts;
-    // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch
-    if (env.USE_DUCKDB_FTS) {
-      this.logger.info('Searching with Duckdb FTS');
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-        datasetId,
-      );
-      concepts = await this.cachedbService.getConceptsByIds(
-        conceptIds,
-        datasetId,
-        vocabSchemaName,
-      );
-    } else {
-      this.logger.info('Searching with Meilisearch');
-      concepts = await this.conceptService.getConceptsByIds(
-        datasetId,
-        conceptIds,
-      );
-    }
+    const systemPortalApi = new SystemPortalAPI(this.token);
+    const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
+      datasetId,
+    );
+    const concepts = await this.cachedbService.getConceptsByIds(
+      conceptIds,
+      datasetId,
+      vocabSchemaName,
+    );
 
     const conceptSetWithConceptDetails = {
       ...conceptSet,
@@ -188,19 +176,9 @@ export class ConceptSetService {
       const { conceptSetIds, datasetId } = body;
 
       const systemPortalApi = new SystemPortalAPI(this.token);
-      const { databaseCode, vocabSchemaName, dialect } =
-        await systemPortalApi.getDatasetDetails(datasetId);
-
-      const meilisearchApi = new MeilisearchAPI();
-      const conceptName = dialect === 'hana' ? 'CONCEPT' : 'concept';
-      const conceptAncestorName =
-        dialect === 'hana' ? 'CONCEPT_ANCESTOR' : 'concept_ancestor';
-      const conceptRelationshipName =
-        dialect === 'hana' ? 'CONCEPT_RELATIONSHIP' : 'concept_relationship';
-
-      const conceptIndex = `${databaseCode}_${vocabSchemaName}_${conceptName}`;
-      const conceptAncestorIndex = `${databaseCode}_${vocabSchemaName}_${conceptAncestorName}`;
-      const conceptRelationshipIndex = `${databaseCode}_${vocabSchemaName}_${conceptRelationshipName}`;
+      const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
+        datasetId,
+      );
 
       const promises = conceptSetIds.map((conceptSetId) =>
         this.getConceptSet(conceptSetId, datasetId),
@@ -231,49 +209,30 @@ export class ConceptSetService {
         return [];
       }
 
-      let includedConceptIds;
-      let mappedConceptsAndDescendantIds;
-      // If USE_DUCKDB_FTS, use duckdb fts instead of meilisearch
-      if (env.USE_DUCKDB_FTS) {
-        includedConceptIds =
-          await this.cachedbService.getConceptsAndDescendantIds(
-            conceptIds,
-            conceptIdsToIncludeDescendant,
-            datasetId,
-            vocabSchemaName,
-          );
-        mappedConceptsAndDescendantIds =
-          await this.cachedbService.getConceptsAndDescendantIds(
-            conceptIdsToIncludeMapped,
-            conceptIdsToIncludeMappedAndDescendant,
-            datasetId,
-            vocabSchemaName,
-          );
-      } else {
-        includedConceptIds = await this.getConceptsAndDescendantIds(
-          meilisearchApi,
-          conceptIndex,
-          conceptAncestorIndex,
+      const includedConceptIds =
+        await this.cachedbService.getConceptsAndDescendantIds(
           conceptIds,
           conceptIdsToIncludeDescendant,
+          datasetId,
+          vocabSchemaName,
         );
-        mappedConceptsAndDescendantIds = await this.getConceptsAndDescendantIds(
-          meilisearchApi,
-          conceptIndex,
-          conceptAncestorIndex,
+      const mappedConceptsAndDescendantIds =
+        await this.cachedbService.getConceptsAndDescendantIds(
           conceptIdsToIncludeMapped,
           conceptIdsToIncludeMappedAndDescendant,
+          datasetId,
+          vocabSchemaName,
         );
-      }
-      const mappedConceptIds = await meilisearchApi.getMapped(
-        mappedConceptsAndDescendantIds,
-        conceptRelationshipIndex,
-      );
+
+      const mappedConceptIds =
+        await this.cachedbService.getConceptRelationshipMapsTo(
+          mappedConceptsAndDescendantIds,
+          datasetId,
+          vocabSchemaName,
+        );
 
       mappedConceptIds.forEach((concept) => {
-        concept.hits.forEach((hit) => {
-          includedConceptIds.push(hit.concept_id_1);
-        });
+        includedConceptIds.push(concept.concept_id_1);
       });
 
       const uniqueConceptIds = Array.from(new Set(includedConceptIds)).sort();
@@ -283,45 +242,5 @@ export class ConceptSetService {
       this.logger.error(err);
       throw err;
     }
-  }
-
-  private async getConceptsAndDescendantIds(
-    meilisearchApi: MeilisearchAPI,
-    conceptIndex: string,
-    conceptAncestorIndex: string,
-    conceptIds: number[],
-    descendantIds: number[],
-  ) {
-    if (!conceptIds.length) {
-      return [];
-    }
-    const conceptsAndDescendantIds: number[] = [];
-
-    // Ensures included concept IDs are present in vocab schema and valid
-    const validConcepts = await meilisearchApi.getMultipleExactConcepts(
-      conceptIds,
-      conceptIndex,
-      false,
-    );
-    validConcepts.forEach((concept) => {
-      concept.hits.forEach((hit) => {
-        conceptsAndDescendantIds.push(hit.concept_id);
-      });
-    });
-
-    if (!descendantIds.length) {
-      return conceptsAndDescendantIds;
-    }
-
-    const conceptDescendants = await meilisearchApi.getDescendants(
-      descendantIds,
-      conceptAncestorIndex,
-    );
-    conceptDescendants.forEach((concept) => {
-      concept.hits.forEach((hit) => {
-        conceptsAndDescendantIds.push(hit.descendant_concept_id);
-      });
-    });
-    return conceptsAndDescendantIds;
   }
 }

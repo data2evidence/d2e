@@ -6,7 +6,6 @@ const Env = z.object({
   FHIR_TERMINOLOGY_SVC__PORT: z.string(),
   NODE_ENV: z.string(),
   LOCAL_DEBUG: z.string(),
-  MEILI_MASTER_KEY: z.string(),
 
   PG__HOST: z.string(),
   PG__PORT: z.string().transform(Number),
