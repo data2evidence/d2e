@@ -27,14 +27,14 @@ export const terminologyRequest = (
         env.SERVICE_ROUTES.terminology
     );
 
-    const protocolLib = https;
+    const protocolLib = http;
     const data = JSON.stringify(payload);
 
     const defaultPath = `/terminology/${path}`;
 
     const sourceOrigin = req.headers["x-source-origin"];
 
-    const options: https.RequestOptions = {
+    const options: http.RequestOptions = {
         hostname,
         port,
         protocol,
@@ -46,8 +46,8 @@ export const terminologyRequest = (
             "x-req-correlation-id": reqCorrelationId,
         },
         method,
-        rejectUnauthorized: true,
-        ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
+        // rejectUnauthorized: true,
+        // ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
     };
     if (payload) {
         options.headers["Content-Type"] = "application/json";
@@ -78,13 +78,22 @@ export const terminologyRequest = (
                         reject(err);
                     }
                 });
+
+                response.on("error", (err) => {
+                    log.enrichErrorWithRequestCorrelationID(err, req);
+                    log.error(JSON.stringify(err));
+                    reject(err);
+                });
             })
             .on("error", (err) => {
                 log.enrichErrorWithRequestCorrelationID(err, req);
                 log.error(JSON.stringify(err));
                 reject(err);
             });
-        post_req.write(data);
+        // For GET requests, .write will error as a body is not expected to be sent
+        if (payload) {
+            post_req.write(data);
+        }
         post_req.end();
     });
 };
