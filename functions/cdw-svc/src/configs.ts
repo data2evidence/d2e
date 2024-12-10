@@ -74,17 +74,22 @@ const Env = z
     }
   );
 
-let _env = Deno.env.toObject();
-_env.PG_SCHEMA = _env.PG_SCHEMA || "cdw_config";
-
-const result = Env.safeParse(_env);
-
-if (!result.success) {
-  console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
-  throw new Error("ZOD parse failed");
-}
-
-let env = _env as unknown as z.infer<typeof Env>;
+let env = {} as unknown as z.infer<typeof Env>;
 const envVarUtils = new EnvVarUtils(env);
 
-export { env, envVarUtils };
+function initEnv(__env) {
+  const _env = Object.assign({}, Deno.env.toObject(), __env);
+  _env.PG_SCHEMA = _env.PG_SCHEMA || "cdw_config";
+
+  const result = Env.safeParse(_env);
+
+  if (!result.success) {
+    console.error(`Service Failed to Start!! ${JSON.stringify(result)}`);
+    throw new Error("ZOD parse failed");
+  }
+
+  env = _env as unknown as z.infer<typeof Env>;
+  return env;
+}
+
+export { env, envVarUtils, initEnv };
