@@ -10,7 +10,7 @@ X509_SUBJECT="/C=SG/O=ALP Dev"
 DOTENV_APPEND=${DOTENV_APPEND:-false}
 
 # vars
-GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+export GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 GIT_BRANCH_NAME=$(git symbolic-ref --short HEAD 2> /dev/null)
 
 # action
@@ -46,6 +46,8 @@ echo PG_SUPER_PASSWORD=$(random-password $DEFAULT_PASSWORD_LENGTH) >> $DOTENV_FI
 echo PG_WRITE_PASSWORD=$(random-password $DEFAULT_PASSWORD_LENGTH) >> $DOTENV_FILE_OUT
 echo REDIS_PASSWORD=$(random-uuid) >> $DOTENV_FILE_OUT
 echo STRATEGUS__KEYRING_PASSWORD=$(random-uuid) >> $DOTENV_FILE_OUT
+
+echo PREFECT_DOCKER_VOLUMES='["alp_duckdb-data-1:/app/duckdb_data", "alp_cdw-config-duckdb-data-1:/app/cdw-config/duckdb_data", "alp_r-libs:/home/docker/plugins/R/site-library", "alp_fhir-schema-file-1:/home/docker/fhir", "$GIT_BASE_DIR/cache/synpuf1k:/app/synpuf1k", "${GIT_BASE_DIR}/cache/vocab:/app/vocab"]' | envsubst >> $DOTENV_FILE_OUT
 
 echo >> $DOTENV_FILE_OUT
 

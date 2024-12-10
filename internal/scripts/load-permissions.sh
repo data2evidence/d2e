@@ -23,24 +23,24 @@ source $DOTENV_PATH
 POSTGRES_TENANT_READ_PASSWORD=$POSTGRES_TENANT_READ_PASSWORD_PLAIN; echo POSTGRES_TENANT_READ_PASSWORD=$POSTGRES_TENANT_READ_PASSWORD
 POSTGRES_TENANT_ADMIN_PASSWORD=$POSTGRES_TENANT_ADMIN_PASSWORD_PLAIN; echo POSTGRES_TENANT_ADMIN_PASSWORD=$POSTGRES_TENANT_ADMIN_PASSWORD
 
+
 echo . create read role
-docker exec -t alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_read_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_READ_PASSWORD}';" || true
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_read_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_READ_PASSWORD_PLAIN}';"
 # expect `CREATE ROLE`
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_read_role;"
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "GRANT postgres_tenant_read_role to postgres_tenant_read_user;"
 
 echo . create admin role
-docker exec -t alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_admin_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_ADMIN_PASSWORD}';" || true
-# expect `CREATE ROLE`
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE ROLE postgres_tenant_admin_user NOSUPERUSER LOGIN ENCRYPTED PASSWORD '${POSTGRES_TENANT_ADMIN_PASSWORD_PLAIN}';"
 
-echo . create database alpdev_pg
-docker exec -t alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE DATABASE alpdev_pg;" || true
-# expect `CREATE DATABASE`
+echo . Create database alpdev_pg
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -c "CREATE DATABASE alpdev_pg;"
 
-echo . alter admin role for schema creation
-docker exec -t alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg -c "ALTER ROLE postgres_tenant_admin_user CREATEROLE NOSUPERUSER NOCREATEDB NOREPLICATION NOBYPASSRLS;"
-# expect `ALTER ROLE`
+echo . Alter admin role for schema creation
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg -c "ALTER ROLE postgres_tenant_admin_user CREATEROLE NOSUPERUSER NOCREATEDB NOREPLICATION NOBYPASSRLS;"
 
-echo . grant read permission for future objects to read role
-docker exec -t alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg -c "ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO postgres_tenant_read_user; ALTER DEFAULT PRIVILEGES GRANT USAGE, SELECT ON SEQUENCES TO postgres_tenant_read_user; ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO postgres_tenant_read_user;"
+echo . Grant read permission for future objects to read role
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg -c "ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO postgres_tenant_read_user; ALTER DEFAULT PRIVILEGES GRANT USAGE, SELECT ON SEQUENCES TO postgres_tenant_read_user; ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO postgres_tenant_read_user;"
 
-echo . grant admin permission for future objects to admin role
-docker exec -t alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg -c "GRANT CREATE ON DATABASE alpdev_pg TO postgres_tenant_admin_user WITH GRANT OPTION; ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO postgres_tenant_admin_user WITH GRANT OPTION; ALTER DEFAULT PRIVILEGES GRANT ALL ON SEQUENCES TO postgres_tenant_admin_user WITH GRANT OPTION; ALTER DEFAULT PRIVILEGES GRANT ALL ON FUNCTIONS TO postgres_tenant_admin_user WITH GRANT OPTION;"
+echo . Grant admin permission for future objects to admin role
+docker exec alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg -c "GRANT CREATE ON DATABASE alpdev_pg TO postgres_tenant_admin_user WITH GRANT OPTION; ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO postgres_tenant_admin_user WITH GRANT OPTION; ALTER DEFAULT PRIVILEGES GRANT ALL ON SEQUENCES TO postgres_tenant_admin_user WITH GRANT OPTION; ALTER DEFAULT PRIVILEGES GRANT ALL ON FUNCTIONS TO postgres_tenant_admin_user WITH GRANT OPTION;"
