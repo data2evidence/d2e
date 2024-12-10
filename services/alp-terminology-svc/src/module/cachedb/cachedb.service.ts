@@ -18,14 +18,25 @@ import {
 import { createLogger } from '../../logger';
 import { groupBy } from 'src/utils/helperUtil';
 import { CachedbDAO } from './cachedb-dao';
+import { SystemPortalAPI } from 'src/api/portal-api';
 
 @Injectable()
 export class CachedbService {
   private readonly token: string;
   private readonly logger = createLogger(this.constructor.name);
 
-  constructor(@Inject(REQUEST) request: Request) {
+  constructor(
+    @Inject(REQUEST) request: Request,
+    private readonly systemPortalApi: SystemPortalAPI,
+  ) {
     this.token = request.headers['authorization'];
+  }
+
+  private async getVocabSchemaName(datasetId: string) {
+    const { vocabSchemaName } = await this.systemPortalApi.getDatasetDetails(
+      datasetId,
+    );
+    return vocabSchemaName;
   }
 
   async getConcepts(
@@ -33,10 +44,10 @@ export class CachedbService {
     rowsPerPage: number,
     datasetId: string,
     searchText = '',
-    vocabSchemaName: string,
     filters: Filters,
   ) {
     try {
+      const vocabSchemaName = await this.getVocabSchemaName(datasetId);
       const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
       const result = await cachedbDao.getConcepts(
         pageNumber,
@@ -53,10 +64,10 @@ export class CachedbService {
   async getExactConcept(
     conceptName: string | number,
     datasetId: string,
-    vocabSchemaName: string,
     conceptColumnName: 'concept_name' | 'concept_id' | 'concept_code',
   ) {
     try {
+      const vocabSchemaName = await this.getVocabSchemaName(datasetId);
       const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
       const result = await cachedbDao.getExactConcept(
         conceptName,
@@ -70,16 +81,15 @@ export class CachedbService {
 
   async getConceptFilterOptionsFaceted(
     datasetId: string,
-    vocabSchemaName: string,
     searchText: string,
     filters: Filters,
   ): Promise<IDuckdbFacet> {
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
     return cachedbDao.getConceptFilterOptionsFaceted(searchText, filters);
   }
 
   async getTerminologyDetailsWithRelationships(
-    vocabSchemaName: string,
     conceptId: number,
     datasetId: string,
   ) {
@@ -87,6 +97,7 @@ export class CachedbService {
     try {
       const searchConcepts1: number[] = [conceptId];
 
+      const vocabSchemaName = await this.getVocabSchemaName(datasetId);
       const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
       const DuckdbResultConcept1: any =
         await cachedbDao.getMultipleExactConcepts(searchConcepts1, true);
@@ -173,9 +184,9 @@ export class CachedbService {
   async getRecommendedConcepts(
     conceptIds: number[],
     datasetId: string,
-    vocabSchemaName: string,
   ): Promise<any> {
     try {
+      const vocabSchemaName = await this.getVocabSchemaName(datasetId);
       const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
       const recommendedConcepts = await cachedbDao.getExactConceptRecommended(
         conceptIds,
@@ -212,42 +223,29 @@ export class CachedbService {
     }
   }
 
-  async getDescendants(
-    conceptId: number[],
-    datasetId: string,
-    vocabSchemaName: string,
-  ) {
+  async getDescendants(conceptId: number[], datasetId: string) {
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
     const result = await cachedbDao.getExactConceptDescendants(conceptId);
     return result;
   }
 
-  async getAncestors(
-    conceptId: number[],
-    datasetId: string,
-    vocabSchemaName: string,
-    depth: number,
-  ) {
+  async getAncestors(conceptId: number[], datasetId: string, depth: number) {
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
     const result = await cachedbDao.getExactConceptAncestors(conceptId, depth);
     return result;
   }
 
-  async getConceptsByIds(
-    conceptIds: number[],
-    datasetId: string,
-    vocabSchemaName: string,
-  ) {
+  async getConceptsByIds(conceptIds: number[], datasetId: string) {
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
     const result = await cachedbDao.getMultipleExactConcepts(conceptIds);
     return this.duckdbResultMapping(result).expansion.contains;
   }
 
-  async getConceptRelationshipMapsTo(
-    conceptIds: number[],
-    datasetId: string,
-    vocabSchemaName: string,
-  ) {
+  async getConceptRelationshipMapsTo(conceptIds: number[], datasetId: string) {
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
     const result = await cachedbDao.getConceptRelationship(
       conceptIds,
@@ -260,13 +258,13 @@ export class CachedbService {
     conceptIds: number[],
     descendantIds: number[],
     datasetId: string,
-    vocabSchemaName: string,
   ): Promise<number[]> {
     if (!conceptIds.length) {
       return [];
     }
     const conceptsAndDescendantIds: number[] = [];
 
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
 
     // Ensures included concept IDs are present in vocab schema and valid

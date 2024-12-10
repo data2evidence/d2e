@@ -6,30 +6,22 @@ import dataSource from '../../db/data-source';
 import { ConceptSet } from '../../entity';
 import { randomUUID } from 'crypto';
 import { Request } from 'express';
-import { ConceptService } from '../concept/concept.service';
 import { CachedbService } from '../cachedb/cachedb.service';
-import { SystemPortalAPI } from 'src/api/portal-api';
 import { Brackets } from 'typeorm';
-import { env } from 'src/env';
 
 @Injectable()
 export class ConceptSetService {
   private readonly userId: string;
   private readonly logger = createLogger(this.constructor.name);
-  private token: string;
-  private request: Request;
 
   constructor(
     @Inject(REQUEST) request: Request,
-    private readonly conceptService: ConceptService,
     private readonly cachedbService: CachedbService,
   ) {
     const decodedToken = decode(
       request.headers['authorization'].replace(/bearer /i, ''),
     ) as JwtPayload;
     this.userId = decodedToken.sub;
-    this.token = request.headers['authorization'];
-    this.request = request;
   }
 
   private addOwner<T>(object: T, isNewEntity = false) {
@@ -112,14 +104,9 @@ export class ConceptSetService {
 
     const conceptIds = conceptSet.concepts.map((c) => c.id);
 
-    const systemPortalApi = new SystemPortalAPI(this.token);
-    const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-      datasetId,
-    );
     const concepts = await this.cachedbService.getConceptsByIds(
       conceptIds,
       datasetId,
-      vocabSchemaName,
     );
 
     const conceptSetWithConceptDetails = {
@@ -175,11 +162,6 @@ export class ConceptSetService {
     try {
       const { conceptSetIds, datasetId } = body;
 
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-        datasetId,
-      );
-
       const promises = conceptSetIds.map((conceptSetId) =>
         this.getConceptSet(conceptSetId, datasetId),
       );
@@ -214,21 +196,18 @@ export class ConceptSetService {
           conceptIds,
           conceptIdsToIncludeDescendant,
           datasetId,
-          vocabSchemaName,
         );
       const mappedConceptsAndDescendantIds =
         await this.cachedbService.getConceptsAndDescendantIds(
           conceptIdsToIncludeMapped,
           conceptIdsToIncludeMappedAndDescendant,
           datasetId,
-          vocabSchemaName,
         );
 
       const mappedConceptIds =
         await this.cachedbService.getConceptRelationshipMapsTo(
           mappedConceptsAndDescendantIds,
           datasetId,
-          vocabSchemaName,
         );
 
       mappedConceptIds.forEach((concept) => {

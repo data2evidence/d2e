@@ -8,7 +8,6 @@ import {
   ConceptHierarchyNode,
 } from '../../utils/types';
 import { Request } from 'express';
-import { SystemPortalAPI } from 'src/api/portal-api';
 import { GetStandardConceptsDto } from './dto/concept.dto';
 import { CachedbService } from 'src/module/cachedb/cachedb.service';
 
@@ -17,14 +16,12 @@ const logger = createLogger('ConceptService');
 @Injectable()
 export class ConceptService {
   private token: string;
-  private request: Request;
 
   constructor(
     @Inject(REQUEST) request: Request,
     private readonly cachedbService: CachedbService,
   ) {
     this.token = request.headers['authorization'];
-    this.request = request;
   }
 
   // Used by FHIR server, where request cannot be injected as it does not use nest
@@ -48,10 +45,6 @@ export class ConceptService {
       validity: filters?.validity ?? [],
     };
     const pageNumber = Math.floor(offset / rowsPerPage);
-    const systemPortalApi = new SystemPortalAPI(this.token);
-    const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-      datasetId,
-    );
 
     try {
       return await this.cachedbService.getConcepts(
@@ -59,7 +52,6 @@ export class ConceptService {
         Number(rowsPerPage),
         datasetId,
         searchText,
-        vocabSchemaName,
         completeFilters,
       );
     } catch (err) {
@@ -72,11 +64,6 @@ export class ConceptService {
     getStandardConceptsDto: GetStandardConceptsDto,
   ): Promise<any> {
     const { data, datasetId } = getStandardConceptsDto;
-
-    const systemPortalApi = new SystemPortalAPI(this.token);
-    const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-      datasetId,
-    );
 
     const results = await Promise.all(
       data.map(async (dataItem) => {
@@ -95,7 +82,6 @@ export class ConceptService {
             const domainIdFacets = (
               await this.cachedbService.getConceptFilterOptionsFaceted(
                 datasetId,
-                vocabSchemaName,
                 dataItem.searchText,
                 filters,
               )
@@ -142,12 +128,7 @@ export class ConceptService {
   ) {
     logger.info('Get list of concept details and connections');
     try {
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-        datasetId,
-      );
       return await this.cachedbService.getTerminologyDetailsWithRelationships(
-        vocabSchemaName,
         conceptId,
         datasetId,
       );
@@ -159,15 +140,9 @@ export class ConceptService {
 
   async getRecommendedConcepts(conceptIds: number[], datasetId: string) {
     try {
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-        datasetId,
-      );
-
       return await this.cachedbService.getRecommendedConcepts(
         conceptIds,
         datasetId,
-        vocabSchemaName,
       );
     } catch (err) {
       logger.error(err);
@@ -183,15 +158,9 @@ export class ConceptService {
     datasetId: string;
   }) {
     try {
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-        datasetId,
-      );
-
       return await this.cachedbService.getExactConcept(
         conceptName,
         datasetId,
-        vocabSchemaName,
         'concept_name',
       );
     } catch (err) {
@@ -208,15 +177,9 @@ export class ConceptService {
     datasetId: string;
   }) {
     try {
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-        datasetId,
-      );
-
       return await this.cachedbService.getExactConcept(
         conceptId,
         datasetId,
-        vocabSchemaName,
         'concept_id',
       );
     } catch (err) {
@@ -233,15 +196,9 @@ export class ConceptService {
     datasetId: string;
   }) {
     try {
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-        datasetId,
-      );
-
       return await this.cachedbService.getExactConcept(
         conceptCode,
         datasetId,
-        vocabSchemaName,
         'concept_code',
       );
     } catch (err) {
@@ -256,15 +213,9 @@ export class ConceptService {
     filters: Filters,
   ) {
     try {
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-        datasetId,
-      );
-
       const filterOptions =
         await this.cachedbService.getConceptFilterOptionsFaceted(
           datasetId,
-          vocabSchemaName,
           searchText,
           filters,
         );
@@ -285,15 +236,9 @@ export class ConceptService {
     const conceptIds: Set<number> = new Set<number>().add(conceptId);
     nodeLevels.push({ conceptId: conceptId, level: 0 });
 
-    const systemPortalApi = new SystemPortalAPI(this.token);
-    const { vocabSchemaName } = await systemPortalApi.getDatasetDetails(
-      datasetId,
-    );
-
     const conceptDescendants = await this.cachedbService.getDescendants(
       [conceptId],
       datasetId,
-      vocabSchemaName,
     );
     conceptDescendants.forEach((concept_ancestor) => {
       if (concept_ancestor.descendant_concept_id !== conceptId) {
@@ -318,7 +263,6 @@ export class ConceptService {
       const conceptAncestors = await this.cachedbService.getAncestors(
         [conceptId],
         datasetId,
-        vocabSchemaName,
         1,
       );
 
@@ -350,7 +294,6 @@ export class ConceptService {
     const concepts = await this.cachedbService.getConceptsByIds(
       Array.from(conceptIds),
       datasetId,
-      vocabSchemaName,
     );
 
     const nodes: ConceptHierarchyNode[] = nodeLevels.reduce(
