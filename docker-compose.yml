@@ -313,7 +313,7 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: trex.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/d2e-trex-base:develop
+    image: alpcr.azurecr.io/d2e-trex-base:${DOCKER_TREX_TAG_NAME:-develop}
     pull_policy: always
     platform: linux/amd64
     logging:
