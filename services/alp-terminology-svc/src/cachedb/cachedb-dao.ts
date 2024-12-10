@@ -355,7 +355,7 @@ export class CachedbDAO {
         host: env.CACHEDB__HOST,
         port: env.CACHEDB__PORT,
         user: jwt,
-        database: `A|duckdb|${datasetId}`,
+        database: `A|duckdb|read|${datasetId}`,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 30000,
       });
