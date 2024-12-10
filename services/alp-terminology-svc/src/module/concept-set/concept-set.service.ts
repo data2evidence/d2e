@@ -209,7 +209,6 @@ export class ConceptSetService {
           mappedConceptsAndDescendantIds,
           datasetId,
         );
-
       mappedConceptIds.forEach((concept) => {
         includedConceptIds.push(concept.concept_id_1);
       });

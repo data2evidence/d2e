@@ -222,21 +222,30 @@ export class CachedbService {
     }
   }
 
-  async getDescendants(conceptId: number[], datasetId: string) {
+  async getDescendants(conceptIds: number[], datasetId: string) {
+    if (conceptIds.length === 0) {
+      return [];
+    }
     const vocabSchemaName = await this.getVocabSchemaName(datasetId);
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
-    const result = await cachedbDao.getExactConceptDescendants(conceptId);
+    const result = await cachedbDao.getExactConceptDescendants(conceptIds);
     return result;
   }
 
-  async getAncestors(conceptId: number[], datasetId: string, depth: number) {
+  async getAncestors(conceptIds: number[], datasetId: string, depth: number) {
+    if (conceptIds.length === 0) {
+      return [];
+    }
     const vocabSchemaName = await this.getVocabSchemaName(datasetId);
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
-    const result = await cachedbDao.getExactConceptAncestors(conceptId, depth);
+    const result = await cachedbDao.getExactConceptAncestors(conceptIds, depth);
     return result;
   }
 
   async getConceptsByIds(conceptIds: number[], datasetId: string) {
+    if (conceptIds.length === 0) {
+      return [];
+    }
     const vocabSchemaName = await this.getVocabSchemaName(datasetId);
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
     const result = await cachedbDao.getMultipleExactConcepts(conceptIds);
@@ -244,6 +253,9 @@ export class CachedbService {
   }
 
   async getConceptRelationshipMapsTo(conceptIds: number[], datasetId: string) {
+    if (conceptIds.length === 0) {
+      return [];
+    }
     const vocabSchemaName = await this.getVocabSchemaName(datasetId);
     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
     const result = await cachedbDao.getConceptRelationship(
