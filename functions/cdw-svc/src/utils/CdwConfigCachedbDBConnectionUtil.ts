@@ -17,7 +17,7 @@ export class CdwConfigCachedbDBConnectionUtil extends CachedbDBConnectionUtil.Ca
     vocabSchemaName?: string,
     cb?,
     userObj?: User
-  ): Promise<ConnectionInterface> {
+  ): Promise<Connection.ConnectionInterface> {
     return new Promise((resolve, reject) => {
       const callback =
         cb ||

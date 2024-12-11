@@ -130,7 +130,7 @@ function createGuid() {
  */
 function createDWID() {
   var guid = createGuid()
-  return new Buffer(guid.substr(0, 32)).toString('hex')
+  return Buffer.from(guid.substring(0, 32)).toString('hex')
 }
 
 /**
