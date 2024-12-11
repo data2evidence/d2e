@@ -163,7 +163,7 @@ jobs:
           yarn remote:minerva up --remove-orphans --force-recreate --wait
           DC_EXIT_CODE=$?
 
-          CMD=(docker ps --format "{{.Names}} {{.Status}}")
+          CMD=(docker ps --format {{.Names}},{{.Status}})
           DC_FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy")
 
           echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY

@@ -138,11 +138,11 @@ jobs:
             yarn local:minerva up --wait
             DC_EXIT_CODE=$?
             echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_ENV
-            docker ps --format "{{.Names}} {{.Status}}" | sort
+            docker ps --format {{.Names}},{{.Status}} | sort
 
       - name: Check Container Health
         run: |
-          CMD=(docker ps --format "{{.Names}} {{.Status}}")
+          CMD=(docker ps --format {{.Names}},{{.Status}})
           DC_FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy")
 
           echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
