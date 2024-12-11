@@ -34,6 +34,7 @@
     "put:env:dev": "for ENV_NAME in ${npm_package_config_env_names_dev[@]}; do OVERWRITE=$OVERWRITE ENV_NAME=$ENV_NAME yarn put:env; done",
     "put:env": "scripts/put-env.sh",
     "set:env": "ENV_TYPE=$ENV_TYPE ENV_NAME=$ENV_NAME scripts/set-env.sh && ENV_TYPE=$ENV_TYPE TLS_REGENERATE=$TLS_REGENERATE yarn --cwd .. gen:tls && D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT ENV_TYPE=$ENV_TYPE yarn --cwd .. gen:resource-limits",
+    "set:env:dev": "scripts/set-env-dev.sh",
     "sort:dc1": "scripts/sort-dc.mjs --backup --force",
     "sort:dc2": "scripts/sort-dc.mjs --update",
     "sort:env": "scripts/sort-env.sh",

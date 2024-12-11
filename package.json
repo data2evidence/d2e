@@ -26,7 +26,6 @@
     "logs:minerva:startup": "yarn base:minerva logs -t --until 1s",
     "logs:minerva:follow": "yarn base:minerva logs -t --follow",
     "logs:minerva": "yarn base:minerva logs -t",
-    "set:env:dev": "scripts/set-env-dev.sh",
     "base:ui": "DN_REPO_RELATIVE_PATH='.' && GIT__COMMIT_ID__UI=${GIT__COMMIT_ID__UI:-develop} docker compose --file ${DN_REPO_RELATIVE_PATH}/docker-compose.yml --file ${DN_REPO_RELATIVE_PATH}/docker-compose-local.yml --profile minerva-s3",
     "az:start:ui": "yarn base:ui up alp-caddy",
     "start:ui": "RELATIVE_PATH__UI_REPO=../${RELATIVE_PATH__UI_REPO:-d2e-ui} yarn az:start:ui",
