@@ -134,19 +134,20 @@ jobs:
 
       - name: docker compose up
         run: |
-          # Run ALP services
+          echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
           yarn remote:minerva up --remove-orphans --force-recreate --wait
-          EXIT_CODE=$?
+          DC_EXIT_CODE=$?
 
           CMD=(docker ps --format "{{.Names}} {{.Status}}")
-          ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
-          echo | tee -a $GITHUB_STEP_SUMMARY
+          DC_FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy")
 
-          if [ $EXIT_CODE != 0 ]; then
-            echo "ALERT docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-            FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy"); echo FAIL_COUNT=$FAIL_COUNT
-            [ $FAIL_COUNT != 0 ] && echo exit $EXIT_CODE
-          fi
+          echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
+          echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
+
+          echo | tee -a $GITHUB_STEP_SUMMARY
+          ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
+
+          [ $DC_FAIL_COUNT != 0 ] && exit $DC_FAIL_COUNT
 
       - name: Logs minerva
         if: success() || failure()
