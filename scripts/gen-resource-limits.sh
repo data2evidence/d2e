@@ -2,6 +2,7 @@
 
 # inputs
 D2E_RESOURCE_LIMIT=${D2E_RESOURCE_LIMIT:-0.7}
+D2E_MEM_TO_SWAP_LIMIT_RATIO=${D2E_MEM_TO_SWAP_LIMIT_RATIO:-4}
 ENV_TYPE=${ENV_TYPE:-local}
 
 # vars
@@ -26,7 +27,7 @@ get_cpu_count() {
     echo D2E_CPU_LIMIT=$D2E_CPU_LIMIT
 
     # remove existing env var from dotenv
-    sed -i.bak "/D2E_CPU_LIMIT=/,//d" $DOTENV_FILE
+    sed -i.bak "/D2E_CPU_LIMIT=/d" $DOTENV_FILE
     # set env var
     echo D2E_CPU_LIMIT=\'"$D2E_CPU_LIMIT"\' >> $DOTENV_FILE
 }
@@ -41,14 +42,23 @@ get_memory() {
     D2E_MEMORY_LIMIT=$(echo "scale=2;$MEMORY*$D2E_RESOURCE_LIMIT" |bc)
     # Strip decimal numbers
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT%%.*}
+
+    # Calculate D2E_SWAP_LIMIT
+    D2E_SWAP_LIMIT="$((D2E_MEMORY_LIMIT*D2E_MEM_TO_SWAP_LIMIT_RATIO))"
+
     # Add G suffix for gigabyte
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT}G
     echo D2E_MEMORY_LIMIT=$D2E_MEMORY_LIMIT
+    D2E_SWAP_LIMIT=${D2E_SWAP_LIMIT}G
+    echo D2E_SWAP_LIMIT=$D2E_SWAP_LIMIT
 
     # remove existing env var from dotenv
-    sed -i.bak "/D2E_MEMORY_LIMIT=/,//d" $DOTENV_FILE
+    sed -i.bak "/D2E_MEMORY_LIMIT=/d" $DOTENV_FILE
+    sed -i.bak "/D2E_SWAP_LIMIT=/d" $DOTENV_FILE
+
     # set env var
     echo D2E_MEMORY_LIMIT=\'"$D2E_MEMORY_LIMIT"\' >> $DOTENV_FILE
+    echo D2E_SWAP_LIMIT=\'"$D2E_SWAP_LIMIT"\' >> $DOTENV_FILE
 
 }
 
