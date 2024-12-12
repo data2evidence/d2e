@@ -140,8 +140,8 @@ jobs:
           echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
 
           CMD=(docker ps --format {{.Names}},{{.Status}})
-          ${CMD[@]} 2> /dev/null | grep -iE "starting|unhealthy"
-          DC_FAIL_COUNT=$(${CMD[@]} 2> /dev/null | grep -ciE "starting|unhealthy")
+          ${CMD[@]} 2> /dev/null | grep -iE "starting|unhealthy" || true
+          DC_FAIL_COUNT=$(${CMD[@]} 2> /dev/null | grep -ciE "starting|unhealthy" || true)
           echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
 
           echo | tee -a $GITHUB_STEP_SUMMARY
