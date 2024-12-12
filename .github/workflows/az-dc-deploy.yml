@@ -1,4 +1,4 @@
-name: Deploy AzureDev
+name: DC Deploy AzureDev
 run-name: ${{ github.event.inputs.env }} ${{ github.event.inputs.repo_full_name }}
 
 on:

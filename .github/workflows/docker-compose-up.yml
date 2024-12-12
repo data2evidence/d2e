@@ -1,4 +1,4 @@
-name: Deploy GitHub Agent
+name: DC Deploy GitHub Agent
 
 on:
   pull_request:
