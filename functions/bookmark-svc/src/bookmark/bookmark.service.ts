@@ -41,7 +41,6 @@ export function createBookmarkDto(
     type: null,
     view_name: null,
     modified: new Date().toISOString(),
-    study_id: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
     version: 1,
     pa_config_id: paConfigId,
     cdm_config_id: cdmConfigId,

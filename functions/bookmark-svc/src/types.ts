@@ -122,7 +122,6 @@ export interface BookmarkDto {
   type: string | null
   view_name: string | null
   modified: string
-  study_id: string
   version: number
   pa_config_id: string
   cdm_config_id: string
