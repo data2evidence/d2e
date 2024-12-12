@@ -107,7 +107,7 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: trex.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/trex:${DOCKER_TREX_TAG_NAME:-develop}
+    image: alpcr.azurecr.io/d2e-trex-base:${DOCKER_TREX_TAG_NAME:-develop}
     pull_policy: always
     platform: linux/amd64
     logging:
@@ -163,7 +163,7 @@ services:
             "CACHEDB__PORT": 41191,
             "CACHEDB__HOST": "alp-cachedb",
             "CACHEDB__POOL_SIZE": "${CACHEDB__POOL_SIZE:-10}",
-            "NODE_ENV": "development",
+            "NODE_ENV": "${NODE_ENV:-development}",
             "PG__DB_NAME": "alp",
             "PG__DEBUG": "${PG_DEBUG:-1}",
             "PG__HOST": "${PG_HOST:-alp-minerva-postgres-1}",
@@ -173,6 +173,7 @@ services:
             "PG__IDLE_TIMEOUT_IN_MS": 1000,
             "PG__DIALECT": "postgresql",
             "LOCAL_DEBUG": "false",
+            "isHttpTestRun": "${isHttpTestRun}",
             "SERVICE_ROUTES": {
               "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
@@ -209,7 +210,6 @@ services:
             "USE_DUCKDB": "${USE_DUCKDB:-true}",
             "USE_CACHEDB": "${USE_CACHEDB:-true}",
             "USE_EXTENSION_FOR_COHORT_CREATION": "false",
-            "isHttpTestRun": "${isHttpTestRun}",
             "isTestEnv": "${isTestEnv}",
             "local": "${local}",
             "TESTSCHEMA": "${TESTSCHEMA}"
@@ -255,7 +255,6 @@ services:
           },
           "query-gen-svc": {
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",
-            "isHttpTestRun": "${isTestEnv}",
             "isTestEnv": "${isTestEnv}",
             "TESTSCHEMA": "${TESTSCHEMA}",
             "NOT_EQ_CHECK_FILTERCARDS": "${NOT_EQ_CHECK_FILTERCARDS:-true}"
@@ -521,7 +520,7 @@ services:
     command:
       - sh
       - -c
-      - "apt-get update && apt-get install -y curl && pip install prefect[docker]==3.0.3 && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
+      - "apt-get update && apt-get install -y curl && pip install prefect[docker]==3.0.3 && prefect work-pool create 'docker-pool' --type docker --base-job-template ./custom-docker-workpool.json --overwrite; prefect worker start --pool 'docker-pool' --type  docker --name prefect-docker-worker"
     container_name: &c83 alp-dataflow-gen-worker
     depends_on:
       alp-minio-post-init:
@@ -553,6 +552,7 @@ services:
       data:
         priority: 20
     volumes:
+      - ./services/alp-dataflow-gen/custom-docker-workpool.json:/opt/prefect/custom-work-pool.json
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
@@ -991,7 +991,7 @@ services:
       TERMINOLOGY_SVC__LOG_LEVEL: info
       TERMINOLOGY_SVC__PATH: terminology
       TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
-      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-false}
+      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-true}
 
   alp-minio-post-init:
     container_name: &c23 alp-minio-post-init

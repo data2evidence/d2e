@@ -17,6 +17,17 @@ export class CohortService {
       flowName,
       parameters
     );
+
+    await prefectApi.createInputAuthToken(flowRunId);
+    await Promise.any([
+      new Promise((resolve) => {
+        setTimeout(async () => {
+          await prefectApi.deleteInputAuthToken(flowRunId);
+          resolve(`Deleted the input of ${flowRunId}`);
+        }, 5000);
+      }),
+    ]);
+
     return { flowRunId };
   }
 }
