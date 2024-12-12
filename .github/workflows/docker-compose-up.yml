@@ -143,10 +143,11 @@ jobs:
       - name: Check Container Health
         run: |
           CMD=(docker ps --format {{.Names}},{{.Status}})
+          ${CMD[@]} | grep -iE "starting|unhealthy"
           DC_FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy")
+          echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
 
           echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
-          echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
           echo RETRY_EXIT_CODE=${{ steps.retry.outputs.exit_code }} | tee -a $GITHUB_STEP_SUMMARY
           echo RETRY_OUTCOME=${{ steps.retry.outcome }} | tee -a $GITHUB_STEP_SUMMARY
           echo RETRY_TOTAL_ATTEMPTS=${{ steps.retry.outputs.total_attempts }} | tee -a $GITHUB_STEP_SUMMARY
@@ -154,7 +155,7 @@ jobs:
           echo | tee -a $GITHUB_STEP_SUMMARY
           ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
 
-          [ $DC_FAIL_COUNT != 0 ] && exit $DC_FAIL_COUNT
+          [ $DC_FAIL_COUNT != 0 ] && echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT
 
       - name: Logs minerva
         if: success() || failure()

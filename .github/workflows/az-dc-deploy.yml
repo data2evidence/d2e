@@ -162,17 +162,17 @@ jobs:
           echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
           yarn remote:minerva up --remove-orphans --force-recreate --wait
           DC_EXIT_CODE=$?
+          echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
 
           CMD=(docker ps --format {{.Names}},{{.Status}})
+          ${CMD[@]} | grep -iE "starting|unhealthy"
           DC_FAIL_COUNT=$(${CMD[@]} | grep -ciE "starting|unhealthy")
-
-          echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
           echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
 
           echo | tee -a $GITHUB_STEP_SUMMARY
           ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
 
-          [ $DC_FAIL_COUNT != 0 ] && exit $DC_FAIL_COUNT
+          [ $DC_FAIL_COUNT != 0 ] && echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT
 
       - name: Logs minerva
         if: success() || failure()
