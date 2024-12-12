@@ -6,7 +6,7 @@ import {
 import * as Utils from "../settings/Utils";
 import ConnectionInterface = connLib.ConnectionInterface;
 import CallBackInterface = connLib.CallBackInterface;
-import { getDefaultSchemaName } from "../../utils/DuckdbConnection";
+import { getDuckdbSchemaName } from "../../utils/DuckdbConnection";
 import { env } from "../../configs";
 const log = Logger.CreateLogger();
 
@@ -36,7 +36,7 @@ function getColumnsForTable(
       : connection.schemaName;
     let query = ""
     if (env.USE_DUCKDB === "true") {
-      schema = getDefaultSchemaName()
+      schema = getDuckdbSchemaName()
       query = `SELECT column_name as "value" 
       from information_schema.columns 
       where table_catalog = %s AND TABLE_NAME = %s 
