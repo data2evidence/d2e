@@ -1338,8 +1338,7 @@ services:
       resources:
         limits:
           cpus: ${D2E_CPU_LIMIT:-2}
-          memory: 15G
-          # memory: ${D2E_MEMORY_LIMIT:-7G}
+          memory: ${D2E_MEMORY_LIMIT:-7G}
 
   alp-perseus-files-manager:
     image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}

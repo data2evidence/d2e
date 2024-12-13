@@ -48,7 +48,7 @@ get_memory() {
     # remove existing env var from dotenv
     sed -i.bak "/D2E_MEMORY_LIMIT=/,//d" $DOTENV_FILE
     # set env var
-    echo D2E_MEMORY_LIMIT=\'"$D2E_MEMORY_LIMIT"\' >> $DOTENV_FILE
+    echo D2E_MEMORY_LIMIT="$D2E_MEMORY_LIMIT" >> $DOTENV_FILE
 
 }
 
