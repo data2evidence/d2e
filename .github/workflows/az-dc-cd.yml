@@ -141,13 +141,11 @@ jobs:
 
           docker ps --format {{.Names}},{{.Status}} 2> /dev/null | sort | tee private-docker-status.txt
 
-          # CMD=(docker ps --format {{.Names}},{{.Status}})
-          # ${CMD[@]} 2> /dev/null | grep -iE "starting|unhealthy" || true
-          # DC_FAIL_COUNT=$(${CMD[@]} 2> /dev/null | grep -ciE "starting|unhealthy" || true)
-          # echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
+          DOCKER_STATUS_FILE=../docker-status-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S').txt
+          docker ps --format {{.Names}},{{.Status}} 2> /dev/null | sort | tee $DOCKER_STATUS_FILE | tee -a $GITHUB_STEP_SUMMARY
 
-          # echo | tee -a $GITHUB_STEP_SUMMARY
-          # ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
+          DC_FAIL_COUNT=(grep -iE "starting|unhealthy" $DOCKER_STATUS_FILE) || true
+          echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
 
           # [ $DC_FAIL_COUNT != 0 ] && echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT
 

@@ -7,20 +7,18 @@ set -o pipefail
 # export OP_FORMAT=json
 # export OP_FORMAT=human-readable
 
-if [ -z "${GITHUB_JOB}" ]; then 
-	PREFIX=private
+if [ -z "${GITHUB_JOB}" ]; then
+	PREFIX=private-opratelimit
 else
 	DATETIME_STAMP=$(date -I)
-	PREFIX=${GITHUB_JOB}_${GITHUB_RUN_ID}
+	PREFIX=../opratelimit-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 fi
-START_YML=${PREFIX}-start.yml
-END_YML=${PREFIX}-end.yml
+START_YML=private-opratelimit-start.yml
+END_YML=private-opratelimit-end.yml
 STATS_YML=${PREFIX}-stats.yml
 touch $STATS_YML
 
-op service-account ratelimit 
-
-if [ ! -e ${START_YML} ]; then 
+if [ ! -e ${START_YML} ]; then
 	echo . set $START_YML
 	op --format json service-account ratelimit | yq -P | tee $START_YML
 else
