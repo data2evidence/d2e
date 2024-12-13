@@ -131,7 +131,6 @@ https://*.alp.local:55555 {
 		path /
 		path /portal/researcher/*
 		path /portal/systemadmin/*
-		path /starboard-notebook-base/*
 	}
 
 	handle @portalpath {
