@@ -128,9 +128,6 @@ jobs:
           wc -l .env.base-all.yml .env.base-local.yml
           yarn --cwd internal gen:env
           sed -i "s/CDMDEFAULT/${TESTSCHEMA}/g" .env.local
-          scripts/gen-resource-limits.sh
-          echo grep _LIMIT .env.${ENV_TYPE}
-          grep _LIMIT .env.${ENV_TYPE}
 
       - name: Setup Test DB
         run: |
