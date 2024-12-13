@@ -159,7 +159,6 @@ jobs:
         env:
           GATEWAY_NAME: alp-minerva-gateway-1
         run: |
-          echo CADDY__ALP__PUBLIC_FQDN=$CADDY__ALP__PUBLIC_FQDN
           yarn remote:minerva up --remove-orphans --force-recreate --wait
           DC_EXIT_CODE=$?
           echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
@@ -169,7 +168,7 @@ jobs:
 
           DC_FAIL_COUNT=$(grep -icE "starting|unhealthy" $DOCKER_STATUS_FILE|| true)
           echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
-          [ $DC_FAIL_COUNT != 0 ] && echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT
+          [ $DC_FAIL_COUNT = 0 ] || echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT
 
       - name: Logs minerva
         if: success() || failure()
