@@ -61,12 +61,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # - name: Free Disk Space (Ubuntu)
-      #   uses: jlumbroso/free-disk-space@main
-      #   with:
-      #     # this might remove tools that are actually needed,
-      #     # if set to "true" but frees about 6 GB
-      #     tool-cache: false
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
 
       - name: Load dotenv from 1password
         uses: 1password/load-secrets-action@v2
@@ -136,7 +136,6 @@ jobs:
 
       - name: Build system services
         run: |
-          echo grep _LIMIT .env.${ENV_TYPE}
           grep _LIMIT .env.${ENV_TYPE}
           yarn build:minerva
 
