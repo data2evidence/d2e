@@ -138,7 +138,7 @@ jobs:
             yarn local:minerva up --wait
             DC_EXIT_CODE=$?
             echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_ENV
-            DOCKER_STATUS_FILE=../docker-status-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S').txt | tee -a $GITHUB_ENV
+            DOCKER_STATUS_FILE=../docker-status-${GITHUB_RUN_ID:-ghRunId}-$(date '+%Y%m%dT%H%M%S').txt | tee -a $GITHUB_ENV
             docker ps --format {{.Names}},{{.Status}} 2> /dev/null | sort | tee $DOCKER_STATUS_FILE | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Check Container Health
@@ -150,7 +150,7 @@ jobs:
 
           DC_FAIL_COUNT=$(grep -icE "starting|unhealthy" $DOCKER_STATUS_FILE|| true)
           echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
-          [ $DC_FAIL_COUNT = 0 ] || echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT
+          [ $DC_FAIL_COUNT = 0 ] || { echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT; }
 
       - name: Logs minerva
         if: success() || failure()
