@@ -35,7 +35,10 @@ const Env = z.object({
     .transform(Number),
 
   PG__DEBUG: z.string().transform(val => val === '1' || /true/i.test(val)),
-  sqlOnly: z.string().transform(val => val === '1' || /true/i.test(val)).optional(),
+  sqlOnly: z
+    .string()
+    .transform(val => val === '1' || /true/i.test(val))
+    .optional(),
 
   PG_SSL: z
     .string()
@@ -44,6 +47,14 @@ const Env = z.object({
 
   TLS__INTERNAL__KEY: z.string().optional(),
   TLS__INTERNAL__CRT: z.string().optional(),
+  SERVICE_ROUTES: z.string().transform((str, ctx): z.infer<ReturnType<typeof object>> => {
+    try {
+      return JSON.parse(str)
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Invalid JSON' })
+      return z.never()
+    }
+  }),
 })
 
 let _env = Deno.env.toObject() 

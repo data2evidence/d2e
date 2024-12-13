@@ -25,13 +25,12 @@ export class PermissionsMiddleware implements NestMiddleware {
     const { method } = req
     const { serviceName, userId } = req.params
 
-    const permissionLevel = this.determinePermissionLevel(userIdFromToken, userId)
+    const permissionLevel = await this.determinePermissionLevel(userIdFromToken, userId)
     const servicePermissions = permissions[serviceName]
 
     if (!this.hasPermission(method, servicePermissions[permissionLevel])) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN)
     }
-
     next()
   }
 

@@ -9,6 +9,7 @@ services:
       - 9229:9229
     volumes:
       - ./functions:/usr/src/plugins/d2ef
+      # - ../trex/core:/usr/src/core # For debugging trex with local code
     environment:
       LOCAL_DEBUG: "true"
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
