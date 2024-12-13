@@ -37,10 +37,13 @@ export class UserArtifactService {
     [ServiceName.NOTEBOOKS]: 'isShared'
   }
 
-  async getServiceArtifact(userId: string, serviceName: ServiceName): Promise<any> {
+  async getUserServiceArtifact(userId: string, serviceName: ServiceName): Promise<any> {
     const artifact = await this.userArtifactRepository.findOne({
       where: { userId }
     })
+    if (!artifact?.artifacts?.[serviceName]) {
+      throw new NotFoundException(`Artifacts for userId ${userId} not found in ${serviceName}`)
+    }
     const result = artifact?.artifacts[serviceName]
     if (!result) {
       throw new NotFoundException(`Artifact for userId ${userId} not found in ${serviceName}`)
@@ -48,10 +51,13 @@ export class UserArtifactService {
     return result
   }
 
-  async getServiceArtifactById(userId: string, serviceName: ServiceName, id: string): Promise<any> {
+  async getUserServiceArtifactById(userId: string, serviceName: ServiceName, id: string): Promise<any> {
     const artifact = await this.userArtifactRepository.findOne({
       where: { userId }
     })
+    if (!artifact?.artifacts?.[serviceName]) {
+      throw new NotFoundException(`Artifacts for userId ${userId} not found in ${serviceName}`)
+    }
     const result = artifact?.artifacts[serviceName].find(art => art.id === id)
     if (!result) {
       throw new NotFoundException(`Artifact with id ${id} not found in ${serviceName}`)
@@ -59,8 +65,30 @@ export class UserArtifactService {
     return result
   }
 
-  async createServiceArtifact<T>(createArtifactDto: CreateArtifactDto<T>): Promise<UserArtifact> {
-    const { serviceName, serviceArtifact } = createArtifactDto
+  async getServiceArtifactById(serviceName: string, id: string): Promise<UserArtifact[]> {
+    const userArtifacts = await this.userArtifactRepository
+      .createQueryBuilder('user_artifact')
+      .where(`user_artifact.artifacts->:serviceName @> :jsonValue`, {
+        serviceName,
+        jsonValue: JSON.stringify([{ id }])
+      })
+      .getMany()
+
+    for (const artifact of userArtifacts) {
+      const matchedEntity = artifact.artifacts[serviceName].find(item => item.id === id)
+      if (matchedEntity) {
+        return [matchedEntity]
+      }
+    }
+
+    throw new NotFoundException(`Artifact with id ${id} not found in ${serviceName}`)
+  }
+
+  async createServiceArtifact<T extends { id: string }>(
+    serviceName: string,
+    createArtifactDto: CreateArtifactDto<T>
+  ): Promise<UserArtifact> {
+    const { serviceArtifact } = createArtifactDto
 
     let artifact = await this.userArtifactRepository.findOne({ where: { userId: this.userId } })
 
@@ -84,14 +112,23 @@ export class UserArtifactService {
         )
       )
     }
-    return this.userArtifactRepository.save(artifact)
+
+    try {
+      return await this.userArtifactRepository.save(artifact)
+    } catch (error) {
+      throw new ConflictException('Error creating service artifact', error.message)
+    }
   }
 
-  async updateServiceArtifact<T>(
+  async updateUserServiceArtifact<T>(
     serviceName: ServiceName,
     updateArtifactDto: UpdateArtifactDto<T>
   ): Promise<UserArtifact> {
     const { userId, id, serviceArtifact } = updateArtifactDto
+
+    if (!updateArtifactDto.serviceArtifact) {
+      throw new ConflictException('UpdateArtifactDto is missing serviceArtifact')
+    }
     const artifact = await this.userArtifactRepository.findOne({ where: { userId } })
 
     if (artifact && artifact.artifacts[serviceName]) {
@@ -109,9 +146,43 @@ export class UserArtifactService {
     throw new NotFoundException(`Service ${serviceName} not found for user ${userId}`)
   }
 
+  async updateServiceArtifactEntity(serviceName: string, updatedEntity: Record<string, any>): Promise<UserArtifact> {
+    const userArtifacts = await this.userArtifactRepository.find()
+
+    if (!userArtifacts || userArtifacts.length === 0) {
+      throw new NotFoundException('No user artifacts found')
+    }
+
+    for (const userArtifact of userArtifacts) {
+      const artifacts = userArtifact.artifacts[serviceName]
+
+      if (artifacts) {
+        const artifactIndex = artifacts.findIndex(artifact => artifact.id === updatedEntity.id)
+
+        if (artifactIndex !== -1) {
+          const artifact = artifacts[artifactIndex]
+
+          Object.assign(artifact, updatedEntity)
+          userArtifact.artifacts[serviceName] = [...artifacts]
+
+          await this.userArtifactRepository.save(userArtifact)
+
+          return userArtifact
+        }
+      }
+    }
+
+    throw new NotFoundException('Service artifact not found')
+  }
+
   async getAllServiceArtifacts(serviceName: ServiceName): Promise<any[]> {
-    const artifacts = await this.userArtifactRepository.find()
-    return artifacts.map(artifact => artifact.artifacts[serviceName]).flat()
+    const result = await this.userArtifactRepository
+      .createQueryBuilder('user_artifact')
+      .select(`jsonb_array_elements(user_artifact.artifacts->:serviceName)`, 'artifact')
+      .where(`user_artifact.artifacts ? :serviceName`, { serviceName })
+      .getRawMany()
+
+    return result.map(row => row.artifact)
   }
 
   async getAllUserServiceArtifacts(serviceName: ServiceName, userId?: string): Promise<any[]> {
@@ -125,7 +196,7 @@ export class UserArtifactService {
     return [...userArtifactsList, ...sharedArtifactsFromOthers]
   }
 
-  async deleteServiceArtifact(userId: string, serviceName: ServiceName, id: string): Promise<void> {
+  async deleteUserServiceArtifact(userId: string, serviceName: ServiceName, id: string): Promise<void> {
     const artifact = await this.userArtifactRepository.findOne({ where: { userId } })
 
     if (artifact && artifact.artifacts[serviceName]) {
@@ -134,6 +205,32 @@ export class UserArtifactService {
     } else {
       throw new NotFoundException(`Artifact with id ${id} for user ${userId} not found in ${serviceName}`)
     }
+  }
+
+  async deleteServiceArtifactEntity(serviceName: string, entityId: string): Promise<UserArtifact> {
+    const userArtifacts = await this.userArtifactRepository.find()
+
+    if (!userArtifacts || userArtifacts.length === 0) {
+      throw new NotFoundException('No user artifacts found')
+    }
+
+    for (const userArtifact of userArtifacts) {
+      const artifacts = userArtifact.artifacts[serviceName]
+
+      if (artifacts) {
+        const artifactIndex = artifacts.findIndex(artifact => artifact.id === entityId)
+
+        if (artifactIndex !== -1) {
+          artifacts.splice(artifactIndex, 1)
+          userArtifact.artifacts[serviceName] = [...artifacts]
+          await this.userArtifactRepository.save(userArtifact)
+
+          return userArtifact
+        }
+      }
+    }
+
+    throw new NotFoundException('Service artifact not found')
   }
 
   private async getAllSharedServiceArtifacts(serviceName: ServiceName, userId: string): Promise<any[]> {
