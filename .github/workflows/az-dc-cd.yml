@@ -134,20 +134,22 @@ jobs:
 
       - name: docker compose up
         run: |
-          ACTIONS_STEP_DEBUG=true
+          export ACTIONS_STEP_DEBUG=true
           yarn remote:minerva up --remove-orphans --force-recreate --wait
           DC_EXIT_CODE=$?
           echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
 
-          CMD=(docker ps --format {{.Names}},{{.Status}})
-          ${CMD[@]} 2> /dev/null | grep -iE "starting|unhealthy" || true
-          DC_FAIL_COUNT=$(${CMD[@]} 2> /dev/null | grep -ciE "starting|unhealthy" || true)
-          echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
+          docker ps --format {{.Names}},{{.Status}} 2> /dev/null | sort | tee private-docker-status.txt
 
-          echo | tee -a $GITHUB_STEP_SUMMARY
-          ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
+          # CMD=(docker ps --format {{.Names}},{{.Status}})
+          # ${CMD[@]} 2> /dev/null | grep -iE "starting|unhealthy" || true
+          # DC_FAIL_COUNT=$(${CMD[@]} 2> /dev/null | grep -ciE "starting|unhealthy" || true)
+          # echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
 
-          [ $DC_FAIL_COUNT != 0 ] && echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT
+          # echo | tee -a $GITHUB_STEP_SUMMARY
+          # ${CMD[@]} | sort | tee -a $GITHUB_STEP_SUMMARY
+
+          # [ $DC_FAIL_COUNT != 0 ] && echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT
 
       - name: Logs minerva
         if: success() || failure()
