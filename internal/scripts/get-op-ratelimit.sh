@@ -13,8 +13,8 @@ else
 	DATETIME_STAMP=$(date -I)
 	PREFIX=../opratelimit-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
 fi
-START_YML=private-opratelimit-start.yml
-END_YML=private-opratelimit-end.yml
+START_YML=${PREFIX}-start.yml
+END_YML=${PREFIX}-end.yml
 STATS_YML=${PREFIX}-stats.yml
 touch $STATS_YML
 

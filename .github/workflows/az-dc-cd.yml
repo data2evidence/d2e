@@ -141,7 +141,7 @@ jobs:
 
           DOCKER_STATUS_FILE=../docker-status-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S').txt
           docker ps --format {{.Names}},{{.Status}} 2> /dev/null | sort | tee $DOCKER_STATUS_FILE | tee -a $GITHUB_STEP_SUMMARY
-          DC_FAIL_COUNT=(grep -iE "starting|unhealthy" $DOCKER_STATUS_FILE) || true
+          DC_FAIL_COUNT=$(grep -iE "starting|unhealthy" $DOCKER_STATUS_FILE) || true
           echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
           [ $DC_FAIL_COUNT != 0 ] && echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT
 

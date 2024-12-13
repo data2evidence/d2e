@@ -148,7 +148,7 @@ jobs:
           echo RETRY_OUTCOME=${{ steps.retry.outcome }} | tee -a $GITHUB_STEP_SUMMARY
           echo RETRY_TOTAL_ATTEMPTS=${{ steps.retry.outputs.total_attempts }} | tee -a $GITHUB_STEP_SUMMARY
 
-          DC_FAIL_COUNT=(grep -iE "starting|unhealthy" $DOCKER_STATUS_FILE) || true
+          DC_FAIL_COUNT=$(grep -iE "starting|unhealthy" $DOCKER_STATUS_FILE) || true
           echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
           [ $DC_FAIL_COUNT != 0 ] && echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT
 
