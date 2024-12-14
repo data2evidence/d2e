@@ -20,7 +20,8 @@ get_cpu_count() {
     else
         NPROCS="$(getconf _NPROCESSORS_ONLN)"  # glibc/coreutils fallback
     fi
-    D2E_CPU_LIMIT=$(echo "scale=2;$NPROCS*$D2E_RESOURCE_LIMIT" |bc)
+    # bc not installed on GHA Agent
+    D2E_CPU_LIMIT=$(($NPROCS*$D2E_RESOURCE_LIMIT))
     # Strip decimal numbers
     D2E_CPU_LIMIT=${D2E_CPU_LIMIT%%.*}
     echo D2E_CPU_LIMIT=$D2E_CPU_LIMIT
