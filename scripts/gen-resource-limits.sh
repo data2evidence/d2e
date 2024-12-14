@@ -39,7 +39,7 @@ get_memory() {
         MEMORY=$(free -g | grep Mem: | awk '{print $2}')
     fi
     # bc not installed on GHA Agent
-    echo D2E_MEMORY_LIMIT=$(($MEMORY*$D2E_RESOURCE_LIMIT))
+    D2E_MEMORY_LIMIT=$(($MEMORY*$D2E_RESOURCE_LIMIT))
     # Strip decimal numbers
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT%%.*}
     # Add G suffix for gigabyte
