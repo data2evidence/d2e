@@ -29,7 +29,7 @@ get_cpu_count() {
     # remove existing env var from dotenv
     sed -i.bak "/D2E_CPU_LIMIT=/,//d" $DOTENV_FILE
     # set env var
-    echo D2E_CPU_LIMIT=\'"$D2E_CPU_LIMIT"\' >> $DOTENV_FILE
+    echo D2E_CPU_LIMIT=$D2E_CPU_LIMIT >> $DOTENV_FILE
 }
 
 get_memory() {
