@@ -38,7 +38,8 @@ get_memory() {
     else
         MEMORY=$(free -g | grep Mem: | awk '{print $2}')
     fi
-    D2E_MEMORY_LIMIT=$(echo "scale=2;$MEMORY*$D2E_RESOURCE_LIMIT" |bc)
+    # bc not installed on GHA Agent
+    echo D2E_MEMORY_LIMIT=$(($MEMORY*$D2E_RESOURCE_LIMIT))
     # Strip decimal numbers
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT%%.*}
     # Add G suffix for gigabyte
@@ -49,7 +50,6 @@ get_memory() {
     sed -i.bak "/D2E_MEMORY_LIMIT=/,//d" $DOTENV_FILE
     # set env var
     echo D2E_MEMORY_LIMIT=$D2E_MEMORY_LIMIT >> $DOTENV_FILE
-
 }
 
 get_cpu_count
