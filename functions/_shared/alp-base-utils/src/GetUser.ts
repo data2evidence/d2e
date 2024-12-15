@@ -13,7 +13,17 @@ export const getUser = (req: Pick<IMRIDBRequest, "headers">): User => {
       decode(req.headers["authorization"].replace(/bearer /i, "")),
     );
 
-    return new User(JSON.parse(userToken), lang);
+    const userThirdPartyToken = JSON.stringify(
+      decode(req.headers["x-idp-authorization"].replace(/bearer /i, "")),
+    );
+
+    const user = new User(JSON.parse(userToken), lang);
+
+    if (userThirdPartyToken) {
+      user.thirdPartyToken = userThirdPartyToken;
+    }
+
+    return user;
   } catch (err) {
     throw err;
   }
