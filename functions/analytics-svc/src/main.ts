@@ -674,6 +674,17 @@ const getDBConnections = async ({
             delete analyticsCredentials.ca;
             delete analyticsCredentials.pfx;
         }
+
+        if (analyticsCredentials.dialect === DB.HANA && env.USE_HANA_JWT_AUTHC === "true") {
+            delete analyticsCredentials.user
+            delete analyticsCredentials.password
+            if (userObj.thirdPartyToken) {
+                analyticsCredentials["token"] = userObj.thirdPartyToken;
+            } else {
+                throw new Error("Third party token doesnt exist for HANA JWT Authentication!");
+            }
+        }
+
         analyticsConnectionPromise =
             dbConnectionUtil.DBConnectionUtil.getDBConnection({
                 credentials: analyticsCredentials,
