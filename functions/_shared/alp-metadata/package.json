@@ -21,8 +21,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "graphql": "^15.3.0",
-    "graphql-request": "^3.7.0",
     "node-fetch": "^2.6"
   },
   "resolutions": {},

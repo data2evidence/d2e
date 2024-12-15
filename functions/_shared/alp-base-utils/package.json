@@ -27,6 +27,7 @@
   "devDependencies": {
     "@types/jasmine": "^3.6.2",
     "@types/node": "^18",
+    "hdb": "^0.19.3",
     "jasmine": "^3.6.1",
     "jasmine-reporters": "^2.3.2",
     "jasmine-spec-reporter": "^6.0.0",
@@ -41,7 +42,7 @@
     "@types/bcryptjs": "^2.4.2",
     "@types/jsonstream": "^0.8.30",
     "@types/passport-azure-ad": "^4.3.0",
-    "axios": "^0.21.2",
+    "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
     "hdb": "0.19.3",
     "pako": "1.0.11",
@@ -63,5 +64,8 @@
     "roots": [
       "src"
     ]
+  },
+  "imports": {
+    "base64": "jsr:@std/encoding/base64"
   }
 }
