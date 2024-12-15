@@ -1,7 +1,7 @@
 import { Container ,  Service } from 'typedi'
 import type { Knex } from '../types'
 import { createLogger } from '../Logger'
-import { UserActivateRequest, UserAddRequest, UserDeleteRequest } from 'types'
+import { UserActivateRequest, UserAddRequest, UserDeleteRequest } from '../types'
 import { CONTAINER_KEY } from '../const'
 import { generatePassword } from '../utils'
 import { UserService } from './UserService'

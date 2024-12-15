@@ -23,7 +23,6 @@ import * as mri2 from "./mri/endpoint/analytics";
 import * as xsenv from "@sap/xsenv";
 import { AuditLogger } from "./utils/AuditLogger";
 import { Settings } from "./qe/settings/Settings";
-//import * as swagger from "@alp/swagger-node-runner";
 import MRIEndpointErrorHandler from "./utils/MRIEndpointErrorHandler";
 import noCacheMiddleware from "./middleware/NoCache";
 import timerMiddleware from "./middleware/Timer";
