@@ -29,9 +29,6 @@
     "typescript": "4.4.4"
   },
   "imports": {
-    "knex": "npm:knex@^3.1.0",
-    "pg": "npm:pg@^8.7.3",
-    "dotenv": "npm:dotenv@16.0.1",
     "path": "https://deno.land/std@0.188.0/path/mod.ts",
     "./src/db/migrations/20220128064620_create_table_MRIEntities_CollectionItems": "./src/db/migrations/20220128064620_create_table_MRIEntities_CollectionItems.ts",
     "./src/db/migrations/20220128065418_create_view_ConfigDbModels_Assignment": "./src/db/migrations/20220128065418_create_view_ConfigDbModels_Assignment.ts",
