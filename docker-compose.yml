@@ -412,9 +412,9 @@ services:
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",
             "DUCKDB__DATA_FOLDER": "/home/docker/src/alp-data-node/app/duckdb_data",
             "LOCAL_DEBUG": "false",
-            "SKIP_AUTH": "${SKIP_AUTH:-FALSE}",
             "USE_DUCKDB": "${USE_DUCKDB:-true}",
             "USE_CACHEDB": "${USE_CACHEDB:-true}",
+            "USE_HANA_JWT_AUTHC": "${USE_HANA_JWT_AUTHC:-false}",
             "USE_EXTENSION_FOR_COHORT_CREATION": "false",
             "isTestEnv": "${isTestEnv}",
             "local": "${local}",
@@ -720,7 +720,6 @@ services:
       PREFECT_UI_STATIC_DIRECTORY: /app/ui-files
       PREFECT_SERVER_API_PORT: 41${BASE_PORT:-1}20
       PREFECT_API_ENABLE_HTTP2: False
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-dataflow-gen-worker:
     command:
