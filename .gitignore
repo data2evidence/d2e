@@ -33,3 +33,4 @@ alp-data-node-override
 liquibase
 
 **/liveness
+.generated_import.json
