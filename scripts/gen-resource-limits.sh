@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # inputs
-D2E_RESOURCE_LIMIT=${D2E_RESOURCE_LIMIT:-0.7}
+D2E_RESOURCE_LIMIT=${D2E_RESOURCE_LIMIT:-70/100}
 ENV_TYPE=${ENV_TYPE:-local}
 
 # vars
