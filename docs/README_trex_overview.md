@@ -11,13 +11,13 @@ The following documentation outlines the basic setup of Analytics Platform (D2E)
 3. Clone Github repository d2e-plugins in your terminal using the command: `git clone --branch trex https://github.com/alp-os/d2e-plugins.git`. _(TODO - this step will be updated)_
 4. Request docker credentials from [D2E Support](#d2e-support) for authenticating to private docker registry to retrieve resources to run D2E.
 
-## Credentials Setup 
-5. Generate application credentials: `yarn gen:dotenv`
+## Environment Variables and Credentials Setup 
+5. Generate environment variables: `yarn gen:dotenv`
+   - Refer [here](./1-setup/environment-variables.md) for more information on the environment variables generated.
 6. Append the following variables to the `env.local` file in the format:
-   - `GH_TOKEN=<your-Github-PAT-token>`. Refer [here](./1-setup/README.md) for more info
+   - `GH_TOKEN=<your-Github-PAT-token>`. (Refer [here](./1-setup/README.md) for more info)
    - `DATABASE_CREDENTIALS=[]` 
 7. Initialize Authentication Applications: `yarn init:logto`
-    - For more information on the credentials generated, please refer to the [documentation here](./1-setup/environment-variables.md)
 
 ## Application Setup
 
@@ -32,7 +32,7 @@ In d2e repo,
 11. Start/Restarting application: `yarn start:minerva --wait; sleep 60`
 
 > **Note:**
-> - If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run **Credentials Setup** section
+> - If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run the **Environment Variables and Credentials Setup** section
 > - If you have setup the application before, run steps in section **Application Setup** as required.
 
 
@@ -46,7 +46,7 @@ In d2e repo,
 > ![](./images/portal/LoginPage.png)
 
 ## Accessing Admin Portal
-The Admin Portal allows authorized personnel to login and perform user, datasets and job plugin management. 
+The Admin Portal allows authorized personnel to login and perform the management of users, datasets and job plugins. 
 
 - Login as Admin with following credentials:
   - username - `admin`
@@ -65,7 +65,7 @@ The Admin Portal allows authorized personnel to login and perform user, datasets
 
 This sections assumes that there is an existing database available. The database should be in a Postgres docker container name or external database with a Fully Qualified Domain Name (FQDN).
 
-If there is no existing databases available, users may consider using a [sample dataset](./2-load/), and perform sub-steps 3 to 7 to setup the database. Thereafter, users may continue to follow the guide from section [Plugins](#plugins) onwards.
+If there is no existing databases available, you may consider using a [sample dataset](./2-load/), and perform sub-steps 3 to 7 to setup the database. Thereafter, you may continue to follow the guide from section [Plugins](#plugins) onwards.
 
 
 - In the Admin Portal, navigate to **Setup** > **Databases** > **Configure** > **Add database**
@@ -77,14 +77,14 @@ If there is no existing databases available, users may consider using a [sample 
 
 
 ## Plugins 
-The page allows users to manage plugins in the platform, for instance installation, update and uninstallation of plugins. 
+The Admin portal allows the admin user to manage plugins in the platform, for instance installation, update and uninstallation of plugins. 
 - In the Admin Portal, navigate to **Setup** > **Trex Plugins** > **Configure**
   >**The expected display is:**![PluginTable](./images/plugins/PluginTable.png)
 
 - Refer to the [documentation here](./2-load/5-load-d2e-plugins.md) for more information on plugins.
 
 ## Jobs Portal
-D2E allows users to perform customized and scheduled job runs from [plugins](#plugins) that have been installed.
+The Admin portal allows the admin user to perform customized and scheduled job runs from [plugins](#plugins) that have been installed.
 
 - In the Admin Portal, navigate to **Jobs** and select the **Jobs** tab.
 > **The expected display is**: ![JobsPortal](./images/dataflow/JobsPortal.png)
@@ -102,7 +102,7 @@ D2E allows users to perform customized and scheduled job runs from [plugins](#pl
   > **The expected result upon successful addition of dataset**: ![Datasets](./images/datasets/ConfirmDatasetsPortal.png)
 
 ## Dataset Permissions
-The Admin Portal allows users to perform dataset management to provide users with permissions for selected datasets. 
+The Admin Portal allows the admin to perform dataset management to provide users with permissions for selected datasets. 
 - Input the url https://localhost:41100/portal/systemadmin/dataset-overview. 
 - Navigate to the dataset you wish to provide/revoke permission access for users. 
 - Under **Actions** dropdown, select **Permissions** to view users who have requested for access or provide access to existing users. 
