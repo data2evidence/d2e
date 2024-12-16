@@ -1,4 +1,3 @@
-import * as dotenv from "dotenv";
 import { object, z } from "zod";
 
 let env = {}; 
