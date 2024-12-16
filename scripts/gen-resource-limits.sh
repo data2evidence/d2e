@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # inputs
-D2E_RESOURCE_LIMIT=${D2E_RESOURCE_LIMIT:-70/100}
+D2E_RESOURCE_LIMIT=${D2E_RESOURCE_LIMIT:-0.7}
 ENV_TYPE=${ENV_TYPE:-local}
 
 # vars
@@ -20,8 +20,8 @@ get_cpu_count() {
     else
         NPROCS="$(getconf _NPROCESSORS_ONLN)"  # glibc/coreutils fallback
     fi
-    # bc not installed on GHA Agent
-    D2E_CPU_LIMIT=$(($NPROCS*$D2E_RESOURCE_LIMIT))
+    # bc no longer installed on GHA Agent
+    D2E_CPU_LIMIT=$(awk -v x=$NPROCS -v y=$D2E_RESOURCE_LIMIT "BEGIN {print x*y}")
     # Strip decimal numbers
     D2E_CPU_LIMIT=${D2E_CPU_LIMIT%%.*}
     echo D2E_CPU_LIMIT=$D2E_CPU_LIMIT
@@ -39,8 +39,8 @@ get_memory() {
     else
         MEMORY=$(free -g | grep Mem: | awk '{print $2}')
     fi
-    # bc not installed on GHA Agent
-    D2E_MEMORY_LIMIT=$(($MEMORY*$D2E_RESOURCE_LIMIT))
+    # bc no longer installed on GHA Agent
+    D2E_MEMORY_LIMIT=$(awk -v x=$MEMORY -v y=$D2E_RESOURCE_LIMIT "BEGIN {print x*y}")
     # Strip decimal numbers
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT%%.*}
     # Add G suffix for gigabyte
