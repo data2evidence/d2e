@@ -12,17 +12,15 @@ export const getUser = (req: Pick<IMRIDBRequest, "headers">): User => {
     const userToken: string = JSON.stringify(
       decode(req.headers["authorization"].replace(/bearer /i, "")),
     );
-
-    const userThirdPartyToken = JSON.stringify(
-      decode(req.headers["x-idp-authorization"].replace(/bearer /i, "")),
-    );
-
+    
     const user = new User(JSON.parse(userToken), lang);
 
-    if (userThirdPartyToken) {
-      user.thirdPartyToken = userThirdPartyToken;
+    // For HANA JWT Authentication
+    if (req.headers["x-idp-authorization"]) {
+      user.thirdPartyToken = JSON.stringify(decode(req.headers["x-idp-authorization"].replace(/bearer /i, "")));
+    } else {
+      throw new Error("Intermediary IDP Token not Found!")
     }
-
     return user;
   } catch (err) {
     throw err;

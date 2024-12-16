@@ -680,7 +680,7 @@ const getDBConnections = async ({
             if (userObj.thirdPartyToken) {
                 analyticsCredentials["token"] = userObj.thirdPartyToken;
             } else {
-                throw new Error("Third party token doesnt exist for HANA JWT Authentication!");
+                throw new Error("Intermediary IDP token doesnt exist for HANA JWT Authentication!");
             }
         }
 
