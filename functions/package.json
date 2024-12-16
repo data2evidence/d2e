@@ -313,8 +313,6 @@
           "gateway.db.vocabSchemas.read",
           "gateway.db.dataset.versionInfo.read",
           "gateway.db.schema.update",
-          "gateway.terminology.hybridSearchConfig.read",
-          "gateway.terminology.hybridSearchConfig.update",
           "gateway.terminology.concept.getStandardConcepts.read",
           "dataflowmgmt.analysisflow.read",
           "dataflowmgmt.analysisflow.add",
@@ -376,7 +374,6 @@
           "gateway.terminology.concept.recommended.read",
           "gateway.terminology.concept.hierarchy.read",
           "gateway.terminology.fhir.read",
-          "gateway.terminology.hybridSearchConfig.read",
           "dataflowmgmt.analysisflow.read",
           "dataflowmgmt.analysisflow.add",
           "dataflowmgmt.analysisflow.delete",
@@ -1276,24 +1273,6 @@
           ],
           "httpMethods": [
             "GET"
-          ]
-        },
-        {
-          "path": "^/terminology/hybrid-search-config",
-          "scopes": [
-            "gateway.terminology.hybridSearchConfig.read"
-          ],
-          "httpMethods": [
-            "GET"
-          ]
-        },
-        {
-          "path": "^/terminology/hybrid-search-config",
-          "scopes": [
-            "gateway.terminology.hybridSearchConfig.update"
-          ],
-          "httpMethods": [
-            "POST"
           ]
         },
         {

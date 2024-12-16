@@ -186,14 +186,6 @@ x-envs:
           "route": "ps-config"
         },
         {
-          "description": "Configure hybrid search for concepts",
-          "enabled": true,
-          "name": "Hybrid Search",
-          "notes": "",
-          "pluginPath": "plugins/Setup/HybridSearch/module",
-          "route": "hybrid-search"
-        },
-        {
           "description": "Configure overview description text",
           "enabled": true,
           "name": "Overview description",
