@@ -5,7 +5,7 @@ export const checkUserDataId = (
   res: Response,
   next: NextFunction
 ) => {
-  const userDataId = req.params || {};
+  const { userDataId } = req.params || {};
 
   if (!userDataId) {
     return res.status(400).send("User DataId is required");
