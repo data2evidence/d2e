@@ -62,3 +62,7 @@ yarn stop:minerva
 ```bash
 yarn clean:minerva
 ```
+
+## Extra information
+### Setting resource limits
+- see: [Resource limits](docs/1-setup/resource-limits.md)
