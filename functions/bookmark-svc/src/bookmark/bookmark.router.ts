@@ -1,9 +1,8 @@
 import { Logger } from '@alp/alp-base-utils'
-import { EnvVarUtils } from '@alp/alp-base-utils'
 import { Router, NextFunction, Response } from 'express'
 import { IMRIRequest } from '../types'
 import { Service } from 'typedi'
-import { queryBookmarks } from './bookmarkservice'
+import { queryBookmarks } from './bookmark.service'
 import { getUser } from '@alp/alp-base-utils'
 import MRIEndpointErrorHandler from '../utils/MRIEndpointErrorHandler'
 import { validate } from '../middleware/route-check'
@@ -33,13 +32,16 @@ export class BookmarkRouter {
       try {
         const { configConnection } = req.dbConnections
         const user = getUser(req)
-        const userId = req.query.username
+
+        const userName = req.query.username
         const language = user.lang
+
+        const token = req.headers['authorization']
 
         req.body.cmd = 'loadAll'
         req.body.paConfigId = req.query.paConfigId
 
-        queryBookmarks(req.body, userId, EnvVarUtils.getBookmarksTable(), configConnection, (err, data) => {
+        await queryBookmarks(req.body, userName, token, configConnection, (err, data) => {
           if (err) {
             return res.status(500).send(MRIEndpointErrorHandler({ err, language }))
           } else {
@@ -67,9 +69,11 @@ export class BookmarkRouter {
           const { configConnection } = req.dbConnections
           const user = getUser(req)
           const language = user.lang
-          const userId = req.body.username
+          const userName = req.body.username
 
-          queryBookmarks(req.body, userId, EnvVarUtils.getBookmarksTable(), configConnection, (err, data) => {
+          const token = req.headers['authorization']
+
+          queryBookmarks(req.body, userName, token, configConnection, (err, data) => {
             if (err) {
               return res.status(500).send(MRIEndpointErrorHandler({ err, language }))
             } else {
@@ -94,10 +98,11 @@ export class BookmarkRouter {
           const userId = req.body.username
 
           const { bookmarkId } = req.params
+          const token = req.headers['authorization']
 
           req.body.bmkId = bookmarkId
 
-          queryBookmarks(req.body, userId, EnvVarUtils.getBookmarksTable(), configConnection, (err, data) => {
+          queryBookmarks(req.body, userId, token, configConnection, (err, data) => {
             if (err) {
               return res.status(500).send(MRIEndpointErrorHandler({ err, language }))
             } else {
@@ -123,10 +128,12 @@ export class BookmarkRouter {
           const userId = req.body.username
           const { bookmarkId } = req.params
 
+          const token = req.headers['authorization']
+
           req.body.cmd = 'delete'
           req.body.bmkId = bookmarkId
 
-          queryBookmarks(req.body, userId, EnvVarUtils.getBookmarksTable(), configConnection, (err, data) => {
+          queryBookmarks(req.body, userId, token, configConnection, (err, data) => {
             if (err) {
               return res.status(500).send(MRIEndpointErrorHandler({ err, language }))
             } else {
@@ -155,7 +162,9 @@ export class BookmarkRouter {
           req.body.bmkIds = (req.query.ids as string).split(',')
           req.body.paConfigId = req.query.paConfigId
 
-          queryBookmarks(req.body, userId, EnvVarUtils.getBookmarksTable(), configConnection, (err, data) => {
+          const token = req.headers['authorization']
+
+          queryBookmarks(req.body, userId, token, configConnection, (err, data) => {
             if (err) {
               return res.status(500).send(MRIEndpointErrorHandler({ err, language }))
             } else {
