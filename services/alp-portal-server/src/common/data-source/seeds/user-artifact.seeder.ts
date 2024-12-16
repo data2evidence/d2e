@@ -25,7 +25,15 @@ export default class UserArtifactSeeder implements Seeder {
     const entities = repository.create({
       userId: 'system',
       artifacts: {
-        notebooks: notebookEntities
+        notebooks: notebookEntities,
+        dataflow: [],
+        dataflow_revision: [],
+        dataflow_run: [],
+        analysis_flow: [],
+        analysis_flow_run: [],
+        pa_config: [],
+        cdw_config: [],
+        bookmarks: []
       },
       createdBy: 'system',
       modifiedBy: 'system'
