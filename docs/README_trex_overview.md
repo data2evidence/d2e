@@ -1,43 +1,39 @@
-# D2E Documentation (trex)
-The following documentation outlines the basic setup of D2E for users who require the software.
+# Analytics Platform Documentation (D2E)
 
+[![DockerCompose AzureTest CD](https://github.com/alp-os/d2e/actions/workflows/az-dc-cd.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/az-dc-cd.yml) &nbsp;&nbsp; [![Docker Build & Push](https://github.com/alp-os/d2e/actions/workflows/docker-push.yml/badge.svg)](https://github.com/alp-os/d2e/actions/wosrkflows/docker-push.yml) &nbsp;&nbsp; [![Docker compose Build & Up](https://github.com/alp-os/d2e/actions/workflows/docker-compose-up.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/docker-compose-up.yml)
+
+The following documentation outlines the basic setup of Analytics Platform (D2E) for users who require the software.
+
+# Getting Started 
+## Pre-requisites
 1. Install pre-requisite softwares for running D2E. Refer to the installation guide [here](./1-setup/README.md). 
+2. Clone Github repository d2e in your terminal using the command: `git clone --branch develop https://github.com/alp-os/d2e.git`. 
+3. Clone Github repository d2e-plugins in your terminal using the command: `git clone --branch trex https://github.com/alp-os/d2e-plugins.git`. _(TODO - this step will be updated)_
+4. Request docker credentials from [D2E Support](#d2e-support) for authenticating to private docker registry to retrieve resources to run D2E.
 
-2. Clone Github repository d2e in your terminal using the command: `git clone --branch <branch-name> https://github.com/alp-os/d2e.git`. 
-    - Note: Edit `<branch-name>` to `develop`
+## Credentials Setup 
+5. Generate application credentials: `yarn gen:dotenv`
+6. Append the following variables to the `env.local` file in the format:
+   - `GH_TOKEN=<your-Github-PAT-token>`. Refer [here](./1-setup/README.md) for more info
+   - `DATABASE_CREDENTIALS=[]` 
+7. Initialize Authentication Applications: `yarn init:logto`
+    - For more information on the credentials generated, please refer to the [documentation here](./1-setup/environment-variables.md)
 
-3. Request docker credentials from [D2E Support](#d2e-support) for authenticating to private docker registry to retrieve resources to run D2E.
+## Application Setup
 
-**Credentials Setup** 
+In d2e-plugins repo, _(TODO - this step will be updated)_
 
-4. Generate application credentials: `yarn gen:dotenv``
+8. Run the command to build the neccessary docker images to run D2E plugins: `yarn build`. 
 
-5. Set up variable `DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY` for `env.local`. Run the following commands: 
+In d2e repo, 
 
-    ```
-    set -a; source .env.local; set +a
-
-    DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY=$(echo $DB_CREDENTIALS__INTERNAL__PRIVATE_KEY | openssl rsa -inform PEM -passin pass:$DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE) && echo DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY=\'"${DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY}"\' >> .env.local
-    ```
-
-    _(for more info on openssl, refer [here](https://marco.maranao.ca/articles/how-decrypt-rsa-private-key-using-openssl#google_vignette))_
-
-6. Please ensure Github PAT token has been created in [step 1](./1-setup/README.md). Add the token in the `env.local` file in the format `GH_TOKEN=<your-Github-PAT-token>`.
-      
-7. Initialize Authentication Applications: ```yarn init:logto```
-    - For more info on the credentials generated, please refer to the [documentation here](./docs/1-setup/environment-variables.md)
-
-**Application Setup**
-
-8. Run the command to get the neccessary docker images to run D2E: `yarn build:minerva`
-9. Starting Application User Interface (UI): `yarn start:ui --wait`
-10. Start/Restarting application: `yarn start:minerva --wait; sleep 60`
+9. Run the command to get the neccessary docker images to run D2E: `yarn build:minerva`
+10. Starting Application User Interface (UI): `yarn start:ui --wait`
+11. Start/Restarting application: `yarn start:minerva --wait; sleep 60`
 
 > **Note:**
->
-> If you are starting the application for first time and/or if docker volume resources have been completely removed, run pointers 4-7.
->
-> If you have setup the application before, run pointers 7-10 as required.
+> - If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run **Credentials Setup** section
+> - If you have setup the application before, run steps in section **Application Setup** as required.
 
 
 # D2E Guide 
@@ -56,56 +52,57 @@ The Admin Portal allows authorized personnel to login and perform user, datasets
   - username - `admin`
   - password - `Updatepassword12345`
 
-- Click on Account > Switch to admin portal 
+- Click on **Account** on the top right > **Switch to admin portal**
 
 > **The expected display is:**
 > ![AdminPortal](./images/portal/AdminPortal.png)
 
-- For quick access to the Admin Portal, input the URL https://localhost:41100/portal/systemadmin/user-overview. 
-- Refer to the [documentation here](./2-load/2-users-roles.md) for performing user management. 
+- For quick access to the Admin Portal, input URL https://localhost:41100/portal/systemadmin/user-overview in the search bar.
+- Refer to the [documentation here](./2-load/2-users-roles.md) to perform user management. 
 
 
 ## Adding Existing Databases
 
 This sections assumes that there is an existing database available. The database should be in a Postgres docker container name or external database with a Fully Qualified Domain Name (FQDN).
 
-If there is no existing databases available, users may consider using a sample dataset with the detailed [documentation here](./2-load/), and perform sub-steps 3 to 7 to setup a sample database. Thereafter, users may continue to follow the guide below.
+If there is no existing databases available, users may consider using a [sample dataset](./2-load/), and perform sub-steps 3 to 7 to setup the database. Thereafter, users may continue to follow the guide from section [Plugins](#plugins) onwards.
 
 
-- In the [Admin Portal](#accessing-admin-portal), navigate to **Setup** > **Databases** > **Configure** > **Add database**
+- In the Admin Portal, navigate to **Setup** > **Databases** > **Configure** > **Add database**
   > **The expected display is:** ![DatabaseListEmpty](./images/database/DatabaseListEmpty.png)
 - Select **Add database** and provide the database information accordingly. 
 - Please refer to [documentation here](./2-load/4-setup-db-credentials.md) for more details on the input parameters for database creation.
   >**The expected result after adding a database is:** ![DatabaseList](./images/database/DatabaseList.png)
+- Perform a restart of the system for new connection details to be provisioned to the data services using the command: `yarn start:minerva --wait --force-recreate`
+
 
 ## Plugins 
-The page allows users to perform installation, update and uninstallation of plugins. 
-- In the [Admin Portal](#accessing-admin-portal), navigate to **Setup** > **Trex Plugins** > **Configure**
+The page allows users to manage plugins in the platform, for instance installation, update and uninstallation of plugins. 
+- In the Admin Portal, navigate to **Setup** > **Trex Plugins** > **Configure**
   >**The expected display is:**![PluginTable](./images/plugins/PluginTable.png)
 
+- Refer to the [documentation here](./2-load/5-load-d2e-plugins.md) for more information on plugins.
 
-## Job Runs
-D2E allows running customized job runs from [plugins](#plugins) that have been installed.
+## Jobs Portal
+D2E allows users to perform customized and scheduled job runs from [plugins](#plugins) that have been installed.
 
-- In the [Admin Portal](#accessing-admin-portal), navigate to **Jobs** and select the **Jobs** tab.
- 
+- In the Admin Portal, navigate to **Jobs** and select the **Jobs** tab.
+> **The expected display is**: ![JobsPortal](./images/dataflow/JobsPortal.png)
 
-- To ensure that the jobs have been successfully uploaded, select the **Jobs** tab.
-> **The expected display is**: ![alt text](./images/dataflow/JobsPortal.png)
-
-- Navigate to **Setup** > **Trex plugins** > **Configure** to update or install new plugins.
+- Select the `⋮` icon to perform the respective job functions. 
+- Select **Job Runs** tab to get the job run status.
 
 
 ## Creating Datasets
-- In the [Admin Portal](#accessing-admin-portal), navigate to **Datasets** > **Add dataset**
+- In the Admin Portal, navigate to **Datasets** > **Add dataset**
   >**The expected display is:**![DatasetList](./images/datasets/DatasetList.png)
 
   
-- Provide the dataset information accordingly. Refer to the [documentation here](./3-configure/1-create-dataset.md) for more details on the dataset parameters.
-  > **The expected result if dataset has been successfully added**: ![Datasets](./images/datasets/ConfirmDatasetsPortal.png)
+- Provide the dataset [parameters](./3-configure/1-create-dataset.md) accordingly.
+  > **The expected result upon successful addition of dataset**: ![Datasets](./images/datasets/ConfirmDatasetsPortal.png)
 
 ## Dataset Permissions
-The [Admin Portal](#accessing-admin-portal) allows users to perform dataset management to provide users with permissions for selected datasets. 
+The Admin Portal allows users to perform dataset management to provide users with permissions for selected datasets. 
 - Input the url https://localhost:41100/portal/systemadmin/dataset-overview. 
 - Navigate to the dataset you wish to provide/revoke permission access for users. 
 - Under **Actions** dropdown, select **Permissions** to view users who have requested for access or provide access to existing users. 
@@ -113,12 +110,15 @@ The [Admin Portal](#accessing-admin-portal) allows users to perform dataset mana
 
 
 ## Generating Data Quality Dashboard (DQD)
-  >"The [Data Quality Dashboard](https://data.ohdsi.org/DataQualityDashboard/) applies a Harmonized Data Quality Assessment Terminology to data that has been standardized in the OMOP Common Data Model."  _([Reference](https://data.ohdsi.org/DataQualityDashboard/))_
+> _"The goal of the Data Quality Dashboard (DQD) project is to design and develop an open-source tool to expose and evaluate observational data quality."_ ([*Reference*](https://ohdsi.github.io/DataQualityDashboard/index.html))
+
+For more information, refer to the [link here](https://data.ohdsi.org/DataQualityDashboard/).
 
 ### Running Data Quality and Characterization Job
-- In the [Admin Portal](#accessing-admin-portal), navigate to **Datasets**. 
-- Navigate to the dataset of interest and click **Select Action**. Select **Run data quality** and **Run data characterization** respectively.
-- Refer to the [documentation here](./3-configure/3-dqd-job.md) for a manual guide on running Data Quality and Characterization jobs.
+- In the Admin Portal, navigate to **Datasets**. 
+- Navigate to the dataset of interest and click **Select Action**. 
+- Select **Run data quality** and select **Run Analysis**. Repeat the step for **Run data characterization**.
+- Refer to the [documentation here](./3-configure/3-dqd-job.md) for a guide on running Data Quality and Characterization jobs manually via the Jobs Portal.
 
 #### Data Quality Dashboard
 - After completing **Data Quality** and **Data Characterization** job runs in the [**Running Data Quality and Characterization Job**](#running-data-quality-and-characterization-job) section, refer to the [documentation here](./3-configure/4-dqd-dashboard.md) to access the Data Quality Dashboard for the respective datasets in the Researcher portal.
@@ -129,17 +129,15 @@ The [Admin Portal](#accessing-admin-portal) allows users to perform dataset mana
 
 ### Run Job for Duckdb
 This section provides the steps for setting up the analytics environment.
-- Please ensure that `create-cachedb-file-plugin_deployment` job has been uploaded. 
+- Ensure that `create-cachedb-file-plugin` plugin is available in the [Jobs Portal](#jobs-portal).
 - Refer to the [documentation here](./3-configure/5-create-duckdb-file.md) for a detailed guide on creating a duckdb file.
 
 ### Run Job for Creating Search Indexes for Schema Concept Table
 This section provides the steps for setting up the schema concept table. 
 
-- In the [Admin Portal](#accessing-admin-portal), navigate to **Jobs**.
-- Search for the deployment `add-search-index-plugin_deployment`. 
+- Ensure that the plugins `add_search_index_plugin` is available in the [Jobs Portal](#jobs-portal) 
 - Select the `⋮` icon to perform a **Quick Run**.
-- Refer to the [documentation here](./3-configure/6-create-meilisearch-indexes.md) on the details to create the indexes search.
-
+- Refer to the [documentation here](./3-configure/6-create-meilisearch-indexes.md) on the details to create the indexes search.dock
 - Input the URL https://localhost:41100/portal/researcher. Navigate to **Concepts**. 
   > **The expected result is:** ![ConceptSearch](./images/concepts/ConceptSearch.png)
 
@@ -158,7 +156,7 @@ This section provides the steps for setting up the schema concept table.
 ## Stopping Application
 1. Stop all containers: `yarn stop:minerva`
 2. Perform clean-up: `yarn clean:minerva`
-    - **WARNING**: removes all containers and volumes
+    - **WARNING**: This step removes all containers and volumes. You would need to re-run [Credential Setup](#credentials-setup) for a fresh startup. 
 
 
 # D2E Support

@@ -21,7 +21,7 @@ get_cpu_count() {
         NPROCS="$(getconf _NPROCESSORS_ONLN)"  # glibc/coreutils fallback
     fi
     # bc not installed on GHA Agent
-    D2E_CPU_LIMIT=$(($NPROCS*$D2E_RESOURCE_LIMIT))
+    D2E_CPU_LIMIT=$(echo $NPROCS*$D2E_RESOURCE_LIMIT | bc )
     # Strip decimal numbers
     D2E_CPU_LIMIT=${D2E_CPU_LIMIT%%.*}
     echo D2E_CPU_LIMIT=$D2E_CPU_LIMIT
@@ -40,7 +40,7 @@ get_memory() {
         MEMORY=$(free -g | grep Mem: | awk '{print $2}')
     fi
     # bc not installed on GHA Agent
-    D2E_MEMORY_LIMIT=$(($MEMORY*$D2E_RESOURCE_LIMIT))
+    D2E_MEMORY_LIMIT=$(echo $MEMORY*$D2E_RESOURCE_LIMIT | bc)
     # Strip decimal numbers
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT%%.*}
     # Add G suffix for gigabyte

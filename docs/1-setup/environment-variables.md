@@ -5,6 +5,7 @@ key | type | comment
 DB_CREDENTIALS__INTERNAL__PRIVATE_KEY | rsaPrivateKey | to encrypt dbcredentials entered in admin>setup>databases>configure
 DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE | passphrase | to encrypt dbcredentials entered in admin>setup>databases>configure
 DB_CREDENTIALS__INTERNAL__PUBLIC_KEY | x509publicKey | to encrypt dbcredentials entered in admin>setup>databases>configure
+DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY| rsaPrivateKey | to decrypt dbcredentials | 
 DOCKER_TAG_NAME | string | default tag
 MEILI_MASTER_KEY | password | meilisearch master key
 MINIO__SECRET_KEY | password | meilisearch secret_key
