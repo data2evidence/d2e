@@ -136,6 +136,7 @@ jobs:
 
       - name: Build system services
         run: |
+          grep _LIMIT .env.${ENV_TYPE}
           yarn build:minerva
 
       - name: Manipulate configuration

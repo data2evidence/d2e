@@ -78,14 +78,14 @@ x-envs:
           ],
           "route": "cohort"
         },
-        { 
+        {
           "enabled": false,
           "featureFlag": "cohorts",
-          "name": "Cohorts M", 
+          "name": "Cohorts M",
           "pluginPath": "plugins/Cohort/module",
-          "requiredRoles": [ 
-            "RESEARCHER" 
-          ], 
+          "requiredRoles": [
+            "RESEARCHER"
+          ],
           "route": "cohorts"
         },
         {
@@ -202,7 +202,7 @@ x-envs:
           "pluginPath": "plugins/Setup/OverviewDescription/module",
           "route": "overview-description"
         },
-        { 
+        {
           "description": "Upload / delete flows",
           "enabled": true,
           "name": "Plugins Table",
