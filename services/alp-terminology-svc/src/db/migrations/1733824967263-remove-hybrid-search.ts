@@ -2,7 +2,9 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class RemoveHybridSearch1733824967263 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP TABLE "terminology"."hybrid_search_config"`);
+    await queryRunner.query(
+      `DROP TABLE IF EXISTS "terminology"."hybrid_search_config"`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
