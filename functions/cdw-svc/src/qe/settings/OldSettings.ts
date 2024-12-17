@@ -12,7 +12,7 @@ import {
   defaultTableTypePlaceholderMap,
 } from "./Defaults";
 import * as Utils from "./Utils";
-import { getDefaultSchemaName } from "../../utils/DuckdbConnection";
+import { getDuckdbSchemaName } from "../../utils/DuckdbConnection";
 export const DEFAULT_USER = "TEST_USER";
 import { env } from "../../configs";
 
@@ -49,9 +49,9 @@ export async function validateDBTable(
 
     const query = getQueryString("CHECK_TABLE");
     const parameters = [
-      { value: env.USE_DUCKDB === "true" ? getDefaultSchemaName() : schema },
+      { value: env.USE_DUCKDB === "true" ? getDuckdbSchemaName(): schema },
       { value: parsedName.tableName },
-      { value: env.USE_DUCKDB === "true" ? getDefaultSchemaName() : schema },
+      { value: env.USE_DUCKDB === "true" ? getDuckdbSchemaName(): schema },
       { value: parsedName.tableName },
     ];
 
