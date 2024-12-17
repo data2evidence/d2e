@@ -5,27 +5,23 @@ import { createLogger } from '../../logger';
 import { ConceptSet } from '../../entity';
 import { randomUUID } from 'crypto';
 import { Request } from 'express';
-import { ConceptService } from '../concept/concept.service';
-import { MeilisearchAPI } from '../../api/meilisearch-api';
+import { CachedbService } from '../cachedb/cachedb.service';
 import { SystemPortalAPI } from 'src/api/portal-api';
 
 @Injectable()
 export class ConceptSetService {
   private readonly userId: string;
   private readonly logger = createLogger(this.constructor.name);
-  private token: string;
-  private request: Request;
 
   constructor(
     @Inject(REQUEST) request: Request,
-    private readonly conceptService: ConceptService,
+    private readonly cachedbService: CachedbService,
+    private readonly systemPortalApi: SystemPortalAPI,
   ) {
     const decodedToken = decode(
       request.headers['authorization'].replace(/bearer /i, ''),
     ) as JwtPayload;
     this.userId = decodedToken.sub;
-    this.token = request.headers['authorization'];
-    this.request = request;
   }
 
   private addOwner<T>(object: T, isNewEntity = false) {
@@ -50,8 +46,7 @@ export class ConceptSetService {
 
   async getConceptSets() {
     try {
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      return await systemPortalApi.getUserConceptSets(this.userId);
+      return await this.systemPortalApi.getUserConceptSets(this.userId);
     } catch (error) {
       this.logger.warn(`Error while getting concept sets: ${error}`);
       throw error;
@@ -68,8 +63,7 @@ export class ConceptSetService {
         true,
       );
 
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      await systemPortalApi.createConceptSet({
+      await this.systemPortalApi.createConceptSet({
         serviceArtifact: newConceptSet,
       });
 
@@ -81,13 +75,15 @@ export class ConceptSetService {
   }
 
   async getConceptSet(conceptSetId: string, datasetId: string) {
-    const systemPortalApi = new SystemPortalAPI(this.token);
-    const conceptSet = await systemPortalApi.getConceptSetById(conceptSetId);
+    const conceptSet = await this.systemPortalApi.getConceptSetById(
+      conceptSetId,
+    );
 
     const conceptIds = conceptSet.concepts.map((c) => c.id);
-    const concepts = await this.conceptService.getConceptsByIds(
-      datasetId,
+
+    const concepts = await this.cachedbService.getConceptsByIds(
       conceptIds,
+      datasetId,
     );
 
     const conceptSetWithConceptDetails = {
@@ -121,8 +117,7 @@ export class ConceptSetService {
         },
         false,
       );
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      await systemPortalApi.updateConceptSet(updatedConceptSet);
+      await this.systemPortalApi.updateConceptSet(updatedConceptSet);
       return conceptSetId;
     } catch (error) {
       this.logger.warn(
@@ -134,8 +129,7 @@ export class ConceptSetService {
 
   async removeConceptSet(conceptSetId: string) {
     try {
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      await systemPortalApi.deleteConceptSet(conceptSetId);
+      await this.systemPortalApi.deleteConceptSet(conceptSetId);
       return conceptSetId;
     } catch (error) {
       this.logger.warn(
@@ -152,23 +146,11 @@ export class ConceptSetService {
     try {
       const { conceptSetIds, datasetId } = body;
 
-      const systemPortalApi = new SystemPortalAPI(this.token);
-      const { databaseCode, vocabSchemaName, dialect } =
-        await systemPortalApi.getDatasetDetails(datasetId);
-
-      const meilisearchApi = new MeilisearchAPI();
-      const conceptName = dialect === 'hana' ? 'CONCEPT' : 'concept';
-      const conceptAncestorName =
-        dialect === 'hana' ? 'CONCEPT_ANCESTOR' : 'concept_ancestor';
-      const conceptRelationshipName =
-        dialect === 'hana' ? 'CONCEPT_RELATIONSHIP' : 'concept_relationship';
-      const conceptIndex = `${databaseCode}_${vocabSchemaName}_${conceptName}`;
-      const conceptAncestorIndex = `${databaseCode}_${vocabSchemaName}_${conceptAncestorName}`;
-      const conceptRelationshipIndex = `${databaseCode}_${vocabSchemaName}_${conceptRelationshipName}`;
       const promises = conceptSetIds.map((conceptSetId) =>
         this.getConceptSet(conceptSetId, datasetId),
       );
       const conceptSets = await Promise.all(promises);
+
       const conceptIds: number[] = [];
       const conceptIdsToIncludeDescendant: number[] = [];
       const conceptIdsToIncludeMapped: number[] = [];
@@ -193,32 +175,26 @@ export class ConceptSetService {
         return [];
       }
 
-      const includedConceptIds = await this.getConceptsAndDescendantIds(
-        meilisearchApi,
-        conceptIndex,
-        conceptAncestorIndex,
-        conceptIds,
-        conceptIdsToIncludeDescendant,
-      );
-
+      const includedConceptIds =
+        await this.cachedbService.getConceptsAndDescendantIds(
+          conceptIds,
+          conceptIdsToIncludeDescendant,
+          datasetId,
+        );
       const mappedConceptsAndDescendantIds =
-        await this.getConceptsAndDescendantIds(
-          meilisearchApi,
-          conceptIndex,
-          conceptAncestorIndex,
+        await this.cachedbService.getConceptsAndDescendantIds(
           conceptIdsToIncludeMapped,
           conceptIdsToIncludeMappedAndDescendant,
+          datasetId,
         );
 
-      const mappedConceptIds = await meilisearchApi.getMapped(
-        mappedConceptsAndDescendantIds,
-        conceptRelationshipIndex,
-      );
-
+      const mappedConceptIds =
+        await this.cachedbService.getConceptRelationshipMapsTo(
+          mappedConceptsAndDescendantIds,
+          datasetId,
+        );
       mappedConceptIds.forEach((concept) => {
-        concept.hits.forEach((hit) => {
-          includedConceptIds.push(hit.concept_id_1);
-        });
+        includedConceptIds.push(concept.concept_id_1);
       });
 
       const uniqueConceptIds = Array.from(new Set(includedConceptIds)).sort();
@@ -228,45 +204,5 @@ export class ConceptSetService {
       this.logger.error(err);
       throw err;
     }
-  }
-
-  private async getConceptsAndDescendantIds(
-    meilisearchApi: MeilisearchAPI,
-    conceptIndex: string,
-    conceptAncestorIndex: string,
-    conceptIds: number[],
-    descendantIds: number[],
-  ) {
-    if (!conceptIds.length) {
-      return [];
-    }
-    const conceptsAndDescendantIds: number[] = [];
-
-    // Ensures included concept IDs are present in vocab schema and valid
-    const validConcepts = await meilisearchApi.getMultipleExactConcepts(
-      conceptIds,
-      conceptIndex,
-      false,
-    );
-    validConcepts.forEach((concept) => {
-      concept.hits.forEach((hit) => {
-        conceptsAndDescendantIds.push(hit.concept_id);
-      });
-    });
-
-    if (!descendantIds.length) {
-      return conceptsAndDescendantIds;
-    }
-
-    const conceptDescendants = await meilisearchApi.getDescendants(
-      descendantIds,
-      conceptAncestorIndex,
-    );
-    conceptDescendants.forEach((concept) => {
-      concept.hits.forEach((hit) => {
-        conceptsAndDescendantIds.push(hit.descendant_concept_id);
-      });
-    });
-    return conceptsAndDescendantIds;
   }
 }

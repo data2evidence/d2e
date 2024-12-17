@@ -115,12 +115,6 @@ export interface DatasetAttributesFlowRunDto {
   datasetSchemaMapping: any[];
 }
 
-export interface MeilisearchAddIndexFlowRunDto {
-  databaseCode: string;
-  vocabSchemaName: string;
-  tableName: string;
-}
-
 export enum FlowRunState {
   SCHEDULED = "Scheduled",
   LATE = "Late",
