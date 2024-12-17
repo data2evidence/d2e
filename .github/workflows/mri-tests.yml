@@ -30,18 +30,15 @@ jobs:
           initial-fetch-depth: 1
           filters: |
             src:
-              - "alp-libs/nodejs/**"
-              - "services/analytics-svc/**"
-              - "services/assignment-svc/**"
-              - "services/bookmark-svc/**"
-              - "services/cdw-svc/**"
-              - "services/mri-pa-config/**"
-              - "services/mri-pg-config/**"
-              - "services/ps-config/**"
-              - "services/query-gen-svc/**"
+              - "functions/_shared/alp-libs/nodejs/**"
+              - "functions/analytics-svc/**"
+              - "functions/bookmark-svc/**"
+              - "functions/cdw-svc/**"
+              - "functions/mri-pa-config/**"
+              - "functions/mri-pg-config/**"
+              - "functions/query-gen-svc/**"
               - "services/mri-db/**"
-              - "internal/build/**"
-              - ".github/workflows/mri-tests.yml"
+              - ".github/workflows/http-tests.yml"
 
   test-mri:
     # needs: [check_file_changes]

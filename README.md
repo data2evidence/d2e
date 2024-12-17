@@ -30,19 +30,15 @@ yarn init:logto
 yarn build:minerva
 ```
 
-## Start UI
-- Start ui
-```bash
-yarn start:ui --wait
-```
-notes:
-- invokes docker compose up
-- detects `../d2e-ui` branch or defaults to develop branch
-
 ## (Re)Start App
 - Docker compose up - approx 5 minutes
 ```bash
-yarn start:minerva --wait; sleep 60
+yarn start:minerva; sleep 60
+```
+
+## View Logs
+```bash
+yarn logs:minerva
 ```
 
 ## Data Load
