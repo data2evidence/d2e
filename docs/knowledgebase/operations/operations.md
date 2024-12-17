@@ -11,12 +11,12 @@ alias clean="yarn clean:minerva && yarn gen:dotenv"
 alias build="yarn build:minerva --progress=plain | tee ~/Downloads/build-$(date '+%Y%m%dT%H%M').log"
 ```
 ## start
-- start ui & start minerva with logging
+- start minerva
 ```
-alias start="yarn start:ui --remove-orphans --wait && yarn start:minerva --remove-orphans --force-recreate | tee ~/Downloads/start-$(date '+%Y%m%dT%H%M').log"
+alias start="yarn start:minerva --remove-orphans --force-recreate | tee ~/Downloads/start-$(date '+%Y%m%dT%H%M').log"
 ```
 ## stop
 - stop ui & minerva
 ```
-alias stop="yarn stop:ui && yarn stop:minerva"
+alias stop="yarn stop:minerva"
 ```
