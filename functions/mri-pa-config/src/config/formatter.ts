@@ -3,6 +3,7 @@ import { configTools } from "@alp/alp-config-utils";
 import * as pathlib from "path";
 import { env } from "../configs";
 import {configDefaultValues} from "../../cfg/pa/configDefaultValues.ts"
+import { cwd } from 'node:process';
 
 export class Formatter {
 
@@ -343,7 +344,7 @@ export class Formatter {
             // add Name to filtercard
             if (filtercard.obj.source === "patient") {
                 try {
-                    filtercard.obj.modelName = utils.TextLib.getText2(pathlib.join(`${process.cwd()}`, "i18n", "mri-pa-config.properties"),
+                    filtercard.obj.modelName = utils.TextLib.getText2(pathlib.join(`${cwd()}`, "i18n", "mri-pa-config.properties"),
                     "MRI_PA_SERVICES_FILTERCARD_TITLE_BASIC_DATA", language);
                 } catch (err) {
                     console.log("formatter.ts: getText2 Error:");

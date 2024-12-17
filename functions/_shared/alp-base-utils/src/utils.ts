@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { ILogger } from "./Logger";
 import { Logger } from "winston";
 import * as base64 from "base64";
+import { Buffer } from "node:buffer";
 
 const rm = new ResourceManager(
   path.join(`${Deno.cwd()}`, "i18n", "mri", "text.properties"),
