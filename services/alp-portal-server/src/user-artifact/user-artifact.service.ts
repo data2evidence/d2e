@@ -30,7 +30,8 @@ export class UserArtifactService {
     [ServiceName.NOTEBOOKS]: [],
     [ServiceName.PA_CONFIG]: [],
     [ServiceName.CDW_CONFIG]: [],
-    [ServiceName.BOOKMARKS]: []
+    [ServiceName.BOOKMARKS]: [],
+    [ServiceName.CONCEPT_SETS]: []
   }
 
   private sharedConditionMap = {
@@ -94,10 +95,14 @@ export class UserArtifactService {
 
     if (artifact) {
       const artifactArray = artifact.artifacts[serviceName]
-      if (this.isArtifactExists(artifactArray, serviceArtifact)) {
-        throw new ConflictException(`Artifact for ${serviceName} already exists`)
+      if (artifactArray) {
+        if (this.isArtifactExists(artifactArray, serviceArtifact)) {
+          throw new ConflictException(`Artifact for ${serviceName} already exists`)
+        }
+        artifactArray.push(serviceArtifact)
+      } else {
+        artifact.artifacts[serviceName] = [serviceArtifact]
       }
-      artifactArray.push(serviceArtifact)
     } else {
       artifact = this.userArtifactRepository.create(
         this.addOwner(

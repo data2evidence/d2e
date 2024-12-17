@@ -34,16 +34,14 @@ jobs:
           initial-fetch-depth: 1
           filters: |
             src:
-              - "alp-libs/nodejs/**"
-              - "services/analytics-svc/**"
-              - "services/bookmark-svc/**"
-              - "services/cdw-svc/**"
-              - "services/mri-pa-config/**"
-              - "services/mri-pg-config/**"
-              - "services/ps-config/**"
-              - "alp-data-node/query-gen-svc/**"
+              - "functions/_shared/alp-libs/nodejs/**"
+              - "functions/analytics-svc/**"
+              - "functions/bookmark-svc/**"
+              - "functions/cdw-svc/**"
+              - "functions/mri-pa-config/**"
+              - "functions/mri-pg-config/**"
+              - "functions/query-gen-svc/**"
               - "services/mri-db/**"
-              - "internal/build/initdb.js"
               - ".github/workflows/http-tests.yml"
 
   run-http-tests:
@@ -136,6 +134,7 @@ jobs:
 
       - name: Build system services
         run: |
+          grep _LIMIT .env.${ENV_TYPE}
           yarn build:minerva
 
       - name: Manipulate configuration
