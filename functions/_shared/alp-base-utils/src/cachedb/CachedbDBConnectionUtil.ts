@@ -111,6 +111,7 @@ export class CachedbDBConnectionUtil extends DBConnectionUtil.DBConnectionUtil {
           schemaName,
           vocabSchemaName,
           callback,
+          "duckdb" // TODO: Consume this from dataset metadata
         );
       } else {
         CachedbNodeHDBConnection.createConnection(

@@ -8,5 +8,6 @@ export enum ServiceName {
   NOTEBOOKS = 'notebooks',
   PA_CONFIG = 'pa_config',
   CDW_CONFIG = 'cdw_config',
-  BOOKMARKS = 'bookmarks'
+  BOOKMARKS = 'bookmarks',
+  CONCEPT_SETS = 'concept_sets'
 }

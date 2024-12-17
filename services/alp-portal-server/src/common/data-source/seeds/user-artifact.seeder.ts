@@ -33,7 +33,8 @@ export default class UserArtifactSeeder implements Seeder {
         analysis_flow_run: [],
         pa_config: [],
         cdw_config: [],
-        bookmarks: []
+        bookmarks: [],
+        concept_sets: []
       },
       createdBy: 'system',
       modifiedBy: 'system'
