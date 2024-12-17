@@ -77,14 +77,14 @@ x-envs:
           ],
           "route": "cohort"
         },
-        { 
+        {
           "enabled": false,
           "featureFlag": "cohorts",
-          "name": "Cohorts M", 
+          "name": "Cohorts M",
           "pluginPath": "plugins/Cohort/module",
-          "requiredRoles": [ 
-            "RESEARCHER" 
-          ], 
+          "requiredRoles": [
+            "RESEARCHER"
+          ],
           "route": "cohorts"
         },
         {
@@ -193,7 +193,7 @@ x-envs:
           "pluginPath": "plugins/Setup/OverviewDescription/module",
           "route": "overview-description"
         },
-        { 
+        {
           "description": "Upload / delete flows",
           "enabled": true,
           "name": "Plugins Table",
@@ -303,7 +303,7 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: trex.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/${DOCKER_TREX_REPO_NAME:-alp-data-node/trex}:${DOCKER_TREX_TAG_NAME:-develop}
+    image: alpcr.azurecr.io/d2e-trex-base:${DOCKER_TREX_TAG_NAME:-develop}
     pull_policy: always
     platform: linux/amd64
     logging:

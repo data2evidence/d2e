@@ -2,12 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { JwtPayload, decode } from 'jsonwebtoken';
 import { createLogger } from '../../logger';
-import dataSource from '../../db/data-source';
 import { ConceptSet } from '../../entity';
 import { randomUUID } from 'crypto';
 import { Request } from 'express';
 import { CachedbService } from '../cachedb/cachedb.service';
-import { Brackets } from 'typeorm';
+import { SystemPortalAPI } from 'src/api/portal-api';
 
 @Injectable()
 export class ConceptSetService {
@@ -17,6 +16,7 @@ export class ConceptSetService {
   constructor(
     @Inject(REQUEST) request: Request,
     private readonly cachedbService: CachedbService,
+    private readonly systemPortalApi: SystemPortalAPI,
   ) {
     const decodedToken = decode(
       request.headers['authorization'].replace(/bearer /i, ''),
@@ -25,47 +25,36 @@ export class ConceptSetService {
   }
 
   private addOwner<T>(object: T, isNewEntity = false) {
+    const currentDate = new Date().toISOString();
+
     if (isNewEntity) {
       return {
         ...object,
         createdBy: this.userId,
         modifiedBy: this.userId,
+        createdDate: currentDate,
+        modifiedDate: currentDate,
       };
     }
+
     return {
       ...object,
       modifiedBy: this.userId,
+      modifiedDate: currentDate,
     };
   }
 
-  async getDataSource() {
-    if (!dataSource.isInitialized) {
-      try {
-        await dataSource.initialize();
-      } catch (e) {
-        this.logger.error(`Datasource initialisation has failed: ${e}`);
-        throw e;
-      }
-    }
-    return dataSource;
-  }
-
   async getConceptSets() {
-    const dataSource = await this.getDataSource();
-    const conceptSets = await dataSource
-      .getRepository(ConceptSet)
-      .createQueryBuilder()
-      .where({ createdBy: this.userId })
-      .orWhere({ shared: true })
-      .orderBy('name')
-      .getMany();
-
-    return conceptSets;
+    try {
+      return await this.systemPortalApi.getUserConceptSets(this.userId);
+    } catch (error) {
+      this.logger.warn(`Error while getting concept sets: ${error}`);
+      throw error;
+    }
   }
 
   async createConceptSet(conceptSetData: ConceptSet) {
     try {
-      const dataSource = await this.getDataSource();
       const newConceptSet = this.addOwner(
         {
           id: randomUUID(),
@@ -73,14 +62,12 @@ export class ConceptSetService {
         },
         true,
       );
-      const conceptSet = await dataSource
-        .createQueryBuilder()
-        .insert()
-        .into(ConceptSet)
-        .values(newConceptSet)
-        .execute();
 
-      return conceptSet.identifiers[0].id;
+      await this.systemPortalApi.createConceptSet({
+        serviceArtifact: newConceptSet,
+      });
+
+      return newConceptSet.id;
     } catch (err) {
       this.logger.warn(`Creating new concept set has failed: ${err}`);
       throw err;
@@ -88,19 +75,9 @@ export class ConceptSetService {
   }
 
   async getConceptSet(conceptSetId: string, datasetId: string) {
-    const dataSource = await this.getDataSource();
-    const conceptSet = await dataSource
-      .getRepository(ConceptSet)
-      .createQueryBuilder('conceptSet')
-      .where('conceptSet.id = :id', { id: conceptSetId })
-      .andWhere(
-        new Brackets((qb) => {
-          qb.where('conceptSet.createdBy = :createdBy', {
-            createdBy: this.userId,
-          }).orWhere('conceptSet.shared = :shared', { shared: true });
-        }),
-      )
-      .getOne();
+    const conceptSet = await this.systemPortalApi.getConceptSetById(
+      conceptSetId,
+    );
 
     const conceptIds = conceptSet.concepts.map((c) => c.id);
 
@@ -132,27 +109,34 @@ export class ConceptSetService {
     conceptSetId: string,
     conceptSetData: Partial<ConceptSet>,
   ) {
-    const dataSource = await this.getDataSource();
-    await dataSource
-      .createQueryBuilder()
-      .update(ConceptSet)
-      .set(conceptSetData)
-      .where({ id: conceptSetId })
-      .andWhere({ createdBy: this.userId })
-      .execute();
-    return conceptSetId;
+    try {
+      const updatedConceptSet = this.addOwner(
+        {
+          id: conceptSetId,
+          ...conceptSetData,
+        },
+        false,
+      );
+      await this.systemPortalApi.updateConceptSet(updatedConceptSet);
+      return conceptSetId;
+    } catch (error) {
+      this.logger.warn(
+        `Error while updating concept set with id ${conceptSetId}: ${error}`,
+      );
+      throw error;
+    }
   }
 
   async removeConceptSet(conceptSetId: string) {
-    const dataSource = await this.getDataSource();
-    await dataSource
-      .createQueryBuilder()
-      .delete()
-      .from(ConceptSet)
-      .where({ id: conceptSetId })
-      .andWhere({ createdBy: this.userId })
-      .execute();
-    return conceptSetId;
+    try {
+      await this.systemPortalApi.deleteConceptSet(conceptSetId);
+      return conceptSetId;
+    } catch (error) {
+      this.logger.warn(
+        `Error while removing concept set with id ${conceptSetId}: ${error}`,
+      );
+      throw error;
+    }
   }
 
   async getIncludedConcepts(body: {

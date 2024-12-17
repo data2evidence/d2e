@@ -10,6 +10,11 @@ import { Agent } from 'https';
 import { env } from '../env';
 import { createLogger } from '../logger';
 
+import { ConceptSet } from 'src/entity';
+
+interface CreateConceptSetDto {
+  serviceArtifact: any;
+}
 @Injectable()
 export class SystemPortalAPI {
   private readonly token: string;
@@ -77,6 +82,78 @@ export class SystemPortalAPI {
       vocabSchemaName: dataset.vocabSchemaName,
       dialect: dataset.dialect,
     };
+  }
+
+  async getUserConceptSets(userId: string): Promise<any> {
+    this.logger.info('Portal request to get concept sets');
+    const errorMessage = 'Error while getting concept sets';
+    try {
+      const options = await this.createOptions();
+      const url = `${this.url}/user-artifact/${userId}/concept_sets/shared/list`;
+      const result = await axios.get(url, options);
+      return result.data;
+    } catch (error) {
+      this.logger.error(`${errorMessage}: ${error}`);
+      throw new InternalServerErrorException(errorMessage);
+    }
+  }
+
+  async getConceptSetById(id: string): Promise<ConceptSet> {
+    this.logger.info(`Portal request to get concept set for id ${id}`);
+    const errorMessage = `Error while getting concept set for id ${id}`;
+    try {
+      const options = await this.createOptions();
+      const url = `${this.url}/user-artifact/concept_sets/${id}`;
+      const result = await axios.get(url, options);
+      return result.data[0];
+    } catch (error) {
+      this.logger.error(`${errorMessage}: ${error}`);
+      throw new InternalServerErrorException(errorMessage);
+    }
+  }
+
+  async createConceptSet(input: CreateConceptSetDto): Promise<any> {
+    this.logger.info('Portal request to create concept set');
+    const errorMessage = 'Error while creating concept set';
+    try {
+      const options = await this.createOptions();
+      const url = `${this.url}/user-artifact/concept_sets`;
+      const result = await axios.post(url, input, options);
+      return result.data;
+    } catch (error) {
+      this.logger.error(`${errorMessage}: ${error}`);
+      throw new InternalServerErrorException(errorMessage);
+    }
+  }
+
+  async updateConceptSet(input: Record<string, any>): Promise<any> {
+    this.logger.info(
+      `Portal request to update concept set for id: ${input.id}`,
+    );
+    const errorMessage = `Error while updating concept set for id: ${input.id}`;
+    try {
+      const options = await this.createOptions();
+      const url = `${this.url}/user-artifact/concept_sets`;
+      const result = await axios.put(url, input, options);
+      return result.data;
+    } catch (error) {
+      this.logger.error(`${errorMessage}: ${error}`);
+      throw new InternalServerErrorException(errorMessage);
+    }
+  }
+
+  async deleteConceptSet(id: string): Promise<any> {
+    this.logger.info(`Portal request to delete concept set for id: ${id}`);
+    const errorMessage = `Error while deleting concept set for id: ${id}`;
+    try {
+      const options = await this.createOptions();
+      const url = `${this.url}/user-artifact/concept_sets/${id}`;
+      const result = await axios.delete(url, options);
+      return result.data;
+    } catch (error) {
+      this.logger.error(`${errorMessage}: ${error}`);
+      throw new InternalServerErrorException(errorMessage);
+    }
   }
 
   private async createOptions() {
