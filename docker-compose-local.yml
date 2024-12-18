@@ -72,10 +72,6 @@ services:
     environment:
       NODE_ENV: development
 
-  alp-minerva-meilisearch-svc:
-    ports:
-      - 41111:41111
-
   alp-minerva-pg-mgmt-init:
     build:
       context: services/alp-pg-management
