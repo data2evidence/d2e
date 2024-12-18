@@ -267,7 +267,7 @@ x-envs:
        "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/db-credentials",
        "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
        "usermgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/usermgmt/api",
-       "terminology": "http://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
+       "terminology": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/terminology",
        "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT:-1}:3001/oidc",
        "minio": "",
@@ -381,7 +381,7 @@ services:
               "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
               "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
               "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
-              "terminology": "http://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
+              "terminology": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/terminology",
               "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
               "idIssuerUrl": "http://alp-logto-${BASE_PORT:-1}:3001/oidc",
               "minio": "",
@@ -508,7 +508,8 @@ services:
             "GATEWAY_WO_PROTOCOL_FQDN": "${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}"
           },
           "alpdb": {},
-          "concept-mapping": {}
+          "concept-mapping": {},
+          "terminology-svc": {}
         }
       SERVICE_ROUTES: |-
         {

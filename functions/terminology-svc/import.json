@@ -1,0 +1,9 @@
+{
+    "imports": {
+        "zod": "npm:zod",
+        "yaml": "npm:yaml",
+        "@asteasolutions/zod-to-openapi": "npm:@asteasolutions/zod-to-openapi",
+        "fs": "node:fs",
+        "express": "npm:express"
+    }
+}

@@ -114,7 +114,9 @@
         },
         {
           "source": "/terminology",
-          "service": "terminology"
+          "function": "/terminology-svc",
+          "imports": "/terminology-svc/import.json",
+          "env": "terminology-svc"
         },
         {
           "source": "/pa-config-svc",
