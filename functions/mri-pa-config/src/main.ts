@@ -14,6 +14,7 @@ import express from "express";
 import { MRIConfig } from "./config/config";
 import { ConfigFacade as MriConfigFacade } from "./config/ConfigFacade";
 import { IRequest, IDBCredentialsType } from "./types";
+import { configDefaultValues } from "../cfg/pa/configDefaultValues.ts"
 import https from "https";
 import fs from "node:fs";
 const log = Logger.CreateLogger("mri-config-log");
@@ -182,7 +183,9 @@ function initRoutes() {
     });
   });
 
-  app.use("/pa-config-svc/db", express.static("./cfg/pa"));
+  app.use("/pa-config-svc/db", (req: IRequest, res) => {
+    res.json(configDefaultValues)
+  });
 
   app.use((err, req, res, next) => {
     if (err) {

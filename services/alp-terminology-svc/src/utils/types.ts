@@ -15,17 +15,24 @@ export interface IConcept {
   valid_start_date?: number;
   valid_end_date?: number;
 }
-export interface IMeilisearchConcept {
-  hits: IConcept[];
-  query: string;
-  processingTimeMs: number;
-  hitsPerPage: number;
-  page: number;
-  totalHits: number;
-  facetDistribution: {
-    [key: string]: {
-      [key: string]: number;
-    };
+export interface IDuckdbFacet {
+  conceptClassId: {
+    [key: string]: number;
+  };
+  domainId: {
+    [key: string]: number;
+  };
+  standardConcept: {
+    [key: string]: number;
+  };
+  vocabularyId: {
+    [key: string]: number;
+  };
+  validity: {
+    [key: string]: number;
+  };
+  concept: {
+    [key: string]: number;
   };
 }
 
@@ -43,43 +50,13 @@ export interface IRelationship {
   relationship_concept_id: number;
 }
 
-export interface IMeilisearchRelationship {
-  hits: IRelationship[];
-  query: string;
-  processingTimeMs: number;
-  hitsPerPage: number;
-  page: number;
-  totalHits: number;
-  facetDistribution: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
-}
-
 export interface IConceptAncestor {
-  meilisearch_id: number;
   ancestor_concept_id: number;
   descendant_concept_id: number;
   min_levels_of_separation: number;
   max_levels_of_separation: number;
 }
-export interface IMeilisearchGetDescendants {
-  hits: IConceptAncestor[];
-  query: string;
-  processingTimeMs: number;
-  hitsPerPage: number;
-  page: number;
-  totalHits: number;
-  facetDistribution: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
-}
-
 export interface IConceptRelationship {
-  meilisearch_id: number;
   concept_id_1: number;
   concept_id_2: number;
   relationship_id: string;
@@ -87,41 +64,11 @@ export interface IConceptRelationship {
   valid_end_date: number;
   invalid_reason: string;
 }
-export interface IMeilisearchGetMapped {
-  hits: IConceptRelationship[];
-  query: string;
-  processingTimeMs: number;
-  hitsPerPage: number;
-  page: number;
-  totalHits: number;
-  facetDistribution: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
-}
 
-export interface IMeilisearchFacet {
-  facetHits: { value: string; count: number };
-}
 export interface IConceptRecommended {
-  meilisearch_id: number;
   concept_id_1: number;
   concept_id_2: number;
   relationship_id: string;
-}
-export interface IMeilisearchGetConceptRecommended {
-  hits: IConceptRecommended[];
-  query: string;
-  processingTimeMs: number;
-  hitsPerPage: number;
-  page: number;
-  totalHits: number;
-  facetDistribution: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
 }
 export class FhirValueSet {
   resourceType: string;
@@ -224,14 +171,6 @@ export type Filters = {
   standardConcept: string[];
   vocabularyId: string[];
   validity: ('Valid' | 'Invalid')[];
-};
-
-export type HybridSearchConfig = {
-  id: number;
-  isEnabled: boolean;
-  semanticRatio: number;
-  source: string;
-  model: string;
 };
 
 export type ConceptHierarchyEdge = {

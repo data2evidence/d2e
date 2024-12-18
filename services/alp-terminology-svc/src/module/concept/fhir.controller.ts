@@ -1,15 +1,10 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ConceptService } from './concept.service';
 import { SupportedFhirVersion } from '../../utils/types';
-import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
-import { GetStandardConceptsDto as GetStandardConceptsDto } from './dto/concept.dto';
 
 @Controller()
 export class FhirController {
-  constructor(
-    private readonly appService: ConceptService,
-    private readonly hybridSearchConfigService: HybridSearchConfigService,
-  ) {}
+  constructor(private readonly appService: ConceptService) {}
 
   @Get(`${SupportedFhirVersion}/valueset/\\$expand`)
   async getConcepts(
@@ -24,7 +19,6 @@ export class FhirController {
       count,
       datasetId,
       code,
-      this.hybridSearchConfigService,
       JSON.parse(filter),
     );
   }
