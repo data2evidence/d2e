@@ -9,7 +9,7 @@ import { Connection as connLib } from "@alp/alp-base-utils";
 import ConnectionInterface = connLib.ConnectionInterface;
 import { Logger, utils} from "@alp/alp-base-utils";
 import {configDefaultValues} from "../../cfg/pa/configDefaultValues.ts"
-import * as pathlib from "path";
+import { dirname, normalize, join } from 'node:path';
 import { cwd } from 'node:process';
 
 import { AssignedConfigType, HPHConfigMetaType } from "../types";
@@ -17,6 +17,9 @@ import { AssignedConfigType, HPHConfigMetaType } from "../types";
 // import { Settings } from "../../qe/settings/Settings";
 // import { User } from "./utils/GetUser";
 import User = GetUser.User;
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const logger = Logger.CreateLogger("mri-config-log");
 
@@ -353,7 +356,7 @@ export class MRIConfig {
 
                     if (path === "patient") {
                         try {
-                            modelName = utils.TextLib.getText2(pathlib.join(`${cwd()}`, "i18n", "mri-pa-config.properties"),
+                            modelName = utils.TextLib.getText2(`${normalize(join(__dirname, "../../i18n/mri-pa-config.properties"))}`,
                             "MRI_PA_SERVICES_FILTERCARD_TITLE_BASIC_DATA", lang);
                         } catch (err) {
                             console.log("formatter.ts: getText2 Error:");
