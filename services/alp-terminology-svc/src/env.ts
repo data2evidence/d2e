@@ -6,7 +6,6 @@ const Env = z.object({
   FHIR_TERMINOLOGY_SVC__PORT: z.string(),
   NODE_ENV: z.string(),
   LOCAL_DEBUG: z.string(),
-  MEILI_MASTER_KEY: z.string(),
 
   PG__HOST: z.string(),
   PG__PORT: z.string().transform(Number),
@@ -31,13 +30,6 @@ const Env = z.object({
 
   CACHEDB__HOST: z.string(),
   CACHEDB__PORT: z.string().transform(Number),
-
-  USE_DUCKDB_FTS: z
-    .string()
-    .refine((value) => value === 'true' || value === 'false', {
-      message: 'Value must be a boolean',
-    })
-    .transform((value) => value === 'true'),
 
   SERVICE_ROUTES: z
     .string()

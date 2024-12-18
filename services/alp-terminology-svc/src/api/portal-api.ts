@@ -1,3 +1,6 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 import axios, { AxiosRequestConfig } from 'axios';
 import {
   BadRequestException,
@@ -6,22 +9,22 @@ import {
 import { Agent } from 'https';
 import { env } from '../env';
 import { createLogger } from '../logger';
+
 import { ConceptSet } from 'src/entity';
 
 interface CreateConceptSetDto {
   serviceArtifact: any;
 }
+@Injectable()
 export class SystemPortalAPI {
-  private readonly jwt: string;
+  private readonly token: string;
   private readonly url: string;
   private readonly httpsAgent: Agent;
   private readonly logger = createLogger(this.constructor.name);
 
-  constructor(jwt: string) {
-    this.jwt = jwt;
-    if (!jwt) {
-      throw new Error('No token passed for Portal API!');
-    }
+  constructor(@Inject(REQUEST) request: Request) {
+    this.token = request.headers['authorization'];
+
     if (env.SERVICE_ROUTES.portalServer) {
       this.url = env.SERVICE_ROUTES.portalServer;
       this.httpsAgent = new Agent({
@@ -158,7 +161,7 @@ export class SystemPortalAPI {
 
     options = {
       headers: {
-        Authorization: this.jwt,
+        Authorization: this.token,
       },
       httpsAgent: this.httpsAgent,
       timeout: 20000,
