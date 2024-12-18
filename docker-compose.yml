@@ -509,7 +509,18 @@ services:
           },
           "alpdb": {},
           "concept-mapping": {},
-          "terminology-svc": {}
+          "terminology-svc": {
+            "LOCAL_DEBUG": "false"
+            "NODE_ENV": "development"
+            "PG_MANAGE_PASSWORD": "${PG_ADMIN_PASSWORD}"
+            "PG_MANAGE_USER": "${PG_ADMIN_USER:-alp_pg_admin_user}"
+            "PG_PASSWORD": "${PG_WRITE_PASSWORD}"
+            "PG_SCHEMA": "terminology"
+            "PG_USER": "${PG_WRITE_USER:-alp_pg_write_user}"
+            "TERMINOLOGY_SVC__LOG_LEVEL": "info"
+            "TERMINOLOGY_SVC__PATH": "terminology"
+            "TERMINOLOGY_SVC__PORT": "41${BASE_PORT:-1}08"
+          }
         }
       SERVICE_ROUTES: |-
         {
