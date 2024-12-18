@@ -2,6 +2,7 @@
 import { NextFunction, Response, Request, Router } from "express";
 import { routeMap } from "./openApi.ts";
 import { conceptSetController as csc } from "./controllers/index.ts";
+import { SupportedFhirVersion } from "./types.ts";
 
 const router = Router();
 
@@ -26,7 +27,13 @@ const addRoute = (
 };
 
 /****************** START ROUTES ******************/
-addRoute("get:/users/{id}", () => {});
+addRoute("get:/concept/filter-options", csc.getConceptSets);
+addRoute("post:/concept/searchByName", csc.getConceptSets);
+addRoute("post:/concept/searchById", csc.getConceptSets);
+addRoute("post:/concept/searchByCode", csc.getConceptSets);
+addRoute("post:/concept/recommended/list", csc.getConceptSets);
+addRoute("get:/concept/hierarchy", csc.getConceptSets);
+addRoute("post:/concept/getStandardConcepts", csc.getConceptSets);
 
 addRoute("get:/concept-set", csc.getConceptSets);
 addRoute("post:/concept-set", csc.getConceptSets);
@@ -34,6 +41,16 @@ addRoute("get:/concept-set/{conceptSetId}", csc.getConceptSets);
 addRoute("put:/concept-set/{conceptSetId}", csc.getConceptSets);
 addRoute("delete:/concept-set/{conceptSetId}", csc.getConceptSets);
 addRoute("post:/concept-set/included-concepts", csc.getConceptSets);
+
+addRoute(
+  `get:/fhir/${SupportedFhirVersion}/valueset/\\$expand`,
+  csc.getConceptSets
+);
+addRoute(
+  `get:/fhir/${SupportedFhirVersion}/conceptmap/\\$translate`,
+  csc.getConceptSets
+);
+
 /****************** END ROUTES ******************/
 
 const remainingRouteMapKeys = Object.keys(_routeMap);
