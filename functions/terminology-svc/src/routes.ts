@@ -1,36 +1,52 @@
 // @ts-types="npm:@types/express"
 import { NextFunction, Response, Request, Router } from "express";
 import { routeMap } from "./openApi.ts";
-import { conceptSetController } from "./controllers/index.ts";
+import { conceptSetController as csc } from "./controllers/index.ts";
 
 const router = Router();
 
 const _routeMap = routeMap;
+const errors: string[] = [];
 
 const addRoute = (
   routeId: string,
   controller: (req: Request, res: Response, next: NextFunction) => void
 ) => {
-  const routeInfo = _routeMap[routeId];
+  const [first, ...rest] = routeId.split(":");
+  rest[0] = `/terminology${rest[0]}`;
+  const fullRouteId = [first, ...rest].join(":");
+  const routeInfo = _routeMap[fullRouteId];
   if (!routeInfo) {
-    throw new Error(`No route "${routeId}" in OpenApi definition.`);
+    errors.push(`No route "${fullRouteId}" in OpenApi definition.`);
+    return;
   }
   router[routeInfo.method](routeInfo.path, controller);
-  delete _routeMap[routeId];
+  console.info(`Route "${fullRouteId}" ready.`);
+  delete _routeMap[fullRouteId];
 };
 
 /****************** START ROUTES ******************/
 addRoute("get:/users/{id}", () => {});
-addRoute("get:/terminology/concept-set", conceptSetController.getConceptSets);
+
+addRoute("get:/concept-set", csc.getConceptSets);
+addRoute("post:/concept-set", csc.getConceptSets);
+addRoute("get:/concept-set/{conceptSetId}", csc.getConceptSets);
+addRoute("put:/concept-set/{conceptSetId}", csc.getConceptSets);
+addRoute("delete:/concept-set/{conceptSetId}", csc.getConceptSets);
+addRoute("post:/concept-set/included-concepts", csc.getConceptSets);
 /****************** END ROUTES ******************/
 
 const remainingRouteMapKeys = Object.keys(_routeMap);
 if (remainingRouteMapKeys.length > 0) {
-  console.warn(
+  errors.push(
     `No implementation found for the following: ${remainingRouteMapKeys.join(
       ", "
     )}`
   );
+}
+
+if (errors.length) {
+  throw new Error(errors.join("\n"));
 }
 
 export { router };
