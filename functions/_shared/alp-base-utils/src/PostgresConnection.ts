@@ -9,7 +9,7 @@ import type { Pool } from "pg";
 import { DBError } from "./DBError";
 import { CreateLogger } from "./Logger";
 import QueryStream from "pg-query-stream";
-import { translateHanaToPostgres } from "./helpers/hanaTranslation";
+import { translateHanaToPostgres, translateHanaToDuckdb } from "./helpers/hanaTranslation";
 import { EnvVarUtils } from "./EnvVarUtils";
 const logger = CreateLogger("Postgres Connection");
 
@@ -25,7 +25,7 @@ export class PostgresConnection implements ConnectionInterface {
     public conn: Pool,
     public schemaName,
     public vocabSchemaName,
-    public dialect = "POSTGRES",
+    public dialect = "postgresql",
   ) {}
 
   public static createConnection(
@@ -33,9 +33,10 @@ export class PostgresConnection implements ConnectionInterface {
     schemaName,
     vocabSchemaName = schemaName,
     callback,
+    dialect = "postgresql",
   ) {
     try {
-      const conn = new PostgresConnection(pool, schemaName, vocabSchemaName);
+      const conn = new PostgresConnection(pool, schemaName, vocabSchemaName, dialect);
       callback(null, conn);
     } catch (err) {
       callback(err, null);
@@ -120,7 +121,14 @@ export class PostgresConnection implements ConnectionInterface {
   }
 
   public parseSql(temp: string): string {
-    return translateHanaToPostgres(temp, this.schemaName, this.vocabSchemaName);
+    switch (this.dialect) {
+      case "postgresql":
+        return translateHanaToPostgres(temp, this.schemaName, this.vocabSchemaName);
+      case "duckdb":
+        return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName);
+      default:
+        throw new Error("Invalid Dialect")
+    }
   }
 
   public getTranslatedSql(sql: string, schemaName: string, parameters: ParameterInterface[]): string {

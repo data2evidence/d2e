@@ -9,6 +9,7 @@ services:
       - 9229:9229
     volumes:
       - ./functions:/usr/src/plugins/d2ef
+      # - ../trex/core:/usr/src/core # For debugging trex with local code
     environment:
       LOCAL_DEBUG: "true"
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
@@ -54,10 +55,6 @@ services:
       - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
     environment:
       NODE_ENV: development
-
-  alp-minerva-meilisearch-svc:
-    ports:
-      - 41111:41111
 
   alp-minerva-pg-mgmt-init:
     build:

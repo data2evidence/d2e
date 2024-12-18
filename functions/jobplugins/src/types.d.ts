@@ -92,7 +92,6 @@ interface CohortGeneratorFlowRunOptions {
   datasetId: string;
   description: string;
   owner: string;
-  token: string;
 }
 interface CohortJson {
   id: number;
@@ -112,15 +111,8 @@ export interface DBSvcFlowRunDto {
 }
 
 export interface DatasetAttributesFlowRunDto {
-  token: string;
   versionInfo: object;
   datasetSchemaMapping: any[];
-}
-
-export interface MeilisearchAddIndexFlowRunDto {
-  databaseCode: string;
-  vocabSchemaName: string;
-  tableName: string;
 }
 
 export enum FlowRunState {

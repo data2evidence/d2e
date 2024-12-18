@@ -1,6 +1,5 @@
-import { env, envVarUtils } from "./configs";
+import { env } from "./configs";
 import https from "https";
-import * as xsenv from "@sap/xsenv";
 import {
   getUser,
   Logger,
@@ -34,26 +33,13 @@ const noCache = (req, res, next) => {
 export const main = () => {
   const app = express();
   app.use("/check-liveness", healthCheckMiddleware);
-  const mountPath =
-    env.NODE_ENV === "production" ? env.ENV_MOUNT_PATH : "../../";
-  const envFile = `${mountPath}default-env.json`;
-  xsenv.loadEnv(envVarUtils.getEnvFile(envFile));
 
   const port = env.PORT || 41114;
 
   //Determine if this application is being run for Development / testing / Production
-  let analyticsCredential;
-  let configCredentials;
   let isTestEnvironment = false;
 
-  let cdwService = xsenv
-    .filterServices({ tag: "cdw" })
-    .map((db) => db.credentials);
-  if (env.USE_DUCKDB !== "true") {
-    cdwService = cdwService.filter((db) => db.dialect == "hana");
-    analyticsCredential = cdwService[0];
-  }
-  configCredentials = {
+  const configCredentials = {
     database: env.PG__DB_NAME,
     schema: env.PG_SCHEMA,
     dialect: env.PG__DIALECT,

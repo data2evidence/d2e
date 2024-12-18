@@ -9,6 +9,7 @@ import { Connection as connLib } from "@alp/alp-base-utils";
 import ConnectionInterface = connLib.ConnectionInterface;
 import { Logger, utils} from "@alp/alp-base-utils";
 import * as pathlib from "path";
+import { cwd } from 'node:process';
 
 import { AssignedConfigType, HPHConfigMetaType } from "../types";
 // import { FFHConfig } from "./utils/FFHConfig";
@@ -351,7 +352,7 @@ export class MRIConfig {
 
                     if (path === "patient") {
                         try {
-                            modelName = utils.TextLib.getText2(pathlib.join(`${process.cwd()}`, "i18n", "mri-pa-config.properties"),
+                            modelName = utils.TextLib.getText2(pathlib.join(`${cwd()}`, "i18n", "mri-pa-config.properties"),
                             "MRI_PA_SERVICES_FILTERCARD_TITLE_BASIC_DATA", lang);
                         } catch (err) {
                             console.log("formatter.ts: getText2 Error:");

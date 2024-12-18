@@ -6,13 +6,9 @@ import {
   ConceptHierarchyDto,
   GetStandardConceptsDto,
 } from './dto/concept.dto';
-import { HybridSearchConfigService } from '../hybrid-search-config/hybrid-search-config.service';
 @Controller()
 export class ConceptController {
-  constructor(
-    private readonly appService: ConceptService,
-    private readonly hybridSearchConfigService: HybridSearchConfigService,
-  ) {}
+  constructor(private readonly appService: ConceptService) {}
 
   @Get('filter-options')
   async getConceptFilterOptions(
@@ -92,9 +88,6 @@ export class ConceptController {
   async getStandardConcepts(
     @Body() getStandardConceptsDto: GetStandardConceptsDto,
   ): Promise<any> {
-    return await this.appService.getStandardConcepts(
-      getStandardConceptsDto,
-      this.hybridSearchConfigService,
-    );
+    return await this.appService.getStandardConcepts(getStandardConceptsDto);
   }
 }
