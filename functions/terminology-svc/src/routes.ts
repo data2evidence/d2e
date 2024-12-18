@@ -1,7 +1,7 @@
 // @ts-types="npm:@types/express"
 import { NextFunction, Response, Request, Router } from "express";
 import { routeMap } from "./openApi.ts";
-import { getRoot, validator } from "./requestValidators.ts";
+import { conceptSetController } from "./controllers/index.ts";
 
 const router = Router();
 
@@ -19,15 +19,10 @@ const addRoute = (
   delete _routeMap[routeId];
 };
 
+/****************** START ROUTES ******************/
 addRoute("get:/users/{id}", () => {});
-addRoute("get:/terminology/concept-set", (_req, res, next) => {
-  try {
-    // const { body } = validator(req, getRoot);
-    res.send("Welcome to the Concept Set API!");
-  } catch (e) {
-    next(e);
-  }
-});
+addRoute("get:/terminology/concept-set", conceptSetController.getConceptSets);
+/****************** END ROUTES ******************/
 
 const remainingRouteMapKeys = Object.keys(_routeMap);
 if (remainingRouteMapKeys.length > 0) {
