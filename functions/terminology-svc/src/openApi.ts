@@ -7,6 +7,16 @@ import * as yaml from "yaml";
 import * as fs from "fs";
 import * as schemas from "./validationSchemas.ts";
 
+type Method =
+  | "get"
+  | "post"
+  | "put"
+  | "delete"
+  | "patch"
+  | "head"
+  | "options"
+  | "trace";
+
 const registry = new OpenAPIRegistry();
 
 const UserIdSchema = registry.registerParameter("UserId", schemas.UserIdSchema);
@@ -29,6 +39,27 @@ registry.registerPath({
   responses: {
     200: {
       description: "Object with user data.",
+      content: {
+        "application/json": {
+          schema: schemas.UserSchema,
+        },
+      },
+    },
+    204: {
+      description: "No content - successful operation",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/terminology/concept-set",
+  description: "Get concept sets",
+  summary: "Get all concept sets",
+  security: [{ [bearerAuth.name]: [] }],
+  responses: {
+    200: {
+      description: "Object with concept set data.",
       content: {
         "application/json": {
           schema: schemas.UserSchema,
@@ -68,5 +99,28 @@ function writeDocumentation() {
   });
 }
 
-writeDocumentation();
+// writeDocumentation();
 // deno run --allow-env --allow-read --allow-write src/openApi.ts
+const routeMap = registry.definitions
+  .filter((v) => v.type === "route")
+  .map((v) => {
+    if (v.type === "route") {
+      return { method: v.route.method, path: v.route.path };
+    }
+  })
+  .reduce(
+    (map, obj) => {
+      if (!obj) return map;
+      const key = `${obj.method}:${obj.path}`;
+      map[key] = obj;
+      return map;
+    },
+    {} as {
+      [key: string]: {
+        method: Method;
+        path: string;
+      };
+    }
+  );
+
+export { routeMap, writeDocumentation };
