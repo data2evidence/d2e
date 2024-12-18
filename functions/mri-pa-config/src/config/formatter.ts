@@ -2,7 +2,7 @@ import { utils} from "@alp/alp-base-utils";
 import { configTools } from "@alp/alp-config-utils";
 import * as pathlib from "path";
 import { env } from "../configs";
-import {configDefaultValues} from "../../cfg/pa/configDefaultValues.ts"
+import { configDefaultValues } from "../../cfg/pa/configDefaultValues.ts"
 import { cwd } from 'node:process';
 
 export class Formatter {
@@ -435,11 +435,7 @@ export class Formatter {
         return paConfig;
     }
 
-    private _loadDefaultValues() {
-        //const filepath = "pa.configDefaultValues.json";
-        //const file = configTools.extractPackageAndFile(filepath);
-        //const defaultValues = configTools.loadFile(file[0], file[1], file[2], this.fs);
-        
+    private _loadDefaultValues() {        
         return configDefaultValues;
     }
 

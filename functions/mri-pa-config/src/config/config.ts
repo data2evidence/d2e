@@ -8,6 +8,7 @@ import {validator as validatorlib, configTools, GetUser, FFHConfig} from "@alp/a
 import { Connection as connLib } from "@alp/alp-base-utils";
 import ConnectionInterface = connLib.ConnectionInterface;
 import { Logger, utils} from "@alp/alp-base-utils";
+import {configDefaultValues} from "../../cfg/pa/configDefaultValues.ts"
 import * as pathlib from "path";
 import { cwd } from 'node:process';
 
@@ -774,10 +775,7 @@ export class MRIConfig {
     }
 
     private _loadDefaultValues() {
-        const filepath = "pa.configDefaultValues.json";
-        const file = configTools.extractPackageAndFile(filepath);
-        const defaultValues = configTools.loadFile(file[0], file[1], file[2], this.fs);
-        return defaultValues;
+        return configDefaultValues;
     }
 
     private async _getConfigById(configId, configVersion, callback) {
