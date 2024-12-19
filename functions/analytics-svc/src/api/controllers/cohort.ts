@@ -387,29 +387,10 @@ export async function deleteCohort(req: IMRIRequest, res: Response) {
     }
 }
 
-// Takes in req object to use pluginEndpoint get patient list, extract patient ids then build and return cohort object
+// Form and return cohort object
 async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
     try {
-        // Extract mriquery and use pluginEndpoint.retrieveData to get patient list
-        let mriquery = req.body.mriquery;
-        const { cohortDefinition, datasetId, pluginEndpoint } =
-            await createEndpointFromRequest(req);
-        pluginEndpoint.setRequest(req);
-        const pluginResult = (await pluginEndpoint.retrieveData({
-            cohortDefinition,
-            datasetId,
-            language,
-            dataFormat: "json",
-            requestQuery: mriquery,
-            patientId: null,
-            auditLogChannelName:
-                req.usage === "EXPORT" ? "MRI Pt. List Exp" : "MRI Pt. List",
-        })) as PluginEndpointResultType;
-
-        // Extract patient id from patient list
-        let patientIds = pluginResult.data[0].data.map(
-            (obj) => obj["patient.attributes.pid"]
-        );
+        const patientIds = []
 
         // Create cohort object
         let cohort = <CohortType>{
@@ -419,7 +400,8 @@ async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
             creationTimestamp: new Date(),
             modificationTimestamp: null,
             owner: req.body.owner,
-            definitionTypeConceptId: req.body.definitionTypeConceptId,
+            definitionTypeConceptId:
+            req.body.definitionTypeConceptId,
             subjectConceptId: req.body.subjectConceptId,
             syntax: req.body.syntax,
         };
