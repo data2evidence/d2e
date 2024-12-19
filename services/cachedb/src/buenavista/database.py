@@ -207,7 +207,7 @@ def get_db_connection(clients: CachedbDatabaseClients, dialect: str, connection_
 
 
 def _attach_direct_postgres_connection_for_duckdb(db: duckdb.DuckDBPyConnection, database_code: str, connection_type: ConnectionTypes):
-    duckdb_pg_connection_type = "(TYPE postgres, READ_ONLY)" if connection_type == ConnectionTypes.READ else "(TYPE postgres)"
+    duckdb_pg_connection_type = "(TYPE postgres)"
     print("Attaching postgres as direct connection ")
     conn_details = extract_db_credentials(database_code)
 
