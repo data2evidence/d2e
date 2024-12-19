@@ -31,11 +31,11 @@ export async function getCohortAnalyticsConnection(req: IMRIRequest) {
         let userObj: User;
         try {
             userObj = getUser(req);
-            logger.debug(
-                `req.headers: ${JSON.stringify(req.headers)}\n
-                    currentUser: ${JSON.stringify(userObj)}\n
-                    url is: ${req.url}`
-            );
+            // logger.debug(
+            //     `req.headers: ${JSON.stringify(req.headers)}\n
+            //         currentUser: ${JSON.stringify(userObj)}\n
+            //         url is: ${req.url}`
+            // );
         } catch (err) {
             logger.debug(`No user found in request:${err.stack}`);
         }
