@@ -21,7 +21,7 @@ export class CachedbController {
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-          res.status(400).json({ errors: errors.array() });
+          return res.status(400).json({ errors: errors.array() });
         }
         await this.createCachedbFileFlowRun(req, res);
       }
@@ -34,7 +34,7 @@ export class CachedbController {
       async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-          res.status(400).json({ errors: errors.array() });
+          return res.status(400).json({ errors: errors.array() });
         }
         await this.getFlowRunResults(req, res);
       }
