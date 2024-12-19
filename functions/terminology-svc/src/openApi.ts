@@ -27,29 +27,29 @@ const bearerAuth = registry.registerComponent("securitySchemes", "bearerAuth", {
   bearerFormat: "JWT",
 });
 
-registry.registerPath({
-  method: "get",
-  path: "/users/{id}",
-  description: "Get user data by its id",
-  summary: "Get a single user",
-  security: [{ [bearerAuth.name]: [] }],
-  request: {
-    params: z.object({ id: UserIdSchema }),
-  },
-  responses: {
-    200: {
-      description: "Object with user data.",
-      content: {
-        "application/json": {
-          schema: schemas.UserSchema,
-        },
-      },
-    },
-    204: {
-      description: "No content - successful operation",
-    },
-  },
-});
+// registry.registerPath({
+//   method: "get",
+//   path: "/users/{id}",
+//   description: "Get user data by its id",
+//   summary: "Get a single user",
+//   security: [{ [bearerAuth.name]: [] }],
+//   request: {
+//     params: z.object({ id: UserIdSchema }),
+//   },
+//   responses: {
+//     200: {
+//       description: "Object with user data.",
+//       content: {
+//         "application/json": {
+//           schema: schemas.UserSchema,
+//         },
+//       },
+//     },
+//     204: {
+//       description: "No content - successful operation",
+//     },
+//   },
+// });
 
 registry.registerPath({
   method: "get",

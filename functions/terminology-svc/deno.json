@@ -1,9 +1,9 @@
 {
-    "importMap": "./import.json",
-    "compilerOptions": {
-        "types": [
-            "npm:@types/express"
-        ],
-        "noImplicitAny": true
-    }
+  "importMap": "./import.json",
+  "compilerOptions": {
+    "types": [
+      "npm:@types/express"
+    ],
+    "noImplicitAny": true
+  }
 }

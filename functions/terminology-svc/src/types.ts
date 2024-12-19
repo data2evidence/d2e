@@ -70,37 +70,37 @@ export interface IConceptRecommended {
   concept_id_2: number;
   relationship_id: string;
 }
-export class FhirValueSet {
-  resourceType: string;
-  url?: string;
-  version?: string;
-  name?: string;
-  title?: string;
-  status?: string;
-  experimental?: string;
-  date?: string;
-  publisher?: string;
-  contact?: string;
-  description?: string;
-  useContext?: string;
-  jurisdiction?: string;
-  immutable?: string;
-  purpose?: string;
-  copyright?: string;
-  copyrightLabel?: string;
-  approvalDate?: string;
-  lastReviewDate?: string;
-  effectivePeriod?: string;
-  topic?: string;
-  author?: string;
-  editor?: string;
-  reviewer?: string;
-  endorser?: string;
-  relatedArtifact?: string;
-  compose?: string;
-  expansion: FhirValueSetExpansion;
-  scope?: string;
-}
+// export class FhirValueSet {
+//   resourceType: string;
+//   url?: string;
+//   version?: string;
+//   name?: string;
+//   title?: string;
+//   status?: string;
+//   experimental?: string;
+//   date?: string;
+//   publisher?: string;
+//   contact?: string;
+//   description?: string;
+//   useContext?: string;
+//   jurisdiction?: string;
+//   immutable?: string;
+//   purpose?: string;
+//   copyright?: string;
+//   copyrightLabel?: string;
+//   approvalDate?: string;
+//   lastReviewDate?: string;
+//   effectivePeriod?: string;
+//   topic?: string;
+//   author?: string;
+//   editor?: string;
+//   reviewer?: string;
+//   endorser?: string;
+//   relatedArtifact?: string;
+//   compose?: string;
+//   expansion: FhirValueSetExpansion;
+//   scope?: string;
+// }
 
 export type FhirValueSetExpansion = {
   id?: string;
@@ -134,43 +134,43 @@ export type FhirValueSetExpansionContainsWithExt = {
   validity: string;
 };
 
-export const SupportedFhirVersion = '4_0_0';
+export const SupportedFhirVersion = "4_0_0";
 
 export const FhirResourceType = {
-  valueset: 'ValueSet',
-  conceptmap: 'ConceptMap',
+  valueset: "ValueSet",
+  conceptmap: "ConceptMap",
 };
 
-export type FhirConceptMapElementTarget = {
-  code: number;
-  display: string;
-  equivalence: string;
-  vocabularyId: string;
-};
-export type FhirConceptMapElementWithExt = {
-  code: string;
-  display: string;
-  valueSet: FhirValueSet;
-  target: FhirConceptMapElementTarget[];
-};
+// export type FhirConceptMapElementTarget = {
+//   code: number;
+//   display: string;
+//   equivalence: string;
+//   vocabularyId: string;
+// };
+// export type FhirConceptMapElementWithExt = {
+//   code: string;
+//   display: string;
+//   valueSet: FhirValueSet;
+//   target: FhirConceptMapElementTarget[];
+// };
 
-export type FhirConceptMapGroup = {
-  source: string;
-  target: string;
-  element: FhirConceptMapElementWithExt[];
-};
+// export type FhirConceptMapGroup = {
+//   source: string;
+//   target: string;
+//   element: FhirConceptMapElementWithExt[];
+// };
 
-export type FhirConceptMap = {
-  resourceType: string;
-  group: FhirConceptMapGroup[];
-};
+// export type FhirConceptMap = {
+//   resourceType: string;
+//   group: FhirConceptMapGroup[];
+// };
 
 export type Filters = {
   conceptClassId: string[];
   domainId: string[];
   standardConcept: string[];
   vocabularyId: string[];
-  validity: ('Valid' | 'Invalid')[];
+  validity: ("Valid" | "Invalid")[];
 };
 
 export type ConceptHierarchyEdge = {

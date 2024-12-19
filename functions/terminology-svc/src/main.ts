@@ -1,6 +1,7 @@
 // @ts-types="npm:@types/express"
 import express, { NextFunction, Response, Request } from "express";
 import { z } from "zod";
+import "./env.ts"; // Ensure env var validation is done on start
 import { router } from "./routes.ts";
 
 const main = () => {

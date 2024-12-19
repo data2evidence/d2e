@@ -4,6 +4,9 @@
         "yaml": "npm:yaml",
         "@asteasolutions/zod-to-openapi": "npm:@asteasolutions/zod-to-openapi",
         "fs": "node:fs",
-        "express": "npm:express"
+        "https": "node:https",
+        "express": "npm:express",
+        "axios": "npm:axios",
+        "jsonwebtoken": "npm:jsonwebtoken"
     }
 }
