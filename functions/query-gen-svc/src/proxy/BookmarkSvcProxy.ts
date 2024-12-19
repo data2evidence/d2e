@@ -75,10 +75,7 @@ export async function loadBookmarks(
         default:
             console.log("Invalid request!");
             throw new Error("Invalid request!");
-            break;
     }
-
-    console.log(`options12312 ${JSON.stringify(options)}`)
 
     return new Promise((resolve, reject) => {
         const post_req = protocolLib
@@ -95,7 +92,6 @@ export async function loadBookmarks(
                             response.statusCode >= 200 &&
                             response.statusCode <= 399
                         ) {
-                            console.log(`body122 ${body}`)
                             resolve(JSON.parse(body));
                         } else {
                             reject(body);
