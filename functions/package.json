@@ -32,6 +32,7 @@
         {
           "source": "/jobplugins",
           "function": "/jobplugins",
+          "imports": "/jobplugins/import.json",
           "env": "jobplugins"
         },
         {
