@@ -1,9 +1,9 @@
-import { ConceptSetConcept } from '../utils/types';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { ConceptSetConcept } from "../types.ts";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
-@Entity('concept_set')
+@Entity("concept_set")
 export class ConceptSet {
-  @PrimaryColumn({ type: 'uuid' })
+  @PrimaryColumn({ type: "uuid" })
   id: string;
 
   @Column({ unique: true })
@@ -12,29 +12,29 @@ export class ConceptSet {
   @Column({ nullable: true, default: false })
   shared: boolean;
 
-  @Column({ type: 'jsonb', array: false })
+  @Column({ type: "jsonb", array: false })
   concepts: ConceptSetConcept[];
 
-  @Column({ name: 'created_by' })
+  @Column({ name: "created_by" })
   createdBy!: string;
 
   @Column({
-    name: 'created_date',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
+    name: "created_date",
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
   })
   createdDate!: Date;
 
-  @Column({ name: 'modified_by' })
+  @Column({ name: "modified_by" })
   modifiedBy!: string;
 
   @Column({
-    name: 'modified_date',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
+    name: "modified_date",
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
   })
   modifiedDate!: Date;
 
-  @Column({ name: 'user_name' })
+  @Column({ name: "user_name" })
   userName: string;
 }
