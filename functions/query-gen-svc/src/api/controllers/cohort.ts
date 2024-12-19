@@ -97,8 +97,8 @@ export async function generateQuery(req: IMRIRequest, res, next) {
         if (config.panelOptions.cohortEntryExit) {
             queryString = `
                 INSERT
-                    INTO
-                    $$SCHEMA$$.COHORT (COHORT_DEFINITION_ID,
+                    INTO 
+                    ${placeholderMap["@COHORT"]} (COHORT_DEFINITION_ID,
                     SUBJECT_ID,
                     COHORT_START_DATE,
                     COHORT_END_DATE)
