@@ -186,3 +186,8 @@ export interface DataCharacterizationFlowRunDto {
   releaseId?: string;
   excludeAnalysisIds?: string;
 }
+
+export interface ICreateCachedbFileFlowRunDto {
+  databaseCode: string;
+  schemaName: string;
+}
