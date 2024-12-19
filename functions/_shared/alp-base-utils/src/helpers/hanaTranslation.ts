@@ -244,6 +244,5 @@ export const translateHanaToDuckdb = (
       return match;
     });
   }
-  console.log(`intemp123 ${temp}`)
   return temp;
 };
