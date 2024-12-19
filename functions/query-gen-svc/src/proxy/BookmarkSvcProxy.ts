@@ -6,6 +6,8 @@ import * as dotenv from "dotenv";
 import { URL } from "url";
 import { IMRIRequest, BookmarkCMDType } from "../types";
 import { env } from "../env";
+import axios, { AxiosRequestConfig } from "axios";
+
 dotenv.config();
 const log = Logger.CreateLogger();
 
@@ -26,7 +28,7 @@ export async function loadBookmarks(
         protocolLib = http;
     } else {
         urlParams = new URL(env.SERVICE_ROUTES.bookmark);
-        protocolLib = https;
+        protocolLib = http;
     }
 
     hostname = urlParams.hostname;
@@ -34,7 +36,20 @@ export async function loadBookmarks(
     protocol = urlParams.protocol;
     const sourceOrigin = req.headers["x-source-origin"];
 
-    let options: https.RequestOptions = {
+    const username_response = await axios.get(
+        `${new URL(env.SERVICE_ROUTES.usermgmt)}/me`,
+        {
+            headers: {
+                Authorization: req.headers.authorization,
+            },
+        }
+    );
+
+    if (!username_response.data || !username_response.data.username) {
+        throw new Error("Invalid username")
+    }
+
+    let options: http.RequestOptions = {
         hostname,
         port,
         protocol,
@@ -53,18 +68,17 @@ export async function loadBookmarks(
         case BookmarkCMDType.LOAD_BOOKMARKS:
             const bookmarkIds = queryParams.bmkIds;
             const paConfigId = queryParams.configId;
-            const fullPath =
-                "/analytics-svc/api/services/bookmark/bookmarkIds?ids=" +
-                bookmarkIds +
-                "&paConfigId=" +
-                paConfigId;
+            const fullPath = `/analytics-svc/api/services/bookmark/bookmarkIds?ids=${bookmarkIds}&paConfigId=${paConfigId}&username=${username_response.data.username}`;
             options.path = fullPath;
             options.method = "GET";
             break;
         default:
-            console.log("shit");
+            console.log("Invalid request!");
+            throw new Error("Invalid request!");
             break;
     }
+
+    console.log(`options12312 ${JSON.stringify(options)}`)
 
     return new Promise((resolve, reject) => {
         const post_req = protocolLib
@@ -81,6 +95,7 @@ export async function loadBookmarks(
                             response.statusCode >= 200 &&
                             response.statusCode <= 399
                         ) {
+                            console.log(`body122 ${body}`)
                             resolve(JSON.parse(body));
                         } else {
                             reject(body);

@@ -118,10 +118,13 @@ export async function loadSingleBookmark(userName, bookmarkId, paConfigId, token
   try {
     const portalAPI = new PortalAPI(token)
     const result = await portalAPI.getBookmarkById(bookmarkId)
+    console.log(`bmk1 ${JSON.stringify(result)}`)
     const formattedRows = formatUserArtifactData(paConfigId, result, userName)
+    console.log(`bmk2 ${JSON.stringify(formattedRows)} ${paConfigId} ${userName}`)
     const returnValue = _convertBookmarkIFR({
       bookmarks: formattedRows,
     })
+    console.log(`bmk3 ${JSON.stringify(returnValue)}`)
     if (callback) {
       callback(null, _convertBookmarkIFR(returnValue))
     } else {
@@ -325,11 +328,13 @@ export async function _updateBookmark( //TODO remove user input
  * @returns array of bookmarks
  */
 export async function loadBookmarks({
+  userName,
   bookmarkIds,
   paConfigId,
   token,
   callback,
 }: {
+  userName: string
   bookmarkIds: string[]
   paConfigId: string
   token: string
@@ -337,10 +342,11 @@ export async function loadBookmarks({
 }) {
   const list = await Promise.all(
     bookmarkIds.map(bookmarkid =>
-      loadSingleBookmark(bookmarkid, paConfigId, token, null).then(result => result.bookmarks[0])
+      loadSingleBookmark(userName, bookmarkid, paConfigId, token, null).then(result => result.bookmarks[0])
     )
   )
     .then(data => {
+      console.log(`data45rfasdfas ${JSON.stringify(data)}`)
       callback(null, data)
     })
     .catch(err => {
@@ -371,6 +377,7 @@ export async function queryBookmarks(
   callback: CallBackInterface
 ) {
   try {
+    console.log(`requestParameters234234 ${JSON.stringify(requestParameters)}`)
     let cmd: string = requestParameters.cmd
     let bookmark: string = requestParameters.bookmark
     let bookmarkId: string = requestParameters.bmkId
@@ -418,6 +425,7 @@ export async function queryBookmarks(
         break
       case 'loadByIDs':
         loadBookmarks({
+          userName,
           bookmarkIds,
           paConfigId,
           token,
