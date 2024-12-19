@@ -201,6 +201,15 @@ export const translateHanaToDuckdb = (
   vocabSchemaName: string,
   parameters?: ParameterInterface[],
 ): string => {
+  temp = temp.replace(
+      /\$\$SCHEMA\$\$.COHORT_DEFINITION/g,
+      `direct_db_conn.${schemaName}.COHORT_DEFINITION`
+    );
+  temp = temp.replace(
+      /\$\$SCHEMA\$\$.COHORT/g,
+      `direct_db_conn.${schemaName}.COHORT`
+  );
+
   temp = hanaCommonTranslation(temp, schemaName, vocabSchemaName);
   
   temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, `direct_db_conn.${schemaName}.`); // Used when using cachedb connection connecting to duckdb, but additionally requires direct connection to database schema
@@ -235,6 +244,5 @@ export const translateHanaToDuckdb = (
       return match;
     });
   }
-
   return temp;
 };

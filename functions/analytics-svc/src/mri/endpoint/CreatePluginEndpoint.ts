@@ -17,7 +17,7 @@ export async function createEndpointFromRequest(req: IMRIRequest): Promise<{
     const user = getUser(req);
     const lang = user.lang;
     let body: PluginEndpointRequestType = {
-        ...convertZlibBase64ToJson(req.query.mriquery),
+        ...convertZlibBase64ToJson(req.query.mriquery || req.body.mriquery),
     };
 
     if (!body.cohortDefinition.configData) {
