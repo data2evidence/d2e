@@ -32,6 +32,7 @@
         {
           "source": "/jobplugins",
           "function": "/jobplugins",
+          "imports": "/jobplugins/import.json",
           "env": "jobplugins"
         },
         {
@@ -115,10 +116,6 @@
         {
           "source": "/terminology",
           "service": "terminology"
-        },
-        {
-          "source": "/meilisearch-svc",
-          "service": "meilisearch"
         },
         {
           "source": "/pa-config-svc",
@@ -295,7 +292,6 @@
           "dataflowmgmt.dqd.dataQuality.flowRun.add",
           "dataflowmgmt.dqd.dataCharacterization.flowRun.results.drilldown.read",
           "dataflowmgmt.dqd.dataCharacterization.flowRun.add",
-          "dataflowmgmt.meilisearch.flowRun.add",
           "dataflowmgmt.dbSvc.flowRun.add",
           "dbSvc.schema.create",
           "dbSvc.snapshot.create",
@@ -309,9 +305,6 @@
           "dbSvc.schema.snapshot.metadata.read",
           "dbSvc.snapshot.parquet.create",
           "dbSvc.schema.delete",
-          "meilisearchSvc.index.add",
-          "meilisearchSvc.index.setting.update",
-          "meilisearchSvc.document.add",
           "gateway.dashboardGate.register",
           "gateway.dataset.dashboards.read",
           "gateway.dataset.cohorts.read",
@@ -321,8 +314,6 @@
           "gateway.db.vocabSchemas.read",
           "gateway.db.dataset.versionInfo.read",
           "gateway.db.schema.update",
-          "gateway.terminology.hybridSearchConfig.read",
-          "gateway.terminology.hybridSearchConfig.update",
           "gateway.terminology.concept.getStandardConcepts.read",
           "dataflowmgmt.analysisflow.read",
           "dataflowmgmt.analysisflow.add",
@@ -384,7 +375,6 @@
           "gateway.terminology.concept.recommended.read",
           "gateway.terminology.concept.hierarchy.read",
           "gateway.terminology.fhir.read",
-          "gateway.terminology.hybridSearchConfig.read",
           "dataflowmgmt.analysisflow.read",
           "dataflowmgmt.analysisflow.add",
           "dataflowmgmt.analysisflow.delete",
@@ -404,9 +394,6 @@
         ],
         "IDP_ALP_DATA_CLIENT_ID": [
           "portal.dataset.read",
-          "meilisearchSvc.index.add",
-          "meilisearchSvc.index.setting.update",
-          "meilisearchSvc.document.add",
           "gateway.fhir.create"
         ]
       },
@@ -478,12 +465,17 @@
           "path": "^/pa-config-svc/enduser(.*)",
           "scopes": [
             "PAConfig.svc",
-            "PAConfig.svc/read",
-            "PA.Score.svc"
+            "PAConfig.svc/read"
           ]
         },
         {
           "path": "^/pa-config-svc/services/(.*)",
+          "scopes": [
+            "PAConfig.svc"
+          ]
+        },
+        {
+          "path": "^/pa-config-svc/db/(.*)",
           "scopes": [
             "PAConfig.svc"
           ]
@@ -1290,24 +1282,6 @@
           ]
         },
         {
-          "path": "^/terminology/hybrid-search-config",
-          "scopes": [
-            "gateway.terminology.hybridSearchConfig.read"
-          ],
-          "httpMethods": [
-            "GET"
-          ]
-        },
-        {
-          "path": "^/terminology/hybrid-search-config",
-          "scopes": [
-            "gateway.terminology.hybridSearchConfig.update"
-          ],
-          "httpMethods": [
-            "POST"
-          ]
-        },
-        {
           "path": "^/dataflow-mgmt/dataflow/(.*)",
           "scopes": [
             "dataflowmgmt.dataflow.read"
@@ -1642,15 +1616,6 @@
           ]
         },
         {
-          "path": "^/dataflow-mgmt/meilisearch/index/flow-run",
-          "scopes": [
-            "dataflowmgmt.meilisearch.flowRun.add"
-          ],
-          "httpMethods": [
-            "POST"
-          ]
-        },
-        {
           "path": "^/dataflow-mgmt/db-svc/run",
           "scopes": [
             "dataflowmgmt.dbSvc.flowRun.add"
@@ -1837,43 +1802,6 @@
           ],
           "httpMethods": [
             "GET"
-          ]
-        },
-        {
-          "path": "^/meilisearch-svc/indexes",
-          "scopes": [
-            "meilisearchSvc.index.add"
-          ],
-          "httpMethods": [
-            "POST"
-          ]
-        },
-        {
-          "path": "^/meilisearch-svc/indexes/[a-zA-Z0-9_-]+/settings(.*)",
-          "scopes": [
-            "meilisearchSvc.index.setting.update"
-          ],
-          "httpMethods": [
-            "PATCH"
-          ]
-        },
-        {
-          "path": "^/meilisearch-svc/indexes/[a-zA-Z0-9_-]+/documents(.*)",
-          "scopes": [
-            "meilisearchSvc.document.add"
-          ],
-          "httpMethods": [
-            "POST",
-            "PUT"
-          ]
-        },
-        {
-          "path": "^/meilisearch-svc/indexes/[a-zA-Z0-9_-]+/settings/synonyms",
-          "scopes": [
-            "meilisearchSvc.document.add"
-          ],
-          "httpMethods": [
-            "PUT"
           ]
         },
         {

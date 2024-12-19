@@ -52,7 +52,7 @@ For `D2E_CPU_LIMIT` and `D2E_MEMORY_LIMIT`, 70% of the system's available resour
 - To change this default configuration, Add this environment variable into the `.env.local` file:
   ```
   # For example to change it to use 80% of the system's resources instead
-  D2E_RESOURCE_LIMIT=80/100
+  D2E_RESOURCE_LIMIT=0.8
   ```
 
 For `D2E_SWAP_LIMIT`, 4 times the value provided by D2E_MEMORY_LIMIT will be used by default.
