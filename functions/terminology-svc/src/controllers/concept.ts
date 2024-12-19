@@ -36,7 +36,7 @@ export const getConceptFilterOptions = async (
         validity,
       }
     );
-    res.send(filterOptions);
+    res.send({ filterOptions });
   } catch (e) {
     next(e);
   }

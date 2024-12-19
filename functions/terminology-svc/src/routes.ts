@@ -20,10 +20,13 @@ const addRoute = (
   rest[0] = `/terminology${rest[0]}`;
   const fullRouteId = [first, ...rest].join(":");
   const routeInfo = _routeMap[fullRouteId];
+
   if (!routeInfo) {
     errors.push(`No route "${fullRouteId}" in OpenApi definition.`);
     return;
   }
+  // i.e. $expand needs to be \\$expand for route regex to work
+  routeInfo.path = routeInfo.path.replaceAll("$", "\\$");
   router[routeInfo.method](routeInfo.path, controller);
   console.info(`Route "${fullRouteId}" ready.`);
   delete _routeMap[fullRouteId];
@@ -45,10 +48,7 @@ addRoute("get:/concept-set", csc.getConceptSets);
 // addRoute("delete:/concept-set/{conceptSetId}", csc.getConceptSets);
 // addRoute("post:/concept-set/included-concepts", csc.getConceptSets);
 
-// addRoute(
-//   `get:/fhir/${SupportedFhirVersion}/valueset/\\$expand`,
-//   csc.getConceptSets
-// );
+addRoute(`get:/fhir/4_0_0/valueset/$expand`, csc.getConceptSets);
 // addRoute(
 //   `get:/fhir/${SupportedFhirVersion}/conceptmap/\\$translate`,
 //   csc.getConceptSets
