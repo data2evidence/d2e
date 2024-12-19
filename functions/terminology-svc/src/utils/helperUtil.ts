@@ -1,20 +1,20 @@
-import { FhirConceptMapElementTarget } from "./types";
+import { FhirConceptMapElementTarget } from "../types.ts";
 
 export function groupBy(
   objectArray: FhirConceptMapElementTarget[],
-  property: string,
+  property: string
 ) {
   return objectArray.reduce(function (
     acc: {
       [key: string]: FhirConceptMapElementTarget[];
     },
-    obj,
+    obj
   ) {
     if (
-      property !== 'code' &&
-      property !== 'display' &&
-      property !== 'equivalence' &&
-      property !== 'vocabularyId'
+      property !== "code" &&
+      property !== "display" &&
+      property !== "equivalence" &&
+      property !== "vocabularyId"
     ) {
       return acc;
     }

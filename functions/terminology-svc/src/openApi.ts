@@ -53,6 +53,27 @@ const bearerAuth = registry.registerComponent("securitySchemes", "bearerAuth", {
 
 registry.registerPath({
   method: "get",
+  path: "/terminology/concept/filter-options",
+  description: "Get concept sets",
+  summary: "Get all concept sets",
+  security: [{ [bearerAuth.name]: [] }],
+  responses: {
+    200: {
+      description: "Object with concept set data.",
+      content: {
+        "application/json": {
+          schema: schemas.UserSchema,
+        },
+      },
+    },
+    204: {
+      description: "No content - successful operation",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
   path: "/terminology/concept-set",
   description: "Get concept sets",
   summary: "Get all concept sets",

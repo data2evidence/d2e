@@ -1,7 +1,10 @@
 // @ts-types="npm:@types/express"
 import { NextFunction, Response, Request, Router } from "express";
 import { routeMap } from "./openApi.ts";
-import { conceptSetController as csc } from "./controllers/index.ts";
+import {
+  conceptSetController as csc,
+  conceptController as cc,
+} from "./controllers/index.ts";
 import { SupportedFhirVersion } from "./types.ts";
 
 const router = Router();
@@ -27,7 +30,7 @@ const addRoute = (
 };
 
 /****************** START ROUTES ******************/
-// addRoute("get:/concept/filter-options", csc.getConceptSets);
+addRoute("get:/concept/filter-options", cc.getConceptFilterOptions);
 // addRoute("post:/concept/searchByName", csc.getConceptSets);
 // addRoute("post:/concept/searchById", csc.getConceptSets);
 // addRoute("post:/concept/searchByCode", csc.getConceptSets);

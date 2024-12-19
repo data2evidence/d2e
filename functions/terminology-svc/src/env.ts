@@ -27,8 +27,8 @@ const envSchema = z.object({
   // TLS__INTERNAL__CRT: z.string(),
   // TLS__INTERNAL__CA_CRT: z.string(),
 
-  // CACHEDB__HOST: z.string(),
-  // CACHEDB__PORT: z.string().transform(Number),
+  CACHEDB__HOST: z.string(),
+  CACHEDB__PORT: z.string().transform(Number),
 
   SERVICE_ROUTES: z
     .string()
