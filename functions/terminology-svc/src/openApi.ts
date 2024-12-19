@@ -141,8 +141,6 @@ function writeDocumentation() {
   });
 }
 
-// writeDocumentation();
-// deno run --allow-env --allow-read --allow-write src/openApi.ts
 const routeMap = registry.definitions
   .filter((v) => v.type === "route")
   .map((v) => {
