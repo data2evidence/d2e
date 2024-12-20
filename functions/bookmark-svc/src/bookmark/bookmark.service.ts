@@ -325,11 +325,13 @@ export async function _updateBookmark( //TODO remove user input
  * @returns array of bookmarks
  */
 export async function loadBookmarks({
+  userName,
   bookmarkIds,
   paConfigId,
   token,
   callback,
 }: {
+  userName: string
   bookmarkIds: string[]
   paConfigId: string
   token: string
@@ -337,7 +339,7 @@ export async function loadBookmarks({
 }) {
   const list = await Promise.all(
     bookmarkIds.map(bookmarkid =>
-      loadSingleBookmark(bookmarkid, paConfigId, token, null).then(result => result.bookmarks[0])
+      loadSingleBookmark(userName, bookmarkid, paConfigId, token, null).then(result => result.bookmarks[0])
     )
   )
     .then(data => {
@@ -418,6 +420,7 @@ export async function queryBookmarks(
         break
       case 'loadByIDs':
         loadBookmarks({
+          userName,
           bookmarkIds,
           paConfigId,
           token,
