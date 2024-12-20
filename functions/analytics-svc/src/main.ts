@@ -179,7 +179,9 @@ const initRoutes = async (app: express.Application) => {
                     credentials = req.dbCredentials.studyAnalyticsCredential;
                 }
 
-                if (env.USE_CACHEDB === "true") {
+
+                // Even if USE_CACHEDB is true, For Hana dialect it will use the legacy / non-cachedb connection always. So that both duckdb and Hana datasets can functionally coexist
+                if (env.USE_CACHEDB === "true" && credentials.dialect != DB.HANA) {
                     req.dbConnections = await getCachedbDbConnections({
                         analyticsCredentials: credentials,
                         userObj: userObj,
