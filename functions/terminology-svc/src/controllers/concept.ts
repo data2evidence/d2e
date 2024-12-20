@@ -6,6 +6,7 @@ import {
   ConceptHierarchyEdge,
   ConceptHierarchyNodeLevel,
   ConceptHierarchyNode,
+  Filters,
 } from "../types.ts";
 
 export const getConcepts = async (
@@ -272,6 +273,82 @@ export const getConceptHierarchy = async (
     );
 
     res.send({ edges, nodes });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getStandardConcepts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      body: { datasetId, data },
+    } = schemas.getStandardConcepts.parse(req);
+
+    const results = await Promise.all(
+      data.map(async (dataItem) => {
+        const { domainId, searchText, index } = dataItem;
+
+        const filters: Filters = {
+          conceptClassId: [],
+          domainId: [],
+          standardConcept: ["S"],
+          vocabularyId: [],
+          validity: [],
+        };
+
+        try {
+          if (domainId) {
+            const cachedbService = new CachedbService(req);
+            const domainIdFacets = (
+              await cachedbService.getConceptFilterOptionsFaceted(
+                datasetId,
+                dataItem.searchText,
+                filters
+              )
+            ).domainId;
+
+            const keyExists = Object.keys(domainIdFacets).some(
+              (objKey) => objKey.toUpperCase() === domainId.toUpperCase()
+            );
+
+            if (keyExists) {
+              filters.domainId.push(domainId);
+            }
+          }
+
+          const cachedbService = new CachedbService(req);
+          const concepts = await cachedbService.getConcepts(
+            0,
+            1,
+            datasetId,
+            searchText,
+            filters
+          );
+
+          if (!concepts?.expansion.contains) {
+            return {};
+          }
+
+          const [conceptResults] = concepts.expansion.contains;
+
+          return {
+            index,
+            conceptId: conceptResults.conceptId,
+            conceptName: conceptResults.display,
+            domainId: conceptResults.domainId,
+          };
+        } catch (error) {
+          console.error(error);
+          throw error;
+        }
+      })
+    );
+
+    res.send(results);
   } catch (e) {
     next(e);
   }

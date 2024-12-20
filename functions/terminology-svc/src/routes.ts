@@ -38,7 +38,7 @@ addRoute("post:/concept/searchById", cc.searchConceptById);
 addRoute("post:/concept/searchByCode", cc.searchConceptByCode);
 addRoute("post:/concept/recommended/list", cc.getRecommendedConcepts);
 addRoute("get:/concept/hierarchy", cc.getConceptHierarchy);
-// addRoute("post:/concept/getStandardConcepts", csc.getConceptSets);
+addRoute("post:/concept/getStandardConcepts", cc.getStandardConcepts);
 
 addRoute("get:/concept-set", csc.getConceptSets);
 // addRoute("post:/concept-set", csc.getConceptSets);

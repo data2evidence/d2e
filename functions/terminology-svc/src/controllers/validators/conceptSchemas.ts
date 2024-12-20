@@ -119,3 +119,17 @@ export const getConceptHierarchyQuery = z.object({
 export const getConceptHierarchy = z.object({
   query: getConceptHierarchyQuery,
 });
+
+export const getStandardConceptsBody = z.object({
+  datasetId: z.string().uuid(),
+  data: z.array(
+    z.object({
+      index: z.number(),
+      searchText: z.string(),
+      domainId: z.string().optional(),
+    })
+  ),
+});
+export const getStandardConcepts = z.object({
+  body: getStandardConceptsBody,
+});
