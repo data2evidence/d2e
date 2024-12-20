@@ -1,6 +1,6 @@
 // @ts-types="npm:@types/express"
 import { NextFunction, Response, Request, Router } from "express";
-import { routeMap } from "./openApi.ts";
+import { routeMap } from "./openApi/openApi.ts";
 import {
   conceptSetController as csc,
   conceptController as cc,

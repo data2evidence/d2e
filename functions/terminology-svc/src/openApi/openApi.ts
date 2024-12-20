@@ -5,7 +5,7 @@ import {
 import { z } from "zod";
 import * as yaml from "yaml";
 import * as fs from "fs";
-import * as schemas from "./validationSchemas.ts";
+import * as schemas from "../validators/validationSchemas.ts";
 
 type Method =
   | "get"
