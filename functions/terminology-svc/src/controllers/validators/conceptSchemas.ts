@@ -95,3 +95,11 @@ export const searchConceptByCodeBody = z.object({
 export const searchConceptByCode = z.object({
   body: searchConceptByCodeBody,
 });
+
+export const getRecommendedConceptsBody = z.object({
+  datasetId: z.string(),
+  conceptIds: z.array(z.number()),
+});
+export const getRecommendedConcepts = z.object({
+  body: getRecommendedConceptsBody,
+});

@@ -205,44 +205,47 @@ export class CachedbService {
     }
   }
 
-  //   async getRecommendedConcepts(conceptIds: number[], datasetId: string) {
-  //     try {
-  //       const vocabSchemaName = await this.getVocabSchemaName(datasetId);
-  //       const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
-  //       const recommendedConcepts = await cachedbDao.getExactConceptRecommended(
-  //         conceptIds
-  //       );
+  async getRecommendedConcepts(conceptIds: number[], datasetId: string) {
+    try {
+      const vocabSchemaName = await this.getVocabSchemaName(datasetId);
+      const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+      const recommendedConcepts = await cachedbDao.getExactConceptRecommended(
+        conceptIds
+      );
 
-  //       if (recommendedConcepts.length === 0) {
-  //         return [];
-  //       }
+      if (recommendedConcepts.length === 0) {
+        return [];
+      }
 
-  //       const mappedConceptIds = recommendedConcepts.map((e) => e.concept_id_2);
+      const mappedConceptIds = recommendedConcepts.map((e) => e.concept_id_2);
 
-  //       const duckdbResult = await cachedbDao.getMultipleExactConcepts(
-  //         mappedConceptIds
-  //       );
+      const duckdbResult = await cachedbDao.getMultipleExactConcepts(
+        mappedConceptIds
+      );
 
-  //       if (duckdbResult === null) {
-  //         return [];
-  //       }
-
-  //       const mappedResult =
-  //         this.duckdbResultMapping(duckdbResult).expansion.contains[0];
-  //       // Result has to be mapped like this due to expected response from frontend
-  //       const mappedResult2 = [
-  //         {
-  //           ...mappedResult,
-  //           conceptCode: mappedResult.code,
-  //           conceptName: mappedResult.display,
-  //           vocabularyId: mappedResult.system,
-  //         },
-  //       ];
-  //       return mappedResult2;
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   }
+      if (duckdbResult === null) {
+        return [];
+      }
+      const duckdbMappedResult = this.duckdbResultMapping(duckdbResult);
+      if (!duckdbMappedResult.expansion.contains) {
+        return [];
+      }
+      const mappedResult = duckdbMappedResult.expansion.contains[0];
+      // Result has to be mapped like this due to expected response from frontend
+      const mappedResult2 = [
+        {
+          ...mappedResult,
+          conceptCode: mappedResult.code,
+          conceptName: mappedResult.display,
+          vocabularyId: mappedResult.system,
+        },
+      ];
+      return mappedResult2;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
 
   //   async getDescendants(conceptIds: number[], datasetId: string) {
   //     if (conceptIds.length === 0) {

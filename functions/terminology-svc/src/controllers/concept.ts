@@ -109,6 +109,29 @@ export const searchConceptByCode = async (
   }
 };
 
+export const getRecommendedConcepts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.info("Get concept by code");
+  try {
+    const {
+      body: { datasetId, conceptIds },
+    } = schemas.getRecommendedConcepts.parse(req);
+
+    const cachedbService = new CachedbService(req);
+    const concepts = await cachedbService.getRecommendedConcepts(
+      conceptIds,
+      datasetId
+    );
+    res.send(concepts);
+  } catch (e) {
+    console.error(JSON.stringify(e));
+    next(e);
+  }
+};
+
 export const getConceptFilterOptions = async (
   req: Request,
   res: Response,

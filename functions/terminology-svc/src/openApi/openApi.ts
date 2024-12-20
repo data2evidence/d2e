@@ -222,6 +222,36 @@ registry.registerPath({
   },
 });
 
+registry.registerPath({
+  method: "post",
+  path: "/terminology/concept/recommended/list",
+  description: "Get a list of recommended concepts",
+  summary: "Get all concept sets",
+  security: [{ [bearerAuth.name]: [] }],
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: conceptSchemas.getRecommendedConceptsBody,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Object with concept set data.",
+      content: {
+        "application/json": {
+          schema: schemas.UserSchema,
+        },
+      },
+    },
+    204: {
+      description: "No content - successful operation",
+    },
+  },
+});
+
 /****** **************** ******/
 /****** SCHEMAS END HERE ******/
 /****** **************** ******/
