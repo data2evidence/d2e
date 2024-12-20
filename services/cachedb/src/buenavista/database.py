@@ -264,7 +264,7 @@ def get_rewriter_from_dialect(dialect: str) -> Optional[rewrite.Rewriter]:
 
     if dialect == DatabaseDialects.DUCKDB:
         return DefaultRewriterForPostgres(
-            bv_dialects.BVPostgres(), bv_dialects.BVDuckDB()
+            bv_dialects.BVDuckDB(), bv_dialects.BVDuckDB()
         )
 
     if dialect == DatabaseDialects.POSTGRES:
