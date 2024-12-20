@@ -252,6 +252,30 @@ registry.registerPath({
   },
 });
 
+registry.registerPath({
+  method: "get",
+  path: "/terminology/concept/hierarchy",
+  description: "Get a list of recommended concepts",
+  summary: "Get all concept sets",
+  security: [{ [bearerAuth.name]: [] }],
+  request: {
+    query: conceptSchemas.getConceptHierarchy,
+  },
+  responses: {
+    200: {
+      description: "Object with concept set data.",
+      content: {
+        "application/json": {
+          schema: schemas.UserSchema,
+        },
+      },
+    },
+    204: {
+      description: "No content - successful operation",
+    },
+  },
+});
+
 /****** **************** ******/
 /****** SCHEMAS END HERE ******/
 /****** **************** ******/

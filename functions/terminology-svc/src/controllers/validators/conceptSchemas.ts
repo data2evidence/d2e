@@ -25,7 +25,7 @@ export const getConceptsQuery = z.object({
     .string()
     .refine((val) => !isNaN(parseInt(val)))
     .transform(Number),
-  datasetId: z.string(),
+  datasetId: z.string().uuid(),
   code: z.string(),
   filter: z
     .string()
@@ -45,7 +45,7 @@ export const getConcepts = z.object({
 });
 
 export const getConceptFilterOptionsQuery = z.object({
-  datasetId: z.string(),
+  datasetId: z.string().uuid(),
   searchText: z.string(),
   filter: z
     .string()
@@ -65,7 +65,7 @@ export const getConceptFilterOptions = z.object({
 });
 
 export const getTerminologyDetailsWithRelationshipsQuery = z.object({
-  datasetId: z.string(),
+  datasetId: z.string().uuid(),
   conceptId: z.string().transform(Number),
 });
 export const getTerminologyDetailsWithRelationships = z.object({
@@ -73,7 +73,7 @@ export const getTerminologyDetailsWithRelationships = z.object({
 });
 
 export const searchConceptByNameBody = z.object({
-  datasetId: z.string(),
+  datasetId: z.string().uuid(),
   conceptName: z.string(),
 });
 export const searchConceptByName = z.object({
@@ -81,7 +81,7 @@ export const searchConceptByName = z.object({
 });
 
 export const searchConceptByIdBody = z.object({
-  datasetId: z.string(),
+  datasetId: z.string().uuid(),
   conceptId: z.number(),
 });
 export const searchConceptById = z.object({
@@ -89,7 +89,7 @@ export const searchConceptById = z.object({
 });
 
 export const searchConceptByCodeBody = z.object({
-  datasetId: z.string(),
+  datasetId: z.string().uuid(),
   conceptCode: z.string(),
 });
 export const searchConceptByCode = z.object({
@@ -97,9 +97,25 @@ export const searchConceptByCode = z.object({
 });
 
 export const getRecommendedConceptsBody = z.object({
-  datasetId: z.string(),
+  datasetId: z.string().uuid(),
   conceptIds: z.array(z.number()),
 });
 export const getRecommendedConcepts = z.object({
   body: getRecommendedConceptsBody,
+});
+
+export const getConceptHierarchyQuery = z.object({
+  datasetId: z.string().uuid(),
+  conceptId: z
+    .string()
+    .refine((val) => !isNaN(Number(val)), { message: "Must be a valid number" })
+    .transform(Number),
+  depth: z
+    .string()
+    .refine((val) => !isNaN(Number(val)), { message: "Must be a valid number" })
+    .transform(Number)
+    .pipe(z.number().min(1).max(10)),
+});
+export const getConceptHierarchy = z.object({
+  query: getConceptHierarchyQuery,
 });

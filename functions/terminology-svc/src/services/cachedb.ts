@@ -247,35 +247,42 @@ export class CachedbService {
     }
   }
 
-  //   async getDescendants(conceptIds: number[], datasetId: string) {
-  //     if (conceptIds.length === 0) {
-  //       return [];
-  //     }
-  //     const vocabSchemaName = await this.getVocabSchemaName(datasetId);
-  //     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
-  //     const result = await cachedbDao.getExactConceptDescendants(conceptIds);
-  //     return result;
-  //   }
+  async getDescendants(conceptIds: number[], datasetId: string) {
+    if (conceptIds.length === 0) {
+      return [];
+    }
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+    const result = await cachedbDao.getExactConceptDescendants(conceptIds);
+    return result;
+  }
 
-  //   async getAncestors(conceptIds: number[], datasetId: string, depth: number) {
-  //     if (conceptIds.length === 0) {
-  //       return [];
-  //     }
-  //     const vocabSchemaName = await this.getVocabSchemaName(datasetId);
-  //     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
-  //     const result = await cachedbDao.getExactConceptAncestors(conceptIds, depth);
-  //     return result;
-  //   }
+  async getAncestors(conceptIds: number[], datasetId: string, depth: number) {
+    if (conceptIds.length === 0) {
+      return [];
+    }
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+    const result = await cachedbDao.getExactConceptAncestors(conceptIds, depth);
+    return result;
+  }
 
-  //   async getConceptsByIds(conceptIds: number[], datasetId: string) {
-  //     if (conceptIds.length === 0) {
-  //       return [];
-  //     }
-  //     const vocabSchemaName = await this.getVocabSchemaName(datasetId);
-  //     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
-  //     const result = await cachedbDao.getMultipleExactConcepts(conceptIds);
-  //     return this.duckdbResultMapping(result).expansion.contains;
-  //   }
+  async getConceptsByIds(conceptIds: number[], datasetId: string) {
+    if (conceptIds.length === 0) {
+      return [];
+    }
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+    const result = await cachedbDao.getMultipleExactConcepts(conceptIds);
+    if (!result) {
+      return [];
+    }
+    const duckdbResultMap = this.duckdbResultMapping(result);
+    if (!duckdbResultMap.expansion.contains) {
+      return [];
+    }
+    return duckdbResultMap.expansion.contains;
+  }
 
   //   async getConceptRelationshipMapsTo(conceptIds: number[], datasetId: string) {
   //     if (conceptIds.length === 0) {

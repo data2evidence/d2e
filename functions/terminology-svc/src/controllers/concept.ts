@@ -2,6 +2,11 @@
 import { NextFunction, Response, Request } from "express";
 import { CachedbService } from "../services/cachedb.ts";
 import * as schemas from "./validators/conceptSchemas.ts";
+import {
+  ConceptHierarchyEdge,
+  ConceptHierarchyNodeLevel,
+  ConceptHierarchyNode,
+} from "../types.ts";
 
 export const getConcepts = async (
   req: Request,
@@ -171,6 +176,102 @@ export const getTerminologyDetailsWithRelationships = async (
       datasetId
     );
     res.send(details);
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getConceptHierarchy = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      query: { datasetId, conceptId, depth },
+    } = schemas.getConceptHierarchy.parse(req);
+    const edges: ConceptHierarchyEdge[] = [];
+    const nodeLevels: ConceptHierarchyNodeLevel[] = [];
+    const conceptIds: Set<number> = new Set<number>().add(conceptId);
+    nodeLevels.push({ conceptId: conceptId, level: 0 });
+
+    const cachedbService = new CachedbService(req);
+    const conceptDescendants = await cachedbService.getDescendants(
+      [conceptId],
+      datasetId
+    );
+    conceptDescendants.forEach((concept_ancestor) => {
+      if (concept_ancestor.descendant_concept_id !== conceptId) {
+        edges.push({
+          source: conceptId,
+          target: concept_ancestor.descendant_concept_id,
+        });
+        conceptIds.add(concept_ancestor.descendant_concept_id);
+        nodeLevels.push({
+          conceptId: concept_ancestor.descendant_concept_id,
+          level: -1,
+        });
+      }
+    });
+
+    // recursively get the ancestors of the specified conceptId
+    const getAllAncestors = async (
+      conceptId: number,
+      depth: number,
+      maxDepth: number
+    ) => {
+      const conceptAncestors = await cachedbService.getAncestors(
+        [conceptId],
+        datasetId,
+        1
+      );
+
+      if (conceptAncestors.length == 0 || depth <= 0) {
+        return;
+      }
+      conceptAncestors.forEach((concept_ancestor) => {
+        if (concept_ancestor.ancestor_concept_id !== conceptId) {
+          edges.push({
+            source: concept_ancestor.ancestor_concept_id,
+            target: conceptId,
+          });
+          conceptIds.add(concept_ancestor.ancestor_concept_id);
+          nodeLevels.push({
+            conceptId: concept_ancestor.ancestor_concept_id,
+            level: maxDepth - depth + 1,
+          });
+          getAllAncestors(
+            concept_ancestor.ancestor_concept_id,
+            depth - 1,
+            maxDepth
+          );
+        }
+      });
+    };
+
+    await getAllAncestors(conceptId, depth, depth);
+
+    const concepts = await cachedbService.getConceptsByIds(
+      Array.from(conceptIds),
+      datasetId
+    );
+
+    const nodes: ConceptHierarchyNode[] = nodeLevels.reduce(
+      (acc: ConceptHierarchyNode[], current: ConceptHierarchyNodeLevel) => {
+        const conceptNode = concepts.find(
+          (concept) => concept.conceptId === current.conceptId
+        );
+        acc.push({
+          conceptId: current.conceptId,
+          display: conceptNode?.display ?? "",
+          level: current.level,
+        });
+        return acc;
+      },
+      []
+    );
+
+    res.send({ edges, nodes });
   } catch (e) {
     next(e);
   }
