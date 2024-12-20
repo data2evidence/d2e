@@ -1,12 +1,21 @@
 import { z } from "zod";
 
-const ParsedFiltersSchema = z.object({
-  conceptClassId: z.array(z.string()).optional(),
-  domainId: z.array(z.string()).optional(),
-  standardConcept: z.array(z.string()).optional(),
-  vocabularyId: z.array(z.string()).optional(),
-  validity: z.array(z.enum(["Valid", "Invalid"])).optional(),
-});
+const filtersSchema = z
+  .object({
+    conceptClassId: z.array(z.string()).default([]),
+    domainId: z.array(z.string()).default([]),
+    standardConcept: z.array(z.string()).default([]),
+    vocabularyId: z.array(z.string()).default([]),
+    validity: z.array(z.enum(["Valid", "Invalid"])).default([]),
+  })
+  .default({
+    conceptClassId: [],
+    domainId: [],
+    standardConcept: [],
+    vocabularyId: [],
+    validity: [],
+  });
+
 export const getConceptsQuery = z.object({
   offset: z
     .string()
@@ -22,15 +31,43 @@ export const getConceptsQuery = z.object({
     .string()
     .optional()
     .transform((value) => {
-      if (!value) return {} as z.infer<typeof ParsedFiltersSchema>;
+      if (!value) return filtersSchema.parse({});
       try {
         const parsed = JSON.parse(value);
-        return ParsedFiltersSchema.parse(parsed);
+        return filtersSchema.parse(parsed);
       } catch {
-        return {} as z.infer<typeof ParsedFiltersSchema>;
+        return filtersSchema.parse({});
       }
     }),
 });
 export const getConcepts = z.object({
   query: getConceptsQuery,
+});
+
+export const getConceptFilterOptionsQuery = z.object({
+  datasetId: z.string(),
+  searchText: z.string(),
+  filter: z
+    .string()
+    .optional()
+    .transform((value) => {
+      if (!value) return filtersSchema.parse({});
+      try {
+        const parsed = JSON.parse(value);
+        return filtersSchema.parse(parsed);
+      } catch {
+        return filtersSchema.parse({});
+      }
+    }),
+});
+export const getConceptFilterOptions = z.object({
+  query: getConceptFilterOptionsQuery,
+});
+
+export const getTerminologyDetailsWithRelationshipsQuery = z.object({
+  datasetId: z.string(),
+  conceptId: z.string().transform(Number),
+});
+export const getTerminologyDetailsWithRelationships = z.object({
+  query: getTerminologyDetailsWithRelationshipsQuery,
 });

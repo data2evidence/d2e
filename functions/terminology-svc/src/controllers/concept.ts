@@ -1,11 +1,6 @@
 // @ts-types="npm:@types/express"
 import { NextFunction, Response, Request } from "express";
-import { getRoot, validator } from "./validators/requestValidators.ts";
-import { SystemPortalAPI } from "../api/portal-api.ts";
-import { JwtPayload, decode } from "jsonwebtoken";
 import { CachedbService } from "../services/cachedb.ts";
-import { Filters } from "../types.ts";
-import { z } from "zod";
 import * as schemas from "./validators/conceptSchemas.ts";
 
 export const getConcepts = async (
@@ -24,13 +19,7 @@ export const getConcepts = async (
         filter,
       },
     } = schemas.getConcepts.parse(req);
-    const completeFilters = {
-      conceptClassId: filter?.conceptClassId ?? [],
-      domainId: filter?.domainId ?? [],
-      standardConcept: filter?.standardConcept ?? [],
-      vocabularyId: filter?.vocabularyId ?? [],
-      validity: filter?.validity ?? [],
-    };
+
     const pageNumber = Math.floor(offset / rowsPerPage);
 
     const cachedbService = new CachedbService(req);
@@ -39,7 +28,7 @@ export const getConcepts = async (
       Number(rowsPerPage),
       datasetId,
       searchText,
-      completeFilters
+      filter
     );
     res.send(concepts);
   } catch (e) {
@@ -53,31 +42,17 @@ export const getConceptFilterOptions = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.info("Get concept filter options");
   try {
-    // TODO: add validator
-    const datasetId = req.query.datasetId as string;
-    const searchText = req.query.searchText as string;
-    const filters = req.query?.filter
-      ? JSON.parse(req.query.filter as string)
-      : {};
-
-    const conceptClassId = filters.conceptClassId || [];
-    const domainId = filters.domainId || [];
-    const vocabularyId = filters.vocabularyId || [];
-    const standardConcept = filters.standardConcept || [];
-    const validity = filters.validity || [];
+    const {
+      query: { datasetId, searchText, filter },
+    } = schemas.getConceptFilterOptions.parse(req);
 
     const cachedbService = new CachedbService(req);
     const filterOptions = await cachedbService.getConceptFilterOptionsFaceted(
       datasetId,
       searchText,
-      {
-        conceptClassId,
-        domainId,
-        vocabularyId,
-        standardConcept,
-        validity,
-      }
+      filter
     );
     res.send({ filterOptions });
   } catch (e) {
@@ -92,11 +67,12 @@ export const getTerminologyDetailsWithRelationships = async (
 ) => {
   console.info("Get list of concept details and connections");
   try {
-    const datasetId = req.query.datasetId as string;
-    const conceptId = req.query.conceptId as string;
+    const {
+      query: { datasetId, conceptId },
+    } = schemas.getTerminologyDetailsWithRelationships.parse(req);
     const cachedbService = new CachedbService(req);
     const details = await cachedbService.getTerminologyDetailsWithRelationships(
-      Number(conceptId),
+      conceptId,
       datasetId
     );
     res.send(details);
