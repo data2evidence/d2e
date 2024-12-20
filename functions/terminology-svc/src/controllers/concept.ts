@@ -37,6 +37,30 @@ export const getConcepts = async (
   }
 };
 
+export const searchConceptByName = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.info("Get concept by name");
+  try {
+    const {
+      body: { datasetId, conceptName },
+    } = schemas.searchConceptByName.parse(req);
+
+    const cachedbService = new CachedbService(req);
+    const concepts = await cachedbService.getExactConcept(
+      conceptName,
+      datasetId,
+      "concept_name"
+    );
+    res.send(concepts);
+  } catch (e) {
+    console.error(JSON.stringify(e));
+    next(e);
+  }
+};
+
 export const getConceptFilterOptions = async (
   req: Request,
   res: Response,

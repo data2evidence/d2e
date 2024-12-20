@@ -122,6 +122,9 @@ registry.registerPath({
   description: "Get concept sets",
   summary: "Get all concept sets",
   security: [{ [bearerAuth.name]: [] }],
+  request: {
+    query: conceptSchemas.getTerminologyDetailsWithRelationshipsQuery,
+  },
   responses: {
     200: {
       description: "Object with concept set data.",
@@ -136,7 +139,33 @@ registry.registerPath({
     },
   },
 });
-
+registry.registerPath({
+  method: "post",
+  path: "/terminology/concept/searchByName",
+  description: "Get concept sets",
+  summary: "Get all concept sets",
+  security: [{ [bearerAuth.name]: [] }],
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: conceptSchemas.searchConceptByNameBody },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Object with concept set data.",
+      content: {
+        "application/json": {
+          schema: schemas.UserSchema,
+        },
+      },
+    },
+    204: {
+      description: "No content - successful operation",
+    },
+  },
+});
 function getOpenApiDocumentation() {
   const generator = new OpenApiGeneratorV3(registry.definitions);
 

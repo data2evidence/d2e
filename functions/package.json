@@ -316,6 +316,7 @@
           "gateway.db.dataset.versionInfo.read",
           "gateway.db.schema.update",
           "gateway.terminology.concept.getStandardConcepts.read",
+          "gateway.terminology.concept.searchByName.read",
           "dataflowmgmt.analysisflow.read",
           "dataflowmgmt.analysisflow.add",
           "dataflowmgmt.analysisflow.delete",
@@ -1263,6 +1264,15 @@
           "path": "^/terminology/concept/getStandardConcepts$",
           "scopes": [
             "gateway.terminology.concept.getStandardConcepts.read"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/terminology/concept/searchByName$",
+          "scopes": [
+            "gateway.terminology.concept.searchByName.read"
           ],
           "httpMethods": [
             "POST"

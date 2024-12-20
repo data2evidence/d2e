@@ -73,6 +73,7 @@ export class CachedbService {
       return result;
     } catch (err) {
       console.error(err);
+      throw err;
     }
   }
 

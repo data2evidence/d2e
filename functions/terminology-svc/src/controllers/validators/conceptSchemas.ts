@@ -71,3 +71,11 @@ export const getTerminologyDetailsWithRelationshipsQuery = z.object({
 export const getTerminologyDetailsWithRelationships = z.object({
   query: getTerminologyDetailsWithRelationshipsQuery,
 });
+
+export const searchConceptByNameBody = z.object({
+  datasetId: z.string(),
+  conceptName: z.string(),
+});
+export const searchConceptByName = z.object({
+  body: searchConceptByNameBody,
+});
