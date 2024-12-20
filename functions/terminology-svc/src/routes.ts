@@ -48,7 +48,7 @@ addRoute("get:/concept-set", csc.getConceptSets);
 // addRoute("delete:/concept-set/{conceptSetId}", csc.getConceptSets);
 // addRoute("post:/concept-set/included-concepts", csc.getConceptSets);
 
-addRoute(`get:/fhir/4_0_0/valueset/$expand`, csc.getConceptSets);
+addRoute(`get:/fhir/4_0_0/valueset/$expand`, cc.getConcepts);
 // addRoute(
 //   `get:/fhir/${SupportedFhirVersion}/conceptmap/\\$translate`,
 //   csc.getConceptSets

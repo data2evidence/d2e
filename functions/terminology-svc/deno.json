@@ -2,7 +2,8 @@
   "importMap": "./import.json",
   "compilerOptions": {
     "types": [
-      "npm:@types/express"
+      "npm:@types/express",
+      "npm:@types/pg"
     ],
     "noImplicitAny": true
   }

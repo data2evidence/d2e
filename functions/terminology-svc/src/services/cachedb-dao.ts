@@ -1,3 +1,4 @@
+// @ts-types="npm:@types/pg"
 import pg from "pg";
 import {
   Filters,
@@ -5,6 +6,7 @@ import {
   IDuckdbConcept,
   IConceptRecommended,
   IConceptAncestor,
+  IConcept,
 } from "../types.ts";
 import { env } from "../env.ts";
 
@@ -49,9 +51,12 @@ export class CachedbDAO {
       const countSql = `${duckdbFtsBaseQuery} select count(concept_id) as count from fts`;
       const countSqlParams = duckdbFtsBaseQueryParams;
       const sqlPromises = [
-        client.query(conceptsSql, conceptsSqlParams),
-        client.query(countSql, countSqlParams),
-      ];
+        client.query<IConcept & { count: number }>(
+          conceptsSql,
+          conceptsSqlParams
+        ),
+        client.query<{ count: string }>(countSql, countSqlParams),
+      ] as const;
       const results = await Promise.all(sqlPromises);
 
       const data = {
@@ -61,52 +66,55 @@ export class CachedbDAO {
       return data;
     } catch (error) {
       console.error(error);
-    } finally {
-      await client.end();
-    }
-  }
-
-  async getMultipleExactConcepts(
-    searchTexts: number[],
-    includeInvalid = true
-  ): Promise<IDuckdbConcept | null> {
-    const client = this.getCachedbConnection(this.jwt, this.datasetId);
-    try {
-      const searchTextWhereclause =
-        searchTexts.reduce((accumulator, _searchText, index: number) => {
-          accumulator += `$${index + 1},`;
-          return accumulator;
-        }, `concept_id IN (`) + ") ";
-
-      const invalidReasonWhereClause = includeInvalid
-        ? ""
-        : `AND invalid_reason = '' `;
-
-      const sql = `
-        select *
-        from ${this.vocabSchemaName}.concept
-        WHERE 
-        ${searchTextWhereclause}
-        ${invalidReasonWhereClause}
-        `;
-
-      const result = await client.query(sql, [...searchTexts]);
-      if (result) {
-        const data = {
-          hits: result.rows,
-          totalHits: result.rowCount,
-        };
-        return data;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      console.error(error);
       throw new Error(error);
     } finally {
       await client.end();
     }
   }
+
+  // async getMultipleExactConcepts(
+  //   searchTexts: number[],
+  //   includeInvalid = true
+  // ): Promise<IDuckdbConcept | null> {
+  //   const client = this.getCachedbConnection(this.jwt, this.datasetId);
+  //   try {
+  //     const searchTextWhereclause =
+  //       searchTexts.reduce((accumulator, _searchText, index: number) => {
+  //         accumulator += `$${index + 1},`;
+  //         return accumulator;
+  //       }, `concept_id IN (`) + ") ";
+
+  //     const invalidReasonWhereClause = includeInvalid
+  //       ? ""
+  //       : `AND invalid_reason = '' `;
+
+  //     const sql = `
+  //       select *
+  //       from ${this.vocabSchemaName}.concept
+  //       WHERE
+  //       ${searchTextWhereclause}
+  //       ${invalidReasonWhereClause}
+  //       `;
+
+  //     const result = await client.query<{ rosws: string }>(sql, [
+  //       ...searchTexts,
+  //     ]);
+  //     if (result) {
+  //       const data = {
+  //         hits: result.rows,
+  //         totalHits: result.rowCount,
+  //       };
+  //       return data;
+  //     } else {
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new Error(error);
+  //   } finally {
+  //     await client.end();
+  //   }
+  // }
 
   async getConceptFilterOptionsFaceted(
     searchText: string,
@@ -484,7 +492,6 @@ export class CachedbDAO {
         port: env.CACHEDB__PORT,
         user: jwt,
         database: `A|duckdb|read|${datasetId}`,
-        idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 30000,
       });
       client.connect();

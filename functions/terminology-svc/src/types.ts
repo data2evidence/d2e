@@ -70,37 +70,37 @@ export interface IConceptRecommended {
   concept_id_2: number;
   relationship_id: string;
 }
-// export class FhirValueSet {
-//   resourceType: string;
-//   url?: string;
-//   version?: string;
-//   name?: string;
-//   title?: string;
-//   status?: string;
-//   experimental?: string;
-//   date?: string;
-//   publisher?: string;
-//   contact?: string;
-//   description?: string;
-//   useContext?: string;
-//   jurisdiction?: string;
-//   immutable?: string;
-//   purpose?: string;
-//   copyright?: string;
-//   copyrightLabel?: string;
-//   approvalDate?: string;
-//   lastReviewDate?: string;
-//   effectivePeriod?: string;
-//   topic?: string;
-//   author?: string;
-//   editor?: string;
-//   reviewer?: string;
-//   endorser?: string;
-//   relatedArtifact?: string;
-//   compose?: string;
-//   expansion: FhirValueSetExpansion;
-//   scope?: string;
-// }
+export interface FhirValueSet {
+  resourceType: string;
+  url?: string;
+  version?: string;
+  name?: string;
+  title?: string;
+  status?: string;
+  experimental?: string;
+  date?: string;
+  publisher?: string;
+  contact?: string;
+  description?: string;
+  useContext?: string;
+  jurisdiction?: string;
+  immutable?: string;
+  purpose?: string;
+  copyright?: string;
+  copyrightLabel?: string;
+  approvalDate?: string;
+  lastReviewDate?: string;
+  effectivePeriod?: string;
+  topic?: string;
+  author?: string;
+  editor?: string;
+  reviewer?: string;
+  endorser?: string;
+  relatedArtifact?: string;
+  compose?: string;
+  expansion: FhirValueSetExpansion;
+  scope?: string;
+}
 
 export type FhirValueSetExpansion = {
   id?: string;

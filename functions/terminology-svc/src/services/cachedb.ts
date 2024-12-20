@@ -2,7 +2,7 @@
 import { Request } from "express";
 import {
   IDuckdbConcept,
-  //   FhirValueSet,
+  FhirValueSet,
   FhirValueSetExpansion,
   FhirValueSetExpansionContainsWithExt,
   FhirResourceType,
@@ -35,27 +35,27 @@ export class CachedbService {
     return vocabSchemaName;
   }
 
-  //   async getConcepts(
-  //     pageNumber = 0,
-  //     rowsPerPage: number,
-  //     datasetId: string,
-  //     searchText = "",
-  //     filters: Filters
-  //   ) {
-  //     try {
-  //       const vocabSchemaName = await this.getVocabSchemaName(datasetId);
-  //       const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
-  //       const result = await cachedbDao.getConcepts(
-  //         pageNumber,
-  //         Number(rowsPerPage),
-  //         searchText,
-  //         filters
-  //       );
-  //       return this.duckdbResultMapping(result);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   }
+  async getConcepts(
+    pageNumber = 0,
+    rowsPerPage: number,
+    datasetId: string,
+    searchText = "",
+    filters: Filters
+  ) {
+    try {
+      const vocabSchemaName = await this.getVocabSchemaName(datasetId);
+      const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+      const result = await cachedbDao.getConcepts(
+        pageNumber,
+        Number(rowsPerPage),
+        searchText,
+        filters
+      );
+      return this.duckdbResultMapping(result);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   async getExactConcept(
     conceptName: string | number,
@@ -296,51 +296,54 @@ export class CachedbService {
   //     return conceptsAndDescendantIds;
   //   }
 
-  //   private mapConceptWithFhirValueSetExpansionContains(item: IConcept) {
-  //     const today = new Date();
-  //     today.setHours(0, 0, 0, 0);
-  //     // valid_end_date is in seconds while js timestamp is in ms
-  //     const validity =
-  //       item.valid_end_date > Number(new Date()) / 1000 ? "Valid" : "Invalid";
-  //     const details: FhirValueSetExpansionContainsWithExt = {
-  //       conceptId: item.concept_id,
-  //       display: item.concept_name,
-  //       domainId: item.domain_id,
-  //       system: item.vocabulary_id,
-  //       conceptClassId: item.concept_class_id,
-  //       standardConcept: item.standard_concept,
-  //       concept:
-  //         item.standard_concept == null || item.standard_concept !== "S"
-  //           ? "Non-standard"
-  //           : "Standard",
-  //       code: item.concept_code,
-  //       // The date is stored as seconds from epoch, but new Date() expects ms
-  //       validStartDate: item.valid_start_date
-  //         ? new Date(item.valid_start_date * 1000).toISOString()
-  //         : new Date(0).toISOString(),
-  //       validEndDate: item.valid_end_date
-  //         ? new Date(item.valid_end_date * 1000).toISOString()
-  //         : "",
-  //       validity,
-  //     };
-  //     return details;
-  //   }
+  private mapConceptWithFhirValueSetExpansionContains(item: IConcept) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    // valid_end_date is in seconds while js timestamp is in ms
+    const validity =
+      (item.valid_end_date || -1) > Number(new Date()) / 1000
+        ? "Valid"
+        : "Invalid";
 
-  //   private duckdbResultMapping(DuckdbResult: IDuckdbConcept): FhirValueSet {
-  //     const valueSetExpansionContains = DuckdbResult.hits.map((data) => {
-  //       return this.mapConceptWithFhirValueSetExpansionContains(data);
-  //     });
+    const details: FhirValueSetExpansionContainsWithExt = {
+      conceptId: item.concept_id,
+      display: item.concept_name,
+      domainId: item.domain_id,
+      system: item.vocabulary_id,
+      conceptClassId: item.concept_class_id,
+      standardConcept: item.standard_concept,
+      concept:
+        item.standard_concept == null || item.standard_concept !== "S"
+          ? "Non-standard"
+          : "Standard",
+      code: item.concept_code,
+      // The date is stored as seconds from epoch, but new Date() expects ms
+      validStartDate: item.valid_start_date
+        ? new Date(item.valid_start_date * 1000).toISOString()
+        : new Date(0).toISOString(),
+      validEndDate: item.valid_end_date
+        ? new Date(item.valid_end_date * 1000).toISOString()
+        : "",
+      validity,
+    };
+    return details;
+  }
 
-  //     const valueSetExpansion: FhirValueSetExpansion = {
-  //       total: DuckdbResult.hits.length > 0 ? DuckdbResult.totalHits : 0,
-  //       offset: 1,
-  //       timestamp: new Date(),
-  //       contains: valueSetExpansionContains,
-  //     };
-  //     const result: FhirValueSet = {
-  //       resourceType: FhirResourceType.valueset,
-  //       expansion: valueSetExpansion,
-  //     };
-  //     return result;
-  //   }
+  private duckdbResultMapping(DuckdbResult: IDuckdbConcept): FhirValueSet {
+    const valueSetExpansionContains = DuckdbResult.hits.map((data) => {
+      return this.mapConceptWithFhirValueSetExpansionContains(data);
+    });
+
+    const valueSetExpansion: FhirValueSetExpansion = {
+      total: DuckdbResult.hits.length > 0 ? DuckdbResult.totalHits : 0,
+      offset: 1,
+      timestamp: new Date(),
+      contains: valueSetExpansionContains,
+    };
+    const result: FhirValueSet = {
+      resourceType: FhirResourceType.valueset,
+      expansion: valueSetExpansion,
+    };
+    return result;
+  }
 }

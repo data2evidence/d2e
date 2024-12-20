@@ -15,7 +15,7 @@ export const getConceptSets = async (
     const decodedToken = decode(token.replace(/bearer /i, "")) as JwtPayload;
     const userId = decodedToken.sub;
     const systemPortalApi = new SystemPortalAPI(req);
-    const conceptSets = systemPortalApi.getUserConceptSets(userId);
+    const conceptSets = await systemPortalApi.getUserConceptSets(userId);
     res.send(conceptSets);
   } catch (e) {
     next(e);
