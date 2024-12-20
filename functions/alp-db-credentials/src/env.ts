@@ -1,7 +1,7 @@
+import { Deno } from '@deno/shim-deno'
+
 type LoggingLevel = 'info' | 'warn' | 'error'
-
-const _env = Deno.env.toObject();
-
+const _env = Deno.env.toObject()
 export const env = {
   NODE_ENV: _env.NODE_ENV,
   PORT: Number(_env.DB_CREDENTIALS_MGR__PORT) || 9007,
@@ -22,5 +22,5 @@ export const env = {
   VALID_CLIENT_CREDENTIAL_IDS: _env.DB_CREDENTIALS_MGR__VALID_CLIENT_CREDENTIAL_IDS || '',
   SSL_PRIVATE_KEY: _env.TLS__INTERNAL__KEY?.replace(/\\n/g, '\n'),
   SSL_PUBLIC_CERT: _env.TLS__INTERNAL__CRT?.replace(/\\n/g, '\n'),
-  SSL_CA_CERT: _env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n'),
+  SSL_CA_CERT: _env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, '\n')
 }

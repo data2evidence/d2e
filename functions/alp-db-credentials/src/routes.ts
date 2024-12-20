@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { Service } from 'typedi'
 import { DbRouter } from './db/db.router'
-import { VocabRouter } from './vocab/vocab.router.ts'
+import { VocabRouter } from './vocab/vocab.router'
 
 @Service()
 export class Routes {

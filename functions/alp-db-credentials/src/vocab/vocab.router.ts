@@ -1,7 +1,7 @@
 import { Router, NextFunction, Request, Response } from 'express'
 import { Service } from 'typedi'
 import { createLogger } from '../logger'
-import { VocabService } from './vocab.service.ts'
+import { VocabService } from './vocab.service'
 
 @Service()
 export class VocabRouter {

@@ -52,6 +52,8 @@
   "./src/db/entity/db-vocab-schema.entity": "./src/db/entity/db-vocab-schema.entity.ts",
   "./src/db/entity": "./src/db/entity/index.ts",
   "./src/db/db.service": "./src/db/db.service.ts",
+  "./src/vocab/vocab.router": "./src/vocab/vocab.router.ts",
+  "./src/vocab/vocab.service": "./src/vocab/vocab.service.ts",
   "./src/env": "./src/env.ts",
   "https": "node:https",
   "path": "node:path",
