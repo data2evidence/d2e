@@ -139,31 +139,31 @@ export const SupportedFhirVersion = "4_0_0";
 export const FhirResourceType = {
   valueset: "ValueSet",
   conceptmap: "ConceptMap",
+} as const;
+
+export type FhirConceptMapElementTarget = {
+  code: number;
+  display: string;
+  equivalence: string;
+  vocabularyId: string;
+};
+export type FhirConceptMapElementWithExt = {
+  code: string;
+  display: string;
+  valueSet: FhirValueSet;
+  target: FhirConceptMapElementTarget[];
 };
 
-// export type FhirConceptMapElementTarget = {
-//   code: number;
-//   display: string;
-//   equivalence: string;
-//   vocabularyId: string;
-// };
-// export type FhirConceptMapElementWithExt = {
-//   code: string;
-//   display: string;
-//   valueSet: FhirValueSet;
-//   target: FhirConceptMapElementTarget[];
-// };
+export type FhirConceptMapGroup = {
+  source: string;
+  target: string;
+  element: FhirConceptMapElementWithExt[];
+};
 
-// export type FhirConceptMapGroup = {
-//   source: string;
-//   target: string;
-//   element: FhirConceptMapElementWithExt[];
-// };
-
-// export type FhirConceptMap = {
-//   resourceType: string;
-//   group: FhirConceptMapGroup[];
-// };
+export type FhirConceptMap = {
+  resourceType: string;
+  group: FhirConceptMapGroup[];
+};
 
 export type Filters = {
   conceptClassId: string[];

@@ -6,10 +6,10 @@ import {
   FhirValueSetExpansion,
   FhirValueSetExpansionContainsWithExt,
   FhirResourceType,
-  //   FhirConceptMapGroup,
-  //   FhirConceptMap,
-  //   FhirConceptMapElementWithExt,
-  //   FhirConceptMapElementTarget,
+  FhirConceptMapGroup,
+  FhirConceptMap,
+  FhirConceptMapElementWithExt,
+  FhirConceptMapElementTarget,
   IConcept,
   Filters,
   IDuckdbFacet,
@@ -17,6 +17,7 @@ import {
 // import { groupBy } from "../utils/helperUtil.ts";
 import { CachedbDAO } from "./cachedb-dao.ts";
 import { SystemPortalAPI } from "../api/portal-api.ts";
+import { groupBy } from "../utils/helperUtil.ts";
 
 export class CachedbService {
   private readonly token: string;
@@ -85,99 +86,123 @@ export class CachedbService {
     return cachedbDao.getConceptFilterOptionsFaceted(searchText, filters);
   }
 
-  //   async getTerminologyDetailsWithRelationships(
-  //     conceptId: number,
-  //     datasetId: string
-  //   ) {
-  //     console.info("Get list of concept details and connections");
-  //     try {
-  //       const searchConcepts1: number[] = [conceptId];
+  async getTerminologyDetailsWithRelationships(
+    conceptId: number,
+    datasetId: string
+  ) {
+    console.info("Get list of concept details and connections");
+    const defaultValue: FhirConceptMap = {
+      resourceType: FhirResourceType.conceptmap,
+      group: [],
+    };
+    try {
+      const searchConcepts1: number[] = [conceptId];
 
-  //       const vocabSchemaName = await this.getVocabSchemaName(datasetId);
-  //       const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
-  //       const DuckdbResultConcept1 = await cachedbDao.getMultipleExactConcepts(
-  //         searchConcepts1,
-  //         true
-  //       );
+      const vocabSchemaName = await this.getVocabSchemaName(datasetId);
+      const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+      const DuckdbResultConcept1 = await cachedbDao.getMultipleExactConcepts(
+        searchConcepts1,
+        true
+      );
+      if (!DuckdbResultConcept1) {
+        return defaultValue;
+      }
 
-  //       const conceptC1: FhirValueSet =
-  //         this.duckdbResultMapping(DuckdbResultConcept1);
-  //       const groups: FhirConceptMapGroup[] = [];
+      const conceptC1: FhirValueSet =
+        this.duckdbResultMapping(DuckdbResultConcept1);
+      if (!conceptC1.expansion.contains) {
+        return defaultValue;
+      }
+      const groups: FhirConceptMapGroup[] = [];
 
-  //       if (conceptC1.expansion.contains.length > 0) {
-  //         const detailsC1: FhirValueSetExpansionContainsWithExt =
-  //           conceptC1.expansion.contains[0];
-  //         const fhirTargetElements: FhirConceptMapElementTarget[] = [];
-  //         const conceptRelations = await cachedbDao.getConceptRelationships(
-  //           detailsC1.conceptId
-  //         );
+      if (conceptC1.expansion.contains.length > 0) {
+        const detailsC1: FhirValueSetExpansionContainsWithExt =
+          conceptC1.expansion.contains[0];
+        const fhirTargetElements: FhirConceptMapElementTarget[] = [];
+        const conceptRelations = await cachedbDao.getConceptRelationships(
+          detailsC1.conceptId
+        );
 
-  //         for (let i = 0; i < conceptRelations.hits.length; i++) {
-  //           const relationships = await cachedbDao.getRelationships(
-  //             conceptRelations.hits[i].relationship_id
-  //           );
-  //           const searchConcepts2: number[] = [
-  //             conceptRelations.hits[i].concept_id_2,
-  //           ];
-  //           const DuckdbResultConcept2 =
-  //             await cachedbDao.getMultipleExactConcepts(searchConcepts2, true);
-  //           const conceptC2: FhirValueSet =
-  //             this.duckdbResultMapping(DuckdbResultConcept2);
-  //           const detailsC2: FhirValueSetExpansionContainsWithExt =
-  //             conceptC2.expansion.contains[0];
-  //           if (!detailsC2) {
-  //             continue;
-  //           }
-  //           const searchConcepts3: number[] = [
-  //             relationships.hits[0].relationship_concept_id,
-  //           ];
-  //           const DuckdbResultConcept3 =
-  //             await cachedbDao.getMultipleExactConcepts(searchConcepts3, true);
-  //           const conceptC3: FhirValueSet =
-  //             this.duckdbResultMapping(DuckdbResultConcept3);
-  //           const detailsC3: FhirValueSetExpansionContainsWithExt =
-  //             conceptC3.expansion.contains[0];
-  //           if (!detailsC3) {
-  //             continue;
-  //           }
-  //           const fhirTargetElement: FhirConceptMapElementTarget = {
-  //             code: detailsC2.conceptId,
-  //             display: detailsC2.display,
-  //             equivalence: detailsC3.display,
-  //             vocabularyId: detailsC2.system,
-  //           };
-  //           fhirTargetElements.push(fhirTargetElement);
-  //         }
-  //         const conceptRelationsGroupByVocab = groupBy(
-  //           fhirTargetElements,
-  //           "vocabularyId"
-  //         );
-  //         for (const targetVocab in conceptRelationsGroupByVocab) {
-  //           const conceptMapElement: FhirConceptMapElementWithExt = {
-  //             code: detailsC1.code,
-  //             display: detailsC1.display,
-  //             valueSet: conceptC1,
-  //             target: conceptRelationsGroupByVocab[targetVocab],
-  //           };
-  //           groups.push({
-  //             source: detailsC1.system,
-  //             target: targetVocab,
-  //             element: [conceptMapElement],
-  //           });
-  //         }
-  //       }
+        for (let i = 0; i < conceptRelations.hits.length; i++) {
+          const relationships = await cachedbDao.getRelationships(
+            conceptRelations.hits[i].relationship_id
+          );
+          const searchConcepts2: number[] = [
+            conceptRelations.hits[i].concept_id_2,
+          ];
+          const DuckdbResultConcept2 =
+            await cachedbDao.getMultipleExactConcepts(searchConcepts2, true);
+          if (!DuckdbResultConcept2) {
+            continue;
+          }
+          const conceptC2: FhirValueSet =
+            this.duckdbResultMapping(DuckdbResultConcept2);
 
-  //       const conceptMap_ext: FhirConceptMap = {
-  //         resourceType: FhirResourceType.conceptmap,
-  //         group: groups,
-  //       };
-  //       console.info("Return concept details and connections");
-  //       return conceptMap_ext;
-  //     } catch (err) {
-  //       console.error(err);
-  //       throw err;
-  //     }
-  //   }
+          if (!conceptC2.expansion.contains) {
+            continue;
+          }
+          const detailsC2: FhirValueSetExpansionContainsWithExt =
+            conceptC2.expansion.contains[0];
+          if (!detailsC2) {
+            continue;
+          }
+          const searchConcepts3: number[] = [
+            relationships.hits[0].relationship_concept_id,
+          ];
+          const DuckdbResultConcept3 =
+            await cachedbDao.getMultipleExactConcepts(searchConcepts3, true);
+          if (!DuckdbResultConcept3) {
+            continue;
+          }
+          const conceptC3: FhirValueSet =
+            this.duckdbResultMapping(DuckdbResultConcept3);
+
+          if (!conceptC3.expansion.contains) {
+            continue;
+          }
+          const detailsC3: FhirValueSetExpansionContainsWithExt =
+            conceptC3.expansion.contains[0];
+          if (!detailsC3) {
+            continue;
+          }
+          const fhirTargetElement: FhirConceptMapElementTarget = {
+            code: detailsC2.conceptId,
+            display: detailsC2.display,
+            equivalence: detailsC3.display,
+            vocabularyId: detailsC2.system,
+          };
+          fhirTargetElements.push(fhirTargetElement);
+        }
+        const conceptRelationsGroupByVocab = groupBy(
+          fhirTargetElements,
+          "vocabularyId"
+        );
+        for (const targetVocab in conceptRelationsGroupByVocab) {
+          const conceptMapElement: FhirConceptMapElementWithExt = {
+            code: detailsC1.code,
+            display: detailsC1.display,
+            valueSet: conceptC1,
+            target: conceptRelationsGroupByVocab[targetVocab],
+          };
+          groups.push({
+            source: detailsC1.system,
+            target: targetVocab,
+            element: [conceptMapElement],
+          });
+        }
+      }
+
+      const conceptMap_ext: FhirConceptMap = {
+        resourceType: FhirResourceType.conceptmap,
+        group: groups,
+      };
+      console.info("Return concept details and connections");
+      return conceptMap_ext;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
 
   //   async getRecommendedConcepts(conceptIds: number[], datasetId: string) {
   //     try {

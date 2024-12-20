@@ -78,3 +78,23 @@ export const getConceptFilterOptions = async (
     next(e);
   }
 };
+
+export const getTerminologyDetailsWithRelationships = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.info("Get list of concept details and connections");
+  try {
+    const datasetId = req.query.datasetId as string;
+    const conceptId = req.query.conceptId as string;
+    const cachedbService = new CachedbService(req);
+    const details = await cachedbService.getTerminologyDetailsWithRelationships(
+      Number(conceptId),
+      datasetId
+    );
+    res.send(details);
+  } catch (e) {
+    next(e);
+  }
+};

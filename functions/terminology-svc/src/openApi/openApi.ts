@@ -114,6 +114,27 @@ registry.registerPath({
   },
 });
 
+registry.registerPath({
+  method: "get",
+  path: "/terminology/fhir/4_0_0/conceptmap/$translate",
+  description: "Get concept sets",
+  summary: "Get all concept sets",
+  security: [{ [bearerAuth.name]: [] }],
+  responses: {
+    200: {
+      description: "Object with concept set data.",
+      content: {
+        "application/json": {
+          schema: schemas.UserSchema,
+        },
+      },
+    },
+    204: {
+      description: "No content - successful operation",
+    },
+  },
+});
+
 function getOpenApiDocumentation() {
   const generator = new OpenApiGeneratorV3(registry.definitions);
 

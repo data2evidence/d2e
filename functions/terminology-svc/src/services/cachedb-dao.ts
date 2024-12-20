@@ -72,49 +72,47 @@ export class CachedbDAO {
     }
   }
 
-  // async getMultipleExactConcepts(
-  //   searchTexts: number[],
-  //   includeInvalid = true
-  // ): Promise<IDuckdbConcept | null> {
-  //   const client = this.getCachedbConnection(this.jwt, this.datasetId);
-  //   try {
-  //     const searchTextWhereclause =
-  //       searchTexts.reduce((accumulator, _searchText, index: number) => {
-  //         accumulator += `$${index + 1},`;
-  //         return accumulator;
-  //       }, `concept_id IN (`) + ") ";
+  async getMultipleExactConcepts(
+    searchTexts: number[],
+    includeInvalid = true
+  ): Promise<IDuckdbConcept | null> {
+    const client = this.getCachedbConnection(this.jwt, this.datasetId);
+    try {
+      const searchTextWhereclause =
+        searchTexts.reduce((accumulator, _searchText, index: number) => {
+          accumulator += `$${index + 1},`;
+          return accumulator;
+        }, `concept_id IN (`) + ") ";
 
-  //     const invalidReasonWhereClause = includeInvalid
-  //       ? ""
-  //       : `AND invalid_reason = '' `;
+      const invalidReasonWhereClause = includeInvalid
+        ? ""
+        : `AND invalid_reason = '' `;
 
-  //     const sql = `
-  //       select *
-  //       from ${this.vocabSchemaName}.concept
-  //       WHERE
-  //       ${searchTextWhereclause}
-  //       ${invalidReasonWhereClause}
-  //       `;
+      const sql = `
+        select *
+        from ${this.vocabSchemaName}.concept
+        WHERE
+        ${searchTextWhereclause}
+        ${invalidReasonWhereClause}
+        `;
 
-  //     const result = await client.query<{ rosws: string }>(sql, [
-  //       ...searchTexts,
-  //     ]);
-  //     if (result) {
-  //       const data = {
-  //         hits: result.rows,
-  //         totalHits: result.rowCount,
-  //       };
-  //       return data;
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new Error(error);
-  //   } finally {
-  //     await client.end();
-  //   }
-  // }
+      const result = await client.query<IConcept>(sql, [...searchTexts]);
+      if (result) {
+        const data = {
+          hits: result.rows,
+          totalHits: result.rowCount ?? 0,
+        };
+        return data;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+      throw new Error(error);
+    } finally {
+      await client.end();
+    }
+  }
 
   async getConceptFilterOptionsFaceted(
     searchText: string,
