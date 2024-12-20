@@ -1,32 +1,38 @@
 // @ts-types="npm:@types/express"
 import { NextFunction, Response, Request } from "express";
-import { getRoot, validator } from "../validators/requestValidators.ts";
+import { getRoot, validator } from "./validators/requestValidators.ts";
 import { SystemPortalAPI } from "../api/portal-api.ts";
 import { JwtPayload, decode } from "jsonwebtoken";
 import { CachedbService } from "../services/cachedb.ts";
 import { Filters } from "../types.ts";
+import { z } from "zod";
+import * as schemas from "./validators/conceptSchemas.ts";
 
 export const getConcepts = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const offset = req.query.offset as unknown as number;
-  const rowsPerPage = req.query.count as unknown as number;
-  const datasetId = req.query.datasetId as string;
-  const searchText = req.query.code as string;
-  const filters = req.query.filters as Filters;
   console.info("Get list of concepts");
-  const completeFilters = {
-    conceptClassId: filters?.conceptClassId ?? [],
-    domainId: filters?.domainId ?? [],
-    standardConcept: filters?.standardConcept ?? [],
-    vocabularyId: filters?.vocabularyId ?? [],
-    validity: filters?.validity ?? [],
-  };
-  const pageNumber = Math.floor(offset / rowsPerPage);
-
   try {
+    const {
+      query: {
+        offset,
+        count: rowsPerPage,
+        datasetId,
+        code: searchText,
+        filter,
+      },
+    } = schemas.getConcepts.parse(req);
+    const completeFilters = {
+      conceptClassId: filter?.conceptClassId ?? [],
+      domainId: filter?.domainId ?? [],
+      standardConcept: filter?.standardConcept ?? [],
+      vocabularyId: filter?.vocabularyId ?? [],
+      validity: filter?.validity ?? [],
+    };
+    const pageNumber = Math.floor(offset / rowsPerPage);
+
     const cachedbService = new CachedbService(req);
     const concepts = await cachedbService.getConcepts(
       pageNumber,

@@ -5,7 +5,6 @@ import {
   conceptSetController as csc,
   conceptController as cc,
 } from "./controllers/index.ts";
-import { SupportedFhirVersion } from "./types.ts";
 
 const router = Router();
 

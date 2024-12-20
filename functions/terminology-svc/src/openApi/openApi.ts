@@ -5,7 +5,8 @@ import {
 import { z } from "zod";
 import * as yaml from "yaml";
 import * as fs from "fs";
-import * as schemas from "../validators/validationSchemas.ts";
+import * as schemas from "../controllers/validators/validationSchemas.ts";
+import * as conceptSchemas from "../controllers/validators/conceptSchemas.ts";
 
 type Method =
   | "get"
@@ -99,6 +100,7 @@ registry.registerPath({
   description: "Get concept sets",
   summary: "Get all concept sets",
   security: [{ [bearerAuth.name]: [] }],
+  request: { query: conceptSchemas.getConceptsQuery },
   responses: {
     200: {
       description: "Object with concept set data.",
