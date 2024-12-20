@@ -85,6 +85,30 @@ export const searchConceptById = async (
   }
 };
 
+export const searchConceptByCode = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.info("Get concept by code");
+  try {
+    const {
+      body: { datasetId, conceptCode },
+    } = schemas.searchConceptByCode.parse(req);
+
+    const cachedbService = new CachedbService(req);
+    const concepts = await cachedbService.getExactConcept(
+      conceptCode,
+      datasetId,
+      "concept_code"
+    );
+    res.send(concepts);
+  } catch (e) {
+    console.error(JSON.stringify(e));
+    next(e);
+  }
+};
+
 export const getConceptFilterOptions = async (
   req: Request,
   res: Response,

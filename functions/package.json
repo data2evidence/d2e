@@ -318,6 +318,7 @@
           "gateway.terminology.concept.getStandardConcepts.read",
           "gateway.terminology.concept.searchByName.read",
           "gateway.terminology.concept.searchById.read",
+          "gateway.terminology.concept.searchByCode.read",
           "dataflowmgmt.analysisflow.read",
           "dataflowmgmt.analysisflow.add",
           "dataflowmgmt.analysisflow.delete",
@@ -1283,6 +1284,15 @@
           "path": "^/terminology/concept/searchById$",
           "scopes": [
             "gateway.terminology.concept.searchById.read"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/terminology/concept/searchByCode$",
+          "scopes": [
+            "gateway.terminology.concept.searchByCode.read"
           ],
           "httpMethods": [
             "POST"
