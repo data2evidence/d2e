@@ -1,6 +1,6 @@
 import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { PrefectDeploymentName, PrefectFlowName } from "../const.ts";
-import { CohortGeneratorFlowRunDto } from "../types.d.ts";
+import { CohortGeneratorFlowRunDto } from "../types_1.ts";
 
 export class CohortService {
   public async createCohortGeneratorFlowRun(

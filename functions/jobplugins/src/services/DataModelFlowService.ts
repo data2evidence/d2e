@@ -5,7 +5,7 @@ import {
   DataModel,
   IGetVersionInfoFlowRunDto,
   PluginFlow,
-} from "../types.d.ts";
+} from "../types_1.ts";
 
 export class DataModelFlowService {
   private env = Deno.env.toObject();

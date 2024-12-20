@@ -7,6 +7,9 @@ import { DataModelFlowController } from "./src/controllers/DataModelFlowControll
 import { DbSvcController } from "./src/controllers/DbSvcController.ts";
 import { DqdController } from "./src/controllers/DqdController.ts";
 import { MeilisearchController } from "./src/controllers/MeilisearchController.ts";
+import { runMigrations } from "./src/db/data-migration.ts";
+import { DataTransformationController } from "./src/controllers/DataTransformationController.ts";
+import { PrefectController } from "./src/controllers/PrefectController.ts";
 
 const app = express();
 const env = Deno.env.toObject();
@@ -22,6 +25,8 @@ app.use(
   new DataCharacterizationController().router
 );
 app.use("/jobplugins/datamodel", new DataModelFlowController().router);
+app.use("/dataflow-mgmt/dataflow", new DataTransformationController().router);
+app.use("/dataflow-mgmt/prefect", new PrefectController().router);
 
 const opt = {
   user: env.PG_USER,

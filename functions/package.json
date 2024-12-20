@@ -67,8 +67,9 @@
         },
         {
           "source": "/dataflow-mgmt",
-          "rmsrc": true,
-          "service": "dataflowMgmt"
+          "function": "/jobplugins",
+          "env": "jobplugins",
+          "imports": "/jobplugins/import.json"
         },
         {
           "source": "/usermgmt",

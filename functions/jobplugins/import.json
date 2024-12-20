@@ -1,0 +1,5 @@
+{"imports":{
+    "./src/types_1": "./src/types_1.ts",
+    "./src/types": "./src/types_1.ts",
+    "npm:uuid": "npm:uuid"
+  }}

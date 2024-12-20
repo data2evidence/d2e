@@ -1,6 +1,6 @@
 import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { PrefectDeploymentName, PrefectFlowName } from "../const.ts";
-import { MeilisearchAddIndexFlowRunDto } from "../types.d.ts";
+import { MeilisearchAddIndexFlowRunDto } from "../types_1.ts";
 
 export class MeilisearchService {
   public async createAddIndexFlowRun(

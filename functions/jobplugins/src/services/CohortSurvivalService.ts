@@ -4,7 +4,7 @@ import {
   PrefectDeploymentName,
   PrefectFlowName,
 } from "../const.ts";
-import { CohortSurvivalFlowRunDto } from "../types.d.ts";
+import { CohortSurvivalFlowRunDto } from "../types_1.ts";
 
 export class CohortSurvivalService {
   public async createCohortSurvivalFlowRun(
