@@ -27,7 +27,9 @@ const mriConfigConnection = new MriConfigConnection(
 
 export async function getCohortAnalyticsConnection(req: IMRIRequest) {
     // If USE_CACHEDB is true, return early with cachedb connection
-    if (env.USE_CACHEDB === "true") {
+    const { analyticsConnection } = req.dbConnections;
+
+    if (env.USE_CACHEDB === "true" && analyticsConnection.dialect !== "hana") {
         let userObj: User;
         try {
             userObj = getUser(req);
@@ -51,7 +53,6 @@ export async function getCohortAnalyticsConnection(req: IMRIRequest) {
         return analyticsConnection;
     }
 
-    const { analyticsConnection } = req.dbConnections;
     // If dialect is DUCKDB, get direct postgres write connection instead
     if (analyticsConnection.dialect === "DUCKDB") {
         const { studyAnalyticsCredential } = req.dbCredentials;
