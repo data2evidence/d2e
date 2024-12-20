@@ -158,7 +158,9 @@ export class DatasetRouter {
 
                 const dataModels = await dataflowMgmtAPI.getDatamodels();
                 const dataModelInfo = dataModels.find(
-                  (model) => model.datamodel === dataModel
+                  (model) =>
+                    model.datamodel === dataModel &&
+                    model.flowName === plugin.replace(/_/g, "-")
                 );
 
                 const options = {
