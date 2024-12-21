@@ -7,6 +7,7 @@ import * as yaml from "yaml";
 import * as fs from "fs";
 import * as schemas from "../controllers/validators/validationSchemas.ts";
 import * as conceptSchemas from "../controllers/validators/conceptSchemas.ts";
+import * as conceptSetSchemas from "../controllers/validators/conceptSetSchemas.ts";
 
 type Method =
   | "get"
@@ -286,6 +287,35 @@ registry.registerPath({
       content: {
         "application/json": {
           schema: conceptSchemas.getStandardConcepts,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Object with concept set data.",
+      content: {
+        "application/json": {
+          schema: schemas.UserSchema,
+        },
+      },
+    },
+    204: {
+      description: "No content - successful operation",
+    },
+  },
+});
+registry.registerPath({
+  method: "post",
+  path: "/terminology/concept-set",
+  description: "Get a list of recommended concepts",
+  summary: "Get all concept sets",
+  security: [{ [bearerAuth.name]: [] }],
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: conceptSetSchemas.createConceptSetBody,
         },
       },
     },

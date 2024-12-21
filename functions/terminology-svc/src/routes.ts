@@ -41,7 +41,7 @@ addRoute("get:/concept/hierarchy", cc.getConceptHierarchy);
 addRoute("post:/concept/getStandardConcepts", cc.getStandardConcepts);
 
 addRoute("get:/concept-set", csc.getConceptSets);
-// addRoute("post:/concept-set", csc.getConceptSets);
+addRoute("post:/concept-set", csc.createConceptSet);
 // addRoute("get:/concept-set/{conceptSetId}", csc.getConceptSets);
 // addRoute("put:/concept-set/{conceptSetId}", csc.getConceptSets);
 // addRoute("delete:/concept-set/{conceptSetId}", csc.getConceptSets);
