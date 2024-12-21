@@ -433,7 +433,6 @@ function getOpenApiDocumentation() {
   });
 }
 
-// TODO: add this to init step, together with migrations
 function writeDocumentation() {
   // OpenAPI JSON
   const docs = getOpenApiDocumentation();

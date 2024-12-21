@@ -15,9 +15,7 @@ export class SystemPortalAPI {
   private readonly httpsAgent: Agent;
 
   constructor(request: Request) {
-    // TODO: remove fallback string
-    this.token = request.headers["authorization"] || "";
-
+    this.token = request.headers["authorization"]!;
     if (env.SERVICE_ROUTES.portalServer) {
       this.url = env.SERVICE_ROUTES.portalServer;
       this.httpsAgent = new Agent({

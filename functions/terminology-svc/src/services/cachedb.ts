@@ -24,8 +24,7 @@ export class CachedbService {
 
   constructor(request: Request) {
     this.systemPortalApi = new SystemPortalAPI(request);
-    // TODO: remove default string
-    this.token = request.headers["authorization"] || "";
+    this.token = request.headers["authorization"]!;
   }
 
   private async getVocabSchemaName(datasetId: string) {
