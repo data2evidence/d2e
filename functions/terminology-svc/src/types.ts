@@ -53,15 +53,6 @@ export interface IDuckdbConcept {
   totalHits: number;
 }
 
-export interface IRelationship {
-  relationship_id: string;
-  relationship_name: string;
-  is_hierarchical: boolean;
-  defines_ancestry: boolean;
-  reverse_relationship_id: string;
-  relationship_concept_id: number;
-}
-
 export interface IConceptAncestor {
   ancestor_concept_id: number;
   descendant_concept_id: number;
@@ -145,8 +136,6 @@ export type FhirValueSetExpansionContainsWithExt = {
   validEndDate: string;
   validity: string;
 };
-
-export const SupportedFhirVersion = "4_0_0";
 
 export const FhirResourceType = {
   valueset: "ValueSet",

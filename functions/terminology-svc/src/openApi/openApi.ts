@@ -2,7 +2,6 @@ import {
   OpenApiGeneratorV3,
   OpenAPIRegistry,
 } from "@asteasolutions/zod-to-openapi";
-import { z } from "zod";
 import * as yaml from "yaml";
 import * as fs from "fs";
 import * as schemas from "../controllers/validators/validationSchemas.ts";
@@ -21,37 +20,11 @@ type Method =
 
 const registry = new OpenAPIRegistry();
 
-const UserIdSchema = registry.registerParameter("UserId", schemas.UserIdSchema);
-
 const bearerAuth = registry.registerComponent("securitySchemes", "bearerAuth", {
   type: "http",
   scheme: "bearer",
   bearerFormat: "JWT",
 });
-
-// registry.registerPath({
-//   method: "get",
-//   path: "/users/{id}",
-//   description: "Get user data by its id",
-//   summary: "Get a single user",
-//   security: [{ [bearerAuth.name]: [] }],
-//   request: {
-//     params: z.object({ id: UserIdSchema }),
-//   },
-//   responses: {
-//     200: {
-//       description: "Object with user data.",
-//       content: {
-//         "application/json": {
-//           schema: schemas.UserSchema,
-//         },
-//       },
-//     },
-//     204: {
-//       description: "No content - successful operation",
-//     },
-//   },
-// });
 
 registry.registerPath({
   method: "get",

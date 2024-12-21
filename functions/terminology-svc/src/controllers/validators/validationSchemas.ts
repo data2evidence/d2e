@@ -2,6 +2,7 @@ import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 extendZodWithOpenApi(z);
 
+// TODO: remove after updating openapi
 export const UserIdSchema = z.string().openapi({
   param: {
     name: "id",

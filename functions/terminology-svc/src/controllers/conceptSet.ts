@@ -1,6 +1,5 @@
 // @ts-types="npm:@types/express"
 import { NextFunction, Response, Request } from "express";
-import { getRoot, validator } from "./validators/requestValidators.ts";
 import { SystemPortalAPI } from "../api/portal-api.ts";
 import { JwtPayload, decode } from "jsonwebtoken";
 import { randomUUID } from "crypto";

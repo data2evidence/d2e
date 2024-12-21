@@ -14,7 +14,6 @@ import {
   Filters,
   IDuckdbFacet,
 } from "../types.ts";
-// import { groupBy } from "../utils/helperUtil.ts";
 import { CachedbDAO } from "./cachedb-dao.ts";
 import { SystemPortalAPI } from "../api/portal-api.ts";
 import { groupBy } from "../utils/helperUtil.ts";
