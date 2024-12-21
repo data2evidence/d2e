@@ -401,9 +401,9 @@ services:
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",
             "DUCKDB__DATA_FOLDER": "/home/docker/src/alp-data-node/app/duckdb_data",
             "LOCAL_DEBUG": "false",
-            "SKIP_AUTH": "${SKIP_AUTH:-FALSE}",
             "USE_DUCKDB": "${USE_DUCKDB:-true}",
             "USE_CACHEDB": "${USE_CACHEDB:-true}",
+            "USE_HANA_JWT_AUTHC": "${USE_HANA_JWT_AUTHC:-false}",
             "USE_EXTENSION_FOR_COHORT_CREATION": "false",
             "isTestEnv": "${isTestEnv}",
             "local": "${local}",
@@ -568,7 +568,6 @@ services:
       GH_TOKEN: ${GH_TOKEN}
       PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
       PLUGINS_API_VERSION: ${PLUGINS_API_VERSION:-latest}
-      WATCH_FUNCTIONS: false
       PLUGINS_SEED_UPDATE: ${PLUGINS_SEED_UPDATE:-false}
 
   alp-minerva-pg-mgmt-init:
@@ -709,7 +708,6 @@ services:
       PREFECT_UI_STATIC_DIRECTORY: /app/ui-files
       PREFECT_SERVER_API_PORT: 41${BASE_PORT:-1}20
       PREFECT_API_ENABLE_HTTP2: False
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-dataflow-gen-worker:
     command:
@@ -882,6 +880,7 @@ services:
       LOGTO__ADMIN_SERVER__FQDN_URL: "http://alp-logto-1:3002"
       LOGTO__CLIENTID_PASSWORD__BASIC_AUTH: ${LOGTO__CLIENTID_PASSWORD__BASIC_AUTH}
       LOGTO__ALP_ADMIN_APP: '{"application": {"id": "${LOGTO_API_M2M_CLIENT_ID}", "name":"alp-admin","description":"alp-admin", "secret": "${LOGTO_API_M2M_CLIENT_SECRET}"}, "role": { "name":"api-access","description":"Logto API access"}}'
+      CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
 
   alp-logto:
     container_name: &c8 alp-logto-${BASE_PORT:-1}

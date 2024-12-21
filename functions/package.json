@@ -32,6 +32,7 @@
         {
           "source": "/jobplugins",
           "function": "/jobplugins",
+          "imports": "/jobplugins/import.json",
           "env": "jobplugins"
         },
         {
@@ -469,12 +470,17 @@
           "path": "^/pa-config-svc/enduser(.*)",
           "scopes": [
             "PAConfig.svc",
-            "PAConfig.svc/read",
-            "PA.Score.svc"
+            "PAConfig.svc/read"
           ]
         },
         {
           "path": "^/pa-config-svc/services/(.*)",
+          "scopes": [
+            "PAConfig.svc"
+          ]
+        },
+        {
+          "path": "^/pa-config-svc/db/(.*)",
           "scopes": [
             "PAConfig.svc"
           ]
