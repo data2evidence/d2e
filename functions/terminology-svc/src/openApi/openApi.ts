@@ -34,8 +34,8 @@ function getOpenApiDocumentation() {
     openapi: "3.0.0",
     info: {
       version: "1.0.0",
-      title: "My API",
-      description: "This is the API",
+      title: "Terminology Service API",
+      description: "This is the API for Terminology Service",
     },
     servers: [{ url: "v1" }],
   });
