@@ -1,3 +1,15 @@
+export type ConceptSet = {
+  id: string;
+  name: string;
+  shared: boolean;
+  concepts: ConceptSetConcept[];
+  createdBy: string;
+  createdDate: Date;
+  modifiedBy: string;
+  modifiedDate: Date;
+  userName: string;
+};
+
 export type ConceptSetConcept = {
   id: number;
   useDescendants: boolean;

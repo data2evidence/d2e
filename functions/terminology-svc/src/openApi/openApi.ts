@@ -334,6 +334,60 @@ registry.registerPath({
     },
   },
 });
+registry.registerPath({
+  method: "get",
+  path: "/terminology/concept-set/{conceptSetId}",
+  description: "Get a list of recommended concepts",
+  summary: "Get all concept sets",
+  security: [{ [bearerAuth.name]: [] }],
+  request: {
+    params: conceptSetSchemas.getConceptSetParams,
+    query: conceptSetSchemas.getConceptSetQuery,
+  },
+  responses: {
+    200: {
+      description: "Object with concept set data.",
+      content: {
+        "application/json": {
+          schema: schemas.UserSchema,
+        },
+      },
+    },
+    204: {
+      description: "No content - successful operation",
+    },
+  },
+});
+registry.registerPath({
+  method: "put",
+  path: "/terminology/concept-set/{conceptSetId}",
+  description: "Get a list of recommended concepts",
+  summary: "Get all concept sets",
+  security: [{ [bearerAuth.name]: [] }],
+  request: {
+    params: conceptSetSchemas.updateConceptSetParams,
+    body: {
+      content: {
+        "application/json": {
+          schema: conceptSetSchemas.updateConceptSetBody,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Object with concept set data.",
+      content: {
+        "application/json": {
+          schema: schemas.UserSchema,
+        },
+      },
+    },
+    204: {
+      description: "No content - successful operation",
+    },
+  },
+});
 
 /****** **************** ******/
 /****** SCHEMAS END HERE ******/

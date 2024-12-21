@@ -8,6 +8,7 @@
         "express": "npm:express",
         "axios": "npm:axios",
         "jsonwebtoken": "npm:jsonwebtoken",
+        "crypto": "node:crypto",
         "pg": "npm:pg"
     }
 }

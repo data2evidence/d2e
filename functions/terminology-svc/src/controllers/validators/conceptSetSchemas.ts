@@ -31,3 +31,34 @@ export const createConceptSetBody = z.object({
 export const createConceptSet = z.object({
   body: createConceptSetBody,
 });
+
+export const getConceptSetQuery = z.object({ datasetId: z.string() });
+export const getConceptSetParams = z.object({
+  conceptSetId: z.string(),
+});
+export const getConceptSet = z.object({
+  query: getConceptSetQuery,
+  params: getConceptSetParams,
+});
+
+export const updateConceptSetBody = z
+  .object({
+    concepts: z.array(
+      z.object({
+        id: z.number(),
+        useDescendants: z.boolean(),
+        useMapped: z.boolean(),
+      })
+    ),
+    name: z.string(),
+    shared: z.boolean(),
+    userName: z.string(),
+  })
+  .partial();
+export const updateConceptSetParams = z.object({
+  conceptSetId: z.string(),
+});
+export const updateConceptSet = z.object({
+  body: updateConceptSetBody,
+  params: updateConceptSetParams,
+});

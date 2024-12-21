@@ -5,6 +5,7 @@ import { SystemPortalAPI } from "../api/portal-api.ts";
 import { JwtPayload, decode } from "jsonwebtoken";
 import { randomUUID } from "crypto";
 import * as schemas from "./validators/conceptSetSchemas.ts";
+import { CachedbService } from "../services/cachedb.ts";
 
 const getUserIdFromToken = (token: string): string => {
   const decodedToken = decode(token.replace(/bearer /i, "")) as JwtPayload;
@@ -57,8 +58,8 @@ export const createConceptSet = async (
     const userId = getUserIdFromToken(req.headers["authorization"]!);
     const newConceptSet = addOwner(
       {
-        ...body,
         id: randomUUID(),
+        ...body,
       },
       true,
       userId
@@ -70,6 +71,68 @@ export const createConceptSet = async (
     });
 
     res.send(newConceptSet.id);
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getConceptSet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { query, params } = schemas.getConceptSet.parse(req);
+    const systemPortalApi = new SystemPortalAPI(req);
+    const conceptSet = await systemPortalApi.getConceptSetById(
+      params.conceptSetId
+    );
+    const conceptIds = conceptSet.concepts.map((c) => c.id);
+    const cachedbService = new CachedbService(req);
+    const concepts = await cachedbService.getConceptsByIds(
+      conceptIds,
+      query.datasetId
+    );
+    const conceptSetWithConceptDetails = {
+      ...conceptSet,
+      concepts: concepts.map((concept) => {
+        const conceptFromSet = conceptSet.concepts.find(
+          (c) => c.id === concept.conceptId
+        );
+        return {
+          ...concept,
+          ...conceptFromSet,
+          conceptCode: concept.code,
+          conceptName: concept.display,
+          vocabularyId: concept.system,
+        };
+      }),
+    };
+    res.send(conceptSetWithConceptDetails);
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const updateConceptSet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body, params } = schemas.updateConceptSet.parse(req);
+    const userId = getUserIdFromToken(req.headers["authorization"]!);
+    const updatedConceptSet = addOwner(
+      {
+        id: params.conceptSetId,
+        ...body,
+      },
+      false,
+      userId
+    );
+    const systemPortalApi = new SystemPortalAPI(req);
+    await systemPortalApi.updateConceptSet(updatedConceptSet);
+    res.send(updatedConceptSet.id);
   } catch (e) {
     next(e);
   }

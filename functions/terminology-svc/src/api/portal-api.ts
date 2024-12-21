@@ -3,10 +3,7 @@ import { Request } from "express";
 import axios, { AxiosRequestConfig } from "axios";
 import { Agent } from "https";
 import { env } from "../env.ts";
-
-// import { ConceptSet } from "../entity/index.ts";
-
-type ConceptSet = any;
+import { ConceptSet } from "../types.ts";
 
 interface CreateConceptSetDto {
   serviceArtifact: any;
@@ -96,7 +93,7 @@ export class SystemPortalAPI {
     try {
       const options = await this.createOptions();
       const url = `${this.url}/user-artifact/concept_sets/${id}`;
-      const result = await axios.get(url, options);
+      const result = await axios.get<ConceptSet[]>(url, options);
       return result.data[0];
     } catch (error) {
       console.error(`${errorMessage}: ${error}`);

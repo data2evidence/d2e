@@ -26,6 +26,8 @@ const addRoute = (
   }
   // i.e. $expand needs to be \\$expand for route regex to work
   routeInfo.path = routeInfo.path.replaceAll("$", "\\$");
+  // convert {paramvalue} to :paramvalue for express routes
+  routeInfo.path = routeInfo.path.replace(/\{([a-zA-Z0-9_]+)\}/g, ":$1");
   router[routeInfo.method](routeInfo.path, controller);
   console.info(`Route "${fullRouteId}" ready.`);
   delete _routeMap[fullRouteId];
@@ -42,8 +44,8 @@ addRoute("post:/concept/getStandardConcepts", cc.getStandardConcepts);
 
 addRoute("get:/concept-set", csc.getConceptSets);
 addRoute("post:/concept-set", csc.createConceptSet);
-// addRoute("get:/concept-set/{conceptSetId}", csc.getConceptSets);
-// addRoute("put:/concept-set/{conceptSetId}", csc.getConceptSets);
+addRoute("get:/concept-set/{conceptSetId}", csc.getConceptSet);
+addRoute("put:/concept-set/{conceptSetId}", csc.updateConceptSet);
 // addRoute("delete:/concept-set/{conceptSetId}", csc.getConceptSets);
 // addRoute("post:/concept-set/included-concepts", csc.getConceptSets);
 
