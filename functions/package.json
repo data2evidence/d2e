@@ -1209,6 +1209,15 @@
           ]
         },
         {
+          "path": "^/terminology/concept-set/included-concepts$",
+          "scopes": [
+            "gateway.terminology.conceptSet.read"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
           "path": "^/terminology/concept-set/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}?",
           "scopes": [
             "gateway.terminology.conceptSet.read"

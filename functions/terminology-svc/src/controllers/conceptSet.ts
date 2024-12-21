@@ -151,3 +151,99 @@ export const removeConceptSet = async (
     next(e);
   }
 };
+
+export const getIncludedConcepts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = schemas.getIncludedConcepts.parse(req);
+
+    const { conceptSetIds, datasetId } = body;
+
+    const promises = conceptSetIds.map(async (conceptSetId) => {
+      const systemPortalApi = new SystemPortalAPI(req);
+      const conceptSet = await systemPortalApi.getConceptSetById(conceptSetId);
+      const conceptIds = conceptSet.concepts.map((c) => c.id);
+      const cachedbService = new CachedbService(req);
+      const concepts = await cachedbService.getConceptsByIds(
+        conceptIds,
+        datasetId
+      );
+      const conceptSetWithConceptDetails = {
+        ...conceptSet,
+        concepts: concepts.map((concept) => {
+          const conceptFromSet = conceptSet.concepts.find(
+            (c) => c.id === concept.conceptId
+          );
+          return {
+            ...concept,
+            ...conceptFromSet,
+            conceptCode: concept.code,
+            conceptName: concept.display,
+            vocabularyId: concept.system,
+          };
+        }),
+      };
+      return conceptSetWithConceptDetails;
+    });
+
+    const conceptSets = await Promise.all(promises);
+
+    const conceptIds: number[] = [];
+    const conceptIdsToIncludeDescendant: number[] = [];
+    const conceptIdsToIncludeMapped: number[] = [];
+    const conceptIdsToIncludeMappedAndDescendant: number[] = [];
+
+    conceptSets.forEach((conceptSet) => {
+      conceptSet.concepts.forEach((concept) => {
+        if (!concept.id) {
+          return;
+        }
+        conceptIds.push(concept.id);
+        if (concept.useDescendants) {
+          conceptIdsToIncludeDescendant.push(concept.id);
+        }
+        if (concept.useMapped) {
+          conceptIdsToIncludeMapped.push(concept.id);
+          if (concept.useDescendants) {
+            conceptIdsToIncludeMappedAndDescendant.push(concept.id);
+          }
+        }
+      });
+    });
+
+    if (conceptIds.length === 0) {
+      res.send([]);
+      return;
+    }
+    const cachedbService = new CachedbService(req);
+
+    const includedConceptIds = await cachedbService.getConceptsAndDescendantIds(
+      conceptIds,
+      conceptIdsToIncludeDescendant,
+      datasetId
+    );
+    const mappedConceptsAndDescendantIds =
+      await cachedbService.getConceptsAndDescendantIds(
+        conceptIdsToIncludeMapped,
+        conceptIdsToIncludeMappedAndDescendant,
+        datasetId
+      );
+
+    const mappedConceptIds = await cachedbService.getConceptRelationshipMapsTo(
+      mappedConceptsAndDescendantIds,
+      datasetId
+    );
+    mappedConceptIds.forEach((concept) => {
+      includedConceptIds.push(concept.concept_id_1);
+    });
+
+    const uniqueConceptIds = Array.from(new Set(includedConceptIds)).sort();
+    res.send(uniqueConceptIds);
+  } catch (e) {
+    console.error("Error getting included concepts for concept sets!");
+    next(e);
+  }
+};

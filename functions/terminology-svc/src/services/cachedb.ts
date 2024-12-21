@@ -284,53 +284,56 @@ export class CachedbService {
     return duckdbResultMap.expansion.contains;
   }
 
-  //   async getConceptRelationshipMapsTo(conceptIds: number[], datasetId: string) {
-  //     if (conceptIds.length === 0) {
-  //       return [];
-  //     }
-  //     const vocabSchemaName = await this.getVocabSchemaName(datasetId);
-  //     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
-  //     const result = await cachedbDao.getConceptRelationship(
-  //       conceptIds,
-  //       "Maps to"
-  //     );
-  //     return result;
-  //   }
+  async getConceptRelationshipMapsTo(conceptIds: number[], datasetId: string) {
+    if (conceptIds.length === 0) {
+      return [];
+    }
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+    const result = await cachedbDao.getConceptRelationship(
+      conceptIds,
+      "Maps to"
+    );
+    return result;
+  }
 
-  //   async getConceptsAndDescendantIds(
-  //     conceptIds: number[],
-  //     descendantIds: number[],
-  //     datasetId: string
-  //   ): Promise<number[]> {
-  //     if (!conceptIds.length) {
-  //       return [];
-  //     }
-  //     const conceptsAndDescendantIds: number[] = [];
+  async getConceptsAndDescendantIds(
+    conceptIds: number[],
+    descendantIds: number[],
+    datasetId: string
+  ): Promise<number[]> {
+    if (!conceptIds.length) {
+      return [];
+    }
+    const conceptsAndDescendantIds: number[] = [];
 
-  //     const vocabSchemaName = await this.getVocabSchemaName(datasetId);
-  //     const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
+    const vocabSchemaName = await this.getVocabSchemaName(datasetId);
+    const cachedbDao = new CachedbDAO(this.token, datasetId, vocabSchemaName);
 
-  //     // Ensures included concept IDs are present in vocab schema and valid
-  //     const validConcepts = await cachedbDao.getMultipleExactConcepts(
-  //       conceptIds,
-  //       false
-  //     );
-  //     validConcepts.hits.forEach((concept) => {
-  //       conceptsAndDescendantIds.push(concept.concept_id);
-  //     });
+    // Ensures included concept IDs are present in vocab schema and valid
+    const validConcepts = await cachedbDao.getMultipleExactConcepts(
+      conceptIds,
+      false
+    );
+    if (!validConcepts) {
+      return [];
+    }
+    validConcepts.hits.forEach((concept) => {
+      conceptsAndDescendantIds.push(concept.concept_id);
+    });
 
-  //     if (!descendantIds.length) {
-  //       return conceptsAndDescendantIds;
-  //     }
+    if (!descendantIds.length) {
+      return conceptsAndDescendantIds;
+    }
 
-  //     const conceptDescendants = await cachedbDao.getExactConceptDescendants(
-  //       descendantIds
-  //     );
-  //     conceptDescendants.forEach((concept) => {
-  //       conceptsAndDescendantIds.push(concept.descendant_concept_id);
-  //     });
-  //     return conceptsAndDescendantIds;
-  //   }
+    const conceptDescendants = await cachedbDao.getExactConceptDescendants(
+      descendantIds
+    );
+    conceptDescendants.forEach((concept) => {
+      conceptsAndDescendantIds.push(concept.descendant_concept_id);
+    });
+    return conceptsAndDescendantIds;
+  }
 
   private mapConceptWithFhirValueSetExpansionContains(item: IConcept) {
     const today = new Date();

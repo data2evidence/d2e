@@ -69,3 +69,11 @@ export const removeConceptSetParams = z.object({
 export const removeConceptSet = z.object({
   params: removeConceptSetParams,
 });
+
+export const getIncludedConceptsBody = z.object({
+  datasetId: z.string(),
+  conceptSetIds: z.array(z.string()),
+});
+export const getIncludedConcepts = z.object({
+  body: getIncludedConceptsBody,
+});

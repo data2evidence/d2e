@@ -126,7 +126,7 @@ export type FhirValueSetExpansion = {
 };
 
 export type FhirValueSetExpansionContainsWithExt = {
-  id?: string;
+  id?: number;
   extension?: string;
   abstract?: string;
   inactive?: string;
