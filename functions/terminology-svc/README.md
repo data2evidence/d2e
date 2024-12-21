@@ -1,5 +1,14 @@
-# Generate OpenAPI Spec
+# Terminology Service
 
+## Trial run the server to check for typescript or import errors
+
+```bash
+deno task trial-run-server
 ```
-deno run --allow-env --allow-read --allow-write src/updateOpenApi.ts
+
+## Generate OpenApi yaml
+
+```bash
+deno task gen-openapi-doc
+# Generates openapi-docs.yml
 ```
