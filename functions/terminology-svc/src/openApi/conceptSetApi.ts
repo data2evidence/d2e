@@ -1,6 +1,6 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import * as conceptSetSchemas from "../controllers/validators/conceptSetSchemas.ts";
-import * as schemas from "../controllers/validators/validationSchemas.ts";
+import z from "zod";
 
 export const registerApi = (registry: OpenAPIRegistry) => {
   registry.registerPath({
@@ -13,7 +13,7 @@ export const registerApi = (registry: OpenAPIRegistry) => {
         description: "Object with concept set data.",
         content: {
           "application/json": {
-            schema: schemas.UserSchema,
+            schema: z.string(),
           },
         },
       },
@@ -40,7 +40,7 @@ export const registerApi = (registry: OpenAPIRegistry) => {
         description: "Object with concept set data.",
         content: {
           "application/json": {
-            schema: schemas.UserSchema,
+            schema: z.string(),
           },
         },
       },
@@ -62,7 +62,7 @@ export const registerApi = (registry: OpenAPIRegistry) => {
         description: "Object with concept set data.",
         content: {
           "application/json": {
-            schema: schemas.UserSchema,
+            schema: z.string(),
           },
         },
       },
@@ -90,7 +90,7 @@ export const registerApi = (registry: OpenAPIRegistry) => {
         description: "Object with concept set data.",
         content: {
           "application/json": {
-            schema: schemas.UserSchema,
+            schema: z.string(),
           },
         },
       },
@@ -111,7 +111,7 @@ export const registerApi = (registry: OpenAPIRegistry) => {
         description: "Object with concept set data.",
         content: {
           "application/json": {
-            schema: schemas.UserSchema,
+            schema: z.string(),
           },
         },
       },
@@ -138,7 +138,7 @@ export const registerApi = (registry: OpenAPIRegistry) => {
         description: "Object with concept set data.",
         content: {
           "application/json": {
-            schema: schemas.UserSchema,
+            schema: z.string(),
           },
         },
       },

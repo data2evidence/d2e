@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type ConceptSet = {
   id: string;
   name: string;
@@ -27,26 +29,16 @@ export interface IConcept {
   valid_start_date?: number;
   valid_end_date?: number;
 }
-export interface IDuckdbFacet {
-  conceptClassId: {
-    [key: string]: number;
-  };
-  domainId: {
-    [key: string]: number;
-  };
-  standardConcept: {
-    [key: string]: number;
-  };
-  vocabularyId: {
-    [key: string]: number;
-  };
-  validity: {
-    [key: string]: number;
-  };
-  concept: {
-    [key: string]: number;
-  };
-}
+
+export const IDuckdbFacetSchema = z.object({
+  conceptClassId: z.record(z.number()),
+  domainId: z.record(z.number()),
+  standardConcept: z.record(z.number()),
+  vocabularyId: z.record(z.number()),
+  validity: z.record(z.number()),
+  concept: z.record(z.number()),
+});
+export type IDuckdbFacet = z.infer<typeof IDuckdbFacetSchema>;
 
 export interface IDuckdbConcept {
   hits: IConcept[];

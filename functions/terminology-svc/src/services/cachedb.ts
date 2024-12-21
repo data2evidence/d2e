@@ -53,6 +53,7 @@ export class CachedbService {
       return this.duckdbResultMapping(result);
     } catch (err) {
       console.error(err);
+      throw err;
     }
   }
 

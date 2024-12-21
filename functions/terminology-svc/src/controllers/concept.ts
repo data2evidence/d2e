@@ -8,6 +8,7 @@ import {
   ConceptHierarchyNode,
   Filters,
 } from "../types.ts";
+import { GetConceptFilterOptions } from "./responseTypes.ts";
 
 export const getConcepts = async (
   req: Request,
@@ -155,7 +156,8 @@ export const getConceptFilterOptions = async (
       searchText,
       filter
     );
-    res.send({ filterOptions });
+    const response: GetConceptFilterOptions = { filterOptions };
+    res.send(response);
   } catch (e) {
     next(e);
   }
