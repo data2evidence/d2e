@@ -1,4 +1,9 @@
 {
+  "deno": "1.43.0",
+  "tasks": {
+    "gen-openapi-doc": "deno run --allow-env --allow-read --allow-write src/openApi/updateOpenApi.ts",
+    "trial-run-server": "CACHEDB__HOST=test CACHEDB__PORT=1234 TLS__INTERNAL__CA_CRT=test SERVICE_ROUTES='{}' deno run --allow-env --allow-read --allow-write --allow-net index.ts"
+  },
   "importMap": "./import.json",
   "compilerOptions": {
     "types": [
