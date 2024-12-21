@@ -137,3 +137,17 @@ export const updateConceptSet = async (
     next(e);
   }
 };
+export const removeConceptSet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { params } = schemas.removeConceptSet.parse(req);
+    const systemPortalApi = new SystemPortalAPI(req);
+    await systemPortalApi.deleteConceptSet(params.conceptSetId);
+    res.send(params.conceptSetId);
+  } catch (e) {
+    next(e);
+  }
+};

@@ -46,7 +46,7 @@ addRoute("get:/concept-set", csc.getConceptSets);
 addRoute("post:/concept-set", csc.createConceptSet);
 addRoute("get:/concept-set/{conceptSetId}", csc.getConceptSet);
 addRoute("put:/concept-set/{conceptSetId}", csc.updateConceptSet);
-// addRoute("delete:/concept-set/{conceptSetId}", csc.getConceptSets);
+addRoute("delete:/concept-set/{conceptSetId}", csc.removeConceptSet);
 // addRoute("post:/concept-set/included-concepts", csc.getConceptSets);
 
 addRoute(`get:/fhir/4_0_0/valueset/$expand`, cc.getConcepts);

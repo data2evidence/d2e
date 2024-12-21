@@ -62,3 +62,10 @@ export const updateConceptSet = z.object({
   body: updateConceptSetBody,
   params: updateConceptSetParams,
 });
+
+export const removeConceptSetParams = z.object({
+  conceptSetId: z.string(),
+});
+export const removeConceptSet = z.object({
+  params: removeConceptSetParams,
+});
