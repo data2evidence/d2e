@@ -18,9 +18,6 @@ export const registerApi = (registry: OpenAPIRegistry) => {
           },
         },
       },
-      204: {
-        description: "No content - successful operation",
-      },
     },
     tags: ["Concept", "FHIR"],
   });
@@ -42,9 +39,6 @@ export const registerApi = (registry: OpenAPIRegistry) => {
           },
         },
       },
-      204: {
-        description: "No content - successful operation",
-      },
     },
     tags: ["Concept"],
   });
@@ -65,9 +59,6 @@ export const registerApi = (registry: OpenAPIRegistry) => {
             schema: schemas.UserSchema,
           },
         },
-      },
-      204: {
-        description: "No content - successful operation",
       },
     },
     tags: ["Concept", "FHIR"],
@@ -93,9 +84,6 @@ export const registerApi = (registry: OpenAPIRegistry) => {
             schema: schemas.UserSchema,
           },
         },
-      },
-      204: {
-        description: "No content - successful operation",
       },
     },
     tags: ["Concept"],
@@ -124,9 +112,6 @@ export const registerApi = (registry: OpenAPIRegistry) => {
           },
         },
       },
-      204: {
-        description: "No content - successful operation",
-      },
     },
     tags: ["Concept"],
   });
@@ -153,9 +138,6 @@ export const registerApi = (registry: OpenAPIRegistry) => {
             schema: schemas.UserSchema,
           },
         },
-      },
-      204: {
-        description: "No content - successful operation",
       },
     },
     tags: ["Concept"],
@@ -184,9 +166,6 @@ export const registerApi = (registry: OpenAPIRegistry) => {
           },
         },
       },
-      204: {
-        description: "No content - successful operation",
-      },
     },
     tags: ["Concept"],
   });
@@ -207,9 +186,6 @@ export const registerApi = (registry: OpenAPIRegistry) => {
             schema: schemas.UserSchema,
           },
         },
-      },
-      204: {
-        description: "No content - successful operation",
       },
     },
     tags: ["Concept"],
@@ -237,9 +213,6 @@ export const registerApi = (registry: OpenAPIRegistry) => {
             schema: schemas.UserSchema,
           },
         },
-      },
-      204: {
-        description: "No content - successful operation",
       },
     },
     tags: ["Concept"],
