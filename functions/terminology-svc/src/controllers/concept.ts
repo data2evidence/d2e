@@ -232,7 +232,7 @@ export const getConceptHierarchy = async (
       if (conceptAncestors.length == 0 || depth <= 0) {
         return;
       }
-      conceptAncestors.forEach((concept_ancestor) => {
+      for (const concept_ancestor of conceptAncestors) {
         if (concept_ancestor.ancestor_concept_id !== conceptId) {
           edges.push({
             source: concept_ancestor.ancestor_concept_id,
@@ -243,13 +243,13 @@ export const getConceptHierarchy = async (
             conceptId: concept_ancestor.ancestor_concept_id,
             level: maxDepth - depth + 1,
           });
-          getAllAncestors(
+          await getAllAncestors(
             concept_ancestor.ancestor_concept_id,
             depth - 1,
             maxDepth
           );
         }
-      });
+      }
     };
 
     await getAllAncestors(conceptId, depth, depth);
