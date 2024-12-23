@@ -11,6 +11,7 @@ import {
     SnapshotSchemaMetadata,
 } from "../utils/DBSvcTypes";
 import { env } from "../env";
+import { decode } from "jsonwebtoken";
 
 const logger = CreateLogger("analytics-log");
 
@@ -184,7 +185,10 @@ export class DBDAO {
     ): void => {
         (async () => {
             try {
-                const dbClient = await this.getDBClientByTenant(this.tenant, req);
+                const dbClient = await this.getDBClientByTenant(
+                    this.tenant,
+                    req
+                );
                 const dbConnection: DBSvcConnectionInterface = <
                     DBSvcConnectionInterface
                 >await dbConnectionUtil.getConnection(this.dialect, dbClient);
@@ -211,7 +215,8 @@ export class DBDAO {
             async (resolve, reject) => {
                 try {
                     const dbClient = await this.getDBClientByTenant(
-                        this.tenant, req
+                        this.tenant,
+                        req
                     );
                     const dbConnection: DBSvcConnectionInterface = <
                         DBSvcConnectionInterface
@@ -230,7 +235,11 @@ export class DBDAO {
         );
     };
 
-    private getDBClientByTenant = (tenant: string, request: any, schema?: string) => {
+    private getDBClientByTenant = (
+        tenant: string,
+        request: any,
+        schema?: string
+    ) => {
         return new Promise(async (resolve, reject) => {
             let tenant_configs = config.getTenantConfigs(this.dialect);
 
@@ -238,13 +247,25 @@ export class DBDAO {
             credentials = config.getDBConfigByTenant(this.dialect, tenant);
 
             try {
-                if (credentials.dialect === DB.HANA && env.USE_HANA_JWT_AUTHC === "true") {
+                if (
+                    credentials.dialect === DB.HANA &&
+                    env.USE_HANA_JWT_AUTHC === "true"
+                ) {
                     delete credentials.user;
                     delete credentials.password;
-                    if(request.headers["x-idp-authorization"]) {
-                        credentials["token"] = JSON.stringify(decode(request.headers["x-idp-authorization"].replace(/bearer /i, "")))
+                    if (request.headers["x-idp-authorization"]) {
+                        credentials["token"] = JSON.stringify(
+                            decode(
+                                request.headers["x-idp-authorization"].replace(
+                                    /bearer /i,
+                                    ""
+                                )
+                            )
+                        );
                     } else {
-                        throw new Error("Intermediary IDP token doesnt exist for HANA JWT Authentication!");
+                        throw new Error(
+                            "Intermediary IDP token doesnt exist for HANA JWT Authentication!"
+                        );
                     }
                 }
                 const client = await dbConnectionUtil.getDbClient(credentials);
