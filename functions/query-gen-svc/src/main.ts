@@ -91,7 +91,7 @@ export const main = async () => {
     //await initSwaggerRoutes(app);
     app.post('/analytics-svc/api/services/query', generateQuery);
     app.post('/analytics-svc/api/services/query/cohort', cohortGenerateQuery);
-    app.post('/analytics-svc/api/services/query/generateQuery', cohortCompareGenerateQuery);
+    app.post('/analytics-svc/api/services/query/cohortCompare', cohortCompareGenerateQuery);
     app.post('/analytics-svc/api/services/query/domainvalues', domainGenerateQuery);
     app.post('/analytics-svc/api/services/query/pluginendpoint', pluginGenerateQuery);
 

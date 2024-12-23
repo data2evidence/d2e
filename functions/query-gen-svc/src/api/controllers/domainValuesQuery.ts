@@ -19,7 +19,7 @@ export const generateQuery = async (req: IMRIRequest, res, next) => {
             searchQuery
         ).generateQuery();
 
-        log.debug(`Query response:\n${JSON.stringify(sQuery)}`);
+        // log.debug(`Query response:\n${JSON.stringify(sQuery)}`);
 
         res.status(200).send({
             queryString: sQuery.queryString,

@@ -44,8 +44,7 @@ export class NotebookService {
         },
         true
       )
-      await this.userArtifactService.createServiceArtifact({
-        serviceName: ServiceName.NOTEBOOKS,
+      await this.userArtifactService.createServiceArtifact(ServiceName.NOTEBOOKS, {
         serviceArtifact: notebookEntity
       })
       this.logger.info(`Created new notebook ${notebookEntity.name} with id ${notebookEntity.id}`)
@@ -58,7 +57,7 @@ export class NotebookService {
 
   async updateNotebook(notebookUpdateDto: INotebookUpdateDto): Promise<INotebook> {
     try {
-      const notebook = await this.userArtifactService.getServiceArtifactById(
+      const notebook = await this.userArtifactService.getUserServiceArtifactById(
         this.userId,
         ServiceName.NOTEBOOKS,
         notebookUpdateDto.id
@@ -74,7 +73,7 @@ export class NotebookService {
         id: notebookUpdateDto.id,
         serviceArtifact: notebookUpdateDto
       })
-      await this.userArtifactService.updateServiceArtifact(ServiceName.NOTEBOOKS, updatedServiceEntity)
+      await this.userArtifactService.updateUserServiceArtifact(ServiceName.NOTEBOOKS, updatedServiceEntity)
 
       this.logger.info(`Updated notebook ${notebookUpdateDto.name}`)
       return {
@@ -93,7 +92,7 @@ export class NotebookService {
   async deleteNotebook(id: string): Promise<INotebook> {
     try {
       const notebook = await this.getNotebook(id)
-      await this.userArtifactService.deleteServiceArtifact(this.userId, ServiceName.NOTEBOOKS, id)
+      await this.userArtifactService.deleteUserServiceArtifact(this.userId, ServiceName.NOTEBOOKS, id)
       return notebook
     } catch (error) {
       this.logger.error(`Error deleting notebook ${id}: ${error}`)
@@ -105,7 +104,7 @@ export class NotebookService {
   }
 
   private async getNotebook(id: string) {
-    const notebook = await this.userArtifactService.getServiceArtifactById(this.userId, ServiceName.NOTEBOOKS, id)
+    const notebook = await this.userArtifactService.getUserServiceArtifactById(this.userId, ServiceName.NOTEBOOKS, id)
     if (!notebook) {
       throw new NotFoundException(`Notebook with id ${id} not found`)
     }
