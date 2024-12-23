@@ -1,6 +1,6 @@
 import dayjs from "npm:dayjs";
 import { services } from "../env.ts";
-import { IFlowRunQueryDto, IPrefectFlowRunDto } from "../types_1.ts";
+import { IFlowRunQueryDto, IPrefectFlowRunDto } from "../types.ts";
 
 interface FlowRunParams {
   name: string;

@@ -1,11 +1,7 @@
 import pg from "npm:pg";
 import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { PrefectDeploymentName, PrefectFlowName } from "../const.ts";
-import {
-  DataModel,
-  IGetVersionInfoFlowRunDto,
-  PluginFlow,
-} from "../types_1.ts";
+import { DataModel, IGetVersionInfoFlowRunDto, PluginFlow } from "../types.ts";
 
 export class DataModelFlowService {
   private env = Deno.env.toObject();

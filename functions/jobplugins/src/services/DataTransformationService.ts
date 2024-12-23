@@ -6,7 +6,7 @@ import { Graph } from "../entities/graph.ts";
 import { UtilsService } from "../utils/DataTransformationParser.ts";
 import { PortalServerAPI } from "../api/PortalServerAPI.ts";
 import { PrefectAPI } from "../api/PrefectAPI.ts";
-import { IDataflowDto, IDataflowDuplicateDto } from "../types_1.ts";
+import { IDataflowDto, IDataflowDuplicateDto } from "../types.ts";
 
 export class TransformationService {
   private env = Deno.env.toObject();

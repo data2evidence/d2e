@@ -1,6 +1,6 @@
 import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { PrefectDeploymentName, PrefectFlowName } from "../const.ts";
-import { DatasetAttributesFlowRunDto, DBSvcFlowRunDto } from "../types_1.ts";
+import { DatasetAttributesFlowRunDto, DBSvcFlowRunDto } from "../types.ts";
 
 export class DbSvcService {
   public async createDbSvcFlowRun(

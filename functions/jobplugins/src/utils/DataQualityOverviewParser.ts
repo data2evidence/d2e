@@ -1,4 +1,4 @@
-import { IDataQualityCheckResult } from "../types_1.ts";
+import { IDataQualityCheckResult } from "../types.ts";
 
 export class DataQualityOverviewParser {
   parse = (items: IDataQualityCheckResult[]) => {

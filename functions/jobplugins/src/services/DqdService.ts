@@ -11,7 +11,7 @@ import {
   IDataCharacterizationResult,
   IDataQualityResult,
   IDomainContinuityResult,
-} from "../types_1.ts";
+} from "../types.ts";
 import { DataQualityOverviewParser } from "../utils/DataQualityOverviewParser.ts";
 
 export class DqdService {

@@ -10,7 +10,7 @@ import {
 import {
   DataCharacterizationFlowRunDto,
   DataCharacterizationOptions,
-} from "../types_1.ts";
+} from "../types.ts";
 
 export class DataCharacterizationService {
   public async getDataCharacterizationResults(

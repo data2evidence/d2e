@@ -7,7 +7,7 @@ import {
 } from "npm:typeorm";
 
 import { Audit } from "./audit.ts";
-import { type IReactFlow } from "../types_1.ts";
+import { type IReactFlow } from "../types.ts";
 import { Canvas } from "./canvas.ts";
 
 @Entity("Graph")
