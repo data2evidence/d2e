@@ -745,6 +745,7 @@ services:
       data:
         priority: 20
     volumes:
+      - ./services/alp-dataflow-gen/init_docker_credentials.py:/opt/prefect/init_docker_credentials.py
       - ./services/alp-dataflow-gen/create_workpool_json.py:/opt/prefect/create_workpool_json.py
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
