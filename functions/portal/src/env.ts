@@ -11,14 +11,14 @@ export const env = {
 
   PORTAL_PLUGINS: _env.PORTAL_PLUGINS,
 
-  PG_HOST: _env.PG__HOST,
-  PG_PORT: parseInt(<string>_env.PG__PORT),
-  PG_DATABASE: process.env.PG__DB_NAME,
+  PG_HOST: _env.PG_HOST,
+  PG_PORT: parseInt(<string>_env.PG_PORT),
+  PG_DATABASE: _env.PG_DATABASE,
   PG_SCHEMA: "portal",
-  PG_USER: _env.PG__PORTAL_SERVER__USER,
-  PG_PASSWORD: _env.PG__PORTAL_SERVER__PASSWORD,
-  PG_MANAGE_USER: _env.PG__PORTAL_SERVER__MANAGE_USER,
-  PG_MANAGE_PASSWORD: _env.PG__PORTAL_SERVER__MANAGE_PASSWORD,
+  PG_USER: _env.PG_USER,
+  PG_PASSWORD: _env.PG_PASSWORD,
+  PG_MANAGE_USER: _env.PG_MANAGE_USER,
+  PG_MANAGE_PASSWORD: _env.PG_MANAGE_PASSWORD,
   PG_SSL: _env.PG__SSL,
   PG_CA_ROOT_CERT: _env.PG__CA_ROOT_CERT,
   PG_MAX_POOL: parseInt(_env.PG__MAX_POOL) || 10,
@@ -30,17 +30,7 @@ export const env = {
   MINIO_ACCESS_KEY: "${MINIO__SECRET_KEY}",
   MINIO_SECRET_KEY: "${MINIO__SECRET_KEY}",
 
-  SSL_CA_CERT: _env.SSL_CA_CERT,
-  DB_NAME: "alp",
-  DB_HOST: "localhost",
-  DB_PORT: "41190",
-  DB_USERNAME: "postgres",
-  DB_PASSWORD: "Toor1234",
+  SSL_CA_CERT: _env.SSL_CA_CERT
 };
 
 export const services = JSON.parse(env.SERVICE_ROUTES);
-// export const services = {
-//   usermgmt: "sdfsadf",
-//   analytics: "sfasdf",
-//   paConfig: "sdfasdf"
-// }

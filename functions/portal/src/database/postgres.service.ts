@@ -25,22 +25,21 @@ export class PostgresService implements OnAppBootstrap, OnAppClose {
 
   constructor() {
     this.client = new Client({
-      user: 'postgres',
-      password: 'Toor1234',
-      database: this._env['PG__DB_NAME'] || 'alp',
-      hostname: this._env['PG__HOST'] || 'localhost',
-      schema: 'portal',
+      user: this._env.PG_USER,
+      password: this._env.PG_PASSWORD,
+      database: this._env.PG__DB_NAME,
+      hostname: this._env.PG_HOST,
+      schema: env.PG_SCHEMA,
     });
 
     this.dataSource = new DataSource({
       type: 'postgres',
-      host: this._env['PG__HOST'] || 'localhost',
-      port: parseInt(this._env['DB_PORT']) || 5432,
-      username: 'postgres',
-      password: 'Toor1234',
-      database: this._env['PG__DB_NAME'] || 'alp',
-      schema: 'portal',
-      // TODO: Change to wildcard matching
+      host: this._env.PG_HOST,
+      port: parseInt(this._env.PG_PORT),
+      username: this._env.PG_USER,
+      password: this._env.PG_PASSWORD,
+      database: this._env.PG__DB_NAME,
+      schema: env.PG_SCHEMA,
       entities: [Feature, Config, UserArtifact, UserArtifactGroup, Dataset, DatasetDetail, DatasetTag, DatasetTagConfig, DatasetDashboard, DatasetRelease, DatasetAttribute, DatasetAttributeConfig, Notebook],
     });
   }
