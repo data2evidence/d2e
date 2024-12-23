@@ -13,7 +13,6 @@ export class UserMgmtService {
   }
 
   async getResearcherDatasetIds(userId: string) {
-    console.log(`user-mgmt jwt: ${JSON.stringify(this.jwt)}`);
     const userGroups = await this.userMgmtApi.getUserGroups(userId, this.jwt);
     return userGroups.alp_role_study_researcher;
   }

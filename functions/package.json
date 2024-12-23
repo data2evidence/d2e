@@ -272,6 +272,9 @@
           "portal.dataset.metadataConfig.attribute.delete",
           "portal.config.read",
           "portal.config.write",
+          "portal.userArtifact.read",
+          "portal.userArtifact.write",
+          "portal.userArtifact.delete",
           "portal.userArtifact.group.write",
           "portal.userArtifact.group.delete",
           "terminology.user.read",
@@ -811,30 +814,6 @@
           ]
         },
         {
-          "path": "^/system-portal/helloworld",
-          "scopes": [
-            "portal.dataset.read"
-          ],
-          "httpMethods": [
-            "GET",
-            "POST",
-            "PUT",
-            "DELETE"
-          ]
-        },
-        {
-          "path": "^/system-portal/todo",
-          "scopes": [
-            "portal.dataset.read"
-          ],
-          "httpMethods": [
-            "GET",
-            "POST",
-            "PUT",
-            "DELETE"
-          ]
-        },
-        {
           "path": "^/system-portal/dataset$",
           "scopes": [
             "portal.dataset.read"
@@ -1175,6 +1154,20 @@
           ],
           "httpMethods": [
             "PUT"
+          ]
+        },
+        {
+          "path": "^/system-portal/user-artifact/(.*)$",
+          "scopes": [
+            "portal.userArtifact.read",
+            "portal.userArtifact.write",
+            "portal.userArtifact.delete"
+          ],
+          "httpMethods": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE"
           ]
         },
         {
