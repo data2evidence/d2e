@@ -6,13 +6,15 @@ export class CdwConfigCachedbPostgresConnection extends PostgresConnection.Postg
     pool: Pool,
     schemaName,
     vocabSchemaName = schemaName,
-    callback
+    callback,
+    dialect = "postgresql"
   ) {
     try {
       const conn = new CdwConfigCachedbPostgresConnection(
         pool,
         schemaName,
-        vocabSchemaName
+        vocabSchemaName,
+        dialect
       );
       callback(null, conn);
     } catch (err) {
