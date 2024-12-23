@@ -377,13 +377,11 @@ export class PrefectAPI {
       };
       const options = this.createOptions("POST", data);
       const r = await fetch(url, options);
-      // return await firstValueFrom(obs.pipe(map((result) => result.data)));
       if (!r.ok) {
         throw new Error(`${r.statusText}`);
       }
-      const result = await r.json();
-      console.log(`prefect flowrun logs: ${JSON.stringify(result)}`);
-      return result;
+      console.log(`fetched prefect logs for flowrun: ${id}`);
+      return await r.json();
     } catch (error) {
       console.info(`${errorMessage}: ${error}`);
       throw new Error(errorMessage);
@@ -397,10 +395,10 @@ export class PrefectAPI {
       const data = { state: { type: "CANCELLED" } };
       const options = this.createOptions("POST", data);
       const r = await fetch(url, options);
-      // return await firstValueFrom(r.pipe(map((result) => result.data)));
       if (!r.ok) {
         throw new Error(`${r.statusText}`);
       }
+      console.log(`cancelled prefect flowrun: ${id}`);
       return await r.json();
     } catch (error) {
       console.info(`${errorMessage}: ${error}`);
@@ -417,7 +415,7 @@ export class PrefectAPI {
       if (!r.ok) {
         throw new Error(`${r.statusText}`);
       }
-      // console.log(`getFlowrunState: ${JSON.stringify(await r.json())}`);
+      console.log(`fetched state of flowrun: ${id}`);
       return await r.json();
     } catch (error) {
       console.info(`${errorMessage}: ${error}`);
@@ -442,7 +440,6 @@ export class PrefectAPI {
         throw new Error(r.statusText);
       }
       return await r.json();
-      // return await firstValueFrom(obs.pipe(map(result => result.data)))
     } catch (error) {
       console.info(`${errorMessage}: ${error}`);
       throw new Error(errorMessage);

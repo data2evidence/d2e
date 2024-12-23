@@ -30,54 +30,7 @@ export class TransformationService {
     this.utilsService = new UtilsService();
   }
 
-  // async getGraphByCanvasId(id: string) {
-  //   const revision = await this.graphRepo
-  //     .createQueryBuilder("revision")
-  //     .leftJoin("revision.dataflow", "dataflow")
-  //     .select([
-  //       "dataflow.id",
-  //       "dataflow.name",
-  //       "dataflow.lastFlowRunId",
-  //       "revision.id",
-  //       "revision.flow",
-  //       "revision.comment",
-  //       "revision.createdDate",
-  //       "revision.createdBy",
-  //       "revision.version",
-  //     ])
-  //     .where("dataflow.id = :id", { id })
-  //     .orderBy("revision.createdDate", "DESC")
-  //     .getOne();
-  //   if (revision) {
-  //     return {
-  //       id: revision.dataflow.id,
-  //       name: revision.dataflow.name,
-  //       lastFlowRunId: revision.dataflow.lastFlowRunId,
-  //       flow: revision.flow,
-  //       version: revision.version,
-  //     };
-  //   }
-  //   return null;
-  // }
-
   async getLatestGraphByCanvasId(id: string) {
-    // return await this.canvasRepo
-    //   .createQueryBuilder("dataflow")
-    //   .leftJoin("dataflow.revisions", "revision")
-    //   .select([
-    //     "dataflow.id",
-    //     "dataflow.name",
-    //     "revision.id",
-    //     "revision.flow",
-    //     "revision.comment",
-    //     "revision.createdDate",
-    //     "revision.createdBy",
-    //     "revision.version",
-    //   ])
-    //   .where("dataflow.id = :id", { id })
-    //   .orderBy("revision.createdDate", "DESC")
-    //   .getOne();
-
     return await this.graphRepo
       .createQueryBuilder("revision")
       .leftJoin("revision.canvas", "dataflow")
@@ -233,7 +186,7 @@ export class TransformationService {
     );
 
     if (!revisionEntity) {
-      throw new BadRequestException("Dataflow Revision does not exist");
+      throw new Error("Dataflow Revision does not exist");
     }
     const newDataflowEntity = this.addOwner(
       token,
@@ -281,9 +234,7 @@ export class TransformationService {
       };
     }
 
-    throw new BadRequestException(
-      "Dataflow and/or dataflow revision do not match"
-    );
+    throw new Error("Dataflow and/or dataflow revision do not match");
   }
 
   async getCanvas(id) {
@@ -303,26 +254,5 @@ export class TransformationService {
       .where("dataflow.id = :id", { id })
       .orderBy("revision.createdDate")
       .getOne();
-    // await this.canvasRepo
-    // .createQueryBuilder("dataflow")
-    // .leftJoinAndSelect("dataflow.revisions", "revision")
-    // .leftJoin("dataflow.revisions", "revision")
-    // .select([
-    //   "dataflow.id",
-    //   "dataflow.name",
-    //   "revision.id",
-    //   "revision.flow",
-    //   "revision.comment",
-    //   "revision.createdDate",
-    //   "revision.createdBy",
-    //   "revision.version",
-    // ])
-    // .where("dataflow.id = :id", { id })
-    // .orderBy("revision.createdDate")
-    // .getOne();
   }
-
-  // async createFlowrun(id) {}
-
-  // async createAnalysisFlowrun(id) {}
 }

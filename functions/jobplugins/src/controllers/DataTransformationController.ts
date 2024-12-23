@@ -11,7 +11,6 @@ export class DataTransformationController {
   }
   private async getCanvasList(req, res) {
     try {
-      console.log("in controller");
       const result = await this.dataTransformationService.getCanvasList();
       return res.status(200).send(result);
     } catch (error) {
@@ -124,30 +123,6 @@ export class DataTransformationController {
     }
   }
 
-  // private async createFlowrun(req: Request, res: Response) {
-  //   try {
-  //     const { id } = req.params;
-  //     const result = await this.dataTransformationService.createFlowrun(id);
-  //     return res.status(201).send(result);
-  //   } catch (error) {
-  //     console.error("Error in createFlowrun: ", error);
-  //     return res.status(500).send({ message: "Internal Server Error" });
-  //   }
-  // }
-
-  // private async createAnalysisRun(req: Request, res: Response) {
-  //   try {
-  //     const { id } = req.params;
-  //     const result = await this.dataTransformationService.createAnalysisFlowrun(
-  //       id
-  //     );
-  //     return res.status(201).send(result);
-  //   } catch (error) {
-  //     console.error("Error in createFlowrun: ", error);
-  //     return res.status(500).send({ message: "Internal Server Error" });
-  //   }
-  // }
-
   private registerRoutes() {
     this.router.get("/list", this.getCanvasList.bind(this));
     this.router.get("/:id", this.getCanvasById.bind(this));
@@ -160,8 +135,5 @@ export class DataTransformationController {
     this.router.delete("/:id/:revisionId", this.deleteGraphById.bind(this));
     this.router.post("/", this.createCanvas.bind(this));
     this.router.get("/:id/flow-run-results", this.getResultsById.bind(this));
-
-    // this.router.post("/flow-run/:id", this.createFlowrun);
-    // this.router.post("/analysis-run/:id", this.createAnalysisRun);
   }
 }

@@ -161,4 +161,5 @@ app.get("/jobplugins/exec_datamodel/:datamodel", async (req, res) => {
   }
 });
 
+await runMigrations();
 app.listen(8000);
