@@ -1,11 +1,5 @@
 services:
 
-  alp-minerva-dataflow-mgmt:
-    container_name: alp-minerva-dataflow-mgmt-nest-dev-${BASE_PORT:-1}
-    extends:
-      file: ./services/alp-dataflow/docker-compose.yml
-      service: dataflow-mgmt
-
   alp-minerva-portal-server:
     container_name: alp-minerva-portal-server-nest-dev-${BASE_PORT:-1}
     extends:

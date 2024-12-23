@@ -106,10 +106,6 @@ jobs:
             directory: ./services/alp-portal-server
             context: ./services/alp-portal-server
             fileName: Dockerfile
-          - name: alp-data-node/alp-dataflow
-            directory: ./services/alp-dataflow
-            context: ./services/alp-dataflow
-            fileName: Dockerfile
           - name: alp-data-node/alp-dataflow-gen
             directory: ./services/alp-dataflow-gen
             context: .
