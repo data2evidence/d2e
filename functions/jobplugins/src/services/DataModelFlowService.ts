@@ -58,12 +58,24 @@ export class DataModelFlowService {
     const prefectApi = new PrefectAPI(token);
     const flowRunName = getVersionInfoFlowRunDto.flowRunName;
     const options = getVersionInfoFlowRunDto.options;
-    const result = await prefectApi.createFlowRun(
+    const flowRunId = await prefectApi.createFlowRun(
       flowRunName,
       PrefectDeploymentName.DATA_MANAGEMENT,
       PrefectFlowName.DATA_MANAGEMENT,
       options
     );
-    return result;
+
+    await prefectApi.createInputAuthToken(flowRunId);
+
+    await Promise.any([
+      new Promise((resolve) => {
+        setTimeout(async () => {
+          await prefectApi.deleteInputAuthToken(flowRunId);
+          resolve(`Deleted the input of ${flowRunId}`);
+        }, 5000);
+      }),
+    ]);
+
+    return flowRunId;
   }
 }
