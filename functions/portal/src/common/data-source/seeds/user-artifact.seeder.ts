@@ -1,36 +1,38 @@
-import { DataSource } from 'npm:typeorm'
-import { Seeder } from 'typeorm-extension'
-import { UserArtifact } from '../../../user-artifact/entity'
-import { notebookContents } from './notebooks'
+import { DataSource } from "npm:typeorm";
+import { Seeder } from "typeorm-extension";
+import { UserArtifact } from "../../../user-artifact/entity";
+import { notebookContents } from "./notebooks";
 
 export default class UserArtifactSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {
-    const repository = dataSource.getRepository(UserArtifact)
+    const repository = dataSource.getRepository(UserArtifact);
 
-    const result = await repository.createQueryBuilder('userArtifact').getMany()
+    const result = await repository
+      .createQueryBuilder("userArtifact")
+      .getMany();
     if (result.length > 0) {
-      return
+      return;
     }
 
-    const notebookEntities = Object.keys(notebookContents).map(name => ({
+    const notebookEntities = Object.keys(notebookContents).map((name) => ({
       id: notebookContents[name].id,
       name,
       notebookContent: notebookContents[name].content,
-      userId: 'system',
+      userId: "system",
       isShared: true,
-      createdBy: 'system',
-      modifiedBy: 'system'
-    }))
+      createdBy: "system",
+      modifiedBy: "system",
+    }));
 
     const entities = repository.create({
-      userId: 'system',
+      userId: "system",
       artifacts: {
-        notebooks: notebookEntities
+        notebooks: notebookEntities,
       },
-      createdBy: 'system',
-      modifiedBy: 'system'
-    })
+      createdBy: "system",
+      modifiedBy: "system",
+    });
 
-    await repository.save(entities)
+    await repository.save(entities);
   }
 }

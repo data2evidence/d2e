@@ -1,4 +1,5 @@
 import { Client } from '@bartlomieju/postgres';
+import pg from 'npm:pg';
 import { Injectable } from '@danet/core';
 import { OnAppBootstrap, OnAppClose } from 'jsr:@danet/core/hook';
 import { DataSource } from 'npm:typeorm';
@@ -15,6 +16,7 @@ import { Feature } from '../feature/entity/feature.entity.ts';
 import { Notebook } from '../notebook/entity/notebook.entity.ts';
 import { UserArtifactGroup } from '../user-artifact/entity/user-artifact-group.entity.ts';
 import { UserArtifact } from '../user-artifact/entity/user-artifact.entity.ts';
+import { env } from '../env.ts';
 @Injectable()
 export class PostgresService implements OnAppBootstrap, OnAppClose {
   private _env = Deno.env.toObject();
@@ -22,24 +24,26 @@ export class PostgresService implements OnAppBootstrap, OnAppClose {
   private dataSource: DataSource;
 
   constructor() {
+    console.log(env);
+    console.log(`_env: ${JSON.stringify(this._env)}`);
     this.client = new Client({
-      user: this._env['DB_USERNAME'],
-      password: this._env['DB_PASSWORD'],
-      database: this._env['DB_NAME'],
-      hostname: this._env['DB_HOST'],
+      user: 'postgres',
+      password: 'Toor1234',
+      database: this._env['PG__DB_NAME'] || 'alp',
+      hostname: this._env['PG__HOST'] || 'localhost',
+      schema: 'portal',
     });
 
     this.dataSource = new DataSource({
       type: 'postgres',
-      host: this._env['DB_HOST'],
-      port: 5432,
-      username: this._env['DB_USERNAME'],
-      password: this._env['DB_PASSWORD'],
-      database: this._env['DB_NAME'],
-      synchronize: true,
+      host: this._env['PG__HOST'] || 'localhost',
+      port: parseInt(this._env['DB_PORT']) || 5432,
+      username: 'postgres',
+      password: 'Toor1234',
+      database: this._env['PG__DB_NAME'] || 'alp',
+      schema: 'portal',
       // TODO: Change to wildcard matching
       entities: [Feature, Config, UserArtifact, UserArtifactGroup, Dataset, DatasetDetail, DatasetTag, DatasetTagConfig, DatasetDashboard, DatasetRelease, DatasetAttribute, DatasetAttributeConfig, Notebook],
-      // logging: true,
     });
   }
 

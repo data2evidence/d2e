@@ -1,6 +1,9 @@
+import process from "node:process";
+
 const _env = Deno.env.toObject();
 
 export const env = {
+  SERVICE_ROUTES: process.env.SERVICE_ROUTES || "{}",
   NODE_ENV: _env.NODE_ENV,
   TENANT_ID: _env.APP_TENANT_ID,
   TENANT_NAME: _env.APP__TENANT_NAME,
@@ -10,8 +13,8 @@ export const env = {
 
   PG_HOST: _env.PG__HOST,
   PG_PORT: parseInt(<string>_env.PG__PORT),
-  PG_DATABASE: _env.PG__PORTAL_SERVER__DB_NAME,
-  PG_SCHEMA: _env.PG__PORTAL_SERVER__SCHEMA,
+  PG_DATABASE: process.env.PG__DB_NAME,
+  PG_SCHEMA: "portal",
   PG_USER: _env.PG__PORTAL_SERVER__USER,
   PG_PASSWORD: _env.PG__PORTAL_SERVER__PASSWORD,
   PG_MANAGE_USER: _env.PG__PORTAL_SERVER__MANAGE_USER,
@@ -27,13 +30,17 @@ export const env = {
   MINIO_ACCESS_KEY: "${MINIO__SECRET_KEY}",
   MINIO_SECRET_KEY: "${MINIO__SECRET_KEY}",
 
-  SSL_CA_CERT: _env.SSL_CA_CERT
-}
+  SSL_CA_CERT: _env.SSL_CA_CERT,
+  DB_NAME: "alp",
+  DB_HOST: "localhost",
+  DB_PORT: "41190",
+  DB_USERNAME: "postgres",
+  DB_PASSWORD: "Toor1234",
+};
 
-export const services = {
-  analytics: _env.ANALYTICS_URL,
-  // paConfig: _env.PA_CONFIG_URL,
-  // usermgmt: _env.USER_MGMT_URL
-  usermgmt: "usermgmt_url",
-  paConfig: "pa_config_url"
-}
+export const services = JSON.parse(env.SERVICE_ROUTES);
+// export const services = {
+//   usermgmt: "sdfsadf",
+//   analytics: "sfasdf",
+//   paConfig: "sdfasdf"
+// }

@@ -519,7 +519,12 @@ services:
             "GATEWAY_WO_PROTOCOL_FQDN": "${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}"
           },
           "alpdb": {},
-          "concept-mapping": {}
+          "concept-mapping": {},
+          "portal": {
+            "PG_USER": "${PG_WRITE_USER:-alp_pg_write_user}",
+            "PG_PASSWORD": "${PG_WRITE_PASSWORD}",
+            "PG_SCHEMA": "portal"
+          }
         }
       SERVICE_ROUTES: |-
         {

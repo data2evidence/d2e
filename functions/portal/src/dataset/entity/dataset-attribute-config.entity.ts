@@ -1,29 +1,20 @@
-import { Column, Entity, PrimaryColumn } from 'npm:typeorm'
-import { ATTRIBUTE_CONFIG_CATEGORIES, ATTRIBUTE_CONFIG_DATA_TYPES } from '../../common/const.ts'
-import { Audit } from '../../common/entity/audit.entity.ts'
+import { Column, Entity, PrimaryColumn } from "npm:typeorm";
+import { Audit } from "../../common/entity/audit.entity.ts";
 
-@Entity('dataset_attribute_config')
+@Entity("dataset_attribute_config")
 export class DatasetAttributeConfig extends Audit {
   @PrimaryColumn()
-  id: string
+  id: string;
 
   @Column()
-  name: string
+  name: string;
 
-  @Column({
-    type: 'enum',
-    enum: ATTRIBUTE_CONFIG_DATA_TYPES,
-    default: ATTRIBUTE_CONFIG_DATA_TYPES.STRING
-  })
-  dataType: ATTRIBUTE_CONFIG_DATA_TYPES
+  @Column({ name: "data_type" })
+  dataType: string;
 
-  @Column({
-    type: 'enum',
-    enum: ATTRIBUTE_CONFIG_CATEGORIES,
-    default: ATTRIBUTE_CONFIG_CATEGORIES.DATASET
-  })
-  category: ATTRIBUTE_CONFIG_CATEGORIES
+  @Column({ name: "category" })
+  category: string;
 
-  @Column({ name: 'is_displayed' })
-  isDisplayed: boolean
+  @Column({ name: "is_displayed" })
+  isDisplayed: boolean;
 }

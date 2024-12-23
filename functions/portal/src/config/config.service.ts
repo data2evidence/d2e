@@ -21,6 +21,7 @@ export class ConfigService {
     try {
       return await this.overviewDescriptionRepo.findOneOrFail(type)
     } catch (error) {
+      console.log(`Error getting config of type ${type}: ${error}`)
       this.logger.error(`Error getting config of type ${type}: ${error}`)
       throw new InternalServerErrorException()
     }

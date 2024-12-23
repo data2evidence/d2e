@@ -1,14 +1,16 @@
-import { Controller, Get, Middleware } from '@danet/core'
-import { PatientAnalyticsConfigService } from './pa-config.service.ts'
-import { RequestContextMiddleware } from '../common/request-context.middleware.ts'
+import { Controller, Get, Middleware } from "@danet/core";
+import { PatientAnalyticsConfigService } from "./pa-config.service.ts";
+import { RequestContextMiddleware } from "../common/request-context.middleware.ts";
 
 @Middleware(RequestContextMiddleware)
-@Controller('pa-config')
+@Controller("system-portal/pa-config")
 export class PatientAnalyticsConfigController {
-  constructor(private readonly paConfigService: PatientAnalyticsConfigService) { }
+  constructor(
+    private readonly paConfigService: PatientAnalyticsConfigService
+  ) {}
 
-  @Get('metadata/list')
+  @Get("metadata/list")
   async getList() {
-    return await this.paConfigService.getList()
+    return await this.paConfigService.getList();
   }
 }

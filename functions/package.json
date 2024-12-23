@@ -51,8 +51,9 @@
         },
         {
           "source": "/portalsvc",
-          "rmsrc": true,
-          "service": "portalServer"
+          "function": "/portal",
+          "imports": "/portal/import.json",
+          "env": "portal"
         },
         {
           "source": "/analytics-svc/api/services/query",
@@ -62,8 +63,9 @@
         },
         {
           "source": "/system-portal",
-          "rmsrc": true,
-          "service": "portalServer"
+          "function": "/portal",
+          "imports": "/portal/import.json",
+          "env": "portal"
         },
         {
           "source": "/dataflow-mgmt",
@@ -805,6 +807,30 @@
             "dbCredentials.db.delete"
           ],
           "httpMethods": [
+            "DELETE"
+          ]
+        },
+        {
+          "path": "^/system-portal/helloworld",
+          "scopes": [
+            "portal.dataset.read"
+          ],
+          "httpMethods": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE"
+          ]
+        },
+        {
+          "path": "^/system-portal/todo",
+          "scopes": [
+            "portal.dataset.read"
+          ],
+          "httpMethods": [
+            "GET",
+            "POST",
+            "PUT",
             "DELETE"
           ]
         },

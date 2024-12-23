@@ -1,9 +1,9 @@
-import { DataSource, DataSourceOptions } from 'npm:typeorm'
-import { SeederOptions } from 'typeorm-extension'
-import { env } from '../../env.ts'
+import { DataSource, DataSourceOptions } from "npm:typeorm";
+import { SeederOptions } from "typeorm-extension";
+import { env } from "../../env.ts";
 
 export const dataSourceOptions: DataSourceOptions & SeederOptions = {
-  type: 'postgres',
+  type: "postgres",
   host: env.PG_HOST,
   port: env.PG_PORT,
   username: env.PG_USER,
@@ -11,9 +11,9 @@ export const dataSourceOptions: DataSourceOptions & SeederOptions = {
   database: env.PG_DATABASE,
   schema: env.PG_SCHEMA,
   poolSize: env.PG_MAX_POOL,
-  entities: ['dist/**/*.entity.{ts,js}'],
-  seeds: ['dist/**/data-source/seeds/*.seeder.{ts,js}']
-}
+  entities: ["dist/**/*.entity.{ts,js}"],
+  seeds: ["dist/**/data-source/seeds/*.seeder.{ts,js}"],
+};
 
-const dataSource = new DataSource(dataSourceOptions)
-export default dataSource
+const dataSource = new DataSource(dataSourceOptions);
+export default dataSource;

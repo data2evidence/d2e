@@ -3,7 +3,7 @@ import { ServiceName } from './enums/index.ts'
 import { PermissionsMiddleware } from './middlewares/permissions.middleware.ts'
 import { UserArtifactService } from './user-artifact.service.ts'
 
-@Controller("user-artifact")
+@Controller("system-portal/user-artifact")
 @Middleware(PermissionsMiddleware)
 export class UserArtifactController {
   constructor(private readonly userArtifactService: UserArtifactService) { }

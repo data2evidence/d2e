@@ -7,8 +7,8 @@ export const bootstrap = async () => {
   const application = new DanetApplication();
   await application.init(AppModule);
   const spec = new SpecBuilder()
-    .setTitle('Todo')
-    .setDescription('The todo API')
+    .setTitle('D2E Portal')
+    .setDescription('')
     .setVersion('1.0')
     .build();
   const document = await SwaggerModule.createDocument(application, spec);

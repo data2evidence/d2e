@@ -1,12 +1,12 @@
-import { Controller, Get } from '@danet/core';
-import { SystemService } from './system.service.ts';
+import { Controller, Get } from "@danet/core";
+import { SystemService } from "./system.service.ts";
 
-@Controller('system')
+@Controller("system-portal/system")
 export class SystemController {
-  constructor(private readonly systemService: SystemService) { }
+  constructor(private readonly systemService: SystemService) {}
 
-  @Get('feature/list')
+  @Get("feature/list")
   async getSystemFeatures() {
-    return await this.systemService.getSystemFeatures()
+    return await this.systemService.getSystemFeatures();
   }
 }

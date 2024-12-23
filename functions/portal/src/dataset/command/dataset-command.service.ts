@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, SCOPE } from '@danet/core'
 import { EntityManager, In } from 'npm:typeorm'
-import { v4 as uuidv4 } from 'npm:uuid'
+import { v4 as uuidv4 } from 'uuid'
 import { TransactionRunner } from '../../common/data-source/transaction-runner.ts'
 import { RequestContextService } from '../../common/request-context.service.ts'
 import { createLogger } from '../../logger.ts'

@@ -1,15 +1,17 @@
-import { Controller, Get, Query } from '@danet/core';
-import { PrefectFlowRunResultDto } from './dto/index.ts';
-import { PrefectService } from './prefect.service.ts';
+import { Controller, Get, Query } from "@danet/core";
+import { PrefectFlowRunResultDto } from "./dto/index.ts";
+import { PrefectService } from "./prefect.service.ts";
 
-@Controller("prefect")
+@Controller("system-portal/prefect")
 export class PrefectController {
-  constructor(private readonly prefectService: PrefectService) { }
+  constructor(private readonly prefectService: PrefectService) {}
 
-  @Get('results')
-  async getFlowRunResults(@Query('filePath', { value: 'first' }) filePath?: string,
-    @Query('filePaths[]', { value: 'array' }) filePaths?: string[]) {
-    const prefectFlowRunResultDto: PrefectFlowRunResultDto = {}
+  @Get("results")
+  async getFlowRunResults(
+    @Query("filePath", { value: "first" }) filePath?: string,
+    @Query("filePaths[]", { value: "array" }) filePaths?: string[]
+  ) {
+    const prefectFlowRunResultDto: PrefectFlowRunResultDto = {};
 
     if (filePath) {
       prefectFlowRunResultDto.filePath = filePath;
@@ -17,6 +19,6 @@ export class PrefectController {
       prefectFlowRunResultDto.filePaths = filePaths;
     }
 
-    return await this.prefectService.getFlowRunResults(prefectFlowRunResultDto)
+    return await this.prefectService.getFlowRunResults(prefectFlowRunResultDto);
   }
 }

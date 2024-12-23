@@ -12,6 +12,12 @@
     "@danet/typeorm": "jsr:@danet/typeorm@0.1.1",
     "mime": "npm:mime@1.6.0",
     "typeorm-extension": "npm:typeorm-extension@3.6.3",
-    "@hono/hono/request": "jsr:@hono/hono@4.6.3/request"
+    "@hono/hono/request": "jsr:@hono/hono@4.6.3/request",
+    "uuid": "npm:uuid@9.0.1",
+    "@dx/reflect": "jsr:@dx/reflect@0.2.14",
+    "reflect-metadata": "npm:reflect-metadata@0.2.2",
+    "@danet/validatte": "jsr:@danet/validatte@0.7.4",
+    "class-validator": "npm:class-validator@0.14.1",
+    "class-transformer": "npm:class-transformer@0.5.1"
   }
 }
