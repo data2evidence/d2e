@@ -6,7 +6,6 @@ import { EntityManager } from 'typeorm'
 import { FeatureRepository } from './repository/feature.repository'
 import { createLogger } from '../logger'
 import { IPortalPlugin, IFeatureUpdateDto } from '../types'
-import { env } from '../env'
 import { TransactionRunner } from '../common/data-source/transaction-runner'
 
 @Injectable({ scope: Scope.REQUEST })
@@ -30,11 +29,12 @@ export class FeatureService {
   constructor(
     @Inject(REQUEST) request: Request,
     private readonly transactionRunner: TransactionRunner,
-    private readonly featureRepo: FeatureRepository
+    private readonly featureRepo: FeatureRepository,
+    @Inject('PLUGINS_JSON_PROVIDER') pluginsJsonProvider
   ) {
     try {
-      const plugins = JSON.parse(env.PORTAL_PLUGINS || '{}')
-      this.logger.debug(`Plugins: ${JSON.stringify(plugins)}`)
+      const plugins: any = JSON.parse(pluginsJsonProvider)
+      this.logger.debug(`In FeatureService, Plugins: ${JSON.stringify(plugins)}`)
       const researcherPlugins = plugins.researcher?.filter(p => Boolean(p.featureFlag)) || []
       const systemadminPlugins = plugins.systemadmin?.filter(p => Boolean(p.featureFlag)) || []
       this.featurePlugins = [...researcherPlugins, ...systemadminPlugins]
