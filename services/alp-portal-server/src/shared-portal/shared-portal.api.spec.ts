@@ -5,7 +5,7 @@ import { httpServiceMockFactory } from '../../test/http-service.mock'
 import { SharedPortalApi } from './shared-portal.api'
 import { env } from '../env'
 
-env.PORTAL_API_URL = 'portal-url'
+env.TREX_API_URL = 'portal-url'
 
 describe('SharedPortalApi', () => {
   let api: SharedPortalApi

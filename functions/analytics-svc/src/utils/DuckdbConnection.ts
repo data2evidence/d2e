@@ -1,3 +1,4 @@
+// NON FUNCTIONAL FOR TREX!!
 import {
     ConnectionInterface,
     CallBackInterface,
@@ -183,7 +184,7 @@ export class DuckdbConnection implements ConnectionInterface {
     }
 
     private parseSql(temp: string, parameters?: ParameterInterface[]): string {
-        temp = this.getSqlStatementWithSchemaName(this.schemaName, temp);
+        temp = this.getSqlStatementWithSchemaName(this.schemaName, temp); //THIS HAS TO COME BEFORE
         return translateHanaToDuckdb(
             temp,
             this.schemaName,

@@ -46,7 +46,7 @@ jobs:
 
   run-http-tests:
     needs: [check_file_changes]
-    if: (github.ref_name == 'develop' || contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
+    if: (github.ref_name == 'develop' || contains('release', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft && needs.check_file_changes.outputs.changes == 'true' ) # Should run if branch is develop/release/workflow_dispatch and doesnt have a PR
     runs-on:
       group: dockerup # Custom runner 4 cpus & 14gb ram
     timeout-minutes: 60
@@ -363,10 +363,6 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-minerva-fhir-server-1 -t
-      - name: print logs for alp-minerva-meilisearch-svc-1
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-meilisearch-svc-1 -t
       - name: print logs for alp-minerva-portal-server-nest-prod-1
         if: ${{ always() || cancelled() || failure() }}
         run: |
@@ -383,10 +379,6 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-minerva-s3 -t
-      - name: print logs for alp-minerva-terminology-svc-nest-prod-1
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-terminology-svc-nest-prod-1 -t
       - name: print logs for broadsea-atlasdb
         if: ${{ always() || cancelled() || failure() }}
         run: |
@@ -399,10 +391,6 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-dataflow-gen-init-1 -t
-      - name: print logs for alp-meilisearch-post-init
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-meilisearch-post-init -t
       - name: print logs for alp-minio-post-init
         if: ${{ always() || cancelled() || failure() }}
         run: |

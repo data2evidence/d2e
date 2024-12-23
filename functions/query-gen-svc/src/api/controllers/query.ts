@@ -34,7 +34,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
                 ? JSON.parse(<any>req.query.data)
                 : req.body;
         const queryParams = body.queryParams;
-        log.debug(`Input params:\n${JSON.stringify(queryParams)}`);
+        // log.debug(`Input params:\n${JSON.stringify(queryParams)}`);
         const configId = queryParams.configId;
         const configVersion = queryParams.configVersion;
         const datasetId = queryParams.datasetId;
@@ -133,7 +133,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
         queryResponse.cdmConfigMetaData.version =
             configResponse.meta.dependentConfig.configVersion;
 
-        log.debug(`Query response:\n${JSON.stringify(queryResponse)}`);
+        // log.debug(`Query response:\n${JSON.stringify(queryResponse)}`);
         res.status(200).send(queryResponse);
     } catch (err) {
         log.enrichErrorWithRequestCorrelationID(err, req);
