@@ -16,4 +16,7 @@ export class Canvas extends Audit {
 
   @OneToMany(() => Graph, (revision) => revision.dataflow)
   revisions;
+
+  @Column
+  type: string;
 }

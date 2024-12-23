@@ -4,7 +4,7 @@ import {
   IPrefectParameters,
   IReactFlow,
   IReactFlowNode,
-} from "../types";
+} from "../types.ts";
 
 export class UtilsService {
   regexMatcher(result: any[]): string[] {

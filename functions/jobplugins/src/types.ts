@@ -257,3 +257,46 @@ export interface IDataflowDuplicateDto {
 export interface IDataflowDuplicateDto {
   name: string;
 }
+
+interface IFlowCsvNodeData extends IFlowBasicNodeData {
+  hasheader: string;
+}
+
+interface IPrefectEdge {
+  source?: string;
+  target: string;
+}
+
+export interface IPrefectParameters {
+  json_graph: {
+    edges: IPrefectEdge;
+    nodes: object;
+  };
+  options?: IPrefectOptions;
+}
+
+interface IPrefectOptions {
+  trace_config: IPrefectTraceConfig;
+  test_mode: boolean;
+}
+
+interface IPrefectTraceConfig {
+  trace_mode: boolean;
+  trace_db: string;
+}
+
+interface IReactFlowNode {
+  id: string;
+  type: string;
+  data: IFlowBasicNodeData | IFlowCsvNodeData;
+  position: {
+    x: number;
+    y: number;
+  };
+  sourcePosition: string;
+  targetPosition: string;
+  dragHandle: string;
+  width: number;
+  height: number;
+  parentNode?: string;
+}

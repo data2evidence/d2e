@@ -10,6 +10,7 @@ import { MeilisearchController } from "./src/controllers/MeilisearchController.t
 import { runMigrations } from "./src/db/data-migration.ts";
 import { DataTransformationController } from "./src/controllers/DataTransformationController.ts";
 import { PrefectController } from "./src/controllers/PrefectController.ts";
+import { AnalysisController } from "./src/controllers/AnalysisController.ts";
 
 const app = express();
 const env = Deno.env.toObject();
@@ -27,6 +28,7 @@ app.use(
 app.use("/jobplugins/datamodel", new DataModelFlowController().router);
 app.use("/dataflow-mgmt/dataflow", new DataTransformationController().router);
 app.use("/dataflow-mgmt/prefect", new PrefectController().router);
+app.use("/dataflow-mgmt/analysisflow", new AnalysisController().router);
 
 const opt = {
   user: env.PG_USER,

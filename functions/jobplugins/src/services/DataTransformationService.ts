@@ -3,20 +3,12 @@ import { v4 as uuidv4 } from "npm:uuid";
 import dataSource from "../db/datasource.ts";
 import { Canvas } from "../entities/canvas.ts";
 import { Graph } from "../entities/graph.ts";
-import { UtilsService } from "../utils/DataTransformationParser.ts";
+import { UtilsService } from "../utils/DataflowParser.ts";
 import { PortalServerAPI } from "../api/PortalServerAPI.ts";
 import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { IDataflowDto, IDataflowDuplicateDto } from "../types.ts";
 
 export class TransformationService {
-  private env = Deno.env.toObject();
-  private opt = {
-    user: this.env.PG_USER,
-    password: this.env.PG_PASSWORD,
-    host: this.env.PG__HOST,
-    port: parseInt(this.env.PG__PORT),
-    database: this.env.PG__DB_NAME,
-  };
   private readonly logger = console;
   private canvasRepo;
   private graphRepo;
@@ -102,8 +94,10 @@ export class TransformationService {
   }
 
   async getCanvasList() {
-    console.log("in service");
-    return await this.canvasRepo.createQueryBuilder("dataflow").getMany();
+    return await this.canvasRepo
+      .createQueryBuilder("dataflow")
+      .where("dataflow.type = :type", { type: "datatransformation-flow" })
+      .getMany();
   }
 
   async createCanvas(dataflowDto: IDataflowDto, token: string) {
@@ -111,6 +105,7 @@ export class TransformationService {
     const canvas = {
       id,
       name: dataflowDto.name,
+      type: "datatransformation-flow",
     };
 
     console.log(`createCanvas with canvas id: ${id}`);
@@ -121,7 +116,6 @@ export class TransformationService {
       );
       version += lastDataflowRevision.version;
       console.log(`updating a flow by user: ${token}`);
-      console.log(JSON.stringify(this.addOwner(token, canvas)));
       await this.canvasRepo.update(
         dataflowDto.id,
         this.addOwner(token, canvas)
@@ -139,13 +133,16 @@ export class TransformationService {
       comment,
       version,
     });
-    console.log(JSON.stringify(this.addOwner(token, graphEntity)));
     await this.graphRepo.insert(this.addOwner(token, graphEntity, true));
     this.logger.info(
       `Created new revision for dataflow ${canvas.name} with id ${graphEntity.id}`
     );
 
-    return canvas;
+    return {
+      id: canvas.id,
+      revisionId: graphEntity.id,
+      version: graphEntity.version,
+    };
   }
 
   async deleteCanvas(id: string) {
@@ -193,6 +190,7 @@ export class TransformationService {
       this.canvasRepo.create({
         id: uuidv4(),
         name: dataflowDuplicateDto.name,
+        type: "datatransformation-flow",
       }),
       true
     );

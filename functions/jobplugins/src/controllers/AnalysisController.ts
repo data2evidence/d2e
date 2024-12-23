@@ -1,17 +1,17 @@
 import { JwtPayload, decode } from "npm:jsonwebtoken";
 import { Request, Response, Router } from "npm:express";
-import { TransformationService as DataTransformationService } from "../services/DataTransformationService.ts";
+import { AnalysisService } from "../services/AnalysisService.ts";
 
-export class DataTransformationController {
+export class AnalysisController {
   public router = Router();
-  private dataTransformationService = new DataTransformationService();
+  public analysisService = new AnalysisService();
 
   constructor() {
     this.registerRoutes();
   }
   private async getCanvasList(req: Request, res: Response) {
     try {
-      const result = await this.dataTransformationService.getCanvasList();
+      const result = await this.analysisService.getAnalysisflows();
       return res.status(200).send(result);
     } catch (error) {
       console.error("Error in getCanvasList: ", error);
@@ -23,7 +23,7 @@ export class DataTransformationController {
     try {
       const { id } = req.params;
       console.log(`getCanvasById id: ${id}`);
-      const result = await this.dataTransformationService.getCanvas(id);
+      const result = await this.analysisService.getAnalysisflow(id);
       return res.status(200).send(result);
     } catch (error) {
       console.error("Error in getCanvasById: ", error);
@@ -34,8 +34,7 @@ export class DataTransformationController {
   private async getGraph(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const result =
-        await this.dataTransformationService.getLatestGraphByCanvasId(id);
+      const result = await this.analysisService.getLastAnalysisflowRevision(id);
       return res.status(200).send(result);
     } catch (error) {
       console.error("Error in getGraph: ", error);
@@ -46,7 +45,7 @@ export class DataTransformationController {
   private async deleteCanvas(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const result = await this.dataTransformationService.deleteCanvas(id);
+      const result = await this.analysisService.deleteAnalysisflow(id);
       return res.status(200).send(result);
     } catch (error) {
       console.error("Error in deleteCanvas: ", error);
@@ -60,7 +59,7 @@ export class DataTransformationController {
       const token = decode(
         req.headers["authorization"].replace(/bearer /i, "")
       ) as JwtPayload;
-      const result = await this.dataTransformationService.getResultsByCanvasId(
+      const result = await this.analysisService.getResultsByCanvasId(
         dataflowId,
         token
       );
@@ -78,7 +77,7 @@ export class DataTransformationController {
         req.headers["authorization"].replace(/bearer /i, "")
       ) as JwtPayload;
       console.log(`data transoformation controller, token: ${token}`);
-      const canvas = await this.dataTransformationService.createCanvas(
+      const canvas = await this.analysisService.createAnalysisflow(
         dataflowDto,
         token
       );
@@ -96,7 +95,7 @@ export class DataTransformationController {
       const token = decode(
         req.headers["authorization"].replace(/bearer /i, "")
       ) as JwtPayload;
-      const result = await this.dataTransformationService.duplicateCanvas(
+      const result = await this.analysisService.duplicateAnalysisflow(
         flowId,
         revisionId,
         dataflowDto,
@@ -112,7 +111,7 @@ export class DataTransformationController {
   private async deleteGraphById(req: Request, res: Response) {
     try {
       const { id, revisionId } = req.params;
-      const result = await this.dataTransformationService.deleteGraph(
+      const result = await this.analysisService.deleteAnalysisflowRevision(
         id,
         revisionId
       );
