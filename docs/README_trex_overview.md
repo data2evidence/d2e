@@ -28,8 +28,8 @@ In d2e-plugins repo, _(TODO - this step will be updated)_
 In d2e repo, 
 
 9. Run the command to get the neccessary docker images to run D2E: `yarn build:minerva`
-10. Starting Application User Interface (UI): `yarn start:ui --wait`
-11. Start/Restarting application: `yarn start:minerva --wait; sleep 60`
+10. Start/Restarting application: `yarn start:minerva; sleep 60`
+11. To view application logs: `yarn logs:minerva`
 
 > **Note:**
 > - If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run the **Environment Variables and Credentials Setup** section
@@ -73,7 +73,7 @@ If there is no existing databases available, you may consider using a [sample da
 - Select **Add database** and provide the database information accordingly. 
 - Please refer to [documentation here](./2-load/4-setup-db-credentials.md) for more details on the input parameters for database creation.
   >**The expected result after adding a database is:** ![DatabaseList](./images/database/DatabaseList.png)
-- Perform a restart of the system for new connection details to be provisioned to the data services using the command: `yarn start:minerva --wait --force-recreate`
+- Perform a restart of the system for new connection details to be provisioned to the data services using the command: `yarn start:minerva --force-recreate; sleep 60`
 
 
 ## Plugins 
@@ -132,14 +132,6 @@ This section provides the steps for setting up the analytics environment.
 - Ensure that `create-cachedb-file-plugin` plugin is available in the [Jobs Portal](#jobs-portal).
 - Refer to the [documentation here](./3-configure/5-create-duckdb-file.md) for a detailed guide on creating a duckdb file.
 
-### Run Job for Creating Search Indexes for Schema Concept Table
-This section provides the steps for setting up the schema concept table. 
-
-- Ensure that the plugins `add_search_index_plugin` is available in the [Jobs Portal](#jobs-portal) 
-- Select the `⋮` icon to perform a **Quick Run**.
-- Refer to the [documentation here](./3-configure/6-create-meilisearch-indexes.md) on the details to create the indexes search.dock
-- Input the URL https://localhost:41100/portal/researcher. Navigate to **Concepts**. 
-  > **The expected result is:** ![ConceptSearch](./images/concepts/ConceptSearch.png)
 
 ## Fetching Datasets Metadata 
 - In the Admin Portal, navigate to **Datasets** tab and select **Check for data model updates**. 
