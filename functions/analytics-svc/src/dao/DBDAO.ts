@@ -248,7 +248,7 @@ export class DBDAO {
 
             try {
                 if (
-                    credentials.dialect === DB.HANA &&
+                    credentials.dialect === config.DB.HANA &&
                     env.USE_HANA_JWT_AUTHC === "true"
                 ) {
                     delete credentials.user;
