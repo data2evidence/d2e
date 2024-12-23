@@ -1028,7 +1028,6 @@ services:
       PG__PORTAL_SERVER__PASSWORD: ${PG_WRITE_PASSWORD}
       PG__PORTAL_SERVER__SCHEMA: portal
       PG__PORTAL_SERVER__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      PLUGINS__JSON: *x-plugins
       PORTAL_SERVER__LOG_LEVEL: info
       PORTAL_SERVER__PORT: 33002
 

@@ -19,8 +19,8 @@ export class SharedPortalApi {
 
   constructor(@Inject(REQUEST) request: Request, protected readonly httpService: HttpService) {
     this.jwt = request.headers['authorization']
-    if (env.PORTAL_API_URL) {
-      this.url = env.PORTAL_API_URL
+    if (env.TREX_API_URL) {
+      this.url = env.TREX_API_URL
       this.httpsAgent = new Agent({
         rejectUnauthorized: true,
         ca: env.SSL_CA_CERT
