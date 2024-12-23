@@ -241,8 +241,6 @@ export class DBDAO {
         schema?: string
     ) => {
         return new Promise(async (resolve, reject) => {
-            let tenant_configs = config.getTenantConfigs(this.dialect);
-
             let credentials: IDBHanaCredentialsType | IDBPgCredentialsType;
             credentials = config.getDBConfigByTenant(this.dialect, tenant);
 
