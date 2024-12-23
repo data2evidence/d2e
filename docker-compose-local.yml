@@ -31,7 +31,7 @@ services:
           "dataset": false,
           "alpdb": false,
           "concept-mapping": false,
-          "terminology-svc": true
+          "terminology-svc": false
         }
 
   alp-caddy:
