@@ -57,7 +57,6 @@ export class FeatureService {
   }
 
   async getFeatures() {
-    console.log(this.userId)
     const savedFeatures = (await this.featureRepo.getFeatures()).filter(f => this.validFeatures.includes(f.feature))
 
     const defaultNonPlugins = this.NON_PLUGIN_FEATURES.filter(

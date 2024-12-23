@@ -18,7 +18,6 @@ export class PublicDatasetQueryService {
 
   async getDatasets(queryParams: IDatasetSearchFilterDto) {
     const { searchText } = queryParams;
-    console.log(`I am here: searchText: ${searchText}`);
 
     const query = this.datasetRepo
       .createQueryBuilder("dataset")
@@ -48,8 +47,6 @@ export class PublicDatasetQueryService {
         "attributeConfig.dataType",
         "attributeConfig.isDisplayed",
       ]);
-
-    console.log(`query: ${query}`);
 
     if (searchText) {
       const tsQuery = this.convertToTsqueryFormat(

@@ -63,8 +63,6 @@ export class DatasetQueryService {
   }
 
   async getDatasets(queryParams?: IDatasetQueryDto) {
-    console.log('userId', this.userId)
-    console.log('getDatasets, I am here')
     const { role, searchText, ...filterParams } = queryParams
     const isResearcher = role === 'researcher'
     const hasFilterParams = Object.keys(filterParams).length > 0

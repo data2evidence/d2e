@@ -66,7 +66,6 @@ export class DatasetController {
       console.log("No datasetId provided");
       throw new BadRequestException("datasetId is required");
     }
-    console.log("getDataset", id);
     return await this.datasetQueryService.getDataset(id);
   }
 

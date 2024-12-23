@@ -24,8 +24,6 @@ export class PostgresService implements OnAppBootstrap, OnAppClose {
   private dataSource: DataSource;
 
   constructor() {
-    console.log(env);
-    console.log(`_env: ${JSON.stringify(this._env)}`);
     this.client = new Client({
       user: 'postgres',
       password: 'Toor1234',
@@ -65,10 +63,8 @@ export class PostgresService implements OnAppBootstrap, OnAppClose {
       await this.dataSource.initialize();
     }
 
-    // Verify metadata is loaded
     if (this.dataSource.entityMetadatas.length === 0) {
       console.error('No entity metadata loaded after initialization!');
-      // Force reload entities
       await this.dataSource.synchronize();
     }
 
