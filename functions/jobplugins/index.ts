@@ -6,7 +6,7 @@ import { DataCharacterizationController } from "./src/controllers/DataCharacteri
 import { DataModelFlowController } from "./src/controllers/DataModelFlowController.ts";
 import { DbSvcController } from "./src/controllers/DbSvcController.ts";
 import { DqdController } from "./src/controllers/DqdController.ts";
-import { MeilisearchController } from "./src/controllers/MeilisearchController.ts";
+import { CachedbController } from "./src/controllers/CachedbController.ts";
 
 const app = express();
 const env = Deno.env.toObject();
@@ -16,12 +16,12 @@ app.use("/jobplugins/dqd/data-quality", new DqdController().router);
 app.use("/jobplugins/cohort", new CohortController().router);
 app.use("/jobplugins/cohort-survival", new CohortSurvivalController().router);
 app.use("/jobplugins/db-svc", new DbSvcController().router);
-app.use("/jobplugins/meilisearch", new MeilisearchController().router);
 app.use(
   "/jobplugins/dqd/data-characterization",
   new DataCharacterizationController().router
 );
 app.use("/jobplugins/datamodel", new DataModelFlowController().router);
+app.use("/jobplugins/cachedb", new CachedbController().router);
 
 const opt = {
   user: env.PG_USER,

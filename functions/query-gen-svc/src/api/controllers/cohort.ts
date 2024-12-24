@@ -26,7 +26,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
                 ? JSON.parse(<any>req.query.data)
                 : req.body;
         const queryParams = body.queryParams;
-        log.debug(`Input params:\n${JSON.stringify(queryParams)}`);
+        // log.debug(`Input params:\n${JSON.stringify(queryParams)}`);
 
         const { configId, configVersion, datasetId, queryType, insert } =
             body.queryParams;
@@ -97,8 +97,8 @@ export async function generateQuery(req: IMRIRequest, res, next) {
         if (config.panelOptions.cohortEntryExit) {
             queryString = `
                 INSERT
-                    INTO
-                    $$SCHEMA$$.COHORT (COHORT_DEFINITION_ID,
+                    INTO 
+                    ${placeholderMap["@COHORT"]} (COHORT_DEFINITION_ID,
                     SUBJECT_ID,
                     COHORT_START_DATE,
                     COHORT_END_DATE)
@@ -158,7 +158,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
             },
         };
 
-        log.debug(`Query response:\n${JSON.stringify(response)}`);
+        // log.debug(`Query response:\n${JSON.stringify(response)}`);
         res.status(200).send(response);
     } catch (err) {
         log.enrichErrorWithRequestCorrelationID(err, req);

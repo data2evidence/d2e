@@ -15,8 +15,12 @@ export const getCachedbDbConnections = async ({
 }): Promise<{
     analyticsConnection: Connection.ConnectionInterface;
 }> => {
+    let dialect = analyticsCredentials.dialect
+    if(dialect === "postgresql") {
+        dialect = "duckdb" //TODO: CONSUME from Portal metadata
+    }
     let cachedbDatabase = getCachedbDatabaseFormatProtocolA(
-        analyticsCredentials.dialect,
+        dialect,
         datasetId
     );
     // IF use duckdb is true change dialect from postgres -> duckdb

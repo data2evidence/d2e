@@ -443,12 +443,31 @@ export function getUsername() {
   }
 }
 
+const filterVcapByTag = (
+  vcapServices: {
+    mridb: {
+      name: string;
+      tags: string[];
+      credentials: { dialect: string };
+    }[];
+  },
+  tag: string
+) => {
+  const dbs: typeof vcapServices.mridb = [];
+  for (const db of vcapServices.mridb) {
+    if (db.tags.includes(tag)) {
+      dbs.push(db);
+    }
+  }
+  return dbs;
+};
+
 export async function getAnalyticsConnection(userObj, token?: string) {
   let analyticsCredentials;
   let analyticsConnection;
-  let cdwService = xsenv
-    .filterServices({ tag: "cdw" })
-    .map((db) => db.credentials);
+  let cdwService = filterVcapByTag(env.VCAP_SERVICES, "cdw").map(
+    (db) => db.credentials
+  );
   if (env.USE_DUCKDB === "true") {
     if (env.USE_CACHEDB === "true") {
       // Get duckdb db connection via alp-cachedb
@@ -463,6 +482,14 @@ export async function getAnalyticsConnection(userObj, token?: string) {
   } else {
     cdwService = cdwService.filter((db) => db.dialect == "hana");
     analyticsCredentials = cdwService[0];
+    // node hdb library checks for these to use TLS
+    // TLS does not work with deno for self signed certs
+    if (!analyticsCredentials.useTLS) {
+      delete analyticsCredentials.key;
+      delete analyticsCredentials.cert;
+      delete analyticsCredentials.ca;
+      delete analyticsCredentials.pfx;
+    }
     analyticsConnection =
       await dbConnectionUtil.DBConnectionUtil.getDBConnection({
         credentials: analyticsCredentials,

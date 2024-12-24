@@ -114,11 +114,11 @@ const hanaCommonTranslation = (temp: string, schemaName: string, vocabSchemaName
   // Replace TABLES, VIEWS with PG_TABLES and PG_VIEWS
   temp = temp.replace(
     /SELECT COUNT\(\*\) AS tableCount from tables where schema_name=(\%s|\?) and table_name=(\%s|\?)/gi,
-    `select count(*) as "TABLECOUNT" from pg_tables where schemaname=%s and tablename=%s`,
+    `select count(*) as "tableCount" from pg_tables where schemaname=%s and tablename=%s`,
   );
   temp = temp.replace(
     /SELECT COUNT\(\*\) AS tableCount from views where schema_name=(\%s|\?) and view_name=(\%s|\?)/gi,
-    `select count(*) as "TABLECOUNT" from pg_views where schemaname=%s and viewname=%s`,
+    `select count(*) as "tableCount" from pg_views where schemaname=%s and viewname=%s`,
   );
 
   // Replace Upsert with Insert On Conflict
@@ -201,6 +201,15 @@ export const translateHanaToDuckdb = (
   vocabSchemaName: string,
   parameters?: ParameterInterface[],
 ): string => {
+  temp = temp.replace(
+      /\$\$SCHEMA\$\$.COHORT_DEFINITION/g,
+      `direct_db_conn.${schemaName}.COHORT_DEFINITION`
+    );
+  temp = temp.replace(
+      /\$\$SCHEMA\$\$.COHORT/g,
+      `direct_db_conn.${schemaName}.COHORT`
+  );
+
   temp = hanaCommonTranslation(temp, schemaName, vocabSchemaName);
   
   temp = temp.replace(/\$\$SCHEMA_DIRECT_CONN\$\$./g, `direct_db_conn.${schemaName}.`); // Used when using cachedb connection connecting to duckdb, but additionally requires direct connection to database schema
@@ -235,6 +244,5 @@ export const translateHanaToDuckdb = (
       return match;
     });
   }
-
   return temp;
 };

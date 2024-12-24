@@ -216,7 +216,8 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
       })
     })
 
-    describe('bookmarks', function () {
+    // TODO: unskip after bookmarks datastore init is ready. Awaiting artifact manager.
+    describe.skip('bookmarks', function () {
       it('returns a valid response', function (done) {
         var setQuery = {
           method: defaultBookmarkParameters.httpMethod,

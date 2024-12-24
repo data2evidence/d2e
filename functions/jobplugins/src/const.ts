@@ -23,11 +23,11 @@ export enum PrefectDeploymentName {
   DATA_CHARACTERIZATION = "data_characterization_plugin",
   COHORT = "cohort_generator",
   DB_SVC = "alp-db-svc",
-  MEILISEARCH_ADD_INDEX = "add_search_index",
   DATASET_ATTRIBUTE = "update-dataset-attributes",
   FETCH_VERSION_INFO = "fetch-version-info",
   COHORT_SURVIVAL = "cohort-survival-plugin_deployment",
   DATA_MANAGEMENT = "data_management_plugin",
+  CACHEDB_CREATE_FILE = "create_cachedb_file_plugin",
 }
 
 export enum PrefectFlowName {
@@ -35,11 +35,11 @@ export enum PrefectFlowName {
   DATA_CHARACTERIZATION = "data_characterization_plugin",
   COHORT = "execute-cohort-generator-flow",
   DB_SVC = "execute-alp-db-svc-flow",
-  MEILISEARCH_ADD_INDEX = "execute-add-search-index-flow",
   DATASET_ATTRIBUTE = "update-dataset-attributes-flow",
   FETCH_VERSION_INFO = "fetch-version-info-flow",
   COHORT_SURVIVAL = "cohort-survival-plugin",
   DATA_MANAGEMENT = "data_management_plugin",
+  CACHEDB_CREATE_FILE = "create_cachedb_file_plugin",
 }
 
 export enum FLOW_RUN_STATE_TYPES {
