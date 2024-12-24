@@ -1,0 +1,507 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Terminology Service API
+  description: This is the API for Terminology Service
+servers:
+  - url: v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas: {}
+  parameters: {}
+paths:
+  /terminology/fhir/4_0_0/valueset/$expand:
+    get:
+      description: List of concepts
+      summary: List of concepts
+      tags:
+        - Concept
+        - FHIR
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: offset
+          in: query
+        - schema:
+            type: string
+          required: true
+          name: count
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: datasetId
+          in: query
+        - schema:
+            type: string
+          required: true
+          name: code
+          in: query
+        - schema:
+            type: string
+          required: false
+          name: filter
+          in: query
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+  /terminology/concept/filter-options:
+    get:
+      description: Get filter options for current search
+      summary: Get filter options for current search
+      tags:
+        - Concept
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: datasetId
+          in: query
+        - schema:
+            type: string
+          required: true
+          name: searchText
+          in: query
+        - schema:
+            type: string
+          required: false
+          name: filter
+          in: query
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  filterOptions:
+                    type: object
+                    properties:
+                      conceptClassId:
+                        type: object
+                        additionalProperties:
+                          type: number
+                      domainId:
+                        type: object
+                        additionalProperties:
+                          type: number
+                      standardConcept:
+                        type: object
+                        additionalProperties:
+                          type: number
+                      vocabularyId:
+                        type: object
+                        additionalProperties:
+                          type: number
+                      validity:
+                        type: object
+                        additionalProperties:
+                          type: number
+                      concept:
+                        type: object
+                        additionalProperties:
+                          type: number
+                    required:
+                      - conceptClassId
+                      - domainId
+                      - standardConcept
+                      - vocabularyId
+                      - validity
+                      - concept
+                required:
+                  - filterOptions
+  /terminology/fhir/4_0_0/conceptmap/$translate:
+    get:
+      description: List concept details and connections
+      summary: List concept details and connections
+      tags:
+        - Concept
+        - FHIR
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: datasetId
+          in: query
+        - schema:
+            type: string
+          required: true
+          name: conceptId
+          in: query
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+  /terminology/concept/searchById:
+    post:
+      description: Get concept by Id
+      summary: Get concept by Id
+      tags:
+        - Concept
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datasetId:
+                  type: string
+                  format: uuid
+                conceptId:
+                  type: number
+              required:
+                - datasetId
+                - conceptId
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+  /terminology/concept/searchByName:
+    post:
+      description: Get concept by name
+      summary: Get concept by name
+      tags:
+        - Concept
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datasetId:
+                  type: string
+                  format: uuid
+                conceptName:
+                  type: string
+              required:
+                - datasetId
+                - conceptName
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+  /terminology/concept/searchByCode:
+    post:
+      description: Get concept by code
+      summary: Get concept by code
+      tags:
+        - Concept
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datasetId:
+                  type: string
+                  format: uuid
+                conceptCode:
+                  type: string
+              required:
+                - datasetId
+                - conceptCode
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+  /terminology/concept/recommended/list:
+    post:
+      description: List recommended concepts
+      summary: List recommended concepts
+      tags:
+        - Concept
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datasetId:
+                  type: string
+                  format: uuid
+                conceptIds:
+                  type: array
+                  items:
+                    type: number
+              required:
+                - datasetId
+                - conceptIds
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+  /terminology/concept/hierarchy:
+    get:
+      description: List hierarchical items of a concept
+      summary: List hierarchical items of a concept
+      tags:
+        - Concept
+      parameters:
+        - schema:
+            type: object
+            properties:
+              datasetId:
+                type: string
+                format: uuid
+              conceptId:
+                type: string
+              depth:
+                type: string
+            required:
+              - datasetId
+              - conceptId
+              - depth
+          required: true
+          name: query
+          in: query
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+  /terminology/concept/getStandardConcepts:
+    post:
+      description: List all standard concepts
+      summary: List all standard concepts
+      tags:
+        - Concept
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: object
+                  properties:
+                    datasetId:
+                      type: string
+                      format: uuid
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          index:
+                            type: number
+                          searchText:
+                            type: string
+                          domainId:
+                            type: string
+                        required:
+                          - index
+                          - searchText
+                  required:
+                    - datasetId
+                    - data
+              required:
+                - body
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+  /terminology/concept-set:
+    get:
+      description: List concept sets
+      summary: List concept sets
+      tags:
+        - Concept Set
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+    post:
+      description: Create concept set
+      summary: Create concept set
+      tags:
+        - Concept Set
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                concepts:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                      useDescendants:
+                        type: boolean
+                      useMapped:
+                        type: boolean
+                    required:
+                      - id
+                      - useDescendants
+                      - useMapped
+                name:
+                  type: string
+                shared:
+                  type: boolean
+                userName:
+                  type: string
+              required:
+                - concepts
+                - name
+                - shared
+                - userName
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+  /terminology/concept-set/{conceptSetId}:
+    get:
+      description: Get concept set
+      summary: Get concept set
+      tags:
+        - Concept Set
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: conceptSetId
+          in: path
+        - schema:
+            type: string
+          required: true
+          name: datasetId
+          in: query
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+    put:
+      description: Update concept set
+      summary: Update concept set
+      tags:
+        - Concept Set
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: conceptSetId
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                concepts:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                      useDescendants:
+                        type: boolean
+                      useMapped:
+                        type: boolean
+                    required:
+                      - id
+                      - useDescendants
+                      - useMapped
+                name:
+                  type: string
+                shared:
+                  type: boolean
+                userName:
+                  type: string
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+    delete:
+      description: Delete concept set
+      summary: Delete concept set
+      tags:
+        - Concept Set
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: conceptSetId
+          in: path
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
+  /terminology/concept-set/included-concepts:
+    post:
+      description: List included concepts for a list of concept sets
+      summary: List included concepts for a list of concept sets
+      tags:
+        - Concept Set
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datasetId:
+                  type: string
+                conceptSetIds:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - datasetId
+                - conceptSetIds
+      responses:
+        "200":
+          description: Object with concept set data.
+          content:
+            application/json:
+              schema:
+                type: string
