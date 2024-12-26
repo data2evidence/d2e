@@ -150,12 +150,25 @@ export class DataCharacterizationService {
       },
     };
 
-    return await prefectApi.createFlowRun(
+    const flowRunId = await prefectApi.createFlowRun(
       name,
       PrefectDeploymentName.DATA_CHARACTERIZATION,
       PrefectFlowName.DATA_CHARACTERIZATION,
       parameters
     );
+
+    await prefectApi.createInputAuthToken(flowRunId);
+
+    await Promise.any([
+      new Promise((resolve) => {
+        setTimeout(async () => {
+          await prefectApi.deleteInputAuthToken(flowRunId);
+          resolve(`Deleted the input of ${flowRunId}`);
+        }, 5000);
+      }),
+    ]);
+
+    return { flowRunId };
   }
 
   public async getSchemaMappingList(token: string) {
