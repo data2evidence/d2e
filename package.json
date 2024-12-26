@@ -17,15 +17,15 @@
     "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local",
 
     "build:minerva": "yarn local:minerva build --build-arg GIT_COMMIT_ARG=$(git rev-parse HEAD)",
-    "build:nest-dev:minerva": "ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn build:minerva alp-minerva-dataflow-mgmt alp-minerva-portal-server",
-    "build:nest-prod:minerva": "yarn build:minerva alp-minerva-dataflow-mgmt alp-minerva-portal-server",
+    "build:nest-dev:minerva": "ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn build:minerva alp-minerva-dataflow-mgmt",
+    "build:nest-prod:minerva": "yarn build:minerva alp-minerva-dataflow-mgmt",
 
     "init:logto": "ENV_TYPE=${ENV_TYPE:-local} && yarn $ENV_TYPE:minerva up alp-minerva-postgres alp-logto --wait && sleep 10 && yarn $ENV_TYPE:minerva up alp-logto-post-init",
 
     "start:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes --wait",
     "start:minerva:perseus": "yarn local:minerva --profile perseus up --renew-anon-volumes --wait",
-    "start:nest-dev:minerva": "yarn build:nest-dev:minerva && ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt alp-minerva-portal-server --wait --force-recreate --no-deps",
-    "start:nest-prod:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt alp-minerva-portal-server --wait --force-recreate --no-deps",
+    "start:nest-dev:minerva": "yarn build:nest-dev:minerva && ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt --wait --force-recreate --no-deps",
+    "start:nest-prod:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes alp-minerva-dataflow-mgmt --wait --force-recreate --no-deps",
     
     "stop:minerva": "yarn local:minerva stop",
     "clean:minerva": "yarn local:minerva down --volumes --remove-orphans",
