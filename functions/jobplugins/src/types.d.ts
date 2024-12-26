@@ -141,7 +141,6 @@ export interface DataModel {
   datamodel: string;
   flowId: string;
 }
-
 export interface PluginFlow {
   name: string;
   tags: string[];
@@ -150,6 +149,11 @@ export interface PluginFlow {
   datamodels: string[];
   entrypoint: string;
   parameter_openapi_schema: object;
+}
+
+export interface ICreateDatamodelFlowRunDto {
+  flowRunName: string;
+  options: object;
 }
 
 export interface IGetVersionInfoFlowRunDto {
