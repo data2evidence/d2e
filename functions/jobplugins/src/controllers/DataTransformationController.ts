@@ -1,5 +1,5 @@
-import { JwtPayload, decode } from "npm:jsonwebtoken";
-import { Request, Response, Router } from "npm:express";
+import { JwtPayload, decode } from "jsonwebtoken";
+import { Request, Response, Router } from "express";
 import { TransformationService as DataTransformationService } from "../services/DataTransformationService.ts";
 
 export class DataTransformationController {
