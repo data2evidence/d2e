@@ -18,12 +18,11 @@ export class DatasetFilterService {
 
   async getDatabaseSchemaFilterResults(
     filterParams: IDatasetFilterParamsDto,
-    datasetsWithSchema: { databaseCode: string; schemaName: string }[],
-    jwt: string
+    datasetsWithSchema: { databaseCode: string; schemaName: string }[]
   ) {
     const encodedDatasetsWithSchema = encodeURIComponent(JSON.stringify(datasetsWithSchema))
     const encodedFilterParams = encodeURIComponent(JSON.stringify(filterParams))
 
-    return await this.analyticsApi.getDatabaseSchemaFilter(encodedDatasetsWithSchema, encodedFilterParams, jwt)
+    return await this.analyticsApi.getDatabaseSchemaFilter(encodedDatasetsWithSchema, encodedFilterParams)
   }
 }
