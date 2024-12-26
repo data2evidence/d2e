@@ -18,7 +18,7 @@ export class AnalysisService {
   public async getLastAnalysisflowRevision(id: string) {
     return await this.graphRepo
       .createQueryBuilder("revision")
-      .leftJoin("revision.analysisflow", "analysisflow")
+      .leftJoin("revision.canvas", "analysisflow")
       .select([
         "analysisflow.id",
         "analysisflow.name",
@@ -64,7 +64,8 @@ export class AnalysisService {
 
     const revisionEntity = this.graphRepo.create({
       id: uuidv4(),
-      analysisflowId: analysisflowEntity.id,
+      // analysisflowId: analysisflowEntity.id,
+      canvasId: analysisflowEntity.id,
       flow,
       comment,
       version,
@@ -96,13 +97,13 @@ export class AnalysisService {
     if (isNewEntity) {
       return {
         ...object,
-        createdBy: owner,
-        modifiedBy: owner,
+        createdBy: owner.sub,
+        modifiedBy: owner.sub,
       };
     }
     return {
       ...object,
-      modifiedBy: owner,
+      modifiedBy: owner.sub,
     };
   }
 
@@ -133,7 +134,8 @@ export class AnalysisService {
       token,
       this.graphRepo.create({
         id: uuidv4(),
-        analysisflowId: newAnalysisflowEntity.id,
+        // analysisflowId: newAnalysisflowEntity.id,
+        canvasId: newAnalysisflowEntity.id,
         flow: revisionEntity.flow,
         version: 1,
       }),

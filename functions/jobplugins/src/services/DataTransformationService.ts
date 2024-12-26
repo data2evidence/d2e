@@ -161,13 +161,13 @@ export class TransformationService {
     if (isNewEntity) {
       return {
         ...object,
-        createdBy: owner,
-        modifiedBy: owner,
+        createdBy: owner.sub,
+        modifiedBy: owner.sub,
       };
     }
     return {
       ...object,
-      modifiedBy: owner,
+      modifiedBy: owner.sub,
     };
   }
 
