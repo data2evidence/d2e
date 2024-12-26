@@ -1,14 +1,13 @@
-import { Inject, Injectable } from '@danet/core'
-import { Repository } from 'npm:typeorm'
-import { DATABASE } from '../../database/module.ts'
-import { PostgresService } from '../../database/postgres.service.ts'
-import { UserArtifact } from '../entity/user-artifact.entity.ts'
-import { ServiceName } from '../enums/index.ts'
+import { Inject, Injectable } from "@danet/core";
+import { Repository } from "typeorm";
+import { DATABASE } from "../../database/module.ts";
+import { PostgresService } from "../../database/postgres.service.ts";
+import { UserArtifact } from "../entity/user-artifact.entity.ts";
+import { ServiceName } from "../enums/index.ts";
 @Injectable()
 export class UserArtifactRepository {
   private repository: Repository<UserArtifact> | null = null;
-  constructor(@Inject(DATABASE) private dbService: PostgresService) {
-  }
+  constructor(@Inject(DATABASE) private dbService: PostgresService) {}
   private async getRepository() {
     if (!this.repository) {
       const dataSource = await this.dbService.getDataSourceAsync();
@@ -18,22 +17,22 @@ export class UserArtifactRepository {
   }
 
   async findOne(userId: string): Promise<UserArtifact | null> {
-    const repository = await this.getRepository()
+    const repository = await this.getRepository();
     return await repository.findOne({
       where: {
-        userId: userId
-      }
+        userId: userId,
+      },
     });
   }
 
   async find(): Promise<UserArtifact[]> {
-    const repository = await this.getRepository()
-    return await repository.find()
+    const repository = await this.getRepository();
+    return await repository.find();
   }
 
   async create(entity: Partial<UserArtifact>): Promise<UserArtifact> {
-    const repository = await this.getRepository()
-    return await repository.create(entity)
+    const repository = await this.getRepository();
+    return await repository.create(entity);
   }
 
   async update(entity: Partial<UserArtifact>): Promise<UserArtifact | null> {
@@ -44,7 +43,7 @@ export class UserArtifactRepository {
       {
         artifacts: entity.artifacts,
         modifiedBy: entity.modifiedBy,
-        modifiedDate: new Date()
+        modifiedDate: new Date(),
       }
     );
 
@@ -52,37 +51,48 @@ export class UserArtifactRepository {
   }
 
   async save(entity: Partial<UserArtifact>): Promise<UserArtifact> {
-    const repository = await this.getRepository()
-    return await repository.save(entity)
+    const repository = await this.getRepository();
+    return await repository.save(entity);
   }
 
-  async getAllServiceArtifacts(serviceName: ServiceName): Promise<UserArtifact[]> {
-    const repository = await this.getRepository()
+  async getAllServiceArtifacts(
+    serviceName: ServiceName
+  ): Promise<UserArtifact[]> {
+    const repository = await this.getRepository();
     const result = await repository
-      .createQueryBuilder('user_artifact')
-      .select(`jsonb_array_elements(user_artifact.artifacts->:serviceName)`, 'artifact')
+      .createQueryBuilder("user_artifact")
+      .select(
+        `jsonb_array_elements(user_artifact.artifacts->:serviceName)`,
+        "artifact"
+      )
       .where(`user_artifact.artifacts ? :serviceName`, { serviceName })
-      .getRawMany()
-    return result.map(row => row.artifact)
+      .getRawMany();
+    return result.map((row) => row.artifact);
   }
 
-  async findSharedArtifacts(userId: string, serviceName: ServiceName): Promise<UserArtifact[]> {
-    const repository = await this.getRepository()
+  async findSharedArtifacts(
+    userId: string,
+    serviceName: ServiceName
+  ): Promise<UserArtifact[]> {
+    const repository = await this.getRepository();
     return repository
-      .createQueryBuilder('userArtifact')
-      .where('userArtifact.userId != :userId', { userId })
+      .createQueryBuilder("userArtifact")
+      .where("userArtifact.userId != :userId", { userId })
       .andWhere(`userArtifact.artifacts ? :serviceName`, { serviceName })
-      .getMany()
+      .getMany();
   }
 
-  async findByServiceArtifactId(serviceName: string, id: string): Promise<UserArtifact[]> {
-    const repository = await this.getRepository()
+  async findByServiceArtifactId(
+    serviceName: string,
+    id: string
+  ): Promise<UserArtifact[]> {
+    const repository = await this.getRepository();
     return repository
-      .createQueryBuilder('user_artifact')
+      .createQueryBuilder("user_artifact")
       .where(`user_artifact.artifacts->:serviceName @> :jsonValue`, {
         serviceName,
-        jsonValue: JSON.stringify([{ id }])
+        jsonValue: JSON.stringify([{ id }]),
       })
-      .getMany()
+      .getMany();
   }
 }

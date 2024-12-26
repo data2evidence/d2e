@@ -1,28 +1,28 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'npm:typeorm'
-import { Audit } from '../../common/entity/audit.entity.ts'
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Audit } from "../../common/entity/audit.entity.ts";
 // import { Dataset } from './dataset.entity.ts'
 
-@Entity('dataset_dashboard')
+@Entity("dataset_dashboard")
 export class DatasetDashboard extends Audit {
-  @PrimaryColumn({ type: 'uuid' })
-  id: string
+  @PrimaryColumn({ type: "uuid" })
+  id: string;
 
   @Column({ unique: true })
-  name: string
+  name: string;
 
   @Column()
-  url: string
+  url: string;
 
-  @Column({ name: 'base_path' })
-  basePath: string
+  @Column({ name: "base_path" })
+  basePath: string;
 
   // Required for creation
-  @Column({ name: 'dataset_id' })
-  datasetId: string
+  @Column({ name: "dataset_id" })
+  datasetId: string;
 
-  @ManyToOne('Dataset', 'dashboards', {
-    onDelete: 'CASCADE'
+  @ManyToOne("Dataset", "dashboards", {
+    onDelete: "CASCADE",
   })
-  @JoinColumn({ name: 'dataset_id' })
-  dataset: any
+  @JoinColumn({ name: "dataset_id" })
+  dataset: any;
 }

@@ -11,6 +11,7 @@
     "express": "npm:express@^4.18",
     "@danet/typeorm": "jsr:@danet/typeorm@0.1.1",
     "mime": "npm:mime@1.6.0",
+    "typeorm": "npm:typeorm@0.3.20",
     "typeorm-extension": "npm:typeorm-extension@3.6.3",
     "@hono/hono/request": "jsr:@hono/hono@4.6.3/request",
     "uuid": "npm:uuid@9.0.1",

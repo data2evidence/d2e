@@ -1,4 +1,4 @@
-import { DataSource, DataSourceOptions } from "npm:typeorm";
+import { DataSource, DataSourceOptions } from "typeorm";
 import { SeederOptions } from "typeorm-extension";
 import { env } from "../../env.ts";
 

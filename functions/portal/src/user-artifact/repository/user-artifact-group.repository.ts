@@ -1,13 +1,13 @@
-import { Inject, Injectable } from '@danet/core';
-import { Repository } from 'npm:typeorm';
-import { DATABASE } from '../../database/module.ts';
-import { PostgresService } from '../../database/postgres.service.ts';
-import { UserArtifactGroup } from '../entity/user-artifact-group.entity.ts';
+import { Inject, Injectable } from "@danet/core";
+import { Repository } from "typeorm";
+import { DATABASE } from "../../database/module.ts";
+import { PostgresService } from "../../database/postgres.service.ts";
+import { UserArtifactGroup } from "../entity/user-artifact-group.entity.ts";
 
 @Injectable()
-export class UserArtifactGroupRepository{
+export class UserArtifactGroupRepository {
   private repository: Repository<UserArtifactGroup> | null = null;
-  constructor(@Inject(DATABASE) private dbService: PostgresService) { }
+  constructor(@Inject(DATABASE) private dbService: PostgresService) {}
 
   private async getRepository() {
     if (!this.repository) {
@@ -18,26 +18,26 @@ export class UserArtifactGroupRepository{
   }
 
   async findOne(userId: string): Promise<UserArtifactGroup | null> {
-    const repository = await this.getRepository()
+    const repository = await this.getRepository();
     return await repository.findOne({
       where: {
-        userId: userId
-      }
+        userId: userId,
+      },
     });
   }
 
   async create(entity: Partial<UserArtifactGroup>): Promise<UserArtifactGroup> {
-    const repository = await this.getRepository()
-    return await repository.create(entity)
+    const repository = await this.getRepository();
+    return await repository.create(entity);
   }
 
   async save(entity: Partial<UserArtifactGroup>): Promise<UserArtifactGroup> {
-    const repository = await this.getRepository()
-    return await repository.save(entity)
+    const repository = await this.getRepository();
+    return await repository.save(entity);
   }
 
   async delete(userId: string): Promise<void> {
-    const repository = await this.getRepository()
-    await repository.delete({ userId })
+    const repository = await this.getRepository();
+    await repository.delete({ userId });
   }
 }

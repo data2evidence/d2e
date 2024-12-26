@@ -1,4 +1,4 @@
-import { DataSource } from "npm:typeorm";
+import { DataSource } from "typeorm";
 import { Seeder } from "typeorm-extension";
 import { Config } from "../../../config/entity/index.ts";
 

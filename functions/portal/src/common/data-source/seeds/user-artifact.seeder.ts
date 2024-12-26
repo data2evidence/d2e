@@ -1,4 +1,4 @@
-import { DataSource } from "npm:typeorm";
+import { DataSource } from "typeorm";
 import { Seeder } from "typeorm-extension";
 import { UserArtifact } from "../../../user-artifact/entity";
 import { notebookContents } from "./notebooks";
