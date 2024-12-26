@@ -16,7 +16,6 @@ import { Feature } from '../feature/entity/feature.entity.ts';
 import { Notebook } from '../notebook/entity/notebook.entity.ts';
 import { UserArtifactGroup } from '../user-artifact/entity/user-artifact-group.entity.ts';
 import { UserArtifact } from '../user-artifact/entity/user-artifact.entity.ts';
-import { env } from '../env.ts';
 @Injectable()
 export class PostgresService implements OnAppBootstrap, OnAppClose {
   private _env = Deno.env.toObject();
@@ -29,7 +28,7 @@ export class PostgresService implements OnAppBootstrap, OnAppClose {
       password: this._env.PG_PASSWORD,
       database: this._env.PG__DB_NAME,
       hostname: this._env.PG_HOST,
-      schema: env.PG_SCHEMA,
+      schema: this._env.PG_SCHEMA,
     });
 
     this.dataSource = new DataSource({
@@ -39,7 +38,7 @@ export class PostgresService implements OnAppBootstrap, OnAppClose {
       username: this._env.PG_USER,
       password: this._env.PG_PASSWORD,
       database: this._env.PG__DB_NAME,
-      schema: env.PG_SCHEMA,
+      schema: this._env.PG_SCHEMA,
       entities: [Feature, Config, UserArtifact, UserArtifactGroup, Dataset, DatasetDetail, DatasetTag, DatasetTagConfig, DatasetDashboard, DatasetRelease, DatasetAttribute, DatasetAttributeConfig, Notebook],
     });
   }

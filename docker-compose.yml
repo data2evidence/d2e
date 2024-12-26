@@ -516,8 +516,8 @@ services:
             "PG_PASSWORD": "${PG_WRITE_PASSWORD}",
             "PG_SCHEMA": "portal",
             "PG_HOST": "${PG_HOST:-alp-minerva-postgres-1}",
-            "PG_PORT": ${PG_PORT:-5432},
-            "PG_DATABASE": "${PG_DB_NAME:-alp}",
+            "PG_PORT": "${PG_PORT:-5432}",
+            "PG_DATABASE": "${PG_DB_NAME:-alp}"
           },
           "terminology-svc": {}
         }
