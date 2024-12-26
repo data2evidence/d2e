@@ -38,6 +38,16 @@ export class DatasetController {
     private readonly datasetFilterService: DatasetFilterService
   ) {}
 
+  @Get()
+  async getDataset(@Query() queryParams: any): Promise<IDataset> {
+    const id = queryParams.datasetId
+    if (!id) {
+      console.log("No datasetId provided");
+      throw new BadRequestException("datasetId is required");
+    }
+    return await this.datasetQueryService.getDataset(id);
+  }
+
   @Head()
   async hasDataset(@Query() searchParams: DatasetSearchDto) {
     const dataset = await this.datasetQueryService.hasDataset(searchParams);
@@ -55,19 +65,6 @@ export class DatasetController {
   @Get("filter-scopes")
   async getDatasetFilterScopes() {
     return await this.datasetFilterService.getFilterScopes();
-  }
-
-  // TODO: Fix path error when using query with no path prefix, check uuid
-  // Solution 1: use prefix in @Get("/byId")
-  @Get()
-  async getDataset(@Query("datasetId") id: string): Promise<IDataset> {
-    console.log("Query param received:", id);
-
-    if (!id) {
-      console.log("No datasetId provided");
-      throw new BadRequestException("datasetId is required");
-    }
-    return await this.datasetQueryService.getDataset(id);
   }
 
   @Put()

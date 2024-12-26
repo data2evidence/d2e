@@ -22,6 +22,8 @@ import {
   DatasetTagRepository
 } from './repository/index.ts'
 import { IsDatasetAttributeValueValid } from './validator/dataset-attribute.validator.ts'
+import { ResourceModule } from './resource/resource.module.ts'
+
 const imports: Array<any> = [
   DatabaseModule,
   TenantModule,
@@ -29,7 +31,8 @@ const imports: Array<any> = [
   UserMgmtModule,
   PublicDatasetModule,
   DatasetPaConfigModule,
-  MetadataConfigModule
+  MetadataConfigModule,
+  ResourceModule
 ]
 const injectables = [
   DatasetQueryService,
