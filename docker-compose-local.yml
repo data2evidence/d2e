@@ -2,7 +2,6 @@ services:
   trex:
     command: npm run startdev
     external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
       - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
     ports:
       - 9229:9229
@@ -67,8 +66,6 @@ services:
       context: ./services/alp-dataflow
       dockerfile: Dockerfile
     container_name: alp-minerva-dataflow-mgmt-nest-prod-${BASE_PORT:-1}
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
     environment:
       NODE_ENV: development
 
@@ -80,16 +77,6 @@ services:
       - ./services/alp-pg-management/app:/home/docker/app
     environment:
       LOCAL_DEBUG: "true"
-
-  alp-minerva-portal-server:
-    build:
-      context: ./services/alp-portal-server
-      dockerfile: Dockerfile
-    container_name: alp-minerva-portal-server-nest-prod-${BASE_PORT:-1}
-    environment:
-      MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
-      MINIO__SSL: false
-      NODE_ENV: development
 
   alp-minerva-postgres:
     ports:
