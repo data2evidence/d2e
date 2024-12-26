@@ -89,18 +89,18 @@ class WinstonLogger implements ILogger {
     const errorMsg = this.addPrefix(`[${guid}]: ${msg} `);
     switch (level) {
       case LOG_LEVEL.INFO:
-        this.logger.info(errorMsg);
+        console.log(errorMsg);
         break;
       case LOG_LEVEL.DEBUG:
-        this.logger.debug(errorMsg);
+        console.debug(errorMsg);
         break;
       case LOG_LEVEL.WARN:
-        this.logger.warn(errorMsg);
+        console.warn(errorMsg);
         break;
       case LOG_LEVEL.ERROR:
       case LOG_LEVEL.FATAL:
       default:
-        this.logger.error(errorMsg);
+        console.error(errorMsg);
         break;
     }
 

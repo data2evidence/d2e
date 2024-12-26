@@ -32,7 +32,7 @@ USER docker
 ### Start env converter ###
 WORKDIR /home/docker/envConverter
 COPY ./services/envConverter .
-RUN yarn install
+RUN --mount=type=cache,target=~/.cache/yarn yarn install
 ### End env converter ###
 
 

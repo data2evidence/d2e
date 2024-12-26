@@ -38,7 +38,7 @@ export class MeRouter {
           return res.status(400).send({ message: `IDP user ID ${idpUserId} not found` })
         }
 
-        return res.status(200).send({ id: user.id })
+        return res.status(200).send({ id: user.id, username: user.username })
       } catch (err) {
         this.logger.error(`Error when updating user ${idpUserId}: ${JSON.stringify(err)}`)
         next(err)

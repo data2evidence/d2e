@@ -66,7 +66,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
             req
         }).generateQuery();
 
-        log.debug(`Query response:\n${JSON.stringify(stackedBarchartQuery)}`);
+        // log.debug(`Query response:\n${JSON.stringify(stackedBarchartQuery)}`);
 
         res.status(200).send(stackedBarchartQuery);
     } catch (err) {

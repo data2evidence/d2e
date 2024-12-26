@@ -9,6 +9,8 @@ type ConnectionInterface = connLib.ConnectionInterface;
 type CallBackInterface = connLib.CallBackInterface;
 import { Settings } from "../qe/settings/Settings";
 import * as utilsLib from "../utils/utils";
+import { Buffer } from "node:buffer";
+
 const CONFIG_TYPES = {
   GLOBAL_SETTINGS: "HC/HPH/GLOBAL",
   CDW: "HC/HPH/CDW",
@@ -116,7 +118,7 @@ export class FfhConfig {
     params.push(settings.configName);
     params.push(
       utilsLib.isXS2()
-        ? new Buffer(JSON.stringify(config), "utf8")
+        ? Buffer.from(JSON.stringify(config), "utf8")
         : JSON.stringify(config)
     );
     params.push(settings.configStatus);
@@ -196,7 +198,7 @@ export class FfhConfig {
     );
     params.push(
       utilsLib.isXS2()
-        ? new Buffer(JSON.stringify(config), "utf8")
+        ? Buffer.from(JSON.stringify(config), "utf8")
         : JSON.stringify(config)
     );
 
