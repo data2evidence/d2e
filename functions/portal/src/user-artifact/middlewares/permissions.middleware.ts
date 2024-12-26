@@ -1,5 +1,5 @@
 import { BadRequestException, DanetMiddleware, ForbiddenException, HttpContext, Injectable, UnauthorizedException } from '@danet/core'
-import { JwtPayload, decode } from 'npm:jsonwebtoken'
+import { JwtPayload, decode } from 'jsonwebtoken'
 import { ServiceName } from '../enums/index.ts'
 import { GroupService } from '../group/group.service.ts'
 

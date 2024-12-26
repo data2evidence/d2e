@@ -1,4 +1,4 @@
-import { Logger, createLogger as createWinstonLogger, format, transports } from 'npm:winston'
+import { Logger, createLogger as createWinstonLogger, format, transports } from 'winston'
 import { env } from './env.ts'
 
 export enum LOG_LEVEL {

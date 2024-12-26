@@ -1,6 +1,6 @@
 import { Injectable } from "@danet/core";
 import { HonoRequest } from "@hono/hono/request";
-import { JwtPayload } from "npm:jsonwebtoken";
+import { JwtPayload } from "jsonwebtoken";
 @Injectable()
 export class RequestContextService {
   private request: HonoRequest | null = null;

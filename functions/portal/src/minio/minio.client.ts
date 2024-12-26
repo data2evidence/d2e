@@ -1,7 +1,7 @@
 import { BadRequestException, InternalServerErrorException } from '@danet/core'
 import { Buffer } from 'node:buffer'
 import { type Multer } from 'npm:@types/multer'
-import * as mime from 'npm:mime@1.6.0'
+import * as mime from 'mime'
 import * as Minio from 'npm:minio@8.0.2'
 import { env } from '../env.ts'
 

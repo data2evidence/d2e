@@ -1,6 +1,6 @@
 import { DanetMiddleware, HttpContext, Injectable } from "@danet/core";
 import { RequestContextService } from "./request-context.service.ts";
-import { JwtPayload, decode } from "npm:jsonwebtoken";
+import { JwtPayload, decode } from "jsonwebtoken";
 
 @Injectable()
 export class RequestContextMiddleware implements DanetMiddleware {

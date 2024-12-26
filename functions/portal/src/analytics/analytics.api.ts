@@ -1,5 +1,5 @@
 import { Injectable, SCOPE } from '@danet/core';
-import axios, { AxiosRequestConfig } from "npm:axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { services } from '../env.ts';
 import { IDatabaseSchemaFilterResult, IDatasetFilterScopesResult } from '../types.d.ts';
 import { RequestContextService } from '../common/request-context.service.ts';
