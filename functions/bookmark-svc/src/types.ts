@@ -114,3 +114,18 @@ export interface IDBCredentialsType {
   min?: number | undefined
   idleTimeoutMillis?: number | undefined
 }
+
+export interface BookmarkDto {
+  id: string
+  bookmark_name: string
+  bookmark: string
+  type: string | null
+  view_name: string | null
+  modified: string
+  version: number
+  pa_config_id: string
+  cdm_config_id: string
+  cdm_config_version: number
+  user_id: string
+  shared: boolean
+}

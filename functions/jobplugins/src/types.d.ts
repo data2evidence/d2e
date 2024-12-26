@@ -92,7 +92,6 @@ interface CohortGeneratorFlowRunOptions {
   datasetId: string;
   description: string;
   owner: string;
-  token: string;
 }
 interface CohortJson {
   id: number;
@@ -112,15 +111,8 @@ export interface DBSvcFlowRunDto {
 }
 
 export interface DatasetAttributesFlowRunDto {
-  token: string;
   versionInfo: object;
   datasetSchemaMapping: any[];
-}
-
-export interface MeilisearchAddIndexFlowRunDto {
-  databaseCode: string;
-  vocabSchemaName: string;
-  tableName: string;
 }
 
 export enum FlowRunState {
@@ -149,7 +141,6 @@ export interface DataModel {
   datamodel: string;
   flowId: string;
 }
-
 export interface PluginFlow {
   name: string;
   tags: string[];
@@ -158,6 +149,11 @@ export interface PluginFlow {
   datamodels: string[];
   entrypoint: string;
   parameter_openapi_schema: object;
+}
+
+export interface ICreateDatamodelFlowRunDto {
+  flowRunName: string;
+  options: object;
 }
 
 export interface IGetVersionInfoFlowRunDto {
@@ -193,4 +189,9 @@ export interface DataCharacterizationFlowRunDto {
   comment?: string;
   releaseId?: string;
   excludeAnalysisIds?: string;
+}
+
+export interface ICreateCachedbFileFlowRunDto {
+  databaseCode: string;
+  schemaName: string;
 }

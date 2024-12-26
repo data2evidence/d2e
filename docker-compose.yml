@@ -7,7 +7,6 @@ volumes:
   caddy:
   duckdb-data-1:
   cdw-config-duckdb-data-1:
-  meilisearch-minerva-data-1:
   minio-data-1:
   pg-minerva-data-1:
   dicom-sqlite-storage:
@@ -78,14 +77,14 @@ x-envs:
           ],
           "route": "cohort"
         },
-        { 
+        {
           "enabled": false,
           "featureFlag": "cohorts",
-          "name": "Cohorts M", 
+          "name": "Cohorts M",
           "pluginPath": "plugins/Cohort/module",
-          "requiredRoles": [ 
-            "RESEARCHER" 
-          ], 
+          "requiredRoles": [
+            "RESEARCHER"
+          ],
           "route": "cohorts"
         },
         {
@@ -187,14 +186,6 @@ x-envs:
           "route": "ps-config"
         },
         {
-          "description": "Configure hybrid search for concepts",
-          "enabled": true,
-          "name": "Hybrid Search",
-          "notes": "",
-          "pluginPath": "plugins/Setup/HybridSearch/module",
-          "route": "hybrid-search"
-        },
-        {
           "description": "Configure overview description text",
           "enabled": true,
           "name": "Overview description",
@@ -202,7 +193,7 @@ x-envs:
           "pluginPath": "plugins/Setup/OverviewDescription/module",
           "route": "overview-description"
         },
-        { 
+        {
           "description": "Upload / delete flows",
           "enabled": true,
           "name": "Plugins Table",
@@ -267,17 +258,17 @@ x-envs:
   service: &x-routes
     SERVICE_ROUTES: |-
       {
-       "analytics": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+       "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
        "bookmark": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/analytics-svc/api/services/bookmark",
        "cdw": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "paConfig": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/pa-config-svc",
        "queryGen": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+       "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
        "dataflowMgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/db-credentials",
-       "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
        "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
        "usermgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/usermgmt/api",
-       "terminology": "http://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
+       "terminology": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/terminology",
        "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT:-1}:3001/oidc",
        "minio": "",
@@ -313,7 +304,7 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: trex.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/trex:${DOCKER_TREX_TAG_NAME:-develop}
+    image: alpcr.azurecr.io/d2e-trex-base:${DOCKER_TREX_TAG_NAME:-develop}
     pull_policy: always
     platform: linux/amd64
     logging:
@@ -369,7 +360,7 @@ services:
             "CACHEDB__PORT": 41191,
             "CACHEDB__HOST": "alp-cachedb",
             "CACHEDB__POOL_SIZE": "${CACHEDB__POOL_SIZE:-10}",
-            "NODE_ENV": "development",
+            "NODE_ENV": "${NODE_ENV:-development}",
             "PG__DB_NAME": "alp",
             "PG__DEBUG": "${PG_DEBUG:-1}",
             "PG__HOST": "${PG_HOST:-alp-minerva-postgres-1}",
@@ -379,6 +370,7 @@ services:
             "PG__IDLE_TIMEOUT_IN_MS": 1000,
             "PG__DIALECT": "postgresql",
             "LOCAL_DEBUG": "false",
+            "isHttpTestRun": "${isHttpTestRun}",
             "SERVICE_ROUTES": {
               "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "bookmark": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/analytics-svc/api/services/bookmark",
@@ -387,11 +379,11 @@ services:
               "trex": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "dataflowMgmt": "http://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
+              "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
-              "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
               "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
               "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
-              "terminology": "http://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
+              "terminology": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/terminology",
               "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
               "idIssuerUrl": "http://alp-logto-${BASE_PORT:-1}:3001/oidc",
               "minio": "",
@@ -411,11 +403,10 @@ services:
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",
             "DUCKDB__DATA_FOLDER": "/home/docker/src/alp-data-node/app/duckdb_data",
             "LOCAL_DEBUG": "false",
-            "SKIP_AUTH": "${SKIP_AUTH:-FALSE}",
             "USE_DUCKDB": "${USE_DUCKDB:-true}",
             "USE_CACHEDB": "${USE_CACHEDB:-true}",
+            "USE_HANA_JWT_AUTHC": "${USE_HANA_JWT_AUTHC:-false}",
             "USE_EXTENSION_FOR_COHORT_CREATION": "false",
-            "isHttpTestRun": "${isHttpTestRun}",
             "isTestEnv": "${isTestEnv}",
             "local": "${local}",
             "TESTSCHEMA": "${TESTSCHEMA}"
@@ -461,7 +452,6 @@ services:
           },
           "query-gen-svc": {
             "SQL_RETURN_ON": "${SQL_RETURN_ON:-false}",
-            "isHttpTestRun": "${isTestEnv}",
             "isTestEnv": "${isTestEnv}",
             "TESTSCHEMA": "${TESTSCHEMA}",
             "NOT_EQ_CHECK_FILTERCARDS": "${NOT_EQ_CHECK_FILTERCARDS:-true}"
@@ -520,7 +510,8 @@ services:
             "GATEWAY_WO_PROTOCOL_FQDN": "${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}"
           },
           "alpdb": {},
-          "concept-mapping": {}
+          "concept-mapping": {},
+          "terminology-svc": {}
         }
       SERVICE_ROUTES: |-
         {
@@ -532,10 +523,9 @@ services:
         "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
         "dataflowMgmt": "http://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
         "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
-        "meilisearch": "http://alp-minerva-meilisearch-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41111",
         "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
         "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
-        "terminology": "http://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
+        "terminology": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/terminology",
         "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
         "appRouter": "https://alp-mercury-approuter:41000",
         "idIssuerUrl": "http://alp-logto-${BASE_PORT:-1}:3001/oidc",
@@ -580,7 +570,6 @@ services:
       GH_TOKEN: ${GH_TOKEN}
       PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
       PLUGINS_API_VERSION: ${PLUGINS_API_VERSION:-latest}
-      WATCH_FUNCTIONS: false
       PLUGINS_SEED_UPDATE: ${PLUGINS_SEED_UPDATE:-false}
 
   alp-minerva-pg-mgmt-init:
@@ -721,13 +710,12 @@ services:
       PREFECT_UI_STATIC_DIRECTORY: /app/ui-files
       PREFECT_SERVER_API_PORT: 41${BASE_PORT:-1}20
       PREFECT_API_ENABLE_HTTP2: False
-      SKIP_AUTH: ${SKIP_AUTH:-FALSE}
 
   alp-dataflow-gen-worker:
     command:
       - sh
       - -c
-      - "apt-get update && apt-get install -y curl && pip install prefect[docker]==3.0.3 && prefect work-pool create 'docker-pool' --type docker; prefect worker start --pool 'docker-pool' --type  docker"
+      - "apt-get update && apt-get install -y curl && pip install prefect[docker]==3.0.3 && python3 ./create_workpool_json.py && prefect work-pool create 'docker-pool' --type docker --base-job-template ./custom-docker-workpool.json --overwrite; prefect worker start --pool 'docker-pool' --type  docker --name prefect-docker-worker"
     container_name: &c83 alp-dataflow-gen-worker
     depends_on:
       alp-minio-post-init:
@@ -759,10 +747,13 @@ services:
       data:
         priority: 20
     volumes:
+      - ./services/alp-dataflow-gen/create_workpool_json.py:/opt/prefect/create_workpool_json.py
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_API_ENABLE_HTTP2: False
+      D2E_MEMORY_LIMIT: ${D2E_MEMORY_LIMIT:-16G}
+      D2E_SWAP_LIMIT: ${D2E_SWAP_LIMIT:-64G}
 
   alp-dataflow-gen-init:
     command:
@@ -891,6 +882,7 @@ services:
       LOGTO__ADMIN_SERVER__FQDN_URL: "http://alp-logto-1:3002"
       LOGTO__CLIENTID_PASSWORD__BASIC_AUTH: ${LOGTO__CLIENTID_PASSWORD__BASIC_AUTH}
       LOGTO__ALP_ADMIN_APP: '{"application": {"id": "${LOGTO_API_M2M_CLIENT_ID}", "name":"alp-admin","description":"alp-admin", "secret": "${LOGTO_API_M2M_CLIENT_SECRET}"}, "role": { "name":"api-access","description":"Logto API access"}}'
+      CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
 
   alp-logto:
     container_name: &c8 alp-logto-${BASE_PORT:-1}
@@ -989,38 +981,6 @@ services:
       PG__DATAFLOW_MGMT__SCHEMA: dataflow
       PG__DATAFLOW_MGMT__USER: ${PG_WRITE_USER:-alp_pg_write_user}
 
-  alp-minerva-meilisearch-svc:
-    container_name: &c13 alp-minerva-meilisearch-svc-${BASE_PORT:-1}
-    depends_on:
-      alp-minerva-postgres:
-        condition: service_healthy
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 60s
-      timeout: 30s
-      test:
-        - CMD
-        - curl
-        - http://alp-minerva-meilisearch-svc-1:41111/health
-    hostname: alp-minerva-meilisearch-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: getmeili/meilisearch:v1.6
-    logging:
-      options:
-        tag: *c13
-    networks:
-      alp:
-        priority: 20
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    volumes:
-      - meilisearch-minerva-data-1:/meili_data
-    environment:
-      <<:
-        - *x-tls
-      MEILI_HTTP_ADDR: 0.0.0.0:41${BASE_PORT:-1}11
-      MEILI_LOG_LEVEL: INFO
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-
   alp-minerva-portal-server:
     container_name: &c16 alp-minerva-portal-server-${BASE_PORT:-1}
     init: true
@@ -1070,7 +1030,6 @@ services:
       PG__PORTAL_SERVER__PASSWORD: ${PG_WRITE_PASSWORD}
       PG__PORTAL_SERVER__SCHEMA: portal
       PG__PORTAL_SERVER__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      PLUGINS__JSON: *x-plugins
       PORTAL_SERVER__LOG_LEVEL: info
       PORTAL_SERVER__PORT: 33002
 
@@ -1147,59 +1106,6 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO__SECRET_KEY}
       MINIO_ROOT_USER: ${MINIO__ACCESS_KEY:-root}
 
-  alp-minerva-terminology-svc:
-    container_name: &c21 alp-minerva-terminology-svc-${BASE_PORT:-1}
-    init: true
-    depends_on:
-      trex:
-        condition: service_healthy
-      alp-minerva-postgres:
-        condition: service_healthy
-      alp-meilisearch-post-init:
-        condition: service_completed_successfully
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 60s
-      timeout: 30s
-      test:
-        - CMD
-        - wget
-        - --no-check-certificate
-        - -O
-        - liveness
-        - http://localhost:41108/check-liveness
-    hostname: alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-terminology-svc:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c21
-    networks:
-      alp:
-        priority: 20
-    platform: linux/amd64
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    environment:
-      <<:
-        - *x-converter
-        - *x-tls
-        - *x-routes
-        - *x-pg
-        - *cachedb
-      FHIR_TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}11
-      LOCAL_DEBUG: "false"
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-      NODE_ENV: development
-      PG_MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
-      PG_MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG_PASSWORD: ${PG_WRITE_PASSWORD}
-      PG_SCHEMA: terminology
-      PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      TERMINOLOGY_SVC__LOG_LEVEL: info
-      TERMINOLOGY_SVC__PATH: terminology
-      TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
-      USE_DUCKDB_FTS: ${USE_DUCKDB_FTS:-false}
-
   alp-minio-post-init:
     container_name: &c23 alp-minio-post-init
     depends_on:
@@ -1256,37 +1162,6 @@ services:
       alp:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     profiles: [fhir]
-
-  alp-meilisearch-post-init:
-    container_name: &c29 alp-meilisearch-post-init
-    depends_on:
-      alp-minerva-meilisearch-svc:
-        condition: service_healthy
-    image: getmeili/meilisearch:v1.6
-    logging:
-      options:
-        tag: *c29
-    entrypoint:
-      - curl
-      - -X
-      - PATCH
-      - "http://alp-minerva-meilisearch-svc-1:41${BASE_PORT:-1}11/experimental-features/"
-      - -H
-      - "Content-Type: application/json"
-      - -H
-      - "Authorization: Bearer ${MEILI_MASTER_KEY}"
-      - --data-binary
-      - '{ "vectorStore": true }'
-    networks:
-      alp:
-        priority: 20
-    hostname: alp-meilisearch-post-init.${TLS__INTERNAL__DOMAIN:-alp.local}
-    environment:
-      <<:
-        - *x-tls
-      MEILI_HTTP_ADDR: 0.0.0.0:41${BASE_PORT:-1}11
-      MEILI_LOG_LEVEL: INFO
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
 
   alp-cachedb:
     container_name: &c30 alp-cachedb

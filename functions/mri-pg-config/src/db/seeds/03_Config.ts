@@ -17866,57 +17866,6 @@ export const cdwConfigDuckdb = {
                       "cohortDefinitionKey": "",
                       "conceptIdentifierType": ""
                   },
-                  "conditionconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Condition concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@CONDERA.\"CONDITION_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Condition' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 7,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "Condition_era_concept_set": {
                       "name": [
                           {
@@ -18399,57 +18348,6 @@ export const cdwConfigDuckdb = {
                       "useRefValue": true,
                       "useRefText": true
                   },
-                  "conditionconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Condition concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@COND.\"CONDITION_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Condition' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 17,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "conditionconceptset": {
                       "name": [
                           {
@@ -18499,155 +18397,6 @@ export const cdwConfigDuckdb = {
                       "useRefValue": true,
                       "useRefText": true
                   },
-                  "conditiontypeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Condition Type concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@COND.\"CONDITION_TYPE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Condition Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 19,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "ConditionType",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
-                  "conditionsourceconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Condition Source concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@COND.\"CONDITION_SOURCE_CONCEPT_ID\"",
-                      "order": 20,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "",
-                      "conceptIdentifierType": ""
-                  },
-                  "conditionstatusconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Condition Status concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@COND.\"CONDITION_STATUS_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Condition Status' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 21,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "ConditionStatus",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "condition_occ_concept_name": {
                       "name": [
                           {
@@ -18693,7 +18442,7 @@ export const cdwConfigDuckdb = {
                       "defaultFilter": "@REF.concept_id = @COND.condition_concept_id",
                       "referenceFilter": "@REF.DOMAIN_ID = 'Condition' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
                       "referenceExpression": "@REF.CONCEPT_NAME",
-                      "order": 0,
+                      "order": 22,
                       "domainFilter": "",
                       "standardConceptCodeFilter": "",
                       "cohortDefinitionKey": "CodesetId",
@@ -18937,57 +18686,6 @@ export const cdwConfigDuckdb = {
                       "standardConceptCodeFilter": "",
                       "cohortDefinitionKey": "OccurrenceStartDate",
                       "conceptIdentifierType": ""
-                  },
-                  "deathtypeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Death Type concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@DEATH.\"DEATH_TYPE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Death Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 9,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "DeathType",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
                   },
                   "death_type_concept_name": {
                       "name": [
@@ -19420,57 +19118,6 @@ export const cdwConfigDuckdb = {
                       "useRefValue": true,
                       "useRefText": true
                   },
-                  "deviceconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Device concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@DEVEXP.\"DEVICE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Device' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 10,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "deviceconceptset": {
                       "name": [
                           {
@@ -19517,57 +19164,6 @@ export const cdwConfigDuckdb = {
                       "standardConceptCodeFilter": "",
                       "cohortDefinitionKey": "CodesetId",
                       "conceptIdentifierType": "",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
-                  "devicetypeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Device Type concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@DEVEXP.\"DEVICE_TYPE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Device Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 12,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "DeviceType",
-                      "conceptIdentifierType": "id",
                       "useRefValue": true,
                       "useRefText": true
                   },
@@ -20003,108 +19599,6 @@ export const cdwConfigDuckdb = {
                       "conceptIdentifierType": "",
                       "useRefValue": true,
                       "useRefText": true
-                  },
-                  "drugconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Drug concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@DOSEERA.\"DRUG_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Drug' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 11,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
-                  "unitconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Unit concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@DOSEERA.\"UNIT_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Unit' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 12,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "Unit",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
                   }
               }
           },
@@ -20483,57 +19977,6 @@ export const cdwConfigDuckdb = {
                       "standardConceptCodeFilter": "",
                       "cohortDefinitionKey": "CodesetId",
                       "conceptIdentifierType": "",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
-                  "drugconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Drug concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@DRUGERA.\"DRUG_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Drug' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 9,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
-                      "conceptIdentifierType": "id",
                       "useRefValue": true,
                       "useRefText": true
                   }
@@ -21152,57 +20595,6 @@ export const cdwConfigDuckdb = {
                       "cohortDefinitionKey": "DaysSupply",
                       "conceptIdentifierType": ""
                   },
-                  "drugconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Drug concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@DRUGEXP.\"DRUG_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Drug' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
-                      "order": 19,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "drugconceptset": {
                       "name": [
                           {
@@ -21252,57 +20644,6 @@ export const cdwConfigDuckdb = {
                       "useRefValue": true,
                       "useRefText": true
                   },
-                  "routeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Route concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@DRUGEXP.\"ROUTE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Route' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 21,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "RouteConcept",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "routeconceptset": {
                       "name": [
                           {
@@ -21349,57 +20690,6 @@ export const cdwConfigDuckdb = {
                       "standardConceptCodeFilter": "",
                       "cohortDefinitionKey": "RouteConcept",
                       "conceptIdentifierType": "",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
-                  "drugtypeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Drug type concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@DRUGEXP.\"DRUG_TYPE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Drug Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 23,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "DrugType",
-                      "conceptIdentifierType": "id",
                       "useRefValue": true,
                       "useRefText": true
                   },
@@ -21885,57 +21175,6 @@ export const cdwConfigDuckdb = {
                       "cohortDefinitionKey": "Unit",
                       "conceptIdentifierType": ""
                   },
-                  "measurementconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Measurement concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@MEAS.\"MEASUREMENT_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Measurement' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 15,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "measurementconceptset": {
                       "name": [
                           {
@@ -21984,151 +21223,6 @@ export const cdwConfigDuckdb = {
                       "conceptIdentifierType": "",
                       "useRefValue": true,
                       "useRefText": true
-                  },
-                  "measurementtypeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Measurement type concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@MEAS.\"MEASUREMENT_TYPE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Meas Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 17,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "MeasurementType",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
-                  "valueasconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Value as concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@MEAS.\"VALUE_AS_CONCEPT_ID\"",
-                      "order": 18,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "ValueAsConcept",
-                      "conceptIdentifierType": "id"
-                  },
-                  "unitconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Unit concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@MEAS.\"UNIT_CONCEPT_ID\"",
-                      "order": 19,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "Unit",
-                      "conceptIdentifierType": "id"
                   },
                   "meas_concept_name": {
                       "name": [
@@ -22561,57 +21655,6 @@ export const cdwConfigDuckdb = {
                       "useRefValue": true,
                       "useRefText": true
                   },
-                  "observationtypeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Observation type concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@OBS.\"OBSERVATION_TYPE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Observation Type' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
-                      "order": 20,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "ObservationType",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "observationtypeconceptset": {
                       "name": [
                           {
@@ -22661,53 +21704,6 @@ export const cdwConfigDuckdb = {
                       "useRefValue": true,
                       "useRefText": true
                   },
-                  "valueasconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Value as concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@OBS.\"VALUE_AS_CONCEPT_ID\"",
-                      "order": 22,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "ValueAsConcept",
-                      "conceptIdentifierType": "id"
-                  },
                   "valueasconceptset": {
                       "name": [
                           {
@@ -22754,57 +21750,6 @@ export const cdwConfigDuckdb = {
                       "standardConceptCodeFilter": "",
                       "cohortDefinitionKey": "ValueAsConcept",
                       "conceptIdentifierType": ""
-                  },
-                  "qualifierconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Qualifier concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@OBS.\"QUALIFIER_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Observation' AND @REF.STANDARD_CONCEPT = 'S' AND @REF.CONCEPT_CLASS_ID = 'Qualifier Value' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 24,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "Qualifier",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
                   },
                   "qualifierconceptset": {
                       "name": [
@@ -22855,57 +21800,6 @@ export const cdwConfigDuckdb = {
                       "useRefValue": true,
                       "useRefText": true
                   },
-                  "unitconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Unit concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@OBS.\"UNIT_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Unit' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
-                      "order": 26,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "Unit",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "unitconceptset": {
                       "name": [
                           {
@@ -22951,57 +21845,6 @@ export const cdwConfigDuckdb = {
                       "domainFilter": "",
                       "standardConceptCodeFilter": "",
                       "cohortDefinitionKey": "Unit",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
-                  "obsconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Observation concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@OBS.\"OBSERVATION_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Observation' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 28,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
                       "conceptIdentifierType": "id",
                       "useRefValue": true,
                       "useRefText": true
@@ -23388,57 +22231,6 @@ export const cdwConfigDuckdb = {
                       "cohortDefinitionKey": "",
                       "conceptIdentifierType": ""
                   },
-                  "periodtypeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Period type concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@OBSPER.\"PERIOD_TYPE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Obs Period Type' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 6,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "PeriodType",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "periodtypeconceptset": {
                       "name": [
                           {
@@ -23823,53 +22615,6 @@ export const cdwConfigDuckdb = {
                       "cohortDefinitionKey": "OccurrenceStartDate",
                       "conceptIdentifierType": ""
                   },
-                  "procconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Procedure Occurrence Id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@PROC.\"PROCEDURE_OCCURRENCE_ID\"",
-                      "order": 2,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
-                      "conceptIdentifierType": "id"
-                  },
                   "procconceptset": {
                       "name": [
                           {
@@ -24058,57 +22803,6 @@ export const cdwConfigDuckdb = {
                       "cohortDefinitionKey": "",
                       "conceptIdentifierType": ""
                   },
-                  "proctypeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Procedure type concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@PROC.\"PROCEDURE_TYPE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Procedure Type' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
-                      "order": 13,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "ProcedureType",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "proctypeconceptset": {
                       "name": [
                           {
@@ -24157,53 +22851,6 @@ export const cdwConfigDuckdb = {
                       "conceptIdentifierType": "",
                       "useRefValue": true,
                       "useRefText": true
-                  },
-                  "modifierconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Modifier concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@PROC.\"MODIFIER_CONCEPT_ID\"",
-                      "order": 16,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "Modifier",
-                      "conceptIdentifierType": "id"
                   },
                   "modifierconceptset": {
                       "name": [
@@ -24638,57 +23285,6 @@ export const cdwConfigDuckdb = {
                       "cohortDefinitionKey": "OccurrenceStartDate",
                       "conceptIdentifierType": ""
                   },
-                  "specimenconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Specimen concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@SPEC.\"SPECIMEN_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Specimen' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
-                      "order": 16,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "specimenconceptset": {
                       "name": [
                           {
@@ -24735,57 +23331,6 @@ export const cdwConfigDuckdb = {
                       "standardConceptCodeFilter": "",
                       "cohortDefinitionKey": "CodesetId",
                       "conceptIdentifierType": "",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
-                  "specimentypeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Specimen type concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@SPEC.\"SPECIMEN_TYPE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Specimen Type' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
-                      "order": 18,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "SpecimenType",
-                      "conceptIdentifierType": "id",
                       "useRefValue": true,
                       "useRefText": true
                   },
@@ -24838,57 +23383,6 @@ export const cdwConfigDuckdb = {
                       "useRefValue": true,
                       "useRefText": true
                   },
-                  "anatomicsiteconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Anatomic site concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@SPEC.\"ANATOMIC_SITE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Spec Anatomic Site' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
-                      "order": 20,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "AnatomicSite",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "anatomicsiteconceptset": {
                       "name": [
                           {
@@ -24938,57 +23432,6 @@ export const cdwConfigDuckdb = {
                       "useRefValue": true,
                       "useRefText": true
                   },
-                  "diseasestatusconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Disease status concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@SPEC.\"DISEASE_STATUS_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Spec Disease Status' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
-                      "order": 22,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "DiseaseStatus",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "diseasestatusconceptset": {
                       "name": [
                           {
@@ -25035,57 +23478,6 @@ export const cdwConfigDuckdb = {
                       "standardConceptCodeFilter": "",
                       "cohortDefinitionKey": "DiseaseStatus",
                       "conceptIdentifierType": "",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
-                  "unitconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Unit concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@SPEC.\"UNIT_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Unit' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
-                      "order": 24,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "Unit",
-                      "conceptIdentifierType": "id",
                       "useRefValue": true,
                       "useRefText": true
                   },
@@ -25475,57 +23867,6 @@ export const cdwConfigDuckdb = {
                       "useRefValue": true,
                       "useRefText": true
                   },
-                  "visitconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Visit concept Id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@VISIT.\"VISIT_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Visit' AND @REF.STANDARD_CONCEPT = 'S' AND JARO_SIMILARITY(lower(@REF.CONCEPT_NAME), lower('@SEARCH_QUERY')) >= 0.65",
-                      "referenceExpression": "CAST (@REF.CONCEPT_ID AS VARCHAR)",
-                      "order": 10,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "CodesetId",
-                      "conceptIdentifierType": "id",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
                   "visitconceptset": {
                       "name": [
                           {
@@ -25572,57 +23913,6 @@ export const cdwConfigDuckdb = {
                       "standardConceptCodeFilter": "",
                       "cohortDefinitionKey": "CodesetId",
                       "conceptIdentifierType": "",
-                      "useRefValue": true,
-                      "useRefText": true
-                  },
-                  "visittypeconceptid": {
-                      "name": [
-                          {
-                              "lang": "",
-                              "value": "Visit type concept id"
-                          }
-                      ],
-                      "disabledLangName": [
-                          {
-                              "lang": "en",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "de",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "fr",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "es",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "pt",
-                              "value": "",
-                              "visible": true
-                          },
-                          {
-                              "lang": "zh",
-                              "value": "",
-                              "visible": true
-                          }
-                      ],
-                      "type": "text",
-                      "expression": "@VISIT.\"VISIT_TYPE_CONCEPT_ID\"",
-                      "referenceFilter": "@REF.DOMAIN_ID = 'Type Concept' AND @REF.CONCEPT_CLASS_ID = 'Visit Type' AND JARO_SIMILARITY(CAST(@REF.CONCEPT_ID AS VARCHAR), '@SEARCH_QUERY') >= 0.85",
-                      "referenceExpression": "@REF.CONCEPT_ID",
-                      "order": 12,
-                      "domainFilter": "",
-                      "standardConceptCodeFilter": "",
-                      "cohortDefinitionKey": "VisitType",
-                      "conceptIdentifierType": "id",
                       "useRefValue": true,
                       "useRefText": true
                   },
@@ -28974,26 +27264,6 @@ const paConfigDuckdb = {
           modelName: "Visit type concept set",
         },
         {
-          source: "patient.interactions.visit.attributes.visitconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 6,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Visit concept Id",
-        },
-        {
           source: "patient.interactions.visit.attributes.visitconceptset",
           ordered: false,
           cached: true,
@@ -29014,26 +27284,6 @@ const paConfigDuckdb = {
           modelName: "Visit concept set",
         },
         {
-          source: "patient.interactions.visit.attributes.visittypeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 8,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Visit type concept id",
-        },
-        {
           source:
             "patient.interactions.visit.attributes.visit_occ_concept_name",
           ordered: false,
@@ -29043,7 +27293,7 @@ const paConfigDuckdb = {
           category: true,
           measure: false,
           filtercard: {
-            initial: true,
+            initial: false,
             visible: true,
             order: 9,
           },
@@ -29443,26 +27693,6 @@ const paConfigDuckdb = {
           modelName: "Specimen Date",
         },
         {
-          source: "patient.interactions.specimen.attributes.specimenconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 6,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Specimen concept id",
-        },
-        {
           source: "patient.interactions.specimen.attributes.specimenconceptset",
           ordered: false,
           cached: true,
@@ -29481,27 +27711,6 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Specimen concept set",
-        },
-        {
-          source:
-            "patient.interactions.specimen.attributes.specimentypeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 8,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Specimen type concept id",
         },
         {
           source:
@@ -29526,27 +27735,6 @@ const paConfigDuckdb = {
         },
         {
           source:
-            "patient.interactions.specimen.attributes.anatomicsiteconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 10,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Anatomic site concept id",
-        },
-        {
-          source:
             "patient.interactions.specimen.attributes.anatomicsiteconceptset",
           ordered: false,
           cached: true,
@@ -29568,27 +27756,6 @@ const paConfigDuckdb = {
         },
         {
           source:
-            "patient.interactions.specimen.attributes.diseasestatusconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 12,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Disease status concept id",
-        },
-        {
-          source:
             "patient.interactions.specimen.attributes.diseasestatusconceptset",
           ordered: false,
           cached: true,
@@ -29607,26 +27774,6 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Disease status concept set",
-        },
-        {
-          source: "patient.interactions.specimen.attributes.unitconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 14,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Unit concept id",
         },
         {
           source: "patient.interactions.specimen.attributes.unitconceptset",
@@ -29658,7 +27805,7 @@ const paConfigDuckdb = {
           category: true,
           measure: false,
           filtercard: {
-            initial: true,
+            initial: false,
             visible: true,
             order: 16,
           },
@@ -29698,26 +27845,6 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Procedure Datetime",
-        },
-        {
-          source: "patient.interactions.proc.attributes.procconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: false,
-          useRefValue: false,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 2,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Procedure Occurrence Id",
         },
         {
           source: "patient.interactions.proc.attributes.procconceptset",
@@ -29800,26 +27927,6 @@ const paConfigDuckdb = {
           modelName: "Person id",
         },
         {
-          source: "patient.interactions.proc.attributes.proctypeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 7,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Procedure type concept id",
-        },
-        {
           source: "patient.interactions.proc.attributes.proctypeconceptset",
           ordered: false,
           cached: true,
@@ -29838,26 +27945,6 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Procedure type concept set",
-        },
-        {
-          source: "patient.interactions.proc.attributes.modifierconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: false,
-          useRefValue: false,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 9,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Modifier concept id",
         },
         {
           source: "patient.interactions.proc.attributes.modifierconceptset",
@@ -29888,7 +27975,7 @@ const paConfigDuckdb = {
           category: true,
           measure: false,
           filtercard: {
-            initial: true,
+            initial: false,
             visible: true,
             order: 11,
           },
@@ -30102,27 +28189,6 @@ const paConfigDuckdb = {
         },
         {
           source:
-            "patient.interactions.obsperiod.attributes.periodtypeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 5,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Period type concept id",
-        },
-        {
-          source:
             "patient.interactions.obsperiod.attributes.periodtypeconceptset",
           ordered: false,
           cached: true,
@@ -30294,27 +28360,6 @@ const paConfigDuckdb = {
         },
         {
           source:
-            "patient.interactions.observation.attributes.observationtypeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 8,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Observation type concept id",
-        },
-        {
-          source:
             "patient.interactions.observation.attributes.observationtypeconceptset",
           ordered: false,
           cached: true,
@@ -30333,27 +28378,6 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Observation type concept set",
-        },
-        {
-          source:
-            "patient.interactions.observation.attributes.valueasconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: false,
-          useRefValue: false,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 10,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Value as concept id",
         },
         {
           source:
@@ -30378,27 +28402,6 @@ const paConfigDuckdb = {
         },
         {
           source:
-            "patient.interactions.observation.attributes.qualifierconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 12,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Qualifier concept id",
-        },
-        {
-          source:
             "patient.interactions.observation.attributes.qualifierconceptset",
           ordered: false,
           cached: true,
@@ -30417,26 +28420,6 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Qualifier concept set",
-        },
-        {
-          source: "patient.interactions.observation.attributes.unitconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 14,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Unit concept id",
         },
         {
           source: "patient.interactions.observation.attributes.unitconceptset",
@@ -30459,26 +28442,6 @@ const paConfigDuckdb = {
           modelName: "Unit concept set",
         },
         {
-          source: "patient.interactions.observation.attributes.obsconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 16,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Observation concept id",
-        },
-        {
           source:
             "patient.interactions.observation.attributes.obs_concept_name",
           ordered: false,
@@ -30488,7 +28451,7 @@ const paConfigDuckdb = {
           category: true,
           measure: false,
           filtercard: {
-            initial: true,
+            initial: false,
             visible: true,
             order: 17,
           },
@@ -30653,27 +28616,6 @@ const paConfigDuckdb = {
         },
         {
           source:
-            "patient.interactions.measurement.attributes.measurementconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 8,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Measurement concept id",
-        },
-        {
-          source:
             "patient.interactions.measurement.attributes.measurementconceptset",
           ordered: false,
           cached: true,
@@ -30695,68 +28637,6 @@ const paConfigDuckdb = {
         },
         {
           source:
-            "patient.interactions.measurement.attributes.measurementtypeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 10,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Measurement type concept id",
-        },
-        {
-          source:
-            "patient.interactions.measurement.attributes.valueasconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: false,
-          useRefValue: false,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 11,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Value as concept id",
-        },
-        {
-          source: "patient.interactions.measurement.attributes.unitconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: false,
-          useRefValue: false,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 12,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Unit concept id",
-        },
-        {
-          source:
             "patient.interactions.measurement.attributes.meas_concept_name",
           ordered: false,
           cached: true,
@@ -30765,7 +28645,7 @@ const paConfigDuckdb = {
           category: true,
           measure: false,
           filtercard: {
-            initial: true,
+            initial: false,
             visible: true,
             order: 13,
           },
@@ -31228,26 +29108,6 @@ const paConfigDuckdb = {
           modelName: "Days of supply",
         },
         {
-          source: "patient.interactions.drugexposure.attributes.drugconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 13,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Drug concept id",
-        },
-        {
           source: "patient.interactions.drugexposure.attributes.drugconceptset",
           ordered: false,
           cached: true,
@@ -31266,26 +29126,6 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Drug concept set",
-        },
-        {
-          source: "patient.interactions.drugexposure.attributes.routeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 15,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Route concept id",
         },
         {
           source:
@@ -31307,27 +29147,6 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Route concept set",
-        },
-        {
-          source:
-            "patient.interactions.drugexposure.attributes.drugtypeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 17,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Drug type concept id",
         },
         {
           source:
@@ -31360,7 +29179,7 @@ const paConfigDuckdb = {
           category: true,
           measure: false,
           filtercard: {
-            initial: true,
+            initial: false,
             visible: true,
             order: 19,
           },
@@ -31521,26 +29340,6 @@ const paConfigDuckdb = {
           },
           modelName: "Drug concept set",
         },
-        {
-          source: "patient.interactions.drugera.attributes.drugconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 8,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Drug concept id",
-        },
       ],
       initialPatientlistColumn: false,
       modelName: "Drug Era",
@@ -31691,46 +29490,6 @@ const paConfigDuckdb = {
           },
           modelName: "Unit concept set",
         },
-        {
-          source: "patient.interactions.doseera.attributes.drugconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 8,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Drug concept id",
-        },
-        {
-          source: "patient.interactions.doseera.attributes.unitconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 9,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Unit concept id",
-        },
       ],
       initialPatientlistColumn: false,
       modelName: "Dose Era",
@@ -31845,27 +29604,6 @@ const paConfigDuckdb = {
         },
         {
           source:
-            "patient.interactions.deviceexposure.attributes.deviceconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 6,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Device concept id",
-        },
-        {
-          source:
             "patient.interactions.deviceexposure.attributes.deviceconceptset",
           ordered: false,
           cached: true,
@@ -31887,27 +29625,6 @@ const paConfigDuckdb = {
         },
         {
           source:
-            "patient.interactions.deviceexposure.attributes.devicetypeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 8,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Device Type concept id",
-        },
-        {
-          source:
             "patient.interactions.deviceexposure.attributes.device_concept_name",
           ordered: false,
           cached: true,
@@ -31916,7 +29633,7 @@ const paConfigDuckdb = {
           category: true,
           measure: false,
           filtercard: {
-            initial: true,
+            initial: false,
             visible: true,
             order: 9,
           },
@@ -32018,26 +29735,6 @@ const paConfigDuckdb = {
           modelName: "Death Date",
         },
         {
-          source: "patient.interactions.death.attributes.deathtypeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 5,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Death Type concept id",
-        },
-        {
           source:
             "patient.interactions.death.attributes.death_type_concept_name",
           ordered: false,
@@ -32078,7 +29775,7 @@ const paConfigDuckdb = {
           category: true,
           measure: false,
           filtercard: {
-            initial: true,
+            initial: false,
             visible: true,
             order: 1,
           },
@@ -32257,27 +29954,6 @@ const paConfigDuckdb = {
         },
         {
           source:
-            "patient.interactions.conditionoccurrence.attributes.conditionconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 10,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Condition concept id",
-        },
-        {
-          source:
             "patient.interactions.conditionoccurrence.attributes.conditionconceptset",
           ordered: false,
           cached: true,
@@ -32296,69 +29972,6 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Condition concept set",
-        },
-        {
-          source:
-            "patient.interactions.conditionoccurrence.attributes.conditiontypeconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 12,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Condition Type concept id",
-        },
-        {
-          source:
-            "patient.interactions.conditionoccurrence.attributes.conditionsourceconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: false,
-          useRefValue: false,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 13,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Condition Source concept id",
-        },
-        {
-          source:
-            "patient.interactions.conditionoccurrence.attributes.conditionstatusconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 14,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Condition Status concept id",
         },
       ],
       initialPatientlistColumn: false,
@@ -32469,27 +30082,6 @@ const paConfigDuckdb = {
             linkColumn: false,
           },
           modelName: "Condition Era Id",
-        },
-        {
-          source:
-            "patient.interactions.conditionera.attributes.conditionconceptid",
-          ordered: false,
-          cached: true,
-          useRefText: true,
-          useRefValue: true,
-          category: true,
-          measure: false,
-          filtercard: {
-            initial: false,
-            visible: true,
-            order: 6,
-          },
-          patientlist: {
-            initial: false,
-            visible: true,
-            linkColumn: false,
-          },
-          modelName: "Condition concept id",
         },
         {
           source:

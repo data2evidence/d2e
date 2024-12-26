@@ -48,7 +48,7 @@ https://*.alp.local:55555 {
 	@cors_preflight method OPTIONS
 
 	@cors_origin {
-		header_regexp Origin ^https?://localhost:(4000|5173|8081|4800|4900)?$
+		header_regexp Origin ^https?://localhost:(4000|4900)?$
 	}
 
 	header @cors_origin {
@@ -131,7 +131,6 @@ https://*.alp.local:55555 {
 		path /
 		path /portal/researcher/*
 		path /portal/systemadmin/*
-		path /starboard-notebook-base/*
 	}
 
 	handle @portalpath {

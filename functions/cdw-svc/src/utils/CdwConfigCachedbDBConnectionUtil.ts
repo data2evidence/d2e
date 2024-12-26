@@ -17,7 +17,7 @@ export class CdwConfigCachedbDBConnectionUtil extends CachedbDBConnectionUtil.Ca
     vocabSchemaName?: string,
     cb?,
     userObj?: User
-  ): Promise<ConnectionInterface> {
+  ): Promise<Connection.ConnectionInterface> {
     return new Promise((resolve, reject) => {
       const callback =
         cb ||
@@ -32,7 +32,8 @@ export class CdwConfigCachedbDBConnectionUtil extends CachedbDBConnectionUtil.Ca
           client,
           schemaName,
           vocabSchemaName,
-          callback
+          callback,
+          dialect
         );
       } else {
         // CachedbNodeHDBConnection.CachedbNodeHDBConnection.createConnection(

@@ -188,7 +188,7 @@ PatientCreator.prototype.insertIntoTable = function (tableName, jsonData, cb) {
       value = parseFloat(value)
       // Ensure that binary values are stored accordingly
     } else if (type === 'binary') {
-      value = new Buffer(value, 'hex')
+      value = Buffer.from(value, 'hex')
     }
     return value
   }
