@@ -981,58 +981,6 @@ services:
       PG__DATAFLOW_MGMT__SCHEMA: dataflow
       PG__DATAFLOW_MGMT__USER: ${PG_WRITE_USER:-alp_pg_write_user}
 
-  alp-minerva-portal-server:
-    container_name: &c16 alp-minerva-portal-server-${BASE_PORT:-1}
-    init: true
-    depends_on:
-      trex:
-        condition: service_healthy
-      alp-minerva-pg-mgmt-init:
-        condition: service_completed_successfully
-      alp-minio-post-init:
-        condition: service_completed_successfully
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 60s
-      test:
-        - CMD
-        - wget
-        - --no-check-certificate
-        - -O
-        - liveness
-        - http://localhost:33002/check-liveness
-      timeout: 30s
-    hostname: alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-portal-server:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c16
-    networks:
-      alp:
-        priority: 20
-    platform: linux/amd64
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    environment:
-      <<:
-        - *x-minio
-        - *x-pg
-        - *x-tls
-        - *x-routes
-      ALP__SYSTEM_NAME: ${ALP__SYSTEM_NAME:-Research System}
-      APP__DEPLOY_MODE: standalone
-      APP__TENANT_ID: ${APP__TENANT_ID:-e0348e4d-2e17-43f2-a3c6-efd752d17c23}
-      APP__TENANT_NAME: ${APP__TENANT_NAME:-Tenant}
-      NODE_ENV: production
-      PG__PORTAL_SERVER__DB_NAME: ${PG_DB_NAME:-alp}
-      PG__PORTAL_SERVER__MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
-      PG__PORTAL_SERVER__MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG__PORTAL_SERVER__PASSWORD: ${PG_WRITE_PASSWORD}
-      PG__PORTAL_SERVER__SCHEMA: portal
-      PG__PORTAL_SERVER__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      PORTAL_SERVER__LOG_LEVEL: info
-      PORTAL_SERVER__PORT: 33002
-
   alp-minerva-postgres:
     container_name: &c17 alp-minerva-postgres-${BASE_PORT:-1}
     healthcheck:
