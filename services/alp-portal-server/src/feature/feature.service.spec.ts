@@ -24,7 +24,8 @@ describe('FeatureService', () => {
         FeatureService,
         { provide: REQUEST, useValue: req },
         { provide: FeatureRepository, useFactory: repositoryMockFactory },
-        { provide: TransactionRunner, useFactory: transactionRunnerMockFactory }
+        { provide: TransactionRunner, useFactory: transactionRunnerMockFactory },
+        { provide: 'PLUGINS_JSON_PROVIDER', useValue: '{}' } // useValue could also be a mock object (with PLUGINS_JSON)
       ]
     }).compile()
 

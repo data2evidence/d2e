@@ -3,7 +3,6 @@ services:
     command: npm run startdev
     external_links:
       - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
     ports:
       - 9229:9229
     volumes:
@@ -15,7 +14,24 @@ services:
       PLUGINS_SEED: '["d2e-plugins", "d2e-ui"]'
       PLUGINS_SEED_UPDATE: ${PLUGINS_SEED_UPDATE:-false}
       PLUGINS_DEV_PATH: "./plugins"
-      WATCH_FUNCTIONS: ${WATCH_FUNCTIONS:-false}
+      WATCH: |-
+        {
+          "analytics-svc": false,
+          "mri-pg-config": false,
+          "alp-db-credentials": false,
+          "alp-fhir-svc": false,
+          "alp-fhir-init": false,
+          "query-gen-svc": false,
+          "alp-usermgmt": false,
+          "bookmark-svc": false,
+          "mri-pa-config": false,
+          "cdw-svc": false,
+          "jobplugins": false,
+          "dataset": false,
+          "alpdb": false,
+          "concept-mapping": false,
+          "terminology-svc": false
+        }
 
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile --watch
@@ -45,10 +61,6 @@ services:
       context: ./services/alp-logto
       dockerfile: Dockerfile
 
-  alp-minerva-meilisearch-svc:
-    ports:
-      - 41111:41111
-
   alp-minerva-pg-mgmt-init:
     build:
       context: services/alp-pg-management
@@ -72,14 +84,6 @@ services:
     ports:
       - 41190:5432
       - 5432:5432
-
-  alp-minerva-terminology-svc:
-    build:
-      context: .
-      dockerfile: ./services/alp-terminology-svc/Dockerfile
-    container_name: alp-minerva-terminology-svc-nest-prod-${BASE_PORT:-1}
-    environment:
-      LOCAL_DEBUG: "false"
 
   #alp-dicom-server:
   # uses 8042 port on the container

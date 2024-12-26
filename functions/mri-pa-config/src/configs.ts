@@ -1,7 +1,5 @@
-import * as dotenv from "dotenv";
 import { z } from "zod";
 import { EnvVarUtils, Logger } from "@alp/alp-base-utils";
-dotenv.config();
 
 const log = Logger.CreateLogger("pa-config: Loading of environment variables");
 

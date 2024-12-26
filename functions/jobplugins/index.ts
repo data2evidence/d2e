@@ -6,11 +6,11 @@ import { DataCharacterizationController } from "./src/controllers/DataCharacteri
 import { DataModelFlowController } from "./src/controllers/DataModelFlowController.ts";
 import { DbSvcController } from "./src/controllers/DbSvcController.ts";
 import { DqdController } from "./src/controllers/DqdController.ts";
-import { MeilisearchController } from "./src/controllers/MeilisearchController.ts";
 import { initialiseDataSource } from "./src/db/data-migration.ts";
 import { DataTransformationController } from "./src/controllers/DataTransformationController.ts";
 import { PrefectController } from "./src/controllers/PrefectController.ts";
 import { AnalysisController } from "./src/controllers/AnalysisController.ts";
+import { CachedbController } from "./src/controllers/CachedbController.ts";
 
 const app = express();
 const env = Deno.env.toObject();
@@ -20,7 +20,6 @@ app.use("/jobplugins/dqd/data-quality", new DqdController().router);
 app.use("/jobplugins/cohort", new CohortController().router);
 app.use("/jobplugins/cohort-survival", new CohortSurvivalController().router);
 app.use("/jobplugins/db-svc", new DbSvcController().router);
-app.use("/jobplugins/meilisearch", new MeilisearchController().router);
 app.use(
   "/jobplugins/dqd/data-characterization",
   new DataCharacterizationController().router
@@ -29,6 +28,7 @@ app.use("/jobplugins/datamodel", new DataModelFlowController().router);
 app.use("/dataflow-mgmt/dataflow", new DataTransformationController().router);
 app.use("/dataflow-mgmt/prefect", new PrefectController().router);
 app.use("/dataflow-mgmt/analysisflow", new AnalysisController().router);
+app.use("/jobplugins/cachedb", new CachedbController().router);
 
 const opt = {
   user: env.PG_USER,

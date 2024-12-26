@@ -115,12 +115,6 @@ export interface DatasetAttributesFlowRunDto {
   datasetSchemaMapping: any[];
 }
 
-export interface MeilisearchAddIndexFlowRunDto {
-  databaseCode: string;
-  vocabSchemaName: string;
-  tableName: string;
-}
-
 export enum FlowRunState {
   SCHEDULED = "Scheduled",
   LATE = "Late",
@@ -147,7 +141,6 @@ export interface DataModel {
   datamodel: string;
   flowId: string;
 }
-
 export interface PluginFlow {
   name: string;
   tags: string[];
@@ -156,6 +149,11 @@ export interface PluginFlow {
   datamodels: string[];
   entrypoint: string;
   parameter_openapi_schema: object;
+}
+
+export interface ICreateDatamodelFlowRunDto {
+  flowRunName: string;
+  options: object;
 }
 
 export interface IGetVersionInfoFlowRunDto {
@@ -299,4 +297,9 @@ interface IReactFlowNode {
   width: number;
   height: number;
   parentNode?: string;
+}
+
+export interface ICreateCachedbFileFlowRunDto {
+  databaseCode: string;
+  schemaName: string;
 }
