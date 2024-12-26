@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "npm:uuid";
+import { v4 as uuidv4 } from "uuid";
 
 import dataSource from "../db/datasource.ts";
 import { Canvas } from "../entities/canvas.ts";

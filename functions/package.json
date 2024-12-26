@@ -28,7 +28,7 @@
           "env": "alp-db-credentials"
         },
         {
-          "function": "/jobplugins/init",
+          "function": "/jobplugins/src/init",
           "imports": "/jobplugins/import.json",
           "env": "jobplugins"
         }

@@ -7,7 +7,7 @@ import { DataModelFlowController } from "./src/controllers/DataModelFlowControll
 import { DbSvcController } from "./src/controllers/DbSvcController.ts";
 import { DqdController } from "./src/controllers/DqdController.ts";
 import { MeilisearchController } from "./src/controllers/MeilisearchController.ts";
-import { runMigrations } from "./src/db/data-migration.ts";
+import { initialiseDataSource } from "./src/db/data-migration.ts";
 import { DataTransformationController } from "./src/controllers/DataTransformationController.ts";
 import { PrefectController } from "./src/controllers/PrefectController.ts";
 import { AnalysisController } from "./src/controllers/AnalysisController.ts";
@@ -163,5 +163,5 @@ app.get("/jobplugins/exec_datamodel/:datamodel", async (req, res) => {
   }
 });
 
-await runMigrations();
+await initialiseDataSource();
 app.listen(8000);

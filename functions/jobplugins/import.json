@@ -1,4 +1,4 @@
 {"imports":{
-    "./src/types": "./src/types.ts",
-    "npm:uuid": "npm:uuid"
+    "pg": "npm:pg@^8.4.2",
+    "uuid": "npm:uuid@^10.0.0"
   }}

@@ -10,6 +10,15 @@ export const runMigrations = async () => {
     logger.info("~~~ Migrations jobplugins completed! ~~~");
   } catch (err) {
     logger.error("jobplugins migrations has failed!", err);
-    process.exit(0);
+    Deno.exit(0);
+  }
+};
+
+export const initialiseDataSource = async () => {
+  try {
+    await dataSource.initialize();
+  } catch (err) {
+    console.log("jobplugins datasource initialisation failed with: ", err);
+    Deno.exit(0);
   }
 };

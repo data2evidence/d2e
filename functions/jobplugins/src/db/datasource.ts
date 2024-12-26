@@ -1,3 +1,4 @@
+import pg from "pg";
 import { DataSource, DataSourceOptions, LogLevel } from "npm:typeorm";
 
 import { env } from "../env.ts";
