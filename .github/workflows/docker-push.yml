@@ -61,6 +61,9 @@ jobs:
             DOCKER_IMG_TAG_NAME=develop
           elif [ $DOCKER_BUILD_PUSH_BOOL_OVERRIDE = true ] || [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
             DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME
+            if [[ $GIT_BRANCH_NAME = */* ]]; then
+              GIT_BRANCH_NAME=$(printf "%s" "$GIT_BRANCH_NAME" | awk -F '/' '{print $2}')
+            fi 
           else
             DOCKER_BUILD_PUSH_BOOL_STR=false
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
