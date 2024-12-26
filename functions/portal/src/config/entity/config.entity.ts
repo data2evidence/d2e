@@ -1,11 +1,11 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
-import { Audit } from "../../common/entity/audit.entity.ts";
+import { Column, Entity, PrimaryColumn } from 'npm:typeorm'
+import { Audit } from '../../common/entity/audit.entity.ts'
 
-@Entity("config")
+@Entity('config')
 export class Config extends Audit {
   @PrimaryColumn()
-  type: string;
+  type: string
 
   @Column()
-  value: string;
+  value: string
 }

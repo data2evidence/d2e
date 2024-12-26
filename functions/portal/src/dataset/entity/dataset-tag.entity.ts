@@ -1,35 +1,28 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  Unique,
-} from "typeorm";
-import { Audit } from "../../common/entity/audit.entity.ts";
-import { DatasetTagConfig } from "./dataset-tag-config.entity.ts";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'npm:typeorm'
+import { Audit } from '../../common/entity/audit.entity.ts'
+import { DatasetTagConfig } from './dataset-tag-config.entity.ts'
 // import { Dataset } from './dataset.entity.ts'
 
-@Entity("dataset_tag")
-@Unique(["datasetId", "name"])
+@Entity('dataset_tag')
+@Unique(['datasetId', 'name'])
 export class DatasetTag extends Audit {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ nullable: true })
-  name: string;
-  @ManyToOne(() => DatasetTagConfig, (tagConfig) => tagConfig.name, {
-    onDelete: "CASCADE",
+  name: string
+  @ManyToOne(() => DatasetTagConfig, tagConfig => tagConfig.name, {
+    onDelete: 'CASCADE'
   })
-  @JoinColumn({ name: "name" })
-  tagConfig: DatasetTagConfig;
+  @JoinColumn({ name: 'name' })
+  tagConfig: DatasetTagConfig
 
-  @Column({ name: "dataset_id" })
-  datasetId: string;
+  @Column({ name: 'dataset_id' })
+  datasetId: string
 
-  @ManyToOne("Dataset", "tags", {
-    onDelete: "CASCADE",
+  @ManyToOne('Dataset', 'tags', {
+    onDelete: 'CASCADE'
   })
-  @JoinColumn({ name: "dataset_id" })
-  dataset: any;
+  @JoinColumn({ name: 'dataset_id' })
+  dataset: any
 }

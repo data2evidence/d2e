@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "npm:typeorm";
 import { Audit } from "../../common/entity/audit.entity.ts";
 
 @Entity("dataset_attribute_config")

@@ -1,15 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { Audit } from "../../common/entity/audit.entity.ts";
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'npm:typeorm'
+import { Audit } from '../../common/entity/audit.entity.ts'
 
-@Entity("feature")
-@Unique(["feature"])
+@Entity('feature')
+@Unique(['feature'])
 export class Feature extends Audit {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column()
-  feature: string;
+  feature: string
 
-  @Column({ name: "is_enabled" })
-  isEnabled: boolean;
+  @Column({ name: 'is_enabled' })
+  isEnabled: boolean
 }

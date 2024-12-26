@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm";
+import { DataSource } from "npm:typeorm";
 import { Seeder } from "typeorm-extension";
 
 import { DatasetTagConfig } from "../../../dataset/entity";

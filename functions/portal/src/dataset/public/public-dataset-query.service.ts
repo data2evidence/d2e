@@ -1,5 +1,5 @@
 import { Injectable, SCOPE } from "@danet/core";
-import { Brackets } from "typeorm";
+import { Brackets } from "npm:typeorm";
 import { TenantService } from "../../tenant/tenant.service.ts";
 import { IDatasetResponseDto, IDatasetSearchFilterDto } from "../../types.d.ts";
 import { DatasetRepository } from "../repository/dataset.repository.ts";
