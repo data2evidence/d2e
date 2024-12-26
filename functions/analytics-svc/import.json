@@ -203,6 +203,7 @@
     "url": "node:url",
     "querystring": "node:querystring",
     "tls": "node:tls",
-    "net": "node:net"
+    "net": "node:net",
+    "buffer": "node:buffer"
   }
 }
