@@ -58,6 +58,7 @@ export class DatasetController {
   }
 
   // TODO: Fix path error when using query with no path prefix, check uuid
+  // Solution 1: use prefix in @Get("/byId")
   @Get()
   async getDataset(@Query("datasetId") id: string): Promise<IDataset> {
     console.log("Query param received:", id);
