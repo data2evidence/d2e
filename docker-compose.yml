@@ -258,16 +258,17 @@ x-envs:
   service: &x-routes
     SERVICE_ROUTES: |-
       {
-       "analytics": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+       "analytics": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
        "bookmark": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/analytics-svc/api/services/bookmark",
        "cdw": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "paConfig": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/pa-config-svc",
        "queryGen": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
+       "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
        "dataflowMgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/db-credentials",
        "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
        "usermgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/usermgmt/api",
-       "terminology": "http://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
+       "terminology": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/terminology",
        "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
        "idIssuerUrl": "http://alp-logto-${BASE_PORT:-1}:3001/oidc",
        "minio": "",
@@ -378,10 +379,11 @@ services:
               "trex": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "dataflowMgmt": "http://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
+              "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
               "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
               "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
-              "terminology": "http://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
+              "terminology": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/terminology",
               "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
               "idIssuerUrl": "http://alp-logto-${BASE_PORT:-1}:3001/oidc",
               "minio": "",
@@ -508,7 +510,8 @@ services:
             "GATEWAY_WO_PROTOCOL_FQDN": "${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}"
           },
           "alpdb": {},
-          "concept-mapping": {}
+          "concept-mapping": {},
+          "terminology-svc": {}
         }
       SERVICE_ROUTES: |-
         {
@@ -522,7 +525,7 @@ services:
         "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
         "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
         "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
-        "terminology": "http://alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41108",
+        "terminology": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/terminology",
         "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
         "appRouter": "https://alp-mercury-approuter:41000",
         "idIssuerUrl": "http://alp-logto-${BASE_PORT:-1}:3001/oidc",
@@ -1027,7 +1030,6 @@ services:
       PG__PORTAL_SERVER__PASSWORD: ${PG_WRITE_PASSWORD}
       PG__PORTAL_SERVER__SCHEMA: portal
       PG__PORTAL_SERVER__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      PLUGINS__JSON: *x-plugins
       PORTAL_SERVER__LOG_LEVEL: info
       PORTAL_SERVER__PORT: 33002
 
@@ -1103,55 +1105,6 @@ services:
         - *x-tls
       MINIO_ROOT_PASSWORD: ${MINIO__SECRET_KEY}
       MINIO_ROOT_USER: ${MINIO__ACCESS_KEY:-root}
-
-  alp-minerva-terminology-svc:
-    container_name: &c21 alp-minerva-terminology-svc-${BASE_PORT:-1}
-    init: true
-    depends_on:
-      trex:
-        condition: service_healthy
-      alp-minerva-postgres:
-        condition: service_healthy
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 60s
-      timeout: 30s
-      test:
-        - CMD
-        - wget
-        - --no-check-certificate
-        - -O
-        - liveness
-        - http://localhost:41108/check-liveness
-    hostname: alp-minerva-terminology-svc-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-terminology-svc:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c21
-    networks:
-      alp:
-        priority: 20
-    platform: linux/amd64
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    environment:
-      <<:
-        - *x-converter
-        - *x-tls
-        - *x-routes
-        - *x-pg
-        - *cachedb
-      FHIR_TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}11
-      LOCAL_DEBUG: "false"
-      NODE_ENV: development
-      PG_MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
-      PG_MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG_PASSWORD: ${PG_WRITE_PASSWORD}
-      PG_SCHEMA: terminology
-      PG_USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      TERMINOLOGY_SVC__LOG_LEVEL: info
-      TERMINOLOGY_SVC__PATH: terminology
-      TERMINOLOGY_SVC__PORT: 41${BASE_PORT:-1}08
 
   alp-minio-post-init:
     container_name: &c23 alp-minio-post-init
