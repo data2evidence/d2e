@@ -1,1 +1,0 @@
-TYPE "hc.hph.um.org.db.models::TT_UM_OUTORG" AS TABLE  ( "OrgID" NVARCHAR(100)  CS_STRING, "Attribute" NVARCHAR(100)  CS_STRING, "Value" NVARCHAR(100)  CS_STRING ) 

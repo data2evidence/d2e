@@ -1,6 +1,0 @@
-export const mock_decrypt = {
-  encryptedText:
-    'AgABDZz4a0oJwFYKGXMKSdw5J8BOt6z2uEagm/z1PvVh74r6Ls/MVbk4XmfFHADlevRxDrziMDB/sVlz2O5NHOWTfGiylszbvV+/8ruJWwa0FDNrx2UBg2T5+lBmlQqsREUkxHOK80UBhw8sh7NiWdbBzMNQ0AeQBABSIef+ohCjZISIVYlC4DPWp/QdRwdQeQHTde5HIZ/aoqf5IV0gPBmA5xrtGnWWD1kwZCWY7geIulHsWBbaEzgtcaaWQ4V841nmaBowcgw8ELEhioTsHH/ofyFpzJz7pKjMw0RRuKYKhyucKFDyU8BDMGFO3IJ27mAkx68Wzg3Z8Hjdacaurcy4XvEEX4VW57HL5uGgm8cuCLRyAQAAAAAAAPDUefkdvUP8X5ZZk7TdoprBwVmAXDhSRwjIL5P7bALZsCPsS6dz0d8XWkTO8WJdubCARpnReA94UyC440J/iA4esx4p+dZ+i9CzqHkQ9bL1oQaha1CATVUmCGKklQn741jiQBZl8wu6FJ1pIIwLs0VsNo2QN94eA5HHVz54anLYx2l/SdfkWCQ9VXlUPNJJoL3QwZYjyRgM4wT8ctT3cF7Fqed/NtubL9Yl5tYuXEcC0Tfn/70tvLLHFh5HusY81xizZ62p8CpxrMv2J6odppuZpbR1ye0mSUkzrcmPblTB10+Q3OH9zddF539jXdtg7RUENuePOlOL4zTKtHLB8cx4AdPaOnUiQRE/Opg6oxG9Y/gBuhfQBc3/FF3qtC2Bwavu6eQkbi5fwbkwbtinSniklZ0hISSr/HnfBsWWKslAyviv7TmgwDYu5JsdHJR1HegcGIT+/i9bgntuTXKKYStkV+CRdEviGaNV+lqiRTsbFKA=',
-  expectedDecryptedText:
-    '{"resourceType":"ResearchSubject","status":"enrolled","individual":{"identifier":{"system":"http://fhir.data4life.care/stu3/CodeSystem/alp-encrypted-external-id","value":"anonymous"}},"study":{"identifier":{"system":"http://fhir.data4life.care/stu3/CodeSystem/research-study-id","value":"d4lregistry"}},"period":{"start":"2022-11-01T00:00:00.000+01:00"}}'
-}
