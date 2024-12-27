@@ -1,9 +1,0 @@
-FUNCTION "hc.hph.plugins.textProcessing.pathology.postProcessing.lib.table_functions::fhir_mapping" ()
-	RETURNS "hc.hph.plugins.textProcessing.pathology.postProcessing::Types.fhir_mapping"
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY INVOKER AS
-BEGIN
-
-RETURN SELECT * FROM "hc.hph.plugins.textProcessing.pathology.postProcessing::Entities.FHIR_MAPPING" ;
-
-END;

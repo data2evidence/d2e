@@ -1,1 +1,0 @@
-VIEW "hc.hph.cdw.db.models::DWTargetDocumentStoreColumns" ( "Target", "ColumnName" ) AS ((SELECT '"'||"SCHEMA_NAME"||'"."'||"TABLE_NAME"||'"' as "Target", "COLUMN_NAME" as "ColumnName" FROM "hc::TABLE_COLUMNS") UNION (SELECT '"'||"SCHEMA_NAME"||'"."'||"VIEW_NAME"||'"' as "Target", "COLUMN_NAME" as "ColumnName" FROM "hc::VIEW_COLUMNS")) WITH READ ONLY

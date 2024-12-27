@@ -1,6 +1,0 @@
-TYPE "hc.hph.plugins.vcf.db.models.cdw::InteractionKeysType" AS TABLE (
-	"DWID" VARBINARY(32),
-	"DWAuditID" BIGINT,
-	"DWSource" NVARCHAR(5),
-	"InteractionID" VARCHAR(100)
-)
