@@ -53,10 +53,10 @@ export class PortalAPI {
     }
     if (services.portalServer) {
       this.baseURL = services.portalServer;
-      this.httpsAgent = new https.Agent({
-        rejectUnauthorized: true,
-        // ca: env.GATEWAY_CA_CERT
-      });
+      // this.httpsAgent = new https.Agent({
+      //   rejectUnauthorized: true,
+      //   ca: env.GATEWAY_CA_CERT
+      // });
     } else {
       throw new Error("No url is set for PortalAPI");
     }
