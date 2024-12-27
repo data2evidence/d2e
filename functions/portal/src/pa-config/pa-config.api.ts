@@ -1,5 +1,5 @@
 import { Injectable, SCOPE } from '@danet/core';
-import { Agent } from 'node:https';
+// import { Agent } from 'node:https';
 import axios, { AxiosRequestConfig } from "axios";
 import { PA_CONFIG_TYPE } from '../common/const.ts';
 import { RequestContextService } from '../common/request-context.service.ts';
@@ -30,16 +30,16 @@ const post = <T = any>(url: string, data?: any, config?: AxiosRequestConfig) => 
 export class PaConfigApi {
   private readonly jwt: string;
   private readonly url: string;
-  private readonly httpsAgent: Agent;
+  // private readonly httpsAgent: Agent;
 
   constructor(private readonly requestContextService: RequestContextService) {
     if (services.paConfig) {
-      this.jwt = this.requestContextService.getAuthToken();
+      this.jwt = this.requestContextService.getOriginalToken() || "";
       this.url = services.paConfig;
-      this.httpsAgent = new Agent({
-        rejectUnauthorized: true,
-        ca: env.SSL_CA_CERT
-      });
+      // this.httpsAgent = new Agent({
+      //   rejectUnauthorized: true,
+      //   ca: env.SSL_CA_CERT
+      // });
     } else {
       throw new Error('No url is set for PaConfigApi');
     }
@@ -70,8 +70,7 @@ export class PaConfigApi {
     return {
       headers: {
         Authorization: this.jwt
-      },
-      httpsAgent: this.httpsAgent
+      }
     };
   }
 }
