@@ -1,1 +1,0 @@
-TYPE "hc.hph.cdw.db.procedures::TT_DOCUMENT" AS TABLE  ( "DWID" VARBINARY(32) CS_RAW, "FileName" NVARCHAR(25)  CS_STRING, "MIMEType" NVARCHAR(256)  CS_STRING, "LanguageCode" NVARCHAR(2)  CS_STRING ) 

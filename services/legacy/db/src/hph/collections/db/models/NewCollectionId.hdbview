@@ -1,1 +1,0 @@
-VIEW "hc.hph.collections.db.models::NewCollectionId" ( "NewCollectionId" ) AS select cast(SYSUUID as NVARCHAR(32)) as "NewCollectionId" from "hc::DUMMY"
