@@ -1,7 +1,0 @@
-VIEW "hc.hph.plugins.vcf.db.models.cdw::PatientKeys" ( "DWID", "DWAuditID", "DWSource", "PatientID" ) AS SELECT
-        TO_BINARY( RPAD( "DWSource", 5, ' ' ) || 'P' || "PatientIndex" ) AS "DWID",
-        "DWAuditID",
-        "DWSource",
-        CAST( "PatientIndex" AS VARCHAR ) AS "PatientID"
-    FROM
-        "hc.hph.genomics.db.models::General.Patients"

@@ -1,4 +1,0 @@
-JRNameAndBirthDate;LEGACY;JointResultList;0;NAME_BIRTH_DATE;NAME_BIRTH_DATE;X;;X;X;string
-JRPatientID;LEGACY;JointResultList;1;;;;;;;string
-JRSourcePatientID;LEGACY;JointResultList;2;PATIENT_ID;PATIENT_ID;;;;;string
-JRType;LEGACY;JointResultList;20;TYPE;Type;;;;;string

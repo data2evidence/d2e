@@ -1,2 +1,0 @@
-SEQUENCE "hc.hph.plugins.ccdi.db.models::taskId" MINVALUE 1  START WITH 1 NO CYCLE
- RESET BY SELECT IFNULL(MAX("taskId")+1,1) FROM "hc.hph.plugins.ccdi.db.models::Tasks.Queue" 

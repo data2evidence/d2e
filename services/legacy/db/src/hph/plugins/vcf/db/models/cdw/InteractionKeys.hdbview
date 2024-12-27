@@ -1,7 +1,0 @@
-VIEW "hc.hph.plugins.vcf.db.models.cdw::InteractionKeys" ( "DWID", "DWAuditID", "DWSource", "InteractionID" ) AS SELECT
-        "InteractionDWID" AS "DWID",
-        "DWAuditID",
-        "DWSource",
-        CAST( "SampleIndex" AS VARCHAR ) AS "InteractionID"
-    FROM
-        "hc.hph.genomics.db.models::General.Samples"

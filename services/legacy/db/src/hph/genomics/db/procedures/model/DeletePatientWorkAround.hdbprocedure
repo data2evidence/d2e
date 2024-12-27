@@ -1,7 +1,0 @@
-PROCEDURE "hc.hph.genomics.db.procedures.model::DeletePatientWorkAround" ( IN PatientIdChar NVarchar(64) )
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY DEFINER
-    AS
-BEGIN
-  CALL "hc.hph.genomics.db.procedures.model::DeletePatient" (HEXTOBIN (  :PatientIdChar ));
-END

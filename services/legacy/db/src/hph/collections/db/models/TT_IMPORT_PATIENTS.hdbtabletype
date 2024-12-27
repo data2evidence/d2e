@@ -1,1 +1,0 @@
-TYPE "hc.hph.collections.db.models::TT_IMPORT_PATIENTS" AS TABLE  ( "PatientID" NVARCHAR(100)  CS_STRING, "Source" NVARCHAR(20)  CS_STRING )
