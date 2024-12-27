@@ -1,5 +1,0 @@
-VIEW "hc.hph.di.documents.staging.db.models::DocumentsForRun" ( "Type", "ParentEntityID", "ParentEntityType", "DWAuditID" ) AS SELECT stage."Type", stage."ParentEntityID", stage."ParentEntityType", status."DWAuditID" from "hc.hph.di.documents.staging.db.models::DocumentStage.ProcessingStage" as stage 
-INNER JOIN "hc.hph.di.documents.staging.db.models::DocumentProcessing.Status" as status 
-on stage."DWID" = status."DWID"
-and stage."DWDateFrom" = status."DWDateFrom"
-where status."ActionName" = 'Initialize Profile Run' WITH READ ONLY
