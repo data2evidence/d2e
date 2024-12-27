@@ -21,42 +21,65 @@ export class FeatureService {
 
   private readonly logger = createLogger(this.constructor.name)
   private readonly userId: string | undefined
-  private readonly featurePlugins: IPortalPlugin[]
-  private readonly validFeatures: string[]
+  private featurePlugins: IPortalPlugin[] = []
+  private validFeatures: string[] = []
 
   constructor(
     private readonly transactionRunner: TransactionRunner,
     private readonly featureRepo: FeatureRepository,
     private readonly requestContextService: RequestContextService,
   ) {
-    try {
-      const plugins = JSON.parse(env.PORTAL_PLUGINS || '{}')
-      this.logger.debug(`Plugins: ${JSON.stringify(plugins)}`)
-      const researcherPlugins = plugins.researcher?.filter(p => Boolean(p.featureFlag)) || []
-      const systemadminPlugins = plugins.systemadmin?.filter(p => Boolean(p.featureFlag)) || []
-      this.featurePlugins = [...researcherPlugins, ...systemadminPlugins]
-    } catch (err) {
-      this.logger.error(`Error while loading plugin config: ${err}`)
-      throw new Error('Error while loading plugin config in TenantService')
-    }
-
-    const pluginFeatureFlags: string[] = []
-    this.featurePlugins.forEach(f => {
-      if (f.enabled) {
-        pluginFeatureFlags.push(f.featureFlag)
-      }
-      f.children?.forEach(childPlugin => {
-        if (childPlugin.enabled) {
-          pluginFeatureFlags.push(childPlugin.featureFlag)
-        }
-      })
-    })
-    this.validFeatures = [...this.NON_PLUGIN_FEATURES.map(f => f.featureFlag), ...pluginFeatureFlags]
     const token = this.requestContextService.getAuthToken();
     this.userId = token?.sub
   }
 
+  private async initializePlugins() {
+    const authHeader = this.requestContextService.getOriginalToken() || "";
+    
+    try {
+      const response = await fetch(`${env.TREX_API_URL}/portal/plugin.json`, {
+        headers: {
+          Authorization: authHeader
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const plugins = await response.json();
+      const researcherPlugins = JSON.parse(plugins).researcher || [];
+      const systemadminPlugins = JSON.parse(plugins).systemadmin || [];
+
+      this.featurePlugins = [
+        ...researcherPlugins.filter(p => Boolean(p.featureFlag)),
+        ...systemadminPlugins.filter(p => Boolean(p.featureFlag))
+      ];
+
+      const pluginFeatureFlags: string[] = [];
+      this.featurePlugins.forEach(f => {
+        if (f.enabled) {
+          pluginFeatureFlags.push(f.featureFlag);
+        }
+        f.children?.forEach(childPlugin => {
+          if (childPlugin.enabled) {
+            pluginFeatureFlags.push(childPlugin.featureFlag);
+          }
+        });
+      });
+
+      this.validFeatures = [
+        ...this.NON_PLUGIN_FEATURES.map(f => f.featureFlag),
+        ...pluginFeatureFlags
+      ];
+    } catch (err) {
+      this.logger.error(`Error while loading plugin config: ${err}`);
+      throw new Error('Error while loading plugin config in FeatureService');
+    }
+  }
+
   async getFeatures() {
+    await this.initializePlugins();
     const savedFeatures = (await this.featureRepo.getFeatures()).filter(f => this.validFeatures.includes(f.feature))
 
     const defaultNonPlugins = this.NON_PLUGIN_FEATURES.filter(
@@ -86,6 +109,7 @@ export class FeatureService {
   }
 
   async setFeature(featureUpdateDto: IFeatureUpdateDto) {
+    await this.initializePlugins();
     const setFeatureFn = async (entityMgr: EntityManager, featureUpdateDto: IFeatureUpdateDto) => {
       const result: { id: number }[] = []
       for (const feat of featureUpdateDto.features) {

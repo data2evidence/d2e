@@ -9,7 +9,7 @@ export const env = {
   TENANT_NAME: _env.APP__TENANT_NAME,
   SYSTEM_NAME: _env.ALP__SYSTEM_NAME,
 
-  PORTAL_PLUGINS: _env.PORTAL_PLUGINS,
+  TREX_API_URL: JSON.parse(process.env.SERVICE_ROUTES || '{ "trex": "" }').trex,
 
   PG_HOST: _env.PG_HOST,
   PG_PORT: parseInt(<string>_env.PG_PORT),
