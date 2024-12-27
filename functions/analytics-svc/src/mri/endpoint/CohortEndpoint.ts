@@ -189,18 +189,14 @@ export class CohortEndpoint {
     }
 
     public async saveCohortToDb(
+        cohortDefinitionId: number,
         cohort: CohortType,
         queryObject: QueryObjectType
     ) {
-        // Get cohort definition id from cohort object
-        const cohortDefinitionId = await this.queryCohortDefinitionId(cohort);
-        const paramDict = {
-            cohortDefinitionId,
-        };
         try {
             const partialInsertQuery = QueryObject.formatDict(
                 queryObject.queryString,
-                paramDict
+                { cohortDefinitionId }
             );
             const insertQuery = new QueryObject(
                 partialInsertQuery.queryString,

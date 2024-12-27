@@ -19,6 +19,7 @@ import { dataflowRequest } from "../../utils/DataflowMgmtProxy";
 import { getDuckdbDirectPostgresWriteConnection } from "../../utils/DuckdbConnection";
 import { getCachedbDbConnections } from "../../utils/cachedb/cachedb";
 import { env } from "../../env";
+
 const language = "en";
 
 const mriConfigConnection = new MriConfigConnection(
@@ -167,6 +168,8 @@ export async function getFilteredCohorts(req: IMRIRequest, res: Response) {
 export async function createCohort(req: IMRIRequest, res: Response) {
     try {
         const datasetId = req.body.datasetId;
+        const token = req.headers.authorization;
+        const { bookmarkId } = JSON.parse(req.body.syntax);
         const analyticsConnection = await getCohortAnalyticsConnection(req);
         const { schemaName, databaseCode, vocabSchemaName } =
             await getStudyDetails(datasetId, res);
@@ -174,6 +177,18 @@ export async function createCohort(req: IMRIRequest, res: Response) {
         const requestQuery: string[] | undefined = req.body?.query?.split(",");
         // Remap mriquery for use in createEndpointFromRequest
         const { cohortDefinition } = await createEndpointFromRequest(req);
+
+        const portalServerAPI = new PortalServerAPI();
+        // Get bookmark
+        const bookmarks = await portalServerAPI.getBookmarkById(
+            token,
+            bookmarkId
+        );
+        if (bookmarks.length === 0) {
+            throw `No bookmarks found with bookmark_id: ${bookmarkId}`;
+        }
+        // Assuming all bookmarks with the same bookmark_id are the same
+        const bookmark = bookmarks[0];
 
         if (env.USE_EXTENSION_FOR_COHORT_CREATION === "true") {
             const mriConfig = await mriConfigConnection.getStudyConfig(
@@ -204,15 +219,14 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                 datasetId
             );
             const now = +new Date();
-            const { bookmarkId } = JSON.parse(req.body.syntax);
             await dataflowRequest(req, "POST", `cohort/flow-run`, {
                 options: {
                     owner: req.body.owner,
-                    token: req.headers.authorization,
+                    token,
                     datasetId,
                     cohortJson: {
                         id: 1, // Not used by us
-                        name: req.body.name,
+                        name: bookmark.name,
                         tags: [],
                         expression: {
                             datasetId, // required for cohort filtering
@@ -255,17 +269,29 @@ export async function createCohort(req: IMRIRequest, res: Response) {
             querySvcParams,
             "cohort"
         );
-        const cohort = await getCohortFromMriQuery(req);
+        const cohort = await getCohortFromMriQuery(req, bookmark.name);
         const cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
             analyticsConnection.schemaName
         );
         let cohortDefinitionResult =
             await cohortEndpoint.saveCohortDefinitionToDb(cohort);
+
+        // Get cohort definition id from cohort object
+        const cohortDefinitionId = await cohortEndpoint.queryCohortDefinitionId(
+            cohort
+        );
+
         let cohortRowCount = await cohortEndpoint.saveCohortToDb(
+            cohortDefinitionId,
             cohort,
             queryResponse.queryObject
         );
+
+        // Update bookmark with new cohort definition id
+        bookmark.cohortDefinitionId = cohortDefinitionId;
+        await portalServerAPI.updateBookmark(token, bookmark);
+
         res.status(200).send(
             `Inserted ${JSON.stringify(
                 cohortDefinitionResult.data
@@ -389,20 +415,22 @@ export async function deleteCohort(req: IMRIRequest, res: Response) {
 }
 
 // Form and return cohort object
-async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
+async function getCohortFromMriQuery(
+    req: IMRIRequest,
+    cohortName: string
+): Promise<CohortType> {
     try {
-        const patientIds = []
+        const patientIds = [];
 
         // Create cohort object
         let cohort = <CohortType>{
             patientIds,
-            name: req.body.name,
+            name: cohortName,
             description: req.body.description,
             creationTimestamp: new Date(),
             modificationTimestamp: null,
             owner: req.body.owner,
-            definitionTypeConceptId:
-            req.body.definitionTypeConceptId,
+            definitionTypeConceptId: req.body.definitionTypeConceptId,
             subjectConceptId: req.body.subjectConceptId,
             syntax: req.body.syntax,
         };
