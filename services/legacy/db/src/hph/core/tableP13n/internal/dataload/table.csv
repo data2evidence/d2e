@@ -1,7 +1,0 @@
-Title;HPH_ADMIN;ExampleTable;0;Title;Title;X;X;X;X
-Description;HPH_ADMIN;ExampleTable;1;Description;Description;X;X;X;X
-CreatedAt;HPH_ADMIN;ExampleTable;2;Createdon;CreatedAt;;X;X;X
-ChangedAt;HPH_ADMIN;ExampleTable;3;LastModified;ChangedAt;X;X;X;X
-ParticipantCount;HPH_ADMIN;ExampleTable;4;Sharedwith;ParticipantCount;X;X;X;X
-ItemCount;HPH_ADMIN;ExampleTable;5;TotalPatients;ItemCount;X;X;X;X
-

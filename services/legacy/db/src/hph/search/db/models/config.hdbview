@@ -1,1 +1,0 @@
-VIEW "hc.hph.search.db.models::config" ( "ODATA_ID" ) AS SELECT "ODATA_ID" FROM "hc::ESH_MODEL" WITH READ ONLY

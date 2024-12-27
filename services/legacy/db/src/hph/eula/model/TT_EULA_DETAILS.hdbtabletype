@@ -1,1 +1,0 @@
-TYPE "hc.hph.eula.model::TT_EULA_DETAILS" AS TABLE  ( "ID" NVARCHAR(32)  CS_STRING, "VersionNo" INT CS_INT, "ValidToPointInTime" DAYDATE CS_DAYDATE ) 
