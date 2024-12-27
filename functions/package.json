@@ -28,6 +28,11 @@
           "env": "alp-db-credentials"
         },
         {
+          "function": "/jobplugins/src/init",
+          "imports": "/jobplugins/import.json",
+          "env": "jobplugins"
+        },
+        {
           "function": "/alp-usermgmt/src/init",
           "imports": "/alp-usermgmt/import.json",
           "env": "alp-usermgmt"
@@ -73,8 +78,9 @@
         },
         {
           "source": "/dataflow-mgmt",
-          "rmsrc": true,
-          "service": "dataflowMgmt"
+          "function": "/jobplugins",
+          "env": "jobplugins",
+          "imports": "/jobplugins/import.json"
         },
         {
           "source": "/usermgmt",
