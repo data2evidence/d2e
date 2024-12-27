@@ -90,6 +90,7 @@ custom_docker_workpool_dict = {
             "registry_credentials": {
                 "allOf": [{"$ref": "#/definitions/DockerRegistryCredentials"}],
                 "title": "Registry Credentials",
+                "default": {'$ref': {'block_document_id': 'afefe974-5ff2-415b-bf88-615d28de264e'}},
                 "description": "Credentials for logging into a Docker registry to pull images from.",
             },
         },
@@ -154,7 +155,8 @@ custom_docker_workpool_dict = {
 
 if __name__ == "__main__":
     # Serializing json
-    custom_docker_workpool_json = json.dumps(custom_docker_workpool_dict, indent=4)
+    custom_docker_workpool_json = json.dumps(
+        custom_docker_workpool_dict, indent=4)
 
     with open("./custom-docker-workpool.json", "w") as outfile:
         outfile.write(custom_docker_workpool_json)
