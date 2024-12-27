@@ -1,1 +1,0 @@
-#if($Observation.code_value=="8302-2")#parse("tpl/HCIM_bodyheight.vm")#end

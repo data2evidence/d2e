@@ -1,1 +1,0 @@
-TYPE "hc.hph.core.tableP13n.db.models::TT_SV_P13N" AS TABLE  ( "Id" NVARCHAR(1024)  CS_STRING, "HANAUserName" NVARCHAR(1024)  CS_STRING, "TableId" NVARCHAR(1024)  CS_STRING, "ColumnOrder" INT CS_INT, "Visible" NVARCHAR(1024)  CS_STRING ) 
