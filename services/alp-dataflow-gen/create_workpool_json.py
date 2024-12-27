@@ -1,6 +1,5 @@
 import os
 import json
-from prefect.blocks.core import Block
 from prefect_docker import DockerRegistryCredentials
 
 custom_docker_workpool_dict = {
@@ -166,7 +165,8 @@ if __name__ == "__main__":
         name="docker-registry-credentials", overwrite=True)
 
     # Get DockerRegistryCredentials block id
-    credentials_block = Block.load("docker-registry-credentials")
+    credentials_block = DockerRegistryCredentials.load(
+        "docker-registry-credentials")
     block_id = credentials_block._block_document_id
 
     # Set id in workpool json
