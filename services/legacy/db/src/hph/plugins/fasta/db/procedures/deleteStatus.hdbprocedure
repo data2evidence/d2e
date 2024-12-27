@@ -1,8 +1,0 @@
-PROCEDURE "hc.hph.plugins.fasta.db.procedures::deleteStatus" ( AuditLogID BIGINT ) 
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY INVOKER AS
-BEGIN
-
-delete from "hc.hph.plugins.fasta.db.models::FastaAdapterRunStatus.StatusValue" where "AuditLogID" = :AuditLogID;
-
-END;

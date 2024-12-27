@@ -1,9 +1,0 @@
-  alp-cube:
-    build:
-      context: alp-cube
-      dockerfile: Dockerfile
-    ports:
-      - 41${BASE_PORT:-1}40:4000
-      - 41${BASE_PORT:-1}09:15432
-    volumes:
-      - ./alp-cube:/cube/conf
