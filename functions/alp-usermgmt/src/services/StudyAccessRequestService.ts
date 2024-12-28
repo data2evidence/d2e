@@ -1,7 +1,7 @@
 import { Service } from 'typedi'
 import { v4 as uuidv4 } from 'uuid'
 import { GroupAccessRequest } from '../entities'
-import { StudyAccessRequest } from 'dtos'
+import { StudyAccessRequest } from '../dtos'
 import { StudyAccessRequestCriteria, GroupAccessRequestField, GroupAccessRequestRepository } from '../repositories'
 import { B2cGroupService } from './B2cGroupService'
 import { AccessRequestAction, ITokenUser } from '../types'
