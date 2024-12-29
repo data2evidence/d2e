@@ -34,8 +34,8 @@ jobs:
         run: sudo mkdir -p /usr/src/plugin/node_modules/@alp-os/d2e-functions
       - name: lsl
         run: ls -la .
-      - name: chmod
-        run: sudo chmod 777 /usr/src/plugin/node_modules/@alp-os/d2e-functions
+      - name: chown
+        run: sudo chown runner:docker /usr/src/plugin/node_modules/@alp-os/d2e-functions
       - name: cp src
         run: cp -a . /usr/src/plugin/node_modules/@alp-os/d2e-functions
       - name: npminstall
