@@ -45,12 +45,6 @@
       ],
       "api": [
         {
-          "source": "/helloworld",
-          "function": "/helloworld",
-          "imports": "/helloworld/import.json",
-          "env": "mri-pg-config"
-        },
-        {
           "source": "/jobplugins",
           "function": "/jobplugins",
           "imports": "/jobplugins/import.json",
@@ -425,12 +419,6 @@
         ]
       },
       "scopes": [
-        {
-          "path": "^/helloworld",
-          "scopes": [
-            "jobplugins"
-          ]
-        },
         {
           "path": "^/concept-mapping",
           "scopes": [
