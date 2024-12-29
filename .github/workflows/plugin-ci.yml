@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - develop
-      - p-hoffmann/ci
+      - trex
 
 env:
   GIT_CI_BRANCH_NAME: ${{ github.ref_name }}
@@ -32,8 +32,6 @@ jobs:
         run: cp package.org.json package.json
       - name: mkdir
         run: sudo mkdir -p /usr/src/plugin/node_modules/@alp-os/d2e-functions
-      - name: lsl
-        run: ls -la .
       - name: chown
         run: sudo chown runner:docker /usr/src/plugin/node_modules/@alp-os/d2e-functions
       - name: npminstall
@@ -48,7 +46,7 @@ jobs:
       - name: Publish
         working-directory: /usr/src/plugin/node_modules/@alp-os/d2e-functions
         run: |
-          if [[ $GIT_CI_BRANCH_NAME == 'p-hoffmann/ci' || $GIT_CI_BRANCH_NAME == 'develop' ]]; then 
+          if [[ $GIT_CI_BRANCH_NAME == 'trex' || $GIT_CI_BRANCH_NAME == 'develop' ]]; then 
             npm publish
           else 
             npm publish --dry-run
