@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - develop
-      - trex
+      - p-hoffmann/ci
 
 env:
   GIT_CI_BRANCH_NAME: ${{ github.ref_name }}
