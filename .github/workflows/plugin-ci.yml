@@ -54,7 +54,7 @@ jobs:
             npm publish --dry-run
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GIT_TOKEN__PLUGINS_REPO_READ }}
+          NODE_AUTH_TOKEN: ${{ secrets.PH_TOKEN }}
       - uses: actions/delete-package-versions@v5
         if: github.ref_name == 'trex' || github.ref_name == 'develop'
         with:
