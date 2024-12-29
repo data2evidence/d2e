@@ -38,12 +38,13 @@ jobs:
         run: sudo chown runner:docker /usr/src/plugin/node_modules/@alp-os/d2e-functions
       - name: npminstall
         run: npm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: cp src
         run: cp -a . /usr/src/plugin/node_modules/@alp-os/d2e-functions
       - name: npm build
         working-directory: /usr/src/plugin/node_modules/@alp-os/d2e-functions
         run: npm run build
-
       - name: Publish
         working-directory: /usr/src/plugin/node_modules/@alp-os/d2e-functions
         run: |
