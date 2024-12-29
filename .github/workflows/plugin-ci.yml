@@ -32,6 +32,8 @@ jobs:
         run: cp package.org.json package.json
       - name: mkdir
         run: sudo mkdir -p /usr/src/plugin/node_modules/@alp-os/d2e-functions
+      - name: lsl
+        run: ls -la .
       - name: chmod
         run: sudo chmod 777 /usr/src/plugin/node_modules/@alp-os/d2e-functions
       - name: cp src
