@@ -26,7 +26,6 @@ jobs:
           node-version: "18.x"
           registry-url: "https://npm.pkg.github.com"
           scope: "@alp-os"
-          token: ${{ secrets.PH_TOKEN }}
       - name: Update version
         run: jq --arg v "-$(date +%s)-$GITHUB_SHA" '.version+=$v' package.org.json > tmppkg; mv tmppkg package.org.json
       - name: cp pkg
@@ -40,7 +39,7 @@ jobs:
       - name: npminstall
         run: npm install
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.PH_TOKEN }}
       - name: cp src
         run: cp -a . /usr/src/plugin/node_modules/@alp-os/d2e-functions
       - name: npm build
@@ -55,7 +54,7 @@ jobs:
             npm publish --dry-run
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.PH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/delete-package-versions@v5
         if: github.ref_name == 'trex' || github.ref_name == 'develop'
         with:
