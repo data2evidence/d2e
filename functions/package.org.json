@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tbuild node_modules/@alp-os/trex"
   },
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@alp-os/trex": "latest",
+    "deno": "latest"
+  },
   "trex": {
     "functions": {
       "init": [
@@ -39,6 +44,12 @@
         }
       ],
       "api": [
+        {
+          "source": "/helloworld",
+          "function": "/helloworld",
+          "imports": "/helloworld/import.json",
+          "env": "mri-pg-config"
+        },
         {
           "source": "/jobplugins",
           "function": "/jobplugins",
@@ -414,6 +425,12 @@
         ]
       },
       "scopes": [
+        {
+          "path": "^/helloworld",
+          "scopes": [
+            "jobplugins"
+          ]
+        },
         {
           "path": "^/concept-mapping",
           "scopes": [

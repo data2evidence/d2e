@@ -27,8 +27,21 @@ jobs:
           registry-url: "https://npm.pkg.github.com"
           scope: "@alp-os"
       - name: Update version
-        run: jq --arg v "-$(date +%s)-$GITHUB_SHA" '.version+=$v' package.json > tmppkg; mv tmppkg package.json
+        run: jq --arg v "-$(date +%s)-$GITHUB_SHA" '.version+=$v' package.org.json > tmppkg; mv tmppkg package.org.json
+      - name: cp pkg
+        run: cp package.org.json package.json
+      - name: mkdir
+        run: mkdir -p /usr/src/plugin/node_modules/@alp-os/d2e-functions
+      - name: cp src
+        run: cp -a . /usr/src/plugin/node_modules/@alp-os/d2e-functions
+      - name: npminstall
+        working-directory: /usr/src/plugin/node_modules/@alp-os/d2e-functions
+        run: npm install
+      - name: npm build
+        working-directory: /usr/src/plugin/node_modules/@alp-os/d2e-functions
+        run: npm run build
       - name: Publish
+        working-directory: /usr/src/plugin/node_modules/@alp-os/d2e-functions
         run: |
           if [[ $GIT_CI_BRANCH_NAME == 'trex' || $GIT_CI_BRANCH_NAME == 'develop' ]]; then 
             npm publish
