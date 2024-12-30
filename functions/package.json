@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tbuild node_modules/@alp-os/trex"
   },
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@alp-os/trex": "latest",
+    "deno": "latest"
+  },
   "trex": {
     "functions": {
       "init": [
@@ -26,6 +31,11 @@
           "function": "/alp-db-credentials/src/init",
           "imports": "/alp-db-credentials/import.json",
           "env": "alp-db-credentials"
+        },
+        {
+          "function": "/jobplugins/src/init",
+          "imports": "/jobplugins/import.json",
+          "env": "jobplugins"
         },
         {
           "function": "/alp-usermgmt/src/init",
@@ -73,8 +83,9 @@
         },
         {
           "source": "/dataflow-mgmt",
-          "rmsrc": true,
-          "service": "dataflowMgmt"
+          "function": "/jobplugins",
+          "env": "jobplugins",
+          "imports": "/jobplugins/import.json"
         },
         {
           "source": "/usermgmt",

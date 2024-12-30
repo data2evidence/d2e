@@ -1,6 +1,9 @@
 {
   "imports": {
     "express": "npm:express@^4.19.2",
-    "express-validator": "npm:express-validator@^7.2.0"
+    "express-validator": "npm:express-validator@^7.2.0",
+    "pg": "npm:pg@^8.4.2",
+    "uuid": "npm:uuid@^10.0.0",
+    "jsonwebtoken": "npm:jsonwebtoken@^9.0.2"
   }
 }
