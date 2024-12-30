@@ -236,7 +236,7 @@ export default class PGUserDAO {
       await client.query(`GRANT CREATE ON ${databaseName} TO ${user}`);
 
       this.logger.info(
-        `${databaseName} schema granted create privileges for future objects to ${user}`
+        `${databaseName} database granted create privileges for future objects to ${user}`
       );
     } catch (e: any) {
       this.logger.error(
