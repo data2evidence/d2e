@@ -518,7 +518,7 @@ services:
             "PG_ADMIN_PASSWORD": "${PG_ADMIN_PASSWORD}",
             "PG_ADMIN_USER": "${PG_ADMIN_USER:-alp_pg_admin_user}",
             "PG_SCHEMA": "files_manager"
-          }
+          },
           "terminology-svc": {}
         }
       SERVICE_ROUTES: |-
