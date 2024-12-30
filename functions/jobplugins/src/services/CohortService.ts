@@ -1,6 +1,6 @@
 import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { PrefectDeploymentName, PrefectFlowName } from "../const.ts";
-import { CohortGeneratorFlowRunDto } from "../types.d.ts";
+import { CohortGeneratorFlowRunDto } from "../types.ts";
 
 export class CohortService {
   public async createCohortGeneratorFlowRun(
@@ -17,6 +17,17 @@ export class CohortService {
       flowName,
       parameters
     );
+
+    await prefectApi.createInputAuthToken(flowRunId);
+    await Promise.any([
+      new Promise((resolve) => {
+        setTimeout(async () => {
+          await prefectApi.deleteInputAuthToken(flowRunId);
+          resolve(`Deleted the input of ${flowRunId}`);
+        }, 5000);
+      }),
+    ]);
+
     return { flowRunId };
   }
 }

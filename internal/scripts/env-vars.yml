@@ -53,11 +53,8 @@ LOGTO__ALP_DATA__CLIENT_ID:
 LOGTO__ALP_DATA__CLIENT_SECRET:
   comment: generated with logto APIs post init
   type: password
-MEILI_MASTER_KEY:
-  comment: meilisearch master key
-  type: password
 MINIO__SECRET_KEY:
-  comment: meilisearch secret_key
+  comment: minio secret_key
   type: password
 PG_ADMIN_PASSWORD:
   comment: admin permissions

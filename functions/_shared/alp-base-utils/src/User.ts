@@ -53,6 +53,7 @@ export class User {
   private isAlice: boolean = false;
   private isClientCredReqUser: boolean = false;
   private user: IUser;
+  private thirdPartyToken: string;
 
   constructor(
     private token: IAppTokenPayload | string,
@@ -76,6 +77,8 @@ export class User {
 
     this.userLang = userLang.split("-")[0];
 
+    this.token = token;
+
     this.user = buildUserFromToken(token);
   }
 
@@ -93,6 +96,14 @@ export class User {
     }
 
     return this.user.userId;
+  }
+
+  get thirdPartyToken(): string {
+    return this.thirdPartyToken;
+  }
+
+  set thirdPartyToken(thirdPartyToken: string): void {
+    this.thirdPartyToken = thirdPartyToken;
   }
 
   get lang(): string {

@@ -78,24 +78,6 @@ export default class DefaultPluginsSeeder implements Seeder {
         modifiedBy: 'system'
       },
       {
-        pluginId: '55530682-d09d-4a0f-9acc-0ea6e7d0bed6',
-        name: 'meilisearch-embeddings',
-        type: 'default',
-        url: 'https://github.com/alp-os/d2e-plugins.git@main#subdirectory=meilisearch-embeddings',
-        status: PluginUploadStatus.PENDING,
-        createdBy: 'system',
-        modifiedBy: 'system'
-      },
-      {
-        pluginId: '6d027d9b-087c-4a3b-a4a9-45262dec152e',
-        name: 'meilisearch',
-        type: 'default',
-        url: 'https://github.com/alp-os/d2e-plugins.git@main#subdirectory=meilisearch',
-        status: PluginUploadStatus.PENDING,
-        createdBy: 'system',
-        modifiedBy: 'system'
-      },
-      {
         pluginId: 'a0550deb-8b6a-4000-b3e0-8b5d08dc86ad',
         name: 'r-cdm',
         type: 'default',

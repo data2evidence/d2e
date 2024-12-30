@@ -41,7 +41,7 @@ export default class TerminologySvcAPI {
 
         const data = { conceptSetIds, datasetId };
         const result = await axios.post(
-            `${this.baseUrl}/terminology/concept-set/included-concepts`,
+            `${this.baseUrl}/concept-set/included-concepts`,
             data,
             options
         );

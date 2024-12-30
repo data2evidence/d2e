@@ -1,3 +1,4 @@
+// NON FUNCTIONAL FOR TREX!!
 import {
     ConnectionInterface,
     CallBackInterface,
@@ -14,7 +15,7 @@ import { translateHanaToDuckdb } from "../../../_shared/alp-base-utils/src/helpe
 import { env } from "../env";
 const logger = CreateLogger("Duckdb Connection");
 
-// Helper function similar to getDBConnection implementation in alp-base-utils DBConnectionUtil.ts
+// Non-CacheDB - Helper function similar to getDBConnection implementation in alp-base-utils DBConnectionUtil.ts
 export const getDuckdbDBConnection = (
     duckdbSchemaFileName: string,
     duckdbVocabSchemaFileName: string
@@ -61,7 +62,7 @@ export class DuckdbConnection implements ConnectionInterface {
         public database: Database,
         public schemaName: string,
         public vocabSchemaName: string,
-        public dialect = "DUCKDB"
+        public dialect = "duckdb"
     ) {}
 
     public static async createConnection(
@@ -183,7 +184,7 @@ export class DuckdbConnection implements ConnectionInterface {
     }
 
     private parseSql(temp: string, parameters?: ParameterInterface[]): string {
-        temp = this.getSqlStatementWithSchemaName(this.schemaName, temp);
+        temp = this.getSqlStatementWithSchemaName(this.schemaName, temp); //THIS HAS TO COME BEFORE
         return translateHanaToDuckdb(
             temp,
             this.schemaName,

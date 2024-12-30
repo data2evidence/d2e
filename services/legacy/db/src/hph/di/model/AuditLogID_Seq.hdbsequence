@@ -1,1 +1,0 @@
-SEQUENCE "hc.hph.di.model::AuditLogID_Seq" RESET BY SELECT IFNULL(MAX("AuditLogID")+1,1) FROM "hc.hph.di.model::DataIntegration.AuditLog"
