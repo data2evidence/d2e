@@ -61,6 +61,9 @@ jobs:
             DOCKER_IMG_TAG_NAME=develop
           elif [ $DOCKER_BUILD_PUSH_BOOL_OVERRIDE = true ] || [ $GITHUB_EVENT_NAME = "workflow_dispatch" ]; then
             DOCKER_IMG_TAG_NAME=$GIT_BRANCH_NAME
+            if [[ $GIT_BRANCH_NAME = */* ]]; then
+              DOCKER_IMG_TAG_NAME=$(printf "%s" "$GIT_BRANCH_NAME" | awk -F '/' '{print $2}')
+            fi 
           else
             DOCKER_BUILD_PUSH_BOOL_STR=false
             DOCKER_IMG_TAG_NAME=$(echo ${{ github.sha }} | cut -c1-8)
@@ -91,10 +94,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: alp-data-node/alp-dataflow
-            directory: ./services/alp-dataflow
-            context: ./services/alp-dataflow
-            fileName: Dockerfile
           - name: alp-data-node/alp-dataflow-gen
             directory: ./services/alp-dataflow-gen
             context: .

@@ -1,8 +1,6 @@
 services:
   trex:
     command: npm run startdev
-    external_links:
-      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
     ports:
       - 9229:9229
     volumes:
@@ -66,6 +64,8 @@ services:
       context: ./services/alp-dataflow
       dockerfile: Dockerfile
     container_name: alp-minerva-dataflow-mgmt-nest-prod-${BASE_PORT:-1}
+    external_links:
+      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
     environment:
       NODE_ENV: development
 

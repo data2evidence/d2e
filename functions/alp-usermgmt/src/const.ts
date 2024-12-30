@@ -1,4 +1,4 @@
-import { ITokenUser } from 'types'
+import { ITokenUser } from './types'
 
 export const ROLES = {
   ALP_USER_ADMIN: 'ALP_USER_ADMIN',

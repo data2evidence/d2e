@@ -2,10 +2,7 @@ import { Request, Response, Router } from "npm:express";
 import { validationResult } from "npm:express-validator";
 import { validateDatamodelFlowRunDto } from "../middlewares/DataModelValidatorMiddlewares.ts";
 import { DataModelFlowService } from "../services/DataModelFlowService.ts";
-import {
-  ICreateDatamodelFlowRunDto,
-  IGetVersionInfoFlowRunDto,
-} from "../types.d.ts";
+import { IGetVersionInfoFlowRunDto, ICreateDatamodelFlowRunDto } from "../types.ts";
 
 export class DataModelFlowController {
   private DataModelFlowService: DataModelFlowService;

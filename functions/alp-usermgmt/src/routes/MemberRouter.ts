@@ -4,7 +4,7 @@ import { createLogger } from '../Logger'
 import { PortalAPI } from '../api'
 import { ROLES } from '../const'
 import { B2cGroupService, MemberService, UserService } from '../services'
-import { UserActivateRequest, UserAddRequest, UserDeleteRequest } from 'types'
+import { UserActivateRequest, UserAddRequest, UserDeleteRequest } from '../types'
 
 @Service()
 export class MemberRouter {
