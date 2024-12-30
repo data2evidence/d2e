@@ -574,7 +574,6 @@ paths:
             required:
               - datasetId
               - mriquery
-              - name
               - description
               - owner
             properties:
@@ -584,9 +583,6 @@ paths:
               mriquery:
                 type: string
                 description: Filtercard information in bookmark form. This is a binary string encoded in base64
-              name:
-                type: string
-                description: Cohort Name
               description:
                 type: string
                 description: Cohort Description
