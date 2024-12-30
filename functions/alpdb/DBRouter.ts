@@ -1,6 +1,6 @@
 import express from "npm:express";
 
-import { DataflowMgmtAPI } from "./api/DataflowMgmtAPI.ts";
+import { JobpluginsAPI } from "./api/JobpluginsAPI.ts";
 //import { createLogger } from '../Logger'
 
 export class DBRouter {
@@ -15,8 +15,8 @@ export class DBRouter {
     this.router.get("/dataset/version-info", async (req, res) => {
       try {
         const token = req.headers.authorization!;
-        const dataflowMgmtAPI = new DataflowMgmtAPI(token);
-        const result = await dataflowMgmtAPI.getSchemasVersionInformation();
+        const jobpluginsAPI= new JobpluginsAPI(token);
+        const result = await jobpluginsAPI.getSchemasVersionInformation();
         return res.status(200).json(result);
       } catch (error) {
         this.logger.error(
@@ -33,9 +33,9 @@ export class DBRouter {
         req.body;
       try {
         const token = req.headers.authorization!;
-        const dataflowMgmtAPI = new DataflowMgmtAPI(token);
+        const jobpluginsAPI= new JobpluginsAPI(token);
 
-        const datamodels = await dataflowMgmtAPI.getDatamodels();
+        const datamodels = await jobpluginsAPI.getDatamodels();
         const dmInfo = datamodels.find(
           (model) => model.datamodel === dataModel
         );
@@ -50,9 +50,8 @@ export class DBRouter {
           },
         };
 
-        const result = await dataflowMgmtAPI.createFlowRunByMetadata(
+        const result = await jobpluginsAPI.createDataModelFlowRun(
           options,
-          "datamodel",
           dmInfo.flowId,
           `datamodel-update-${schemaName}`
         );

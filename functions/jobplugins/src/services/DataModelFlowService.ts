@@ -5,7 +5,8 @@ import {
   DataModel,
   IGetVersionInfoFlowRunDto,
   PluginFlow,
-  ICreateDatamodelFlowRunDto
+  ICreateDatamodelFlowRunDto,
+  ICreateDatamartFlowRunDto
 } from "../types.d.ts";
 
 export class DataModelFlowService {
@@ -89,8 +90,24 @@ export class DataModelFlowService {
     const options = createDatamodelFlowRunDto.options;
     const result = await prefectApi.createFlowRun(
       flowRunName,
-      PrefectDeploymentName.DATA_MANAGEMENT,
-      PrefectFlowName.DATA_MANAGEMENT,
+      "datamodel",
+      "datamodel",
+      options
+    );
+    return result;
+  }
+
+  public async createDatamartFlowRun(
+    createDatamartFlowRunDto: ICreateDatamartFlowRunDto,
+    token: string
+  ) {
+    const prefectApi = new PrefectAPI(token);
+    const flowRunName = createDatamartFlowRunDto.flowRunName;
+    const options = createDatamartFlowRunDto.options;
+    const result = await prefectApi.createFlowRun(
+      flowRunName,
+      "datamart",
+      "datamart",
       options
     );
     return result;

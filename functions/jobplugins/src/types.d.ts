@@ -156,6 +156,11 @@ export interface ICreateDatamodelFlowRunDto {
   options: object;
 }
 
+export interface ICreateDatamartFlowRunDto {
+  flowRunName: string;
+  options: object;
+}
+
 export interface IGetVersionInfoFlowRunDto {
   flowRunName: string;
   options: object;

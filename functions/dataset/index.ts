@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import express from "npm:express";
 import { v4 as uuidv4 } from "npm:uuid";
 import { AnalyticsSvcAPI } from "./api/AnalyticsSvcAPI.ts";
-import { DataflowMgmtAPI } from "./api/DataflowMgmtAPI.ts";
 import { JobPluginsAPI } from "./api/JobpluginsAPI.ts";
 import { PortalAPI } from "./api/PortalAPI.ts";
 import { CDMSchemaTypes, DbDialect } from "./const.ts";
@@ -219,7 +218,7 @@ export class DatasetRouter {
     this.router.post("/snapshot", async (req: Request, res: Response) => {
       const token = req.headers.authorization!;
       const portalAPI = new PortalAPI(token);
-      const dataflowMgmtAPI = new DataflowMgmtAPI(token);
+      const jobpluginsAPI = new JobPluginsAPI(token);
 
       const {
         sourceStudyId,
@@ -235,7 +234,7 @@ export class DatasetRouter {
       const id = uuidv4();
       const newSchemaName = sourceHasSchema ? `CDM${id}`.replace(/-/g, "") : "";
 
-      const dataModels = await dataflowMgmtAPI.getDatamodels();
+      const dataModels = await jobpluginsAPI.getDatamodels();
       const dataModelInfo = dataModels.find(
         (model) => model.datamodel === dataModel
       );
@@ -275,9 +274,8 @@ export class DatasetRouter {
               },
             };
 
-            await dataflowMgmtAPI.createFlowRunByMetadata(
+            await jobpluginsAPI.createDatamartFlowRun(
               options,
-              "datamart",
               dataModelInfo.flowId,
               `datamart-snapshot-${schemaName}`
             );
