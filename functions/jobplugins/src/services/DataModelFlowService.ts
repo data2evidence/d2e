@@ -3,10 +3,10 @@ import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { PrefectDeploymentName, PrefectFlowName } from "../const.ts";
 import {
   DataModel,
+  ICreateDatamartFlowRunDto,
+  ICreateDatamodelFlowRunDto,
   IGetVersionInfoFlowRunDto,
   PluginFlow,
-  ICreateDatamodelFlowRunDto,
-  ICreateDatamartFlowRunDto
 } from "../types.d.ts";
 
 export class DataModelFlowService {

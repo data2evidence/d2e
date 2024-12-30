@@ -7,7 +7,7 @@ import { createLogger } from '../Logger'
 import { B2cGroupService, UserGroupService, UserService } from '../services'
 import { env } from '../env'
 import { LogtoAPI } from '../api'
-import { ITokenUser } from 'types'
+import { ITokenUser } from '../types'
 import { UserField } from '../repositories'
 
 const logger = createLogger('GrantRolesByScopes')

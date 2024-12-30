@@ -3,9 +3,9 @@ import { validationResult } from "npm:express-validator";
 import { validateDatamodelFlowRunDto } from "../middlewares/DataModelValidatorMiddlewares.ts";
 import { DataModelFlowService } from "../services/DataModelFlowService.ts";
 import {
+  ICreateDatamartFlowRunDto,
   ICreateDatamodelFlowRunDto,
   IGetVersionInfoFlowRunDto,
-  ICreateDatamartFlowRunDto,
 } from "../types.d.ts";
 
 export class DataModelFlowController {

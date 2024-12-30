@@ -1,10 +1,10 @@
 import express, { NextFunction, Response } from 'express'
 import { Service } from 'typedi'
 import { ROLES } from '../const'
-import { IAppRequest, IUserWithRoles } from 'types'
+import { IAppRequest, IUserWithRoles } from '../types'
 import { UserAdminService, DashboardViewerService } from '../services'
 import { createLogger } from '../Logger'
-import { User } from 'entities'
+import { User } from '../entities'
 
 @Service()
 export class AlpUserRouter {

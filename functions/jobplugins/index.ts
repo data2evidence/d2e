@@ -6,6 +6,10 @@ import { DataCharacterizationController } from "./src/controllers/DataCharacteri
 import { DataModelFlowController } from "./src/controllers/DataModelFlowController.ts";
 import { DbSvcController } from "./src/controllers/DbSvcController.ts";
 import { DqdController } from "./src/controllers/DqdController.ts";
+import { initialiseDataSource } from "./src/db/data-migration.ts";
+import { DataTransformationController } from "./src/controllers/DataTransformationController.ts";
+import { PrefectController } from "./src/controllers/PrefectController.ts";
+import { AnalysisController } from "./src/controllers/AnalysisController.ts";
 import { CachedbController } from "./src/controllers/CachedbController.ts";
 
 const app = express();
@@ -21,6 +25,9 @@ app.use(
   new DataCharacterizationController().router
 );
 app.use("/jobplugins/datamodel", new DataModelFlowController().router);
+app.use("/dataflow-mgmt/dataflow", new DataTransformationController().router);
+app.use("/dataflow-mgmt/prefect", new PrefectController().router);
+app.use("/dataflow-mgmt/analysisflow", new AnalysisController().router);
 app.use("/jobplugins/cachedb", new CachedbController().router);
 
 const opt = {
@@ -156,4 +163,5 @@ app.get("/jobplugins/exec_datamodel/:datamodel", async (req, res) => {
   }
 });
 
+await initialiseDataSource();
 app.listen(8000);

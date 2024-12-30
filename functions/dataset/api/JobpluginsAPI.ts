@@ -1,6 +1,6 @@
 // import https from "node:https";
 import { AxiosRequestConfig } from "npm:axios";
-import { ICreateDatamodelFlowRunDto } from "../../jobplugins/src/types.d.ts";
+import { ICreateDatamodelFlowRunDto } from "../../jobplugins/src/types.ts";
 import { services } from "../env.ts";
 import { get, post } from "./request-util.ts";
 
