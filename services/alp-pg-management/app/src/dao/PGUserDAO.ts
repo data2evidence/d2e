@@ -225,4 +225,24 @@ export default class PGUserDAO {
       this.logger.error(e.message);
     }
   };
+
+  grantCreatePrivilegesForDatabase = async (
+    client: any,
+    databaseName: string,
+    user: string
+  ) => {
+    try {
+      //Create Access to Future Objects
+      await client.query(`GRANT CREATE ON ${databaseName} TO ${user}`);
+
+      this.logger.info(
+        `${databaseName} schema granted create privileges for future objects to ${user}`
+      );
+    } catch (e: any) {
+      this.logger.error(
+        `Error granting create privileges for future objects in database ${databaseName} to user ${user}`
+      );
+      this.logger.error(e.message);
+    }
+  };
 }
