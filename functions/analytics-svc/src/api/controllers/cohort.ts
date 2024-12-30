@@ -278,7 +278,8 @@ export async function createCohort(req: IMRIRequest, res: Response) {
         );
 
         if (bookmarkCohortDefinitionId) {
-            // If bookmark already has a cohort definition id, update cohort definition id, remove all existing records from cohort table, before saving cohort to db
+            // If bookmark already has a cohort definition id
+            // Update cohort definition with cohort definition id and remove all existing records from cohort table before saving cohort to db
             cohort.id = bookmarkCohortDefinitionId;
             await cohortEndpoint.updateCohortDefinitionToDb(cohort);
 
@@ -290,7 +291,10 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                 queryResponse.queryObject
             );
         } else {
-            // Else if bookmark does not already have a cohort definition id, save cohort definition to db and query cohort definition id, then update bookmark with newly created cohort definition id.
+            // Else if bookmark does not already have a cohort definition id
+            // Save cohort definition to db and query cohort definition id for newly created cohort definition
+            // Save cohort to db
+            // Then update bookmark with newly created cohort definition id.
             await cohortEndpoint.saveCohortDefinitionToDb(cohort);
 
             // Get cohort definition id from cohort object
