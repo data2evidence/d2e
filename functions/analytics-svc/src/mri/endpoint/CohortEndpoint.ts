@@ -188,6 +188,45 @@ export class CohortEndpoint {
         }
     }
 
+    // Update cohort definition to db
+    public async updateCohortDefinitionToDb(
+        cohortDefinition: CohortDefinitionTableType
+    ) {
+        let queryString = `
+        UPDATE $$SCHEMA$$.COHORT_DEFINITION SET (
+            COHORT_DEFINITION_NAME,
+            COHORT_DEFINITION_DESCRIPTION,
+            COHORT_INITIATION_DATE,
+            OWNER,
+            DEFINITION_TYPE_CONCEPT_ID,
+            COHORT_DEFINITION_SYNTAX,
+            SUBJECT_CONCEPT_ID
+            )
+        = (%s, %s, %s, %s, %s, %s, %s)
+        WHERE COHORT_DEFINITION_ID = %s`;
+
+        try {
+            const query = QueryObject.format(
+                queryString,
+                cohortDefinition.name,
+                cohortDefinition.description,
+                this.parseDateToString(cohortDefinition.creationTimestamp),
+                cohortDefinition.owner,
+                cohortDefinition.definitionTypeConceptId,
+                cohortDefinition.syntax,
+                cohortDefinition.subjectConceptId,
+                cohortDefinition.id
+            );
+            let result = await query.executeQuery(this.connection);
+            return result;
+        } catch (err) {
+            logger.error(
+                `Failed to insert cohort definition with data: ${cohortDefinition}`
+            );
+            throw err;
+        }
+    }
+
     public async saveCohortToDb(
         cohortDefinitionId: number,
         cohort: CohortType,

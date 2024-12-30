@@ -410,7 +410,7 @@ export type QueryObjectType = {
 };
 
 export type CohortDefinitionTableType = {
-    id?: string;
+    id?: number;
     name: string;
     description: string;
     creationTimestamp: Date;
