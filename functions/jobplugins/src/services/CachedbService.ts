@@ -4,7 +4,7 @@ import {
   PrefectDeploymentName,
   PrefectFlowName,
 } from "../const.ts";
-import { ICreateCachedbFileFlowRunDto } from "../types.d.ts";
+import { ICreateCachedbFileFlowRunDto } from "../types.ts";
 
 export class CachedbService {
   public async createCachedbFileFlowRun(
