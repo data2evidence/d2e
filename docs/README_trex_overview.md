@@ -8,33 +8,28 @@ The following documentation outlines the basic setup of Analytics Platform (D2E)
 ## Pre-requisites
 1. Install pre-requisite softwares for running D2E. Refer to the installation guide [here](./1-setup/README.md). 
 2. Clone Github repository d2e in your terminal using the command: `git clone --branch develop https://github.com/alp-os/d2e.git`. 
-3. Clone Github repository d2e-plugins in your terminal using the command: `git clone --branch trex https://github.com/alp-os/d2e-plugins.git`. _(TODO - this step will be updated)_
-4. Request docker credentials from [D2E Support](#d2e-support) for authenticating to private docker registry to retrieve resources to run D2E.
+3. Request docker credentials from [D2E Support](#d2e-support) for authenticating to private docker registry to retrieve resources to run D2E.
 
 ## Environment Variables and Credentials Setup 
-5. Generate environment variables: `yarn gen:dotenv`
+4. Generate environment variables: `yarn gen:dotenv`
    - Refer [here](./1-setup/environment-variables.md) for more information on the environment variables generated.
-6. Append the following variables to the `env.local` file in the format:
-   - `GH_TOKEN=<your-Github-PAT-token>`. (Refer [here](./1-setup/README.md) for more info)
+5. Add the following variables to the `env.local` file in the format:
+   - `GH_TOKEN=<replace-with-credentials>`. (Refer [here](./1-setup/README.md) for more info)
    - `DATABASE_CREDENTIALS=[]` 
-7. Initialize Authentication Applications: `yarn init:logto`
+   - `DOCKER_REGISTRY_PASSWORD=<replace-with-credentials>`
+   - `DOCKER_REGISTRY_USERNAME=<replace-with-credentials>`
+6. Initialize Authentication Applications: `yarn init:logto`
 
 ## Application Setup
 
-In d2e-plugins repo, _(TODO - this step will be updated)_
-
-8. Run the command to build the neccessary docker images to run D2E plugins: `yarn build`. 
-
-In d2e repo, 
-
-9. Run the command to get the neccessary docker images to run D2E: `yarn build:minerva`
-10. Start/Restarting application: `yarn start:minerva; sleep 60`
-11. To view application logs: `yarn logs:minerva`
+Naviage to the folder where d2e repo is downloaded. Run the folllowing: 
+1. Run the command to get the neccessary docker images to run D2E: `yarn build:minerva`
+2. Start/Restarting application: `yarn start:minerva; sleep 60`
+3. (For debugging) To view application logs: `yarn logs:minerva`
 
 > **Note:**
 > - If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run the **Environment Variables and Credentials Setup** section
 > - If you have setup the application before, run steps in section **Application Setup** as required.
-
 
 # D2E Guide 
 ## Authentication Portal
@@ -57,15 +52,18 @@ The Admin Portal allows authorized personnel to login and perform the management
 > **The expected display is:**
 > ![AdminPortal](./images/portal/AdminPortal.png)
 
-- For quick access to the Admin Portal, input URL https://localhost:41100/portal/systemadmin/user-overview in the search bar.
-- Refer to the [documentation here](./2-load/2-users-roles.md) to perform user management. 
 
+Additional info:
+- [Performing password change](./2-load/1-initial-admin.md)
+- [Performing user management](./2-load/2-users-roles.md)
+
+> Tip: For quick access to the Admin Portal, input URL https://localhost:41100/portal/systemadmin/user-overview in the search bar.
 
 ## Adding Existing Databases
 
 This sections assumes that there is an existing database available. The database should be in a Postgres docker container name or external database with a Fully Qualified Domain Name (FQDN).
 
-If there is no existing databases available, you may consider using a [sample dataset](./2-load/), and perform sub-steps 3 to 7 to setup the database. Thereafter, you may continue to follow the guide from section [Plugins](#plugins) onwards.
+If there is no existing databases available, you may consider using a [sample dataset](./2-load/), and perform sub-steps [3](./2-load/3-setup-pg-permissions.md), [4](./2-load/4-setup-db-credentials.md), [6](./2-load/6-load-synpuf1k.md) and [7](./2-load/7-load-vocab.md) to setup the database. Thereafter, you may continue to follow the guide from section [Plugins](#plugins) onwards.
 
 
 - In the Admin Portal, navigate to **Setup** > **Databases** > **Configure** > **Add database**
@@ -77,11 +75,10 @@ If there is no existing databases available, you may consider using a [sample da
 
 
 ## Plugins 
-The Admin portal allows the admin user to manage plugins in the platform, for instance installation, update and uninstallation of plugins. 
-- In the Admin Portal, navigate to **Setup** > **Trex Plugins** > **Configure**
+The Admin portal allows the admin user to manage plugins in the platform, for instance installation, version updates and uninstallation of plugins. 
+- In the Admin Portal, navigate to **Setup** > **Plugins** > **Configure**
   >**The expected display is:**![PluginTable](./images/plugins/PluginTable.png)
 
-- Refer to the [documentation here](./2-load/5-load-d2e-plugins.md) for more information on plugins.
 
 ## Jobs Portal
 The Admin portal allows the admin user to perform customized and scheduled job runs from [plugins](#plugins) that have been installed.
