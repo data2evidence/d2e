@@ -6,8 +6,9 @@ import { Connection as connLib } from '@alp/alp-base-utils'
 import ConnectionInterface = connLib.ConnectionInterface
 import CallBackInterface = connLib.CallBackInterface
 import * as utils from '@alp/alp-base-utils'
-import { BookmarkDto } from '../types'
+import { BookmarkDto, IcohortDefinition } from '../types'
 import { PortalAPI } from '../api/PortalAPI'
+import { AnalyticsSvcAPI } from '../api/AnalyticsAPI'
 
 /**
  * This method was created so it can be spied on during testing (without affecting utils)
@@ -66,6 +67,7 @@ export function formatUserArtifactData(paConfigId: string, data: any[], userName
       version: row.version,
       user_id: row.user_id,
       shared: row.shared,
+      cohortDefinitionId: row.cohortDefinitionId,
     }))
 }
 
@@ -85,16 +87,32 @@ export async function _loadAllBookmarks(
   userName,
   token,
   paConfigId,
+  datasetId: string,
   connection: ConnectionInterface,
   callback: CallBackInterface
 ) {
   try {
     const portalAPI = new PortalAPI(token)
-    const result = await portalAPI.getBookmarks()
-    const formattedRows = formatUserArtifactData(paConfigId, result, userName)
+    const bookmarks = await portalAPI.getBookmarks()
+    const formattedBookmarks = formatUserArtifactData(paConfigId, bookmarks, userName)
+
+    const analyticsSvcAPI = new AnalyticsSvcAPI(token)
+    const cohortDefinitions = await analyticsSvcAPI.getAllCohorts(datasetId)
+    const formattedCohortDefinitions = cohortDefinitions.map(cohort => _formatCohortDefinitions(cohort))
+
+    // const data = formattedBookmarks.map(bookmark => {
+    //   return {
+    //     ...bookmark,
+    //     cohortDefinition: formattedCohortDefinitions.find(cohort => cohort.id === bookmark.cohortDefinitionId),
+    //   }
+    // })
+
+    // TODO: Combine cohort and bookmarks
+
     const returnValue = {
       schemaName: connection.schemaName,
-      bookmarks: formattedRows,
+      bookmarks: formattedBookmarks,
+      cohortDefinitions: formattedCohortDefinitions,
     }
     callback(null, _convertBookmarkIFR(returnValue))
   } catch (error) {
@@ -382,6 +400,7 @@ export async function queryBookmarks(
     let cdmConfigId: string = requestParameters.cdmConfigId
     let cdmConfigVersion: string = requestParameters.cdmConfigVersion
     let shareBookmark: boolean = requestParameters.shareBookmark
+    let datasetId: string = requestParameters.datasetId
 
     let cb = (err, result) => {
       if (err) {
@@ -428,7 +447,7 @@ export async function queryBookmarks(
         })
         break
       case 'loadAll':
-        await _loadAllBookmarks(userName, token, paConfigId, configConnection, callback)
+        await _loadAllBookmarks(userName, token, paConfigId, datasetId, configConnection, callback)
         break
       default:
         throw new Error('unknown command: ' + cmd)
@@ -455,3 +474,10 @@ function _convertBookmarkIFR(result) {
   }
   return result
 }
+
+const _formatCohortDefinitions = (cohortDefinition: IcohortDefinition) => ({
+  id: cohortDefinition.id,
+  patientCount: cohortDefinition.patientIds.length,
+  cohortDefinitionName: cohortDefinition.name,
+  createdOn: cohortDefinition.creationTimestamp,
+})

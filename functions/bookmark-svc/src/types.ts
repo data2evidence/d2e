@@ -129,3 +129,14 @@ export interface BookmarkDto {
   user_id: string
   shared: boolean
 }
+
+export interface IcohortDefinition {
+  id: number
+  patientIds: number[]
+  name: string
+  description: string
+  creationTimestamp: string
+  modificationTimestamp: string
+  owner: string
+  syntax: string
+}
