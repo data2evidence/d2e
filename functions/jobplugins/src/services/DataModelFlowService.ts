@@ -90,8 +90,8 @@ export class DataModelFlowService {
     const options = createDatamodelFlowRunDto.options;
     const result = await prefectApi.createFlowRun(
       flowRunName,
-      "datamodel",
-      "datamodel",
+      PrefectDeploymentName.DATA_MANAGEMENT,
+      PrefectFlowName.DATA_MANAGEMENT,
       options
     );
     return result;
@@ -106,8 +106,8 @@ export class DataModelFlowService {
     const options = createDatamartFlowRunDto.options;
     const result = await prefectApi.createFlowRun(
       flowRunName,
-      "datamart",
-      "datamart",
+      PrefectDeploymentName.DATAMART,
+      PrefectFlowName.DATAMART,
       options
     );
     return result;
