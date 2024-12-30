@@ -514,7 +514,13 @@ services:
           },
           "alpdb": {},
           "concept-mapping": {},
-          "terminology-svc": {}
+          "terminology-svc": {},
+          "aws-lambda": {
+            "COGNITO_CLIENT_ID": "cthlfafs01n3jf2agqh2van1c",
+            "COGNITO_CLIENT_SECRET": "${COGNITO_CLIENT_SECRET}",
+            "COGNITO_TOKEN_ENDPOINT": "https://${COGNITO_TOKEN_ENDPOINT}",
+            "LAMBDA_API_ENDPOINT": "https://${LAMBDA_API_ENDPOINT}"
+          }
         }
       SERVICE_ROUTES: |-
         {
