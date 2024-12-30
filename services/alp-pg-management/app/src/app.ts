@@ -124,9 +124,9 @@ export class App {
         "Manager"
       );
 
-      await this.userDao.grantPrivileges(
+      await this.userDao.grantCreatePrivilegesForDatabase(
         client,
-        pg_owner.user,
+        databaseName,
         pgUsers.manager
       );
 
