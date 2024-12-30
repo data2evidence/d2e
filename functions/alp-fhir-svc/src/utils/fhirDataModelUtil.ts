@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { env } from '../env';
-import { ConnectionInterface } from '@alp/alp-base-utils/target/src/Connection';
+import { ConnectionInterface } from '../../../_shared/alp-base-utils/src/Connection';
 
 const schemaPath = env.FHIR_SCHEMA_PATH + '/' + env.FHIR_SCHEMA_FILE_NAME 
 
