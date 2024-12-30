@@ -124,6 +124,12 @@ export class App {
         "Manager"
       );
 
+      await this.userDao.grantPrivileges(
+        client,
+        pg_owner.user,
+        pgUsers.manager
+      );
+
       await this.dbDao.closeConnection(client);
     } catch (e: any) {
       this.logger.error(e.message);
