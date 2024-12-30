@@ -100,15 +100,6 @@ export async function _loadAllBookmarks(
     const cohortDefinitions = await analyticsSvcAPI.getAllCohorts(datasetId)
     const formattedCohortDefinitions = cohortDefinitions.map(cohort => _formatCohortDefinitions(cohort))
 
-    // const data = formattedBookmarks.map(bookmark => {
-    //   return {
-    //     ...bookmark,
-    //     cohortDefinition: formattedCohortDefinitions.find(cohort => cohort.id === bookmark.cohortDefinitionId),
-    //   }
-    // })
-
-    // TODO: Combine cohort and bookmarks
-
     const returnValue = {
       schemaName: connection.schemaName,
       bookmarks: formattedBookmarks,
