@@ -1,28 +1,7 @@
 services:
 
-  alp-minerva-dataflow-mgmt:
-    container_name: alp-minerva-dataflow-mgmt-nest-dev-${BASE_PORT:-1}
-    extends:
-      file: ./services/alp-dataflow/docker-compose.yml
-      service: dataflow-mgmt
-
   alp-minerva-portal-server:
     container_name: alp-minerva-portal-server-nest-dev-${BASE_PORT:-1}
     extends:
       file: ./services/alp-portal-server/docker-compose.yml
       service: portal-server
-
-  alp-minerva-terminology-svc:
-    build:
-      target: development
-    command: yarn start:docker
-    container_name: alp-minerva-terminology-svc-nest-dev-${BASE_PORT:-1}
-    ports:
-      - 9228:9228
-      - 9230:9230
-    # Mount our host directory to docker container
-    # Reflect file changes from host to container
-    volumes:
-      - ./services/alp-terminology-svc/src:/usr/src/alp-data-node/app/src
-    environment:
-      LOCAL_DEBUG: "true"

@@ -32,7 +32,8 @@ export class CdwConfigCachedbDBConnectionUtil extends CachedbDBConnectionUtil.Ca
           client,
           schemaName,
           vocabSchemaName,
-          callback
+          callback,
+          dialect
         );
       } else {
         // CachedbNodeHDBConnection.CachedbNodeHDBConnection.createConnection(
