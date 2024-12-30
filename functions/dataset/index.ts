@@ -1,5 +1,4 @@
-import { Request, Response } from "npm:express";
-import express from "npm:express";
+import express, { Request, Response } from "npm:express";
 import { v4 as uuidv4 } from "npm:uuid";
 import { AnalyticsSvcAPI } from "./api/AnalyticsSvcAPI.ts";
 import { JobPluginsAPI } from "./api/JobpluginsAPI.ts";

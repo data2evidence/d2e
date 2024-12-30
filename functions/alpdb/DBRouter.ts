@@ -15,7 +15,7 @@ export class DBRouter {
     this.router.get("/dataset/version-info", async (req, res) => {
       try {
         const token = req.headers.authorization!;
-        const jobpluginsAPI= new JobpluginsAPI(token);
+        const jobpluginsAPI = new JobpluginsAPI(token);
         const result = await jobpluginsAPI.getSchemasVersionInformation();
         return res.status(200).json(result);
       } catch (error) {
@@ -33,7 +33,7 @@ export class DBRouter {
         req.body;
       try {
         const token = req.headers.authorization!;
-        const jobpluginsAPI= new JobpluginsAPI(token);
+        const jobpluginsAPI = new JobpluginsAPI(token);
 
         const datamodels = await jobpluginsAPI.getDatamodels();
         const dmInfo = datamodels.find(
