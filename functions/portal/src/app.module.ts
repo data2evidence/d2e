@@ -1,5 +1,4 @@
 import { Module } from '@danet/core';
-import { AppController } from './app.controller.ts';
 import { RequestContextMiddleware } from './common/request-context.middleware.ts';
 import { ConfigModule } from './config/config.module.ts';
 import { DatabaseModule } from './database/module.ts';
@@ -15,7 +14,7 @@ import { GroupModule } from './user-artifact/group/group.module.ts';
 import { UserArtifactModule } from './user-artifact/user-artifact.module.ts';
 import { UserMgmtModule } from './user-mgmt/user-mgmt.module.ts';
 @Module({
-  controllers: [AppController],
+  controllers: [],
   imports: [TenantModule, SystemModule, FeatureModule, ConfigModule, DatabaseModule, MinioModule, PrefectModule, UserMgmtModule, UserArtifactModule, GroupModule, DatasetModule, NotebookModule, PaConfigModule],
   injectables: [RequestContextMiddleware]
 })
