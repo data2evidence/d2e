@@ -140,3 +140,26 @@ export interface IcohortDefinition {
   owner: string
   syntax: string
 }
+
+export interface IFormattedBookmark {
+  bmkId: string
+  bookmarkname: string
+  bookmark: string
+  viewname: string | null
+  modified: string
+  version: string | null
+  user_id: string
+  shared: boolean
+  cohortDefinitionId?: number | undefined
+}
+export interface IFormattedcohortDefinition {
+  id: number
+  patientCount: number
+  cohortDefinitionName: string
+  createdOn: string
+}
+
+export interface IFrontendBookmark {
+  bookmark: IFormattedBookmark | null
+  cohortDefinition: IFormattedcohortDefinition | null
+}
