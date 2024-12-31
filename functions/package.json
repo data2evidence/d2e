@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tbuild node_modules/@alp-os/trex"
   },
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@alp-os/trex": "latest",
+    "deno": "latest"
+  },
   "trex": {
     "functions": {
       "init": [
@@ -89,10 +94,10 @@
           "env": "alp-usermgmt"
         },
         {
-          "source": "/aws-lambda",
-          "function": "/aws-lambda",
-          "imports": "/aws-lambda/import.json",
-          "env": "aws-lambda"
+          "source": "/code-suggestion",
+          "function": "/code-suggestion",
+          "imports": "/code-suggestion/import.json",
+          "env": "code-suggestion"
         },
         {
           "source": "/db-credentials",
@@ -213,6 +218,7 @@
           "ConfigAssignment.svc"
         ],
         "ALP_USER_ADMIN": [
+          "codesuggestion.all",
           "usermgmt.dataAdmin.read",
           "usermgmt.dataAdmin.write",
           "usermgmt.user.read",
@@ -401,8 +407,8 @@
           "dataflowmgmt.analysisflow.add",
           "dataflowmgmt.analysisflow.delete",
           "dataflowmgmt.analysisflow.revision.delete",
-          "aws-lambda.read",
-          "aws-lambda.write"
+          "codesuggestion.read",
+          "codesuggestion.write"
         ],
         "ALP_SHARED": [
           "usermgmt.group.read",
@@ -616,14 +622,6 @@
             "GET",
             "PUT",
             "DELETE"
-          ]
-        },
-        {
-          "path": "^/aws-lambda/api/me",
-          "scopes": ["aws-lambda.read", "aws-lambda.write"],
-          "httpMethods": [
-            "GET",
-            "POST"
           ]
         },
         {
@@ -1997,6 +1995,13 @@
           ],
           "httpMethods": [
             "DELETE"
+          ]
+        },
+        {
+          "path": "^/code-suggestion",
+          "scopes": ["codesuggestion.read", "codesuggestion.write"],
+          "httpMethods": [
+            "POST"
           ]
         }
       ]

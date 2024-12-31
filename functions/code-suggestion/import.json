@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "express": "npm:express@^4.19.2",
+    "express-validator": "npm:express-validator@^7.2.0",
+    "axios": "npm:axios@^1.7.7",
+    "./src/env": "./src/env.ts",
+    "./src/type": "./src/type.ts",
+    "./src/api/PortalAPI": "./src/api/PortalAPI.ts",
+    "./src/code-suggestion/services": "./src/code-suggestion/services.ts",
+    "./src/code-suggestion/routes": "./src/code-suggestion/routes.ts"
+  }
+}

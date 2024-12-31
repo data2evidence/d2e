@@ -31,7 +31,7 @@ services:
           "alpdb": false,
           "concept-mapping": false,
           "terminology-svc": false,
-          "aws-lambda": false
+          "code-suggestion": false
         }
 
   alp-caddy:
