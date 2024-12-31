@@ -30,7 +30,8 @@ services:
           "dataset": false,
           "alpdb": false,
           "concept-mapping": false,
-          "terminology-svc": false
+          "terminology-svc": false,
+          "files-manager": false
         }
 
   alp-caddy:
