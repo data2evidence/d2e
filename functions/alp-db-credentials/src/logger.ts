@@ -1,9 +1,10 @@
-import winston, { Logger, format, transports } from 'winston'
+// import winston, { Logger, format, transports } from 'winston'
 import { NextFunction, Request, Response } from 'express'
-import { env } from './env'
+// import { env } from './env'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
 export const createLogger = (className = ''): any => {
-  return console;
+  return console
   /*return winston.createLogger({
     level: env.LOG_LEVEL,
     format: format.json(),
