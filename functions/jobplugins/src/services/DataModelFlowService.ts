@@ -1,7 +1,13 @@
 import pg from "npm:pg";
 import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { PrefectDeploymentName, PrefectFlowName } from "../const.ts";
-import { DataModel, IGetVersionInfoFlowRunDto, PluginFlow, ICreateDatamodelFlowRunDto } from "../types.ts";
+import {
+  DataModel,
+  ICreateDatamartFlowRunDto,
+  ICreateDatamodelFlowRunDto,
+  IGetVersionInfoFlowRunDto,
+  PluginFlow,
+} from "../types.d.ts";
 
 export class DataModelFlowService {
   private env = Deno.env.toObject();
@@ -86,6 +92,22 @@ export class DataModelFlowService {
       flowRunName,
       PrefectDeploymentName.DATA_MANAGEMENT,
       PrefectFlowName.DATA_MANAGEMENT,
+      options
+    );
+    return result;
+  }
+
+  public async createDatamartFlowRun(
+    createDatamartFlowRunDto: ICreateDatamartFlowRunDto,
+    token: string
+  ) {
+    const prefectApi = new PrefectAPI(token);
+    const flowRunName = createDatamartFlowRunDto.flowRunName;
+    const options = createDatamartFlowRunDto.options;
+    const result = await prefectApi.createFlowRun(
+      flowRunName,
+      PrefectDeploymentName.DATAMART,
+      PrefectFlowName.DATAMART,
       options
     );
     return result;
