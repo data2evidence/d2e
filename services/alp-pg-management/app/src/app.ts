@@ -154,6 +154,15 @@ export class App {
       }
 
       await this.dbDao.createDatabase(client, databaseName);
+
+      const pgUsers: pgUsers = this.getPGUsers(databaseName);
+
+      await this.userDao.grantCreatePrivilegesForDatabase(
+        client,
+        databaseName,
+        pgUsers.manager
+      );
+
       const pg_owneruserWithoutAtSuffix = this.getUserName(
         pg_owneruser_config.user
       );
