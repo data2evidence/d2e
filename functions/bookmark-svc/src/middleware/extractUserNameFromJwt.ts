@@ -10,7 +10,7 @@ interface userMe {
   username: string
 }
 
-const extractUserIdFromJwt: RequestHandler = async (req, res, next) => {
+const extractUserNameFromJwt: RequestHandler = async (req, res, next) => {
   req.userName = await getUserName(req.headers['authorization'])
   next()
 }
@@ -26,4 +26,4 @@ const getUserName = async (token: string): Promise<string> => {
   return user.username
 }
 
-export default extractUserIdFromJwt
+export default extractUserNameFromJwt

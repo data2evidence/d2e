@@ -16,7 +16,7 @@ import https from 'https'
 import helmet from 'helmet'
 import noCacheMiddleware from './middleware/NoCache'
 import timerMiddleware from './middleware/Timer'
-import extractUserIdFromJwt from './middleware/extractUserIdFromJwt'
+import extractUserNameFromJwt from './middleware/extractUserNameFromJwt'
 import { Container } from 'typedi'
 import Routes from './routes'
 import { IMRIRequest, IDBCredentialsType } from './types'
@@ -32,7 +32,7 @@ const initRoutes = async (app: express.Application) => {
   app.use(express.json({ strict: false, limit: '50mb' }))
   app.use(express.urlencoded({ extended: true, limit: '50mb' }))
   app.use(noCacheMiddleware)
-  app.use(extractUserIdFromJwt)
+  app.use(extractUserNameFromJwt)
 
   let configCredentials: IDBCredentialsType
 

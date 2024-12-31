@@ -77,7 +77,7 @@
     "./src/middleware/route-check": "./src/middleware/route-check.ts",
     "./src/middleware/Timer": "./src/middleware/Timer.ts",
     "./src/middleware/NoCache": "./src/middleware/NoCache.ts",
-    "./src/middleware/extractUserIdFromJwt": "./src/middleware/extractUserIdFromJwt.ts",
+    "./src/middleware/extractUserNameFromJwt": "./src/middleware/extractUserNameFromJwt.ts",
     "./src/bookmark/bookmark.router": "./src/bookmark/bookmark.router.ts",
     "./src/bookmark/bookmark.router.spec": "./src/bookmark/bookmark.router.spec.ts",
     "./src/bookmark/bookmark.service": "./src/bookmark/bookmark.service.ts",
