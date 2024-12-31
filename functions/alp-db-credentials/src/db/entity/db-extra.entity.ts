@@ -22,5 +22,4 @@ export class DbExtra extends Audit {
   })
   @JoinColumn({ name: 'db_id' })
   db: Relation<Database>
-
 }
