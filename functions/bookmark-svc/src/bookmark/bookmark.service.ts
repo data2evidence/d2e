@@ -509,7 +509,7 @@ const _combineBookmarksAndCohortDefinitions = (
     }
   })
 
-  // For remaining cohort definitions, map object to add a bookmar key with value null
+  // For remaining cohort definitions that are created without a bookmark, map object to add a bookmark key with value as null
   return [
     ...combinedBookmarksAndCohortDefinitions,
     ...cohortDefinitions.map(cohortDefinition => ({
