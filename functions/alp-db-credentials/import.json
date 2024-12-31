@@ -1,4 +1,5 @@
 {"imports":{
+  "@deno/shim-deno": "npm:@deno/shim-deno@0.19.2",
   "class-transformer": "npm:class-transformer@^0.5.1",
   "class-validator": "npm:class-validator@^0.14.0",
   "dotenv": "npm:dotenv@^16.3.1",
@@ -52,6 +53,8 @@
   "./src/db/entity/db-vocab-schema.entity": "./src/db/entity/db-vocab-schema.entity.ts",
   "./src/db/entity": "./src/db/entity/index.ts",
   "./src/db/db.service": "./src/db/db.service.ts",
+  "./src/vocab/vocab.router": "./src/vocab/vocab.router.ts",
+  "./src/vocab/vocab.service": "./src/vocab/vocab.service.ts",
   "./src/env": "./src/env.ts",
   "https": "node:https",
   "path": "node:path",
