@@ -1,7 +1,0 @@
-namespace hc.hph.ots.internals;
-
-context Types {
-
-	type DWAuditID : Integer64;
-	type Provider  : String(100);
-};

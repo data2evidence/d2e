@@ -1,11 +1,7 @@
 import pg from "npm:pg";
 import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { PrefectDeploymentName, PrefectFlowName } from "../const.ts";
-import {
-  DataModel,
-  IGetVersionInfoFlowRunDto,
-  PluginFlow,
-} from "../types.d.ts";
+import { DataModel, IGetVersionInfoFlowRunDto, PluginFlow, ICreateDatamodelFlowRunDto } from "../types.ts";
 
 export class DataModelFlowService {
   private env = Deno.env.toObject();
@@ -58,6 +54,34 @@ export class DataModelFlowService {
     const prefectApi = new PrefectAPI(token);
     const flowRunName = getVersionInfoFlowRunDto.flowRunName;
     const options = getVersionInfoFlowRunDto.options;
+    const flowRunId = await prefectApi.createFlowRun(
+      flowRunName,
+      PrefectDeploymentName.DATA_MANAGEMENT,
+      PrefectFlowName.DATA_MANAGEMENT,
+      options
+    );
+
+    await prefectApi.createInputAuthToken(flowRunId);
+
+    await Promise.any([
+      new Promise((resolve) => {
+        setTimeout(async () => {
+          await prefectApi.deleteInputAuthToken(flowRunId);
+          resolve(`Deleted the input of ${flowRunId}`);
+        }, 5000);
+      }),
+    ]);
+
+    return flowRunId;
+  }
+
+  public async createDatamodelFlowRun(
+    createDatamodelFlowRunDto: ICreateDatamodelFlowRunDto,
+    token: string
+  ) {
+    const prefectApi = new PrefectAPI(token);
+    const flowRunName = createDatamodelFlowRunDto.flowRunName;
+    const options = createDatamodelFlowRunDto.options;
     const result = await prefectApi.createFlowRun(
       flowRunName,
       PrefectDeploymentName.DATA_MANAGEMENT,

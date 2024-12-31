@@ -1,8 +1,0 @@
-/* temporary definition of CDS type elementRef until this type is supported by HANA CDS */
-
-namespace common;
-
-context CDSTypes
-{
-  type elementRef: String(127);
-};

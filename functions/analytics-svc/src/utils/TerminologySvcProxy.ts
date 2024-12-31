@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 import { Logger, EnvVarUtils } from "@alp/alp-base-utils";
 import * as https from "https";
 import * as http from "http";

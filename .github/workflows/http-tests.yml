@@ -355,10 +355,6 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-logto-1 -t
-      - name: print logs for alp-minerva-dataflow-mgmt-nest-prod-1
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-dataflow-mgmt-nest-prod-1 -t
       - name: print logs for alp-minerva-fhir-server-1
         if: ${{ always() || cancelled() || failure() }}
         run: |
@@ -379,10 +375,6 @@ jobs:
         if: ${{ always() || cancelled() || failure() }}
         run: |
           docker logs alp-minerva-s3 -t
-      - name: print logs for alp-minerva-terminology-svc-nest-prod-1
-        if: ${{ always() || cancelled() || failure() }}
-        run: |
-          docker logs alp-minerva-terminology-svc-nest-prod-1 -t
       - name: print logs for broadsea-atlasdb
         if: ${{ always() || cancelled() || failure() }}
         run: |

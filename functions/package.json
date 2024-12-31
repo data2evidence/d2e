@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tbuild node_modules/@alp-os/trex"
   },
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@alp-os/trex": "latest",
+    "deno": "latest"
+  },
   "trex": {
     "functions": {
       "init": [
@@ -26,6 +31,16 @@
           "function": "/alp-db-credentials/src/init",
           "imports": "/alp-db-credentials/import.json",
           "env": "alp-db-credentials"
+        },
+        {
+          "function": "/jobplugins/src/init",
+          "imports": "/jobplugins/import.json",
+          "env": "jobplugins"
+        },
+        {
+          "function": "/alp-usermgmt/src/init",
+          "imports": "/alp-usermgmt/import.json",
+          "env": "alp-usermgmt"
         }
       ],
       "api": [
@@ -68,8 +83,9 @@
         },
         {
           "source": "/dataflow-mgmt",
-          "rmsrc": true,
-          "service": "dataflowMgmt"
+          "function": "/jobplugins",
+          "env": "jobplugins",
+          "imports": "/jobplugins/import.json"
         },
         {
           "source": "/usermgmt",
@@ -115,7 +131,9 @@
         },
         {
           "source": "/terminology",
-          "service": "terminology"
+          "function": "/terminology-svc",
+          "imports": "/terminology-svc/import.json",
+          "env": "terminology-svc"
         },
         {
           "source": "/pa-config-svc",
@@ -316,6 +334,9 @@
           "gateway.db.dataset.versionInfo.read",
           "gateway.db.schema.update",
           "gateway.terminology.concept.getStandardConcepts.read",
+          "gateway.terminology.concept.searchByName.read",
+          "gateway.terminology.concept.searchById.read",
+          "gateway.terminology.concept.searchByCode.read",
           "dataflowmgmt.analysisflow.read",
           "dataflowmgmt.analysisflow.add",
           "dataflowmgmt.analysisflow.delete",
@@ -1220,6 +1241,15 @@
           ]
         },
         {
+          "path": "^/terminology/concept-set/included-concepts$",
+          "scopes": [
+            "gateway.terminology.conceptSet.read"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
           "path": "^/terminology/concept-set/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}?",
           "scopes": [
             "gateway.terminology.conceptSet.read"
@@ -1277,6 +1307,33 @@
           "path": "^/terminology/concept/getStandardConcepts$",
           "scopes": [
             "gateway.terminology.concept.getStandardConcepts.read"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/terminology/concept/searchByName$",
+          "scopes": [
+            "gateway.terminology.concept.searchByName.read"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/terminology/concept/searchById$",
+          "scopes": [
+            "gateway.terminology.concept.searchById.read"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/terminology/concept/searchByCode$",
+          "scopes": [
+            "gateway.terminology.concept.searchByCode.read"
           ],
           "httpMethods": [
             "POST"

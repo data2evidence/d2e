@@ -3,8 +3,6 @@ services:
     command: npm run startdev
     external_links:
       - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
-      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
     ports:
       - 9229:9229
     volumes:
@@ -31,7 +29,8 @@ services:
           "jobplugins": false,
           "dataset": false,
           "alpdb": false,
-          "concept-mapping": false
+          "concept-mapping": false,
+          "terminology-svc": false
         }
 
   alp-caddy:
@@ -62,16 +61,6 @@ services:
       context: ./services/alp-logto
       dockerfile: Dockerfile
 
-  alp-minerva-dataflow-mgmt:
-    build:
-      context: ./services/alp-dataflow
-      dockerfile: Dockerfile
-    container_name: alp-minerva-dataflow-mgmt-nest-prod-${BASE_PORT:-1}
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-    environment:
-      NODE_ENV: development
-
   alp-minerva-pg-mgmt-init:
     build:
       context: services/alp-pg-management
@@ -95,14 +84,6 @@ services:
     ports:
       - 41190:5432
       - 5432:5432
-
-  alp-minerva-terminology-svc:
-    build:
-      context: .
-      dockerfile: ./services/alp-terminology-svc/Dockerfile
-    container_name: alp-minerva-terminology-svc-nest-prod-${BASE_PORT:-1}
-    environment:
-      LOCAL_DEBUG: "false"
 
   #alp-dicom-server:
   # uses 8042 port on the container
