@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express'
 import { Service } from 'typedi'
 import { createLogger } from '../Logger'
 import { SetupService } from '../services'
-import { AzureADSetupRequest } from 'types'
+import { AzureADSetupRequest } from '../types'
 
 @Service()
 export class SetupRouter {

@@ -1,8 +1,0 @@
-*~
-.grunt
-node_modules/
-dist/
-coverage/
-npm-debug.log
-package-lock.json
-**/junit*.xml

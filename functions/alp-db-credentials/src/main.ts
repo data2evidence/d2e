@@ -7,7 +7,7 @@ import { env } from './env'
 import { Routes } from './routes'
 import { setupReqContext, healthCheck } from './common/middleware'
 import dataSource from './common/data-source/data-source'
-import https from 'https'
+// import https from 'https'
 
 const PORT = env.PORT || 8000
 const logger = createLogger()

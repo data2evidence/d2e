@@ -1,8 +1,0 @@
-mappingidCol;LEGACY;termMappingsTable;0;MAPPING_ID;MAPPING_ID;;;;;string
-listidCol;LEGACY;termMappingsTable;1;LIST_ID;LIST_ID;X;;X;X;string
-languageCol;LEGACY;termMappingsTable;2;LANGUAGE_CODE;LANGUAGE_CODE;X;;X;X;string
-term1Col;LEGACY;termMappingsTable;3;TERM_1;TERM_1;X;;X;X;string
-term2Col;LEGACY;termMappingsTable;4;TERM_2;TERM_2;X;;X;X;string
-weightCol;LEGACY;termMappingsTable;5;WEIGHT;WEIGHT;X;;X;X;numeric
-usercntCol;LEGACY;termMappingsTable;6;USER_CNT;USER_CNT;X;;;;string
-sourcecntCol;LEGACY;termMappingsTable;7;SOURCE_CNT;SOURCE_CNT;X;;;;string

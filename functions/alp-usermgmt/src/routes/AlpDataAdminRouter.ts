@@ -1,10 +1,10 @@
 import express, { NextFunction, Response } from 'express'
 import { Service } from 'typedi'
 import { ROLES } from '../const'
-import { IAppRequest, IUserWithRolesInfo } from 'types'
+import { IAppRequest, IUserWithRolesInfo } from '../types'
 import { SystemAdminService, NifiAdminService } from '../services'
 import { createLogger } from '../Logger'
-import { UserGroupExt } from 'dtos'
+import { UserGroupExt } from '../dtos'
 import { env } from '../env'
 
 @Service()
