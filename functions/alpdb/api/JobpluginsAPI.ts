@@ -1,29 +1,30 @@
 import { AxiosRequestConfig } from "npm:axios";
-import { get, post, put } from "./request-util.ts";
-import { services } from "../env.ts";
+import { env, services } from "../env.ts";
+import { get, post } from "./request-util.ts";
 //import { createLogger } from '../Logger'
-import { Agent } from "node:https";
+// import { Agent } from "node:https";
 
-export class DataflowMgmtAPI {
+export class JobpluginsAPI {
   private readonly logger = console;
-  private readonly httpsAgent: Agent;
+  // private readonly httpsAgent: Agent;
   private readonly baseURL: string;
   private readonly token: string;
+  private readonly endpoint: string = "/jobplugins";
 
   constructor(token: string) {
     this.token = token;
     if (!token) {
-      throw new Error("No token passed for DataflowMgmtAPI");
+      throw new Error("No token passed for JobpluginsAPI");
     }
-    if (services.dataflowMgmt) {
-      this.baseURL = services.dataflowMgmt;
-      this.httpsAgent = new Agent({
-        rejectUnauthorized: true,
-        // ca: env.GATEWAY_CA_CERT
-      });
+    if (services.jobplugins) {
+      this.baseURL = services.jobplugins + this.endpoint;
+      // this.httpsAgent = new Agent({
+      //   rejectUnauthorized: true,
+      //   ca: env.GATEWAY_CA_CERT,
+      // });
     } else {
-      this.logger.error("No url is set for DataflowMgmtAPI");
-      throw new Error("No url is set for DataflowMgmtAPI");
+      this.logger.error("No url is set for JobpluginsAPI");
+      throw new Error("No url is set for JobpluginsAPI");
     }
   }
 
@@ -33,13 +34,13 @@ export class DataflowMgmtAPI {
     options = {
       headers: {
         Authorization: this.token,
-      },
-      httpsAgent: this.httpsAgent,
+      }
     };
 
     return options;
   }
 
+  // TODO: Check where the actual implementation is
   async getSchemasVersionInformation(): Promise<any> {
     this.logger.info(`Getting schemas version information`);
     const options = await this.getRequestConfig();
@@ -167,17 +168,15 @@ export class DataflowMgmtAPI {
     throw new Error(`Failed to update schema for ${schemaName}`);
   }
 
-  async createFlowRunByMetadata(
+  async createDataModelFlowRun(
     options: object,
-    type: string,
     flowId?: string,
     flowRunName?: string
   ): Promise<any> {
-    this.logger.info(`Running flow by metadata type ${type}`);
+    this.logger.info(`Running create data model flow run`);
     const postOptions = await this.getRequestConfig();
-    const url = `${this.baseURL}/prefect/flow-run/metadata`;
+    const url = `${this.baseURL}/datamodel/create_datamodel_run`;
     const body = {
-      type,
       flowId,
       options,
       flowRunName,
@@ -193,7 +192,7 @@ export class DataflowMgmtAPI {
   async getDatamodels(): Promise<any> {
     this.logger.info(`Getting datamodels`);
     const options = await this.getRequestConfig();
-    const url = `${this.baseURL}/prefect/flow/datamodels/list`;
+    const url = `${this.baseURL}/datamodel/list`;
     const result = await get(url, options);
     if (result.data) {
       return result.data;
