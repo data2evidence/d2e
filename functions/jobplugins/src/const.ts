@@ -27,6 +27,7 @@ export enum PrefectDeploymentName {
   FETCH_VERSION_INFO = "fetch-version-info",
   COHORT_SURVIVAL = "cohort-survival-plugin_deployment",
   DATA_MANAGEMENT = "data_management_plugin",
+  DATAMART = "datamart_plugin",
   UI_DATA_FLOW = "dataflow_ui_plugin",
   CACHEDB_CREATE_FILE = "create_cachedb_file_plugin",
 }
@@ -42,6 +43,7 @@ export enum PrefectFlowName {
   DATA_MANAGEMENT = "data_management_plugin",
   UI_DATA_FLOW = "dataflow_ui_plugin",
   CACHEDB_CREATE_FILE = "create_cachedb_file_plugin",
+  DATAMART = "datamart_plugin",
 }
 
 export enum FLOW_RUN_STATE_TYPES {
