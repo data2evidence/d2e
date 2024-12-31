@@ -6,7 +6,7 @@ const logger = createLogger('HealthCheck')
 
 export const healthCheck = async (_req: Request, res: Response): Promise<void> => {
   const healthCheck = {
-   // uptime: process.uptime(),
+    // uptime: process.uptime(),
     message: 'OK',
     timestamp: Date.now()
   }
