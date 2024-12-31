@@ -30,7 +30,8 @@ services:
           "dataset": false,
           "alpdb": false,
           "concept-mapping": false,
-          "terminology-svc": false
+          "terminology-svc": false,
+          "files-manager": false
         }
 
   alp-caddy:
@@ -132,16 +133,6 @@ services:
       - 9235:9235
     environment:
       LOCAL_DEBUG: "true"
-
-  alp-perseus-backend:
-    build:
-      context: ./services/alp-perseus-backend
-      dockerfile: Dockerfile
-
-  alp-perseus-files-manager:
-    build:
-      context: ./services/alp-perseus-files-manager
-      dockerfile: Dockerfile
 
   alp-perseus-white-rabbit:
     environment:

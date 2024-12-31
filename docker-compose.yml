@@ -53,7 +53,7 @@ x-envs:
     FHIR__CLIENT_ID: db6b2304-f236-45ec-b10c-a852681e7129
     FHIR__CLIENT_SECRET: ${FHIR__CLIENT_SECRET}
   perseus: &x-perseus
-    PERSEUS__FILES_MANAGER_HOST: alp-perseus-files-manager-${BASE_PORT:-1}
+    PERSEUS__FILES_MANAGER_HOST: trex
   plugins: &x-plugins |
     {
       "researcher": [
@@ -425,6 +425,7 @@ services:
             "PG__DB_CREDENTIALS_MGR__PASSWORD": "${PG_WRITE_PASSWORD}",
             "PG__DB_CREDENTIALS_MGR__SCHEMA": "db_credentials_mgr",
             "PG__DB_CREDENTIALS_MGR__USER": "${PG_WRITE_USER:-alp_pg_write_user}",
+            "DB_CREDENTIALS_MGR__VOCAB_SCHEMAS": { "postgres": ["cdmvocab"], "hana": ["CDMVOCAB"] },
             "DATABASE_CREDENTIALS": ${DATABASE_CREDENTIALS}
           },
           "alp-fhir-svc": {
@@ -514,6 +515,11 @@ services:
           },
           "alpdb": {},
           "concept-mapping": {},
+          "files-manager": {
+            "PG_ADMIN_PASSWORD": "${PG_ADMIN_PASSWORD}",
+            "PG_ADMIN_USER": "${PG_ADMIN_USER:-alp_pg_admin_user}",
+            "PG_SCHEMA": "files_manager"
+          },
           "terminology-svc": {}
         }
       SERVICE_ROUTES: |-
@@ -619,7 +625,6 @@ services:
             "+usermgmt": {},
             "+files_manager": {},
             "+perseus": {},
-            "+source": {},
             "+white_rabbit": {},
             "+trex": {}
            }
@@ -1169,27 +1174,8 @@ services:
           cpus: ${D2E_CPU_LIMIT:-2}
           memory: ${D2E_MEMORY_LIMIT:-7G}
 
-  alp-perseus-files-manager:
-    image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
-    container_name: &c34 alp-perseus-files-manager-${BASE_PORT:-1}
-    depends_on:
-      alp-minerva-postgres:
-        condition: service_healthy
-      alp-minerva-pg-mgmt-init:
-        condition: service_completed_successfully
-    environment:
-      <<:
-        - *x-pg
-      SPRING_PROFILES_ACTIVE: docker
-      PG_ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
-      PG_ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-    networks:
-      alp:
-        priority: 20
-    profiles: [perseus]
-
   alp-perseus-backend:
-    image: alpcr.azurecr.io/alp-data-node/alp-perseus-backend:${DOCKER_TAG_NAME:-develop}
+    image: alpcr.azurecr.io/alp-data-node/d2e-perseus:master
     container_name: &c35 alp-perseus-backend-${BASE_PORT:-1}
     environment:
       <<:
@@ -1203,11 +1189,10 @@ services:
         condition: service_healthy
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
-      alp-perseus-files-manager:
-        condition: service_started
     networks:
       alp:
         priority: 20
+    platform: linux/amd64
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
@@ -1226,8 +1211,6 @@ services:
         condition: service_healthy
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
-      alp-perseus-files-manager:
-        condition: service_started
     networks:
       alp:
         priority: 20
