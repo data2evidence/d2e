@@ -133,11 +133,6 @@ services:
     environment:
       LOCAL_DEBUG: "true"
 
-  alp-perseus-backend:
-    build:
-      context: ./services/alp-perseus-backend
-      dockerfile: Dockerfile
-
   alp-perseus-white-rabbit:
     environment:
       JAVA_OPTs: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"

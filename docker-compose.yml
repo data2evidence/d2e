@@ -625,7 +625,6 @@ services:
             "+usermgmt": {},
             "+files_manager": {},
             "+perseus": {},
-            "+source": {},
             "+white_rabbit": {},
             "+trex": {}
            }
@@ -1176,7 +1175,7 @@ services:
           memory: ${D2E_MEMORY_LIMIT:-7G}
 
   alp-perseus-backend:
-    image: alpcr.azurecr.io/alp-data-node/alp-perseus-backend:${DOCKER_TAG_NAME:-develop}
+    image: alpcr.azurecr.io/alp-data-node/d2e-perseus:master
     container_name: &c35 alp-perseus-backend-${BASE_PORT:-1}
     environment:
       <<:
@@ -1193,6 +1192,7 @@ services:
     networks:
       alp:
         priority: 20
+    platform: linux/amd64
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
