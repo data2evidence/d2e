@@ -2,34 +2,47 @@
 
 [![DockerCompose AzureTest CD](https://github.com/alp-os/d2e/actions/workflows/az-dc-cd.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/az-dc-cd.yml) &nbsp;&nbsp; [![Docker Build & Push](https://github.com/alp-os/d2e/actions/workflows/docker-push.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/docker-push.yml) &nbsp;&nbsp; [![Docker compose Build & Up](https://github.com/alp-os/d2e/actions/workflows/docker-compose-up.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/docker-compose-up.yml)
 
-## Install pre-requisites
+# Getting Started 
 
-see: [1-setup](docs/1-setup/README.md)
+## Pre-requisites
 
-## Clone repository
+- Install pre-requisite software for running D2E. See: installation guide [here](./1-setup/README.md)
 
-- see: [Cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
+- Clone `d2e` GitHub repository. See: [Cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 
-## Authenticate to private docker registry
+```bash
+git clone --branch develop https://github.com/alp-os/d2e.git
+```
 
-- Request credentials from D2E support
+- Clone `d2e-plugins` GitHub repository
+
+```bash
+git clone --branch trex https://github.com/alp-os/d2e-plugins.git
+```
+
+- Authenticate to private docker registry with credentials provided by [D2E Support](#d2e-support)
 
 ```bash
 docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 ```
 
-## Generate dotenv
+## Environment Variables and Credentials Setup
 
-- see: [environment variables](docs/1-setup/environment-variables.md)
-- auto-generate secrets from [env.example](env.example) template to `.env.local`
+- Invoke the following command to populate  `.env.local` with random secrets. See: environment variables document [here](docs/1-setup/environment-variables.md)
 
 ```bash
 yarn gen:dotenv
 ```
 
-#### Initalize Logto Apps
+- Append `GH_TOKEN` provided by [D2E Support](#d2e-support) for trex container to read GitHub repos
 
-- note: [clean-up](README.md#clean-up) first to re-initialize
+```bash
+echo GH_TOKEN='<GH_TOKEN>' >> .env.local
+```
+
+- Initalize Logto Apps
+  - note: [clean-up](README.md#clean-up) first to re-initialize
+
 
 ```bash
 yarn init:logto
