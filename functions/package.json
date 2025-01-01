@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tbuild node_modules/@alp-os/trex"
   },
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@alp-os/trex": "latest",
+    "deno": "latest"
+  },
   "trex": {
     "functions": {
       "init": [
@@ -26,6 +31,16 @@
           "function": "/alp-db-credentials/src/init",
           "imports": "/alp-db-credentials/import.json",
           "env": "alp-db-credentials"
+        },
+        {
+          "function": "/files-manager/src/init",
+          "imports": "/files-manager/import.json",
+          "env": "files-manager"
+        },
+        {
+          "function": "/jobplugins/src/init",
+          "imports": "/jobplugins/import.json",
+          "env": "jobplugins"
         },
         {
           "function": "/alp-usermgmt/src/init",
@@ -75,8 +90,9 @@
         },
         {
           "source": "/dataflow-mgmt",
-          "rmsrc": true,
-          "service": "dataflowMgmt"
+          "function": "/jobplugins",
+          "env": "jobplugins",
+          "imports": "/jobplugins/import.json"
         },
         {
           "source": "/usermgmt",
@@ -185,6 +201,12 @@
           "function": "/concept-mapping",
           "env": "concept-mapping",
           "imports": "/concept-mapping/import.json"
+        },
+        {
+          "source": "/files-manager/api",
+          "function": "/files-manager",
+          "env": "files-manager",
+          "imports": "/files-manager/import.json"
         }
       ],
       "roles": {
@@ -251,6 +273,7 @@
           "dbCredentials.db.write",
           "dbCredentials.db.credential.update",
           "dbCredentials.db.delete",
+          "dbCredentials.vocab.schema.list",
           "portal.dataset.systemAdmin.read",
           "portal.dataset.read",
           "portal.dataset.exist",
@@ -341,7 +364,10 @@
           "prefect.post",
           "prefect.update",
           "conceptmapping.read",
-          "conceptmapping.post"
+          "conceptmapping.post",
+          "filesmanager.read",
+          "filesmanager.post",
+          "filesmanager.delete"
         ],
         "ALP_DASHBOARD_VIEWER": [
           "gateway.dashboardGate.content"
@@ -415,6 +441,19 @@
         ]
       },
       "scopes": [
+        {
+          "path": "^/files-manager/api",
+          "scopes": [
+            "filesmanager.read",
+            "filesmanager.post",
+            "filesmanager.delete"
+          ],
+          "httpMethods": [
+            "GET",
+            "POST",
+            "DELETE"
+          ]
+        },
         {
           "path": "^/concept-mapping",
           "scopes": [
@@ -815,6 +854,15 @@
           ],
           "httpMethods": [
             "DELETE"
+          ]
+        },
+        {
+          "path": "^/db-credentials/vocab/(postgres|hana)/schema/list$",
+          "scopes": [
+            "dbCredentials.vocab.schema.list"
+          ],
+          "httpMethods": [
+            "GET"
           ]
         },
         {

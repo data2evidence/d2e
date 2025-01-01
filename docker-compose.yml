@@ -53,7 +53,7 @@ x-envs:
     FHIR__CLIENT_ID: db6b2304-f236-45ec-b10c-a852681e7129
     FHIR__CLIENT_SECRET: ${FHIR__CLIENT_SECRET}
   perseus: &x-perseus
-    PERSEUS__FILES_MANAGER_HOST: alp-perseus-files-manager-${BASE_PORT:-1}
+    PERSEUS__FILES_MANAGER_HOST: trex
   redis: &x-redis
     REDIS_HOST: ${REDIS_HOST:-alp-minerva-redis-1}
     REDIS_PORT: ${REDIS_PORT:-6379}
@@ -77,7 +77,8 @@ x-envs:
        "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}:8103/fhir/R4",
        "fhirTokenUrl": "http://alp-minerva-fhir-server-1:8103/oauth2/token",
        "dicomServer": "http://alp-dicom-server:8042",
-       "fhirSvc": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/gateway/api/fhir"
+       "fhirSvc": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/gateway/api/fhir",
+       "trex": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000"
       }
 
   # "https://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41105",
@@ -180,7 +181,7 @@ services:
               "paConfig": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/pa-config-svc",
               "trex": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
-              "dataflowMgmt": "http://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
+              "dataflowMgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/dataflow-mgmt",
               "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "portalServer": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/system-portal",
               "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
@@ -226,6 +227,7 @@ services:
             "PG__DB_CREDENTIALS_MGR__PASSWORD": "${PG_WRITE_PASSWORD}",
             "PG__DB_CREDENTIALS_MGR__SCHEMA": "db_credentials_mgr",
             "PG__DB_CREDENTIALS_MGR__USER": "${PG_WRITE_USER:-alp_pg_write_user}",
+            "DB_CREDENTIALS_MGR__VOCAB_SCHEMAS": { "postgres": ["cdmvocab"], "hana": ["CDMVOCAB"] },
             "DATABASE_CREDENTIALS": ${DATABASE_CREDENTIALS}
           },
           "alp-fhir-svc": {
@@ -306,7 +308,9 @@ services:
           "jobplugins": {
             "PREFECT_API_URL": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
             "PG_USER": "${PG_WRITE_USER:-alp_pg_write_user}",
-            "PG_PASSWORD": "${PG_WRITE_PASSWORD}"
+            "PG_PASSWORD": "${PG_WRITE_PASSWORD}",
+            "PG_ADMIN_USER": "${PG_ADMIN_USER:-alp_pg_admin_user}",
+            "PG_ADMIN_PASSWORD": "${PG_ADMIN_PASSWORD}"
           },
           "dataset": {
             "GATEWAY_WO_PROTOCOL_FQDN": "${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}"
@@ -323,6 +327,11 @@ services:
             "PG_PORT": "${PG_PORT:-5432}",
             "PG_DATABASE": "${PG_DB_NAME:-alp}"
           },
+          "files-manager": {
+            "PG_ADMIN_PASSWORD": "${PG_ADMIN_PASSWORD}",
+            "PG_ADMIN_USER": "${PG_ADMIN_USER:-alp_pg_admin_user}",
+            "PG_SCHEMA": "files_manager"
+          },
           "terminology-svc": {}
         }
       SERVICE_ROUTES: |-
@@ -333,7 +342,7 @@ services:
         "paConfig": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/pa-config-svc",
         "trex": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
         "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
-        "dataflowMgmt": "http://alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:41107",
+        "dataflowMgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/dataflow-mgmt",
         "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
         "portalServer": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/system-portal",
         "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
@@ -428,7 +437,6 @@ services:
             "+usermgmt": {},
             "+files_manager": {},
             "+perseus": {},
-            "+source": {},
             "+white_rabbit": {},
             "+trex": {}
            }
@@ -743,55 +751,6 @@ services:
       PORT: 3001
       TRUST_PROXY_HEADER: true
 
-  alp-minerva-dataflow-mgmt:
-    container_name: &c11 alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
-    init: true
-    depends_on:
-      trex:
-        condition: service_healthy
-      alp-minio-post-init:
-        condition: service_completed_successfully
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 120s
-      test:
-        - CMD
-        - wget
-        - --no-check-certificate
-        - -O
-        - liveness
-        - http://localhost:41107/check-liveness
-      timeout: 30s
-    hostname: alp-minerva-dataflow-mgmt-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-dataflow:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c11
-    networks:
-      alp:
-        priority: 20
-    platform: linux/amd64
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    environment:
-      <<:
-        - *x-minio
-        - *x-pg
-        - *x-tls
-        - *x-routes
-      DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_SB_NAME: dataflow-adhoc-flows-sb
-      DATAFLOW_MGMT__FLOWS__RESULTS_SB_NAME: flow-results
-      DATAFLOW_MGMT__LOG_LEVEL: info
-      DATAFLOW_MGMT__PORT: 41${BASE_PORT:-1}07
-      DATAFLOW_MGMT__PREFECT__DEPLOYMENT_NAME: testflow
-      DATAFLOW_MGMT__PREFECT__FLOW_NAME: exec-flow
-      NODE_ENV: production
-      PG__DATAFLOW_MGMT__DB_NAME: ${PG_DB_NAME:-alp}
-      PG__DATAFLOW_MGMT__MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
-      PG__DATAFLOW_MGMT__MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG__DATAFLOW_MGMT__PASSWORD: ${PG_WRITE_PASSWORD}
-      PG__DATAFLOW_MGMT__SCHEMA: dataflow
-      PG__DATAFLOW_MGMT__USER: ${PG_WRITE_USER:-alp_pg_write_user}
 
   alp-minerva-portal-server:
     container_name: &c16 alp-minerva-portal-server-${BASE_PORT:-1}
@@ -1027,27 +986,8 @@ services:
           cpus: ${D2E_CPU_LIMIT:-2}
           memory: ${D2E_MEMORY_LIMIT:-7G}
 
-  alp-perseus-files-manager:
-    image: alpcr.azurecr.io/alp-data-node/alp-perseus-files-manager:${DOCKER_TAG_NAME:-develop}
-    container_name: &c34 alp-perseus-files-manager-${BASE_PORT:-1}
-    depends_on:
-      alp-minerva-postgres:
-        condition: service_healthy
-      alp-minerva-pg-mgmt-init:
-        condition: service_completed_successfully
-    environment:
-      <<:
-        - *x-pg
-      SPRING_PROFILES_ACTIVE: docker
-      PG_ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
-      PG_ADMIN_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-    networks:
-      alp:
-        priority: 20
-    profiles: [perseus]
-
   alp-perseus-backend:
-    image: alpcr.azurecr.io/alp-data-node/alp-perseus-backend:${DOCKER_TAG_NAME:-develop}
+    image: alpcr.azurecr.io/alp-data-node/d2e-perseus:master
     container_name: &c35 alp-perseus-backend-${BASE_PORT:-1}
     environment:
       <<:
@@ -1061,11 +1001,10 @@ services:
         condition: service_healthy
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
-      alp-perseus-files-manager:
-        condition: service_started
     networks:
       alp:
         priority: 20
+    platform: linux/amd64
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
@@ -1084,8 +1023,6 @@ services:
         condition: service_healthy
       alp-minerva-pg-mgmt-init:
         condition: service_completed_successfully
-      alp-perseus-files-manager:
-        condition: service_started
     networks:
       alp:
         priority: 20

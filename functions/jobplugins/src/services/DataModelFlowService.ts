@@ -3,9 +3,10 @@ import { PrefectAPI } from "../api/PrefectAPI.ts";
 import { PrefectDeploymentName, PrefectFlowName } from "../const.ts";
 import {
   DataModel,
+  ICreateDatamartFlowRunDto,
+  ICreateDatamodelFlowRunDto,
   IGetVersionInfoFlowRunDto,
   PluginFlow,
-  ICreateDatamodelFlowRunDto
 } from "../types.d.ts";
 
 export class DataModelFlowService {
@@ -91,6 +92,22 @@ export class DataModelFlowService {
       flowRunName,
       PrefectDeploymentName.DATA_MANAGEMENT,
       PrefectFlowName.DATA_MANAGEMENT,
+      options
+    );
+    return result;
+  }
+
+  public async createDatamartFlowRun(
+    createDatamartFlowRunDto: ICreateDatamartFlowRunDto,
+    token: string
+  ) {
+    const prefectApi = new PrefectAPI(token);
+    const flowRunName = createDatamartFlowRunDto.flowRunName;
+    const options = createDatamartFlowRunDto.options;
+    const result = await prefectApi.createFlowRun(
+      flowRunName,
+      PrefectDeploymentName.DATAMART,
+      PrefectFlowName.DATAMART,
       options
     );
     return result;

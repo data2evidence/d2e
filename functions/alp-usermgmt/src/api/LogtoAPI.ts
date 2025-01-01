@@ -1,7 +1,7 @@
 import { Service } from 'typedi'
 import { del, get, patch, post } from './request-util'
 import { BaseIDPAPI } from './BaseIDPAPI'
-import { ILogtoUser, ILogtoUserCreated } from 'types'
+import { ILogtoUser, ILogtoUserCreated } from '../types'
 import { env } from '../env'
 
 @Service()
