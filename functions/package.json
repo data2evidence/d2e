@@ -71,12 +71,6 @@
           "env": "dataset"
         },
         {
-          "source": "/portalsvc",
-          "function": "/portal",
-          "imports": "/portal/import.json",
-          "env": "portal"
-        },
-        {
           "source": "/analytics-svc/api/services/query",
           "function": "/query-gen-svc",
           "imports": "/query-gen-svc/import.json",
