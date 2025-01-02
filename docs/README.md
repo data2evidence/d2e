@@ -127,7 +127,7 @@ The Admin portal allows the admin user to perform customized and scheduled job r
 
 ## Dataset Permissions
 The Admin Portal allows the admin to perform dataset management to provide users with permissions for selected datasets. 
-- Input the url https://localhost:41100/portal/systemadmin/dataset-overview. 
+- In the Admin Portal, navigate to **Datasets**. 
 - Navigate to the dataset you wish to provide/revoke permission access for users. 
 - Under **Actions** dropdown, select **Permissions** to view users who have requested for access or provide access to existing users. 
 - Refer to the [documentation here](./3-configure/2-dataset-permissions.md) for a detailed guide on setting permissions.
@@ -137,14 +137,14 @@ The Admin Portal allows the admin to perform dataset management to provide users
 
 ### Generating Data Quality Dashboard (DQD)
 This section generates the Data Quality Dashboard based on the dataset of interest. 
-- In the Admin Portal, navigate to **Datasets**. 
-- Navigate to the dataset of interest and click **Select Action**. 
-- Select **Run data quality** and select **Run Analysis**. Repeat the step for **Run data characterization**.
-- After completing **Data Quality** and **Data Characterization** job runs in the [**Running Data Quality and Characterization Job**](#running-data-quality-and-characterization-job) section, refer to the [documentation here](./3-configure/4-dqd-dashboard.md) to access the Data Quality Dashboard for the respective datasets in the Researcher portal.
+- In the Admin Portal, navigate to **Datasets**. Navigate to the dataset of interest and click **Select Action**. 
+- Select **Run data quality** and select the **Run Analysis** button. 
+- Repeat the step for **Run data characterization**.
+- After completing the **Data Quality** and **Data Characterization** job runs,  section, refer to the [documentation here](./3-configure/4-dqd-dashboard.md) to access the Data Quality Dashboard for the respective datasets in the Researcher portal.
 
   > **The expected result is:** ![dqd-dashboard](./images/dqd/dqd-dashboard-1.png)
 
-- Refer to the [documentation here](./3-configure/3-dqd-job.md) for a guide on running Data Quality and Characterization jobs manually via the Jobs Portal.
+- Refer to the Jobs Portal if you
 
 ### Create Cache
 This section provides the steps for setting up the analytics environment.
