@@ -145,26 +145,22 @@ export class App {
         client,
         databaseName
       );
+      const pgUsers: pgUsers = this.getPGUsers(databaseName);
 
       if (ifDatabaseExists) {
-        await this.dbDao.createDatabase(client, databaseName);
-
-        const pg_owneruserWithoutAtSuffix = this.getUserName(
-          pg_owneruser_config.user
-        );
-        await this.userDao.alterDatabaseOwner(
+        await this.userDao.grantCreatePrivilegesForDatabase(
           client,
           databaseName,
-          pg_owneruserWithoutAtSuffix
+          pgUsers.manager
         );
-        return true;
+
+        this.logger.info(
+          `${databaseName} Database Already exists! Skipping the rest of the operations such as create users`
+        );
+        return false;
       }
 
-      this.logger.info(
-        `${databaseName} Database does not exists! Skipping the rest of the operations such as create users`
-      );
-
-      const pgUsers: pgUsers = this.getPGUsers(databaseName);
+      await this.dbDao.createDatabase(client, databaseName);
 
       await this.userDao.grantCreatePrivilegesForDatabase(
         client,
@@ -172,8 +168,17 @@ export class App {
         pgUsers.manager
       );
 
+      const pg_owneruserWithoutAtSuffix = this.getUserName(
+        pg_owneruser_config.user
+      );
+      await this.userDao.alterDatabaseOwner(
+        client,
+        databaseName,
+        pg_owneruserWithoutAtSuffix
+      );
+
       await this.dbDao.closeConnection(client);
-      return false;
+      return true;
     } catch (e: any) {
       this.logger.error(e.message);
       await this.dbDao.closeConnection(client);
