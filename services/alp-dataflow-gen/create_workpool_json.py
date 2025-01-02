@@ -1,5 +1,6 @@
 import os
 import json
+from prefect_docker import DockerRegistryCredentials
 
 custom_docker_workpool_dict = {
     "variables": {
@@ -153,8 +154,28 @@ custom_docker_workpool_dict = {
 
 
 if __name__ == "__main__":
+    # Create DockerRegistryCredentials block
+    docker_registry_credentials = DockerRegistryCredentials(
+        username=os.environ["DOCKER_REGISTRY_USERNAME"],
+        password=os.environ["DOCKER_REGISTRY_PASSWORD"],
+        registry_url=os.environ["DOCKER_REGISTRY_URL"],
+    )
+
+    docker_registry_credentials.save(
+        name="docker-registry-credentials", overwrite=True)
+
+    # Get DockerRegistryCredentials block id
+    credentials_block = DockerRegistryCredentials.load(
+        "docker-registry-credentials")
+    block_id = credentials_block._block_document_id
+
+    # Set id in workpool json
+    custom_docker_workpool_dict["variables"]["properties"]["registry_credentials"]["default"] = {
+        "$ref": {"block_document_id": str(block_id)}}
+
     # Serializing json
-    custom_docker_workpool_json = json.dumps(custom_docker_workpool_dict, indent=4)
+    custom_docker_workpool_json = json.dumps(
+        custom_docker_workpool_dict, indent=4)
 
     with open("./custom-docker-workpool.json", "w") as outfile:
         outfile.write(custom_docker_workpool_json)
