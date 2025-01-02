@@ -229,7 +229,6 @@
           "ConfigAssignment.svc"
         ],
         "ALP_USER_ADMIN": [
-          "codesuggestion.all",
           "usermgmt.dataAdmin.read",
           "usermgmt.dataAdmin.write",
           "usermgmt.user.read",
@@ -394,7 +393,8 @@
           "portal.dataset.read",
           "portal.filterScope.read",
           "portal.dataset.release.list.read",
-          "portal.config.read"
+          "portal.config.read",
+          "codesuggestion.tenantview.read"
         ],
         "RESEARCHER": [
           "PA.svc",
@@ -422,8 +422,7 @@
           "dataflowmgmt.analysisflow.add",
           "dataflowmgmt.analysisflow.delete",
           "dataflowmgmt.analysisflow.revision.delete",
-          "codesuggestion.read",
-          "codesuggestion.write"
+          "codesuggestion.read"
         ],
         "ALP_SHARED": [
           "usermgmt.group.read",
@@ -2036,7 +2035,7 @@
         },
         {
           "path": "^/code-suggestion",
-          "scopes": ["codesuggestion.read", "codesuggestion.write"],
+          "scopes": ["codesuggestion.read", "codesuggestion.tenantview.read"],
           "httpMethods": [
             "POST"
           ]
