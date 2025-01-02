@@ -1,7 +1,0 @@
-version: "3"
-services:
-  dataflow-mgmt:
-    ports:
-      - 3002:3000
-    volumes:
-      - ./node_modules:/usr/src/app/node_modules
