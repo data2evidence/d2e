@@ -71,7 +71,7 @@ jobs:
         if: ${{ env.GIT_CI_BRANCH_NAME == 'develop' }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: alp-os-d2e-functions-0.0.99.tgz
+          file: /usr/src/plugin/node_modules/@alp-os/d2e-functions/alp-os-d2e-functions-0.0.99.tgz
           tag: latest
           target_commit: develop
           prerelease: true
