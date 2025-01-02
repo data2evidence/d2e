@@ -1,5 +1,5 @@
 import axios,{ AxiosResponse } from "axios";
-import { PortalAPI } from "../api/PortalAPI";
+import { PortalAPI } from "../api/AWSTokenAPI";
 import { env } from '../env';
 import { UICodeSnippet } from "../type";
 

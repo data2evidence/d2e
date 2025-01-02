@@ -21,7 +21,7 @@ export class PortalAPI {
     }
   }
 
-  async getAccessToken(): Promise<any> {
+  async getAccessToken(): Promise<string> {
     try {
       // Get CognitoAccessToken
       const tokenResponse = await axios.post(this.tokenEndpoint, 
