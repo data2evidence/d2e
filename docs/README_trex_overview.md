@@ -6,26 +6,51 @@ The following documentation outlines the basic setup of Analytics Platform (D2E)
 
 # Getting Started 
 ## Pre-requisites
-1. Install pre-requisite softwares for running D2E. Refer to the installation guide [here](./1-setup/README.md). 
-2. Clone Github repository d2e in your terminal using the command: `git clone --branch develop https://github.com/alp-os/d2e.git`. 
-3. Request docker credentials from [D2E Support](#d2e-support) for authenticating to private docker registry to retrieve resources to run D2E.
+- Install pre-requisite softwares for running D2E. Refer to the installation guide [here](./1-setup/README.md). 
+- Clone Github repository d2e in your terminal using the command: 
+```bash
+git clone --branch develop https://github.com/alp-os/d2e.git
+```
+
+- Request docker credentials from [D2E Support](#d2e-support) for authenticating to private docker registry to retrieve resources to run D2E.
 
 ## Environment Variables and Credentials Setup 
-4. Generate environment variables: `yarn gen:dotenv`
+- Generate environment variables: 
+```bash
+yarn gen:dotenv
+```
    - Refer [here](./1-setup/environment-variables.md) for more information on the environment variables generated.
-5. Add the following variables to the `env.local` file in the format:
-   - `GH_TOKEN=<replace-with-credentials>`. (Refer [here](./1-setup/README.md) for more info)
-   - `DATABASE_CREDENTIALS=[]` 
-   - `DOCKER_REGISTRY_PASSWORD=<replace-with-credentials>`
-   - `DOCKER_REGISTRY_USERNAME=<replace-with-credentials>`
-6. Initialize Authentication Applications: `yarn init:logto`
+- Replace the credentials and append the following variables:
+```bash
+echo GH_TOKEN='GH_TOKEN>' >> .env.local
+echo DOCKER_REGISTRY_PASSWORD='DOCKER_REGISTRY_PASSWORD>' >> .env.local
+echo DOCKER_REGISTRY_USERNAME='DOCKER_REGISTRY_USERNAME>' >> .env.local
+```
+
+
+- Initialize Authentication Applications: 
+```bash
+yarn init:logto
+```
 
 ## Application Setup
 
 Naviage to the folder where d2e repo is downloaded. Run the folllowing: 
-1. Run the command to get the neccessary docker images to run D2E: `yarn build:minerva`
-2. Start/Restarting application: `yarn start:minerva; sleep 60`
-3. (For debugging) To view application logs: `yarn logs:minerva`
+- Run the command to get the neccessary docker images to run D2E: 
+
+```bash
+yarn build:minerva
+```
+
+- Start/Restarting application: 
+```bash
+yarn start:minerva; sleep 60
+```
+
+- (For debugging) To view application logs: 
+```bash
+yarn logs:minerva
+```
 
 > **Note:**
 > - If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run the **Environment Variables and Credentials Setup** section
@@ -71,7 +96,11 @@ If there is no existing databases available, you may consider using a [sample da
 - Select **Add database** and provide the database information accordingly. 
 - Please refer to [documentation here](./2-load/4-setup-db-credentials.md) for more details on the input parameters for database creation.
   >**The expected result after adding a database is:** ![DatabaseList](./images/database/DatabaseList.png)
-- Perform a restart of the system for new connection details to be provisioned to the data services using the command: `yarn start:minerva --force-recreate; sleep 60`
+- Perform a restart of the system for new connection details to be provisioned to the data services using the command: 
+
+```bash
+yarn start:minerva --force-recreate; sleep 60
+```
 
 
 ## Plugins 
@@ -89,12 +118,10 @@ The Admin portal allows the admin user to perform customized and scheduled job r
 - Select the `⋮` icon to perform the respective job functions. 
 - Select **Job Runs** tab to get the job run status.
 
-
 ## Creating Datasets
 - In the Admin Portal, navigate to **Datasets** > **Add dataset**
   >**The expected display is:**![DatasetList](./images/datasets/DatasetList.png)
 
-  
 - Provide the dataset [parameters](./3-configure/1-create-dataset.md) accordingly.
   > **The expected result upon successful addition of dataset**: ![Datasets](./images/datasets/ConfirmDatasetsPortal.png)
 
@@ -104,7 +131,6 @@ The Admin Portal allows the admin to perform dataset management to provide users
 - Navigate to the dataset you wish to provide/revoke permission access for users. 
 - Under **Actions** dropdown, select **Permissions** to view users who have requested for access or provide access to existing users. 
 - Refer to the [documentation here](./3-configure/2-dataset-permissions.md) for a detailed guide on setting permissions.
-
 
 ## Generating Data Quality Dashboard (DQD)
 > _"The goal of the Data Quality Dashboard (DQD) project is to design and develop an open-source tool to expose and evaluate observational data quality."_ ([*Reference*](https://ohdsi.github.io/DataQualityDashboard/index.html))
@@ -122,16 +148,16 @@ For more information, refer to the [link here](https://data.ohdsi.org/DataQualit
 
   > **The expected result is:** ![dqd-dashboard](./images/dqd/dqd-dashboard-1.png)
 
-## Running Jobs
+## Analytics Environment
+### Running Cachedb Job
+- This section provides the steps for setting up the analytics environment.
+- Navigate to the dataset of interest and click **Select Action**. 
+- Select **Create cache**.
+- Refer to the [documentation here](./3-configure/5-create-duckdb-file.md) to create cache via the Jobs Portal.
 
-### Run Job for Duckdb
-This section provides the steps for setting up the analytics environment.
-- Ensure that `create-cachedb-file-plugin` plugin is available in the [Jobs Portal](#jobs-portal).
-- Refer to the [documentation here](./3-configure/5-create-duckdb-file.md) for a detailed guide on creating a duckdb file.
 
-
-## Fetching Datasets Metadata 
-- In the Admin Portal, navigate to **Datasets** tab and select **Check for data model updates**. 
+## Update Datasets Metadata 
+- In the Admin Portal, navigate to **Datasets** tab and select **Update dataset metadata**. 
 - Refer to the [documentation here](./3-configure/7-fetch-datasets-metadata.md) for more details.
 
 **The expected result is as follows:**
