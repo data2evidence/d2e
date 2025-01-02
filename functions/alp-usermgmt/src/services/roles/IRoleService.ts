@@ -1,4 +1,4 @@
-import { User } from 'entities'
+import { User } from '../../entities/User.ts'
 
 export interface IRoleService {
   getUsers(): Promise<User[]>

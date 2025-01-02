@@ -3,6 +3,7 @@ import { createLogger } from '../logger'
 import dataSource from '../common/data-source/data-source'
 import { runMigrations } from '../common/data-source/db-migration'
 import { loadLocalDatabaseCredentials } from '../local-setup'
+// eslint-disable-next-line
 import * as pg from 'pg'
 
 class Init {

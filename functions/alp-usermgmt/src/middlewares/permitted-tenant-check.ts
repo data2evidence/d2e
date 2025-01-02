@@ -1,7 +1,7 @@
 import { NextFunction, Response } from 'express'
 import { Container } from 'typedi'
 import { UserGroupService } from '../services'
-import { AlpTenantUserRoleMapType, IAppRequest } from 'types'
+import { AlpTenantUserRoleMapType, IAppRequest } from '../types'
 import { createLogger } from '../Logger'
 import { ROLES } from '../const'
 import  * as _  from 'lodash-es'
