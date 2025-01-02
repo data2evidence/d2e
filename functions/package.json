@@ -1203,7 +1203,7 @@
           ]
         },
         {
-          "path": "^/system-portal/user-artifact/(.*)$",
+          "path": "^/system-portal/user-artifact/(?!group(?:$|/))(.*)$",
           "scopes": [
             "portal.userArtifact.read",
             "portal.userArtifact.write",
