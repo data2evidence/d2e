@@ -33,6 +33,11 @@
           "env": "alp-db-credentials"
         },
         {
+          "function": "/files-manager/src/init",
+          "imports": "/files-manager/import.json",
+          "env": "files-manager"
+        },
+        {
           "function": "/jobplugins/src/init",
           "imports": "/jobplugins/import.json",
           "env": "jobplugins"
@@ -200,6 +205,12 @@
           "function": "/concept-mapping",
           "env": "concept-mapping",
           "imports": "/concept-mapping/import.json"
+        },
+        {
+          "source": "/files-manager/api",
+          "function": "/files-manager",
+          "env": "files-manager",
+          "imports": "/files-manager/import.json"
         }
       ],
       "roles": {
@@ -267,6 +278,7 @@
           "dbCredentials.db.write",
           "dbCredentials.db.credential.update",
           "dbCredentials.db.delete",
+          "dbCredentials.vocab.schema.list",
           "portal.dataset.systemAdmin.read",
           "portal.dataset.exist",
           "portal.dataset.add",
@@ -353,7 +365,10 @@
           "prefect.post",
           "prefect.update",
           "conceptmapping.read",
-          "conceptmapping.post"
+          "conceptmapping.post",
+          "filesmanager.read",
+          "filesmanager.post",
+          "filesmanager.delete"
         ],
         "ALP_DASHBOARD_VIEWER": [
           "gateway.dashboardGate.content"
@@ -428,6 +443,19 @@
         ]
       },
       "scopes": [
+        {
+          "path": "^/files-manager/api",
+          "scopes": [
+            "filesmanager.read",
+            "filesmanager.post",
+            "filesmanager.delete"
+          ],
+          "httpMethods": [
+            "GET",
+            "POST",
+            "DELETE"
+          ]
+        },
         {
           "path": "^/concept-mapping",
           "scopes": [
@@ -828,6 +856,15 @@
           ],
           "httpMethods": [
             "DELETE"
+          ]
+        },
+        {
+          "path": "^/db-credentials/vocab/(postgres|hana)/schema/list$",
+          "scopes": [
+            "dbCredentials.vocab.schema.list"
+          ],
+          "httpMethods": [
+            "GET"
           ]
         },
         {

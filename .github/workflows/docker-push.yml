@@ -127,13 +127,12 @@ jobs:
             directory: ./services/cachedb
             context: .
             fileName: Dockerfile
-          - name: alp-data-node/alp-perseus-files-manager
-            directory: ./services/alp-perseus-files-manager
-            context: ./services/alp-perseus-files-manager
-            fileName: Dockerfile
           - name: alp-data-node/alp-perseus-backend
             directory: ./services/alp-perseus-backend
             context: ./services/alp-perseus-backend
+          - name: alp-data-node/alp-perseus-files-manager
+            directory: ./services/alp-perseus-files-manager
+            context: ./services/alp-perseus-files-manager
             fileName: Dockerfile
     uses: ./.github/workflows/docker-push-called.yml
     with:

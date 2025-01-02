@@ -8,7 +8,6 @@ import { DbCredential } from '../../db/entity/db-credential.entity'
 import { DbExtra } from '../../db/entity/db-extra.entity'
 import { DbVocabSchema } from '../../db/entity/db-vocab-schema.entity'
 
-
 const logger = createLogger('DataSource')
 
 export const getSsl = (): boolean | TlsOptions => {
