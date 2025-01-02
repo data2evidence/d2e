@@ -61,6 +61,7 @@ jobs:
           min-versions-to-keep: 3
           delete-only-pre-release-versions: "true"
       - name: Pack
+        working-directory: /usr/src/plugin/node_modules/@alp-os/d2e-functions
         run: |
           if [[ $GIT_CI_BRANCH_NAME == 'develop' ]]; then
             npm pack
@@ -70,8 +71,9 @@ jobs:
         if: ${{ env.GIT_CI_BRANCH_NAME == 'develop' }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: alp-data-node-1.0.0.tgz
+          file: alp-os-d2e-functions.tgz
           tag: latest
           target_commit: develop
           prerelease: true
           overwrite: true
+          asset_name: d2e-functions.tgz
