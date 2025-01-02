@@ -298,7 +298,6 @@ export class App {
     } catch (e: any) {
       this.logger.error(e.message);
       await this.dbDao.closeConnection(client);
-      await this.dbDao.closeConnection(client);
       return false;
     }
   }
