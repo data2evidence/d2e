@@ -6,7 +6,7 @@ import {
   ICreateDatamartFlowRunDto,
   ICreateDatamodelFlowRunDto,
   IGetVersionInfoFlowRunDto,
-} from "../types.d.ts";
+} from "../types.ts";
 
 export class DataModelFlowController {
   private DataModelFlowService: DataModelFlowService;
