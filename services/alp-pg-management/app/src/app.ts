@@ -146,13 +146,12 @@ export class App {
         databaseName
       );
 
-      if (!ifDatabaseExists) {
+      if (ifDatabaseExists) {
         await this.dbDao.createDatabase(client, databaseName);
 
         const pg_owneruserWithoutAtSuffix = this.getUserName(
           pg_owneruser_config.user
         );
-
         await this.userDao.alterDatabaseOwner(
           client,
           databaseName,
