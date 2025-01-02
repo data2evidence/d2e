@@ -293,8 +293,11 @@ export class App {
         databaseName,
         user
       );
+      await this.dbDao.closeConnection(client);
+      return true;
     } catch (e: any) {
       this.logger.error(e.message);
+      await this.dbDao.closeConnection(client);
       await this.dbDao.closeConnection(client);
       return false;
     }
