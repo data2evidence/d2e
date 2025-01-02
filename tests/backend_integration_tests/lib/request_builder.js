@@ -17,6 +17,10 @@ var predefinedTags = {
   basicdata: 'patient'
 }
 
+// Constants
+// Test dataset-id
+const DATASET_ID = 'cd13fd3e-9f35-4812-b2a1-497b232a8771'
+
 /**
  * Patient builder object.
  *
@@ -638,7 +642,7 @@ RequestBuilder.prototype.buildJson = function () {
  */
 RequestBuilder.prototype.buildIFR = function (isKMRequest) {
   var request = isKMRequest ? request2Bookmark(this.buildJson(), 'km') : request2Bookmark(this.buildJson())
-  return { ...request, datasetId: 'cd13fd3e-9f35-4812-b2a1-497b232a8771' }
+  return { ...request, datasetId: DATASET_ID }
 }
 
 /**
@@ -662,6 +666,10 @@ RequestBuilder.prototype.submit = function (hanaRequest, urlPath, parameters, cb
     kmRequest = parameters.isKMRequest
     delete parameters.isKMRequest
   }
+
+  // Append datasetId as query param for trex auth
+  parameters['datasetId'] = DATASET_ID
+
   var setQuery = {
     method: parameters[`httpMethod`],
     path: urlPath,
