@@ -145,8 +145,15 @@ export class App {
         client,
         databaseName
       );
+      const pgUsers: pgUsers = this.getPGUsers(databaseName);
 
       if (ifDatabaseExists) {
+        await this.userDao.grantCreatePrivilegesForDatabase(
+          client,
+          databaseName,
+          pgUsers.manager
+        );
+
         this.logger.info(
           `${databaseName} Database Already exists! Skipping the rest of the operations such as create users`
         );
@@ -154,8 +161,6 @@ export class App {
       }
 
       await this.dbDao.createDatabase(client, databaseName);
-
-      const pgUsers: pgUsers = this.getPGUsers(databaseName);
 
       await this.userDao.grantCreatePrivilegesForDatabase(
         client,
