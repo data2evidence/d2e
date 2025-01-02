@@ -36,6 +36,5 @@ notes:
 
 Run the following command to restart the system for the new connection details be provisioned to the data services
 ```
-yarn start:minerva --force-recreate
+yarn start:minerva --wait --force-recreate
 ```
-

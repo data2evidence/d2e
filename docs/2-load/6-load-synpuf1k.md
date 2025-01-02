@@ -104,12 +104,12 @@ docker exec -it alp-dataflow-gen-worker prefect deployment run data_load_plugin/
 ```
 - Docker container logs can be checked with the bash command `docker logs --tail 100 alp-dataflow-gen-worker`
 - Once the flow is completed, the container logs the message "Finished in state Completed()"
-- Confirm data loaded with the following command:
+```
+- Confirm data loaded with 
 ```
 docker exec -it alp-minerva-postgres-1 psql -h localhost -U postgres -p 5432 -d alpdev_pg --command "SELECT schemaname as table_schema,relname as table_name,n_live_tup as table_rows FROM pg_stat_user_tables where schemaname='cdmdefault' ORDER BY n_live_tup DESC limit 17;"
 ```
-
-- Expected output:
+- Expect output to be:
 ```
  table_schema |      table_name      | table_rows 
 --------------+----------------------+------------

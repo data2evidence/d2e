@@ -44,11 +44,9 @@ function set-openssl {
     export PASSPHRASE=$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c $passphrase_length)
     export PRIVATE_KEY=$(openssl genpkey -algorithm RSA -aes-256-cbc -pkeyopt rsa_keygen_bits:4096 -pass env:PASSPHRASE -quiet)
     export PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | openssl rsa -pubout -passin env:PASSPHRASE)
-    export DECRYPT_PRIVATE_KEY=$(echo "${PRIVATE_KEY}" | openssl rsa -passin env:PASSPHRASE)
     echo DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE=\"${PASSPHRASE}\" >> $tmp_file
     echo DB_CREDENTIALS__INTERNAL__PRIVATE_KEY=\'"${PRIVATE_KEY}"\' >> $tmp_file
     echo DB_CREDENTIALS__INTERNAL__PUBLIC_KEY=\'"${PUBLIC_KEY}"\' >> $tmp_file
-    echo DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY=\'"${DECRYPT_PRIVATE_KEY}"\' >> $tmp_file
 }
 set-openssl
 echo
