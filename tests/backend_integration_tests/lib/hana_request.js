@@ -201,7 +201,7 @@ HanaRequest.prototype._makeRequestOptions = function (query) {
 
   var urlArgs = ''
   if (query.parameters && query.parameters[`urlEncodingRequired`]) {
-    // datasetId required as request body toplevel key for trex auth
+    // datasetId required for trex auth
     urlArgs = utils.generateUrl(path, {
       mriquery: query[`body`],
       ...(query.parameters['datasetId'] && { datasetId: query.parameters['datasetId'] })
