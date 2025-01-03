@@ -5,7 +5,7 @@ const _env = Deno.env.toObject();
 export const env = {
   SERVICE_ROUTES: process.env.SERVICE_ROUTES || "{}",
   NODE_ENV: _env.NODE_ENV,
-  TENANT_ID: _env.APP_TENANT_ID,
+  TENANT_ID: _env.APP__TENANT_ID,
   TENANT_NAME: _env.APP__TENANT_NAME,
   SYSTEM_NAME: _env.ALP__SYSTEM_NAME,
 
