@@ -124,7 +124,7 @@ jobs:
         run: |
           yarn init:logto
 
-      - name: Docker compose up Local Mode without UI Container
+      - name: Docker compose up Local Mode
         uses: nick-fields/retry@v3
         id: retry
         with:
@@ -136,20 +136,19 @@ jobs:
             # Run DataNode services without sql-editor
             yarn local:minerva up --wait
             DC_EXIT_CODE=$?
-            echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_ENV
             DOCKER_STATUS_FILE=../docker-status-${GITHUB_RUN_ID:-ghRunId}-$(date '+%Y%m%dT%H%M%S').txt | tee -a $GITHUB_ENV
             docker ps --format {{.Names}},{{.Status}} 2> /dev/null | sort | tee $DOCKER_STATUS_FILE | tee -a $GITHUB_STEP_SUMMARY
+            [ $DC_EXIT_CODE = 0 ] || { echo EXIT DC_EXIT_CODE=$DC_EXIT_CODE && exit $DC_EXIT_CODE; }
 
-      - name: Check Container Health
+      - name: Log status
+        if: success() || failure()
         run: |
           echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
           echo RETRY_EXIT_CODE=${{ steps.retry.outputs.exit_code }} | tee -a $GITHUB_STEP_SUMMARY
           echo RETRY_OUTCOME=${{ steps.retry.outcome }} | tee -a $GITHUB_STEP_SUMMARY
           echo RETRY_TOTAL_ATTEMPTS=${{ steps.retry.outputs.total_attempts }} | tee -a $GITHUB_STEP_SUMMARY
-
           DC_FAIL_COUNT=$(grep -icE "starting|unhealthy" $DOCKER_STATUS_FILE|| true)
           echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
-          [ $DC_EXIT_CODE = 0 ] || { echo EXIT DC_EXIT_CODE=$DC_EXIT_CODE && exit $DC_EXIT_CODE; }
 
       - name: Logs minerva
         if: success() || failure()
