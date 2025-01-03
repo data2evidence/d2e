@@ -1,5 +1,6 @@
 import { Injectable } from '@danet/core';
 import { ITenant } from '../types.d.ts';
+import { env } from '../env.ts';
 @Injectable()
 export class TenantService {
   private readonly tenant: ITenant;
@@ -7,9 +8,9 @@ export class TenantService {
 
   constructor() {
     this.tenant = {
-      id: this._env.TENANT_ID,
-      name: this._env.TENANT_NAME,
-      system: this._env.SYSTEM_NAME
+      id: env.TENANT_ID,
+      name: env.TENANT_NAME,
+      system: env.SYSTEM_NAME
     };
   }
 

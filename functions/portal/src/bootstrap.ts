@@ -1,6 +1,5 @@
 import { DanetApplication } from '@danet/core';
 import { SpecBuilder, SwaggerModule } from '@danet/swagger';
-import '@std/dotenv/load';
 import { AppModule } from './app.module.ts';
 import { loggerMiddleware } from './logger.middleware.ts';
 export const bootstrap = async () => {
