@@ -160,6 +160,7 @@ export interface IFormattedcohortDefinition {
 }
 
 export interface IFrontendBookmark {
-  bookmark: IFormattedBookmark | null
-  cohortDefinition: IFormattedcohortDefinition | null
+  schemaName: string
+  bookmarks: IFormattedBookmark[]
+  cohortDefinitions: IFormattedcohortDefinition[]
 }

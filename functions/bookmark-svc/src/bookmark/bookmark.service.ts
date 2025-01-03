@@ -106,9 +106,10 @@ export async function _loadAllBookmarks(
     const cohortDefinitions = await analyticsSvcAPI.getAllCohorts(datasetId)
     const formattedCohortDefinitions = cohortDefinitions.map(cohort => _formatCohortDefinitions(cohort))
 
-    const returnValue = {
+    const returnValue: IFrontendBookmark = {
       schemaName: connection.schemaName,
-      bookmarks: _combineBookmarksAndCohortDefinitions(formattedBookmarks, formattedCohortDefinitions),
+      bookmarks: formattedBookmarks,
+      cohortDefinitions: formattedCohortDefinitions,
     }
     callback(null, _convertBookmarkIFR(returnValue))
   } catch (error) {
@@ -477,44 +478,3 @@ const _formatCohortDefinitions = (cohortDefinition: IcohortDefinition): IFormatt
   cohortDefinitionName: cohortDefinition.name,
   createdOn: cohortDefinition.creationTimestamp,
 })
-
-const _combineBookmarksAndCohortDefinitions = (
-  bookmarks: IFormattedBookmark[],
-  cohortDefinitions: IFormattedcohortDefinition[]
-): IFrontendBookmark[] => {
-  // For each bookmark, check if there is a tagged cohortDefinitionId, if there is, combine into the bookmarks object and remove corresponding object from cohortDefinitions array.
-  const combinedBookmarksAndCohortDefinitions: IFrontendBookmark[] = bookmarks.map(bookmark => {
-    if (bookmark.cohortDefinitionId) {
-      // If bookmark has cohortDefinitionId, find and remove corresponding cohort definition from cohortDefinitions array
-      const cohortDefinition = cohortDefinitions.find(
-        cohortDefinition => cohortDefinition.id === bookmark.cohortDefinitionId
-      )
-      cohortDefinitions = cohortDefinitions.filter(
-        cohortDefinition => cohortDefinition.id !== bookmark.cohortDefinitionId
-      )
-
-      // Remove cohortDefinitionId from bookmark as is not needed by frontend
-      delete bookmark.cohortDefinitionId
-
-      return {
-        bookmark,
-        cohortDefinition,
-      }
-    } else {
-      // If bookmark is not tagged to a cohortDefinitionId, return cohortDefinition as null
-      return {
-        bookmark,
-        cohortDefinition: null,
-      }
-    }
-  })
-
-  // For remaining cohort definitions that are created without a bookmark, map object to add a bookmark key with value as null
-  return [
-    ...combinedBookmarksAndCohortDefinitions,
-    ...cohortDefinitions.map(cohortDefinition => ({
-      bookmark: null,
-      cohortDefinition,
-    })),
-  ]
-}
