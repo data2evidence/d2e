@@ -1,14 +1,5 @@
 import * as logto from "./middleware/logto";
 import * as pg from "pg";
-import {
-  writeEnvFile,
-  removeEnvLine,
-  copyBackupFile,
-  restoreFile,
-  cleanupFile,
-} from "./utils/manipulateFile";
-import * as nodeutil from "node:util";
-const sleep = nodeutil.promisify(setTimeout);
 
 async function create(
   path: string,
@@ -475,32 +466,6 @@ async function main() {
     } \n User-Roles creation successful: ${
       createdUserRoles.length == userRoles.map((x) => x.roleIds).flat().length
     }`
-  );
-
-  // Inject Logto envs to .env.$ENV_TYPE
-  await (async () => {
-    const orignalEnvFileWithPath = `/run/envs/.env.${process.env.ENV_TYPE}`;
-    const backupFileWithPath = orignalEnvFileWithPath + ".tmp";
-    await copyBackupFile(orignalEnvFileWithPath, backupFileWithPath);
-    console.debug(`backup file path ${backupFileWithPath}`);
-    // Remove existing env & Write to env file
-    APP_ENVS.forEach(async (env) => {
-      const key = env.split("=")[0];
-      console.debug(`Removing key ${key}`);
-      await removeEnvLine(key, backupFileWithPath);
-    });
-    await sleep(3000);
-    await writeEnvFile("\n" + APP_ENVS.join("\n"), backupFileWithPath);
-    await restoreFile(backupFileWithPath, orignalEnvFileWithPath);
-    await cleanupFile(backupFileWithPath);
-  })();
-
-  console.log(
-    `\n********************** LOGTO ENV ASSIGNMENTS Generated IN .env.${process.env.ENV_TYPE} *************************`
-  );
-  console.log(APP_ENVS.join("\n"));
-  console.log(
-    `**********************************************************************************************`
   );
 }
 
