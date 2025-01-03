@@ -250,6 +250,7 @@ export async function _renameBookmark(
   paConfigId,
   cdmConfigId,
   cdmConfigVersion,
+  datasetId,
   token,
   callback: CallBackInterface
 ) {
@@ -264,6 +265,13 @@ export async function _renameBookmark(
     }
     const portalAPI = new PortalAPI(token)
     const result = await portalAPI.updateBookmark(updateBookmarkDto)
+
+    // Additionally update corresponding cohort definition name if bookmark has a cohortDefinitionId
+    const updatedBookmark = result.artifacts.bookmarks.find(bookmark => bookmark.id === bookmarkId)
+    if (updatedBookmark.cohortDefinitionId) {
+      const analyticsSvcAPI = new AnalyticsSvcAPI(token)
+      await analyticsSvcAPI.renameCohortDefinition(datasetId, updatedBookmark.cohortDefinitionId, newBookmarkName)
+    }
 
     callback(null, result)
   } catch (error) {
@@ -429,7 +437,16 @@ export async function queryBookmarks(
         _updateBookmark(bookmarkId, bookmark, paConfigId, cdmConfigId, cdmConfigVersion, shareBookmark, token, cb)
         break
       case 'rename':
-        _renameBookmark(bookmarkId, requestParameters.newName, paConfigId, cdmConfigId, cdmConfigVersion, token, cb)
+        _renameBookmark(
+          bookmarkId,
+          requestParameters.newName,
+          paConfigId,
+          cdmConfigId,
+          cdmConfigVersion,
+          datasetId,
+          token,
+          cb
+        )
         break
       case 'loadSingle':
         loadSingleBookmark(userName, bookmarkId, paConfigId, token, callback)
