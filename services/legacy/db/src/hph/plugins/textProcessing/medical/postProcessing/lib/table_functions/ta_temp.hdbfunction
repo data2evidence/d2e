@@ -1,9 +1,0 @@
-FUNCTION "hc.hph.plugins.textProcessing.medical.postProcessing.lib.table_functions::ta_temp" ()
-	RETURNS "hc.hph.plugins.textProcessing.medical.postProcessing::Types.TA_TEMP"
-	LANGUAGE SQLSCRIPT
-	SQL SECURITY INVOKER AS
-BEGIN
-
-RETURN SELECT * FROM "hc.hph.plugins.textProcessing.medical.postProcessing::Entities.TA_TEMP" ;
-
-END;

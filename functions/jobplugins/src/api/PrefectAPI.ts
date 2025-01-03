@@ -1,6 +1,6 @@
 import dayjs from "npm:dayjs";
 import { services } from "../env.ts";
-import { IFlowRunQueryDto, IPrefectFlowRunDto } from "../types.d.ts";
+import { IFlowRunQueryDto, IPrefectFlowRunDto } from "../types.ts";
 
 interface FlowRunParams {
   name: string;
@@ -329,5 +329,120 @@ export class PrefectAPI {
       // Only include body for non-GET requests
       body: method !== "GET" && data ? JSON.stringify(data) : undefined,
     };
+  }
+
+  async createInputAuthToken(flowrunId: string) {
+    const key = "authtoken"; // keyword "authtoken" must match the object name in Python flow
+    const options = this.createOptions("POST", {
+      key: key,
+      value: JSON.stringify({ token: this.token }), // 'value' must be a string always. Convert the json object to a string
+    });
+
+    const errorMessage =
+      "Error occurred while passing user token to the flow run";
+    const url = `${this.baseURL}/flow_runs/${flowrunId}/input`;
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(`${errorMessage}: ${response.statusText}`);
+    }
+  }
+
+  async deleteInputAuthToken(flowrunId: string) {
+    const errorMessage =
+      'Error occurred while deleting "authtoken" flowrun input';
+    const key = "authtoken"; // keyword "authtoken" must match the object name in Python flow
+    const options = this.createOptions("DELETE");
+    const url = `${this.baseURL}/flow_runs/${flowrunId}/input/${key}`;
+
+    const r = await fetch(url, options);
+    if (!r.ok) {
+      throw new Error(`${errorMessage}: ${r.statusText}`);
+    }
+  }
+
+  async getFlowRunLogs(id: string) {
+    const errorMessage = "Error while getting prefect flow run logs by id";
+    try {
+      const url = `${this.baseURL}/logs/filter`;
+
+      const data = {
+        offset: 0,
+        logs: {
+          flow_run_id: {
+            any_: [id],
+          },
+        },
+        sort: "TIMESTAMP_ASC",
+      };
+      const options = this.createOptions("POST", data);
+      const r = await fetch(url, options);
+      if (!r.ok) {
+        throw new Error(`${r.statusText}`);
+      }
+      console.log(`fetched prefect logs for flowrun: ${id}`);
+      return await r.json();
+    } catch (error) {
+      console.info(`${errorMessage}: ${error}`);
+      throw new Error(errorMessage);
+    }
+  }
+
+  async cancelFlowRun(id: string) {
+    const errorMessage = `Error while cancelling flow run with id: ${id}`;
+    try {
+      const url = `${this.baseURL}/flow_runs/${id}/set_state`;
+      const data = { state: { type: "CANCELLED" } };
+      const options = this.createOptions("POST", data);
+      const r = await fetch(url, options);
+      if (!r.ok) {
+        throw new Error(`${r.statusText}`);
+      }
+      console.log(`cancelled prefect flowrun: ${id}`);
+      return await r.json();
+    } catch (error) {
+      console.info(`${errorMessage}: ${error}`);
+      throw new Error(errorMessage);
+    }
+  }
+
+  async getFlowRunState(id: string) {
+    const errorMessage = "Error while getting prefect flow run states by id";
+    try {
+      const url = `${this.baseURL}/flow_runs/${id}`;
+      const options = this.createOptions("GET");
+      const r = await fetch(url, options);
+      if (!r.ok) {
+        throw new Error(`${r.statusText}`);
+      }
+      console.log(`fetched state of flowrun: ${id}`);
+      return await r.json();
+    } catch (error) {
+      console.info(`${errorMessage}: ${error}`);
+      throw new Error(errorMessage);
+    }
+  }
+
+  async getFlowRunsByParentFlowRunId(parentFlowRunId: string) {
+    const errorMessage = `Error while getting prefect flow run by parent flow run id: ${parentFlowRunId}`;
+    try {
+      const url = `${this.baseURL}/flow_runs/filter`;
+      const data: Record<string, string | object> = {
+        flow_runs: {
+          parent_flow_run_id: {
+            any_: [parentFlowRunId],
+          },
+        },
+      };
+      const options = await this.createOptions("POST", data);
+      const r = await fetch(url, options);
+      if (!r.ok) {
+        throw new Error(r.statusText);
+      }
+      return await r.json();
+    } catch (error) {
+      console.info(`${errorMessage}: ${error}`);
+      throw new Error(errorMessage);
+    }
   }
 }

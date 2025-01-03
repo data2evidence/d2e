@@ -69,6 +69,7 @@
         "npm:jsonwebtoken@^9.0.0",
         "npm:knex@^2.4.0",
         "npm:lodash@^4.17.21",
+        "npm:lodash-es@4.17.21",
         "npm:nodemon@^3.0.1",
         "npm:passport-azure-ad@^4.3.4",
         "npm:pg@^8.3.0",

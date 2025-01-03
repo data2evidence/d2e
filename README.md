@@ -56,22 +56,16 @@ yarn init:logto
 yarn build:minerva
 ```
 
-## Start UI
-
-- Start ui
-
-```bash
-yarn start:ui --wait
-```
-
-- ui & plugins image tags are calculated based on folder `../d2e-{ui|plugins}` If folder is not present then defaults to ui: develop, plugins: main
-
 ## (Re)Start App
 
 - Docker compose up - approx 5 minutes
-
 ```bash
-yarn start:minerva --wait; sleep 60
+yarn start:minerva; sleep 60
+```
+
+## View Logs
+```bash
+yarn logs:minerva
 ```
 
 ## Data Load
@@ -97,3 +91,7 @@ yarn stop:minerva
 ```bash
 yarn clean:minerva
 ```
+
+## Extra information
+### Setting resource limits
+- see: [Resource limits](docs/1-setup/resource-limits.md)

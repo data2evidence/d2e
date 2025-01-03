@@ -81,14 +81,13 @@ const initRoutes = async (app: express.Application) => {
     // Calls Alp-Portal for studies db metadata and cache it
     // Ignore Alp-Portal check for readiness probe check
     app.use(async (req: IMRIRequest, res, next) => {
-        //console.log("AAAAAA")
-        log.debug(
-            `🚀 ~ file: main.ts ~ line 107 ~ app.use ~ req.headers: ${JSON.stringify(
-                req.headers,
-                null,
-                2
-            )}`
-        );
+        // log.debug(
+        //     `🚀 ~ file: main.ts ~ line 107 ~ app.use ~ req.headers: ${JSON.stringify(
+        //         req.headers,
+        //         null,
+        //         2
+        //     )}`
+        // );
         const hasExpiredStudiesDbMetadataCache = (): boolean => {
             if (!studiesDbMetadata) {
                 return true;
@@ -151,11 +150,11 @@ const initRoutes = async (app: express.Application) => {
                 let userObj: User;
                 try {
                     userObj = getUser(req);
-                    log.debug(
-                        `req.headers: ${JSON.stringify(req.headers)}\n
-                            currentUser: ${JSON.stringify(userObj)}\n
-                            url is: ${req.url}`
-                    );
+                    // log.debug(
+                    //     `req.headers: ${JSON.stringify(req.headers)}\n
+                    //         currentUser: ${JSON.stringify(userObj)}\n
+                    //         url is: ${req.url}`
+                    // );
                 } catch (err) {
                     log.debug(`No user found in request:${err.stack}`);
                 }
@@ -180,7 +179,9 @@ const initRoutes = async (app: express.Application) => {
                     credentials = req.dbCredentials.studyAnalyticsCredential;
                 }
 
-                if (env.USE_CACHEDB === "true") {
+
+                // Even if USE_CACHEDB is true, For Hana dialect it will use the legacy / non-cachedb connection always. So that both duckdb and Hana datasets can functionally coexist
+                if (env.USE_CACHEDB === "true" && credentials.dialect != DB.HANA) {
                     req.dbConnections = await getCachedbDbConnections({
                         analyticsCredentials: credentials,
                         userObj: userObj,
@@ -674,6 +675,17 @@ const getDBConnections = async ({
             delete analyticsCredentials.ca;
             delete analyticsCredentials.pfx;
         }
+
+        if (analyticsCredentials.dialect === DB.HANA && env.USE_HANA_JWT_AUTHC === "true") {
+            delete analyticsCredentials.user
+            delete analyticsCredentials.password
+            if (userObj.thirdPartyToken) {
+                analyticsCredentials["token"] = userObj.thirdPartyToken;
+            } else {
+                throw new Error("Intermediary IDP token doesnt exist for HANA JWT Authentication!");
+            }
+        }
+
         analyticsConnectionPromise =
             dbConnectionUtil.DBConnectionUtil.getDBConnection({
                 credentials: analyticsCredentials,

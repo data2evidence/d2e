@@ -1,4 +1,0 @@
-PRIVILEGE_ID;TITLE;DESCRIPTION;LANGUAGE_ISO_CODE
-P1;Reader;Allows to read a collection and its items;en
-P2;Editor;Allows to read and write a collection and its items;en
-P3;Owner;Allows to read write and delete a collection and its items;en

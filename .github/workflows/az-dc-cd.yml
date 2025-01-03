@@ -1,4 +1,4 @@
-name: DockerCompose AzureTest CD
+name: DC Deploy AzureTest CD
 run-name: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
 
 on:
@@ -51,12 +51,7 @@ jobs:
       - name: Install 1Password CLI
         uses: 1Password/install-cli-action@v1.0.0
 
-      - name: Force cleanup containers
-        if: github.event.inputs.force-cleanup-containers
-        continue-on-error: true
-        run: docker rm -v -f $(docker ps -qa)
-
-      - name: 1password ratelimit start
+        - name: 1password ratelimit start
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         run: |
@@ -148,22 +143,21 @@ jobs:
 
       - name: docker compose up
         run: |
-          # Run ALP services
           yarn remote:minerva up --remove-orphans --force-recreate --wait
-          EXIT_CODE=$?
+          DC_EXIT_CODE=$?
+          echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
 
-          yarn base:minerva ps --format "{{.Names}} {{.Status}}" 2> /dev/null | grep ^alp | tee -a $GITHUB_STEP_SUMMARY
-          echo | tee -a $GITHUB_STEP_SUMMARY
+          DOCKER_STATUS_FILE=../docker-status-${GITHUB_RUN_ID:-ghRunId}-$(date '+%Y%m%dT%H%M%S').txt
+          docker ps --format {{.Names}},{{.Status}} 2> /dev/null | sort | tee $DOCKER_STATUS_FILE | tee -a $GITHUB_STEP_SUMMARY
 
-          if [ $EXIT_CODE != 0 ]; then
-            echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-            exit $EXIT_CODE
-          fi
+          DC_FAIL_COUNT=$( grep -icE "starting|unhealthy" $DOCKER_STATUS_FILE || true )
+          echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
+          [ $DC_FAIL_COUNT = 0 ] || { echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT; }
 
       - name: Logs minerva
         if: success() || failure()
         run: |
-          yarn logs:minerva:startup
+          yarn ci:logs:minerva
 
       - name: Post cleanup
         if: always()

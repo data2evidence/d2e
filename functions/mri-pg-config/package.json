@@ -10,7 +10,7 @@
     "add-seed": "DOTENV_PATH=../../.env TS_NODE_FILES=true TS_NODE_PROJECT=./tsconfig.json knex --knexfile ./src/db/knexfile-admin.ts seed:make",
     "migrate": "DOTENV_PATH=../../.env TS_NODE_FILES=true TS_NODE_PROJECT=./tsconfig.json knex --knexfile ./src/db/knexfile-admin.ts migrate:latest",
     "seed": "DOTENV_PATH=../../.env TS_NODE_FILES=true TS_NODE_PROJECT=./tsconfig.json knex --knexfile ./src/db/knexfile-admin.ts seed:run",
-    "migrate-one": "DOTENV_PATH=../../.env TS_NODE_FILES=true TS_NODE_PROJECT=./tsconfig.json knex --knexfile ./src/db/knexfile-admin.ts migrate:up", 
+    "migrate-one": "DOTENV_PATH=../../.env TS_NODE_FILES=true TS_NODE_PROJECT=./tsconfig.json knex --knexfile ./src/db/knexfile-admin.ts migrate:up",
     "rollback": "DOTENV_PATH=../../.env TS_NODE_FILES=true TS_NODE_PROJECT=./tsconfig.json knex --knexfile ./src/db/knexfile-admin.ts migrate:rollback",
     "knex": "knex"
   },
@@ -21,11 +21,11 @@
     "dotenv": "16.0.1"
   },
   "devDependencies": {
-    "ts-node": "^10.3.1",
+    "ts-node": "10.9.2",
     "@types/node": "^18",
     "prettier": "^2.4.1",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "4.4.4"
+    "typescript": "5.5.4"
   }
 }

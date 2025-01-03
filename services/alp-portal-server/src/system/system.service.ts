@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { IPortalPlugin } from '../types'
-import { env } from '../env'
 import { createLogger } from '../logger'
 
 @Injectable()
@@ -8,9 +7,9 @@ export class SystemService {
   private readonly logger = createLogger(this.constructor.name)
   private readonly systemAdminPlugins: IPortalPlugin[]
 
-  constructor() {
+  constructor(@Inject('PLUGINS_JSON_PROVIDER') pluginsJsonProvider) {
     try {
-      const plugins = JSON.parse(env.PORTAL_PLUGINS || '{}')
+      const plugins: any = JSON.parse(pluginsJsonProvider)
       this.systemAdminPlugins = plugins.systemadmin || []
       this.logger.debug(`Plugins: ${JSON.stringify(plugins)}`)
     } catch (err) {

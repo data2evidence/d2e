@@ -3,8 +3,6 @@
 set -o pipefail
 echo ${0} ...
 
-# [ -z "${GITHUB_JOB}" ] && echo FATAL GITHUB_JOB is not set # && exit 1
-# [ -z "${GITHUB_RUN_ID}" ] && echo FATAL GITHUB_RUN_ID is not set # && exit 1
 # export OP_FORMAT=json
 # export OP_FORMAT=human-readable
 
@@ -22,13 +20,14 @@ touch $STATS_YML
 op service-account ratelimit
 
 if [ ! -e ${START_YML} ]; then
+if [ ! -e ${START_YML} ]; then
 	echo . set $START_YML
 	op --format json service-account ratelimit | yq -P | tee $START_YML
 else
 	echo . set $END_YML
 	op --format json service-account ratelimit | yq -P | tee $END_YML
 	export START_YML END_YML
-	export WORKFLOW_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+	export WORKFLOW_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/${GITHUB_RUN_ID}
 	# yq '[.[] | with_entries(.key |= "start_" + .)]' $START_YML
 	yq -i '.account_reset_mins = (load(env(END_YML)).[2].reset / 60)' $STATS_YML
 	yq -i '.account_rw_delta = load(env(END_YML)).[2].used - load(env(START_YML)).[2].used' $STATS_YML

@@ -4,7 +4,7 @@ import { createLogger } from '../Logger'
 import { CONTAINER_KEY } from '../const'
 import https from 'https'
 import { env, services } from '../env'
-import { ITenant, ITenantFeature } from 'types'
+import { ITenant, ITenantFeature } from '../types'
 @Service()
 export class PortalAPI {
   private readonly baseURL: string

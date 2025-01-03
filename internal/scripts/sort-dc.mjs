@@ -13,8 +13,8 @@ $.verbose = false;
 
 const domain = "${TLS__INTERNAL__DOMAIN:-alp.local}";
 
-let git_base_dir = (await $`git rev-parse --show-toplevel`).stdout.trim()
-cd(git_base_dir)
+let git_base_dir = (await $`git rev-parse --show-toplevel`).stdout.trim();
+cd(git_base_dir);
 
 let dcFiles = await glob(["docker-compose*.yml"], { ignore: ["**/*private*"] });
 // dcFiles= ["docker-compose.yml"]
@@ -97,7 +97,6 @@ if (argv.update) {
 
     let svcDoc = srcDoc.get(SERVICES);
     // svcDoc.delete("alp-dataflow-gen.ports");
-    // svcDoc.delete("alp-minerva-meilisearch-svc.ports");
     // let i = 0
     for (let i = 0; i < svcDoc.items.length; i++) {
       if (argv.verbose)
@@ -185,7 +184,10 @@ if (argv.update) {
         // appDoc.delete("hostname");
         // appDoc.delete("domainname");
         // appDoc.set("hostname", String(container_name));
-        appDoc.set("hostname", String(container_name) + '.${TLS__INTERNAL__DOMAIN:-alp.local}');
+        appDoc.set(
+          "hostname",
+          String(container_name) + ".${TLS__INTERNAL__DOMAIN:-alp.local}"
+        );
         // appDoc.set("domainname", String(container_name) + '.${TLS__INTERNAL__DOMAIN:-alp.local}');
 
         container_name.anchor = `c${i}`;

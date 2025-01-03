@@ -6,6 +6,7 @@ echo . INFO generate docker resource limits based on available system resources
 
 # inputs
 D2E_RESOURCE_LIMIT=${D2E_RESOURCE_LIMIT:-0.7}
+D2E_MEM_TO_SWAP_LIMIT_RATIO=${D2E_MEM_TO_SWAP_LIMIT_RATIO:-4}
 ENV_TYPE=${ENV_TYPE:-local}
 
 echo . inputs: D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT ENV_TYPE=$ENV_TYPE
@@ -26,14 +27,15 @@ get_cpu_count() {
     else
         NPROCS="$(getconf _NPROCESSORS_ONLN)"  # glibc/coreutils fallback
     fi
-    D2E_CPU_LIMIT=$(echo "scale=2;$NPROCS*$D2E_RESOURCE_LIMIT" | bc)
+    # bc no longer installed on GHA Agent
+    D2E_CPU_LIMIT=$(awk -v x=$NPROCS -v y=$D2E_RESOURCE_LIMIT "BEGIN {print x*y}")
     # Strip decimal numbers
     D2E_CPU_LIMIT=${D2E_CPU_LIMIT%%.*}
 
     # remove existing env var from dotenv
-    sed -i.bak "/D2E_CPU_LIMIT=/d" $DOTENV_FILE_OUT
+    sed -i.bak "/D2E_CPU_LIMIT=/d" $DOTENV_FILE
     # set env var
-    echo D2E_CPU_LIMIT=\'"$D2E_CPU_LIMIT"\' | tee -a $DOTENV_FILE_OUT
+    echo D2E_CPU_LIMIT=$D2E_CPU_LIMIT >> $DOTENV_FILE
 }
 
 get_memory() {
@@ -43,17 +45,27 @@ get_memory() {
     else
         MEMORY=$(free -g | grep Mem: | awk '{print $2}')
     fi
-    D2E_MEMORY_LIMIT=$(echo "scale=2;$MEMORY*$D2E_RESOURCE_LIMIT" |bc)
+    # bc no longer installed on GHA Agent
+    D2E_MEMORY_LIMIT=$(awk -v x=$MEMORY -v y=$D2E_RESOURCE_LIMIT "BEGIN {print x*y}")
     # Strip decimal numbers
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT%%.*}
+
+    # Calculate D2E_SWAP_LIMIT
+    D2E_SWAP_LIMIT="$((D2E_MEMORY_LIMIT*D2E_MEM_TO_SWAP_LIMIT_RATIO))"
+
     # Add G suffix for gigabyte
     D2E_MEMORY_LIMIT=${D2E_MEMORY_LIMIT}G
+    echo D2E_MEMORY_LIMIT=$D2E_MEMORY_LIMIT
+    D2E_SWAP_LIMIT=${D2E_SWAP_LIMIT}G
+    echo D2E_SWAP_LIMIT=$D2E_SWAP_LIMIT
 
     # remove existing env var from dotenv
-    sed -i.bak "/D2E_MEMORY_LIMIT=/d" $DOTENV_FILE_OUT
-    # set env var
-    echo D2E_MEMORY_LIMIT=\'"$D2E_MEMORY_LIMIT"\' | tee -a $DOTENV_FILE_OUT
+    sed -i.bak "/D2E_MEMORY_LIMIT=/d" $DOTENV_FILE
+    sed -i.bak "/D2E_SWAP_LIMIT=/d" $DOTENV_FILE
 
+    # set env var
+    echo D2E_MEMORY_LIMIT=$D2E_MEMORY_LIMIT >> $DOTENV_FILE
+    echo D2E_SWAP_LIMIT=$D2E_SWAP_LIMIT >> $DOTENV_FILE
 }
 
 # action
