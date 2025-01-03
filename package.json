@@ -11,26 +11,20 @@
     "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml --file docker-compose-atlas.yml ",
     "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile perseus",
     "local:minerva": "ENV_TYPE=local GIT__COMMIT_ID__PLUGINS=${GIT__COMMIT_ID__PLUGINS:-main} yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local",
-    "local:minerva": "ENV_TYPE=local yarn base:minerva --file docker-compose-local.yml ${ADDITIONAL_DC_FILES} --env-file .env.local",
-
     "build:minerva": "yarn local:minerva build --build-arg GIT_COMMIT_ARG=$(git rev-parse HEAD)",
     "build:nest-dev:minerva": "ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn build:minerva alp-minerva-portal-server",
     "build:nest-prod:minerva": "yarn build:minerva alp-minerva-portal-server",
-
     "init:logto": "ENV_TYPE=${ENV_TYPE:-local} && yarn $ENV_TYPE:minerva up alp-minerva-postgres alp-logto --wait && sleep 10 && yarn $ENV_TYPE:minerva up alp-logto-post-init",
-
     "start:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes --wait",
     "start:minerva:perseus": "yarn local:minerva --profile perseus up --renew-anon-volumes --wait",
     "start:nest-dev:minerva": "yarn build:nest-dev:minerva && ADDITIONAL_DC_FILES='--file docker-compose-nest-dev-local.yml' yarn local:minerva up --renew-anon-volumes alp-minerva-portal-server --wait --force-recreate --no-deps",
     "start:nest-prod:minerva": "yarn build:nest-prod:minerva && yarn local:minerva up --renew-anon-volumes alp-minerva-portal-server --wait --force-recreate --no-deps",
-
     "stop:minerva": "yarn local:minerva stop",
     "clean:minerva": "yarn local:minerva down --volumes --remove-orphans",
     "config:minerva": "yarn local:minerva config",
     "ps:minerva": "yarn local:minerva ps",
     "ci:logs:minerva": "yarn base:minerva logs -t --until 1s",
     "logs:minerva": "yarn base:minerva logs -f -t",
-
     "build:minerva-test": "yarn local:minerva build",
     "start:minerva-test": "yarn local:minerva up",
     "create-postgres-cdm-schemas": "bash scripts/create-cdm-schema.sh",
