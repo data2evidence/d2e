@@ -164,7 +164,7 @@ jobs:
 
           DC_FAIL_COUNT=$(grep -icE "starting|unhealthy" $DOCKER_STATUS_FILE|| true)
           echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
-          [ $DC_FAIL_COUNT = 0 ] || { echo EXIT DC_FAIL_COUNT=$DC_FAIL_COUNT && exit $DC_FAIL_COUNT; }
+          [ $DC_EXIT_CODE = 0 ] || { echo EXIT DC_EXIT_CODE=$DC_EXIT_CODE && exit $DC_EXIT_CODE; }
 
       - name: Logs minerva
         if: success() || failure()
