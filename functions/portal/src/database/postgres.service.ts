@@ -80,10 +80,6 @@ export class PostgresService implements OnAppBootstrap, OnAppClose {
         await this.dataSource.initialize();
       }
       console.log('TypeORM DataSource initialized');
-
-      await this.client.queryObject(
-        `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
-      );
     } catch (error) {
       console.error('Database initialization error:', error);
       throw error;
