@@ -221,7 +221,34 @@ export class CohortEndpoint {
             return result;
         } catch (err) {
             logger.error(
-                `Failed to insert cohort definition with data: ${cohortDefinition}`
+                `Failed to update cohort definition with data: ${cohortDefinition}`
+            );
+            throw err;
+        }
+    }
+
+    // Rename cohort definition to db
+    public async renameCohortDefinitionToDb(
+        cohortDefinitionId: number,
+        name: string
+    ) {
+        let queryString = `
+        UPDATE $$SCHEMA$$.COHORT_DEFINITION SET (
+            COHORT_DEFINITION_NAME
+            )
+        = (%s)
+        WHERE COHORT_DEFINITION_ID = %s`;
+
+        try {
+            const query = QueryObject.format(
+                queryString,
+                name,
+                cohortDefinitionId
+            );
+            await query.executeQuery(this.connection);
+        } catch (err) {
+            logger.error(
+                `Failed to rename cohort definition with id: ${cohortDefinitionId}`
             );
             throw err;
         }

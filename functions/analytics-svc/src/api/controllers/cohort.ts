@@ -400,6 +400,27 @@ export async function createCohortDefinition(req: IMRIRequest, res: Response) {
     }
 }
 
+export async function renameCohortDefinition(req: IMRIRequest, res: Response) {
+    try {
+        const cohortDefinitionId = req.body.cohortDefinitionId
+        const name = req.body.name
+
+        const analyticsConnection = await getCohortAnalyticsConnection(req);
+
+        let cohortEndpoint = new CohortEndpoint(
+            analyticsConnection,
+            analyticsConnection.schemaName
+        );
+
+        await cohortEndpoint.renameCohortDefinitionToDb(cohortDefinitionId, name);
+
+        res.status(204).send();
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(MRIEndpointErrorHandler({ err, language }));
+    }
+}
+
 export async function deleteCohort(req: IMRIRequest, res: Response) {
     try {
         // Delete cohort from database
