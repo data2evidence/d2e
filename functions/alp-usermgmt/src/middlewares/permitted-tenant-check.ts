@@ -42,8 +42,8 @@ export const permittedTenantCheck =
       }
 
       const authorizedTenant = allTenantIds.includes(tenantId)
-      console.log(`authorizedTenant: ${authorizedTenant}`)
-      console.log(`tenantId: ${tenantId}`)
+      logger.info(`authorizedTenant: ${authorizedTenant}`)
+      logger.info(`tenantId: ${tenantId}`)
       if (!authorizedTenant) {
         logger.warn(`SECURITY INCIDENT: User (${ctxUserId}) does not belong to tenant (${tenantId})`)
         return res.status(403).send('You do not have enough privileges to manage this tenant')
