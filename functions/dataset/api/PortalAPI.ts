@@ -68,8 +68,7 @@ export class PortalAPI {
     options = {
       headers: {
         Authorization: this.token,
-      },
-      httpsAgent: this.httpsAgent,
+      }
     };
 
     return options;
