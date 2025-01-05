@@ -4,7 +4,7 @@ import { env } from "../env";
 export default class PortalServerAPI {
     private readonly baseUrl: string;
     private readonly oauthUrl: string;
-    private readonly httpsAgent: any;
+    // private readonly httpsAgent: any;
 
     constructor() {
         if (env.SERVICE_ROUTES.portalServer) {
@@ -21,7 +21,7 @@ export default class PortalServerAPI {
     }
 
     private async getRequestConfig(token: string) {
-        let options: AxiosRequestConfig = { httpsAgent: this.httpsAgent };
+        let options: AxiosRequestConfig = { };
         if (token) {
             options = {
                 ...options,
