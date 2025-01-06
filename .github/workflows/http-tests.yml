@@ -17,7 +17,7 @@ env:
 
 # Run only one job per branch
 concurrency:
-  group: ${{  github.head_ref || github.ref_name }}-http-tests # Run the latest push
+  group: ${{ github.head_ref || github.ref_name }}-http-tests # Run the latest push
   cancel-in-progress: true # Cancel in progress jobs of the workflow of the branch
 jobs:
   check_file_changes:
@@ -166,9 +166,6 @@ jobs:
           echo "LOGTO__ALP_DATA__CLIENT_SECRET='vgkToG2nuxzRDU7yMhAHiz5m1VZgLk'" >> .env.local
 
           yarn init:logto
-          yarn init:logto
-          # export LOGTO__ALP_APP__CLIENT_ID=$(cat .env.local | grep LOGTO__ALP_APP__CLIENT_ID | cut -d'=' -f2 | head -n 1)
-          # echo "LOGTO__ALP_APP__CLIENT_ID=$LOGTO__ALP_APP__CLIENT_ID" >> $GITHUB_ENV # Make available to subsequent github actions steps
 
       - name: Start system services
         run: |

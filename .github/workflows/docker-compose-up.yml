@@ -142,7 +142,7 @@ jobs:
           retry_on: any
           command: |
             # Run DataNode services without sql-editor
-            yarn local:minerva up --wait
+            yarn start:minerva
             DC_EXIT_CODE=$?
             DOCKER_STATUS_FILE=../docker-status-${GITHUB_RUN_ID:-ghRunId}-$(date '+%Y%m%dT%H%M%S').txt | tee -a $GITHUB_ENV
             docker ps --format {{.Names}},{{.Status}} 2> /dev/null | sort | tee $DOCKER_STATUS_FILE | tee -a $GITHUB_STEP_SUMMARY
