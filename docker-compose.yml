@@ -325,7 +325,10 @@ services:
             "PG_SCHEMA": "portal",
             "PG_HOST": "${PG_HOST:-alp-minerva-postgres-1}",
             "PG_PORT": "${PG_PORT:-5432}",
-            "PG_DATABASE": "${PG_DB_NAME:-alp}"
+            "PG_DATABASE": "${PG_DB_NAME:-alp}",
+            "APP__TENANT_ID": "${APP__TENANT_ID:-e0348e4d-2e17-43f2-a3c6-efd752d17c23}",
+            "APP__TENANT_NAME": "${APP__TENANT_NAME:-Tenant}",
+            "ALP__SYSTEM_NAME": "${ALP__SYSTEM_NAME:-Research System}"
           },
           "files-manager": {
             "PG_ADMIN_PASSWORD": "${PG_ADMIN_PASSWORD}",
