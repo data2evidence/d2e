@@ -549,9 +549,9 @@ async function seeding_apps() {
   for (const envapp of envApps) {
     await queryPostgres(
       client,
-      "INSERT INTO public.applications(tenant_id, id, name, secret, description, type, oidc_client_metadata) \
-      VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT(id) \
-      DO UPDATE SET secret = EXCLUDED.secret",
+      `INSERT INTO public.applications(tenant_id, id, name, secret, description, type, oidc_client_metadata) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT(id) 
+      DO NOTHING`,
       [
         "default",
         envapp.id,
