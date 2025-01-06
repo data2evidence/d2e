@@ -550,6 +550,9 @@ async function seeding_apps() {
   const client = await getDBClient();
   let envApps: Array<{ name: string, id: string, secret: string, tenant_id: string, type: string, description: string,  oidcClientMetadata?: string}> = JSON.parse(process.env.LOGTO__CLIENT_APPS) || [];
   for (const envapp of envApps) {
+    console.log(
+      `Seeding app ${envapp.name} | id ${envapp.id}`
+    );
     await queryPostgres(
       client,
       `INSERT INTO public.applications(tenant_id, id, name, secret, description, type, oidc_client_metadata) 
