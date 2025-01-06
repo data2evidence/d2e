@@ -544,6 +544,9 @@ async function seeding_alp_admin() {
 }
 
 async function seeding_apps() {
+  console.log(
+    "****************************SEEDING LOGTO APPS*****************************************************\n"
+  );
   const client = await getDBClient();
   let envApps: Array<{ name: string, id: string, secret: string, tenant_id: string, type: string, description: string,  oidcClientMetadata?: string}> = JSON.parse(process.env.LOGTO__CLIENT_APPS) || [];
   for (const envapp of envApps) {
