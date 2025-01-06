@@ -116,22 +116,6 @@
       ]
     },
     {
-      "name": "alp-portal-server",
-      "type": "node",
-      "request": "attach",
-      "restart": true,
-      "port": 9225,
-      "address": "0.0.0.0",
-      "localRoot": "${workspaceFolder}/services/alp-portal-server",
-      "remoteRoot": "/usr/src/app",
-      "protocol": "inspector",
-      "sourceMaps": true,
-      "resolveSourceMapLocations": [
-        "${workspaceFolder}/**",
-        "!**/node_modules/**"
-      ]
-    },
-    {
       "name": "alp-dataflow",
       "type": "node",
       "request": "attach",
