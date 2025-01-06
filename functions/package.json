@@ -46,6 +46,11 @@
           "function": "/alp-usermgmt/src/init",
           "imports": "/alp-usermgmt/import.json",
           "env": "alp-usermgmt"
+        },
+        {
+          "function": "/portal/src/init",
+          "imports": "/portal/import.json",
+          "env": "portal"
         }
       ],
       "api": [
