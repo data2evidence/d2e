@@ -1,18 +1,18 @@
 services:
   trex:
-    command: npm run startdev
+    command: npm run watch
     external_links:
       - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
     ports:
       - 9229:9229
     volumes:
       - ./functions:/usr/src/plugins/d2ef
-      # - ../trex/core:/usr/src/core # For debugging trex with local code
+      - ../trex/core:/usr/src/core # For debugging trex with local code
     environment:
       LOCAL_DEBUG: "true"
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
       PLUGINS_SEED: '["d2e-plugins", "d2e-ui"]'
-      PLUGINS_SEED_UPDATE: ${PLUGINS_SEED_UPDATE:-false}
+      PLUGINS_SEED_UPDATE: true
       PLUGINS_DEV_PATH: "./plugins"
       WATCH: |-
         {
