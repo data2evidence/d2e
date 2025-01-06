@@ -87,18 +87,6 @@ export class PortalAPI {
     }
   }
 
-  async getTenantFeatures(tenantIds: string[]): Promise<ITenantFeature[]> {
-    try {
-      const options = await this.getRequestConfig()
-      options.params = { tenantIds: tenantIds.join(',') }
-      const result = await axios.get(`${this.baseURL}/tenant/feature/list`, options)
-      return result.data
-    } catch (error) {
-      this.logger.error(`Error getting tenant features for ${tenantIds}`, error?.response?.data || error?.code)
-      throw new Error(`Error getting tenant features for ${tenantIds}`)
-    }
-  }
-
   async getPublicDatasets() {
     try {
       const options = await this.getRequestConfig()
