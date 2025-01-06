@@ -31,6 +31,7 @@ services:
           "alpdb": false,
           "concept-mapping": false,
           "terminology-svc": false,
+          "portal": false,
           "files-manager": false
         }
 
