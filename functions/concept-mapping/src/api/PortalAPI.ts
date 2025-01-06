@@ -16,9 +16,9 @@ export class PortalAPI {
     }
     if (env.SERVICE_ROUTES.portalServer) {
       this.baseURL = env.SERVICE_ROUTES.portalServer;
-      this.httpsAgent = new https.Agent({
-        rejectUnauthorized: true,
-      });
+      // this.httpsAgent = new https.Agent({
+      //   rejectUnauthorized: true,
+      // });
     } else {
       throw new Error("No url is set for PortalAPI");
     }
@@ -29,7 +29,6 @@ export class PortalAPI {
       headers: {
         Authorization: this.token,
       },
-      httpsAgent: this.httpsAgent,
     };
 
     return options;

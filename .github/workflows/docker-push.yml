@@ -94,10 +94,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: alp-data-node/alp-portal-server
-            directory: ./services/alp-portal-server
-            context: ./services/alp-portal-server
-            fileName: Dockerfile
           - name: alp-data-node/alp-dataflow-gen
             directory: ./services/alp-dataflow-gen
             context: .
