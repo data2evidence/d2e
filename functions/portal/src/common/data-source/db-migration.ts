@@ -6,9 +6,11 @@ export const runMigrations = async () => {
 
   try {
     logger.info('Running migrations...')
+    console.log(`Running migrations...`)
     await migrationDataSource.initialize()
     await migrationDataSource.runMigrations()
     logger.info('~~~ Migrations completed! ~~~')
+    console.log('~~~ Migrations completed! ~~~')
   } catch (err) {
     logger.error('Cannot start the app. Migrations has failed!', err)
     Deno.exit(0)
