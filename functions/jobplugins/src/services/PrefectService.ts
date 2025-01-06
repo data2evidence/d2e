@@ -47,8 +47,8 @@ export class PrefectService {
       revision.flow
     );
 
-    const prefectDeploymentName = env.PREFECT_DEPLOYMENT_NAME;
-    const prefectFlowName = env.PREFECT_FLOW_NAME;
+    const prefectDeploymentName = PrefectDeploymentName.ANALYSIS_DATA_FLOW;
+    const prefectFlowName = PrefectFlowName.ANALYSIS_DATA_FLOW;
     this.prefectApi = new PrefectAPI(token);
 
     const flowRunId = await this.prefectApi.createFlowRun(
