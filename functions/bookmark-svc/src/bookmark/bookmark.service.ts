@@ -208,13 +208,27 @@ export async function _insertBookmark(
  * @param {object}
  *            dbConnection DB connection to be used
  */
-export async function _deleteBookmark(bookmarkId, userId, token, callback: CallBackInterface) {
+export async function _deleteBookmark(bookmarkId, userId, datasetId, token, callback: CallBackInterface) {
   if (!bookmarkId || !userId || bookmarkId === '' || userId === '') {
     callback(null, null)
   }
   try {
     const portalAPI = new PortalAPI(token)
+    const bookmarkResult = await portalAPI.getBookmarkById(bookmarkId)
+    const currentBookmark = bookmarkResult[0]
+
+    if (!currentBookmark) {
+      throw `Unable to find bookmark with id:${bookmarkId}, aborting delete bookmark`
+    }
+
+    // If bookmark has a cohortDefinitionId, delete cohort before deleting bookmark
+    if (currentBookmark.cohortDefinitionId) {
+      const analyticsSvcAPI = new AnalyticsSvcAPI(token)
+      await analyticsSvcAPI.deleteCohort(datasetId, currentBookmark.cohortDefinitionId)
+    }
+
     const result = await portalAPI.deleteBookmark(bookmarkId)
+
     callback(null, result)
   } catch (error) {
     console.error(error)
@@ -316,7 +330,12 @@ export async function _updateBookmark( //TODO remove user input
 ) {
   try {
     const portalAPI = new PortalAPI(token)
-    const currentBookmark = await portalAPI.getBookmarkById(bookmarkId)
+    const bookmarkResult = await portalAPI.getBookmarkById(bookmarkId)
+    const currentBookmark = bookmarkResult[0]
+
+    if (!currentBookmark) {
+      throw `Unable to find bookmark with id:${bookmarkId}, aborting update bookmark`
+    }
 
     const updateBookmarkDto = {
       id: bookmarkId,
@@ -431,7 +450,7 @@ export async function queryBookmarks(
         )
         break
       case 'delete':
-        _deleteBookmark(bookmarkId, userName, token, cb)
+        _deleteBookmark(bookmarkId, userName, datasetId, token, cb)
         break
       case 'update':
         _updateBookmark(bookmarkId, bookmark, paConfigId, cdmConfigId, cdmConfigVersion, shareBookmark, token, cb)

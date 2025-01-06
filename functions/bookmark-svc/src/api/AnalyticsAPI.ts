@@ -65,6 +65,21 @@ export class AnalyticsSvcAPI {
     }
   }
 
+  async deleteCohort(datasetId: string, cohortDefinitionId: number) {
+    try {
+      const url = `${this.baseURL}/cohort`
+      console.log(`Calling ${url} to delete cohort`)
+      const options = this.getRequestConfig()
+      const params = new URLSearchParams()
+      params.append('datasetId', datasetId)
+      params.append('cohortId', cohortDefinitionId.toString())
+      await axios.delete(url, { ...options, params })
+    } catch (error) {
+      console.error(`Error while deleting cohort: ${error}`)
+      throw error
+    }
+  }
+
   private getRequestConfig() {
     let options: AxiosRequestConfig = {}
 
