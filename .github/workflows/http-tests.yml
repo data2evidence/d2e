@@ -157,7 +157,7 @@ jobs:
 
           # Inject Logto Apps envs
           echo "LOGTO__ALP_APP__CLIENT_ID='GlEUkUOlpdpKgl01BrEVR'" >> .env.local
-          echo "LOGTO__ALP_APP__CLIENT_ID='GlEUkUOlpdpKgl01BrEVR'" >> $GITHUB_ENV
+          echo "LOGTO__ALP_APP__CLIENT_ID=GlEUkUOlpdpKgl01BrEVR" >> $GITHUB_ENV # Intentional to not surround the value with single quotes
 
           echo "LOGTO__ALP_APP__CLIENT_SECRET='2X2hFU4BiW44odwB0OwjtJoQxtX7E5'" >> .env.local
           echo "LOGTO__ALP_SVC__CLIENT_ID='FcvGMfGsNm8QNdt9aCRuX'" >> .env.local
