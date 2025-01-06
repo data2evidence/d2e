@@ -1,7 +1,7 @@
 // @ts-types="npm:@types/express"
 import { Request } from "express";
 import axios, { AxiosRequestConfig } from "axios";
-import { Agent } from "https";
+// import { Agent } from "https";
 import { env } from "../env.ts";
 import { ConceptSet } from "../types.ts";
 
@@ -12,16 +12,16 @@ interface CreateConceptSetDto {
 export class SystemPortalAPI {
   private readonly token: string;
   private readonly url: string;
-  private readonly httpsAgent: Agent;
+  // private readonly httpsAgent: Agent;
 
   constructor(request: Request) {
     this.token = request.headers["authorization"]!;
     if (env.SERVICE_ROUTES.portalServer) {
       this.url = env.SERVICE_ROUTES.portalServer;
-      this.httpsAgent = new Agent({
-        rejectUnauthorized: true,
-        // ca: env.TLS__INTERNAL__CA_CRT,
-      });
+      // this.httpsAgent = new Agent({
+      //   rejectUnauthorized: true,
+      //   ca: env.TLS__INTERNAL__CA_CRT,
+      // });
     } else {
       throw new Error("No url is set for PortalAPI");
     }
@@ -148,7 +148,6 @@ export class SystemPortalAPI {
       headers: {
         Authorization: this.token,
       },
-      httpsAgent: this.httpsAgent,
       timeout: 20000,
     };
     return options;
