@@ -662,6 +662,10 @@ RequestBuilder.prototype.submit = function (hanaRequest, urlPath, parameters, cb
     kmRequest = parameters.isKMRequest
     delete parameters.isKMRequest
   }
+
+  // Append datasetId as query param for trex auth
+  parameters['datasetId'] = 'cd13fd3e-9f35-4812-b2a1-497b232a8771'
+
   var setQuery = {
     method: parameters[`httpMethod`],
     path: urlPath,

@@ -10,7 +10,7 @@ export class PortalAPI {
   private readonly baseURL: string
   private readonly token: string
   private readonly logger = console
-  private readonly httpsAgent: https.Agent
+  // private readonly httpsAgent: https.Agent
 
   constructor(token: string) {
     this.token = token
@@ -19,9 +19,9 @@ export class PortalAPI {
     }
     if (env.SERVICE_ROUTES.portalServer) {
       this.baseURL = env.SERVICE_ROUTES.portalServer
-      this.httpsAgent = new https.Agent({
-        rejectUnauthorized: true,
-      })
+      // this.httpsAgent = new https.Agent({
+      //   rejectUnauthorized: true,
+      // })
     } else {
       throw new Error('No url is set for PortalAPI')
     }
@@ -31,8 +31,7 @@ export class PortalAPI {
     let options: AxiosRequestConfig = {
       headers: {
         Authorization: this.token,
-      },
-      httpsAgent: this.httpsAgent,
+      }
     }
 
     return options

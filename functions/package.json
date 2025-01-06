@@ -71,11 +71,6 @@
           "env": "dataset"
         },
         {
-          "source": "/portalsvc",
-          "rmsrc": true,
-          "service": "portalServer"
-        },
-        {
           "source": "/analytics-svc/api/services/query",
           "function": "/query-gen-svc",
           "imports": "/query-gen-svc/import.json",
@@ -83,8 +78,9 @@
         },
         {
           "source": "/system-portal",
-          "rmsrc": true,
-          "service": "portalServer"
+          "function": "/portal",
+          "imports": "/portal/import.json",
+          "env": "portal"
         },
         {
           "source": "/dataflow-mgmt",
@@ -279,6 +275,7 @@
           "dbCredentials.db.delete",
           "dbCredentials.vocab.schema.list",
           "portal.dataset.systemAdmin.read",
+          "portal.dataset.read",
           "portal.dataset.exist",
           "portal.dataset.add",
           "portal.dataset.update",
@@ -303,6 +300,9 @@
           "portal.dataset.metadataConfig.attribute.delete",
           "portal.config.read",
           "portal.config.write",
+          "portal.userArtifact.read",
+          "portal.userArtifact.write",
+          "portal.userArtifact.delete",
           "portal.userArtifact.group.write",
           "portal.userArtifact.group.delete",
           "terminology.user.read",
@@ -403,6 +403,7 @@
           "CDWConfig.svc/read",
           "portal.dataset.paConfig.read",
           "portal.dataset.resource.read",
+          "portal.dataset.read",
           "portal.dataset.resource.download",
           "portal.notebook.read",
           "portal.notebook.add",
@@ -1207,6 +1208,20 @@
           ],
           "httpMethods": [
             "PUT"
+          ]
+        },
+        {
+          "path": "^/system-portal/user-artifact/(?!group(?:$|/))(.*)$",
+          "scopes": [
+            "portal.userArtifact.read",
+            "portal.userArtifact.write",
+            "portal.userArtifact.delete"
+          ],
+          "httpMethods": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE"
           ]
         },
         {
