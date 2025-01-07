@@ -1,5 +1,4 @@
 import { DataSource, DataSourceOptions } from "npm:typeorm";
-import * as pg from 'npm:pg';
 import { Config } from "../../config/entity/config.entity.ts";
 import { DatasetAttributeConfig } from "../../dataset/entity/dataset-attribute-config.entity.ts";
 import { DatasetAttribute } from "../../dataset/entity/dataset-attribute.entity.ts";
@@ -9,7 +8,6 @@ import { DatasetRelease } from "../../dataset/entity/dataset-release.entity.ts";
 import { DatasetTagConfig } from "../../dataset/entity/dataset-tag-config.entity.ts";
 import { DatasetTag } from "../../dataset/entity/dataset-tag.entity.ts";
 import { Dataset } from "../../dataset/entity/dataset.entity.ts";
-import { env } from "../../env.ts";
 import { Feature } from "../../feature/entity/feature.entity.ts";
 import { Notebook } from "../../notebook/entity/notebook.entity.ts";
 import { UserArtifactGroup } from "../../user-artifact/entity/user-artifact-group.entity.ts";
@@ -48,6 +46,7 @@ import { UpdateDatasetAddPlugin17211757718561 } from "./migrations/1721175771856
 import { UpdateDatasetSplitDatamodelColumn17211757718562 } from "./migrations/17211757718562-update-dataset-split-datamodel-column.ts";
 import { CreateUserArtifactTable1729863090719 } from "./migrations/1729863090719-create-user-artifact-table.ts";
 import { CreateUserArtifactGroupTable1730946830529 } from "./migrations/1730946830529-create-user-artifact-group-table.ts";
+import * as pg from 'npm:pg';
 
 // import { getSsl, getLogLevels } from './data-source'
 const _env = Deno.env.toObject();
@@ -56,9 +55,9 @@ const migrationDataSourceOptions: DataSourceOptions = {
   type: "postgres",
   host: _env.PG_HOST,
   port: parseInt(_env.PG_PORT),
-  username: _env.PG_USER,
-  password: _env.PG_PASSWORD,
-  database: _env.PG__DB_NAME,
+  username: _env.PG_MANAGE_USER,
+  password: _env.PG_MANAGE_PASSWORD,
+  database: _env.PG_DATABASE,
   schema: _env.PG_SCHEMA,
   poolSize: parseInt(_env.PG__MAX_POOL) || 10,
   entities: [
@@ -111,10 +110,10 @@ const migrationDataSourceOptions: DataSourceOptions = {
     UpdateDatasetSplitDatamodelColumn17211757718562,
     UpdateDatasetAddFhirProjectId17211757718560,
     UpdateDatasetAddPlugin17211757718561,
-  ]
-  // migrations: [join(baseDir, '**/common/data-source/migrations/*.{ts,js}')]
+  ],
+  // migrations: ['dist/**/common/data-source/migrations/*.{ts,js}']
 };
 
-console.log(_env.PG_HOST, _env.PG_PORT, _env.PG_USER, _env.PG_PASSWORD, _env.PG__DB_NAME, _env.PG_SCHEMA, _env.PG__MAX_POOL);
+console.log(_env.PG_HOST, _env.PG_PORT, _env.PG_MANAGE_PASSWORD, _env.PG_MANAGE_USER, _env.PG_DATABASE, _env.PG_SCHEMA, _env.PG__MAX_POOL);
 const migrationDataSource = new DataSource(migrationDataSourceOptions);
 export default migrationDataSource;
