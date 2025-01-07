@@ -54,204 +54,6 @@ x-envs:
     FHIR__CLIENT_SECRET: ${FHIR__CLIENT_SECRET}
   perseus: &x-perseus
     PERSEUS__FILES_MANAGER_HOST: trex
-  plugins: &x-plugins |
-    {
-      "researcher": [
-        {
-          "enabled": true,
-          "featureFlag": "conceptSets",
-          "name": "Concepts",
-          "pluginPath": "plugins/Researcher/ConceptSets/module",
-          "requiredRoles": [
-            "RESEARCHER"
-          ],
-          "route": "concepts"
-        },
-        {
-          "enabled": true,
-          "featureFlag": "cohort",
-          "name": "Cohorts",
-          "pluginPath": "plugins/mri/PatientAnalytics/module",
-          "requiredRoles": [
-            "RESEARCHER"
-          ],
-          "route": "cohort"
-        },
-        {
-          "enabled": false,
-          "featureFlag": "cohorts",
-          "name": "Cohorts M",
-          "pluginPath": "plugins/Cohort/module",
-          "requiredRoles": [
-            "RESEARCHER"
-          ],
-          "route": "cohorts"
-        },
-        {
-          "enabled": true,
-          "featureFlag": "starboard",
-          "name": "Notebooks",
-          "pluginPath": "plugins/Starboard/module",
-          "requiredRoles": [
-            "RESEARCHER"
-          ],
-          "route": "starboard",
-          "subMenus": "true"
-        },
-        {
-          "enabled": false,
-          "featureFlag": "analysisFlow",
-          "name": "Analysis",
-          "route": "analysis_parent",
-          "requiredRoles": [
-            "RESEARCHER"
-          ],
-          "children": [
-            {
-              "name": "Kaplan-Meier",
-              "route": "kaplan-meier",
-              "pluginPath": "plugins/Researcher/KaplanMeier/module",
-              "featureFlag": "kaplanMeier",
-              "requiredRoles": ["RESEARCHER"],
-              "enabled": true
-            },
-            {
-              "name": "Strategus",
-              "route": "analysis",
-              "data": {
-                "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
-              },
-              "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/analysis/module.js",
-              "featureFlag": "strategus",
-              "requiredRoles": ["RESEARCHER"],
-              "enabled": true
-            }
-          ]
-        }
-      ],
-      "setup": [
-        {
-          "description": "Database connection and credentials",
-          "enabled": true,
-          "name": "Databases",
-          "notes": "",
-          "pluginPath": "plugins/Setup/Db/module",
-          "route": "db"
-        },
-        {
-          "description": "Allow user to sign-in with Azure Active Directory",
-          "enabled": false,
-          "name": "Azure AD integration",
-          "notes": "Notes: Require manual update of the environment variable to switch the identity provider to Azure",
-          "pluginPath": "plugins/Setup/AzureAD/module",
-          "route": "azure-ad"
-        },
-        {
-          "description": "Enable / disable feature",
-          "enabled": true,
-          "name": "Feature flags",
-          "pluginPath": "plugins/Setup/Feature/module",
-          "route": "feature"
-        },
-        {
-          "description": "Configure dataset metadata and tags",
-          "enabled": true,
-          "name": "Metadata",
-          "notes": "",
-          "pluginPath": "plugins/Setup/Metadata/module",
-          "route": "metadata"
-        },
-        {
-          "description": "Configure patient analytics",
-          "enabled": true,
-          "name": "Patient Analytics Config",
-          "notes": "",
-          "pluginPath": "plugins/mri/PatientAnalyticsConfig/module",
-          "route": "pa-config"
-        },
-        {
-          "description": "Configure CDM",
-          "enabled": true,
-          "name": "CDM Config",
-          "notes": "",
-          "pluginPath": "plugins/mri/CDM/module",
-          "route": "cdm-config"
-        },
-        {
-          "description": "Configure patient summary",
-          "enabled": false,
-          "name": "Patient Summary Config",
-          "notes": "",
-          "pluginPath": "plugins/mri/PatientSummaryConfig/module",
-          "route": "ps-config"
-        },
-        {
-          "description": "Configure overview description text",
-          "enabled": true,
-          "name": "Overview description",
-          "notes": "",
-          "pluginPath": "plugins/Setup/OverviewDescription/module",
-          "route": "overview-description"
-        },
-        {
-          "description": "Upload / delete flows",
-          "enabled": true,
-          "name": "Plugins Table",
-          "notes": "",
-          "pluginPath": "plugins/Setup/PluginTable/module",
-          "route": "plugins-table"
-        }
-      ],
-      "systemadmin": [
-        {
-          "name": "Users",
-          "pluginPath": "plugins/SystemAdmin/UserOverview/module",
-          "route": "user-overview"
-        },
-        {
-          "name": "Datasets",
-          "pluginPath": "plugins/SystemAdmin/StudyOverview/module",
-          "route": "dataset-overview"
-        },
-        {
-          "name": "Jobs",
-          "pluginPath": "plugins/SystemAdmin/Jobs/module",
-          "route": "jobs"
-        },
-        {
-          "name": "ETL",
-          "route": "etl",
-          "children": [
-            {
-              "name": "Concept mapping",
-              "pluginPath": "plugins/SystemAdmin/ConceptMapping/module",
-              "route": "concept-mapping"
-            },
-            {
-          "data": {
-            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
-          },
-              "name": "Data mapping",
-          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/mapping/module.js",
-              "route": "data-mapping"
-        },
-        {
-          "data": {
-            "dnBaseUrl": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/"
-          },
-              "name": "Data transformation",
-          "pluginPath": "https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/flow/module.js",
-              "route": "dataflow"
-            }
-          ]
-        },
-        {
-          "name": "Setup",
-          "pluginPath": "plugins/Setup/module",
-          "route": "setup"
-        }
-      ]
-    }
   redis: &x-redis
     REDIS_HOST: ${REDIS_HOST:-alp-minerva-redis-1}
     REDIS_PORT: ${REDIS_PORT:-6379}
@@ -264,9 +66,9 @@ x-envs:
        "paConfig": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/pa-config-svc",
        "queryGen": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
+       "portalServer": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/system-portal",
        "dataflowMgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000",
        "dbCredentialsMgr": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/db-credentials",
-       "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
        "usermgmt": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/usermgmt/api",
        "terminology": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33000/terminology",
        "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
@@ -381,8 +183,8 @@ services:
               "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "dataflowMgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/dataflow-mgmt",
               "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
+              "portalServer": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/system-portal",
               "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
-              "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
               "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
               "terminology": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/terminology",
               "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
@@ -425,7 +227,7 @@ services:
             "PG__DB_CREDENTIALS_MGR__PASSWORD": "${PG_WRITE_PASSWORD}",
             "PG__DB_CREDENTIALS_MGR__SCHEMA": "db_credentials_mgr",
             "PG__DB_CREDENTIALS_MGR__USER": "${PG_WRITE_USER:-alp_pg_write_user}",
-            "DB_CREDENTIALS_MGR__VOCAB_SCHEMAS": { "postgres": ["cdmvocab"], "hana": ["CDMVOCAB"] },
+            "DB_CREDENTIALS_MGR__VOCAB_SCHEMAS": ${DB_CREDENTIALS_MGR__VOCAB_SCHEMAS:-{ "postgres": ["cdmvocab"], "hana": ["CDMVOCAB"] }},
             "DATABASE_CREDENTIALS": ${DATABASE_CREDENTIALS:-{}}
           },
           "alp-fhir-svc": {
@@ -515,6 +317,19 @@ services:
           },
           "alpdb": {},
           "concept-mapping": {},
+          "portal": {
+            "PG_MANAGE_USER": "${PG_WRITE_USER:-alp_pg_write_user}",
+            "PG_MANAGE_PASSWORD": "${PG_WRITE_PASSWORD}",
+            "PG_USER": "${PG_WRITE_USER:-alp_pg_write_user}",
+            "PG_PASSWORD": "${PG_WRITE_PASSWORD}",
+            "PG_SCHEMA": "portal",
+            "PG_HOST": "${PG_HOST:-alp-minerva-postgres-1}",
+            "PG_PORT": "${PG_PORT:-5432}",
+            "PG_DATABASE": "${PG_DB_NAME:-alp}",
+            "APP__TENANT_ID": "${APP__TENANT_ID:-e0348e4d-2e17-43f2-a3c6-efd752d17c23}",
+            "APP__TENANT_NAME": "${APP__TENANT_NAME:-Tenant}",
+            "ALP__SYSTEM_NAME": "${ALP__SYSTEM_NAME:-Research System}"
+          },
           "files-manager": {
             "PG_ADMIN_PASSWORD": "${PG_ADMIN_PASSWORD}",
             "PG_ADMIN_USER": "${PG_ADMIN_USER:-alp_pg_admin_user}",
@@ -532,7 +347,7 @@ services:
         "queryGen": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
         "dataflowMgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/dataflow-mgmt",
         "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
-        "portalServer": "http://alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}:33002",
+        "portalServer": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/system-portal",
         "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
         "terminology": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/terminology",
         "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
@@ -669,6 +484,8 @@ services:
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
+      INSTANCE_SPECIFIC_CONFIG: ${INSTANCE_SPECIFIC_CONFIG:-}
+      CADDY__ALP__ALIAS_PUBLIC_FQDN: ${CADDY__ALP__ALIAS_PUBLIC_FQDN:-}
 
   alp-dataflow-gen:
     command:
@@ -876,8 +693,6 @@ services:
     networks:
       alp:
         priority: 20
-    volumes:
-      - ./.env.${ENV_TYPE:-local}:/run/envs/.env.${ENV_TYPE:-local}:rw
     environment:
       ENV_TYPE: ${ENV_TYPE:-local}
       PG__DB_NAME: logto
@@ -885,7 +700,7 @@ services:
       PG__PASSWORD: ${PG_SUPER_PASSWORD}
       PG__PORT: ${PG_PORT:-5432}
       PG__USER: ${PG_SUPER_USER:-postgres}
-      LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine"},{"name":"alp-app","description":"alp-app","type":"Traditional","oidcClientMetadata":{"redirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
+      LOGTO__CLIENT_APPS: '[{"name":"alp-svc","description":"alp-svc","type":"MachineToMachine", "id": "${LOGTO__ALP_SVC__CLIENT_ID}", "secret": "${LOGTO__ALP_SVC__CLIENT_SECRET}"},{"name":"alp-data","description":"alp-data","type":"MachineToMachine", "id": "${LOGTO__ALP_DATA__CLIENT_ID}", "secret": "${LOGTO__ALP_DATA__CLIENT_SECRET}"},{"name":"alp-app","description":"alp-app","type":"Traditional", "id": "${LOGTO__ALP_APP__CLIENT_ID}", "secret": "${LOGTO__ALP_APP__CLIENT_SECRET}", "oidcClientMetadata":{"redirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal/login-callback","https://localhost:4000/portal/login-callback","https://localhost:8081"],"postLogoutRedirectUris":["https://${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}/portal","https://localhost:4000/portal","https://localhost:8081"]},"customClientMetadata":{"corsAllowedOrigins":[],"refreshTokenTtlInDays":14,"alwaysIssueRefreshToken":true,"rotateRefreshToken":true}}]'
       LOGTO__RESOURCE: '{"name":"alp-default","indicator":"https://alp-default","accessTokenTtl":3600}'
       LOGTO__USER: '{"username":"admin","initialPassword":"Updatepassword12345"}'
       LOGTO__ROLES: '[{"name":"role.systemadmin","description":"ALP System admin","type":"User"},{"name":"role.useradmin","description":"ALP User admin","type":"User"},{"name":"role.tenantviewer","description":"ALP Tenant viewer","type":"User"},{"name":"role.dashboardviewer","description":"ALP Dashboard viewer","type":"User"}]'
@@ -941,58 +756,6 @@ services:
       NODE_ENV: test
       PORT: 3001
       TRUST_PROXY_HEADER: true
-
-  alp-minerva-portal-server:
-    container_name: &c16 alp-minerva-portal-server-${BASE_PORT:-1}
-    init: true
-    depends_on:
-      trex:
-        condition: service_healthy
-      alp-minerva-pg-mgmt-init:
-        condition: service_completed_successfully
-      alp-minio-post-init:
-        condition: service_completed_successfully
-    healthcheck:
-      interval: 20s
-      retries: 30
-      start_period: 60s
-      test:
-        - CMD
-        - wget
-        - --no-check-certificate
-        - -O
-        - liveness
-        - http://localhost:33002/check-liveness
-      timeout: 30s
-    hostname: alp-minerva-portal-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-portal-server:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c16
-    networks:
-      alp:
-        priority: 20
-    platform: linux/amd64
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    environment:
-      <<:
-        - *x-minio
-        - *x-pg
-        - *x-tls
-        - *x-routes
-      ALP__SYSTEM_NAME: ${ALP__SYSTEM_NAME:-Research System}
-      APP__DEPLOY_MODE: standalone
-      APP__TENANT_ID: ${APP__TENANT_ID:-e0348e4d-2e17-43f2-a3c6-efd752d17c23}
-      APP__TENANT_NAME: ${APP__TENANT_NAME:-Tenant}
-      NODE_ENV: production
-      PG__PORTAL_SERVER__DB_NAME: ${PG_DB_NAME:-alp}
-      PG__PORTAL_SERVER__MANAGE_PASSWORD: ${PG_ADMIN_PASSWORD}
-      PG__PORTAL_SERVER__MANAGE_USER: ${PG_ADMIN_USER:-alp_pg_admin_user}
-      PG__PORTAL_SERVER__PASSWORD: ${PG_WRITE_PASSWORD}
-      PG__PORTAL_SERVER__SCHEMA: portal
-      PG__PORTAL_SERVER__USER: ${PG_WRITE_USER:-alp_pg_write_user}
-      PORTAL_SERVER__LOG_LEVEL: info
-      PORTAL_SERVER__PORT: 33002
 
   alp-minerva-postgres:
     container_name: &c17 alp-minerva-postgres-${BASE_PORT:-1}
