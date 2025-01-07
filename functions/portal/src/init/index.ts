@@ -3,7 +3,6 @@ import migrationDataSource from "../common/data-source/migration-data-source.ts"
 import { runMigrations } from "../common/data-source/db-migration.ts";
 import { createLogger } from "../logger.ts";
 // eslint-disable-next-line
-import { runSeeders } from "typeorm-extension";
 import * as pg from 'npm:pg';
 
 class Init {
