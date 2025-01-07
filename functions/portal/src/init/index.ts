@@ -1,5 +1,4 @@
 import dataSource from "../common/data-source/data-source.ts";
-import migrationDataSource from "../common/data-source/migration-data-source.ts";
 import { runMigrations } from "../common/data-source/db-migration.ts";
 import { createLogger } from "../logger.ts";
 // eslint-disable-next-line
@@ -13,7 +12,6 @@ class Init {
 
     try {
       await dataSource.initialize();
-      await migrationDataSource.initialize();
       this.logger.info("Datasource is initialised");
       await runMigrations();
       //TODO:  not working in deno

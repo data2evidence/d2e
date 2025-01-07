@@ -105,13 +105,12 @@ const migrationDataSourceOptions: DataSourceOptions = {
     UpdateDatasetAddTsvector1715738854019,
     CreateConfigTable1718982722183,
     UpdateDatasetDashboardNameUnique1719500584671,
-    CreateUserArtifactTable1729863090719,
-    CreateUserArtifactGroupTable1730946830529,
-    UpdateDatasetSplitDatamodelColumn17211757718562,
     UpdateDatasetAddFhirProjectId17211757718560,
     UpdateDatasetAddPlugin17211757718561,
-  ],
-  // migrations: ['dist/**/common/data-source/migrations/*.{ts,js}']
+    UpdateDatasetSplitDatamodelColumn17211757718562,
+    CreateUserArtifactTable1729863090719,
+    CreateUserArtifactGroupTable1730946830529,
+  ]
 };
 
 console.log(_env.PG_HOST, _env.PG_PORT, _env.PG_MANAGE_PASSWORD, _env.PG_MANAGE_USER, _env.PG_DATABASE, _env.PG_SCHEMA, _env.PG__MAX_POOL);
