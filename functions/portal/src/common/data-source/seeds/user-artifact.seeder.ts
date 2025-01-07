@@ -1,5 +1,5 @@
 import { DataSource } from "npm:typeorm";
-import { Seeder } from "typeorm-extension";
+import { Seeder } from "./seeder.ts";
 import { UserArtifact } from "../../../user-artifact/entity/index.ts";
 import { notebookContents } from "./notebooks/index.ts";
 

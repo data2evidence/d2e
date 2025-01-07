@@ -1,6 +1,5 @@
 import { DataSource, DataSourceOptions } from "npm:typeorm";
 import { SeederOptions } from "typeorm-extension";
-import { env } from "../../env.ts";
 import { Config } from '../../config/entity/config.entity.ts';
 import { DatasetAttributeConfig } from '../../dataset/entity/dataset-attribute-config.entity.ts';
 import { DatasetAttribute } from '../../dataset/entity/dataset-attribute.entity.ts';
@@ -14,6 +13,9 @@ import { Feature } from '../../feature/entity/feature.entity.ts';
 import { Notebook } from '../../notebook/entity/notebook.entity.ts';
 import { UserArtifactGroup } from '../../user-artifact/entity/user-artifact-group.entity.ts';
 import { UserArtifact } from '../../user-artifact/entity/user-artifact.entity.ts';
+import ConfigSeeder from './seeds/config.seeder.ts';
+import DatasetAttributeConfigSeeder from './seeds/dataset-attribute-config.seeder.ts';
+import UserArtifactSeeder from './seeds/user-artifact.seeder.ts';
 import * as pg from 'npm:pg';
 
 const _env = Deno.env.toObject();
@@ -27,7 +29,7 @@ export const dataSourceOptions: DataSourceOptions & SeederOptions = {
   schema: _env.PG_SCHEMA,
   poolSize: parseInt(_env.PG__MAX_POOL) || 10,
   entities: [Config, DatasetAttributeConfig, DatasetAttribute, DatasetDashboard, DatasetDetail, DatasetRelease, DatasetTagConfig, DatasetTag, Dataset, Feature, Notebook, UserArtifactGroup, UserArtifact],
-  seeds: ["dist/**/data-source/seeds/*.seeder.{ts,js}"],
+  seeds: [ConfigSeeder, DatasetAttributeConfigSeeder, UserArtifactSeeder]
 };
 
 const dataSource = new DataSource(dataSourceOptions);
