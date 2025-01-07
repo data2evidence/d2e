@@ -4,16 +4,16 @@ import { env } from "../env";
 export default class PortalServerAPI {
     private readonly baseUrl: string;
     private readonly oauthUrl: string;
-    private readonly httpsAgent: any;
+    // private readonly httpsAgent: any;
 
     constructor() {
         if (env.SERVICE_ROUTES.portalServer) {
             this.baseUrl = env.SERVICE_ROUTES.portalServer;
             this.oauthUrl = env.ALP_GATEWAY_OAUTH__URL;
-            this.httpsAgent = new https.Agent({
-                rejectUnauthorized: true,
-                ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
-            });
+            // this.httpsAgent = new https.Agent({
+            //     rejectUnauthorized: true,
+            //     ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
+            // });
         }
         if (!this.baseUrl) {
             throw new Error("Portal Server URL is not configured!");
@@ -21,7 +21,7 @@ export default class PortalServerAPI {
     }
 
     private async getRequestConfig(token: string) {
-        let options: AxiosRequestConfig = { httpsAgent: this.httpsAgent };
+        let options: AxiosRequestConfig = { };
         if (token) {
             options = {
                 ...options,
@@ -43,8 +43,7 @@ export default class PortalServerAPI {
         const options: AxiosRequestConfig = {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
-            },
-            httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+            }
         };
 
         const data = Object.keys(params)
