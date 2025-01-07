@@ -74,3 +74,4 @@ services:
     networks:
       alp:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
+    profiles: [fhir]
