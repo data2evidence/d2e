@@ -21,7 +21,8 @@ const minioClient = new Minio.Client({
 
 async function getStudyDetails(
     datasetId: string,
-    res
+    res,
+    accessToken: string
 ): Promise<{
     databaseCode: string;
     schemaName: string;
@@ -29,9 +30,8 @@ async function getStudyDetails(
 }> {
     try {
         const portalServerAPI = new PortalServerAPI();
-        const accessToken = await portalServerAPI.getClientCredentialsToken();
         const studies = await portalServerAPI.getStudies(accessToken);
-
+        
         // find the matching element and get the study schema name
         const studyMatch = studies.find((el) => el.id === datasetId);
         if (!studyMatch) {
@@ -71,8 +71,8 @@ export async function getKmData(req: IMRIRequest, res) {
             const result = await dataflowRequest(
                 req,
                 "GET",
-                `cohort-survival/results/${req.query.flowRunId}`,
-                {}
+                `jobplugins/cohort-survival/results/${req.query.flowRunId}`,
+                null
             );
             if (result.parameters.options.datasetId !== req.query.datasetId) {
                 throw new Error("Not authorized to view this flow run.");
@@ -144,11 +144,12 @@ export async function getKmData(req: IMRIRequest, res) {
 
 export async function analyzeCohortsKm(req: IMRIRequest, res) {
     const datasetId = req.query.datasetId as string;
-    const { schemaName, databaseCode } = await getStudyDetails(datasetId, res);
+    const accessToken = req.headers.authorization as string;
+    const { schemaName, databaseCode } = await getStudyDetails(datasetId, res, accessToken);
     const result = await dataflowRequest(
         req,
         "POST",
-        `cohort-survival/flow-run`,
+        `jobplugins/cohort-survival/flow-run`,
         {
             options: {
                 schemaName,
