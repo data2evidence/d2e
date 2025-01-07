@@ -48,7 +48,6 @@ import { CreateUserArtifactTable1729863090719 } from "./migrations/1729863090719
 import { CreateUserArtifactGroupTable1730946830529 } from "./migrations/1730946830529-create-user-artifact-group-table.ts";
 import * as pg from 'npm:pg';
 
-// import { getSsl, getLogLevels } from './data-source'
 const _env = Deno.env.toObject();
 
 const migrationDataSourceOptions: DataSourceOptions = {
@@ -105,14 +104,12 @@ const migrationDataSourceOptions: DataSourceOptions = {
     UpdateDatasetAddTsvector1715738854019,
     CreateConfigTable1718982722183,
     UpdateDatasetDashboardNameUnique1719500584671,
-    UpdateDatasetAddFhirProjectId17211757718560,
-    UpdateDatasetAddPlugin17211757718561,
-    UpdateDatasetSplitDatamodelColumn17211757718562,
     CreateUserArtifactTable1729863090719,
     CreateUserArtifactGroupTable1730946830529,
+    UpdateDatasetAddFhirProjectId17211757718560,
+    UpdateDatasetAddPlugin17211757718561,
+    UpdateDatasetSplitDatamodelColumn17211757718562
   ]
 };
-
-console.log(_env.PG_HOST, _env.PG_PORT, _env.PG_MANAGE_PASSWORD, _env.PG_MANAGE_USER, _env.PG_DATABASE, _env.PG_SCHEMA, _env.PG__MAX_POOL);
 const migrationDataSource = new DataSource(migrationDataSourceOptions);
 export default migrationDataSource;
