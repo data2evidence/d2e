@@ -1,3 +1,3 @@
-export interface UICodeSnippet {
+export interface IUICodeSnippet {
     code: string;
   }

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { env } from '../env';
 
-export class PortalAPI {
+export class AWSTokenAPI {
   private readonly tokenEndpoint: string;
   private readonly clientID: string;
   private readonly clientSecret: string;

@@ -1,12 +1,12 @@
 import axios,{ AxiosResponse } from "axios";
-import { PortalAPI } from "../api/AWSTokenAPI";
+import { AWSTokenAPI } from "../api/AWSTokenAPI";
 import { env } from '../env';
-import { UICodeSnippet } from "../type";
+import { IUICodeSnippet } from "../type";
 
 const lambdaApiEndpoint = env.LAMBDA_API_ENDPOINT;
-const accessToken = await new PortalAPI().getAccessToken();
+const accessToken = await new AWSTokenAPI().getAccessToken();
 
-export const getCodeSuggestion = async (uiCode: UICodeSnippet) => {
+export const getCodeSuggestion = async (uiCode: IUICodeSnippet) => {
   try {
       const headers = {
       'Content-Type': 'application/json',
