@@ -30,7 +30,7 @@ password_keys=($(cat $example_file | grep password$ | awk -F= '{print $1}')) # e
 password_name=${password_keys[1]}
 for password_name in ${password_keys[@]}; do
     length=$default_password_length
-    if [ $password_name = "LOGTO_API_M2M_CLIENT_ID" ]; then
+    if [[ $password_name =~ ^(LOGTO_API_M2M_CLIENT_ID|LOGTO__ALP_APP__CLIENT_ID|LOGTO__ALP_SVC__CLIENT_ID|LOGTO__ALP_DATA__CLIENT_ID)$ ]]; then
         length=21
     fi
     set-password $password_name $length
