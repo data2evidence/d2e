@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig } from "axios";
-import https from "https";
 import { env } from "../env";
 import { Logger } from "@alp/alp-base-utils";
 import CreateLogger = Logger.CreateLogger;
