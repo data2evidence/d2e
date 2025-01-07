@@ -16,6 +16,10 @@ export class FeatureService {
     {
       featureFlag: 'datasetSearch',
       enabled: false
+    },
+    {
+      featureFlag: 'fhirServer',
+      enabled: false
     }
   ]
 
