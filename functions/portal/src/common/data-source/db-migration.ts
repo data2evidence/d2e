@@ -7,15 +7,23 @@ export const runMigrations = async () => {
   try {
     logger.info('Running migrations...')
     console.log(`Running migrations...`)
-    await migrationDataSource.initialize()
-    await migrationDataSource.runMigrations()
+    await migrationDataSource.initialize().then(()=> {console.log(
+      "datasoure inited"
+    )} ).catch((err) => {
+      console.log("error in datasource", err)
+    })
+    // console.log("then start running migrations")
+    await migrationDataSource.runMigrations().then(() => {console.log("migration stated")}
+    ).catch((err) => {
+      console.log("error in migration", err)
+    })
     logger.info('~~~ Migrations completed! ~~~')
     console.log('~~~ Migrations completed! ~~~')
   } catch (err) {
     logger.error('Cannot start the app. Migrations has failed!', err)
     Deno.exit(0)
   }
-// }
+}
 // const _env = Deno.env.toObject();
 // export const runMigrations = async () => {
 //   const logger = createLogger('db-migration')
