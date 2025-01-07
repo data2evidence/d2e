@@ -1,5 +1,6 @@
-import { createLogger } from '../../logger.ts'
-import migrationDataSource from './migration-data-source.ts'
+import { createLogger } from '../../logger.ts';
+import migrationDataSource from './migration-data-source.ts';
+import * as pg from 'npm:pg';
 
 export const runMigrations = async () => {
   const logger = createLogger('db-migration')
@@ -13,6 +14,6 @@ export const runMigrations = async () => {
     console.log('~~~ Migrations completed! ~~~')
   } catch (err) {
     logger.error('Cannot start the app. Migrations has failed!', err)
-    Deno.exit(0)
+    Deno.exit(1)
   }
 }

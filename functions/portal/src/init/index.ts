@@ -1,28 +1,34 @@
-import { createLogger } from '../logger.ts'
-import dataSource from '../common/data-source/data-source.ts'
-import { runMigrations } from '../common/data-source/db-migration.ts'
+import dataSource from "../common/data-source/data-source.ts";
+import migrationDataSource from "../common/data-source/migration-data-source.ts";
+import { runMigrations } from "../common/data-source/db-migration.ts";
+import { createLogger } from "../logger.ts";
 // eslint-disable-next-line
-import * as pg from 'npm:pg'
+import { runSeeders } from "typeorm-extension";
+import * as pg from 'npm:pg';
 
 class Init {
-  private readonly logger = createLogger('portal-init')
+  private readonly logger = createLogger("portal-init");
 
   private async initialiseDataSource() {
-    this.logger.info('Initialising portal')
+    this.logger.info("Initialising portal");
 
     try {
-      await dataSource.initialize()
-      this.logger.info('Datasource is initialised')
-      await runMigrations()
+      await dataSource.initialize();
+      await migrationDataSource.initialize();
+      this.logger.info("Datasource is initialised");
+      await runMigrations();
+      //TODO:  not working in deno
+      // await runSeeders(dataSource);
     } catch (error) {
-      this.logger.error(`Error while initialising datasource: ${error}`)
-      Deno.exit(0)
+      this.logger.error(`Error while initialising datasource: ${error}`);
+      console.log(`Error while initialising datasource: ${error}`);
+      Deno.exit(1);
     }
   }
 
   async start() {
-    await this.initialiseDataSource()
+    await this.initialiseDataSource();
   }
 }
 
-new Init().start()
+new Init().start();
