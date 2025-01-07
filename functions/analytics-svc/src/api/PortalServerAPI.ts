@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig } from "axios";
-import https from "https";
 import { env } from "../env";
 export default class PortalServerAPI {
     private readonly baseUrl: string;
