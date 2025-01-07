@@ -32,9 +32,6 @@
     "ci:logs:minerva": "yarn base:minerva logs -t --until 1s",
     "logs:minerva": "yarn base:minerva logs -f -t",
 
-    "build:minerva-test": "yarn local:minerva build",
-    "start:minerva-test": "yarn local:minerva up",
-
     "create-postgres-cdm-schemas": "bash scripts/create-cdm-schema.sh",
     "build": "ts-node internal/build/buildservices.ts build",
     "tsc": "ts-node internal/build/buildservices.ts build --only-tsc",

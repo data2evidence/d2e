@@ -1,14 +1,5 @@
 import * as logto from "./middleware/logto";
 import * as pg from "pg";
-import {
-  writeEnvFile,
-  removeEnvLine,
-  copyBackupFile,
-  restoreFile,
-  cleanupFile,
-} from "./utils/manipulateFile";
-import * as nodeutil from "node:util";
-const sleep = nodeutil.promisify(setTimeout);
 
 async function create(
   path: string,
@@ -34,7 +25,7 @@ async function create(
       return -1;
     }
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }
 
@@ -62,7 +53,7 @@ async function update(
       return -1;
     }
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }
 
@@ -82,7 +73,7 @@ async function fetchExisting(path: string, headers: object, showLog = true) {
       return -1;
     }
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }
 
@@ -95,7 +86,7 @@ async function queryPostgres(
 }
 
 async function main() {
-  let apps: Array<{ name: string }> =
+  let apps: Array<{ name: string, id: string }> =
     JSON.parse(process.env.LOGTO__CLIENT_APPS) || [];
 
   let resource: { name: string } = JSON.parse(process.env.LOGTO__RESOURCE) || {
@@ -130,53 +121,14 @@ async function main() {
     headers
   );
   const APP_ENVS: string[] = [];
-  for (const a of apps) {
+  for (const app of apps) {
     const appExists = fetchExistingApps.find(
-      (existingApp: any) => existingApp.name === a.name
+      (existingApp: any) => existingApp.name === app.name
     );
-    const {
-      id: appID,
-      name: appName,
-      secret: appSecret,
-    } = appExists || (await create("applications", headers, a));
 
     if (appExists) {
-      await update(`applications/${appID}`, headers, a);
+      await update(`applications/${app.id}`, headers, app); //Update other attributes such as oidcClientMetadata and custom_client_metadata
     }
-
-    let ENV__CLIENT_ID, ENV__CLIENT_SECRET;
-
-    switch (appName) {
-      case "alp-app":
-        ENV__CLIENT_ID = "LOGTO__ALP_APP__CLIENT_ID";
-        ENV__CLIENT_SECRET = "LOGTO__ALP_APP__CLIENT_SECRET";
-        break;
-      case "alp-svc":
-        ENV__CLIENT_ID = "LOGTO__ALP_SVC__CLIENT_ID";
-        ENV__CLIENT_SECRET = "LOGTO__ALP_SVC__CLIENT_SECRET";
-        break;
-      case "alp-data":
-        ENV__CLIENT_ID = "LOGTO__ALP_DATA__CLIENT_ID";
-        ENV__CLIENT_SECRET = "LOGTO__ALP_DATA__CLIENT_SECRET";
-        break;
-      default:
-        throw new Error(
-          `Unrecoginized app name ${appName}!! Please reconfigure`
-        );
-    }
-
-    console.log(
-      `********************** COPY OVER ENV ASSIGNMENTS FOR ${appName} IN .env.local ***********************`
-    );
-    APP_ENVS.push(
-      `${ENV__CLIENT_ID}=${appID}`,
-      `${ENV__CLIENT_SECRET}=${appSecret}`
-    );
-    console.log(`${ENV__CLIENT_ID}=${appID}`);
-    console.log(`${ENV__CLIENT_SECRET}=${appSecret}`);
-    console.log(
-      `******************************************************************************************\n`
-    );
   }
 
   // Create Resource
@@ -477,31 +429,18 @@ async function main() {
     }`
   );
 
-  // Inject Logto envs to .env.$ENV_TYPE
-  await (async () => {
-    const orignalEnvFileWithPath = `/run/envs/.env.${process.env.ENV_TYPE}`;
-    const backupFileWithPath = orignalEnvFileWithPath + ".tmp";
-    await copyBackupFile(orignalEnvFileWithPath, backupFileWithPath);
-    console.debug(`backup file path ${backupFileWithPath}`);
-    // Remove existing env & Write to env file
-    APP_ENVS.forEach(async (env) => {
-      const key = env.split("=")[0];
-      console.debug(`Removing key ${key}`);
-      await removeEnvLine(key, backupFileWithPath);
-    });
-    await sleep(3000);
-    await writeEnvFile("\n" + APP_ENVS.join("\n"), backupFileWithPath);
-    await restoreFile(backupFileWithPath, orignalEnvFileWithPath);
-    await cleanupFile(backupFileWithPath);
-  })();
+}
 
-  console.log(
-    `\n********************** LOGTO ENV ASSIGNMENTS Generated IN .env.${process.env.ENV_TYPE} *************************`
-  );
-  console.log(APP_ENVS.join("\n"));
-  console.log(
-    `**********************************************************************************************`
-  );
+async function getDBClient() {
+  const client = new pg.Client({
+    user: process.env.PG__USER,
+    password: process.env.PG__PASSWORD,
+    host: process.env.PG__HOST,
+    port: parseInt(process.env.PG__PORT),
+    database: process.env.PG__DB_NAME,
+  });
+  await client.connect();
+  return client;
 }
 
 async function seeding_alp_admin() {
@@ -517,14 +456,7 @@ async function seeding_alp_admin() {
   } = logtoAdminApp.application;
   let alpAdminRole = logtoAdminApp.role;
 
-  let client = new pg.Client({
-    user: process.env.PG__USER,
-    password: process.env.PG__PASSWORD,
-    host: process.env.PG__HOST,
-    port: parseInt(process.env.PG__PORT),
-    database: process.env.PG__DB_NAME,
-  });
-  await client.connect();
+  const client = await getDBClient();
 
   let LOGTO__ADMIN_ROLE__ID = "jrmtgmb34iznwqdu5dhl1";
   let LOGTO__ADMIN_APP__ID = alpAdminApp.id;
@@ -611,5 +543,43 @@ async function seeding_alp_admin() {
   client.end();
 }
 
-seeding_alp_admin();
-main();
+async function seeding_apps() {
+  console.log(
+    "****************************SEEDING LOGTO APPS*****************************************************\n"
+  );
+  const client = await getDBClient();
+  let envApps: Array<{ name: string, id: string, secret: string, tenant_id: string, type: string, description: string,  oidcClientMetadata?: string}> = JSON.parse(process.env.LOGTO__CLIENT_APPS) || [];
+  for (const envapp of envApps) {
+    console.log(
+      `Seeding app ${envapp.name} | id ${envapp.id}`
+    );
+    await queryPostgres(
+      client,
+      `INSERT INTO public.applications(tenant_id, id, name, secret, description, type, oidc_client_metadata) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT(id) 
+      DO UPDATE SET secret = EXCLUDED.secret`,
+      [
+        "default",
+        envapp.id,
+        envapp.name,
+        envapp.secret,
+        envapp.description,
+        envapp.type,
+        envapp.oidcClientMetadata ?? '{  "redirectUris": [],  "postLogoutRedirectUris": [] }',
+      ]
+    );
+  }
+  client.end();
+}
+
+(async () => {
+try {
+    await seeding_alp_admin();
+    await seeding_apps();
+    await main();
+    process.exit(0)
+  } catch (e) {
+    console.error(e)
+    process.exit(1)
+  }
+})();
