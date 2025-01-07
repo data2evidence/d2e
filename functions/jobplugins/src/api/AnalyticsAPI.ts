@@ -49,6 +49,9 @@ export class AnalyticsSvcAPI {
         this.baseURL
       }/data-characterization/${databaseCode}/${vocabSchema}/${resultsSchema.toLowerCase()}/${sourceKey}?datasetId=${datasetId}`;
       const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(errorMessage);
+      }
       return await response.json();
     } catch (error) {
       console.error(`${errorMessage}: ${error}`);
