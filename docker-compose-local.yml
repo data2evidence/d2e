@@ -1,8 +1,6 @@
 services:
   trex:
-    command: npm run watch
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
+    command: npm run startdev
     ports:
       - 9229:9229
     volumes:
@@ -31,6 +29,7 @@ services:
           "alpdb": false,
           "concept-mapping": false,
           "terminology-svc": false,
+          "portal": false,
           "files-manager": false
         }
 
@@ -70,16 +69,6 @@ services:
       - ./services/alp-pg-management/app:/home/docker/app
     environment:
       LOCAL_DEBUG: "true"
-
-  alp-minerva-portal-server:
-    build:
-      context: ./services/alp-portal-server
-      dockerfile: Dockerfile
-    container_name: alp-minerva-portal-server-nest-prod-${BASE_PORT:-1}
-    environment:
-      MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
-      MINIO__SSL: false
-      NODE_ENV: development
 
   alp-minerva-postgres:
     ports:
