@@ -155,14 +155,6 @@ export class App {
 
       await this.dbDao.createDatabase(client, databaseName);
 
-      const pgUsers: pgUsers = this.getPGUsers(databaseName);
-
-      await this.userDao.grantCreatePrivilegesForDatabase(
-        client,
-        databaseName,
-        pgUsers.manager
-      );
-
       const pg_owneruserWithoutAtSuffix = this.getUserName(
         pg_owneruser_config.user
       );
@@ -288,6 +280,28 @@ export class App {
     }
   }
 
+  async grantCreatePrivilegesForDatabase(databaseName: string, user: string) {
+    let client;
+
+    try {
+      const pg_owneruser_config =
+        config.getProperties()["postgres_connection_config"];
+      const client = await this.dbDao.openConnection(pg_owneruser_config);
+
+      await this.userDao.grantCreatePrivilegesForDatabase(
+        client,
+        databaseName,
+        user
+      );
+      await this.dbDao.closeConnection(client);
+      return true;
+    } catch (e: any) {
+      this.logger.error(e.message);
+      await this.dbDao.closeConnection(client);
+      return false;
+    }
+  }
+
   async start() {
     const pg_management_config =
       config.getProperties()["postgres_manage_config"];
@@ -295,15 +309,17 @@ export class App {
     for (let database of Object.keys(databases)) {
       if (database.startsWith("+")) {
         //+ indicating creation scenarios
-        await this.createDatabase(this.getDatabaseName(database));
+        const databaseName = this.getDatabaseName(database);
+        await this.createDatabase(databaseName);
+        await this.grantCreatePrivilegesForDatabase(
+          databaseName,
+          this.getPGUsers(databaseName).manager
+        );
         const schemas = databases[database]["schemas"];
         for (let schema of Object.keys(schemas)) {
           if (schema.startsWith("+")) {
             //+ indicating creation scenarios
-            await this.createSchema(
-              this.getDatabaseName(database),
-              this.getSchemaName(schema)
-            );
+            await this.createSchema(databaseName, this.getSchemaName(schema));
           }
         }
       }
