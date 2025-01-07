@@ -18,4 +18,9 @@ export class DatasetDashboardRepository extends Repository<DatasetDashboard> {
   async deleteDashboard(trxMgr: EntityManager, criteria: { name: string; url: string; basePath: string }) {
     return await trxMgr.delete(DatasetDashboard, criteria)
   }
+
+  async updateDashboard(trxMgr: EntityManager, id: string, entity: Partial<DatasetDashboard>) {
+    await trxMgr.update(DatasetDashboard, id, entity)
+    return { id }
+  }
 }

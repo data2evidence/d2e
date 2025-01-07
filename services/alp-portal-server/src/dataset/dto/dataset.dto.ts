@@ -37,6 +37,10 @@ export class DatasetDetailDto implements IDatasetDetailBaseDto {
 }
 
 export class DatasetDashboardBaseDto implements IDatasetDashboardBaseDto {
+  @IsUUID()
+  @IsOptional()
+  id: string
+
   @IsString()
   @IsNotEmpty()
   name: string
