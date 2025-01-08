@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - develop
-      - trex
 
 env:
   GIT_CI_BRANCH_NAME: ${{ github.ref_name }}
@@ -46,7 +45,7 @@ jobs:
       - name: Publish
         working-directory: /usr/src/plugin/node_modules/@alp-os/d2e-functions
         run: |
-          if [[ $GIT_CI_BRANCH_NAME == 'trex' || $GIT_CI_BRANCH_NAME == 'develop' ]]; then 
+          if [[ $GIT_CI_BRANCH_NAME == 'develop' ]]; then 
             npm publish
           else 
             npm publish --dry-run
@@ -54,9 +53,26 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/delete-package-versions@v5
-        if: github.ref_name == 'trex' || github.ref_name == 'develop'
+        if: github.ref_name == 'develop'
         with:
           package-name: "d2e-functions"
           package-type: "npm"
           min-versions-to-keep: 3
           delete-only-pre-release-versions: "true"
+      - name: Pack
+        working-directory: /usr/src/plugin/node_modules/@alp-os/d2e-functions
+        run: |
+          if [[ $GIT_CI_BRANCH_NAME == 'develop' ]]; then
+            npm pack
+          fi
+      - name: Push
+        uses: svenstaro/upload-release-action@v2
+        if: ${{ env.GIT_CI_BRANCH_NAME == 'develop' }}
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: /usr/src/plugin/node_modules/@alp-os/d2e-functions/alp-os-d2e-functions-0.0.99.tgz
+          tag: latest
+          target_commit: develop
+          prerelease: true
+          overwrite: true
+          asset_name: d2e-functions.tgz

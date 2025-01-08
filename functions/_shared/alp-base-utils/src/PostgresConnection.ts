@@ -98,7 +98,7 @@ export class PostgresConnection implements ConnectionInterface {
       //   `parameters: ${JSON.stringify(flattenParameter(parameters))}`,
       // );
       let temp = sql;
-      temp = this.parseSql(temp);
+      temp = this.parseSql(temp, parameters);
       this.conn.connect((err, client, release) => {
         if (err) {
           logger.error(err);
@@ -120,19 +120,19 @@ export class PostgresConnection implements ConnectionInterface {
     }
   }
 
-  public parseSql(temp: string): string {
+  public parseSql(temp: string, parameters?: ParameterInterface[]): string {
     switch (this.dialect) {
       case "postgresql":
         return translateHanaToPostgres(temp, this.schemaName, this.vocabSchemaName);
       case "duckdb":
-        return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName);
+        return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName, parameters);
       default:
         throw new Error("Invalid Dialect")
     }
   }
 
   public getTranslatedSql(sql: string, schemaName: string, parameters: ParameterInterface[]): string {
-    return this.parseSql(sql);
+    return this.parseSql(sql, parameters);
   }
 
   public executeQuery(
@@ -167,7 +167,7 @@ export class PostgresConnection implements ConnectionInterface {
   ) {
     try {
       sql = this.getSqlStatementWithSchemaName(schemaName, sql);
-      sql = this.parseSql(sql);
+      sql = this.parseSql(sql, parameters);
 
       this.conn.connect((err, client, release) => {
         if (err) {
@@ -224,7 +224,7 @@ export class PostgresConnection implements ConnectionInterface {
       const sql = `select count(*) from \"${procedure}\"(${params.join()})`;
       //logger.debug(`Sql: ${sql}`);
       let temp = sql;
-      temp = this.parseSql(temp);
+      temp = this.parseSql(temp, parameters);
       this.conn.query(temp, parameters, (err, result) => {
         if (err) {
           return callback(new DBError(logger.error(err), err.stack), null);

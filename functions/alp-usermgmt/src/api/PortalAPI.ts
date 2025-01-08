@@ -8,23 +8,24 @@ import { ITenant, ITenantFeature } from '../types'
 @Service()
 export class PortalAPI {
   private readonly baseURL: string
-  private readonly httpsAgent: any
+  // disable as https is not working for trex internal yet
+  // private readonly httpsAgent: any
   private readonly logger = createLogger(this.constructor.name)
 
   constructor() {
     if (services.portalServer) {
       this.baseURL = services.portalServer
-      this.httpsAgent = new https.Agent({
-        rejectUnauthorized: false,
-        ca: env.SSL_CA_CERT
-      })
+      // this.httpsAgent = new https.Agent({
+      //   rejectUnauthorized: false,
+      //   ca: env.SSL_CA_CERT
+      // })
     } else {
       throw new Error('No url is set for PortalAPI')
     }
   }
 
   private async getRequestConfig() {
-    let options: AxiosRequestConfig = { httpsAgent: this.httpsAgent }
+    let options: AxiosRequestConfig = {}
 
     const authHeader = Container.get<string>(CONTAINER_KEY.AUTHORIZATION_HEADER)
     if (authHeader) {
@@ -83,18 +84,6 @@ export class PortalAPI {
       this.logger.error('Error getting tenants', error?.response?.data || error?.code)
       throw new Error('Error getting tenants')
       //return [{ id: "e0348e4d-2e17-43f2-a3c6-efd752d17c23", name: "Tenant" }]
-    }
-  }
-
-  async getTenantFeatures(tenantIds: string[]): Promise<ITenantFeature[]> {
-    try {
-      const options = await this.getRequestConfig()
-      options.params = { tenantIds: tenantIds.join(',') }
-      const result = await axios.get(`${this.baseURL}/tenant/feature/list`, options)
-      return result.data
-    } catch (error) {
-      this.logger.error(`Error getting tenant features for ${tenantIds}`, error?.response?.data || error?.code)
-      throw new Error(`Error getting tenant features for ${tenantIds}`)
     }
   }
 
