@@ -19,6 +19,7 @@ import { dataflowRequest } from "../../utils/DataflowMgmtProxy";
 import { getDuckdbDirectPostgresWriteConnection } from "../../utils/DuckdbConnection";
 import { getCachedbDbConnections } from "../../utils/cachedb/cachedb";
 import { env } from "../../env";
+
 const language = "en";
 
 const mriConfigConnection = new MriConfigConnection(
@@ -167,6 +168,8 @@ export async function getFilteredCohorts(req: IMRIRequest, res: Response) {
 export async function createCohort(req: IMRIRequest, res: Response) {
     try {
         const datasetId = req.body.datasetId;
+        const token = req.headers.authorization;
+        const { bookmarkId } = JSON.parse(req.body.syntax);
         const analyticsConnection = await getCohortAnalyticsConnection(req);
         const { schemaName, databaseCode, vocabSchemaName } =
             await getStudyDetails(datasetId, res);
@@ -174,6 +177,20 @@ export async function createCohort(req: IMRIRequest, res: Response) {
         const requestQuery: string[] | undefined = req.body?.query?.split(",");
         // Remap mriquery for use in createEndpointFromRequest
         const { cohortDefinition } = await createEndpointFromRequest(req);
+
+        const portalServerAPI = new PortalServerAPI();
+        // Get bookmark
+        const bookmarks = await portalServerAPI.getBookmarkById(
+            token,
+            bookmarkId
+        );
+        if (bookmarks.length === 0) {
+            throw `No bookmarks found with bookmark_id: ${bookmarkId}`;
+        }
+        // Assuming all bookmarks with the same bookmark_id are the same
+        const bookmark = bookmarks[0];
+        const bookmarkCohortDefinitionId: number | undefined =
+            bookmark.cohortDefinitionId;
 
         if (env.USE_EXTENSION_FOR_COHORT_CREATION === "true") {
             const mriConfig = await mriConfigConnection.getStudyConfig(
@@ -204,15 +221,14 @@ export async function createCohort(req: IMRIRequest, res: Response) {
                 datasetId
             );
             const now = +new Date();
-            const { bookmarkId } = JSON.parse(req.body.syntax);
             await dataflowRequest(req, "POST", `cohort/flow-run`, {
                 options: {
                     owner: req.body.owner,
-                    token: req.headers.authorization,
+                    token,
                     datasetId,
                     cohortJson: {
                         id: 1, // Not used by us
-                        name: req.body.name,
+                        name: bookmark.bookmark_name,
                         tags: [],
                         expression: {
                             datasetId, // required for cohort filtering
@@ -255,25 +271,47 @@ export async function createCohort(req: IMRIRequest, res: Response) {
             querySvcParams,
             "cohort"
         );
-        const cohort = await getCohortFromMriQuery(req);
+        const cohort = await getCohortFromMriQuery(req, bookmark.bookmark_name);
         const cohortEndpoint = new CohortEndpoint(
             analyticsConnection,
             analyticsConnection.schemaName
         );
-        let cohortDefinitionResult =
+
+        if (bookmarkCohortDefinitionId) {
+            // If bookmark already has a cohort definition id
+            // Update cohort definition with cohort definition id and remove all existing records from cohort table before saving cohort to db
+            cohort.id = bookmarkCohortDefinitionId;
+            await cohortEndpoint.updateCohortDefinitionToDb(cohort);
+
+            // Remove existing records from cohort table before saving cohort to db
+            await cohortEndpoint.deleteCohortFromDb(cohort.id);
+            await cohortEndpoint.saveCohortToDb(
+                cohort.id,
+                cohort,
+                queryResponse.queryObject
+            );
+        } else {
+            // Else if bookmark does not already have a cohort definition id
+            // Save cohort definition to db and query cohort definition id for newly created cohort definition
+            // Save cohort to db
+            // Then update bookmark with newly created cohort definition id.
             await cohortEndpoint.saveCohortDefinitionToDb(cohort);
-        let cohortRowCount = await cohortEndpoint.saveCohortToDb(
-            cohort,
-            queryResponse.queryObject
-        );
-        res.status(200).send(
-            `Inserted ${JSON.stringify(
-                cohortDefinitionResult.data
-            )} rows to COHORT_DEFINITION and ${JSON.stringify(
-                cohortRowCount.data
-            )} rows to COHORT
-            `
-        );
+
+            // Get cohort definition id from cohort object
+            const cohortDefinitionId =
+                await cohortEndpoint.queryCohortDefinitionId(cohort);
+            await cohortEndpoint.saveCohortToDb(
+                cohortDefinitionId,
+                cohort,
+                queryResponse.queryObject
+            );
+            bookmark.cohortDefinitionId = cohortDefinitionId;
+
+            // Update bookmark with new cohort definition id
+            await portalServerAPI.updateBookmark(token, bookmark);
+        }
+
+        res.status(200).send(`Cohort successfully materialized`);
     } catch (err) {
         logger.error(err);
         res.status(500).send(MRIEndpointErrorHandler({ err, language }));
@@ -362,6 +400,27 @@ export async function createCohortDefinition(req: IMRIRequest, res: Response) {
     }
 }
 
+export async function renameCohortDefinition(req: IMRIRequest, res: Response) {
+    try {
+        const cohortDefinitionId = req.body.cohortDefinitionId
+        const name = req.body.name
+
+        const analyticsConnection = await getCohortAnalyticsConnection(req);
+
+        let cohortEndpoint = new CohortEndpoint(
+            analyticsConnection,
+            analyticsConnection.schemaName
+        );
+
+        await cohortEndpoint.renameCohortDefinitionToDb(cohortDefinitionId, name);
+
+        res.status(204).send();
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(MRIEndpointErrorHandler({ err, language }));
+    }
+}
+
 export async function deleteCohort(req: IMRIRequest, res: Response) {
     try {
         // Delete cohort from database
@@ -389,20 +448,22 @@ export async function deleteCohort(req: IMRIRequest, res: Response) {
 }
 
 // Form and return cohort object
-async function getCohortFromMriQuery(req: IMRIRequest): Promise<CohortType> {
+async function getCohortFromMriQuery(
+    req: IMRIRequest,
+    cohortName: string
+): Promise<CohortType> {
     try {
-        const patientIds = []
+        const patientIds = [];
 
         // Create cohort object
         let cohort = <CohortType>{
             patientIds,
-            name: req.body.name,
+            name: cohortName,
             description: req.body.description,
             creationTimestamp: new Date(),
             modificationTimestamp: null,
             owner: req.body.owner,
-            definitionTypeConceptId:
-            req.body.definitionTypeConceptId,
+            definitionTypeConceptId: req.body.definitionTypeConceptId,
             subjectConceptId: req.body.subjectConceptId,
             syntax: req.body.syntax,
         };
