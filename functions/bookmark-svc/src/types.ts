@@ -125,3 +125,38 @@ export interface BookmarkDto {
   user_id: string
   shared: boolean
 }
+
+export interface IcohortDefinition {
+  id: number
+  patientIds: number[]
+  name: string
+  description: string
+  creationTimestamp: string
+  modificationTimestamp: string
+  owner: string
+  syntax: string
+}
+
+export interface IFormattedBookmark {
+  bmkId: string
+  bookmarkname: string
+  bookmark: string
+  viewname: string | null
+  modified: string
+  version: string | null
+  user_id: string
+  shared: boolean
+  cohortDefinitionId?: number | undefined
+}
+export interface IFormattedcohortDefinition {
+  id: number
+  patientCount: number
+  cohortDefinitionName: string
+  createdOn: string
+}
+
+export interface IFrontendBookmark {
+  schemaName: string
+  bookmarks: IFormattedBookmark[]
+  cohortDefinitions: IFormattedcohortDefinition[]
+}

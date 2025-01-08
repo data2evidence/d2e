@@ -574,7 +574,6 @@ paths:
             required:
               - datasetId
               - mriquery
-              - name
               - description
               - owner
             properties:
@@ -584,9 +583,6 @@ paths:
               mriquery:
                 type: string
                 description: Filtercard information in bookmark form. This is a binary string encoded in base64
-              name:
-                type: string
-                description: Cohort Name
               description:
                 type: string
                 description: Cohort Description
@@ -688,7 +684,6 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: 
         - in: body
           name: cohortDefinition
           schema:
@@ -720,6 +715,41 @@ paths:
               syntax: 
                 type: string
                 description: Cohort Definition Syntax
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      description: Renames a cohort definition
+      operationId: renameCohortDefinition
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: cohortDefinition
+          schema:
+            type: object
+            required:
+              - datasetId
+              - cohortDefinitionId
+              - name
+            properties:
+              datasetId:
+                type: string
+                description: Id of dataset
+              cohortDefinitionId:
+                type: number
+                description: Cohort Definition Id
+              name:
+                type: string
+                description: Cohort Name
       responses:
         "200":
           description: Success
