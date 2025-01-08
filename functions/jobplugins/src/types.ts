@@ -153,7 +153,7 @@ export interface PluginFlow {
 
 export interface ICreateDatamodelFlowRunDto {
   flowRunName: string;
-  options: object;
+  options: ICreateDatamodelFlowRunOptions;
 }
 
 export interface ICreateDatamartFlowRunDto {
@@ -302,6 +302,18 @@ interface IReactFlowNode {
   width: number;
   height: number;
   parentNode?: string;
+}
+
+interface ICreateDatamodelFlowRunOptions {
+  options: {
+    flow_action_type: string;
+    database_code: string;
+    data_model: string;
+    schema_name: string;
+    cleansed_schema_option: string;
+    vocab_schema: string;
+    plugin: string;
+  }
 }
 
 export interface ICreateCachedbFileFlowRunDto {
