@@ -20,13 +20,11 @@ git clone --branch develop https://github.com/alp-os/d2e.git
 yarn gen:dotenv
 ```
    - Refer [here](./1-setup/environment-variables.md) for more information on the environment variables generated.
-- Replace credentials and append the following variables below:
+- Replace `DOCKER_REGISTRY_USERNAME` and `DOCKER_REGISTRY_PASSWORD` variables with the provided credentials from D2E support in `.env.local` file
+- Replace `GH_TOKEN` credentials and append the following variables below:
 ```bash
-echo GH_TOKEN='GH_TOKEN>' >> .env.local
-echo DOCKER_REGISTRY_PASSWORD='DOCKER_REGISTRY_PASSWORD>' >> .env.local
-echo DOCKER_REGISTRY_USERNAME='DOCKER_REGISTRY_USERNAME>' >> .env.local
+echo GH_TOKEN=<GH_TOKEN> >> .env.local
 ```
-
 
 - Initialize Authentication Applications: 
 ```bash
@@ -52,9 +50,9 @@ yarn start:minerva; sleep 60
 yarn logs:minerva
 ```
 
-> **Note:**
-> - If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run the **Environment Variables and Credentials Setup** section
-> - If you have setup the application before, run steps in section **Application Setup** as required.
+**Note:**
+- If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run the **Environment Variables and Credentials Setup** section
+- If you have setup the application before, run steps in section **Application Setup** as required.
 
 # D2E Guide 
 ## Authentication Portal
@@ -168,7 +166,7 @@ This section provides the steps for setting up the analytics environment.
 ## Stopping Application
 1. Stop all containers: `yarn stop:minerva`
 2. Perform clean-up: `yarn clean:minerva`
-    - **WARNING**: This step removes all containers and volumes. You would need to re-run [Credential Setup](#credentials-setup) for a fresh startup. 
+    - **WARNING**: This step removes all containers and volumes. You would need to re-run the [Environment Variables and Credentials](#environment-variables-and-credentials-setup) section for a fresh startup. 
 
 
 # D2E Support
