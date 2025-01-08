@@ -1,11 +1,11 @@
 import { DataSource } from "npm:typeorm";
-import { Seeder } from "typeorm-extension";
+import { Seeder } from "./seeder.ts";
 
-import { DatasetAttributeConfig } from "../../../dataset/entity";
+import { DatasetAttributeConfig } from "../../../dataset/entity/index.ts";
 import {
   ATTRIBUTE_CONFIG_CATEGORIES,
   ATTRIBUTE_CONFIG_DATA_TYPES,
-} from "../../const";
+} from "../../const.ts";
 
 export default class DatasetAttributeConfigSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {

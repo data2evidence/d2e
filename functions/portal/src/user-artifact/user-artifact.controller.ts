@@ -2,8 +2,11 @@ import { BadRequestException, Body, Controller, Delete, Get, Middleware, Param, 
 import { ServiceName } from './enums/index.ts'
 import { PermissionsMiddleware } from './middlewares/permissions.middleware.ts'
 import { UserArtifactService } from './user-artifact.service.ts'
+import { RequestContextMiddleware } from "../common/request-context.middleware.ts";
+
 
 // @Middleware(PermissionsMiddleware)
+@Middleware(RequestContextMiddleware)
 @Controller("system-portal/user-artifact")
 export class UserArtifactController {
   constructor(private readonly userArtifactService: UserArtifactService) { }
@@ -62,22 +65,22 @@ export class UserArtifactController {
   }
 
   @Post(':serviceName')
-  createServiceArtifact(@Body() createArtifactDto: any, @Req() request: any) {
-    const token = request.raw.headers.get('authorization')?.replace(/bearer /i, '')
-    return this.userArtifactService.createServiceArtifact(createArtifactDto, token)
+  createServiceArtifact(
+    @Param('serviceName') serviceName: ServiceName, 
+    @Body() createArtifactDto: any
+  ) {
+    return this.userArtifactService.createServiceArtifact(serviceName, createArtifactDto)
   }
 
   @Put(':serviceName/user')
   updateUserServiceArtifact(
     @Param('serviceName') serviceName: ServiceName,
-    @Body() updateArtifactDto: any,
-    @Req() request: any
+    @Body() updateArtifactDto: any
   ) {
     if (!(Object.values(ServiceName).includes(serviceName))) {
       throw new BadRequestException(`Invalid service name: ${serviceName}`)
     }
-    const token = request.raw.headers.get('authorization')?.replace(/bearer /i, '')
-    return this.userArtifactService.updateUserServiceArtifactEntity(serviceName, updateArtifactDto, token)
+    return this.userArtifactService.updateUserServiceArtifactEntity(serviceName, updateArtifactDto)
   }
 
   @Put(':serviceName')

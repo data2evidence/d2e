@@ -1,8 +1,8 @@
-import adhdPhenotype from './adhdPhenotype'
-import drugExposureDemo from './drugExposureDemo'
-import synpuf1kDemo from './synpuf1kDemo'
-import synpuf1kKMV3 from './synpuf1kKMV3'
-import synpuf1kKMByCohortsV3 from './synpuf1kKMByCohortsV3'
+import adhdPhenotype from './adhdPhenotype.ts'
+import drugExposureDemo from './drugExposureDemo.ts'
+import synpuf1kDemo from './synpuf1kDemo.ts'
+import synpuf1kKMV3 from './synpuf1kKMV3.ts'
+import synpuf1kKMByCohortsV3 from './synpuf1kKMByCohortsV3.ts'
 
 export const notebookContents = {
   'ADHD Phenotype': {

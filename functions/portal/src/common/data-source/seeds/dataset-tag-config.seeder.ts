@@ -1,7 +1,8 @@
 import { DataSource } from "npm:typeorm";
-import { Seeder } from "typeorm-extension";
+import { Seeder } from "./seeder.ts";
 
-import { DatasetTagConfig } from "../../../dataset/entity";
+import { DatasetTagConfig } from "../../../dataset/entity/index.ts";
+import pg from 'npm:pg'
 
 export default class DatasetTagConfigSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {

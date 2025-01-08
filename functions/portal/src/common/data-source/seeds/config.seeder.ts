@@ -1,5 +1,5 @@
 import { DataSource } from "npm:typeorm";
-import { Seeder } from "typeorm-extension";
+import { Seeder } from "./seeder.ts";
 import { Config } from "../../../config/entity/index.ts";
 
 export default class ConfigSeeder implements Seeder {
