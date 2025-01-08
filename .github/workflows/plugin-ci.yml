@@ -71,7 +71,7 @@ jobs:
         if: ${{ env.GIT_CI_BRANCH_NAME == 'develop' }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: /usr/src/plugin/node_modules/@alp-os/d2e-functions/${{ env.NPM_FILENAME }}.tgz
+          file: /usr/src/plugin/node_modules/@alp-os/d2e-functions/${{ env.NPM_FILENAME }}
           tag: latest
           target_commit: develop
           prerelease: true
