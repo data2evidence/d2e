@@ -2,7 +2,7 @@
 
 [![DockerCompose AzureTest CD](https://github.com/alp-os/d2e/actions/workflows/az-dc-cd.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/az-dc-cd.yml) &nbsp;&nbsp; [![Docker Build & Push](https://github.com/alp-os/d2e/actions/workflows/docker-push.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/docker-push.yml) &nbsp;&nbsp; [![Docker compose Build & Up](https://github.com/alp-os/d2e/actions/workflows/docker-compose-up.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/docker-compose-up.yml)
 
-# Getting Started 
+# Getting Started
 
 ## Pre-requisites
 
@@ -28,7 +28,7 @@ docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
 
 ## Environment Variables and Credentials Setup
 
-- Invoke the following command to populate  `.env.local` with random secrets. See: environment variables document [here](docs/1-setup/environment-variables.md)
+- Invoke the following command to populate `.env.local` with random secrets. See: environment variables document [here](env-vars.md)
 
 ```bash
 yarn gen:dotenv
@@ -42,7 +42,6 @@ echo GH_TOKEN='<GH_TOKEN>' >> .env.local
 
 - Initalize Logto Apps
   - note: [clean-up](README.md#clean-up) first to re-initialize
-
 
 ```bash
 yarn init:logto
@@ -59,11 +58,13 @@ yarn build:minerva
 ## (Re)Start App
 
 - Docker compose up - approx 5 minutes
+
 ```bash
 yarn start:minerva; sleep 60
 ```
 
 ## View Logs
+
 ```bash
 yarn logs:minerva
 ```
@@ -93,5 +94,7 @@ yarn clean:minerva
 ```
 
 ## Extra information
+
 ### Setting resource limits
+
 - see: [Resource limits](docs/1-setup/resource-limits.md)

@@ -6,7 +6,7 @@ set -o errexit
 # vars
 SCRIPTS_DIR=$(dirname $0)
 GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
-README_FILE=$GIT_BASE_DIR/docs/1-setup/environment-variables.md
+README_FILE=$GIT_BASE_DIR/env-vars.md
 DOC_YML=$GIT_BASE_DIR/.env.doc.yml
 
 # clear
