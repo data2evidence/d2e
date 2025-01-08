@@ -162,12 +162,14 @@ jobs:
         continue-on-error: true
         run: |
           npx --suppess-warnings zx scripts/analyze-acr.mjs
+
           if [ $AZ_REG_PRUNE_ENABLE_DELETE = true ]; then
             echo "INFO . manifests delete ..."
             sh "private-manifests-delete.sh"
           else
             echo "INFO . manifests delete skipped"
           fi
+
           echo AZ_REG_ARTIFACTS_NAME=${AZ_REG_REPOSITORY/\//--} | tee -a $GITHUB_ENV | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Upload ACR manifests artifacts
