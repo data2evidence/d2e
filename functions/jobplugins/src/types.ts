@@ -163,7 +163,7 @@ export interface ICreateDatamartFlowRunDto {
 
 export interface IGetVersionInfoFlowRunDto {
   flowRunName: string;
-  options: object;
+  options: IGetVersionInfoFlowRunOptions;
 }
 
 export interface IFlowRunQueryDto {
@@ -311,6 +311,17 @@ interface ICreateDatamodelFlowRunOptions {
     data_model: string;
     schema_name: string;
     cleansed_schema_option: string;
+    vocab_schema: string;
+    plugin: string;
+  }
+}
+
+interface IGetVersionInfoFlowRunOptions {
+  options: {
+    flow_action_type: string;
+    database_code: string;
+    data_model: string;
+    schema_name: string;
     vocab_schema: string;
     plugin: string;
   }
