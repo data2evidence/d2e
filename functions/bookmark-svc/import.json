@@ -82,6 +82,7 @@
     "./src/bookmark/bookmark.router.spec": "./src/bookmark/bookmark.router.spec.ts",
     "./src/bookmark/bookmark.service": "./src/bookmark/bookmark.service.ts",
     "./src/api/PortalAPI": "./src/api/PortalAPI.ts",
+    "./src/api/AnalyticsAPI": "./src/api/AnalyticsAPI.ts",
     "./src/main": "./src/main.ts",
     "./src/custom.d": "./src/custom.d.ts",
     "./src/utils/MRILoggedError": "./src/utils/MRILoggedError.ts",
