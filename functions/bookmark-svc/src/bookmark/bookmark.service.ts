@@ -6,8 +6,15 @@ import { Connection as connLib } from '@alp/alp-base-utils'
 import ConnectionInterface = connLib.ConnectionInterface
 import CallBackInterface = connLib.CallBackInterface
 import * as utils from '@alp/alp-base-utils'
-import { BookmarkDto } from '../types'
+import {
+  BookmarkDto,
+  IcohortDefinition,
+  IFormattedBookmark,
+  IFormattedcohortDefinition,
+  IFrontendBookmark,
+} from '../types'
 import { PortalAPI } from '../api/PortalAPI'
+import { AnalyticsSvcAPI } from '../api/AnalyticsAPI'
 
 /**
  * This method was created so it can be spied on during testing (without affecting utils)
@@ -50,7 +57,7 @@ export function createBookmarkDto(
   }
 }
 
-export function formatUserArtifactData(paConfigId: string, data: any[], userName: string): any[] {
+export function formatUserArtifactData(paConfigId: string, data: any[], userName: string): IFormattedBookmark[] {
   return data
     .filter(
       row =>
@@ -66,6 +73,7 @@ export function formatUserArtifactData(paConfigId: string, data: any[], userName
       version: row.version,
       user_id: row.user_id,
       shared: row.shared,
+      cohortDefinitionId: row.cohortDefinitionId,
     }))
 }
 
@@ -85,16 +93,23 @@ export async function _loadAllBookmarks(
   userName,
   token,
   paConfigId,
+  datasetId: string,
   connection: ConnectionInterface,
   callback: CallBackInterface
 ) {
   try {
     const portalAPI = new PortalAPI(token)
-    const result = await portalAPI.getBookmarks()
-    const formattedRows = formatUserArtifactData(paConfigId, result, userName)
-    const returnValue = {
+    const bookmarks = await portalAPI.getBookmarks()
+    const formattedBookmarks = formatUserArtifactData(paConfigId, bookmarks, userName)
+
+    const analyticsSvcAPI = new AnalyticsSvcAPI(token)
+    const cohortDefinitions = await analyticsSvcAPI.getAllCohorts(datasetId)
+    const formattedCohortDefinitions = cohortDefinitions.map(cohort => _formatCohortDefinitions(cohort))
+
+    const returnValue: IFrontendBookmark = {
       schemaName: connection.schemaName,
-      bookmarks: formattedRows,
+      bookmarks: formattedBookmarks,
+      cohortDefinitions: formattedCohortDefinitions,
     }
     callback(null, _convertBookmarkIFR(returnValue))
   } catch (error) {
@@ -193,13 +208,27 @@ export async function _insertBookmark(
  * @param {object}
  *            dbConnection DB connection to be used
  */
-export async function _deleteBookmark(bookmarkId, userId, token, callback: CallBackInterface) {
+export async function _deleteBookmark(bookmarkId, userId, datasetId, token, callback: CallBackInterface) {
   if (!bookmarkId || !userId || bookmarkId === '' || userId === '') {
     callback(null, null)
   }
   try {
     const portalAPI = new PortalAPI(token)
+    const bookmarkResult = await portalAPI.getBookmarkById(bookmarkId)
+    const currentBookmark = bookmarkResult[0]
+
+    if (!currentBookmark) {
+      throw `Unable to find bookmark with id:${bookmarkId}, aborting delete bookmark`
+    }
+
+    // If bookmark has a cohortDefinitionId, delete cohort before deleting bookmark
+    if (currentBookmark.cohortDefinitionId) {
+      const analyticsSvcAPI = new AnalyticsSvcAPI(token)
+      await analyticsSvcAPI.deleteCohort(datasetId, currentBookmark.cohortDefinitionId)
+    }
+
     const result = await portalAPI.deleteBookmark(bookmarkId)
+
     callback(null, result)
   } catch (error) {
     console.error(error)
@@ -235,6 +264,7 @@ export async function _renameBookmark(
   paConfigId,
   cdmConfigId,
   cdmConfigVersion,
+  datasetId,
   token,
   callback: CallBackInterface
 ) {
@@ -249,6 +279,13 @@ export async function _renameBookmark(
     }
     const portalAPI = new PortalAPI(token)
     const result = await portalAPI.updateBookmark(updateBookmarkDto)
+
+    // Additionally update corresponding cohort definition name if bookmark has a cohortDefinitionId
+    const updatedBookmark = result.artifacts.bookmarks.find(bookmark => bookmark.id === bookmarkId)
+    if (updatedBookmark.cohortDefinitionId) {
+      const analyticsSvcAPI = new AnalyticsSvcAPI(token)
+      await analyticsSvcAPI.renameCohortDefinition(datasetId, updatedBookmark.cohortDefinitionId, newBookmarkName)
+    }
 
     callback(null, result)
   } catch (error) {
@@ -293,7 +330,12 @@ export async function _updateBookmark( //TODO remove user input
 ) {
   try {
     const portalAPI = new PortalAPI(token)
-    const currentBookmark = await portalAPI.getBookmarkById(bookmarkId)
+    const bookmarkResult = await portalAPI.getBookmarkById(bookmarkId)
+    const currentBookmark = bookmarkResult[0]
+
+    if (!currentBookmark) {
+      throw `Unable to find bookmark with id:${bookmarkId}, aborting update bookmark`
+    }
 
     const updateBookmarkDto = {
       id: bookmarkId,
@@ -382,6 +424,7 @@ export async function queryBookmarks(
     let cdmConfigId: string = requestParameters.cdmConfigId
     let cdmConfigVersion: string = requestParameters.cdmConfigVersion
     let shareBookmark: boolean = requestParameters.shareBookmark
+    let datasetId: string = requestParameters.datasetId
 
     let cb = (err, result) => {
       if (err) {
@@ -407,13 +450,22 @@ export async function queryBookmarks(
         )
         break
       case 'delete':
-        _deleteBookmark(bookmarkId, userName, token, cb)
+        _deleteBookmark(bookmarkId, userName, datasetId, token, cb)
         break
       case 'update':
         _updateBookmark(bookmarkId, bookmark, paConfigId, cdmConfigId, cdmConfigVersion, shareBookmark, token, cb)
         break
       case 'rename':
-        _renameBookmark(bookmarkId, requestParameters.newName, paConfigId, cdmConfigId, cdmConfigVersion, token, cb)
+        _renameBookmark(
+          bookmarkId,
+          requestParameters.newName,
+          paConfigId,
+          cdmConfigId,
+          cdmConfigVersion,
+          datasetId,
+          token,
+          cb
+        )
         break
       case 'loadSingle':
         loadSingleBookmark(userName, bookmarkId, paConfigId, token, callback)
@@ -428,7 +480,7 @@ export async function queryBookmarks(
         })
         break
       case 'loadAll':
-        await _loadAllBookmarks(userName, token, paConfigId, configConnection, callback)
+        await _loadAllBookmarks(userName, token, paConfigId, datasetId, configConnection, callback)
         break
       default:
         throw new Error('unknown command: ' + cmd)
@@ -455,3 +507,10 @@ function _convertBookmarkIFR(result) {
   }
   return result
 }
+
+const _formatCohortDefinitions = (cohortDefinition: IcohortDefinition): IFormattedcohortDefinition => ({
+  id: cohortDefinition.id,
+  patientCount: cohortDefinition.patientIds.length,
+  cohortDefinitionName: cohortDefinition.name,
+  createdOn: cohortDefinition.creationTimestamp,
+})

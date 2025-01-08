@@ -32,6 +32,8 @@ export class BookmarkRouter {
       try {
         const { configConnection } = req.dbConnections
         const user = getUser(req)
+
+        const datasetId = req.query.datasetId
         const userName = req.userName
         const language = user.lang
 
@@ -39,6 +41,7 @@ export class BookmarkRouter {
 
         req.body.cmd = 'loadAll'
         req.body.paConfigId = req.query.paConfigId
+        req.body.datasetId = datasetId
 
         await queryBookmarks(req.body, userName, token, configConnection, (err, data) => {
           if (err) {
