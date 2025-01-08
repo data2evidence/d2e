@@ -1,0 +1,26 @@
+{
+  "name": "",
+  "version": "",
+  "lint": {
+    "rules": {
+      "exclude": [
+        "require-await"
+      ]
+    }
+  },
+  "fmt": {
+    "options": {
+      "singleQuote": true
+    }
+  },
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowJs": true
+  },
+  "importMap": "./import.json",
+  "tasks": {
+    "launch-server": "deno run --allow-net --allow-read --unstable --allow-env --node-modules-dir index.ts",
+    "test": "deno test -A --unstable spec"
+  }
+}

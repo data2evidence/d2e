@@ -587,7 +587,7 @@ const _serialize = ({ queryString, compress }) => {
     .reduce((a, key) => {
       a.push(
         `${key}=${encodeURIComponent(
-          compress.indexOf(key) > -1
+          compress.indexOf(key) > -1 && key !== 'datasetId' // Dont encode if key is datasetId
             ? Buffer.from(pako.deflate(queryString[key], { to: 'string' }), 'binary').toString('base64')
             : queryString[key]
         )}`
