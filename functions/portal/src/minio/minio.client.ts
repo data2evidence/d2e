@@ -12,7 +12,7 @@ export class MinioClient {
     this.client = new Minio.Client({
       endPoint: env.MINIO_ENDPOINT,
       port: Number(env.MINIO_PORT),
-      useSSL: Boolean(env.MINIO_SSL),
+      useSSL: env.MINIO_SSL == "true" ? true : false,
       accessKey: env.MINIO_ACCESS_KEY,
       secretKey: env.MINIO_SECRET_KEY,
     });

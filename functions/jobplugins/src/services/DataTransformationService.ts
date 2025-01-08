@@ -41,7 +41,7 @@ export class TransformationService {
       .getOne();
   }
 
-  async getResultsByCanvasId(dataflowId: string, token) {
+  async getResultsByCanvasId(dataflowId: string, token: string) {
     const dataflow = await this.canvasRepo
       .createQueryBuilder("dataflow")
       .select("dataflow.lastFlowRunId")
