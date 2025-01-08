@@ -14,7 +14,7 @@ export class CachedbService {
     const prefectApi = new PrefectAPI(token);
     const flowName = PrefectFlowName.CACHEDB_CREATE_FILE;
     const deploymentName = PrefectDeploymentName.CACHEDB_CREATE_FILE;
-    const parameters = createCachedbFileFlowRunDto;
+    const parameters = { options: createCachedbFileFlowRunDto };
     const flowRunId = await prefectApi.createFlowRun(
       "Run cachedb file creation",
       deploymentName,
