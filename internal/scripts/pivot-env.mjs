@@ -1,15 +1,15 @@
 #!/usr/bin/env zx
 // pivot/analyze env to ensure consistency
 // Seed:
-// cp -v internal/docs/env-doc.yml .env-doc.yml
+// cp -v internal/docs/env-vars.yml .env-vars.yml
 // Writes:
-// .env-doc.yml - update with sample values
+// .env-vars.yml - update with sample values
 // .env-pivot.yml - show values for all environments
 // .env-pivot.creds.ALPDEV.yml - DATABASE_CREDENTIALS>ALPDEV
 // .env-pivot.creds.postgres-cdm-minerva.yml - DATABASE_CREDENTIALS>postgres-cdm-minerva
 // .env-pivot.creds.OMOP.yml - DATABASE_CREDENTIALS>OMOP
 // Remove values & update git internal env doc with:
-// cat .env-doc.yml | yq '.*.envNames.* = "xxx"' | yq 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' | tee internal/docs/env-doc.yml
+// cat .env-vars.yml | yq '.*.envNames.* = "xxx"' | yq 'sort_keys(..) | (... | select(type == "!!seq")) |= sort' | tee internal/docs/env-vars.yml
 
 // inputs
 const envName = $.env.ENV_NAME || "local"
@@ -20,10 +20,10 @@ const resetDocEnvNameBool = $.env.RESET_DOC_ENV_NAME_BOOL === "true" ? true : fa
 const gitBaseDir = (await $`git rev-parse --show-toplevel`).stdout.trim()
 
 const credsKey = "DATABASE_CREDENTIALS"
-const docPath = `.env-doc.yml`
+const docPath = `.env-vars.yml`
 const envInPath = `.env.${envName}.yml`
 const pvtOutPath = `.env-pivot.yml`
-const srcDocPath = `internal/docs/env-doc.yml`
+const srcDocPath = `internal/docs/env-vars.yml`
 
 if ((!fs.existsSync(docPath)) && fs.existsSync(srcDocPath)) {
 	fs.copyFile(srcDocPath, docPath, (err) => {
