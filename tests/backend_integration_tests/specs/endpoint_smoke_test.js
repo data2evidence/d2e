@@ -204,7 +204,7 @@ describe('-- MRI ENDPOINT SMOKE TESTS --', function () {
           method: 'GET',
           path: PATIENT_PATH,
           body: JSON.stringify(requestBody),
-          parameters: defaultPatientListParameters,
+          parameters: { ...defaultPatientListParameters, datasetId: 'cd13fd3e-9f35-4812-b2a1-497b232a8771' },
           headers: {
             authorization: process.env.BEARER_TOKEN
           }
