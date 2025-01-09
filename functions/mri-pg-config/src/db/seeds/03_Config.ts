@@ -12426,7 +12426,7 @@ const paConfig = {
         },
       ],
       initialPatientlistColumn: true,
-      modelName: "MRI_PA_SERVICES_FILTERCARD_TITLE_BASIC_DATA",
+      modelName: "Basic Data",
     },
     {
       source: "patient.interactions.conditionoccurrence",
@@ -12874,7 +12874,7 @@ const paConfig = {
           modelName: "Condition Status concept id",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Condition Occurrence",
     },
     {
@@ -13124,12 +13124,12 @@ const paConfig = {
           modelName: "Visit type concept id",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Visit",
     },
     {
       source: "patient.interactions.questionnaire",
-      visible: true,
+      visible: false,
       order: 4,
       initial: false,
       attributes: [
@@ -13148,7 +13148,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Link ID",
@@ -13169,7 +13169,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Value coding value",
@@ -13188,8 +13188,8 @@ const paConfig = {
             order: 3,
           },
           patientlist: {
-            initial: true,
-            visible: true,
+            initial: false,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Value type",
@@ -13208,8 +13208,8 @@ const paConfig = {
             order: 4,
           },
           patientlist: {
-            initial: true,
-            visible: true,
+            initial: false,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Value",
@@ -13229,7 +13229,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Record ID",
@@ -13249,8 +13249,8 @@ const paConfig = {
             order: 6,
           },
           patientlist: {
-            initial: true,
-            visible: true,
+            initial: false,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Questionnaire language",
@@ -13270,8 +13270,8 @@ const paConfig = {
             order: 7,
           },
           patientlist: {
-            initial: true,
-            visible: true,
+            initial: false,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Questionnaire status",
@@ -13292,7 +13292,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Questionnaire authored",
@@ -13312,7 +13312,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Text",
@@ -13333,7 +13333,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Questionnaire reference",
@@ -13353,8 +13353,8 @@ const paConfig = {
             order: 11,
           },
           patientlist: {
-            initial: true,
-            visible: true,
+            initial: false,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Questionnaire version",
@@ -13880,7 +13880,7 @@ const paConfig = {
           modelName: "Specimen type concept code",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Specimen",
     },
     {
@@ -14210,7 +14210,7 @@ const paConfig = {
           modelName: "Procedure Date/Time",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Procedure Occurrence",
     },
     {
@@ -14300,7 +14300,7 @@ const paConfig = {
           modelName: "End Date",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Payer Plan Period",
     },
     {
@@ -14473,7 +14473,7 @@ const paConfig = {
           modelName: "End Date",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Observation Period",
     },
     {
@@ -15012,7 +15012,7 @@ const paConfig = {
           modelName: "Observation concept id",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Observation",
     },
     {
@@ -15411,13 +15411,13 @@ const paConfig = {
           modelName: "Unit concept id",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Measurement",
     },
     {
       source:
         "patient.interactions.Consent_74db26d2_bb75_489a_a841_051c85dc897b",
-      visible: true,
+      visible: false,
       order: 11,
       initial: false,
       attributes: [
@@ -15436,8 +15436,8 @@ const paConfig = {
             order: 1,
           },
           patientlist: {
-            initial: true,
-            visible: true,
+            initial: false,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Attribute",
@@ -15458,10 +15458,10 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
-          modelName: "Attribute Group ID",
+          modelName: "Attribute Group Id",
         },
         {
           source:
@@ -15478,8 +15478,8 @@ const paConfig = {
             order: 3,
           },
           patientlist: {
-            initial: true,
-            visible: true,
+            initial: false,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Category",
@@ -15499,8 +15499,8 @@ const paConfig = {
             order: 4,
           },
           patientlist: {
-            initial: true,
-            visible: true,
+            initial: false,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Value",
@@ -15521,7 +15521,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Status",
@@ -15542,7 +15542,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Parent Consent Detail Id",
@@ -15563,7 +15563,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Consent Detail Id",
@@ -15584,7 +15584,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Patient Id",
@@ -15605,7 +15605,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Consent Date/Time",
@@ -16108,7 +16108,7 @@ const paConfig = {
           modelName: "End Date/Time",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Drug Exposure",
     },
     {
@@ -16318,7 +16318,7 @@ const paConfig = {
           modelName: "Drug concept id",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Drug Era",
     },
     {
@@ -16588,7 +16588,7 @@ const paConfig = {
           modelName: "Unit concept id",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Dose Era",
     },
     {
@@ -16846,7 +16846,7 @@ const paConfig = {
           modelName: "Device Type concept id",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Device Exposure",
     },
     {
@@ -16996,7 +16996,7 @@ const paConfig = {
           modelName: "Death Type concept id",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Death",
     },
     {
@@ -17189,12 +17189,12 @@ const paConfig = {
           modelName: "Condition Name",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Condition Era",
     },
     {
       source: "patient.interactions.ptoken",
-      visible: true,
+      visible: false,
       order: 18,
       initial: false,
       attributes: [
@@ -17213,7 +17213,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participation Token Id",
@@ -17234,7 +17234,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participation Token Study Id",
@@ -17255,7 +17255,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participation Token External Id",
@@ -17274,8 +17274,8 @@ const paConfig = {
             order: 4,
           },
           patientlist: {
-            initial: true,
-            visible: true,
+            initial: false,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participation Token",
@@ -17296,7 +17296,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participant Token Created By",
@@ -17317,7 +17317,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participant Token Created Date",
@@ -17338,7 +17338,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participation Token Modified By",
@@ -17359,7 +17359,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participation Token Modified Date",
@@ -17379,8 +17379,8 @@ const paConfig = {
             order: 9,
           },
           patientlist: {
-            initial: true,
-            visible: true,
+            initial: false,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participation Token Status",
@@ -17401,7 +17401,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participation Token Last Donation Date",
@@ -17422,7 +17422,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participation Token Validation Date",
@@ -17443,7 +17443,7 @@ const paConfig = {
           },
           patientlist: {
             initial: false,
-            visible: true,
+            visible: false,
             linkColumn: false,
           },
           modelName: "Participation Token Person Id",
@@ -17476,7 +17476,7 @@ const paConfig = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Cohort Id",
+          modelName: "Cohort ID",
         },
         {
           source: "patient.interactions.cohort.attributes.pid",
@@ -17496,10 +17496,10 @@ const paConfig = {
             visible: true,
             linkColumn: false,
           },
-          modelName: "Cohort Patient",
+          modelName: "Patient Id",
         },
       ],
-      initialPatientlistColumn: false,
+      initialPatientlistColumn: true,
       modelName: "Cohort",
     },
   ],
@@ -17573,10 +17573,10 @@ const paConfig = {
   panelOptions: {
     addToCohorts: true,
     domainValuesLimit: 200,
-    maxFiltercardCount: 10,
     calcViewAccessPoint: true,
     externalAccessPoints: true,
     cohortEntryExit: false,
+    maxFiltercardCount: 10,
   },
 };
 
