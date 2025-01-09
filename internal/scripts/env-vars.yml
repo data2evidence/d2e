@@ -14,7 +14,7 @@ DATABASE_CREDENTIALS:
   example: false
   readme: false
   type: object
-DB_CREDENTIALS__INTERNAL__PRIVATE_KEY:
+DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY:
   comment: to encrypt dbcredentials entered in admin>setup>databases>configure
   type: rsaPrivateKey
 DB_CREDENTIALS__INTERNAL__PUBLIC_KEY:

@@ -38,11 +38,11 @@ echo
 
 echo set-openssl ...
 function set-openssl {
-    echo INFO set DB_CREDENTIALS__INTERNAL__PRIVATE_KEY DB_CREDENTIALS__INTERNAL__PUBLIC_KEY ...
+    echo INFO set DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY DB_CREDENTIALS__INTERNAL__PUBLIC_KEY ...
     export PRIVATE_KEY=$(openssl genpkey  -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -quiet)
     export PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | openssl rsa -pubout)
     
-    echo DB_CREDENTIALS__INTERNAL__PRIVATE_KEY=\'"${PRIVATE_KEY}"\' >> $tmp_file
+    echo DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY=\'"${PRIVATE_KEY}"\' >> $tmp_file
     echo DB_CREDENTIALS__INTERNAL__PUBLIC_KEY=\'"${PUBLIC_KEY}"\' >> $tmp_file
 }
 set-openssl
