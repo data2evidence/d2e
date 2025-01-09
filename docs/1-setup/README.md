@@ -93,6 +93,29 @@ apt install openssl>3
 brew install openssl@3
 ```
 
+## git
+### ubuntu
+```bash
+sudo apt-get update
+sudo apt-get install git-all
+```
+
+### macos 
+```bash
+brew install git
+```
+
+For more information, refer to: https://github.com/git-guides/install-git
+
+## Github PAT token
+Set up a Github PAT (classic) token with scope `read:packages` to retrieve packages to run d2e.
+- Setting up Github PAT: [link](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)
+- Select scope: ```read:packages```
+
+Example:
+![Github PAT token](../images/setup/github-pat-token.png)
+For more information, refer to: https://github.com/git-guides/install-git
+
 ## DBeaver
 
 - Universal database tool and SQL client

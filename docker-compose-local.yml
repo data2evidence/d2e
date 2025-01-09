@@ -1,8 +1,6 @@
 services:
   trex:
     command: npm run startdev
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
     ports:
       - 9229:9229
     volumes:
@@ -31,6 +29,8 @@ services:
           "alpdb": false,
           "concept-mapping": false,
           "terminology-svc": false,
+          "code-suggestion": false,
+          "portal": false,
           "files-manager": false
         }
 
@@ -71,16 +71,6 @@ services:
     environment:
       LOCAL_DEBUG: "true"
 
-  alp-minerva-portal-server:
-    build:
-      context: ./services/alp-portal-server
-      dockerfile: Dockerfile
-    container_name: alp-minerva-portal-server-nest-prod-${BASE_PORT:-1}
-    environment:
-      MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
-      MINIO__SSL: false
-      NODE_ENV: development
-
   alp-minerva-postgres:
     ports:
       - 41190:5432
@@ -90,18 +80,6 @@ services:
   # uses 8042 port on the container
   #  ports:
   #    - 8042:8042
-
-  alp-fhir-server:
-    build:
-      context: ./services/alp-fhir
-      dockerfile: Dockerfile
-
-  alp-fhir-fe-server:
-    build:
-      context: ./services/alp-fhir/
-      dockerfile: Dockerfile.frontend
-    volumes:
-      - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
 
   alp-logto-post-init:
     build:

@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - develop
-      - trex
   workflow_dispatch:
 
 env:
@@ -26,7 +25,7 @@ jobs:
   docker-compose-up:
     runs-on: ubuntu-latest # Custom runner 4 cpus & 14gb ram
 
-    if: (github.ref_name == 'develop' || github.ref_name == 'trex' || contains('rc-', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/rc/workflow_dispatch and doesnt have a PR
+    if: (github.ref_name == 'develop' || contains('rc-', github.ref_name) || github.event_name == 'workflow_dispatch') || ( github.event_name == 'pull_request' && !github.event.pull_request.draft ) # Should run if branch is develop/rc/workflow_dispatch and doesnt have a PR
     steps:
       # - name: Free Disk Space (Ubuntu)
       #   uses: jlumbroso/free-disk-space@main
@@ -108,6 +107,14 @@ jobs:
           # additional mask sensitive values
           internal/scripts/mask-env-gha.sh
 
+          # Inject Logto Apps envs
+          echo "LOGTO__ALP_APP__CLIENT_ID='GlEUkUOlpdpKgl01BrEVR'" >> $DOTENV_FILE
+          echo "LOGTO__ALP_APP__CLIENT_SECRET='2X2hFU4BiW44odwB0OwjtJoQxtX7E5'" >> $DOTENV_FILE
+          echo "LOGTO__ALP_SVC__CLIENT_ID='FcvGMfGsNm8QNdt9aCRuX'" >> $DOTENV_FILE
+          echo "LOGTO__ALP_SVC__CLIENT_SECRET='IoJRGVHm05P8B0XRmqLozdK2U7TN1p'" >> $DOTENV_FILE
+          echo "LOGTO__ALP_DATA__CLIENT_ID='zUkAG2MRaNmnMTWHBzlVb'" >> $DOTENV_FILE
+          echo "LOGTO__ALP_DATA__CLIENT_SECRET='vgkToG2nuxzRDU7yMhAHiz5m1VZgLk'" >> $DOTENV_FILE
+
           echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Login to ACR
@@ -139,7 +146,7 @@ jobs:
         run: |
           yarn init:logto
 
-      - name: Docker compose up Local Mode without UI Container
+      - name: Docker compose up Local Mode
         uses: nick-fields/retry@v3
         id: retry
         with:
@@ -149,22 +156,21 @@ jobs:
           retry_on: any
           command: |
             # Run DataNode services without sql-editor
-            yarn local:minerva up --wait
+            yarn start:minerva
             DC_EXIT_CODE=$?
-            echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_ENV
             DOCKER_STATUS_FILE=../docker-status-${GITHUB_RUN_ID:-ghRunId}-$(date '+%Y%m%dT%H%M%S').txt | tee -a $GITHUB_ENV
             docker ps --format {{.Names}},{{.Status}} 2> /dev/null | sort | tee $DOCKER_STATUS_FILE | tee -a $GITHUB_STEP_SUMMARY
+            [ $DC_EXIT_CODE = 0 ] || { echo EXIT DC_EXIT_CODE=$DC_EXIT_CODE && exit $DC_EXIT_CODE; }
 
-      - name: Check Container Health
+      - name: Log status
+        if: success() || failure()
         run: |
           echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
           echo RETRY_EXIT_CODE=${{ steps.retry.outputs.exit_code }} | tee -a $GITHUB_STEP_SUMMARY
           echo RETRY_OUTCOME=${{ steps.retry.outcome }} | tee -a $GITHUB_STEP_SUMMARY
           echo RETRY_TOTAL_ATTEMPTS=${{ steps.retry.outputs.total_attempts }} | tee -a $GITHUB_STEP_SUMMARY
-
           DC_FAIL_COUNT=$(grep -icE "starting|unhealthy" $DOCKER_STATUS_FILE|| true)
           echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
-          [ $DC_EXIT_CODE = 0 ] || { echo EXIT DC_EXIT_CODE=$DC_EXIT_CODE && exit $DC_EXIT_CODE; }
 
       - name: Logs minerva
         if: success() || failure()

@@ -233,7 +233,7 @@ export default class PGUserDAO {
   ) => {
     try {
       //Create Access to Future Objects
-      await client.query(`GRANT CREATE ON ${databaseName} TO ${user}`);
+      await client.query(`GRANT CREATE ON DATABASE ${databaseName} TO ${user}`);
 
       this.logger.info(
         `${databaseName} database granted create privileges for future objects to ${user}`
