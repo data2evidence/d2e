@@ -33,13 +33,15 @@ export class BookmarkRouter {
         const { configConnection } = req.dbConnections
         const user = getUser(req)
 
-        const userName = req.query.username
+        const datasetId = req.query.datasetId
+        const userName = req.userName
         const language = user.lang
 
         const token = req.headers['authorization']
 
         req.body.cmd = 'loadAll'
         req.body.paConfigId = req.query.paConfigId
+        req.body.datasetId = datasetId
 
         await queryBookmarks(req.body, userName, token, configConnection, (err, data) => {
           if (err) {
@@ -69,7 +71,7 @@ export class BookmarkRouter {
           const { configConnection } = req.dbConnections
           const user = getUser(req)
           const language = user.lang
-          const userName = req.body.username
+          const userName = req.userName
 
           const token = req.headers['authorization']
 
@@ -95,14 +97,14 @@ export class BookmarkRouter {
           const { configConnection } = req.dbConnections
           const user = getUser(req)
           const language = user.lang
-          const userId = req.body.username
+          const userName = req.userName
 
           const { bookmarkId } = req.params
           const token = req.headers['authorization']
 
           req.body.bmkId = bookmarkId
 
-          queryBookmarks(req.body, userId, token, configConnection, (err, data) => {
+          queryBookmarks(req.body, userName, token, configConnection, (err, data) => {
             if (err) {
               return res.status(500).send(MRIEndpointErrorHandler({ err, language }))
             } else {
@@ -125,7 +127,7 @@ export class BookmarkRouter {
           const { configConnection } = req.dbConnections
           const user = getUser(req)
           const language = user.lang
-          const userId = req.body.username
+          const userName = req.userName
           const { bookmarkId } = req.params
 
           const token = req.headers['authorization']
@@ -133,7 +135,7 @@ export class BookmarkRouter {
           req.body.cmd = 'delete'
           req.body.bmkId = bookmarkId
 
-          queryBookmarks(req.body, userId, token, configConnection, (err, data) => {
+          queryBookmarks(req.body, userName, token, configConnection, (err, data) => {
             if (err) {
               return res.status(500).send(MRIEndpointErrorHandler({ err, language }))
             } else {
@@ -156,7 +158,7 @@ export class BookmarkRouter {
           const { configConnection } = req.dbConnections
           const user = getUser(req)
           const language = user.lang
-          const userId = req.query.username
+          const userName = req.userName
 
           req.body.cmd = 'loadByIDs'
           req.body.bmkIds = (req.query.ids as string).split(',')
@@ -164,7 +166,7 @@ export class BookmarkRouter {
 
           const token = req.headers['authorization']
 
-          queryBookmarks(req.body, userId, token, configConnection, (err, data) => {
+          queryBookmarks(req.body, userName, token, configConnection, (err, data) => {
             if (err) {
               return res.status(500).send(MRIEndpointErrorHandler({ err, language }))
             } else {
