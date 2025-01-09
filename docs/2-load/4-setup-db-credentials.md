@@ -27,8 +27,8 @@ notes:
 - `*` - schema/usernames are the values expected for sample data load steps - do not change 
 - `@` - create a random password
 - make a secure note of these passwords as they are required for the sample data load steps
-  - [load-synpuf1k](5-load-synpuf1k.md)
-  - [load-vocabd](6-load-vocab.md)
+  - [load-synpuf1k](6-load-synpuf1k.md)
+  - [load-vocab](7-load-vocab.md)
 
 > ![alt text](../images/db-creds/AddDatabase.png)
 
@@ -38,4 +38,3 @@ Run the following command to restart the system for the new connection details b
 ```
 yarn start:minerva --wait --force-recreate
 ```
-
