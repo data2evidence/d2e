@@ -34,7 +34,7 @@ export class AWSTokenAPI {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         }
       );
-      let accessToken = tokenResponse.data.access_token;
+      const accessToken = tokenResponse.data.access_token;
       return accessToken;
     } catch (error) {
       throw new Error('Error getting access token:', error);
