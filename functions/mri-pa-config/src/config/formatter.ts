@@ -1,8 +1,12 @@
 import { utils} from "@alp/alp-base-utils";
 import { configTools } from "@alp/alp-config-utils";
-import * as pathlib from "path";
 import { env } from "../configs";
-import {configDefaultValues} from "../../cfg/pa/configDefaultValues.ts"
+import { configDefaultValues } from "../../cfg/pa/configDefaultValues.ts"
+import { cwd } from 'node:process';
+import { fileURLToPath } from 'node:url';
+import { dirname, normalize, join } from 'node:path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export class Formatter {
 
@@ -208,21 +212,23 @@ export class Formatter {
             /*if (!cdwConfigs.hasOwnProperty(config.dependentConfig.configId)) {
                 cdwConfigs[config.dependentConfig.configId].error = "MRI_PA_CFG_ERROR_CDW_DOES_NOT_EXIST";
             }*/
-            cdwConfigs[config.dependentConfig.configId].configs.push({
+            if (cdwConfigs[config.dependentConfig.configId]) {
+              cdwConfigs[config.dependentConfig.configId].configs.push({
                 meta: {
-                    configId: config.configId,
-                    configName: config.configName,
-                    configVersion: config.configVersion,
-                    creator: config.creator,
-                    created: config.created,
-                    modifier: config.modifier,
-                    modified: config.modified,
-                    dependentConfig: {
-                        configId: config.dependentConfig.configId,
-                        configVersion: config.dependentConfig.configVersion,
-                    },
+                  configId: config.configId,
+                  configName: config.configName,
+                  configVersion: config.configVersion,
+                  creator: config.creator,
+                  created: config.created,
+                  modifier: config.modifier,
+                  modified: config.modified,
+                  dependentConfig: {
+                    configId: config.dependentConfig.configId,
+                    configVersion: config.dependentConfig.configVersion,
+                  },
                 },
-            });
+              });
+            }
         });
 
         // convert the object storing the cdwConfigs to an array
@@ -343,7 +349,7 @@ export class Formatter {
             // add Name to filtercard
             if (filtercard.obj.source === "patient") {
                 try {
-                    filtercard.obj.modelName = utils.TextLib.getText2(pathlib.join(`${process.cwd()}`, "i18n", "mri-pa-config.properties"),
+                    filtercard.obj.modelName = utils.TextLib.getText2(`${normalize(join(__dirname, "../../i18n/mri-pa-config.properties"))}`,
                     "MRI_PA_SERVICES_FILTERCARD_TITLE_BASIC_DATA", language);
                 } catch (err) {
                     console.log("formatter.ts: getText2 Error:");
@@ -434,11 +440,7 @@ export class Formatter {
         return paConfig;
     }
 
-    private _loadDefaultValues() {
-        //const filepath = "pa.configDefaultValues.json";
-        //const file = configTools.extractPackageAndFile(filepath);
-        //const defaultValues = configTools.loadFile(file[0], file[1], file[2], this.fs);
-        
+    private _loadDefaultValues() {        
         return configDefaultValues;
     }
 

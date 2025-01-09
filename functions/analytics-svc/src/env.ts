@@ -1,4 +1,3 @@
-import * as dotenv from "dotenv";
 import { object, z } from "zod";
 
 let env = {}; 
@@ -24,6 +23,7 @@ function initEnv(__env) {
 
         USE_DUCKDB: z.string(),
         USE_CACHEDB: z.string(),
+        USE_HANA_JWT_AUTHC: z.string(),
 
         PG__IDLE_TIMEOUT_IN_MS: z
             .string()
@@ -44,7 +44,6 @@ function initEnv(__env) {
             .refine((val) => !isNaN(parseInt(val)))
             .transform(Number),
 
-        SKIP_AUTH: z.string(),
         LOCAL_DEBUG: z.string(),
         SQL_RETURN_ON: z.string(),
         isHttpTestRun: z.string().optional(),

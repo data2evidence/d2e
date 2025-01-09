@@ -1,5 +1,0 @@
-prefect==2.19.9
-setuptools-rust==1.5.2
-s3fs==2023.1.0
-pipreqs==0.4.13
-duckdb==1.1.1

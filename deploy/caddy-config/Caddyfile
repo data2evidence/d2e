@@ -48,7 +48,7 @@ https://*.alp.local:55555 {
 	@cors_preflight method OPTIONS
 
 	@cors_origin {
-		header_regexp Origin ^https?://localhost:(4000|5173|8081|4800|4900)?$
+		header_regexp Origin ^https?://localhost:(4000|4900)?$
 	}
 
 	header @cors_origin {
@@ -92,12 +92,12 @@ https://*.alp.local:55555 {
 			header_up X-Real-IP {http.request.remote_host}
 		}
 	}
+}
 
-	handle /files-manager/* {
-		import forward_authentication
-		reverse_proxy http://files-manager:10500 {
-			header_up X-Real-IP {http.request.remote_host}
-		}
+(publicurlredirect) {
+	{$CADDY__ALP__ALIAS_PUBLIC_FQDN} {
+		{$TLS__CADDY_DIRECTIVE}
+		redir https://{$CADDY__ALP__PUBLIC_FQDN}{uri} permanent
 	}
 }
 
@@ -131,7 +131,6 @@ https://*.alp.local:55555 {
 		path /
 		path /portal/researcher/*
 		path /portal/systemadmin/*
-		path /starboard-notebook-base/*
 	}
 
 	handle @portalpath {
@@ -159,6 +158,8 @@ https://localhost:41101 {
 	tls internal
 	respond ""
 }
+
+{$INSTANCE_SPECIFIC_CONFIG}
 
 https://{$CADDY__ALP__PUBLIC_FQDN} {
 	{$TLS__CADDY_DIRECTIVE} 

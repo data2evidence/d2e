@@ -1,8 +1,0 @@
-VIEW "hc.hph.cdw.db.models::DWDocumentTypeDescription" ( "DWDocumentType", "LanguageCode", "LanguageName", "ShortText" ) AS SELECT  DocDesc."DWDocumentType" as "DWDocumentType",
-         DocDesc."LanguageCode" as "LanguageCode",
-         Languages."LANGUAGE_NAME" as "LanguageName",
-         DocDesc."ShortText" as "ShortText"
-		 FROM "hc.hph.cdw.db.models::DWViews.DocumentTypeDescriptions" as DocDesc
-
-LEFT OUTER JOIN "hc::M_TEXT_ANALYSIS_LANGUAGES" as Languages 
-ON Languages."LANGUAGE_CODE" = DocDesc."LanguageCode" WITH READ ONLY

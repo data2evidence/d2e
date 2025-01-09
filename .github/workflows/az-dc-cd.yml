@@ -1,4 +1,4 @@
-name: DockerCompose AzureTest CD
+name: DC Deploy AzureTest CD
 run-name: ${{ github.event_name == 'push' && vars.ENVIRONMENT_NAME_CD || github.event.inputs.env }}
 
 on:
@@ -76,7 +76,7 @@ jobs:
           # generate dotenv
           yarn --cwd internal gen:env
 
-          cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID}-$(date '+%Y%m%dT%H%M%S')
+          cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID:-ghRunId}-$(date '+%Y%m%dT%H%M%S')
 
           echo DOCKER_TAG_NAME=$DOCKER_TAG_NAME | tee -a $DOTENV_FILE | tee -a $GITHUB_STEP_SUMMARY
           echo HEAD_COMMIT_MESSAGE=$(git show -s --format=%s) | tee -a "$GITHUB_STEP_SUMMARY"
@@ -118,7 +118,7 @@ jobs:
         if: github.event_name == 'push'
         id: enable_delay_for_docker_build_to_complete
         run: |
-          sleep 840 # Temporary solution
+          sleep 240 # Temporary solution
 
       - name: Pull docker images
         uses: nick-fields/retry@v3
@@ -134,22 +134,21 @@ jobs:
 
       - name: docker compose up
         run: |
-          # Run ALP services
           yarn remote:minerva up --remove-orphans --force-recreate --wait
-          EXIT_CODE=$?
+          DC_EXIT_CODE=$?
+          echo DC_EXIT_CODE=$DC_EXIT_CODE | tee -a $GITHUB_STEP_SUMMARY
 
-          yarn base:minerva ps --format "{{.Names}} {{.Status}}" 2> /dev/null | grep ^alp | tee -a $GITHUB_STEP_SUMMARY
-          echo | tee -a $GITHUB_STEP_SUMMARY
+          DOCKER_STATUS_FILE=../docker-status-${GITHUB_RUN_ID:-ghRunId}-$(date '+%Y%m%dT%H%M%S').txt
+          docker ps --format {{.Names}},{{.Status}} 2> /dev/null | sort | tee $DOCKER_STATUS_FILE | tee -a $GITHUB_STEP_SUMMARY
 
-          if [ $EXIT_CODE != 0 ]; then
-            echo "ERROR docker compose exit code $EXIT_CODE" | tee -a $GITHUB_STEP_SUMMARY
-            exit $EXIT_CODE
-          fi
+          DC_FAIL_COUNT=$( grep -icE "starting|unhealthy" $DOCKER_STATUS_FILE || true )
+          echo DC_FAIL_COUNT=$DC_FAIL_COUNT | tee -a $GITHUB_STEP_SUMMARY
+          [ $DC_EXIT_CODE = 0 ] || { echo EXIT DC_EXIT_CODE=$DC_EXIT_CODE && exit $DC_EXIT_CODE; }
 
       - name: Logs minerva
         if: success() || failure()
         run: |
-          yarn logs:minerva
+          yarn ci:logs:minerva
 
       - name: Post cleanup
         if: always()

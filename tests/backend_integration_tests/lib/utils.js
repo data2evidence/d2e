@@ -130,7 +130,7 @@ function createGuid() {
  */
 function createDWID() {
   var guid = createGuid()
-  return new Buffer(guid.substr(0, 32)).toString('hex')
+  return Buffer.from(guid.substring(0, 32)).toString('hex')
 }
 
 /**
@@ -587,7 +587,7 @@ const _serialize = ({ queryString, compress }) => {
     .reduce((a, key) => {
       a.push(
         `${key}=${encodeURIComponent(
-          compress.indexOf(key) > -1
+          compress.indexOf(key) > -1 && key !== 'datasetId' // Dont encode if key is datasetId
             ? Buffer.from(pako.deflate(queryString[key], { to: 'string' }), 'binary').toString('base64')
             : queryString[key]
         )}`

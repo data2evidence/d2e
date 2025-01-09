@@ -4,6 +4,9 @@ import CreateLogger = Logger.CreateLogger;
 import { Connection as connLib } from "@alp/alp-base-utils";
 import { DcReplacementConfig } from "../../types";
 import ConnectionInterface = connLib.ConnectionInterface;
+import { fileURLToPath } from "node:url";
+import { dirname, normalize, join } from "node:path";
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const logger = CreateLogger("analytics-log");
 
@@ -25,15 +28,11 @@ export class DataCharacterizationEndpoint {
     public executeDcResultsSql = (
         dbConnection: ConnectionInterface,
         sqlFilePath: string,
-        dcReplacementConfig: DcReplacementConfig,
-        vocabSchema: string
+        dcReplacementConfig: DcReplacementConfig
     ) => {
-        const SQL_BASE_PATH = "./src/db/sql/data-characterization/";
-        // By default cdm vocab schema uses "CDMVOCAB"
-        // TODO(brandan):TBD Receive CDMVOCAB from request or query from portal-serverr
-        dcReplacementConfig["vocab_database_schema"] = vocabSchema;
+        const SQL_BASE_PATH = "../../db/sql/data-characterization/";
         const sqlStatement = this.getSqlStatementFromFile(
-            SQL_BASE_PATH + sqlFilePath,
+            normalize(join(__dirname, SQL_BASE_PATH, sqlFilePath)),
             dcReplacementConfig
         );
         return new Promise(async (resolve, reject) => {

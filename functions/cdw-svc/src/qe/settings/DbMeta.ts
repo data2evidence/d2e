@@ -3,7 +3,7 @@ import { Connection as connLib } from "@alp/alp-base-utils";
 import ConnectionInterface = connLib.ConnectionInterface;
 import CallBackInterface = connLib.CallBackInterface;
 import * as Utils from "./Utils";
-import { getDefaultSchemaName } from "../../utils/DuckdbConnection";
+import { getDuckdbSchemaName } from "../../utils/DuckdbConnection";
 import { env } from "../../configs";
 export class DbMeta {
   constructor(public connection: ConnectionInterface) {}
@@ -21,7 +21,7 @@ export class DbMeta {
       // }
       let query = ""
       if (env.USE_DUCKDB === "true") {
-        schema = getDefaultSchemaName()
+        schema = getDuckdbSchemaName()
         query =  `SELECT COLUMN_NAME AS \"COLUMN_NAME\" 
         from information_schema.columns 
         where table_catalog = ?::text AND TABLE_NAME = ?::text 

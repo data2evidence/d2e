@@ -10,7 +10,7 @@ import {
 import {
   DataCharacterizationFlowRunDto,
   DataCharacterizationOptions,
-} from "../types.d.ts";
+} from "../types.ts";
 
 export class DataCharacterizationService {
   public async getDataCharacterizationResults(
@@ -118,7 +118,7 @@ export class DataCharacterizationService {
     const { dialect, databaseCode, schemaName, vocabSchemaName } =
       await portalServerApi.getDataset(datasetId);
 
-    let dataCharacterizationResultsSchema = `${schemaName}_DATA_CHARACTERIZATION_${Date.now()}`;
+    let dataCharacterizationResultsSchema = `${schemaName}_DC_${Date.now()}`;
 
     if (dialect === "hana") {
       dataCharacterizationResultsSchema =
@@ -150,12 +150,25 @@ export class DataCharacterizationService {
       },
     };
 
-    return await prefectApi.createFlowRun(
+    const flowRunId = await prefectApi.createFlowRun(
       name,
       PrefectDeploymentName.DATA_CHARACTERIZATION,
       PrefectFlowName.DATA_CHARACTERIZATION,
       parameters
     );
+
+    await prefectApi.createInputAuthToken(flowRunId);
+
+    await Promise.any([
+      new Promise((resolve) => {
+        setTimeout(async () => {
+          await prefectApi.deleteInputAuthToken(flowRunId);
+          resolve(`Deleted the input of ${flowRunId}`);
+        }, 5000);
+      }),
+    ]);
+
+    return { flowRunId };
   }
 
   public async getSchemaMappingList(token: string) {

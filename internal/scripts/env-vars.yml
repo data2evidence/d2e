@@ -36,28 +36,25 @@ LOGTO__CLIENTID_PASSWORD__BASIC_AUTH:
   comment: generated
   type: base64 encoded
 LOGTO__ALP_APP__CLIENT_ID:
-  comment: generated with logto APIs post init
-  type: string
+  comment: generated
+  type: password
 LOGTO__ALP_APP__CLIENT_SECRET:
-  comment: generated with logto APIs post init
+  comment: generated
   type: password
 LOGTO__ALP_SVC__CLIENT_ID:
-  comment: generated with logto APIs post init
-  type: string
+  comment: generated
+  type: password
 LOGTO__ALP_SVC__CLIENT_SECRET:
-  comment: generated with logto APIs post init
+  comment: generated
   type: password
 LOGTO__ALP_DATA__CLIENT_ID:
-  comment: generated with logto APIs post init
-  type: string
-LOGTO__ALP_DATA__CLIENT_SECRET:
-  comment: generated with logto APIs post init
+  comment: generated
   type: password
-MEILI_MASTER_KEY:
-  comment: meilisearch master key
+LOGTO__ALP_DATA__CLIENT_SECRET:
+  comment: generated
   type: password
 MINIO__SECRET_KEY:
-  comment: meilisearch secret_key
+  comment: minio secret_key
   type: password
 PG_ADMIN_PASSWORD:
   comment: admin permissions

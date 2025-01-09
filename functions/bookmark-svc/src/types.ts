@@ -10,7 +10,6 @@ export const bookmarkIdSchema = z.object({
   query: z.object({
     paConfigId: z.string(),
     r: z.string(),
-    username: z.string(),
   }),
 })
 
@@ -30,7 +29,6 @@ export const createBookmarkSchema = z.object({
     cdmConfigVersion: z.string(),
     shareBookmark: z.boolean(),
     cmd: z.string(),
-    username: z.string(),
   }),
 })
 
@@ -44,7 +42,6 @@ export const updateBookmarkSchema = z.object({
     paConfigId: z.string(),
     cdmConfigId: z.string(),
     cdmConfigVersion: z.string(),
-    username: z.string(),
   }),
 })
 
@@ -57,7 +54,6 @@ export const deleteBookmarkSchema = z.object({
     paConfigId: z.string(),
     cdmConfigId: z.string(),
     cdmConfigVersion: z.string(),
-    username: z.string(),
   }),
 })
 
@@ -113,4 +109,54 @@ export interface IDBCredentialsType {
   max?: number | undefined
   min?: number | undefined
   idleTimeoutMillis?: number | undefined
+}
+
+export interface BookmarkDto {
+  id: string
+  bookmark_name: string
+  bookmark: string
+  type: string | null
+  view_name: string | null
+  modified: string
+  version: number
+  pa_config_id: string
+  cdm_config_id: string
+  cdm_config_version: number
+  user_id: string
+  shared: boolean
+}
+
+export interface IcohortDefinition {
+  id: number
+  patientIds: number[]
+  name: string
+  description: string
+  creationTimestamp: string
+  modificationTimestamp: string
+  owner: string
+  syntax: string
+}
+
+export interface IFormattedBookmark {
+  bmkId: string
+  bookmarkname: string
+  bookmark: string
+  viewname: string | null
+  modified: string
+  version: string | null
+  user_id: string
+  shared: boolean
+  cohortDefinitionId?: number | undefined
+}
+export interface IFormattedcohortDefinition {
+  id: number
+  patientCount: number
+  cohortDefinitionName: string
+  createdOn: string
+}
+
+export interface IFrontendBookmark {
+  schemaName: string
+  bookmarks: IFormattedBookmark[]
+  cohortDefinitions: IFormattedcohortDefinition[]
 }

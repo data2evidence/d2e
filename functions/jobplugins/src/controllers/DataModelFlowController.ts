@@ -2,7 +2,11 @@ import { Request, Response, Router } from "npm:express";
 import { validationResult } from "npm:express-validator";
 import { validateDatamodelFlowRunDto } from "../middlewares/DataModelValidatorMiddlewares.ts";
 import { DataModelFlowService } from "../services/DataModelFlowService.ts";
-import { IGetVersionInfoFlowRunDto } from "../types.d.ts";
+import {
+  ICreateDatamartFlowRunDto,
+  ICreateDatamodelFlowRunDto,
+  IGetVersionInfoFlowRunDto,
+} from "../types.ts";
 
 export class DataModelFlowController {
   private DataModelFlowService: DataModelFlowService;
@@ -36,6 +40,30 @@ export class DataModelFlowController {
         await this.createGetVersionInfoFlowRun(req, res);
       }
     );
+
+    // POST /datamodel/create_datamodel_run
+    this.router.post(
+      "/create_datamodel_run",
+      async (req: Request, res: Response) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          res.status(400).json({ errors: errors.array() });
+        }
+        await this.createDatamodelFlowRun(req, res);
+      }
+    );
+
+    // POST /datamodel/create_datamart_run
+    this.router.post(
+      "/create_datamart_run",
+      async (req: Request, res: Response) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          res.status(400).json({ errors: errors.array() });
+        }
+        await this.createDatamartFlowRun(req, res);
+      }
+    );
   }
 
   private async getDataModels(req: Request, res: Response) {
@@ -62,6 +90,38 @@ export class DataModelFlowController {
       console.error(
         `Error creating data model get version info flow run: ${error}`
       );
+      res.status(500).send(`Error occurs: ${error}`);
+    }
+  }
+
+  private async createDatamodelFlowRun(req: Request, res: Response) {
+    try {
+      const token = req.headers.authorization;
+      const createDatamodelFlowRunDto: ICreateDatamodelFlowRunDto = req.body;
+      const result = await this.DataModelFlowService.createDatamodelFlowRun(
+        createDatamodelFlowRunDto,
+        token
+      );
+      res.send(result);
+    } catch (error) {
+      console.error(
+        `Error creating data model get version info flow run: ${error}`
+      );
+      res.status(500).send(`Error occurs: ${error}`);
+    }
+  }
+
+  private async createDatamartFlowRun(req: Request, res: Response) {
+    try {
+      const token = req.headers.authorization;
+      const createDatamartFlowRunDto: ICreateDatamartFlowRunDto = req.body;
+      const result = await this.DataModelFlowService.createDatamartFlowRun(
+        createDatamartFlowRunDto,
+        token
+      );
+      res.send(result);
+    } catch (error) {
+      console.error(`Error creating datamart flow run: ${error}`);
       res.status(500).send(`Error occurs: ${error}`);
     }
   }

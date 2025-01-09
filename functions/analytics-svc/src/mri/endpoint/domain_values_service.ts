@@ -1,5 +1,5 @@
 // TODO: import configLib = require("./config.ts");
-import { QueryObject as qo } from "@alp/alp-base-utils";
+import { QueryObject as qo, Logger } from "@alp/alp-base-utils";
 import QueryObject = qo.QueryObject;
 import { assert } from "@alp/alp-base-utils";
 import { Connection as connLib } from "@alp/alp-base-utils";
@@ -8,13 +8,16 @@ import CallBackInterface = connLib.CallBackInterface;
 import { generateQuery } from "../../utils/QueryGenSvcProxy";
 import { terminologyRequest } from "../../utils/TerminologySvcProxy";
 
+const log = Logger.CreateLogger("analytics-log");
+
 export async function processRequest(
     req,
     domainValuesRequest,
     connection: ConnectionInterface,
     callback: CallBackInterface
 ) {
-    try {
+        log.addRequestCorrelationID(req);
+        try {
         assert(
             domainValuesRequest.attributePath,
             'The request must contain a property "attributePath"'
@@ -23,7 +26,7 @@ export async function processRequest(
             const conceptSets = await terminologyRequest(
                 req,
                 "GET",
-                "concept-set",
+                `concept-set?datasetId=${domainValuesRequest.configParams.datasetId}`,
                 null
             );
             callback(null, {
@@ -45,6 +48,7 @@ export async function processRequest(
                 suggestionLimit: domainValuesRequest.suggestionLimit,
                 configParams: domainValuesRequest.configParams,
                 searchQuery: domainValuesRequest.searchQuery,
+                datasetId: domainValuesRequest.configParams.datasetId
             },
             "domainvalues"
         );

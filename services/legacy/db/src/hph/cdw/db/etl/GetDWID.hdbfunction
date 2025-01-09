@@ -1,7 +1,0 @@
-FUNCTION "hc.hph.cdw.db.etl::GetDWID" ( Source NVARCHAR(64) )
-    RETURNS DWID VARBINARY( 32 )
-    LANGUAGE SQLSCRIPT
-    SQL SECURITY INVOKER AS
-BEGIN
-        DWID := HEXTOBIN (  :Source );
-END;

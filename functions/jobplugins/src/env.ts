@@ -10,6 +10,12 @@ export const env = {
     process.env.DATAFLOW_MGMT__ADHOC_FLOWS__PREFECT_S3_BUCKET_NAME ||
     "dataflow-adhoc-flows",
   GATEWAY_CA_CERT: process.env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
+  PG__HOST: _env.PG__HOST,
+  PG__PORT: _env.PG__PORT,
+  PG_ADMIN_USER: _env.PG_ADMIN_USER,
+  PG_ADMIN_PASSWORD: _env.PG_ADMIN_PASSWORD,
+  PG__DB_NAME: _env.PG__DB_NAME,
+  PG_SCHEMA: "trex",
 };
 
 export const services = JSON.parse(env.SERVICE_ROUTES);

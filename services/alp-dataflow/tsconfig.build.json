@@ -1,7 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "watchOptions": {
-    "excludeFiles": ["src/common/data-source/**"]
-  },
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
-}

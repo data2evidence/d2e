@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tbuild node_modules/@alp-os/trex"
   },
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@alp-os/trex": "latest",
+    "deno": "latest"
+  },
   "trex": {
     "functions": {
       "init": [
@@ -26,12 +31,33 @@
           "function": "/alp-db-credentials/src/init",
           "imports": "/alp-db-credentials/import.json",
           "env": "alp-db-credentials"
+        },
+        {
+          "function": "/files-manager/src/init",
+          "imports": "/files-manager/import.json",
+          "env": "files-manager"
+        },
+        {
+          "function": "/jobplugins/src/init",
+          "imports": "/jobplugins/import.json",
+          "env": "jobplugins"
+        },
+        {
+          "function": "/alp-usermgmt/src/init",
+          "imports": "/alp-usermgmt/import.json",
+          "env": "alp-usermgmt"
+        },
+        {
+          "function": "/portal/src/init",
+          "imports": "/portal/import.json",
+          "env": "portal"
         }
       ],
       "api": [
         {
           "source": "/jobplugins",
           "function": "/jobplugins",
+          "imports": "/jobplugins/import.json",
           "env": "jobplugins"
         },
         {
@@ -50,11 +76,6 @@
           "env": "dataset"
         },
         {
-          "source": "/portalsvc",
-          "rmsrc": true,
-          "service": "portalServer"
-        },
-        {
           "source": "/analytics-svc/api/services/query",
           "function": "/query-gen-svc",
           "imports": "/query-gen-svc/import.json",
@@ -62,13 +83,15 @@
         },
         {
           "source": "/system-portal",
-          "rmsrc": true,
-          "service": "portalServer"
+          "function": "/portal",
+          "imports": "/portal/import.json",
+          "env": "portal"
         },
         {
           "source": "/dataflow-mgmt",
-          "rmsrc": true,
-          "service": "dataflowMgmt"
+          "function": "/jobplugins",
+          "env": "jobplugins",
+          "imports": "/jobplugins/import.json"
         },
         {
           "source": "/usermgmt",
@@ -114,11 +137,9 @@
         },
         {
           "source": "/terminology",
-          "service": "terminology"
-        },
-        {
-          "source": "/meilisearch-svc",
-          "service": "meilisearch"
+          "function": "/terminology-svc",
+          "imports": "/terminology-svc/import.json",
+          "env": "terminology-svc"
         },
         {
           "source": "/pa-config-svc",
@@ -179,6 +200,12 @@
           "function": "/concept-mapping",
           "env": "concept-mapping",
           "imports": "/concept-mapping/import.json"
+        },
+        {
+          "source": "/files-manager/api",
+          "function": "/files-manager",
+          "env": "files-manager",
+          "imports": "/files-manager/import.json"
         }
       ],
       "roles": {
@@ -245,7 +272,9 @@
           "dbCredentials.db.write",
           "dbCredentials.db.credential.update",
           "dbCredentials.db.delete",
+          "dbCredentials.vocab.schema.list",
           "portal.dataset.systemAdmin.read",
+          "portal.dataset.read",
           "portal.dataset.exist",
           "portal.dataset.add",
           "portal.dataset.update",
@@ -270,6 +299,9 @@
           "portal.dataset.metadataConfig.attribute.delete",
           "portal.config.read",
           "portal.config.write",
+          "portal.userArtifact.read",
+          "portal.userArtifact.write",
+          "portal.userArtifact.delete",
           "portal.userArtifact.group.write",
           "portal.userArtifact.group.delete",
           "terminology.user.read",
@@ -295,7 +327,6 @@
           "dataflowmgmt.dqd.dataQuality.flowRun.add",
           "dataflowmgmt.dqd.dataCharacterization.flowRun.results.drilldown.read",
           "dataflowmgmt.dqd.dataCharacterization.flowRun.add",
-          "dataflowmgmt.meilisearch.flowRun.add",
           "dataflowmgmt.dbSvc.flowRun.add",
           "dbSvc.schema.create",
           "dbSvc.snapshot.create",
@@ -309,9 +340,6 @@
           "dbSvc.schema.snapshot.metadata.read",
           "dbSvc.snapshot.parquet.create",
           "dbSvc.schema.delete",
-          "meilisearchSvc.index.add",
-          "meilisearchSvc.index.setting.update",
-          "meilisearchSvc.document.add",
           "gateway.dashboardGate.register",
           "gateway.dataset.dashboards.read",
           "gateway.dataset.cohorts.read",
@@ -321,9 +349,10 @@
           "gateway.db.vocabSchemas.read",
           "gateway.db.dataset.versionInfo.read",
           "gateway.db.schema.update",
-          "gateway.terminology.hybridSearchConfig.read",
-          "gateway.terminology.hybridSearchConfig.update",
           "gateway.terminology.concept.getStandardConcepts.read",
+          "gateway.terminology.concept.searchByName.read",
+          "gateway.terminology.concept.searchById.read",
+          "gateway.terminology.concept.searchByCode.read",
           "dataflowmgmt.analysisflow.read",
           "dataflowmgmt.analysisflow.add",
           "dataflowmgmt.analysisflow.delete",
@@ -334,7 +363,10 @@
           "prefect.post",
           "prefect.update",
           "conceptmapping.read",
-          "conceptmapping.post"
+          "conceptmapping.post",
+          "filesmanager.read",
+          "filesmanager.post",
+          "filesmanager.delete"
         ],
         "ALP_DASHBOARD_VIEWER": [
           "gateway.dashboardGate.content"
@@ -369,6 +401,7 @@
           "CDWConfig.svc/read",
           "portal.dataset.paConfig.read",
           "portal.dataset.resource.read",
+          "portal.dataset.read",
           "portal.dataset.resource.download",
           "portal.notebook.read",
           "portal.notebook.add",
@@ -384,7 +417,6 @@
           "gateway.terminology.concept.recommended.read",
           "gateway.terminology.concept.hierarchy.read",
           "gateway.terminology.fhir.read",
-          "gateway.terminology.hybridSearchConfig.read",
           "dataflowmgmt.analysisflow.read",
           "dataflowmgmt.analysisflow.add",
           "dataflowmgmt.analysisflow.delete",
@@ -404,13 +436,23 @@
         ],
         "IDP_ALP_DATA_CLIENT_ID": [
           "portal.dataset.read",
-          "meilisearchSvc.index.add",
-          "meilisearchSvc.index.setting.update",
-          "meilisearchSvc.document.add",
           "gateway.fhir.create"
         ]
       },
       "scopes": [
+        {
+          "path": "^/files-manager/api",
+          "scopes": [
+            "filesmanager.read",
+            "filesmanager.post",
+            "filesmanager.delete"
+          ],
+          "httpMethods": [
+            "GET",
+            "POST",
+            "DELETE"
+          ]
+        },
         {
           "path": "^/concept-mapping",
           "scopes": [
@@ -478,12 +520,17 @@
           "path": "^/pa-config-svc/enduser(.*)",
           "scopes": [
             "PAConfig.svc",
-            "PAConfig.svc/read",
-            "PA.Score.svc"
+            "PAConfig.svc/read"
           ]
         },
         {
           "path": "^/pa-config-svc/services/(.*)",
+          "scopes": [
+            "PAConfig.svc"
+          ]
+        },
+        {
+          "path": "^/pa-config-svc/db/(.*)",
           "scopes": [
             "PAConfig.svc"
           ]
@@ -806,6 +853,15 @@
           ],
           "httpMethods": [
             "DELETE"
+          ]
+        },
+        {
+          "path": "^/db-credentials/vocab/(postgres|hana)/schema/list$",
+          "scopes": [
+            "dbCredentials.vocab.schema.list"
+          ],
+          "httpMethods": [
+            "GET"
           ]
         },
         {
@@ -1152,6 +1208,20 @@
           ]
         },
         {
+          "path": "^/system-portal/user-artifact/(?!group(?:$|/))(.*)$",
+          "scopes": [
+            "portal.userArtifact.read",
+            "portal.userArtifact.write",
+            "portal.userArtifact.delete"
+          ],
+          "httpMethods": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE"
+          ]
+        },
+        {
           "path": "^/system-portal/user-artifact/group$",
           "scopes": [
             "portal.userArtifact.group.write"
@@ -1212,6 +1282,15 @@
           "path": "^/terminology/concept-set$",
           "scopes": [
             "gateway.terminology.conceptSet.create"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/terminology/concept-set/included-concepts$",
+          "scopes": [
+            "gateway.terminology.conceptSet.read"
           ],
           "httpMethods": [
             "POST"
@@ -1281,30 +1360,39 @@
           ]
         },
         {
+          "path": "^/terminology/concept/searchByName$",
+          "scopes": [
+            "gateway.terminology.concept.searchByName.read"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/terminology/concept/searchById$",
+          "scopes": [
+            "gateway.terminology.concept.searchById.read"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/terminology/concept/searchByCode$",
+          "scopes": [
+            "gateway.terminology.concept.searchByCode.read"
+          ],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
           "path": "^/terminology/fhir/4_0_0/(.*)",
           "scopes": [
             "gateway.terminology.fhir.read"
           ],
           "httpMethods": [
             "GET"
-          ]
-        },
-        {
-          "path": "^/terminology/hybrid-search-config",
-          "scopes": [
-            "gateway.terminology.hybridSearchConfig.read"
-          ],
-          "httpMethods": [
-            "GET"
-          ]
-        },
-        {
-          "path": "^/terminology/hybrid-search-config",
-          "scopes": [
-            "gateway.terminology.hybridSearchConfig.update"
-          ],
-          "httpMethods": [
-            "POST"
           ]
         },
         {
@@ -1642,15 +1730,6 @@
           ]
         },
         {
-          "path": "^/dataflow-mgmt/meilisearch/index/flow-run",
-          "scopes": [
-            "dataflowmgmt.meilisearch.flowRun.add"
-          ],
-          "httpMethods": [
-            "POST"
-          ]
-        },
-        {
           "path": "^/dataflow-mgmt/db-svc/run",
           "scopes": [
             "dataflowmgmt.dbSvc.flowRun.add"
@@ -1837,43 +1916,6 @@
           ],
           "httpMethods": [
             "GET"
-          ]
-        },
-        {
-          "path": "^/meilisearch-svc/indexes",
-          "scopes": [
-            "meilisearchSvc.index.add"
-          ],
-          "httpMethods": [
-            "POST"
-          ]
-        },
-        {
-          "path": "^/meilisearch-svc/indexes/[a-zA-Z0-9_-]+/settings(.*)",
-          "scopes": [
-            "meilisearchSvc.index.setting.update"
-          ],
-          "httpMethods": [
-            "PATCH"
-          ]
-        },
-        {
-          "path": "^/meilisearch-svc/indexes/[a-zA-Z0-9_-]+/documents(.*)",
-          "scopes": [
-            "meilisearchSvc.document.add"
-          ],
-          "httpMethods": [
-            "POST",
-            "PUT"
-          ]
-        },
-        {
-          "path": "^/meilisearch-svc/indexes/[a-zA-Z0-9_-]+/settings/synonyms",
-          "scopes": [
-            "meilisearchSvc.document.add"
-          ],
-          "httpMethods": [
-            "PUT"
           ]
         },
         {

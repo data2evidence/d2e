@@ -1,21 +1,37 @@
 services:
   trex:
     command: npm run startdev
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-      - alp-minerva-terminology-svc:alp-minerva-terminology-svc-${BASE_PORT:-1}
-      - alp-minerva-dataflow-mgmt:alp-minerva-dataflow-mgmt-${BASE_PORT:-1}
     ports:
       - 9229:9229
     volumes:
       - ./functions:/usr/src/plugins/d2ef
+      # - ../trex/core:/usr/src/core # For debugging trex with local code
     environment:
       LOCAL_DEBUG: "true"
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
       PLUGINS_SEED: '["d2e-plugins", "d2e-ui"]'
       PLUGINS_SEED_UPDATE: ${PLUGINS_SEED_UPDATE:-false}
       PLUGINS_DEV_PATH: "./plugins"
-      WATCH_FUNCTIONS: ${WATCH_FUNCTIONS:-false}
+      WATCH: |-
+        {
+          "analytics-svc": false,
+          "mri-pg-config": false,
+          "alp-db-credentials": false,
+          "alp-fhir-svc": false,
+          "alp-fhir-init": false,
+          "query-gen-svc": false,
+          "alp-usermgmt": false,
+          "bookmark-svc": false,
+          "mri-pa-config": false,
+          "cdw-svc": false,
+          "jobplugins": false,
+          "dataset": false,
+          "alpdb": false,
+          "concept-mapping": false,
+          "terminology-svc": false,
+          "portal": false,
+          "files-manager": false
+        }
 
   alp-caddy:
     command: caddy run --environ --config /srv/caddy-config/Caddyfile --adapter caddyfile --watch
@@ -45,20 +61,6 @@ services:
       context: ./services/alp-logto
       dockerfile: Dockerfile
 
-  alp-minerva-dataflow-mgmt:
-    build:
-      context: ./services/alp-dataflow
-      dockerfile: Dockerfile
-    container_name: alp-minerva-dataflow-mgmt-nest-prod-${BASE_PORT:-1}
-    external_links:
-      - alp-minerva-portal-server:alp-minerva-portal-server-${BASE_PORT:-1}
-    environment:
-      NODE_ENV: development
-
-  alp-minerva-meilisearch-svc:
-    ports:
-      - 41111:41111
-
   alp-minerva-pg-mgmt-init:
     build:
       context: services/alp-pg-management
@@ -68,28 +70,10 @@ services:
     environment:
       LOCAL_DEBUG: "true"
 
-  alp-minerva-portal-server:
-    build:
-      context: ./services/alp-portal-server
-      dockerfile: Dockerfile
-    container_name: alp-minerva-portal-server-nest-prod-${BASE_PORT:-1}
-    environment:
-      MINIO__REGION: ${MINIO__REGION:-ap-southeast-1}
-      MINIO__SSL: false
-      NODE_ENV: development
-
   alp-minerva-postgres:
     ports:
       - 41190:5432
       - 5432:5432
-
-  alp-minerva-terminology-svc:
-    build:
-      context: .
-      dockerfile: ./services/alp-terminology-svc/Dockerfile
-    container_name: alp-minerva-terminology-svc-nest-prod-${BASE_PORT:-1}
-    environment:
-      LOCAL_DEBUG: "false"
 
   #alp-dicom-server:
   # uses 8042 port on the container
@@ -138,16 +122,6 @@ services:
       - 9235:9235
     environment:
       LOCAL_DEBUG: "true"
-
-  alp-perseus-backend:
-    build:
-      context: ./services/alp-perseus-backend
-      dockerfile: Dockerfile
-
-  alp-perseus-files-manager:
-    build:
-      context: ./services/alp-perseus-files-manager
-      dockerfile: Dockerfile
 
   alp-perseus-white-rabbit:
     environment:

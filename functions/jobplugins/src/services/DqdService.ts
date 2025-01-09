@@ -11,7 +11,7 @@ import {
   IDataCharacterizationResult,
   IDataQualityResult,
   IDomainContinuityResult,
-} from "../types.d.ts";
+} from "../types.ts";
 import { DataQualityOverviewParser } from "../utils/DataQualityOverviewParser.ts";
 
 export class DqdService {
@@ -160,12 +160,25 @@ export class DqdService {
       },
     };
 
-    return await prefectApi.createFlowRun(
+    const flowRunId = await prefectApi.createFlowRun(
       name,
       PrefectDeploymentName.DQD,
       PrefectFlowName.DQD,
       parameters
     );
+
+    await prefectApi.createInputAuthToken(flowRunId);
+
+    await Promise.any([
+      new Promise((resolve) => {
+        setTimeout(async () => {
+          await prefectApi.deleteInputAuthToken(flowRunId);
+          resolve(`Deleted the input of ${flowRunId}`);
+        }, 5000);
+      }),
+    ]);
+
+    return { flowRunId };
   }
 
   public async getDataQualityHistoryByCategory(

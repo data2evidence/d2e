@@ -9,7 +9,7 @@ import type { Pool } from "pg";
 import { DBError } from "./DBError";
 import { CreateLogger } from "./Logger";
 import QueryStream from "pg-query-stream";
-import { translateHanaToPostgres } from "./helpers/hanaTranslation";
+import { translateHanaToPostgres, translateHanaToDuckdb } from "./helpers/hanaTranslation";
 import { EnvVarUtils } from "./EnvVarUtils";
 const logger = CreateLogger("Postgres Connection");
 
@@ -25,7 +25,7 @@ export class PostgresConnection implements ConnectionInterface {
     public conn: Pool,
     public schemaName,
     public vocabSchemaName,
-    public dialect = "POSTGRES",
+    public dialect = "postgresql",
   ) {}
 
   public static createConnection(
@@ -33,9 +33,10 @@ export class PostgresConnection implements ConnectionInterface {
     schemaName,
     vocabSchemaName = schemaName,
     callback,
+    dialect = "postgresql",
   ) {
     try {
-      const conn = new PostgresConnection(pool, schemaName, vocabSchemaName);
+      const conn = new PostgresConnection(pool, schemaName, vocabSchemaName, dialect);
       callback(null, conn);
     } catch (err) {
       callback(err, null);
@@ -66,7 +67,7 @@ export class PostgresConnection implements ConnectionInterface {
     function getType(columnKey: string, value: any) {
       for (const md of metadata) {
         if (md.name === columnKey) {
-          logger.debug(`${md.name} ---- ${md.dataTypeID} ---- value: ${value}`);
+          //logger.debug(`${md.name} ---- ${md.dataTypeID} ---- value: ${value}`);
           return md.dataTypeID;
         }
       }
@@ -92,25 +93,25 @@ export class PostgresConnection implements ConnectionInterface {
     callback: CallBackInterface,
   ) {
     try {
-      logger.debug(`Sql: ${sql}`);
-      logger.debug(
-        `parameters: ${JSON.stringify(flattenParameter(parameters))}`,
-      );
+      //logger.debug(`Sql: ${sql}`);
+      // logger.debug(
+      //   `parameters: ${JSON.stringify(flattenParameter(parameters))}`,
+      // );
       let temp = sql;
-      temp = this.parseSql(temp);
+      temp = this.parseSql(temp, parameters);
       this.conn.connect((err, client, release) => {
         if (err) {
           logger.error(err);
           callback(err, null);
         }
-        logger.debug("PG client created");
+        //logger.debug("PG client created");
         client.query(temp, flattenParameter(parameters), (err, result) => {
           if (err) {
             release(true); // Will destroy this client, instead of releasing back to pool
           } else {
             release();
           }
-          logger.debug("PG client released");
+          //logger.debug("PG client released");
           callback(err, result);
         });
       });
@@ -119,12 +120,19 @@ export class PostgresConnection implements ConnectionInterface {
     }
   }
 
-  public parseSql(temp: string): string {
-    return translateHanaToPostgres(temp, this.schemaName, this.vocabSchemaName);
+  public parseSql(temp: string, parameters?: ParameterInterface[]): string {
+    switch (this.dialect) {
+      case "postgresql":
+        return translateHanaToPostgres(temp, this.schemaName, this.vocabSchemaName);
+      case "duckdb":
+        return translateHanaToDuckdb(temp, this.schemaName, this.vocabSchemaName, parameters);
+      default:
+        throw new Error("Invalid Dialect")
+    }
   }
 
   public getTranslatedSql(sql: string, schemaName: string, parameters: ParameterInterface[]): string {
-    return this.parseSql(sql);
+    return this.parseSql(sql, parameters);
   }
 
   public executeQuery(
@@ -138,7 +146,7 @@ export class PostgresConnection implements ConnectionInterface {
           logger.error(err);
           callback(err, null);
         } else {
-          logger.debug(`${JSON.stringify(resultSet, null, 2)}`);
+          //logger.debug(`${JSON.stringify(resultSet, null, 2)}`);
           const result = this.parseResults(
             _getRows(resultSet),
             resultSet.fields,
@@ -159,7 +167,7 @@ export class PostgresConnection implements ConnectionInterface {
   ) {
     try {
       sql = this.getSqlStatementWithSchemaName(schemaName, sql);
-      sql = this.parseSql(sql);
+      sql = this.parseSql(sql, parameters);
 
       this.conn.connect((err, client, release) => {
         if (err) {
@@ -214,9 +222,9 @@ export class PostgresConnection implements ConnectionInterface {
     try {
       const params = parameters.map(param => "?");
       const sql = `select count(*) from \"${procedure}\"(${params.join()})`;
-      logger.debug(`Sql: ${sql}`);
+      //logger.debug(`Sql: ${sql}`);
       let temp = sql;
-      temp = this.parseSql(temp);
+      temp = this.parseSql(temp, parameters);
       this.conn.query(temp, parameters, (err, result) => {
         if (err) {
           return callback(new DBError(logger.error(err), err.stack), null);
@@ -253,9 +261,9 @@ export class PostgresConnection implements ConnectionInterface {
     ) {
       this.conn.end.apply(this.conn, arguments);
     } else {
-      logger.debug(
-        "PostgresConnection is using a pool. Connection is not closed",
-      );
+      //logger.debug(
+      //   "PostgresConnection is using a pool. Connection is not closed",
+      // );
     }
   }
 
