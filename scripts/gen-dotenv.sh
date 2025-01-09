@@ -38,12 +38,10 @@ done
 echo
 
 echo set-openssl ...
-# https://www.openssl.org/docs/man3.0/man1/openssl-passphrase-options.html
 function set-openssl {
-    echo INFO set DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE DB_CREDENTIALS__INTERNAL__PRIVATE_KEY DB_CREDENTIALS__INTERNAL__PUBLIC_KEY ...
-    # TODO: below fails due to removal of passphrase
-    export PRIVATE_KEY=$(openssl genpkey  -algorithm RSA -aes-256-cbc -pkeyopt rsa_keygen_bits:4096 -quiet)
-    export PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | openssl rsa -pubout -passin)
+    echo INFO set DB_CREDENTIALS__INTERNAL__PRIVATE_KEY DB_CREDENTIALS__INTERNAL__PUBLIC_KEY ...
+    export PRIVATE_KEY=$(openssl genpkey  -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -quiet)
+    export PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | openssl rsa -pubout)
     
     echo DB_CREDENTIALS__INTERNAL__PRIVATE_KEY=\'"${PRIVATE_KEY}"\' >> $tmp_file
     echo DB_CREDENTIALS__INTERNAL__PUBLIC_KEY=\'"${PUBLIC_KEY}"\' >> $tmp_file
