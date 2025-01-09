@@ -101,8 +101,6 @@ Additional info:
 
 This sections assumes that there is an existing database available. The database should be in a Postgres docker container name or external database with a Fully Qualified Domain Name (FQDN).
 
-If there is no existing databases available, you may consider using a [sample dataset](./2-load/), and perform sub-steps [3](./2-load/3-setup-pg-permissions.md), [4](./2-load/4-setup-db-credentials.md), [6](./2-load/6-load-synpuf1k.md) and [7](./2-load/7-load-vocab.md) to setup the database. Thereafter, you may continue to follow the guide from section [Plugins](#plugins) onwards.
-
 
 - In the Admin Portal, navigate to **Setup** > **Databases** > **Configure** > **Add database**
   > **The expected display is:** ![DatabaseListEmpty](./images/database/DatabaseListEmpty.png)
@@ -115,6 +113,9 @@ If there is no existing databases available, you may consider using a [sample da
 yarn start:minerva --force-recreate; sleep 60
 ```
 
+If there is no existing databases available, you may consider using the following sample database below: 
+- [synpuf1k](./2-load/): Perform sub-steps [3](./2-load/3-setup-pg-permissions.md), [4](./2-load/4-setup-db-credentials.md), [6](./2-load/6-load-synpuf1k.md) and [7](./2-load/7-load-vocab.md). Thereafter, you may continue to follow the guide from section [Plugins](#plugins) onwards.
+- atlas-broadsea: Refer to the docs [here](/docs/2-load/8-load-broadsea.md)
 
 ## Plugins 
 The Admin portal allows the admin user to manage plugins in the platform, for instance installation, version updates and uninstallation of plugins. 
@@ -156,8 +157,6 @@ This section generates the Data Quality Dashboard based on the dataset of intere
 - After completing the **Data Quality** and **Data Characterization** job runs,  section, refer to the [documentation here](./3-configure/4-dqd-dashboard.md) to access the Data Quality Dashboard for the respective datasets in the Researcher portal.
 
   > **The expected result is:** ![dqd-dashboard](./images/dqd/dqd-dashboard-1.png)
-
-- Refer to the Jobs Portal if you
 
 ### Create Cache
 This section provides the steps for setting up the analytics environment.
