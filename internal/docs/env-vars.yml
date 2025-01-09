@@ -105,7 +105,7 @@ DATABASE_CREDENTIALS:
     remote: xxx
   type: object
 DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY:
-  comment: to encrypt dbcredentials entered in admin>setup>databases>configure
+  comment: to encrypt dbcredentials entered in admin>setup>databases>configure (no passphrase)
   envNames:
     alp-dev-sg-2: xxx
     alp-dev-sg-3: xxx
@@ -450,7 +450,7 @@ POSTGRES_ANALYTICS_DB_NAME:
     alp-stg-sg-1: xxx
   type: string
 POSTGRES_TENANT_ADMIN_PASSWORD:
-  comment: set in admin>setup>databases>configure but not in env.example
+  comment: set in admin>setup>databases>configure
   envNames:
     alp-dev-sg-2: xxx
     alp-dev-sg-3: xxx
@@ -483,7 +483,7 @@ POSTGRES_TENANT_ADMIN_PASSWORD_SALT:
     remote: xxx
   type: string
 POSTGRES_TENANT_READ_PASSWORD:
-  comment: set in admin>setup>databases>configure but not in env.example
+  comment: set in admin>setup>databases>configure
   envNames:
     alp-dev-sg-2: xxx
     alp-dev-sg-3: xxx
