@@ -81,18 +81,6 @@ services:
   #  ports:
   #    - 8042:8042
 
-  alp-fhir-server:
-    build:
-      context: ./services/alp-fhir
-      dockerfile: Dockerfile
-
-  alp-fhir-fe-server:
-    build:
-      context: ./services/alp-fhir/
-      dockerfile: Dockerfile.frontend
-    volumes:
-      - ./services/alp-fhir/ui-file-server/index.js:/home/docker/index.js
-
   alp-logto-post-init:
     build:
       context: ./services/alp-logto/post-init
