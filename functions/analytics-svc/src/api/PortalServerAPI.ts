@@ -6,17 +6,10 @@ let logger = CreateLogger("analytics-log");
 export default class PortalServerAPI {
     private readonly baseUrl: string;
     private readonly oauthUrl: string;
-    // private readonly httpsAgent: any;
 
     constructor() {
-        if (env.SERVICE_ROUTES.portalServer) {
-            this.baseUrl = env.SERVICE_ROUTES.portalServer;
-            this.oauthUrl = env.ALP_GATEWAY_OAUTH__URL;
-            // this.httpsAgent = new https.Agent({
-            //     rejectUnauthorized: true,
-            //     ca: env.TLS__INTERNAL__CA_CRT?.replace(/\\n/g, "\n"),
-            // });
-        }
+        this.baseUrl = env.SERVICE_ROUTES.portalServer;
+        this.oauthUrl = env.ALP_GATEWAY_OAUTH__URL;
         if (!this.baseUrl) {
             throw new Error("Portal Server URL is not configured!");
         }
@@ -26,7 +19,6 @@ export default class PortalServerAPI {
         let options: AxiosRequestConfig = { };
         if (token) {
             options = {
-                ...options,
                 headers: {
                     Authorization: token,
                 },
@@ -59,7 +51,7 @@ export default class PortalServerAPI {
 
         const result = await axios.post(this.oauthUrl, data, options);
 
-        return result.data.access_token;
+        return `Bearer ${result.data.access_token}`;
     }
 
     async getPublicStudies() {

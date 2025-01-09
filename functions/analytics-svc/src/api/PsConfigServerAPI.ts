@@ -58,7 +58,7 @@ export default class PsConfigServerAPI {
 
         const result = await axios.post(this.oauthUrl, data, options);
 
-        return result.data.access_token;
+        return `Bearer ${result.data.access_token}`;
     }
 
     async getCDWConfig({ action, configId, configVersion, lang }, token) {
