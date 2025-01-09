@@ -349,24 +349,14 @@ export class DqdService {
     flowRunIds: string[]
   ) {
     let dqdResults;
-    const results = await prefectApi.getFlowRunsArtifacts(flowRunIds);
-    if (results.length === 0) {
-      console.log(
-        `No flow run artifacts result found for flowRunIds: ${flowRunIds}`
-      );
-      return results;
-    }
-    const match = this.regexMatcher(results);
-    const filePaths = [];
-    if (match) {
-      for (const m of match) {
-        const s3Path = m.slice(1, -1); // Removing the surrounding brackets []
-        const filePath = this.extractRelativePath(s3Path);
-        filePaths.push(filePath);
-      }
+    // file path '<flowrun_id>_dqd.json' pattern is same as followed in dqd_plugin
+    const filePaths = flowRunIds.map((id) => `results/${id}_dqd.json`);
+    try {
       dqdResults = await portalServerApi.getFlowRunResults(filePaths);
+      return dqdResults;
+    } catch (error) {
+      throw error;
     }
-    return dqdResults;
   }
 
   // Type Gurad helper functions
