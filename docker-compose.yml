@@ -637,46 +637,6 @@ services:
       IDP__ALP_DATA__CLIENT_SECRET: ${LOGTO__ALP_DATA__CLIENT_SECRET}
       FHIR_SCHEMA_JSON_PATH: /home/docker/fhir
 
-  alp-fhir-server:
-    container_name: &c6 alp-minerva-fhir-server-${BASE_PORT:-1}
-    depends_on:
-      trex:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      interval: 20s
-      retries: 5
-      start_period: 120s
-      test:
-        - CMD
-        - wget
-        - -O
-        - fhir.status
-        - http://localhost:8103/healthcheck
-    hostname: alp-minerva-fhir-server-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-fhir-server:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c6
-    networks:
-      alp:
-        priority: 20
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    volumes:
-      - fhir-schema-file-1:/home/docker/app/medplum/packages/definitions/dist/fhir/r4
-    environment:
-      <<:
-        - *x-pg
-        - *x-redis
-        - *x-fhir
-      PG_SUPER_PASSWORD: ${PG_SUPER_PASSWORD}
-      PG_SUPER_USER: ${PG_SUPER_USER:-postgres}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      DUCKDB_PATH: /home/docker/app
-      FHIR_SCHEMA_PATH: /home/docker/app/medplum/packages/definitions/dist/fhir/r4
-      FHIR_SCHEMA_FILE_NAME: fhir.schema.json
-
   # Needed only for future alterations of schema when version upgrades
   # alp-logto-db-post-alterations-init:
   #   depends_on:
@@ -876,22 +836,6 @@ services:
       alp:
         priority: 20
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-
-  alp-fhir-fe-server:
-    container_name: &c28 alp-minerva-fhir-fe-server-${BASE_PORT:-1}
-    image: alpcr.azurecr.io/alp-data-node/alp-fhir-fe-server:${DOCKER_TAG_NAME:-develop}
-    logging:
-      options:
-        tag: *c28
-    depends_on:
-      alp-fhir-server:
-        condition: service_started
-      # alp-fhir-server-post-init:
-      #   condition: service_completed_successfully
-    networks:
-      alp:
-    restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    profiles: [fhir]
 
   alp-cachedb:
     container_name: &c30 alp-cachedb
