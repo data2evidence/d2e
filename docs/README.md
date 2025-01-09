@@ -113,8 +113,8 @@ This sections assumes that there is an existing database available. The database
 yarn start:minerva --force-recreate; sleep 60
 ```
 
-If there is no existing databases available, you may consider using the following sample database below: 
-- [synpuf1k](./2-load/): Perform sub-steps [3](./2-load/3-setup-pg-permissions.md), [4](./2-load/4-setup-db-credentials.md), [6](./2-load/6-load-synpuf1k.md) and [7](./2-load/7-load-vocab.md). Thereafter, you may continue to follow the guide from section [Plugins](#plugins) onwards.
+If there is no existing databases available, you may consider using the following sample database below and continue with the guide from section [Plugins](#plugins) onwards.
+- [synpuf1k](./2-load/): Perform sub-steps [3](./2-load/3-setup-pg-permissions.md), [4](./2-load/4-setup-db-credentials.md), [6](./2-load/6-load-synpuf1k.md) and [7](./2-load/7-load-vocab.md)
 - atlas-broadsea: Refer to the docs [here](/docs/2-load/8-load-broadsea.md)
 
 ## Plugins 
