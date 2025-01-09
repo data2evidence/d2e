@@ -335,7 +335,13 @@ services:
             "PG_ADMIN_USER": "${PG_ADMIN_USER:-alp_pg_admin_user}",
             "PG_SCHEMA": "files_manager"
           },
-          "terminology-svc": {}
+          "terminology-svc": {},
+          "code-suggestion": {
+            "COGNITO_CLIENT_ID": "${COGNITO_CLIENT_ID}",
+            "COGNITO_CLIENT_SECRET": "${COGNITO_CLIENT_SECRET}",
+            "COGNITO_TOKEN_ENDPOINT": "https://${COGNITO_TOKEN_ENDPOINT}",
+            "LAMBDA_API_ENDPOINT": "https://${LAMBDA_API_ENDPOINT}"
+          }
         }
       SERVICE_ROUTES: |-
         {
