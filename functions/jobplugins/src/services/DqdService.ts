@@ -18,27 +18,11 @@ export class DqdService {
   private dataQualityOverviewParser = new DataQualityOverviewParser();
 
   public async getDataQualityResult(flowRunId: string, token: string) {
-    const prefectApi = new PrefectAPI(token);
     const portalServerApi = new PortalServerAPI(token);
-    const result = await prefectApi.getFlowRunsArtifacts([flowRunId]);
-
-    if (result.length === 0) {
-      return null;
-    }
-
-    const match = this.regexMatcher(result);
-    if (!match) {
-      throw new Error("Invalid S3 path found");
-    }
-
-    const s3Path = match[0].slice(1, -1); // Removing surrounding brackets
-    const filePath = [this.extractRelativePath(s3Path)];
-    const dqdResult = await portalServerApi.getFlowRunResults(filePath);
-
+    const dqdResult = await this.getDqdResults(portalServerApi, [flowRunId]);
     if (this.isDataQualityResult(dqdResult[0])) {
       return dqdResult[0].CheckResults;
     }
-
     return null;
   }
 
@@ -287,11 +271,7 @@ export class DqdService {
     if (!flowRunIds.length) {
       return [];
     }
-    const dqdResults = await this.getDqdResults(
-      portalServerApi,
-      prefectApi,
-      flowRunIds
-    );
+    const dqdResults = await this.getDqdResults(portalServerApi, flowRunIds);
     const domainIndexes: { [key: string]: number } = {};
 
     return dqdResults
@@ -330,11 +310,7 @@ export class DqdService {
       PrefectTagNames.DQD
     );
     const flowRunIds = flowRuns.map((run) => run.id);
-    const dqdResults = await this.getDqdResults(
-      portalServerApi,
-      prefectApi,
-      flowRunIds
-    );
+    const dqdResults = await this.getDqdResults(portalServerApi, flowRunIds);
 
     return dqdResults!
       .filter((r) => {
@@ -345,7 +321,6 @@ export class DqdService {
 
   private async getDqdResults(
     portalServerApi: PortalServerAPI,
-    prefectApi: PrefectAPI,
     flowRunIds: string[]
   ) {
     let dqdResults;
