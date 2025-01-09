@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { post } from "./request-util";
+import { get, post } from "./request-util";
 
 export class UserMgmtAPI {
   private readonly baseURL: string;
@@ -18,8 +18,19 @@ export class UserMgmtAPI {
         Authorization: token,
       },
     };
-    const url = `${this.baseURL}user-group/list`;
-    const result = await post(url, {userId}, options);
+    const url = `${this.baseURL}/user-group/list`;
+    const result = await post(url, { userId }, options);
+    return result.data;
+  }
+
+  async getMe(token: string) {
+    const options: AxiosRequestConfig = {
+      headers: {
+        Authorization: token,
+      },
+    };
+    const url = `${this.baseURL}/me`;
+    const result = await get(url, options);
     return result.data;
   }
 }
