@@ -29,6 +29,7 @@ services:
           "alpdb": false,
           "concept-mapping": false,
           "terminology-svc": false,
+          "code-suggestion": false,
           "portal": false,
           "files-manager": false
         }
