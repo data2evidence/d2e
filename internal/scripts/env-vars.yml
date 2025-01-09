@@ -17,9 +17,6 @@ DATABASE_CREDENTIALS:
 DB_CREDENTIALS__INTERNAL__PRIVATE_KEY:
   comment: to encrypt dbcredentials entered in admin>setup>databases>configure
   type: rsaPrivateKey
-DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE:
-  comment: to encrypt dbcredentials entered in admin>setup>databases>configure
-  type: passphrase
 DB_CREDENTIALS__INTERNAL__PUBLIC_KEY:
   comment: to encrypt dbcredentials entered in admin>setup>databases>configure
   type: x509publicKey

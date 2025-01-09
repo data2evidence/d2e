@@ -8,7 +8,6 @@ env_file=.env.local
 example_file=env.example
 tmp_file=.env.tmp
 
-passphrase_length=10
 default_password_length=30
 x509_subject="/C=SG/O=ALP Dev"
 

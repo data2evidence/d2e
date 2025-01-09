@@ -3,7 +3,6 @@
 key | type | comment 
 --- | --- | --- 
 DB_CREDENTIALS__INTERNAL__PRIVATE_KEY | rsaPrivateKey | to encrypt dbcredentials entered in admin>setup>databases>configure
-DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE | passphrase | to encrypt dbcredentials entered in admin>setup>databases>configure
 DB_CREDENTIALS__INTERNAL__PUBLIC_KEY | x509publicKey | to encrypt dbcredentials entered in admin>setup>databases>configure
 DOCKER_TAG_NAME | string | default tag
 MINIO__SECRET_KEY | password | minio secret_key
