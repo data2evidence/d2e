@@ -15,16 +15,31 @@ git clone --branch develop https://github.com/alp-os/d2e.git
 - Request docker credentials from [D2E Support](#d2e-support) for authenticating to private docker registry to retrieve resources to run D2E.
 
 ## Environment Variables and Credentials Setup 
-- Generate environment variables: 
+- Generate environment variables (Refer [here](./1-setup/environment-variables.md) for more information on the environment variables generated)
 ```bash
 yarn gen:dotenv
 ```
-   - Refer [here](./1-setup/environment-variables.md) for more information on the environment variables generated.
-- Replace `DOCKER_REGISTRY_USERNAME` and `DOCKER_REGISTRY_PASSWORD` variables with the provided credentials from D2E support in `.env.local` file
-- Replace `GH_TOKEN` credentials and append the following variables below:
+
+- Replace the following credentials below: 
+  
 ```bash
-echo GH_TOKEN=<GH_TOKEN> >> .env.local
+GH_TOKEN=<GH_TOKEN>
+DOCKER_REGISTRY_USERNAME=<DOCKER_REGISTRY_USERNAME>
+DOCKER_REGISTRY_PASSWORD=<DOCKER_REGISTRY_PASSWORD>
 ```
+
+- Run the following commands: 
+```bash
+ENV_TYPE=local
+echo GH_TOKEN=$GH_TOKEN >> .env.$ENV_TYPE
+sed -i.bak "/DOCKER_REGISTRY_USERNAME=/d" .env.$ENV_TYPE 
+sed -i.bak "/DOCKER_REGISTRY_PASSWORD=/d" .env.$ENV_TYPE 
+echo DOCKER_REGISTRY_USERNAME=$DOCKER_REGISTRY_USERNAME >> .env.$ENV_TYPE
+echo DOCKER_REGISTRY_PASSWORD=$DOCKER_REGISTRY_PASSWORD >> .env.$ENV_TYPE
+```
+Note: 
+- ENV_TYPE refers to environment types. 
+  - local (local environment), remote (all other environments)
 
 - Initialize Authentication Applications: 
 ```bash

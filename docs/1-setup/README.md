@@ -62,13 +62,13 @@ brew install openssl@3
 
 ## git
 ### ubuntu
-```
+```bash
 sudo apt-get update
 sudo apt-get install git-all
 ```
 
 ### macos 
-```
+```bash
 brew install git
 ```
 
@@ -80,5 +80,5 @@ Set up a Github PAT (classic) token with scope `read:packages` to retrieve packa
 - Select scope: ```read:packages```
 
 Example:
-![Github PAT token](./../images/setup/github-pat-token.png)
+![Github PAT token](../images/setup/github-pat-token.png)
 For more information, refer to: https://github.com/git-guides/install-git
