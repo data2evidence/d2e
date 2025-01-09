@@ -56,7 +56,7 @@ jobs:
       AZ_REG_PRUNE_FORCE_ANALYZE: ${{ vars.AZ_REG_PRUNE_FORCE_ANALYZE || 'false' }}
       AZ_REG_PRUNE_KEEP_REGEX: ${{ vars.AZ_REG_PRUNE_KEEP_REGEX }}
       AZ_REG_REPOSITORY: ${{ inputs.AZ_REG_REPOSITORY }}
-      AZ_REG_USERNAME: ${{ secrets.AZ_REGISTRY_USERNAME }}
+      AZ_REG_USERNAME: ${{ vars.AZ_REGISTRY_USERNAME }}
       DOCKER_BUILD_ARG1: ${{ inputs.DOCKER_BUILD_ARG1 }}
       DOCKER_BUILD_CONTEXT_PATH: ${{ inputs.DOCKER_BUILD_CONTEXT_PATH }}
       DOCKER_BUILD_DISABLE: ${{ vars.DOCKER_BUILD_DISABLE || 'false' }}
@@ -162,12 +162,14 @@ jobs:
         continue-on-error: true
         run: |
           npx --suppess-warnings zx scripts/analyze-acr.mjs
+
           if [ $AZ_REG_PRUNE_ENABLE_DELETE = true ]; then
             echo "INFO . manifests delete ..."
             sh "private-manifests-delete.sh"
           else
             echo "INFO . manifests delete skipped"
           fi
+
           echo AZ_REG_ARTIFACTS_NAME=${AZ_REG_REPOSITORY/\//--} | tee -a $GITHUB_ENV | tee -a $GITHUB_OUTPUT | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Upload ACR manifests artifacts
