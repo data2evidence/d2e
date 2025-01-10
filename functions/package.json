@@ -212,6 +212,12 @@
           "function": "/files-manager",
           "env": "files-manager",
           "imports": "/files-manager/import.json"
+        },
+        {
+          "source": "/demo",
+          "function": "/demo",
+          "env": "demo",
+          "imports": "/demo/import.json"
         }
       ],
       "roles": {
@@ -373,7 +379,8 @@
           "conceptmapping.post",
           "filesmanager.read",
           "filesmanager.post",
-          "filesmanager.delete"
+          "filesmanager.delete",
+          "demo.setup"
         ],
         "ALP_DASHBOARD_VIEWER": [
           "gateway.dashboardGate.content"
@@ -2068,6 +2075,16 @@
           "scopes": ["codesuggestion.read", "codesuggestion.tenantview.read"],
           "httpMethods": [
             "POST"
+          ]
+        },
+        {
+          "path": "^/demo",
+          "scopes": [
+            "demo.setup"
+          ],
+          "httpMethods": [
+            "POST",
+            "GET"
           ]
         }
       ]
