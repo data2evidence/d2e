@@ -1,3 +1,8 @@
+
+# Broadsea-atlasdb
+- Initially, the D2E system does not contain any data
+- This docker container is part of the OHDSI Broadsea set of Docker containers. 
+
 # Configure Patient Database Credentials 
 
 ## Add database connection details & credentials
@@ -30,7 +35,7 @@ notes:
 ## Restart Containers
 
 Run the following command to restart the system for the new connection details be provisioned to the data services
-```
+```bash
 yarn start:minerva --force-recreate
 ```
 
@@ -49,6 +54,6 @@ CDM Schema Option | select 'Use existing schema' from dropdown
 Schema Name field | e.g. demo_cdm | name of the cdm schema that was used for seeding
 Vocab schema name | e.g. demo_cdm
 Data Model Option | omop5-4 [datamodel-plugin]
-PA Config | OMOP_GDM_PA_CONF
+PA Config | OMOP_GDM_PA_CONF_DUCKDB
 Type | e.g. DemoDataset
 Token dataset code | e.g. DemoDataset

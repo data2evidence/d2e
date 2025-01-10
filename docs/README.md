@@ -13,6 +13,9 @@ git clone --branch develop https://github.com/alp-os/d2e.git
 ```
 
 - Request docker credentials from [D2E Support](#d2e-support) for authenticating to private docker registry to retrieve resources to run D2E.
+```bash
+docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
+```
 
 ## Environment Variables and Credentials Setup 
 - Generate environment variables (Refer [here](./1-setup/environment-variables.md) for more information on the environment variables generated)
@@ -114,8 +117,8 @@ yarn start:minerva --force-recreate; sleep 60
 ```
 
 If there is no existing databases available, you may consider using the following sample database below and continue with the guide from section [Plugins](#plugins) onwards.
-- [synpuf1k](./2-load/): Perform sub-steps [3](./2-load/3-setup-pg-permissions.md), [4](./2-load/4-setup-db-credentials.md), [6](./2-load/6-load-synpuf1k.md) and [7](./2-load/7-load-vocab.md)
-- atlas-broadsea: Refer to the docs [here](/docs/2-load/8-load-broadsea.md)
+- [Synthetic Public Use Files (SynPUFs)](./2-load/): Perform sub-steps [3](./2-load/3-setup-pg-permissions.md), [4](./2-load/4-setup-db-credentials.md), [6](./2-load/6-load-synpuf1k.md) and [7](./2-load/7-load-vocab.md)
+- broadsea-atlasdb: Refer to the docs [here](/docs/2-load/8-load-broadsea.md)
 
 ## Plugins 
 The Admin portal allows the admin user to manage plugins in the platform, for instance installation, version updates and uninstallation of plugins. 
