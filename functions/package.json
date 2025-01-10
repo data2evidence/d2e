@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@alp-os/trex": "latest",
+    "@data2evidence/trex": "latest",
     "deno": "latest"
   },
   "trex": {
