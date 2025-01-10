@@ -57,9 +57,8 @@ export class DataTransformationController {
   private async getResultsById(req: Request, res: Response) {
     try {
       const { id: dataflowId } = req.params;
-      const token = decode(
-        req.headers["authorization"].replace(/bearer /i, "")
-      ) as JwtPayload;
+      // unlike other places, token is a string here
+      const token = req.headers["authorization"];
       const result = await this.dataTransformationService.getResultsByCanvasId(
         dataflowId,
         token
