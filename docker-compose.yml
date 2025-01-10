@@ -341,7 +341,7 @@ services:
             "COGNITO_TOKEN_ENDPOINT": "https://${COGNITO_TOKEN_ENDPOINT}",
             "LAMBDA_API_ENDPOINT": "https://${LAMBDA_API_ENDPOINT}"
           },
-          demo": {
+          "demo": {
             "DEMO__DB_CODE": "demo_database",
             "DEMO__DB_CDM_SCHEMA": "demo_cdm",
             "DEMO__DB_DEFAULT": "{ \"name\": \"postgres\", \"dialect\": \"postgres\", \"host\": \"broadsea-atlasdb\", \"port\": 5432, \"extra\": { \"Internal\": { \"statementTimeout\": 60000, \"queryTimeout\": 60000, \"idleTimeoutMillis\": 300000, \"idleInTransactionSessionTimeout\": 300000, \"max\": 50 } }, \"credentials\": [] }",
