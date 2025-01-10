@@ -5,9 +5,10 @@ import {
   Param,
   Post,
   Query,
-  Req
+  Req,
+  Res,
 } from "@danet/core";
-import { Buffer } from "node:buffer";
+import { Readable } from "node:stream"
 import { ResourceService } from "./resource.service.ts";
 
 // TODO: Make upload and download work
@@ -47,56 +48,32 @@ export class ResourceController {
   @Get(":fileName/download")
   async downloadResource(
     @Query("datasetId") datasetId: string,
-    @Param("fileName") fileName: string
+    @Param("fileName") fileName: string,
+    @Res() res: Response
   ) {
-    try {
-      const result = await this.resourceService.downloadResource(
-        datasetId,
-        fileName
-      );
+    const result = await this.resourceService.downloadResource(
+      datasetId,
+      fileName
+    );
 
-      const { readable, writable } = new TransformStream();
-      const writer = writable.getWriter();
+    console.log(`Content-Type: ${result.contentType}`);
+    console.log("Content-Disposition", result.contentDisposition);
 
-      result.readStream.on("data", async (chunk) => {
-        try {
-          const buffer = Buffer.from(chunk);
-          console.log("Writing chunk:", buffer.length);
-          await writer.write(buffer);
-        } catch (err) {
-          console.error("Error writing chunk:", err);
-        }
-      });
+    const webStream = Readable.toWeb(result.readStream) as ReadableStream<Uint8Array>;
 
-      result.readStream.on("end", () => {
-        console.log("Stream ended, closing writer");
-        writer.close();
-      });
+    const streamResponse = new Response(webStream, {
+      headers: new Headers({
+        "Content-Type": result.contentType,
+        "Content-Disposition": result.contentDisposition,
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "no-cache"
+      })
+    });
 
-      result.readStream.on("error", (err) => {
-        console.error("Stream error:", err);
-        writer.abort(err);
-      });
-
-      return new Response(readable, {
-        headers: {
-          "Content-Type": result.contentType,
-          "Content-Disposition": `attachment; filename="${fileName}"`,
-        },
-      });
-    } catch (error) {
-      console.error("Download error:", error);
-      return new Response(
-        JSON.stringify({
-          error: "Failed to download file",
-          details: error.message,
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
+    // TODO: Investigate why danet by default send back the response content-type as application/json
+    // Download file is not equipped with the correct data
+    console.log(`Final Content-Type: ${streamResponse.headers.get("Content-Type")}`);
+    return streamResponse;
   }
 
   @Delete(":fileName")
