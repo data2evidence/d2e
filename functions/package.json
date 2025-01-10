@@ -317,6 +317,7 @@
           "portal.userArtifact.group.write",
           "portal.userArtifact.group.delete",
           "terminology.user.read",
+          "dataflowmgmt.dataflow.flowRun.results.read",
           "dataflowmgmt.dataflow.read",
           "dataflowmgmt.dataflow.add",
           "dataflowmgmt.dataflow.delete",
@@ -1252,6 +1253,15 @@
           ],
           "httpMethods": [
             "DELETE"
+          ]
+        },
+        {
+          "path": "^/system-portal/prefect/results",
+          "scopes": [
+            "dataflowmgmt.dataflow.flowRun.results.read"
+          ],
+          "httpMethods": [
+            "GET"
           ]
         },
         {
