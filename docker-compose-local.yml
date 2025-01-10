@@ -56,6 +56,8 @@ services:
     build:
       context: .
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
+    environment:
+      ACHILLES_THREAD_COUNT: 1
 
   alp-logto:
     build:
