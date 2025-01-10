@@ -4,9 +4,7 @@ Because of reuse of passwords from base files in 1Password, please ensure the fo
 
 <i>When porting over, <b>Replace</b> `key=value` -> `key: value` format </i>
 
-- DB_CREDENTIALS__INTERNAL__PRIVATE_KEY
 - DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY
-- DB_CREDENTIALS__INTERNAL__PRIVATE_KEY_PASSPHRASE
 - DB_CREDENTIALS__INTERNAL__PUBLIC_KEY
 - LOGTO_API_M2M_CLIENT_ID
 - LOGTO_API_M2M_CLIENT_SECRET
