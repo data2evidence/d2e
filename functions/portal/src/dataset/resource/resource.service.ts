@@ -17,7 +17,7 @@ export class ResourceService {
     return this.minioClient.download(datasetId, fileName)
   }
 
-  uploadResource(datasetId: string, file: Express.Multer.File) {
+  uploadResource(datasetId: string, file: any) {
     return this.minioClient.upload(datasetId, file)
   }
 

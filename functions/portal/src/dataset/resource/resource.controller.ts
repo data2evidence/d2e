@@ -1,11 +1,17 @@
 import {
   Controller,
+  Delete,
   Get,
+  Param,
+  Post,
   Query,
+  Req,
+  Res,
 } from "@danet/core";
+import { Readable } from "node:stream";
 import { ResourceService } from "./resource.service.ts";
 
-// TODO: Make upload and download work
+
 @Controller("system-portal/dataset/resource")
 export class ResourceController {
   constructor(private readonly resourceService: ResourceService) {}
@@ -15,54 +21,59 @@ export class ResourceController {
     return await this.resourceService.getResources(datasetId);
   }
 
-  // @Post()
-  // @UseInterceptors(
-  //   FileInterceptor("file", {
-  //     fileFilter: (_req, file, cb) => {
-  //       const fileName = file.originalname;
-  //       const invalidFileError = new MulterError(
-  //         "LIMIT_UNEXPECTED_FILE",
-  //         "file"
-  //       );
+  @Post()
+  async uploadResource(
+    @Query("datasetId") datasetId: string,
+    @Req() request: Request
+  ) {
+    const formData = await request.formData();
+    const file = formData.get("file") as File;
 
-  //       if (fileName.includes("\\") || fileName.includes("/")) {
-  //         cb(invalidFileError, false);
-  //       } else {
-  //         cb(null, true);
-  //       }
-  //     },
-  //   })
-  // )
-  // async uploadResource(
-  //   @Query("datasetId", ParseUUIDPipe) datasetId: string,
-  //   @UploadedFile()
-  //   file: Express.Multer.File
-  // ) {
-  //   return await this.resourceService.uploadResource(datasetId, file);
-  // }
+    const uploadedFile = {
+      originalname: file.name,
+      buffer: await file.arrayBuffer(),
+      mimetype: file.type,
+    };
+    console.log(`uploadedFile: ${uploadedFile}`);
+    if (
+      uploadedFile.originalname.includes("\\") ||
+      uploadedFile.originalname.includes("/")
+    ) {
+      throw new Error("Invalid filename");
+    }
 
-  // @Get(":fileName/download")
-  // async downloadResource(
-  //   @Query("datasetId", ParseUUIDPipe) datasetId: string,
-  //   @Param("fileName") fileName: string,
-  //   @Res({ passthrough: true }) res: Response
-  // ) {
-  //   const result = await this.resourceService.downloadResource(
-  //     datasetId,
-  //     fileName
-  //   );
-  //   res.set({
-  //     "Content-Type": result.contentType,
-  //     "Content-Disposition": result.contentDisposition,
-  //   });
-  //   return new StreamableFile(result.readStream);
-  // }
+    return await this.resourceService.uploadResource(datasetId, uploadedFile);
+  }
 
-  // @Delete(":fileName")
-  // async deleteResource(
-  //   @Query("datasetId", ParseUUIDPipe) datasetId: string,
-  //   @Param("fileName") fileName: string
-  // ) {
-  //   return await this.resourceService.deleteResource(datasetId, fileName);
-  // }
+  @Get(":fileName/download")
+  async downloadResource(
+    @Query("datasetId") datasetId: string,
+    @Param("fileName") fileName: string,
+    @Res() res: Response
+  ) {
+    const result = await this.resourceService.downloadResource(
+      datasetId,
+      fileName
+    );
+
+    const webStream = Readable.toWeb(result.readStream) as ReadableStream;
+
+    return new Response(webStream, {
+      headers: {
+        "Content-Type": result.contentType,
+        "Content-Disposition": result.contentDisposition,
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
+  }
+
+  @Delete(":fileName")
+  async deleteResource(
+    @Query("datasetId") datasetId: string,
+    @Param("fileName") fileName: string
+  ) {
+    return await this.resourceService.deleteResource(datasetId, fileName);
+  }
 }
