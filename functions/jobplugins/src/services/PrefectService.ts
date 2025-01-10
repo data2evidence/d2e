@@ -30,7 +30,7 @@ export class PrefectService {
 
     this.prefectApi = new PrefectAPI(token);
     const flowrunId = await this.prefectApi.createFlowRun(
-      `Run ${revision.flow.name}`,
+      `Run ${revision.canvas.name}`,
       PrefectDeploymentName.UI_DATA_FLOW,
       PrefectFlowName.UI_DATA_FLOW,
       prefectParams
@@ -47,12 +47,12 @@ export class PrefectService {
       revision.flow
     );
 
-    const prefectDeploymentName = env.PREFECT_DEPLOYMENT_NAME;
-    const prefectFlowName = env.PREFECT_FLOW_NAME;
+    const prefectDeploymentName = PrefectDeploymentName.ANALYSIS_DATA_FLOW;
+    const prefectFlowName = PrefectFlowName.ANALYSIS_DATA_FLOW;
     this.prefectApi = new PrefectAPI(token);
 
     const flowRunId = await this.prefectApi.createFlowRun(
-      revision.name,
+      revision.canvas.name,
       prefectDeploymentName,
       prefectFlowName,
       prefectParams

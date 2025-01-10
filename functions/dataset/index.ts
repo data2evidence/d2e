@@ -163,6 +163,7 @@ export class DatasetRouter {
                     schema_name: schemaName,
                     cleansed_schema_option: cleansedSchemaOption,
                     vocab_schema: vocabSchema,
+                    plugin: plugin,
                   },
                 };
                 const datamodelFlowRunDto = {
