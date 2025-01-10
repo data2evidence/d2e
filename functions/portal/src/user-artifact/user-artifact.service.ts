@@ -26,7 +26,8 @@ export class UserArtifactService {
     [ServiceName.NOTEBOOKS]: [],
     [ServiceName.PA_CONFIG]: [],
     [ServiceName.CDW_CONFIG]: [],
-    [ServiceName.BOOKMARKS]: []
+    [ServiceName.BOOKMARKS]: [],
+    [ServiceName.CONCEPT_SETS]: []
   }
 
   private readonly sharedConditionMap = {
@@ -67,30 +68,39 @@ export class UserArtifactService {
   async createServiceArtifact<T>(serviceName: string, createArtifactDto: CreateArtifactDto<T>): Promise<UserArtifact | null> {
     const { serviceArtifact } = createArtifactDto
 
-    const artifact = await this.userArtifactRepository.findOne(this.userId)
+    let artifact = await this.userArtifactRepository.findOne(this.userId)
 
     if (artifact) {
       const artifactArray = artifact.artifacts[serviceName]
-      if (this.isArtifactExists(artifactArray, serviceArtifact)) {
-        throw new ConflictException(`Artifact for ${serviceName} already exists`)
-      }
-      artifact.artifacts[serviceName].push(serviceArtifact)
-      return this.userArtifactRepository.update(this.addOwner(artifact))
-    } else {
-      const newArtifact = {
-        userId: this.userId,
-        artifacts: {
-          ...this.defaultArtifact,
-          [serviceName]: [serviceArtifact]
-        }
-      }
 
-      try {
-        return this.userArtifactRepository.create(this.addOwner(newArtifact, true))
-      } catch (error) {
-        console.error('Error creating user artifact:', error)
-        throw new ConflictException('Failed to create user artifact')
+      if (artifactArray) {
+        if (this.isArtifactExists(artifactArray, serviceArtifact)) {
+          throw new ConflictException(`Artifact for ${serviceName} already exists`)
+        }
+        artifactArray.push(serviceArtifact)
+      } else {
+        artifact.artifacts[serviceName] = [serviceArtifact]
       }
+    } else {
+      artifact = await this.userArtifactRepository.create(
+        this.addOwner(
+          {
+            userId: this.userId,
+            artifacts: {
+              ...this.defaultArtifact,
+              [serviceName]: [serviceArtifact]
+            }
+          },
+          true
+        )
+      )
+    }
+
+    try {
+      return this.userArtifactRepository.save(this.addOwner(artifact, true))
+    } catch (error) {
+      console.error('Error creating user artifact:', error)
+      throw new ConflictException('Failed to create user artifact')
     }
   }
 
