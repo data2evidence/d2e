@@ -31,7 +31,8 @@ services:
           "terminology-svc": false,
           "code-suggestion": false,
           "portal": false,
-          "files-manager": false
+          "files-manager": false,
+          "demo": false
         }
 
   alp-caddy:
