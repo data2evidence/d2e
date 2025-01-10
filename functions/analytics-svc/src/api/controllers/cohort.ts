@@ -83,7 +83,7 @@ async function getStudyDetails(
         // find the matching element and get the study schema name
         const studyMatch = studies.find((el) => el.id === datasetId);
         if (!studyMatch) {
-            res.status(500).send(
+            return res.status(500).send(
                 MRIEndpointErrorHandler({
                     err: {
                         name: "mri-pa",

@@ -1,4 +1,4 @@
-import { InternalServerErrorException } from "@danet/core";
+import { BadRequestException, InternalServerErrorException } from "@danet/core";
 import { Buffer } from "node:buffer";
 import { contentType } from "npm:mime-types@2.1.35";
 import * as Minio from "npm:minio@8.0.2";
@@ -56,21 +56,36 @@ export class MinioClient {
   }
 
   async download(datasetId: string, fileName: string) {
-    const bucketName = this.getBucketName(datasetId);
-    await this.createBucket(bucketName);
+    try {
+      const bucketName = this.getBucketName(datasetId);
+      await this.createBucket(bucketName);
 
-    const readStream = await this.client.getObject(bucketName, fileName);
+      const readStream = await this.client.getObject(bucketName, fileName);
 
-    const fileExtension = fileName.substring(fileName.lastIndexOf("."));
-    const mimeType = contentType(fileExtension);
-    return {
-      readStream,
-      contentType: mimeType,
-      contentDisposition: `attachment; filename="${fileName}"`,
-    };
+      const fileExtension = fileName.substring(fileName.lastIndexOf("."));
+      const mimeType = contentType(fileExtension);
+      return {
+        readStream,
+        contentType: mimeType,
+        contentDisposition: `attachment; filename="${fileName}"`,
+      };
+    } catch (e) {
+      if (
+        e instanceof BadRequestException ||
+        e instanceof InternalServerErrorException
+      ) {
+        throw e;
+      } else if (e.message === "Not Found") {
+        throw new BadRequestException(`Invalid file name: ${fileName}`);
+      }
+      console.error(`${e}`);
+      throw new InternalServerErrorException(
+        `Error occurred in MinIO S3 object download: ${fileName}`
+      );
+    }
   }
 
-  async upload(datasetId: string, file: any) {
+  async upload(datasetId: string, file: Multer.File) {
     const fileName = file.originalname;
     try {
       const bucketName = this.getBucketName(datasetId);
@@ -119,10 +134,11 @@ export class MinioClient {
         });
 
         dataStream.on("end", () => {
-          const jsonStr = Buffer.concat(dataChunks).toString("utf8");
+          const buffer = Buffer.concat(dataChunks);
+          const jsonStr = buffer.toString("utf8");
           try {
             const jsonData = JSON.parse(jsonStr);
-            const dataStr = jsonData["data"];
+            const dataStr = jsonData["result"];
             // Parse again the double serialized data
             const parsedData = JSON.parse(dataStr);
             resolve(parsedData);

@@ -100,6 +100,12 @@
           "env": "alp-usermgmt"
         },
         {
+          "source": "/code-suggestion",
+          "function": "/code-suggestion",
+          "imports": "/code-suggestion/import.json",
+          "env": "code-suggestion"
+        },
+        {
           "source": "/db-credentials",
           "function": "/alp-db-credentials",
           "imports": "/alp-db-credentials/import.json",
@@ -206,6 +212,12 @@
           "function": "/files-manager",
           "env": "files-manager",
           "imports": "/files-manager/import.json"
+        },
+        {
+          "source": "/demo",
+          "function": "/demo",
+          "env": "demo",
+          "imports": "/demo/import.json"
         }
       ],
       "roles": {
@@ -305,6 +317,7 @@
           "portal.userArtifact.group.write",
           "portal.userArtifact.group.delete",
           "terminology.user.read",
+          "dataflowmgmt.dataflow.flowRun.results.read",
           "dataflowmgmt.dataflow.read",
           "dataflowmgmt.dataflow.add",
           "dataflowmgmt.dataflow.delete",
@@ -366,7 +379,8 @@
           "conceptmapping.post",
           "filesmanager.read",
           "filesmanager.post",
-          "filesmanager.delete"
+          "filesmanager.delete",
+          "demo.setup"
         ],
         "ALP_DASHBOARD_VIEWER": [
           "gateway.dashboardGate.content"
@@ -392,7 +406,8 @@
           "portal.dataset.read",
           "portal.filterScope.read",
           "portal.dataset.release.list.read",
-          "portal.config.read"
+          "portal.config.read",
+          "codesuggestion.tenantview.read"
         ],
         "RESEARCHER": [
           "PA.svc",
@@ -420,7 +435,8 @@
           "dataflowmgmt.analysisflow.read",
           "dataflowmgmt.analysisflow.add",
           "dataflowmgmt.analysisflow.delete",
-          "dataflowmgmt.analysisflow.revision.delete"
+          "dataflowmgmt.analysisflow.revision.delete",
+          "codesuggestion.read"
         ],
         "ALP_SHARED": [
           "usermgmt.group.read",
@@ -1240,6 +1256,15 @@
           ]
         },
         {
+          "path": "^/system-portal/prefect/results",
+          "scopes": [
+            "dataflowmgmt.dataflow.flowRun.results.read"
+          ],
+          "httpMethods": [
+            "GET"
+          ]
+        },
+        {
           "path": "^/dashboard-gate/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/content(.*)",
           "scopes": [
             "gateway.dashboardGate.content"
@@ -2043,6 +2068,23 @@
           ],
           "httpMethods": [
             "DELETE"
+          ]
+        },
+        {
+          "path": "^/code-suggestion",
+          "scopes": ["codesuggestion.read", "codesuggestion.tenantview.read"],
+          "httpMethods": [
+            "POST"
+          ]
+        },
+        {
+          "path": "^/demo",
+          "scopes": [
+            "demo.setup"
+          ],
+          "httpMethods": [
+            "POST",
+            "GET"
           ]
         }
       ]

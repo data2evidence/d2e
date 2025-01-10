@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "preserveConstEnums": false,
+        "target": "ES2017",
+        "esModuleInterop": true,
+        "types": [
+            "jest"
+        ]
+    },
+    "importMap": "./import.json"
+}

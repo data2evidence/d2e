@@ -1,6 +1,5 @@
 import { Logger, EnvVarUtils } from "@alp/alp-base-utils";
 const envVarUtils = new EnvVarUtils(Deno.env.toObject());
-import * as https from "https";
 import * as http from "http";
 import * as dotenv from "dotenv";
 import { URL } from "url";
@@ -16,24 +15,16 @@ export async function loadBookmarks(
     queryParams,
     bookmark_cmd: BookmarkCMDType
 ) {
-    let hostname;
-    let port;
-    let protocol;
-    let protocolLib;
     let urlParams;
 
     if (envVarUtils.isTestEnv() && !envVarUtils.isHttpTestRun()) {
         // this flow is only for integration test
         urlParams = new URL(`http://localhost:41005`);
-        protocolLib = http;
     } else {
         urlParams = new URL(env.SERVICE_ROUTES.bookmark);
-        protocolLib = http;
     }
 
-    hostname = urlParams.hostname;
-    port = urlParams.port;
-    protocol = urlParams.protocol;
+    const { hostname, port, protocol } = urlParams
     const sourceOrigin = req.headers["x-source-origin"];
 
     const username_response = await axios.get(
@@ -55,20 +46,17 @@ export async function loadBookmarks(
         protocol,
         headers: {
             "Content-Type": "application/json",
-            "auth-type": "azure-ad",
             "authorization": req.headers.authorization,
             "user-agent": "ALP Service",
             "x-source-origin": sourceOrigin,
-        },
-        rejectUnauthorized: true,
-        ca: Deno.env.get("TLS__INTERNAL__CA_CRT")?.replace(/\\n/g, "\n"),
+        }
     };
 
     switch (bookmark_cmd) {
         case BookmarkCMDType.LOAD_BOOKMARKS:
             const bookmarkIds = queryParams.bmkIds;
             const paConfigId = queryParams.configId;
-            const fullPath = `/analytics-svc/api/services/bookmark/bookmarkIds?ids=${bookmarkIds}&paConfigId=${paConfigId}&username=${username_response.data.username}`;
+            const fullPath = `/analytics-svc/api/services/bookmark/bookmarkIds?ids=${bookmarkIds}&paConfigId=${paConfigId}&username=${username_response.data.username}&datasetId=${queryParams.datasetId}`;
             options.path = fullPath;
             options.method = "GET";
             break;
@@ -78,7 +66,7 @@ export async function loadBookmarks(
     }
 
     return new Promise((resolve, reject) => {
-        const post_req = protocolLib
+        const post_req = http
             .request(options, (response) => {
                 let body = "";
 

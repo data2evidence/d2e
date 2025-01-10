@@ -70,6 +70,7 @@ export async function generateQuery(req: IMRIRequest, res, next) {
 
         res.status(200).send(stackedBarchartQuery);
     } catch (err) {
+        log.error(err)
         log.error(`Error in generating query (${err.stack})!`);
         res.status(500).send(
             MRIEndpointErrorHandler({

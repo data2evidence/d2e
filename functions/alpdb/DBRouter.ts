@@ -29,7 +29,7 @@ export class DBRouter {
     });
 
     this.router.put("/schema", async (req, res) => {
-      const { schemaName, dataModel, databaseCode, vocabSchemaValue } =
+      const { schemaName, dataModel, databaseCode, vocabSchemaValue, plugin } =
         req.body;
       try {
         const token = req.headers.authorization!;
@@ -47,6 +47,7 @@ export class DBRouter {
             data_model: dataModel,
             schema_name: schemaName,
             vocab_schema: vocabSchemaValue,
+            plugin: plugin,
           },
         };
 

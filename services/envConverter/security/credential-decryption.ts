@@ -12,7 +12,6 @@ export const decrypt = (encryptedValue: string) => {
   return privateDecrypt(
     {
       key: privateKey,
-      passphrase: process.env.DB_CREDENTIALS__PRIVATE_KEY_PASSPHRASE,
       padding: constants.RSA_PKCS1_OAEP_PADDING,
       oaepHash: "sha256",
     },

@@ -62,8 +62,8 @@ export class DataModelFlowService {
     const options = getVersionInfoFlowRunDto.options;
     const flowRunId = await prefectApi.createFlowRun(
       flowRunName,
-      PrefectDeploymentName.DATA_MANAGEMENT,
-      PrefectFlowName.DATA_MANAGEMENT,
+      options.options.plugin,
+      options.options.plugin,
       options
     );
 
@@ -90,8 +90,8 @@ export class DataModelFlowService {
     const options = createDatamodelFlowRunDto.options;
     const result = await prefectApi.createFlowRun(
       flowRunName,
-      PrefectDeploymentName.DATA_MANAGEMENT,
-      PrefectFlowName.DATA_MANAGEMENT,
+      options.options.plugin,
+      options.options.plugin,
       options
     );
     return result;

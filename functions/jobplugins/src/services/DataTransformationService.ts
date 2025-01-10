@@ -41,41 +41,25 @@ export class TransformationService {
       .getOne();
   }
 
-  async getResultsByCanvasId(dataflowId: string, token) {
-    const lastFlowRun = await this.canvasRepo
+  async getResultsByCanvasId(dataflowId: string, token: string) {
+    const dataflow = await this.canvasRepo
       .createQueryBuilder("dataflow")
       .select("dataflow.lastFlowRunId")
       .where("dataflow.id = :dataflowId", { dataflowId })
       .getOne();
-
-    const lastFlowRunId = lastFlowRun?.lastFlowRunId;
+    const lastFlowRunId = dataflow?.lastFlowRunId;
     if (!lastFlowRunId) {
       console.log("No last flowRun found for dataflowId:", dataflowId);
       return [];
     }
     this.prefectApi = new PrefectAPI(token);
-    const subflowRuns = await this.prefectApi.getFlowRunsByParentFlowRunId(
-      lastFlowRunId
+    const graph = await this.getLatestGraphByCanvasId(dataflowId);
+    const nodes = graph.flow.nodes;
+    // file name pattern is as defined below (created by d2e-plugins/dataflow_ui)
+    const filePath = nodes.map(
+      (n) => `results/${lastFlowRunId}_${n.data.name}.json`
     );
-    const flowRunIds = subflowRuns.map((flow) => flow.id);
-    const flowResult = await this.prefectApi.getFlowRunsArtifacts(
-      subflowRuns.map((item) => item.id)
-    );
-
-    if (flowResult.length === 0) {
-      console.log(
-        `No flow run artifacts result found for flowRunIds: ${flowRunIds}`
-      );
-      return [];
-    }
-    // regex will only match flow runs with description which has path
-    const match = this.utilsService.regexMatcher(flowResult);
-    if (match) {
-      let filePath: Array<string | null> = [];
-      for (const m of match) {
-        const s3Path = m.slice(1, -1); // Removing the surrounding brackets []
-        filePath.push(this.utilsService.extractRelativePath(s3Path));
-      }
+    try {
       this.portalServerApi = new PortalServerAPI(token);
       const res = await this.portalServerApi.getFlowRunResults(filePath);
 
@@ -89,8 +73,10 @@ export class TransformationService {
         errorMessage: null,
       }));
       return transformedRes;
+    } catch (error) {
+      console.log(`Files not found: ${error.message}`);
+      throw new Error("Files not found");
     }
-    throw new Error(`Invalid S3 path found`);
   }
 
   async getCanvasList() {
