@@ -193,14 +193,19 @@ export class DemoService {
       throw new Error("Dataset not found");
     }
 
+    if (!dataset?.plugin) {
+      throw new Error("Dataset has empty plugin");
+    }
+
     const result = await jobPluginsAPI.createGetVersionInfoFlowRun({
-      flowRunName: `${dataset?.plugin}-get_version_info`,
+      flowRunName: `${dataset.plugin}-get_version_info`,
       options: {
         options: {
           flow_action_type: "get_version_info",
           token: "",
           database_code: "",
           data_model: "",
+          plugin: dataset.plugin,
           datasets: [dataset],
         },
       },
