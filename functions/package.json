@@ -502,6 +502,15 @@
           ]
         },
         {
+          "path": "^/analytics-svc/api/services/alpdb/cdmversion",
+          "scopes": [
+            "dbSvc.schema.cdmVersion.read"
+          ],
+          "httpMethods": [
+            "GET"
+          ]
+        },
+        {
           "path": "^/analytics-svc/api/services/population/studies/patientcount",
           "scopes": [
             "PA.DatasetOverview.svc"
@@ -2065,7 +2074,10 @@
         },
         {
           "path": "^/code-suggestion",
-          "scopes": ["codesuggestion.read", "codesuggestion.tenantview.read"],
+          "scopes": [
+            "codesuggestion.read",
+            "codesuggestion.tenantview.read"
+          ],
           "httpMethods": [
             "POST"
           ]
