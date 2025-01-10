@@ -71,7 +71,7 @@ def create_prefect_variables():
 
     # For achilles
     Variable.set("achilles_thread_count", os.getenv(
-        "ACHILLES_THREAD_COUNT", 5), overwrite=True)
+        "ACHILLES_THREAD_COUNT"), overwrite=True)
 
     # For strategus
     Variable.set("cohort_generator_module_settings_url", os.getenv(
