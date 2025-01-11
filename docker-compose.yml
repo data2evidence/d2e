@@ -106,7 +106,7 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: trex.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/d2e-trex-base:${DOCKER_TREX_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-trex-base:${DOCKER_TREX_TAG_NAME:-develop}
     pull_policy: always
     platform: linux/amd64
     logging:
@@ -414,7 +414,7 @@ services:
       alp-minerva-postgres:
         condition: service_healthy
     hostname: alp-minerva-pg-mgmt-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-pg-mgmt-init:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-pg-mgmt-init:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c15
@@ -609,7 +609,7 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: alp-dataflow-gen-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-dataflow-gen:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c4
@@ -661,7 +661,7 @@ services:
     depends_on:
       alp-logto:
         condition: service_healthy
-    image: alpcr.azurecr.io/alp-data-node/alp-logto-post-init:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-logto-post-init:${DOCKER_TAG_NAME:-develop}
     networks:
       alp:
         priority: 20
@@ -698,7 +698,7 @@ services:
         - logto.status
         - http://localhost:3001/api/status
     hostname: alp-logto-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-logto:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-logto:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c8
@@ -846,7 +846,7 @@ services:
   alp-cachedb:
     container_name: &c30 alp-cachedb
     hostname: alp-cachedb.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/cachedb:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2ecachedb:${DOCKER_TAG_NAME:-develop}
     platform: linux/amd64
     depends_on:
       trex:
@@ -896,7 +896,7 @@ services:
           memory: ${D2E_MEMORY_LIMIT:-7G}
 
   alp-perseus-backend:
-    image: alpcr.azurecr.io/alp-data-node/d2e-perseus:master
+    image: ghcr.io/data2evidence/d2e-perseus:master
     container_name: &c35 alp-perseus-backend-${BASE_PORT:-1}
     environment:
       <<:
@@ -917,7 +917,7 @@ services:
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
-    image: alpcr.azurecr.io/whiterabbit:master
+    image: ghcr.io/data2evidence/whiterabbit:master
     container_name: &c36 alp-perseus-white-rabbit-${BASE_PORT:-1}
     platform: linux/amd64
     environment:
