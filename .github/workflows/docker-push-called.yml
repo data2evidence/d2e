@@ -109,6 +109,8 @@ jobs:
           # cache-to: type=gha,mode=max
           # ulimit: nofile=1048576:1048576
           platforms: "linux/amd64"
+          pull: ${{ env.DOCKER_BUILD_PULL_BOOL_STR == 'true' }}
+          push: ${{ env.DOCKER_BUILD_PUSH_BOOL_STR == 'true' }}
           context: ${{ env.DOCKER_BUILD_CONTEXT_PATH }}
           file: ${{ env.DOCKER_BUILD_FILE_PATH }}
           tags: ghcr.io/data2evidence/${{ env.AZ_REG_REPOSITORY }}:${{ env.DOCKER_IMG_TAG_NAME }}
