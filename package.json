@@ -2,7 +2,7 @@
   "name": "alp-data-node",
   "version": "1.0.0",
   "description": "ALP Data Node",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "config": {
     "env_names_all": "local remote base-all base-local base-remote alp-dev-sg-3 alp-dev-sg-2 alp-stg-de-1 alp-stg-sg-1 alp-stg-sg-2",
     "env_names_dev": "local remote base-all base-local base-remote alp-dev-sg-3"
