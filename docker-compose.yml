@@ -404,7 +404,7 @@ services:
       NODE_ENV: development
       PREFECT_DOCKER_VOLUMES: '["alp_duckdb-data-1:/app/duckdb_data", "alp_cdw-config-duckdb-data-1:/app/cdw-config/duckdb_data", "alp_r-libs:/home/docker/plugins/R/site-library", "alp_fhir-schema-file-1:/home/docker/fhir"]'
       GH_TOKEN: ${GH_TOKEN}
-      PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
+      PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-flows"]'
       PLUGINS_API_VERSION: ${PLUGINS_API_VERSION:-latest}
       PLUGINS_SEED_UPDATE: ${PLUGINS_SEED_UPDATE:-false}
 
