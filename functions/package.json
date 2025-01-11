@@ -1,5 +1,5 @@
 {
-  "name": "@alp-os/d2e-functions",
+  "name": "@data2evidence/d2e-functions",
   "version": "0.0.99",
   "description": "",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "build": "tbuild node_modules/@data2evidence/trex"
   },
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@data2evidence/trex": "latest",
     "deno": "latest"
