@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tbuild node_modules/@alp-os/trex"
+    "build": "tbuild node_modules/@data2evidence/trex"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@alp-os/trex": "latest",
+    "@data2evidence/trex": "latest",
     "deno": "latest"
   },
   "trex": {
