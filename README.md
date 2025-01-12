@@ -6,7 +6,7 @@ The following documentation outlines the basic setup of Analytics Platform (D2E)
 
 # Getting Started 
 ## Pre-requisites
-- Install pre-requisite softwares for running D2E. Refer to the installation guide [here](./1-setup/README.md). 
+- Install pre-requisite softwares for running D2E. Refer to the installation guide [here](./docs/1-setup/README.md). 
 - Install the d2e cli client by using the command in your terminal: 
 ```bash
 npm install -g https://github.com/data2evidence/d2e/releases/download/latest/data2evidence-cli.tgz
@@ -14,7 +14,7 @@ npm install -g https://github.com/data2evidence/d2e/releases/download/latest/dat
 
 
 ## Environment Variables and Credentials Setup 
-- Generate environment variables (Refer [here](./1-setup/environment-variables.md) for more information on the environment variables generated). It is required to export `GH_USERNAME` and `GH_TOKEN` before.
+- Generate environment variables (Refer [here](./docs/1-setup/environment-variables.md) for more information on the environment variables generated). It is required to export `GH_USERNAME` and `GH_TOKEN` before.
 ```bash
 export GH_USERNAME=<GH_USERNAME>
 export GH_TOKEN=<GH_TOKEN>
@@ -70,8 +70,8 @@ The Admin Portal allows authorized personnel to login and perform the management
 
 
 Additional info:
-- [Performing password change](./2-load/1-initial-admin.md)
-- [Performing user management](./2-load/2-users-roles.md)
+- [Performing password change](./docs/2-load/1-initial-admin.md)
+- [Performing user management](./docs/2-load/2-users-roles.md)
 
 > Tip: For quick access to the Admin Portal, input URL https://localhost:41100/portal/systemadmin/user-overview in the search bar.
 
@@ -83,7 +83,7 @@ This sections assumes that there is an existing database available. The database
 - In the Admin Portal, navigate to **Setup** > **Databases** > **Configure** > **Add database**
   > **The expected display is:** ![DatabaseListEmpty](./docs/images/database/DatabaseListEmpty.png)
 - Select **Add database** and provide the database information accordingly. 
-- Please refer to [documentation here](./2-load/4-setup-db-credentials.md) for more details on the input parameters for database creation.
+- Please refer to [documentation here](./docs/2-load/4-setup-db-credentials.md) for more details on the input parameters for database creation.
   >**The expected result after adding a database is:** ![DatabaseList](./docs/images/database/DatabaseList.png)
 - Perform a restart of the system for new connection details to be provisioned to the data services using the command: 
 
@@ -92,7 +92,7 @@ yarn start:minerva --force-recreate; sleep 60
 ```
 
 If there is no existing databases available, you may consider using the following sample database below and continue with the guide from section [Plugins](#plugins) onwards.
-- [Synthetic Public Use Files (SynPUFs)](./2-load/): Perform sub-steps [3](./2-load/3-setup-pg-permissions.md), [4](./2-load/4-setup-db-credentials.md), [6](./2-load/6-load-synpuf1k.md) and [7](./2-load/7-load-vocab.md)
+- [Synthetic Public Use Files (SynPUFs)](./docs/2-load/): Perform sub-steps [3](./docs/2-load/3-setup-pg-permissions.md), [4](./docs/2-load/4-setup-db-credentials.md), [6](./docs/2-load/6-load-synpuf1k.md) and [7](./docs/2-load/7-load-vocab.md)
 - broadsea-atlasdb: Refer to the docs [here](/docs/2-load/8-load-broadsea.md)
 
 ## Plugins 
@@ -114,7 +114,7 @@ The Admin portal allows the admin user to perform customized and scheduled job r
 - In the Admin Portal, navigate to **Datasets** > **Add dataset**
   >**The expected display is:**![DatasetList](./docs/images/datasets/DatasetList.png)
 
-- Provide the dataset [parameters](./3-configure/1-create-dataset.md) accordingly.
+- Provide the dataset [parameters](./docs/3-configure/1-create-dataset.md) accordingly.
   > **The expected result upon successful addition of dataset**: ![Datasets](./docs/images/datasets/ConfirmDatasetsPortal.png)
 
 ## Dataset Permissions
@@ -122,7 +122,7 @@ The Admin Portal allows the admin to perform dataset management to provide users
 - In the Admin Portal, navigate to **Datasets**. 
 - Navigate to the dataset you wish to provide/revoke permission access for users. 
 - Under **Actions** dropdown, select **Permissions** to view users who have requested for access or provide access to existing users. 
-- Refer to the [documentation here](./3-configure/2-dataset-permissions.md) for a detailed guide on setting permissions.
+- Refer to the [documentation here](./docs/3-configure/2-dataset-permissions.md) for a detailed guide on setting permissions.
 
 
 ## Platform Configuration
@@ -132,7 +132,7 @@ This section generates the Data Quality Dashboard based on the dataset of intere
 - In the Admin Portal, navigate to **Datasets**. Navigate to the dataset of interest and click **Select Action**. 
 - Select **Run data quality** and select the **Run Analysis** button. 
 - Repeat the step for **Run data characterization**.
-- After completing the **Data Quality** and **Data Characterization** job runs,  section, refer to the [documentation here](./3-configure/4-dqd-dashboard.md) to access the Data Quality Dashboard for the respective datasets in the Researcher portal.
+- After completing the **Data Quality** and **Data Characterization** job runs,  section, refer to the [documentation here](./docs/3-configure/4-dqd-dashboard.md) to access the Data Quality Dashboard for the respective datasets in the Researcher portal.
 
   > **The expected result is:** ![dqd-dashboard](./docs/images/dqd/dqd-dashboard-1.png)
 
@@ -140,11 +140,11 @@ This section generates the Data Quality Dashboard based on the dataset of intere
 This section provides the steps for setting up the analytics environment.
 - Navigate to the dataset of interest and click **Select Action**. 
 - Select **Create cache**.
-- Refer to the [documentation here](./3-configure/5-create-duckdb-file.md) to create cache via the Jobs Portal.
+- Refer to the [documentation here](./docs/3-configure/5-create-duckdb-file.md) to create cache via the Jobs Portal.
 
 ### Update Datasets Metadata 
 - In the Admin Portal, navigate to **Datasets** tab and select **Update dataset metadata**. 
-- Refer to the [documentation here](./3-configure/7-fetch-datasets-metadata.md) for more details.
+- Refer to the [documentation here](./docs/3-configure/7-fetch-datasets-metadata.md) for more details.
 
 **The expected result is as follows:**
 >![Researcher Portal Dataset Donut Chart](./docs/images/metadata/DatasetDonutChart.png)
@@ -153,7 +153,7 @@ This section provides the steps for setting up the analytics environment.
 ## Researcher Portal
 ### Cohort Creation
 - Navigate to [Researcher Portal](https://localhost:41100/portal/researcher) and select **Cohort** tab.
-- Refer to the [documentation here](./3-configure/8-cohort.md) for more details.
+- Refer to the [documentation here](./docs/3-configure/8-cohort.md) for more details.
 
 ## Stopping Application
 1. Stop all containers: `yarn stop:minerva`
