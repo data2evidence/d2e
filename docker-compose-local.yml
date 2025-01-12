@@ -76,7 +76,15 @@ services:
     ports:
       - 41190:5432
       - 5432:5432
+  
+  broadsea-atlasdb:
+    ports:
+      - "15432:5432"
 
+  alp-minerva-s3:
+    ports:
+      # - 9000:9000 #Port for API connectivity, internal communication is good enough. Needs to be uncommented only when testing from outside the alp docker network
+      - 9090:9090
   #alp-dicom-server:
   # uses 8042 port on the container
   #  ports:
@@ -110,6 +118,7 @@ services:
       - ./services/cachedb/src:/home/docker/src
     ports:
       - 9235:9235
+      - 41191:41191
     environment:
       LOCAL_DEBUG: "true"
 

@@ -12,6 +12,10 @@
     "gen:tls": "scripts/gen-tls.sh",
     "gen:resource-limits": "scripts/gen-resource-limits.sh",
 
+    "start": "ENV_TYPE=remote docker compose --file docker-compose.yml --env-file .env up",
+    "start:demo": "ENV_TYPE=remote docker compose --file docker-compose.yml --file docker-compose-atlas.yml --env-file .env up",
+    "start:dev": "ENV_TYPE=local docker compose --file docker-compose.yml --file docker-compose-atlas.yml --file docker-compose-local.yml --env-file .env.local up",
+
     "base:minerva": "BASE_PORT=1 docker compose --file docker-compose.yml --file docker-compose-atlas.yml",
     "base:minerva:fhir": "BASE_PORT=1 docker compose --file docker-compose.yml --file docker-compose-atlas.yml --file docker-compose-fhir.yml",
     "remote:minerva": "ENV_TYPE=remote yarn base:minerva --env-file .env.remote --profile minerva-ui --profile perseus",
