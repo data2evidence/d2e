@@ -17,7 +17,7 @@ DOMAIN_NAME=alp.local
 TLS_CA_NAME=alp-internal
 VOLUME_NAME=alp_caddy
 
-if [ -z ${ENVFILE:-}]; then
+if [ -z "${ENVFILE:-}" ]; then
     DOTENV_FILE=.env.${ENV_TYPE:-local}
 else
     DOTENV_FILE=$ENVFILE

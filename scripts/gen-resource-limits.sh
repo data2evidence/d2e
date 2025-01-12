@@ -7,7 +7,7 @@ ENV_TYPE=${ENV_TYPE:-local}
 
 # vars
 OS="$(uname -s)"
-if [ -z ${ENVFILE:-}]; then
+if [ -z "${ENVFILE:-}" ]; then
     DOTENV_FILE=.env.${ENV_TYPE:-local}
 else
     DOTENV_FILE=$ENVFILE
