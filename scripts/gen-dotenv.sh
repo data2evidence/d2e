@@ -4,6 +4,8 @@ set -o nounset
 set -o errexit
 
 # constants
+ghuser=${GH_USERNAME}
+ghtoken=${GH_TOKEN}
 
 if [ -z ${ENVFILE:-}]; then
     env_file=.env.${ENV_TYPE:-local}
@@ -69,7 +71,11 @@ bash -c "set -a; source $tmp_file; cat $example_file | envsubst > $env_file"
 if [ ${ENV_TYPE:-local} = local ]; then
     echo DOCKER_TAG_NAME=local >> $env_file
 fi
+echo GH_USERNAME=$ghuser >> $env_file
+echo GH_TOKEN=$ghtoken >> $env_file
+
 echo >> $env_file
+
 
 # finish
 wc -l $env_file

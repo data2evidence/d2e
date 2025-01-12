@@ -26,15 +26,15 @@ jobs:
         run: jq --arg v "-$(date +%s)-$GITHUB_SHA" '.version+=$v' package.json > tmppkg; mv tmppkg package.json
       - name: npm build
         run: npm install
-      - name: Publish
-        run: |
-          if [[ $GIT_CI_BRANCH_NAME == 'develop' ]]; then 
-            npm publish
-          else 
-            npm publish --dry-run
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Publish
+      #   run: |
+      #     if [[ $GIT_CI_BRANCH_NAME == 'develop' ]]; then 
+      #       npm publish
+      #     else 
+      #       npm publish --dry-run
+      #     fi
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/delete-package-versions@v5
         if: github.ref_name == 'develop'
         with:
@@ -58,3 +58,5 @@ jobs:
           target_commit: develop
           prerelease: true
           overwrite: true
+          asset_name: data2evidence-cli.tgz
+
