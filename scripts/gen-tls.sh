@@ -8,7 +8,9 @@ ENV_TYPE=${ENV_TYPE:-local}
 TLS_REGENERATE=${TLS_REGENERATE:-false}
 
 # vars
-GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+if [ -z "${GIT_BASE_DIR:-}" ]; then
+	GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
+fi
 CACHE_DIR=$GIT_BASE_DIR/cache/tls
 CONTAINER_NAME=alp-caddy-certs-mgmt
 DOMAIN_NAME=alp.local
@@ -39,19 +41,23 @@ for VAR_NAME in TLS__INTERNAL__CA_CRT TLS__INTERNAL__CRT TLS__INTERNAL__KEY; do 
 # add certs from caddy to dotenv
 TLS__INTERNAL__CA_CRT_FILE=tls__internal__ca.crt
 TLS__INTERNAL__CA_CRT_PATH=$CACHE_DIR/$TLS__INTERNAL__CA_CRT_FILE
+TLS__INTERNAL__CRT_CHAIN_FILE=tls__internal_chain.crt
+TLS__INTERNAL__CRT_CHAIN_PATH=$CACHE_DIR/$TLS__INTERNAL__CRT_CHAIN_FILE
 TLS__INTERNAL__CRT_FILE=tls__internal.crt
 TLS__INTERNAL__CRT_PATH=$CACHE_DIR/$TLS__INTERNAL__CRT_FILE
 TLS__INTERNAL__KEY_FILE=tls__internal.key
 TLS__INTERNAL__KEY_PATH=$CACHE_DIR/$TLS__INTERNAL__KEY_FILE
 
-docker exec $CONTAINER_NAME cat $CONTAINER_CA_DIR/root.crt > $TLS__INTERNAL__CA_CRT_PATH
+
+docker cp $CONTAINER_NAME:/$CONTAINER_CA_DIR/root.crt $TLS__INTERNAL__CA_CRT_PATH
 echo TLS__INTERNAL__CA_CRT=\'"$(cat $TLS__INTERNAL__CA_CRT_PATH)"\' >> $DOTENV_FILE
 
 # wildcard_.${DOMAIN_NAME}.crt contains 2 certs - crt & ca_crt => openssl extracts 1st crt
-docker exec $CONTAINER_NAME cat $CONTAINER_CRT_DIR/wildcard_.${DOMAIN_NAME}.crt | openssl x509 -in /dev/stdin > $TLS__INTERNAL__CRT_PATH
+docker cp $CONTAINER_NAME:$CONTAINER_CRT_DIR/wildcard_.${DOMAIN_NAME}.crt $TLS__INTERNAL__CRT_CHAIN_PATH
+cat $TLS__INTERNAL__CRT_CHAIN_PATH | openssl x509 -in /dev/stdin > $TLS__INTERNAL__CRT_PATH
 echo TLS__INTERNAL__CRT=\'"$(cat $TLS__INTERNAL__CRT_PATH)"\' >> $DOTENV_FILE
 
-docker exec $CONTAINER_NAME cat $CONTAINER_CRT_DIR/wildcard_.${DOMAIN_NAME}.key > $TLS__INTERNAL__KEY_PATH
+docker cp $CONTAINER_NAME:$CONTAINER_CRT_DIR/wildcard_.${DOMAIN_NAME}.key $TLS__INTERNAL__KEY_PATH
 echo TLS__INTERNAL__KEY=\'"$(cat $TLS__INTERNAL__KEY_PATH)"\' >> $DOTENV_FILE
 
 [ $(grep TLS__INTERNAL $DOTENV_FILE | grep -c -- '---') = 3 ] || { echo "FATAL 3xTLS__INTERNAL not populated"; exit 1; }
