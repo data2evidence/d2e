@@ -35,13 +35,13 @@ jobs:
       #     fi
       #   env:
       #     NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/delete-package-versions@v5
-        if: github.ref_name == 'develop'
-        with:
-          package-name: "cli"
-          package-type: "npm"
-          min-versions-to-keep: 3
-          delete-only-pre-release-versions: "true"
+      #- uses: actions/delete-package-versions@v5
+      #  if: github.ref_name == 'develop'
+      #  with:
+      #    package-name: "cli"
+      #    package-type: "npm"
+      #    min-versions-to-keep: 3
+      #    delete-only-pre-release-versions: "true"
       - name: Pack
         run: |
           if [[ $GIT_CI_BRANCH_NAME == 'develop' ]]; then
