@@ -5,9 +5,10 @@
   "license": "Apache-2.0",
   "bin": {
     "d2e-genenv": "scripts/cli-genenv.sh",
-    "d2e": "scripts/cli-start.sh",
+    "d2e-start": "scripts/cli-start.sh",
     "d2e-init": "scripts/cli-init.sh",
-    "d2e-login": "scripts/cli-login.sh"
+    "d2e-login": "scripts/cli-login.sh",
+    "d2e": "scripts/cli.sh"
   },
   "config": {
     "env_names_all": "local remote base-all base-local base-remote alp-dev-sg-3 alp-dev-sg-2 alp-stg-de-1 alp-stg-sg-1 alp-stg-sg-2",
