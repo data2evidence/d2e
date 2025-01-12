@@ -5,8 +5,8 @@ networks:
 
 volumes:
   caddy:
-  duckdb-data-1:
-  cdw-config-duckdb-data-1:
+  cachedb-data-1:
+  cdw-config-cachedb-data-1:
   minio-data-1:
   pg-minerva-data-1:
   dicom-sqlite-storage:
@@ -336,10 +336,10 @@ services:
           },
           "terminology-svc": {},
           "code-suggestion": {
-            "COGNITO_CLIENT_ID": "${COGNITO_CLIENT_ID}",
-            "COGNITO_CLIENT_SECRET": "${COGNITO_CLIENT_SECRET}",
-            "COGNITO_TOKEN_ENDPOINT": "https://${COGNITO_TOKEN_ENDPOINT}",
-            "LAMBDA_API_ENDPOINT": "https://${LAMBDA_API_ENDPOINT}"
+            "COGNITO_CLIENT_ID": "${COGNITO_CLIENT_ID:-null}",
+            "COGNITO_CLIENT_SECRET": "${COGNITO_CLIENT_SECRET:-null}",
+            "COGNITO_TOKEN_ENDPOINT": "${COGNITO_TOKEN_ENDPOINT:-null}",
+            "LAMBDA_API_ENDPOINT": "${LAMBDA_API_ENDPOINT:-null}"
           },
           "demo": {
             "DEMO__DB_CODE": "demo_database",
@@ -402,7 +402,7 @@ services:
       LOGTO__SVC_CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
       LOGTO__TOKEN_URL: http://alp-logto-${BASE_PORT:-1}:3001/oidc/token
       NODE_ENV: development
-      PREFECT_DOCKER_VOLUMES: '["alp_duckdb-data-1:/app/duckdb_data", "alp_cdw-config-duckdb-data-1:/app/cdw-config/duckdb_data", "alp_r-libs:/home/docker/plugins/R/site-library", "alp_fhir-schema-file-1:/home/docker/fhir"]'
+      PREFECT_DOCKER_VOLUMES: '["alp_cachedb-data-1:/app/duckdb_data", "alp_cdw-config-cachedb-data-1:/app/cdw-config/duckdb_data", "alp_r-libs:/home/docker/plugins/R/site-library", "alp_fhir-schema-file-1:/home/docker/fhir"]'
       GH_TOKEN: ${GH_TOKEN}
       PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-flows"]'
       PLUGINS_API_VERSION: ${PLUGINS_API_VERSION:-latest}
@@ -489,10 +489,11 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 41100:41100
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - caddy:/data
-      - ./deploy/caddy-config:/srv/caddy-config
+      - ${CADDY__CONFIG:-./deploy/caddy-config}:/srv/caddy-config
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
@@ -576,7 +577,7 @@ services:
         - http://alp-dataflow-gen-1:41120/api/health
       timeout: 30s
     hostname: alp-dataflow-gen-worker.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: prefecthq/prefect:3.0.3-python3.11
+    image: ghcr.io/data2evidence/d2e-dataflow-gen:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c83
@@ -584,15 +585,14 @@ services:
       data:
         priority: 20
     volumes:
-      - ./services/alp-dataflow-gen/create_workpool_json.py:/opt/prefect/create_workpool_json.py
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_API_ENABLE_HTTP2: False
       D2E_MEMORY_LIMIT: ${D2E_MEMORY_LIMIT:-16G}
       D2E_SWAP_LIMIT: ${D2E_SWAP_LIMIT:-64G}
-      DOCKER_REGISTRY_USERNAME: ${DOCKER_REGISTRY_USERNAME:-tech-user-pull}
-      DOCKER_REGISTRY_PASSWORD: ${DOCKER_REGISTRY_PASSWORD}
+      DOCKER_REGISTRY_USERNAME: ${GH_USERNAME:-tech-user-pull}
+      DOCKER_REGISTRY_PASSWORD: ${GH_TOKEN}
       DOCKER_REGISTRY_URL: ${DOCKER_REGISTRY_URL:-alpcr.azurecr.io}
 
   alp-dataflow-gen-init:
@@ -617,8 +617,6 @@ services:
       alp:
         priority: 20
     platform: linux/amd64
-    volumes:
-      - ./services/alp-dataflow-gen/init.py:/opt/prefect/libs/init.py
     environment:
       <<:
         - *x-minio
@@ -756,7 +754,6 @@ services:
     volumes:
       - pg-minerva-data-1:/var/lib/postgresql/data
       - ./cache/pgbackup:/backup
-      - ./cache/vocab:/vocab
     environment:
       <<:
         - *x-tls
@@ -790,9 +787,7 @@ services:
         priority: 20
       data:
         priority: 10
-    ports:
-      # - 9000:9000 #Port for API connectivity, internal communication is good enough. Needs to be uncommented only when testing from outside the alp docker network
-      - 9090:9090
+
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - minio-data-1:/data
@@ -846,7 +841,7 @@ services:
   alp-cachedb:
     container_name: &c30 alp-cachedb
     hostname: alp-cachedb.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: ghcr.io/data2evidence/d2ecachedb:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-cachedb:${DOCKER_TAG_NAME:-develop}
     platform: linux/amd64
     depends_on:
       trex:
@@ -870,11 +865,9 @@ services:
       data:
         priority: 10
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    ports:
-      - 41191:41191
     volumes:
-      - duckdb-data-1:/home/docker/duckdb_data
-      - cdw-config-duckdb-data-1:/home/docker/cdw_svc/duckdb_data # Volume for dynamically generated cdw-config duckdb file (refer to docs/3-configure/9-create-cdw-config-duckdb-file.md for information)
+      - cachedb-data-1:/home/docker/duckdb_data
+      - cdw-config-cachedb-data-1:/home/docker/cdw_svc/duckdb_data # Volume for dynamically generated cdw-config duckdb file (refer to docs/3-configure/9-create-cdw-config-duckdb-file.md for information)
       - fhir-schema-file-1:/home/docker/fhir
     environment:
       <<:
