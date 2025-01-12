@@ -845,7 +845,7 @@ services:
   alp-cachedb:
     container_name: &c30 alp-cachedb
     hostname: alp-cachedb.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: ghcr.io/data2evidence/d2ecachedb:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-cachedb:${DOCKER_TAG_NAME:-develop}
     platform: linux/amd64
     depends_on:
       trex:
