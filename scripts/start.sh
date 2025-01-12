@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+script_full_path=$(dirname "$0")
+node_modules_path=$script_full_path/../lib/node_modules/@data2evidence/setup/
+export CADDY__CONFIG=$node_modules_path/deploy/caddy-config
+export ENV_TYPE=${ENV_TYPE:-remote}
+
+docker compose --file $node_modules_path/docker-compose.yml --env-file .env up

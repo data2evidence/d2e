@@ -493,7 +493,7 @@ services:
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - caddy:/data
-      - ./deploy/caddy-config:/srv/caddy-config
+      - ${CADDY__CONFIG:-./deploy/caddy-config}:/srv/caddy-config
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
@@ -577,7 +577,7 @@ services:
         - http://alp-dataflow-gen-1:41120/api/health
       timeout: 30s
     hostname: alp-dataflow-gen-worker.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: prefecthq/prefect:3.0.3-python3.11
+    image: ghcr.io/data2evidence/d2e-dataflow-gen:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c83
@@ -585,7 +585,6 @@ services:
       data:
         priority: 20
     volumes:
-      - ./services/alp-dataflow-gen/create_workpool_json.py:/opt/prefect/create_workpool_json.py
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
@@ -618,8 +617,6 @@ services:
       alp:
         priority: 20
     platform: linux/amd64
-    volumes:
-      - ./services/alp-dataflow-gen/init.py:/opt/prefect/libs/init.py
     environment:
       <<:
         - *x-minio
@@ -757,7 +754,6 @@ services:
     volumes:
       - pg-minerva-data-1:/var/lib/postgresql/data
       - ./cache/pgbackup:/backup
-      - ./cache/vocab:/vocab
     environment:
       <<:
         - *x-tls
