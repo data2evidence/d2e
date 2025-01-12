@@ -7,7 +7,7 @@ set -o errexit
 ghuser=${GH_USERNAME}
 ghtoken=${GH_TOKEN}
 
-if [ -z ${ENVFILE:-}]; then
+if [ -z "${ENVFILE:-}" ]; then
     env_file=.env.${ENV_TYPE:-local}
 else
     env_file=$ENVFILE
