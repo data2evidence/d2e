@@ -4,10 +4,6 @@
   "description": "D2E setup script",
   "license": "Apache-2.0",
   "bin": {
-    "d2e-genenv": "scripts/cli-genenv.sh",
-    "d2e-start": "scripts/cli-start.sh",
-    "d2e-init": "scripts/cli-init.sh",
-    "d2e-login": "scripts/cli-login.sh",
     "d2e": "scripts/cli.sh"
   },
   "config": {
