@@ -4,7 +4,13 @@ set -o nounset
 set -o errexit
 
 # constants
-env_file=${$ENVFILE:-.env.${ENV_TYPE}}
+
+if [ -z ${ENVFILE:-}]; then
+    env_file=.env.${ENV_TYPE:-local}
+else
+    env_file=$ENVFILE
+fi
+
 example_file=${ENV_EXAMPLE:-env.example}
 tmp_file=.env.tmp
 
@@ -60,7 +66,7 @@ encode-basic-auth
 echo
 
 bash -c "set -a; source $tmp_file; cat $example_file | envsubst > $env_file"
-if [ $ENV_TYPE = local ]; then
+if [ ${ENV_TYPE:-local} = local ]; then
     echo DOCKER_TAG_NAME=local >> $env_file
 fi
 echo >> $env_file

@@ -8,7 +8,7 @@ ENV_TYPE=${ENV_TYPE:-local}
 TLS_REGENERATE=${TLS_REGENERATE:-false}
 
 # vars
-if [ -z "${GIT_BASE_DIR}" ]; then
+if [ -z "${GIT_BASE_DIR:-}" ]; then
 	GIT_BASE_DIR="$(git rev-parse --show-toplevel)"
 fi
 CACHE_DIR=$GIT_BASE_DIR/cache/tls
