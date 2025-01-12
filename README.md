@@ -12,8 +12,14 @@ The following documentation outlines the basic setup of Analytics Platform (D2E)
 npm install -g https://github.com/data2evidence/d2e/releases/download/latest/data2evidence-cli.tgz
 ```
 
+
 ## Environment Variables and Credentials Setup 
-- Generate environment variables (Refer [here](./1-setup/environment-variables.md) for more information on the environment variables generated)
+- Generate environment variables (Refer [here](./1-setup/environment-variables.md) for more information on the environment variables generated). It is required to export `GH_USERNAME` and `GH_TOKEN` before.
+```bash
+export GH_USERNAME=<GH_USERNAME>
+export GH_TOKEN=<GH_TOKEN>
+```
+
 ```bash
 d2e genenv
 ```
