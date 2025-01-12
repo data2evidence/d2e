@@ -1,0 +1,44 @@
+name: setup ci
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, ready_for_review, reopened, synchronize]
+  push:
+    branches:
+      - develop
+
+env:
+  GIT_CI_BRANCH_NAME: ${{ github.ref_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@data2evidence"
+      - name: Update version
+        run: jq --arg v "-$(date +%s)-$GITHUB_SHA" '.version+=$v' package.json > tmppkg; mv tmppkg package.json
+      - name: npm build
+        run: npm install
+      - name: Publish
+        run: |
+          if [[ $GIT_CI_BRANCH_NAME == 'develop' ]]; then 
+            npm publish
+          else 
+            npm publish --dry-run
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/delete-package-versions@v5
+        if: github.ref_name == 'develop'
+        with:
+          package-name: "setup"
+          package-type: "npm"
+          min-versions-to-keep: 3
+          delete-only-pre-release-versions: "true"
