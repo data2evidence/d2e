@@ -94,32 +94,32 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: alp-data-node/alp-dataflow-gen
+          - name: d2e-dataflow-gen
             directory: ./services/alp-dataflow-gen
             context: .
             fileName: Dockerfile
             pull: true
-          - name: alp-data-node/alp-pg-mgmt-init
+          - name: d2e-pg-mgmt-init
             directory: ./services/alp-pg-management
             context: ./services/alp-pg-management
             fileName: Dockerfile
-          - name: alp-data-node/alp-logto
+          - name: d2e-logto
             directory: ./services/alp-logto
             context: ./services/alp-logto
             fileName: Dockerfile
-          - name: alp-data-node/alp-logto-post-init
+          - name: d2e-logto-post-init
             directory: ./services/alp-logto/post-init
             context: ./services/alp-logto/post-init
             fileName: Dockerfile
-          - name: alp-data-node/alp-fhir-server
+          - name: d2e-fhir-server
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile
-          - name: alp-data-node/alp-fhir-fe-server
+          - name: d2e-fhir-fe-server
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile.frontend
-          - name: alp-data-node/cachedb
+          - name: d2e-cachedb
             directory: ./services/cachedb
             context: .
             fileName: Dockerfile
