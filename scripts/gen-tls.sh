@@ -19,6 +19,8 @@ TLS_CA_NAME=alp-internal
 VOLUME_NAME=alp_caddy
 touch ${DOTENV_FILE}
 
+mkdir -p $CACHE_DIR
+
 CONTAINER_CRT_DIR=/data/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
 CONTAINER_CA_DIR=/data/caddy/pki/authorities/$TLS_CA_NAME
 
