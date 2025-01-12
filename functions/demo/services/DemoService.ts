@@ -1,5 +1,5 @@
 import { DatasetAPI } from "../api/DatasetAPI.ts";
-import { DbCredentialsAPI } from "../api/DbCredentialsApi.ts";
+import { DbCredentialsAPI } from "../api/DbCredentialsAPI.ts";
 import { PortalAPI } from "../api/PortalAPI.ts";
 import { JobPluginsAPI } from "../api/JobPluginsAPI.ts";
 import {
