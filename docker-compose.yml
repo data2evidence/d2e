@@ -336,10 +336,10 @@ services:
           },
           "terminology-svc": {},
           "code-suggestion": {
-            "COGNITO_CLIENT_ID": "${COGNITO_CLIENT_ID}",
-            "COGNITO_CLIENT_SECRET": "${COGNITO_CLIENT_SECRET}",
-            "COGNITO_TOKEN_ENDPOINT": "https://${COGNITO_TOKEN_ENDPOINT}",
-            "LAMBDA_API_ENDPOINT": "https://${LAMBDA_API_ENDPOINT}"
+            "COGNITO_CLIENT_ID": "${COGNITO_CLIENT_ID:-null}",
+            "COGNITO_CLIENT_SECRET": "${COGNITO_CLIENT_SECRET:-null}",
+            "COGNITO_TOKEN_ENDPOINT": "${COGNITO_TOKEN_ENDPOINT:-null}",
+            "LAMBDA_API_ENDPOINT": "${LAMBDA_API_ENDPOINT:-null}"
           },
           "demo": {
             "DEMO__DB_CODE": "demo_database",
@@ -591,8 +591,8 @@ services:
       PREFECT_API_ENABLE_HTTP2: False
       D2E_MEMORY_LIMIT: ${D2E_MEMORY_LIMIT:-16G}
       D2E_SWAP_LIMIT: ${D2E_SWAP_LIMIT:-64G}
-      DOCKER_REGISTRY_USERNAME: ${DOCKER_REGISTRY_USERNAME:-tech-user-pull}
-      DOCKER_REGISTRY_PASSWORD: ${DOCKER_REGISTRY_PASSWORD}
+      DOCKER_REGISTRY_USERNAME: ${GH_USERNAME:-tech-user-pull}
+      DOCKER_REGISTRY_PASSWORD: ${GH_TOKEN}
       DOCKER_REGISTRY_URL: ${DOCKER_REGISTRY_URL:-alpcr.azurecr.io}
 
   alp-dataflow-gen-init:

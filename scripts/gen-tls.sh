@@ -14,9 +14,15 @@ fi
 CACHE_DIR=$GIT_BASE_DIR/cache/tls
 CONTAINER_NAME=alp-caddy-certs-mgmt
 DOMAIN_NAME=alp.local
-DOTENV_FILE=.env.$ENV_TYPE
 TLS_CA_NAME=alp-internal
 VOLUME_NAME=alp_caddy
+
+if [ -z ${ENVFILE:-}]; then
+    DOTENV_FILE=.env.${ENV_TYPE:-local}
+else
+    DOTENV_FILE=$ENVFILE
+fi
+
 touch ${DOTENV_FILE}
 
 mkdir -p $CACHE_DIR
