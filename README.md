@@ -105,4 +105,4 @@ Now you can go to the researcher portal use Data2Evidence with the demo dataset.
 - Stop all containers: `d2e stop` or `d2e stopdemo` if `d2e startdemo` was used
 - Perform clean-up: `d2e clean` or `d2e cleandemo`
 > [!WARNING]
-> This step removes all containers and volumes. You would need to re-run the [Environment Variables and Credentials](#environment-variables-and-credentials-setup) section for a fresh startup. 
+> `d2e clean` removes all containers and volumes. You would need to re-run the [Environment Variables and Credentials](#environment-variables-and-credentials-setup) section for a fresh startup. 
