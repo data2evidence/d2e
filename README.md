@@ -34,7 +34,7 @@ d2e login
 ```
 
 
-Initialize D2E: 
+Setup D2E IDP: 
 ```bash
 d2e setup
 ```
