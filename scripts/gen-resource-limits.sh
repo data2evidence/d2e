@@ -7,7 +7,11 @@ ENV_TYPE=${ENV_TYPE:-local}
 
 # vars
 OS="$(uname -s)"
-DOTENV_FILE=.env.$ENV_TYPE
+if [ -z "${ENVFILE:-}" ]; then
+    DOTENV_FILE=.env.${ENV_TYPE:-local}
+else
+    DOTENV_FILE=$ENVFILE
+fi
 touch ${DOTENV_FILE}
 
 echo D2E_RESOURCE_LIMIT=$D2E_RESOURCE_LIMIT

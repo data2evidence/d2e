@@ -18,3 +18,6 @@ RUN npm install --global yarn
 COPY --chown=docker:docker ./services/envConverter ./libs/envConverter
 WORKDIR /opt/prefect/libs/envConverter
 RUN yarn install
+
+COPY --chown=docker:docker ./services/alp-dataflow-gen/init.py /opt/prefect/libs/init.py
+COPY --chown=docker:docker ./services/alp-dataflow-gen/create_workpool_json.py /opt/prefect/create_workpool_json.py

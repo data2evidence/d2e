@@ -9,7 +9,7 @@ services:
     environment:
       LOCAL_DEBUG: "true"
       DATABASE_CREDENTIALS: ${DATABASE_CREDENTIALS}
-      PLUGINS_SEED: '["d2e-plugins", "d2e-ui"]'
+      PLUGINS_SEED: '["d2e-flows", "d2e-ui"]'
       PLUGINS_SEED_UPDATE: ${PLUGINS_SEED_UPDATE:-false}
       PLUGINS_DEV_PATH: "./plugins"
       WATCH: |-
@@ -31,7 +31,8 @@ services:
           "terminology-svc": false,
           "code-suggestion": false,
           "portal": false,
-          "files-manager": false
+          "files-manager": false,
+          "demo": false
         }
 
   alp-caddy:
@@ -52,10 +53,16 @@ services:
       PORTAL__API_URL: https://trex:33000/portalsvc/graphql
       SYSTEM_PORTAL__API_URL: https://trex:33000/system-portal/
 
+  alp-dataflow-gen-worker:
+    volumes:
+      - ./services/alp-dataflow-gen/create_workpool_json.py:/opt/prefect/create_workpool_json.py
+
   alp-dataflow-gen-init:
     build:
       context: .
       dockerfile: ./services/alp-dataflow-gen/Dockerfile
+    volumes:
+      - ./services/alp-dataflow-gen/init.py:/opt/prefect/libs/init.py
 
   alp-logto:
     build:
@@ -75,7 +82,15 @@ services:
     ports:
       - 41190:5432
       - 5432:5432
+  
+  broadsea-atlasdb:
+    ports:
+      - "15432:5432"
 
+  alp-minerva-s3:
+    ports:
+      # - 9000:9000 #Port for API connectivity, internal communication is good enough. Needs to be uncommented only when testing from outside the alp docker network
+      - 9090:9090
   #alp-dicom-server:
   # uses 8042 port on the container
   #  ports:
@@ -109,6 +124,7 @@ services:
       - ./services/cachedb/src:/home/docker/src
     ports:
       - 9235:9235
+      - 41191:41191
     environment:
       LOCAL_DEBUG: "true"
 

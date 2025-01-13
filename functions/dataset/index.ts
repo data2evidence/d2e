@@ -107,7 +107,6 @@ export class DatasetRouter {
           schemaOption,
           vocabSchemaValue,
           cleansedSchemaOption,
-          tenantName,
           dialect,
           databaseCode,
           schemaName,
@@ -122,10 +121,6 @@ export class DatasetRouter {
           fhirProjectId,
         } = req.body;
 
-        if (!tenantName) {
-          this.logger.error(`Tenant name is not provided`);
-          return res.status(400).send("Tenant name is not provided");
-        }
         // Token study code validation
         const tokenFormat = /^[a-zA-Z0-9_]{1,80}$/;
         if (!tokenStudyCode.match(tokenFormat)) {
