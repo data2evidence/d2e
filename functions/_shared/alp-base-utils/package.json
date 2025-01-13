@@ -3,8 +3,7 @@
   "version": "1.1.9",
   "description": "",
   "repository": {
-    "type": "git",
-    "url": "https://github.com/alp/alp-clinical-research.git"
+    "type": "git"
   },
   "private": false,
   "main": "target/src/index.js",

@@ -3,8 +3,7 @@
   "version": "1.0.2",
   "description": "utility for alp-metadata",
   "repository": {
-    "type": "git",
-    "url": "https://github.com/alp/alp-clinical-research.git"
+    "type": "git"
   },
   "private": false,
   "main": "target/index.js",

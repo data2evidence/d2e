@@ -9,8 +9,7 @@
   "keywords": [],
   "author": "",
   "repository": {
-    "type": "git",
-    "url": "git@github.com:data2evidence/alp-clinical-research.git"
+    "type": "git"
   },
   "dependencies": {},
   "devDependencies": {
