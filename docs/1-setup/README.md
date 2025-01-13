@@ -46,10 +46,11 @@ Untested platforms:
 
 ### ubuntu
 
-- https://snapcraft.io/node
+- https://nodejs.org/en/download
 
 ```bash
-sudo snap install node --channel=18/stable --classic
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+nvm install 18
 ```
 
 ### macos

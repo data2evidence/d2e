@@ -142,7 +142,6 @@ packages:
 snap:
   commands:
     - snap install yq
-    - snap install node --channel=18/stable --classic
 
 users:
   - default
@@ -168,6 +167,10 @@ runcmd:
     docker run hello-world
     # crontab
     crontab -l | grep -q "docker image prune -af" || (crontab -l 2>/dev/null; echo "0 21 * * * sudo /usr/bin/docker image prune -af") | crontab -
+    # logging
+    wc -l /etc/docker/daemon.json
+    sudo systemctl daemon-reload
+    sudo systemctl restart docker
 
   - |
     # disable swap
@@ -186,27 +189,13 @@ runcmd:
     systemctl disable ua-messaging.service ua-messaging.timer --now
 
   - |
-    # portainer, to easily manage containers
-    # available on http://<IP>:9000
-    docker run -d \
-      -p 9000:9010 \
-      --name=portainer \
-      --restart=always \
-      -v /var/run/docker.sock:/var/run/docker.sock \
-      -v portainer_data:/data \
-      portainer/portainer-ce
-
-  - |
     # apt cleanup
     apt-get autoremove -y
 
   - |
-    # logging
-    wc -l /etc/docker/daemon.json
-    sudo systemctl daemon-reload
-    sudo systemctl restart docker
-
-  - |
+    # install node
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+    nvm install 18
     # install https://google.github.io/zx/
     sudo npm install -g zx
 
