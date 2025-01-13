@@ -22,7 +22,7 @@ export async function getCDMVersion(req, res, next) {
             res
         );
 
-        let cdmVersion = await dbDao.getCDMVersion(dbConnection, schemaName);
+        const cdmVersion = await dbDao.getCDMVersion(dbConnection, schemaName);
 
         let hanaKey = "CDM_VERSION";
         let cdmVersionKey =
