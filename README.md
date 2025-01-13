@@ -85,7 +85,7 @@ Additional info:
 Please find information how to add your own dataset and configure D2E [here](./docs/2-load/README.md)
 
 ## Configure D2E using the demo dataset
-> [!IMPORTANT]
+> [!NOTE]
 > You need to start Data2Evidence with `d2e startdemo` in order to use the demo dataset
 
 Open the D2E Portal and go to the Admin Portal. In the Admin portal click on **Setup** and than **Demo Setup**:
