@@ -14,7 +14,7 @@ npm install -g https://github.com/data2evidence/d2e/releases/download/latest/dat
 
 
 ## Environment Variables and Credentials Setup
-- Create directory to store d2e configuration files and go to it:
+- Create directory to store d2e configuration files and go to it. Please note that subsequent commands need to be executed in the directory:
 ```bash
 mkdir d2e
 cd d2e
