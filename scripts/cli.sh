@@ -27,13 +27,13 @@ case $cmd in
                 echo "Aborting";;
         esac
         ;;
-    init)
-        cp -a $node_modules_path/deploy ./deploy &&
+    setup)
         docker compose --file $node_modules_path/docker-compose.yml --env-file .env up alp-minerva-postgres alp-logto --wait &&
         sleep 10 &&
         docker compose --file $node_modules_path/docker-compose.yml --env-file .env up alp-logto-post-init
         ;;
-    genenv)
+    init)
+        cp -a $node_modules_path/deploy ./deploy &&
         $node_modules_path/scripts/gen-dotenv.sh && $node_modules_path/scripts/gen-tls.sh && $node_modules_path/scripts/gen-resource-limits.sh
         ;;
     login)
@@ -50,12 +50,12 @@ case $cmd in
         echo "Usage: d2e COMMAND"
         echo ""
         echo "Commands:"
-        echo "  genenv     Generates .env file"
-        echo "  login      Login into github"
-        echo "  init       Initializes d2e DB"
-        echo "  start      Starts d2e services"
-        echo "  stop       Stops d2e services"
-        echo "  clean      Removes d2e docker containers and volumnes"
+        echo "  init        Initializes D2E directory and generates .env file"
+        echo "  login       Login into github"
+        echo "  setup       Initializes d2e IDP DB"
+        echo "  start       Starts d2e services"
+        echo "  stop        Stops d2e services"
+        echo "  clean       Removes d2e docker containers and volumnes"
         ;;
 esac
     
