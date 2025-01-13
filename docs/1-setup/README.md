@@ -1,3 +1,33 @@
+# User Credentials & Environment Variables
+
+- GitHub Username & PAT Token are required to fetch images from docker registry `ghcr.io`
+
+## GitHub Username (GH_USERNAME)
+
+### GUI
+
+- open: https://github.com/settings > select _Go to your personal profile_
+
+### CLI
+
+- with GitHub cli (optional)
+
+```bash
+gh api user -q .login
+```
+
+## GitHub PAT token (GH_TOKEN)
+
+- Generate a GitHub PAT (classic) token with scope `read:packages` to retrieve packages to run d2e.
+- See: Setting up GitHub PAT: [link](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)
+- open https://github.com/settings/tokens/new?description=d2e%20GH_TOKEN%20(read:packages)&scopes=read:packages
+- Select scope: `read:packages`
+
+Example:
+![GitHub PAT token](../images/setup/github-pat-token.png)
+
+- GitHub PAT token via CLI seems currently not supported - https://github.com/cli/cli/issues/2531
+
 # Installation pre-requisites
 
 Tested platforms:
@@ -85,6 +115,8 @@ brew install openssl@3
 
 ## git
 
+- see: https://github.com/git-guides/install-git
+
 ### ubuntu
 
 ```bash
@@ -97,22 +129,3 @@ sudo apt-get install git-all
 ```bash
 brew install git
 ```
-
-For more information, refer to: https://github.com/git-guides/install-git
-
-## Generate GitHub PAT token
-
-Set up a GitHub PAT (classic) token with scope `read:packages` to retrieve packages to run d2e.
-
-- Setting up GitHub PAT: [link](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)
-- open https://github.com/settings/tokens/new?description=d2e%20GH_TOKEN%20(read:packages)&scopes=read:packages
-- Select scope: `read:packages`
-
-Example:
-![GitHub PAT token](../images/setup/github-pat-token.png)
-For more information, refer to: https://github.com/git-guides/install-git
-
-note:
-
-- GitHub PAT token via CLI seem currently not supported - https://github.com/cli/cli/issues/2531
-- stored as GH_TOKEN in .env

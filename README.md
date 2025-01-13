@@ -15,7 +15,7 @@ The following documentation outlines the basic setup of Data2Evidence for users 
 npm install -g https://github.com/data2evidence/d2e/releases/download/latest/data2evidence-cli.tgz
 ```
 
-- note: run the above command with `sudo` if permission denied
+- note: run the above command with `sudo` if permission denied e.g. where `node` was not installed with the recommended `nvm`
 
 ## Environment Variables and Credentials Setup
 
@@ -26,9 +26,29 @@ mkdir d2e
 cd d2e
 ```
 
-- Generate `.env` file with the environment variables (Refer [here](./docs/1-setup/environment-variables.md) for more information on the environment variables generated). It is required to set the `GH_USERNAME` and `GH_TOKEN` environment variables to run the command (see [here](./docs/1-setup/README.md) for instructions how to generate the `GH_TOKEN`).
+- Populate `.env.user` file with environment variables as follows:
 
 ```bash
+GH_USERNAME=<GH_USERNAME>
+GH_TOKEN=<GH_TOKEN>
+```
+
+- Key:
+
+  - GitHub Username & PAT Token are required to fetch packages & images from docker registry `ghcr.io`
+  - Fully Qualified Domain Name is required only if a Virtual Machine Server
+
+    - Otherise, defaults to `localhost:41100`, if running on desktop/laptop
+
+- References
+
+  - See: [here](./docs/1-setup/README.md) for howto generate the above environment variables
+  - See: [here](./docs/1-setup/environment-variables.md) for a description of _all_ environment variables
+
+- Invoke the following command to generate random environment-variables secrets
+
+```bash
+source .env.user
 GH_USERNAME=$GH_USERNAME GH_TOKEN=$GH_TOKEN d2e genenv
 ```
 
