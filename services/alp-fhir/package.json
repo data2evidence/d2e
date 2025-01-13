@@ -18,8 +18,7 @@
   "author": "",
   "license": "Apache-2.0",
   "repository": {
-    "type": "git",
-    "url": "git@github.com:alp/alp-clinical-research.git"
+    "type": "git"
   },
   "eslintConfig": {
     "parserOptions": {
