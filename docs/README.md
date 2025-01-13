@@ -128,7 +128,7 @@ This sections assumes that there is an existing database available. The database
 - Perform a restart of the system for new connection details to be provisioned to the data services using the command:
 
 ```bash
-yarn start:minerva --force-recreate; sleep 60
+d2e start; sleep 60
 ```
 
 If there is no existing databases available, you may consider using the following sample database below and continue with the guide from section [Plugins](#plugins) onwards.
