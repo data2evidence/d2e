@@ -62,8 +62,6 @@ yarn init:logto
 
 ## Application Setup
 
-Naviage to the folder where d2e repo is downloaded. Run the folllowing:
-
 - Run the command to get the neccessary docker images to run D2E:
 
 ```bash
