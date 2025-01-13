@@ -38,7 +38,6 @@ d2e init
 
 ## Application Setup
 
-Naviage to the folder where d2e repo is downloaded. Run the folllowing: 
 - Run the command to get the neccessary docker images and run D2E: 
 
 ```bash
