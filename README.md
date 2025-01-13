@@ -78,7 +78,8 @@ Additional info:
 - [Performing password change](./docs/2-load/1-initial-admin.md)
 - [Performing user management](./docs/2-load/2-users-roles.md)
 
-> Tip: For quick access to the Admin Portal, input URL https://localhost:41100/portal/systemadmin/user-overview in the search bar.
+> [!TIP]
+> For quick access to the Admin Portal, input URL https://localhost:41100/portal/systemadmin/user-overview in the search bar.
 
 ## Configure D2E with an own dataset
 Please find information how to add your own dataset and configure D2E [here](./docs/2-load/README.md)
