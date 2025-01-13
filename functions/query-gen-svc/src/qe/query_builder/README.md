@@ -11,7 +11,7 @@
 ## Introduction
 
 This document will help you get started to build a request for the query engine in json format, convert it to SQL and execute the SQL query as well. The query builder classes are developed in typescript and present in this file 
-<a href="https://github.com/alp-os/alp/blob/develop/services/query-gen-svc/src/qe/query_builder/FastQueryBuilder.ts" target="_blank">FastQueryBuilder.ts</a>. 
+<a href="https://github.com/data2evidence/alp/blob/develop/services/query-gen-svc/src/qe/query_builder/FastQueryBuilder.ts" target="_blank">FastQueryBuilder.ts</a>. 
 
 ## Background Information
 ### CQL Query
@@ -414,7 +414,7 @@ FROM   SXorDef
 
 ## Useful Links
 
-#### <a href="https://github.com/alp-os/alp/blob/develop/services/query-gen-svc/src/qe/query_builder/sample.js" target="_blank">sample.js</a>
+#### <a href="https://github.com/data2evidence/alp/blob/develop/services/query-gen-svc/src/qe/query_builder/sample.js" target="_blank">sample.js</a>
 
 This is a pure javascript implementation of fast query that generates fast json as output as well as the SQL query generated from fast. This will be useful for your local testing. Once you have cloned this repo (hopefully you have installed node version 5+), you can just run the following commands and it will print the FAST json to the console.
 
@@ -425,6 +425,6 @@ npm run postinstall
 node src/qe/query_builder/sample.js
 ```
 
-#### <a href="https://github.com/alp-os/alp/blob/develop/services/query-gen-svc/src/qe/sql_generator2/SqlGenerator.ts" target="_blank">Query Engine (Sql Generator Wrapper)</a>
+#### <a href="https://github.com/data2evidence/alp/blob/develop/services/query-gen-svc/src/qe/sql_generator2/SqlGenerator.ts" target="_blank">Query Engine (Sql Generator Wrapper)</a>
 
 The wrapper functions to generate and execute SQL.

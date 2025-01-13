@@ -13,8 +13,7 @@
     "test-specs": "envsubst < specs/environment.orig.json > specs/environment.json && node run_specs.js"
   },
   "repository": {
-    "type": "git",
-    "url": "git@github.com:gesundheitscloud/alp-clinical-research.git"
+    "type": "git"
   },
   "keywords": [
     "tests",

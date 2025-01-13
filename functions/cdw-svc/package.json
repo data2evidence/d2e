@@ -24,8 +24,7 @@
   "keywords": [],
   "author": "",
   "repository": {
-    "type": "git",
-    "url": "git@github.com:alp/alp-clinical-research.git"
+    "type": "git"
   },
   "dependencies": {
     "@alp/alp-base-utils": "1.1.9",
