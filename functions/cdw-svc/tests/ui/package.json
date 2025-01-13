@@ -9,8 +9,7 @@
   "keywords": [],
   "author": "",
   "repository": {
-    "type": "git",
-    "url": "git@github.com:alp-os/alp-clinical-research.git"
+    "type": "git"
   },
   "dependencies": {},
   "devDependencies": {

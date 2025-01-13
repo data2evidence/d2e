@@ -1,16 +1,16 @@
 {
-  "name": "@alp-os/d2e-functions",
+  "name": "@data2evidence/d2e-functions",
   "version": "0.0.99",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tbuild node_modules/@alp-os/trex"
+    "build": "tbuild node_modules/@data2evidence/trex"
   },
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "devDependencies": {
-    "@alp-os/trex": "latest",
+    "@data2evidence/trex": "latest",
     "deno": "latest"
   },
   "trex": {
@@ -506,6 +506,15 @@
           "path": "^/analytics-svc/plugins/(.*)",
           "scopes": [
             "PA.svc"
+          ]
+        },
+        {
+          "path": "^/analytics-svc/api/services/alpdb/cdmversion",
+          "scopes": [
+            "dbSvc.schema.cdmVersion.read"
+          ],
+          "httpMethods": [
+            "GET"
           ]
         },
         {
@@ -2072,7 +2081,10 @@
         },
         {
           "path": "^/code-suggestion",
-          "scopes": ["codesuggestion.read", "codesuggestion.tenantview.read"],
+          "scopes": [
+            "codesuggestion.read",
+            "codesuggestion.tenantview.read"
+          ],
           "httpMethods": [
             "POST"
           ]

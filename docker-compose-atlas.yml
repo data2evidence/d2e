@@ -9,8 +9,6 @@ services:
     mem_limit: "2G"
     environment:
       - POSTGRES_PASSWORD=mypass
-    ports:
-      - "15432:5432"
     networks:
       alp:
         priority: 20
