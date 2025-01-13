@@ -22,30 +22,20 @@ write_files:
       autoload -Uz compinit
       compinit
 
-      git_branch_test_color() {
-        local ref=$(git symbolic-ref --short HEAD 2> /dev/null)
-        if [ -n "${ref}" ]; then
-          if [ -n "$(git status --porcelain)" ]; then
-            local gitstatuscolor='%F{red}'
-          else
-            local gitstatuscolor='%F{green}'
-          fi
-          echo "${gitstatuscolor} (${ref})"
-        else
-          echo ""
-        fi
-      }
-
       alias vz='code ~/.zshrc'
       alias sz='source ~/.zshrc'
-      PROMPT='%n@%m %9c$(git_branch_test_color)%F{none} %# '
-      setopt PROMPT_SUBST
 
       export NVM_DIR="$HOME/.nvm"
       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
       [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-      DIR=~/d2e && alias c="cd $DIR" && [ -d $DIR ] && cd $DIR
-      DOTENV_PRIVATE=$DIR/.env.private && [ -e $DOTENV_PRIVATE ] && source $DOTENV_PRIVATE
+
+      D2E_DIR=~/d2e && alias c="cd $D2E_DIR" && [ -d $D2E_DIR ] && cd $D2E_DIR && node_modules_path=$D2E_DIR
+      DOTENV_PRIVATE=$D2E_DIR/.env.private && [ -e $DOTENV_PRIVATE ] && source $DOTENV_PRIVATE
+
+      export CADDY__ALP__PUBLIC_FQDN=d2e.local
+      export DOCKER_DEFAULT_PLATFORM=linux/amd64 # containers are linux/amd64
+      export ENV_TYPE=remote
+      export TLS__CADDY_DIRECTIVE='tls internal'
 
 apt:
   sources:
@@ -195,7 +185,10 @@ runcmd:
   - |
     # install node
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
     nvm install 18
+    npm install --global yarn
     # install https://google.github.io/zx/
     sudo npm install -g zx
 
