@@ -6,12 +6,11 @@ import {
   Post,
   Query,
   Req,
-  Res,
+  Res
 } from "@danet/core";
-import { Readable } from "node:stream"
+import { Readable, pipeline } from "node:stream"
 import { ResourceService } from "./resource.service.ts";
 
-// TODO: Make upload and download work
 @Controller("system-portal/dataset/resource")
 export class ResourceController {
   constructor(private readonly resourceService: ResourceService) {}
@@ -56,9 +55,6 @@ export class ResourceController {
       fileName
     );
 
-    console.log(`Content-Type: ${result.contentType}`);
-    console.log("Content-Disposition", result.contentDisposition);
-
     const webStream = Readable.toWeb(result.readStream) as ReadableStream<Uint8Array>;
 
     const streamResponse = new Response(webStream, {
@@ -70,9 +66,8 @@ export class ResourceController {
       })
     });
 
-    // TODO: Investigate why danet by default send back the response content-type as application/json
+    // TODO: Investigate why danet by default overwritten the response content-type as application/json
     // Download file is not equipped with the correct data
-    console.log(`Final Content-Type: ${streamResponse.headers.get("Content-Type")}`);
     return streamResponse;
   }
 
