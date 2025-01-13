@@ -24,11 +24,6 @@ export async function getCDMVersion(req, res, next) {
 
         let cdmVersion = await dbDao.getCDMVersion(dbConnection, schemaName);
 
-        // For datasets with prefix in cdm version e.g. v5.3.1
-        if (cdmVersion && (cdmVersion[0] === 'v' || cdmVersion[0] === 'V')) {
-            cdmVersion = cdmVersion.substring(1); // Remove the first char
-          }
-
         let hanaKey = "CDM_VERSION";
         let cdmVersionKey =
             dialect === config.DB.HANA
