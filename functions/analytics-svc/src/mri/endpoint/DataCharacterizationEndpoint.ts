@@ -28,9 +28,12 @@ export class DataCharacterizationEndpoint {
     public executeDcResultsSql = (
         dbConnection: ConnectionInterface,
         sqlFilePath: string,
-        dcReplacementConfig: DcReplacementConfig
+        dcReplacementConfig: DcReplacementConfig,
+        vocabSchema: string
     ) => {
         const SQL_BASE_PATH = "../../db/sql/data-characterization/";
+        
+        dcReplacementConfig["vocab_database_schema"] = vocabSchema;
         const sqlStatement = this.getSqlStatementFromFile(
             normalize(join(__dirname, SQL_BASE_PATH, sqlFilePath)),
             dcReplacementConfig
