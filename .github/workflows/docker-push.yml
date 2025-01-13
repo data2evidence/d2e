@@ -18,21 +18,7 @@ on:
         required: false
         type: choice
         options:
-          - alp-os/d2e
-          - alp-os/d2e-dev-afreen
-          - alp-os/d2e-dev-alicia
-          - alp-os/d2e-dev-brandan
-          - alp-os/d2e-dev-brian
-          - alp-os/d2e-dev-hengxian
-          - alp-os/d2e-dev-jerome
-          - alp-os/d2e-dev-khairul
-          - alp-os/d2e-dev-mwaiyee
-          - alp-os/d2e-dev-nicholas
-          - alp-os/d2e-dev-peter
-          - alp-os/d2e-dev-ragavan
-          - alp-os/d2e-dev-santan
-          - alp-os/d2e-dev-satish
-          - alp-os/d2e-dev-suwarno
+          - data2evidence/d2e
       GIT_BRANCH_NAME:
         default: develop
         description: Enter BranchName / ReleaseTagName
@@ -94,32 +80,32 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: alp-data-node/alp-dataflow-gen
+          - name: d2e-dataflow-gen
             directory: ./services/alp-dataflow-gen
             context: .
             fileName: Dockerfile
             pull: true
-          - name: alp-data-node/alp-pg-mgmt-init
+          - name: d2e-pg-mgmt-init
             directory: ./services/alp-pg-management
             context: ./services/alp-pg-management
             fileName: Dockerfile
-          - name: alp-data-node/alp-logto
+          - name: d2e-logto
             directory: ./services/alp-logto
             context: ./services/alp-logto
             fileName: Dockerfile
-          - name: alp-data-node/alp-logto-post-init
+          - name: d2e-logto-post-init
             directory: ./services/alp-logto/post-init
             context: ./services/alp-logto/post-init
             fileName: Dockerfile
-          - name: alp-data-node/alp-fhir-server
+          - name: d2e-fhir-server
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile
-          - name: alp-data-node/alp-fhir-fe-server
+          - name: d2e-fhir-fe-server
             directory: ./services/alp-fhir
             context: ./services/alp-fhir
             fileName: Dockerfile.frontend
-          - name: alp-data-node/cachedb
+          - name: d2e-cachedb
             directory: ./services/cachedb
             context: .
             fileName: Dockerfile

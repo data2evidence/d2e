@@ -34,7 +34,14 @@ export async function getCDMVersion(req, res, next) {
             dialect === config.DB.HANA
                 ? hanaKey
                 : dbUtils.convertNameToPg(hanaKey);
-        res.status(200).json(cdmVersion[0][cdmVersionKey]);
+        let cdmVersionValue = cdmVersion[0][cdmVersionKey]
+        if (cdmVersionValue) {
+            //Cater to scenarios if vx.x is stored in the CDM schema
+            cdmVersionValue = cdmVersionValue.toUpperCase().startsWith("V") ? cdmVersionValue.slice(1) : cdmVersionValue;
+        } else {
+            throw new Error("Invalid cdm version value")
+        }
+        res.status(200).json(cdmVersionValue);
     } catch (err) {
         logger.error(`Error retrieving CDM version: ${err}`);
         const httpResponse = {

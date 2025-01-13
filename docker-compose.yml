@@ -5,8 +5,8 @@ networks:
 
 volumes:
   caddy:
-  duckdb-data-1:
-  cdw-config-duckdb-data-1:
+  cachedb-data-1:
+  cdw-config-cachedb-data-1:
   minio-data-1:
   pg-minerva-data-1:
   dicom-sqlite-storage:
@@ -106,7 +106,7 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: trex.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/d2e-trex-base:${DOCKER_TREX_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-trex-base:${DOCKER_TREX_TAG_NAME:-develop}
     pull_policy: always
     platform: linux/amd64
     logging:
@@ -118,7 +118,7 @@ services:
       data:
         priority: 10
     volumes:
-      - trex:/usr/src/plugin
+      - trex:/usr/src/plugin/node_modules
     healthcheck:
       interval: 60s
       retries: 30
@@ -182,6 +182,7 @@ services:
               "dataflowMgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/dataflow-mgmt",
               "jobplugins": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001",
               "portalServer": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/system-portal",
+              "dataset": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/gateway/api/dataset",
               "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
               "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
               "terminology": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/terminology",
@@ -335,10 +336,18 @@ services:
           },
           "terminology-svc": {},
           "code-suggestion": {
-            "COGNITO_CLIENT_ID": "${COGNITO_CLIENT_ID}",
-            "COGNITO_CLIENT_SECRET": "${COGNITO_CLIENT_SECRET}",
-            "COGNITO_TOKEN_ENDPOINT": "https://${COGNITO_TOKEN_ENDPOINT}",
-            "LAMBDA_API_ENDPOINT": "https://${LAMBDA_API_ENDPOINT}"
+            "COGNITO_CLIENT_ID": "${COGNITO_CLIENT_ID:-null}",
+            "COGNITO_CLIENT_SECRET": "${COGNITO_CLIENT_SECRET:-null}",
+            "COGNITO_TOKEN_ENDPOINT": "${COGNITO_TOKEN_ENDPOINT:-null}",
+            "LAMBDA_API_ENDPOINT": "${LAMBDA_API_ENDPOINT:-null}"
+          },
+          "demo": {
+            "DEMO__DB_CODE": "demo_database",
+            "DEMO__DB_CDM_SCHEMA": "demo_cdm",
+            "DEMO__DB_DEFAULT": "{ \"name\": \"postgres\", \"dialect\": \"postgres\", \"host\": \"broadsea-atlasdb\", \"port\": 5432, \"extra\": { \"Internal\": { \"statementTimeout\": 60000, \"queryTimeout\": 60000, \"idleTimeoutMillis\": 300000, \"idleInTransactionSessionTimeout\": 300000, \"max\": 50 } }, \"credentials\": [] }",
+            "DEMO__DB_USER": "${DEMO__DB_USER:-postgres}",
+            "DEMO__DB_PASSWORD": "${DEMO__DB_PASSWORD}",
+            "DEMO__DATASET": "{ \"tokenStudyCode\": \"demo\", \"type\": \"demo\", \"tenantId\": \"e0348e4d-2e17-43f2-a3c6-efd752d17c23\", \"schemaOption\": \"existing_cdm\", \"dialect\": \"postgres\", \"dataModel\": \"omop5-4\", \"plugin\": \"omop-cdm-plugin\", \"paConfigId\": \"92d7c6f8-3118-4256-ab22-f2f7fd19d4e7\", \"visibilityStatus\": \"DEFAULT\", \"detail\": { \"name\": \"Demo dataset\", \"summary\": \"Demo dataset\", \"description\": \"Demo dataset\", \"showRequestAccess\": false }, \"dashboards\": [], \"attributes\": [], \"tags\": [] }"
           }
         }
       SERVICE_ROUTES: |-
@@ -353,9 +362,8 @@ services:
         "dbCredentialsMgr": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/db-credentials",
         "portalServer": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/system-portal",
         "usermgmt": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/usermgmt/api",
-        "terminology": "https://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/terminology",
+        "terminology": "http://trex.${TLS__INTERNAL__DOMAIN:-alp.local}:33001/terminology",
         "prefect": "http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api",
-        "appRouter": "https://alp-mercury-approuter:41000",
         "idIssuerUrl": "http://alp-logto-${BASE_PORT:-1}:3001/oidc",
         "minio": "",
         "fhir": "http://alp-minerva-fhir-server-${BASE_PORT:-1}:8103/fhir/R4",
@@ -394,9 +402,9 @@ services:
       LOGTO__SVC_CLIENT_SECRET: ${LOGTO__ALP_SVC__CLIENT_SECRET}
       LOGTO__TOKEN_URL: http://alp-logto-${BASE_PORT:-1}:3001/oidc/token
       NODE_ENV: development
-      PREFECT_DOCKER_VOLUMES: '["alp_duckdb-data-1:/app/duckdb_data", "alp_cdw-config-duckdb-data-1:/app/cdw-config/duckdb_data", "alp_r-libs:/home/docker/plugins/R/site-library", "alp_fhir-schema-file-1:/home/docker/fhir"]'
+      PREFECT_DOCKER_VOLUMES: '["alp_cachedb-data-1:/app/duckdb_data", "alp_cdw-config-cachedb-data-1:/app/cdw-config/duckdb_data", "alp_r-libs:/home/docker/plugins/R/site-library", "alp_fhir-schema-file-1:/home/docker/fhir"]'
       GH_TOKEN: ${GH_TOKEN}
-      PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-plugins"]'
+      PLUGINS_SEED: '["d2e-functions", "d2e-ui", "d2e-flows"]'
       PLUGINS_API_VERSION: ${PLUGINS_API_VERSION:-latest}
       PLUGINS_SEED_UPDATE: ${PLUGINS_SEED_UPDATE:-false}
 
@@ -406,7 +414,7 @@ services:
       alp-minerva-postgres:
         condition: service_healthy
     hostname: alp-minerva-pg-mgmt-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-pg-mgmt-init:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-pg-mgmt-init:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c15
@@ -481,10 +489,11 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 41100:41100
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - caddy:/data
-      - ./deploy/caddy-config:/srv/caddy-config
+      - ${CADDY__CONFIG:-./deploy/caddy-config}:/srv/caddy-config
     environment:
       CADDY__ALP__PUBLIC_FQDN: ${CADDY__ALP__PUBLIC_FQDN:-localhost:41100}
       TLS__CADDY_DIRECTIVE: ${TLS__CADDY_DIRECTIVE:-tls internal}
@@ -568,7 +577,7 @@ services:
         - http://alp-dataflow-gen-1:41120/api/health
       timeout: 30s
     hostname: alp-dataflow-gen-worker.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: prefecthq/prefect:3.0.3-python3.11
+    image: ghcr.io/data2evidence/d2e-dataflow-gen:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c83
@@ -576,15 +585,14 @@ services:
       data:
         priority: 20
     volumes:
-      - ./services/alp-dataflow-gen/create_workpool_json.py:/opt/prefect/create_workpool_json.py
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       PREFECT_API_URL: http://alp-dataflow-gen-${BASE_PORT:-1}:41${BASE_PORT:-1}20/api
       PREFECT_API_ENABLE_HTTP2: False
       D2E_MEMORY_LIMIT: ${D2E_MEMORY_LIMIT:-16G}
       D2E_SWAP_LIMIT: ${D2E_SWAP_LIMIT:-64G}
-      DOCKER_REGISTRY_USERNAME: ${DOCKER_REGISTRY_USERNAME:-tech-user-pull}
-      DOCKER_REGISTRY_PASSWORD: ${DOCKER_REGISTRY_PASSWORD}
+      DOCKER_REGISTRY_USERNAME: ${GH_USERNAME:-tech-user-pull}
+      DOCKER_REGISTRY_PASSWORD: ${GH_TOKEN}
       DOCKER_REGISTRY_URL: ${DOCKER_REGISTRY_URL:-alpcr.azurecr.io}
 
   alp-dataflow-gen-init:
@@ -601,7 +609,7 @@ services:
       alp-minio-post-init:
         condition: service_completed_successfully
     hostname: alp-dataflow-gen-init-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-dataflow-gen:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-dataflow-gen:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c4
@@ -609,8 +617,6 @@ services:
       alp:
         priority: 20
     platform: linux/amd64
-    volumes:
-      - ./services/alp-dataflow-gen/init.py:/opt/prefect/libs/init.py
     environment:
       <<:
         - *x-minio
@@ -654,7 +660,7 @@ services:
     depends_on:
       alp-logto:
         condition: service_healthy
-    image: alpcr.azurecr.io/alp-data-node/alp-logto-post-init:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-logto-post-init:${DOCKER_TAG_NAME:-develop}
     networks:
       alp:
         priority: 20
@@ -691,7 +697,7 @@ services:
         - logto.status
         - http://localhost:3001/api/status
     hostname: alp-logto-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/alp-logto:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-logto:${DOCKER_TAG_NAME:-develop}
     logging:
       options:
         tag: *c8
@@ -749,7 +755,6 @@ services:
     volumes:
       - pg-minerva-data-1:/var/lib/postgresql/data
       - ./cache/pgbackup:/backup
-      - ./cache/vocab:/vocab
     environment:
       <<:
         - *x-tls
@@ -783,9 +788,7 @@ services:
         priority: 20
       data:
         priority: 10
-    ports:
-      # - 9000:9000 #Port for API connectivity, internal communication is good enough. Needs to be uncommented only when testing from outside the alp docker network
-      - 9090:9090
+
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
     volumes:
       - minio-data-1:/data
@@ -839,7 +842,7 @@ services:
   alp-cachedb:
     container_name: &c30 alp-cachedb
     hostname: alp-cachedb.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: alpcr.azurecr.io/alp-data-node/cachedb:${DOCKER_TAG_NAME:-develop}
+    image: ghcr.io/data2evidence/d2e-cachedb:${DOCKER_TAG_NAME:-develop}
     platform: linux/amd64
     depends_on:
       trex:
@@ -863,11 +866,9 @@ services:
       data:
         priority: 10
     restart: ${DOCKER__RESTART_POLICY:-unless-stopped}
-    ports:
-      - 41191:41191
     volumes:
-      - duckdb-data-1:/home/docker/duckdb_data
-      - cdw-config-duckdb-data-1:/home/docker/cdw_svc/duckdb_data # Volume for dynamically generated cdw-config duckdb file (refer to docs/3-configure/9-create-cdw-config-duckdb-file.md for information)
+      - cachedb-data-1:/home/docker/duckdb_data
+      - cdw-config-cachedb-data-1:/home/docker/cdw_svc/duckdb_data # Volume for dynamically generated cdw-config duckdb file (refer to docs/3-configure/9-create-cdw-config-duckdb-file.md for information)
       - fhir-schema-file-1:/home/docker/fhir
     environment:
       <<:
@@ -889,7 +890,7 @@ services:
           memory: ${D2E_MEMORY_LIMIT:-7G}
 
   alp-perseus-backend:
-    image: alpcr.azurecr.io/alp-data-node/d2e-perseus:master
+    image: ghcr.io/data2evidence/d2e-perseus:master
     container_name: &c35 alp-perseus-backend-${BASE_PORT:-1}
     environment:
       <<:
@@ -910,7 +911,7 @@ services:
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
-    image: alpcr.azurecr.io/whiterabbit:master
+    image: ghcr.io/data2evidence/whiterabbit:master
     container_name: &c36 alp-perseus-white-rabbit-${BASE_PORT:-1}
     platform: linux/amd64
     environment:

@@ -1,64 +1,88 @@
-# Analytics Platform (D2E)
+# Analytics Platform Documentation (D2E)
 
-[![DockerCompose AzureTest CD](https://github.com/alp-os/d2e/actions/workflows/az-dc-cd.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/az-dc-cd.yml) &nbsp;&nbsp; [![Docker Build & Push](https://github.com/alp-os/d2e/actions/workflows/docker-push.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/docker-push.yml) &nbsp;&nbsp; [![Docker compose Build & Up](https://github.com/alp-os/d2e/actions/workflows/docker-compose-up.yml/badge.svg)](https://github.com/alp-os/d2e/actions/workflows/docker-compose-up.yml)
+[![DockerCompose AzureTest CD](https://github.com/data2evidence/d2e/actions/workflows/az-dc-cd.yml/badge.svg)](https://github.com/data2evidence/d2e/actions/workflows/az-dc-cd.yml) &nbsp;&nbsp; [![Docker Build & Push](https://github.com/data2evidence/d2e/actions/workflows/docker-push.yml/badge.svg)](https://github.com/data2evidence/d2e/actions/wosrkflows/docker-push.yml) &nbsp;&nbsp; [![Docker compose Build & Up](https://github.com/data2evidence/d2e/actions/workflows/docker-compose-up.yml/badge.svg)](https://github.com/data2evidence/d2e/actions/workflows/docker-compose-up.yml)
 
-## Install pre-requisites
-see: [1-setup](docs/1-setup/README.md)
+The following documentation outlines the basic setup of Analytics Platform (D2E) for users who require the software.
 
-## Clone repository
-- see: [Cloning a GitHub repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
-
-## Authenticate to private docker registry
-- Request credentials from D2E support
+# Getting Started 
+## Pre-requisites
+- Install pre-requisite softwares for running D2E. Refer to the installation guide [here](./docs/1-setup/README.md). 
+- Install the d2e cli client by using the command in your terminal: 
 ```bash
-docker login -u $ACR_USERNAME -p "$ACR_PASSWORD" $REGISTRY_URL
+npm install -g https://github.com/data2evidence/d2e/releases/download/latest/data2evidence-cli.tgz
 ```
 
-## Generate dotenv
-- see: [environment variables](docs/1-setup/environment-variables.md)
-- auto-generate secrets from [env.example](env.example) template to `.env.local`
+
+## Environment Variables and Credentials Setup 
+- Generate environment variables (Refer [here](./docs/1-setup/environment-variables.md) for more information on the environment variables generated). It is required to export `GH_USERNAME` and `GH_TOKEN` before.
 ```bash
-yarn gen:dotenv
-```
-#### Initalize Logto Apps
-```bash
-yarn init:logto
-```
-## Build
-- Standard build
-```bash
-yarn build:minerva
+export GH_USERNAME=<GH_USERNAME>
+export GH_TOKEN=<GH_TOKEN>
 ```
 
-## (Re)Start App
-- Docker compose up - approx 5 minutes
 ```bash
-yarn start:minerva; sleep 60
+d2e genenv
 ```
 
-## View Logs
+- Login to docker registry to retrieve resources to run D2E.
 ```bash
-yarn logs:minerva
+d2e login
 ```
 
-## Data Load
-- see: [2-load](docs/2-load)
-
-## Configure
-- see: [3-configure](docs/3-configure)
-
-## Stop
-- Stop all containers
+- Initialize D2E: 
 ```bash
-yarn stop:minerva
+d2e init
 ```
 
-## Clean-up
-- **caution**: removes all containers & volumes
+## Application Setup
+
+Naviage to the folder where d2e repo is downloaded. Run the folllowing: 
+- Run the command to get the neccessary docker images and run D2E: 
+
 ```bash
-yarn clean:minerva
+d2e start
 ```
 
-## Extra information
-### Setting resource limits
-- see: [Resource limits](docs/1-setup/resource-limits.md)
+**Note:**
+- If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run the **Environment Variables and Credentials Setup** section
+- If you have setup the application before, run steps in section **Application Setup** as required.
+
+## Authentication Portal
+- Input the URL https://localhost:41100/portal into a Chrome web browser. A ["**Proceed to localhost**"](docs/images/chrome/chrome-proceed-to-localhost.png) display is expected.
+- Select **Advanced** > **Proceed to localhost (unsafe)**
+
+> **The expected display is:** 
+>
+> ![](./docs/images/portal/LoginPage.png)
+
+## Accessing Admin Portal
+The Admin Portal allows authorized personnel to login and perform the management of users, datasets and job plugins. 
+
+- Login as Admin with following credentials:
+  - username - `admin`
+  - password - `Updatepassword12345`
+
+- Click on **Account** on the top right > **Switch to admin portal**
+
+> **The expected display is:**
+> ![AdminPortal](./docs/images/portal/AdminPortal.png)
+
+
+Additional info:
+- [Performing password change](./docs/2-load/1-initial-admin.md)
+- [Performing user management](./docs/2-load/2-users-roles.md)
+
+> Tip: For quick access to the Admin Portal, input URL https://localhost:41100/portal/systemadmin/user-overview in the search bar.
+
+## Configure D2E
+Please find information how to add dataset and configure D2E [here](./docs/2-load/README.md)
+
+## Researcher Portal
+### Cohort Creation
+- Navigate to [Researcher Portal](https://localhost:41100/portal/researcher) and select **Cohort** tab.
+- Refer to the [documentation here](./docs/3-configure/8-cohort.md) for more details.
+
+## Stopping Application
+1. Stop all containers: `yarn stop:minerva`
+2. Perform clean-up: `yarn clean:minerva`
+    - **WARNING**: This step removes all containers and volumes. You would need to re-run the [Environment Variables and Credentials](#environment-variables-and-credentials-setup) section for a fresh startup. 
