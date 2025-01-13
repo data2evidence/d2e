@@ -19,7 +19,7 @@ case $cmd in
         ;;
     clean)
         read -p "This action will delete all docker containers and volumnes. Continue (y/n)?" choice
-        case "$choice" in 
+        case "$choice" in
             y|Y)
                 docker compose --file $node_modules_path/docker-compose.yml --env-file .env down --volumes --remove-orphans
                 ;;
@@ -57,6 +57,6 @@ case $cmd in
         echo "  clean      Removes d2e docker containers and volumnes"
         ;;
 esac
-    
+
 
 #docker compose --file $node_modules_path/docker-compose.yml --env-file .env up --wait
