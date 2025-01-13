@@ -29,7 +29,7 @@ cd d2e
 - Generate `.env` file with the environment variables (Refer [here](./docs/1-setup/environment-variables.md) for more information on the environment variables generated). It is required to set the `GH_USERNAME` and `GH_TOKEN` environment variables to run the command (see [here](./docs/1-setup/README.md) for instructions how to generate the `GH_TOKEN`).
 
 ```bash
-GH_USERNAME=<GH_USERNAME> GH_TOKEN=<GH_TOKEN> d2e genenv
+GH_USERNAME=$GH_USERNAME GH_TOKEN=$GH_TOKEN d2e genenv
 ```
 
 - Login to docker registry to retrieve resources to run D2E.
@@ -42,7 +42,7 @@ d2e login
 
 ```bash
 d2e init
-``` 
+```
 
 ## Application Setup
 

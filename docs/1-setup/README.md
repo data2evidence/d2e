@@ -36,7 +36,7 @@ Untested platforms:
 
 ### Enable file-sharing
 
-- https://docs.docker.com/desktop/settings-and-maintenance/settings/#file-sharing
+- see: https://docs.docker.com/desktop/settings-and-maintenance/settings/#file-sharing
 - Steps: Go to Docker Desktop > Resources > File Sharing > Add /opt/homebrew/lib/node_modules/
 
 ## nodejs
