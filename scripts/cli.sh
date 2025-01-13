@@ -18,7 +18,7 @@ case $cmd in
         docker compose --file $node_modules_path/docker-compose.yml --env-file .env stop
         ;;
     clean)
-        read -p "This action will delete all docker volumnes. Continue (y/n)?" choice
+        read -p "This action will delete all docker containers and volumnes. Continue (y/n)?" choice
         case "$choice" in 
             y|Y)
                 docker compose --file $node_modules_path/docker-compose.yml --env-file .env down --volumes --remove-orphans
