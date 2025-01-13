@@ -53,6 +53,8 @@ case $cmd in
         echo "  login      Login into github"
         echo "  init       Initializes d2e DB"
         echo "  start      Starts d2e services"
+        echo "  stop       Stops d2e services"
+        echo "  clean      Removes d2e docker containers and volumnes"
         ;;
 esac
     
