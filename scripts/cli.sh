@@ -49,7 +49,7 @@ case $cmd in
         docker compose --file $node_modules_path/docker-compose.yml --env-file .env up alp-logto-post-init
         ;;
     init)
-        cp -a $node_modules_path/deploy ./deploy &&
+        cp -a $node_modules_path/deploy . &&
         $node_modules_path/scripts/gen-dotenv.sh && $node_modules_path/scripts/gen-tls.sh && $node_modules_path/scripts/gen-resource-limits.sh
         ;;
     login)
