@@ -10,8 +10,7 @@
     "node": ">=18.20.4"
   },
   "repository": {
-    "type": "git",
-    "url": "git@github.com:alp/alp-clinical-research.git"
+    "type": "git"
   },
   "devDependencies": {
     "@types/node": "^18.19.31",

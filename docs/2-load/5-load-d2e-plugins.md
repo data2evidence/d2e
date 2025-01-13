@@ -1,7 +1,7 @@
 # Load Dataflow Plugins
 
 The following plugins are currently available:
-- [D2E-Plugins](https://github.com/alp-os/d2e-plugins)
+- [D2E-Plugins](https://github.com/data2evidence/d2e-flows)
 
 ## 1-Step Upload
 
@@ -22,7 +22,7 @@ This will initialize all the plugins available.
 ### Create Plugin zipfile
 - If needed, clone git repositories
 ```bash
-git clone https://github.com/alp-os/d2e-plugins
+git clone https://github.com/data2evidence/d2e-flows
 ```
 - Create zipfiles
 ```bash
@@ -62,9 +62,9 @@ done
 
 ## Upload from git url
 - **n.b.: git repository must be public accessible**
-- Enter git url (e.g. https://github.com/alp-os/d2e-plugins)
+- Enter git url (e.g. https://github.com/data2evidence/d2e-flows)
 
-- Optionally specify branch (e.g. https://github.com/alp-os/d2e-plugins@branch-name)
+- Optionally specify branch (e.g. https://github.com/data2evidence/d2e-flows@branch-name)
 > ![](../images/dataflow/AddFlowURL.png)
 
 - Subsequent Jobs updates by simply clicking **Update deployment** button on the Jobs page.
