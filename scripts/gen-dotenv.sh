@@ -13,6 +13,8 @@ else
     env_file=$ENVFILE
 fi
 
+echo env_file=$env_file
+
 example_file=${ENV_EXAMPLE:-env.example}
 tmp_file=.env.tmp
 
@@ -20,8 +22,7 @@ default_password_length=30
 x509_subject="/C=SG/O=ALP Dev"
 
 # vars
-echo '' > $tmp_file 
-echo '' > $env_file
+echo '' > $tmp_file
 
 # passwords
 echo set-passwords ...
@@ -33,7 +34,7 @@ function set-password {
     echo ${password_name}=${password_value} >> $tmp_file
 }
 
-password_keys=($(cat $example_file | grep password$ | awk -F= '{print $1}')) # echo ${password_keys[@]}; 
+password_keys=($(cat $example_file | grep password$ | awk -F= '{print $1}')) # echo ${password_keys[@]};
 password_name=${password_keys[1]}
 for password_name in ${password_keys[@]}; do
     length=$default_password_length
@@ -49,7 +50,7 @@ function set-openssl {
     echo INFO set DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY DB_CREDENTIALS__INTERNAL__PUBLIC_KEY ...
     export PRIVATE_KEY=$(openssl genpkey  -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -quiet)
     export PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | openssl rsa -pubout)
-    
+
     echo DB_CREDENTIALS__INTERNAL__DECRYPT_PRIVATE_KEY=\'"${PRIVATE_KEY}"\' >> $tmp_file
     echo DB_CREDENTIALS__INTERNAL__PUBLIC_KEY=\'"${PUBLIC_KEY}"\' >> $tmp_file
 }
