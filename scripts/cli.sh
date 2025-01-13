@@ -15,13 +15,13 @@ case $cmd in
         docker compose --file $node_modules_path/docker-compose.yml --env-file .env up --wait
         ;;
     startdemo)
-        docker compose --file $node_modules_path/docker-compose.yml --file docker-compose-atlas.yml --env-file .env up --wait
+        docker compose --file $node_modules_path/docker-compose.yml --file $node_modules_path/docker-compose-atlas.yml --env-file .env up --wait
         ;;
     stop)
         docker compose --file $node_modules_path/docker-compose.yml --env-file .env stop
         ;;
     stopdemo)
-        docker compose --file $node_modules_path/docker-compose.yml --file docker-compose-atlas.yml --env-file .env stop
+        docker compose --file $node_modules_path/docker-compose.yml --file $node_modules_path/docker-compose-atlas.yml --env-file .env stop
         ;;
     clean)
         read -p "This action will delete all docker containers and volumnes. Continue (y/n)?" choice
@@ -37,7 +37,7 @@ case $cmd in
         read -p "This action will delete all docker containers and volumnes. Continue (y/n)?" choice
         case "$choice" in 
             y|Y)
-                docker compose --file $node_modules_path/docker-compose.yml --file docker-compose-atlas.yml --env-file .env down --volumes --remove-orphans
+                docker compose --file $node_modules_path/docker-compose.yml --file $node_modules_path/docker-compose-atlas.yml --env-file .env down --volumes --remove-orphans
                 ;;
             *)
                 echo "Aborting";;
@@ -49,7 +49,7 @@ case $cmd in
         docker compose --file $node_modules_path/docker-compose.yml --env-file .env up alp-logto-post-init
         ;;
     init)
-        cp -a $node_modules_path/deploy ./deploy &&
+        cp -a $node_modules_path/deploy . &&
         $node_modules_path/scripts/gen-dotenv.sh && $node_modules_path/scripts/gen-tls.sh && $node_modules_path/scripts/gen-resource-limits.sh
         ;;
     login)
