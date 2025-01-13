@@ -145,10 +145,10 @@ if (argv.update) {
               console.debug(envValue);
             }
             /* 
-            issue: https://github.com/alp-os/alp/pull/160#discussion_r1510655218 
+            issue: https://github.com/data2evidence/alp/pull/160#discussion_r1510655218 
             exception: DB_CREDENTIALS__PUBLIC_KEYS must not be re-formatted until code fix 
             code: envKey != "DB_CREDENTIALS__PUBLIC_KEYS"
-            fix: https://github.com/alp-os/d2e/pull/31/files
+            fix: https://github.com/data2evidence/d2e/pull/31/files
             */
             if (envValue.match(/^{/)) {
               try {

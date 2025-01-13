@@ -2,7 +2,7 @@
 
 After uploading duckdb-plugin in step `docs/2-load/5-load-d2e-plugins.md`
 
-- [D2E-Plugins/duckdb](https://github.com/alp-os/d2e-plugins/tree/main/cachedb)
+- [D2E-Plugins/duckdb](https://github.com/data2evidence/d2e-flows/tree/main/flows/create_cachedb_file_plugin)
 
 <h1 id="prog">Creating programatically</h1>
 

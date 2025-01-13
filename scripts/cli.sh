@@ -14,6 +14,19 @@ case $cmd in
     start)
         docker compose --file $node_modules_path/docker-compose.yml --env-file .env up --wait
         ;;
+    stop)
+        docker compose --file $node_modules_path/docker-compose.yml --env-file .env stop
+        ;;
+    clean)
+        read -p "This action will delete all docker containers and volumnes. Continue (y/n)?" choice
+        case "$choice" in 
+            y|Y)
+                docker compose --file $node_modules_path/docker-compose.yml --env-file .env down --volumes --remove-orphans
+                ;;
+            *)
+                echo "Aborting";;
+        esac
+        ;;
     init)
         docker compose --file $node_modules_path/docker-compose.yml --env-file .env up alp-minerva-postgres alp-logto --wait &&
         sleep 10 &&
@@ -40,6 +53,8 @@ case $cmd in
         echo "  login      Login into github"
         echo "  init       Initializes d2e DB"
         echo "  start      Starts d2e services"
+        echo "  stop       Stops d2e services"
+        echo "  clean      Removes d2e docker containers and volumnes"
         ;;
 esac
     
