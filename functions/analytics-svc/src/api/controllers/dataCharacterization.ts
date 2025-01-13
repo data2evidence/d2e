@@ -152,7 +152,6 @@ export async function getDataCharacterizationResult(
 
         const dcReplacementConfig: DcReplacementConfig = {
             results_database_schema: resultsSchema,
-            vocab_database_schema: vocabSchema,
         };
         logger.info(
             `Getting Data Characterization Results for schema ${resultsSchema} with sourceKey: ${sourceKey}`
