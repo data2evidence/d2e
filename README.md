@@ -58,10 +58,8 @@ d2e startdemo
 ## Authentication Portal
 - Input the URL https://localhost:41100/portal into a Chrome web browser. A ["**Proceed to localhost**"](docs/images/chrome/chrome-proceed-to-localhost.png) display is expected.
 - Select **Advanced** > **Proceed to localhost (unsafe)**
+- You will see the [**D2E login screen**](./docs/images/portal/LoginPage.png)
 
-> **The expected display is:** 
->
-> ![](./docs/images/portal/LoginPage.png)
 
 ## Accessing Admin Portal
 The Admin Portal allows authorized personnel to login and perform the management of users, datasets and job plugins. 
