@@ -12426,7 +12426,7 @@ const paConfig = {
         },
       ],
       initialPatientlistColumn: true,
-      modelName: "Basic Data",
+      modelName: "MRI_PA_SERVICES_FILTERCARD_TITLE_BASIC_DATA",
     },
     {
       source: "patient.interactions.conditionoccurrence",
@@ -13124,7 +13124,7 @@ const paConfig = {
           modelName: "Visit type concept id",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Visit",
     },
     {
@@ -13880,7 +13880,7 @@ const paConfig = {
           modelName: "Specimen type concept code",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Specimen",
     },
     {
@@ -14210,7 +14210,7 @@ const paConfig = {
           modelName: "Procedure Date/Time",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Procedure Occurrence",
     },
     {
@@ -14300,7 +14300,7 @@ const paConfig = {
           modelName: "End Date",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Payer Plan Period",
     },
     {
@@ -14473,7 +14473,7 @@ const paConfig = {
           modelName: "End Date",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Observation Period",
     },
     {
@@ -15012,7 +15012,7 @@ const paConfig = {
           modelName: "Observation concept id",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Observation",
     },
     {
@@ -15411,7 +15411,7 @@ const paConfig = {
           modelName: "Unit concept id",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Measurement",
     },
     {
@@ -16108,7 +16108,7 @@ const paConfig = {
           modelName: "End Date/Time",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Drug Exposure",
     },
     {
@@ -16318,7 +16318,7 @@ const paConfig = {
           modelName: "Drug concept id",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Drug Era",
     },
     {
@@ -16588,7 +16588,7 @@ const paConfig = {
           modelName: "Unit concept id",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Dose Era",
     },
     {
@@ -16846,7 +16846,7 @@ const paConfig = {
           modelName: "Device Type concept id",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Device Exposure",
     },
     {
@@ -16996,7 +16996,7 @@ const paConfig = {
           modelName: "Death Type concept id",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Death",
     },
     {
@@ -17189,7 +17189,7 @@ const paConfig = {
           modelName: "Condition Name",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Condition Era",
     },
     {
@@ -17499,7 +17499,7 @@ const paConfig = {
           modelName: "Patient Id",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Cohort",
     },
   ],
@@ -27299,7 +27299,7 @@ const paConfigDuckdb = {
           modelName: "Visit concept name",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Visit",
     },
     {
@@ -27811,7 +27811,7 @@ const paConfigDuckdb = {
           modelName: "Specimen concept name",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Specimen",
     },
     {
@@ -28002,7 +28002,7 @@ const paConfigDuckdb = {
           modelName: "Procedure concept id",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Procedure Occurrence",
     },
     {
@@ -28092,7 +28092,7 @@ const paConfigDuckdb = {
           modelName: "Payer Plan Period Id",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Payer Plan Period",
     },
     {
@@ -28203,7 +28203,7 @@ const paConfigDuckdb = {
           modelName: "Period type concept set",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Observation Period",
     },
     {
@@ -28457,7 +28457,7 @@ const paConfigDuckdb = {
           modelName: "Observation concept name",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Observation",
     },
     {
@@ -28651,7 +28651,7 @@ const paConfigDuckdb = {
           modelName: "Measurement concept name",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Measurement",
     },
     {
@@ -29185,7 +29185,7 @@ const paConfigDuckdb = {
           modelName: "Drug concept name",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Drug Exposure",
     },
     {
@@ -29335,7 +29335,7 @@ const paConfigDuckdb = {
           modelName: "Drug concept set",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Drug Era",
     },
     {
@@ -29485,7 +29485,7 @@ const paConfigDuckdb = {
           modelName: "Unit concept set",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Dose Era",
     },
     {
@@ -29639,7 +29639,7 @@ const paConfigDuckdb = {
           modelName: "Device concept name",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Device Exposure",
     },
     {
@@ -29750,7 +29750,7 @@ const paConfigDuckdb = {
           modelName: "Death Type concept name",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Death",
     },
     {
@@ -29968,7 +29968,7 @@ const paConfigDuckdb = {
           modelName: "Condition concept set",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Condition Occurrence",
     },
     {
@@ -30099,7 +30099,7 @@ const paConfigDuckdb = {
           modelName: "Condition concept set",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Condition Era",
     },
     {
@@ -30189,7 +30189,7 @@ const paConfigDuckdb = {
           modelName: "Start Date",
         },
       ],
-      initialPatientlistColumn: true,
+      initialPatientlistColumn: false,
       modelName: "Cohort",
     },
   ],
@@ -30255,7 +30255,7 @@ const paConfigDuckdb = {
       enabled: false,
       systemName: "MRI",
     },
-    minCohortSize: 0,
+    minCohortSize: 1,
   },
   configInformations: {
     note: "",
