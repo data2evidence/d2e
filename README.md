@@ -51,9 +51,9 @@ or if you want to use the demo dataset:
 d2e startdemo
 ```
 
-**Note:**
-- If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run the **Environment Variables and Credentials Setup** section
-- If you have setup the application before, run steps in section **Application Setup** as required.
+> [!NOTE]
+> If you are starting the application for first time and/or if docker volume resources have been completely removed, re-run the **Environment Variables and Credentials Setup** section
+> If you have setup the application before, run steps in section **Application Setup** as required.
 
 ## Authentication Portal
 - Input the URL https://localhost:41100/portal into a Chrome web browser. A ["**Proceed to localhost**"](docs/images/chrome/chrome-proceed-to-localhost.png) display is expected.
@@ -93,4 +93,5 @@ Please find information how to add dataset and configure D2E [here](./docs/2-loa
 ## Stopping Application
 - Stop all containers: `d2e stop` or `d2e stopdemo` if `d2e startdemo` was used
 - Perform clean-up: `d2e clean` or `d2e cleandemo`
-    - **WARNING**: This step removes all containers and volumes. You would need to re-run the [Environment Variables and Credentials](#environment-variables-and-credentials-setup) section for a fresh startup. 
+> [!WARNING]
+> This step removes all containers and volumes. You would need to re-run the [Environment Variables and Credentials](#environment-variables-and-credentials-setup) section for a fresh startup. 
