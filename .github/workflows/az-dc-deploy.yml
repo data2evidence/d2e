@@ -87,6 +87,9 @@ jobs:
 
           cp $DOTENV_FILE ../$DOTENV_FILE-${GITHUB_RUN_ID:-ghRunId}-$(date '+%Y%m%dT%H%M%S')
 
+          if [[ $DOCKER_TAG_NAME = */* ]]; then
+            DOCKER_TAG_NAME=$(printf "%s" "$DOCKER_TAG_NAME" | awk -F '/' '{print $2}')
+          fi 
           [ "${{ github.event.inputs.docker-tag-develop }}" = true ] && DOCKER_TAG_NAME=develop
           UI_DOCKER_TAG_NAME=$DOCKER_TAG_NAME
           [ "${{ github.event.inputs.ui-docker-tag-develop }}" = true ] && UI_DOCKER_TAG_NAME=develop
