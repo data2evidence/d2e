@@ -1,7 +1,6 @@
 import { BadRequestException, InternalServerErrorException } from "@danet/core";
 import { Buffer } from "node:buffer";
-import { type Multer } from "npm:@types/multer";
-import * as mime from "mime";
+import { contentType } from "npm:mime-types@2.1.35";
 import * as Minio from "npm:minio@8.0.2";
 import { env } from "../env.ts";
 
@@ -64,10 +63,10 @@ export class MinioClient {
       const readStream = await this.client.getObject(bucketName, fileName);
 
       const fileExtension = fileName.substring(fileName.lastIndexOf("."));
-      const contentType = mime.getType(fileExtension);
+      const mimeType = contentType(fileExtension);
       return {
         readStream,
-        contentType,
+        contentType: mimeType,
         contentDisposition: `attachment; filename="${fileName}"`,
       };
     } catch (e) {
@@ -92,7 +91,7 @@ export class MinioClient {
       const bucketName = this.getBucketName(datasetId);
       await this.createBucket(bucketName);
 
-      const buffer = file.buffer;
+      const buffer = Buffer.from(file.buffer);
       await this.client.putObject(bucketName, fileName, buffer);
       console.info(`MinIO S3 object ${fileName} successfully uploaded`);
       return {
