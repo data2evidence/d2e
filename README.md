@@ -38,7 +38,7 @@ GH_TOKEN=<GH_TOKEN>
   - GitHub Username & PAT Token are required to fetch packages & images from docker registry `ghcr.io`
   - Fully Qualified Domain Name is required only if a Virtual Machine Server
 
-    - Otherise, defaults to `localhost:41100`, if running on desktop/laptop
+    - Otherwise, defaults to `localhost:41100`, if running on local workstation
 
 - References
 

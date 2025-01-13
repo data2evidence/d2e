@@ -740,7 +740,7 @@ services:
         - ${POSTGRES_DB}
       timeout: 30s
     hostname: alp-minerva-postgres-${BASE_PORT:-1}.${TLS__INTERNAL__DOMAIN:-alp.local}
-    image: postgres:15-alpine
+    image: postgres:16-alpine # debug
     logging:
       options:
         tag: *c17
