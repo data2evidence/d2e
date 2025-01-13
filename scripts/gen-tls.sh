@@ -6,6 +6,7 @@ set -o errexit
 # inputs
 ENV_TYPE=${ENV_TYPE:-local}
 TLS_REGENERATE=${TLS_REGENERATE:-false}
+caddyconfig=${CADDY__CONFIG:-./deploy/caddy-config}
 
 # vars
 if [ -z "${GIT_BASE_DIR:-}" ]; then
@@ -38,7 +39,7 @@ if [ ${TLS_REGENERATE} = true ]; then
 	docker volume inspect $VOLUME_NAME > /dev/null && docker run --rm -v $VOLUME_NAME:/volume -w /volume busybox rm -rf /volume/caddy/certificates/$TLS_CA_NAME/wildcard_.$DOMAIN_NAME
 fi
 
-docker run -d -v $VOLUME_NAME:/data -v ./deploy/caddy-config:/srv/caddy-config --name $CONTAINER_NAME caddy:2.8-alpine caddy run --config /srv/caddy-config/Caddyfile --adapter caddyfile
+docker run -d -v $VOLUME_NAME:/data -v $caddyconfig:/srv/caddy-config --name $CONTAINER_NAME caddy:2.8-alpine caddy run --config /srv/caddy-config/Caddyfile --adapter caddyfile
 
 # Allow time for caddy to generate certs
 sleep 5
