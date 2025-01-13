@@ -7,21 +7,23 @@ The following documentation outlines the basic setup of Analytics Platform (D2E)
 # Getting Started 
 ## Pre-requisites
 - Install pre-requisite softwares for running D2E. Refer to the installation guide [here](./docs/1-setup/README.md). 
-- Install the d2e cli client by using the command in your terminal: 
+- Install the d2e cli client by run the command in your terminal: 
 ```bash
 npm install -g https://github.com/data2evidence/d2e/releases/download/latest/data2evidence-cli.tgz
 ```
 
 
-## Environment Variables and Credentials Setup 
-- Generate environment variables (Refer [here](./docs/1-setup/environment-variables.md) for more information on the environment variables generated). It is required to export `GH_USERNAME` and `GH_TOKEN` before.
+## Environment Variables and Credentials Setup
+- Create directory to store d2e configuration files and go to it:
 ```bash
-export GH_USERNAME=<GH_USERNAME>
-export GH_TOKEN=<GH_TOKEN>
+mkdir d2e
+cd d2e
 ```
 
+- Generate `.env` file with the environment variables (Refer [here](./docs/1-setup/environment-variables.md) for more information on the environment variables generated). It is required to set the `GH_USERNAME` and `GH_TOKEN` environment variables to run the command (see [here](./docs/1-setup/README.md) for instructions how to get the `GH_TOKEN`).
+
 ```bash
-d2e genenv
+GH_USERNAME=<GH_USERNAME> GH_TOKEN=<GH_TOKEN> d2e genenv
 ```
 
 - Login to docker registry to retrieve resources to run D2E.
@@ -83,6 +85,6 @@ Please find information how to add dataset and configure D2E [here](./docs/2-loa
 - Refer to the [documentation here](./docs/3-configure/8-cohort.md) for more details.
 
 ## Stopping Application
-1. Stop all containers: `yarn stop:minerva`
-2. Perform clean-up: `yarn clean:minerva`
+1. Stop all containers: `d2e stop`
+2. Perform clean-up: `d2e clean`
     - **WARNING**: This step removes all containers and volumes. You would need to re-run the [Environment Variables and Credentials](#environment-variables-and-credentials-setup) section for a fresh startup. 
