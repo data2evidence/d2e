@@ -18,27 +18,11 @@ export class DqdService {
   private dataQualityOverviewParser = new DataQualityOverviewParser();
 
   public async getDataQualityResult(flowRunId: string, token: string) {
-    const prefectApi = new PrefectAPI(token);
     const portalServerApi = new PortalServerAPI(token);
-    const result = await prefectApi.getFlowRunsArtifacts([flowRunId]);
-
-    if (result.length === 0) {
-      return null;
-    }
-
-    const match = this.regexMatcher(result);
-    if (!match) {
-      throw new Error("Invalid S3 path found");
-    }
-
-    const s3Path = match[0].slice(1, -1); // Removing surrounding brackets
-    const filePath = [this.extractRelativePath(s3Path)];
-    const dqdResult = await portalServerApi.getFlowRunResults(filePath);
-
+    const dqdResult = await this.getDqdResults(portalServerApi, [flowRunId]);
     if (this.isDataQualityResult(dqdResult[0])) {
       return dqdResult[0].CheckResults;
     }
-
     return null;
   }
 
@@ -287,11 +271,7 @@ export class DqdService {
     if (!flowRunIds.length) {
       return [];
     }
-    const dqdResults = await this.getDqdResults(
-      portalServerApi,
-      prefectApi,
-      flowRunIds
-    );
+    const dqdResults = await this.getDqdResults(portalServerApi, flowRunIds);
     const domainIndexes: { [key: string]: number } = {};
 
     return dqdResults
@@ -330,11 +310,7 @@ export class DqdService {
       PrefectTagNames.DQD
     );
     const flowRunIds = flowRuns.map((run) => run.id);
-    const dqdResults = await this.getDqdResults(
-      portalServerApi,
-      prefectApi,
-      flowRunIds
-    );
+    const dqdResults = await this.getDqdResults(portalServerApi, flowRunIds);
 
     return dqdResults!
       .filter((r) => {
@@ -345,28 +321,17 @@ export class DqdService {
 
   private async getDqdResults(
     portalServerApi: PortalServerAPI,
-    prefectApi: PrefectAPI,
     flowRunIds: string[]
   ) {
     let dqdResults;
-    const results = await prefectApi.getFlowRunsArtifacts(flowRunIds);
-    if (results.length === 0) {
-      console.log(
-        `No flow run artifacts result found for flowRunIds: ${flowRunIds}`
-      );
-      return results;
-    }
-    const match = this.regexMatcher(results);
-    const filePaths = [];
-    if (match) {
-      for (const m of match) {
-        const s3Path = m.slice(1, -1); // Removing the surrounding brackets []
-        const filePath = this.extractRelativePath(s3Path);
-        filePaths.push(filePath);
-      }
+    // file path '<flowrun_id>_dqd.json' pattern is same as followed in dqd_plugin
+    const filePaths = flowRunIds.map((id) => `results/${id}_dqd.json`);
+    try {
       dqdResults = await portalServerApi.getFlowRunResults(filePaths);
+      return dqdResults;
+    } catch (error) {
+      throw error;
     }
-    return dqdResults;
   }
 
   // Type Gurad helper functions
@@ -387,25 +352,6 @@ export class DqdService {
     }
     return false;
   };
-
-  private regexMatcher(result: any[]): string[] {
-    const regex = /\[s3:\/\/[^)]+\]/;
-    return result
-      .map((item) => item.description.match(regex))
-      .filter((match) => match)
-      .flat();
-  }
-
-  private extractRelativePath(path: string): string | null {
-    const prefix = "s3://flows/";
-    const start = path.indexOf(prefix);
-    if (start === -1) return null;
-
-    const end = path.indexOf(")", start);
-    if (end === -1) return path.substring(start + prefix.length);
-
-    return path.substring(start + prefix.length, end);
-  }
 
   private async getReleaseDate(
     releaseId: string,

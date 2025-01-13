@@ -49,8 +49,11 @@ GH_TOKEN=<GH_TOKEN>
 
 ```bash
 source .env.user
-GH_USERNAME=$GH_USERNAME GH_TOKEN=$GH_TOKEN d2e genenv
+GH_USERNAME=$GH_USERNAME GH_TOKEN=$GH_TOKEN d2e init
 ```
+
+> [!NOTE]
+> The Github access token is only used to pull docker images and npm packages from Github. We recommend to create a dedicated Github access token only with read:packages rights. (see [here](./docs/1-setup/README.md) how to create it)
 
 - Login to docker registry to retrieve resources to run D2E.
 
@@ -61,15 +64,17 @@ d2e login
 - Initialize D2E:
 
 ```bash
-d2e init
+d2e setup
 ```
 
 ## Application Setup
 
+Naviage to the folder where d2e repo is downloaded. Run the folllowing:
+
 - Run the command to get the neccessary docker images and run D2E:
 
 ```bash
-d2e start
+d2e startdemo
 ```
 
 **Note:**
@@ -81,10 +86,7 @@ d2e start
 
 - Input the URL https://localhost:41100/portal into a Chrome web browser. A ["**Proceed to localhost**"](docs/images/chrome/chrome-proceed-to-localhost.png) display is expected.
 - Select **Advanced** > **Proceed to localhost (unsafe)**
-
-> **The expected display is:**
->
-> ![](./docs/images/portal/LoginPage.png)
+- You will see the [**D2E login screen**](./docs/images/portal/LoginPage.png)
 
 ## Accessing Admin Portal
 
@@ -104,11 +106,29 @@ Additional info:
 - [Performing password change](./docs/2-load/1-initial-admin.md)
 - [Performing user management](./docs/2-load/2-users-roles.md)
 
-> Tip: For quick access to the Admin Portal, input URL https://localhost:41100/portal/systemadmin/user-overview in the search bar.
+> [!TIP]
+> For quick access to the Admin Portal, input URL https://localhost:41100/portal/systemadmin/user-overview in the search bar.
 
-## Configure D2E
+## Configure D2E with an own dataset
 
 Please find information how to add dataset and configure D2E [here](./docs/2-load/README.md)
+
+## Configure D2E with an own dataset
+
+Please find information how to add your own dataset and configure D2E [here](./docs/2-load/README.md)
+
+## Configure D2E using the demo dataset
+
+> [!NOTE]
+> You need to start Data2Evidence with `d2e startdemo` in order to use the demo dataset
+
+Open the D2E Portal and go to the Admin Portal. In the Admin portal click on **Setup** and than **Demo Setup**:
+
+1. Click on **Run** Button in **1. Setup demo database**
+2. Restart the services by executing `d2e stopdemo` and `d2e startdemo`
+3. Click on **Run** Button in **3. Setup demo dataset**
+
+Now you can go to the researcher portal use Data2Evidence with the demo dataset.
 
 ## Researcher Portal
 
@@ -122,3 +142,7 @@ Please find information how to add dataset and configure D2E [here](./docs/2-loa
 1. Stop all containers: `d2e stop`
 2. Perform clean-up: `d2e clean`
    - **WARNING**: This step removes all containers and volumes. You would need to re-run the [Environment Variables and Credentials](#environment-variables-and-credentials-setup) section for a fresh startup.
+- Stop all containers: `d2e stop` or `d2e stopdemo` if `d2e startdemo` was used
+- Perform clean-up: `d2e clean` or `d2e cleandemo`
+> [!WARNING]
+> `d2e clean` removes all containers and volumes. You would need to re-run the [Environment Variables and Credentials](#environment-variables-and-credentials-setup) section for a fresh startup. 
