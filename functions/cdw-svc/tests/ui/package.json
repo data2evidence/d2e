@@ -10,7 +10,7 @@
   "author": "",
   "repository": {
     "type": "git",
-    "url": "git@github.com:alp-os/alp-clinical-research.git"
+    "url": "git@github.com:data2evidence/alp-clinical-research.git"
   },
   "dependencies": {},
   "devDependencies": {

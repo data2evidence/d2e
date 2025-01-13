@@ -910,7 +910,7 @@ services:
     profiles: [perseus]
 
   alp-perseus-white-rabbit:
-    image: ghcr.io/data2evidence/whiterabbit:master
+    image: ghcr.io/data2evidence/whiterabbit:develop
     container_name: &c36 alp-perseus-white-rabbit-${BASE_PORT:-1}
     platform: linux/amd64
     environment:

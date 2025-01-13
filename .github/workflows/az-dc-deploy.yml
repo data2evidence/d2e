@@ -7,21 +7,7 @@ on:
       repo_full_name:
         description: Select RepoName
         options:
-          - alp-os/d2e
-          - alp-os/d2e-dev-afreen
-          - alp-os/d2e-dev-alicia
-          - alp-os/d2e-dev-brandan
-          - alp-os/d2e-dev-brian
-          - alp-os/d2e-dev-hengxian
-          - alp-os/d2e-dev-jerome
-          - alp-os/d2e-dev-khairul
-          - alp-os/d2e-dev-mwaiyee
-          - alp-os/d2e-dev-nicholas
-          - alp-os/d2e-dev-peter
-          - alp-os/d2e-dev-ragavan
-          - alp-os/d2e-dev-santan
-          - alp-os/d2e-dev-satish
-          - alp-os/d2e-dev-suwarno
+          - data2evidence/d2e
         required: true
         type: choice
       env:
