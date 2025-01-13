@@ -14,37 +14,41 @@ npm install -g https://github.com/data2evidence/d2e/releases/download/latest/dat
 
 
 ## Environment Variables and Credentials Setup
-- Create directory to store d2e configuration files and go to it. Please note that subsequent commands need to be executed in the directory:
+Create directory to store d2e configuration files and go to it. Please note that subsequent commands need to be executed in the directory:
 ```bash
 mkdir d2e
 cd d2e
 ```
 
-- Generate `.env` file with the environment variables (Refer [here](./docs/1-setup/environment-variables.md) for more information on the environment variables generated). It is required to set the `GH_USERNAME` (github username)  and `GH_TOKEN` (github access token) environment variables to run the command (see [here](./docs/1-setup/README.md) for instructions how to get the `GH_TOKEN`).
+Generate `.env` file with the environment variables (Refer [here](./docs/1-setup/environment-variables.md) for more information on the environment variables generated). It is required to set the `GH_USERNAME` (github username)  and `GH_TOKEN` (github access token) environment variables to run the command (see [here](./docs/1-setup/README.md) for instructions how to get the `GH_TOKEN`).
 
 ```bash
 GH_USERNAME=<GH_USERNAME> GH_TOKEN=<GH_TOKEN> d2e init
 ```
 > [!NOTE]
-> The Github access token is only used to pull docker images and npm packages from Github. We recommand to create a dedicated Github access token only with read:packages rights. (see [here](./docs/1-setup/README.md) how to create it)
+> The Github access token is only used to pull docker images and npm packages from Github. We recommend to create a dedicated Github access token only with read:packages rights. (see [here](./docs/1-setup/README.md) how to create it)
 
-- Login to docker registry to retrieve resources to run D2E.
+Login to docker registry to retrieve resources to run D2E.
 ```bash
 d2e login
 ```
 
 
-- Initialize D2E: 
+Initialize D2E: 
 ```bash
 d2e setup
 ```
 
 ## Application Setup
 
-- Run the command to get the neccessary docker images and run D2E: 
+Run the command to get the neccessary docker images and run D2E: 
 
 ```bash
 d2e start
+```
+or if you want to use the demo dataset:
+```bash
+d2e startdemo
 ```
 
 **Note:**
@@ -87,6 +91,6 @@ Please find information how to add dataset and configure D2E [here](./docs/2-loa
 - Refer to the [documentation here](./docs/3-configure/8-cohort.md) for more details.
 
 ## Stopping Application
-1. Stop all containers: `d2e stop`
-2. Perform clean-up: `d2e clean`
+- Stop all containers: `d2e stop` or `d2e stopdemo` if `d2e startdemo` was used
+- Perform clean-up: `d2e clean` or `d2e cleandemo`
     - **WARNING**: This step removes all containers and volumes. You would need to re-run the [Environment Variables and Credentials](#environment-variables-and-credentials-setup) section for a fresh startup. 
